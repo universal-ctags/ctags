@@ -147,7 +147,9 @@ OPTIONS
 Options starting with an underscore character, such as ``--_echo=msg``,
 are not listed here. They are experimental or for debugging purpose.
 
-Input/Output File
+.. _option_input_output_file:
+
+Input/Output File Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--exclude=[pattern]``
 	Add pattern to a list of excluded files and directories. This option may
@@ -264,7 +266,9 @@ Input/Output File
 ``-o tagfile``
 	Equivalent to ``-f tagfile``.
 
-Output Format
+.. _option_output_format:
+
+Output Format Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--filter-terminator=string``
 	Specifies a string to print to standard output following the tags for
@@ -355,8 +359,10 @@ Output Format
 	value for the ``TAG_FILE_ENCODING`` pseudo-tag. The default value of
 	``encoding`` is UTF-8.
 
-Language Selection and Mapping
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _option_lang_mapping:
+
+Language Selection and Mapping Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--language-force=language``
 	By default, @CTAGS_NAME_EXECUTABLE@ automatically selects the language
 	of a source file, ignoring those files whose language cannot be
@@ -487,7 +493,9 @@ Language Selection and Mapping
 	the option can be specified with different arguments multiple times
 	in a command line.
 
-Tags File Contents
+.. _option_tags_file_contents:
+
+Tags File Contents Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--excmd=type``
 	Determines the type of EX command used to locate tags in the source
@@ -903,7 +911,7 @@ Tags File Contents
 	Use forward searching patterns (e.g. /pattern/) (default). [Ignored
 	in etags mode]
 
-Option File
+Option File Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--options=pathname``
 	Read additional options from file or directory.
@@ -930,7 +938,7 @@ Option File
 	Add an optlib *directory* to or reset **optlib** path list.
 	By default, the optlib path list is empty.
 
-optlib
+optlib Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--kinddef-<LANG>=letter,name,description``
 	See ctags-optlib(7).
@@ -945,7 +953,9 @@ optlib
 ``--regex-<LANG>=/regexp/replacement/[kind-spec/][flags]``
 	See ctags-optlib(7).
 
-Language Specific
+.. _option_lang_specific:
+
+Language Specific Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--if0[=yes|no]``
 	Indicates a preference as to whether code within an "#if 0" branch of a
@@ -1067,7 +1077,9 @@ Language Specific
 	would cause the source file to be incorrectly parsed. Correct behavior
 	can be restored by specifying "-I CLASS=class".
 
-Listing
+.. _option_listing:
+
+Listing Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--list-aliases[=language|all]``
 	Lists the aliases for either the specified *language* or **all**
@@ -1346,7 +1358,9 @@ Listing
 	Print headers describing columns in ``--list-`` option output.
 	See also "`List options`_".
 
-Miscellaneous
+.. _option_misc:
+
+Miscellaneous Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``--help``
@@ -1395,7 +1409,7 @@ Miscellaneous
 	output, and then exits. This is guaranteed to always contain the string
 	"Universal Ctags".
 
-Obsoleted
+Obsoleted Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``-w``
 	This option is silently ignored for backward-compatibility with the

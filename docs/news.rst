@@ -19,12 +19,12 @@ New and extended options
 ``--exclude-exception``, an option complementing ``--exclude``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags(1) <ctags(1)>`.
+See :ref:`option_input_output_file` in :ref:`ctags(1) <ctags(1)>`.
 
 ``--maxdepth`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags(1) <ctags(1)>`.
+See :ref:`option_input_output_file` in :ref:`ctags(1) <ctags(1)>`.
 
 ``--input-encoding=ENCODING`` and ``--output-encoding=ENCODING``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,6 +84,8 @@ like this::
 ``--list-features`` helps you to know whether your ctags executable
 links to libiconv or not. You will find ``iconv`` in the output if it
 links to.
+
+See also :ref:`option_output_format` in :ref:`ctags(1) <ctags(1)>`.
 
 ``--map-<LANG>`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -147,15 +149,18 @@ Both `FOO` and `BAR` are registered as handlers for the spec `*.ABC`.
 spec-centric manner and ``--map-<LANG>`` provides a way to manipulate
 the langmap in a parser-centric manner.
 
+See also :ref:`option_lang_mapping` in :ref:`ctags(1) <ctags(1)>`.
+
 Guessing parser from file contents (``-G`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`guessing`.
+See :ref:`guessing` in :ref:`ctags(1) <ctags(1)>`.
 
 Including line number to pattern field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use ``--excmd=number``.  See :ref:`ctags(1) <ctags(1)>`.
+Use ``--excmd=number``.
+See :ref:`option_tags_file_contents` in :ref:`ctags(1) <ctags(1)>`.
 
 Long names in kinds, fields, and extra options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -184,6 +189,8 @@ characters by the shell.
 The available names can be listed with ``--list-kinds-full``,
 ``--list-fields``, or ``--list-extras``.
 
+See also :ref:`option_tags_file_contents` in :ref:`ctags(1) <ctags(1)>`.
+
 Wildcard in options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -202,6 +209,8 @@ source code the "wildcard"(``*``) option value has been introduced.
 ``--kinds-all=*``
 	Enables all available kinds for all available language parsers.
 
+See also :ref:`option_tags_file_contents` in :ref:`ctags(1) <ctags(1)>`.
+
 Extra tag entries (``--extras``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--extra`` option in Exuberant Ctags is renamed to ``--extras`` (plural) in
@@ -218,28 +227,31 @@ These extra tag entries are newly introduced.
 ..
 	NOT REVIEWED YET
 
+See also :ref:`option_tags_file_contents` in :ref:`ctags(1) <ctags(1)>`.
+
 Kinds synchronization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 See the description about ``--kinds-<LANG>`` and ``--list-kinds-full``
-option in :ref:`ctags(1) <ctags(1)>`.
+option on :ref:`option_tags_file_contents` in :ref:`ctags(1) <ctags(1)>`.
 
 Enabling/disabling pseudo-tags (``--pseudo-tags`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. IN MAN PAGE
 
-See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the
-option.
+See :ref:`option_tags_file_contents` in :ref:`ctags(1) <ctags(1)>` and
+:ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the option.
 
 ``--put-field-prefix`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags(1) <ctags(1)>`.
+See :ref:`option_tags_file_contents` in :ref:`ctags(1) <ctags(1)>`.
 
 "always" and "never" as an argument for ``--tag-relative``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``--tag-relative`` option is extend. See :ref:`ctags(1) <ctags(1)>`.
+``--tag-relative`` option is extend.
+See :ref:`option_tags_file_contents` in :ref:`ctags(1) <ctags(1)>`.
 
 Defining a parser specific extra
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,8 +269,10 @@ Newly introduced ``-D`` option extends the function provided by
 ``-I`` option.
 
 ``-D`` emulates the behaviour of the corresponding gcc option:
-it defines a C preprocessor macro. See `The new C/C++ parser <cxx>`
-for more details.
+it defines a C preprocessor macro.
+
+See :ref:`option_tags_file_contents` in :ref:`ctags(1) <ctags(1)>` and
+:ref:`cxx` for more details.
 
 Options for inspecting ctags internals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -293,6 +307,8 @@ header is easy because it starts with a `#` character.
 
 ``--with-list-header=no`` suppresses output of the column header.
 
+See also :ref:`option_listing` in :ref:`ctags(1) <ctags(1)>`.
+
 Notice messages and ``--quiet``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There were 3 classes of message in Exuberant Ctags.
@@ -315,6 +331,8 @@ can be used to disable them.
 
 *verbose* class messages are disabled by default, and ``--verbose`` or ``-V``
 can be used to enable them.
+
+See also :ref:`option_misc` in :ref:`ctags(1) <ctags(1)>`.
 
 Skipping utf-8 BOM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
