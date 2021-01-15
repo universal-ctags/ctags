@@ -86,9 +86,9 @@ AS_IF([test -n "$build"],      [ac_build_tool_prefix="$build-"],
 
 AC_LANG_PUSH([C])
 AC_PROG_CC
-AC_PROG_CC_C99
 _AC_COMPILER_EXEEXT
 _AC_COMPILER_OBJEXT
+AC_PROG_CC_C99
 AC_PROG_CPP
 
 dnl Restore the old definitions
