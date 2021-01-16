@@ -31,67 +31,54 @@ And it works exactly as if we had called:
 
 	ctags --exclude=Units --exclude=tinst-root --exclude=Tmain
 
-There are two categories of option files, though they both contain command
-line options: **preload** and **optlib** option files.
-
-.. Q: do we really want to call the non-preload option files "optlib"?
-	That name seems like an internal detail. Users of ctags never see that
-	name anywhere except in these docs, and it's weird. How about
-	"specified" option files, or "requested" or some such? (i.e., the file
-	is explicitly specified or requested when ctags is run)
-
-Preload option file
+Order of loading option files
 ......................................................................
 
-Preload option files are option files loaded by ``ctags`` automatically
-at start-up time. Which files are loaded at start-up time are very different
-from Exuberant Ctags.
+Option files are loaded by ``ctags`` automatically at start-up time.
+
+Which files are loaded at start-up time are very different from Exuberant Ctags.
 See :ref:`option-file_difference` for the differences and their intentions.
 
-At start-up time, Universal Ctags loads files having :file:`.ctags` as a
+At start-up time, ``ctags`` loads files having :file:`.ctags` as a
 file extension under the following statically defined directories:
 
-#. :file:`$XDG_CONFIG_HOME/ctags/`, or :file:`$HOME/.config/ctags/` if `$XDG_CONFIG_HOME` is not defined (on other than ``Windows``)
+#. :file:`$XDG_CONFIG_HOME/ctags/`, or :file:`$HOME/.config/ctags/` if :file:`$XDG_CONFIG_HOME` is not defined (on other than Windows)
 #. :file:`$HOME/.ctags.d/`
-#. :file:`$HOMEDRIVE$HOMEPATH/ctags.d/` (in Windows)
+#. :file:`$HOMEDRIVE$HOMEPATH/ctags.d/` (on Windows)
 #. :file:`./.ctags.d/`
 #. :file:`./ctags.d/`
 
 ``ctags`` visits the directories in the order listed above for preloading files.
 ``ctags`` loads files having :file:`.ctags` as file extension in alphabetical
-order (strcmp(3) is used for comparing, so for example
+order (``strcmp(3)`` is used for comparing, so for example
 :file:`.ctags.d/ZZZ.ctags` will be loaded *before* :file:`.ctags.d/aaa.ctags` in an ordinary locale).
 
-Optlib option file
+If a option file includes ``--options=PATHNAME`` option, specified files are
+loaded immediately as described in the next section. ``ctags`` load a option
+file only once if it is specified multiple times.
+
+Finally if ``--options=PATHNAME`` option is specified on ``ctags`` command line,
+option files specified are load.
+
+``--options=PATHNAME`` option
 ......................................................................
-
-From a syntax perspective, there is no difference between optlib option files
-and preload option files; ``ctags`` options are written line by line in a file.
-
-Optlib option files are option files not loaded at start-up time
-automatically. To load an optlib option file, specify a pathname
-for an optlib option file with ``--options=PATHNAME`` option
-explicitly. The pathname can be just the filename if it's in the
-current directory.
-
-Exuberant Ctags has the ``--options`` option, but you can only specify a
+Exuberant Ctags also has the ``--options`` option, but you can only specify a
 single file to load. Universal Ctags extends the option in two aspects:
 
 - You can specify a directory, to load all the files in that directory.
 - You can specify a PATH list to look in. See next section for details.
 
-
 Specifying a directory
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 If you specify a directory instead of a file as the argument for the
-``--options=PATHNAME``, Universal Ctags will load all files having a
+``--options=PATHNAME``, ``ctags`` will load all files having a
 :file:`.ctags` extension under said directory in alphabetical order.
 
 Specifying an optlib PATH list
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-Much like a command line shell, ``ctags`` has an "optlib PATH list" in which it
+Much like a command line shell, ``ctags`` has an *optlib PATH list* in which it
 can look for a file (or directory) to load.
 
 When loading a file (or directory) specified with ``--options=PATHNAME``,
@@ -100,19 +87,19 @@ An absolute path starts with '``/``' or '``.``'.
 If ``PATHNAME`` is an absolute path, ctags tries to load it immediately.
 
 If, on the contrary, is a relative path, ``ctags`` does two things: First,
-looks for the file (or directory) in "optlib PATH list" and tries to load it.
+looks for the file (or directory) in *optlib PATH list* and tries to load it.
 
 If the file doesn't exist in the PATH list, ``ctags``  treats ``PATHNAME`` as a
 path relative to the working directory and loads the file.
 
-By default, optlib path list is empty. To set or add a directory
+By default, *optlib PATH list* is empty. To set or add a directory
 path to the list, use ``--optlib-dir=PATH``.
 
 For setting (adding one after clearing)::
 
 	--optlib-dir=PATH
 
-For adding::
+For adding on the beginning of the PATH list::
 
 	--optlib-dir=+PATH
 
