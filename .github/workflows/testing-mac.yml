@@ -27,10 +27,8 @@ jobs:
       run: brew update
     - name: install tools and libraries
       run: |
-        # libxml2 requires python@3.9.
-        # However, the request is not satisfied with just installing libxml2.
-        brew install libxml2 || brew link --overwrite python@3.9
-        brew install autoconf automake pkg-config jansson libyaml bash gdb docutils
+        brew upgrade python@3.9 || brew link --overwrite python@3.9
+        brew install autoconf automake pkg-config bash libxml2 jansson libyaml gdb docutils
     - name: autogen.sh
       run: ./autogen.sh
     - name: report the version of cc
