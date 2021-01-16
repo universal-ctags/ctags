@@ -4,6 +4,7 @@
 # License: GPL-2
 
 CTAGS=$1
+INPUT0=/tmp/u-ctags/input-0.c
 
 . ../utils.sh
 
@@ -11,20 +12,21 @@ if [ $(id -u) = 0 ] && ! sudo -u '#1' $CTAGS --version > /dev/null; then
 	skip "sudo needed in this test case doesn't work expectedly on this platform (execution)"
 fi
 
-echo "int v0;" > input-0.c
-chmod a-r input-0.c
+mkdir -p ${INPUT0%/*}
+echo "int v0;" > ${INPUT0}
+chmod a-r ${INPUT0}
 
-if [ $(id -u) = 0 ] && sudo -u '#1' cat input-0.c > /dev/null 2>&1; then
-	rm input-0.c
+if [ $(id -u) = 0 ] && sudo -u '#1' cat ${INPUT0} > /dev/null 2>&1; then
+	rm ${INPUT0}
 	skip "sudo needed in this test case doesn't work expectedly on this platform (file reading)"
-elif [ $(id -u) != 0 ] && cat input-0.c > /dev/null 2>&1; then
-	rm input-0.c
+elif [ $(id -u) != 0 ] && cat ${INPUT0} > /dev/null 2>&1; then
+	rm ${INPUT0}
 	skip "chmod a-r doesn't work expectedly on this platform"
 fi
 
 
 {
-	echo input-0.c
+	echo ${INPUT0}
 	echo input-1.c
 } | {
 	if [ $(id -u) = 0 ]; then
@@ -34,4 +36,4 @@ fi
 		$CTAGS --quiet --options=NONE -L - -o -
 	fi
 }
-rm input-0.c
+rm ${INPUT0}

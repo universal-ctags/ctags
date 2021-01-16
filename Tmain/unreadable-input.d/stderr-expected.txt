@@ -1,1 +1,1 @@
-ctags: Warning: cannot open "input-0.c" : Permission denied
+ctags: Warning: cannot open "/tmp/u-ctags/input-0.c" : Permission denied
