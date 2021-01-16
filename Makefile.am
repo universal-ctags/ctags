@@ -235,4 +235,5 @@ SUFFIXES += .1.rst .1 .5.rst .5 .7.rst .7
 	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@
 .7.rst.7:
 	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@
+CLEANFILES += $(man_MANS)
 endif
