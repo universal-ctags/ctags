@@ -140,8 +140,9 @@ units: $(CTAGS_TEST)
 
 clean-units:
 	$(SILENT) echo Cleaning test units
-	$(SILENT) builddir=$$(pwd); \
-		$(SHELL) $(srcdir)/misc/units clean $${builddir}/Units
+	$(SILENT) if test -d $$(pwd)/Units; then \
+		$(SHELL) $(srcdir)/misc/units clean $$(pwd)/Units; \
+	fi
 
 #
 # VALIDATE-INPUT Target
@@ -201,8 +202,9 @@ tmain: $(CTAGS_TEST) $(READ_TEST)
 
 clean-tmain:
 	$(SILENT) echo Cleaning main part tests
-	$(SILENT) builddir=$$(pwd); \
-		$(SHELL) $(srcdir)/misc/units clean-tmain $${builddir}/Tmain
+	$(SILENT) if test -d $$(pwd)/Tmain; then \
+		$(SHELL) $(srcdir)/misc/units clean-tmain $$(pwd)/Tmain; \
+	fi
 
 tlib: $(MINI_GEANY_TEST)
 	$(V_RUN) \
