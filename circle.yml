@@ -225,6 +225,38 @@ jobs:
            name: Test
            command: |
              test -f out/bin/ctags && ( file out/bin/ctags | grep -q 'ARM aarch64' )
+   centos6:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: centos:6
+     steps:
+       - run:
+           name: Rearrange CentOS-Base.repo file
+           command: |
+             sed -i "s|#baseurl=|baseurl=|g" /etc/yum.repos.d/CentOS-Base.repo
+             sed -i "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-Base.repo
+             sed -i 's|mirror|vault|g' /etc/yum.repos.d/CentOS-Base.repo
+       - run:
+           name: Install tools for building
+           command: |
+             yum install -y git gcc make autoconf automake pkgconfig
+       - run:
+           name: Get the source code of u-ctags
+           command: |
+             git clone https://github.com/universal-ctags/ctags
+       - run:
+           name: Build
+           command: |
+             (
+             cd ctags
+             bash ./autogen.sh
+             ./configure --enable-debugging
+             make -j 2
+             )
+       - run:
+           name: Don't run test cases because python3 is no available
+           command: |
+             :
 
 workflows:
   version: 2
@@ -236,3 +268,4 @@ workflows:
       - centos_make
       - fedora33_gmake
       - fedora33_cross_aarch64
+      - centos6
