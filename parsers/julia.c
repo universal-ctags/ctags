@@ -44,19 +44,56 @@ typedef enum {
     K_MODULE,
     K_STRUCT,
     K_TYPE,
-    // K_IMPORT,
+    K_UNKNOWN,
     K_NONE
 } JuliaKind;
+
+typedef enum {
+    JULIA_MODULE_IMPORTED,
+    JULIA_MODULE_USED,
+    JULIA_MODULE_NAMESPACE,
+} juliaModuleRole;
+
+typedef enum {
+    JULIA_UNKNOWN_IMPORTED,
+    JULIA_UNKNOWN_USED,
+} juliaUnknownRole;
+
+/*
+*  using X               X = (kind:module, role:used)
+*
+*  using X: a, b         X = (kind:module, role:namespace)
+*                     a, b = (kind:unknown, role:used, scope:module:X)
+*
+*  import X              X = (kind:module, role:imported)
+*
+*  import X.a, Y.b    X, Y = (kind:module, role:namespace)
+*                     a, b = (kind:unknown, role:imported, scope:module:X)
+*
+*  import X: a, b     Same as the above one
+*/
+static roleDefinition JuliaModuleRoles [] = {
+    { true, "imported", "loaded by \"import\"" },
+    { true, "used", "loaded by \"using\"" },
+    { true, "namespace", "only some symbols in it are imported" },
+};
+
+static roleDefinition JuliaUnknownRoles [] = {
+    { true, "imported", "loaded by \"import\"" },
+    { true, "used", "loaded by \"using\""},
+};
 
 static kindDefinition JuliaKinds [] = {
     { true, 'c', "constant", "Constants"    },
     { true, 'f', "function", "Functions"    },
     { true, 'g', "field",    "Fields"       },
     { true, 'm', "macro",    "Macros"       },
-    { true, 'n', "module",   "Modules"      },
+    { true, 'n', "module",   "Modules",
+      ATTACH_ROLES(JuliaModuleRoles) },
     { true, 's', "struct",   "Structures"   },
     { true, 't', "type",     "Types"        },
-    // { true, 'x', "unknown",  "Imported name"}
+    { true, 'x', "unknown", "name defined in other modules",
+      .referenceOnly = true, ATTACH_ROLES(JuliaUnknownRoles) },
 };
 
 typedef enum {
@@ -81,6 +118,7 @@ typedef enum {
     TOKEN_ENUM,
     TOKEN_TYPE,
     TOKEN_IMPORT,         /*  = 20 */
+    TOKEN_USING,
     TOKEN_EXPORT,
     TOKEN_NEWLINE,
     TOKEN_SEMICOLON,
@@ -107,7 +145,7 @@ static const keywordTable JuliaKeywordTable [] = {
     { "module",    TOKEN_MODULE       },
     { "baremodule",TOKEN_MODULE       },
 
-    { "using",     TOKEN_IMPORT       },
+    { "using",     TOKEN_USING        },
     { "import",    TOKEN_IMPORT       },
 
     { "export",    TOKEN_EXPORT       },
@@ -638,6 +676,7 @@ static int parseIdentifier (lexerState *lexer)
     if ((k == TOKEN_OPEN_BLOCK)
         || (k == TOKEN_MODULE)
         || (k == TOKEN_IMPORT)
+        || (k == TOKEN_USING)
         || (k == TOKEN_EXPORT)
         || (k == TOKEN_CONST)
         || (k == TOKEN_MACRO)
@@ -838,6 +877,24 @@ static void addTag (vString* ident, const char* type, const char* arg_list, int 
 
     tag.extensionFields.signature = arg_list;
     /* tag.extensionFields.varType = type; */  /* Needs a workaround */
+    if (parent_kind != K_NONE)
+    {
+        tag.extensionFields.scopeKindIndex = parent_kind;
+        tag.extensionFields.scopeName = vStringValue(scope);
+    }
+    makeTagEntry(&tag);
+}
+
+static void addReferenceTag (vString* ident, int kind, int role, unsigned long line, MIOPos pos, vString* scope, int parent_kind)
+{
+    if (kind == K_NONE)
+    {
+        return;
+    }
+    tagEntryInfo tag;
+    initRefTagEntry(&tag, vStringValue(ident), kind, role);
+    tag.lineNumber = line;
+    tag.filePosition = pos;
     if (parent_kind != K_NONE)
     {
         tag.extensionFields.scopeKindIndex = parent_kind;
@@ -1155,30 +1212,75 @@ static void parseModule (lexerState *lexer, vString *scope, int parent_kind)
     parseExpr(lexer, true, K_MODULE, scope);
 }
 
-/* Import format:
- * [ "import" | "using" ] <ident> [: <name>]
+/*
+ * Parse comma separated entity in import/using expressions. An entity could be
+ * in the form of "Module" or "Module.symbol". The lexer should be at the end
+ * of "Module", and this function will take it to the end of the entity
+ * (whitespaces also skipped).
  */
-static void parseImport (lexerState *lexer, vString *scope, int parent_kind)
+static void parseImportEntity (lexerState *lexer, vString *scope, int token_type, int parent_kind)
 {
-    vString *name = vStringNew();
-
-    /* capture the imported name */
-    advanceToken(lexer, true);
-    if (lexer->cur_c == ':')
+    if (lexer->cur_c == '.')
     {
-        advanceAndStoreChar(lexer);
-        vStringCopy(name, lexer->token_str);
+        if (token_type == TOKEN_IMPORT)
+        {
+            vString *module_name = vStringNewCopy(lexer->token_str);
+            addReferenceTag(module_name, K_MODULE, JULIA_MODULE_NAMESPACE, lexer->line, lexer->pos, scope, parent_kind);
+            advanceChar(lexer);
+            advanceToken(lexer, true);
+            addReferenceTag(lexer->token_str, K_UNKNOWN, JULIA_UNKNOWN_IMPORTED, lexer->line, lexer->pos, module_name, K_MODULE);
+            vStringDelete(module_name);
+        }
+        else /* if (token_type == TOKEN_USING) */
+        {
+            /* using Module.symbol is invalid, so we advance the lexer but don't tag it. */
+            advanceChar(lexer);
+            advanceToken(lexer, true);
+        }
+    }
+    else
+    {
+        if (token_type == TOKEN_IMPORT)
+        {
+            addReferenceTag(lexer->token_str, K_MODULE, JULIA_MODULE_IMPORTED, lexer->line, lexer->pos, scope, parent_kind);
+        }
+        else /* if (token_type == TOKEN_USING) */
+        {
+            addReferenceTag(lexer->token_str, K_MODULE, JULIA_MODULE_USED, lexer->line, lexer->pos, scope, parent_kind);
+        }
+    }
+}
+
+/* Parse import/using expressions with a colon, like: */
+/* import Module: symbol1, symbol2 */
+/* using Module: symbol1, symbol2 */
+/* The lexer should be at the end of "Module", and this function will take it
+ * to the end of the token after this expression (whitespaces also skipped). */
+static void parseColonImportExpr (lexerState *lexer, vString *scope, int token_type, int parent_kind)
+{
+    int symbol_role;
+    if (token_type == TOKEN_IMPORT)
+    {
+        symbol_role = JULIA_UNKNOWN_IMPORTED;
+    }
+    else /* if (token_type == TOKEN_USING) */
+    {
+        symbol_role = JULIA_UNKNOWN_USED;
+    }
+    vString *name = vStringNewCopy(lexer->token_str);
+    addReferenceTag(name, K_MODULE, JULIA_MODULE_NAMESPACE, lexer->line, lexer->pos, scope, parent_kind);
+    advanceChar(lexer);
+    advanceToken(lexer, true);
+    if (lexer->cur_token == TOKEN_NEWLINE)
+    {
         advanceToken(lexer, true);
     }
-
     while (lexer->cur_token == TOKEN_IDENTIFIER || lexer->cur_token == TOKEN_MACROCALL)
     {
-        // addTag(lexer->token_str, vStringValue(name), NULL, K_IMPORT, lexer->line, lexer->pos, scope, parent_kind);
-
-        skipWhitespace(lexer, false);
+        addReferenceTag(lexer->token_str, K_UNKNOWN, symbol_role, lexer->line, lexer->pos, name, K_MODULE);
         if (lexer->cur_c == ',')
         {
-            advanceNChar(lexer, 1);
+            advanceChar(lexer);
             advanceToken(lexer, true);
             if (lexer->cur_token == TOKEN_NEWLINE)
             {
@@ -1190,8 +1292,43 @@ static void parseImport (lexerState *lexer, vString *scope, int parent_kind)
             advanceToken(lexer, true);
         }
     }
-
     vStringDelete(name);
+}
+
+/* Import format:
+ * [ "import" | "using" ] <ident> [: <name>]
+ */
+static void parseImport (lexerState *lexer, vString *scope, int token_type, int parent_kind)
+{
+    /* capture the imported name */
+    advanceToken(lexer, true);
+    /* import Mod1: symbol1, symbol2 */
+    /* using Mod1: symbol1, symbol2 */
+    if (lexer->cur_c == ':')
+    {
+        parseColonImportExpr(lexer, scope, token_type, parent_kind);
+    }
+    /* All other situations, like import/using Mod1, Mod2.symbol1, Mod3... */
+    else
+    {
+        while (lexer->cur_token == TOKEN_IDENTIFIER || lexer->cur_token == TOKEN_MACROCALL)
+        {
+            parseImportEntity(lexer, scope, token_type, parent_kind);
+            if (lexer->cur_c == ',')
+            {
+                advanceChar(lexer);
+                advanceToken(lexer, true);
+                if (lexer->cur_token == TOKEN_NEWLINE)
+                {
+                    advanceToken(lexer, true);
+                }
+            }
+            else
+            {
+                advanceToken(lexer, true);
+            }
+        }
+    }
 }
 
 /* Structs format:
@@ -1317,8 +1454,10 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
                 parseType(lexer, scope, kind);
                 break;
             case TOKEN_IMPORT:
-                parseImport(lexer, scope, kind);
+                parseImport(lexer, scope, TOKEN_IMPORT, kind);
                 break;
+            case TOKEN_USING:
+                parseImport(lexer, scope, TOKEN_USING, kind);
             case TOKEN_IDENTIFIER:
                 if (lexer->first_token && lexer->cur_c == '.')
                 {
