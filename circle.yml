@@ -235,7 +235,7 @@ jobs:
            command: |
              sed -i "s|#baseurl=|baseurl=|g" /etc/yum.repos.d/CentOS-Base.repo
              sed -i "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-Base.repo
-             sed -i "s|http://mirror\.centos\.org/centos/\$releasever|https://vault\.centos\.org/6.10|g" /etc/yum.repos.d/CentOS-Base.repo
+             sed -i 's|mirror|vault|g' /etc/yum.repos.d/CentOS-Base.repo
        - run:
            name: Install tools for building
            command: |
