@@ -60,6 +60,7 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	building.rst
 	man-pages.rst
 	parsers.rst
+	option-file.rst
 	optlib.rst
 	output-format.rst
 	interactive-mode.rst
