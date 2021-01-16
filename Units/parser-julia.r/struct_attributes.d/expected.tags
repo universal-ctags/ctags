@@ -1,0 +1,3 @@
+Test	input.jl	/^Base.@kwdef struct Test$/;"	s
+a	input.jl	/^    a::Float64 = 1E12$/;"	g	struct:Test
+b	input.jl	/^    b::Float64 = pi$/;"	g	struct:Test

@@ -1374,9 +1374,9 @@ static void parseStruct (lexerState *lexer, vString *scope, int parent_kind)
     /* Parse fields and inner constructors */
     while (lexer->cur_token != TOKEN_EOF && lexer->cur_token != TOKEN_CLOSE_BLOCK)
     {
-        if (lexer->cur_token == TOKEN_IDENTIFIER)
+        if (lexer->cur_token == TOKEN_IDENTIFIER && lexer->first_token)
         {
-            if (lexer->first_token && strcmp(vStringValue(lexer->token_str), vStringValue(name)) == 0)
+            if (strcmp(vStringValue(lexer->token_str), vStringValue(name)) == 0)
             {
                 /* inner constructor */
                 parseShortFunction(lexer, scope, K_STRUCT);
