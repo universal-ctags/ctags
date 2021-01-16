@@ -9,8 +9,6 @@ Extending ctags with Regex parser (*optlib*)
 	:depth: 3
 	:local:
 
-----
-
 .. TODO:
 	review extras, fields, and roles sections
 	possibly restructure this file's section ordering
@@ -20,20 +18,23 @@ Extending ctags with Regex parser (*optlib*)
 	add a section on langdef base parser flag, including
 		shared/dedicated/bidirectional directions
 
-----
-
 Exuberant Ctags allows a user to add a new parser to ctags with ``--langdef=<LANG>``
 and ``--regex-<LANG>=...`` options.
-
 Universal Ctags follows and extends the design of Exuberant Ctags in more
-powerful ways, as described in the following chapters.
+powerful ways and call the feature as *optlib parser*, which is described in in
+:ref:`ctags-optlib(7) <ctags-optlib(7)>` and the following sections.
 
-Universal Ctags encourages users to share the new parsers defined by
-their options. See ":ref:`submitting_optlib`" to know how you can share your
-parser definition with others.
+:ref:`ctags-optlib(7) <ctags-optlib(7)>` is the primary document of the *optlib
+parser* feature. The following sections provide additional information and more
+advanced features. Note that some of the features are experimental, and will be
+marked as such in the documentation.
 
-Note that some of the new features are experimental, and will be marked as such
-in the documentation.
+Lots of *optlib parsers* are included in Universal Ctags,
+`optlib/*.ctags <https://github.com/universal-ctags/ctags/tree/master/optlib>`_.
+They will be good examples when you develop your own parsers.
+
+A *optlib parser* can be translated into C source code. Your optlib parser can
+thus easily become a built-in parser. See :ref:`optlib2c` for details.
 
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1737,6 +1738,25 @@ Subparsers can be listed with ``--list-subparser``:
     ctags: Notice: No options will be read from files or environment
     #NAME                          BASEPARSER           DIRECTION
     linux                          C                    base => sub {shared}
+
+.. _optlib2c:
+
+Translating an option file into C source code (optlib2c)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Universal Ctags has an ``optlib2c`` script that translates an option file into C
+source code. Your optlib parser can thus easily become a built-in parser.
+
+To add your optlib file, ``foo.ctags``, into ``ctags`` do the following steps;
+
+* copy ``foo.ctags`` file on ``optlib/`` directory
+* add ``foo.ctags`` on ``OPTLIB2C_INPUT`` variable in ``makefiles/optlib2c_input.mak``
+* add ``fooParser`` on ``PARSER_LIST`` macro variable in ``main/parser_p.h``
+
+You are encouraged to submit your :file:`.ctags` file to our repository on
+github through a pull request. See :ref:`contributions` for more details.
+
+.. TODO: the following section is a duplicate of "Contribution" chatper and has
+   less information than it.  To be removed.
 
 .. _submitting_optlib:
 

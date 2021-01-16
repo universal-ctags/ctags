@@ -113,9 +113,8 @@ Tips for writing an option file
   section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 * Universal Ctags has an ``optlib2c`` script that translates an option file
-  into C source code. Your optlib parser can thus easily become a built-in parser,
-  by contributing to Universal Ctags' github. You could be famous!
-  Examples are in the ``optlib`` directory in Universal Ctags source tree.
+  into C source code. Your optlib parser can thus easily become a built-in parser.
+  See :ref:`optlib2c` for details.
 
 .. _option-file_difference:
 
