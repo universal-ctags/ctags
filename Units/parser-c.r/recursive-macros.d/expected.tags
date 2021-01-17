@@ -1,0 +1,1 @@
+dummy	input.c	/^int dummy;$/;"	v	typeref:typename:int

@@ -1,0 +1,2 @@
+dummy	input.c	/^int dummy;$/;"	v	typeref:typename:int
+p	input.c	/^int p;$/;"	v	typeref:typename:int ((((((((+p)+p)+p)+p)+p)+p)+p)+p)
