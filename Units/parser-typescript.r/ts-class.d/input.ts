@@ -124,3 +124,16 @@ class Ct<T> extends A<T> implements B<T>, D, E<T> {
 class A<T> implements I<T>
 {
 }
+
+export class TasksService {
+  private tasks: string[] = [];
+  private taskObj: object = {};
+
+  getAllTasks(): string[] {
+    return this.tasks;
+  }
+
+  getTaskObj(): object {
+    return this.taskObj;
+  }
+}
