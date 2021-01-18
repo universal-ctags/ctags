@@ -14,6 +14,10 @@ struct OurRational{T<:Integer} <: Real
         if num == 0 && den == 0
             error("invalid rational: 0//0")
         end
+        # Bug with short function misidentification of == and =>
+        length(num) == 0
+        length(den) => 0
+        
         g = gcd(den, num)
         num = div(num, g)
         den = div(den, g)

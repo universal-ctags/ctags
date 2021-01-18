@@ -1033,10 +1033,10 @@ static void parseShortFunction (lexerState *lexer, vString *scope, int parent_ki
         advanceToken(lexer, true, false);
     }
 
-    /* scan equal sign */
-    if (lexer->cur_token != '=' &&
-        lexer->cur_c != '=' &&
-        lexer->cur_c != '>')
+    /* scan equal sign, ignore `==` and `=>` */
+    if (!(lexer->cur_token == '=' &&
+          lexer->cur_c != '=' &&
+          lexer->cur_c != '>'))
     {
         vStringDelete(name);
         vStringDelete(arg_list);
