@@ -60,14 +60,15 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	building.rst
 	man-pages.rst
 	parsers.rst
-	output-format.rst
-	news.rst
-	interactive-mode.rst
-	reporting.rst
-	contributions.rst
+	option-file.rst
 	optlib.rst
+	output-format.rst
+	interactive-mode.rst
+	news.rst
 	extending.rst
 	tips.rst
 	testing.rst
+	reporting.rst
+	contributions.rst
 	other-projects.rst
 	developers.rst

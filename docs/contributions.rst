@@ -1,3 +1,5 @@
+.. _contributions:
+
 ======================================================================
 Contributions
 ======================================================================
@@ -251,32 +253,45 @@ Write a test case for Tmain or Units.
 
 Don't remove an option, especially if it exists in Exuberant Ctags.
 
-Writing parser in regex
+Writing parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-You can write a parser with regex patterns.
+There are two ways to write a parser, writing in C and using *optlib parser*.
 
-`optlib2c`, a part of the Universal Ctags build system can translate
-a parser written in regex patterns into C source code.
+Universal Ctags extends the *optlib parser* feature so extensively that it can
+implement most of functions of a parser.
+*optlib parser* is also suitable for prototyping.
 
-The `man` parser is one example described in regex patterns.
-See the output of the following command line for details::
+See :ref:`ctags-optlib(7) <ctags-optlib(7)>` and :ref:`optlib` for details.
+See :ref:`optlib2c` how to add a optlib parser on ``ctags``.
 
-	git show 0a9e78a8a40e8595b3899e2ad249c8f2c3819c8a^..89aa548
-
-Translated C code is also committed to our git repository. The
-translated code is useful for building ctags on the platforms where
-optlib2c doesn't run.
-
-The regex approach is also suitable for prototyping.
+For writing a parser in C see :ref:`writing_parser_in_c`.
 
 Build script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To add your optlib parser, ``foo.ctags``, into ``ctags`` do the following steps;
 
-Add your `.c` file to `source.mak`.
+* put ``foo.ctags`` file on ``optlib/`` directory
+* add ``foo.ctags`` on ``OPTLIB2C_INPUT`` variable in ``makefiles/optlib2c_input.mak``
+* add ``fooParser`` on ``PARSER_LIST`` macro variable in ``main/parser_p.h``
+* add ``foo`` on the list in the section "New parsers" in ``docs/news.rst``
+* add ``"..\optlib\foo.c"`` in ``win32/ctags_vs2013.vcxproj``
+* add ``"..\optlib\foo.c"`` in  ``win32/ctags_vs2013.vcxproj.filters``
 
-In addition, update `win32/ctags_vs2013.vcxproj` and
-`win32/ctags_vs2013.vcxproj.filters`. Otherwise our CI process run on
-Appveyor will fail.
+Translated C code is also committed to our git repository. The translated code
+is useful for building ctags on the platforms where optlib2c doesn't run.
+
+To add your parser file, ``foo.c``, into ``ctags`` do the following steps;
+
+* put ``foo.c`` file on ``parsers/`` directory
+* add ``foo.c`` on ``PARSER_SRCS`` variable in ``sources.mak``
+* add ``foo`` on the list in the section "New parsers" in ``docs/news.rst``
+* add ``"..\parsers\foo.c"`` in ``win32/ctags_vs2013.vcxproj``
+* add ``"..\parsers\foo.c"`` in  ``win32/ctags_vs2013.vcxproj.filters``
+
+Without updating win32 files our CI process run on Appveyor will fail.
+
+See `this pull request <https://github.com/universal-ctags/ctags/pull/2765>`_
+for the `Meson` parser as an example of optlib parser.
 
 Testing
 ---------------------------------------------------------------------

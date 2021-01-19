@@ -1,6 +1,8 @@
 ctags Internal API
 ---------------------------------------------------------------------
 
+.. _input-text-stream:
+
 Input text stream
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -277,6 +279,7 @@ writes parsers. tokenInfo API is the first fruit of my study.
 
 TBW
 
+.. _output-tag-stream:
 
 Output tag stream
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

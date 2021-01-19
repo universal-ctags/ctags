@@ -9,8 +9,6 @@ Extending ctags with Regex parser (*optlib*)
 	:depth: 3
 	:local:
 
-----
-
 .. TODO:
 	review extras, fields, and roles sections
 	possibly restructure this file's section ordering
@@ -20,228 +18,23 @@ Extending ctags with Regex parser (*optlib*)
 	add a section on langdef base parser flag, including
 		shared/dedicated/bidirectional directions
 
-----
-
-.. Q: shouldn't the section about option files (preload especially) go in
-	their own section somewhere else in the docs? They're not specifically
-	for "Extending ctags" - they can be used for any command options that
-	you want to use permanently. It's really the new language parsers using
-	--regex-<LANG> and such that are about "Extending ctags", no?
-
 Exuberant Ctags allows a user to add a new parser to ctags with ``--langdef=<LANG>``
 and ``--regex-<LANG>=...`` options.
-
 Universal Ctags follows and extends the design of Exuberant Ctags in more
-powerful ways, as described in the following chapters.
+powerful ways and call the feature as *optlib parser*, which is described in in
+:ref:`ctags-optlib(7) <ctags-optlib(7)>` and the following sections.
 
-Universal Ctags encourages users to share the new parsers defined by
-their options. See ":ref:`submitting_optlib`" to know how you can share your
-parser definition with others.
+:ref:`ctags-optlib(7) <ctags-optlib(7)>` is the primary document of the *optlib
+parser* feature. The following sections provide additional information and more
+advanced features. Note that some of the features are experimental, and will be
+marked as such in the documentation.
 
-Note that some of the new features are experimental, and will be marked as such
-in the documentation.
+Lots of *optlib parsers* are included in Universal Ctags,
+`optlib/*.ctags <https://github.com/universal-ctags/ctags/tree/master/optlib>`_.
+They will be good examples when you develop your own parsers.
 
-.. _option_files:
-
-Option files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-An "option file" is a file in which command line options are written line
-by line. ``ctags`` loads it and runs as if the options in the file were
-passed through command line.
-
-The following file is an example of an option file:
-
-.. code-block:: perl
-
-	# Exclude directories that don't contain real code
-	--exclude=Units
-		# indentation is ignored
-		--exclude=tinst-root
-	--exclude=Tmain
-
-The character `#` can be used as a start marker of a line comment.
-Whitespaces at the start of lines are ignored during loading.
-
-And it works exactly as if we had called:
-
-.. code-block:: sh
-
-	ctags --exclude=Units --exclude=tinst-root --exclude=Tmain
-
-There are two categories of option files, though they both contain command
-line options: **preload** and **optlib** option files.
-
-.. Q: do we really want to call the non-preload option files "optlib"?
-	That name seems like an internal detail. Users of ctags never see that
-	name anywhere except in these docs, and it's weird. How about
-	"specified" option files, or "requested" or some such? (i.e., the file
-	is explicitly specified or requested when ctags is run)
-
-Preload option file
-......................................................................
-
-Preload option files are option files loaded by ``ctags`` automatically
-at start-up time. Which files are loaded at start-up time are very different
-from Exuberant Ctags.
-
-At start-up time, Universal Ctags loads files having :file:`.ctags` as a
-file extension under the following statically defined directories:
-
-#. :file:`$XDG_CONFIG_HOME/ctags/`, or :file:`$HOME/.config/ctags/` if `$XDG_CONFIG_HOME` is not defined (on other than ``Windows``)
-#. :file:`$HOME/.ctags.d/`
-#. :file:`$HOMEDRIVE$HOMEPATH/ctags.d/` (in Windows)
-#. :file:`./.ctags.d/`
-#. :file:`./ctags.d/`
-
-``ctags`` visits the directories in the order listed above for preloading files.
-``ctags`` loads files having :file:`.ctags` as file extension in alphabetical
-order (strcmp(3) is used for comparing, so for example
-:file:`.ctags.d/ZZZ.ctags` will be loaded *before* :file:`.ctags.d/aaa.ctags` in an ordinary locale).
-
-Quoted from man page of Exuberant Ctags:
-
-	FILES
-		- /ctags.cnf (on MSDOS, MSWindows only)
-		- /etc/ctags.conf
-		- /usr/local/etc/ctags.conf
-		- $HOME/.ctags
-		- $HOME/ctags.cnf (on MSDOS, MSWindows only)
-		- .ctags
-		- ctags.cnf (on MSDOS, MSWindows only)
-
-	If any of these configuration files exist, each will
-	be expected to contain a set of default options
-	which are read in the order listed when ctags
-	starts, but before the CTAGS environment variable is
-	read or any command line options are read.  This
-	makes it possible to set up site-wide, personal or
-	project-level defaults. It is possible to compile
-	ctags to read an additional configuration file
-	before any of those shown above, which will be
-	indicated if the output produced by the --version
-	option lists the "custom-conf" feature. Options
-	appearing in the CTAGS environment variable or on
-	the command line will override options specified in
-	these files. Only options will be read from these
-	files.  Note that the option files are read in
-	line-oriented mode in which spaces are significant
-	(since shell quoting is not possible). Each line of
-	the file is read as one command line parameter (as
-	if it were quoted with single quotes). Therefore,
-	use new lines to indicate separate command-line
-	arguments.
-
-What follows explains the differences and their intentions...
-
-
-Directory oriented configuration management
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-
-Exuberant Ctags provides a way to customize ctags with options like
-``--langdef=<LANG>`` and ``--regex-<LANG>``. These options are
-powerful and make ctags popular for programmers.
-
-Universal Ctags extends this idea; we have added new options for
-defining a parser, and have extended existing options. Defining
-a new parser with the options is more than "customizing" in
-Universal Ctags.
-
-To make easier the maintenance a parser defined using the options, you can put
-each language parser in a different options file. Universal Ctags doesn't
-preload a single file. Instead, Universal Ctags loads all the files having the
-:file:`.ctags` extension under the previously specified directories. If you
-have multiple parser definitions, put them in different files.
-
-Avoiding option incompatibility issues
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-
-The Universal Ctags options are different from those of Exuberant Ctags,
-therefore Universal Ctags doesn't load any of the files Exuberant Ctags loads at
-start-up. Otherwise there would be incompatibility issues if Exuberant Ctags
-loaded an option file that used a newly introduced option in Universal Ctags,
-and vice versa.
-
-No system wide configuration
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-
-To make the preload path list short and because it was rarely ever used,
-Universal Ctags does not load any option files for system wide configuration.
-(i.e., no :file:`/etc/ctags.d`)
-
-Using :file:`.ctags` for the file extension
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-
-Extensions :file:`.cnf` and :file:`.conf` are obsolete.
-Use the unified extension :file:`.ctags` only.
-
-
-Optlib option file
-......................................................................
-
-From a syntax perspective, there is no difference between optlib option files
-and preload option files; ``ctags`` options are written line by line in a file.
-
-Optlib option files are option files not loaded at start-up time
-automatically. To load an optlib option file, specify a pathname
-for an optlib option file with ``--options=PATHNAME`` option
-explicitly. The pathname can be just the filename if it's in the
-current directory.
-
-Exuberant Ctags has the ``--options`` option, but you can only specify a
-single file to load. Universal Ctags extends the option in two aspects:
-
-- You can specify a directory, to load all the files in that directory.
-- You can specify a PATH list to look in. See next section for details.
-
-
-Specifying a directory
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-
-If you specify a directory instead of a file as the argument for the
-``--options=PATHNAME``, Universal Ctags will load all files having a
-:file:`.ctags` extension under said directory in alphabetical order.
-
-Specifying an optlib PATH list
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-
-Much like a command line shell, ``ctags`` has an "optlib PATH list" in which it
-can look for a file (or directory) to load.
-
-When loading a file (or directory) specified with ``--options=PATHNAME``,
-ctags first checks if ``PATHNAME`` is an absolute path or a relative path.
-An absolute path starts with '``/``' or '``.``'.
-If ``PATHNAME`` is an absolute path, ctags tries to load it immediately.
-
-If, on the contrary, is a relative path, ``ctags`` does two things: First,
-looks for the file (or directory) in "optlib PATH list" and tries to load it.
-
-If the file doesn't exist in the PATH list, ``ctags``  treats ``PATHNAME`` as a
-path relative to the working directory and loads the file.
-
-By default, optlib path list is empty. To set or add a directory
-path to the list, use ``--optlib-dir=PATH``.
-
-For setting (adding one after clearing)::
-
-	--optlib-dir=PATH
-
-For adding::
-
-	--optlib-dir=+PATH
-
-Tips for writing an option file
-......................................................................
-
-* Use ``--quiet --options=NONE`` to disable preloading.
-
-* ``--_echo=MSG`` and  ``--_force-quit=[NUM]`` options are introduced for
-  debugging the process of loading option files. See "OPTIONS"
-  section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
-
-* Universal Ctags has an ``optlib2c`` script that translates an option file
-  into C source code. Your optlib parser can thus easily become a built-in parser,
-  by contributing to Universal Ctags' github. You could be famous!
-  Examples are in the ``optlib`` directory in Universal Ctags source tree.
+A *optlib parser* can be translated into C source code. Your optlib parser can
+thus easily become a built-in parser. See :ref:`optlib2c` for details.
 
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1738,6 +1531,232 @@ following input file::
 	        ^                                             ^
 			 `- "1end" points here.                       |
 			                       "2start" points here. -+
+
+..
+	NOT REVIEWED YET
+
+.. _defining-subparsers:
+
+Defining a subparser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. TODO upper level?
+
+Basic
+.........................................................................
+
+About the concept of subparser, see :ref:`base-sub-parsers`.
+
+With ``base`` long flag of `--langdef=<LANG>` option, you can define
+a subparser for a specified base parser. Combining with ``--kinddef-<LANG>``
+and ``--regex-<KIND>`` options, you can extend an existing parser
+without risk of kind confliction.
+
+Let's see an example.
+
+input.c
+
+.. code-block:: C
+
+    static int set_one_prio(struct task_struct *p, int niceval, int error)
+    {
+    }
+
+    SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
+    {
+	    ...;
+    }
+
+.. code-block:: console
+
+    $./ctags --options=NONE  -x --_xformat="%20N %10K %10l"  -o - input.c
+    ctags: Notice: No options will be read from files or environment
+	    set_one_prio   function          C
+	 SYSCALL_DEFINE3   function          C
+
+C parser doesn't understand that `SYSCALL_DEFINE3` is a macro for defining an
+entry point for a system.
+
+Let's define `linux` subparser which using C parser as a base parser:
+
+.. code-block:: console
+
+    $ cat linux.ctags
+    --langdef=linux{base=C}
+    --kinddef-linux=s,syscall,system calls
+    --regex-linux=/SYSCALL_DEFINE[0-9]\(([^, )]+)[\),]*/\1/s/
+
+The output is change as follows with `linux` parser:
+
+.. code-block:: console
+
+	$ ./ctags --options=NONE --options=./linux.ctags -x --_xformat="%20N %10K %10l"  -o - input.c
+	ctags: Notice: No options will be read from files or environment
+		 setpriority    syscall      linux
+		set_one_prio   function          C
+	     SYSCALL_DEFINE3   function          C
+
+`setpriority` is recognized as a `syscall` of `linux`.
+
+Using only `--regex-C=...` you can capture `setpriority`.
+However, there were concerns about kind confliction; when introducing
+a new kind with `--regex-C=...`, you cannot use a letter and name already
+used in C parser and `--regex-C=...` options specified in the other places.
+
+You can use a newly defined subparser as a new namespace of kinds.
+In addition you can enable/disable with the subparser usable
+`--languages=[+|-]` option:
+
+.. code-block::console
+
+    $ ./ctags --options=NONE --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
+    ctags: Notice: No options will be read from files or environment
+	    set_one_prio   function          C
+	 SYSCALL_DEFINE3   function          C
+
+Directions
+.........................................................................
+
+As explained in :ref:`Tagging definitions of higher(upper) level language (sub/base) <base-sub-parsers>`,
+you can choose direction(s) how a base parser and a guest parser work together with
+long flags putting after `--langdef=Foo{base=Bar}`.
+
+========================  ======================
+C level notation          Command line long flag
+========================  ======================
+SUBPARSER_BASE_RUNS_SUB   shared (default)
+SUBPARSER_SUB_RUNS_BASE   dedicated
+SUBPARSER_BASE_RUNS_SUB   bidirectional
+========================  ======================
+
+`{shared}` is the default behavior. If none of `{shared}`, `{dedicated}`, nor
+`{bidirectional}` is specified, it implies `{shared}`.
+
+Let's see actual difference of behaviors.
+
+
+The examples are taken from `#1409
+<https://github.com/universal-ctags/ctags/issues/1409>`_ submitted by @sgraham on
+github Universal Ctags repository.
+
+`input.cc` and `input.mojom` are input files, and have the same
+contents::
+
+     ABC();
+    int main(void)
+    {
+    }
+
+C++ parser can capture `main` as a function. Mojom subparser defined in the
+later runs on C++ parser and is for capturing `ABC`.
+
+shared combination
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+`{shared}` is specified, for `input.cc`, both tags capture by C++ parser
+and mojom parser are recorded to tags file. For `input.mojom`, only
+tags captured by mojom parser are recorded to tags file.
+
+mojom-shared.ctags:
+
+.. code-block:: ctags
+
+    --langdef=mojom{base=C++}{shared}
+    --map-mojom=+.mojom
+    --kinddef-mojom=f,function,functions
+    --regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
+
+tags for `input.cc`::
+
+    ABC	input.cc	/^ ABC();$/;"	f	language:mojom
+    main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+
+tags for `input.mojom`::
+
+  ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
+
+Mojom parser uses C++ parser internally but tags captured by C++ parser are
+dropped in the output.
+
+dedicated combination
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+`{dedicated}` is specified, for `input.cc`, only tags capture by C++
+parser are recorded to tags file. For `input.mojom`, both tags capture
+by C++ parser and mojom parser are recorded to tags file.
+
+mojom-dedicated.ctags:
+
+.. code-block:: ctags
+
+    --langdef=mojom{base=C++}{dedicated}
+    --map-mojom=+.mojom
+    --kinddef-mojom=f,function,functions
+    --regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
+
+tags for `input.cc`::
+
+    main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+
+tags for `input.mojom`::
+
+    ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
+    main	input.mojom	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+
+Mojom parser works only when `.mojom` file is given as input.
+
+bidirectional combination
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+`{bidirectional}` is specified, both tags capture by C++ parser and
+mojom parser are recorded to tags file for either input `input.cc` and
+`input.mojom`.
+
+mojom-bidirectional.ctags:
+
+.. code-block:: ctags
+
+    --langdef=mojom{base=C++}{bidirectional}
+    --map-mojom=+.mojom
+    --kinddef-mojom=f,function,functions
+    --regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
+
+tags for `input.cc`::
+
+    ABC	input.cc	/^ ABC();$/;"	f	language:mojom
+    main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+
+tags for `input.mojom`::
+
+    ABC	input.cc	/^ ABC();$/;"	f	language:mojom
+    main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+
+Listing subparsers
+.........................................................................
+Subparsers can be listed with ``--list-subparser``:
+
+.. code-block:: console
+
+    $ ./ctags --options=NONE --options=./linux.ctags --list-subparsers=C
+    ctags: Notice: No options will be read from files or environment
+    #NAME                          BASEPARSER           DIRECTION
+    linux                          C                    base => sub {shared}
+
+.. _optlib2c:
+
+Translating an option file into C source code (optlib2c)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Universal Ctags has an ``optlib2c`` script that translates an option file into C
+source code. Your optlib parser can thus easily become a built-in parser.
+
+To add your optlib file, ``foo.ctags``, into ``ctags`` do the following steps;
+
+* copy ``foo.ctags`` file on ``optlib/`` directory
+* add ``foo.ctags`` on ``OPTLIB2C_INPUT`` variable in ``makefiles/optlib2c_input.mak``
+* add ``fooParser`` on ``PARSER_LIST`` macro variable in ``main/parser_p.h``
+
+You are encouraged to submit your :file:`.ctags` file to our repository on
+github through a pull request. See :ref:`contributions` for more details.
+
+.. TODO: the following section is a duplicate of "Contribution" chatper and has
+   less information than it.  To be removed.
 
 .. _submitting_optlib:
 
