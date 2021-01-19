@@ -251,12 +251,10 @@ jobs:
        - run:
            name: Build
            command: |
-             (
              cd ctags
              bash ./autogen.sh
              ./configure --enable-debugging
              make -j 2
-             )
        - run:
            name: Test
            command: |
