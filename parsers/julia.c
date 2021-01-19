@@ -1072,12 +1072,16 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
     if (lexer->cur_token != TOKEN_IDENTIFIER)
     {
         return;
-    } else if (lexer->cur_c == '.') {
+    }
+    else if (lexer->cur_c == '.')
+    {
         local_scope = vStringNewCopy(lexer->token_str);
         local_parent_kind = K_MODULE;
         advanceChar(lexer);
         advanceToken(lexer, true, false);
-    } else {
+    }
+    else
+    {
         local_scope = vStringNewCopy(scope);
         local_parent_kind = parent_kind;
     }
