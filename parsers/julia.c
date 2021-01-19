@@ -1086,6 +1086,14 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
         local_parent_kind = parent_kind;
     }
 
+    /* Scan for parametric type constructor */
+    skipWhitespace(lexer, false);
+    if (lexer->cur_c == '{')
+    {
+        scanCurlyBlock(lexer);
+        skipWhitespace(lexer, false);
+    }
+
     name = vStringNewCopy(lexer->token_str);
     arg_list = vStringNew();
     line = lexer->line;
@@ -1345,6 +1353,7 @@ static void parseStruct (lexerState *lexer, vString *scope, int parent_kind)
 {
     vString *name;
     vString *field;
+    size_t old_scope_len;
     unsigned long line;
     MIOPos pos;
 
@@ -1378,6 +1387,8 @@ static void parseStruct (lexerState *lexer, vString *scope, int parent_kind)
         advanceToken(lexer, true, false);
     }
 
+    /* keep the struct scope in memory to reset it after parsing constructors */
+    old_scope_len = vStringLength(scope);
     /* Parse fields and inner constructors */
     while (lexer->cur_token != TOKEN_EOF && lexer->cur_token != TOKEN_CLOSE_BLOCK)
     {
@@ -1414,6 +1425,7 @@ static void parseStruct (lexerState *lexer, vString *scope, int parent_kind)
             /* Get next token */
             advanceToken(lexer, true, false);
         }
+        resetScope(scope, old_scope_len);
     }
 
     vStringDelete(name);
@@ -1485,7 +1497,7 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
                 else
                 {
                     skipWhitespace(lexer, false);
-                    if (lexer->first_token && lexer->cur_c == '(')
+                    if (lexer->first_token && (lexer->cur_c == '(' || lexer->cur_c == '{'))
                     {
                         parseShortFunction(lexer, scope, kind);
                     }

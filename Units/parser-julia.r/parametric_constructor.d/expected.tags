@@ -1,0 +1,8 @@
+OurRational	input.jl	/^struct OurRational{T<:Integer} <: Real$/;"	s
+OurRational{Int16}	input.jl	/^OurRational{Int16}(num::T, den::T) where T<:Integer = new(num, den)$/;"	f
+OurRational{Int64}	input.jl	/^    OurRational{Int64}(num::T, den::T, test::T) where T<:Integer = new(num, den, test)$/;"	f	struct:OurRational
+OurRational{Int8}	input.jl	/^    OurRational{Int8}(num::T, den::T) where T<:Integer = new(convert(Int8, num), convert(Int8, d/;"	f	struct:OurRational
+OurRational{T}	input.jl	/^    function OurRational{T}(num::T, den::T) where T<:Integer$/;"	f	struct:OurRational
+den	input.jl	/^    den::T$/;"	g	struct:OurRational
+num	input.jl	/^    num::T$/;"	g	struct:OurRational
+test	input.jl	/^    test::T$/;"	g	struct:OurRational
