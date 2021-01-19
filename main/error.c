@@ -35,7 +35,8 @@ extern bool stderrDefaultErrorPrinter (const errorSelection selection,
 					  va_list ap, void *data CTAGS_ATTR_UNUSED)
 {
 	fprintf (stderr, "%s: %s", getExecutableName (),
-		 selected (selection, WARNING) ? "Warning: " : "");
+		 selected (selection, WARNING) ? "Warning: " :
+		 selected (selection, NOTICE) ? "Notice: " : "");
 	vfprintf (stderr, format, ap);
 	if (selected (selection, PERROR))
 	{
@@ -55,6 +56,9 @@ extern void error (const errorSelection selection,
 {
 	va_list ap;
 	bool shouldExit;
+
+	if (Option.quiet && selected (selection, NOTICE))
+		return;
 
 	va_start (ap, format);
 	shouldExit = (* errorPrinter) (selection, format, ap, errorPrinterData);
@@ -77,6 +81,8 @@ bool jsonErrorPrinter (const errorSelection selection, const char *const format,
 	json_t *response = json_object ();
 	json_object_set_new (response, "_type", json_string ("error"));
 	json_object_set_new (response, "message", json_string (reason));
+	if (selected (selection, NOTICE))
+		json_object_set_new (response, "notice", json_true ());
 	if (selected (selection, WARNING))
 		json_object_set_new (response, "warning", json_true ());
 	if (selected (selection, FATAL))

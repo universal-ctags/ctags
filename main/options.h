@@ -25,7 +25,6 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void notice (const char *const format, ...) CTAGS_ATTR_PRINTF (1, 2);
 extern void verbose (const char *const format, ...) CTAGS_ATTR_PRINTF (1, 2);
 
 #define BEGIN_VERBOSE(VFP) do { if (ctags_verbose) { \

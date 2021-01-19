@@ -1,0 +1,5 @@
+{"_type": "program", "name": "Universal Ctags", "version": "5.9.0"}
+{"_type": "error", "message": "notice output for testing: triggerNotice", "notice": true}
+{"_type": "completed", "command": "generate-tags"}
+{"_type": "program", "name": "Universal Ctags", "version": "5.9.0"}
+{"_type": "completed", "command": "generate-tags"}

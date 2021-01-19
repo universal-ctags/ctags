@@ -10,6 +10,7 @@ e  a kind enabled by default
 r  emit a tag with multi roles
 R  emit a tag with multi roles(disabled by default) [off]
 f  tag for testing field:
+n  trigger notice output
 
 # list kinds-full
 #LETTER NAME                                      ENABLED REFONLY NROLES MASTER DESCRIPTION
@@ -23,6 +24,7 @@ b       broken tag                                yes     no      1      NONE   
 d       disabled                                  no      no      2      NONE   a kind disabled by default
 e       enabled                                   yes     no      2      NONE   a kind enabled by default
 f       fieldMaker                                yes     no      0      NONE   tag for testing field:
+n       triggerNotice                             yes     no      0      NONE   trigger notice output
 r       roles                                     yes     yes     4      NONE   emit a tag with multi roles
 
 # +K

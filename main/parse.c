@@ -5143,6 +5143,7 @@ typedef enum {
 	K_ROLES,
 	K_ROLES_DISABLED,
 	K_FIELD_TESTING,
+	K_TRIGGER_NOTICE,
 	KIND_COUNT
 } CTST_Kind;
 
@@ -5222,6 +5223,7 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	{false, 'R', "rolesDisabled", "emit a tag with multi roles(disabled by default)",
 	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesDisabledKindRoles)},
 	{true,  'f', "fieldMaker", "tag for testing field:" },
+	{true,  'n', "triggerNotice", "trigger notice output"},
 };
 
 typedef enum {
@@ -5403,6 +5405,9 @@ static void createCTSTTags (void)
 
 						break;
 					}
+					case K_TRIGGER_NOTICE:
+						notice ("notice output for testing: %s", CTST_Kinds [i].name);
+						break;
 				}
 			}
 	}
