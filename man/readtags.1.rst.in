@@ -203,7 +203,7 @@ Case-insensitive matching can be performed by ``#/PATTERN/i``.
 
      $ readtags -Q '(and $inherits (#/(^|, )A(,|$)/i $inherits))' -l
 
-To include "/" in a pattern, prefix "\" to the "/".
+To include "/" in a pattern, prefix ``\`` to the "/".
 
 NOTE: The above regular expression pattern for inspecting inheritances is just an
 example to show how to use ``#/PATTERN/`` expression.  Tags file generators have
@@ -215,7 +215,7 @@ The expressions ``#/PATTERN/`` and ``#/PATTERN/i`` are for interactive use.
 Readtags also offers an alias ``string->regexp``, so ``#/PATTERN/`` is equal to
 ``(string->regexp "PATTERN")``, and ``#/PATTERN/i`` is equal to
 ``(string->regexp "PATTERN" :case-fold #t)``. ``string->regexp`` doesn't need to
-prefix "\" for including "/" in a pattern. ``string->regexp`` may simplify a
+prefix ``\`` for including "/" in a pattern. ``string->regexp`` may simplify a
 client tool building an expression. See also ctags-client-tools(7) for making an
 expression in your tool.
 
