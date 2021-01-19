@@ -228,7 +228,7 @@ jobs:
    centos6:
      working_directory: ~/universal-ctags
      docker:
-       - image: centos:6
+       - image: centos:6.10
      steps:
        - run:
            name: Rearrange CentOS-Base.repo file
