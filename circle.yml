@@ -241,6 +241,9 @@ jobs:
            name: Install tools for building
            command: |
              yum install -y git gcc make autoconf automake pkgconfig
+             yum install -y https://repo.ius.io/ius-release-el6.rpm
+             yum --enablerepo=ius-archive -y install python36
+             ln -s /usr/bin/python36 /usr/bin/python3
        - run:
            name: Get the source code of u-ctags
            command: |
@@ -255,9 +258,10 @@ jobs:
              make -j 2
              )
        - run:
-           name: Don't run test cases because python3 is no available
+           name: Test
            command: |
-             :
+             cd ctags
+             make check roundtrip CIRCLECI=1
 
 workflows:
   version: 2
