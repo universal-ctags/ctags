@@ -64,3 +64,8 @@ x	input.ts	/^    x: number$/;"	p	class:C
 Ct	input.ts	/^class Ct<T> extends A<T> implements B<T>, D, E<T> {$/;"	c	inherits:A,B,D,E
 x	input.ts	/^    x: number$/;"	p	class:Ct
 A	input.ts	/^class A<T> implements I<T>$/;"	c	inherits:I
+TasksService	input.ts	/^export class TasksService {$/;"	c
+tasks	input.ts	/^  private tasks: string[] = []$/;"	p	class:TasksService
+taskObj	input.ts	/^  private taskObj: object = {}$/;"	p	class:TasksService
+getAllTasks	input.ts	/^  getAllTasks(): string[] {$/;"	m	class:TasksService
+getTaskObj	input.ts	/^  getTaskObj(): object {$/;"	m	class:TasksService
