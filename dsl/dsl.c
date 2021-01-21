@@ -125,7 +125,7 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(and exp0 ... expN) -> <boolean>" },
 	{ "or",      sform_or,     NULL, DSL_PATTR_SELF_EVAL,
 	  .helpstr = "(or exp0 ... expN) -> <boolean>" },
-	{ "if",      sform_if,       NULL, DSL_PATTR_CHECK_ARITY, 3,
+	{ "if",      sform_if,       NULL, DSL_PATTR_SELF_EVAL|DSL_PATTR_CHECK_ARITY, 3,
 	  .helpstr = "(if cond exp-true exp-false) -> exp-true|exp-false" },
 	{ "not",     builtin_not,    NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(not exp) -> <boolean>" },
