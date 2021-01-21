@@ -88,9 +88,33 @@ jobs:
              dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
              dnf -y install jq puppet
        - run:
-           name: Build
+           name: Run autogen.sh
            command: |
              bash ./autogen.sh
+       - run:
+           name: verify optlib files are updated
+           command: |
+             if ! git diff --exit-code optlib; then
+                echo "Files under optlib are not up to date."
+                echo "If you change optlib/foo.ctags, don't forget to add optlib/foo.c to your commit."
+                exit 1
+             else
+                exit 0
+             fi
+       - run:
+           name: verify man pages in docs directory are updated
+           command: |
+             make -B -C man QUICK=1 update-docs
+             if ! git diff --exit-code docs/man; then
+                echo "Files under docs/man/ are not up to date."
+                echo "Please execute 'make -C man QUICK=1 update-docs' and commit them."
+                exit 1
+             else
+                exit 0
+             fi
+       - run:
+           name: Run configure
+           command: |
              ./configure
        - run:
            name: Test
@@ -145,6 +169,28 @@ jobs:
            name: Test
            command: |
              make check roundtrip CIRCLECI=1
+   ubuntu20_mingw:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/ubuntu:20.04
+     steps:
+       - run:
+           name: Install git
+           command: |
+             export DEBIAN_FRONTEND=noninteractive
+             apt-get -y update
+             apt-get -y install git
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+             export DEBIAN_FRONTEND=noninteractive
+             apt-get -o APT::Immediate-Configure=false -y install \
+             binutils-mingw-w64-i686 gcc-mingw-w64-i686 make gcc
+       - run:
+           name: Build
+           command: |
+             make -j2 CC=i686-w64-mingw32-gcc WINDRES=i686-w64-mingw32-windres CC_FOR_PACKCC=gcc -f mk_mingw.mak
    ubuntu20_32bit:
      working_directory: ~/universal-ctags
      docker:
@@ -272,3 +318,4 @@ workflows:
       - fedora33_gmake
       - fedora33_cross_aarch64
       - centos6
+      - ubuntu20_mingw
