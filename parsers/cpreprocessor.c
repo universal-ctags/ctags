@@ -360,7 +360,7 @@ static void cppInitCommon(langType clientLang,
 	Cpp.fileMacroTable =
 		(doesExpandMacros
 		 && ((isFieldEnabled (FIELD_SIGNATURE)
-			 && isFieldEnabled (Cpp.macrodefFieldIndex))
+			  && isFieldEnabled (Cpp.macrodefFieldIndex))
 			 || useHint)
 		 && (getLanguageCorkUsage ((clientLang == LANG_IGNORE)
 								   ? Cpp.lang
