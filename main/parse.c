@@ -5067,6 +5067,12 @@ extern bool processPretendOption (const char *const option, const char *const pa
 	return true;
 }
 
+extern unsigned int getLanguageCorkUsage (langType lang)
+{
+	parserObject* const parser = LanguageTable + lang;
+	return parserCorkFlags (parser->def);
+}
+
 /*
  * The universal fallback parser.
  * If any parser doesn't handle the input, this parser is

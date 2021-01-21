@@ -340,7 +340,12 @@ static void cppInitCommon(langType clientLang,
 
 	Cpp.macroInUse = NULL;
 	Cpp.fileMacroTable =
-		doesExpandMacros && isFieldEnabled (FIELD_SIGNATURE) && isFieldEnabled (Cpp.macrodefFieldIndex)
+		(doesExpandMacros
+		 && isFieldEnabled (FIELD_SIGNATURE)
+		 && isFieldEnabled (Cpp.macrodefFieldIndex)
+		 && (getLanguageCorkUsage ((clientLang == LANG_IGNORE)
+								   ? Cpp.lang
+								   : clientLang) & CORK_SYMTAB))
 		? makeMacroTable ()
 		: NULL;
 }
