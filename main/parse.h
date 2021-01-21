@@ -149,6 +149,7 @@ extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int r
 extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
 
 extern void initializeParser (langType language);
+extern unsigned int getLanguageCorkUsage (langType language);
 
 #ifdef HAVE_ICONV
 extern const char *getLanguageEncoding (const langType language);
