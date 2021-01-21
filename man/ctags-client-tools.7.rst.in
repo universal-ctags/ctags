@@ -312,6 +312,12 @@ Lisps:
 Notice that even when the client tool uses this method, ``'`` still needs to be
 replaced by ``'"'"'`` to prevent broken expressions and shell injection.
 
+Another thing to notice is that missing fields are represented by ``#f``, and
+applying string operators to them will produce an error. You should always
+check if a field is missing before applying string operators. See the
+"Filtering" section in readtags(1) to know how to do this. Run "readtags -H
+filter" to see which operators take string arguments.
+
 Parse Readtags Output
 ~~~~~~~~~~~~~~~~~~~~~
 In the output of readtags, tabs can appear in all field values (e.g., the tag
@@ -346,12 +352,10 @@ Client tools could split the line using the following steps:
       there's no pattern delimiter (since there's no regex pattern). In this
       case the pattern field ends at the 3rd tab.
 
-* Find the 3rd tab, and count the delimiters between it and the 2nd tab. Notice
-  that delimiters can be escaped, so only the ones with a even number
-  (including 0) of backslashes before should be counted.
-* If there are even numbers of delimiters, then the 3rd tab is the end of the
-  pattern. If not, keep searching tabs forward until this condition is
-  satisfied.
+* After the opening delimiter, find the next unescaped pattern delimiter, and
+  that's the closing delimiter. It will be followed by ``;"`` and then a tab.
+  That's the end of the pattern field. By "unescaped pattern delimiter", we
+  mean there's an even number (including 0) of backslashes before it.
 * From here, split the rest of the line into fields by tabs.
 
 Then, the escape sequences in fields other than the pattern field should be
