@@ -133,13 +133,17 @@ who doesn't know Scheme or Lisp, just remember:
 * A function call is wrapped in a pair of parenthesis. The first item in it is
   the function/operator name, the others are arguments.
 * Function calls can be nested.
+* Missing values and boolean false are represented by ``#f``. ``#t`` and all
+  other values are considered to be true.
 
 So, ``(+ 1 (+ 2 3))`` means add 2 and 3 first, then add the result with 1.
+``(and "string" 1 #t)`` means logical AND on ``"string"``, ``1`` and ``#t``,
+and the result is true since there is no ``#f``.
 
 Filtering
 ~~~~~~~~~
-The tag entries that makes the filter expression produces non-#f values are
-filtered out (#f means false).
+The tag entries that make the filter expression produces true value are printed
+by readtags.
 
 The basic operators for filtering are ``eq?``, ``prefix?``, ``suffix?``,
 ``substr?``, and ``#/PATTERN/``. Language common fields can be accessed using
@@ -170,10 +174,10 @@ missing field is #f, so we could deal with missing fields:
   .. code-block:: console
 
      $ readtags -Q '(and (substr? $name "impl")\
-                         (or (eq? $language "Python")\
-                             (not $language)))' -l
+                         (or (not $language)\
+                             (eq? $language "Python")))' -l
 
-``#/PATTERN/`` is for the case when string predicates (``prefix?``, ``suffix``,
+``#/PATTERN/`` is for the case when string predicates (``prefix?``, ``suffix?``,
 and ``substr?``) are not enough. You can use "Posix extended regular expression"
 as PATTERN.
 
@@ -181,43 +185,63 @@ as PATTERN.
 
   .. code-block:: console
 
-     $ readtags -Q '(#/(^|, )A(,|$)/ $inherits)' -l
+     $ readtags -Q '(#/(^|,) ?A(,|$)/ $inherits)' -l
 
-Here ``$inherits`` is a comma-separated class list like "A, B, C", "Z, A", "P, A,
-Q", or just "A". The tags file may have tag entries that has no ``inherits:``
-field. In that case ``$inherits`` is #f, and the regular expression matching
-raises an error, since it works only for strings. To avoid this problem:
+Here ``$inherits`` is a comma-separated class list like "A,B,C", "P, A, Q", or
+just "A". Notice that this filter works on both situations where there's a
+space after each comma or there's not.
+
+Case-insensitive matching can be performed by ``#/PATTERN/i``:
+
+* List all tags inherits from the class "A" or "a":
+
+  .. code-block:: console
+
+     $ readtags -Q '(#/(^|,) ?A(,|$)/i $inherits)' -l
+
+To include "/" in a pattern, prefix ``\`` to the "/".
+
+NOTE: The above regular expression pattern for inspecting inheritances is just
+an example to show how to use ``#/PATTERN/`` expression. Tags file generators
+have no consensus about the format of ``inherits:``, e.g., whether there should
+be a space after a comma. Even parsers in ctags have no consensus. Noticing the
+format of the ``inherits:`` field of specific languages is needed for such
+queries.
+
+The expressions ``#/PATTERN/`` and ``#/PATTERN/i`` are for interactive use.
+Readtags also offers an alias ``string->regexp``, so ``#/PATTERN/`` is equal to
+``(string->regexp "PATTERN")``, and ``#/PATTERN/i`` is equal to
+``(string->regexp "PATTERN" :case-fold #t)``. ``string->regexp`` doesn't need
+to prefix ``\`` for including "/" in a pattern. ``string->regexp`` may simplify
+a client tool building an expression. See also :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` for
+building expressions in your tool.
+
+Let's now consider missing fields. The tags file may have tag entries that has
+no ``inherits:`` field. In that case ``$inherits`` is #f, and the regular
+expression matching raises an error, since string operators only work for
+strings. To avoid this problem:
 
 * Safely list all tags inherits from the class "A":
 
   .. code-block:: console
 
-     $ readtags -Q '(and $inherits (#/(^|, )A(,|$)/ $inherits))' -l
+     $ readtags -Q '(and $inherits (#/(^|,) ?A(,|$)/ $inherits))' -l
 
+This makes sure ``$inherits`` is not missing first, then match it by regexp.
 
-Case-insensitive matching can be performed by ``#/PATTERN/i``.
+Sometimes you want to keep tags where the field *is* missing. For example, your
+want to exclude reference tags, which is marked by the ``extras:`` field, then
+you want to keep tags who doesn't have ``extras:`` field since they are also
+not reference tags. Here's how to do it:
 
-* Safely list all tags inherits from the class "A" or "a":
+* List all tags but the reference tags:
 
   .. code-block:: console
 
-     $ readtags -Q '(and $inherits (#/(^|, )A(,|$)/i $inherits))' -l
+     $ readtags -Q '(or (not $extras) (#/(^|,) ?reference(,|$)/ $extras))' -l
 
-To include "/" in a pattern, prefix ``\`` to the "/".
-
-NOTE: The above regular expression pattern for inspecting inheritances is just an
-example to show how to use ``#/PATTERN/`` expression.  Tags file generators have
-no consensus about the format of ``inherits:``.  Even parsers in ctags have no
-consensus. Noticing the format of the ``inherits:`` field of specific languages
-is needed for such queries.
-
-The expressions ``#/PATTERN/`` and ``#/PATTERN/i`` are for interactive use.
-Readtags also offers an alias ``string->regexp``, so ``#/PATTERN/`` is equal to
-``(string->regexp "PATTERN")``, and ``#/PATTERN/i`` is equal to
-``(string->regexp "PATTERN" :case-fold #t)``. ``string->regexp`` doesn't need to
-prefix ``\`` for including "/" in a pattern. ``string->regexp`` may simplify a
-client tool building an expression. See also :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` for making an
-expression in your tool.
+Notice that ``(not $extras)`` produces ``#t`` when ``$extras`` is missing, so
+the whole ``or`` expression produces ``#t``.
 
 Run "readtags -H filter" to know about all valid functions and variables.
 
@@ -229,8 +253,8 @@ decided.
 
 In a sorter expression, ``$`` and ``&`` are used to access the fields in the
 two tag entries, and let's call them $-entry and &-entry. The sorter expression
-should have a value of -1, 0 or 1. The value -1 means the $-entry should sort
-before the &-entry, 1 means the contrary, and 0 makes their order in the output
+should have a value of -1, 0 or 1. The value -1 means the $-entry should be put
+above the &-entry, 1 means the contrary, and 0 makes their order in the output
 uncertain.
 
 The core operator of sorting is ``<>``. It's used to compare two strings or two
@@ -249,8 +273,8 @@ This reads "If the tag name in the $-entry is smaller, it goes before the
 &-entry".
 
 The ``<or>`` operator is used to chain multiple expressions until one returns
--1. For example, sort by input file names, then line numbers if in the same
-file:
+-1 or 1. For example, sort by input file names, then line numbers if in the
+same file:
 
 .. code-block:: console
 
@@ -258,6 +282,29 @@ file:
 
 The ``*-`` operator is used to flip the compare result. i.e., ``(*- (<> a b))``
 is the same as ``(<> b a)``.
+
+Filter expressions can be used in sorter expressions. The technique is use
+``if`` to produce integers that can be compared based on the filter, like:
+
+.. code-block:: lisp
+
+   (<> (if filter-expr-on-$-entry -1 1)
+       (if filter-expr-on-&-entry -1 1))
+
+So if $-entry satisfies the filter, while &-entry doesn't, it's the same as
+``(<> -1 1)``, which produces ``-1``.
+
+For example, we want to put tags with "file" kind below other tags, then the
+sorter would look like:
+
+.. code-block:: lisp
+
+   (<> (if (eq? $kind "file") 1 -1)
+       (if (eq? &kind "file") 1 -1))
+
+A quick read tells us: If $-entry has "file" kind, and &-entry doesn't, the
+sorter becomes ``(<> 1 -1)``, which produces ``1``, so the $-entry is put below
+the &-entry, exactly what we want.
 
 Inspecting the Behavior of Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
