@@ -16,25 +16,10 @@
 make --version
 
 if [ "$TARGET" = "Unix" ]; then
-    ./autogen.sh
-    if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
-		if ! git diff --exit-code optlib; then
-			echo "Files under optlib are not up to date."
-			echo "If you change optlib/foo.ctags, don't forget to add optlib/foo.c to your commit."
-			exit 1
-		fi
-		make -B -C man QUICK=1 update-docs
-		if ! git diff --exit-code docs/man; then
-			echo "Files under docs/man/ are not up to date."
-			echo "Please execute 'make -C man QUICK=1 update-docs' and commit them."
-			exit 1
-		fi
-    fi
-
+    :
 elif [ "$TARGET" = "Mingw32" ]; then
     # Don't run test units in Mingw32 target.
-    make -j2 CC=i686-w64-mingw32-gcc WINDRES=i686-w64-mingw32-windres CC_FOR_PACKCC=gcc -f mk_mingw.mak
-
+    :
 else
     echo "Invalid TARGET value: $TARGET" 1>&2
     exit 1
