@@ -100,11 +100,10 @@ expandEscapeSequences()
     s/__BACKSLASH__x7[fF]//;			t again
     /\\/b again
 
-:out
-    # replace lonely "\"es
-    s/__BACKSLASH__/\\/g
-    # replace literal "\"es ("\\" from the input)
-    s/__LITBACKSLASH__/\\/g
+# replace lonely "\"es
+s/__BACKSLASH__/\\/g
+# replace literal "\"es ("\\" from the input)
+s/__LITBACKSLASH__/\\/g
 '
 }
 
