@@ -162,7 +162,6 @@ static struct tokenTypePair typePairs [] = {
 	{ '{', '}' },
 	{ '[', ']' },
 	{ '(', ')' },
-	{ TOKEN_R_DBRACKET_OEPN, TOKEN_R_DBRACKET_CLOSE },
 };
 
 typedef struct sRToken {
@@ -572,39 +571,13 @@ static void readToken (tokenInfo *const token, void *data)
 	case '}':
 	case '(':
 	case ')':
+	case '[':
+	case ']':
 	case ',':
 	case '$':
 	case '@':
 		token->type = c;
 		tokenPutc (token, c);
-		break;
-	case '[':
-		tokenPutc (token, c);
-		c = getcFromInputFile ();
-		if (c == '[')
-		{
-			token->type = TOKEN_R_DBRACKET_OEPN;
-			tokenPutc (token, c);
-		}
-		else
-		{
-			token->type = '[';
-			ungetcToInputFile (c);
-		}
-		break;
-	case ']':
-		tokenPutc (token, c);
-		c = getcFromInputFile ();
-		if (c == ']')
-		{
-			token->type = TOKEN_R_DBRACKET_CLOSE;
-			tokenPutc (token, c);
-		}
-		else
-		{
-			token->type = ']';
-			ungetcToInputFile (c);
-		}
 		break;
 	case '.':
 		tokenPutc (token, c);
@@ -907,8 +880,7 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 	R_TRACE_ENTER();
 
 	bool in_continuous_pair = tokenIsTypeVal (token, '(')
-		|| tokenIsTypeVal (token, '[')
-		|| tokenIsType(token, R_DBRACKET_OEPN);
+		|| tokenIsTypeVal (token, '[');
 	bool is_funcall = funcall && tokenIsTypeVal (token, '(');
 	bool done = false;
 
@@ -938,8 +910,7 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 	while (! (tokenIsEOF (token)
 			  || tokenIsTypeVal (token, ')')
 			  || tokenIsTypeVal (token, '}')
-			  || tokenIsTypeVal (token, ']')
-			  || tokenIsType (token, R_DBRACKET_CLOSE)));
+			  || tokenIsTypeVal (token, ']')));
 	R_TRACE_LEAVE();
 }
 
@@ -1051,8 +1022,7 @@ static bool parseStatement (tokenInfo *const token, int parent,
 		}
 		else if (tokenIsTypeVal (token, '(')
 				 || tokenIsTypeVal (token, '{')
-				 || tokenIsTypeVal (token, '[')
-				 || tokenIsType (token, R_DBRACKET_OEPN))
+				 || tokenIsTypeVal (token, '['))
 		{
 			parsePair (token, parent, NULL);
 			tokenRead (token);
@@ -1060,8 +1030,7 @@ static bool parseStatement (tokenInfo *const token, int parent,
 		}
 		else if (tokenIsTypeVal (token, ')')
 				 || tokenIsTypeVal (token, '}')
-				 || tokenIsTypeVal (token, ']')
-				 || tokenIsType (token, R_DBRACKET_CLOSE))
+				 || tokenIsTypeVal (token, ']'))
 		{
 			R_TRACE_TOKEN_TEXT ("break with close", token, parent);
 			break;
@@ -1285,8 +1254,6 @@ static const char *tokenTypeStr(enum RTokenType e)
 		case         TOKEN_R_DOTS_N: return "DOTS_N";
 		case        TOKEN_R_LASSIGN: return "LASSIGN";
 		case        TOKEN_R_RASSIGN: return "RASSIGN";
-		case  TOKEN_R_DBRACKET_OEPN: return "DBRACKET_OEPN";
-		case TOKEN_R_DBRACKET_CLOSE: return "DBRACKET_CLOSE";
 		case          TOKEN_R_SCOPE: return "SCOPE";
 		default:                   break;
 	}

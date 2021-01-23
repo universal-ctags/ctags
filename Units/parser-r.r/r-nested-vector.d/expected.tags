@@ -1,0 +1,4 @@
+i	input.r	/^i = c(1,2)$/;"	globalVar	end:1
+v	input.r	/^v = c (100, 100)$/;"	globalVar	end:2
+f	input.r	/^f = function() {$/;"	function	end:5	constructor:function
+x	input.r	/^x <- 1$/;"	globalVar	end:6

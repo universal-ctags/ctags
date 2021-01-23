@@ -42,8 +42,6 @@ enum RTokenType {
 	TOKEN_R_DOTS_N,				/* ..1, ..2, etc */
 	TOKEN_R_LASSIGN,				/* <-, <<- */
 	TOKEN_R_RASSIGN,				/* ->, ->> */
-	TOKEN_R_DBRACKET_OEPN,		/* [[ */
-	TOKEN_R_DBRACKET_CLOSE,		/* ]] */
 	TOKEN_R_SCOPE,				/* ::, ::: */
 };
 
