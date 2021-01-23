@@ -97,6 +97,8 @@ extern void rTeardownCollectingSignature (tokenInfo *const token);
  * FUNCTION PROTOTYPES
  */
 
+extern tokenInfo *rNewToken (void);
+
 extern void rTokenReadNoNewline (tokenInfo *const token);
 
 /* This function returns true if a new token is read.

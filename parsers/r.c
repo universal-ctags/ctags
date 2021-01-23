@@ -700,7 +700,8 @@ static void readToken (tokenInfo *const token, void *data)
 	}
 }
 
-static tokenInfo *newRToken(void)
+#define newRToken rNewToken
+extern tokenInfo *rNewToken (void)
 {
 	return newToken (&rTokenInfoClass);
 }
