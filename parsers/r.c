@@ -77,6 +77,8 @@ typedef enum {
 	K_GLOBALVAR,
 	K_FUNCVAR,
 	K_PARAM,
+	K_VECTOR,
+	K_NAMEATTR,
 	KIND_COUNT
 } rKind;
 
@@ -107,6 +109,8 @@ static kindDefinition RKinds[KIND_COUNT] = {
 	{true, 'g', "globalVar", "global variables having values other than function()"},
 	{true, 'v', "functionVar", "function variables having values other than function()"},
 	{false,'z', "parameter",  "function parameters inside function definitions" },
+	{true, 'c', "vector", "vectors explicitly created with `c()'" },
+	{true, 'n', "nameattr", "names attribtes in vectors" },
 };
 
 struct sKindExtraInfo {
@@ -118,6 +122,10 @@ static struct sKindExtraInfo kindExtraInfo[KIND_COUNT] = {
 	[K_FUNCTION] = {
 		"anonFunc",
 		"function",
+	},
+	[K_VECTOR] = {
+		"anonVec",
+		"c",
 	},
 };
 
@@ -134,7 +142,7 @@ static fieldDefinition RFields [] = {
 	},
 	{
 		.name = "constructor",
-		.description = "function used for making value assigned to the tag (NOT USED YET)",
+		.description = "function used for making value assigned to the nameattr tag",
 		.enabled = true,
 	}
 };
@@ -142,6 +150,7 @@ static fieldDefinition RFields [] = {
 typedef int keywordId;			/* to allow KEYWORD_NONE */
 
 static const keywordTable RKeywordTable [] = {
+	{ "c",        KEYWORD_R_C        },
 	{ "function", KEYWORD_R_FUNCTION },
 	{ "if",       KEYWORD_R_IF       },
 	{ "else",     KEYWORD_R_ELSE     },
@@ -255,6 +264,22 @@ static bool hasKindOrCtor (tagEntryInfo * e, int kind)
        return false;
 }
 
+static int searchScopeOtherThan (int scope, int kind)
+{
+	do
+	{
+		tagEntryInfo * e = getEntryInCorkQueue (scope);
+		if (!e)
+			return CORK_NIL;
+
+		if (!hasKindOrCtor (e, kind))
+			return scope;
+
+		scope = e->extensionFields.scopeIndex;
+	}
+	while (1);
+}
+
 static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 							const char * assignmentOp)
 {
@@ -282,6 +307,18 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 		cousin = anyEntryInScope (parent, tokenString (token));
 		if (kind == K_GLOBALVAR)
 			kind = K_FUNCVAR;
+	}
+	else if (pe && (kind == K_GLOBALVAR) && hasKindOrCtor (pe, K_VECTOR))
+	{
+		parent = searchScopeOtherThan (pe->extensionFields.scopeIndex,
+									   K_VECTOR);
+		if (parent == CORK_NIL)
+			cousin = anyKindEntryInScope (parent, tokenString (token), K_GLOBALVAR);
+		else
+		{
+			cousin = anyKindEntryInScope (parent, tokenString (token), K_FUNCVAR);
+			kind = K_FUNCVAR;
+		}
 	}
 	else if (pe)
 	{
@@ -319,6 +356,16 @@ static int makeSimpleRTag (tokenInfo *const token, int parent, bool in_func, int
 	const char *ctor = kindExtraInfo [kind].ctor;
 	tagEntryInfo *pe = (parent == CORK_NIL)? NULL: getEntryInCorkQueue (parent);
 
+	/* makeTagWithTranslation method for subparsers
+	   called from makeSimpleSubparserTag expects
+	   kind should be resolved. */
+	if (pe && hasKindOrCtor (pe, K_VECTOR))
+	{
+		if (assignmentOp
+			&& strcmp (assignmentOp, "=") == 0)
+			kind = K_NAMEATTR;
+	}
+
 	if (pe == NULL || pe->langType == Lang_R ||
 		!askSubparserTagAcceptancy (pe))
 		r = makeSimpleRTagR (token, parent, kind, assignmentOp);
@@ -326,7 +373,7 @@ static int makeSimpleRTag (tokenInfo *const token, int parent, bool in_func, int
 		r = makeSimpleSubparserTag (pe->langType, token, parent, in_func,
 									kind, assignmentOp);
 
-	if (0 && ctor)
+	if ((kind == K_NAMEATTR) && ctor)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (r);
 		if (e)
@@ -781,6 +828,17 @@ extern void rTeardownCollectingSignature (tokenInfo *const token)
 	teardownCollectingSignature (token);
 }
 
+static bool findNonPlaceholder (int corkIndex, tagEntryInfo *entry, void *data)
+{
+	bool *any_non_placehoders = data;
+	if (!entry->placeholder)
+	{
+		*any_non_placehoders = true;
+		return false;
+	}
+	return true;
+}
+
 static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int parent)
 {
 	R_TRACE_ENTER();
@@ -791,6 +849,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	tokenReadNoNewline (token);
 
 	bool in_func = tokenIsKeyword (token, R_FUNCTION);
+	bool in_vec  = tokenIsKeyword (token, R_C);
 	int corkIndex;
 
 	/* Call sub parsers */
@@ -802,7 +861,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	if (corkIndex == CORK_NIL)
 	{
 		/* No subparser handle the symbol */
-		int kind = in_func? K_FUNCTION: K_GLOBALVAR;
+		int kind = (in_func? K_FUNCTION: (in_vec? K_VECTOR: K_GLOBALVAR));
 		corkIndex = makeSimpleRTag (symbol, parent, in_func,
 									kind,
 									assignment_operator);
@@ -829,6 +888,13 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 				  ? blackHoleIndex
 				  : corkIndex);
 	}
+	else if (in_vec)
+	{
+		tokenRead (token);
+		parsePair (token, corkIndex, NULL);
+		tokenRead (token);
+		parent = corkIndex;
+	}
 
 	R_TRACE_TOKEN_TEXT("body", token, parent);
 
@@ -842,6 +908,17 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 		{
 			tag->extensionFields.signature = vStringDeleteUnwrap(signature);
 			signature = NULL;
+		}
+		/* If a vector has no named attribte and it has no lval,
+		 * we don't make a tag for the vector. */
+		if (in_vec &&
+			*assignment_operator == '\0')
+		{
+			bool any_non_placehoders = false;
+			foreachEntriesInScope (corkIndex, NULL,
+								   findNonPlaceholder, &any_non_placehoders);
+			if (!any_non_placehoders)
+				tag->placeholder = 1;
 		}
 	}
 
@@ -971,6 +1048,19 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 	R_TRACE_LEAVE();
 }
 
+static bool isAtConstructorInvocation (void)
+{
+	bool r = false;
+
+	tokenInfo *const token = newRToken ();
+	tokenRead (token);
+	if (tokenIsTypeVal (token, '('))
+		r = true;
+	tokenUnread (token);
+	tokenDelete (token);
+	return r;
+}
+
 static bool parseStatement (tokenInfo *const token, int parent,
 							bool in_arglist, bool in_continuous_pair)
 {
@@ -992,13 +1082,16 @@ static bool parseStatement (tokenInfo *const token, int parent,
 			break;
 		}
 		else if (tokenIsType (token, R_KEYWORD)
-				 && tokenIsKeyword (token, R_FUNCTION))
+				 && (tokenIsKeyword (token, R_FUNCTION)
+					 || (tokenIsKeyword (token, R_C)
+						 && isAtConstructorInvocation ())))
 		{
 			/* This statement doesn't start with a symbol.
 			 * This function is not assigned to any symbol. */
 			tokenInfo *const anonfunc = newTokenByCopying (token);
-			anonGenerate (anonfunc->string, kindExtraInfo [K_FUNCTION].anon_prefix,
-						  K_FUNCTION);
+			int kind = tokenIsKeyword (token, R_FUNCTION)? K_FUNCTION: K_VECTOR;
+			anonGenerate (anonfunc->string,
+						  kindExtraInfo [kind].anon_prefix, kind);
 			tokenUnread (token);
 			vStringClear (token->string);
 			parseRightSide (token, anonfunc, parent);

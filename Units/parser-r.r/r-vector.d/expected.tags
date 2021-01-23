@@ -1,0 +1,9 @@
+v	input.r	/^v = c(x = function() 1,$/;"	c	line:1	end:3
+x	input.r	/^v = c(x = function() 1,$/;"	n	line:1	vector:v	end:1	constructor:function
+y	input.r	/^      y = 2,$/;"	n	line:2	vector:v	end:2
+z	input.r	/^      z = function() { 2 })$/;"	n	line:3	vector:v	end:3	constructor:function
+w	input.r	/^w = 0$/;"	g	line:4	end:4
+anonVec1725f6020206	input.r	/^c(a = function(arg) 1)$/;"	c	line:6	end:6
+a	input.r	/^c(a = function(arg) 1)$/;"	n	line:6	vector:anonVec1725f6020206	end:6	constructor:function
+z	input.r	/^z = c(w <- 1, b = 1)$/;"	c	line:7	end:7
+b	input.r	/^z = c(w <- 1, b = 1)$/;"	n	line:7	vector:z	end:7

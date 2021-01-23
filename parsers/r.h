@@ -47,6 +47,7 @@ enum RTokenType {
 
 enum eRKeywordId
 {
+	KEYWORD_R_C,
 	KEYWORD_R_FUNCTION,
 	KEYWORD_R_IF,
 	KEYWORD_R_ELSE,

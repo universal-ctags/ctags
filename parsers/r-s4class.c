@@ -182,9 +182,9 @@ static bool parseMethodArgs (rSubparser *s, tokenInfo *const token, int parent,
 	if (tokenIsTypeVal (token, ','))
 	{
 		rTokenReadNoNewline (token);
-		if (tokenIsType (token, R_SYMBOL)
-			&& ((strcmp (tokenString (token), "c") == 0)
-				|| (strcmp (tokenString (token), "signature") == 0)))
+		if (tokenIsKeyword (token, R_C)
+			|| (tokenIsType (token, R_SYMBOL)
+				&& (strcmp (tokenString (token), "signature") == 0)))
 		{
 			rTokenReadNoNewline (token);
 			if (tokenIsTypeVal (token, '('))

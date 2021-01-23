@@ -35,6 +35,7 @@ Well-known constructor and kind mapping
 	Constructor kind
 	=========== ==================
 	function()  function
+	c()         vector
 	=========== ==================
 
 If a variable doesn't get a value returned from one of well-known
@@ -48,8 +49,10 @@ Here is an example demonstrating the usage of the kinds:
 .. code-block:: R
 
 	G <- 1
+	v <- c(1, 2)
 	f <- function(a) {
 		g <- function (b) a + b
+		w <- c(1, 2)
 		L <- 2
 	}
 
@@ -59,8 +62,10 @@ with "--options=NONE --sort=no --fields=+KZ -o - input.r"
 .. code-block:: tags
 
 	G	input.r	/^G <- 1$/;"	globalVar
+	v	input.r	/^v <- c(1, 2)$/;"	vector
 	f	input.r	/^f <- function(a) {$/;"	function
 	g	input.r	/^	g <- function (b) a + b$/;"	function	scope:function:f
+	w	input.r	/^	w <- c(1, 2)$/;"	vector	scope:function:f
 	L	input.r	/^	L <- 2$/;"	functionVar	scope:function:f
 
 .. TODO:
