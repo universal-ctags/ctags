@@ -33,6 +33,7 @@ x       UCTAGSxpath          no      NONE             s--    no    xpath for the
 -       UCTAGSdecorators     no      Python           s--    no    decorators on functions and classes
 -       UCTAGSnameref        yes     Python           s--    no    the original name for the tag
 -       UCTAGSassignmentop   no      R                s--    no    operator for assignment
+-       UCTAGSconstructor    yes     R                s--    no    function used for making value assigned to the tag (NOT USED YET)
 -       UCTAGSsectionMarker  no      ReStructuredText s--    no    character used for declaring section
 -       UCTAGSmixin          yes     Ruby             s--    no    how the class or module is mixed in (mixin:HOW:MODULE)
 -       UCTAGSparameter      no      SystemVerilog    --b    no    parameter whose value can be overridden.

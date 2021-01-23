@@ -111,6 +111,7 @@ static kindDefinition RKinds[KIND_COUNT] = {
 
 typedef enum {
 	F_ASSIGNMENT_OPERATOR,
+	F_CONSTRUCTOR,
 } rField;
 
 static fieldDefinition RFields [] = {
@@ -119,6 +120,11 @@ static fieldDefinition RFields [] = {
 		.description = "operator for assignment",
 		.enabled = false,
 	},
+	{
+		.name = "constructor",
+		.description = "function used for making value assigned to the tag (NOT USED YET)",
+		.enabled = true,
+	}
 };
 
 typedef int keywordId;			/* to allow KEYWORD_NONE */
