@@ -215,8 +215,31 @@ static int r6ReadRightSideSymbol (rSubparser *s,
 								  int parent,
 								  tokenInfo *const token)
 {
-	if (strcmp (tokenString (token), "R6Class") != 0)
+	tokenInfo * token0 = NULL;
+	tokenInfo * token1 = NULL;
+	if (strcmp (tokenString (token), "R6") == 0)
+	{
+		tokenInfo * token0 = rNewToken ();
+		tokenRead (token0);
+		if (!tokenIsType (token0, R_SCOPE))
+			goto reject;
+		if (strcmp (tokenString (token0), "::"))
+			goto reject;
+
+		tokenInfo * token1 = rNewToken ();
+		tokenRead (token1);
+		if (!tokenIsType (token1, R_SYMBOL))
+			goto reject;
+		if (strcmp (tokenString (token1), "R6Class"))
+			goto reject;
+		tokenCopy (token, token1);
+		tokenDelete (token1);
+		tokenDelete (token0);
+		token0 = token1 = NULL;
+	}
+	else if (strcmp (tokenString (token), "R6Class") != 0)
 		return CORK_NIL;
+
 	rTokenReadNoNewline (token);
 	if (tokenIsTypeVal (token, '('))
 	{
@@ -227,6 +250,16 @@ static int r6ReadRightSideSymbol (rSubparser *s,
 		parseClass (s, token, corkIndex);
 		return corkIndex;
 	}
+	return CORK_NIL;
+ reject:
+	if (token1)
+		tokenUnread (token1);
+	if (token0)
+		tokenUnread (token0);
+	/* tokenDelete accepts NULL. */
+	tokenDelete (token1);
+	tokenDelete (token0);
+
 	return CORK_NIL;
 }
 
