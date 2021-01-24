@@ -356,9 +356,6 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 			if (pb->cache)
 				return pb->cache;
 
-			if (pb->flags & DSL_PATTR_PURE)
-				dsl_throw (UNBOUND_VARIABLE, object);
-
 			r = pb->proc (es_nil, env);
 			if (pb->flags & DSL_PATTR_MEMORABLE)
 				pb->cache = r;
