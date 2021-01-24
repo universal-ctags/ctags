@@ -2996,6 +2996,22 @@ EsObject* es_map   (EsObject * (*fn) (EsObject *, void *),
 	return o;
 }
 
+EsObject* es_foreach (EsObject * (*fn) (EsObject *, void *),
+					  EsObject *list, void *user_data)
+{
+	if (es_null (list))
+		return es_false;
+
+	for (EsObject *c = list; !es_null (c); c = es_cdr (c))
+	{
+		EsObject *r = fn (es_car (c), user_data);
+		if (!es_object_equal (r, es_false))
+			return r;
+	}
+
+	return es_false;
+}
+
 static EsObject*
 es_vmatch_atom_input(EsObject* input, EsObject* fmt_object, va_list *ap)
 {
