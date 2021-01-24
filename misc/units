@@ -772,19 +772,11 @@ run_tcase ()
 failure_in_globing ()
 {
     # skip if globing failed, also ignore backup files
-    local file=$1
-    local pat='~$|\*'
-    # use [[ if it is available in the shell implementation.
-    if type '[[' > /dev/null 2>&1; then
-	if [[ "$file" =~ $pat ]]; then
-	    return 0
-	fi
-    else
-	if echo "$file" | grep -q '~$\|\*'; then
-	    return 0
-	fi
-    fi
-    return 1
+    case $1 in
+        *\~)  return 0 ;;
+        *\**) return 0 ;;
+         *)   return 1 ;;
+     esac
 }
 
 run_dir ()
