@@ -167,7 +167,7 @@ static DSLProcBind pbinds [] = {
 	  .macro = macro_string_append },
 	{ "string->regexp",  NULL,                 NULL, 0, 0,
 	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal.",
-	  .macro = string2regex},
+	  .macro = string2regex },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
 	{ "true",    value_true, NULL, 0, 0UL,
