@@ -72,6 +72,7 @@ static EsObject* builtin_length (EsObject *args, DSLEnv *env);
 static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env);
 static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env);
 
+static EsObject* builtin_string_append (EsObject *args, DSLEnv *env);
 static EsObject* builtin_add  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_sub  (EsObject *args, DSLEnv *env);
 
@@ -157,6 +158,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(+ <integer> <integer>) -> <integer>", },
 	{ "-",               builtin_sub,          NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(- <integer> <integer>) -> <integer>", },
+	{ "string-append",   builtin_string_append,NULL, 0, 0,
+	  .helpstr = "(string-append any ...)" },
 	{ "string->regexp",  NULL,                 NULL, 0, 0,
 	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal.",
 	  .macro = string2regex},
@@ -1022,6 +1025,57 @@ EsObject* dsl_entry_scope_name (const tagEntry *entry)
 	r = es_object_autounref (es_string_new (kind + 1));
 
 	return r;
+}
+
+static EsObject* accumulate_length (EsObject *elt, void *data)
+{
+	size_t *len = data;
+	if (!es_string_p (elt))
+		dsl_throw (STRING_REQUIRED, elt);
+
+	const char *s = es_string_get (elt);
+	*len += strlen (s);
+
+	return es_false;
+}
+
+static EsObject* string_accumulate (EsObject *elt, void *data)
+{
+	char **cursor = data;
+	const char *s;
+	char *t;
+
+	for (s = es_string_get(elt), t = *cursor;
+		 *s != '\0';
+		 s++, t++)
+		*t = *s;
+	*cursor = t;
+	return es_false;
+}
+
+static EsObject* builtin_string_append  (EsObject *args, DSLEnv *env)
+{
+	size_t len = 0;
+
+	EsObject *r = es_foreach (accumulate_length, args, &len);
+	if (!es_object_equal (r, es_false))
+		return r;
+
+	char *buf = malloc (len + 1);
+	if (buf == NULL)
+		return ES_ERROR_MEMORY;
+
+	char *cursor = buf;
+	r = es_foreach (string_accumulate, args, &cursor);
+	if (!es_object_equal (r, es_false))
+		goto out;
+	*cursor = '\0';
+
+	r = es_string_new (buf);
+
+ out:
+	free (buf);
+	return es_object_autounref (r);
 }
 
 static EsObject* builtin_add  (EsObject *args, DSLEnv *env)
