@@ -101,6 +101,7 @@ DECLARE_VALUE_FN(typeref);
 DECLARE_VALUE_FN(roles);
 DECLARE_VALUE_FN(xpath);
 
+static EsObject* macro_string_append (EsObject *args);
 static EsObject* string2regex (EsObject *args);
 
 /*
@@ -158,8 +159,12 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(+ <integer> <integer>) -> <integer>", },
 	{ "-",               builtin_sub,          NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(- <integer> <integer>) -> <integer>", },
+	{ "concat",   builtin_string_append,NULL, 0, 0,
+	  .helpstr = "(concat any<string> ...) -> <string>; an alias for string-append",
+	  .macro = macro_string_append },
 	{ "string-append",   builtin_string_append,NULL, 0, 0,
-	  .helpstr = "(string-append any ...)" },
+	  .helpstr = "(string-append any<string> ...) -> <string>",
+	  .macro = macro_string_append },
 	{ "string->regexp",  NULL,                 NULL, 0, 0,
 	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal.",
 	  .macro = string2regex},
@@ -1076,6 +1081,69 @@ static EsObject* builtin_string_append  (EsObject *args, DSLEnv *env)
  out:
 	free (buf);
 	return es_object_autounref (r);
+}
+
+static EsObject* optimize_strings (EsObject *kar, EsObject *kdr, void *user_data)
+{
+	EsObject *r;
+	if (!es_string_p (kar))
+	{
+		r = es_cons (kar, kdr);
+		return r;
+	}
+
+	EsObject *kadr = es_car (kdr);
+	if (!es_string_p (kadr))
+	{
+		r = es_cons (kar, kdr);
+		return r;
+	}
+
+	const char *kar_str = es_string_get (kar);
+	const char *kadr_str = es_string_get (kadr);
+	size_t kar_len = strlen (kar_str);
+	size_t kadr_len = strlen (kadr_str);
+	char *buf = malloc (kar_len + kadr_len + 1);
+	if (buf == NULL)
+		return ES_ERROR_MEMORY;
+
+	memcpy (buf, kadr_str, kadr_len);
+	memcpy (buf + kadr_len, kar_str, kar_len);
+	buf [kadr_len + kar_len] = '\0';
+
+	EsObject *elt = es_object_autounref (es_string_new (buf));
+	free (buf);
+
+	if (es_error_p (elt))
+		return ES_ERROR_MEMORY;
+
+	r = es_cons (elt, es_cdr (kdr));
+
+	return r;
+}
+
+static EsObject* macro_string_append (EsObject *expr)
+{
+	EsObject *new_expr;
+	EsObject *list = es_cdr (expr);
+	EsObject *r = es_fold (optimize_strings,
+						   es_nil, list, NULL);
+
+	if (es_error_p (r))
+		return es_error_set_object (r, expr);
+
+	EsObject *str = es_car (r);
+	if (es_string_p (str) && es_null (es_cdr (r)))
+		new_expr = es_object_ref (str);
+	else
+	{
+		EsObject *kar = es_car (expr);
+		EsObject* rr  = es_reverse (r);
+		new_expr = es_cons (kar, rr);
+		es_object_unref (rr);
+	}
+	es_object_unref (r);
+	return new_expr;
 }
 
 static EsObject* builtin_add  (EsObject *args, DSLEnv *env)
