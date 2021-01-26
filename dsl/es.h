@@ -254,6 +254,10 @@ EsObject* es_map   (EsObject * (*fn) (EsObject *, void *),
 EsObject* es_foreach (EsObject * (*fn) (EsObject *, void *),
 					  EsObject *list, void *user_data);
 
+/* The memory management of es_map is also applicable to es_fold. */
+EsObject* es_fold (EsObject * (*kons) (EsObject *, EsObject *, void *),
+				   EsObject * knil, EsObject * list, void *user_data);
+
 /*
  * Rich element accessors
  */
