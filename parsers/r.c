@@ -739,13 +739,25 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	bool in_func = tokenIsKeyword (token, R_FUNCTION);
 	int corkIndex;
 
+	/* Call sub parsers */
+	corkIndex = notifyReadRightSideSymbol (symbol,
+										   assignment_operator,
+										   parent,
+										   token);
+
+	if (corkIndex == CORK_NIL)
+	{
+		/* No subparser handle the symbol */
+		int kind = in_func? K_FUNCTION: K_GLOBALVAR;
+		corkIndex = makeSimpleRTag (symbol, parent, in_func,
+									kind,
+									assignment_operator);
+	}
+
 	if (in_func)
 	{
-		corkIndex = makeSimpleRTag (symbol, parent, true,
-									K_FUNCTION, assignment_operator);
+		/* parse signature */
 		tokenReadNoNewline (token);
-
-		/* Signature */
 		if (tokenIsTypeVal (token, '('))
 		{
 			if (corkIndex == CORK_NIL)
@@ -760,14 +772,6 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 			tokenReadNoNewline (token);
 		}
 	}
-	else if ((corkIndex = notifyReadRightSideSymbol (symbol,
-													 assignment_operator,
-													 parent,
-													 token)) != CORK_NIL)
-		;
-	else
-		corkIndex = makeSimpleRTag (symbol, parent, false,
-									K_GLOBALVAR, assignment_operator);
 
 	int new_scope = (in_func
 					 ? (corkIndex == CORK_NIL
