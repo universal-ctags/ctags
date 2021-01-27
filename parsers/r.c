@@ -731,13 +731,14 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 {
 	R_TRACE_ENTER();
 
-	int corkIndex = CORK_NIL;
 	char *const assignment_operator = eStrdup (tokenString (token));
 	vString *signature = NULL;
 
 	tokenReadNoNewline (token);
 
 	bool in_func = tokenIsKeyword (token, R_FUNCTION);
+	int corkIndex;
+
 	if (in_func)
 	{
 		corkIndex = makeSimpleRTag (symbol, parent, true,
