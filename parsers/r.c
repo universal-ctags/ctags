@@ -771,16 +771,14 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 			}
 			tokenReadNoNewline (token);
 		}
+		parent = (corkIndex == CORK_NIL
+				  ? blackHoleIndex
+				  : corkIndex);
 	}
 
-	int new_scope = (in_func
-					 ? (corkIndex == CORK_NIL
-						? blackHoleIndex
-						: corkIndex)
-					 : parent);
-	R_TRACE_TOKEN_TEXT("body", token, new_scope);
+	R_TRACE_TOKEN_TEXT("body", token, parent);
 
-	parseStatement (token, new_scope, false, false);
+	parseStatement (token, parent, false, false);
 
 	tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
 	if (tag)
