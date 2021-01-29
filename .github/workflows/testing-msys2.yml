@@ -1,0 +1,56 @@
+name: run units target on MSYS2
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  testing:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        msystem: [MSYS, MINGW32, MINGW64]
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.msystem }}
+        update: true
+        install: git make automake1.16 autoconf
+
+    - if:  matrix.msystem == 'MSYS'
+      run: pacman -S --noconfirm gcc libiconv-devel pkg-config python dos2unix
+
+    - if:  matrix.msystem == 'MINGW32'
+      run: pacman -S --noconfirm mingw-w64-i686-toolchain
+
+    - if:  matrix.msystem == 'MINGW64'
+      run: pacman -S --noconfirm mingw-w64-x86_64-toolchain
+
+    - run: ln -s /usr/bin/automake-1.16 /usr/bin/automake
+    - run: ln -s /usr/bin/aclocal-1.16  /usr/bin/aclocal
+    
+    - run: git config --global core.autocrlf input
+      shell: bash
+    - uses: actions/checkout@v2
+
+    - run: ./autogen.sh
+    - run: ./configure --prefix=/usr
+    - run: make V=1
+    - run: make install
+    - run: file /usr/bin/ctags
+    - run: ctags --version
+    
+    - run: make check V=1 APPVEYOR=1
+     
+    # FAILED: "./readtags.exe" -t "/d/a/ctags2/ctags2/Units/parser-asciidoc.r/utf8-asciidoc.d/expected.tags" - "@Ѐ–𐀀"
+    # The raw tag name was "@Ѐ–𐀀"
+    - if:  matrix.msystem == 'MSYS'
+      run: make roundtrip
