@@ -227,6 +227,34 @@ static  int notifyReadFuncall (tokenInfo *const func, tokenInfo *const token, in
 /*
 *   FUNCTION DEFINITIONS
 */
+static bool hasKindOrCtor (tagEntryInfo * e, int kind)
+{
+       if (e->langType == Lang_R)
+	   {
+		   if (e->kindIndex == kind)
+			   return true;
+	   }
+	   else if (kind == K_FUNCTION)
+	   {
+		   if (askSubparserTagHasFunctionAlikeKind (e))
+			   return true;
+	   }
+
+	   const char *tmp = getParserFieldValueForType (e,
+													 RFields [F_CONSTRUCTOR].ftype);
+	   if (tmp == NULL)
+		   return tmp;
+
+	   const char * ctor = kindExtraInfo [kind].ctor;
+	   if (ctor == NULL)
+		   return false;
+
+       if (strcmp (tmp, ctor) == 0)
+               return true;
+
+       return false;
+}
+
 static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 							const char * assignmentOp)
 {
@@ -287,13 +315,27 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 static int makeSimpleRTag (tokenInfo *const token, int parent, bool in_func, int kind,
 						   const char * assignmentOp)
 {
+	int r;
+	const char *ctor = kindExtraInfo [kind].ctor;
 	tagEntryInfo *pe = (parent == CORK_NIL)? NULL: getEntryInCorkQueue (parent);
+
 	if (pe == NULL || pe->langType == Lang_R ||
 		!askSubparserTagAcceptancy (pe))
-		return makeSimpleRTagR (token, parent, kind, assignmentOp);
+		r = makeSimpleRTagR (token, parent, kind, assignmentOp);
 	else
-		return makeSimpleSubparserTag (pe->langType, token, parent, in_func,
-									   kind, assignmentOp);
+		r = makeSimpleSubparserTag (pe->langType, token, parent, in_func,
+									kind, assignmentOp);
+
+	if (0 && ctor)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (r);
+		if (e)
+			attachParserField (e, true,
+							   RFields [F_CONSTRUCTOR].ftype,
+							   ctor);
+	}
+
+	return r;
 }
 
 static void clearToken (tokenInfo *token)
