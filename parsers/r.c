@@ -109,6 +109,18 @@ static kindDefinition RKinds[KIND_COUNT] = {
 	{false,'z', "parameter",  "function parameters inside function definitions" },
 };
 
+struct sKindExtraInfo {
+	const char *anon_prefix;
+	const char *ctor;
+};
+
+static struct sKindExtraInfo kindExtraInfo[KIND_COUNT] = {
+	[K_FUNCTION] = {
+		"anonFunc",
+		"function",
+	},
+};
+
 typedef enum {
 	F_ASSIGNMENT_OPERATOR,
 	F_CONSTRUCTOR,
@@ -943,7 +955,8 @@ static bool parseStatement (tokenInfo *const token, int parent,
 			/* This statement doesn't start with a symbol.
 			 * This function is not assigned to any symbol. */
 			tokenInfo *const anonfunc = newTokenByCopying (token);
-			anonGenerate (anonfunc->string, "anonFunc", K_FUNCTION);
+			anonGenerate (anonfunc->string, kindExtraInfo [K_FUNCTION].anon_prefix,
+						  K_FUNCTION);
 			tokenUnread (token);
 			vStringClear (token->string);
 			parseRightSide (token, anonfunc, parent);
