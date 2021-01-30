@@ -236,35 +236,47 @@ static  int notifyReadFuncall (tokenInfo *const func, tokenInfo *const token, in
 /*
 *   FUNCTION DEFINITIONS
 */
-static bool hasKindOrCtor (tagEntryInfo * e, int kind)
+static bool hasKindsOrCtors (tagEntryInfo * e, int kinds[], size_t count)
 {
        if (e->langType == Lang_R)
 	   {
-		   if (e->kindIndex == kind)
-			   return true;
+		   for (size_t i = 0; i < count; i++)
+		   {
+			   if (e->kindIndex == kinds[i])
+				   return true;
+		   }
 	   }
-	   else if (kind == K_FUNCTION)
+	   else
 	   {
-		   if (askSubparserTagHasFunctionAlikeKind (e))
+		   bool function = false;
+		   for (size_t i = 0; i < count; i++)
+		   {
+			   if (K_FUNCTION == kinds[i])
+			   {
+				   function = true;
+				   break;
+			   }
+		   }
+		   if (function && askSubparserTagHasFunctionAlikeKind (e))
 			   return true;
 	   }
 
 	   const char *tmp = getParserFieldValueForType (e,
 													 RFields [F_CONSTRUCTOR].ftype);
 	   if (tmp == NULL)
-		   return tmp;
-
-	   const char * ctor = kindExtraInfo [kind].ctor;
-	   if (ctor == NULL)
 		   return false;
 
-       if (strcmp (tmp, ctor) == 0)
+	   for (size_t i = 0; i < count; i++)
+	   {
+		   const char * ctor = kindExtraInfo [kinds[i]].ctor;
+		   if (ctor && strcmp (tmp, ctor) == 0)
                return true;
+	   }
 
        return false;
 }
 
-static int searchScopeOtherThan (int scope, int kind)
+static int searchScopeOtherThan (int scope, int kinds[], size_t count)
 {
 	do
 	{
@@ -272,7 +284,7 @@ static int searchScopeOtherThan (int scope, int kind)
 		if (!e)
 			return CORK_NIL;
 
-		if (!hasKindOrCtor (e, kind))
+		if (!hasKindsOrCtors (e, kinds, count))
 			return scope;
 
 		scope = e->extensionFields.scopeIndex;
@@ -308,10 +320,10 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 		if (kind == K_GLOBALVAR)
 			kind = K_FUNCVAR;
 	}
-	else if (pe && (kind == K_GLOBALVAR) && hasKindOrCtor (pe, K_VECTOR))
+	else if (pe && (kind == K_GLOBALVAR) && hasKindsOrCtors (pe, (int[]){K_VECTOR}, 1))
 	{
 		parent = searchScopeOtherThan (pe->extensionFields.scopeIndex,
-									   K_VECTOR);
+									   (int[]){K_VECTOR}, 1);
 		if (parent == CORK_NIL)
 			cousin = anyKindEntryInScope (parent, tokenString (token), K_GLOBALVAR);
 		else
@@ -359,7 +371,7 @@ static int makeSimpleRTag (tokenInfo *const token, int parent, bool in_func, int
 	/* makeTagWithTranslation method for subparsers
 	   called from makeSimpleSubparserTag expects
 	   kind should be resolved. */
-	if (pe && hasKindOrCtor (pe, K_VECTOR))
+	if (pe && hasKindsOrCtors (pe, (int[]){K_VECTOR}, 1))
 	{
 		if (assignmentOp
 			&& strcmp (assignmentOp, "=") == 0)
