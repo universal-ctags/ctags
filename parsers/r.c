@@ -828,6 +828,15 @@ extern void rTeardownCollectingSignature (tokenInfo *const token)
 	teardownCollectingSignature (token);
 }
 
+static int getKindForToken (tokenInfo *const token)
+{
+	if (tokenIsKeyword (token, R_FUNCTION))
+		return K_FUNCTION;
+	else if (tokenIsKeyword (token, R_C))
+		return K_VECTOR;
+	return K_GLOBALVAR;
+}
+
 static bool findNonPlaceholder (int corkIndex, tagEntryInfo *entry, void *data)
 {
 	bool *any_non_placehoders = data;
@@ -848,19 +857,13 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 
 	tokenReadNoNewline (token);
 
-	int kind = K_GLOBALVAR;
-	if (tokenIsKeyword (token, R_FUNCTION))
-		kind = K_FUNCTION;
-	else if (tokenIsKeyword (token, R_C))
-		kind = K_VECTOR;
-	int corkIndex;
+	int kind = getKindForToken (token);
 
 	/* Call sub parsers */
-	corkIndex = notifyReadRightSideSymbol (symbol,
-										   assignment_operator,
-										   parent,
-										   token);
-
+	int corkIndex = notifyReadRightSideSymbol (symbol,
+											   assignment_operator,
+											   parent,
+											   token);
 	if (corkIndex == CORK_NIL)
 	{
 		/* No subparser handle the symbol */
@@ -1091,7 +1094,7 @@ static bool parseStatement (tokenInfo *const token, int parent,
 			/* This statement doesn't start with a symbol.
 			 * This function is not assigned to any symbol. */
 			tokenInfo *const anonfunc = newTokenByCopying (token);
-			int kind = tokenIsKeyword (token, R_FUNCTION)? K_FUNCTION: K_VECTOR;
+			int kind = getKindForToken (token);
 			anonGenerate (anonfunc->string,
 						  kindExtraInfo [kind].anon_prefix, kind);
 			tokenUnread (token);
