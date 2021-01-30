@@ -51,6 +51,7 @@ static int r6MakeTagWithTranslation (rSubparser *s,
 									 int kindInR,
 									 const char *const assignmentOperator);
 static bool r6AskTagAcceptancy (rSubparser *s, tagEntryInfo *pe);
+static bool r6HasFunctionAlikeKind (rSubparser *s, tagEntryInfo *e);
 
 static void parseClass (rSubparser *s, tokenInfo *const token, int classIndex);
 
@@ -81,6 +82,7 @@ static struct r6Subparser r6Subparser = {
 		.readRightSideSymbol = r6ReadRightSideSymbol,
 		.makeTagWithTranslation = r6MakeTagWithTranslation,
 		.askTagAcceptancy = r6AskTagAcceptancy,
+		.hasFunctionAlikeKind = r6HasFunctionAlikeKind,
 	},
 	.access = NULL,
 	.activeBinding = false,
@@ -252,6 +254,13 @@ static int r6MakeTagWithTranslation (rSubparser *s,
 static bool r6AskTagAcceptancy (rSubparser *s, tagEntryInfo *pe)
 {
 	return (pe->kindIndex == R6_K_CLASS);
+}
+
+static bool r6HasFunctionAlikeKind (rSubparser *s,
+									tagEntryInfo *e)
+{
+	return e->kindIndex == R6_K_METHOD ||
+		e->kindIndex == R6_K_ACTIVE_BINDING_FUNCTION;
 }
 
 static void findR6Tags(void)
