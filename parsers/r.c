@@ -848,8 +848,11 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 
 	tokenReadNoNewline (token);
 
-	bool in_func = tokenIsKeyword (token, R_FUNCTION);
-	bool in_vec  = tokenIsKeyword (token, R_C);
+	int kind = K_GLOBALVAR;
+	if (tokenIsKeyword (token, R_FUNCTION))
+		kind = K_FUNCTION;
+	else if (tokenIsKeyword (token, R_C))
+		kind = K_VECTOR;
 	int corkIndex;
 
 	/* Call sub parsers */
@@ -861,13 +864,12 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	if (corkIndex == CORK_NIL)
 	{
 		/* No subparser handle the symbol */
-		int kind = (in_func? K_FUNCTION: (in_vec? K_VECTOR: K_GLOBALVAR));
-		corkIndex = makeSimpleRTag (symbol, parent, in_func,
+		corkIndex = makeSimpleRTag (symbol, parent, kind == K_FUNCTION,
 									kind,
 									assignment_operator);
 	}
 
-	if (in_func)
+	if (kind == K_FUNCTION)
 	{
 		/* parse signature */
 		tokenReadNoNewline (token);
@@ -888,7 +890,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 				  ? blackHoleIndex
 				  : corkIndex);
 	}
-	else if (in_vec)
+	else if (kind == K_VECTOR)
 	{
 		tokenRead (token);
 		parsePair (token, corkIndex, NULL);
@@ -911,7 +913,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 		}
 		/* If a vector has no named attribte and it has no lval,
 		 * we don't make a tag for the vector. */
-		if (in_vec &&
+		if (kind == K_VECTOR &&
 			*assignment_operator == '\0')
 		{
 			bool any_non_placehoders = false;
