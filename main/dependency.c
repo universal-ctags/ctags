@@ -292,6 +292,19 @@ extern slaveParser *getFirstSlaveParser (struct slaveControlBlock *scb)
 	return NULL;
 }
 
+extern subparser *getLanguageSubparser (langType sublang,
+										bool including_none_crafted_parser)
+{
+	subparser *s;
+
+	foreachSubparser (s, including_none_crafted_parser)
+	{
+		if (getSubparserLanguage (s) == sublang)
+			return s;
+	}
+	return NULL;
+}
+
 extern struct colprintTable * subparserColprintTableNew (void)
 {
 	return colprintTableNew ("L:NAME", "L:BASEPARSER", "L:DIRECTIONS", NULL);
