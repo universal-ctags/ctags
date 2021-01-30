@@ -1086,10 +1086,9 @@ static bool parseStatement (tokenInfo *const token, int parent,
 			R_TRACE_TOKEN_TEXT ("break with \\n", token, parent);
 			break;
 		}
-		else if (tokenIsType (token, R_KEYWORD)
-				 && (tokenIsKeyword (token, R_FUNCTION)
-					 || (tokenIsKeyword (token, R_C)
-						 && isAtConstructorInvocation ())))
+		else if ((tokenIsKeyword (token, R_FUNCTION)
+				  || (tokenIsKeyword (token, R_C)
+					  && isAtConstructorInvocation ())))
 		{
 			/* This statement doesn't start with a symbol.
 			 * This function is not assigned to any symbol. */
