@@ -1113,22 +1113,18 @@ static  int makeSimpleSubparserTag (int langType,
 									const char *assignmentOperator)
 {
 	int q = CORK_NIL;
-	subparser *sub;
-	foreachSubparser (sub, false)
+	subparser *sub = getLanguageSubparser (langType, false);
+	if (sub)
 	{
-		if (sub->slaveParser->id == langType)
+		rSubparser *rsub = (rSubparser *)sub;
+		if (rsub->makeTagWithTranslation)
 		{
-			rSubparser *rsub = (rSubparser *)sub;
-			if (rsub->makeTagWithTranslation)
-			{
-				enterSubparser (sub);
-				q = rsub->makeTagWithTranslation (rsub,
-												  token, parent,
-												  in_func, kindInR,
-												  assignmentOperator);
-				leaveSubparser ();
-			}
-			break;
+			enterSubparser (sub);
+			q = rsub->makeTagWithTranslation (rsub,
+											  token, parent,
+											  in_func, kindInR,
+											  assignmentOperator);
+			leaveSubparser ();
 		}
 	}
 	return q;
@@ -1137,19 +1133,14 @@ static  int makeSimpleSubparserTag (int langType,
 static  bool askSubparserTagAcceptancy (tagEntryInfo *pe)
 {
 	bool q = false;
-	subparser *sub;
-	foreachSubparser (sub, false)
+	subparser *sub = getLanguageSubparser (pe->langType, false);
 	{
-		if (sub->slaveParser->id == pe->langType)
+		rSubparser *rsub = (rSubparser *)sub;
+		if (rsub->askTagAcceptancy)
 		{
-			rSubparser *rsub = (rSubparser *)sub;
-			if (rsub->askTagAcceptancy)
-			{
-				enterSubparser (sub);
-				q = rsub->askTagAcceptancy (rsub, pe);
-				leaveSubparser ();
-			}
-			break;
+			enterSubparser (sub);
+			q = rsub->askTagAcceptancy (rsub, pe);
+			leaveSubparser ();
 		}
 	}
 	return q;
