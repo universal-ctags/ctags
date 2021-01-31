@@ -956,8 +956,7 @@ static bool parseStatement (tokenInfo *const token, int parent,
 			/* This statement doesn't start with a symbol.
 			 * This function is not assigned to any symbol. */
 			tokenInfo *const anonfunc = newTokenByCopying (token);
-			anonGenerate (anonfunc->string, "anonFunc",
-						  parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR);
+			anonGenerate (anonfunc->string, "anonFunc", K_FUNCTION);
 			tokenUnread (token);
 			vStringClear (token->string);
 			parseRightSide (token, anonfunc, parent);
