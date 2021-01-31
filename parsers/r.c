@@ -104,8 +104,8 @@ static kindDefinition RKinds[KIND_COUNT] = {
 	 .referenceOnly = true, ATTACH_ROLES (RLibraryRoles) },
 	{true, 's', "source", "sources",
 	 .referenceOnly = true, ATTACH_ROLES (RSourceRoles) },
-	{true, 'g', "globalVar", "global variables"},
-	{true, 'v', "functionVar", "function variables"},
+	{true, 'g', "globalVar", "global variables having values other than function()"},
+	{true, 'v', "functionVar", "function variables having values other than function()"},
 	{false,'z', "parameter",  "function parameters inside function definitions" },
 };
 
@@ -204,6 +204,7 @@ static  int notifyReadRightSideSymbol (tokenInfo *const symbol,
 static  int makeSimpleSubparserTag (int langType, tokenInfo *const token, int parent,
 									bool in_func, int kindInR, const char *assignmentOperator);
 static  bool askSubparserTagAcceptancy (tagEntryInfo *pe);
+static  bool askSubparserTagHasFunctionAlikeKind (tagEntryInfo *e);
 static  int notifyReadFuncall (tokenInfo *const func, tokenInfo *const token, int parent);
 
 /*
@@ -223,21 +224,29 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 			return CORK_NIL;
 
 		parent = CORK_NIL;
-		/* TODO: we must choose K_GLOBALVAR or K_FUNCTION though K_GLOBALVAR
-		 * is used statically here.*/
-		kind = K_GLOBALVAR;
 	}
-	else if (kind != K_FUNCTION)
+
+	/* If the tag (T) to be created is defined in a scope and
+	   the scope already has another tag having the same name
+	   as T, T should not be created. */
+	tagEntryInfo *pe = getEntryInCorkQueue (parent);
+	int cousin = CORK_NIL;
+	if (pe && ((pe->langType == Lang_R && pe->kindIndex == K_FUNCTION)
+			   || (pe->langType != Lang_R && askSubparserTagHasFunctionAlikeKind (pe))))
 	{
-		if (kind == K_FUNCVAR)
-		{
-			if (anyKindsEntryInScope (parent, tokenString (token),
-									  (int[]){K_FUNCVAR, K_PARAM}, 2) != CORK_NIL)
-				return CORK_NIL;
-		}
-		else if (anyKindEntryInScope (parent, tokenString (token), kind) != CORK_NIL)
-			return CORK_NIL;
+		cousin = anyEntryInScope (parent, tokenString (token));
+		if (kind == K_GLOBALVAR)
+			kind = K_FUNCVAR;
 	}
+	else if (pe)
+	{
+		/* The condition for tagging is a bit relaxed here.
+		   Even if the same name tag is created in the scope, a name
+		   is tagged if kinds are different. */
+		cousin = anyKindEntryInScope (parent, tokenString (token), kind);
+	}
+	if (cousin != CORK_NIL)
+		return CORK_NIL;
 
 	int corkIndex = makeSimpleTag (token->string, kind);
 	tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
@@ -752,8 +761,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	if (in_func)
 	{
 		corkIndex = makeSimpleRTag (symbol, parent, true,
-									parent == CORK_NIL? K_FUNCTION: K_FUNCVAR,
-									assignment_operator);
+									K_FUNCTION, assignment_operator);
 		tokenReadNoNewline (token);
 
 		/* Signature */
@@ -778,8 +786,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 		;
 	else
 		corkIndex = makeSimpleRTag (symbol, parent, false,
-									parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR,
-									assignment_operator);
+									K_GLOBALVAR, assignment_operator);
 
 	int new_scope = (in_func
 					 ? (corkIndex == CORK_NIL
@@ -873,8 +880,7 @@ static bool preParseLoopCounter(tokenInfo *const token, int parent)
 
 	tokenReadNoNewline (token);
 	if (tokenIsType (token, R_SYMBOL))
-		makeSimpleRTag (token, parent, false,
-						(parent == CORK_NIL) ? K_GLOBALVAR: K_FUNCVAR , NULL);
+		makeSimpleRTag (token, parent, false, K_GLOBALVAR, NULL);
 
 	if (tokenIsEOF (token)
 		|| tokenIsTypeVal (token, ')'))
@@ -1025,8 +1031,7 @@ static bool parseStatement (tokenInfo *const token, int parent,
 				|| tokenIsType (token, R_STRING))
 			{
 				makeSimpleRTag (token, parent, false,
-								parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR,
-								assignment_operator);
+								K_GLOBALVAR, assignment_operator);
 				tokenRead (token);
 			}
 			eFree (assignment_operator);
@@ -1142,6 +1147,23 @@ static  bool askSubparserTagAcceptancy (tagEntryInfo *pe)
 			q = rsub->askTagAcceptancy (rsub, pe);
 			leaveSubparser ();
 		}
+	}
+	return q;
+}
+
+static  bool askSubparserTagHasFunctionAlikeKind (tagEntryInfo *e)
+{
+	bool q = false;
+	pushLanguage (Lang_R);
+	subparser *sub = getLanguageSubparser (e->langType, false);
+	Assert (sub);
+	popLanguage ();
+	rSubparser *rsub = (rSubparser *)sub;
+	if (rsub->hasFunctionAlikeKind)
+	{
+		enterSubparser (sub);
+		q = rsub->hasFunctionAlikeKind (rsub, e);
+		leaveSubparser ();
 	}
 	return q;
 }

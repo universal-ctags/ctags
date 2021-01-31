@@ -30,14 +30,14 @@ f1	input-2.r	/^    {f1 = 1;$/;"	v	line:15	function:f	end:15	assignmentop:=
 g1	input-2.r	/^       g1 <- 2}$/;"	v	line:16	function:f	end:16	assignmentop:<-
 h1	input-2.r	/^    {h1 = 1; j1 <- 2}$/;"	v	line:18	function:f	end:18	assignmentop:=
 j1	input-2.r	/^    {h1 = 1; j1 <- 2}$/;"	v	line:18	function:f	end:18	assignmentop:<-
-g	input-2.r	/^    g = function () {$/;"	v	line:19	function:f	signature:()	end:28	assignmentop:=
-c2	input-2.r	/^	{c2 = 1$/;"	v	line:20	functionVar:f.g	end:20	assignmentop:=
-d2	input-2.r	/^	   d2 <- 2}$/;"	v	line:22	functionVar:f.g	end:22	assignmentop:<-
-f2	input-2.r	/^	{f2 = 1;$/;"	v	line:24	functionVar:f.g	end:24	assignmentop:=
-g2	input-2.r	/^	   g2 <- 2}$/;"	v	line:25	functionVar:f.g	end:25	assignmentop:<-
-h2	input-2.r	/^	{h2 = 1; j2 <- 2}$/;"	v	line:27	functionVar:f.g	end:27	assignmentop:=
-j2	input-2.r	/^	{h2 = 1; j2 <- 2}$/;"	v	line:27	functionVar:f.g	end:27	assignmentop:<-
-h0	input-2.r	/^    }; h0 = function () {$/;"	v	line:28	function:f	signature:()	end:31	assignmentop:=
+g	input-2.r	/^    g = function () {$/;"	f	line:19	function:f	signature:()	end:28	assignmentop:=
+c2	input-2.r	/^	{c2 = 1$/;"	v	line:20	function:f.g	end:20	assignmentop:=
+d2	input-2.r	/^	   d2 <- 2}$/;"	v	line:22	function:f.g	end:22	assignmentop:<-
+f2	input-2.r	/^	{f2 = 1;$/;"	v	line:24	function:f.g	end:24	assignmentop:=
+g2	input-2.r	/^	   g2 <- 2}$/;"	v	line:25	function:f.g	end:25	assignmentop:<-
+h2	input-2.r	/^	{h2 = 1; j2 <- 2}$/;"	v	line:27	function:f.g	end:27	assignmentop:=
+j2	input-2.r	/^	{h2 = 1; j2 <- 2}$/;"	v	line:27	function:f.g	end:27	assignmentop:<-
+h0	input-2.r	/^    }; h0 = function () {$/;"	f	line:28	function:f	signature:()	end:31	assignmentop:=
 k	input-2.r	/^	   k <<- 3$/;"	g	line:29	end:29	assignmentop:<<-
 f	input-3.r	/^f <- function () {$/;"	f	line:1	signature:()	end:8	assignmentop:<-
 d	input-3.r	/^	d <- ($/;"	v	line:2	function:f	end:4	assignmentop:<-
