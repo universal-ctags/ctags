@@ -19,7 +19,7 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-The *ctags* and *etags* programs
+The *ctags* and *etags* (see ``-e`` option) programs
 (hereinafter collectively referred to as ctags,
 except where distinguished) generate an index (or "tag") file for a
 variety of *language objects* found in *source file(s)*. This tag file allows
@@ -117,7 +117,7 @@ List options
 ~~~~~~~~~~~~
 
 Universal Ctags introduces many ``--list-...`` options that provide
-the internal data of Universal Ctags (See :ref:`option_listing`). Both users and client tools may
+the internal data of Universal Ctags (See "`Listing Options`_"). Both users and client tools may
 use the data. ``--with-list-header`` and ``--machinable`` options
 adjust the output of the most of ``--list-...`` options.
 
@@ -191,11 +191,7 @@ Input/Output File Options
 
 	For an example, you want ctags to ignore all files
 	under ``foo`` directory except ``foo/main.c``, use the following command
-	line: ``--exclude=foo/* --exclude-exception=foo/main.c``. Don't forget
-	shell quoting for '``*``'.
-
-.. TODO: Which shell requires the quoting?
-   At least bash does not require quoting unless directory `--exclude=foo' exists.
+	line: ``--exclude=foo/* --exclude-exception=foo/main.c``.
 
 ``--filter[=yes|no]``
 	Makes ctags behave as a filter, reading source
@@ -522,6 +518,8 @@ Language Selection and Mapping Options
 
 Tags File Contents Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
+
 ``--excmd=type``
 	Determines the type of ``EX`` command used to locate tags in the source
 	file. [Ignored in etags mode]
@@ -619,7 +617,7 @@ Tags File Contents Options
 
 ``--fields=[+|-]flags|*``
 	Specifies which available extension fields are to be included in
-	the tag entries (see "`TAG FILE FORMAT`_" section, and "`Fields`_"
+	the tag entries (see "`TAG FILE FORMAT`_" section, and "`Extension fields`_"
 	subsection, for more information).
 
 	The parameter ``flags`` is a set of one-letter or long-name flags,
@@ -685,12 +683,6 @@ Tags File Contents Options
 
 ``--<LANG>-kinds=[+|-]kinds|*``
 	This option is obsolete. Use ``--kinds-<LANG>=...`` instead.
-
-``--param-<LANG>:name=argument``
-	Set <LANG> specific parameter. Available parameters can be listed with
-	``--list-params``.
-
-	.. TODO: add description of "parameter".
 
 ``--pattern-length-limit=N``
 	Truncate patterns of tag entries after '``N``' characters. Disable by setting to 0
@@ -1035,7 +1027,7 @@ Listing Options
 
 ``--list-fields[=language|all]``
 	Lists the fields recognized for either the specified *language* or
-	*all* languages. See "`Fields`_" subsection to know what are fields.
+	*all* languages. See "`Extension fields`_" subsection to know what are fields.
 	``all`` is used as default value if the option argument is omitted.
 
 	.. TODO? xref output
@@ -1191,7 +1183,7 @@ Listing Options
 	This option does not work with ``--machinable`` nor
 	``--with-list-header``.
 
-	.. TODO: ".. may be used in many other options...": I don't think it is``all`` worth to be described.
+	.. TODO: ".. may be used in many other options...": I don't think it is worth to be described.
 
 ``--list-map-extensions[=language|all]``
 	Lists the file extensions which associate a file
@@ -1442,15 +1434,6 @@ is given or not.)
 
 .. TODO: all heuristics??? To be confirmed.
 
-.. options should be revised here
-	``--map-<LANG>`` (done)
-	``--langmap=map[,map[...]]`` (done)
-	``--language-force=language`` (done)
-	``--languages=[+|-]list`` (done)
-	``--list-maps[=language|all]`` (done)
-	``--list-map-extensions`` (done)
-	``--list-map-patterns`` (done)
-
 Heuristically guessing
 ..........................
 
@@ -1565,8 +1548,11 @@ Examples:
 TAG FILE FORMAT
 ---------------
 
+This section describes the tag file format briefly.  See :ref:`tags(5) <tags(5)>` and
+:ref:`ctags-client-tools(7) <ctags-client-tools(7)>` for more details.
+
 When not running in etags mode, each entry in the tag file consists of a
-separate line, each looking like this in the most general case:
+separate line, each looking like this, called *regular tags*, in the most general case:
 
 ::
 
@@ -1574,19 +1560,35 @@ separate line, each looking like this in the most general case:
 
 The fields and separators of these lines are specified as follows:
 
-	1.	tag name
-	2.	single tab character
-	3.	name of the file in which the object associated with the tag is located
-	4.	single tab character
-	5.	EX command used to locate the tag within the file; generally a
-		search pattern (either /pattern/ or ?pattern?) or line number (see
-		``--excmd``). Tag file format 2 (see ``--format``) extends this EX command
-		under certain circumstances to include a set of extension fields
-		(described below) embedded in an EX comment immediately appended
-		to the EX command, which leaves it backward-compatible with original
-		vi(1) implementations.
+	1.	``tag_name``: tag name
+	2.	``<TAB>``: single tab character
+	3.	``file_name``: name of the file in which the object associated with the tag is located
+	4.	``<TAB>``: single tab character
+	5.	``ex_cmd``: EX command used to locate the tag within the file; generally a
+		search pattern (either ``/pattern/`` or ``?pattern?``) or line number (see
+		``--excmd=type`` option).
+	6.	``;"<TAB>extension_fields``: a set of extension fields. See
+		"`Extension fields`_" for more details.
 
-A few special tags are written into the tag file for internal purposes.
+		Tag file format 2 (see ``--format``) extends the EX command
+		to include the extension fields embedded in an EX comment immediately appended
+		to the EX command, which leaves it backward-compatible with original
+		``vi(1)`` implementations.
+
+A few special tags, called *pseudo tags*, are written into the tag file for internal purposes.
+
+::
+
+	!_TAG_FILE_FORMAT       2       /extended format; --format=1 will not append ;" to lines/
+	!_TAG_FILE_SORTED       1       /0=unsorted, 1=sorted, 2=foldcase/
+	...
+
+``--pseudo-tags=[+|-]ptag|*`` option enables or disables emitting pseudo-tags.
+
+See the output of ``ctags --list-pseudo-tags`` for the list of
+the kinds.
+See also :ref:`tags(5) <tags(5)>` and :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` for more details of the pseudo tags.
+
 These tags are composed in such a way that they always sort to the top of
 the file. Therefore, the first two characters of these tags are used a magic
 number to detect a tag file for purposes of determining whether a
@@ -1596,9 +1598,8 @@ Note that the name of each source file will be recorded in the tag file
 exactly as it appears on the command line. Therefore, if the path you
 specified on the command line was relative to the current directory, then
 it will be recorded in that same manner in the tag file. See, however,
-the ``--tag-relative`` option for how this behavior can be modified.
-
-.. _tag_entries:
+the ``--tag-relative[=yes|no|always|never]`` option for how this behavior can be
+modified.
 
 TAG ENTRIES
 -----------
@@ -1614,24 +1615,14 @@ objects: places where named language objects *are used*. However, support
 for generating reference tags is new and limited to specific areas of
 specific languages in the current version.
 
-Fields
-~~~~~~
+Extension fields
+~~~~~~~~~~~~~~~~
 
-A tag can record various information, called *fields*. The
-essential fields are: *name* of language objects, *input*,
-*pattern*, and *line*. ``input:`` is the name of source file where
-``name:`` is defined or referenced. ``pattern:`` can be used to search
-the *name* in ``input:``. *line* is the line number where
-``name:`` is defined or referenced in ``input:``.
-
-ctags offers extension fields. See also the
-descriptions of ``--list-fields`` option and ``--fields`` option.
+A tag can record various information, called *extension fields*.
 
 Extension fields are tab-separated key-value pairs appended to the end of
 the EX command as a comment, as described above. These key value pairs
-appear in the general form ``key:value``. Their presence in the lines of the
-tag file are controlled by the ``--fields`` option. The possible keys and
-the meaning of their values are as follows:
+appear in the general form ``key:value``.
 
 In addition, information on the scope of the tag definition may be
 available, with the key portion equal to some language-dependent construct
@@ -1640,78 +1631,83 @@ This scope entry indicates the scope in which the tag was found.
 For example, a tag generated for a C structure member would have a scope
 looking like ``struct:myStruct``.
 
-The meaning of major fields is as follows (one-letter flag/long-name flag):
+``--fields=[+|-]flags|*`` and ``--fields-<LANG>=[+|-]flags|*`` options specifies
+which available extension fields are to be included in the tag entries.
+
+See the output of ``ctags --list-fields`` for the list of
+extension fields.
+The essential fields are ``name``, ``input``, ``pattern``, and ``line``.
+The meaning of major fields is as follows (long-name flag/one-letter flag):
 
 ``access``/``a``
-	Access (or export) of class members
-
 	Indicates the visibility of this class member, where value is specific
 	to the language.
 
 ``end``/``e``
-	End lines of various items
+	Indicates the line number of the end lines of the language object.
+
+``extras``/``E``
+	Extra tag type information. See "`Extras`_" for details.
 
 ``file``/``f``
-	File-restricted scoping. Enabled by default.
-
 	Indicates that the tag has file-limited visibility. This key has no
-	corresponding value.
+	corresponding value. Enabled by default.
 
 ``implementation``/``m``
-	Implementation information
-
 	When present, this indicates a limited implementation (abstract vs.
 	concrete) of a routine or class, where value is specific to the
 	language (``virtual`` or ``pure virtual`` for C++; ``abstract`` for Java).
 
 ``inherits``/``i``
-	Inheritance information.
-
-	When present, value. is a comma-separated list of classes from which
+	When present, value is a comma-separated list of classes from which
 	this class is derived (i.e. inherits from).
 
+``input``/``F``
+	The name of source file where ``name`` is defined or referenced.
+
 ``k``
-	Kind of tag as one-letter. Enabled by default.
-	Exceptionally this has no long-name.
+	`Kind <Kinds>`_ of tag as one-letter. Enabled by default.
+	This field has no long-name.
 	See also ``kind``/``z`` flag.
 
 ``K``
-	Kind of tag as long-name.
-	Exceptionally this has no long-name.
+	`Kind <Kinds>`_ of tag as long-name.
+	This field has no long-name.
 	See also ``kind``/``z`` flag.
 
 ``kind``/``z``
-	Include the ``kind:`` key in kind field.  See also ``k`` and ``K`` flags.
+	Include the ``kind:`` key in `kind field <Kinds>`_.  See also ``k`` and ``K`` flags.
 
 ``language``/``l``
 	Language of source file containing tag
 
 ``line``/``n``
-	Line number of tag definition
+	The line number where ``name`` is defined or referenced in ``input``.
+
+``name``/``N``
+	The name of language objects.
+
+``pattern``/``P``
+	Can be used to search the ``name`` in ``input``
 
 ``roles``/``r``
-	Roles assigned to the tag.
-	For a definition tag, this field takes ``def`` as a value.
+	Roles assigned to the tag. See "`Roles`_" for more details.
 
 ``s``
 	Scope of tag definition. Enabled by default.
-	Exceptionally this has no long-name.
-	See also ``Z`` flag.
+	This field has no long-name.
+	See also ``scope``/``Z`` flag.
 
-	.. TODO? implement "scope" of Z/scope flag.
-
-``Z``
-	Include the ``scope:`` key in scope field.
-	Exceptionally this has no long-name.  See also ``s`` flag.
+``scope``/``Z``
+	Prepend the ``scope:`` key to scope (``s``) field.
+	See also ``s`` flag.
 
 ``scopeKind``/``p``
 	Kind of scope as long-name
 
 ``signature``/``S``
-	Signature of routine (e.g. prototype or parameter list)
-
 	When present, value is a language-dependent representation of the
-	signature of a routine. A routine signature in its complete form
+	signature of a routine (e.g. prototype or parameter list). A routine signature in its complete form
 	specifies the return type of a routine and its formal argument list.
 	This extension field is presently supported only for C-based
 	languages and does not include the return type.
@@ -1721,26 +1717,41 @@ The meaning of major fields is as follows (one-letter flag/long-name flag):
 	callable like function as ``typeref:`` field.
 	Enabled by default.
 
-Check the output of the ``--list-fields`` option for the other minor
-fields.
-
 Kinds
-~~~~~~
+......
 
-``kind:`` is a field which represents the *kind* of language object
+``kind`` is a field which represents the *kind* of language object
 specified by a tag. Kinds used and defined are very different between
 parsers. For example, C language defines ``macro``, ``function``,
-``variable``, ``typedef``, etc. See also the descriptions of
-``--list-kinds-full`` option and ``--kinds-<LANG>`` option.
+``variable``, ``typedef``, etc.
 
-Indicates the type, or kind, of tag. Its value is either one of the
-corresponding one-letter flags described under the various
-``--kinds-<LANG>`` options above, or a long-name flag. It is permitted
+``--kinds-<LANG>=[+|-]kinds|*`` option specifies a list of language-specific
+kinds of tags (or kinds) to include in the output file for a particular
+language.
+
+See the output of ``ctags --list-kinds-full`` for the complete
+list of the kinds.
+
+Its value is either one of the
+corresponding one-letter flags or a long-name flag. It is permitted
 (and is, in fact, the default) for the key portion of this field to be
-omitted. The optional behaviors are controlled with the ``--fields`` option.
+omitted. The optional behaviors are controlled with the ``--fields`` option as follows.
+
+.. code-block:: console
+
+	$ ctags -o - kinds.c
+	foo     kinds.c /^int foo() {$/;"       f       typeref:typename:int
+	$ ctags --fields=+k -o - kinds.c
+	foo     kinds.c /^int foo() {$/;"       f       typeref:typename:int
+	$ ctags --fields=+K -o - kinds.c
+	foo     kinds.c /^int foo() {$/;"       function        typeref:typename:int
+	$ ctags --fields=+z -o - kinds.c
+	foo     kinds.c /^int foo() {$/;"       kind:f  typeref:typename:int
+	$ ctags --fields=+zK -o - kinds.c
+	foo     kinds.c /^int foo() {$/;"       kind:function   typeref:typename:int
 
 Roles
-~~~~~~
+......
 
 *Role* is a newly introduced concept in Universal Ctags. Role is a
 concept associated with reference tags, and is not implemented widely yet.
@@ -1754,15 +1765,35 @@ kind. In other words, the ``kind`` field identifies the *what* of the language
 object, whereas the ``roles`` field identifies the *how* of a referenced language
 object. Roles are only used with specific kinds.
 
-For example, for the source file used for demonstrating in the "`Extras`_"
-subsection, ``Baz`` is tagged as a reference tag with kind ``package`` and with
-role ``imported``. Another example is for a C++ ``header`` kind tag, generated by
-``#include`` statements: the ``roles:system`` or ``roles:local`` fields will be
-added depending on whether the include file name begins with '``<``' or not.
+For a definition tag, this field takes ``def`` as a value.
 
-See also the descriptions of ``--list-roles`` and ``--roles-<LANG>.<KIND>=``
-options.
+For example, ``Baz`` is tagged as a reference tag with kind ``package`` and with
+role ``imported`` with the following code.
 
+.. code-block:: java
+
+	package Bar;
+	import Baz;
+
+	class Foo {
+			// ...
+	}
+
+.. code-block:: console
+
+	$ ctags --fields=+KEr -uo - roles.java
+	Bar     roles.java     /^package Bar;$/;"      package roles:def
+	Foo     roles.java     /^class Foo {$/;"       class   roles:def
+	$ ctags --fields=+EKr --extras=+r -uo - roles.java
+	Bar     roles.java     /^package Bar;$/;"      package roles:def
+	Baz     roles.java     /^import Baz;$/;"       package roles:imported  extras:reference
+	Foo     roles.java     /^class Foo {$/;"       class   roles:def
+
+``--roles-<LANG>.<KIND>=[+|-]roles|*`` option specifies a list of kind-specific
+roles of tags to include in the output file for a particular language.
+
+Inquire the output of ``ctags --list-roles`` for the list of
+roles.
 
 Extras
 ~~~~~~
@@ -1775,18 +1806,18 @@ name, or for tagging something not associated with a language object. A typical
 extra tag is ``qualified``, which tags a language object with a
 class-qualified or scope-qualified name.
 
-Inquire the output of ``--list-extras`` option for the other minor
-extras.
+``--extra=[+|-]flags|*`` and ``--extras-<LANG>=[+|-]flags|*`` options specifies
+whether to include extra tag entries for certain kinds of information.
 
-See also the descriptions of ``--list-extras`` option and ``--extras``
-option in "`OPTIONS`_".
+Inquire the output of ``ctags --list-extras`` for the list of extras.
+The meaning of major extras is as follows (long-name flag/one-letter flag):
 
-The meaning of major extras is as follows (one-letter flag/long-name flag):
-
-none/``anonymous``
+``anonymous``/none
 	Include an entry for the language object that has no name like lambda
 	function. This extra has no one-letter flag and is enabled by
-	default. The extra tag is useful as a placeholder to fill scope fields
+	default.
+
+	The extra tag is useful as a placeholder to fill scope fields
 	for language objects defined in a language object with no name.
 
 	.. code-block:: C
@@ -1801,12 +1832,13 @@ none/``anonymous``
 	ctags generates an anonymous extra tag for the struct
 	and fills the scope fields with the name of the extra tag.
 
-	.. code-block:: tags
+	.. code-block:: console
 
+		$ ctags --fields=-f -uo - input.c
 		__anon9f26d2460108	input.c	/^struct {$/;"	s
-		p	input.c	/^} p = { .x = 0.0, .y = 0.0 };$/;"	v	typeref:struct:__anon9f26d2460108
 		x	input.c	/^	double x, y;$/;"	m	struct:__anon9f26d2460108
 		y	input.c	/^	double x, y;$/;"	m	struct:__anon9f26d2460108
+		p	input.c	/^} p = { .x = 0.0, .y = 0.0 };$/;"	v	typeref:struct:__anon9f26d2460108
 
 	The above tag output has ``__anon9f26d2460108`` as an anonymous extra tag.
 	The typeref field of '``p``' also receives the benefit of it.
@@ -1815,11 +1847,28 @@ none/``anonymous``
 	Indicates whether tags scoped only for a single file (i.e. tags which
 	cannot be seen outside of the file in which they are defined, such as
 	language objects with ``static`` modifier of C language) should be included
-	in the output. See also the ``-h`` option. This option is enabled by
-	default. This is the replacement for ``--file-scope`` option of
-	Exuberant Ctags.
+	in the output. See also the ``-h`` option.
 
-	.. TODO: "This option" is ambiguous. fileScope Extra Tag or -h option?
+	This extra tag is enabled by default. Add ``--extras=-F`` option not to
+	output tags scoped only for a single-file. This is the replacement for
+	``--file-scope`` option of Exuberant Ctags.
+
+	.. code-block:: c
+
+		static int f() {
+			return 0;
+		}
+		int g() {
+			return 0;
+		}
+
+	.. code-block:: console
+
+		$ ctags -uo - filescope.c
+		f       filescope.c     /^static int f() {$/;"  f       typeref:typename:int    file:
+		g       filescope.c     /^int g() {$/;" f       typeref:typename:int
+		$ ctags --extras=-F -uo - filescope.c
+		g       filescope.c     /^int g() {$/;" f       typeref:typename:int
 
 ``inputFile``/``f``
 	Include an entry for the base file name of every source file
@@ -1831,7 +1880,7 @@ none/``anonymous``
 	attached to the tag. (However, ctags omits the ``end:`` field
 	if no newline is in the file like an empty file.)
 
-	By default, ctags doesn't create the ``f/inputFile`` extra
+	By default, ctags doesn't create the ``inputFile``/``f`` extra
 	tag for the source file when ctags doesn't find a parser
 	for it. Enabling ``Unknown`` parser with ``--languages=+Unknown`` forces
 	ctags to create the extra tags for any source files.
@@ -1868,20 +1917,52 @@ none/``anonymous``
 
 	.. code-block:: Java
 
-		package Bar;
-		import Baz;
+		class point {
+			double x;
+		};
 
-		class Foo {
-			// ...
-		}
-
-	For the above source file, ctags tags ``Bar`` and ``Foo`` by
+	For the above source file, ctags tags ``point`` and ``x`` by
 	default.  If the ``qualified`` extra is enabled from the command line
-	(``--extras=+q``), then ``Bar.Foo`` is also tagged even though the string
-	``Bar.Foo`` is not in the source code.
+	(``--extras=+q``), then ``point.x`` is also tagged even though the string
+	"``point.x``" is not in the source code.
+
+	.. code-block:: console
+
+		$ ctags --fields=+K -uo - qualified.java
+		point   qualified.java  /^class point {$/;"     class
+		x       qualified.java  /^      double x;$/;"   field   class:point
+		$ ctags --fields=+K --extras=+q -uo - qualified.java
+		point   qualified.java  /^class point {$/;"     class
+		x       qualified.java  /^      double x;$/;"   field   class:point
+		point.x qualified.java  /^      double x;$/;"   field   class:point
 
 ``reference``/``r``
 	Include reference tags. See "`TAG ENTRIES`_" about reference tags.
+
+	The following example demonstrates the ``reference`` extra tag.
+
+	.. code-block:: c
+
+		#include <stdio.h>
+		#include "utils.h"
+		#define X
+		#undef X
+
+	The ``roles:system`` or ``roles:local`` fields will be
+	added depending on whether the include file name begins with '``<``' or not.
+
+	``#define X`` emits a definition tag. On the other hand ``#undef X`` emits a
+	reference tag.
+
+	.. code-block:: console
+
+		$ ctags --fields=+EKr -uo - inc.c
+		X       inc.c   /^#define X$/;" macro   file:   roles:def       extras:fileScope
+		$ ctags --fields=+EKr --extras=+r -uo - inc.c
+		stdio.h inc.c   /^#include <stdio.h>/;" header  roles:system    extras:reference
+		utils.h inc.c   /^#include "utils.h"/;" header  roles:local     extras:reference
+		X       inc.c   /^#define X$/;" macro   file:   roles:def       extras:fileScope
+		X       inc.c   /^#undef X$/;"  macro   file:   roles:undef     extras:fileScope,reference
 
 Language-specific fields and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1890,18 +1971,9 @@ Exuberant Ctags has the concept of *fields* and *extras*. They are common
 between parsers of different languages. Universal Ctags extends this concept
 by providing language-specific fields and extras.
 
-.. options should be explained and revised here
-   ``--list-languages`` (done)
-   ``--list-kinds``     (done)
-   ``--list-kinds-full``(done)
-   ``--list-fields``    (done)
-   ``--list-extras``    (done)
-   ``--list-roles``     (done)
-   ``--kinds-<LANG>=``  (done)
-   ``--fields=``        (done)
-   ``--fields-<LANG>``  (done)
-   ``--extras=``        (done)
-   ``--extras-<LANG>=`` (done)
+.. Note: kinds are language-specific since e-ctags. roles are new to u-ctags.
+
+.. TODO: move the following "Hot to ..." sections to FAQ man page when available
 
 HOW TO USE WITH VI
 ------------------
@@ -1980,8 +2052,6 @@ identical to the line containing the tag. The following example
 demonstrates this condition:
 
 .. code-block:: C
-	:linenos:
-	:emphasize-lines: 1,5
 
 	int variable;
 
@@ -1994,8 +2064,8 @@ demonstrates this condition:
 
 Depending upon which editor you use and where in the code you happen to be,
 it is possible that the search pattern may locate the local parameter
-declaration on the line 5 before it finds the actual global variable definition
-on the line 1, since the lines (and therefore their search patterns) are
+declaration before it finds the actual global variable definition,
+since the lines (and therefore their search patterns) are
 identical.
 
 This can be avoided by use of the ``--excmd=n`` option.
