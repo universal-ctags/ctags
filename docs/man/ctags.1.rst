@@ -205,6 +205,22 @@ Input/Output File Options
 	esoteric and is disabled by default. This option must appear before
 	the first file name.
 
+``--filter-terminator=string``
+	Specifies a string to print to standard output following the tags for
+	each file name parsed when the ``--filter`` option is enabled. This may
+	permit an application reading the output of ctags
+	to determine when the output for each file is finished.
+
+	Note that if the
+	file name read is a directory and ``--recurse`` is enabled, this string will
+	be printed only once at the end of all tags found for by descending
+	the directory. This string will always be separated from the last tag
+	line for the file by its terminating newline.
+
+	This option is quite
+	esoteric and is empty by default. This option must appear before
+	the first file name.
+
 ``--links[=yes|no]``
 	Indicates whether symbolic links (if supported) should be followed.
 	When disabled, symbolic links are ignored. This option is on by default.
@@ -283,24 +299,6 @@ Input/Output File Options
 
 Output Format Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-``--filter-terminator=string``
-	Specifies a string to print to standard output following the tags for
-	each file name parsed when the ``--filter`` option is enabled. This may
-	permit an application reading the output of ctags
-	to determine when the output for each file is finished.
-
-	Note that if the
-	file name read is a directory and ``--recurse`` is enabled, this string will
-	be printed only once at the end of all tags found for by descending
-	the directory. This string will always be separated from the last tag
-	line for the file by its terminating newline.
-
-	This option is quite
-	esoteric and is empty by default. This option must appear before
-	the first file name.
-
-.. TODO: Shall we move this after "--filter"?
-
 ``--format=level``
 	Change the format of the output tag file. Currently the only valid
 	values for level are 1 or 2. Level 1 specifies the original tag file
@@ -649,8 +647,6 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 	(i.e. ``--fields-all=``), all fields are disabled. These two combinations
 	are useful for testing.
 
-	.. TODO: "to all languages;" instead of "to all fields;" ???
-
 ``--kinds-<LANG>=[+|-]kinds|*``
 	Specifies a list of language-specific kinds of tags (or kinds) to
 	include in the output file for a particular language, where *<LANG>* is
@@ -683,6 +679,9 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 
 ``--<LANG>-kinds=[+|-]kinds|*``
 	This option is obsolete. Use ``--kinds-<LANG>=...`` instead.
+
+..	COMMENT:
+	``--param-<LANG>:name=argument`` is moved to "Language Specific Options"
 
 ``--pattern-length-limit=N``
 	Truncate patterns of tag entries after '``N``' characters. Disable by setting to 0
@@ -757,18 +756,30 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 	(e.g.  ``--roles-all.*=*`` or ``--roles-all.*=``).
 
 ``--tag-relative[=yes|no|always|never]``
-	The ``yes`` value indicates that the file paths recorded in the tag file should be
-	relative to the directory containing the tag file, rather than relative
-	to the current directory, unless the files supplied on the command line
-	are specified with absolute paths. This option must appear before the
+	Specifies how the file paths recorded in the tag file.
+	This option must appear before the
 	first file name. The default is ``yes`` when running in etags mode (see
 	the ``-e`` option), ``no`` otherwise.
-	The ``always`` value indicates the recorded file paths should be relative
-	even if source file names are passed in with absolute paths.
-	The ``never`` value indicates the recorded file paths should be absolute
-	even if source file names are passed in with relative paths.
 
-	.. TODO: make as a definition list
+	``yes``
+		indicates that the file paths recorded in the tag file should be
+		*relative to the directory containing the tag file*
+		unless the files supplied on the command line
+		are specified with absolute paths.
+
+	``no``
+		indicates that the file paths recorded in the tag file should be
+		*relative to the current directory*
+		unless the files supplied on the command line
+		are specified with absolute paths.
+
+	``always``
+		indicates the recorded file paths should be relative
+		even if source file names are passed in with absolute paths.
+
+	``never``
+		indicates the recorded file paths should be absolute
+		even if source file names are passed in with relative paths.
 
 ``--use-slash-as-filename-separator[=yes|no]``
 	Uses slash ('``/``') character as filename separators instead of backslash
@@ -1249,8 +1260,6 @@ Listing Options
 
 	ENABLED
 		Whether the kind is enabled or not. It takes ``yes`` or ``no``.
-		(Currently all roles are enabled. An option for disabling
-		a specified role is not implemented yet.)
 
 	DESCRIPTION
 		Human readable description for the role.
@@ -1528,8 +1537,6 @@ conditions.  "interpreter" testing is enabled only when a file is an
 executable or the ``--guess-language-eagerly`` (``-G`` in short) option is
 given. The other heuristic tests are enabled only when ``-G`` option is
 given.
-
-.. TODO: move the paragraph above to the beginning of this section.
 
 The ``--print-language`` option can be used just to print the results of
 parser selections for given files instead of generating a tags file.
