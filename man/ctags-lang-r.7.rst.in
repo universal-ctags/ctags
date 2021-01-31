@@ -36,6 +36,7 @@ Well-known constructor and kind mapping
 	=========== ==================
 	function()  function
 	c()         vector
+	list()      list
 	=========== ==================
 
 If a variable doesn't get a value returned from one of well-known
@@ -50,9 +51,11 @@ Here is an example demonstrating the usage of the kinds:
 
 	G <- 1
 	v <- c(1, 2)
+	l <- list(3, 4)
 	f <- function(a) {
 		g <- function (b) a + b
 		w <- c(1, 2)
+		m <- list (3, 4)
 		L <- 2
 	}
 
@@ -63,9 +66,11 @@ with "--options=NONE --sort=no --fields=+KZ -o - input.r"
 
 	G	input.r	/^G <- 1$/;"	globalVar
 	v	input.r	/^v <- c(1, 2)$/;"	vector
+	l	input.r	/^l <- list(3, 4)$/;"	list
 	f	input.r	/^f <- function(a) {$/;"	function
 	g	input.r	/^	g <- function (b) a + b$/;"	function	scope:function:f
 	w	input.r	/^	w <- c(1, 2)$/;"	vector	scope:function:f
+	m	input.r	/^	m <- list (3, 4)$/;"	list	scope:function:f
 	L	input.r	/^	L <- 2$/;"	functionVar	scope:function:f
 
 .. TODO:

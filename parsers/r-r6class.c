@@ -155,7 +155,7 @@ static void parseList (rSubparser *s,
 	if (tokenIsTypeVal (token, '='))
 	{
 		rTokenReadNoNewline (token);
-		if (tokenIsType (token, R_SYMBOL) && strcmp(tokenString (token), "list") == 0)
+		if (tokenIsKeyword (token, R_LIST))
 		{
 			rTokenReadNoNewline (token);
 			if (tokenIsTypeVal (token, '('))
