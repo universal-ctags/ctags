@@ -10,13 +10,7 @@ Extending ctags with Regex parser (*optlib*)
 	:local:
 
 .. TODO:
-	review extras, fields, and roles sections
-	possibly restructure this file's section ordering
-	add documentation for --_mtable-extend-<LANG>
-	add documentation for tjump, treset, tquit flags
 	add a section on debugging
-	add a section on langdef base parser flag, including
-		shared/dedicated/bidirectional directions
 
 Exuberant Ctags allows a user to add a new parser to ctags with ``--langdef=<LANG>``
 and ``--regex-<LANG>=...`` options.
@@ -1540,8 +1534,6 @@ following input file::
 Defining a subparser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. TODO upper level?
-
 Basic
 .........................................................................
 
@@ -1754,135 +1746,3 @@ To add your optlib file, ``foo.ctags``, into ``ctags`` do the following steps;
 
 You are encouraged to submit your :file:`.ctags` file to our repository on
 github through a pull request. See :ref:`contributions` for more details.
-
-.. TODO: the following section is a duplicate of "Contribution" chatper and has
-   less information than it.  To be removed.
-
-.. _submitting_optlib:
-
-Submitting an optlib file to the Universal Ctags project
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You are encouraged to submit your :file:`.ctags` file to our repository on
-github through a pull request.
-
-Universal Ctags provides a facility for "Option library".
-Read ":ref:`option_files`" about the concept and usage first.
-
-Here I will explain how to merge your .ctags into Universal Ctags as
-part of the option library. Here I assume you consider contributing
-an option library in which a regex-based language parser is defined.
-
-First you need your option library (which you have seen in this part of the
-guide).  See `How to Add Support for a New Language to Exuberant Ctags
-(EXTENDING)`_ to learn how to write a regex-based language parser in C.
-
-In this section I explain what to do after you have your parser.
-
-Like in the link, I use Swine as the name of programming language that
-the parser deals with. Assume source files written in Swine language have a
-suffix *.swn*. The file name of the option library is *swine.ctags*.
-
-.. _`How to Add Support for a New Language to Exuberant Ctags (EXTENDING)`: http://ctags.sourceforge.net/EXTENDING.html
-
-Copyright notice, contact mail address and license term
-......................................................................
-
-Put these information at the header of *swine.ctags*.
-
-An example taken from *data/optlib/ctags.ctags* ::
-
-	#
-	#
-	#  Copyright (c) 2014, Red Hat, Inc.
-	#  Copyright (c) 2014, Masatake YAMATO
-	#
-	#  Author: Masatake YAMATO <yamato@redhat.com>
-	#
-	# This program is free software; you can redistribute it and/or
-	# modify it under the terms of the GNU General Public License
-	# as published by the Free Software Foundation; either version 2
-	# of the License, or (at your option) any later version.
-	#
-	# This program is distributed in the hope that it will be useful,
-	# but WITHOUT ANY WARRANTY; without even the implied warranty of
-	# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	# GNU General Public License for more details.
-	#
-	# You should have received a copy of the GNU General Public License
-	# along with this program; if not, write to the Free Software
-	# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-	# USA.
-	#
-	#
-	...
-
-"GPL version 2 or later version" is needed here. The Option library is not
-linked to ``ctags`` command. However, I have written a translator which
-generates *.c* file from a given option file. Said translator is called
-``optlib2c`` and can be found in ``misc/optlib2c`` from the source tree. As
-result the *.c* file is built into ``ctags`` command. In such a case "GPL
-version 2 or later version" is be required.
-
-*Units* test cases
-......................................................................
-
-We, Universal Ctags developers don't have enough time to learn all
-languages supported by ``ctags``. In other word, we cannot review the
-code. Only test cases help us to know whether a contributed option
-library works well or not. We may reject any contribution without
-a test case.
-
-Read "Using *Units*" about how to write *Units* test cases.  Do not write one
-big test case: smaller cases are helpful to know about the intent of the
-contributor. For example:
-
-* *Units/sh-alias.d*
-* *Units/sh-comments.d*
-* *Units/sh-quotes.d*
-* *Units/sh-statements.d*
-
-are good example of small test cases.
-Big test cases are acceptable if smaller test cases exist.
-
-See also *parser-m4.r/m4-simple.d* especially *parser-m4.r/m4-simple.d/args.ctags*.
-Your test cases need ``ctags`` having already loaded your option
-library, swine.ctags. You must specify loading it in the
-test case own *args.ctags*.
-
-Assume your test name is *swine-simile.d*. Put ``--option=swine`` in
-*Units/swine-simile.d/args.ctags*.
-
-Incorporating your parser to ctags build process
-......................................................................
-
-Add your optlib file, *swine.ctags* to ``OPTLIB2C_INPUT`` variable of
-+*makefiles/optlib2c_input.mak* in Universal Ctags source tree.
-
-
-Verification
-......................................................................
-
-Let's verify all your work here.
-
-1. Run the tests and check whether your test case is passed or failed::
-
-	$ make units
-
-2. Verify your files are installed as expected::
-
-	$ mkdir /tmp/tmp
-	$ ./configure --prefix=/tmp/tmp
-	$ make
-	$ make install
-	$ /tmp/tmp/ctags -o - --languages=Swine something_input.swn
-
-
-Pull-request
-......................................................................
-
-Please, consider submitting your well written optlib parser to
-Universal Ctags. Your *.ctags* is a treasure and can be shared as a
-first class software component in Universal Ctags.
-
-Pull-requests are welcome.
