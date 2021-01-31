@@ -47,7 +47,7 @@ endif
 
 PACKCC = $(top_builddir)/packcc$(BUILD_EXEEXT)
 
-$(PACKCC):
+$(PACKCC): $(top_srcdir)/misc/packcc/packcc.c
 	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(EXTRA_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/misc/packcc/packcc.c
 
 if USE_READCMD
