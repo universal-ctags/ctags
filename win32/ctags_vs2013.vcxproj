@@ -232,13 +232,13 @@
     <ClCompile Include="..\parsers\m4.c" />
     <ClCompile Include="..\parsers\make.c" />
     <ClCompile Include="..\parsers\matlab.c" />
-    <ClCompile Include="..\parsers\moose.c" />
     <ClCompile Include="..\parsers\myrddin.c" />
     <ClCompile Include="..\parsers\nsis.c" />
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\parsers\pascal.c" />
     <ClCompile Include="..\parsers\perl.c" />
+    <ClCompile Include="..\parsers\perl-moose.c" />
     <ClCompile Include="..\parsers\perl6.c" />
     <ClCompile Include="..\parsers\php.c" />
     <ClCompile Include="..\parsers\powershell.c" />
