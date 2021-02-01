@@ -74,6 +74,7 @@ static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env);
 
 static EsObject* builtin_string_append (EsObject *args, DSLEnv *env);
 static EsObject* builtin_string2regexp (EsObject *args, DSLEnv *env);
+static EsObject* builtin_regexp_quote (EsObject *args, DSLEnv *env);
 static EsObject* builtin_add  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_sub  (EsObject *args, DSLEnv *env);
 
@@ -169,6 +170,8 @@ static DSLProcBind pbinds [] = {
 	{ "string->regexp",  builtin_string2regexp,NULL, 0, 0,
 	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal.",
 	  .macro = macro_string2regexp },
+	{ "regexp-quote",    builtin_regexp_quote, NULL, DSL_PATTR_CHECK_ARITY, 1,
+	  .helpstr = "(regexp-quote <string>) -> <string>" },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
 	{ "true",    value_true, NULL, 0, 0UL,
@@ -1274,6 +1277,34 @@ static EsObject* builtin_string2regexp (EsObject *args, DSLEnv *env)
 static EsObject* macro_string2regexp (EsObject *expr)
 {
 	return common_string2regexp (es_cdr (expr), NULL, expr);
+}
+
+static EsObject* builtin_regexp_quote (EsObject *args, DSLEnv *env)
+{
+	EsObject *unquoted_str = es_car (args);
+	if (!es_string_p (unquoted_str))
+		dsl_throw (STRING_REQUIRED, unquoted_str);
+
+	const char *src = es_string_get (unquoted_str);
+	if (src[0] == '\0')
+		return unquoted_str;
+
+	size_t len = strlen (src);
+	char *buf = malloc (len * 2 + 1);
+	if (!buf)
+		return ES_ERROR_MEMORY;
+
+	char *dst = buf;
+	for (size_t i = 0; i < len; i++)
+	{
+		if (strchr ("[{.*+]}^$()|?\\", src [i]))
+			*dst++ = '\\';
+		*dst++ = src[i];
+	}
+	*dst = '\0';
+	EsObject *r = es_object_autounref (es_string_new (buf));
+	free (buf);
+	return r;
 }
 
 void dsl_report_error (const char *msg, EsObject *obj)
