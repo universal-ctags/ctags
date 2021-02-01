@@ -319,3 +319,4 @@ workflows:
       - fedora33_cross_aarch64
       - centos6
       - ubuntu20_mingw
+      - centos7_make
