@@ -103,7 +103,7 @@ DECLARE_VALUE_FN(roles);
 DECLARE_VALUE_FN(xpath);
 
 static EsObject* macro_string_append (EsObject *args);
-static EsObject* macro_string2regex (EsObject *args);
+static EsObject* macro_string2regexp (EsObject *args);
 
 /*
  * DATA DEFINITIONS
@@ -168,7 +168,7 @@ static DSLProcBind pbinds [] = {
 	  .macro = macro_string_append },
 	{ "string->regexp",  builtin_string2regexp,NULL, 0, 0,
 	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal.",
-	  .macro = macro_string2regex },
+	  .macro = macro_string2regexp },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
 	{ "true",    value_true, NULL, 0, 0UL,
@@ -1211,8 +1211,8 @@ static EsObject* value_nil (EsObject *args, DSLEnv *env)
 	return es_nil;
 }
 
-static EsObject* common_string2regex (EsObject *args, DSLEnv *env,
-									  EsObject *original_expr)
+static EsObject* common_string2regexp (EsObject *args, DSLEnv *env,
+									   EsObject *original_expr)
 {
 	static EsObject *self = es_nil;
 	if (self == es_nil)
@@ -1269,9 +1269,9 @@ static EsObject* builtin_string2regexp (EsObject *args, DSLEnv *env)
 	return common_string2regexp (args, env, es_nil);
 }
 
-static EsObject* macro_string2regex (EsObject *expr)
+static EsObject* macro_string2regexp (EsObject *expr)
 {
-	return common_string2regex (es_cdr (expr), NULL, expr);
+	return common_string2regexp (es_cdr (expr), NULL, expr);
 }
 
 void dsl_report_error (const char *msg, EsObject *obj)
