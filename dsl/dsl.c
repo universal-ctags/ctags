@@ -105,6 +105,7 @@ DECLARE_VALUE_FN(xpath);
 
 static EsObject* macro_string_append (EsObject *args);
 static EsObject* macro_string2regexp (EsObject *args);
+static EsObject* macro_regexp_quote (EsObject *args);
 
 /*
  * DATA DEFINITIONS
@@ -171,7 +172,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal.",
 	  .macro = macro_string2regexp },
 	{ "regexp-quote",    builtin_regexp_quote, NULL, DSL_PATTR_CHECK_ARITY, 1,
-	  .helpstr = "(regexp-quote <string>) -> <string>" },
+	  .helpstr = "(regexp-quote <string>) -> <string>",
+	  .macro = macro_regexp_quote },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
 	{ "true",    value_true, NULL, 0, 0UL,
@@ -1279,15 +1281,31 @@ static EsObject* macro_string2regexp (EsObject *expr)
 	return common_string2regexp (es_cdr (expr), NULL, expr);
 }
 
-static EsObject* builtin_regexp_quote (EsObject *args, DSLEnv *env)
+static EsObject* common_regexp_quote (EsObject *args, DSLEnv *env,
+									  EsObject *original_expr)
 {
+	static EsObject *self = es_nil;
+	if (self == es_nil)
+		self = es_symbol_intern ("regexp-quote");
+
+	if (original_expr != es_nil && !es_cons_p (args))
+		dsl_throw(TOO_FEW_ARGUMENTS,
+				  es_car (original_expr));
+
 	EsObject *unquoted_str = es_car (args);
 	if (!es_string_p (unquoted_str))
-		dsl_throw (STRING_REQUIRED, unquoted_str);
+	{
+		if (original_expr  == es_nil)
+			dsl_throw(STRING_REQUIRED, self);
+		else
+			return es_object_ref (original_expr);
+	}
 
 	const char *src = es_string_get (unquoted_str);
 	if (src[0] == '\0')
-		return unquoted_str;
+		return (original_expr  == es_nil)
+			? unquoted_str
+			: es_object_ref (unquoted_str);
 
 	size_t len = strlen (src);
 	char *buf = malloc (len * 2 + 1);
@@ -1302,9 +1320,19 @@ static EsObject* builtin_regexp_quote (EsObject *args, DSLEnv *env)
 		*dst++ = src[i];
 	}
 	*dst = '\0';
-	EsObject *r = es_object_autounref (es_string_new (buf));
+	EsObject *r = es_string_new (buf);
 	free (buf);
-	return r;
+	return (original_expr  == es_nil)? es_object_autounref (r): r;
+}
+
+static EsObject* builtin_regexp_quote (EsObject *args, DSLEnv *env)
+{
+	return common_regexp_quote (args, env, es_nil);
+}
+
+static EsObject* macro_regexp_quote (EsObject *expr)
+{
+	return common_regexp_quote (es_cdr (expr), NULL, expr);
 }
 
 void dsl_report_error (const char *msg, EsObject *obj)
