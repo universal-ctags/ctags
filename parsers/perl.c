@@ -411,6 +411,14 @@ static void findPerlTags (void)
 			spaceRequired = true;
 			qualified = true;
 		}
+		else if (strncmp((const char*) cp, "method", (size_t) 6) == 0)
+		{
+			TRACE("this looks like a sub\n");
+			cp += 6;
+			kind = KIND_PERL_SUBROUTINE;
+			spaceRequired = true;
+			qualified = true;
+		}
 		else if (strncmp((const char*) cp, "use", (size_t) 3) == 0)
 		{
 			cp += 3;
