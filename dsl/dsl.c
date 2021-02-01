@@ -401,6 +401,15 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 	}
 	else if (es_error_p(car))
 		return car;
+	else if (es_cons_p (car))
+	{
+		car = dsl_eval0 (car, env);
+		if (es_error_p(car))
+			return car;
+
+		object = es_object_autounref (es_cons (car, es_cdr (object)));
+		return dsl_eval0 (object, env);
+	}
 	else
 	{
 		EsObject *cdr = es_cdr (object);
