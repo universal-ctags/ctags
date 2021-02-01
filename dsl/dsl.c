@@ -475,8 +475,12 @@ static EsObject *compile (EsObject *expr, void *engine)
 			dsl_throw (UNBOUND_VARIABLE, head);
 		if (pb->macro)
 		{
-			/* TODO: compile recursively */
-			return pb->macro (expr);
+			EsObject *tail = compile (es_cdr (expr), engine);
+			expr = es_cons (head, tail);
+			EsObject *r = pb->macro (expr);
+			es_object_unref (expr);
+			es_object_unref (tail);
+			return r;
 		}
 	}
 	return es_map (compile, expr, engine);
