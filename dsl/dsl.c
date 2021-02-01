@@ -73,6 +73,7 @@ static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env);
 static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env);
 
 static EsObject* builtin_string_append (EsObject *args, DSLEnv *env);
+static EsObject* builtin_string2regexp (EsObject *args, DSLEnv *env);
 static EsObject* builtin_add  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_sub  (EsObject *args, DSLEnv *env);
 
@@ -102,7 +103,7 @@ DECLARE_VALUE_FN(roles);
 DECLARE_VALUE_FN(xpath);
 
 static EsObject* macro_string_append (EsObject *args);
-static EsObject* string2regex (EsObject *args);
+static EsObject* macro_string2regex (EsObject *args);
 
 /*
  * DATA DEFINITIONS
@@ -165,9 +166,9 @@ static DSLProcBind pbinds [] = {
 	{ "string-append",   builtin_string_append,NULL, 0, 0,
 	  .helpstr = "(string-append any<string> ...) -> <string>",
 	  .macro = macro_string_append },
-	{ "string->regexp",  NULL,                 NULL, 0, 0,
+	{ "string->regexp",  builtin_string2regexp,NULL, 0, 0,
 	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal.",
-	  .macro = string2regex },
+	  .macro = macro_string2regex },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
 	{ "true",    value_true, NULL, 0, 0UL,
@@ -1210,36 +1211,67 @@ static EsObject* value_nil (EsObject *args, DSLEnv *env)
 	return es_nil;
 }
 
-static EsObject* string2regex (EsObject *expr)
+static EsObject* common_string2regex (EsObject *args, DSLEnv *env,
+									  EsObject *original_expr)
 {
-	EsObject *args = es_cdr (expr);
+	static EsObject *self = es_nil;
+	if (self == es_nil)
+		self = es_symbol_intern ("string->regexp");
+
 	if (!es_cons_p (args))
-		dsl_throw(TOO_FEW_ARGUMENTS, es_car (expr));
+		dsl_throw(TOO_FEW_ARGUMENTS,
+				  (original_expr == es_nil)
+				  ? self
+				  : es_car (original_expr));
 	else if (!es_string_p (es_car (args)))
-		dsl_throw(STRING_REQUIRED, es_car (expr));
+	{
+		if (original_expr == es_nil)
+			dsl_throw(STRING_REQUIRED, self);
+		else
+			return es_object_ref (original_expr);
+	}
 	else
 	{
+		static EsObject *case_fold_key = es_nil;
+		if (case_fold_key == es_nil)
+			case_fold_key = es_symbol_intern (":case-fold");
+		static EsObject *false_val = es_nil;
+		if (false_val == es_nil)
+			false_val = es_symbol_intern ("false");
+
 		EsObject *case_fold = es_car (es_cdr (args));
 		EsObject *pattern = es_car (args);
 		int icase = 0;
 
 		if (!es_null (case_fold))
 		{
-			if (!es_object_equal (case_fold,
-								  es_symbol_intern (":case-fold")))
-				dsl_throw (WRONG_TYPE_ARGUMENT, expr);
+			if (!es_object_equal (case_fold, case_fold_key))
+				dsl_throw (WRONG_TYPE_ARGUMENT,
+						   (original_expr == es_nil)? self: original_expr);
 
 			case_fold = es_car (es_cdr (es_cdr (args)));
 			if (es_null (case_fold))
-				dsl_throw (TOO_FEW_ARGUMENTS, expr);
+				dsl_throw (TOO_FEW_ARGUMENTS,
+						   (original_expr == es_nil)? self: original_expr);
 
 			icase = ! (es_object_equal(case_fold, es_false)
 					   /* TODO: remove the next condition. */
-					   || es_object_equal(case_fold, es_symbol_intern ("false")));
+					   || es_object_equal(case_fold, false_val));
 		}
 
-		return es_regex_compile (es_string_get (pattern), icase);
+		EsObject *r = es_regex_compile (es_string_get (pattern), icase);
+		return (original_expr == es_nil)? es_object_autounref (r): r;
 	}
+}
+
+static EsObject* builtin_string2regexp (EsObject *args, DSLEnv *env)
+{
+	return common_string2regexp (args, env, es_nil);
+}
+
+static EsObject* macro_string2regex (EsObject *expr)
+{
+	return common_string2regex (es_cdr (expr), NULL, expr);
 }
 
 void dsl_report_error (const char *msg, EsObject *obj)
