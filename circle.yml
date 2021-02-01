@@ -32,7 +32,33 @@ jobs:
        - run:
            name: Test
            command: |
-             make check roundtrip CIRCLECI=1
+             make check CIRCLECI=1
+
+   fedora33_gmake_roundtrip:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/fedora:33
+     steps:
+       - run:
+           name: Install Git
+           command: |
+             yum -y install git gdb
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+             dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
+             dnf -y install jq puppet
+       - run:
+           name: Build
+           command: |
+             bash ./autogen.sh
+             ./configure --enable-debugging
+             make -j 2
+       - run:
+           name: Test
+           command: |
+             make roundtrip CIRCLECI=1
 
   #
   # On Fedora 31 bmake package cannot be installed because a package
@@ -70,7 +96,33 @@ jobs:
        - run:
            name: Test
            command: |
-             MAKE=bmake bmake validate-input check roundtrip codecheck CIRCLECI=1
+             MAKE=bmake bmake validate-input check codecheck CIRCLECI=1
+
+   fedora30_bmake_roundtrip:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/fedora:30
+     steps:
+       - run:
+           name: Install Git and Gdb
+           command: |
+             dnf -y install git gdb
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+             dnf -y install gcc automake autoconf pkgconfig bmake libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils sudo
+             dnf -y install jq puppet
+       - run:
+           name: Build
+           command: |
+             bash ./autogen.sh
+             MAKE=bmake ./configure --enable-debugging
+             bmake -j 2
+       - run:
+           name: Test
+           command: |
+             MAKE=bmake bmake roundtrip CIRCLECI=1
 
    fedora_distcheck:
      working_directory: ~/universal-ctags
@@ -144,7 +196,32 @@ jobs:
        - run:
            name: Test
            command: |
-             make check roundtrip CIRCLECI=1
+             make check CIRCLECI=1
+
+   centos_make_roundtrip:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/centos:latest
+     steps:
+       - run:
+           name: Install Git
+           command: |
+             yum -y install git
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+              yum -y --enablerepo=powertools install python3 gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
+       - run:
+           name: Build
+           command: |
+             bash ./autogen.sh
+             ./configure --enable-debugging
+             make -j 2
+       - run:
+           name: Test
+           command: |
+             make roundtrip CIRCLECI=1
    centos7_make:
      working_directory: ~/universal-ctags
      docker:
@@ -158,7 +235,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-              yum -y gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
+              yum -y install python3 gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
        - run:
            name: Build
            command: |
@@ -168,7 +245,33 @@ jobs:
        - run:
            name: Test
            command: |
-             make check roundtrip CIRCLECI=1
+             make check CIRCLECI=1
+
+   centos7_make_roundtrip:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/centos:7
+     steps:
+       - run:
+           name: Install Git
+           command: |
+             yum -y install git
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+              yum -y install gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
+       - run:
+           name: Build
+           command: |
+             bash ./autogen.sh
+             ./configure --enable-debugging
+             make -j 2
+       - run:
+           name: Test
+           command: |
+             make roundtrip CIRCLECI=1
+
    ubuntu20_mingw:
      working_directory: ~/universal-ctags
      docker:
@@ -305,7 +408,43 @@ jobs:
            name: Test
            command: |
              cd ctags
-             make check roundtrip CIRCLECI=1
+             make check CIRCLECI=1
+
+   centos6_roundtrip:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: centos:6.10
+     steps:
+       - run:
+           name: Rearrange CentOS-Base.repo file
+           command: |
+             sed -i 's|#baseurl=|baseurl=|g'       /etc/yum.repos.d/CentOS-Base.repo
+             sed -i 's|mirrorlist=|#mirrorlist=|g' /etc/yum.repos.d/CentOS-Base.repo
+             sed -i 's|mirror|vault|g'             /etc/yum.repos.d/CentOS-Base.repo
+             sed -i 's|http:|https:|g'             /etc/yum.repos.d/CentOS-Base.repo
+       - run:
+           name: Install tools for building
+           command: |
+             yum install -y git gcc make autoconf automake pkgconfig
+             yum install -y https://repo.ius.io/ius-release-el6.rpm
+             yum --enablerepo=ius-archive -y install python36
+             ln -s /usr/bin/python36 /usr/bin/python3
+       - run:
+           name: Get the source code of u-ctags
+           command: |
+             git clone https://github.com/universal-ctags/ctags
+       - run:
+           name: Build
+           command: |
+             cd ctags
+             bash ./autogen.sh
+             ./configure --enable-debugging
+             make -j 2
+       - run:
+           name: Test
+           command: |
+             cd ctags
+             make roundtrip CIRCLECI=1
 
 workflows:
   version: 2
@@ -317,5 +456,11 @@ workflows:
       - centos_make
       - fedora33_gmake
       - fedora33_cross_aarch64
+      - centos7_make
       - centos6
       - ubuntu20_mingw
+      - centos_make_roundtrip
+      - fedora30_bmake_roundtrip
+      - fedora33_gmake_roundtrip
+      - centos7_make_roundtrip
+      - centos6_roundtrip
