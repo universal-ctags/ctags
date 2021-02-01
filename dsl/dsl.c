@@ -477,6 +477,8 @@ static EsObject *compile (EsObject *expr, void *engine)
 		if (pb->macro)
 		{
 			EsObject *tail = compile (es_cdr (expr), engine);
+			if (es_error_p (tail))
+				return tail;
 			expr = es_cons (head, tail);
 			EsObject *r = pb->macro (expr);
 			es_object_unref (expr);
