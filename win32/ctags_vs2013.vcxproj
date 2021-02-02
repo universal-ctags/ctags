@@ -238,6 +238,7 @@
     <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\parsers\pascal.c" />
     <ClCompile Include="..\parsers\perl.c" />
+    <ClCompile Include="..\parsers\perl-function-parameters.c" />
     <ClCompile Include="..\parsers\perl-moose.c" />
     <ClCompile Include="..\parsers\perl6.c" />
     <ClCompile Include="..\parsers\php.c" />

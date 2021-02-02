@@ -450,6 +450,9 @@
     <ClCompile Include="..\parsers\perl.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\perl-function-parameters.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\perl-moose.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

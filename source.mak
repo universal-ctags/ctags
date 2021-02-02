@@ -261,6 +261,7 @@ PARSER_SRCS =				\
 	parsers/ocaml.c			\
 	parsers/pascal.c		\
 	parsers/perl.c			\
+	parsers/perl-function-parameters.c \
 	parsers/perl-moose.c		\
 	parsers/perl6.c			\
 	parsers/php.c			\

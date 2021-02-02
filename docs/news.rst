@@ -404,6 +404,7 @@ The following parsers have been added:
 * Elixir *optlib*
 * Elm *optlib*
 * Falcon
+* FunctionParameters *perl based subparser*
 * Gdbinit script *optlib*
 * Glade *libxml*
 * Go
