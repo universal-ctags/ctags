@@ -765,6 +765,7 @@ AC_CONFIG_FILES([Makefile
 		 man/ctags-lang-python.7.rst
 		 man/ctags-lang-verilog.7.rst
 		 man/ctags-lang-inko.7.rst
+		 man/ctags-lang-r.7.rst
 		 man/readtags.1.rst
 		 ])
 
