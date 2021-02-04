@@ -12,3 +12,5 @@ p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:in
 p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int
 ;;  ((string->regexp (concat (concat (concat "a" "b" "p") (concat "c" "y")))) (or $scope-name ""))
 p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int
+;;  ((printX (string->regexp (concat (concat (concat "a" "b" "p") (concat "c" "y"))))) (or $scope-name ""))
+p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int

@@ -106,6 +106,7 @@ DECLARE_VALUE_FN(xpath);
 static EsObject* macro_string_append (EsObject *args);
 static EsObject* macro_string2regexp (EsObject *args);
 static EsObject* macro_regexp_quote (EsObject *args);
+static EsObject* macro_debug_printX (EsObject *args);
 
 /*
  * DATA DEFINITIONS
@@ -176,6 +177,9 @@ static DSLProcBind pbinds [] = {
 	  .macro = macro_regexp_quote },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
+	{ "printX", NULL, 0, 0,
+	  .helpstr = "(printX EXPR) -> EXPR; do the same as `print' but this works before evaluating",
+	  .macro = macro_debug_printX },
 	{ "true",    value_true, NULL, 0, 0UL,
 	  .helpstr = "-> #t" },
 	{ "false",    value_false, NULL, 0, 0UL,
@@ -1333,6 +1337,13 @@ static EsObject* builtin_regexp_quote (EsObject *args, DSLEnv *env)
 static EsObject* macro_regexp_quote (EsObject *expr)
 {
 	return common_regexp_quote (es_cdr (expr), NULL, expr);
+}
+
+static EsObject* macro_debug_printX (EsObject *expr)
+{
+	EsObject *code = es_cdr (expr);
+	bulitin_debug_print (code, NULL);
+	return es_object_ref(es_car (code));
 }
 
 void dsl_report_error (const char *msg, EsObject *obj)
