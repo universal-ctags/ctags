@@ -255,13 +255,14 @@ PARSER_SRCS =				\
 	parsers/m4.c			\
 	parsers/make.c			\
 	parsers/matlab.c		\
-	parsers/moose.c			\
 	parsers/myrddin.c		\
 	parsers/nsis.c			\
 	parsers/objc.c			\
 	parsers/ocaml.c			\
 	parsers/pascal.c		\
 	parsers/perl.c			\
+	parsers/perl-function-parameters.c \
+	parsers/perl-moose.c		\
 	parsers/perl6.c			\
 	parsers/php.c			\
 	parsers/powershell.c		\

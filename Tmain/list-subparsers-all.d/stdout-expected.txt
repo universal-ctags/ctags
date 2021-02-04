@@ -3,6 +3,7 @@ Ant                  XML        base <> sub {bidirectional}
 Autoconf             M4         base <> sub {bidirectional}
 Automake             Make       base <= sub {dedicated}
 DBusIntrospect       XML        base <> sub {bidirectional}
+FunctionParameters   Perl       base <> sub {bidirectional}
 Glade                XML        base <> sub {bidirectional}
 ITcl                 Tcl        base <> sub {bidirectional}
 Maven2               XML        base <> sub {bidirectional}
