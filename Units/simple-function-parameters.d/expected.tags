@@ -1,0 +1,6 @@
+foo	input.pl	/^fun foo($x, $y, $z = 5) {$/;"	fun	language:FunctionParameters
+bar	input.pl	/^method bar($label, $n) {$/;"	method	language:FunctionParameters
+create_point	input.pl	/^fun create_point(:$x, :$y, :$color) {$/;"	fun	language:FunctionParameters
+Derived	input.pl	/^package Derived {$/;"	package	language:Perl
+Derived	input.pl	/^package Derived {$/;"	class	language:Moose
+go_big	input.pl	/^    has 'go_big' => ($/;"	attribute	language:Moose	class:Derived
