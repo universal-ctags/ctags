@@ -86,6 +86,25 @@ static void notifyLeavingPod ()
 	}
 }
 
+static void notifyFindingQuotedWord (int moduleIndex,
+									 const char *qwd)
+{
+	subparser *sub;
+
+	foreachSubparser (sub, false)
+	{
+		perlSubparser *perlsub = (perlSubparser *)sub;
+		if (perlsub->findingQuotedWordNotify)
+		{
+			enterSubparser (sub);
+			perlsub->findingQuotedWordNotify (perlsub,
+											  moduleIndex,
+											  qwd);
+			leaveSubparser ();
+		}
+	}
+}
+
 static bool isIdentifier1 (int c)
 {
 	return (bool) (isalpha (c) || c == '_');
@@ -243,11 +262,11 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 	}
 }
 
-static void makeTagForModule (const char *name, int role)
+static int makeTagForModule (const char *name, int role)
 {
 	tagEntryInfo entry;
 	initRefTagEntry(&entry, name, KIND_PERL_MODULE, role);
-	makeTagEntry(&entry);
+	return makeTagEntry(&entry);
 }
 
 enum const_state { CONST_STATE_NEXT_LINE, CONST_STATE_HIT_END };
@@ -301,6 +320,47 @@ static int parseConstantsFromHashRef (const unsigned char *cp,
 				return 0;
 		}
 	}
+}
+
+static void parseQuotedWords(const unsigned char *cp,
+							 vString *name, int moduleIndex)
+{
+	unsigned char end = *cp++;
+	switch (end)
+	{
+	case '[': end = ']'; break;
+	case '(': end = ')'; break;
+	case '{': end = '}'; break;
+	case '<': end = '>'; break;
+	}
+
+	do {
+		while (*cp && *cp != end)
+		{
+			if (isspace(*cp))
+			{
+				notifyFindingQuotedWord (moduleIndex, vStringValue(name));
+				vStringClear(name);
+				cp++;
+				continue;
+			}
+
+			if (*cp == '\\')
+			{
+				cp++;
+				if (*cp == '\0')
+					break;
+			}
+
+			vStringPut(name, *cp);
+			cp++;
+		}
+		if (!vStringIsEmpty(name))
+			notifyFindingQuotedWord (moduleIndex, vStringValue(name));
+
+		if (*cp == end)
+			break;
+	} while ((cp = readLineFromInputFile()) != NULL);
 }
 
 /* Algorithm adapted from from GNU etags.
@@ -439,11 +499,26 @@ static void findPerlTags (void)
 			if (!module)
 				continue;
 
-			makeTagForModule(vStringValue(module), ROLE_PERL_MODULE_USED);
+			int q = makeTagForModule(vStringValue(module), ROLE_PERL_MODULE_USED);
 			bool isConstant = (strcmp(vStringValue(module), "constant") == 0);
 			vStringDelete(module);
 			if (!isConstant)
+			{
+				while (isspace(*cp))
+					cp++;
+				if (strncmp("qw", (const char *)cp, 2) != 0)
+					continue;
+				cp += 2;
+				while (isspace(*cp))
+					cp++;
+				if (*cp == '\0')
+					continue;
+				vStringClear (name);
+
+				parseQuotedWords(cp, name, q);
+				vStringClear (name);
 				continue;
+			}
 
 			/* Skip up to the first non-space character, skipping empty
 			 * and comment lines.
