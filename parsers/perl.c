@@ -54,7 +54,7 @@ static kindDefinition PerlKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
-static void notifyEntringPod ()
+static void notifyEnteringPod ()
 {
 	subparser *sub;
 
@@ -366,7 +366,7 @@ static void findPerlTags (void)
 			if (skipPodDoc)
 			{
 				podStart = getSourceLineNumber ();
-				notifyEntringPod ();
+				notifyEnteringPod ();
 			}
 			continue;
 		}
