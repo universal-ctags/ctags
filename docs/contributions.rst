@@ -331,8 +331,10 @@ test case directory should be prepared like `Units/parser-c.r`.
 Writing Documents
 ---------------------------------------------------------------------
 
-* Update documents. ``man/*.rst`` files are the source files of our man pages.
-  The man pages are for users. ``docs/*.rst`` files explain experimental
+* ``man/*.rst`` files are the source files of our man pages.
+  The man pages are for users. See "`How to add a new man page for your parser`_".
+
+* ``docs/*.rst`` files explain experimental
   new features. The files are for developers. The parts of contents
   of ``docs/*.rst`` should be moved to ``man/*.rst`` in the future.
 
@@ -342,6 +344,25 @@ Writing Documents
   A FAQ and the design or your parser are common topics.
   Consider the maintenance of your parser after you left the
   project for some reason.
+
+How to add a new man page for your parser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. write what the users of your parser may want to (or should) know to ``man/ctags-lang-LANGUAGE.7.rst.in``
+2. add ``man/ctags-lang-LANGUAGE.7.rst`` to the list of ``AC_CONFIG_FILES`` in ``configure.ac``.
+3. add ``man/ctags-lang-LANGUAGE.7`` to ``man_MANS`` of ``Makefile.am``.
+4. add ``man/ctags-lang-LANGUAGE.7.rst.in`` to ``IN_SOURCE_FILES`` of ``man/Makefile``.
+5. run ``cd man; make QUICK=1 update-docs``. This step generates the rst file at ``docs/man/ctags-lang-LANGUAGE.7.rst``.
+6. add ``ctags-lang-LANGUAGE(7)`` to (toctree of) ``docs/man-pages.rst``.
+7. do ``git add`` for
+    * ``man/ctags-lang-LANGUAGE.7.rst.in``
+    * ``configure.ac``
+    * ``Makefile.am``
+    * ``man/Makefile``
+    * ``docs/man/ctags-lang-LANGUAGE.7.rst``
+    * ``docs/man-pages.rst``
+8. git commit with a log header: "``docs(man): add a man page for LANGUAGE``".
+9. make a pull request
 
 Committing and submitting a pull request
 ---------------------------------------------------------------------
