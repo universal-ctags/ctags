@@ -79,6 +79,7 @@ typedef enum {
 	K_PARAM,
 	K_VECTOR,
 	K_LIST,
+	K_DATAFRAME,
 	K_NAMEATTR,
 	KIND_COUNT
 } rKind;
@@ -112,7 +113,8 @@ static kindDefinition RKinds[KIND_COUNT] = {
 	{false,'z', "parameter",  "function parameters inside function definitions" },
 	{true, 'c', "vector", "vectors explicitly created with `c()'" },
 	{true, 'L', "list", "lists explicitly created with `list()'" },
-	{true, 'n', "nameattr", "names attribtes in vectors or lists" },
+	{true, 'd', "dataframe", "data frame explicitly created with `data.frame()'" },
+	{true, 'n', "nameattr", "names attribtes in vectors, lists, or dataframes" },
 };
 
 struct sKindExtraInfo {
@@ -132,6 +134,10 @@ static struct sKindExtraInfo kindExtraInfo[KIND_COUNT] = {
 	[K_LIST] = {
 		"anonList",
 		"list",
+	},
+	[K_DATAFRAME] = {
+		"anonDataFrame",
+		"data.frame",
 	},
 };
 
@@ -158,6 +164,7 @@ typedef int keywordId;			/* to allow KEYWORD_NONE */
 static const keywordTable RKeywordTable [] = {
 	{ "c",        KEYWORD_R_C        },
 	{ "list",     KEYWORD_R_LIST     },
+	{ "data.frame",KEYWORD_R_DATAFRAME },
 	{ "function", KEYWORD_R_FUNCTION },
 	{ "if",       KEYWORD_R_IF       },
 	{ "else",     KEYWORD_R_ELSE     },
@@ -328,10 +335,10 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 			kind = K_FUNCVAR;
 	}
 	else if (pe && (kind == K_GLOBALVAR)
-			 && hasKindsOrCtors (pe, (int[]){K_VECTOR, K_LIST}, 2))
+			 && hasKindsOrCtors (pe, (int[]){K_VECTOR, K_LIST, K_DATAFRAME}, 3))
 	{
 		parent = searchScopeOtherThan (pe->extensionFields.scopeIndex,
-									   (int[]){K_VECTOR, K_LIST}, 2);
+									   (int[]){K_VECTOR, K_LIST, K_DATAFRAME}, 3);
 		if (parent == CORK_NIL)
 			cousin = anyKindEntryInScope (parent, tokenString (token), K_GLOBALVAR);
 		else
@@ -379,7 +386,7 @@ static int makeSimpleRTag (tokenInfo *const token, int parent, bool in_func, int
 	/* makeTagWithTranslation method for subparsers
 	   called from makeSimpleSubparserTag expects
 	   kind should be resolved. */
-	if (pe && hasKindsOrCtors (pe, (int[]){K_VECTOR, K_LIST}, 2))
+	if (pe && hasKindsOrCtors (pe, (int[]){K_VECTOR, K_LIST, K_DATAFRAME}, 3))
 	{
 		if (assignmentOp
 			&& strcmp (assignmentOp, "=") == 0)
@@ -856,6 +863,8 @@ static int getKindForToken (tokenInfo *const token)
 		return K_VECTOR;
 	else if (tokenIsKeyword (token, R_LIST))
 		return K_LIST;
+	else if (tokenIsKeyword (token, R_DATAFRAME))
+		return K_DATAFRAME;
 	return K_GLOBALVAR;
 }
 
@@ -915,7 +924,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 				  ? blackHoleIndex
 				  : corkIndex);
 	}
-	else if (kind == K_VECTOR || kind == K_LIST)
+	else if (kind == K_VECTOR || kind == K_LIST || kind == K_DATAFRAME)
 	{
 		tokenRead (token);
 		parsePair (token, corkIndex, NULL);
@@ -938,7 +947,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 		}
 		/* If a vector has no named attribte and it has no lval,
 		 * we don't make a tag for the vector. */
-		if ((kind == K_VECTOR || kind == K_LIST)
+		if ((kind == K_VECTOR || kind == K_LIST || kind == K_DATAFRAME)
 			&& *assignment_operator == '\0')
 		{
 			bool any_non_placehoders = false;
@@ -1110,7 +1119,8 @@ static bool parseStatement (tokenInfo *const token, int parent,
 		}
 		else if ((tokenIsKeyword (token, R_FUNCTION)
 				  || ((tokenIsKeyword (token, R_C)
-					   || tokenIsKeyword (token, R_LIST))
+					   || tokenIsKeyword (token, R_LIST)
+					   || tokenIsKeyword (token, R_DATAFRAME))
 					  && isAtConstructorInvocation ())))
 		{
 			/* This statement doesn't start with a symbol.
