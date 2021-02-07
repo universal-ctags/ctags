@@ -278,3 +278,10 @@ CPPCHECK_FLAGS  = --enable=all
 cppcheck:
 	cppcheck $(CPPCHECK_DEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_FLAGS) \
 		 $$(git  ls-files | grep '^\(parsers\|main\)/.*\.[ch]' )
+#
+# Testing examples in per-language man pages
+#
+man-test: $(CTAGS_TEST)
+	$(V_RUN) \
+	builddir=$$(pwd); \
+	$(PYTHON) $(srcdir)/misc/man-test.py $${builddir}/ManTest $(CTAGS_TEST) $(srcdir)/man/ctags-lang-*.7.rst.in
