@@ -18,6 +18,8 @@ else
 TIMEOUT = 0
 endif
 
+ROUNDTRIP_MAX_ENTRIES=
+
 LANGUAGES=
 CATEGORIES=
 UNITS=
@@ -243,7 +245,7 @@ if USE_READCMD
 roundtrip: $(READ_TEST)
 	$(V_RUN) \
 	builddir=$$(pwd); \
-	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
+	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units $(ROUNDTRIP_MAX_ENTRIES)
 else
 roundtrip:
 endif
