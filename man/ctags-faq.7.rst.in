@@ -18,10 +18,10 @@ It is based on `Exuberant Ctags FAQ <http://ctags.sourceforge.net/faq.html>`_
 DESCRIPTION
 -----------
 
-What are these strange bits of text beginning with ;" which follow many of the lines in the tag file?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+What are these strange bits of text beginning with ``;"`` which follow many of the lines in the tag file?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-These are "extension flags". They are added in order to provide extra
+These are *extension flags*. They are added in order to provide extra
 information about the tag that may be utilized by the editor in order to
 more intelligently handle tags. They are appended to the EX command part of
 the tag line in a manner that provides backwards compatibility with existing
@@ -32,41 +32,41 @@ EX command.
 
 Some non-vi editors, however, implement only the bare minimum of EX commands
 in order to process the search command or line number in the third field of
-the tag file. If you encounter this problem, use the option "--format=1" to
+the tag file. If you encounter this problem, use the option ``--format=1`` to
 generate a tag file without these extensions (remember that you can set the
 CTAGS environment variable to any default arguments you wish to supply). Then
 ask the supplier of your editor to implement handling of this feature of EX
 commands.
 
-Why can't I jump to "class::member"?
+Why can't I jump to ``class::member``?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Because, by default, ctags only generates tags for the separate identifiers
-found in the source files. If you specify the --extra=+q option, then
+found in the source files. If you specify the ``--extra=+q`` option, then
 ctags will also generate a second, class-qualified tag for each class member
-(data and function/method) in the form class::member for C++, and in the form
-class.method for Eiffel and Java.
+(data and function/method) in the form ``class::member`` for C++, and in the form
+``class.method`` for Eiffel and Java.
 
 How can I avoid having to specify my favorite option every time?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Either by setting the environment variable CTAGS to your custom
-options, or putting them into a .ctags file in your home directory.
+Either by setting the environment variable ``CTAGS`` to your custom
+options, or putting them into a ``.ctags`` file in your home directory.
 
 Why do I end up on the wrong line when I jump to a tag?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, ctags encodes the line number in the file where macro (#define)
+By default, ctags encodes the line number in the file where macro (``#define``)
 tags are found. This was done to remain compatible with the original UNIX
 version of ctags. If you change the file containing the tag without
 rebuilding the tag file, the location of tag in the tag file may no longer
 match the current location.
 
-In order to avoid this problem, you can specify the option "--excmd=p",
+In order to avoid this problem, you can specify the option ``--excmd=p``,
 which causes ctags to use a search pattern to locate macro tags. I have
 never uncovered the reason why the original UNIX ctags used line numbers
 exclusively for macro tags, but have so far resisted changing the default
-behaviour of Exuberant Ctags to behave differently.
+behavior of Exuberant (and Universal) Ctags to behave differently.
 
 How do I jump to the tag I want instead of the wrong one by the same name?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,7 +76,7 @@ are duplicate entries, you often end up going to the wrong one because the
 tag file is sorted and your editor locates the first one in the tag file.
 
 Standard Vi provides no facilities to alter this behavior. However, Vim
-has some nice features to minimize this problem, primarly by examining all
+has some nice features to minimize this problem, primarily by examining all
 matches and choosing the best one under the circumstances. Vim also provides
 commands which allow for selection of the desired matching tag.
 
@@ -97,13 +97,13 @@ Why does appending tags to a tag file tag so long?
 
 Sometimes, in an attempt to build a global tag file for all source files in
 a large source tree of many directories, someone will make an attempt to run
-ctags in append (-a) mode on every directory in the hierarchy. Each time
+ctags in append (``-a``) mode on every directory in the hierarchy. Each time
 ctags is invoked, its default behavior is to sort the tag file once the tags
 for that execution have been added. As the cumulative tag file grows, the sort
 time increases arithmetically.
 
 The best way to avoid this problem (and the most efficient) is to make
-use of the --recurse (or -R) option of ctags by executing the following
+use of the ``--recurse`` (or ``-R``) option of ctags by executing the following
 command in the root of the directory hierarchy (thus running ctags only once):
 
 	.. code-block:: sh
@@ -111,7 +111,7 @@ command in the root of the directory hierarchy (thus running ctags only once):
 		ctags -R
 
 If you really insist on running ctags separately on each directory, you can
-avoid the sort pass each time by specifying the option "--sort=no". Once the
+avoid the sort pass each time by specifying the option ``--sort=no``. Once the
 tag file is completely built, use the sort command to manually sort the
 final tag file, or let the final invocation of ctags sort the file.
 
@@ -164,7 +164,7 @@ B.  The time is takes for your editor to look up a tag in the tag file.
 C.  Whether or not you expect the source code to change and the time it
     takes to rebuild a tag file to account for changes to the source code.
 
-    While Exuberant Ctags is particularly fast in scanning source code
+    While Universal Ctags is particularly fast in scanning source code
     (around 1-2 MB/sec), a large project may still result in objectionable
     delays if one wishes to keep their tag file(s) up to date on a
     frequent basis, or if the files are located on a remote file system.
@@ -206,7 +206,7 @@ tag file.
 
 The advantages of Approach 3 are many (assuming that your editor has
 the ability to support both multiple tag files and duplicate tags). All
-lookups of tag located in the currect directory are fast and the local
+lookups of tag located in the current directory are fast and the local
 tag file can be quickly and easily regenerated in one second or less
 (I have even mapped a keystroke to do this easily). A lookup of a
 (necessarily non-static) tag found in another directory fails a lookup in
@@ -244,9 +244,9 @@ Here is a visual representation of an example directory hierarchy:
 
 Here is a recommended solution (conceptually) to build the tag files:
 
-1.  Within each of the leaf nodes (i.e. hdrs, lib, src, test) build a tag
+1.  Within each of the leaf nodes (i.e. ``hdrs``, ``lib``, ``src``, ``test``) build a tag
     file using "``ctags *.[ch]``". This can be easily be done for the whole
-    hierarchy by making a shell script, call it "dirtags", containing the
+    hierarchy by making a shell script, call it ``dirtags``, containing the
     following lines:
 
 	.. code-block:: sh
@@ -289,7 +289,7 @@ Here is a recommended solution (conceptually) to build the tag files:
 		:set tags=./tags,tags,~/project/tags
 
 If you wish to implement Approach 4, you would need to replace the
-"dirtags" script of step 1 with the following:
+``dirtags`` script of step 1 with the following:
 
 	.. code-block:: sh
 
@@ -307,7 +307,7 @@ And replace the configuration of step 3 with this:
 
 As a caveat, it should be noted that step 2 builds a global tag file whose
 file names will be relative to the directory in which the global tag file
-is being built. This takes advantage of the Vim 'tagrelative' option,
+is being built. This takes advantage of the Vim ``tagrelative`` option,
 which causes the path to be interpreted a relative to the location of the
 tag file instead of the current directory. For standard vi, which always
 interprets the paths as relative to the current directory, we need to
