@@ -393,14 +393,18 @@ static int makeSimpleRTag (tokenInfo *const token, int parent, bool in_func, int
 			kind = K_NAMEATTR;
 	}
 
+	bool foreign_tag = false;
 	if (pe == NULL || pe->langType == Lang_R ||
 		!askSubparserTagAcceptancy (pe))
 		r = makeSimpleRTagR (token, parent, kind, assignmentOp);
 	else
+	{
+		foreign_tag = true;
 		r = makeSimpleSubparserTag (pe->langType, token, parent, in_func,
 									kind, assignmentOp);
+	}
 
-	if ((kind == K_NAMEATTR) && ctor)
+	if ((kind == K_NAMEATTR || foreign_tag) && ctor)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (r);
 		if (e)
