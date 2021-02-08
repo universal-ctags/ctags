@@ -18,6 +18,11 @@ It is based on `Exuberant Ctags FAQ <http://ctags.sourceforge.net/faq.html>`_
 DESCRIPTION
 -----------
 
+.. TODO: https://github.com/universal-ctags/ctags/issues/2312
+	#1421: feature: clean up stale tags when appending (`-a`)
+	#2356: can't pre-process the macro but it works with Exuberant Ctags 5.8
+	#2540: C/C++：conditional compilation like #ifdef will cause parse errror
+
 What are these strange bits of text beginning with ``;"`` which follow many of the lines in the tag file?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -318,6 +323,55 @@ accomplished by replacing step 2 with the following:
 
 		cd ~/project
 		ctags --file-scope=no -R `pwd`
+
+Does Universal Ctags support Unicode file names?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. MEMO: from https://github.com/universal-ctags/ctags/issues/1837
+
+Yes, Unicode file names are supported on unix-like platforms (Linux, macOS,
+Cygwin, etc.).
+
+However, on Windows, you need to use Windows 10 version 1903 or later to use
+Unicode file names. (This is an experimental feature, though.) On older versions
+on Windows, Universal Ctags only support file names represented in the current
+code page. If you still want to use Unicode file names on them, use Cygwin or
+MSYS2 version of Universal Ctags as a workaround.
+
+Why does zsh cause "zsh: no matches found" error?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. MEMO: from https://github.com/universal-ctags/ctags/issues/2842
+
+zsh causes error on the following cases;
+
+	.. code-block:: sh
+
+		ctags --extras=+* ...
+		ctags --exclude=foo/* ...
+
+This is the 2nd most significant incompatibility *feature* of zsh.
+
+Cited from "Z-Shell Frequently-Asked Questions", "`2.1: Differences from sh and
+ksh <http://zsh.sourceforge.net/FAQ/zshfaq02.html>`_";
+
+	... The next most classic difference is that unmatched glob patterns cause
+	the command to abort; set ``NO_NOMATCH`` for those.
+
+You may add "``setopt nonomatch``" on your ``~/.zshrc``. Or you can escape glob
+patterns with backslash;
+
+	.. code-block:: sh
+
+		ctags --extras=+\* ...
+		ctags --exclude=foo/\* ...
+
+Or quote them;
+
+	.. code-block:: sh
+
+		ctags '--extras=+*' ...
+		ctags '--exclude=foo/*' ...
 
 SEE ALSO
 --------
