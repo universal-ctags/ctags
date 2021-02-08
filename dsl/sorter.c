@@ -80,14 +80,14 @@ static EsObject* sorter_sform_cmp_or (EsObject* args, DSLEnv *env);
 
 static DSLProcBind pbinds [] = {
 	{ "<>",              sorter_proc_cmp,          NULL, DSL_PATTR_CHECK_ARITY,     2,
-	  .helpstr = "(<> a b) -> -1|0|1; compare a b. The types of a and b must be the same." },
+	  .helpstr = "(<> <any:a> <any:b>) -> -1|0|1; compare a b. The types of a and b must be the same." },
 	{ "*-",              sorter_proc_flip,         NULL, DSL_PATTR_CHECK_ARITY,     1,
-	  .helpstr = "(*- n<interger>) -> -n<integer>; filp the result of comparison." },
+	  .helpstr = "(*- <interger:n>) -> -<integer:n>; filp the result of comparison." },
 	{ "<or>",            sorter_sform_cmp_or,      NULL, DSL_PATTR_CHECK_ARITY_OPT, 1,
-	  .helpstr = "(<or> args...) -> -1|0|1; evaluate arguments left to right till one of thme returns -1 or 1." },
+	  .helpstr = "(<or> <any> ...) -> -1|0|1; evaluate arguments left to right till one of thme returns -1 or 1." },
 
 	{ "&",               sorter_alt_entry_ref, NULL, DSL_PATTR_CHECK_ARITY,  1,
-	  .helpstr = "(& FIELD) -> #f|<string>" },
+	  .helpstr = "(& <string:field>) -> #f|<string>" },
 	{ "&name",           alt_value_name,           NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <string>"},
 	{ "&input",          alt_value_input,          NULL, DSL_PATTR_MEMORABLE, 0UL,
