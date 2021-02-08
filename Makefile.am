@@ -222,6 +222,7 @@ man_MANS = \
 	man/ctags-client-tools.7 \
 	man/ctags-incompatibilities.7 \
 	man/ctags-optlib.7 \
+	man/ctags-faq.7 \
 	\
 	man/ctags-lang-julia.7 \
 	man/ctags-lang-python.7 \
