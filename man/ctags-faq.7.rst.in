@@ -23,6 +23,22 @@ DESCRIPTION
 	#2356: can't pre-process the macro but it works with Exuberant Ctags 5.8
 	#2540: C/C++：conditional compilation like #ifdef will cause parse errror
 
+What is the difference between Universal Ctags and Exuberant Ctags?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Universal Ctags is an unofficial fork of Exuberant Ctags.
+The differences are summarized in ctags-incompatibilities(7) man page.
+
+The most notable one is that Universal Ctags doesn't read ``~/.ctags`` file.
+Instead, it reads ``*.ctags`` under ``~/.ctags.d`` directory.
+
+How can I avoid having to specify my favorite option every time?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Either by setting the environment variable ``CTAGS`` to your custom
+options, or putting them into a ``~/.ctags.d/anyname.ctags`` file in your home
+directory.
+
 What are these strange bits of text beginning with ``;"`` which follow many of the lines in the tag file?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -51,12 +67,6 @@ found in the source files. If you specify the ``--extra=+q`` option, then
 ctags will also generate a second, class-qualified tag for each class member
 (data and function/method) in the form ``class::member`` for C++, and in the form
 ``class.method`` for Eiffel and Java.
-
-How can I avoid having to specify my favorite option every time?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Either by setting the environment variable ``CTAGS`` to your custom
-options, or putting them into a ``.ctags`` file in your home directory.
 
 Why do I end up on the wrong line when I jump to a tag?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -347,7 +357,7 @@ zsh causes error on the following cases;
 
 	.. code-block:: sh
 
-		ctags --extras=+* ...
+		ctags --extra=+* ...
 		ctags --exclude=foo/* ...
 
 This is the 2nd most significant incompatibility *feature* of zsh.
@@ -363,14 +373,14 @@ patterns with backslash;
 
 	.. code-block:: sh
 
-		ctags --extras=+\* ...
+		ctags --extra=+\* ...
 		ctags --exclude=foo/\* ...
 
 Or quote them;
 
 	.. code-block:: sh
 
-		ctags '--extras=+*' ...
+		ctags '--extra=+*' ...
 		ctags '--exclude=foo/*' ...
 
 SEE ALSO
