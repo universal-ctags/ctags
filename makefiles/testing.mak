@@ -1,7 +1,7 @@
 # -*- makefile -*-
 .PHONY: check units fuzz noise tmain tinst tlib clean-units clean-tlib clean-tmain clean-gcov run-gcov codecheck cppcheck dicts validate-input
 
-EXTRA_DIST += misc/units misc/units.py
+EXTRA_DIST += misc/units misc/units.py misc/man-test.py
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
 
 check: tmain units tlib
