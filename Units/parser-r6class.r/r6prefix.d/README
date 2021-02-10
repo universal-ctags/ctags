@@ -1,0 +1,10 @@
+
+	p	input.r	/^            p <<- fp[-1]$/;"	globalVar	language:R
+
+in expected.tags is questionable. The parser knows p is field of eppFP as printing
+
+	p	input.r	/^        p = NULL,$/;"	field	language:R6Class	class:eppFP
+
+So the parser can emit
+
+	p	input.r	/^            p <<- fp[-1]$/;"	field	language:R	roles:lval

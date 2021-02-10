@@ -1,0 +1,4 @@
+eppFP	input.r	/^eppFP <- R6::R6Class("eppfp", class=F, cloneable=F, portable=F, lock_objects=F,$/;"	class	language:R6Class
+p	input.r	/^        p = NULL,$/;"	field	language:R6Class	class:eppFP
+initialize	input.r	/^        initialize = function(fp) {$/;"	method	language:R6Class	class:eppFP	constructor:function
+p	input.r	/^            p <<- fp[-1]$/;"	globalVar	language:R

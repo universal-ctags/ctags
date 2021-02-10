@@ -1,0 +1,4 @@
+i	input.r	/^i = c(1,2)$/;"	vector	end:1
+v	input.r	/^v = c (100, 100)$/;"	vector	end:2
+f	input.r	/^f = function() {$/;"	function	end:5
+x	input.r	/^x <- 1$/;"	globalVar	end:6

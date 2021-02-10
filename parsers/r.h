@@ -42,13 +42,13 @@ enum RTokenType {
 	TOKEN_R_DOTS_N,				/* ..1, ..2, etc */
 	TOKEN_R_LASSIGN,				/* <-, <<- */
 	TOKEN_R_RASSIGN,				/* ->, ->> */
-	TOKEN_R_DBRACKET_OEPN,		/* [[ */
-	TOKEN_R_DBRACKET_CLOSE,		/* ]] */
 	TOKEN_R_SCOPE,				/* ::, ::: */
 };
 
 enum eRKeywordId
 {
+	KEYWORD_R_C,
+	KEYWORD_R_DATAFRAME,
 	KEYWORD_R_FUNCTION,
 	KEYWORD_R_IF,
 	KEYWORD_R_ELSE,
@@ -62,6 +62,7 @@ enum eRKeywordId
 	KEYWORD_R_FALSE,
 	KEYWORD_R_NULL,
 	KEYWORD_R_INF,
+	KEYWORD_R_LIST,
 	KEYWORD_R_NAN,
 	KEYWORD_R_NA,
 	KEYWORD_R_SOURCE,
@@ -82,6 +83,7 @@ struct sRSubparser {
 									int kindInR,
 									const char *const assignmentOperator);
 	bool (* askTagAcceptancy) (rSubparser *s, tagEntryInfo *pe);
+	bool (* hasFunctionAlikeKind) (rSubparser *s, tagEntryInfo *pe);
 	int (* readFuncall) (rSubparser *s,
 						 tokenInfo *const func,
 						 tokenInfo *const token,
@@ -95,6 +97,8 @@ extern void rTeardownCollectingSignature (tokenInfo *const token);
 /*
  * FUNCTION PROTOTYPES
  */
+
+extern tokenInfo *rNewToken (void);
 
 extern void rTokenReadNoNewline (tokenInfo *const token);
 

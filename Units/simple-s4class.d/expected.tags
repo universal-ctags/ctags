@@ -1,24 +1,24 @@
 C	input.r	/^setClass("C", representation(x="numeric"))$/;"	c	language:S4Class	extras:subparser
 x	input.r	/^setClass("C", representation(x="numeric"))$/;"	r	language:S4Class	class:C	typeref:typename:numeric	extras:subparser
 run	input.r	/^setGeneric("run", function(object) 1)$/;"	g	language:S4Class	extras:subparser
-anonFuncc203d3890104	input.r	/^setGeneric("run", function(object) 1)$/;"	v	language:R	generic:run	signature:(object)	extras:anonymous
-object	input.r	/^setGeneric("run", function(object) 1)$/;"	z	language:R	functionVar:run.anonFuncc203d3890104
+anonFuncc203d3890100	input.r	/^setGeneric("run", function(object) 1)$/;"	f	language:R	generic:run	signature:(object)	extras:anonymous
+object	input.r	/^setGeneric("run", function(object) 1)$/;"	z	language:R	function:run.anonFuncc203d3890100
 run	input.r	/^setMethod("run", c("C"), definition = function (object) {$/;"	m	language:S4Class	signature:("C")	extras:subparser
-anonFuncc203d3890204	input.r	/^setMethod("run", c("C"), definition = function (object) {$/;"	v	language:R	method:run	signature:(object)	extras:anonymous
-object	input.r	/^setMethod("run", c("C"), definition = function (object) {$/;"	z	language:R	functionVar:run.anonFuncc203d3890204
+anonFuncc203d3890200	input.r	/^setMethod("run", c("C"), definition = function (object) {$/;"	f	language:R	method:run	signature:(object)	extras:anonymous
+object	input.r	/^setMethod("run", c("C"), definition = function (object) {$/;"	z	language:R	function:run.anonFuncc203d3890200
 run2	input.r	/^setGeneric("run2", function(object) 1)$/;"	g	language:S4Class	extras:subparser
-anonFuncc203d3890304	input.r	/^setGeneric("run2", function(object) 1)$/;"	v	language:R	generic:run2	signature:(object)	extras:anonymous
-object	input.r	/^setGeneric("run2", function(object) 1)$/;"	z	language:R	functionVar:run2.anonFuncc203d3890304
+anonFuncc203d3890300	input.r	/^setGeneric("run2", function(object) 1)$/;"	f	language:R	generic:run2	signature:(object)	extras:anonymous
+object	input.r	/^setGeneric("run2", function(object) 1)$/;"	z	language:R	function:run2.anonFuncc203d3890300
 run2	input.r	/^setMethod("run2", c("C"), function (object) {$/;"	m	language:S4Class	signature:("C")	extras:subparser
-anonFuncc203d3890404	input.r	/^setMethod("run2", c("C"), function (object) {$/;"	v	language:R	method:run2	signature:(object)	extras:anonymous
-object	input.r	/^setMethod("run2", c("C"), function (object) {$/;"	z	language:R	functionVar:run2.anonFuncc203d3890404
+anonFuncc203d3890400	input.r	/^setMethod("run2", c("C"), function (object) {$/;"	f	language:R	method:run2	signature:(object)	extras:anonymous
+object	input.r	/^setMethod("run2", c("C"), function (object) {$/;"	z	language:R	function:run2.anonFuncc203d3890400
 D	input.r	/^setClass ("D", contains = "C")$/;"	c	language:S4Class	extras:subparser
 run3	input.r	/^setGeneric("run3", function(i, j) 1)$/;"	g	language:S4Class	extras:subparser
-anonFuncc203d3890504	input.r	/^setGeneric("run3", function(i, j) 1)$/;"	v	language:R	generic:run3	signature:(i, j)	extras:anonymous
-i	input.r	/^setGeneric("run3", function(i, j) 1)$/;"	z	language:R	functionVar:run3.anonFuncc203d3890504
-j	input.r	/^setGeneric("run3", function(i, j) 1)$/;"	z	language:R	functionVar:run3.anonFuncc203d3890504
+anonFuncc203d3890500	input.r	/^setGeneric("run3", function(i, j) 1)$/;"	f	language:R	generic:run3	signature:(i, j)	extras:anonymous
+i	input.r	/^setGeneric("run3", function(i, j) 1)$/;"	z	language:R	function:run3.anonFuncc203d3890500
+j	input.r	/^setGeneric("run3", function(i, j) 1)$/;"	z	language:R	function:run3.anonFuncc203d3890500
 run3	input.r	/^setMethod("run3", signature("numeric", "numeric"),$/;"	m	language:S4Class	signature:("numeric", "numeric")	extras:subparser
-anonFuncc203d3890604	input.r	/^		  function (i, j) { i + j })$/;"	v	language:R	method:run3	signature:(i, j)	extras:anonymous
-i	input.r	/^		  function (i, j) { i + j })$/;"	z	language:R	functionVar:run3.anonFuncc203d3890604
-j	input.r	/^		  function (i, j) { i + j })$/;"	z	language:R	functionVar:run3.anonFuncc203d3890604
+anonFuncc203d3890600	input.r	/^		  function (i, j) { i + j })$/;"	f	language:R	method:run3	signature:(i, j)	extras:anonymous
+i	input.r	/^		  function (i, j) { i + j })$/;"	z	language:R	function:run3.anonFuncc203d3890600
+j	input.r	/^		  function (i, j) { i + j })$/;"	z	language:R	function:run3.anonFuncc203d3890600
 c	input.r	/^c <- new ("C", x = 2)$/;"	g	language:R	assignmentop:<-

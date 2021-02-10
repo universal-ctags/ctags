@@ -51,6 +51,7 @@ static int r6MakeTagWithTranslation (rSubparser *s,
 									 int kindInR,
 									 const char *const assignmentOperator);
 static bool r6AskTagAcceptancy (rSubparser *s, tagEntryInfo *pe);
+static bool r6HasFunctionAlikeKind (rSubparser *s, tagEntryInfo *e);
 
 static void parseClass (rSubparser *s, tokenInfo *const token, int classIndex);
 
@@ -81,6 +82,7 @@ static struct r6Subparser r6Subparser = {
 		.readRightSideSymbol = r6ReadRightSideSymbol,
 		.makeTagWithTranslation = r6MakeTagWithTranslation,
 		.askTagAcceptancy = r6AskTagAcceptancy,
+		.hasFunctionAlikeKind = r6HasFunctionAlikeKind,
 	},
 	.access = NULL,
 	.activeBinding = false,
@@ -153,7 +155,7 @@ static void parseList (rSubparser *s,
 	if (tokenIsTypeVal (token, '='))
 	{
 		rTokenReadNoNewline (token);
-		if (tokenIsType (token, R_SYMBOL) && strcmp(tokenString (token), "list") == 0)
+		if (tokenIsKeyword (token, R_LIST))
 		{
 			rTokenReadNoNewline (token);
 			if (tokenIsTypeVal (token, '('))
@@ -213,8 +215,31 @@ static int r6ReadRightSideSymbol (rSubparser *s,
 								  int parent,
 								  tokenInfo *const token)
 {
-	if (strcmp (tokenString (token), "R6Class") != 0)
+	tokenInfo * token0 = NULL;
+	tokenInfo * token1 = NULL;
+	if (strcmp (tokenString (token), "R6") == 0)
+	{
+		tokenInfo * token0 = rNewToken ();
+		tokenRead (token0);
+		if (!tokenIsType (token0, R_SCOPE))
+			goto reject;
+		if (strcmp (tokenString (token0), "::"))
+			goto reject;
+
+		tokenInfo * token1 = rNewToken ();
+		tokenRead (token1);
+		if (!tokenIsType (token1, R_SYMBOL))
+			goto reject;
+		if (strcmp (tokenString (token1), "R6Class"))
+			goto reject;
+		tokenCopy (token, token1);
+		tokenDelete (token1);
+		tokenDelete (token0);
+		token0 = token1 = NULL;
+	}
+	else if (strcmp (tokenString (token), "R6Class") != 0)
 		return CORK_NIL;
+
 	rTokenReadNoNewline (token);
 	if (tokenIsTypeVal (token, '('))
 	{
@@ -225,6 +250,16 @@ static int r6ReadRightSideSymbol (rSubparser *s,
 		parseClass (s, token, corkIndex);
 		return corkIndex;
 	}
+	return CORK_NIL;
+ reject:
+	if (token1)
+		tokenUnread (token1);
+	if (token0)
+		tokenUnread (token0);
+	/* tokenDelete accepts NULL. */
+	tokenDelete (token1);
+	tokenDelete (token0);
+
 	return CORK_NIL;
 }
 
@@ -252,6 +287,13 @@ static int r6MakeTagWithTranslation (rSubparser *s,
 static bool r6AskTagAcceptancy (rSubparser *s, tagEntryInfo *pe)
 {
 	return (pe->kindIndex == R6_K_CLASS);
+}
+
+static bool r6HasFunctionAlikeKind (rSubparser *s,
+									tagEntryInfo *e)
+{
+	return e->kindIndex == R6_K_METHOD ||
+		e->kindIndex == R6_K_ACTIVE_BINDING_FUNCTION;
 }
 
 static void findR6Tags(void)

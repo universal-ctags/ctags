@@ -46,6 +46,7 @@ static int s4ReadRightSideSymbol (rSubparser *s,
 								  int parent,
 								  tokenInfo *const token);
 static bool s4AskTagAcceptancy (rSubparser *s, tagEntryInfo *pe);
+static bool s4HasFunctionAlikeKind (rSubparser *s, tagEntryInfo *e);
 
 
 /*
@@ -74,6 +75,7 @@ static struct s4Subparser s4Subparser = {
 		.readFuncall = s4ReadFuncall,
 		.readRightSideSymbol = s4ReadRightSideSymbol,
 		.askTagAcceptancy = s4AskTagAcceptancy,
+		.hasFunctionAlikeKind = s4HasFunctionAlikeKind,
 	},
 };
 
@@ -180,9 +182,9 @@ static bool parseMethodArgs (rSubparser *s, tokenInfo *const token, int parent,
 	if (tokenIsTypeVal (token, ','))
 	{
 		rTokenReadNoNewline (token);
-		if (tokenIsType (token, R_SYMBOL)
-			&& ((strcmp (tokenString (token), "c") == 0)
-				|| (strcmp (tokenString (token), "signature") == 0)))
+		if (tokenIsKeyword (token, R_C)
+			|| (tokenIsType (token, R_SYMBOL)
+				&& (strcmp (tokenString (token), "signature") == 0)))
 		{
 			rTokenReadNoNewline (token);
 			if (tokenIsTypeVal (token, '('))
@@ -309,6 +311,12 @@ static int s4ReadFuncall (rSubparser *s,
 static bool s4AskTagAcceptancy (rSubparser *s, tagEntryInfo *pe)
 {
 	return (pe->kindIndex == S4_K_CLASS);
+}
+
+static bool s4HasFunctionAlikeKind (rSubparser *s, tagEntryInfo *e)
+{
+	return e->kindIndex == S4_K_METHOD ||
+		e->kindIndex == S4_K_GENERIC;
 }
 
 /*

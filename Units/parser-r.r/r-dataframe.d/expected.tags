@@ -1,0 +1,12 @@
+L3	input.r	/^L3 <- LETTERS[1:3]$/;"	g
+fac	input.r	/^fac <- sample(L3, 10, replace = TRUE)$/;"	g
+d	input.r	/^(d <- data.frame(x = 1, y = 1:10, fac = fac))$/;"	d
+x	input.r	/^(d <- data.frame(x = 1, y = 1:10, fac = fac))$/;"	n	dataframe:d
+y	input.r	/^(d <- data.frame(x = 1, y = 1:10, fac = fac))$/;"	n	dataframe:d
+fac	input.r	/^(d <- data.frame(x = 1, y = 1:10, fac = fac))$/;"	n	dataframe:d
+anonDataFrame083788b40108	input.r	/^data.frame(n=1, 1:10, sample(L3, 10, replace = TRUE))$/;"	d
+n	input.r	/^data.frame(n=1, 1:10, sample(L3, 10, replace = TRUE))$/;"	n	dataframe:anonDataFrame083788b40108
+dd	input.r	/^(dd <- cbind(d, char = I(letters[1:10])))$/;"	g
+d0	input.r	/^(d0  <- d[, FALSE])   # data frame with 0 columns and 10 rows$/;"	g
+d.0	input.r	/^(d.0 <- d[FALSE, ])   # <0 rows> data frame  (3 named cols)$/;"	g
+d00	input.r	/^(d00 <- d0[FALSE, ])  # data frame with 0 columns and 0 rows$/;"	g
