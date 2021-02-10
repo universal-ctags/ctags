@@ -114,12 +114,14 @@ Summary
 Examples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 "input.py"
+
 .. code-block:: Python
 
    import X0
 
 "output.tags"
 with "--options=NONE -o - --extras=+r --fields=+rzK input.py"
+
 .. code-block:: tags
 
 	X0	input.py	/^import X0$/;"	kind:module	roles:imported
@@ -131,13 +133,15 @@ imported module is a reference tag; specify ``--extras=+r`` (or
 ``--fields=+r`` is for recording the module is "imported" to the tag file.
 
 "input.py"
+
 .. code-block:: Python
 
 	import X1 as Y1
 
 "output.tags"
-with "--options=NONE -o - --extras=+r --fields=+rzK --fields-Python='+{nameref}' input.py"
-::
+with "--options=NONE -o - --extras=+r --fields=+rzK --fields-Python=+{nameref} input.py"
+
+.. code-block:: tags
 
 	X1	input.py	/^import X1 as Y1$/;"	kind:module	roles:indirectlyImported
 	Y1	input.py	/^import X1 as Y1$/;"	kind:namespace	roles:def	nameref:module:X1
@@ -152,15 +156,17 @@ relationship, ``nameref:`` field is attached to the tag of "Y1".  Instead of
 isn't a module.
 
 "input.py"
+
 .. code-block:: Python
 
 	from X2 import *
 
 "output.tags"
 with "--options=NONE -o - --extras=+r --fields=+rzK input.py"
-::
 
-	X2	input.py	/^from X2 import \*$/;"	kind:module	roles:namespace
+.. code-block:: tags
+
+	X2	input.py	/^from X2 import *$/;"	kind:module	roles:namespace
 
 The module is not defined here; it is defined in another file. So the tag for
 the imported module is a reference tag. Unlike "X0" in "import X0", "X2" may not
@@ -168,13 +174,15 @@ be used because the names defined in "X2" can be used in this source file. To re
 the difference ``namespace`` role is attached to "X2" instead of ``imported``.
 
 "input.py"
+
 .. code-block:: Python
 
 	from X3 import Y3
 
 "output.tags"
 with "--options=NONE -o - --extras=+r --fields=+rzKZ input.py"
-::
+
+.. code-block:: tags
 
 	X3	input.py	/^from X3 import Y3$/;"	kind:module	roles:namespace
 	Y3	input.py	/^from X3 import Y3$/;"	kind:unknown	scope:module:X3	roles:imported
@@ -185,13 +193,15 @@ assigns ``unknown`` kind to "Y3" because ctags cannot know whether "Y3" is a
 class, a variable, or a function from the input file.
 
 "input.py"
+
 .. code-block:: Python
 
 	from X4 import Y4 as Z4
 
 "output.tags"
 with "--options=NONE -o - --extras=+r --fields=+rzKZ input.py"
-::
+
+.. code-block:: tags
 
 	X4	input.py	/^from X4 import Y4 as Z4$/;"	kind:module	roles:namespace
 	Y4	input.py	/^from X4 import Y4 as Z4$/;"	kind:unknown	scope:module:X4	roles:indirectlyImported
@@ -228,6 +238,7 @@ Summary
 Examples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 "input.py"
+
 .. code-block:: Python
 
 	from typing import Callable
@@ -235,14 +246,15 @@ Examples
 	id_t: Callable[[int], int] = lambda var1: var1
 
 "output.tags"
-with "--options=NONE -o - --sort=no --fields=+KS --fields-Python='+{nameref}' --extras='+{anonymous}' input.py"
-::
+with "--options=NONE -o - --sort=no --fields=+KS --fields-Python=+{nameref} --extras=+{anonymous} input.py"
+
+.. code-block:: tags
 
 	id	input.py	/^id = lambda var0: var0$/;"	function	signature:(var0)
 	id_t	input.py	/^id_t: Callable[[int], int] = lambda var1: var1$/;"\
-   		variable	typeref:typename:Callable[[int], int]	nameref:function:anonFunc84011d2c0101
+		variable	typeref:typename:Callable[[int], int]	nameref:function:anonFunc84011d2c0101
 	anonFunc84011d2c0101	input.py	/^id_t: Callable[[int], int] = lambda var1: var1$/;"\
-   		function	signature:(var1)
+		function	signature:(var1)
 
 If a variable ("id") with no type hint is initialized with a lambda expression,
 ctags assigns ``function`` kind for the tag of "id".

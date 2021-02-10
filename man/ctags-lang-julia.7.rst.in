@@ -83,7 +83,7 @@ with "--options=NONE -o - --extras=+r --fields=+rzK input.jl"
 
 .. code-block:: tags
 
-	X0	input.jl	/^using X$/;"	kind:module	roles:used
+	X0	input.jl	/^using X0$/;"	kind:module	roles:used
 
 ``--extras=+r`` (or ``--extras=+{reference}``) option is needed for this tag,
 since it's a reference tag. This is because module ``X`` is not defined here.
@@ -101,11 +101,11 @@ with "--options=NONE -o - --extras=+r --fields=+rzKZ input.jl"
 
 .. code-block:: tags
 
-	X1	julia-example.jl	/^import X1.a, X2.b, X3$/;"	kind:module	roles:namespace
-	X2	julia-example.jl	/^import X1.a, X2.b, X3$/;"	kind:module	roles:namespace
-	X3	julia-example.jl	/^import X1.a, X2.b, X3$/;"	kind:module	roles:imported
-	a	julia-example.jl	/^import X1.a, X2.b, X3$/;"	kind:unknown	scope:module:X1	roles:imported
-	b	julia-example.jl	/^import X1.a, X2.b, X3$/;"	kind:unknown	scope:module:X2	roles:imported
+	X1	input.jl	/^import X1.a, X2.b, X3$/;"	kind:module	roles:namespace
+	X2	input.jl	/^import X1.a, X2.b, X3$/;"	kind:module	roles:namespace
+	X3	input.jl	/^import X1.a, X2.b, X3$/;"	kind:module	roles:imported
+	a	input.jl	/^import X1.a, X2.b, X3$/;"	kind:unknown	scope:module:X1	roles:imported
+	b	input.jl	/^import X1.a, X2.b, X3$/;"	kind:unknown	scope:module:X2	roles:imported
 
 Why ``X1`` and ``X2`` have role "namespace", while ``X3`` have role "imported"?
 It's because the symbol ``a`` in module ``X1``, and ``b`` in module ``X2`` are

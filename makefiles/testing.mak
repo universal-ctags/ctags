@@ -1,10 +1,10 @@
 # -*- makefile -*-
 .PHONY: check units fuzz noise tmain tinst tlib clean-units clean-tlib clean-tmain clean-gcov run-gcov codecheck cppcheck dicts validate-input
 
-EXTRA_DIST += misc/units misc/units.py
+EXTRA_DIST += misc/units misc/units.py misc/man-test.py
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
 
-check: tmain units tlib
+check: tmain units tlib man-test
 
 clean-local: clean-units clean-tmain
 
@@ -278,3 +278,10 @@ CPPCHECK_FLAGS  = --enable=all
 cppcheck:
 	cppcheck $(CPPCHECK_DEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_FLAGS) \
 		 $$(git  ls-files | grep '^\(parsers\|main\)/.*\.[ch]' )
+#
+# Testing examples in per-language man pages
+#
+man-test: $(CTAGS_TEST)
+	$(V_RUN) \
+	builddir=$$(pwd); \
+	$(PYTHON) $(srcdir)/misc/man-test.py $${builddir}/ManTest $(CTAGS_TEST) $(srcdir)/man/ctags-lang-*.7.rst.in
