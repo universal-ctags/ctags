@@ -84,19 +84,19 @@ with "--options=NONE --sort=no -o - --fields-SystemVerilog=+{parameter} input.sv
 
 .. code-block:: tags
 
-	L1      foo.sv  /^parameter L1 = "synonym for the localparam";$/;"      c       parameter:
-	with_parameter_port_list foo.sv  /^module with_parameter_port_list #($/;" m
-	P1      foo.sv  /^    P1, $/;"  c       module:with_parameter_port_list  parameter:
-	L2      foo.sv  /^    localparam L2 = P1+1,$/;" c       module:with_parameter_port_list
-	P2      foo.sv  /^    parameter P2)$/;" c       module:with_parameter_port_list  parameter:
-	L3      foo.sv  /^    parameter  L3 = "synonym for the localparam";$/;" c       module:with_parameter_port_list
-	L4      foo.sv  /^    localparam L4 = "localparam";$/;" c       module:with_parameter_port_list
-	with_empty_parameter_port_list   foo.sv  /^module with_empty_parameter_port_list #()$/;"  m
-	L5      foo.sv  /^    parameter  L5 = "synonym for the localparam";$/;" c       module:with_empty_parameter_port_list
-	L6      foo.sv  /^    localparam L6 = "localparam";$/;" c       module:with_empty_parameter_port_list
-	no_parameter_port_list   foo.sv  /^module no_parameter_port_list$/;"      m
-	P3      foo.sv  /^    parameter  P3 = "parameter";$/;"  c       module:no_parameter_port_list    parameter:
-	L7      foo.sv  /^    localparam L7 = "localparam";$/;" c       module:no_parameter_port_list
+	L1	input.sv	/^parameter L1 = "synonym for the localparam";$/;"	c	parameter:
+	with_parameter_port_list	input.sv	/^module with_parameter_port_list #($/;"	m
+	P1	input.sv	/^	P1,$/;"	c	module:with_parameter_port_list	parameter:
+	L2	input.sv	/^	localparam L2 = P1+1,$/;"	c	module:with_parameter_port_list
+	P2	input.sv	/^	parameter P2)$/;"	c	module:with_parameter_port_list	parameter:
+	L3	input.sv	/^	parameter  L3 = "synonym for the localparam";$/;"	c	module:with_parameter_port_list
+	L4	input.sv	/^	localparam L4 = "localparam";$/;"	c	module:with_parameter_port_list
+	with_empty_parameter_port_list	input.sv	/^module with_empty_parameter_port_list #()$/;"	m
+	L5	input.sv	/^	parameter  L5 = "synonym for the localparam";$/;"	c	module:with_empty_parameter_port_list
+	L6	input.sv	/^	localparam L6 = "localparam";$/;"	c	module:with_empty_parameter_port_list
+	no_parameter_port_list	input.sv	/^module no_parameter_port_list$/;"	m
+	P3	input.sv	/^	parameter  P3 = "parameter";$/;"	c	module:no_parameter_port_list	parameter:
+	L7	input.sv	/^	localparam L7 = "localparam";$/;"	c	module:no_parameter_port_list
 
 Known Issues
 ---------------------------------------------------------------------
