@@ -243,10 +243,8 @@ message, too. What we should do?
 In such a case, merge as usually but use *.b* as suffix for
 the directory of test case instead of *.d*.
 
-*Unix/css-singlequote-in-comment-issue2.b* is an example
-of *.b* suffix usage.
-
-.. TODO: Now we only have Units/parser-css.r/css-singlequote-in-comment-issue2.d/
+``parser-autoconf.r/nested-block.ac.b/`` is an example
+of ``.b``*`` suffix usage.
 
 When you run test.units target, you will see::
 
@@ -351,16 +349,21 @@ The file name rule is suggested by Maxime Coste <frrrwww@gmail.com>.
 Reviewing the result of Units test
 ------------------------------------------------------------
 
-Try misc/review. [TBW]
+Try misc/review.
 
-..	semifuzz.rst
+.. code-block:: console
+
+    $ misc/review --help
+    Usage:
+            misc/review          help|--help|-h                 show this message
+            misc/review          [list] [-b]                    list failed Units and Tmain
+                                 -b                             list .b (known bug) marked cases
+            misc/review          inspect [-b]                   inspect difference interactively
+                                 -b                             inspect .b (known bug) marked cases
+    $
 
 Semi-fuzz(*Fuzz*) testing
 ---------------------------------------------------------------------
-
-:Maintainer: Masatake YAMATO <yamato@redhat.com>
-
-----
 
 Unexpected input can lead ctags to enter an infinite loop. The fuzz
 target tries to identify these conditions by passing
@@ -411,14 +414,8 @@ As the same as units target, this semi-fuzz test target also calls
 *misc/units shrink* when a test case is failed. See "*Units* test facility"
 about the shrunk result.
 
-..	noise.rst
-
 *Noise* testing
 ---------------------------------------------------------------------
-
-:Maintainer: Masatake YAMATO <yamato@redhat.com>
-
------
 
 After enjoying developing Semi-fuzz testing, I'm looking for a more unfair
 approach. Run
@@ -427,22 +424,14 @@ approach. Run
 
 	$ make noise LANGUAGES=LANG1[,LANG2,...]
 
-It takes a long time, especially with ``VG=1``, so this cannot be run
-under Travis CI. However, it is a good idea to run it locally.
-
 The noise target generates test cases by inserting or deleting one
 character to the test cases of *Units*.
 
-TBW
-
-..	chop.rst
+It takes a long time, even without ``VG=1``, so this cannot be run
+under Travis CI. However, it is a good idea to run it locally.
 
 *Chop* and *slap* testing
 ---------------------------------------------------------------------
-
-:Maintainer: Masatake YAMATO <yamato@redhat.com>
-
-----
 
 After reviving many bug reports, we recognized some of them spot
 unexpected EOF. The chop target was developed based on this recognition.
@@ -466,10 +455,6 @@ from head.
 
 Input validation for *Units*
 ---------------------------------------------------------------------
-
-:Maintainer: Masatake YAMATO <yamato@redhat.com>
-
-----
 
 We have to maintain parsers for languages that we don't know well.  We
 don't have enough time to learn the languages.

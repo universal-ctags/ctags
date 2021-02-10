@@ -425,20 +425,21 @@ An example can be found in DTS parser:
 Setting `requestAutomaticFQTag` to `TRUE` implies setting
 `useCork` to `CORK_QUEUE`.
 
-PACKCC compiler-compiler
+PackCC compiler-compiler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Packcc is a compiler-compiler; it translates .peg grammar file to .c
-file.  packcc was originally written by Arihiro Yoshida. Its source
-repository is at sourceforge. It seems that packcc at sourceforge is
+PackCC is a compiler-compiler; it translates .peg grammar file to .c
+file.  PackCC was originally written by Arihiro Yoshida. Its source
+repository is at sourceforge. It seems that PackCC at sourceforge is
 not actively maintained. Some derived repositories are at
 github. Currently, our choice is
 https://github.com/enechaev/packcc. It is the most active one in the
 derived repositories.
 
-The source tree of packcc is grafted at misc/packcc directory.
-Building packcc and ctags are integrated in the build-scripts of
+The source tree of PackCC is grafted at misc/packcc directory.
+Building PackCC and ctags are integrated in the build-scripts of
 Universal Ctags.
 
-.. TODO:
-	refer peg/* as a sample implementation
+Refer `peg/valink.peg
+<https://github.com/universal-ctags/ctags/blob/master/peg/varlink.peg>`_ as a
+sample of a parser using PackCC.

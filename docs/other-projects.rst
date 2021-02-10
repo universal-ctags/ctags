@@ -52,10 +52,13 @@ Software using ctags
 	.. TODO: Is Pygments using ctags? To be move moved to other section?
 
 	Pygments is a generic syntax highlighter.
+
 	It can utilize tags file
 	as input for making hyperlinks. However, Pygments just looks
 	at names and lines in tags file. scopes and kinds are not
-	used.
+	used.  See `here
+	<https://pygments-doc.readthedocs.io/en/latest/formatters/html.html>`_ for
+	details.
 
 	As far as I (Masatake YAMATO) tried, using Pygments from ctags
 	is not so useful. There are critical gap between ctags and Pygments.
@@ -72,6 +75,9 @@ Software using ctags
 	A person at GNU global project proposed an extension for the tags file
 	format: See `this ticket
 	<https://sourceforge.net/p/ctags/mailman/message/30020186/>`_ for details.
+
+	See also `'Source code reading' related sites
+	<https://www.gnu.org/software/global/links.html>`_.
 
 `GNU Source-highlight <https://www.gnu.org/software/src-highlite/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

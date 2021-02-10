@@ -84,10 +84,6 @@ Defining kinds is the most important task in writing a new parser.
 Once a kind is introduced, we cannot change it because it breaks
 tags file compatibility.
 
-If you are not interested in designing kinds because you are an
-emacs user and use just TAGS output, there are two choices:
-TBW.
-
 See :ref:`tag_entries` in :ref:`ctags(1) <ctags(1)>` for more details of kinds
 and roles.
 
@@ -95,11 +91,6 @@ Scope information and full qualified tags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Optional.
-TBW.
-
-Adding a new field
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 TBW.
 
 Developing a parser
