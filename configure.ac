@@ -761,6 +761,7 @@ AC_CONFIG_FILES([Makefile
 		 man/ctags-client-tools.7.rst
 		 man/ctags-incompatibilities.7.rst
 		 man/ctags-optlib.7.rst
+		 man/ctags-faq.7.rst
 		 man/ctags-lang-julia.7.rst
 		 man/ctags-lang-python.7.rst
 		 man/ctags-lang-verilog.7.rst
