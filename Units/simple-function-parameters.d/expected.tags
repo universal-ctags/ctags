@@ -4,3 +4,7 @@ create_point	input.pl	/^fun create_point(:$x, :$y, :$color) {$/;"	fun	language:F
 Derived	input.pl	/^package Derived {$/;"	package	language:Perl
 Derived	input.pl	/^package Derived {$/;"	class	language:Moose
 go_big	input.pl	/^    has 'go_big' => ($/;"	attribute	language:Moose	class:Derived
+size	input.pl	/^    around size($x, $y) {$/;"	wrapper	language:Moose	class:Derived	wrapping:around
+Derived0	input-0.pl	/^package Derived0 {$/;"	package	language:Perl
+Derived0	input-0.pl	/^package Derived0 {$/;"	class	language:Moose
+go_big0	input-0.pl	/^    has 'go_big0' => ($/;"	attribute	language:Moose	class:Derived0

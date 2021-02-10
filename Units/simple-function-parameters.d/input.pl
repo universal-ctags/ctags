@@ -23,7 +23,10 @@ create_point(
 );
  
 package Derived {
-    use Function::Parameters qw(:std :modifiers);
+    use Function::Parameters qw(
+	:std
+	:modifiers
+	);
     use Moo;
  
     extends 'Base';
@@ -33,7 +36,7 @@ package Derived {
     );
  
     # "around" method with implicit $orig and $self
-    around size() {
+    around size($x, $y) {
         return $self->$orig() * 2 if $self->go_big;
         return $self->$orig();
     }

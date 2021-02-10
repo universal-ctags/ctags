@@ -94,6 +94,39 @@ struct mooseSubparser {
 	int classCork;
 	bool notContinuousExtendsLines;
 
+	int indexForFunctionParameters;
+
+	/* functionParametersModifiersStateCounter is for tracking the conditions
+	 * that both "use Moose;" and "use Functions::Parameters qw/:modifiers/"
+	 * are specified.
+	 * functionParametersModifiersStateCounter is initialized to 2.
+	 * Decrement functionParametersModifiersStateCounter when finding one of two.
+	 * When functionParametersModifiersStateCounter is 0, the state is
+	 * propagated to notInFunctionParametersModifiers. */
+	bool notInFunctionParametersModifiers;
+	int  functionParametersModifiersStateCounter;
+#define RESET_FunctionParameters_STATE(MOOSE)				\
+	do {													\
+		MOOSE->notInFunctionParametersModifiers = true;		\
+		MOOSE->functionParametersModifiersStateCounter = 2;	\
+	} while (0)
+#define DEC_FunctionParameters_STATE(MOOSE)							\
+	do {															\
+		MOOSE->functionParametersModifiersStateCounter--;			\
+		if (MOOSE->functionParametersModifiersStateCounter == 0)	\
+			MOOSE->notInFunctionParametersModifiers = false;		\
+		if (MOOSE->functionParametersModifiersStateCounter < 0)		\
+			MOOSE->functionParametersModifiersStateCounter = 0; 	\
+	} while (0)
+#define INC_FunctionParameters_STATE(MOOSE)						\
+	do {														\
+		MOOSE->functionParametersModifiersStateCounter++;		\
+		if (MOOSE->functionParametersModifiersStateCounter > 0)	\
+			MOOSE->notInFunctionParametersModifiers = true;		\
+		if (MOOSE->functionParametersModifiersStateCounter > 2)	\
+			MOOSE->functionParametersModifiersStateCounter = 2;	\
+	} while (0)
+
 	vString *supersOrRoles;
 };
 
@@ -107,6 +140,7 @@ static void enterMoose (struct mooseSubparser *moose, bool role);
 static void leaveMoose (struct mooseSubparser *moose);
 static void enteringPodNotify (perlSubparser *perl);
 static void leavingPodNotify  (perlSubparser *perl);
+static void findingQuotedWordNotify (perlSubparser *perl, int moduleIndex, const char *qwd);
 
 /*
  *   DATA DEFINITIONS
@@ -122,6 +156,7 @@ static struct mooseSubparser mooseSubparser = {
 		},
 		.enteringPodNotify = enteringPodNotify,
 		.leavingPodNotify  = leavingPodNotify,
+		.findingQuotedWordNotify = findingQuotedWordNotify,
 	},
 };
 
@@ -140,6 +175,8 @@ static void inputStart (subparser *s)
 	moose->inPod = false;
 	moose->supersOrRoles = vStringNew ();
 	moose->notContinuousExtendsLines = true;
+	moose->indexForFunctionParameters = CORK_NIL;
+	RESET_FunctionParameters_STATE (moose);
 }
 
 static void inputEnd (subparser *s)
@@ -179,12 +216,19 @@ static void makeTagEntryNotify (subparser *s, const tagEntryInfo *tag, int corkI
 				enterMoose (moose, false);
 			else if (strcmp (tag->name, "Moose::Role") == 0)
 				enterMoose (moose, true);
+			else if (strcmp (tag->name, "Function::Parameters") == 0)
+				moose->indexForFunctionParameters = corkIndex;
 		}
 		else if (isRoleAssigned(tag, ROLE_PERL_MODULE_UNUSED))
 		{
 			if (strcmp (tag->name, "Moose") == 0
 				|| strcmp (tag->name, "Moo") == 0)
 				leaveMoose (moose);
+			else if (strcmp (tag->name, "Function::Parameters") == 0)
+			{
+				moose->indexForFunctionParameters = CORK_NIL;
+				INC_FunctionParameters_STATE(moose);
+			}
 		}
 	}
 }
@@ -201,6 +245,17 @@ static void leavingPodNotify  (perlSubparser *perl)
 	moose->inPod = false;
 }
 
+static void findingQuotedWordNotify (perlSubparser *perl,
+									 int moduleIndex, const char *qwd)
+{
+	struct mooseSubparser *moose = (struct mooseSubparser *)perl;
+	if (moose->indexForFunctionParameters != moduleIndex)
+		return;
+
+	if (strcmp (qwd, ":modifiers") == 0)
+		DEC_FunctionParameters_STATE(moose);
+}
+
 static void leaveMoose (struct mooseSubparser *moose)
 {
 	moose->notContinuousExtendsLines = true;
@@ -214,6 +269,7 @@ static void leaveMoose (struct mooseSubparser *moose)
 	moose->classCork = CORK_NIL;
 	moose->notInMoose = true;
 	moose->packageCork = CORK_NIL;
+	INC_FunctionParameters_STATE(moose);
 }
 
 static void enterMoose (struct mooseSubparser *moose, bool role)
@@ -232,6 +288,8 @@ static void enterMoose (struct mooseSubparser *moose, bool role)
 	moose_e.filePosition = perl_e->filePosition;
 	moose->classCork = makeTagEntry (&moose_e);
 	vStringClear (moose->supersOrRoles);
+
+	DEC_FunctionParameters_STATE(moose);
 
 	return;
 }
@@ -477,6 +535,11 @@ static void initializeMooseParser (langType language)
 							  "([a-zA-Z_][a-zA-Z0-9_]*([ \t][a-zA-Z_][a-zA-Z0-9_]*)*).*=>",
 							  "{exclusive}",
 							  findAttributeOrWrapperMulti, &mooseSubparser.notInMoose,
+							  &mooseSubparser);
+	addLanguageCallbackRegex (language, "^[ \t]*(has|after|before|around|override) +"
+							  "([a-zA-Z_][a-zA-Z0-9_]*)[ \t]*\\(",
+							  "{exclusive}",
+							  findAttributeOrWrapperOne, &mooseSubparser.notInFunctionParametersModifiers,
 							  &mooseSubparser);
 	addLanguageCallbackRegex (language, "^[ \t]*(.+)",
 							  "{exclusive}",

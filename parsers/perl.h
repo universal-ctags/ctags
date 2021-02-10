@@ -34,6 +34,9 @@ enum PerlKindType {
 
 struct sPerlSubparser {
 	subparser subparser;
+	void (* findingQuotedWordNotify) (perlSubparser *,
+									  int moduleIndex,
+									  const char *qwd);
 	void (* enteringPodNotify) (perlSubparser *);
 	void (* leavingPodNotify)    (perlSubparser *);
 };
