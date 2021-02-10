@@ -598,7 +598,7 @@ run_tcase ()
     #
     # Build _CMDLINE
     #
-    _CMDLINE="${CTAGS} --verbose --options=NONE $PRETENSE_OPTS --optlib-dir=+$t/optlib -o -"
+    _CMDLINE="${CTAGS} --verbose --options=NONE --fields=-T $PRETENSE_OPTS --optlib-dir=+$t/optlib -o -"
     [ -f "${fargs}" ] && _CMDLINE="${_CMDLINE} --options=${fargs}"
 
     if [ -f "${fargs}" ] && ! ${_CMDLINE} --_force-quit=0 > /dev/null 2>&1; then
