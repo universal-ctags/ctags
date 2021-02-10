@@ -2996,6 +2996,43 @@ EsObject* es_map   (EsObject * (*fn) (EsObject *, void *),
 	return o;
 }
 
+EsObject* es_foreach (EsObject * (*fn) (EsObject *, void *),
+					  EsObject *list, void *user_data)
+{
+	if (es_null (list))
+		return es_false;
+
+	for (EsObject *c = list; !es_null (c); c = es_cdr (c))
+	{
+		EsObject *r = fn (es_car (c), user_data);
+		if (!es_object_equal (r, es_false))
+			return r;
+	}
+
+	return es_false;
+}
+
+EsObject* es_fold (EsObject * (*kons) (EsObject *, EsObject *, void *),
+				   EsObject * knil, EsObject * list, void *user_data)
+{
+	EsObject *r = knil;
+
+	es_autounref_pool_push();
+	while (!es_null (list))
+	{
+		EsObject *e = es_car (list);
+		list = es_cdr (list);
+
+		r = (* kons) (e, (r == knil) ? r : es_object_autounref (r),
+					  user_data);
+		if (es_error_p (r))
+			break;
+	}
+	es_autounref_pool_pop();
+
+	return r;
+}
+
 static EsObject*
 es_vmatch_atom_input(EsObject* input, EsObject* fmt_object, va_list *ap)
 {

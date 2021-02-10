@@ -1,0 +1,16 @@
+;;  (eq? $scope-name (string-append "ab" $name "cy"))
+p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int
+;;  (eq? $scope-name (concat "ab" "p" "cy"))
+p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int
+;;  (eq? $scope-name (concat (concat "a" "b") $name (concat "c" "y")))
+p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int
+;;  (eq? $scope-name (concat (concat "a" "b" $name) (concat "c" "y")))
+p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int
+;;  (eq? $scope-name (concat (concat (concat "a" "b" $name) (concat "c" "y"))))
+p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int
+;;  ((string->regexp (concat (concat (concat "a" "b" $name) (concat "c" "y")))) (or $scope-name ""))
+p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int
+;;  ((string->regexp (concat (concat (concat "a" "b" "p") (concat "c" "y")))) (or $scope-name ""))
+p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int
+;;  ((printX (string->regexp (concat (concat (concat "a" "b" "p") (concat "c" "y"))))) (or $scope-name ""))
+p	input.c	/^	int p;$/;"	kind:member	file:	scope:struct:abpcy	typeref:typename:int

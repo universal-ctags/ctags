@@ -247,6 +247,17 @@ EsObject* es_srealize  (const char* fmt,...);
 EsObject* es_map   (EsObject * (*fn) (EsObject *, void *),
 					EsObject *list, void *user_data);
 
+/* Unlike es_map, the value returnd from FN is not accumulated.
+ * If FN returns a value other than #f, es_foreach stops the
+ * iteration immediately and returns the value.
+ */
+EsObject* es_foreach (EsObject * (*fn) (EsObject *, void *),
+					  EsObject *list, void *user_data);
+
+/* The memory management of es_map is also applicable to es_fold. */
+EsObject* es_fold (EsObject * (*kons) (EsObject *, EsObject *, void *),
+				   EsObject * knil, EsObject * list, void *user_data);
+
 /*
  * Rich element accessors
  */

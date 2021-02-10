@@ -1,0 +1,17 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/jet/var/ctags-new/Tmain/readtags-qualifier-op-string-append.d/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/f51fcb67/
+aapcz	input.c	/^struct aapcz {$/;"	struct	line:9	file:
+abpcx	input.c	/^struct abpcx {$/;"	struct	line:1	file:
+abpcy	input.c	/^struct abpcy {$/;"	struct	line:5	file:
+p	input.c	/^	int p;$/;"	member	line:10	scope:struct:aapcz	typeref:typename:int	file:
+p	input.c	/^	int p;$/;"	member	line:2	scope:struct:abpcx	typeref:typename:int	file:
+p	input.c	/^	int p;$/;"	member	line:6	scope:struct:abpcy	typeref:typename:int	file:
