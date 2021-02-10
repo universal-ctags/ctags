@@ -593,3 +593,119 @@ runs the command in two ways.
     non-zero if the input file contains invalid syntax. This method
     will never run if *is_runnable* method of the command exits with
     non-zero.
+
+
+..	_man_test:
+
+Testing examples in language specific man pages
+---------------------------------------------------------------------
+
+:Maintainer: Masatake YAMATO <yamato@redhat.com>
+
+----
+
+`man-test` is a target for testing the examples in the language
+specific man pages (``man/ctags-lang-<LANG>.7.rst.in``). The command
+line for running the target is:
+
+.. code-block:: console
+
+   $ make man-test
+
+An example for testing must have following form:
+
+.. code-block:: ReStructuredText
+
+  "input.<EXT>"
+
+  .. code-block:: <LANG>
+
+    <INPUT LINES>
+
+  "output.tags"
+  with "<OPTIONS FOR CTAGS>"
+
+  .. code-block:: tags
+
+    <TAGS OUTPUT LINES>
+
+
+The man-test target recognizes the form and does the same as
+the following shell code for each example in the man page:
+
+.. code-block:: console
+
+  $ echo <INPUT LINES> > input.<EXT>
+  $ echo <TAGS OUTPUT LINES> > output.tags
+  $ ctags <OPTIONS FOR CTAGS> > actual.tags
+  $ diff output.tags actual.tags
+
+A backslash character at the end of ``<INPUT LINES>`` or
+``<TAGS OUTPUT LINES>`` represents the continuation of lines;
+a subsequent newline is ignored.
+
+.. code-block:: ReStructuredText
+
+    .. code-block:: tags
+
+       very long\
+            line
+
+is read as:
+
+.. code-block:: ReStructuredText
+
+    .. code-block:: tags
+
+       very long     line
+
+Here is an example of a test case taken from
+``ctags-lang-python.7.rst.in``:
+
+.. code-block:: ReStructuredText
+
+	"input.py"
+
+	.. code-block:: Python
+
+	   import X0
+
+	"output.tags"
+	with "--options=NONE -o - --extras=+r --fields=+rzK input.py"
+
+	.. code-block:: tags
+
+		X0	input.py	/^import X0$/;"	kind:module	roles:imported
+
+``make man-test`` returns 0 if the all test cases in the all language
+specific man pages are passed.
+
+Here is an example output of the man-test target.
+
+.. code-block:: console
+
+	$ make man-test
+	  RUN      man-test
+	# Run test cases in ./man/ctags-lang-julia.7.rst.in
+	```
+	./man/ctags-lang-julia.7.rst.in[0]:75...passed
+	./man/ctags-lang-julia.7.rst.in[1]:93...passed
+	```
+	# Run test cases in ./man/ctags-lang-python.7.rst.in
+	```
+	./man/ctags-lang-python.7.rst.in[0]:116...passed
+	./man/ctags-lang-python.7.rst.in[1]:133...passed
+	./man/ctags-lang-python.7.rst.in[2]:154...passed
+	./man/ctags-lang-python.7.rst.in[3]:170...passed
+	./man/ctags-lang-python.7.rst.in[4]:187...passed
+	./man/ctags-lang-python.7.rst.in[5]:230...passed
+	```
+	# Run test cases in ./man/ctags-lang-verilog.7.rst.in
+	```
+	./man/ctags-lang-verilog.7.rst.in[0]:51...passed
+	```
+	OK
+
+NOTE: keep examples in the man pages simple. If you want to test ctags
+complicated (and or subtle) input, use the units target. The main
+purpose of the examples is for explaining the parser.
