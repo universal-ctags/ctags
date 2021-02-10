@@ -4,7 +4,7 @@
 EXTRA_DIST += misc/units misc/units.py misc/man-test.py
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
 
-check: tmain units tlib
+check: tmain units tlib man-test
 
 clean-local: clean-units clean-tmain
 
