@@ -642,6 +642,10 @@ END_MAIN_WHILE:
 extern parserDefinition* PerlParser (void)
 {
 	static const char *const extensions [] = { "pl", "pm", "ph", "plx", "perl", NULL };
+	static const char *const aliases [] = {
+		/* cperl is an Emacs' editing mode for Perl source code  */
+		"cperl",
+		NULL };
 	static selectLanguage selectors [] = { selectByPickingPerlVersion,
 					       NULL };
 	parserDefinition* def = parserNew ("Perl");
@@ -650,6 +654,7 @@ extern parserDefinition* PerlParser (void)
 	def->extensions = extensions;
 	def->parser     = findPerlTags;
 	def->selectLanguage = selectors;
+	def->aliases    = aliases;
 
 	/* Subparsers need this */
 	def->useCork = CORK_QUEUE;
