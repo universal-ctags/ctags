@@ -72,5 +72,9 @@ Execute the following command in the top directory to update them:
 make -C man QUICK=1 man update-docs
 ```
 
+During this process, hyperlinks to man pages are added as described above, and
+delete unnecessary section markups from `docs/man/*.rst`.  See `man/Makefile`
+for more details.
+
 To generate the man pages `rst2man` command is needed.
 `rst2man` is part of the `python-docutils` package on Ubuntu.

@@ -98,8 +98,10 @@ endif
 
 update-docs: $(doc_files)
 
+# Delete the line "------" in the first 10 lines of ../docs/man/*.rst to
+# suppress unnecessary section indices.
 ../docs/man/%.rst: %.rst
-	sed $(reppat) < $< > $@
+	sed $(reppat) -e '1,10s/^-*$$//' < $< > $@
 
 %.rst: %.rst.in
 ifeq ($(QUICK),)
