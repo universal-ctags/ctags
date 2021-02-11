@@ -31,6 +31,30 @@ See "FILES" section of ctags(1).
 Incompatibilities in command line interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Ordering in a command line
+....................................................................................
+
+.. NOTE: #1889
+
+The command line format of Universal Ctags is "``ctags [options]
+[source_file(s)]``" following the standard POSIX convention.
+
+Exuberant Ctags accepts a option following a source file.
+
+.. code-block:: console
+
+	$ ctags -o - foo.c --list-kinds=Sh
+	f  functions
+
+Universal Ctags warns and ignores the option ``--list-kinds=Sh`` as follows.
+
+.. code-block:: console
+
+	$ ctags -o - foo.c --list-kinds=Sh
+	ctags: Warning: cannot open input file "--list-kinds=Sh" : No such file or directory
+	a	foo.c	/^void a () {}$/;"	f	typeref:typename:void
+	b	foo.c	/^void b () {}$/;"	f	typeref:typename:void
+
 The order of application of patterns and extensions in ``--langmap``
 ....................................................................................
 
