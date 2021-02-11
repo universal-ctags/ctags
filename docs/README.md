@@ -69,7 +69,7 @@ directory. **Do not edit the files in `docs/man/` directory directly.**
 Execute the following command in the top directory to update them:
 
 ```sh
-make -C man QUICK=1 update-docs
+make -C man QUICK=1 man update-docs
 ```
 
 To generate the man pages `rst2man` command is needed.
