@@ -549,6 +549,12 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 		to which it is applied is not subject to change. Selecting this
 		option type causes the following options to be ignored: ``-B``, ``-F``.
 
+		``number`` type is ignored in Xref and JSON output formats. Use
+		``--_xformat="...%n"`` for Xref output format, or ``--fields=+n-P`` for
+		JSON output format.
+
+		.. NOTE: #2792
+
 	``pattern``
 		Use only search patterns for all tags, rather than the line numbers
 		usually used for macro definitions. This has the advantage of
@@ -1080,10 +1086,13 @@ Listing Options
 		``--output-format=json`` are still experimental.
 
 	FIXED
-	   Whether this field can be disabled or not.
+		Whether this field can be disabled or not in tags output.
 
-	   Some fields are printed always
-	   in tags output. They have ``yes`` as the value for this column.
+		Some fields are printed always in tags output.
+		They have ``yes`` as the value for this column.
+
+		Unlike the tag output mode, JSON output mode allows disabling
+		any fields.
 
 	DESCRIPTION
 		Human readable description for the field.
