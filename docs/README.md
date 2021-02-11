@@ -50,6 +50,10 @@ See also [Writing Documents](https://docs.ctags.io/en/latest/contributions.html#
   But this cause error on `rst2man` which is used to format man pages.
   Don't use this style in man pages.
 
+* The titles of man pages (e.g. "``ctags(1)``", "``ctags-optlib(7)``", etc.) in
+  ``man/*.[1-9].rst.in`` are replaced to hyperlinks as "`` :ref:`ctags(1)` ``"
+  by "``make update-docs``".
+
 ### Markers ###
 
 - "`NOT REVIEWED YET`" means the section or block is not reviewed yet.
