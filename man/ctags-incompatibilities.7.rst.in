@@ -21,11 +21,18 @@ DESCRIPTION
 This page describes major incompatible changes introduced to
 Universal Ctags forked from Exuberant Ctags.
 
+Option files loading at starting up time (preload files)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Universal Ctags doesn't load "~/.ctags" at starting up time.
+File paths for preload files are changed.
+See "FILES" section of ctags(1).
+
 Incompatibilities in command line interface
--------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The order of application of patterns and extensions in ``--langmap``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+....................................................................................
 
 When applying mappings for a name of given source file,
 Exuberant Ctags tests file name patterns AFTER file extensions
@@ -53,7 +60,7 @@ options are helpful to verify and the file extensions and the file
 name patterns of given *language*.
 
 Remove ``--file-tags`` and ``--file-scope`` options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+....................................................................................
 
 Even in Exuberant Ctags, "--file-tags" is not documented in its man page.
 Instead of specifying "--file-tags" or "--file-tags=yes", use
@@ -71,8 +78,8 @@ Instead of specifying "--file-tags" or "--file-tags=yes", use
 Instead of specifying "--file-tags=no", use
 "--extras=-F" or "--extras=-{fileScope}".
 
-Language and kind definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Incompatibilities in language and kind definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Language name defined with ``--langdef=name`` option
 ....................................................................................
@@ -155,10 +162,10 @@ for defining a kind "abstractClass" and "attribute".
 
 
 Incompatibilities in tags file format
--------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using numerical character in the name part of tag tagfield
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+....................................................................................
 
 The version 2 tags file format, the default output format of
 Exuberant Ctags, accepts only alphabetical characters in the name part
@@ -172,22 +179,15 @@ The kinds "heading1", "heading2", and "heading3" in the HTML parser
 are the examples.
 
 Truncating the pattern for long input lines
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+....................................................................................
 
 To prevent generating overly large tags files, a pattern field is
 truncated, by default, when its size exceeds 96 bytes. A different
 limit can be specified with ``--pattern-length-limit=N``. Specifying
 0 as *N* results no truncation as Exuberant Ctags does not.
 
-Option files loading at starting up time (preload files)
--------------------------------------------------------------
-
-File paths for preload files are changed.
-Universal Ctags doesn't load "~/.ctags" at starting up time.
-See "FILES" section of ctags(1).
-
 Kind letters and names
--------------------------------------------------------------
+....................................................................................
 
 A kind letter "F" and a kind name "file" are reserved in the
 main part. A parser cannot have a kind conflicting with
