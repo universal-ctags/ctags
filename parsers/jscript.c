@@ -168,6 +168,7 @@ typedef enum {
 	JSTAG_GENERATOR,
 	JSTAG_GETTER,
 	JSTAG_SETTER,
+	JSTAG_FIELD,
 	JSTAG_COUNT
 } jsKind;
 
@@ -181,6 +182,7 @@ static kindDefinition JsKinds [] = {
 	{ true,  'g', "generator",	  "generators"		   },
 	{ true,  'G', "getter",		  "getters"			   },
 	{ true,  'S', "setter",		  "setters"			   },
+	{ true,  'M', "field",		  "fields"			   },
 };
 
 static const keywordTable JsKeywordTable [] = {
@@ -1626,14 +1628,24 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
      *     get [property]() {}
      *     set [property]() {}
      *     *[generator]() {}
+	 *
+	 * tc39/proposal-class-fields
+	 *     field0 = function(a,b) {}
+	 *     field1 = 1
+	 * The parser extracts field0 as a method because the left value
+	 * is a function (kind propagation), and field1 as a field.
 	 */
 
+	bool dont_read = false;
 	do
 	{
 		bool is_setter = false;
 		bool is_getter = false;
 
-		readToken (token);
+		if (!dont_read)
+			readToken (token);
+		dont_read = false;
+
 		if (isType (token, TOKEN_CLOSE_CURLY))
 		{
 			goto cleanUp;
@@ -1709,7 +1721,8 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				vStringDelete (dprop);
 
 			is_shorthand = isType (token, TOKEN_OPEN_PAREN);
-			if ( isType (token, TOKEN_COLON) || is_shorthand )
+			bool can_be_field = isType (token, TOKEN_EQUAL_SIGN);
+			if ( isType (token, TOKEN_COLON) || can_be_field || is_shorthand )
 			{
 				if (! is_shorthand)
 				{
@@ -1799,6 +1812,17 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						else
 							makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 				}
+				else if (can_be_field)
+				{
+					makeJsTag (name, JSTAG_FIELD, NULL, NULL);
+					parseLine (token, true);
+				}
+			}
+			else
+			{
+				makeJsTag (name, JSTAG_FIELD, NULL, NULL);
+				if (!isType (token, TOKEN_SEMICOLON))
+					dont_read = true;
 			}
 		}
 	} while ( isType(token, TOKEN_COMMA) ||

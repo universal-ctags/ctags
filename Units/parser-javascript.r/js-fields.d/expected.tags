@@ -1,0 +1,30 @@
+fun0	input.js	/^var fun0 = function() {}$/;"	f
+Class0	input.js	/^class Class0 {$/;"	c
+field1	input.js	/^    field1 = []$/;"	M	class:Class0
+field2	input.js	/^    field2;$/;"	M	class:Class0
+field3	input.js	/^    field3$/;"	M	class:Class0
+field4	input.js	/^    field4$/;"	M	class:Class0
+field5	input.js	/^    field5$/;"	M	class:Class0
+field6	input.js	/^    field6;$/;"	M	class:Class0
+field7	input.js	/^    field7$/;"	M	class:Class0
+field8	input.js	/^    field8 = 1;$/;"	M	class:Class0
+field9	input.js	/^    field9 = "abc"$/;"	M	class:Class0
+field10	input.js	/^    field10 = {}$/;"	M	class:Class0
+field11	input.js	/^    field11 = function(x, y) {$/;"	m	class:Class0
+method1	input.js	/^    method1() {$/;"	m	class:Class0
+field12	input.js	/^    ['field12'] = 1$/;"	M	class:Class0
+field13	input.js	/^    ['field13'];$/;"	M	class:Class0
+['field1' + '4']	input.js	/^    ['field1' + '4']$/;"	M	class:Class0
+field15	input.js	/^    field15 = 1$/;"	M	class:Class0
+field16	input.js	/^    field16 = [ function() {return}, function() {return} ]$/;"	M	class:Class0
+method2	input.js	/^    method2() {$/;"	m	class:Class0
+method3	input.js	/^    method3() {$/;"	m	class:Class0
+Class1	input.js	/^class Class1 {$/;"	c
+field10	input.js	/^    field10$/;"	M	class:Class1
+method10	input.js	/^    method10() {$/;"	m	class:Class1
+Class2	input.js	/^class Class2 {field20}$/;"	c
+field20	input.js	/^class Class2 {field20}$/;"	M	class:Class2
+Class3	input.js	/^class Class3 {field30$/;"	c
+field30	input.js	/^class Class3 {field30$/;"	M	class:Class3
+Class4	input.js	/^class Class4 {$/;"	c
+field40	input.js	/^    field40$/;"	M	class:Class4
