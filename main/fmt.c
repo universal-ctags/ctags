@@ -230,13 +230,13 @@ static fmtElement** queueTagField (fmtElement **last, long width, bool truncatio
 	else
 		cur->spec.field.raw_fmtstr = NULL;
 
-	enableField (ftype, true, false);
+	enableField (ftype, true);
 	if (language == LANG_AUTO)
 	{
 		fieldType ftype_next = ftype;
 
 		while ((ftype_next = nextSiblingField (ftype_next)) != FIELD_UNKNOWN)
-			enableField (ftype_next, true, false);
+			enableField (ftype_next, true);
 	}
 
 	cur->printer = printTagField;

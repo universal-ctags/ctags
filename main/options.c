@@ -173,6 +173,7 @@ optionValues Option = {
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
 	.interactive = false,
+	.fieldsReset = false,
 #ifdef WIN32
 	.useSlashAsFilenameSeparator = FILENAME_SEP_UNSET,
 #endif
@@ -742,7 +743,7 @@ extern void checkOptions (void)
 		if (Option.tagFileName != NULL)
 			error (WARNING, "%s ignores output tag file name", notice);
 	}
-	writerCheckOptions ();
+	writerCheckOptions (Option.fieldsReset);
 }
 
 extern langType getLanguageComponentInOptionFull (const char *const option,
@@ -1311,7 +1312,10 @@ static void resetFieldsOption (langType lang, bool mode)
 
 	for (i = 0; i < countFields (); ++i)
 		if ((lang == LANG_AUTO) || (lang == getFieldOwner (i)))
-			enableField (i, mode, false);
+			enableField (i, mode);
+
+	if ((lang == LANG_AUTO || lang == LANG_IGNORE)&& !mode)
+		Option.fieldsReset = true;
 }
 
 static void processFieldsOption (
@@ -1326,6 +1330,8 @@ static void processFieldsOption (
 	bool inLongName = false;
 
 	longName = vStringNewOrClearWithAutoRelease (longName);
+
+	Option.fieldsReset = false;
 
 	if (*p == '*')
 	{
@@ -1370,7 +1376,7 @@ static void processFieldsOption (
 			if (t == FIELD_UNKNOWN)
 				error(FATAL, "no such field: \'%s\'", vStringValue (longName));
 
-			enableField (t, mode, true);
+			enableField (t, mode);
 
 			inLongName = false;
 			vStringClear (longName);
@@ -1385,7 +1391,7 @@ static void processFieldsOption (
 					error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
 					      c, option);
 				else
-					enableField (t, mode, true);
+					enableField (t, mode);
 			}
 			break;
 	}
@@ -2962,13 +2968,13 @@ static void enableLanguageField (langType language, const char *field, bool mode
 	t = getFieldTypeForNameAndLanguage (field, language);
 	if (t == FIELD_UNKNOWN)
 		error(FATAL, "no such field: \'%s\'", field);
-	enableField (t, mode, (language != LANG_AUTO));
+	enableField (t, mode);
 	if (language == LANG_AUTO)
 	{
 		fieldType ftype_next = t;
 
 		while ((ftype_next = nextSiblingField (ftype_next)) != FIELD_UNKNOWN)
-			enableField (ftype_next, mode, (language != LANG_AUTO));
+			enableField (ftype_next, mode);
 	}
 }
 

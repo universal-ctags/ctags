@@ -177,10 +177,10 @@ extern bool ptagMakeCtagsOutputExcmd (ptagDesc *desc,
 						   NULL);
 }
 
-extern void writerCheckOptions (void)
+extern void writerCheckOptions (bool fieldsWereReset)
 {
 	if (writer->checkOptions)
-		writer->checkOptions (writer);
+		writer->checkOptions (writer, fieldsWereReset);
 }
 
 extern bool writerPrintPtagByDefault (void)

@@ -1,0 +1,4 @@
+# --output-format=json --fields=+n-P
+{"_type": "tag", "name": "main", "path": "input.c", "line": 1, "typeref": "typename:void", "kind": "function"}
+# --fields=+n-P --output-format=json
+{"_type": "tag", "name": "main", "path": "input.c", "line": 1, "typeref": "typename:void", "kind": "function"}
