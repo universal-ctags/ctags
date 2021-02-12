@@ -12,8 +12,8 @@ Generate tag files for source code
 
 SYNOPSIS
 --------
-|	**@CTAGS_NAME_EXECUTABLE@** [options] [source_file(s)]
-|	**@ETAGS_NAME_EXECUTABLE@** [options] [source_file(s)]
+|	**@CTAGS_NAME_EXECUTABLE@** [<options>] [<source_file(s)>]
+|	**@ETAGS_NAME_EXECUTABLE@** [<options>] [<source_file(s)>]
 
 
 DESCRIPTION
@@ -80,9 +80,8 @@ and that "``=0``", "``=off``", and "``=false``" are considered synonyms for "``=
 Some options are either ignored or useful only when used while running in
 etags mode (see ``-e`` option). Such options will be noted.
 
-Most options may appear anywhere on the command line, affecting only those
-files which follow the option. A few options, however, must appear
-before the first file name and will be noted as such.
+<options> must precede the <source_file(s)> following the standard POSIX
+convention.
 
 Options taking language names will accept those names in either upper or
 lower case. See the ``--list-languages`` option for a complete list of the
@@ -202,8 +201,7 @@ Input/Output File Options
 	option) and only after file names listed on the command line or from
 	any file supplied using the ``-L`` option. When this option is enabled,
 	the options ``-f``, ``-o``, and ``--totals`` are ignored. This option is quite
-	esoteric and is disabled by default. This option must appear before
-	the first file name.
+	esoteric and is disabled by default.
 
 ``--filter-terminator=string``
 	Specifies a string to print to standard output following the tags for
@@ -217,9 +215,7 @@ Input/Output File Options
 	the directory. This string will always be separated from the last tag
 	line for the file by its terminating newline.
 
-	This option is quite
-	esoteric and is empty by default. This option must appear before
-	the first file name.
+	This option is quite esoteric and is empty by default.
 
 ``--links[=yes|no]``
 	Indicates whether symbolic links (if supported) should be followed.
@@ -266,8 +262,7 @@ Input/Output File Options
 ``--append[=yes|no]``
 	Indicates whether tags generated from the specified files should be
 	appended to those already present in the tag file or should replace them.
-	This option is ``no`` by default. This option must appear before the
-	first file name.
+	This option is ``no`` by default.
 
 ``-a``
 	Equivalent to ``--append``.
@@ -304,8 +299,8 @@ Output Format Options
 	values for level are 1 or 2. Level 1 specifies the original tag file
 	format and level 2 specifies a new extended format containing extension
 	fields (but in a manner which retains backward-compatibility with
-	original ``vi(1)`` implementations). The default level is 2. This option
-	must appear before the first file name. [Ignored in etags mode]
+	original ``vi(1)`` implementations). The default level is 2.
+	[Ignored in etags mode]
 
 ``--output-format=u-ctags|e-ctags|etags|xref|json``
 	Specify the output format. The default is ``u-ctags``.
@@ -313,7 +308,6 @@ Output Format Options
 	See ``-e`` for ``etags``, and ``-x`` for ``xref``.
 	``json`` is experimental format, and available only if
 	the ctags executable is built with ``libjansson``.
-	This option must appear before the first file name.
 
 .. TODO: convert output-json.rst to ctags-json-output.1.rst (ctags-json-output(1)).
    and add a link to it here.
@@ -324,7 +318,6 @@ Output Format Options
 	editor. Alternatively, if @CTAGS_NAME_EXECUTABLE@ is invoked by a
 	name containing the string "@ETAGS_NAME_EXECUTABLE@" (either by renaming,
 	or creating a link to, the executable), etags mode will be enabled.
-	This option must appear before the first file name.
 
 ``-x``
 	Same as ``--output-format=xref``.
@@ -340,7 +333,6 @@ Output Format Options
 	file (e.g. ``@CTAGS_NAME_EXECUTABLE@ -x --kinds-c=f file``), or generating
 	a list of all externally visible global variables located in a source
 	file (e.g. ``@CTAGS_NAME_EXECUTABLE@ -x --kinds-c=v --extras=-F file``).
-	This option must appear before the first file name.
 
 ``--sort[=yes|no|foldcase]``
 	Indicates whether the tag file should be sorted on the tag name
@@ -349,8 +341,8 @@ Output Format Options
 	Fast binary searches of tag files sorted with case-folding will require
 	special support from tools using tag files, such as that found in the
 	@CTAGS_NAME_EXECUTABLE@ readtags library, or Vim version 6.2 or higher
-	(using ``set ignorecase``). This option must appear before the first file
-	name. [Ignored in etags mode]
+	(using ``set ignorecase``).
+	[Ignored in etags mode]
 
 ``-u``
 	Equivalent to ``--sort=no`` (i.e. "unsorted").
@@ -763,8 +755,7 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 
 ``--tag-relative[=yes|no|always|never]``
 	Specifies how the file paths recorded in the tag file.
-	This option must appear before the
-	first file name. The default is ``yes`` when running in etags mode (see
+	The default is ``yes`` when running in etags mode (see
 	the ``-e`` option), ``no`` otherwise.
 
 	``yes``
@@ -1315,7 +1306,7 @@ Miscellaneous Options
 ``--totals[=yes|no|extra]``
 	Prints statistics about the source files read and the tag file written
 	during the current invocation of @CTAGS_NAME_EXECUTABLE@. This option
-	is off by default. This option must appear before the first file name.
+	is off by default.
 
 	The ``extra`` value prints parser specific statistics for parsers
 	gathering such information.
