@@ -328,6 +328,14 @@ modification.
 If there are more than 3 test cases for a parser, a parser specific
 test case directory should be prepared like `Units/parser-c.r`.
 
+Add realistic examples for you parser to *codebase*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+At `codebase <https://github.com/universal-ctags/codebase>`_, we
+collect realistic examples that can be used for evaluating your parser
+especially about its performance aspect. Consider contributing to the
+repository when adding a new parser to Universal Ctags.
+
 Writing Documents
 ---------------------------------------------------------------------
 
