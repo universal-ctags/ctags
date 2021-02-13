@@ -454,6 +454,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Output list of flags which can be used with --langdef option."},
  {1,1,"  --_list-mtable-regex-flags"},
  {1,1,"       Output list of flags which can be used in a multitable regex parser definition."},
+ {1,1,"  --_list-operators"},
+ {1,1,"       Output list of optscript operators."},
  {1,0,""},
  {1,0,"Miscellaneous Options"},
  {1,0,"  --help"},
@@ -2285,6 +2287,13 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 	exit (0);
 }
 
+static void processListOperators (const char *const option CTAGS_ATTR_UNUSED,
+								  const char *const parameter)
+{
+	listRegexOpscriptOperators (stdout);
+	exit (0);
+}
+
 static void freeSearchPathList (searchPathList** pathList)
 {
 	stringListClear (*pathList);
@@ -2863,6 +2872,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_list-kinddef-flags",    processListKinddefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-langdef-flags",    processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
+	{ "_list-operators",        processListOperators,           true,   STAGE_ANY },
 #ifdef DO_TRACING
 	{ "_trace",                 processTraceOption,             false,  STAGE_ANY },
 #endif

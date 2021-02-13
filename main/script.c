@@ -328,3 +328,10 @@ extern EsObject *optscriptReadAndDefine (OptVM *vm, EsObject *dict, const char *
 		return obj;
 	return optscriptDefine (dict, name, obj);
 }
+
+extern void optscriptHelp (OptVM *vm, FILE *fp)
+{
+	MIO *out = mio_new_fp (fp, NULL);
+	opt_vm_help (vm, out, NULL, NULL);
+	mio_unref (out);
+}

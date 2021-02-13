@@ -1967,11 +1967,6 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 	ptrArrayClear (lcb->tstack);
 	guestRequestClear (lcb->guest_req);
 
-	if (es_null (lregex_dict))
-	{
-		lregex_dict = opt_dict_new (17);
-		optscriptInstallProcs (lregex_dict);
-	}
 	opt_vm_dstack_push (optvm, lregex_dict);
 
 	if (es_null (lcb->local_dict))
@@ -2995,8 +2990,25 @@ extern bool checkRegex (void)
 	regexAvailable = true;
 #endif
 
-	if (regexAvailable)
-		optvm = optscriptInit ();
-
 	return regexAvailable;
+}
+
+extern void initRegexOptscript (void)
+{
+	if (!regexAvailable)
+		return;
+
+	if (optvm)
+		return;
+
+	optvm = optscriptInit ();
+	lregex_dict = opt_dict_new (17);
+	optscriptInstallProcs (lregex_dict);
+}
+
+extern void	listRegexOpscriptOperators (FILE *fp)
+{
+	opt_vm_dstack_push (optvm, lregex_dict);
+	optscriptHelp (optvm, fp);
+	opt_vm_dstack_pop (optvm);
 }

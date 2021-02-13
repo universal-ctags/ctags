@@ -4334,6 +4334,12 @@ static void installTagRegexTable (const langType language)
 
 	if (lang->tagRegexTable != NULL)
 	{
+		/* ctags_cli_main() calls initRegexOptscript ().
+		 * However, mini-geany deasn't call ctags_cli_main().
+		 * So we call initRegexOptscript () here.
+		 */
+		initRegexOptscript ();
+
 	    for (i = 0; i < lang->tagRegexCount; ++i)
 		{
 			if (lang->tagRegexTable [i].mline)

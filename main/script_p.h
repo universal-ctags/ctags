@@ -33,4 +33,6 @@ extern EsObject *optscriptReadAndEval   (OptVM *vm, const char *src, size_t len)
 extern EsObject *optscriptReadAndDefine (OptVM *vm, EsObject *dict, const char *name,
 										 const char *src, size_t len);
 
+extern void      optscriptHelp          (OptVM *vm, FILE *fp);
+
 #endif	/* CTAGS_MAIN_SCRIPT_PRIVATE_H */
