@@ -172,15 +172,15 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 	   That cannot be changed to keep the compatibility of tags file format.
 	   Use FIELD_KIND_KEY instead */
 	if (isFieldEnabled (FIELD_KIND) || isFieldEnabled (FIELD_KIND_LONG))
-		enableField (FIELD_KIND_KEY, true, false);
+		enableField (FIELD_KIND_KEY, true);
 
 	/* FIELD_SCOPE has no name; getFieldName (FIELD_KIND_KEY) returns NULL.
 	   That cannot be changed to keep the compatibility of tags file format.
 	   Use FIELD_SCOPE_KEY and FIELD_SCOPE_KIND_LONG instead. */
 	if (isFieldEnabled (FIELD_SCOPE))
 	{
-		enableField (FIELD_SCOPE_KEY, true, false);
-		enableField (FIELD_SCOPE_KIND_LONG, true, false);
+		enableField (FIELD_SCOPE_KEY, true);
+		enableField (FIELD_SCOPE_KIND_LONG, true);
 	}
 
 	for (k = FIELD_EXTENSION_START; k <= FIELD_BUILTIN_LAST; k++)

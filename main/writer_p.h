@@ -52,7 +52,7 @@ struct sTagWriter {
 								void *clientData);
 	bool (* treatFieldAsFixed) (int fieldType);
 
-	void (* checkOptions) (tagWriter *writer);
+	void (* checkOptions) (tagWriter *writer, bool fieldsWereReset);
 
 #ifdef WIN32
 	enum filenameSepOp (* overrideFilenameSeparator) (enum filenameSepOp currentSetting);
@@ -97,7 +97,7 @@ extern bool ptagMakeCtagsOutputExcmd (ptagDesc *desc, langType language CTAGS_AT
 extern bool writerCanPrintPtag (void);
 extern bool writerDoesTreatFieldAsFixed (int fieldType);
 
-extern void writerCheckOptions (void);
+extern void writerCheckOptions (bool fieldsWereReset);
 extern bool writerPrintPtagByDefault (void);
 
 #ifdef WIN32

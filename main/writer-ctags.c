@@ -35,7 +35,7 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								const char *const parserName,
 								void *clientData);
 static bool treatFieldAsFixed (int fieldType);
-static void checkCtagsOptions (tagWriter *writer);
+static void checkCtagsOptions (tagWriter *writer, bool fieldsWereReset);
 
 #ifdef WIN32
 static enum filenameSepOp overrideFilenameSeparator (enum filenameSepOp currentSetting);
@@ -389,20 +389,22 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 #undef OPT
 }
 
+static fieldType fixedFields [] = {
+	FIELD_NAME,
+	FIELD_INPUT_FILE,
+	FIELD_PATTERN,
+};
+
 static bool treatFieldAsFixed (int fieldType)
 {
-	switch (fieldType)
-	{
-	case FIELD_NAME:
-	case FIELD_INPUT_FILE:
-	case FIELD_PATTERN:
-		return true;
-	default:
-		return false;
-	}
+	for (int i = 0; i < ARRAY_SIZE(fixedFields); i++)
+		if (fixedFields [i] == fieldType)
+			return true;
+	return false;
 }
 
-static void checkCtagsOptions (tagWriter *writer CTAGS_ATTR_UNUSED)
+static void checkCtagsOptions (tagWriter *writer CTAGS_ATTR_UNUSED,
+							   bool fieldsWereReset)
 {
 	if (isFieldEnabled (FIELD_KIND_KEY)
 		&& (!(isFieldEnabled (FIELD_KIND_LONG) ||
@@ -417,7 +419,7 @@ static void checkCtagsOptions (tagWriter *writer CTAGS_ATTR_UNUSED)
 			   getFieldLetter (FIELD_KIND_LONG),
 			   getFieldLetter (FIELD_KIND_KEY),
 			   getFieldName (FIELD_KIND_KEY));
-		enableField (FIELD_KIND_LONG, true, true);
+		enableField (FIELD_KIND_LONG, true);
 	}
 	if (isFieldEnabled (FIELD_SCOPE_KEY)
 		&& !isFieldEnabled (FIELD_SCOPE))
@@ -430,6 +432,30 @@ static void checkCtagsOptions (tagWriter *writer CTAGS_ATTR_UNUSED)
 			   getFieldLetter (FIELD_SCOPE),
 			   getFieldLetter (FIELD_SCOPE_KEY),
 			   getFieldName (FIELD_SCOPE_KEY));
-		enableField (FIELD_SCOPE, true, true);
+		enableField (FIELD_SCOPE, true);
+	}
+
+	for (int i = 0; i < ARRAY_SIZE (fixedFields); i++)
+	{
+		if (!isFieldEnabled (fixedFields [i]))
+		{
+			enableField (fixedFields [i], true);
+
+			if (fieldsWereReset)
+				continue;
+
+			const char *name = getFieldName (fixedFields [i]);
+			unsigned char letter = getFieldLetter (fixedFields [i]);
+
+			if (name && letter != NUL_FIELD_LETTER)
+				error(WARNING, "Cannot disable fixed field: '%c'{%s} in ctags output mode",
+				      letter, name);
+			else if (name)
+				error(WARNING, "Cannot disable fixed field: {%s} in ctags output mode",
+				      name);
+			else if (letter != NUL_FIELD_LETTER)
+				error(WARNING, "Cannot disable fixed field: '%c' in ctags output mode",
+				      letter);
+		}
 	}
 }
