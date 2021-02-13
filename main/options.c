@@ -2852,13 +2852,13 @@ static parametricOption ParametricOptions [] = {
 	{ "_dump-keywords",         processDumpKeywordsOption,      false,  STAGE_ANY },
 	{ "_dump-options",          processDumpOptionsOption,       false,  STAGE_ANY },
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
-	{ "_force-initializing",    processForceInitOption,         false, STAGE_ANY },
+	{ "_force-initializing",    processForceInitOption,         false,  STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
 #ifdef HAVE_JANSSON
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
 #endif
-	{ "_list-kinddef-flags",     processListKinddefFlagsOptions, true,   STAGE_ANY },
-	{ "_list-langdef-flags",     processListLangdefFlagsOptions, true,   STAGE_ANY },
+	{ "_list-kinddef-flags",    processListKinddefFlagsOptions, true,   STAGE_ANY },
+	{ "_list-langdef-flags",    processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
 #ifdef DO_TRACING
 	{ "_trace",                 processTraceOption,             false,  STAGE_ANY },
