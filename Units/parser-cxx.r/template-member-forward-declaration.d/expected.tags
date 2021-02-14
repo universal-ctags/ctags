@@ -1,0 +1,4 @@
+p	input.cpp	/^	Class *p;$/;"	m	class:A	typeref:typename:Class *	file:
+a_c_forward	input.cpp	/^	A<class C> a_c_forward;$/;"	m	class:B	typeref:typename:A<class C>	file:
+a_s_forward	input.cpp	/^	A<struct S> a_s_forward;$/;"	m	class:B	typeref:typename:A<struct S>	file:
+a_u_forward	input.cpp	/^	A<union U> a_u_forward;$/;"	m	class:B	typeref:typename:A<union U>	file:
