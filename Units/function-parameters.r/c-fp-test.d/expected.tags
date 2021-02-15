@@ -1,3 +1,3 @@
-fun	input.c	/^int fun(void) $/;"	f	typeref:typename:int
-method	input.c	/^int method(void) $/;"	f	typeref:typename:int
-sub	input.c	/^int sub(void) $/;"	f	typeref:typename:int
+fun	input.c	/^int fun(void)$/;"	f	typeref:typename:int
+method	input.c	/^int method(void)$/;"	f	typeref:typename:int
+sub	input.c	/^int sub(void)$/;"	f	typeref:typename:int
