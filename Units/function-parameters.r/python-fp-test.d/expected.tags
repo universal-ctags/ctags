@@ -1,3 +1,0 @@
-fun	input.py	/^def fun():$/;"	f
-method	input.py	/^def method():$/;"	f
-sub	input.py	/^def sub():$/;"	f
