@@ -1,0 +1,4 @@
+Jim::Butler	input.pl	/^package Jim::Butler;$/;"	p
+my_function	input.pl	/^fun my_function() {}$/;"	f
+my_method	input.pl	/^method my_method() {}$/;"	m
+my_subroutine	input.pl	/^sub my_subroutine {}$/;"	s
