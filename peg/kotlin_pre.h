@@ -31,7 +31,6 @@
 */
 typedef enum {
     K_PACKAGE,
-    K_IMPORT,
     K_INTERFACE,
     K_CLASS,
     K_OBJECT,
@@ -44,7 +43,6 @@ typedef enum {
 
 static kindDefinition KotlinKinds [] = {
     { true, 'p', "package", "packages", },
-    { true, 'I', "import", "imports", },
     { true, 'i', "interface", "interfaces", },
     { true, 'c', "class", "classes", },
     { true, 'o', "object", "objects", },

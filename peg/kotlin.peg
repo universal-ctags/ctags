@@ -33,7 +33,7 @@ shebangLine <- ShebangLine _* NL+
 fileAnnotation <- (AT_NO_WS / AT_PRE_WS) FILE NL* COLON _* NL* (LSQUARE _* unescapedAnnotation+ _* RSQUARE / unescapedAnnotation) _* NL*
 packageHeader <- PACKAGE {pushKind(auxil, K_PACKAGE);} _ <identifier> {makeKotlinTag(auxil, $1, $1s, true);} _* semi?
 importList <- importHeader+
-importHeader <- IMPORT {pushKind(auxil, K_IMPORT);} _ <identifier> {makeKotlinTag(auxil, $1, $1s, false);} (DOT MULT / importAlias)? _* semi? _*
+importHeader <- IMPORT _ identifier (DOT MULT / importAlias)? _* semi? _*
 importAlias <- _ AS _ simpleIdentifier
 topLevelObject <- declaration _* semis?
 typeAlias <- modifiers? _* TYPE_ALIAS {pushKind(auxil, K_TYPEALIAS);} (_ / NL)* <simpleIdentifier> {makeKotlinTag(auxil, $1, $1s, false);} _* (NL* _* typeParameters)? NL* ASSIGNMENT NL* type
