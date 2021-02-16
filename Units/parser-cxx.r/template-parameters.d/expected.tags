@@ -1,0 +1,4 @@
+B	input.h	/^template<class A> class B {$/;"	c
+a	input.h	/^	A a;$/;"	m	class:B	typeref:typename:A
+C	input.h	/^template<class A> class C {$/;"	c
+b	input.h	/^  class B<A> b;$/;"	m	class:C	typeref:class:B

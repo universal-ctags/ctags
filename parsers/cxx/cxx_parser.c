@@ -51,6 +51,7 @@ void cxxParserNewStatement(void)
 	{
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 		g_cxx.pTemplateTokenChain = NULL;
+		g_cxx.oTemplateParameters.uCount = 0;
 	} else {
 		// we don't care about stale specializations as they
 		// are destroyed wen the base template prefix is extracted
