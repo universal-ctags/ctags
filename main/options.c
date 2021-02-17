@@ -1542,6 +1542,9 @@ static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED
 static void processListFieldsOption(const char *const option CTAGS_ATTR_UNUSED,
 				    const char *const parameter)
 {
+	/* Before listing, adjust states of enabled/disabled for fixed fields. */
+	writerCheckOptions (Option.fieldsReset);
+
 	struct colprintTable * table = fieldColprintTableNew ();
 
 	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
