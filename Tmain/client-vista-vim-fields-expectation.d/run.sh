@@ -1,4 +1,4 @@
-# Copyright: 2021 <liuchengxu@github.com>
+# Copyright: 2021 <https://github.com/liuchengxu>
 # License: GPL-2
 
 CTAGS=$1
