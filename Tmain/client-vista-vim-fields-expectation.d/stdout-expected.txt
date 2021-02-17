@@ -1,0 +1,2 @@
+{"_type": "tag", "name": "s:cur_dir", "line": 1, "kind": "variable"}
+{"_type": "tag", "name": "vista#FindItemsUnderDirectory", "line": 3, "signature": "(dir)", "kind": "function"}
