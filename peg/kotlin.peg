@@ -1,10 +1,21 @@
 # Copyright (c) 2021 Jan Dolinár
 #
 # This source code is released for free distribution under the terms of the
-# GNU General Public License version 2 or (at your option) any later version.
+# GNU General Public License version 2.
 #
 # This file contains description of Kotlin grammar based on the ANTLR grammar
 # from https://github.com/Kotlin/kotlin-grammar-gpl2.
+#
+# Notes:
+#   1. This file was originally derived from files (reference grammar files) in https://github.com/Kotlin/kotlin-spec
+#   2. Kotlin/kotlin-spec is distributed under Apache2 license
+#   3. I have requested the original developers to "re-license or dual-license" (see https://github.com/Kotlin/kotlin-spec/issues/70)
+#   4. The request was accepted and the original developer made a new repository https://github.com/Kotlin/kotlin-grammar-gpl2
+#      for redistributing the reference grammar files under GPLv2 license.
+#   5. This file is now derived from Kotlin/kotlin-grammar-gpl2 repository.
+#   6. Unlike many other files in Universal Ctags, this source code is released strictly under GPLv2
+#      and should not be relicensed to later versions of GPL.
+
 
 
 %prefix "pkotlin"
