@@ -1,11 +1,11 @@
 com.example.helloworld	input.kt	/^package com.example.helloworld$/;"	p
-AbstractWorker	input.kt	/^interface AbstractWorker {$/;"	i
-process	input.kt	/^    abstract fun process(): String$/;"	m
-Worker	input.kt	/^class Worker<T>(val name: T): AbstractWorker {$/;"	c
-name	input.kt	/^class Worker<T>(val name: T): AbstractWorker {$/;"	C
-process	input.kt	/^    override fun process(): String = name.toString()$/;"	m
-Global	input.kt	/^object Global {$/;"	o
-greeting	input.kt	/^    const val greeting = "Hello"$/;"	C
-StringWorker	input.kt	/^typealias StringWorker = Worker<String>$/;"	T
-main	input.kt	/^fun main() {$/;"	m
-result	input.kt	/^    var result: String = Global.greeting$/;"	v
+AbstractWorker	input.kt	/^interface AbstractWorker {$/;"	i	package:com.example.helloworld
+process	input.kt	/^    abstract fun process(): String$/;"	m	interface:com.example.helloworld.AbstractWorker
+Worker	input.kt	/^class Worker<T>(val name: T): AbstractWorker {$/;"	c	package:com.example.helloworld
+name	input.kt	/^class Worker<T>(val name: T): AbstractWorker {$/;"	C	class:com.example.helloworld.Worker
+process	input.kt	/^    override fun process(): String = name.toString()$/;"	m	class:com.example.helloworld.Worker
+Global	input.kt	/^object Global {$/;"	o	package:com.example.helloworld
+greeting	input.kt	/^    const val greeting = "Hello"$/;"	C	object:com.example.helloworld.Global
+StringWorker	input.kt	/^typealias StringWorker = Worker<String>$/;"	T	package:com.example.helloworld
+main	input.kt	/^fun main() {$/;"	m	package:com.example.helloworld
+result	input.kt	/^    var result: String = Global.greeting$/;"	v	method:com.example.helloworld.main

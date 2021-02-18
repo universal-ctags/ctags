@@ -8,7 +8,6 @@ OPTLIB2C_INPUT = \
 	optlib/gdbinit.ctags			\
 	optlib/inko.ctags			\
 	optlib/kconfig.ctags			\
-	optlib/kotlin.ctags			\
 	optlib/man.ctags			\
 	optlib/markdown.ctags			\
 	optlib/meson.ctags			\

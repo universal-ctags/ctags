@@ -36,7 +36,8 @@
 
 #ifdef HAVE_PACKCC
 #define PEG_PARSER_LIST						\
-	VarlinkParser
+	VarlinkParser, \
+	KotlinParser
 #else
 #define PEG_PARSER_LIST
 #endif
@@ -98,7 +99,6 @@
 	JsonParser, \
 	JuliaParser, \
 	KconfigParser, \
-	KotlinParser, \
 	LdScriptParser, \
 	LispParser, \
 	LiterateHaskellParser, \

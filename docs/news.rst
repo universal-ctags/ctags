@@ -415,7 +415,7 @@ The following parsers have been added:
 * JSON
 * Julia
 * Kconfig *optlib*
-* Kotlin *optlib*
+* Kotlin *peg/packcc*
 * GNU linker script(LdScript)
 * Man page *optlib*
 * Markdown *optlib*

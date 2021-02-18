@@ -1,2 +1,5 @@
 used1	input.kt	/^var used1 = "var unused1 = 1"$/;"	v
 used2	input.kt	/^var used2 = "\\"var\\" unused2 = 2"$/;"	v
+used3	input.kt	/^var used3 = ""$/;"	v
+used4	input.kt	/^var used4 = "${process("var unused4 = 4")}"$/;"	v
+used5	input.kt	/^var used5 = '\\"'$/;"	v
