@@ -1844,14 +1844,16 @@ extern cppMacroInfo * cppFindMacro (const char *const name)
 		if (!isHintAvailable ())
 			return NULL;
 
-		if (hashTableGetItem (Cpp.hintNegativeCache, (char *)name))
+		if (Cpp.hintNegativeCache
+			&& hashTableGetItem (Cpp.hintNegativeCache, (char *)name))
 			return NULL;
 
 		info = cppFindMacroFromHintFile (name);
 		if (info)
 			return info;
 
-		hashTablePutItem (Cpp.hintNegativeCache, eStrdup (name), "");
+		if (Cpp.hintNegativeCache)
+			hashTablePutItem (Cpp.hintNegativeCache, eStrdup (name), "");
 	}
 	return NULL;
 }
