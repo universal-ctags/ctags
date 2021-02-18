@@ -10,12 +10,8 @@
 /*
 *   INCLUDE FILES
 */
-#include "debug.h"
-#include "options.h"
 #include "parse.h"
-#include "routines.h"
-
-#include <signal.h>
+#include "trace.h"
 
 /*
 * FUNCTION DEFINITIONS
@@ -75,11 +71,11 @@ static void makeKotlinTag (struct parserCtx *auxil, const char *name, long offse
     } else
     {
         size_t len = strlen(name) - 2;
-        char *stripped = (char *)PCC_MALLOC(auxil, len+1); //TODO: Should I free it? When?
+        char *stripped = (char *)eMalloc(len+1);
         memcpy(stripped, name + 1, len);
         stripped[len] = '\0';
         initTagEntry(&e, stripped, k);
-
+        eFree(stripped);
     }
     e.lineNumber = getInputLineNumberForFileOffset (offset);
     e.filePosition = getInputFilePositionForLine (e.lineNumber);
@@ -91,6 +87,7 @@ static void makeKotlinTag (struct parserCtx *auxil, const char *name, long offse
     }
 }
 
+#ifdef DEBUG
 static void reportFailure(struct parserCtx *auxil, long offset)
 {
     if(auxil->fail_offset < 0)
@@ -107,14 +104,15 @@ static void resetFailure(struct parserCtx *auxil, long offset)
         unsigned long endLine = getInputLineNumberForFileOffset(offset-1);
         if (startLine == endLine)
         {
-            fprintf(stderr, "Failed to parse '%s' at line %lu!\n", getInputFileName(), startLine);
+            TRACE_PRINT("Failed to parse '%s' at line %lu!\n", getInputFileName(), startLine);
         } else
         {
-            fprintf(stderr, "Failed to parse '%s' from line %lu to line %ld!\n", getInputFileName(), startLine, endLine);
+            TRACE_PRINT("Failed to parse '%s' from line %lu to line %lu!\n", getInputFileName(), startLine, endLine);
         }
     }
     auxil->fail_offset = -1;
 }
+#endif
 
 static void ctxInit (struct parserCtx *auxil)
 {
@@ -123,7 +121,9 @@ static void ctxInit (struct parserCtx *auxil)
     auxil->scope_cork_index = CORK_NIL;
     auxil->found_syntax_error = false;
     auxil->parenthesis_level = 0;
+    #ifdef DEBUG
     auxil->fail_offset = -1;
+    #endif
 }
 
 static void ctxFini (struct parserCtx *auxil)

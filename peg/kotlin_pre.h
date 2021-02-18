@@ -57,7 +57,9 @@ struct parserCtx {
     intArray *kind_stack;
     bool found_syntax_error;
     int parenthesis_level;
+    #ifdef DEBUG
     long fail_offset;
+    #endif
 };
 
 /*
@@ -70,5 +72,10 @@ static void popKind (struct parserCtx *auxil, bool popScopeToo);
 static int peekKind (struct parserCtx *auxil);
 static void reportError (struct parserCtx *auxil);
 static void makeKotlinTag (struct parserCtx *auxil, const char *name, long offset, bool pushScope);
+#ifdef DEBUG
 static void reportFailure(struct parserCtx *auxil, long offset);
 static void resetFailure(struct parserCtx *auxil, long offset);
+#else
+    #define reportFailure(AUXIL, OFFSET)
+    #define resetFailure(AUXIL, OFFSET)
+#endif
