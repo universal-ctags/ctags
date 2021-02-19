@@ -90,6 +90,9 @@ static bool     isEpochAvailable           (const tagEntryInfo *const tag);
 static EsObject* getFieldValueForName (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForName (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* getFieldValueForKind (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* getFieldValueForTyperef (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* setFieldValueForTyperef (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+static EsObject* checkFieldValueForTyperef (const fieldDefinition *, const EsObject *);
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
@@ -266,6 +269,11 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.doesContainAnyChar = NULL,
 		.isValueAvailable	= isTyperefFieldAvailable,
 		.dataType			= FIELDTYPE_STRING,
+		.getterValueType    = "[string|false string|false]",
+		.getValueObject     = getFieldValueForTyperef,
+		.setterValueType    = "[string|false string|false]|false",
+		.checkValueForSetter= checkFieldValueForTyperef,
+		.setValueObject     = setFieldValueForTyperef,
 	},
 	[FIELD_KIND_KEY - FIELD_COMPACT_INPUT_LINE] = {
 		.letter				= 'z',
@@ -1484,4 +1492,90 @@ static EsObject* getFieldValueForKind (const tagEntryInfo *tag, const fieldDefin
 {
 	const char *kind_name = getLanguageKindName (tag->langType, tag->kindIndex);
 	return opt_name_new_from_cstr (kind_name);
+}
+
+static EsObject* getFieldValueForTyperef (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	if (tag->extensionFields.typeRef [0] == NULL
+		&& tag->extensionFields.typeRef [1] == NULL)
+		return es_nil;
+
+	EsObject *a = opt_array_new ();
+	EsObject *e0 = tag->extensionFields.typeRef [0]
+		? opt_string_new_from_cstr(tag->extensionFields.typeRef [0])
+		: es_false;
+	EsObject *e1 = tag->extensionFields.typeRef [1]
+		? opt_string_new_from_cstr(tag->extensionFields.typeRef [1])
+		: es_false;
+	opt_array_put (a, 0, e0);
+	opt_array_put (a, 1, e1);
+	es_object_unref (e0);
+	es_object_unref (e1);
+	return a;
+}
+
+static EsObject* setFieldValueForTyperef (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
+{
+	if (es_boolean_p (obj))
+	{
+		for (int i = 0 ; i < 2; i++)
+		{
+			if (tag->extensionFields.typeRef [i])
+			{
+				/* TODO: (void *) */
+				eFree ((void *)tag->extensionFields.typeRef [i]);
+				tag->extensionFields.typeRef [i] = NULL;
+			}
+		}
+		return es_false;
+	}
+	else if (es_object_get_type (obj) == OPT_TYPE_ARRAY)
+	{
+		for (int i = 0 ; i < 2; i++)
+		{
+			EsObject *e = opt_array_get (obj, i);
+			if (es_boolean_p (e))
+			{
+				if (tag->extensionFields.typeRef [i])
+				{
+					/* TODO: (void *) */
+					eFree ((void *)tag->extensionFields.typeRef [i]);
+					tag->extensionFields.typeRef [i] = NULL;
+				}
+			}
+			else if (es_object_get_type (e) == OPT_TYPE_STRING)
+			{
+				if (tag->extensionFields.typeRef [i])
+					eFree ((void *)tag->extensionFields.typeRef [i]); /* TODO: (void *) */
+				tag->extensionFields.typeRef [i] = eStrdup (opt_string_get_cstr (e));
+			}
+		}
+		return es_false;
+	}
+	AssertNotReached();
+	return OPT_ERR_TYPECHECK;
+}
+
+static EsObject* checkFieldValueForTyperef (const fieldDefinition *fdef, const EsObject *obj)
+{
+	if (es_boolean_p (obj))
+	{
+		if (!es_object_equal (es_false, obj))
+			return OPT_ERR_TYPECHECK;
+	}
+	else if (es_object_get_type (obj) == OPT_TYPE_ARRAY)
+	{
+		if (opt_array_length (obj) != 2)
+			return OPT_ERR_TYPECHECK;
+
+		for (unsigned int i = 0; i < 2; i++)
+		{
+			EsObject *e = opt_array_get (obj, i);
+			if (es_object_get_type (e) != OPT_TYPE_STRING)
+				return OPT_ERR_TYPECHECK;
+		}
+	}
+	else
+		return OPT_ERR_TYPECHECK;
+	return es_false;
 }
