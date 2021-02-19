@@ -211,6 +211,13 @@ struct guestRequest {
 	struct boundaryInRequest boundary[2];
 };
 
+typedef struct {
+	const char *line;
+	const regexPattern* const patbuf;
+	const regmatch_t* const pmatch;
+	int nmatch;
+} scriptWindow;
+
 struct lregexControlBlock {
 	int currentScope;
 	ptrArray *entries [2];
@@ -226,6 +233,8 @@ struct lregexControlBlock {
 	ptrArray *prelude_code;
 
 	langType owner;
+
+	scriptWindow *window;
 };
 
 /*
@@ -250,7 +259,7 @@ static void   guestRequestClear (struct guestRequest *);
 static void   guestRequestSubmit (struct guestRequest *);
 
 static EsObject *scriptRead (OptVM *vm, const char *src);
-static void scriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex);
+static void scriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex, scriptWindow *window);
 static EsObject* scriptEval (OptVM *vm, EsObject *optscript);
 static void scriptEvalPrelude (OptVM *vm, struct lregexControlBlock *lcb);
 static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb);
@@ -1532,7 +1541,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		const char* line,
 		const regexPattern* const patbuf,
 		const regmatch_t* const pmatch,
-			     off_t offset)
+			     off_t offset, scriptWindow *window)
 {
 	vString *const name =
 		(patbuf->u.tag.name_pattern[0] != '\0') ? substitute (line,
@@ -1651,17 +1660,14 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	if (patbuf->scopeActions & SCOPE_PUSH)
 		lcb->currentScope = n;
 
-	if (n != CORK_NIL)
+	if (n != CORK_NIL && window)
 	{
-		if (patbuf->optscript)
-		{
-			scriptSetup (optvm, lcb, n);
-			EsObject *e = scriptEval (optvm, patbuf->optscript);
-			if (es_error_p (e))
-				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
-			es_object_unref (e);
-			scriptTeardown (optvm, lcb);
-		}
+		scriptSetup (optvm, lcb, n, window);
+		EsObject *e = scriptEval (optvm, patbuf->optscript);
+		if (es_error_p (e))
+			error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
+		es_object_unref (e);
+		scriptTeardown (optvm, lcb);
 	}
 
 	vStringDelete (name);
@@ -1795,9 +1801,16 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 	{
 		result = true;
 		entry->statistics.match++;
+		scriptWindow window = {
+			.line = vStringValue (line),
+			.patbuf = patbuf,
+			.pmatch = pmatch,
+			.nmatch = BACK_REFERENCE_COUNT,
+		};
+
 		if (patbuf->optscript && (! hasNameSlot (patbuf)))
 		{
-			scriptSetup (optvm, lcb, CORK_NIL);
+			scriptSetup (optvm, lcb, CORK_NIL, &window);
 			EsObject *e = scriptEval (optvm, patbuf->optscript);
 			if (es_error_p (e))
 				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
@@ -1810,7 +1823,8 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 
 		if (patbuf->type == PTRN_TAG)
 		{
-			matchTagPattern (lcb, vStringValue (line), patbuf, pmatch, 0);
+			matchTagPattern (lcb, vStringValue (line), patbuf, pmatch, 0,
+							 (patbuf->optscript && hasNameSlot (patbuf))? &window: NULL);
 
 			if (guest->lang.type != GUEST_LANG_UNKNOWN)
 			{
@@ -1878,9 +1892,16 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 				 - start;
 
 		entry->statistics.match++;
+		scriptWindow window = {
+			.line = current,
+			.patbuf = patbuf,
+			.pmatch = pmatch,
+			.nmatch = BACK_REFERENCE_COUNT,
+		};
+
 		if (patbuf->optscript && (! hasNameSlot (patbuf)))
 		{
-			scriptSetup (optvm, lcb, CORK_NIL);
+			scriptSetup (optvm, lcb, CORK_NIL, &window);
 			EsObject *e = scriptEval (optvm, patbuf->optscript);
 			if (es_error_p (e))
 				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
@@ -1890,7 +1911,8 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 
 		if (patbuf->type == PTRN_TAG)
 		{
-			matchTagPattern (lcb, current, patbuf, pmatch, offset);
+			matchTagPattern (lcb, current, patbuf, pmatch, offset,
+							 (patbuf->optscript && hasNameSlot (patbuf))? &window: NULL);
 			result = true;
 		}
 		else if (patbuf->type == PTRN_CALLBACK)
@@ -1972,11 +1994,13 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 	if (es_null (lcb->local_dict))
 		lcb->local_dict = opt_dict_new (23);
 	opt_vm_dstack_push (optvm, lcb->local_dict);
+	opt_vm_set_app_data (optvm, lcb);
 	scriptEvalPrelude (optvm, lcb);
 }
 
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
 {
+	opt_vm_set_app_data (optvm, NULL);
 	opt_vm_clear (optvm);
 	opt_dict_clear (lcb->local_dict);
 	unsigned long endline = getInputLineNumber ();
@@ -2594,9 +2618,18 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		if (match == 0)
 		{
 			entry->statistics.match++;
+			off_t offset_for_tag = (current
+									+ pmatch [ptrn->mgroup.forLineNumberDetermination].rm_so)
+				- cstart;
+			scriptWindow window = {
+				.line = current,
+				.patbuf = ptrn,
+				.pmatch = pmatch,
+				.nmatch = BACK_REFERENCE_COUNT,
+			};
 			if (ptrn->optscript && (! hasNameSlot (ptrn)))
 			{
-				scriptSetup (optvm, lcb, CORK_NIL);
+				scriptSetup (optvm, lcb, CORK_NIL, &window);
 				EsObject *e = scriptEval (optvm, ptrn->optscript);
 				if (es_error_p (e))
 					error (WARNING, "error when evaluating: %s", ptrn->optscript_src);
@@ -2608,10 +2641,8 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 			{
 				struct mTableActionSpec *taction = &(ptrn->taction);
 
-				matchTagPattern (lcb, current, ptrn, pmatch,
-								 (current
-								  + pmatch [ptrn->mgroup.forLineNumberDetermination].rm_so)
-								 - cstart);
+				matchTagPattern (lcb, current, ptrn, pmatch, offset_for_tag,
+								 (ptrn->optscript && hasNameSlot (ptrn))? &window: NULL);
 				BEGIN_VERBOSE(vfp);
 				{
 					fprintf(vfp, "result: matched %d bytes\n", (int)(pmatch[0].rm_eo));
@@ -2957,14 +2988,16 @@ static void scriptEvalPrelude (OptVM *vm, struct lregexControlBlock *lcb)
 	}
 }
 
-static void scriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex)
+static void scriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex, scriptWindow *window)
 {
+	lcb->window = window;
 	optscriptSetup (vm, lcb->local_dict, corkIndex);
 }
 
 static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb)
 {
 	optscriptTeardown (vm, lcb->local_dict);
+	lcb->window = NULL;
 }
 
 extern void	addOptscriptPrelude (struct lregexControlBlock *lcb, const char *code)
@@ -2993,6 +3026,34 @@ extern bool checkRegex (void)
 	return regexAvailable;
 }
 
+static EsObject* lrop_get_match_string (OptVM *vm, EsObject *name)
+{
+	void * data = es_symbol_get_data (name);
+	int i = HT_PTR_TO_INT (data);
+
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	scriptWindow *window = lcb->window;
+	if (window == NULL
+		|| 0 >= i
+		|| window->nmatch <= i
+		|| window->pmatch [i].rm_so == -1)
+	{
+		opt_vm_ostack_push (vm, es_false);
+		return es_false;
+	}
+
+	const int len = window->pmatch [i].rm_eo - window->pmatch [i].rm_so;
+	const char *start = window->line + window->pmatch [i].rm_so;
+
+	const char *cstr = eStrndup (start, len);
+	EsObject *str = opt_string_new_from_cstr (cstr);
+	eFree ((void *)cstr);
+
+	opt_vm_ostack_push (vm, str);
+	es_object_unref (str);
+	return es_false;
+}
+
 extern void initRegexOptscript (void)
 {
 	if (!regexAvailable)
@@ -3003,7 +3064,7 @@ extern void initRegexOptscript (void)
 
 	optvm = optscriptInit ();
 	lregex_dict = opt_dict_new (17);
-	optscriptInstallProcs (lregex_dict);
+	optscriptInstallProcs (lregex_dict, lrop_get_match_string);
 }
 
 extern void	listRegexOpscriptOperators (FILE *fp)

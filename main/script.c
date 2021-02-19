@@ -228,9 +228,30 @@ static void optscriptInstallFieldAccessors (EsObject *dict)
 	vStringDelete (op_desc);
 }
 
-extern void optscriptInstallProcs (EsObject *dict)
+/* Define \1, \2,... \9 */
+static void optscriptInstallMatchResultProcs (EsObject *dict,
+											  OptOperatorFn fun)
+{
+	char name [] = { [0] = '\\', [2] = '\0' };
+	char help [] = "- \\_ string|false";
+	char *p = strchr (help, '_');
+	for (int i = 1; i <= 9; i++)
+	{
+		name [1] = '0' + i;
+		*p = name [1];
+		EsObject *op_sym = es_symbol_intern (name);
+		es_symbol_set_data (op_sym, HT_INT_TO_PTR (i));
+		EsObject *op = opt_operator_new (fun, name, 0, help);
+		opt_dict_def (dict, op_sym, op);
+		es_object_unref (op);
+	}
+}
+
+extern void optscriptInstallProcs (EsObject *dict,
+								   OptOperatorFn matchResultAccessor)
 {
 	optscriptInstallFieldAccessors (dict);
+	optscriptInstallMatchResultProcs (dict, matchResultAccessor);
 }
 
 static EsObject *optscript_CorkIndex_sym = es_nil;

@@ -19,7 +19,7 @@ extern EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
 
 extern OptVM *optscriptInit (void);
 
-extern void optscriptInstallProcs (EsObject *dict);
+extern void optscriptInstallProcs (EsObject *dict, OptOperatorFn matchResultAccessor);
 
 extern void optscriptSetup (OptVM *vm, EsObject *dict, int corkIndex);
 extern void optscriptTeardown (OptVM *vm, EsObject *dict);
