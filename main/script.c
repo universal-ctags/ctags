@@ -27,6 +27,11 @@ int OPT_TYPE_MATCHLOC;
 static int locEqual (const void *a, const void  *b);
 static void locPrint (const void *a, MIO *out);
 
+int OPT_TYPE_TAG;
+static void tagFree (void *a);
+static int tagEqual (const void *a, const void  *b);
+static void tagPrint (const void *a, MIO *out);
+
 static void vStringCatToupperS (vString *str, const char *s)
 {
 	for (const char *tmp = s; *tmp != '\0'; tmp++)
@@ -55,6 +60,10 @@ extern OptVM *optscriptInit (void)
 												eFreeNoNullCheck,
 												locEqual,
 												locPrint);
+	OPT_TYPE_TAG = es_type_define_pointer ("tagEntryInfo",
+										   tagFree,
+										   tagEqual,
+										   tagPrint);
 	return optvm;
 }
 
@@ -394,4 +403,25 @@ static void locPrint (const void *a, MIO *out)
 {
 	const matchLoc *al = a;
 	mio_printf (out, "#<matchloc %p line: %lu>", a, al->line);
+}
+
+static void tagFree (void *a)
+{
+	tagEntryInfo *e = a;
+	eFree ((void *)e->name);	/* TODO */
+	eFree (e);
+}
+
+static int tagEqual (const void *a, const void  *b)
+{
+	if (a == b)
+		return 1;
+	return 0;
+}
+
+static void tagPrint (const void *a, MIO *out)
+{
+	const tagEntryInfo *tag = a;
+	mio_printf (out, "#<tagEntryInfo %p name: %s line: %lu>",
+				tag, tag->name, tag->lineNumber);
 }

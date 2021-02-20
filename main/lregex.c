@@ -3030,6 +3030,89 @@ extern bool checkRegex (void)
 	return regexAvailable;
 }
 
+static EsObject *OPTSCRIPT_ERR_UNKNOWNKIND;
+
+/* name:str kind:name loc _TAG tag
+ * name:str kind:name     _TAG tag */
+static EsObject* lrop_make_tag (OptVM *vm, EsObject *name)
+{
+	matchLoc *loc;
+
+	if (opt_vm_ostack_count (vm) < 1)
+		return OPT_ERR_UNDERFLOW;
+
+	int index;
+	EsObject *top = opt_vm_ostack_top (vm);
+	if (es_object_get_type (top) == OPT_TYPE_MATCHLOC)
+	{
+		if (opt_vm_ostack_count (vm) < 3)
+			return OPT_ERR_UNDERFLOW;
+		loc = es_pointer_get (top);
+		index = 1;
+	}
+	else
+	{
+		struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+		if (lcb->window->patbuf->regptype != REG_PARSER_SINGLE_LINE)
+			return OPT_ERR_TYPECHECK;
+		if (opt_vm_ostack_count (vm) < 2)
+			return OPT_ERR_UNDERFLOW;
+		loc = NULL;
+		index = 0;
+	}
+
+	EsObject *kind = opt_vm_ostack_peek (vm, index++);
+	if (es_object_get_type (kind) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+	EsObject *kind_sym = es_pointer_get (kind);
+	const char *kind_str = es_symbol_get (kind_sym);
+	kindDefinition* kind_def = getLanguageKindForName (getInputLanguage (),
+													   kind_str);
+	if (!kind_def)
+		return OPTSCRIPT_ERR_UNKNOWNKIND;
+	int kind_index = kind_def->id;
+
+	EsObject *tname = opt_vm_ostack_peek (vm, index++);
+	if (es_object_get_type (tname) != OPT_TYPE_STRING)
+		return OPT_ERR_TYPECHECK;
+	const char *n = opt_string_get_cstr (tname);
+	if (n [0] == '\0')
+		return OPT_ERR_TYPECHECK; /* TODO */
+
+	tagEntryInfo *e = xMalloc (1, tagEntryInfo);
+	initRegexTag (e, eStrdup (n),
+				  kind_index, ROLE_DEFINITION_INDEX, CORK_NIL, 0,
+				  loc? loc->line: 0, loc? &loc->pos: NULL, XTAG_UNKNOWN);
+	EsObject *obj = es_pointer_new (OPT_TYPE_TAG, e);
+	if (es_error_p (obj))
+		return obj;
+
+	while (index-- > 0)
+		opt_vm_ostack_pop (vm);
+
+	opt_vm_ostack_push (vm, obj);
+	es_object_unref (obj);
+	return es_false;
+}
+
+/* tag COMMIT int */
+static EsObject* lrop_commit_tag (OptVM *vm, EsObject *name)
+{
+	EsObject *tag = opt_vm_ostack_top (vm);
+	if (es_object_get_type (tag) != OPT_TYPE_TAG)
+		return OPT_ERR_TYPECHECK;
+
+	tagEntryInfo *e = es_pointer_get (tag);
+	int corkIndex = makeTagEntry (e);
+	EsObject *n = es_integer_new (corkIndex);
+	if (es_error_p (n))
+		return n;
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_push (vm, n);
+	es_object_unref (n);
+	return es_false;
+}
+
 static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 {
 
@@ -3151,6 +3234,9 @@ extern void initRegexOptscript (void)
 
 	optvm = optscriptInit ();
 	lregex_dict = opt_dict_new (17);
+
+	OPTSCRIPT_ERR_UNKNOWNKIND = es_error_intern ("unknownkind");
+
 	optscriptInstallProcs (lregex_dict, lrop_get_match_string);
 
 	EsObject *op;
@@ -3160,6 +3246,19 @@ extern void initRegexOptscript (void)
 	op = opt_operator_new (lrop_get_match_loc, es_symbol_get (sym), -1,
 						   "group:int /start|/end _MATCHLOC matchloc%"
 						   "group:int _MATCHLOC matchloc");
+	opt_dict_def (lregex_dict, sym, op);
+	es_object_unref (op);
+
+	sym = es_symbol_intern ("_tag");
+	op = opt_operator_new (lrop_make_tag, es_symbol_get (sym), -1,
+						   "name:struct kind:name matchloc _TAG tag%"
+						   "name:struct kind:name _TAG tag");
+	opt_dict_def (lregex_dict, sym, op);
+	es_object_unref (op);
+
+	sym = es_symbol_intern ("_commit");
+	op = opt_operator_new (lrop_commit_tag, es_symbol_get (sym), 1,
+						   "tag _COMMIT int");
 	opt_dict_def (lregex_dict, sym, op);
 	es_object_unref (op);
 }

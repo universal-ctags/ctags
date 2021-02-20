@@ -43,4 +43,5 @@ typedef struct {
 } matchLoc;
 extern int OPT_TYPE_MATCHLOC;
 
+extern int OPT_TYPE_TAG;
 #endif	/* CTAGS_MAIN_SCRIPT_PRIVATE_H */
