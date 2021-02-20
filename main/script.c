@@ -17,9 +17,19 @@
 #include "optscript.h"
 #include "routines.h"
 
+#include <ctype.h>
 #include <string.h>
 
 EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
+
+static void vStringCatToupperS (vString *str, const char *s)
+{
+	for (const char *tmp = s; *tmp != '\0'; tmp++)
+	{
+		int c = toupper (*tmp);
+		vStringPut (str, c);
+	}
+}
 
 extern OptVM *optscriptInit (void)
 {
@@ -131,7 +141,7 @@ static void optscriptInstallFieldGetter (EsObject *dict, fieldType ftype,
 	unsigned int fdata_type = getFieldDataType (ftype);
 
 	vStringCatS (op_desc, "int :");
-	vStringCatS (op_desc, fname);
+	vStringCatToupperS (op_desc, fname);
 	vStringPut (op_desc, ' ');
 
 	if (vtype)
@@ -153,7 +163,7 @@ static void optscriptInstallFieldGetter (EsObject *dict, fieldType ftype,
 		vStringPut (op_desc, ' ');
 		vStringCatS (op_desc, "true%");
 		vStringCatS (op_desc, "int :");
-		vStringCatS (op_desc, fname);
+		vStringCatToupperS (op_desc, fname);
 		vStringCatS (op_desc, " false");
 	}
 
@@ -193,7 +203,7 @@ static void optscriptInstallFieldSetter (EsObject *dict, fieldType ftype,
 	}
 
 	vStringPut (op_desc, ' ');
-	vStringCatS (op_desc, fname);
+	vStringCatToupperS (op_desc, fname);
 	vStringCatS (op_desc, ": -");
 
 	EsObject *op = opt_operator_new (lrop_set_field_value,
