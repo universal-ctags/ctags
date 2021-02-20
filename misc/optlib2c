@@ -613,6 +613,8 @@ sub escape_as_cstr {
     for my $c (split //, $input) {
 	if ($c eq '"') {
 	    $output = $output . '\\' . '"';
+	} elsif ($c eq '\\') {
+	    $output = $output . '\\' . '\\';
 	} else {
 	    $output = $output . $c;
 	}
