@@ -16,11 +16,16 @@
 #include "htable.h"			/* For HT_PTR_TO_INT */
 #include "optscript.h"
 #include "routines.h"
+#include "script_p.h"
 
 #include <ctype.h>
 #include <string.h>
 
 EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
+
+int OPT_TYPE_MATCHLOC;
+static int locEqual (const void *a, const void  *b);
+static void locPrint (const void *a, MIO *out);
 
 static void vStringCatToupperS (vString *str, const char *s)
 {
@@ -46,6 +51,10 @@ extern OptVM *optscriptInit (void)
 
 	OPTSCRIPT_ERR_NOTAGENTRY = es_error_intern ("notagentry");
 
+	OPT_TYPE_MATCHLOC = es_type_define_pointer ("matchloc",
+												eFreeNoNullCheck,
+												locEqual,
+												locPrint);
 	return optvm;
 }
 
@@ -365,4 +374,24 @@ extern void optscriptHelp (OptVM *vm, FILE *fp)
 	MIO *out = mio_new_fp (fp, NULL);
 	opt_vm_help (vm, out, NULL, NULL);
 	mio_unref (out);
+}
+
+static int locEqual (const void *a, const void  *b)
+{
+	if (a == b)
+		return 1;
+
+	const matchLoc *al = a;
+	const matchLoc *bl = b;
+
+	if (al->line == bl->line
+		&& memcmp (&al->pos, &bl->pos, sizeof (al->pos)) == 0)
+		return 1;
+	return 0;
+}
+
+static void locPrint (const void *a, MIO *out)
+{
+	const matchLoc *al = a;
+	mio_printf (out, "#<matchloc %p line: %lu>", a, al->line);
 }

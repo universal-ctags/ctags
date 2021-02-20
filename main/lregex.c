@@ -213,6 +213,7 @@ struct guestRequest {
 
 typedef struct {
 	const char *line;
+	const char *start;
 	const regexPattern* const patbuf;
 	const regmatch_t* const pmatch;
 	int nmatch;
@@ -1803,6 +1804,7 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 		entry->statistics.match++;
 		scriptWindow window = {
 			.line = vStringValue (line),
+			.start = 0,
 			.patbuf = patbuf,
 			.pmatch = pmatch,
 			.nmatch = BACK_REFERENCE_COUNT,
@@ -1894,6 +1896,7 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 		entry->statistics.match++;
 		scriptWindow window = {
 			.line = current,
+			.start = start,
 			.patbuf = patbuf,
 			.pmatch = pmatch,
 			.nmatch = BACK_REFERENCE_COUNT,
@@ -2623,6 +2626,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 				- cstart;
 			scriptWindow window = {
 				.line = current,
+				.start = cstart,
 				.patbuf = ptrn,
 				.pmatch = pmatch,
 				.nmatch = BACK_REFERENCE_COUNT,
@@ -3026,6 +3030,89 @@ extern bool checkRegex (void)
 	return regexAvailable;
 }
 
+static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
+{
+
+	bool start;
+	EsObject *group;
+
+	if (opt_vm_ostack_count (vm) < 1)
+		return OPT_ERR_UNDERFLOW;
+
+	EsObject *tmp = opt_vm_ostack_top (vm);
+
+	if (es_object_get_type (tmp) == ES_TYPE_INTEGER)
+	{
+		group = tmp;
+		start = true;
+	}
+	else
+	{
+		EsObject *pos = tmp;
+
+		static EsObject *start_name, *end_name;
+		if (!start_name)
+		{
+			start_name = opt_name_new_from_cstr ("start");
+			end_name = opt_name_new_from_cstr ("end");
+		}
+
+		if (es_object_equal (pos, start_name))
+			start = true;
+		else if (es_object_equal (pos, end_name))
+			start = false;
+		else
+			return OPT_ERR_TYPECHECK;
+
+		if (opt_vm_ostack_count (vm) < 2)
+			return OPT_ERR_UNDERFLOW;
+
+		group = opt_vm_ostack_peek (vm, 1);
+		if (es_object_get_type (group) != ES_TYPE_INTEGER)
+			return OPT_ERR_TYPECHECK;
+	}
+
+	int g = es_integer_get (group);
+	if (g < 1)
+		return OPT_ERR_RANGECHECK;
+
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	scriptWindow *window = lcb->window;
+
+	if (window == NULL
+		|| 0 >= g
+		|| window->nmatch <= g
+		|| window->pmatch [g].rm_so == -1)
+		return OPT_ERR_RANGECHECK;
+
+	matchLoc *mloc = xMalloc (1, matchLoc);
+	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
+	{
+		mloc->line = getInputLineNumber ();
+		mloc->pos = getInputFilePosition ();
+	}
+	else
+	{
+		off_t offset = (window->line + (start
+									   ? window->pmatch [g].rm_so
+										: window->pmatch [g].rm_eo))
+			- window->start;
+		mloc->line = getInputLineNumberForFileOffset (offset);
+		mloc->pos  = getInputFilePositionForLine (mloc->line);
+	}
+
+	EsObject * mlocobj = es_pointer_new (OPT_TYPE_MATCHLOC, mloc);
+	if (es_error_p (mlocobj))
+		return mlocobj;
+
+	if (group != tmp)
+		opt_vm_ostack_pop (vm);
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_push (vm, mlocobj);
+	es_object_unref (mlocobj);
+	return es_false;
+}
+
 static EsObject* lrop_get_match_string (OptVM *vm, EsObject *name)
 {
 	void * data = es_symbol_get_data (name);
@@ -3065,6 +3152,16 @@ extern void initRegexOptscript (void)
 	optvm = optscriptInit ();
 	lregex_dict = opt_dict_new (17);
 	optscriptInstallProcs (lregex_dict, lrop_get_match_string);
+
+	EsObject *op;
+	EsObject *sym;
+
+	sym = es_symbol_intern ("_matchloc");
+	op = opt_operator_new (lrop_get_match_loc, es_symbol_get (sym), -1,
+						   "group:int /start|/end _MATCHLOC matchloc%"
+						   "group:int _MATCHLOC matchloc");
+	opt_dict_def (lregex_dict, sym, op);
+	es_object_unref (op);
 }
 
 extern void	listRegexOpscriptOperators (FILE *fp)

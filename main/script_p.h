@@ -14,6 +14,7 @@
 #include "general.h"  /* must always come first */
 
 #include "optscript.h"
+#include "mio.h"
 
 extern EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
 
@@ -34,5 +35,12 @@ extern EsObject *optscriptReadAndDefine (OptVM *vm, EsObject *dict, const char *
 										 const char *src, size_t len);
 
 extern void      optscriptHelp          (OptVM *vm, FILE *fp);
+
+
+typedef struct {
+	unsigned long line;
+	MIOPos pos;
+} matchLoc;
+extern int OPT_TYPE_MATCHLOC;
 
 #endif	/* CTAGS_MAIN_SCRIPT_PRIVATE_H */
