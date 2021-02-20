@@ -1,0 +1,44 @@
+#
+#  mesonOptions.ctags --- multitable regex parser for meso_options files
+#
+#  Copyright (c) 2021 Masatake YAMATO
+#  Copyright (c) 2021 Red Hat, Inc.
+#
+#  This source code is released for free distribution under the terms of the
+#  GNU General Public License version 2 or (at your option) any later version.
+#
+#  This parser is one of testbed of optscript.
+#
+# References:
+#
+# - https://mesonbuild.com/Build-options.html
+#
+# TODO:
+#
+# - capture choice items
+#
+--langdef=MesonOptions
+--map-MesonOptions=+(meson_options.txt)
+
+--kinddef-MesonOptions=s,string,strings
+--kinddef-MesonOptions=b,boolean,booleans
+--kinddef-MesonOptions=c,combo,combos
+--kinddef-MesonOptions=i,integer,integers
+--kinddef-MesonOptions=a,array,arrays
+--kinddef-MesonOptions=f,feature,features
+
+--mline-regex-MesonOptions=/^option[ \t\n]*\([ \t\n]*'([^']*[^\])'[ \t\n]*,[ \t\n]*type[ \t\n]*:[ \t\n]*'([a-z]+)'//{{
+    % \1 points a tag name.
+    \1
+    % \2 may point a kind. This must be converted to a name from a string.
+    \2 cvn
+    % Push the start position of the group 1.
+    1 /start _matchloc
+    % To skip an unexpected kind name, _tag is wrapped with stopped.
+    { _tag } stopped {
+        % Unexpected kind. Clear the stack.
+        pop pop pop
+    } {
+        _commit pop
+    } ifelse
+}}

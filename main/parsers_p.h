@@ -109,6 +109,7 @@
 	MarkdownParser, \
 	MatLabParser, \
 	MesonParser, \
+	MesonOptionsParser, \
 	MooseParser, \
 	MyrddinParser, \
 	NsisParser, \

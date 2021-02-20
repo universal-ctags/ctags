@@ -1,0 +1,82 @@
+option('qemu_suffix', type : 'string', value: 'qemu',
+       description: 'Suffix for QEMU data/modules/config directories (can be empty)')
+option('docdir', type : 'string', value : 'doc',
+       description: 'Base directory for documentation installation (can be empty)')
+option('qemu_firmwarepath', type : 'string', value : '',
+       description: 'search PATH for firmware files')
+option('sphinx_build', type : 'string', value : '',
+       description: 'Use specified sphinx-build [$sphinx_build] for building document (default to be empty)')
+
+option('docs', type : 'feature', value : 'auto',
+       description: 'Documentations build support')
+option('gettext', type : 'boolean', value : true,
+       description: 'Localization of the GTK+ user interface')
+option('install_blobs', type : 'boolean', value : true,
+       description: 'install provided firmware blobs')
+option('sparse', type : 'feature', value : 'auto',
+       description: 'sparse checker')
+
+option('malloc_trim', type : 'feature', value : 'auto',
+       description: 'enable libc malloc_trim() for memory optimization')
+option('malloc', type : 'combo', choices : ['system', 'tcmalloc', 'jemalloc'],
+       value: 'system', description: 'choose memory allocator to use')
+
+option('kvm', type: 'feature', value: 'auto',
+       description: 'KVM acceleration support')
+option('hax', type: 'feature', value: 'auto',
+       description: 'HAX acceleration support')
+option('whpx', type: 'feature', value: 'auto',
+       description: 'WHPX acceleration support')
+option('hvf', type: 'feature', value: 'auto',
+       description: 'HVF acceleration support')
+option('xen', type: 'feature', value: 'auto',
+       description: 'Xen backend support')
+option('xen_pci_passthrough', type: 'feature', value: 'auto',
+       description: 'Xen PCI passthrough support')
+option('tcg', type: 'feature', value: 'auto',
+       description: 'TCG support')
+
+option('cocoa', type : 'feature', value : 'auto',
+       description: 'Cocoa user interface (macOS only)')
+option('mpath', type : 'feature', value : 'auto',
+       description: 'Multipath persistent reservation passthrough')
+option('iconv', type : 'feature', value : 'auto',
+       description: 'Font glyph conversion support')
+option('curses', type : 'feature', value : 'auto',
+       description: 'curses UI')
+option('libudev', type : 'feature', value : 'auto',
+       description: 'Use libudev to enumerate host devices')
+option('sdl', type : 'feature', value : 'auto',
+       description: 'SDL user interface')
+option('sdl_image', type : 'feature', value : 'auto',
+       description: 'SDL Image support for icons')
+option('u2f', type : 'feature', value : 'auto',
+       description: 'U2F emulation support')
+option('vnc', type : 'feature', value : 'enabled',
+       description: 'VNC server')
+option('vnc_jpeg', type : 'feature', value : 'auto',
+       description: 'JPEG lossy compression for VNC server')
+option('vnc_png', type : 'feature', value : 'auto',
+       description: 'PNG compression for VNC server')
+option('vnc_sasl', type : 'feature', value : 'auto',
+       description: 'SASL authentication for VNC server')
+option('xkbcommon', type : 'feature', value : 'auto',
+       description: 'xkbcommon support')
+option('virtiofsd', type: 'feature', value: 'auto',
+       description: 'build virtiofs daemon (virtiofsd)')
+option('vhost_user_blk_server', type: 'feature', value: 'auto',
+       description: 'build vhost-user-blk server')
+option('fuse', type: 'feature', value: 'auto',
+       description: 'FUSE block device export')
+option('fuse_lseek', type : 'feature', value : 'auto',
+       description: 'SEEK_HOLE/SEEK_DATA support for FUSE exports')
+
+option('capstone', type: 'combo', value: 'auto',
+       choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
+       description: 'Whether and how to find the capstone library')
+option('slirp', type: 'combo', value: 'auto',
+       choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
+       description: 'Whether and how to find the slirp library')
+option('fdt', type: 'combo', value: 'auto',
+       choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
+       description: 'Whether and how to find the libfdt library')

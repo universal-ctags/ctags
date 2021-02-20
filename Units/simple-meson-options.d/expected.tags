@@ -1,0 +1,37 @@
+qemu_suffix	input.meson_options	/^option('qemu_suffix', type : 'string', value: 'qemu',$/;"	string
+docdir	input.meson_options	/^option('docdir', type : 'string', value : 'doc',$/;"	string
+qemu_firmwarepath	input.meson_options	/^option('qemu_firmwarepath', type : 'string', value : '',$/;"	string
+sphinx_build	input.meson_options	/^option('sphinx_build', type : 'string', value : '',$/;"	string
+docs	input.meson_options	/^option('docs', type : 'feature', value : 'auto',$/;"	feature
+gettext	input.meson_options	/^option('gettext', type : 'boolean', value : true,$/;"	boolean
+install_blobs	input.meson_options	/^option('install_blobs', type : 'boolean', value : true,$/;"	boolean
+sparse	input.meson_options	/^option('sparse', type : 'feature', value : 'auto',$/;"	feature
+malloc_trim	input.meson_options	/^option('malloc_trim', type : 'feature', value : 'auto',$/;"	feature
+malloc	input.meson_options	/^option('malloc', type : 'combo', choices : ['system', 'tcmalloc', 'jemalloc'],$/;"	combo
+kvm	input.meson_options	/^option('kvm', type: 'feature', value: 'auto',$/;"	feature
+hax	input.meson_options	/^option('hax', type: 'feature', value: 'auto',$/;"	feature
+whpx	input.meson_options	/^option('whpx', type: 'feature', value: 'auto',$/;"	feature
+hvf	input.meson_options	/^option('hvf', type: 'feature', value: 'auto',$/;"	feature
+xen	input.meson_options	/^option('xen', type: 'feature', value: 'auto',$/;"	feature
+xen_pci_passthrough	input.meson_options	/^option('xen_pci_passthrough', type: 'feature', value: 'auto',$/;"	feature
+tcg	input.meson_options	/^option('tcg', type: 'feature', value: 'auto',$/;"	feature
+cocoa	input.meson_options	/^option('cocoa', type : 'feature', value : 'auto',$/;"	feature
+mpath	input.meson_options	/^option('mpath', type : 'feature', value : 'auto',$/;"	feature
+iconv	input.meson_options	/^option('iconv', type : 'feature', value : 'auto',$/;"	feature
+curses	input.meson_options	/^option('curses', type : 'feature', value : 'auto',$/;"	feature
+libudev	input.meson_options	/^option('libudev', type : 'feature', value : 'auto',$/;"	feature
+sdl	input.meson_options	/^option('sdl', type : 'feature', value : 'auto',$/;"	feature
+sdl_image	input.meson_options	/^option('sdl_image', type : 'feature', value : 'auto',$/;"	feature
+u2f	input.meson_options	/^option('u2f', type : 'feature', value : 'auto',$/;"	feature
+vnc	input.meson_options	/^option('vnc', type : 'feature', value : 'enabled',$/;"	feature
+vnc_jpeg	input.meson_options	/^option('vnc_jpeg', type : 'feature', value : 'auto',$/;"	feature
+vnc_png	input.meson_options	/^option('vnc_png', type : 'feature', value : 'auto',$/;"	feature
+vnc_sasl	input.meson_options	/^option('vnc_sasl', type : 'feature', value : 'auto',$/;"	feature
+xkbcommon	input.meson_options	/^option('xkbcommon', type : 'feature', value : 'auto',$/;"	feature
+virtiofsd	input.meson_options	/^option('virtiofsd', type: 'feature', value: 'auto',$/;"	feature
+vhost_user_blk_server	input.meson_options	/^option('vhost_user_blk_server', type: 'feature', value: 'auto',$/;"	feature
+fuse	input.meson_options	/^option('fuse', type: 'feature', value: 'auto',$/;"	feature
+fuse_lseek	input.meson_options	/^option('fuse_lseek', type : 'feature', value : 'auto',$/;"	feature
+capstone	input.meson_options	/^option('capstone', type: 'combo', value: 'auto',$/;"	combo
+slirp	input.meson_options	/^option('slirp', type: 'combo', value: 'auto',$/;"	combo
+fdt	input.meson_options	/^option('fdt', type: 'combo', value: 'auto',$/;"	combo

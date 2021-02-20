@@ -421,6 +421,7 @@ The following parsers have been added:
 * Markdown *optlib*
 * Maven2 *libxml*
 * MesonBuild (Meson) *optlib*
+* MesonOptions *optlib+script*
 * Moose *perl based subparser*
 * Myrddin
 * M4
