@@ -380,11 +380,11 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 */
 
 static void initRegexTag (tagEntryInfo *e,
-		const vString* const name, int kindIndex, int roleIndex, int scopeIndex, int placeholder,
+		const char * name, int kindIndex, int roleIndex, int scopeIndex, int placeholder,
 		unsigned long line, MIOPos *pos, int xtag_type)
 {
-	Assert (name != NULL  &&  ((vStringLength (name) > 0) || placeholder));
-	initRefTagEntry (e, vStringValue (name), kindIndex, roleIndex);
+	Assert (name != NULL  &&  ((name[0] != '\0') || placeholder));
+	initRefTagEntry (e, name, kindIndex, roleIndex);
 	e->extensionFields.scopeIndex = scopeIndex;
 	e->placeholder = !!placeholder;
 	if (line)
@@ -1612,7 +1612,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		kind = patbuf->u.tag.kindIndex;
 		roleBits = patbuf->u.tag.roleBits;
 
-		initRegexTag (&e, name, kind, ROLE_DEFINITION_INDEX, scope, placeholder,
+		initRegexTag (&e, vStringValue (name), kind, ROLE_DEFINITION_INDEX, scope, placeholder,
 					  ln, ln == 0? NULL: &pos, patbuf->xtagType);
 
 		if (field_trashbox == NULL)
