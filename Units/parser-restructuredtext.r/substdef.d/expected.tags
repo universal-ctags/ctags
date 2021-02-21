@@ -1,0 +1,3 @@
+struct cpuidle_state	input.rst	/^.. |struct cpuidle_state| replace:: :c:type:`struct cpuidle_state <cpuidle_state>`$/;"	d
+cpufreq	input.rst	/^.. |cpufreq| replace:: :doc:`CPU Performance Scaling <cpufreq>`$/;"	d
+CPU Idle Time Management	input.rst	/^CPU Idle Time Management$/;"	c

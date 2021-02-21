@@ -37,6 +37,7 @@ typedef enum {
 	K_SUBSUBSECTION,
 	K_CITATION,
 	K_TARGET,
+	K_SUBSTDEF,
 	SECTION_COUNT
 } rstKind;
 
@@ -47,6 +48,7 @@ static kindDefinition RstKinds[] = {
 	{ true, 't', "subsubsection", "subsubsections" },
 	{ true, 'C', "citation",      "citations"},
 	{ true, 'T', "target",        "targets" },
+	{ true, 'd', "substdef",      "substitute definitions" },
 };
 
 typedef enum {
@@ -332,6 +334,17 @@ static void findRstTags (void)
 			 * https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#citations
 			 */
 			if (capture_markup (markup_line, ']', K_CITATION) != CORK_NIL)
+			{
+				vStringClear (name);
+				continue;
+			}
+		}
+		else if ((markup_line = is_markup_line (line, '|')) != NULL)
+		{
+			/* Hanle .. |substitute definition|
+			 * https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#substitution-definitions
+			 */
+			if (capture_markup (markup_line, '|', K_SUBSTDEF) != CORK_NIL)
 			{
 				vStringClear (name);
 				continue;
