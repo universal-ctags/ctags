@@ -47,6 +47,9 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 				cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeAssignment) &&
 				(
 					(eScopeType == CXXScopeTypeFunction) ||
+					(eScopeType == CXXScopeTypeClass)    ||
+					(eScopeType == CXXScopeTypeStruct)   ||
+					(eScopeType == CXXScopeTypeUnion)    ||
 					(eScopeType == CXXScopeTypeNamespace)
 				)
 			) || (
