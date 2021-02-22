@@ -146,6 +146,10 @@ OPTIONS
 Options starting with an underscore character, such as ``--_echo=<msg>``,
 are not listed here. They are experimental or for debugging purpose.
 
+Notation: ``<foo>`` is for a variable string ``foo``, ``[ ... ]`` for optional,
+``|`` for selection, and ``( ... )`` for grouping.  For example
+``--foo[=(yes|no)]'' means ``--foo``, ``-foo=yes``, or ``-foo=no``.
+
 .. _option_input_output_file:
 
 Input/Output File Options
@@ -611,17 +615,11 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 	Check the output of the ``--list-extras=<LANG>`` option for the
 	extras of specific language *<LANG>*.
 
-``--extra=[+|-][<flags>|*]``
-	Equivalent to ``--extras=[+|-][<flags>|*]``, which was introduced to
-	make the option naming convention align to the other options
-	like ``--kinds-<LANG>=`` and ``--fields=``.
-
-	This option is kept for backward-compatibility with Exuberant Ctags.
-
 ``--fields=[+|-][<flags>|*]``
-	Specifies which available extension fields are to be included in
-	the tag entries (see "`TAG FILE FORMAT`_" section, and "`Extension fields`_"
-	subsection, for more information).
+	Specifies which language-independent fields are to be included in the tag
+	entries. Language-independent fields are extension fields which are common
+	in all languages. See "`TAG FILE FORMAT`_" section, and "`Extension fields`_"
+	subsection, for details of extension fields.
 
 	The parameter *<flags>* is a set of one-letter or long-name flags,
 	each representing one type of extension field to include.
@@ -634,25 +632,24 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 	This option is ignored if the
 	option ``--format=1`` (legacy tag file format) has been specified.
 
-	This ``--fields=`` option is for controlling fields common in all
-	languages (or language-independent fields).  Universal Ctags also
-	supports language-specific fields. (See "`Language-specific fields and
-	extras`_" about the concept). Use ``--fields-<LANG>=`` option for
-	controlling them.
-
-	.. TODO: Confirm the description above is correct.
+	Use ``--fields-<LANG>=`` option for controlling language-specific fields.
 
 ``--fields-(<LANG>|all)=[+|-][<flags>|*]``
 	Specifies which language-specific fields are to be included in
-	the entries of the tag file. Universal Ctags
+	the tag entries. Universal Ctags
 	supports language-specific fields. (See "`Language-specific fields and
-	extras`_" about the concept). This option is for controlling them.
+	extras`_" about the concept).
 
 	Specify ``all`` as *<LANG>* to apply the parameter *<flags>* to all
 	languages; all fields are enabled with specifying '``*``' as the
 	parameter flags. If specifying nothing as the parameter *<flags>*
 	(i.e. ``--fields-all=``), all fields are disabled. These two combinations
 	are useful for testing.
+
+	See the description of ``--fields=[+|-][<flags>|*]`` about *<flags>*.
+
+	Use ``--fields=`` option for controlling language-independent fields.
+
 
 ``--kinds-(<LANG>|all)=[+|-](<kinds>|*)``
 	Specifies a list of language-specific *<kinds>* of tags (or kinds) to
@@ -687,9 +684,6 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 	(or disabling) a kind in one language enables the kind having
 	the same one-letter and long-name in the other language. See also the
 	description of ``MASTER`` column of ``--list-kinds-full``.
-
-``--<LANG>-kinds=[+|-](<kinds>|*)``
-	This option is obsolete. Use ``--kinds-<LANG>=...`` instead.
 
 ..	COMMENT:
 	``--param-<LANG>:name=argument`` is moved to "Language Specific Options"
@@ -794,9 +788,10 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 ``--use-slash-as-filename-separator[=(yes|no)]``
 	Uses slash ('``/``') character as filename separators instead of backslash
 	('``\``') character when printing ``input:`` field.
-	This option is available on MSWindows only.
 	The default is ``yes`` for the default "u-ctags" output format, and
 	``no`` for the other formats.
+
+	This option is available on MS Windows only.
 
 ``-B``
 	Use backward searching patterns (e.g. ``?pattern?``). [Ignored in etags mode]
@@ -934,14 +929,16 @@ Language Specific Options
 	will be ignored during parsing of the source files.
 
 	If an identifier is
-	suffixed with a '``+``' character, @CTAGS_NAME_EXECUTABLE@ will also
+	suffixed with a '``+``' character (i.e. "``-I FOO+``"), @CTAGS_NAME_EXECUTABLE@ will also
 	ignore any parenthesis-enclosed argument list which may immediately
-	follow the identifier in the source files.
+	follow the identifier in the source files. See the example of "``-I
+	MODULE_VERSION+``" below.
 
 	If two identifiers are
-	separated with the '``=``' character, the first identifiers is replaced by
+	separated with the '``=``' character (i.e. ``-I FOO=BAR``), the first identifiers is replaced by
 	the second identifiers for parsing purposes. The list of identifiers may
 	be supplied directly on the command line or read in from a separate file.
+	See the example of "``-I CLASS=class``" below.
 
 	If the first character of *<identifier-list>* is '``@``', '``.``' or a pathname
 	separator ('``/``' or '``\``'), or the first two characters specify a drive
@@ -969,7 +966,7 @@ Language Specific Options
 
 	In the above example, the macro ``ARGDECL4`` would be mistakenly
 	interpreted to be the name of the function instead of the correct name
-	of ``foo``. Specifying ``-I ARGDECL4`` results in the correct behavior.
+	of ``foo``. Specifying "``-I ARGDECL4``" results in the correct behavior.
 
 	.. code-block:: C
 
@@ -982,7 +979,7 @@ Language Specific Options
 	much like a K&R style function parameter declaration). In fact, this
 	seeming function definition could possibly even cause the rest of the
 	file to be skipped over while trying to complete the definition.
-	Specifying ``-I MODULE_VERSION+`` would avoid such a problem.
+	Specifying "``-I MODULE_VERSION+``" would avoid such a problem.
 
 	.. code-block:: C
 
@@ -995,13 +992,12 @@ Language Specific Options
 	defined as ``class __declspec(dllexport)`` on Win32 platforms and simply
 	``class`` on UNIX. Normally, the absence of the C++ keyword ``class``
 	would cause the source file to be incorrectly parsed. Correct behavior
-	can be restored by specifying ``-I CLASS=class``.
+	can be restored by specifying "``-I CLASS=class``".
 
 ``--param-<LANG>:<name>=<argument>``
-	Set *<LANG>* specific parameter. Available parameters can be listed with
-	``--list-params``.
+	Set a *<LANG>* specific parameter, a parameter specific to the *<LANG>*.
 
-	.. TODO: add description of "parameter".
+	Available parameters can be listed with ``--list-params``.
 
 Listing Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1051,13 +1047,6 @@ Listing Options
 	``all`` languages. See "`Extension fields`_" subsection to know what are fields.
 	``all`` is used as default value if the option argument is omitted.
 
-	.. TODO? xref output
-
-	A field can be enabled or disabled with ``--fields=`` option for common
-	fields in all languages, or ``--fields-<LANG>=`` option for the specified
-	language.  These options take one-letter flags and/or long-name flags
-	as a parameter for specifying fields.
-
 	The meaning of columns are as follows:
 
 	LETTER
@@ -1071,7 +1060,8 @@ Listing Options
 
 	LANGUAGE
 		The name of language if the field is owned by a parser.
-		``NONE`` means the extra is common in parsers.
+		``NONE`` means that the field is a language-independent field which is
+		common in all languages.
 
 	JSTYPE
 		JSON type used in printing the value of field when ``--output-format=json``
@@ -1204,10 +1194,8 @@ Listing Options
 	To use the parser for such a language, specify the language as an
 	argument of ``--languages=+`` option.
 
-	This option does not work with ``--machinable`` nor
-	``--with-list-header``.
-
-	.. TODO: ".. may be used in many other options...": I don't think it is worth to be described.
+	``--machinable`` and ``--with-list-header`` options are ignored if they are
+	specified with this option.
 
 ``--list-map-extensions[=(<language>|all)]``
 	Lists the file extensions which associate a file
@@ -1344,6 +1332,8 @@ Miscellaneous Options
 
 Obsoleted Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+These options are kept for backward-compatibility with Exuberant Ctags.
+
 ``-w``
 	This option is silently ignored for backward-compatibility with the
 	ctags of SVR4 Unix.
@@ -1351,6 +1341,14 @@ Obsoleted Options
 ``--file-scope[=(yes|no)]``
 	This options is removed. Use ``--extras=[+|-]F`` or
 	``--extras=[+|-]{fileScope}`` instead.
+
+``--extra=[+|-][<flags>|*]``
+	Equivalent to ``--extras=[+|-][<flags>|*]``, which was introduced to make
+	the option naming convention align to the other options like
+	``--kinds-<LANG>=`` and ``--fields=``.
+
+``--<LANG>-kinds=[+|-](<kinds>|*)``
+	This option is obsolete. Use ``--kinds-<LANG>=...`` instead.
 
 OPERATIONAL DETAILS
 -------------------
@@ -2156,11 +2154,11 @@ FILES
 
 ``$XDG_CONFIG_HOME/ctags/*.ctags``, or ``$HOME/.config/ctags/*.ctags`` if
 ``$XDG_CONFIG_HOME`` is not defined
-(on other than MSWindows)
+(on other than MS Windows)
 
 ``$HOME/.ctags.d/*.ctags``
 
-``$HOMEDRIVE$HOMEPATH/ctags.d/*.ctags`` (on MSWindows only)
+``$HOMEDRIVE$HOMEPATH/ctags.d/*.ctags`` (on MS Windows only)
 
 ``.ctags.d/*.ctags``
 
