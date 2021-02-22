@@ -34,6 +34,7 @@ Following options are for defining (or customizing) a parser:
 * ``--map-<LANG>=[+|-]<extension>|<pattern>``
 * ``--kinddef-<LANG>=<letter>,<name>,<description>``
 * ``--regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+* ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
 
 Following options are for controlling loading parser definition:
 
@@ -115,32 +116,12 @@ Overview for defining a parser
 5. Define patterns
 
    Use ``--regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
-   option for a regular expression.
+   option for a single-line regular expression. You can also use
+   ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+   option for a multi-line regular expression.
 
    As *<kind-spec>*, you can use the one-letter flag defined with
    ``--kinddef-<LANG>=<letter>,<name>,<description>`` option.
-
-EXAMPLE
-------------
-
-This is the definition (pod.ctags) used in ctags for parsing pod
-(https://perldoc.perl.org/perlpod.html) file.
-
-::
-
-   --langdef=pod
-   --map-pod=+.pod
-
-   --kinddef-pod=c,chapter,chapters
-   --kinddef-pod=s,section,sections
-   --kinddef-pod=S,subsection,subsections
-   --kinddef-pod=t,subsubsection,subsubsections
-
-   --regex-pod=/^=head1[ \t]+(.+)/\1/c/
-   --regex-pod=/^=head2[ \t]+(.+)/\1/s/
-   --regex-pod=/^=head3[ \t]+(.+)/\1/S/
-   --regex-pod=/^=head4[ \t]+(.+)/\1/t/
-
 
 OPTIONS
 ------------
@@ -174,9 +155,6 @@ OPTIONS
 	lowercase character to your private optlib parser. With this
 	convention, people can know where a tag entry in a tag file comes
 	from a built-in parser or a private optlib parser.
-
-``--list-regex-flags``
-	Lists the flags that can be used in ``--regex-<LANG>`` option.
 
 ``--kinddef-<LANG>=<letter>,<name>,<description>``
 	Define a kind for *<LANG>*.
@@ -224,6 +202,8 @@ OPTIONS
 	*<description>*. They will be used meta characters in the future.
 
 ``--regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+	Define a single-line regular expression.
+
 	The */<line_pattern>/<name_pattern>/* pair defines a regular expression
 	replacement pattern, similar in style to ``sed`` substitution
 	commands, ``s/regexp/replacement/``, with which to generate tags from source files mapped to
@@ -260,29 +240,24 @@ OPTIONS
 	follow *<name_pattern>*, which will determine what kind of tag is
 	reported in the ``kind`` extension field (see tags(5)).
 
-	*<kind-spec>* has two forms: *one-letter form* and *full form*.  The
-	one-letter form assumes using ``--regex-<LANG>`` option with
-	``--kinddef-<LANG>`` option. The *<kind-spec>* in ``--regex-<LANG>``
-	option just refers a letter defined with
-	``--kinddef-<LANG>``. This form is recommended in Universal Ctags.
+	*<kind-spec>* has two forms: *one-letter form* and *full form*.
 
-	The full form of *<kind-spec>* is in the form of ``<letter>,<name>,<description>``, a single *<letter>*, a
-	comma, a *<name>*, a comma, and a *<description>*. See the description of
-	``--kinddef-<LANG>=<letter>,<name>,<description>`` option about how the
-	elements are used.
+	The	one-letter form in the form of ``<letter>``. It just refers a kind
+	*<letter>* defined with ``--kinddef-<LANG>``. This form is recommended in
+	Universal Ctags.
 
-	Either the kind *<name>* and/or the *<description>* can be omitted.
-	However, unless the *<letter>* is not defined with
-	``--kinddef-<LANG>`` option, omitting is not recommended in
-	Universal Ctags. The omitting form is supported only for keeping
-	the compatibility with Exuberant Ctags. Supporting the omitting
+	The full form of *<kind-spec>* is in the form of
+	``<letter>,<name>,<description>``. 	Either the kind *<name>* and/or the
+	*<description>* can be omitted. See the description of
+	``--kinddef-<LANG>=<letter>,<name>,<description>`` option about the
+	elements.
+
+	The full form is supported only for keeping the compatibility with Exuberant
+	Ctags which does not have ``--kinddef-<LANG>`` option. Supporting the
 	form will be removed from Universal Ctags in the future.
 
-	.. TODO: make clear the paragraph above
-
-	If *<kind-spec>* is omitted, it defaults to ``r,regex``.
-
-	.. TODO: describe what 'r,regex' means.
+	.. MEMO: the following line is commented out
+		If *<kind-spec>* is omitted, it defaults to ``r,regex``.
 
 	About *<flags>*, see "FLAGS FOR ``--regex-<LANG>`` OPTION".
 
@@ -290,8 +265,20 @@ OPTIONS
 	@CTAGS_NAME_EXECUTABLE@, see either the regex(5,7) man page, or
 	the GNU info documentation for regex (e.g. "``info regex``").
 
-``--_echo=<msg>``
-	Print *<msg>* to the standard error stream.  This is helpful to
+``--list-regex-flags``
+	Lists the flags that can be used in ``--regex-<LANG>`` option.
+
+``--list-mline-regex-flags``
+	Lists the flags that can be used in ``--mline-regex-<LANG>`` option.
+
+``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+	Define a multi-line regular expression.
+
+	This option is similar to ``--regex-<LANG>`` option except the pattern is
+	applied to the whole file’s contents, not line by line.
+
+``--_echo=<message>``
+	Print *<message>* to the standard error stream.  This is helpful to
 	understand (and debug) optlib loading feature of Universal Ctags.
 
 ``--_force-quit[=<num>]``
@@ -301,7 +288,7 @@ OPTIONS
 
 
 FLAGS FOR ``--regex-<LANG>`` OPTION
------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can specify more than one flag, ``<letter>|{<name>}``, at the end of ``--regex-<LANG>`` to
 control how Universal Ctags uses the pattern.
@@ -390,14 +377,35 @@ representation. ``--list-regex-flags`` lists all the flags.
 	reaches the end of the input source file. The line number of the
 	end is attached to the ``end:`` field of the cleared tags.
 
+``warning=<message>``
+	print the given *<message>* at WARNING level
 
-MORE EXAMPLES
+``fatal=<message>``
+	print the given *<message>* and exit
+
+EXAMPLES
 -------------
 
-Four things, an input source file,
-an optlib file, a command line invoking ctags, and
-output makes an example.
+Perl Pod
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+This is the definition (pod.ctags) used in ctags for parsing Pod
+(https://perldoc.perl.org/perlpod.html) file.
+
+::
+
+   --langdef=pod
+   --map-pod=+.pod
+
+   --kinddef-pod=c,chapter,chapters
+   --kinddef-pod=s,section,sections
+   --kinddef-pod=S,subsection,subsections
+   --kinddef-pod=t,subsubsection,subsubsections
+
+   --regex-pod=/^=head1[ \t]+(.+)/\1/c/
+   --regex-pod=/^=head2[ \t]+(.+)/\1/s/
+   --regex-pod=/^=head3[ \t]+(.+)/\1/S/
+   --regex-pod=/^=head4[ \t]+(.+)/\1/t/
 
 Using scope regex flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -448,7 +456,7 @@ The official Universal Ctags web site at:
 
 https://ctags.io/
 
-ctags(1), tags(5), regex(5,7), egrep(1)
+ctags(1), tags(5), regex(3), regex(7), egrep(1)
 
 AUTHOR
 ------
