@@ -371,7 +371,7 @@ static optionDescription LongOptionDescription [] = {
 #else
  {1,"       Not supported on this platform."},
 #endif
- {1,"  --mline-regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]"},
+ {1,"  --mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]"},
  {1,"       Define multiline regular expression for locating tags in specific language."},
  {1,"  --options=<pathname>"},
  {1,"       Specify file (or directory) <pathname> from which command line options should be read."},
@@ -411,7 +411,7 @@ static optionDescription LongOptionDescription [] = {
 #else
  {1,"       Not supported on this platform."},
 #endif
- {1,"  --regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]"},
+ {1,"  --regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]"},
  {1,"       Define single-line regular expression for locating tags in specific language."},
  {1,"  --roles-(<LANG>|all).(<kind>|all)=[+|-][<roles>|*]"},
  {1,"       Enable/disable tag roles for kinds of language <LANG>."},

@@ -33,8 +33,8 @@ Following options are for defining (or customizing) a parser:
 * ``--langdef=<name>``
 * ``--map-<LANG>=[+|-]<extension>|<pattern>``
 * ``--kinddef-<LANG>=<letter>,<name>,<description>``
-* ``--regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
-* ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+* ``--regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
+* ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
 
 Following options are for controlling loading parser definition:
 
@@ -115,9 +115,9 @@ Overview for defining a parser
 
 5. Define patterns
 
-   Use ``--regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+   Use ``--regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
    option for a single-line regular expression. You can also use
-   ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+   ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
    option for a multi-line regular expression.
 
    As *<kind-spec>*, you can use the one-letter flag defined with
@@ -197,11 +197,11 @@ OPTIONS
 	is used as value in the "kind" extension field in tags output.
 
 	The *<description>* and *<letter>* are listed in ``--list-kinds``
-	output. All three elements of kind-spec are listed in
+	output. All three elements of the kind-spec are listed in
 	``--list-kinds-full`` output. Don't use braces in the
 	*<description>*. They will be used meta characters in the future.
 
-``--regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+``--regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
 	Define a single-line regular expression.
 
 	The */<line_pattern>/<name_pattern>/* pair defines a regular expression
@@ -236,7 +236,7 @@ OPTIONS
 	message will be reported unless ``{placeholder}`` regex flag is
 	specified.
 
-	An optional kind specifier (*<kind-spec>*) for tags matching regexp may
+	A kind specifier (*<kind-spec>*) for tags matching regexp may
 	follow *<name_pattern>*, which will determine what kind of tag is
 	reported in the ``kind`` extension field (see tags(5)).
 
@@ -271,7 +271,7 @@ OPTIONS
 ``--list-mline-regex-flags``
 	Lists the flags that can be used in ``--mline-regex-<LANG>`` option.
 
-``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
 	Define a multi-line regular expression.
 
 	This option is similar to ``--regex-<LANG>`` option except the pattern is

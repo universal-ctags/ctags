@@ -842,10 +842,10 @@ See :ref:`ctags-optlib(7) <ctags-optlib(7)>` for details of each option.
 	Defines a new user-defined language, *<name>*, to be parsed with regular
 	expressions.
 
-``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
 	Define multi-line regular expression for locating tags in specific language.
 
-``--regex-<LANG>=/<line_pattern>/<name_pattern>/[<kind-spec>/][<flags>]``
+``--regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
 	Define single-line regular expression for locating tags in specific language.
 
 .. _option_lang_specific:
@@ -1239,7 +1239,7 @@ Listing Options
 	Lists the flags that can be used in ``--regex-<LANG>`` option.
 	See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
-``--list-roles[=(<language>|all)[.(<kindspecs>|*)]]``
+``--list-roles[=(<language>|all)[.(<kind-specs>|*)]]``
 	List the roles for either the specified *<language>* or ``all`` languages.
 	``all`` is used as default value if the option argument is omitted.
 
