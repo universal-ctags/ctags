@@ -41,6 +41,9 @@ static void findAwkTags (void)
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
+		while (isspace ((int) *line))
+			++line;
+
 		if (strncmp ((const char*) line, "function", (size_t) 8) == 0  &&
 			isspace ((int) line [8]))
 		{
