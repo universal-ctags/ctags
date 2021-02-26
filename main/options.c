@@ -437,10 +437,7 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"       --list-{aliases,extras,features,fields,kind-full,langdef-flags,params," },
  {1,0,"       pseudo-tags,regex-flags,roles,subparsers} support this option."},
  {1,0,"       Specify before --list-* option."},
- {1,0, NULL}
-};
 
-static optionDescription ExperimentalLongOptionDescription [] = {
  {1,1,"  --_anonhash=<fname>"},
  {1,1,"       Used in u-ctags test harness"},
  {1,1,"  --_dump-keywords"},
@@ -1445,17 +1442,6 @@ static void printInvocationDescription (void)
 	printf (INVOCATION, getExecutableName ());
 }
 
-static void printOptionDescriptions (const optionDescription *const optDesc)
-{
-	int i;
-	for (i = 0 ; optDesc [i].description != NULL ; ++i)
-	{
-		if (! Option.etags || optDesc [i].usedByEtags)
-			puts (optDesc [i].description);
-	}
-}
-
-
 static int excludesCompare (struct colprintLine *a, struct colprintLine *b)
 {
 	return strcmp (colprintLineGetColumn (a, 0), colprintLineGetColumn (b, 0));
@@ -1602,9 +1588,14 @@ static void processHelpOptionCommon (
 	putchar ('\n');
 	printInvocationDescription ();
 	putchar ('\n');
-	printOptionDescriptions (LongOptionDescription);
-	if (includingExperimentalOptions)
-		printOptionDescriptions (ExperimentalLongOptionDescription);
+
+	int i;
+	for (i = 0 ; LongOptionDescription [i].description != NULL ; ++i)
+	{
+		if ((! Option.etags || LongOptionDescription [i].usedByEtags)
+			&& (! LongOptionDescription [i].experimentalOption || includingExperimentalOptions))
+			puts (LongOptionDescription [i].description);
+	}
 }
 
 static void processHelpOption (
