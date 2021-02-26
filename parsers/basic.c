@@ -173,6 +173,15 @@ static void findBasicTags (void)
 		if (!*p)
 			continue;
 
+		/* REM comment? */
+		if (strncasecmp (p, "REM", 3) == 0  &&
+			(isspace (*(p + 3)) || *(p + 3) == '\0'))
+			continue;
+
+		/* Single-quote comment? */
+		if (*p == '\'')
+			continue;
+
 		/* In Basic, keywords always are at the start of the line. */
 		for (kw = keywords; kw->token; kw++)
 			if (match_keyword (p, kw)) break;
