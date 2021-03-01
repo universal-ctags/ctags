@@ -237,7 +237,6 @@ AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
 # Checks for programs
 # -------------------
 AC_PROG_CC
-AC_PROG_CC_C99
 AC_PROG_RANLIB
 AC_C_BIGENDIAN
 
