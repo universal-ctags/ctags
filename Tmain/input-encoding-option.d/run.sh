@@ -11,7 +11,7 @@ BUILDDIR=$2
 if ${CTAGS} --quiet --options=NONE --list-features | grep -q iconv; then
   if ${CTAGS} --quiet --options=NONE \
 	      --pseudo-tags=-TAG_PROC_CWD \
-	      --input-encoding=utf-8 --input-encoding-java=cp932 --input-encoding-javascript=euc-jp \
+	      --input-encoding=utf-8 --input-encoding-java=shift_jis --input-encoding-javascript=euc-jp \
 	      -o ${BUILDDIR}/tags \
 	      input.js input.java ; then
       remove_commit_id ${BUILDDIR}/tags
