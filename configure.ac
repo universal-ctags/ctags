@@ -234,33 +234,12 @@ fi
 
 AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
 
-
 # Checks for programs
 # -------------------
-
 AC_PROG_CC
 AC_PROG_CC_C99
 AC_PROG_RANLIB
 AC_C_BIGENDIAN
-
-# https://www.gnu.org/software/autoconf-archive/ax_prog_cc_for_build.html
-AX_PROG_CC_FOR_BUILD
-
-# We need to compile and run a program on the build machine.
-AC_MSG_CHECKING(for cc for build)
-if test "$cross_compiling" = "yes"; then
-  CC_FOR_BUILD="${CC_FOR_BUILD-cc}"
-else
-  CC_FOR_BUILD="${CC_FOR_BUILD-$CC}"
-  CFLAGS_FOR_BUILD="${CFLAGS_FOR_BUILD-$CFLAGS}"
-  CPPFLAGS_FOR_BUILD="${CPPFLAGS_FOR_BUILD-$CPPFLAGS}"
-  LDFLAGS_FOR_BUILD="${LDFLAGS_FOR_BUILD-$LDFLAGS}"
-fi
-AC_MSG_RESULT($CC_FOR_BUILD)
-AC_ARG_VAR(CC_FOR_BUILD,[build system C compiler])
-AC_ARG_VAR(CFLAGS_FOR_BUILD,[CFLAGS for build system C compiler])
-AC_ARG_VAR(CPPFLAGS_FOR_BUILD,[CPPFLAGS for build system C compiler])
-AC_ARG_VAR(LDFLAGS_FOR_BUILD,[LDFLAGS for build system C compiler])
 
 if test "${with_sparse_cgcc}" = "yes"; then
 	REAL_CC="${CC}"
