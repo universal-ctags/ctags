@@ -262,6 +262,19 @@ AC_ARG_VAR(CFLAGS_FOR_BUILD,[CFLAGS for build system C compiler])
 AC_ARG_VAR(CPPFLAGS_FOR_BUILD,[CPPFLAGS for build system C compiler])
 AC_ARG_VAR(LDFLAGS_FOR_BUILD,[LDFLAGS for build system C compiler])
 
+AC_ARG_VAR(AR,[ar command or path])
+AC_ARG_VAR(RANLIB,[ranlib command or path])
+AC_ARG_VAR(WINDRES,[windres command or path, used with mingw-w64])
+AC_SUBST([WINDRES])
+
+if test "x${AR}" = "x" ; then
+    AR=ar
+fi
+
+if test "x${WINDRES}" = "x" ; then
+    WINDRES=windres
+fi
+
 if test "${with_sparse_cgcc}" = "yes"; then
 	REAL_CC="${CC}"
 	CC="cgcc"
