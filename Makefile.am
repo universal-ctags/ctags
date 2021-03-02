@@ -167,7 +167,6 @@ ctags_LDADD += $(ICONV_LIBS)
 dist_ctags_SOURCES = $(CMDLINE_HEADS) $(CMDLINE_SRCS)
 
 if HOST_MINGW
-WINDRES = windres
 RES_OBJ = win32/ctags.res.o
 ctags_LDADD += $(RES_OBJ)
 windres_verbose = $(windres_verbose_@AM_V@)
