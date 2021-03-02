@@ -1,0 +1,72 @@
+name: cross compile with android-ndk
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  cross-compile:
+    strategy:
+      fail-fast: false
+      matrix:
+        build-machine-os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04, macos-10.15]
+
+    runs-on: ${{ matrix.build-machine-os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - run: brew install gcc make automake autoconf file
+      
+      - run: ./autogen.sh
+
+      - name: Run ./configure ...
+        run: |
+          BUILD_MACHINE_OS_TYPE=$(uname | tr A-Z a-z)
+          BUILD_MACHINE_OS_ARCH=$(uname -m)
+
+          TOOLCHAIN_BASE_DIR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/$BUILD_MACHINE_OS_TYPE-$BUILD_MACHINE_OS_ARCH
+          TOOLCHAIN_BIN_DIR=$TOOLCHAIN_BASE_DIR/bin
+          SYSROOT=$TOOLCHAIN_BASE_DIR/sysroot
+          
+          export CC=$TOOLCHAIN_BIN_DIR/armv7a-linux-androideabi21-clang
+          export AR=$TOOLCHAIN_BIN_DIR/arm-linux-androideabi-ar
+          export RANLIB=$TOOLCHAIN_BIN_DIR/arm-linux-androideabi-ranlib
+
+          export CFLAGS="--sysroot $SYSROOT -Qunused-arguments -Os -fpic"
+          export CPPFLAGS="--sysroot $SYSROOT -Qunused-arguments"
+          export LDFLAGS="--sysroot $SYSROOT"
+          
+          TARGET=armv7a-linux-androideabi
+          
+          COLOR_PURPLE='\033[0;35m'       # Purple
+          COLOR_GREEN='\033[0;32m'        # Green
+          COLOR_OFF='\033[0m'             # Reset
+          
+          echo() {
+            printf "%b\n" "$*"
+          }
+          
+          run() {
+            echo "$COLOR_PURPLE==>$COLOR_OFF $COLOR_GREEN$@$COLOR_OFF"
+            eval "$*"
+          }
+           
+          run ./configure \
+              --host=$TARGET \
+              --disable-iconv \
+              --disable-xml \
+              --disable-json \
+              --disable-yaml \
+              CC="$CC" \
+              CFLAGS="\"$CFLAGS\"" \
+              CPPFLAGS="\"$CPPFLAGS\"" \
+              LDFLAGS="\"$LDFLAGS\"" \
+              AR=$AR \
+              RANLIB=$RANLIB
+      
+      - run: make V=1
+      
+      - run: file ctags | grep 'ELF 32-bit LSB shared object, ARM, EABI5'
