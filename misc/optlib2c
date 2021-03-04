@@ -57,8 +57,9 @@ my $options =
 	   $_[0]->{'direction'} = $7 if defined $7;
 	   $_[0]->{'autoFQTag'} = (defined $8)? 1: 0;
 
-	   die "Don't use a character as a language name other than alphanumeric, # and +."
-	       unless ($_[0]->{'langdef'} =~ /^[a-zA-Z#+]+$/);
+	   die "Don't use a character as a language name other than alphanumeric, # and +: "
+	       . $_[0]->{'langdef'} unless ($_[0]->{'langdef'} =~ /^[a-zA-Z0-9#+]+$/);
+	   return 1;
        } ],
      [ qr/^--kinddef-(.*)=([^,]),([^,]+),([^\{]+)(\{_refonly\})?/, sub {
 	 die "Don't use --kinddef-<LANG>=+ option before defining the language"
@@ -137,7 +138,7 @@ my $options =
 	       if (! defined $_[0]->{'langdef'});
 	   die "Only language specified with --langdef can be disabled: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
-	   $_[0]->{'disabled'} = 1
+	   $_[0]->{'disabled'} = 1;
        } ],
      [ qr/^--language=(.*)/, sub {
 	   die "--languages can be used only for disabling a language defined with --langdef: $1";
@@ -612,6 +613,8 @@ sub escape_as_cstr {
     for my $c (split //, $input) {
 	if ($c eq '"') {
 	    $output = $output . '\\' . '"';
+	} elsif ($c eq '\\') {
+	    $output = $output . '\\' . '\\';
 	} else {
 	    $output = $output . $c;
 	}

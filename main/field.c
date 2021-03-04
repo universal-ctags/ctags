@@ -84,7 +84,7 @@ static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag);
 static bool     isExtrasFieldAvailable    (const tagEntryInfo *const tag);
 static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
-static bool     isEpochAvaiable           (const tagEntryInfo *const tag);
+static bool     isEpochAvailable           (const tagEntryInfo *const tag);
 
 
 #define DEFINE_FIELD(L, N, V, H, DT, RE)				\
@@ -231,7 +231,7 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 			   renderFieldEnd, NULL, NULL),
 	DEFINE_FIELD_FULL ('T', "epoch", true,
 					   "the last modified time of the input file (only for F/file kind tag)",
-					   isEpochAvaiable,
+					   isEpochAvailable,
 					   FIELDTYPE_INTEGER,
 					   renderFieldEpoch, NULL, NULL),
 };
@@ -961,7 +961,7 @@ static bool     isEndFieldAvailable       (const tagEntryInfo *const tag)
 	return (tag->extensionFields.endLine != 0)? true: false;
 }
 
-static bool isEpochAvaiable (const tagEntryInfo *const tag)
+static bool isEpochAvailable (const tagEntryInfo *const tag)
 {
 	return (tag->kindIndex == KIND_FILE_INDEX)
 		? true

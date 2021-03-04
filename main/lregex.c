@@ -364,7 +364,7 @@ static void initRegexTag (tagEntryInfo *e,
  * Returns pointer to terminating separator.  Works in place.  Null
  * terminates name string.
  */
-static char* scanSeparators (char* name, enum regexParserType regptype)
+static char* scanSeparators (char* name, bool multiline)
 {
 	char sep = name [0];
 	char *copyto = name;
@@ -378,9 +378,7 @@ static char* scanSeparators (char* name, enum regexParserType regptype)
 				*copyto++ = sep;
 			else if (*name == 't')
 				*copyto++ = '\t';
-			else if ((regptype == REG_PARSER_MULTI_LINE
-					  || (regptype == REG_PARSER_MULTI_TABLE))
-					 && *name == 'n')
+			else if (multiline && *name == 'n')
 				*copyto++ = '\n';
 			else
 			{
@@ -420,7 +418,8 @@ static bool parseTagRegex (
 	bool result = false;
 	const int separator = (unsigned char) regexp [0];
 
-	*name = scanSeparators (regexp, regptype);
+	*name = scanSeparators (regexp, (regptype == REG_PARSER_MULTI_LINE
+									 || regptype == REG_PARSER_MULTI_TABLE));
 	if (*regexp == '\0')
 		error (WARNING, "empty regexp");
 	else if (**name != separator)
@@ -1877,7 +1876,7 @@ extern void findRegexTags (void)
 	findRegexTagsMainloop (fileReadLineDriver);
 }
 
-static bool hasScopeActionInRegex0(ptrArray *entries)
+static bool doesExpectCorkInRegex0(ptrArray *entries)
 {
 	for (unsigned int i = 0; i < ptrArrayCount(entries); i++)
 	{
@@ -1889,18 +1888,22 @@ static bool hasScopeActionInRegex0(ptrArray *entries)
 	return false;
 }
 
-extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb)
+extern bool doesExpectCorkInRegex (struct lregexControlBlock *lcb)
 {
 	ptrArray *entries;
 
 	entries = lcb->entries[REG_PARSER_SINGLE_LINE];
-	if (hasScopeActionInRegex0 (entries))
+	if (doesExpectCorkInRegex0 (entries))
+		return true;
+
+	entries = lcb->entries[REG_PARSER_MULTI_LINE];
+	if (doesExpectCorkInRegex0 (entries))
 		return true;
 
 	for (unsigned int i = 0; i < ptrArrayCount(lcb->tables); i++)
 	{
 		struct regexTable *table = ptrArrayItem(lcb->tables, i);
-		if (hasScopeActionInRegex0 (table->entries))
+		if (doesExpectCorkInRegex0 (table->entries))
 			return true;
 	}
 

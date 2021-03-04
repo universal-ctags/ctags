@@ -3754,7 +3754,7 @@ static unsigned int parserCorkFlags (parserDefinition *parser)
 
 	r |= parser->useCork;
 
-	if (hasLanguageScopeActionInRegex (parser->id)
+	if (doesLanguageExpectCorkInRegex (parser->id)
 	    || parser->requestAutomaticFQTag)
 		r |= CORK_QUEUE;
 
@@ -4268,12 +4268,12 @@ extern void addLanguageCallbackRegex (const langType language, const char *const
 	addCallbackRegex ((LanguageTable +language)->lregexControlBlock, regex, flags, callback, disabled, userData);
 }
 
-extern bool hasLanguageScopeActionInRegex (const langType language)
+extern bool doesLanguageExpectCorkInRegex (const langType language)
 {
 	bool hasScopeAction;
 
 	pushLanguage (language);
-	hasScopeAction = lregexQueryParserAndSubparsers (language, hasScopeActionInRegex);
+	hasScopeAction = lregexQueryParserAndSubparsers (language, doesExpectCorkInRegex);
 	popLanguage ();
 
 	return hasScopeAction;
