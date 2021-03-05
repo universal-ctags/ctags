@@ -2094,6 +2094,10 @@ BUGS
 
 ctags has more options than ``ls(1)``.
 
+ctags assumes the input file is written in the correct
+grammar.  Otherwise output of ctags is undefined. In other words it has garbage
+in, garbage out (GIGO) feature.
+
 .. TODO: move the following paragraph to parser-cxx.rst.
 
 When parsing a C++ member function definition (e.g. ``className::function``),
