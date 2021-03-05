@@ -105,6 +105,8 @@ static vString *fyppGuestParser;
 static bool fypp_does_line_continue(const char *line,
 									const regexMatch *matches)
 {
+	if (matches[0].length == 0)
+		return false;
 	return *(line + matches[0].start + matches[0].length - 1) == '&';
 }
 
