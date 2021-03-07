@@ -99,7 +99,7 @@ The general format and placement is as follows::
 
 Some examples:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--regex-Pod=/^=head1[ \t]+(.+)/\1/c/
 	--regex-Foo=/set=[^;]+/\1/v/{icase}
@@ -142,14 +142,14 @@ i           icase       Case-insensitive matching.
 
 So the following ``--regex-<LANG>`` expression:
 
-.. code-block:: perl
+.. code-block:: ctags
 
    --kinddef-m4=d,definition,definitions
    --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d/x
 
 is the same as:
 
-.. code-block:: perl
+.. code-block:: ctags
 
    --kinddef-m4=d,definition,definitions
    --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d/{extend}
@@ -174,7 +174,7 @@ For specifying exclusive-matching the flags ``exclusive`` (long) and ``x``
 :file:`optlib/gdbinit.ctags` for ignoring comment lines in ``gdb`` files,
 as follows:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--regex-Gdbinit=/^#//{exclusive}
 
@@ -232,7 +232,7 @@ Experimental flags
 
 	Consider following optlib file (foo.ctags):
 
-	.. code-block:: perl
+	.. code-block:: ctags
 
 		--langdef=Foo
 		--map-Foo=+.foo
@@ -277,7 +277,7 @@ Example 1:
 	def gar(gaz):
 		print(gaz)
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	# in /tmp/foo.ctags:
 	--langdef=Foo
@@ -306,7 +306,7 @@ Example 2:
 		int bar;
 	}
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	# in /tmp/pp.ctags:
 	--langdef=pp
@@ -363,7 +363,9 @@ input.foo::
      var y
   end
 
-foo.ctags::
+foo.ctags:
+
+.. code-block:: ctags
 
   --langdef=foo{_autoFQTag}
   --map-foo=+.foo
@@ -578,11 +580,11 @@ type of the argument. For example the developer wants the tag name
 To accomplish this, the developer creates a :file:`spring.ctags` file with
 the following:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	# in spring.ctags:
 	--langdef=javaspring
-	--map-javaspring:+.java
+	--map-javaspring=+.java
 	--mline-regex-javaspring=/@Subscribe([[:space:]])*([a-z ]+)[[:space:]]*([a-zA-Z]*)\(([a-zA-Z]*)/\3-\4/s,subscription/{mgroup=3}
 	--fields=+ln
 
@@ -633,7 +635,7 @@ Multiline pattern flags
 
 	Consider two sets of options, foo and bar.
 
-	.. code-block:: perl
+	.. code-block:: ctags
 
 		# foo.ctags:
 	   	--langdef=foo
@@ -642,7 +644,7 @@ Multiline pattern flags
 	   	--mline-regex-foo=/def *([a-z]+)/\1/a/{mgroup=1}
 
 
-	.. code-block:: perl
+	.. code-block:: ctags
 
 		# bar.ctags:
 		--langdef=bar
@@ -777,7 +779,8 @@ A parser written with multi-table regex, on the other hand, can capture only
 ``a`` and ``b`` safely. But it is more complicated to understand.
 
 Here is a 1st version of :file:`X.ctags`:
-::
+
+.. code-block:: ctags
 
    --langdef=X
    --map-X=.x
@@ -803,7 +806,8 @@ Before adding regular expressions, you have to declare tables for each state
 with the ``--_tabledef-<LANG>=<TABLE>`` option.
 
 Here is the 2nd version of :file:`X.ctags` doing so:
-::
+
+.. code-block:: ctags
 
    --langdef=X
    --map-X=.x
@@ -882,7 +886,7 @@ Skipping block comments
 
 Let's continue with our example. Here is the 3rd version of :file:`X.ctags`:
 
-.. code-block:: perl
+.. code-block:: ctags
 
    --langdef=X
    --map-X=.x
@@ -909,7 +913,7 @@ anything, and thus stop processing the input file and effectively do nothing)
 The first declared table (``toplevel``) has the following regex added to
 it first:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=toplevel/\/\*//{tenter=comment}
 
@@ -945,7 +949,7 @@ begin again from the top of the first declared table.
 
 Getting back to our example, the top of the ``comment`` table has this regex:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=comment/\*\///{tleave}
 
@@ -959,7 +963,7 @@ separate the regex pattern from the long flags, instead of the usual ``///``.
 Thus it's using the shorthand form of the ``--_mtable-regex-X`` option.
 It could instead have been:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=comment/\*\////{tleave}
 
@@ -980,7 +984,7 @@ The pattern doesn't match for the position just after ``/*``, because that
 position is a space character. So ``ctags`` tries the next pattern in the same
 table:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=comment/.//
 
@@ -990,7 +994,7 @@ position moves one character forward. Now the character at the current position 
 ``ctags`` uses next pattern again. When the current position moves to the ``*/``
 of the 3rd line of :file:`input.x`, it will finally match this:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=comment/\*\///{tleave}
 
@@ -1004,7 +1008,7 @@ stack and chooses it.
 So now ``ctags`` is back to the ``toplevel`` table, and tries the first regex
 of that table, which was this:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=toplevel/\/\*//{tenter=comment}
 
@@ -1019,7 +1023,7 @@ newline on line 3, between the ``*/`` and the word ``var``::
 The first regex of the ``toplevel`` table does not match a newline, so it tries
 the second regex:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=toplevel/.//
 
@@ -1043,7 +1047,7 @@ Capturing variables in a sequence
 
 Here is the 4th version of :file:`X.ctags`:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--langdef=X
 	--map-X=.x
@@ -1072,7 +1076,7 @@ patterns was also added.
 
 The new regex in ``toplevel`` is this:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=toplevel/var[ \n\t]//{tenter=vars}
 
@@ -1090,7 +1094,7 @@ names ``a`` and ``b``, so that we know to tag each of them; and saving that
 
 The first regex in our new ``vars`` table is:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=vars/;//{tleave}
 
@@ -1102,7 +1106,7 @@ last for this example to work).
 
 The second regex in our ``vars`` table is:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=vars/\/\*//{tenter=comment}
 
@@ -1120,7 +1124,7 @@ pop back to the right one.
 
 The third regex in our ``vars`` table is:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=vars/([a-zA-Z][a-zA-Z0-9]*)/\1/v/
 
@@ -1130,7 +1134,7 @@ captures the variable name and uses it for generating a ``variable`` (shorthand
 
 The last regex in the ``vars`` table we've seen before:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-X=vars/.//
 
@@ -1186,7 +1190,7 @@ marked ``{_extra=XNAME}``.
 To capture the lines above in a python program(*input.py*), an `extra` flag can
 be used.
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_extradef-Python=main,__main__ entry points
 	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
@@ -1237,7 +1241,7 @@ extra context information of `bar`.
 With the following optlib file(*unknown.ctags*), ``ctags`` can attach
 `protected` to the field protection and `(n)` to the field signature.
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--langdef=unknown
 	--kinddef-unknown=f,func,functions
@@ -1256,7 +1260,7 @@ For the line `protected func bar(n);` you will get following tags output::
 
 Let's see the detail of *unknown.ctags*.
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_fielddef-unknown=protection,access scope
 
@@ -1266,13 +1270,13 @@ the parser must be defined with ``--langdef=<LANG>``. `protection` is
 the field name used in tags output. `access scope` is the description
 used in the output of ``--list-fields`` and ``--list-fields=Unknown``.
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_fielddef-unknown=signature,signatures
 
 This defines a field named `signature`.
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
 
@@ -1306,7 +1310,7 @@ Capturing reference tags
 To make a reference tag with an optlib parser, specify a role with
 `_role` long regex flag. Let's see an example:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--langdef=FOO
 	--kinddef-FOO=m,module,modules
@@ -1365,7 +1369,7 @@ roles.
 
 You can implement such roles by extending the built-in C parser:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	# c-extra.ctags
 	--_roledef-C.v=lvalue,locator values
@@ -1513,6 +1517,8 @@ group associated with the flag.
 
 Let's more realistic example.
 Here is an optlib file for an imaginary language "single".
+
+.. code-block:: ctags
 
 	--langdef=single
 	--map-single=.single

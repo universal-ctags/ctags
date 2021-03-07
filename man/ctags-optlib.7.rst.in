@@ -392,7 +392,7 @@ Perl Pod
 This is the definition (pod.ctags) used in ctags for parsing Pod
 (https://perldoc.perl.org/perlpod.html) file.
 
-::
+.. code-block:: ctags
 
    --langdef=pod
    --map-pod=+.pod
@@ -429,7 +429,9 @@ The parser for the input should capture ``Example`` with ``class`` kind,
 should have ``Example`` as their scope. ``end:`` fields of each tag
 should have proper values.
 
-optlib file (``sub-ruby.ctags``)::
+optlib file (``sub-ruby.ctags``):
+
+.. code-block:: ctags
 
 	--langdef=subRuby
 	--map-subRuby=.srb
