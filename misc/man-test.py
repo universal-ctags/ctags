@@ -68,14 +68,14 @@ def run_test_case(tmpdir, ctags, t):
     D = d + '/' + 'tags.diff'
     O0 = 'args.ctags'
     O = d + '/' + O0
-    with open(i, mode='w') as f:
+    with open(i, mode='w', encoding='utf-8') as f:
         f.write(t['code'])
 
-    with open(e, mode='w') as g:
+    with open(e, mode='w', encoding='utf-8') as g:
         g.write(t['tags'])
 
     inputf=None
-    with open(O, mode='w') as Of:
+    with open(O, mode='w', encoding='utf-8') as Of:
         for c in t['cmdline'].split():
             if c == '--options=NONE':
                 continue
@@ -84,12 +84,12 @@ def run_test_case(tmpdir, ctags, t):
                 continue
             print (c, file=Of)
 
-    with open(o, mode='w') as h:
+    with open(o, mode='w', encoding='utf-8') as h:
         cmdline = [ctags, '--quiet', '--options=NONE',
                    '--options=' + O0, inputf]
         subprocess.run(cmdline, cwd=d, stdout=h)
 
-    with open(D, mode='w') as diff:
+    with open(D, mode='w', encoding='utf-8') as diff:
         r = subprocess.run(['diff', '-uN', '--strip-trailing-cr', o0, e0],
                            cwd=d, stdout=diff).returncode
 
@@ -97,11 +97,11 @@ def run_test_case(tmpdir, ctags, t):
         t['result'] = True
         t['result_readable'] = 'passed'
     else:
-        with open(o) as f:
+        with open(o, encoding='utf-8') as f:
             t['actual_tags'] = f.read()
         t['result'] = False
         t['result_readable'] = 'failed'
-        with open(D) as diff:
+        with open(D, encoding='utf-8') as diff:
             t['tags_diff'] = diff.read()
     os.remove(O)
     os.remove(i)
@@ -220,7 +220,7 @@ def man_test (tmpdir, ctags, man_file):
     result = True
     print ('# Run test cases in ' + man_file)
     print ('```')
-    with open(man_file) as f:
+    with open(man_file, encoding='utf-8') as f:
         for t in extract_test_cases (f):
             t['man_file'] = man_file
             v = verify_test_case (t)
