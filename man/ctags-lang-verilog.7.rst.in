@@ -179,7 +179,7 @@ SEE ALSO
 - ctags(1)
 - ctags-client-tools(7)
 - Language Reference Manuals (LRM)
-   - IEEE Standard for SystemVerilog - Unified Hardware Design, Specification, and
+   - IEEE Standard for SystemVerilog — Unified Hardware Design, Specification, and
      Verification Language, IEEE Std 1800-2017,
      https://ieeexplore.ieee.org/document/8299595
    - IEEE Standard for Verilog Hardware Description Language, IEEE Std 1364-2005,
