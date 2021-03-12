@@ -14,7 +14,7 @@ passed through command line.
 
 The following file is an example of an option file:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	# Exclude directories that don't contain real code
 	--exclude=Units
