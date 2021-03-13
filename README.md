@@ -6,6 +6,7 @@
 [![RTD build status](https://readthedocs.org/projects/ctags/badge)](https://docs.ctags.io)
 [![CircleCI Build Status](https://circleci.com/gh/universal-ctags/ctags.svg?style=shield&circle-token=2e582261da84ebc6d21725b05381f410bc5de29d)](https://circleci.com/gh/universal-ctags)
 ![GitHub Actions/VALGRIND](https://github.com/universal-ctags/ctags/workflows/run%20units%20target%20under%20VALGRIND/badge.svg)
+[![Documentation Status](https://readthedocs.org/projects/ctags/badge/?version=latest)](http://docs.ctags.io/en/latest/?badge=latest)
 
 [Universal Ctags](https://ctags.io/) (abbreviated as u-ctags) is a *maintained*
 implementation of `ctags`.
