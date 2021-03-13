@@ -22,7 +22,7 @@ jobs:
            name: Install build tools
            command: |
              dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
-             dnf -y install jq puppet
+             dnf -y install jq puppet python3-sphinx
        - run:
            name: Build
            command: |
@@ -33,6 +33,11 @@ jobs:
            name: Test
            command: |
              make check CIRCLECI=1
+       - run:
+           name: Make HTML documents
+           command: |
+             cd docs
+             make html
 
    fedora33_gmake_roundtrip:
      working_directory: ~/universal-ctags
