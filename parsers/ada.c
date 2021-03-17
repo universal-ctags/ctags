@@ -335,6 +335,7 @@ static bool adaKeywordCmp(adaKeyword keyword);
 static void skipUntilWhiteSpace(void);
 static void skipWhiteSpace(void);
 static void skipComments(void);
+static void skipCommentsAndStringLiteral(void);
 static void skipPast(const char *past);
 static void skipPastKeyword(adaKeyword keyword);
 static void skipPastWord(void);
@@ -639,6 +640,8 @@ static void movePos(int amount)
   (((pos) == 0 || (!isalnum((buf)[(pos) - 1]) && (buf)[(pos) - 1] != '_')) && \
    (pos) < (len) && \
    strncasecmp(&(buf)[(pos)], "--", strlen("--")) == 0)
+#define isAdaStringLiteral(buf, pos, len) \
+  (((pos) < (len)) && ((buf)[(pos)] == '"'))
 
 static bool cmp(const char *buf, int len, const char *match)
 {
@@ -786,6 +789,34 @@ static void skipComments(void)
   }
 }
 
+/* Return true if skipped over a string literal.
+ * Return false if no string literal is found. */
+static bool skipStringLiteral(void)
+{
+  if (exception != EXCEPTION_EOF && isAdaStringLiteral(line, pos, lineLen))
+  {
+    do {
+      movePos(1);
+    } while (exception != EXCEPTION_EOF && !isAdaStringLiteral(line, pos, lineLen));
+
+    /* Go to the next char of " */
+    movePos(1);
+
+    return true;
+  }
+  return false;
+}
+
+static void skipCommentsAndStringLiteral(void)
+{
+  while (true)
+  {
+    skipComments();
+    if (!skipStringLiteral())
+      break;
+  }
+}
+
 static void skipPast(const char *past)
 {
   /* first check for a comment line, because this would cause the isspace
@@ -862,7 +893,7 @@ static void skipPastLambda(skipCompFn cmpfn, void *data)
 {
   /* first check for a comment line, because this would cause the isspace
    * check to fail immediately */
-  skipComments();
+  skipCommentsAndStringLiteral();
 
   /* now call the predicate */
   while(exception != EXCEPTION_EOF && !cmpfn(data))
@@ -870,7 +901,7 @@ static void skipPastLambda(skipCompFn cmpfn, void *data)
     movePos(1);
 
     /* now check for comments here */
-    skipComments();
+    skipCommentsAndStringLiteral();
   }
 } /* static void skipPast(char *past) */
 

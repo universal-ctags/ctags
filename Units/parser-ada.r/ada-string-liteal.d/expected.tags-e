@@ -1,0 +1,15 @@
+
+input.adb,660
+procedure Reproduce isReproduce/p2,18
+  type String_T is new String;String_T/t4,42
+  function "+" (Left : String) return String_T is (String_T(Left));"+"/f5,73
+  function "+" (Left : String_T; Right : String) return String_T is (String_T(String (Left) & Ri"+"/f6,141
+  package Generic_G isGeneric_G/s10,283
+    procedure Go;Go/p11,306
+  package body Generic_G isGeneric_G/b14,342
+    procedure Go isGo/p15,370
+  package Impl isImpl/s21,481
+    procedure Go;Go/p22,499
+  package body Impl isImpl/b25,530
+    package Generic1 is new Generic_G (Description => +"; " +":");Generic1/s26,553
+    procedure Go renames Generic1.Go;Go/p27,620
