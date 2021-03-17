@@ -18,17 +18,17 @@ Universal Ctags follows and extends the design of Exuberant Ctags in more
 powerful ways and call the feature as *optlib parser*, which is described in in
 :ref:`ctags-optlib(7) <ctags-optlib(7)>` and the following sections.
 
-:ref:`ctags-optlib(7) <ctags-optlib(7)>` is the primary document of the *optlib
-parser* feature. The following sections provide additional information and more
+:ref:`ctags-optlib(7) <ctags-optlib(7)>` is the primary document of the optlib
+parser feature. The following sections provide additional information and more
 advanced features. Note that some of the features are experimental, and will be
 marked as such in the documentation.
 
-Lots of *optlib parsers* are included in Universal Ctags,
+Lots of optlib parsers are included in Universal Ctags,
 `optlib/*.ctags <https://github.com/universal-ctags/ctags/tree/master/optlib>`_.
 They will be good examples when you develop your own parsers.
 
-A *optlib parser* can be translated into C source code. Your optlib parser can
-thus easily become a built-in parser. See :ref:`optlib2c` for details.
+A optlib parser can be translated into C source code. Your optlib parser can
+thus easily become a built-in parser. See ":ref:`optlib2c`" for details.
 
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -41,47 +41,47 @@ non-capturing grouping, atomic grouping, possessive quantifiers, look-ahead/behi
 etc. It is also notoriously slow when backtracking, and has some known "quirks"
 with respect to escaping special characters in bracket expressions.
 
-For example, a pattern of ``[^\]]+`` is invalid in POSIX.2, because the ``]`` is
+For example, a pattern of ``[^\]]+`` is invalid in POSIX.2, because the '``]``' is
 *not* special inside a bracket expression, and thus should **not** be escaped.
 Most regex engines ignore this subtle detail in POSIX.2, and instead allow
-escaping it with ``\]`` inside the bracket expression and treat it as the
-literal character ``]``. GNU glibc, however, does not generate an error but
+escaping it with '``\]``' inside the bracket expression and treat it as the
+literal character '``]``'. GNU glibc, however, does not generate an error but
 instead considers it undefined behavior, and in fact it will match very odd
 things. Instead you **must** use the more unintuitive ``[^]]+`` syntax. The same
 is technically true of other special characters inside a bracket expression,
 such as ``[^\)]+``, which should instead be ``[^)]+``. The ``[^\)]+`` will
 appear to work usually, but only because what it is really doing is matching any
-character but ``\`` *or* ``)``. The only exceptions for using ``\`` inside a
-bracket expression are for ``\t`` and ``\n``, which ctags converts to their
+character but '``\``' *or* '``)``'. The only exceptions for using '``\``' inside a
+bracket expression are for '``\t``' and '``\n``', which ctags converts to their
 single literal character control codes before passing the pattern to glibc.
 
 Another detail to keep in mind is how the regex engine treats newlines.
 Universal Ctags compiles the regular expressions in the ``--regex-<LANG>`` and
-``--mline-regex-<LANG>`` options with REG_NEWLINE set. What that means is documented
+``--mline-regex-<LANG>`` options with ``REG_NEWLINE`` set. What that means is documented
 in the
 `POSIX spec <https://pubs.opengroup.org/onlinepubs/009695399/functions/regcomp.html>`_.
-One obvious effect is that the regex special dot any-character ``.`` does not match
-newline characters, the ``^`` anchor *does* match right after a newline, and
-the ``$`` anchor matches right before a newline. A more subtle issue is this text from the
-`Regular Expressions chapter <https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html>`_:
+One obvious effect is that the regex special dot any-character '``.``' does not match
+newline characters, the '``^``' anchor *does* match right after a newline, and
+the '``$``' anchor matches right before a newline. A more subtle issue is this text from the
+"`Regular Expressions chapter <https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html>`_":
 "the use of literal <newline>s or any escape sequence equivalent produces undefined
 results". What that means is using a regex pattern with ``[^\n]+`` is invalid,
-and indeed in glibc produces very odd results. **Never** use ``\n`` in patterns
-for ``--regex-<LANG>``, and never use them in non-matching bracket expressions
+and indeed in glibc produces very odd results. **Never use** '``\n``' in patterns
+for ``--regex-<LANG>``, and **never use them** in non-matching bracket expressions
 for ``--mline-regex-<LANG>`` patterns. For the experimental ``--_mtable-regex-<LANG>``
-you can safely use ``\n`` because that regex is not compiled with REG_NEWLINE.
+you can safely use '``\n``' because that regex is not compiled with ``REG_NEWLINE``.
 
 You should always test your regex patterns against test files with strings that
 do and do not match. Pay particular emphasis to when it should *not* match, and
 how *much* it matches when it should. A common error is forgetting that a
-POSIX.2 ERE engine is always *greedy*; the `*` and `+` quantifiers match
+POSIX.2 ERE engine is always *greedy*; the '``*``' and '``+``' quantifiers match
 as much as possible, before backtracking from the end of their match.
 
 For example this pattern::
 
 	foo.*bar
 
-Will match this **entire** string, not just the first part::
+Will match this entire string, not just the first part::
 
 	foobar, bar, and even more bar
 
@@ -90,8 +90,8 @@ Regex option argument flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Many regex-based options described in this document support additional arguments
-in the form of long flags. Long flags are specified with surrounding ``{`` and
-``}``.
+in the form of long flags. Long flags are specified with surrounding '``{``' and
+'``}``'.
 
 The general format and placement is as follows::
 
@@ -106,7 +106,7 @@ Some examples:
 	--regex-Man=/^\.TH[[:space:]]{1,}"([^"]{1,})".*/\1/t/{exclusive}{icase}{scope=push}
 	--regex-Gdbinit=/^#//{exclusive}
 
-Note that the last example only has two ``/`` forward slashes following
+Note that the last example only has two '``/``' forward slashes following
 the regex pattern, as a shortened form when no kind-spec exists.
 
 The ``--mline-regex-<LANG>`` option also follows the above format. The
@@ -154,13 +154,13 @@ is the same as:
    --kinddef-m4=d,definition,definitions
    --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d/{extend}
 
-The characters ``{`` and ``}`` may not be suitable for command line
+The characters '``{``' and '``}``' may not be suitable for command line
 use, but long flags are mostly intended for option files.
 
 Exclusive flag in regex
 ......................................................................
 
-By default, lines read from the input files will be matched against **all** the
+By default, lines read from the input files will be matched against all the
 regular expressions defined with ``--regex-<LANG>``. Each successfully matched
 regular expression will emit a tag.
 
@@ -171,18 +171,18 @@ successfully, for that input line.
 
 For specifying exclusive-matching the flags ``exclusive`` (long) and ``x``
 (short) were introduced. For example, this is used in
-:file:`optlib/gdbinit.ctags` for ignoring comment lines in ``gdb`` files,
+:file:`optlib/gdbinit.ctags` for ignoring comment lines in gdb files,
 as follows:
 
 .. code-block:: ctags
 
 	--regex-Gdbinit=/^#//{exclusive}
 
-Comments in gbd files start with ``#`` so the above line is the first regex
+Comments in gbd files start with '``#``' so the above line is the first regex
 match line in :file:`gdbinit.ctags`, so that subsequent regex matches are
 not tried for the input line.
 
-If an empty name pattern(``//``) is used for the ``--regex-<LANG>`` option,
+If an empty name pattern (``//``) is used for the ``--regex-<LANG>`` option,
 ctags warns it as a wrong usage of the option. However, if the flags
 ``exclusive`` or ``x`` is specified, the warning is suppressed.
 
@@ -200,17 +200,17 @@ Experimental flags
 ``_extra``
 
 	This flag indicates the tag should only be generated if the given
-	'extra' type is enabled, as explained in :ref:`extras`.
+	``extra`` type is enabled, as explained in ":ref:`extras`".
 
 ``_field``
 
 	This flag allows a regex match to add additional custom fields to the
-	generated tag entry, as explained in :ref:`fields`.
+	generated tag entry, as explained in ":ref:`fields`".
 
 ``_role``
 
 	This flag allows a regex match to generate a reference tag entry and
-	specify the role of the reference, as explained in :ref:`roles`.
+	specify the role of the reference, as explained in ":ref:`roles`".
 
 .. NOT REVIEWED YET
 
@@ -222,7 +222,7 @@ Experimental flags
 	having no name. A lambda function in a functional programming
 	language is a typical example of a language object having no name.
 
-	Consider following input (input.foo):
+	Consider following input (``input.foo``):
 
 	.. code-block:: lisp
 
@@ -230,7 +230,7 @@ Experimental flags
 			...
 			)
 
-	Consider following optlib file (foo.ctags):
+	Consider following optlib file (``foo.ctags``):
 
 	.. code-block:: ctags
 
@@ -262,7 +262,7 @@ Normally you don't need to know this.
 Scope tracking in a regex parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-About the `{scope=..}` flag itself for scope tracking, see "FLAGS FOR
+About the ``{scope=..}`` flag itself for scope tracking, see "FLAGS FOR
 --regex-<LANG> OPTION" section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 Example 1:
@@ -344,16 +344,16 @@ Overriding the letter for file kind is not allowed in Universal Ctags.
 Generating fully qualified tags automatically from scope information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If scope fields are filled properly with `{scope=...}` regex flags,
+If scope fields are filled properly with ``{scope=...}`` regex flags,
 you can use the field values for generating fully qualified tags.
-About the `{scope=..}` flag itself, see "FLAGS FOR --regex-<LANG>
+About the ``{scope=..}`` flag itself, see "FLAGS FOR --regex-<LANG>
 OPTION" section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
-Specify `{_autoFQTag}` to the end of ``--langdef=<LANG>`` option like
+Specify ``{_autoFQTag}`` to the end of ``--langdef=<LANG>`` option like
 ``-langdef=Foo{_autoFQTag}`` to make ctags generate fully qualified
 tags automatically.
 
-`.` is the (ctags global) default separator combining names into a
+'``.``' is the (ctags global) default separator combining names into a
 fully qualified tag. You can customize separators with
 ``--_scopesep-<LANG>=...`` option.
 
@@ -387,21 +387,21 @@ Output::
 	y	input.foo	/^	var y$/;"	v	class:X
 
 
-"X.y" is printed as a fully qualified tag when ``--extras=+q`` is given.
+``X.y`` is printed as a fully qualified tag when ``--extras=+q`` is given.
 
 .. NOT REVIEWED YET (--_scopesep)
 
 Customizing scope separators
 ......................................................................
 Use ``--_scopesep-<LANG>=[<parent-kindLetter>]/<child-kindLetter>:<sep>``
-option for customizing if the language uses `{_autoFQTag}`.
+option for customizing if the language uses ``{_autoFQTag}``.
 
 ``parent-kindLetter``
 
 	The kind letter for a tag of outer-scope.
 
-	You can use `*` for specifying as wildcards that means
-	"any kinds" for a tag of outer-scope.
+	You can use '``*``' for specifying as wildcards that means
+	*any kinds* for a tag of outer-scope.
 
 	If you omit ``parent-kindLetter``, the separator is used as
 	a prefix for tags having the kind specified with ``child-kindLetter``.
@@ -412,8 +412,8 @@ option for customizing if the language uses `{_autoFQTag}`.
 
 	The kind letter for a tag of inner-scope.
 
-	You can use `*` for specifying as wildcards that means
-	"any kinds" for a tag of inner-scope.
+	You can use '``*``' for specifying as wildcards that means
+	*any kinds* for a tag of inner-scope.
 
 ``sep``
 
@@ -421,10 +421,10 @@ option for customizing if the language uses `{_autoFQTag}`.
 	the inner-scope has ``child-kindLetter``, then ``sep`` is instead in
 	between the scope names in the generated tags file.
 
-specifying `*` as both  ``parent-kindLetter`` and ``child-kindLetter``
+specifying '``*``' as both  ``parent-kindLetter`` and ``child-kindLetter``
 sets ``sep`` as the language default separator. It is used as fallback.
 
-Specifying `*` as ``child-kindLetter`` and omitting ``parent-kindLetter``
+Specifying '``*``' as ``child-kindLetter`` and omitting ``parent-kindLetter``
 sets ``sep`` as the language default prefix. It is used as fallback.
 
 
@@ -437,10 +437,10 @@ Let's see an example.
 The input file is written in Tcl.  Tcl parser is not an optlib
 parser. However, it uses the ``_autoFQTag`` feature internally.
 Therefore, ``_scopesep-Tcl=`` option works well. Tcl parser
-defines two kinds `n (namespace)` and `p (procedure)`.
+defines two kinds ``n`` (``namespace``) and ``p`` (``procedure``).
 
-By default, Tcl parser uses `::` as scope separator. The parser also
-uses `::` as root prefix.
+By default, Tcl parser uses ``::`` as scope separator. The parser also
+uses ``::`` as root prefix.
 
 .. code-block:: tcl
 
@@ -456,10 +456,10 @@ uses `::` as root prefix.
 		puts $s
 	}
 
-`M` is defined under the scope of `N`. `pr0` is defined	under the scope
-of `M`. `N` and `pr1` are at top level (so they are candidates to be added
-prefixes). `M` and `N` are language objects with `n (namespace)` kind.
-`pr0` and `pr1` are language objects with `p (procedure)` kind.
+``M`` is defined under the scope of ``N``. ``pr0`` is defined	under the scope
+of ``M``. ``N`` and ``pr1`` are at top level (so they are candidates to be added
+prefixes). ``M`` and ``N`` are language objects with ``n`` (``namespace``) kind.
+``pr0`` and ``pr1`` are language objects with ``p`` (``procedure``) kind.
 
 .. code-block:: console
 
@@ -473,7 +473,7 @@ prefixes). `M` and `N` are language objects with `n (namespace)` kind.
 	pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:::N::M
 	pr1	input.tcl	/^proc pr1 {s} {$/;"	p
 
-Let's change the default separator to `->`:
+Let's change the default separator to ``->``:
 
 .. code-block:: console
 
@@ -487,7 +487,7 @@ Let's change the default separator to `->`:
 	pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:::N->M
 	pr1	input.tcl	/^proc pr1 {s} {$/;"	p
 
-Let's define '^' as default prefix:
+Let's define '``^``' as default prefix:
 
 .. code-block:: console
 
@@ -502,7 +502,7 @@ Let's define '^' as default prefix:
 	pr1	input.tcl	/^proc pr1 {s} {$/;"	p
 
 Let's override the specification of separator for combining a
-namespace and a procedure with '+': (About the separator for
+namespace and a procedure with '``+``': (About the separator for
 combining a namespace and another namespace, ctags uses the default separator.)
 
 .. code-block:: console
@@ -518,7 +518,7 @@ combining a namespace and another namespace, ctags uses the default separator.)
 	pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:^N->M
 	pr1	input.tcl	/^proc pr1 {s} {$/;"	p
 
-Let's override the definition of prefix for a namespace with '@':
+Let's override the definition of prefix for a namespace with '``@``':
 (About the prefix for procedures, ctags uses the default prefix.)
 
 .. code-block:: console
@@ -543,8 +543,8 @@ needing contextual information to decide whether to tag or not, or to
 constrain generating tags to only certain cases, or to grab multiple
 substrings to generate the tag name.
 
-Universal Ctags has two ways to accomplish this: multi-line regex options,
-and an experimental multi-table regex options described later.
+Universal Ctags has two ways to accomplish this: *multi-line regex options*,
+and an experimental *multi-table regex options* described later.
 
 The newly introduced ``--mline-regex-<LANG>`` is similar to ``--regex-<LANG>``
 except the pattern is applied to the whole file's contents, not line by line.
@@ -633,7 +633,7 @@ Multiline pattern flags
 
 	   def def abc
 
-	Consider two sets of options, foo and bar.
+	Consider two sets of options, ``foo`` and ``bar``.
 
 	.. code-block:: ctags
 
@@ -652,46 +652,46 @@ Multiline pattern flags
 		--kinddef-bar=a,something,something
 		--mline-regex-bar=/def *([a-z]+)/\1/a/{mgroup=1}{_advanceTo=1start}
 
-	*foo.ctags* emits following tags output::
+	``foo.ctags`` emits following tags output::
 
 	   def	input.foo	/^def def abc$/;"	a
 
-	*bar.ctags* emits following tags output::
+	``bar.ctags`` emits following tags output::
 
 	   def	input-0.bar	/^def def abc$/;"	a
 	   abc	input-0.bar	/^def def abc$/;"	a
 
-	``_advanceTo=1start`` is specified in *bar.ctags*.
-	This allows ctags to capture "abc".
+	``_advanceTo=1start`` is specified in ``bar.ctags``.
+	This allows ctags to capture ``abc``.
 
 	At the first iteration, the patterns of both
-	*foo.ctags* and *bar.ctags* match as follows
+	``foo.ctags`` and ``bar.ctags`` match as follows
 	::
 
 		0   1       (start)
 		v   v
 		def def abc
-			   ^
-			   0,1  (end)
+		       ^
+		       0,1  (end)
 
-	"def" at the group 1 is captured as a tag in
+	``def`` at the group 1 is captured as a tag in
 	both languages. At the next iteration, the positions
 	where the pattern matching is applied to are not the
 	same in the languages.
 
-	*foo.ctags*
+	``foo.ctags``
 	::
 
-			   0end (default)
-			   v
+		       0end (default)
+		       v
 		def def abc
 
 
-	*bar.ctags*
+	``bar.ctags``
 	::
 
-			1start (as specified in _advanceTo long flag)
-			v
+		    1start (as specified in _advanceTo long flag)
+		    v
 		def def abc
 
 	This difference of positions makes the difference of tags output.
@@ -739,11 +739,11 @@ The new options are:
 
 ``--_tabledef-<LANG>``
 	Declares a new regex matching table of a given name for the language,
-	as described in :ref:`tabledef`.
+	as described in ":ref:`tabledef`".
 
 ``--_mtable-regex-<LANG>``
 	Adds a regex pattern and associated tag generation information and flags, to
-	the given table, as described in :ref:`mtable_regex`.
+	the given table, as described in ":ref:`mtable_regex`".
 
 ``--_mtable-extend-<LANG>``
 	Includes a previously-defined regex table to the named one.
@@ -751,8 +751,8 @@ The new options are:
 The above will be discussed in more detail shortly.
 
 First, let's explain the feature with an example. Consider an
-imaginary language "`X`" has a similar syntax as JavaScript: "var" is
-used as defining variable(s), , and "/\* ... \*/" is used for block
+imaginary language `X` has a similar syntax as JavaScript: ``var`` is
+used as defining variable(s), , and "``/* ... */``" is used for block
 comments.
 
 Here is our input, :file:`input.x`:
@@ -773,7 +773,7 @@ The ``--regex-<LANG>`` option only works on one line at a time, so can not know
 ``dont_capture_me`` is within comments. The ``--mline-regex-<LANG>`` could
 do it in theory, but due to the greedy nature of the regex engine it is
 impractical and potentially inefficient to do so, given that there could be
-multiple block comments in the file, with `*` inside them, etc.
+multiple block comments in the file, with '``*``' inside them, etc.
 
 A parser written with multi-table regex, on the other hand, can capture only
 ``a`` and ``b`` safely. But it is more complicated to understand.
@@ -791,7 +791,7 @@ language named ``X``, for files ending with a :file:`.x` suffix, and defines a
 new tag for variable kinds.
 
 When writing a multi-table parser, you have to think about the necessary states
-of parsing. For the parser of language ``X``, we need the following states:
+of parsing. For the parser of language `X`, we need the following states:
 
 * `toplevel` (initial state)
 * `comment` (inside comment)
@@ -820,7 +820,7 @@ Here is the 2nd version of :file:`X.ctags` doing so:
 For table names, only characters in the range ``[0-9a-zA-Z_]`` are acceptable.
 
 For a given language, for each file's input the ctags multi-table parser begins
-with the *first* declared table. For :file:`X.ctags`, ``toplevel`` is the one.
+with the first declared table. For :file:`X.ctags`, ``toplevel`` is the one.
 The other tables are only ever entered/checked if another table specified to do
 so, starting with the first table. In other words, if the first declared table
 does not find a match for the current input, and does not specify to go to
@@ -847,9 +847,9 @@ the name of a table previously declared with the ``--_tabledef-<LANG>`` option.
 
 A regex pattern added to a parser with ``--_mtable-regex-<LANG>`` is matched
 against the input at the current byte position, not line. Even if you do not
-specify the ``^`` anchor at the start of the pattern, ``ctags`` adds ``^`` to
+specify the '``^``' anchor at the start of the pattern, ctags adds '``^``' to
 the pattern automatically. Unlike the ``--regex-<LANG>`` and
-``--mline-regex-<LANG>`` options, a ``^`` anchor does not mean "beginning of
+``--mline-regex-<LANG>`` options, a '``^``' anchor does not mean "beginning of
 line" in ``--_mtable-regex-<LANG>``; instead it means the beginning of the
 input string (i.e., the current byte position).
 
@@ -905,8 +905,8 @@ Let's continue with our example. Here is the 3rd version of :file:`X.ctags`:
 Four ``--_mtable-regex-X`` lines are added for skipping the block comments. Let's
 discuss them one by one.
 
-For each new file it scans, ``ctags`` always chooses the first pattern of the
-first table of the parser. Even if it's an empty table, ``ctags`` will only try
+For each new file it scans, ctags always chooses the first pattern of the
+first table of the parser. Even if it's an empty table, ctags will only try
 the first declared table. (in such a case it would immediately fail to match
 anything, and thus stop processing the input file and effectively do nothing)
 
@@ -919,11 +919,11 @@ it first:
 
 A pattern of ``\/\*`` is added to the ``toplevel`` table, to match the
 beginning of a block comment. A backslash character is used in front of the
-leading ``/`` to escape the separation character ``/`` that separates the fields
+leading '``/``' to escape the separation character '``/``' that separates the fields
 of ``--_mtable-regex-<LANG>``. Another backslash inside the pattern is used
-before the asterisk ``*``, to make it a literal asterisk character in regex.
+before the asterisk '``*``', to make it a literal asterisk character in regex.
 
-The last ``//`` means ``ctags`` should not tag something matching this pattern.
+The last ``//`` means ctags should not tag something matching this pattern.
 In ``--regex-<LANG>`` you never use ``//`` because it would be pointless to
 match something and not tag it using and single-line ``--regex-<LANG>``; in
 multi-line ``--mline-regex-<LANG>`` you rarely see it, because it would rarely
@@ -935,7 +935,7 @@ The long flag added to our first regex of our first table is ``tenter``, which
 is a long flag for switching the table and pushing on the stack. ``{tenter=comment}``
 means "switch the table from toplevel to comment".
 
-So given the input file :file:`input.x` shown earlier, ``ctags`` will begin at
+So given the input file :file:`input.x` shown earlier, ctags will begin at
 the ``toplevel`` table and try to match the first regex. It will succeed, and
 thus push on the stack and go to the ``comment`` table.
 
@@ -954,7 +954,7 @@ Getting back to our example, the top of the ``comment`` table has this regex:
 	--_mtable-regex-X=comment/\*\///{tleave}
 
 Similar to the previous ``toplevel`` table pattern, this one for ``\*\/`` uses
-a backslash to escape the separator ``/``, as well as one before the ``*`` to
+a backslash to escape the separator '``/``', as well as one before the '``*``' to
 make it a literal asterisk in regex. So what it's looking for, from a simple
 string perspective, is the sequence ``*/``. Note that this means even though
 you see three backslashes ``///`` at the end, the first one is escaped and used
@@ -981,7 +981,7 @@ regex of that table, shown above, at the following location::
 	var a /* ANOTHER BLOCK COMMENT */, b;
 
 The pattern doesn't match for the position just after ``/*``, because that
-position is a space character. So ``ctags`` tries the next pattern in the same
+position is a space character. So ctags tries the next pattern in the same
 table:
 
 .. code-block:: ctags
@@ -990,8 +990,8 @@ table:
 
 This pattern matches any any one character including newline; the current
 position moves one character forward. Now the character at the current position is
-``B``. The first pattern of the table ``*/`` still does not match with the input. So
-``ctags`` uses next pattern again. When the current position moves to the ``*/``
+'``B``'. The first pattern of the table ``*/`` still does not match with the input. So
+ctags uses next pattern again. When the current position moves to the ``*/``
 of the 3rd line of :file:`input.x`, it will finally match this:
 
 .. code-block:: ctags
@@ -999,13 +999,13 @@ of the 3rd line of :file:`input.x`, it will finally match this:
 	--_mtable-regex-X=comment/\*\///{tleave}
 
 In this pattern, the long flag ``{tleave}`` is specified. This triggers table
-switching again. ``{tleave}`` makes ``ctags`` switch the table back to the last
+switching again. ``{tleave}`` makes ctags switch the table back to the last
 table used before doing ``{tenter}``. In this case, ``toplevel`` is the table.
-``ctags`` manages a stack where references to tables are put. ``{tenter}`` pushes
+ctags manages a stack where references to tables are put. ``{tenter}`` pushes
 the current table to the stack. ``{tleave}`` pops the table at the top of the
 stack and chooses it.
 
-So now ``ctags`` is back to the ``toplevel`` table, and tries the first regex
+So now ctags is back to the ``toplevel`` table, and tries the first regex
 of that table, which was this:
 
 .. code-block:: ctags
@@ -1027,17 +1027,17 @@ the second regex:
 
 	--_mtable-regex-X=toplevel/.//
 
-This matches a newline successfully, but has no actions to perform. So ``ctags``
+This matches a newline successfully, but has no actions to perform. So ctags
 moves one character forward (the newline it just matched), and goes back to the
 top of the ``toplevel`` table, and tries the first regex again. Eventually we'll
 reach the beginning of the second block comment, and do the same things as before.
 
-When ``ctags`` finally reaches the end of the file (the position after ``b;``),
+When ctags finally reaches the end of the file (the position after ``b;``),
 it will not be able to match either the first or second regex of the
 ``toplevel`` table, and quit processing the input file.
 
 So far, we've successfully skipped over block comments for our new ``X``
-language, but haven't generated any tags. The point of ``ctags`` is to generate
+language, but haven't generated any tags. The point of ctags is to generate
 tags, not just keep your computer warm. So now let's move onto actually tagging
 variables...
 
@@ -1098,7 +1098,7 @@ The first regex in our new ``vars`` table is:
 
 	--_mtable-regex-X=vars/;//{tleave}
 
-This pattern is used to match a single semi-colon ``;``, and if it matches
+This pattern is used to match a single semi-colon '``;``', and if it matches
 pop back to the ``toplevel`` table using the ``{tleave}`` long flag. We
 didn't have to make this the first regex pattern, because it doesn't overlap
 with any of the other ones other than the ``/.//`` last one (which must be
@@ -1119,7 +1119,7 @@ like it was used in the ``toplevel`` table: to find the literal ``/*`` beginning
 of the block comment and enter the ``comment`` table. Because we're using
 ``{tenter}`` and ``{tleave}`` to push/pop from a stack of tables, we can
 use the same ``comment`` table for both ``toplevel`` and ``vars`` to go to,
-because ``ctags`` will "remember" the previous table and ``{tleave}`` will
+because ctags will *remember* the previous table and ``{tleave}`` will
 pop back to the right one.
 
 The third regex in our ``vars`` table is:
@@ -1138,8 +1138,8 @@ The last regex in the ``vars`` table we've seen before:
 
 	--_mtable-regex-X=vars/.//
 
-This makes ``ctags`` ignore any other characters, such as whitespace or the
-comma ``,``.
+This makes ctags ignore any other characters, such as whitespace or the
+comma '``,``'.
 
 
 Running our example
@@ -1163,7 +1163,7 @@ It works!
 You can find additional examples of multi-table regex in our github repo, under
 the ``optlib`` directory. For example ``puppetManifest.ctags`` is a serious
 example. It is the primary parser for testing multi-table regex parsers, and
-used in the actual ``ctags`` program for parsing puppet manifest files.
+used in the actual ctags program for parsing puppet manifest files.
 
 
 .. this "extras" section should probably be moved up this document, as a
@@ -1187,7 +1187,7 @@ marked ``{_extra=XNAME}``.
 	if __name__ == '__main__':
 		do_something()
 
-To capture the lines above in a python program(*input.py*), an `extra` flag can
+To capture the lines above in a python program (``input.py``), an ``extra`` flag can
 be used.
 
 .. code-block:: ctags
@@ -1195,7 +1195,7 @@ be used.
 	--_extradef-Python=main,__main__ entry points
 	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
 
-The above optlib(*python-main.ctags*) introduces ``main`` extra to the Python parser.
+The above optlib (``python-main.ctags``) introduces ``main`` extra to the Python parser.
 The pattern matching is done only when the ``main`` is enabled.
 
 .. code-block:: console
@@ -1222,8 +1222,8 @@ Universal Ctags allows using the other groups in the regex pattern.
 An optlib parser can have its specific fields. The groups can be used as a
 value of the fields of a tagEntry.
 
-Let's think about *Unknown*, an imaginary language.
-Here is a source file(*input.unknown*) written in *Unknown*:
+Let's think about `Unknown`, an imaginary language.
+Here is a source file (``input.unknown``) written in `Unknown`:
 
 .. code-block:: java
 
@@ -1231,15 +1231,15 @@ Here is a source file(*input.unknown*) written in *Unknown*:
 	protected func bar(n);
 	private func baz(n,...);
 
-With `--regex-Unknown=...` Exuberant Ctags can capture `foo`, `bar`, and `baz`
+With ``--regex-Unknown=...`` Exuberant Ctags can capture ``foo``, ``bar``, and ``baz``
 as names. Universal Ctags can attach extra context information to the
-names as values for fields. Let's focus on `bar`. `protected` is a
-keyword to control how widely the identifier `bar` can be accessed.
-`(n)` is the parameter list of `bar`. `protected` and `(n)` are
-extra context information of `bar`.
+names as values for fields. Let's focus on ``bar``. ``protected`` is a
+keyword to control how widely the identifier ``bar`` can be accessed.
+``(n)`` is the parameter list of ``bar``. ``protected`` and ``(n)`` are
+extra context information of ``bar``.
 
-With the following optlib file(*unknown.ctags*), ``ctags`` can attach
-`protected` to the field protection and `(n)` to the field signature.
+With the following optlib file (``unknown.ctags``), ctags can attach
+``protected`` to the field protection and ``(n)`` to the field signature.
 
 .. code-block:: ctags
 
@@ -1254,36 +1254,36 @@ With the following optlib file(*unknown.ctags*), ``ctags`` can attach
 
 	--fields-unknown=+'{protection}{signature}'
 
-For the line `protected func bar(n);` you will get following tags output::
+For the line ``protected func bar(n);`` you will get following tags output::
 
 	bar	input.unknown	/^protected func bar(n);$/;"	f	protection:protected	signature:(n)
 
-Let's see the detail of *unknown.ctags*.
+Let's see the detail of ``unknown.ctags``.
 
 .. code-block:: ctags
 
 	--_fielddef-unknown=protection,access scope
 
 ``--_fielddef-<LANG>=name,description`` defines a new field for a parser
-specified by `<LANG>`.  Before defining a new field for the parser,
-the parser must be defined with ``--langdef=<LANG>``. `protection` is
-the field name used in tags output. `access scope` is the description
+specified by *<LANG>*.  Before defining a new field for the parser,
+the parser must be defined with ``--langdef=<LANG>``. ``protection`` is
+the field name used in tags output. ``access scope`` is the description
 used in the output of ``--list-fields`` and ``--list-fields=Unknown``.
 
 .. code-block:: ctags
 
 	--_fielddef-unknown=signature,signatures
 
-This defines a field named `signature`.
+This defines a field named ``signature``.
 
 .. code-block:: ctags
 
 	--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
 
 This option requests making a tag for the name that is specified with the group 3 of the
-pattern, attaching the group 1 as a value for `protection` field to the tag, and attaching
-the group 4 as a value for `signature` field to the tag. You can use the long regex flag
-`_field` for attaching fields to a tag with the following notation rule::
+pattern, attaching the group 1 as a value for ``protection`` field to the tag, and attaching
+the group 4 as a value for ``signature`` field to the tag. You can use the long regex flag
+``_field`` for attaching fields to a tag with the following notation rule::
 
   {_field=FIELDNAME:GROUP}
 
@@ -1291,8 +1291,8 @@ the group 4 as a value for `signature` field to the tag. You can use the long re
 ``--fields-<LANG>=[+|-]{FIELDNAME}`` can be used to enable or disable specified field.
 
 When defining a new parser specific field, it is disabled by default. Enable the
-field explicitly to use the field. See :ref:`Parser specific fields <parser-specific-fields>`
-about `--fields-<LANG>` option.
+field explicitly to use the field. See ":ref:`Parser specific fields <parser-specific-fields>`"
+about ``--fields-<LANG>`` option.
 
 `passwd` parser is a simple example that uses ``--fields-<LANG>`` option.
 
@@ -1308,7 +1308,7 @@ Capturing reference tags
 .. NOT REVIEWED YET
 
 To make a reference tag with an optlib parser, specify a role with
-`_role` long regex flag. Let's see an example:
+``_role`` long regex flag. Let's see an example:
 
 .. code-block:: ctags
 
@@ -1322,25 +1322,25 @@ To make a reference tag with an optlib parser, specify a role with
 A role must be defined before specifying it as value for ``_role`` flag.
 ``--_roledef-<LANG>.<KIND>=<ROLE>,<ROLEDESC>`` option is for defining a role.
 See the line, ``--regex-FOO=...``.  In this parser `FOO`, the name of an
-imported module is captured as a reference tag with role `imported`.
+imported module is captured as a reference tag with role ``imported``.
 
-For specifing KIND where the role is defined, you can use either a
-kind letter or a kind name.  surrounded by ``{`` and ``}``.
+For specifying *<KIND>* where the role is defined, you can use either a
+kind letter or a kind name surrounded by '``{``' and '``}``'.
 
 The option has two parameters separated by a comma:
 
-``<ROLE>``
+*<ROLE>*
 
 	the role name, and
 
-``<ROLEDESC>``
+*<ROLEDESC>*
 
 	the description of the role.
 
 The first parameter is the name of the role. The role is defined in
-the kind ``<KIND>`` of the language ``<LANG>``. In the example,
-`imported` role is defined in the `module` kind, which is specified
-with `m`. You can use ``{module}``, the name of the kind instead.
+the kind *<KIND>* of the language *<LANG>*. In the example,
+``imported`` role is defined in the ``module`` kind, which is specified
+with ``m``. You can use ``{module}``, the name of the kind instead.
 
 The kind specified in ``--_roledef-<LANG>.<KIND>`` option must be
 defined *before* using the option. See the description of
@@ -1363,8 +1363,8 @@ assign multiple roles to a reference tag.  See following input of C language
    x  = 0;
    i += 1;
 
-An ultra fine grained C parser may capture the variable `x` with
-`lvalue` role and the variable `i` with `lvalue` and `incremented`
+An ultra fine grained C parser may capture the variable ``x`` with
+``lvalue`` role and the variable ``i`` with ``lvalue`` and ``incremented``
 roles.
 
 You can implement such roles by extending the built-in C parser:
@@ -1387,57 +1387,57 @@ ctags with ``--options=c-extra.ctags --extras=+r --fields=+r`` emits
 
 .. _guest-regex-flag:
 
-Running a guest parser with `_guest` regex flag
+Running a guest parser with ``_guest`` regex flag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. NOT REVIEWED YET
 
-With `_guest` regex flag, you can run a parser (a guest parser) on an
+With ``_guest`` regex flag, you can run a parser (a guest parser) on an
 area of the current input file.
-See :ref:`Applying a parser to specified areas of input file (guest/host) <host-guest-parsers>`
+See ":ref:`Applying a parser to specified areas of input file (guest/host) <host-guest-parsers>`"
 about the concept of the guest parser.
 
-The `_guest` regex flag specifies `guest spec`, and attaches it to
+The ``_guest`` regex flag specifies *guest spec*, and attaches it to
 the associated regex pattern.
 
-A guest spec has three fields: `PARSER`, `START of area`, and `END of area`.
-The `_guest` regex flag has following forms::
+A guest spec has three fields: *<PARSER>*, *<START>* of area, and *<END>* of area.
+The ``_guest`` regex flag has following forms::
 
-  {_guest=PARSER,START,END}
+  {_guest=<PARSER>,<START>,<END>}
 
-``ctags`` maintains a data called `guest request` during parsing.  The
+ctags maintains a data called *guest request* during parsing.  The
 guest request also has three fields: `parser`, `start of area`, and
 `end of area`.
 
 You, a parser developer, have to fill the fields of guest specs.
-``ctags`` inquiries the guest spec when matching the regex pattern
+ctags inquiries the guest spec when matching the regex pattern
 associated with it, tries to fill the fields of the guest request,
 and runs a guest parser when all the fields of the guest request are
 filled.
 
 If you don't use `Multi-line pattern match`_ to define a host parser,
-``ctags`` can fill fields of `guest request` incrementally; more than
+ctags can fill fields of `guest request` incrementally; more than
 one guest specs are used to fill the fields. In other words, you can
 make some of the fields of a guest spec empty. On the other hand, you must
 specify all the fields of a guest spec for `Multi-line pattern match`_.
 
-The PARSER field of `_guest` regex flag
+The *<PARSER>* field of ``_guest`` regex flag
 ......................................................................
-For PARSER, you can specify one of the following items:
+For *<PARSER>*, you can specify one of the following items:
 
 a name of a parser
 
 	If you know the guest parser you want to run before parsing
-	the input file, specify the name to the `PARSER`.
+	the input file, specify the name to the parser.
 
 	An example of running C parser as a guest parser::
 
-	  {_guest=C,...
+		{_guest=C,...
 
-the group number of a regex pattern started from ``\`` (backslash)
+the group number of a regex pattern started from '``\``' (backslash)
 
 	If a parser name appears in an input file, write a regex pattern
 	to capture the name.  Specify the group number where the name is
-	stored to the `PARSER`.  In such case, use ``\`` as the prefix for
+	stored to the parser.  In such case, use '``\``' as the prefix for
 	the number.
 
 	Let's see an example. Git Flavor Markdown (GFM) is a language for
@@ -1445,28 +1445,26 @@ the group number of a regex pattern started from ``\`` (backslash)
 	program code; the language treats the area started from ``~~~`` to
 	``~~~`` as a snippet. You can specify a programming language of
 	the snippet with starting the area with
-	``~~~THE_NAME_OF_LANGUAGE`` like ``~~~C`` or ``~~~Java``.
+	``~~~<THE_NAME_OF_LANGUAGE>``, like ``~~~C`` or ``~~~Java``.
 
 	To run a guest parser on the area, you have to capture the
-	``THE_NAME_OF_LANGUAGE`` with a regex pattern::
+	*<THE_NAME_OF_LANGUAGE>* with a regex pattern::
 
 		--_mtable-regex-Markdown=main/~~~([a-zA-Z0-9][-#+a-zA-Z0-9]*)[\n]//{_guest=\1,0end,}
 
 	The pattern captures the language name in the input file with the
-	regex group 1, and specify it to `PARSER`::
+	regex group 1, and specify it to *<PARSER>*::
 
+		{guest=\1,...
 
-	   {guest=\1,...
-
-
-the group number of a regex pattern started from ``*`` (asterisk)
+the group number of a regex pattern started from '``*``' (asterisk)
 
 	If a file name implying a programming language appears in an input
 	file, capture the file name with the regex pattern where the guest
-	spec attaches to. ``ctags`` tries to find a proper parser for the
+	spec attaches to. ctags tries to find a proper parser for the
 	file name by inquiring the langmap.
 
-	Use ``*`` as the prefix to the number for specifying the group of
+	Use '``*``' as the prefix to the number for specifying the group of
 	the regex pattern that captures the file name.
 
 	Let's see an example. Consider you have a shell script that emits
@@ -1486,37 +1484,37 @@ the group number of a regex pattern started from ``*`` (asterisk)
 
 	To run guest parsers for the here document areas, the shell
 	script parser of ctags must choose the parsers from the file
-	names (foo.c and foo.el)::
+	names (``foo.c`` and ``foo.el``)::
 
 		--regex-sh=/cat > ([a-z.]+) <<EOF//{_guest=*1,0end,}
 
 	The pattern captures the file name in the input file with the
-	regex group 1, and specify it to `PARSER`::
+	regex group 1, and specify it to *<PARSER>*::
 
 	   {_guest=*1,...
 
-The START and END fields of `_guest` regex flag
+The *<START>* and *<END>* fields of `_guest` regex flag
 ......................................................................
 
-The START and END fields specify the area the PARSER parses.  START
-specifies the start of the area. END specifies the end of the area.
+The *<START>* and *<END>* fields specify the area the *<PARSER>* parses.  *<START>*
+specifies the start of the area. *<END>* specifies the end of the area.
 
 The forms of the two fields are the same: a regex group number
-followed by "start" or "end". e.g. "3start", "0end".  The suffixes,
-"start" and "end", represents one of two boundaries of the group.
+followed by ``start`` or ``end``. e.g. ``3start``, ``0end``.  The suffixes,
+``start`` and ``end``, represents one of two boundaries of the group.
 
-Let's see an example:
+Let's see an example::
 
 	{_guest=C,2end,3start}
 
 This guest regex flag means running C parser on the area between
-"2end" and "3start". "2end" means the area starts from the end of
-matching of the 2nd regex group associated with the flag. "3start"
+``2end`` and ``3start``. ``2end`` means the area starts from the end of
+matching of the 2nd regex group associated with the flag. ``3start``
 means the area ends at the beginning of matching of the 3rd regex
 group associated with the flag.
 
 Let's more realistic example.
-Here is an optlib file for an imaginary language "single".
+Here is an optlib file for an imaginary language `single`::
 
 .. code-block:: ctags
 
@@ -1524,13 +1522,13 @@ Here is an optlib file for an imaginary language "single".
 	--map-single=.single
 	--regex-single=/^(BEGIN_C<).*(>END_C)$//{_guest=C,1end,2start}
 
-This parser can run C parser and extract "main" function from the
+This parser can run C parser and extract ``main`` function from the
 following input file::
 
 	BEGIN_C<int main (int argc, char **argv) { return 0; }>END_C
 	        ^                                             ^
-			 `- "1end" points here.                       |
-			                       "2start" points here. -+
+	         `- "1end" points here.                       |
+	                               "2start" points here. -+
 
 ..
 	NOT REVIEWED YET
@@ -1543,9 +1541,9 @@ Defining a subparser
 Basic
 .........................................................................
 
-About the concept of subparser, see :ref:`base-sub-parsers`.
+About the concept of subparser, see ":ref:`base-sub-parsers`".
 
-With ``base`` long flag of `--langdef=<LANG>` option, you can define
+With ``base`` long flag of ``--langdef=<LANG>`` option, you can define
 a subparser for a specified base parser. Combining with ``--kinddef-<LANG>``
 and ``--regex-<KIND>`` options, you can extend an existing parser
 without risk of kind confliction.
@@ -1572,7 +1570,7 @@ input.c
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
-C parser doesn't understand that `SYSCALL_DEFINE3` is a macro for defining an
+C parser doesn't understand that ``SYSCALL_DEFINE3`` is a macro for defining an
 entry point for a system.
 
 Let's define `linux` subparser which using C parser as a base parser:
@@ -1594,16 +1592,16 @@ The output is change as follows with `linux` parser:
 		set_one_prio   function          C
 	     SYSCALL_DEFINE3   function          C
 
-`setpriority` is recognized as a `syscall` of `linux`.
+``setpriority`` is recognized as a ``syscall`` of `linux`.
 
-Using only `--regex-C=...` you can capture `setpriority`.
+Using only ``--regex-C=...`` you can capture ``setpriority``.
 However, there were concerns about kind confliction; when introducing
-a new kind with `--regex-C=...`, you cannot use a letter and name already
-used in C parser and `--regex-C=...` options specified in the other places.
+a new kind with ``--regex-C=...``, you cannot use a letter and name already
+used in C parser and ``--regex-C=...`` options specified in the other places.
 
 You can use a newly defined subparser as a new namespace of kinds.
 In addition you can enable/disable with the subparser usable
-`--languages=[+|-]` option:
+``--languages=[+|-]`` option:
 
 .. code-block::console
 
@@ -1615,9 +1613,9 @@ In addition you can enable/disable with the subparser usable
 Directions
 .........................................................................
 
-As explained in :ref:`Tagging definitions of higher(upper) level language (sub/base) <base-sub-parsers>`,
+As explained in ":ref:`Tagging definitions of higher(upper) level language (sub/base) <base-sub-parsers>`",
 you can choose direction(s) how a base parser and a guest parser work together with
-long flags putting after `--langdef=Foo{base=Bar}`.
+long flags putting after ``--langdef=Foo{base=Bar}``.
 
 ========================  ======================
 C level notation          Command line long flag
@@ -1627,8 +1625,8 @@ SUBPARSER_SUB_RUNS_BASE   dedicated
 SUBPARSER_BASE_RUNS_SUB   bidirectional
 ========================  ======================
 
-`{shared}` is the default behavior. If none of `{shared}`, `{dedicated}`, nor
-`{bidirectional}` is specified, it implies `{shared}`.
+``{shared}`` is the default behavior. If none of ``{shared}``, ``{dedicated}``, nor
+``{bidirectional}`` is specified, it implies ``{shared}``.
 
 Let's see actual difference of behaviors.
 
@@ -1637,7 +1635,7 @@ The examples are taken from `#1409
 <https://github.com/universal-ctags/ctags/issues/1409>`_ submitted by @sgraham on
 github Universal Ctags repository.
 
-`input.cc` and `input.mojom` are input files, and have the same
+``input.cc`` and ``input.mojom`` are input files, and have the same
 contents::
 
      ABC();
@@ -1645,13 +1643,13 @@ contents::
     {
     }
 
-C++ parser can capture `main` as a function. Mojom subparser defined in the
-later runs on C++ parser and is for capturing `ABC`.
+C++ parser can capture ``main`` as a function. `Mojom` subparser defined in the
+later runs on C++ parser and is for capturing ``ABC``.
 
 shared combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-`{shared}` is specified, for `input.cc`, both tags capture by C++ parser
-and mojom parser are recorded to tags file. For `input.mojom`, only
+``{shared}`` is specified, for ``input.cc``, both tags capture by C++ parser
+and mojom parser are recorded to tags file. For ``input.mojom``, only
 tags captured by mojom parser are recorded to tags file.
 
 mojom-shared.ctags:
@@ -1663,12 +1661,12 @@ mojom-shared.ctags:
     --kinddef-mojom=f,function,functions
     --regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-tags for `input.cc`::
+tags for ``input.cc``::
 
     ABC	input.cc	/^ ABC();$/;"	f	language:mojom
     main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-tags for `input.mojom`::
+tags for ``input.mojom``::
 
   ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
 
@@ -1677,8 +1675,8 @@ dropped in the output.
 
 dedicated combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-`{dedicated}` is specified, for `input.cc`, only tags capture by C++
-parser are recorded to tags file. For `input.mojom`, both tags capture
+``{dedicated}`` is specified, for ``input.cc``, only tags capture by C++
+parser are recorded to tags file. For ``input.mojom``, both tags capture
 by C++ parser and mojom parser are recorded to tags file.
 
 mojom-dedicated.ctags:
@@ -1690,22 +1688,22 @@ mojom-dedicated.ctags:
     --kinddef-mojom=f,function,functions
     --regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-tags for `input.cc`::
+tags for ``input.cc``::
 
     main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-tags for `input.mojom`::
+tags for ``input.mojom``::
 
     ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
     main	input.mojom	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-Mojom parser works only when `.mojom` file is given as input.
+Mojom parser works only when ``.mojom`` file is given as input.
 
 bidirectional combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-`{bidirectional}` is specified, both tags capture by C++ parser and
-mojom parser are recorded to tags file for either input `input.cc` and
-`input.mojom`.
+``{bidirectional}`` is specified, both tags capture by C++ parser and
+mojom parser are recorded to tags file for either input ``input.cc`` and
+``input.mojom``.
 
 mojom-bidirectional.ctags:
 
@@ -1716,12 +1714,12 @@ mojom-bidirectional.ctags:
     --kinddef-mojom=f,function,functions
     --regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-tags for `input.cc`::
+tags for ``input.cc``::
 
     ABC	input.cc	/^ ABC();$/;"	f	language:mojom
     main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-tags for `input.mojom`::
+tags for ``input.mojom``::
 
     ABC	input.cc	/^ ABC();$/;"	f	language:mojom
     main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
@@ -1744,11 +1742,11 @@ Translating an option file into C source code (optlib2c)
 Universal Ctags has an ``optlib2c`` script that translates an option file into C
 source code. Your optlib parser can thus easily become a built-in parser.
 
-To add your optlib file, ``foo.ctags``, into ``ctags`` do the following steps;
+To add your optlib file, ``foo.ctags``, into ctags do the following steps;
 
 * copy ``foo.ctags`` file on ``optlib/`` directory
 * add ``foo.ctags`` on ``OPTLIB2C_INPUT`` variable in ``makefiles/optlib2c_input.mak``
 * add ``fooParser`` on ``PARSER_LIST`` macro variable in ``main/parser_p.h``
 
 You are encouraged to submit your :file:`.ctags` file to our repository on
-github through a pull request. See :ref:`contributions` for more details.
+github through a pull request. See ":ref:`contributions`" for more details.
