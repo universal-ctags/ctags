@@ -14,7 +14,7 @@
    viewBox="0 0 499.14381 173.96183"
    id="svg2"
    version="1.1"
-   inkscape:version="0.92.1 r"
+   inkscape:version="0.92.4 (unknown)"
    sodipodi:docname="promise.svg">
   <defs
      id="defs4">
@@ -237,17 +237,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.2218218"
-     inkscape:cx="11.723731"
-     inkscape:cy="336.86908"
+     inkscape:cx="50.371414"
+     inkscape:cy="96.637368"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      showguides="false"
      inkscape:guide-bbox="true"
-     inkscape:window-width="1200"
-     inkscape:window-height="1536"
+     inkscape:window-width="1920"
+     inkscape:window-height="972"
      inkscape:window-x="0"
-     inkscape:window-y="47"
+     inkscape:window-y="55"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -471,7 +471,7 @@
          sodipodi:role="line"
          id="tspan4773-5-7-4-2-7"
          x="-242.36191"
-         y="329.81918">promise for X is foreced</tspan></text>
+         y="329.81918">promise for X is forced</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.50000095px;line-height:0%;font-family:'VL Gothic';-inkscape-font-specification:'VL Gothic';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -483,7 +483,7 @@
          sodipodi:role="line"
          id="tspan4773-5-7-4-2-7-2"
          x="-171.92081"
-         y="413.22397">promise for Y is foreced</tspan></text>
+         y="413.22397">promise for Y is forced</tspan></text>
     <path
        sodipodi:type="star"
        style="opacity:1;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:1.875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
