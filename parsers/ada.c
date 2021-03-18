@@ -334,6 +334,8 @@ static bool adaCmp(const char *match);
 static bool adaKeywordCmp(adaKeyword keyword);
 static void skipUntilWhiteSpace(void);
 static void skipWhiteSpace(void);
+static void skipComments(void);
+static void skipCommentsAndStringLiteral(void);
 static void skipPast(const char *past);
 static void skipPastKeyword(adaKeyword keyword);
 static void skipPastWord(void);
@@ -638,6 +640,8 @@ static void movePos(int amount)
   (((pos) == 0 || (!isalnum((buf)[(pos) - 1]) && (buf)[(pos) - 1] != '_')) && \
    (pos) < (len) && \
    strncasecmp(&(buf)[(pos)], "--", strlen("--")) == 0)
+#define isAdaStringLiteral(buf, pos, len) \
+  (((pos) < (len)) && ((buf)[(pos)] == '"'))
 
 static bool cmp(const char *buf, int len, const char *match)
 {
@@ -730,10 +734,7 @@ static void skipUntilWhiteSpace(void)
 {
   /* first check for a comment line, because this would cause the isspace
    * check to be true immediately */
-  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-  {
-    readNewLine();
-  }
+  skipComments();
 
   while(exception != EXCEPTION_EOF && !isspace(line[pos]))
   {
@@ -761,10 +762,7 @@ static void skipUntilWhiteSpace(void)
     } /* if(pos >= lineLen) */
 
     /* now check for comments here */
-    while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-    {
-      readNewLine();
-    }
+    skipComments();
   } /* while(!isspace(line[pos])) */
 } /* static void skipUntilWhiteSpace(void) */
 
@@ -772,31 +770,58 @@ static void skipWhiteSpace(void)
 {
   /* first check for a comment line, because this would cause the isspace
    * check to fail immediately */
-  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-  {
-    readNewLine();
-  }
+  skipComments();
 
   while(exception != EXCEPTION_EOF && isspace(line[pos]))
   {
     movePos(1);
 
     /* now check for comments here */
-    while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-    {
-      readNewLine();
-    }
+    skipComments();
   } /* while(isspace(line[pos])) */
 } /* static void skipWhiteSpace(void) */
+
+static void skipComments(void)
+{
+  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
+  {
+    readNewLine();
+  }
+}
+
+/* Return true if skipped over a string literal.
+ * Return false if no string literal is found. */
+static bool skipStringLiteral(void)
+{
+  if (exception != EXCEPTION_EOF && isAdaStringLiteral(line, pos, lineLen))
+  {
+    do {
+      movePos(1);
+    } while (exception != EXCEPTION_EOF && !isAdaStringLiteral(line, pos, lineLen));
+
+    /* Go to the next char of " */
+    movePos(1);
+
+    return true;
+  }
+  return false;
+}
+
+static void skipCommentsAndStringLiteral(void)
+{
+  while (true)
+  {
+    skipComments();
+    if (!skipStringLiteral())
+      break;
+  }
+}
 
 static void skipPast(const char *past)
 {
   /* first check for a comment line, because this would cause the isspace
    * check to fail immediately */
-  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-  {
-    readNewLine();
-  }
+  skipComments();
 
   /* now look for the keyword */
   while(exception != EXCEPTION_EOF && !adaCmp(past))
@@ -804,10 +829,7 @@ static void skipPast(const char *past)
     movePos(1);
 
     /* now check for comments here */
-    while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-    {
-      readNewLine();
-    }
+    skipComments ();
   }
 } /* static void skipPast(char *past) */
 
@@ -815,10 +837,7 @@ static void skipPastKeyword(adaKeyword keyword)
 {
   /* first check for a comment line, because this would cause the isspace
    * check to fail immediately */
-  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-  {
-    readNewLine();
-  }
+  skipComments();
 
   /* now look for the keyword */
   while(exception != EXCEPTION_EOF && !adaKeywordCmp(keyword))
@@ -826,10 +845,7 @@ static void skipPastKeyword(adaKeyword keyword)
     movePos(1);
 
     /* now check for comments here */
-    while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-    {
-      readNewLine();
-    }
+    skipComments();
   }
 } /* static void skipPastKeyword(adaKeyword keyword) */
 
@@ -837,10 +853,7 @@ static void skipPastWord(void)
 {
   /* first check for a comment line, because this would cause the isspace
    * check to fail immediately */
-  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-  {
-    readNewLine();
-  }
+  skipComments();
 
   /* now increment until we hit a non-word character... Specifically,
    * whitespace, '(', ')', ':', and ';' */
@@ -872,10 +885,7 @@ static void skipPastWord(void)
     } /* if(pos >= lineLen) */
 
     /* now check for comments here */
-    while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-    {
-      readNewLine();
-    }
+    skipComments();
   } /* while(!isspace(line[pos])) */
 } /* static void skipPastWord(void) */
 
@@ -883,10 +893,7 @@ static void skipPastLambda(skipCompFn cmpfn, void *data)
 {
   /* first check for a comment line, because this would cause the isspace
    * check to fail immediately */
-  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-  {
-    readNewLine();
-  }
+  skipCommentsAndStringLiteral();
 
   /* now call the predicate */
   while(exception != EXCEPTION_EOF && !cmpfn(data))
@@ -894,10 +901,7 @@ static void skipPastLambda(skipCompFn cmpfn, void *data)
     movePos(1);
 
     /* now check for comments here */
-    while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-    {
-      readNewLine();
-    }
+    skipCommentsAndStringLiteral();
   }
 } /* static void skipPast(char *past) */
 
@@ -1314,10 +1318,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
 
   /* skip any preliminary whitespace or comments */
   skipWhiteSpace();
-  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
-  {
-    readNewLine();
-  }
+  skipComments();
 
   /* before we start reading input save the current line number and file
    * position, so we can reconstruct the correct line & file position for any
