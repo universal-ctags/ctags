@@ -63,7 +63,7 @@ in the
 One obvious effect is that the regex special dot any-character '``.``' does not match
 newline characters, the '``^``' anchor *does* match right after a newline, and
 the '``$``' anchor matches right before a newline. A more subtle issue is this text from the
-"`Regular Expressions chapter <https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html>`_":
+chapter "`Regular Expressions <https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html>`_";
 "the use of literal <newline>s or any escape sequence equivalent produces undefined
 results". What that means is using a regex pattern with ``[^\n]+`` is invalid,
 and indeed in glibc produces very odd results. **Never use** '``\n``' in patterns
@@ -93,7 +93,9 @@ Many regex-based options described in this document support additional arguments
 in the form of long flags. Long flags are specified with surrounding '``{``' and
 '``}``'.
 
-The general format and placement is as follows::
+The general format and placement is as follows:
+
+.. code-block:: ctags
 
 	--regex-<LANG>=<PATTERN>/<NAME>/[<KIND>/]LONGFLAGS
 
@@ -106,7 +108,7 @@ Some examples:
 	--regex-Man=/^\.TH[[:space:]]{1,}"([^"]{1,})".*/\1/t/{exclusive}{icase}{scope=push}
 	--regex-Gdbinit=/^#//{exclusive}
 
-Note that the last example only has two '``/``' forward slashes following
+Note that the last example only has two '``/``' forward-slashes following
 the regex pattern, as a shortened form when no kind-spec exists.
 
 The ``--mline-regex-<LANG>`` option also follows the above format. The
@@ -115,6 +117,9 @@ modified version as well.
 
 The ``--langdef=<LANG>`` option also supports long flags, but not using
 forward-slash separators.
+
+.. TODO: It is obvious for --langdef option not use forward-slash separators.
+	Question to @masatake-san: Shall we remove the paragraph above?
 
 Regex control flags
 ......................................................................
@@ -178,13 +183,14 @@ as follows:
 
 	--regex-Gdbinit=/^#//{exclusive}
 
-Comments in gbd files start with '``#``' so the above line is the first regex
+Comments in gdb files start with '``#``' so the above line is the first regex
 match line in :file:`gdbinit.ctags`, so that subsequent regex matches are
 not tried for the input line.
 
 If an empty name pattern (``//``) is used for the ``--regex-<LANG>`` option,
 ctags warns it as a wrong usage of the option. However, if the flags
 ``exclusive`` or ``x`` is specified, the warning is suppressed.
+This is useful to ignore matched patterns as above.
 
 NOTE: This flag does not make sense in the multi-line ``--mline-regex-<LANG>``
 option nor the multi-table ``--_mtable-regex-<LANG>`` option.
@@ -250,7 +256,7 @@ Experimental flags
 Ghost kind in regex parser
 ......................................................................
 
-.. Q: what is the point of documenting this?
+.. TODO: Q: what is the point of documenting this?
 
 If a whitespace is used as a kind letter, it is never printed when
 ctags is called with ``--list-kinds`` option.  This kind is
@@ -350,7 +356,7 @@ About the ``{scope=..}`` flag itself, see "FLAGS FOR --regex-<LANG>
 OPTION" section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 Specify ``{_autoFQTag}`` to the end of ``--langdef=<LANG>`` option like
-``-langdef=Foo{_autoFQTag}`` to make ctags generate fully qualified
+``--langdef=Foo{_autoFQTag}`` to make ctags generate fully qualified
 tags automatically.
 
 '``.``' is the (ctags global) default separator combining names into a
@@ -429,6 +435,7 @@ sets ``sep`` as the language default prefix. It is used as fallback.
 
 
 NOTE: There is no ctags global default prefix.
+
 NOTE: ``_scopesep-<LANG>=...`` option affects only a parser that
 enables ``_autoFQTag``. A parser building full qualified tags
 manually ignores the option.
@@ -615,7 +622,8 @@ Multiline pattern flags
 	start position of the whole regex pattern). You do not need to add it for
 	the multi-table ``--_mtable-regex-<LANG>``.
 
-.. Q: isn't the above restriction really a bug? I think it is. I should fix it.
+.. TODO: Q: isn't the above restriction really a bug? I think it is. I should fix it.
+   Q to @masatake-san: Do you mean that {mgroup=0} can be omitted?
 
 
 ``{_advanceTo=N[start|end]}``
@@ -633,7 +641,7 @@ Multiline pattern flags
 
 	   def def abc
 
-	Consider two sets of options, ``foo`` and ``bar``.
+	Consider two sets of options, ``foo.ctags`` and ``bar.ctags``.
 
 	.. code-block:: ctags
 
@@ -752,7 +760,7 @@ The above will be discussed in more detail shortly.
 
 First, let's explain the feature with an example. Consider an
 imaginary language `X` has a similar syntax as JavaScript: ``var`` is
-used as defining variable(s), , and "``/* ... */``" is used for block
+used as defining variable(s), and "``/* ... */``" is used for block
 comments.
 
 Here is our input, :file:`input.x`:
@@ -778,7 +786,7 @@ multiple block comments in the file, with '``*``' inside them, etc.
 A parser written with multi-table regex, on the other hand, can capture only
 ``a`` and ``b`` safely. But it is more complicated to understand.
 
-Here is a 1st version of :file:`X.ctags`:
+Here is the 1st version of :file:`X.ctags`:
 
 .. code-block:: ctags
 
@@ -836,7 +844,7 @@ Adding a regex to a regex table
 The new option to add a regex to a declared table is ``--_mtable-regex-<LANG>``,
 and it follows this form:
 
-.. code-block:: perl
+.. code-block:: ctags
 
 	--_mtable-regex-<LANG>=<TABLE>/<PATTERN>/<NAME>/[<KIND>]/LONGFLAGS
 
@@ -1166,7 +1174,7 @@ example. It is the primary parser for testing multi-table regex parsers, and
 used in the actual ctags program for parsing puppet manifest files.
 
 
-.. this "extras" section should probably be moved up this document, as a
+.. TODO: this "extras" section should probably be moved up this document, as a
 	subsection in the "Regex option argument flags" section
 
 .. _extras:
@@ -1204,7 +1212,7 @@ The pattern matching is done only when the ``main`` is enabled.
 	__main__	input.py	/^if __name__ == '__main__':$/;"	f
 
 
-.. this "fields" section should probably be moved up this document, as a
+.. TODO: this "fields" section should probably be moved up this document, as a
 	subsection in the "Regex option argument flags" section
 
 .. _fields:
@@ -1215,12 +1223,11 @@ Adding custom fields to the tag output
 .. NEEDS MORE REVIEWS
 
 Exuberant Ctags allows just one of the specified groups in a regex pattern to
-be used as a part of the name of a tagEntry.
+be used as a part of the name of a tag entry.
 
 Universal Ctags allows using the other groups in the regex pattern.
-
 An optlib parser can have its specific fields. The groups can be used as a
-value of the fields of a tagEntry.
+value of the fields of a tag entry.
 
 Let's think about `Unknown`, an imaginary language.
 Here is a source file (``input.unknown``) written in `Unknown`:
@@ -1297,7 +1304,7 @@ about ``--fields-<LANG>`` option.
 `passwd` parser is a simple example that uses ``--fields-<LANG>`` option.
 
 
-.. this "roles" section should probably be moved up this document, as a
+.. TODO: this "roles" section should probably be moved up this document, as a
 	subsection in the "Regex option argument flags" section
 
 .. _roles:
@@ -1377,10 +1384,9 @@ You can implement such roles by extending the built-in C parser:
 	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *=/\1/v/{_role=lvalue}
 	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *\+=/\1/v/{_role=lvalue}{_role=incremented}
 
-ctags with ``--options=c-extra.ctags --extras=+r --fields=+r`` emits
+.. code-block:: console
 
-.. code-block:: tags
-
+	$ ctags with --options=c-extra.ctags --extras=+r --fields=+r
 	i	input.c	/^i += 1;$/;"	v	roles:lvalue,incremented
 	x	input.c	/^x = 0;$/;"	v	roles:lvalue
 
@@ -1396,7 +1402,7 @@ area of the current input file.
 See ":ref:`Applying a parser to specified areas of input file (guest/host) <host-guest-parsers>`"
 about the concept of the guest parser.
 
-The ``_guest`` regex flag specifies *guest spec*, and attaches it to
+The ``_guest`` regex flag specifies a *guest spec*, and attaches it to
 the associated regex pattern.
 
 A guest spec has three fields: *<PARSER>*, *<START>* of area, and *<END>* of area.
@@ -1404,7 +1410,7 @@ The ``_guest`` regex flag has following forms::
 
   {_guest=<PARSER>,<START>,<END>}
 
-ctags maintains a data called *guest request* during parsing.  The
+ctags maintains a data called *guest request* during parsing.  A
 guest request also has three fields: `parser`, `start of area`, and
 `end of area`.
 
@@ -1414,11 +1420,13 @@ associated with it, tries to fill the fields of the guest request,
 and runs a guest parser when all the fields of the guest request are
 filled.
 
-If you don't use `Multi-line pattern match`_ to define a host parser,
+If you use `Multi-line pattern match`_ to define a host parser,
+you must specify all the fields of `guest request`.
+
+On the other hand if you don't use `Multi-line pattern match`_ to define a host parser,
 ctags can fill fields of `guest request` incrementally; more than
 one guest specs are used to fill the fields. In other words, you can
-make some of the fields of a guest spec empty. On the other hand, you must
-specify all the fields of a guest spec for `Multi-line pattern match`_.
+make some of the fields of a guest spec empty.
 
 The *<PARSER>* field of ``_guest`` regex flag
 ......................................................................
@@ -1427,7 +1435,7 @@ For *<PARSER>*, you can specify one of the following items:
 a name of a parser
 
 	If you know the guest parser you want to run before parsing
-	the input file, specify the name to the parser.
+	the input file, specify the name of the parser.
 
 	An example of running C parser as a guest parser::
 
@@ -1468,7 +1476,7 @@ the group number of a regex pattern started from '``*``' (asterisk)
 	the regex pattern that captures the file name.
 
 	Let's see an example. Consider you have a shell script that emits
-	a program code instantiated from one of the templates. HERE DOCUMENTs
+	a program code instantiated from one of the templates. Here documents
 	are used to represent the templates like:
 
 	.. code-block:: sh
@@ -1514,7 +1522,7 @@ means the area ends at the beginning of matching of the 3rd regex
 group associated with the flag.
 
 Let's more realistic example.
-Here is an optlib file for an imaginary language `single`::
+Here is an optlib file for an imaginary language `single`:
 
 .. code-block:: ctags
 
@@ -1543,7 +1551,8 @@ Basic
 
 About the concept of subparser, see ":ref:`base-sub-parsers`".
 
-With ``base`` long flag of ``--langdef=<LANG>`` option, you can define
+``--langdef=<LANG>`` option is extended as
+``--langdef=<LANG>[{base=<LANG>}[{shared|dedicated|bidirectional}]][{_autoFQTag}]`` to define
 a subparser for a specified base parser. Combining with ``--kinddef-<LANG>``
 and ``--regex-<KIND>`` options, you can extend an existing parser
 without risk of kind confliction.
@@ -1622,7 +1631,7 @@ C level notation          Command line long flag
 ========================  ======================
 SUBPARSER_BASE_RUNS_SUB   shared (default)
 SUBPARSER_SUB_RUNS_BASE   dedicated
-SUBPARSER_BASE_RUNS_SUB   bidirectional
+SUBPARSER_BI_DIRECTION    bidirectional
 ========================  ======================
 
 ``{shared}`` is the default behavior. If none of ``{shared}``, ``{dedicated}``, nor

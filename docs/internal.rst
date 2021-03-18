@@ -25,8 +25,8 @@ are for ctags main part.
 `inputFile` type and the functions of input group
 ......................................................................
 
-(The original version of this sub sub sub section was written
-before ``inputFile`` type and ``File`` variable are made private. )
+.. note:: The original version of this section was written
+	before ``inputFile`` type and ``File`` variable are made private.
 
 ``inputFile`` is the type for representing the input file and stream for
 a parser. It was declared in ``main/read.h`` but now it is defined in
@@ -41,15 +41,15 @@ well known ``MIO`` declared in ``main/mio.h``. By calling functions of input gro
 (``getcFromInputFile`` and ``readLineFromInputFile``), a parser gets input
 text from ``fp``.
 
-The functions of input group updates fields ``input`` and ``source`` of ``File``
+The functions of input group updates fields ``input`` and ``source`` of ``File`` variable.
 These two fields has type ``inputFileInfo``. These two fields are for mainly
 tracking the name of file and the current line number. Usually ctags uses
-only ``input`` field. ``source`` is used only when ``#line`` directive is found
+only ``input`` field. ``source`` field is used only when ``#line`` directive is found
 in the current input text stream.
 
 A case when a tool generates the input file from another file, a tool
 can record the original source file to the generated file with using
-the ``#line`` directive. ``source`` is used for tracking/recording the
+the ``#line`` directive. ``source`` field is used for tracking/recording the
 information appeared on ``#line`` directives.
 
 Regex pattern matching are also done behind calling the functions of
@@ -61,7 +61,7 @@ The functions of bypass group
 The functions of bypass group (``readLineFromBypass`` and
 ``readLineFromBypassSlow``) are used for reading text from ``fp`` field of
 ``File`` static variable without updating ``input`` and ``source`` fields of
-``File``.
+``File`` variable.
 
 
 Parsers may not need the functions of this group.  The functions are
@@ -79,13 +79,14 @@ Parsers may not need the functions of this group.  The functions are
 used in ctags main part. The functions are used to load option files,
 for example.
 
+.. TODO: move promise API to "API for running a parser in an area"
 
 .. _promiseAPI:
 
 promise API
 ......................................................................
-(Currently the tagging via promise API is disabled by default.
-Use ``--extras=+g`` option for enabling it.)
+.. note:: Currently the tagging via promise API is disabled by default.
+	Use ``--extras=+g`` option for enabling it.
 
 Background and Idea
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -144,8 +145,9 @@ More examples are in ":ref:`Applying a parser to specified areas of input file <
 Usage
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-See a commit titled with "Yacc: run C parser in the areas where code
-is written in C".  I applied promise API to the Yacc parser.
+See a commit titled with "`Yacc: run C parser in the areas where code
+is written in C <https://github.com/universal-ctags/ctags/commit/757673f>`_".
+I applied promise API to the Yacc parser.
 
 The parser for host language must track and record the ``start`` and the
 ``end`` of a guest language. Pairs of ``line number`` and ``byte offset``
@@ -306,9 +308,9 @@ Background and Idea
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 *cork API* is introduced for recording scope information easier.
 
-Before introducing cork, a scope information must be recorded as
+Before introducing cork API, a scope information must be recorded as
 strings. It is flexible but memory management is required.
-Following code is taken from ``clojure.c`` (with modifications).
+Following code is taken from ``clojure.c`` (with some modifications).
 
 .. code-block:: c
 
@@ -320,8 +322,9 @@ Following code is taken from ``clojure.c`` (with modifications).
 
 		makeTagEntry (&current);
 
-``parent``, values stored to ``scope [0]`` and ``scope [1]`` are all
-kind of strings.
+``parent``, ``scope [0]`` and ``scope [1]`` are vStrings. The parser must manage
+their life cycles; the parser cannot free them till the tag referring them via
+its scope fields are emitted, and must free them after emitting.
 
 cork API provides more solid way to hold scope information. cork API
 expects ``parent``, which represents scope of a tag(``current``)
@@ -336,11 +339,11 @@ a parser can reused it as scope information.
 How to use
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-See a commit titled with "clojure: use cork". I applied cork
-API to the clojure parser.
+See a commit titled with "`clojure: use cork <https://github.com/universal-ctags/ctags/commit/ef181e6>`_".
+I applied cork API to the clojure parser.
 
-cork can be enabled and disabled per parser.
-cork is disabled by default. So there is no impact till you
+Cork API can be enabled and disabled per parser,
+and is disabled by default. So there is no impact till you
 enables it in your parser.
 
 ``useCork`` field is introduced in ``parserDefinition`` type:
@@ -403,7 +406,7 @@ the initialization explicitly.
 Automatic full qualified tag generation
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-If a parser uses the cork for recording and emitting scope
+If a parser uses the cork API for recording and emitting scope
 information, ctags can reuse it for generating *full qualified (FQ)
 tags*. Set ``requestAutomaticFQTag`` field of ``parserDefinition`` to
 ``TRUE`` then the main part of ctags emits FQ tags on behalf of the parser
