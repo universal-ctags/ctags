@@ -78,7 +78,7 @@ An example of specifying common fields:
 
 .. code-block:: console
 
-    $  ./ctags -x --_xformat="%-20N %4n %-16{input}|" main/main.c | head
+    $  ctags -x --_xformat="%-20N %4n %-16{input}|" main/main.c | head
     CLOCKS_PER_SEC        360 main/main.c     |
     CLOCKS_PER_SEC        364 main/main.c     |
     CLOCK_AVAILABLE       358 main/main.c     |
@@ -121,7 +121,7 @@ Another example of specifying parser specific fields:
 
 .. code-block:: console
 
-	$  ./ctags -x --_xformat="%-20N [%10{C.properties}]" main/main.c
+	$  ctags -x --_xformat="%-20N [%10{C.properties}]" main/main.c
 	CLOCKS_PER_SEC       [          ]
 	CLOCK_AVAILABLE      [          ]
 	Totals               [          ]

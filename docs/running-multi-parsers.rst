@@ -727,7 +727,7 @@ addition Make parser calls the methods during parsing the input file.
 
 .. code-block:: console
 
-   $ ./ctags --fields=+lK  --extras=+r -o - Makefile.am
+   $ ctags --fields=+lK  --extras=+r -o - Makefile.am
    bin	Makefile.am	/^bin_PROGRAMS = ctags$/;"	directory	language:Automake
    bin_PROGRAMS	Makefile.am	/^bin_PROGRAMS = ctags$/;"	macro	language:Make
    ctags	Makefile.am	/^bin_PROGRAMS = ctags$/;"	program	language:Automake	directory:bin
@@ -754,7 +754,7 @@ disabled.
 
 .. code-block:: console
 
-	$ ./ctags --languages=-Make --fields=+lKr --extras=+r -o - Makefile.am
+	$ ctags --languages=-Make --fields=+lKr --extras=+r -o - Makefile.am
 	bin	Makefile.am	/^bin_PROGRAMS = ctags$/;"	directory	language:Automake	roles:program
 	ctags	Makefile.am	/^bin_PROGRAMS = ctags$/;"	program	language:Automake	directory:bin
 

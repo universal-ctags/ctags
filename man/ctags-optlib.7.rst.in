@@ -444,7 +444,7 @@ optlib file (``sub-ruby.ctags``):
 
 command line and output::
 
-	$ ctags  --quiet --options=NONE --fields=+eK \
+	$ ctags --quiet --fields=+eK \
 	--options=./sub-ruby.ctags -o - input.srb
 	Example	input.srb	/^class Example$/;"	class	end:8
 	methodA	input.srb	/^  def methodA$/;"	method	class:Example	end:4

@@ -9,7 +9,7 @@ used to enable it.
 
 .. code-block:: console
 
-   $ ./ctags --output-format=json --fields=-s /tmp/foo.py
+   $ ctags --output-format=json --fields=-s /tmp/foo.py
    {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
    {"_type": "tag", "name": "doIt", "path": "/tmp/foo.py", "pattern": "/^    def doIt():$/", "kind": "member"}
 
@@ -21,7 +21,7 @@ Each generated tag line is represented as an object.
 
 .. code-block:: console
 
-    $./ctags --output-format=json /tmp/foo.py
+    $ ctags --output-format=json /tmp/foo.py
     {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
 
 
@@ -41,7 +41,7 @@ concept of the pseudo-tags.
 
 .. code-block:: console
 
-   $ ./ctags --extras='p' --pseudo-tags=JSON_OUTPUT_VERSION  --output-format=json /tmp/foo.py
+   $ ctags --extras='p' --pseudo-tags=JSON_OUTPUT_VERSION  --output-format=json /tmp/foo.py
    {"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "0.0", "pattern": "in development"}
    {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
    ...
@@ -72,7 +72,7 @@ of ``--list-fields`` option:
 
 .. code-block:: console
 
-        $ ./ctags --list-fields
+        $ ctags --list-fields
         #LETTER NAME            ENABLED LANGUAGE         XFMT   JSTYPE DESCRIPTION
         N       name            on      NONE             TRUE   s--    tag name (fixed field)
         ..

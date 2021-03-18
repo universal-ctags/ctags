@@ -37,7 +37,7 @@ Traditional output:
 
 .. code-block:: console
 
-    $ ./ctags -o - reftag.c
+    $ ctags -o - reftag.c
     TYPE	reftag.c	/^#define TYPE /;"	d	file:
     TYPE	reftag.c	/^struct TYPE { int x, y; };$/;"	s	file:
     p	reftag.c	/^TYPE p;$/;"	v	typeref:typename:TYPE
@@ -48,9 +48,9 @@ Output with the extra-tag ``r`` enabled:
 
 .. code-block:: console
 
-    $ ./ctags --list-extras | grep ^r
+    $ ctags --list-extras | grep ^r
     r	Include reference tags	off
-    $ ./ctags -o - --extras=+r reftag.c
+    $ ctags -o - --extras=+r reftag.c
     TYPE	reftag.c	/^#define TYPE /;"	d	file:
     TYPE	reftag.c	/^#undef TYPE$/;"	d	file:
     TYPE	reftag.c	/^struct TYPE { int x, y; };$/;"	s	file:
@@ -71,7 +71,7 @@ field is enabled with ``--fields=+r``.
 
 .. code-block:: console
 
-    $  ./ctags -o - --extras=+r --fields=+r reftag.c
+    $ ctags -o - --extras=+r --fields=+r reftag.c
     TYPE	reftag.c	/^#define TYPE /;"	d	file:
     TYPE	reftag.c	/^#undef TYPE$/;"	d	file:	roles:undef
     TYPE	reftag.c	/^struct TYPE { int x, y; };$/;"	s	file:	roles:def
@@ -88,7 +88,7 @@ used for the new reference tags. The field can be used only with
 
 .. code-block:: console
 
-    $ ./ctags -x --_xformat="%R %-16N %4n %-16F %C" --extras=+r reftag.c
+    $ ctags -x --_xformat="%R %-16N %4n %-16F %C" --extras=+r reftag.c
     D TYPE                3 reftag.c         #define TYPE point
     D TYPE                4 reftag.c         struct TYPE { int x, y; };
     D p                   5 reftag.c         TYPE p;
@@ -107,7 +107,7 @@ listed with ``--list-roles``:
 
 .. code-block:: console
 
-    $ ./ctags --list-roles
+    $ ctags --list-roles
     #LANGUAGE      KIND(L/N)         NAME                ENABLED DESCRIPTION
     SystemdUnit    u/unit            Requires            on      referred in Requires key
     SystemdUnit    u/unit            Wants               on      referred in Wants key
@@ -210,7 +210,7 @@ Example output:
 
 .. code-block:: console
 
-    $ ./ctags -o - --extras=+p --pseudo-tags=  --pseudo-tags=+TAG_KIND_SEPARATOR input.php
+    $ ctags -o - --extras=+p --pseudo-tags=  --pseudo-tags=+TAG_KIND_SEPARATOR input.php
     !_TAG_KIND_SEPARATOR!PHP	::	/*c/
     ...
     !_TAG_KIND_SEPARATOR!PHP	\\	/c/
@@ -277,7 +277,7 @@ in the `LANGUAGE` column:
 
 .. code-block:: console
 
-	$ ./ctags --list-fields
+	$ ctags --list-fields
 	#LETTER NAME            ENABLED LANGUAGE         XFMT  DESCRIPTION
 	...
 	-       end             off     C                TRUE   end lines of various constructs
@@ -297,7 +297,7 @@ given, ``--list-fields`` prints only the fields for that parser:
 
 .. code-block:: console
 
-	$ ./ctags --list-fields=Maven2
+	$ ctags --list-fields=Maven2
 	#LETTER NAME            ENABLED LANGUAGE        XFMT  DESCRIPTION
 	-       version         off     Maven2          TRUE  version of artifact
 
@@ -310,7 +310,7 @@ e.g. for enabling the `sectionMarker` field owned by the
 
 .. code-block:: console
 
-	$ ./ctags --fields-reStructuredText=+{sectionMarker} ...
+	$ ctags --fields-reStructuredText=+{sectionMarker} ...
 
 The wild card notation can be used for enabling/disabling parser specific
 fields, too. The following example enables all fields owned by the
@@ -318,7 +318,7 @@ fields, too. The following example enables all fields owned by the
 
 .. code-block:: console
 
-	$ ./ctags --fields-C++='*' ...
+	$ ctags --fields-C++='*' ...
 
 `*` can also be used for specifying languages.
 
@@ -327,7 +327,7 @@ have such a field.
 
 .. code-block:: console
 
-	$ ./ctags --fields-'*'=+'{end}' ...
+	$ ctags --fields-'*'=+'{end}' ...
 	...
 
 In this case, using wild card notation to specify the language, not
@@ -368,7 +368,7 @@ See some examples:
 
 .. code-block:: console
 
-	$ ./ctags --list-extras
+	$ ctags --list-extras
 	#LETTER NAME                   ENABLED LANGUAGE         DESCRIPTION
 	F       fileScope              TRUE    NONE             Include tags ...
 	f       inputFile              FALSE   NONE             Include an entry ...
@@ -391,11 +391,11 @@ by default but can be disabled with `--extras-Robot=-{whitespaceSwapped}`.
     it's ok to be correct
 	Python_keyword_2
 
-    $ ./ctags -o - input.robot
+    $ ctags -o - input.robot
     it's ok to be correct	input.robot	/^it's ok to be correct$/;"	k
     it's_ok_to_be_correct	input.robot	/^it's ok to be correct$/;"	k
 
-    $ ./ctags -o - --extras-Robot=-'{whitespaceSwapped}' input.robot
+    $ ctags -o - --extras-Robot=-'{whitespaceSwapped}' input.robot
     it's ok to be correct	input.robot	/^it's ok to be correct$/;"	k
 
 When disabled the name `it's_ok_to_be_correct` is not included in the
@@ -433,7 +433,7 @@ Let's see an example:
 	def func (self):
 	    pass
 
-    $ ./ctags -o - --extras=+q --fields=+E input.py
+    $ ctags -o - --extras=+q --fields=+E input.py
     Foo	input.py	/^class Foo:$/;"	c
     Foo.func	input.py	/^    def func (self):$/;"	m	class:Foo	extra:qualified
     func	input.py	/^    def func (self):$/;"	m	class:Foo
@@ -454,7 +454,7 @@ I don't say all parsers follows this idea.
       A operator+ (int);
     };
 
-    $ ./ctags --kinds-all='*' --fields= -o - input.cc
+    $ ctags --kinds-all='*' --fields= -o - input.cc
     A	input.cc	/^class A$/
     operator +	input.cc	/^  A operator+ (int);$/
 
@@ -479,11 +479,11 @@ extra.
 	    return 1;
     }
 
-    $ ./ctags --sort=no -o - --extras=+F input.c
+    $ ctags --sort=no -o - --extras=+F input.c
     foo	input.c	/^static int foo (void)$/;"	f	typeref:typename:int	file:
     bar	input.c	/^int bar (void)$/;"	f	typeref:typename:int
 
-    $ ./ctags -o - --extras=-F input.c
+    $ ctags -o - --extras=-F input.c
     foo	input.c	/^static int foo (void)$/;"	f	typeref:typename:int	file:
 
     $
@@ -540,7 +540,7 @@ All available parameters can be listed with ``--list-params`` option.
 
 .. code-block:: console
 
-    $ ./ctags --list-params
+    $ ctags --list-params
     #PARSER         NAME     DESCRIPTION
     CPreProcessor   if0      examine code within "#if 0" branch (true or [false])
     CPreProcessor   ignore   a token to be specially handled

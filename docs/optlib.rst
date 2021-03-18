@@ -383,11 +383,11 @@ foo.ctags:
 
 Output::
 
-	$ u-ctags --quiet --options=NONE --options=./foo.ctags -o - input.foo
+	$ u-ctags --quiet --options=./foo.ctags -o - input.foo
 	X	input.foo	/^class X$/;"	c
 	y	input.foo	/^	var y$/;"	v	class:X
 
-	$ u-ctags --quiet --options=NONE --options=./foo.ctags --extras=+q -o - input.foo
+	$ u-ctags --quiet --options=./foo.ctags --extras=+q -o - input.foo
 	X	input.foo	/^class X$/;"	c
 	X.y	input.foo	/^	var y$/;"	v	class:X
 	y	input.foo	/^	var y$/;"	v	class:X
@@ -599,7 +599,7 @@ And now using :file:`spring.ctags` the tag file has this:
 
 .. code-block:: console
 
-	$ ./ctags -o - --options=./spring.ctags input.java
+	$ ctags -o - --options=./spring.ctags input.java
 	Event-SomeEvent	input.java	/^public void catchEvent(SomeEvent e)$/;"	s	line:2	language:javaspring
 	recover-Exception	input.java	/^    recover(Exception e)$/;"	s	line:10	language:javaspring
 
@@ -1208,7 +1208,7 @@ The pattern matching is done only when the ``main`` is enabled.
 
 .. code-block:: console
 
-	$ ./ctags --options=python-main.ctags -o - --extras-Python='+{main}' input.py
+	$ ctags --options=python-main.ctags -o - --extras-Python='+{main}' input.py
 	__main__	input.py	/^if __name__ == '__main__':$/;"	f
 
 
@@ -1356,7 +1356,7 @@ defined *before* using the option. See the description of
 The roles are listed with ``--list-roles=<LANG>``. The name and description
 passed to ``--_roledef-<LANG>.<KIND>`` option are used in the output like::
 
-	$ ./ctags --langdef=FOO --kinddef-FOO=m,module,modules \
+	$ ctags --langdef=FOO --kinddef-FOO=m,module,modules \
 				--_roledef-FOO.m='imported,imported module' --list-roles=FOO
 	#KIND(L/N) NAME     ENABLED DESCRIPTION
 	m/module   imported on      imported module
@@ -1574,7 +1574,7 @@ input.c
 
 .. code-block:: console
 
-    $./ctags --options=NONE  -x --_xformat="%20N %10K %10l"  -o - input.c
+    $ ctags  -x --_xformat="%20N %10K %10l"  -o - input.c
     ctags: Notice: No options will be read from files or environment
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
@@ -1595,7 +1595,7 @@ The output is change as follows with `linux` parser:
 
 .. code-block:: console
 
-	$ ./ctags --options=NONE --options=./linux.ctags -x --_xformat="%20N %10K %10l"  -o - input.c
+	$ ctags --options=./linux.ctags -x --_xformat="%20N %10K %10l"  -o - input.c
 	ctags: Notice: No options will be read from files or environment
 		 setpriority    syscall      linux
 		set_one_prio   function          C
@@ -1614,7 +1614,7 @@ In addition you can enable/disable with the subparser usable
 
 .. code-block::console
 
-    $ ./ctags --options=NONE --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
+    $ ctags --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
     ctags: Notice: No options will be read from files or environment
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
@@ -1739,7 +1739,7 @@ Subparsers can be listed with ``--list-subparser``:
 
 .. code-block:: console
 
-    $ ./ctags --options=NONE --options=./linux.ctags --list-subparsers=C
+    $ ctags --options=./linux.ctags --list-subparsers=C
     ctags: Notice: No options will be read from files or environment
     #NAME                          BASEPARSER           DIRECTION
     linux                          C                    base => sub {shared}
