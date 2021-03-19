@@ -821,7 +821,7 @@ static void skipPast(const char *past)
 {
   /* first check for a comment line, because this would cause the isspace
    * check to fail immediately */
-  skipComments();
+  skipCommentsAndStringLiteral();
 
   /* now look for the keyword */
   while(exception != EXCEPTION_EOF && !adaCmp(past))
@@ -829,7 +829,7 @@ static void skipPast(const char *past)
     movePos(1);
 
     /* now check for comments here */
-    skipComments ();
+    skipCommentsAndStringLiteral();
   }
 } /* static void skipPast(char *past) */
 
@@ -1147,6 +1147,11 @@ static adaTokenInfo *adaParseSubprogram(adaTokenInfo *parent, adaKind kind)
       {
         /* if this is a "new" something then no need to parse */
         skipPast(";");
+      }
+      else if (line[pos] == '(')
+      {
+          /* '(' is the starter of an expression function. */
+          skipPast(";");
       }
       else
       {
