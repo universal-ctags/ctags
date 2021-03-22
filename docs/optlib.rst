@@ -1617,7 +1617,6 @@ input.c
 .. code-block:: console
 
     $ ctags  -x --_xformat="%20N %10K %10l"  -o - input.c
-    ctags: Notice: No options will be read from files or environment
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
@@ -1639,7 +1638,6 @@ The output is change as follows with `linux` parser:
 	:emphasize-lines: 2
 
 	$ ctags --options=./linux.ctags -x --_xformat="%20N %10K %10l"  -o - input.c
-	ctags: Notice: No options will be read from files or environment
 		 setpriority    syscall      linux
 		set_one_prio   function          C
 	     SYSCALL_DEFINE3   function          C
@@ -1658,7 +1656,6 @@ In addition you can enable/disable with the subparser usable
 .. code-block::console
 
     $ ctags --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
-    ctags: Notice: No options will be read from files or environment
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
@@ -1797,7 +1794,6 @@ Subparsers can be listed with ``--list-subparser``:
 .. code-block:: console
 
     $ ctags --options=./linux.ctags --list-subparsers=C
-    ctags: Notice: No options will be read from files or environment
     #NAME                          BASEPARSER           DIRECTION
     linux                          C                    base => sub {shared}
 
