@@ -115,12 +115,6 @@ The ``--mline-regex-<LANG>`` option also follows the above format. The
 experimental ``--_mtable-regex-<LANG>`` option follows a slightly
 modified version as well.
 
-The ``--langdef=<LANG>`` option also supports long flags, but not using
-forward-slash separators.
-
-.. TODO: It is obvious for --langdef option not use forward-slash separators.
-	Question to @masatake-san: Shall we remove the paragraph above?
-
 Regex control flags
 ......................................................................
 
@@ -258,6 +252,7 @@ Ghost kind in regex parser
 ......................................................................
 
 .. TODO: Q: what is the point of documenting this?
+	from comment on #2916: I must explain the ghost kind in internal.rst, not here.
 
 If a whitespace is used as a kind letter, it is never printed when
 ctags is called with ``--list-kinds`` option.  This kind is
@@ -630,7 +625,7 @@ Multiline pattern flags
 	the multi-table ``--_mtable-regex-<LANG>``.
 
 .. TODO: Q: isn't the above restriction really a bug? I think it is. I should fix it.
-   Q to @masatake-san: Do you mean that {mgroup=0} can be omitted?
+   Q to @masatake-san: Do you mean that {mgroup=0} can be omitted? -> #2918 is opened
 
 
 ``{_advanceTo=N[start|end]}``
