@@ -115,12 +115,6 @@ The ``--mline-regex-<LANG>`` option also follows the above format. The
 experimental ``--_mtable-regex-<LANG>`` option follows a slightly
 modified version as well.
 
-The ``--langdef=<LANG>`` option also supports long flags, but not using
-forward-slash separators.
-
-.. TODO: It is obvious for --langdef option not use forward-slash separators.
-	Question to @masatake-san: Shall we remove the paragraph above?
-
 Regex control flags
 ......................................................................
 
@@ -239,6 +233,7 @@ Experimental flags
 	Consider following optlib file (``foo.ctags``):
 
 	.. code-block:: ctags
+		:emphasize-lines: 4
 
 		--langdef=Foo
 		--map-Foo=+.foo
@@ -257,6 +252,7 @@ Ghost kind in regex parser
 ......................................................................
 
 .. TODO: Q: what is the point of documenting this?
+	from comment on #2916: I must explain the ghost kind in internal.rst, not here.
 
 If a whitespace is used as a kind letter, it is never printed when
 ctags is called with ``--list-kinds`` option.  This kind is
@@ -284,6 +280,7 @@ Example 1:
 		print(gaz)
 
 .. code-block:: ctags
+	:emphasize-lines: 7,8
 
 	# in /tmp/foo.ctags:
 	--langdef=Foo
@@ -313,6 +310,7 @@ Example 2:
 	}
 
 .. code-block:: ctags
+	:emphasize-lines: 7-9
 
 	# in /tmp/pp.ctags:
 	--langdef=pp
@@ -372,14 +370,15 @@ input.foo::
 foo.ctags:
 
 .. code-block:: ctags
+	:emphasize-lines: 1
 
-  --langdef=foo{_autoFQTag}
-  --map-foo=+.foo
-  --kinddef-foo=c,class,classes
-  --kinddef-foo=v,var,variables
-  --regex-foo=/class ([A-Z]*)/\1/c/{scope=push}
-  --regex-foo=/end///{placeholder}{scope=pop}
-  --regex-foo=/[ \t]*var ([a-z]*)/\1/v/{scope=ref}
+	--langdef=foo{_autoFQTag}
+	--map-foo=+.foo
+	--kinddef-foo=c,class,classes
+	--kinddef-foo=v,var,variables
+	--regex-foo=/class ([A-Z]*)/\1/c/{scope=push}
+	--regex-foo=/end///{placeholder}{scope=pop}
+	--regex-foo=/[ \t]*var ([a-z]*)/\1/v/{scope=ref}
 
 Output::
 
@@ -483,6 +482,7 @@ prefixes). ``M`` and ``N`` are language objects with ``n`` (``namespace``) kind.
 Let's change the default separator to ``->``:
 
 .. code-block:: console
+	:emphasize-lines: 1
 
 	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' input.tcl
 	::N	input.tcl	/^namespace eval N {$/;"	n
@@ -497,6 +497,7 @@ Let's change the default separator to ``->``:
 Let's define '``^``' as default prefix:
 
 .. code-block:: console
+	:emphasize-lines: 1
 
 	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' --_scopesep-Tcl='/*:^' input.tcl
 	M	input.tcl	/^	namespace eval M {$/;"	n	namespace:^N
@@ -513,9 +514,9 @@ namespace and a procedure with '``+``': (About the separator for
 combining a namespace and another namespace, ctags uses the default separator.)
 
 .. code-block:: console
+	:emphasize-lines: 1
 
-	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' --_scopesep-Tcl='/*:^' \
-				--_scopesep-Tcl='n/p:+' input.tcl
+	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' --_scopesep-Tcl='/*:^' --_scopesep-Tcl='n/p:+' input.tcl
 	M	input.tcl	/^	namespace eval M {$/;"	n	namespace:^N
 	N	input.tcl	/^namespace eval N {$/;"	n
 	^N	input.tcl	/^namespace eval N {$/;"	n
@@ -529,9 +530,9 @@ Let's override the definition of prefix for a namespace with '``@``':
 (About the prefix for procedures, ctags uses the default prefix.)
 
 .. code-block:: console
+	:emphasize-lines: 1
 
-	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' --_scopesep-Tcl='/*:^' \
-				 --_scopesep-Tcl='n/p:+' --_scopesep-Tcl='/n:@' input.tcl
+	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' --_scopesep-Tcl='/*:^' --_scopesep-Tcl='n/p:+' --_scopesep-Tcl='/n:@' input.tcl
 	@N	input.tcl	/^namespace eval N {$/;"	n
 	@N->M	input.tcl	/^	namespace eval M {$/;"	n	namespace:@N
 	@N->M+pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:@N->M
@@ -588,6 +589,7 @@ To accomplish this, the developer creates a :file:`spring.ctags` file with
 the following:
 
 .. code-block:: ctags
+	:emphasize-lines: 4
 
 	# in spring.ctags:
 	--langdef=javaspring
@@ -623,7 +625,7 @@ Multiline pattern flags
 	the multi-table ``--_mtable-regex-<LANG>``.
 
 .. TODO: Q: isn't the above restriction really a bug? I think it is. I should fix it.
-   Q to @masatake-san: Do you mean that {mgroup=0} can be omitted?
+   Q to @masatake-san: Do you mean that {mgroup=0} can be omitted? -> #2918 is opened
 
 
 ``{_advanceTo=N[start|end]}``
@@ -644,6 +646,7 @@ Multiline pattern flags
 	Consider two sets of options, ``foo.ctags`` and ``bar.ctags``.
 
 	.. code-block:: ctags
+		:emphasize-lines: 5
 
 		# foo.ctags:
 	   	--langdef=foo
@@ -653,6 +656,7 @@ Multiline pattern flags
 
 
 	.. code-block:: ctags
+		:emphasize-lines: 5
 
 		# bar.ctags:
 		--langdef=bar
@@ -816,14 +820,15 @@ with the ``--_tabledef-<LANG>=<TABLE>`` option.
 Here is the 2nd version of :file:`X.ctags` doing so:
 
 .. code-block:: ctags
+	:emphasize-lines: 5-7
 
-   --langdef=X
-   --map-X=.x
-   --kinddef-X=v,var,variables
+	--langdef=X
+	--map-X=.x
+	--kinddef-X=v,var,variables
 
-   --_tabledef-X=toplevel
-   --_tabledef-X=comment
-   --_tabledef-X=vars
+	--_tabledef-X=toplevel
+	--_tabledef-X=comment
+	--_tabledef-X=vars
 
 For table names, only characters in the range ``[0-9a-zA-Z_]`` are acceptable.
 
@@ -895,20 +900,22 @@ Skipping block comments
 Let's continue with our example. Here is the 3rd version of :file:`X.ctags`:
 
 .. code-block:: ctags
+	:emphasize-lines: 9-13
+	:linenos:
 
-   --langdef=X
-   --map-X=.x
-   --kinddef-X=v,var,variables
+	--langdef=X
+	--map-X=.x
+	--kinddef-X=v,var,variables
 
-   --_tabledef-X=toplevel
-   --_tabledef-X=comment
-   --_tabledef-X=vars
+	--_tabledef-X=toplevel
+	--_tabledef-X=comment
+	--_tabledef-X=vars
 
-   --_mtable-regex-X=toplevel/\/\*//{tenter=comment}
-   --_mtable-regex-X=toplevel/.//
+	--_mtable-regex-X=toplevel/\/\*//{tenter=comment}
+	--_mtable-regex-X=toplevel/.//
 
-   --_mtable-regex-X=comment/\*\///{tleave}
-   --_mtable-regex-X=comment/.//
+	--_mtable-regex-X=comment/\*\///{tleave}
+	--_mtable-regex-X=comment/.//
 
 Four ``--_mtable-regex-X`` lines are added for skipping the block comments. Let's
 discuss them one by one.
@@ -922,6 +929,8 @@ The first declared table (``toplevel``) has the following regex added to
 it first:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 9
 
 	--_mtable-regex-X=toplevel/\/\*//{tenter=comment}
 
@@ -958,6 +967,8 @@ begin again from the top of the first declared table.
 Getting back to our example, the top of the ``comment`` table has this regex:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 12
 
 	--_mtable-regex-X=comment/\*\///{tleave}
 
@@ -993,6 +1004,8 @@ position is a space character. So ctags tries the next pattern in the same
 table:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 13
 
 	--_mtable-regex-X=comment/.//
 
@@ -1003,6 +1016,8 @@ ctags uses next pattern again. When the current position moves to the ``*/``
 of the 3rd line of :file:`input.x`, it will finally match this:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 12
 
 	--_mtable-regex-X=comment/\*\///{tleave}
 
@@ -1017,6 +1032,8 @@ So now ctags is back to the ``toplevel`` table, and tries the first regex
 of that table, which was this:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 9
 
 	--_mtable-regex-X=toplevel/\/\*//{tenter=comment}
 
@@ -1032,6 +1049,8 @@ The first regex of the ``toplevel`` table does not match a newline, so it tries
 the second regex:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 13
 
 	--_mtable-regex-X=toplevel/.//
 
@@ -1056,6 +1075,8 @@ Capturing variables in a sequence
 Here is the 4th version of :file:`X.ctags`:
 
 .. code-block:: ctags
+	:emphasize-lines: 10,16-19
+	:linenos:
 
 	--langdef=X
 	--map-X=.x
@@ -1066,14 +1087,12 @@ Here is the 4th version of :file:`X.ctags`:
 	--_tabledef-X=vars
 
 	--_mtable-regex-X=toplevel/\/\*//{tenter=comment}
-	# NEW
 	--_mtable-regex-X=toplevel/var[ \n\t]//{tenter=vars}
 	--_mtable-regex-X=toplevel/.//
 
 	--_mtable-regex-X=comment/\*\///{tleave}
 	--_mtable-regex-X=comment/.//
 
-	# NEW
 	--_mtable-regex-X=vars/;//{tleave}
 	--_mtable-regex-X=vars/\/\*//{tenter=comment}
 	--_mtable-regex-X=vars/([a-zA-Z][a-zA-Z0-9]*)/\1/v/
@@ -1085,6 +1104,8 @@ patterns was also added.
 The new regex in ``toplevel`` is this:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 10
 
 	--_mtable-regex-X=toplevel/var[ \n\t]//{tenter=vars}
 
@@ -1103,6 +1124,8 @@ names ``a`` and ``b``, so that we know to tag each of them; and saving that
 The first regex in our new ``vars`` table is:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 16
 
 	--_mtable-regex-X=vars/;//{tleave}
 
@@ -1115,6 +1138,8 @@ last for this example to work).
 The second regex in our ``vars`` table is:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 17
 
 	--_mtable-regex-X=vars/\/\*//{tenter=comment}
 
@@ -1133,6 +1158,8 @@ pop back to the right one.
 The third regex in our ``vars`` table is:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 18
 
 	--_mtable-regex-X=vars/([a-zA-Z][a-zA-Z0-9]*)/\1/v/
 
@@ -1143,6 +1170,8 @@ captures the variable name and uses it for generating a ``variable`` (shorthand
 The last regex in the ``vars`` table we've seen before:
 
 .. code-block:: ctags
+	:linenos:
+	:lineno-start: 19
 
 	--_mtable-regex-X=vars/.//
 
@@ -1199,6 +1228,7 @@ To capture the lines above in a python program (``input.py``), an ``extra`` flag
 be used.
 
 .. code-block:: ctags
+	:emphasize-lines: 1-2
 
 	--_extradef-Python=main,__main__ entry points
 	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
@@ -1249,6 +1279,7 @@ With the following optlib file (``unknown.ctags``), ctags can attach
 ``protected`` to the field protection and ``(n)`` to the field signature.
 
 .. code-block:: ctags
+	:emphasize-lines: 5-9
 
 	--langdef=unknown
 	--kinddef-unknown=f,func,functions
@@ -1258,7 +1289,6 @@ With the following optlib file (``unknown.ctags``), ctags can attach
 	--_fielddef-unknown=signature,signatures
 
 	--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
-
 	--fields-unknown=+'{protection}{signature}'
 
 For the line ``protected func bar(n);`` you will get following tags output::
@@ -1318,6 +1348,7 @@ To make a reference tag with an optlib parser, specify a role with
 ``_role`` long regex flag. Let's see an example:
 
 .. code-block:: ctags
+	:emphasize-lines: 3-6
 
 	--langdef=FOO
 	--kinddef-FOO=m,module,modules
@@ -1377,6 +1408,7 @@ roles.
 You can implement such roles by extending the built-in C parser:
 
 .. code-block:: ctags
+	:emphasize-lines: 2-5
 
 	# c-extra.ctags
 	--_roledef-C.v=lvalue,locator values
@@ -1456,7 +1488,9 @@ the group number of a regex pattern started from '``\``' (backslash)
 	``~~~<THE_NAME_OF_LANGUAGE>``, like ``~~~C`` or ``~~~Java``.
 
 	To run a guest parser on the area, you have to capture the
-	*<THE_NAME_OF_LANGUAGE>* with a regex pattern::
+	*<THE_NAME_OF_LANGUAGE>* with a regex pattern:
+
+	.. code-block:: ctags
 
 		--_mtable-regex-Markdown=main/~~~([a-zA-Z0-9][-#+a-zA-Z0-9]*)[\n]//{_guest=\1,0end,}
 
@@ -1492,7 +1526,9 @@ the group number of a regex pattern started from '``*``' (asterisk)
 
 	To run guest parsers for the here document areas, the shell
 	script parser of ctags must choose the parsers from the file
-	names (``foo.c`` and ``foo.el``)::
+	names (``foo.c`` and ``foo.el``):
+
+	.. code-block:: ctags
 
 		--regex-sh=/cat > ([a-z.]+) <<EOF//{_guest=*1,0end,}
 
@@ -1525,6 +1561,7 @@ Let's more realistic example.
 Here is an optlib file for an imaginary language `single`:
 
 .. code-block:: ctags
+	:emphasize-lines: 3
 
 	--langdef=single
 	--map-single=.single
@@ -1575,28 +1612,27 @@ input.c
 .. code-block:: console
 
     $ ctags  -x --_xformat="%20N %10K %10l"  -o - input.c
-    ctags: Notice: No options will be read from files or environment
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
 C parser doesn't understand that ``SYSCALL_DEFINE3`` is a macro for defining an
 entry point for a system.
 
-Let's define `linux` subparser which using C parser as a base parser:
+Let's define `linux` subparser which using C parser as a base parser (``linux.ctags``):
 
-.. code-block:: console
+.. code-block:: ctags
+	:emphasize-lines: 1,3
 
-    $ cat linux.ctags
-    --langdef=linux{base=C}
-    --kinddef-linux=s,syscall,system calls
-    --regex-linux=/SYSCALL_DEFINE[0-9]\(([^, )]+)[\),]*/\1/s/
+	--langdef=linux{base=C}
+	--kinddef-linux=s,syscall,system calls
+	--regex-linux=/SYSCALL_DEFINE[0-9]\(([^, )]+)[\),]*/\1/s/
 
 The output is change as follows with `linux` parser:
 
 .. code-block:: console
+	:emphasize-lines: 2
 
 	$ ctags --options=./linux.ctags -x --_xformat="%20N %10K %10l"  -o - input.c
-	ctags: Notice: No options will be read from files or environment
 		 setpriority    syscall      linux
 		set_one_prio   function          C
 	     SYSCALL_DEFINE3   function          C
@@ -1615,7 +1651,6 @@ In addition you can enable/disable with the subparser usable
 .. code-block::console
 
     $ ctags --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
-    ctags: Notice: No options will be read from files or environment
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
@@ -1647,10 +1682,10 @@ github Universal Ctags repository.
 ``input.cc`` and ``input.mojom`` are input files, and have the same
 contents::
 
-     ABC();
-    int main(void)
-    {
-    }
+	ABC();
+	int main(void)
+	{
+	}
 
 C++ parser can capture ``main`` as a function. `Mojom` subparser defined in the
 later runs on C++ parser and is for capturing ``ABC``.
@@ -1664,20 +1699,25 @@ tags captured by mojom parser are recorded to tags file.
 mojom-shared.ctags:
 
 .. code-block:: ctags
+	:emphasize-lines: 1
 
-    --langdef=mojom{base=C++}{shared}
-    --map-mojom=+.mojom
-    --kinddef-mojom=f,function,functions
-    --regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
+	--langdef=mojom{base=C++}{shared}
+	--map-mojom=+.mojom
+	--kinddef-mojom=f,function,functions
+	--regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-tags for ``input.cc``::
+.. code-block:: ctags
+	:emphasize-lines: 2
 
-    ABC	input.cc	/^ ABC();$/;"	f	language:mojom
-    main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+	$ ctags --options=mojom-shared.ctags --fields=+l -o - input.cc
+	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
+	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-tags for ``input.mojom``::
+.. code-block:: ctags
+	:emphasize-lines: 2
 
-  ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
+	$ ctags --options=mojom-shared.ctags --fields=+l -o - input.mojom
+	ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
 
 Mojom parser uses C++ parser internally but tags captured by C++ parser are
 dropped in the output.
@@ -1691,20 +1731,24 @@ by C++ parser and mojom parser are recorded to tags file.
 mojom-dedicated.ctags:
 
 .. code-block:: ctags
+	:emphasize-lines: 1
 
-    --langdef=mojom{base=C++}{dedicated}
-    --map-mojom=+.mojom
-    --kinddef-mojom=f,function,functions
-    --regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
+	--langdef=mojom{base=C++}{dedicated}
+	--map-mojom=+.mojom
+	--kinddef-mojom=f,function,functions
+	--regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-tags for ``input.cc``::
+.. code-block:: ctags
 
-    main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+	$ ctags --options=mojom-dedicated.ctags --fields=+l -o - input.cc
+	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-tags for ``input.mojom``::
+.. code-block:: ctags
+	:emphasize-lines: 2-3
 
-    ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
-    main	input.mojom	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+	$ ctags --options=mojom-dedicated.ctags --fields=+l -o - input.mojom
+	ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
+	main	input.mojom	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
 Mojom parser works only when ``.mojom`` file is given as input.
 
@@ -1717,21 +1761,26 @@ mojom parser are recorded to tags file for either input ``input.cc`` and
 mojom-bidirectional.ctags:
 
 .. code-block:: ctags
+	:emphasize-lines: 1
 
-    --langdef=mojom{base=C++}{bidirectional}
-    --map-mojom=+.mojom
-    --kinddef-mojom=f,function,functions
-    --regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
+	--langdef=mojom{base=C++}{bidirectional}
+	--map-mojom=+.mojom
+	--kinddef-mojom=f,function,functions
+	--regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-tags for ``input.cc``::
+.. code-block:: ctags
+	:emphasize-lines: 2
 
-    ABC	input.cc	/^ ABC();$/;"	f	language:mojom
-    main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+	$ ctags --options=mojom-bidirectional.ctags --fields=+l -o - input.cc
+	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
+	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-tags for ``input.mojom``::
+.. code-block:: ctags
+	:emphasize-lines: 2-3
 
-    ABC	input.cc	/^ ABC();$/;"	f	language:mojom
-    main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+	$ ctags --options=mojom-bidirectional.ctags --fields=+l -o - input.mojom
+	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
+	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
 Listing subparsers
 .........................................................................
@@ -1740,7 +1789,6 @@ Subparsers can be listed with ``--list-subparser``:
 .. code-block:: console
 
     $ ctags --options=./linux.ctags --list-subparsers=C
-    ctags: Notice: No options will be read from files or environment
     #NAME                          BASEPARSER           DIRECTION
     linux                          C                    base => sub {shared}
 

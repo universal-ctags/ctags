@@ -999,6 +999,8 @@ Language Specific Options
 
 	Available parameters can be listed with ``--list-params``.
 
+.. _option_listing:
+
 Listing Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--list-aliases[=(<language>|all)]``
