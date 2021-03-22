@@ -104,7 +104,7 @@ extensions and patterns.
 
 ``--langmap`` maps specs to languages exclusively::
 
-  $ ./ctags --langdef=FOO --langmap=FOO:+.ABC \
+  $ ctags --langdef=FOO --langmap=FOO:+.ABC \
 	    --langdef=BAR --langmap=BAR:+.ABC  \
 	    --list-maps | grep '\*.ABC$'
   BAR      *.ABC
@@ -120,7 +120,7 @@ variety of internal guessing strategies (see :ref:`Determining file language
 Let's see how specs can be mapped non-exclusively with
 ``--map-<LANG>``::
 
-    % ./ctags --langdef=FOO --map-FOO=+.ABC \
+    $ ctags --langdef=FOO --map-FOO=+.ABC \
 	      --langdef=BAR --map-BAR=+.ABC \
 	      --list-maps | grep '\*.ABC$'
     FOO      *.ABC
@@ -130,17 +130,17 @@ Both `FOO` and `BAR` are registered as handlers for the spec `*.ABC`.
 
 ``--map-<LANG>`` can also be used for removing a langmap entry.::
 
-    $ ./ctags --langdef=FOO --map-FOO=+.ABC \
+    $ ctags --langdef=FOO --map-FOO=+.ABC \
 	      --langdef=BAR --map-BAR=+.ABC \
 	      --map-FOO=-.ABC --list-maps | grep '\*.ABC$'
     BAR      *.ABC
 
-    $ ./ctags --langdef=FOO --map-FOO=+.ABC \
+    $ ctags --langdef=FOO --map-FOO=+.ABC \
 	      --langdef=BAR --map-BAR=+.ABC \
 	      --map-BAR=-.ABC --list-maps | grep '\*.ABC$'
     FOO      *.ABC
 
-    $./ctags --langdef=FOO --map-FOO=+.ABC \
+    $ ctags --langdef=FOO --map-FOO=+.ABC \
 	     --langdef=BAR --map-BAR=+.ABC \
 	     --map-BAR=-.ABC --map-FOO=-.ABC  --list-maps | grep '\*.ABC$'
     (NOTHING)
@@ -173,7 +173,7 @@ options, ``--kind-<LANG>=``, ``--fields=``, or ``--extras=``.
 
 .. code-block:: console
 
-	$ ./ctags --kinds-C=+L-d ...
+	$ ctags --kinds-C=+L-d ...
 
 This command line uses the letters, `L` for enabling the label kind
 and `d` for disabling the macro kind of C. The command line can be
@@ -181,7 +181,7 @@ rewritten with the associated names.
 
 .. code-block:: console
 
-	$ ./ctags --kinds-C='+{label}-{macro}' ...
+	$ ctags --kinds-C='+{label}-{macro}' ...
 
 The quotes are needed because braces are interpreted as meta
 characters by the shell.

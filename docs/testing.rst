@@ -395,7 +395,7 @@ be obtained with following command line
 
 ::
 
-	$ ./ctags --list-languages
+	$ ctags --list-languages
 
 Besides ``LANGUAGES`` and ``TIMEOUT``, fuzz target also takes the
 following parameters:

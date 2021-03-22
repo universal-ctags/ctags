@@ -10,13 +10,13 @@ Input text stream
 	    :scale: 80%
 
 Function prototypes for handling input text stream are declared in
-main/read.h. The file exists in Exuberant Ctags, too.  However, the
+``main/read.h``. The file exists in Exuberant Ctags, too.  However, the
 names functions are changed when overhauling ``--line-directive``
 option. (In addition macros were converted to functions for making
 data structures for the input text stream opaque.)
 
-Ctags has 3 groups of functions for handling input: input, bypass, and
-raw. Parser developers should use input group. The rest of two
+Ctags has 3 groups of functions for handling input: *input*, *bypass*, and
+*raw*. Parser developers should use input group. The rest of two
 are for ctags main part.
 
 
@@ -25,32 +25,32 @@ are for ctags main part.
 `inputFile` type and the functions of input group
 ......................................................................
 
-(The original version of this sub sub sub section was written
- before `inputFile` type and `File` variable are made private. )
+.. note:: The original version of this section was written
+	before ``inputFile`` type and ``File`` variable are made private.
 
-`inputFile` is the type for representing the input file and stream for
-a parser. It was declared in main/read.h but now it is defined in
-main/read.c.
+``inputFile`` is the type for representing the input file and stream for
+a parser. It was declared in ``main/read.h`` but now it is defined in
+``main/read.c``.
 
-Ctags uses a file static variable `File` having type `inputFile` for
-maintaining the input file and stream. `File` is also defined in
-main/read.c as `inputFile` is.
+Ctags uses a file static variable ``File`` having type ``inputFile`` for
+maintaining the input file and stream. ``File`` is also defined in
+main/read.c as ``inputFile`` is.
 
-`fp` and `line` are the essential fields of `File`. `fp` having type
-well known `MIO` declared in main/mio.h. By calling functions of input group
-(`getcFromInputFile` and `readLineFromInputFile`), a parser gets input
-text from `fp`.
+``fp`` and ``line`` are the essential fields of ``File``. ``fp`` having type
+well known ``MIO`` declared in ``main/mio.h``. By calling functions of input group
+(``getcFromInputFile`` and ``readLineFromInputFile``), a parser gets input
+text from ``fp``.
 
-The functions of input group updates fields `input` and `source` of `File`
-These two fields has type `inputFileInfo`. These two fields are for mainly
+The functions of input group updates fields ``input`` and ``source`` of ``File`` variable.
+These two fields has type ``inputFileInfo``. These two fields are for mainly
 tracking the name of file and the current line number. Usually ctags uses
-only `input` field. `source` is used only when `#line` directive is found
+only ``input`` field. ``source`` field is used only when ``#line`` directive is found
 in the current input text stream.
 
 A case when a tool generates the input file from another file, a tool
 can record the original source file to the generated file with using
-the `#line` directive. `source` is used for tracking/recording the
-information appeared on #line directives.
+the ``#line`` directive. ``source`` field is used for tracking/recording the
+information appeared on ``#line`` directives.
 
 Regex pattern matching are also done behind calling the functions of
 this group.
@@ -58,10 +58,10 @@ this group.
 
 The functions of bypass group
 ......................................................................
-The functions of bypass group (`readLineFromBypass` and
-`readLineFromBypassSlow`) are used for reading text from `fp` field of
-`File` static variable without updating `input` and `source` fields of
-`File`.
+The functions of bypass group (``readLineFromBypass`` and
+``readLineFromBypassSlow``) are used for reading text from ``fp`` field of
+``File`` static variable without updating ``input`` and ``source`` fields of
+``File`` variable.
 
 
 Parsers may not need the functions of this group.  The functions are
@@ -71,26 +71,27 @@ fields of tags file, for example.
 
 The functions of raw group
 ......................................................................
-The functions of this group(`readLineRaw` and `readLineRawWithNoSeek`)
-take a parameter having type `MIO`; and don't touch `File` static
+The functions of this group (``readLineRaw`` and ``readLineRawWithNoSeek``)
+take a parameter having type ``MIO``; and don't touch ``File`` static
 variable.
 
 Parsers may not need the functions of this group.  The functions are
 used in ctags main part. The functions are used to load option files,
 for example.
 
+.. TODO: move promise API to "API for running a parser in an area"
 
 .. _promiseAPI:
 
 promise API
 ......................................................................
-(Currently the tagging via promise API is disabled by default.
-Use `--extras=+g` option for enabling it.)
+.. note:: Currently the tagging via promise API is disabled by default.
+	Use ``--extras=+g`` option for enabling it.
 
 Background and Idea
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 More than one programming languages can be used in one input text stream.
-promise API allows a host parser running a guest parser in the specified
+*promise API* allows a host parser running a guest parser in the specified
 area of input text stream.
 
 e.g. Code written in c language (C code) is embedded
@@ -129,32 +130,33 @@ input stream.
 	return 1;
     }
 
-In the input the area started from `%{` to `%}` and the area started from
-the second `%%` to the end of file are written in C. Yacc can be called
-host language, and C can be called guest language.
+In the input the area started from ``%{`` to ``%}`` and the area started from
+the second ``%%`` to the end of file are written in C. Yacc can be called
+*host language*, and C can be called *guest language*.
 
 Ctags may choose the Yacc parser for the input. However, the parser
 doesn't know about C syntax. Implementing C parser in the Yacc parser
 is one of approach. However, ctags has already C parser.  The Yacc
 parser should utilize the existing C parser. The promise API allows this.
 
-More examples are in :ref:`Applying a parser to specified areas of input file <host-guest-parsers>`.
+More examples are in ":ref:`Applying a parser to specified areas of input file <host-guest-parsers>`".
 
 
 Usage
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-See a commit titled with "Yacc: run C parser in the areas where code
-is written in C".  I applied promise API to the Yacc parser.
+See a commit titled with "`Yacc: run C parser in the areas where code
+is written in C <https://github.com/universal-ctags/ctags/commit/757673f>`_".
+I applied promise API to the Yacc parser.
 
-The parser for host language must track and record the `start` and the
-`end` of a guest language. Pairs of `line number` and `byte offset`
-represents the `start` and `end`. When the `start` and `end` are
-fixed, call `makePromise` with (1) the guest parser name, (2) start,
-and (3) end. (This description is a bit simplified the real usage.)
+The parser for host language must track and record the ``start`` and the
+``end`` of a guest language. Pairs of ``line number`` and ``byte offset``
+represents the ``start`` and ``end``. When the ``start`` and ``end`` are
+fixed, call ``makePromise`` with (1) the guest parser name, (2) ``start``,
+and (3) ``end``. (This description is a bit simplified the real usage.)
 
 
-Let's see the actual code from parsers/yacc.c.
+Let's see the actual code from ``parsers/yacc.c``.
 
 .. code-block:: c
 
@@ -163,13 +165,13 @@ Let's see the actual code from parsers/yacc.c.
 		unsigned long source;
 	};
 
-Both fields are for recording `start`. `input` field
-is for recording the value returned from `getInputLineNumber`.
-`source` is for `getSourceLineNumber`. See `inputFile`_ for the
+Both fields are for recording ``start``. ``input`` field
+is for recording the value returned from ``getInputLineNumber``.
+``source`` is for ``getSourceLineNumber``. See "`inputFile`_" for the
 difference of the two.
 
-`enter_c_prologue` shown in the next is a function called when `%{` is
-found in the current input text stream. Remember, in yacc syntax, `%{`
+``enter_c_prologue`` shown in the next is a function called when ``%{`` is
+found in the current input text stream. Remember, in yacc syntax, ``%{``
 is a marker of C code area.
 
 .. code-block:: c
@@ -189,11 +191,11 @@ is a marker of C code area.
 
 
 The function just records the start line.  It calls
-`readLineFromInputFile` because the C code may start the next line of
+``readLineFromInputFile`` because the C code may start the next line of
 the line where the marker is.
 
-`leave_c_prologue` shown in the next is a function called when `%}`,
-the end marker of C code area is found in the current input text stream.
+``leave_c_prologue`` shown in the next is a function called when ``%}``,
+the end marker of C code area, is found in the current input text stream.
 
 .. code-block:: c
 
@@ -210,17 +212,17 @@ the end marker of C code area is found in the current input text stream.
     }
 
 After recording the line number of the end of the C code area,
-`leave_c_prologue` calls `makePromise`.
+``leave_c_prologue`` calls ``makePromise``.
 
-Of course "C" stands for C language, the name of guest parser.
+Of course ``"C"`` stands for C language, the name of guest parser.
 Available parser names can be listed by running ctags with
-`--list-languages` option. In this example two `0` characters are provided as
+``--list-languages`` option. In this example two ``0`` characters are provided as
 the 3rd and 5th argument. They are byte offsets of the start and the end of the
 C language area from the beginning of the line which is 0 in this case. In
 general, the guest language's section does not have to start at the beginning of
 the line in which case the two offsets have to be provided. Compilers reading
 the input character by character can obtain the current offset by calling
-`getInputLineOffset()`.
+``getInputLineOffset()``.
 
 Internal design
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -230,8 +232,8 @@ Internal design
 
 A host parser cannot run a guest parser directly. What the host parser
 can do is just asking the ctags main part scheduling of running the
-guest parser for specified area which defined with the `start` and
-`end`. These scheduling requests are called promises.
+guest parser for specified area which defined with the ``start`` and
+``end``. These scheduling requests are called *promises*.
 
 After running the host parser, before closing the input stream, the
 ctags main part checks the existence of promise(s). If there is, the
@@ -287,16 +289,16 @@ Output tag stream
 .. figure:: output-tag-stream.svg
 	    :scale: 80%
 
-Ctags provides `makeTagEntry` to parsers as an entry point for writing
-tag information to MIO. `makeTagEntry` calls `writeTagEntry` if the
-parser does not set `useCork` field. `writeTagEntry` calls `writerWriteTag`.
-`writerWriteTag` just calls `writeEntry` of writer backends.
-`writerTable` variable holds the four backends: ctagsWriter, etagsWriter,
+Ctags provides ``makeTagEntry`` to parsers as an entry point for writing
+tag information to MIO. ``makeTagEntry`` calls ``writeTagEntry`` if the
+parser does not set ``useCork`` field. ``writeTagEntry`` calls ``writerWriteTag``.
+``writerWriteTag`` just calls ``writeEntry`` of writer backends.
+``writerTable`` variable holds the four backends: ctagsWriter, etagsWriter,
 xrefWriter, and jsonWriter.
 One of them is chosen depending on the arguments passed to ctags.
 
-If `useCork` is set, the tag information goes to a queue on memory.
-The queue is flushed when `useCork` in unset. See `cork API` for more
+If ``useCork`` is set, the tag information goes to a queue on memory.
+The queue is flushed when ``useCork`` in unset. See "`cork API`_" for more
 details.
 
 cork API
@@ -304,11 +306,11 @@ cork API
 
 Background and Idea
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-cork API is introduced for recording scope information easier.
+*cork API* is introduced for recording scope information easier.
 
-Before introducing cork, a scope information must be recorded as
+Before introducing cork API, a scope information must be recorded as
 strings. It is flexible but memory management is required.
-Following code is taken from clojure.c(with modifications).
+Following code is taken from ``clojure.c`` (with some modifications).
 
 .. code-block:: c
 
@@ -320,30 +322,31 @@ Following code is taken from clojure.c(with modifications).
 
 		makeTagEntry (&current);
 
-`parent`, values stored to `scope [0]` and `scope [1]` are all
-kind of strings.
+``parent``, ``scope [0]`` and ``scope [1]`` are vStrings. The parser must manage
+their life cycles; the parser cannot free them till the tag referring them via
+its scope fields are emitted, and must free them after emitting.
 
 cork API provides more solid way to hold scope information. cork API
-expects `parent`, which represents scope of a tag(`current`)
+expects ``parent``, which represents scope of a tag(``current``)
 currently parser dealing, is recorded to a *tags* file before recording
-the `current` tag via `makeTagEntry` function.
+the ``current`` tag via ``makeTagEntry`` function.
 
-For passing the information about `parent` to `makeTagEntry`,
-`tagEntryInfo` object was created. It was used just for recording; and
+For passing the information about ``parent`` to ``makeTagEntry``,
+``tagEntryInfo`` object was created. It was used just for recording; and
 freed after recording.  In cork API, it is not freed after recording;
 a parser can reused it as scope information.
 
 How to use
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-See a commit titled with "clojure: use cork". I applied cork
-API to the clojure parser.
+See a commit titled with "`clojure: use cork <https://github.com/universal-ctags/ctags/commit/ef181e6>`_".
+I applied cork API to the clojure parser.
 
-cork can be enabled and disabled per parser.
-cork is disabled by default. So there is no impact till you
+Cork API can be enabled and disabled per parser,
+and is disabled by default. So there is no impact till you
 enables it in your parser.
 
-`useCork` field is introduced in `parserDefinition` type:
+``useCork`` field is introduced in ``parserDefinition`` type:
 
 .. code-block:: c
 
@@ -353,7 +356,7 @@ enables it in your parser.
 		...
 		} parserDefinition;
 
-Set `CORK_QUEUE` to `useCork` like:
+Set ``CORK_QUEUE`` to ``useCork`` like:
 
 .. code-block:: c
 
@@ -366,13 +369,13 @@ Set `CORK_QUEUE` to `useCork` like:
 	    return def;
     }
 
-When ctags running a parser with `useCork` being `CORK_QUEUE`, all output
-requested via `makeTagEntry` function calling is stored to an internal
-queue, not to `tags` file.  When parsing an input file is done, the
+When ctags running a parser with ``useCork`` being ``CORK_QUEUE``, all output
+requested via ``makeTagEntry`` function calling is stored to an internal
+queue, not to ``tags`` file.  When parsing an input file is done, the
 tag information stored automatically to the queue are flushed to
-`tags` file in batch.
+``tags`` file in batch.
 
-When calling `makeTagEntry` with a `tagEntryInfo` object(`parent`),
+When calling ``makeTagEntry`` with a ``tagEntryInfo`` object (``parent``),
 it returns an integer. The integer can be used as handle for referring
 the object after calling.
 
@@ -383,31 +386,31 @@ the object after calling.
 		...
 		parent = makeTagEntry (&e);
 
-The handle can be used by setting to a `scopeIndex`
-field of `current` tag, which is in the scope of `parent`.
+The handle can be used by setting to a ``scopeIndex``
+field of ``current`` tag, which is in the scope of ``parent``.
 
 .. code-block:: c
 
 		current.extensionFields.scopeIndex = parent;
 
-When passing `current` to `makeTagEntry`, the `scopeIndex` is
-refereed for emitting the scope information of `current`.
+When passing ``current`` to ``makeTagEntry``, the ``scopeIndex`` is
+referred for emitting the scope information of ``current``.
 
-`scopeIndex` must be set to `CORK_NIL` if a tag is not in any scope.
-When using `scopeIndex` of `current`, `NULL` must be assigned to both
-`current.extensionFields.scope[0]` and
-`current.extensionFields.scope[1]`.  `initTagEntry` function does this
+``scopeIndex`` must be set to ``CORK_NIL`` if a tag is not in any scope.
+When using ``scopeIndex`` of ``current``, ``NULL`` must be assigned to both
+``current.extensionFields.scope[0]`` and
+``current.extensionFields.scope[1]``.  ``initTagEntry`` function does this
 initialization internally, so you generally you don't have to write
 the initialization explicitly.
 
 Automatic full qualified tag generation
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-If a parser uses the cork for recording and emitting scope
-information, ctags can reuse it for generating full qualified(FQ)
-tags. Set `requestAutomaticFQTag` field of `parserDefinition` to
-`TRUE` then the main part of ctags emits FQ tags on behalf of the parser
-if `--extras=+q` is given.
+If a parser uses the cork API for recording and emitting scope
+information, ctags can reuse it for generating *full qualified (FQ)
+tags*. Set ``requestAutomaticFQTag`` field of ``parserDefinition`` to
+``TRUE`` then the main part of ctags emits FQ tags on behalf of the parser
+if ``--extras=+q`` is given.
 
 An example can be found in DTS parser:
 
@@ -422,13 +425,13 @@ An example can be found in DTS parser:
 	    return def;
     }
 
-Setting `requestAutomaticFQTag` to `TRUE` implies setting
-`useCork` to `CORK_QUEUE`.
+Setting ``requestAutomaticFQTag`` to ``TRUE`` implies setting
+``useCork`` to ``CORK_QUEUE``.
 
 PackCC compiler-compiler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PackCC is a compiler-compiler; it translates .peg grammar file to .c
+PackCC is a compiler-compiler; it translates ``.peg`` grammar file to ``.c``
 file.  PackCC was originally written by Arihiro Yoshida. Its source
 repository is at sourceforge. It seems that PackCC at sourceforge is
 not actively maintained. Some derived repositories are at
@@ -436,7 +439,7 @@ github. Currently, our choice is
 https://github.com/enechaev/packcc. It is the most active one in the
 derived repositories.
 
-The source tree of PackCC is grafted at misc/packcc directory.
+The source tree of PackCC is grafted at ``misc/packcc`` directory.
 Building PackCC and ctags are integrated in the build-scripts of
 Universal Ctags.
 

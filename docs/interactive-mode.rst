@@ -14,7 +14,7 @@ at build-time. If it's supported it will be listed in the output of ``--list-fea
 
 .. code-block:: console
 
-	$ ./ctags --list-features | grep json
+	$ ctags --list-features | grep json
 	json
 
 Communication with Universal Ctags over stdio uses the `json lines`_ format, where each
@@ -90,7 +90,7 @@ built with seccomp support, ``sandbox`` is listed in the output of
 
 .. code-block:: console
 
-	$ ./ctags --list-features | grep sandbox
+	$ ctags --list-features | grep sandbox
 	sandbox
 
 .. code-block:: console

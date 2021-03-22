@@ -4,24 +4,24 @@
 Writing a parser in C
 =============================================================================
 
-The section is based on the section "Integrating a new language parser" in `How
+The section is based on the section "Integrating a new language parser" in "`How
 to Add Support for a New Language to Exuberant Ctags (EXTENDING)
-<http://ctags.sourceforge.net/EXTENDING.html>`_ of Exuberant Ctags documents.
+<http://ctags.sourceforge.net/EXTENDING.html>`_" of Exuberant Ctags documents.
 
 Now suppose that I want to truly integrate compiled-in support for Swine into
 ctags.
 
 Registering a parser
 -------------------------------------------------
-First, I create a new module, swine.c, and add one externally visible function
-to it, extern parserDefinition ``*SwineParser(void)``, and add its name to the
+First, I create a new module, ``swine.c``, and add one externally visible function
+to it, ``extern parserDefinition *SwineParser(void)``, and add its name to the
 table in ``parsers.h``. The job of this parser definition function is to create
-an instance of the parserDefinition structure (using ``parserNew()``) and
+an instance of the ``parserDefinition`` structure (using ``parserNew()``) and
 populate it with information defining how files of this language are recognized,
 what kinds of tags it can locate, and the function used to invoke the parser on
 the currently open file.
 
-The structure parserDefinition allows assignment of the following fields:
+The structure ``parserDefinition`` allows assignment of the following fields:
 
 .. code-block:: c
 
@@ -54,7 +54,7 @@ parser should read the file stream using using one of the two I/O interfaces:
 either the character-oriented ``getcFromInputFile()``, or the line-oriented
 ``readLineFromInputFile()``.
 
-See :ref:`input-text-stream` for more details.
+See ":ref:`input-text-stream`" for more details.
 
 Parsing
 -------------------------------------------------
@@ -73,7 +73,7 @@ beginning of the line. After filling in information defining the current entry
 (and possibly overriding the file position or other defaults), the parser passes
 this structure to ``makeTagEntry()``.
 
-See :ref:`output-tag-stream` for more details.
+See ":ref:`output-tag-stream`" for more details.
 
 Adding the parser to ``ctags``
 -------------------------------------------------
@@ -87,7 +87,7 @@ This is all there is to it. All other details are specific to the parser and how
 it wants to do its job.
 
 There are some support functions which can take care of some commonly needed
-parsing tasks, such as keyword table lookups (see ``main/keyword.c``), which you
+parsing tasks, such as *keyword table lookups* (see ``main/keyword.c``), which you
 can make use of if desired (examples of its use can be found in ``parsers/c.c``,
 ``parsers/eiffel.c``, and ``parsers/fortran.c``).
 
