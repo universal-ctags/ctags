@@ -642,6 +642,10 @@ static void movePos(int amount)
    strncasecmp(&(buf)[(pos)], "--", strlen("--")) == 0)
 #define isAdaStringLiteral(buf, pos, len) \
   (((pos) < (len)) && ((buf)[(pos)] == '"'))
+#define isAdaCharLiteral(buf, pos, len) \
+  (((pos) < (len - 2)) && ((buf)[(pos)] == '\'') \
+   && ((buf)[(pos + 2)] == '\''))
+
 
 static bool cmp(const char *buf, int len, const char *match)
 {
@@ -789,8 +793,8 @@ static void skipComments(void)
   }
 }
 
-/* Return true if skipped over a string literal.
- * Return false if no string literal is found. */
+/* Return true if skipped over a string literal (or char literal).
+ * Return false if no string literal (nor char literal) is found. */
 static bool skipStringLiteral(void)
 {
   if (exception != EXCEPTION_EOF && isAdaStringLiteral(line, pos, lineLen))
@@ -802,6 +806,9 @@ static bool skipStringLiteral(void)
     /* Go to the next char of " */
     movePos(1);
 
+    return true;
+  } else if (exception != EXCEPTION_EOF && isAdaCharLiteral(line, pos, lineLen)) {
+    movePos(3);
     return true;
   }
   return false;
