@@ -19,4 +19,3 @@ See :ref:`ctags-optlib(7) <ctags-optlib(7)>` and :ref:`optlib` for details.
 
 	parser-in-c.rst
 	internal.rst
-	running-multi-parsers.rst

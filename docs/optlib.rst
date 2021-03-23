@@ -1782,15 +1782,6 @@ mojom-bidirectional.ctags:
 	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-Listing subparsers
-.........................................................................
-Subparsers can be listed with ``--list-subparser``:
-
-.. code-block:: console
-
-    $ ctags --options=./linux.ctags --list-subparsers=C
-    #NAME                          BASEPARSER           DIRECTION
-    linux                          C                    base => sub {shared}
 
 .. _optlib2c:
 
