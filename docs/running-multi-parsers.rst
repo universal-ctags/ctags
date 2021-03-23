@@ -73,20 +73,6 @@ The Perl parser recognizes the area where Pod document is
 embedded in a Perl script and schedules applying pod parser
 as a guest parser on the area.
 
-
-API for running a parser in an area
-......................................................................
-
-:ref:`promise API <promiseAPI>` can be used.
-A host parser using the interface has responsibility to detect areas
-from input stream and record them with name of guest parsers that will
-be applied to the areas.
-
-Running guest parsers from an optlib based host parser
-......................................................................
-
-See ":ref:`Running a guest parser with guest regex flag <guest-regex-flag>`".
-
 .. _base-sub-parsers:
 
 Tagging definitions of higher (upper) level language (sub/base)
