@@ -1654,28 +1654,16 @@ In addition you can enable/disable with the subparser usable
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
-Directions
+.. _optlib_directions:
+
+Direction flags
 .........................................................................
 
-As explained in ":ref:`Tagging definitions of higher(upper) level language (sub/base) <base-sub-parsers>`",
-you can choose direction(s) how a base parser and a guest parser work together with
-long flags putting after ``--langdef=Foo{base=Bar}``.
+As explained in ":ref:`multiple_parsers_directions`" in
+":ref:`multiple_parsers`", you can choose direction(s) how a base parser and a
+guest parser work together with direction flags.
 
-========================  ======================
-C level notation          Command line long flag
-========================  ======================
-SUBPARSER_BASE_RUNS_SUB   shared (default)
-SUBPARSER_SUB_RUNS_BASE   dedicated
-SUBPARSER_BI_DIRECTION    bidirectional
-========================  ======================
-
-``{shared}`` is the default behavior. If none of ``{shared}``, ``{dedicated}``, nor
-``{bidirectional}`` is specified, it implies ``{shared}``.
-
-Let's see actual difference of behaviors.
-
-
-The examples are taken from `#1409
+The following examples are taken from `#1409
 <https://github.com/universal-ctags/ctags/issues/1409>`_ submitted by @sgraham on
 github Universal Ctags repository.
 

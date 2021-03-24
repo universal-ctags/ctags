@@ -495,8 +495,20 @@ Here the source code of Autoconf/m4 parsers is referred as an example.
 
 A subparser must fill the fields of ``subparser``.
 
-``direction`` field specifies how the subparser is called.  If a
-subparser runs exclusively and is chosen in top down way, set
+``direction`` field specifies how the subparser is called. See
+":ref:`multiple_parsers_directions`" in ":ref:`multiple_parsers`" about
+*direction flags*, and see ":ref:`optlib_directions`" in ":ref:`optlib`" for
+examples of using the direction flags.
+
+===========================  ======================
+``direction`` field          Direction Flag
+===========================  ======================
+``SUBPARSER_BASE_RUNS_SUB``  ``shared`` (default)
+``SUBPARSER_SUB_RUNS_BASE``  ``dedicated``
+``SUBPARSER_BI_DIRECTION``   ``bidirectional``
+===========================  ======================
+
+If a subparser runs exclusively and is chosen in top down way, set
 ``SUBPARSER_SUB_RUNS_BASE`` flag. If a subparser runs coexisting way and
 is chosen in bottom up way, set ``SUBPARSER_BASE_RUNS_SUB``.  Use
 ``SUBPARSER_BI_DIRECTION`` if both cases can be considered.

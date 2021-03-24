@@ -1,5 +1,7 @@
 .. NOT REVIEWED YET
 
+.. _multiple_parsers:
+
 Running multiple parsers on an input file
 ---------------------------------------------------------------------
 
@@ -245,12 +247,61 @@ chosen (bottom up choice).
 Some subparsers can be chosen both top down and bottom up ways. Some
 subparser can be chosen only top down way or bottom up ways.
 
+.. _multiple_parsers_directions:
 
-Exclusive subparser and coexisting subparser
+Direction flags
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-TBW. This must be filled when I implement python-celery parser.
+*Direction flags* specify how a base parser and a subparser work together. You
+can choose directions by putting a long flag after
+``--langdef=<SUB_LANG>{base=<BASE_LANG>}``.
 
+The following three direction flags are available;
+
+``shared`` (default):
+	For an input file of *<BASE_LANG>* (ex. ``input.base``), tags captured by
+	both *<BASE_LANG>* and *<SUB_LANG>* parser are recorded to tags file.
+
+	For an input file of *<SUB_LANG>* (ex. ``input.sub``), tags captured by only
+	*<SUB_LANG>* parser are recorded to tags file.
+
+	=============== ===================== ======================
+	input file      tags of *<BASE_LANG>* tags of *<SUB_LANG>*
+	=============== ===================== ======================
+	``input.base``  recorded              recorded
+	``input.sub``   ---                   recorded
+	=============== ===================== ======================
+
+``dedicated``:
+	For an input file of *<BASE_LANG>* (ex. ``input.base``), tags captured by
+	only *<BASE_LANG>* parser are recorded to tags file.
+
+	For an input file of *<SUB_LANG>* (ex. ``input.sub``), tags captured by both
+	*<BASE_LANG>* and *<SUB_LANG>* parser are recorded to tags file.
+
+	=============== ===================== ======================
+	input file      tags of *<BASE_LANG>* tags of *<SUB_LANG>*
+	=============== ===================== ======================
+	``input.base``  recorded              ---
+	``input.sub``   recorded              recorded
+	=============== ===================== ======================
+
+``bidirectional``:
+	For an input file of both *<BASE_LANG>* (ex. ``input.base``) and
+	*<SUB_LANG>* (ex. ``input.sub``), tags captured by both *<BASE_LANG>* and
+	<SUB_LANG> parser are recorded to tags file.
+
+	=============== ===================== ======================
+	input file      tags of *<BASE_LANG>* tags of *<SUB_LANG>*
+	=============== ===================== ======================
+	``input.base``  recorded              recorded
+	``input.sub``   recorded              recorded
+	=============== ===================== ======================
+
+If no direction flag is specified, it implies ``{shared}``.
+
+See ":ref:`optlib_directions`" in ":ref:`optlib`" for examples of using the
+direction flags.
 
 Listing subparsers
 .........................................................................
