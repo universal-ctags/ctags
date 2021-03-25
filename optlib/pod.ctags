@@ -29,8 +29,14 @@
 --kinddef-Pod=S,subsection,subsections
 --kinddef-Pod=t,subsubsection,subsubsections
 
---regex-Pod=/^=head1[ \t]+(.+)/\1/c/
---regex-Pod=/^=head2[ \t]+(.+)/\1/s/
---regex-Pod=/^=head3[ \t]+(.+)/\1/S/
---regex-Pod=/^=head4[ \t]+(.+)/\1/t/
+--_prelude-Pod={{
+	/kindTable
+	[ /chapter /section /subsection /subsubsection ] def
+}}
 
+--regex-Pod=/^=head([1-4])[ \t]+(.+)//{{
+	\2
+	kindTable \1 0 get ?1 sub get
+	2 /start _matchloc
+	_tag _commit pop
+}}
