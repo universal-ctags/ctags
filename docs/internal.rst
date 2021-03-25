@@ -1,5 +1,5 @@
-ctags Internal API
----------------------------------------------------------------------
+.. ctags Internal API
+.. ---------------------------------------------------------------------
 
 .. _input-text-stream:
 
@@ -106,7 +106,7 @@ cork API
 ......................................................................
 
 Background and Idea
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *cork API* is introduced for recording scope information easier.
 
 Before introducing cork API, a scope information must be recorded as
@@ -138,7 +138,7 @@ freed after recording.  In cork API, it is not freed after recording;
 a parser can reused it as scope information.
 
 How to use
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 See a commit titled with "`clojure: use cork <https://github.com/universal-ctags/ctags/commit/ef181e6>`_".
 I applied cork API to the clojure parser.
@@ -205,7 +205,7 @@ initialization internally, so you generally you don't have to write
 the initialization explicitly.
 
 Automatic full qualified tag generation
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If a parser uses the cork API for recording and emitting scope
 information, ctags can reuse it for generating *full qualified (FQ)
@@ -253,16 +253,16 @@ Multiple parsers
 
 .. _promiseAPI:
 
-promise API
+Guest parser (promise API)
 ......................................................................
-.. note:: Currently the tagging via promise API is disabled by default.
-	Use ``--extras=+g`` option for enabling it.
+
+See ":ref:`host-guest-parsers`" about the concept of guest parsers.
 
 Background and Idea
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 More than one programming languages can be used in one input text stream.
-*promise API* allows a host parser running a guest parser in the specified
-area of input text stream.
+*promise API* allows a host parser running a :ref:`guest parser
+<host-guest-parsers>` in the specified area of input text stream.
 
 e.g. Code written in c language (C code) is embedded
 in code written in Yacc language (Yacc code). Let's think about this
@@ -309,11 +309,11 @@ doesn't know about C syntax. Implementing C parser in the Yacc parser
 is one of approach. However, ctags has already C parser.  The Yacc
 parser should utilize the existing C parser. The promise API allows this.
 
-More examples are in ":ref:`Applying a parser to specified areas of input file <host-guest-parsers>`".
-
+See also ":ref:`host-guest-parsers`" about more concept and examples of the
+guest parser.
 
 Usage
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 See a commit titled with "`Yacc: run C parser in the areas where code
 is written in C <https://github.com/universal-ctags/ctags/commit/757673f>`_".
@@ -326,7 +326,8 @@ fixed, call ``makePromise`` with (1) the guest parser name, (2) ``start``,
 and (3) ``end``. (This description is a bit simplified the real usage.)
 
 
-Let's see the actual code from ``parsers/yacc.c``.
+Let's see the actual code from "`parsers/yacc.c
+<https://github.com/universal-ctags/ctags/blob/master/parsers/yacc.c>`_".
 
 .. code-block:: c
 
@@ -395,7 +396,7 @@ the input character by character can obtain the current offset by calling
 ``getInputLineOffset()``.
 
 Internal design
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. figure:: promise.svg
 	    :scale: 80%
@@ -420,11 +421,16 @@ Why not running the guest parser directly from the context of the host
 parser? Remember many parsers have their own file static variables. If
 a parser is called from the parser, the variables may be crashed.
 
-API for making a combination of base parser and subparsers
+API for subparser
 ......................................................................
 
+See ":ref:`base-sub-parsers`" about the concept of subparser.
+
+.. note:: Consider using optlib when implementing a subparser. It is much more
+	easy and simple. See ":ref:`defining-subparsers`" for details.
+
 Outline
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You have to work on both sides: a base parser and subparsers.
 
@@ -456,11 +462,8 @@ By extending ``struct subparser`` you can define a type for
 your subparser. Then make a variable for the type and
 declare a dependency on the base parser.
 
-Details
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-
 Fields of ``subparser`` type
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Here the source code of Autoconf/m4 parsers is referred as an example.
 
@@ -537,7 +540,7 @@ as an exclusive parser. Calling this method is a job of a base parser.
 
 
 Extending ``subparser`` type
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The m4 parser extends ``subparser`` type like following:
 
@@ -642,7 +645,7 @@ It changes quote characters of the m4 parser.
 
 
 Making a tag in a subparser
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Via calling callback functions defined in subparsers, their base parser
 gives chance to them making tag entries.
@@ -694,7 +697,7 @@ the Autoconf parser makes a tag for it.
 
 
 Calling methods of subparsers from a base parser
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A base parser can use ``foreachSubparser`` macro for accessing its
 subparsers. A base should call ``enterSubparser`` before calling a
@@ -742,7 +745,7 @@ field of tags made in the callback function called between
 ``enterSubparser`` and ``leaveSubparser`` is adjusted.
 
 Registering a subparser to its base parser
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Use ``DEPTYPE_SUBPARSER`` dependency in a subparser for registration.
 
@@ -789,7 +792,7 @@ the index of the array when the subparser calls
 
 
 Scheduling running the base parser
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For the case that a subparser is chosen in top down, the subparser
 must call ``scheduleRunningBaseparser`` in the main ``parser`` method.
@@ -849,4 +852,16 @@ Automatic parser guessing (TBW)
 
 Managing regular expression parsers (TBW)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ghost kind in regex parser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. TODO: Q: what is the point of documenting this?
+	from comment on #2916: I must explain the ghost kind.
+
+If a whitespace is used as a kind letter, it is never printed when
+ctags is called with ``--list-kinds`` option.  This kind is
+automatically assigned to an empty name pattern.
+
+Normally you don't need to know this.
 

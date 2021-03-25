@@ -248,19 +248,6 @@ Experimental flags
 		Le4679d360100	/tmp/input.foo	/^(let ((f (lambda (x) (+ 1 x))))$/;"	l
 
 
-Ghost kind in regex parser
-......................................................................
-
-.. TODO: Q: what is the point of documenting this?
-	from comment on #2916: I must explain the ghost kind in internal.rst, not here.
-
-If a whitespace is used as a kind letter, it is never printed when
-ctags is called with ``--list-kinds`` option.  This kind is
-automatically assigned to an empty name pattern.
-
-Normally you don't need to know this.
-
-
 Scope tracking in a regex parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1412,7 +1399,7 @@ You can implement such roles by extending the built-in C parser:
 
 	# c-extra.ctags
 	--_roledef-C.v=lvalue,locator values
-	--_roledef-C.v=incremented,incremeted with ++ operator
+	--_roledef-C.v=incremented,incremented with ++ operator
 	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *=/\1/v/{_role=lvalue}
 	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *\+=/\1/v/{_role=lvalue}{_role=incremented}
 
@@ -1425,14 +1412,13 @@ You can implement such roles by extending the built-in C parser:
 
 .. _guest-regex-flag:
 
-Running a guest parser with ``_guest`` regex flag
+Scheduling a guest parser with ``_guest`` regex flag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. NOT REVIEWED YET
 
 With ``_guest`` regex flag, you can run a parser (a guest parser) on an
 area of the current input file.
-See ":ref:`Applying a parser to specified areas of input file (guest/host) <host-guest-parsers>`"
-about the concept of the guest parser.
+See ":ref:`host-guest-parsers`" about the concept of the guest parser.
 
 The ``_guest`` regex flag specifies a *guest spec*, and attaches it to
 the associated regex pattern.
@@ -1575,8 +1561,7 @@ following input file::
 	         `- "1end" points here.                       |
 	                               "2start" points here. -+
 
-..
-	NOT REVIEWED YET
+.. NOT REVIEWED YET
 
 .. _defining-subparsers:
 
