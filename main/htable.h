@@ -54,6 +54,16 @@ extern hashTable* hashTableNew         (unsigned int size,
 					hashTableDeleteFunc keyfreefn,
 					hashTableDeleteFunc valfreefn);
 
+/* By default, hashTableGetItem() returns NULL for a unknown key.
+ * It means you cannot store NULL as a value for a key.
+ * With hashTableSetValueForUnknownKey(), you can specific
+ * an alternative address representing the value for for unknown
+ * keys.
+ */
+extern void hashTableSetValueForUnknownKey (hashTable *htable,
+											void *val,
+											hashTableDeleteFunc valfreefn);
+
 extern void       hashTableDelete      (hashTable *htable);
 extern void       hashTableClear       (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
