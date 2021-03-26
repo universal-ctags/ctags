@@ -1,0 +1,9 @@
+package X
+
+def a:int = 1
+def b:str = "abc"
+
+package Y
+
+def c:name = name
+

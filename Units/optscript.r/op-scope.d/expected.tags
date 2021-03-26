@@ -1,0 +1,5 @@
+X	input.unknown	/^package X$/;"	p
+Y	input.unknown	/^package Y$/;"	p
+a	input.unknown	/^def a:int = 1$/;"	d	package:X	typeref:typename:int
+b	input.unknown	/^def b:str = "abc"$/;"	d	package:X	typeref:typename:str
+c	input.unknown	/^def c:name = name$/;"	d	package:Y	typeref:typename:name

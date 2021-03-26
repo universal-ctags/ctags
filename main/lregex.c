@@ -3224,6 +3224,126 @@ static EsObject* lrop_get_match_string (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject* lrop_set_scope (OptVM *vm, EsObject *name)
+{
+	EsObject *corkIndex = opt_vm_ostack_top (vm);
+	if (!es_integer_p (corkIndex))
+		return OPT_ERR_TYPECHECK;
+
+	int n = es_integer_get (corkIndex);
+	if (n < 0)
+		return OPT_ERR_RANGECHECK;
+
+	if (n >= countEntryInCorkQueue())
+		return OPT_ERR_RANGECHECK;
+
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	lcb->currentScope = n;
+
+	opt_vm_ostack_pop (vm);
+
+	return es_false;
+}
+
+static EsObject* lrop_pop_scope (OptVM *vm, EsObject *name)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	if (lcb->currentScope != CORK_NIL)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (lcb->currentScope);
+		if (e)
+			lcb->currentScope = e->extensionFields.scopeIndex;
+	}
+	return es_false;
+}
+
+static EsObject* lrop_clear_scope (OptVM *vm, EsObject *name)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	lcb->currentScope = CORK_NIL;
+	return es_false;
+}
+
+static EsObject* lrop_ref0_scope (OptVM *vm, EsObject *name)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+
+	if (lcb->currentScope == 0)
+	{
+		opt_vm_ostack_push (vm, es_false);
+		return es_false;
+	}
+
+	EsObject *q = es_integer_new (lcb->currentScope);
+
+	if (es_error_p (q))
+		return q;
+
+	opt_vm_ostack_push (vm, q);
+	es_object_unref (q);
+	opt_vm_ostack_push (vm, es_true);
+	return es_false;
+}
+
+static EsObject* lrop_refN_scope (OptVM *vm, EsObject *name)
+{
+	EsObject *nobj = opt_vm_ostack_top (vm);
+	if (!es_integer_p (nobj))
+		return OPT_ERR_TYPECHECK;
+
+	int n = es_integer_get(nobj);
+
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	int scope = lcb->currentScope;
+
+	while (n--)
+	{
+		if (scope == CORK_NIL)
+			break;
+		tagEntryInfo *e = getEntryInCorkQueue (scope);
+		if (e == NULL)
+			break;
+
+		scope = e->extensionFields.scopeIndex;
+	}
+
+	EsObject *q = es_integer_new (scope);
+	if (es_error_p(q))
+		return q;
+
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_push (vm, q);
+	es_object_unref (q);
+
+	return es_false;
+}
+
+static EsObject* lrop_get_scope_depth (OptVM *vm, EsObject *name)
+{
+	int n = 0;
+
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	int scope = lcb->currentScope;
+
+	while (scope != CORK_NIL)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (scope);
+		if (!e)
+			break;
+
+		scope = e->extensionFields.scopeIndex;
+		n++;
+	}
+
+	EsObject *q = es_integer_new (scope);
+	if (es_error_p(q))
+		return q;
+
+	opt_vm_ostack_push (vm, q);
+	es_object_unref (q);
+	return es_false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchloc",
@@ -3244,6 +3364,43 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.fn       = lrop_commit_tag,
 		.arity    = 1,
 		.help_str = "tag _COMMIT int",
+	},
+	{
+		.name     = "_scopeset",
+		.fn       = lrop_set_scope,
+		.arity    = 1,
+		.help_str = "int _SCOPESET -",
+	},
+	{
+		.name     = "_scopepop",
+		.fn       = lrop_pop_scope,
+		.arity    = 0,
+		.help_str = "- _SCOPEPOP -",
+	},
+	{
+		.name     = "_scopeclear",
+		.fn       = lrop_clear_scope,
+		.arity    = 0,
+		.help_str = "- _SCOPECLEAR -",
+	},
+	{
+		.name     = "_scopetop",
+		.fn       = lrop_ref0_scope,
+		.arity    = 0,
+		.help_str = "- _SCOPETOP int true%"
+		"- _SCOPETOP false",
+	},
+	{
+		.name     = "_scopeNth",
+		.fn       = lrop_refN_scope,
+		.arity    = 1,
+		.help_str = "index:int _SCOPENTH int",
+	},
+	{
+		.name     = "_scopedepth",
+		.fn       = lrop_get_scope_depth,
+		.arity    = 0,
+		.help_str = "- _SCOPEDEPTH int",
 	},
 };
 
