@@ -16,6 +16,15 @@
 #include "optscript.h"
 #include "mio.h"
 
+struct optscriptOperatorRegistration {
+	const char *name;
+	OptOperatorFn fn;
+	int arity;
+	const char *help_str;
+};
+extern void optscriptRegisterOperators(EsObject * dict,
+									   struct optscriptOperatorRegistration regs[], size_t count);
+
 extern EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
 
 extern OptVM *optscriptInit (void);

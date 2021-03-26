@@ -3224,6 +3224,29 @@ static EsObject* lrop_get_match_string (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static struct optscriptOperatorRegistration lropOperators [] = {
+	{
+		.name     = "_matchloc",
+		.fn       = lrop_get_match_loc,
+		.arity    = -1,
+		.help_str = "group:int /start|/end _MATCHLOC matchloc%"
+		"group:int _MATCHLOC matchloc",
+	},
+	{
+		.name     = "_tag",
+		.fn       = lrop_make_tag,
+		.arity    = -1,
+		.help_str = "name:str kind:name matchloc _TAG tag%"
+		"name:str kind:name _TAG tag",
+	},
+	{
+		.name     = "_commit",
+		.fn       = lrop_commit_tag,
+		.arity    = 1,
+		.help_str = "tag _COMMIT int",
+	},
+};
+
 extern void initRegexOptscript (void)
 {
 	if (!regexAvailable)
@@ -3239,28 +3262,8 @@ extern void initRegexOptscript (void)
 
 	optscriptInstallProcs (lregex_dict, lrop_get_match_string);
 
-	EsObject *op;
-	EsObject *sym;
-
-	sym = es_symbol_intern ("_matchloc");
-	op = opt_operator_new (lrop_get_match_loc, es_symbol_get (sym), -1,
-						   "group:int /start|/end _MATCHLOC matchloc%"
-						   "group:int _MATCHLOC matchloc");
-	opt_dict_def (lregex_dict, sym, op);
-	es_object_unref (op);
-
-	sym = es_symbol_intern ("_tag");
-	op = opt_operator_new (lrop_make_tag, es_symbol_get (sym), -1,
-						   "name:struct kind:name matchloc _TAG tag%"
-						   "name:struct kind:name _TAG tag");
-	opt_dict_def (lregex_dict, sym, op);
-	es_object_unref (op);
-
-	sym = es_symbol_intern ("_commit");
-	op = opt_operator_new (lrop_commit_tag, es_symbol_get (sym), 1,
-						   "tag _COMMIT int");
-	opt_dict_def (lregex_dict, sym, op);
-	es_object_unref (op);
+	optscriptRegisterOperators (lregex_dict,
+								lropOperators, ARRAY_SIZE(lropOperators));
 }
 
 extern void	listRegexOpscriptOperators (FILE *fp)

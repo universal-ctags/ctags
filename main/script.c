@@ -425,3 +425,19 @@ static void tagPrint (const void *a, MIO *out)
 	mio_printf (out, "#<tagEntryInfo %p name: %s line: %lu>",
 				tag, tag->name, tag->lineNumber);
 }
+
+extern void optscriptRegisterOperators(EsObject * dict,
+									   struct optscriptOperatorRegistration regs[], size_t count)
+{
+	EsObject *op;
+	EsObject *sym;
+
+	for (size_t i = 0; i < count; i++)
+	{
+		sym = es_symbol_intern (regs[i].name);
+		op = opt_operator_new (regs[i].fn, es_symbol_get (sym), regs[i].arity,
+							   regs[i].help_str);
+		opt_dict_def (dict, sym, op);
+		es_object_unref (op);
+	}
+}
