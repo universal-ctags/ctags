@@ -93,6 +93,9 @@ static EsObject* getFieldValueForKind (const tagEntryInfo *, const fieldDefiniti
 static EsObject* getFieldValueForTyperef (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForTyperef (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* checkFieldValueForTyperef (const fieldDefinition *, const EsObject *);
+static EsObject* getFieldValueForScope (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* setFieldValueForScope (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+static EsObject* checkFieldValueForScope (const fieldDefinition *, const EsObject *);
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
@@ -330,6 +333,11 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 		.doesContainAnyChar = doesContainAnyCharInFieldScope,
 		.isValueAvailable   = NULL,
 		.dataType           = FIELDTYPE_STRING,
+		.getterValueType    = "int",
+		.getValueObject     = getFieldValueForScope,
+		.setterValueType    = "int",
+		.checkValueForSetter= checkFieldValueForScope,
+		.setValueObject     = setFieldValueForScope,
 	},
 	[FIELD_EXTRAS - FIELD_ROLES] = {
 		.letter				= 'E',
@@ -1577,5 +1585,33 @@ static EsObject* checkFieldValueForTyperef (const fieldDefinition *fdef, const E
 	}
 	else
 		return OPT_ERR_TYPECHECK;
+	return es_false;
+}
+
+static EsObject* getFieldValueForScope (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	return es_integer_new (tag->extensionFields.scopeIndex);
+}
+
+static EsObject* setFieldValueForScope (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
+{
+	int index = es_integer_get (obj);
+	if (index < countEntryInCorkQueue ())
+	{
+		tag->extensionFields.scopeIndex = index;
+		return es_false;
+	}
+
+	return OPTSCRIPT_ERR_NOTAGENTRY;
+}
+
+static EsObject* checkFieldValueForScope (const fieldDefinition *fdef, const EsObject *obj)
+{
+	if (!es_integer_p (obj))
+		return OPT_ERR_TYPECHECK;
+
+	if (es_integer_get (obj) < 0)
+		return OPT_ERR_RANGECHECK;
+
 	return es_false;
 }
