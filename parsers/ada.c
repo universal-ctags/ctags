@@ -1754,9 +1754,10 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
         if(token != NULL)
         {
           /* if any generic params have been gathered, attach them to
-           * token, and set the mode back to ADA_ROOT */
+           * token, and set the mode back to ADA_ROOT or ADA_DECLARATIONS */
           appendAdaTokenList(token, &genericParamsRoot.children);
-          mode = ADA_ROOT;
+          Assert (parent);
+          mode = (parent->parent)? ADA_DECLARATIONS: ADA_ROOT;
         } /* if(token != NULL) */
 
         break;
