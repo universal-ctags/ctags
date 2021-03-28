@@ -3344,6 +3344,36 @@ static EsObject* lrop_get_scope_depth (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject* lrop_repl (OptVM *vm, EsObject *name)
+{
+	char *old_prompt = opt_vm_set_prompt (vm, "\n% type \"quit\" for exiting from repl\nOPT");
+
+	opt_vm_print_prompt (vm);
+	opt_vm_set_prompt (vm, "OPT");
+
+	while (true)
+	{
+		EsObject *o = opt_vm_read (vm, NULL);
+		if (es_object_equal (o, ES_READER_EOF))
+		{
+			es_object_unref (o);
+			break;
+		}
+		EsObject *e = opt_vm_eval (vm, o);
+		es_object_unref (o);
+
+		if (es_error_p (e))
+		{
+			if (!es_object_equal (e, OPT_ERR_QUIT))
+				opt_vm_report_error (vm, e, NULL);
+			break;
+		}
+	}
+
+	opt_vm_set_prompt (vm, old_prompt);
+	return es_false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchloc",
@@ -3402,6 +3432,12 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = 0,
 		.help_str = "- _SCOPEDEPTH int",
 	},
+	{
+		.name     = "_repl",
+		.fn       = lrop_repl,
+		.arity    = 0,
+		.help_str = "- _repl -",
+	}
 };
 
 extern void initRegexOptscript (void)
