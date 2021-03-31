@@ -29,7 +29,8 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/gen-repoinfo.bat \
 	       man/Makefile man/README man/tags.5.rst \
-	       $(PEG_INPUT) $(OPTLIB2C_INPUT) \
+	       makefiles/list-txt2cstr-input.mak misc/txt2cstr \
+	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(TXT2CSTR_INPUT) \
 	       docs Tmain Units
 
 CLEANFILES =
@@ -39,6 +40,7 @@ clean-local:
 	rm -f packcc$(BUILD_EXEEXT)
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
 		rm -rf $(OPTLIB2C_SRCS); \
+		rm -rf $(TXT2CSTR_SRCS); \
 	fi
 
 bin_PROGRAMS = ctags
@@ -148,6 +150,17 @@ SUFFIXES += .ctags
 .ctags.c:
 	$(optlib2c_verbose)$(OPTLIB2C) $< > $@
 $(OPTLIB2C_SRCS): $(OPTLIB2C) Makefile
+endif
+
+if RUN_TXT2CSTR
+txt2cstr_verbose = $(txt2cstr_verbose_@AM_V@)
+txt2cstr_verbose_ = $(txt2cstr_verbose_@AM_DEFAULT_V@)
+txt2cstr_verbose_0 = @echo TXT2CSTR "  $@";
+TXT2CSTR = $(srcdir)/misc/txt2cstr
+SUFFIXES += .ps
+.ps.c:
+	$(txt2cstr_verbose)$(TXT2CSTR) $< > $@
+$(TXT2CSTR_SRCS): $(TXT2CSTR) Makefile
 endif
 
 packcc_verbose = $(packcc_verbose_@AM_V@)

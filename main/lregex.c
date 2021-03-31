@@ -3457,6 +3457,15 @@ extern void initRegexOptscript (void)
 
 	optscriptRegisterOperators (lregex_dict,
 								lropOperators, ARRAY_SIZE(lropOperators));
+
+	extern const char ctagsCommonPrelude[];
+	opt_vm_dstack_push (optvm, lregex_dict);
+	MIO *mio = mio_new_memory ((unsigned char*)ctagsCommonPrelude, strlen (ctagsCommonPrelude), NULL, NULL);
+	EsObject *e = optscriptLoad (optvm, mio);
+	if (es_error_p (e))
+		error (FATAL, "failed in loading built-in procedures");
+	mio_unref (mio);
+	opt_vm_dstack_pop (optvm);
 }
 
 extern void	listRegexOpscriptOperators (FILE *fp)

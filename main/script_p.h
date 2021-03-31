@@ -43,6 +43,8 @@ extern EsObject *optscriptReadAndEval   (OptVM *vm, const char *src, size_t len)
 extern EsObject *optscriptReadAndDefine (OptVM *vm, EsObject *dict, const char *name,
 										 const char *src, size_t len);
 
+extern EsObject *optscriptLoad          (OptVM *vm, MIO *mio);
+
 extern void      optscriptHelp          (OptVM *vm, FILE *fp);
 
 

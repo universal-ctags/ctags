@@ -140,6 +140,9 @@ LIB_SRCS =			\
 	main/writer-xref.c		\
 	main/xtag.c			\
 	\
+	\
+	$(TXT2CSTR_SRCS) \
+	\
 	$(REPOINFO_SRCS) \
 	$(MIO_SRCS)      \
 	\
@@ -164,6 +167,9 @@ OPTSCRIPT_SRCS = \
 
 include makefiles/optlib2c_input.mak
 OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
+
+include makefiles/txt2cstr_input.mak
+TXT2CSTR_SRCS = $(TXT2CSTR_INPUT:.ps=.c)
 
 include makefiles/peg_input.mak
 PEG_SRCS = $(PEG_INPUT:.peg=.c)

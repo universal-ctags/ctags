@@ -358,6 +358,34 @@ extern EsObject* optscriptDefine (EsObject *dict,
 }
 
 
+extern EsObject *optscriptLoad (OptVM *vm, MIO *mio)
+{
+	while (true)
+	{
+		EsObject *o = opt_vm_read (vm, mio);
+		if (es_object_equal (o, ES_READER_EOF))
+		{
+			es_object_unref (o);
+			return es_false;
+		}
+		else if (es_error_p (o))
+		{
+			opt_vm_report_error (vm, o, NULL);
+			return o;
+		}
+
+		EsObject *e = opt_vm_eval (vm, o);
+		if (es_error_p (e))
+		{
+			opt_vm_report_error (vm, e, NULL);
+			es_object_unref (o);
+			return e;
+		}
+
+		es_object_unref (o);
+	}
+}
+
 extern EsObject *optscriptReadAndEval   (OptVM *vm, const char *src, size_t len)
 {
 	EsObject *obj = optscriptRead (vm, src, len);

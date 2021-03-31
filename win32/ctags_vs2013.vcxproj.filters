@@ -63,6 +63,9 @@
     <ClCompile Include="..\main\colprint.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\CommonPrelude.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\debug.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>

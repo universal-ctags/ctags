@@ -182,6 +182,7 @@
     <ClCompile Include="..\main\args.c" />
     <ClCompile Include="..\main\cmd.c" />
     <ClCompile Include="..\main\colprint.c" />
+    <ClCompile Include="..\main\CommonPrelude.c" />
     <ClCompile Include="..\main\debug.c" />
     <ClCompile Include="..\main\dependency.c" />
     <ClCompile Include="..\main\entry.c" />
