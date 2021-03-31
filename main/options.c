@@ -490,6 +490,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Dump keywords of initialized parser(s)."},
  {1,1,"  --_dump-options"},
  {1,1,"       Dump options."},
+ {1,1,"  --_dump-prelude"},
+ {1,1,"       Dump contents of optscript prelude."},
  {1,1,"  --_fatal-warnings"},
  {1,1,"       Make all warnings fatal."},
  {1,1,"  --_force-initializing"},
@@ -2807,6 +2809,7 @@ static void setBooleanToXtagWithWarning(booleanOption *const option, bool value)
  */
 
 static void processDumpOptionsOption (const char *const option, const char *const parameter);
+static void processDumpPreludeOption (const char *const option, const char *const parameter);
 
 static parametricOption ParametricOptions [] = {
 	{ "etags-include",          processEtagsInclude,            false,  STAGE_ANY },
@@ -2863,6 +2866,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_anonhash",              processAnonHashOption,          false,  STAGE_ANY },
 	{ "_dump-keywords",         processDumpKeywordsOption,      false,  STAGE_ANY },
 	{ "_dump-options",          processDumpOptionsOption,       false,  STAGE_ANY },
+	{ "_dump-prelude",          processDumpPreludeOption,       false,  STAGE_ANY },
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
 	{ "_force-initializing",    processForceInitOption,         false,  STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
@@ -3914,6 +3918,13 @@ static void processDumpOptionsOption (const char *const option CTAGS_ATTR_UNUSED
 	fprintf(stdout, "# %s\n", "BooleanOptions");
 	for (unsigned int i = 0; i < ARRAY_SIZE(BooleanOptions); i++)
 		fprintf(stdout, "%s\n", BooleanOptions[i].name);
+}
+
+static void processDumpPreludeOption (const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	extern const char ctagsCommonPrelude[];
+	fprintf(stdout, "%s\n", ctagsCommonPrelude);
+	exit (0);
 }
 
 extern bool inSandbox (void)
