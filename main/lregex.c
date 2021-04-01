@@ -217,6 +217,7 @@ typedef struct {
 	const regexPattern* const patbuf;
 	const regmatch_t* const pmatch;
 	int nmatch;
+	struct mTableActionSpec taction;
 } scriptWindow;
 
 struct lregexControlBlock {
@@ -2631,6 +2632,8 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 				.pmatch = pmatch,
 				.nmatch = BACK_REFERENCE_COUNT,
 			};
+			initTaction (&window.taction);
+
 			if (ptrn->optscript && (! hasNameSlot (ptrn)))
 			{
 				scriptSetup (optvm, lcb, CORK_NIL, &window);
@@ -2643,10 +2646,13 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 
 			if (ptrn->type == PTRN_TAG)
 			{
-				struct mTableActionSpec *taction = &(ptrn->taction);
-
 				matchTagPattern (lcb, current, ptrn, pmatch, offset_for_tag,
 								 (ptrn->optscript && hasNameSlot (ptrn))? &window: NULL);
+
+				struct mTableActionSpec *taction = (window.taction.action == TACTION_NOP)
+					? &(ptrn->taction)
+					: &window.taction;
+
 				BEGIN_VERBOSE(vfp);
 				{
 					fprintf(vfp, "result: matched %d bytes\n", (int)(pmatch[0].rm_eo));
@@ -3374,6 +3380,123 @@ static EsObject* lrop_repl (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject *OPTSCRIPT_ERR_UNKNOWNTABLE;
+static EsObject *OPTSCRIPT_ERR_NOTMTABLEPTRN;
+
+static struct regexTable *getRegexTableForOptscriptName (struct lregexControlBlock *lcb,
+														 EsObject *tableName)
+{
+	EsObject *table_sym = es_pointer_get (tableName);
+	const char *table_str = es_symbol_get (table_sym);
+	int n = getTableIndexForName (lcb, table_str);
+	if (n < 0)
+		return NULL;
+	return ptrArrayItem (lcb->tables, n);
+}
+
+static EsObject* lrop_tenter_common (OptVM *vm, EsObject *name, enum tableAction action)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	if (lcb->window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
+	{
+		error (WARNING, "Use table related operators only with mtable regular expression");
+		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
+	}
+
+	EsObject *table = opt_vm_ostack_top (vm);
+	if (es_object_get_type (table) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+
+	struct regexTable *t = getRegexTableForOptscriptName (lcb, table);
+	if (t == NULL)
+		return OPTSCRIPT_ERR_UNKNOWNTABLE;
+
+	lcb->window->taction = (struct mTableActionSpec){
+		.action             = action,
+		.table              = t,
+		.continuation_table = NULL,
+	};
+
+	opt_vm_ostack_pop (vm);
+	return es_false;
+}
+
+static EsObject* lrop_tenter (OptVM *vm, EsObject *name)
+{
+	return lrop_tenter_common (vm, name, TACTION_ENTER);
+}
+
+static EsObject* lrop_tenter_with_continuation (OptVM *vm, EsObject *name)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	if (lcb->window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
+	{
+		error (WARNING, "Use table related operators only with mtable regular expression");
+		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
+	}
+
+	EsObject *cont = opt_vm_ostack_top (vm);
+	EsObject *table = opt_vm_ostack_peek (vm, 1);
+
+	if (es_object_get_type (table) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+	if (es_object_get_type (cont) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+
+	struct regexTable *t = getRegexTableForOptscriptName (lcb, table);
+	if (t == NULL)
+		return OPTSCRIPT_ERR_UNKNOWNTABLE;
+	struct regexTable *c = getRegexTableForOptscriptName (lcb, cont);
+	if (c == NULL)
+		return OPTSCRIPT_ERR_UNKNOWNTABLE;
+
+	lcb->window->taction = (struct mTableActionSpec){
+		.action             = TACTION_ENTER,
+		.table              = t,
+		.continuation_table = c,
+	};
+
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_pop (vm);
+	return es_false;
+}
+
+static EsObject* lrop_tleave (OptVM *vm, EsObject *name)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	if (lcb->window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
+	{
+		error (WARNING, "Use table related operators only with mtable regular expression");
+		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
+	}
+
+	lcb->window->taction.action = TACTION_LEAVE;
+	return es_false;
+}
+
+static EsObject* lrop_tjump (OptVM *vm, EsObject *name)
+{
+	return lrop_tenter_common (vm, name, TACTION_JUMP);
+}
+
+static EsObject* lrop_treset (OptVM *vm, EsObject *name)
+{
+	return lrop_tenter_common (vm, name, TACTION_RESET);
+}
+
+static EsObject* lrop_tquit (OptVM *vm, EsObject *name)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	if (lcb->window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
+	{
+		error (WARNING, "Use table related operators only with mtable regular expression");
+		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
+	}
+
+	lcb->window->taction.action = TACTION_QUIT;
+	return es_false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchloc",
@@ -3437,7 +3560,43 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.fn       = lrop_repl,
 		.arity    = 0,
 		.help_str = "- _repl -",
-	}
+	},
+	{
+		.name     = "_tenter",
+		.fn       = lrop_tenter,
+		.arity    = 1,
+		.help_str = "table:name _TENTER -",
+	},
+	{
+		.name     = "_tentercont",
+		.fn       = lrop_tenter_with_continuation,
+		.arity    = 2,
+		.help_str = "table:name cont:name _TENTERCONT -",
+	},
+	{
+		.name     = "_tleave",
+		.fn       = lrop_tleave,
+		.arity    = 0,
+		.help_str = "- _TLEAVE -",
+	},
+	{
+		.name     = "_tjump",
+		.fn       = lrop_tjump,
+		.arity    = 1,
+		.help_str = "table:name _TJUMP -",
+	},
+	{
+		.name     = "_treset",
+		.fn       = lrop_treset,
+		.arity    = 1,
+		.help_str = "table:name _TRESET -",
+	},
+	{
+		.name     = "_tquit",
+		.fn       = lrop_tquit,
+		.arity    = 0,
+		.help_str = "- _TQUIT -",
+	},
 };
 
 extern void initRegexOptscript (void)
@@ -3451,6 +3610,8 @@ extern void initRegexOptscript (void)
 	optvm = optscriptInit ();
 	lregex_dict = opt_dict_new (17);
 
+	OPTSCRIPT_ERR_UNKNOWNTABLE = es_error_intern ("unknowntable");
+	OPTSCRIPT_ERR_NOTMTABLEPTRN = es_error_intern ("notmtableptrn");
 	OPTSCRIPT_ERR_UNKNOWNKIND = es_error_intern ("unknownkind");
 
 	optscriptInstallProcs (lregex_dict, lrop_get_match_string);
