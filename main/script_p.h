@@ -26,6 +26,8 @@ extern void optscriptRegisterOperators(EsObject * dict,
 									   struct optscriptOperatorRegistration regs[], size_t count);
 
 extern EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
+extern EsObject *OPTSCRIPT_ERR_UNKNOWNLANGUAGE;
+extern EsObject *OPTSCRIPT_ERR_UNKNOWNEXTRA;
 
 extern OptVM *optscriptInit (void);
 
@@ -47,6 +49,7 @@ extern EsObject *optscriptLoad          (OptVM *vm, MIO *mio);
 
 extern void      optscriptHelp          (OptVM *vm, FILE *fp, EsObject *procdocs);
 
+extern xtagType optscriptGetXtagType (const EsObject *extra);
 
 typedef struct {
 	unsigned long line;

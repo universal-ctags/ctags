@@ -1,0 +1,7 @@
+a	input.unknown	/^abcdaxyzb$/;"	d
+B	input.unknown	/^abcdaxyzb$/;"	d
+c	input.unknown	/^abcdaxyzb$/;"	d
+D	input.unknown	/^abcdaxyzb$/;"	d
+a	input.unknown	/^abcdaxyzb$/;"	d
+OK:no such extra	input.unknown	/^abcdaxyzb$/;"	d
+OK:no such language extra	input.unknown	/^abcdaxyzb$/;"	d

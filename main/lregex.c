@@ -3497,6 +3497,23 @@ static EsObject* lrop_tquit (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+EsObject *OPTSCRIPT_ERR_UNKNOWNEXTRA;
+static EsObject* lrop_extraenabled (OptVM *vm, EsObject *name)
+{
+	EsObject *extra = opt_vm_ostack_top (vm);
+	if (es_object_get_type (extra) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+
+	xtagType xt = optscriptGetXtagType (extra);
+	if (xt == XTAG_UNKNOWN)
+		return OPTSCRIPT_ERR_UNKNOWNEXTRA;
+
+	EsObject *r = isXtagEnabled (xt)? es_true: es_false;
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_push (vm, r);
+	return es_false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchloc",
@@ -3597,6 +3614,13 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = 0,
 		.help_str = "- _TQUIT -",
 	},
+	{
+		.name     = "_extraenabled",
+		.fn       = lrop_extraenabled,
+		.arity    = 1,
+		.help_str = "extra:name _extraenabled bool%"
+		"language.extra _extraenabled bool",
+	},
 };
 
 extern void initRegexOptscript (void)
@@ -3612,6 +3636,8 @@ extern void initRegexOptscript (void)
 
 	OPTSCRIPT_ERR_UNKNOWNTABLE = es_error_intern ("unknowntable");
 	OPTSCRIPT_ERR_NOTMTABLEPTRN = es_error_intern ("notmtableptrn");
+	OPTSCRIPT_ERR_UNKNOWNEXTRA = es_error_intern ("unknownextra");
+	OPTSCRIPT_ERR_UNKNOWNLANGUAGE = es_error_intern ("unknownlanguage");
 	OPTSCRIPT_ERR_UNKNOWNKIND = es_error_intern ("unknownkind");
 
 	optscriptInstallProcs (lregex_dict, lrop_get_match_string);

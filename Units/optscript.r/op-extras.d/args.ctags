@@ -1,0 +1,66 @@
+--sort=no
+
+--langdef=X
+--map-X=.unknown
+--_tabledef-X=main
+
+--kinddef-X=d,def,definitions
+
+--_extradef-X=foo,...
+--extras-X=+{foo}
+--_extradef-X=bar,...
+--extras-X=-{bar}
+
+--extras=+{subparser}
+--extras=-{reference}
+
+--_prelude-X={{
+	/maketag {
+		/def 1 /start _matchloc _tag _commit pop
+	} def
+}}
+
+--_mtable-regex-X=main/(a)//{{
+	/X.foo _extraenabled {\1} {(A)} ifelse
+	maketag
+}}
+
+--_mtable-regex-X=main/(b)//{{
+	/X.bar _extraenabled {\1} {(B)} ifelse
+	maketag
+}}
+
+--_mtable-regex-X=main/(c)//{{
+	/subparser _extraenabled {\1} {(C)} ifelse
+	maketag
+}}
+
+--_mtable-regex-X=main/(d)//{{
+	/reference	_extraenabled {\1} {(D)} ifelse
+	maketag
+}}
+
+--_mtable-regex-X=main/(x)//{{
+	{
+		/nosuchextra  _extraenabled
+	} stopped {
+		(OK:no such extra)
+	} {
+		pop (thiShouldNotBeTagged)
+	} ifelse maketag
+}}
+
+--_mtable-regex-X=main/(y)//{{
+	{
+		/X.nosuchextra	_extraenabled
+	} stopped {
+		(OK:no such language extra)
+	} {
+		pop (thiShouldNotBeTagged)
+	} ifelse maketag
+}}
+
+--_mtable-regex-X=main/(z)//{{
+	% this one is for testing _tquit.
+	_tquit
+}}

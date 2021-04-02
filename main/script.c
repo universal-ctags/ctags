@@ -15,13 +15,16 @@
 #include "field_p.h"
 #include "htable.h"			/* For HT_PTR_TO_INT */
 #include "optscript.h"
+#include "parse.h"
 #include "routines.h"
 #include "script_p.h"
+#include "xtag_p.h"
 
 #include <ctype.h>
 #include <string.h>
 
 EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
+EsObject *OPTSCRIPT_ERR_UNKNOWNLANGUAGE;
 
 int OPT_TYPE_MATCHLOC;
 static int locEqual (const void *a, const void  *b);
@@ -500,4 +503,22 @@ extern void optscriptRegisterOperators(EsObject * dict,
 		opt_dict_def (dict, sym, op);
 		es_object_unref (op);
 	}
+}
+
+extern xtagType optscriptGetXtagType (const EsObject *extra)
+{
+	EsObject *extra_sym = es_pointer_get (extra);
+	const char *extra_str = es_symbol_get (extra_sym);
+
+	const char *sep = strchr (extra_str, '.');
+	if (sep)
+	{
+		langType lang = getNamedLanguage (extra_str, sep - extra_str);
+		if (lang == LANG_IGNORE)
+			return XTAG_UNKNOWN;
+
+		return getXtagTypeForNameAndLanguage (sep + 1, lang);
+	}
+	else
+		return getXtagTypeForNameAndLanguage (extra_str, LANG_IGNORE);
 }

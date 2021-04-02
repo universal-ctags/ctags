@@ -61,6 +61,8 @@ void      opt_dict_clear     (EsObject *dict);
 EsObject *opt_array_new      (void);
 EsObject *opt_array_get      (const EsObject *array, unsigned int index);
 void      opt_array_put      (EsObject *array, unsigned int index, EsObject *obj);
+void      opt_array_add      (EsObject *array, EsObject *elt);
+
 unsigned int opt_array_length(const EsObject *array);
 
 EsObject *opt_operator_new   (OptOperatorFn op, const char *name, int arity, const char *help_str);

@@ -731,6 +731,12 @@ opt_array_put (EsObject *array, unsigned int index, EsObject *obj)
 	array_op_put (array, index, obj);
 }
 
+void
+opt_array_add (EsObject *array, EsObject* elt)
+{
+	array_op_add (array, elt);
+}
+
 unsigned int
 opt_array_length(const EsObject *array)
 {
