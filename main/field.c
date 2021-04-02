@@ -1291,11 +1291,14 @@ extern int defineField (fieldDefinition *def, langType language)
 #define FIELD_COL_LANGUAGE    3
 #define FIELD_COL_JSTYPE      4
 #define FIELD_COL_FIXED       5
-#define FIELD_COL_DESCRIPTION 6
+#define FIELD_COL_OPERATOR    6
+#define FIELD_COL_DESCRIPTION 7
+
 extern struct colprintTable * fieldColprintTableNew (void)
 {
 	return colprintTableNew ("L:LETTER", "L:NAME", "L:ENABLED",
-							 "L:LANGUAGE", "L:JSTYPE", "L:FIXED", "L:DESCRIPTION", NULL);
+							 "L:LANGUAGE", "L:JSTYPE", "L:FIXED",
+							 "L:OP", "L:DESCRIPTION", NULL);
 }
 
 static void  fieldColprintAddLine (struct colprintTable *table, int i)
@@ -1330,6 +1333,13 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 	}
 	colprintLineAppendColumnCString (line, typefields);
 	colprintLineAppendColumnBool (line, writerDoesTreatFieldAsFixed (i));
+
+	char operator[] = {'-', '-', '\0'};
+	if (fdef->getValueObject)
+		operator[0] = 'r';
+	if (fdef->setValueObject)
+		operator[1] = 'w';
+	colprintLineAppendColumnCString (line, operator);
 	colprintLineAppendColumnCString (line, fdef->description);
 }
 

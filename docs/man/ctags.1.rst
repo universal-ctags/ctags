@@ -1077,6 +1077,11 @@ Listing Options
 		Unlike the tag output mode, JSON output mode allows disabling
 		any fields.
 
+	OP
+		How this field can be accessed from optscript code.
+		This field is for Universal Ctags developers.
+
+
 	DESCRIPTION
 		Human readable description for the field.
 
