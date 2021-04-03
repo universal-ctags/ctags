@@ -1885,7 +1885,7 @@ static void    markTagExtraBitFull     (tagEntryInfo *const tag, xtagType extra,
 		int n = countXtags () - XTAG_COUNT;
 		tag->extraDynamic = xCalloc ((n / 8) + 1, uint8_t);
 		PARSER_TRASH_BOX(tag->extraDynamic, eFree);
-		markTagExtraBit (tag, extra);
+		markTagExtraBitFull (tag, extra, mark);
 		return;
 	}
 
