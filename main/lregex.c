@@ -3514,6 +3514,50 @@ static EsObject* lrop_extraenabled (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject *lrop_markextra (OptVM *vm, EsObject *name)
+{
+	EsObject *tag = opt_vm_ostack_peek (vm, 1);
+	tagEntryInfo *e;
+	if (es_integer_p (tag))
+	{
+		int n = es_integer_get (tag);
+		if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
+			return OPT_ERR_RANGECHECK;
+		e = getEntryInCorkQueue (n);
+	}
+	else if (es_object_get_type (tag) == OPT_TYPE_TAG)
+		e = es_pointer_get (tag);
+	else
+		return OPT_ERR_TYPECHECK;
+
+	if (e == NULL)
+		return OPTSCRIPT_ERR_NOTAGENTRY;
+
+	EsObject *extra = opt_vm_ostack_top (vm);
+	if (es_object_get_type (extra) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+
+	xtagType xt = optscriptGetXtagType (extra);
+	if (xt == XTAG_UNKNOWN)
+		return OPTSCRIPT_ERR_UNKNOWNEXTRA;
+
+	langType lang = getXtagOwner (xt);
+	if (lang != LANG_IGNORE && e->langType != lang)
+	{
+		error (WARNING,
+			   "mismatch in the language of the tag (%s) and the language of field (%s)",
+			   getLanguageName (e->langType), getLanguageName (lang));
+		return OPTSCRIPT_ERR_UNKNOWNEXTRA;
+	}
+
+	markTagExtraBit (e, xt);
+
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_pop (vm);
+
+	return es_false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchloc",
@@ -3621,6 +3665,13 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.help_str = "extra:name _extraenabled bool%"
 		"language.extra _extraenabled bool",
 	},
+	{
+		.name     = "_markextra",
+		.fn       = lrop_markextra,
+		.arity    = 2,
+		.help_str = "tag:int|tag:tag extra:name _MARKEXTRA -%"
+		"tag:int|tag:tag lang.extra:name _MARKEXTRA -",
+	}
 };
 
 extern void initRegexOptscript (void)

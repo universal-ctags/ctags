@@ -1,4 +1,5 @@
 --sort=no
+--fields=+{extras}
 
 --langdef=X
 --map-X=.unknown
@@ -15,8 +16,11 @@
 --extras=-{reference}
 
 --_prelude-X={{
+	/maketag0 {
+		/def 1 /start _matchloc _tag _commit
+	} def
 	/maketag {
-		/def 1 /start _matchloc _tag _commit pop
+		maketag0 pop
 	} def
 }}
 
@@ -38,6 +42,13 @@
 --_mtable-regex-X=main/(d)//{{
 	/reference	_extraenabled {\1} {(D)} ifelse
 	maketag
+}}
+
+--_mtable-regex-X=main/(e)//{{
+	(eCommon)   maketag0 /reference _markextra
+	(a.b.eCommon2)  maketag0 dup /reference _markextra /qualified _markextra
+	(eLangspec) maketag0 /X.foo _markextra
+	(eLangspec+Common) maketag0 dup /X.foo _markextra /reference _markextra
 }}
 
 --_mtable-regex-X=main/(x)//{{
