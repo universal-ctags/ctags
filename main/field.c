@@ -96,6 +96,7 @@ static EsObject* checkFieldValueForTyperef (const fieldDefinition *, const EsObj
 static EsObject* getFieldValueForScope (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForScope (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* checkFieldValueForScope (const fieldDefinition *, const EsObject *);
+static EsObject* getFieldValueForExtras (const tagEntryInfo *, const fieldDefinition *);
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
@@ -349,6 +350,11 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 		.doesContainAnyChar = NULL,
 		.isValueAvailable	= isExtrasFieldAvailable,
 		.dataType			= FIELDTYPE_STRING,
+		.getterValueType    = "[ extra1:name ... extran:name ]",
+		.getValueObject     = getFieldValueForExtras,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = NULL,
 	},
 	[FIELD_XPATH - FIELD_ROLES] = {
 		.letter				= 'x',
@@ -1624,4 +1630,40 @@ static EsObject* checkFieldValueForScope (const fieldDefinition *fdef, const EsO
 		return OPT_ERR_RANGECHECK;
 
 	return es_false;
+}
+
+static EsObject* getFieldValueForExtras (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+
+	if (!isTagExtra (tag))
+		return es_nil;
+
+	EsObject* a = opt_array_new ();
+
+	for (int i = 0; i < countXtags (); i++)
+	{
+		if (!isTagExtraBitMarked (tag, i))
+			continue;
+
+		langType lang = getXtagOwner (i);
+		const char *lang_name = (lang == LANG_IGNORE)
+			? NULL
+			: getLanguageName (lang);
+		const char *extra_name = getXtagName (i);
+
+		EsObject *extra;
+		if (lang_name == NULL)
+			extra = opt_name_new_from_cstr (extra_name);
+		else
+		{
+			vString *tmp = vStringNewInit (lang_name);
+			vStringPut (tmp, '.');
+			vStringCatS (tmp, extra_name);
+			extra = opt_name_new_from_cstr (vStringValue (tmp));
+			vStringDelete (tmp);
+		}
+		opt_array_add (a, extra);
+		es_object_unref (extra);
+	}
+	return a;
 }

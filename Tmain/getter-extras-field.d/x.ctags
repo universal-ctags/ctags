@@ -1,0 +1,30 @@
+--sort=no
+--fields=+{extras}
+
+--langdef=X
+--map-X=.unknown
+--_tabledef-X=main
+
+--kinddef-X=d,def,definitions
+
+--_extradef-X=foo,...
+--extras-X=+{foo}
+--_extradef-X=bar,...
+--extras-X=-{bar}
+
+--_prelude-X={{
+	/maketag0 {
+		/def 1 /start _matchloc _tag _commit
+	} def
+	/maketag {
+		maketag0 pop
+	} def
+	/pc {pstack clear} def
+}}
+
+--_mtable-regex-X=main/(e)//{{
+	(eCommon)   maketag0 dup /reference _markextra :extras pc
+	(a.b.eCommon2)  maketag0 dup dup /reference _markextra /qualified _markextra :extras pc
+	(eLangspec) maketag0 dup /X.foo _markextra :extras pc
+	(eLangspec+Common) maketag0 dup dup /X.foo _markextra /reference _markextra :extras pc
+}}
