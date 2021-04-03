@@ -1913,7 +1913,6 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 		index = (extra / 8);
 		offset = (extra % 8);
 		slot = tag->extra;
-
 	}
 	else if (!tag->extraDynamic)
 		return false;
@@ -1923,7 +1922,6 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 		index = ((extra - XTAG_COUNT) / 8);
 		offset = ((extra - XTAG_COUNT) % 8);
 		slot = tag->extraDynamic;
-
 	}
 	return !! ((slot [ index ]) & (1 << offset));
 }
