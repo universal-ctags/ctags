@@ -372,6 +372,9 @@ ALL_OBJS = \
 	$(ALL_SRCS:.c=.$(OBJEXT)) \
 	$(LIBOBJS)
 
+ALL_LIB_OBJS = \
+	$(ALL_LIB_SRCS:.c=.$(OBJEXT)) \
+	$(LIBOBJS)
 
 READTAGS_SRCS  = \
 	libreadtags/readtags.c      \

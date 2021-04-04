@@ -282,12 +282,12 @@ extern bool isCommonXtag (xtagType type)
 	return (type < XTAG_COUNT)? true: false;
 }
 
-extern int     getXtagOwner (xtagType type)
+extern langType getXtagOwner (xtagType type)
 {
 	return getXtagObject (type)->language;
 }
 
-const char* getXtagName (xtagType type)
+extern const char* getXtagName (xtagType type)
 {
 	xtagDefinition* def = getXtagDefinition (type);
 	if (def)
@@ -296,7 +296,7 @@ const char* getXtagName (xtagType type)
 		return NULL;
 }
 
-const char* getXtagDescription (xtagType type)
+extern const char* getXtagDescription (xtagType type)
 {
 	xtagDefinition* def = getXtagDefinition (type);
 	if (def)

@@ -45,6 +45,8 @@ struct sHashTable {
 	hashTableEqualFunc equalfn;
 	hashTableDeleteFunc keyfreefn;
 	hashTableDeleteFunc valfreefn;
+	void *valForNotUnknownKey;
+	hashTableDeleteFunc valForNotUnknownKeyfreefn;
 };
 
 struct chainTracker {
@@ -100,7 +102,8 @@ static void  entry_reclaim (hentry* entry,
 		entry = entry_destroy (entry, keyfreefn, valfreefn);
 }
 
-static void *entry_find (hentry* entry, const void* const key, hashTableEqualFunc equalfn)
+static void *entry_find (hentry* entry, const void* const key, hashTableEqualFunc equalfn,
+						 void *valForNotUnknownKey)
 {
 	while (entry)
 	{
@@ -108,7 +111,7 @@ static void *entry_find (hentry* entry, const void* const key, hashTableEqualFun
 			return entry->value;
 		entry = entry->next;
 	}
-	return NULL;
+	return valForNotUnknownKey;
 }
 
 static bool		entry_delete (hentry **entry, const void *key, hashTableEqualFunc equalfn,
@@ -168,16 +171,21 @@ extern hashTable *hashTableNew    (unsigned int size,
 	htable->equalfn = equalfn;
 	htable->keyfreefn = keyfreefn;
 	htable->valfreefn = valfreefn;
+	htable->valForNotUnknownKey = NULL;
+	htable->valForNotUnknownKeyfreefn = NULL;
 
 	return htable;
 }
 
-extern hashTable* hashTableIntNew (unsigned int size,
-								   hashTableHashFunc hashfn,
-								   hashTableEqualFunc equalfn,
-								   hashTableDeleteFunc keyfreefn)
+extern void hashTableSetValueForUnknownKey (hashTable *htable,
+											void *val,
+											hashTableDeleteFunc valfreefn)
 {
-	return hashTableNew (size, hashfn, equalfn, keyfreefn, NULL);
+	if (htable->valfreefn)
+		htable->valfreefn (htable->valForNotUnknownKey);
+
+	htable->valForNotUnknownKey = val;
+	htable->valForNotUnknownKeyfreefn = valfreefn;
 }
 
 extern void       hashTableDelete (hashTable *htable)
@@ -187,6 +195,8 @@ extern void       hashTableDelete (hashTable *htable)
 
 	hashTableClear (htable);
 
+	if (htable->valForNotUnknownKeyfreefn)
+		htable->valForNotUnknownKeyfreefn (htable->valForNotUnknownKey);
 	eFree (htable->table);
 	eFree (htable);
 }
@@ -220,7 +230,7 @@ extern void*      hashTableGetItem   (hashTable *htable, const void * key)
 	unsigned int i;
 
 	i = htable->hashfn (key) % htable->size;
-	return entry_find(htable->table[i], key, htable->equalfn);
+	return entry_find(htable->table[i], key, htable->equalfn, htable->valForNotUnknownKey);
 }
 
 extern bool     hashTableDeleteItem (hashTable *htable, const void *key)
@@ -246,7 +256,7 @@ extern bool    hashTableUpdateItem (hashTable *htable, void *key, void *value)
 
 extern bool    hashTableHasItem    (hashTable *htable, const void *key)
 {
-	return hashTableGetItem (htable, key)? true: false;
+	return hashTableGetItem (htable, key) == htable->valForNotUnknownKey? false: true;
 }
 
 extern bool       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data)

@@ -35,10 +35,12 @@ extern xtagType  getXtagTypeForNameAndLanguage (const char *name, langType langu
 extern bool enableXtag (xtagType type, bool state);
 extern bool isXtagFixed (xtagType type);
 extern bool isCommonXtag (xtagType type);
-extern int  getXtagOwner (xtagType type);
 
-const char* getXtagName (xtagType type);
-const char* getXtagDescription (xtagType type);
+/* Return LANG_IGNORE for common fields. */
+extern langType getXtagOwner (xtagType type);
+
+extern const char* getXtagName (xtagType type);
+extern const char* getXtagDescription (xtagType type);
 
 extern void initXtagObjects (void);
 extern int countXtags (void);

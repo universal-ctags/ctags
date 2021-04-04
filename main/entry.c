@@ -1449,6 +1449,7 @@ static int queueTagEntry(const tagEntryInfo *const tag)
 
 	corkIndex = (int)ptrArrayAdd (TagFile.corkQueue, entry);
 	entry->corkIndex = corkIndex;
+	entry->slot.inCorkQueue = 1;
 
 	return corkIndex;
 }
@@ -1884,8 +1885,9 @@ static void    markTagExtraBitFull     (tagEntryInfo *const tag, xtagType extra,
 
 		int n = countXtags () - XTAG_COUNT;
 		tag->extraDynamic = xCalloc ((n / 8) + 1, uint8_t);
-		PARSER_TRASH_BOX(tag->extraDynamic, eFree);
-		markTagExtraBit (tag, extra);
+		if (!tag->inCorkQueue)
+			PARSER_TRASH_BOX(tag->extraDynamic, eFree);
+		markTagExtraBitFull (tag, extra, mark);
 		return;
 	}
 
@@ -1913,7 +1915,6 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 		index = (extra / 8);
 		offset = (extra % 8);
 		slot = tag->extra;
-
 	}
 	else if (!tag->extraDynamic)
 		return false;
@@ -1923,7 +1924,6 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 		index = ((extra - XTAG_COUNT) / 8);
 		offset = ((extra - XTAG_COUNT) % 8);
 		slot = tag->extraDynamic;
-
 	}
 	return !! ((slot [ index ]) & (1 << offset));
 }

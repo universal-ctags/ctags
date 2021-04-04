@@ -53,6 +53,7 @@ struct sTagEntryInfo {
 										  current tag by itself, set this. */
 	unsigned int isPseudoTag:1;	/* Used only in xref output.
 								   If a tag is a pseudo, set this. */
+	unsigned int inCorkQueue:1;
 
 	unsigned long lineNumber;     /* line number of tag */
 	const char* pattern;	      /* pattern for locating input line

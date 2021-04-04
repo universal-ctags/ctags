@@ -54,6 +54,16 @@ extern hashTable* hashTableNew         (unsigned int size,
 					hashTableDeleteFunc keyfreefn,
 					hashTableDeleteFunc valfreefn);
 
+/* By default, hashTableGetItem() returns NULL for a unknown key.
+ * It means you cannot store NULL as a value for a key.
+ * With hashTableSetValueForUnknownKey(), you can specific
+ * an alternative address representing the value for for unknown
+ * keys.
+ */
+extern void hashTableSetValueForUnknownKey (hashTable *htable,
+											void *val,
+											hashTableDeleteFunc valfreefn);
+
 extern void       hashTableDelete      (hashTable *htable);
 extern void       hashTableClear       (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
@@ -77,10 +87,6 @@ extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *ke
 
 extern unsigned int hashTableCountItem   (hashTable *htable);
 
-extern hashTable* hashTableIntNew (unsigned int size,
-								   hashTableHashFunc hashfn,
-								   hashTableEqualFunc equalfn,
-								   hashTableDeleteFunc keyfreefn);
 #define HT_PTR_TO_INT(P) ((int)(intptr_t)(P))
 #define HT_INT_TO_PTR(P) ((void*)(intptr_t)(P))
 #define HT_PTR_TO_UINT(P) ((unsigned int)(uintptr_t)(P))
