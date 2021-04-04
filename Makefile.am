@@ -2,6 +2,13 @@ ACLOCAL_AMFLAGS = -I m4
 
 include $(top_srcdir)/source.mak
 
+PACKCC_FILES = misc/packcc/.gitignore   \
+	       misc/packcc/README.md    \
+	       misc/packcc/LICENSE      \
+	       misc/packcc/src/packcc.c \
+	       \
+	       $(NULL)
+
 EXTRA_DIST   = README.md autogen.sh \
 	       makefiles/list-optlib2c-input.mak misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
@@ -10,8 +17,7 @@ EXTRA_DIST   = README.md autogen.sh \
 	       gnu_regex/regex_internal.c gnu_regex/regex_internal.h \
 	       misc/ctags-optlib-mode.el \
 	       misc/mk-interactive-request.sh misc/roundtrip misc/tinst \
-	       misc/packcc/.gitignore misc/packcc/LICENSE.txt \
-	       misc/packcc/README.md misc/packcc/packcc.c \
+	       $(PACKCC_FILES) \
 	       misc/validators/validator-jq \
 	       misc/validators/validator-KNOWN-INVALIDATION \
 	       misc/validators/validator-NONE \
@@ -50,8 +56,8 @@ PACKCC = $(top_builddir)/packcc$(BUILD_EXEEXT)
 cc4b_verbose = $(cc4b_verbose_@AM_V@)
 cc4b_verbose_ = $(cc4b_verbose_@AM_DEFAULT_V@)
 cc4b_verbose_0 = @echo CC4BUILD "  $@";
-$(PACKCC): $(top_srcdir)/misc/packcc/packcc.c
-	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(EXTRA_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/misc/packcc/packcc.c
+$(PACKCC): $(top_srcdir)/misc/packcc/src/packcc.c
+	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(EXTRA_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/misc/packcc/src/packcc.c
 
 if USE_READCMD
 bin_PROGRAMS+= readtags
@@ -149,9 +155,9 @@ packcc_verbose_ = $(packcc_verbose_@AM_DEFAULT_V@)
 packcc_verbose_0 = @echo PACKCC "    $@";
 SUFFIXES += .peg
 .peg.c:
-	$(packcc_verbose)$(PACKCC) -i \"general.h\" -o $(top_builddir)/peg/$(*F) "$<"
+	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
 .peg.h:
-	$(packcc_verbose)$(PACKCC) -i \"general.h\" -o $(top_builddir)/peg/$(*F) "$<"
+	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
 # You cannot use $(PACKCC) as a target name here.
 $(PEG_SRCS) $(PEG_HEADS): $(PACKCC) Makefile
 dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)

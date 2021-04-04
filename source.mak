@@ -390,7 +390,7 @@ READTAGS_HEADS = \
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 
 PACKCC_SRCS = \
-	misc/packcc/packcc.c \
+	misc/packcc/src/packcc.c \
 	\
 	$(NULL)
 

@@ -433,11 +433,7 @@ PackCC compiler-compiler
 
 PackCC is a compiler-compiler; it translates ``.peg`` grammar file to ``.c``
 file.  PackCC was originally written by Arihiro Yoshida. Its source
-repository is at sourceforge. It seems that PackCC at sourceforge is
-not actively maintained. Some derived repositories are at
-github. Currently, our choice is
-https://github.com/enechaev/packcc. It is the most active one in the
-derived repositories.
+repository is at https://github.com/arithy/packcc.
 
 The source tree of PackCC is grafted at ``misc/packcc`` directory.
 Building PackCC and ctags are integrated in the build-scripts of

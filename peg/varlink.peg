@@ -58,6 +58,10 @@
 
 %auxil	"struct parserCtx *"
 
+%earlysource {
+    #include "general.h"
+}
+
 %header {
 	struct parserCtx;
 }
