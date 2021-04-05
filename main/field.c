@@ -1065,13 +1065,12 @@ static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag)
 static bool     isExtrasFieldAvailable     (const tagEntryInfo *const tag)
 {
 	unsigned int i;
+
+	if (tag->extraDynamic)
+		return true;
 	for (i = 0; i < sizeof (tag->extra); i++)
-	{
 		if (tag->extra [i])
 			return true;
-		else if (tag->extraDynamic)
-			return true;
-	}
 
 	return false;
 }
