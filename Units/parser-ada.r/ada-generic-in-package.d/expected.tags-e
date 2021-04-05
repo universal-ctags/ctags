@@ -6,3 +6,39 @@ package My_Package isMy_Package/s2,48
     type Num is digits <>;Num5,81
   type Missing_Tag is recordMissing_Tag/t10,208
     Num : Integer;Num11,237
+
+input_1.adb,1666
+procedure Input_1 isInput_1/p1,0
+  procedure Generic_Reverse_Array (X : in out Array_T);Generic_Reverse_Array/p9,200
+    type T is private;T4,32
+    type Index is range <>;Index5,55
+    type Array_T is array (Index range <>) of T;Array_T6,83
+    with function Img (A, B: T) return boolean;Img8,152
+  procedure Generic_Reverse_Array (X : in out Array_T) isGeneric_Reverse_Array/p11,257
+	Tmp     : T;Tmp15,389
+	X_Left  : T renames X (I);X_Left16,403
+	X_Right : T renames X (X'Last + X'First - I);X_Right17,431
+  type Color is (None, Black, Red, Green, Blue, White);Color/t26,603
+  type Color is (None, Black, Red, Green, Blue, White);None26,603
+  type Color is (None, Black, Red, Green, Blue, White);Black26,603
+  type Color is (None, Black, Red, Green, Blue, White);Red26,603
+  type Color is (None, Black, Red, Green, Blue, White);Green26,603
+  type Color is (None, Black, Red, Green, Blue, White);Blue26,603
+  type Color is (None, Black, Red, Green, Blue, White);White26,603
+  type Color_Array is array (Integer range <>) of Color;Color_Array/t27,659
+  procedure Reverse_Color_Array is new Generic_Reverse_ArrayReverse_Color_Array/p28,716
+  type Shape is (None, Circle, Triangle, Square);Shape/t31,859
+  type Shape is (None, Circle, Triangle, Square);None31,859
+  type Shape is (None, Circle, Triangle, Square);Circle31,859
+  type Shape is (None, Circle, Triangle, Square);Triangle31,859
+  type Shape is (None, Circle, Triangle, Square);Square31,859
+  type Shape_Array is array (Integer range <>) of Shape;Shape_Array/t32,909
+  procedure Reverse_Shape_Array is new Generic_Reverse_ArrayReverse_Shape_Array/p33,966
+
+input_2.ads,301
+package input_2 isinput_2/s1,0
+  type Generator is null record;Generator/t3,20
+    type Unsigned is mod <>;Unsigned5,63
+    type Real is digits <>;Real6,92
+    with function Random (G: Generator) return Unsigned is <>;Random7,120
+  function Random (G: Generator) return Real;Random/f8,183
