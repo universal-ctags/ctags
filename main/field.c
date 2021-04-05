@@ -74,7 +74,6 @@ static bool doesContainAnyCharInInput (const tagEntryInfo *const tag, const char
 static bool doesContainAnyCharInFieldScope (const tagEntryInfo *const tag, const char *value, const char *chars);
 static bool doesContainAnyCharInSignature (const tagEntryInfo *const tag, const char *value, const char *chars);
 
-static bool     isLanguageFieldAvailable  (const tagEntryInfo *const tag);
 static bool     isTyperefFieldAvailable   (const tagEntryInfo *const tag);
 static bool     isFileFieldAvailable      (const tagEntryInfo *const tag);
 static bool     isInheritsFieldAvailable  (const tagEntryInfo *const tag);
@@ -199,7 +198,6 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.render             = renderFieldLanguage,
 		.renderNoEscaping   = NULL,
 		.doesContainAnyChar = NULL,
-		.isValueAvailable   = isLanguageFieldAvailable,
 		.dataType           = FIELDTYPE_STRING,
 	},
 	[FIELD_IMPLEMENTATION - FIELD_COMPACT_INPUT_LINE] = {
@@ -883,7 +881,10 @@ static const char *renderFieldLanguage (const tagEntryInfo *const tag,
 	if (Option.lineDirectives && (tag->sourceLangType != LANG_IGNORE))
 		l = getLanguageName(tag->sourceLangType);
 	else
+	{
+		Assert (tag->langType != LANG_IGNORE);
 		l = getLanguageName(tag->langType);
+	}
 
 	return renderAsIs (b, WITH_DEFUALT_VALUE(l));
 }
@@ -1028,11 +1029,6 @@ static const char *renderFieldEpoch (const tagEntryInfo *const tag,
 		return renderAsIs (b, buf);
 	else
 		return NULL;
-}
-
-static bool     isLanguageFieldAvailable (const tagEntryInfo *const tag)
-{
-	return (tag->langType == LANG_IGNORE)? false: true;
 }
 
 static bool     isTyperefFieldAvailable  (const tagEntryInfo *const tag)
