@@ -161,7 +161,7 @@ OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
 include makefiles/peg_input.mak
 PEG_SRCS = $(PEG_INPUT:.peg=.c)
 PEG_HEADS = $(PEG_INPUT:.peg=.h)
-PEG_EXTRA_HEADS = $(PEG_INPUT:.peg=_pre.h) $(PEG_INPUT:.peg=_post.h)
+PEG_EXTRA_HEADS = peg/peg_common.h $(PEG_INPUT:.peg=_pre.h) $(PEG_INPUT:.peg=_post.h)
 PEG_OBJS = $(PEG_SRCS:.c=.$(OBJEXT))
 
 PARSER_HEADS = \
