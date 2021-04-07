@@ -1,0 +1,58 @@
+Null_Before_Label	input.adb	/^  <<Null_Before_Label>> null;  <<Null_After_Label>>$/;"	b	subprogram:Input	file:
+Null_After_Label	input.adb	/^  <<Null_Before_Label>> null;  <<Null_After_Label>>$/;"	b	subprogram:Input	file:
+Assignment_Before_Label	input.adb	/^  <<Assignment_Before_Label>> X := 1; <<Assignment_After_Label>>$/;"	b	subprogram:Input	file:
+Assignment_After_Label	input.adb	/^  <<Assignment_Before_Label>> X := 1; <<Assignment_After_Label>>$/;"	b	subprogram:Input	file:
+Exit_Before_Label	input.adb	/^      <<Exit_Before_Label>> exit; <<Exit_After_Label>>$/;"	b	anon:loop	file:
+Exit_After_Label	input.adb	/^      <<Exit_Before_Label>> exit; <<Exit_After_Label>>$/;"	b	anon:loop	file:
+Goto_Before_Label	input.adb	/^      <<Goto_Before_Label>> goto Assignment_Before_Label;  <<Goto_After_Label>>$/;"	b	anon:loop	file:
+Goto_After_Label	input.adb	/^      <<Goto_Before_Label>> goto Assignment_Before_Label;  <<Goto_After_Label>>$/;"	b	anon:loop	file:
+Procedure_Call_Before_Label	input.adb	/^  <<Procedure_Call_Before_Label>> Ada.Text_IO.Put_Line ("Hello World"); <<Procedure_Call_After_L/;"	b	subprogram:Input	file:
+Procedure_Call_After_Label	input.adb	/^  <<Procedure_Call_Before_Label>> Ada.Text_IO.Put_Line ("Hello World"); <<Procedure_Call_After_L/;"	b	subprogram:Input	file:
+Return_Before_Label	input.adb	/^    <<Return_Before_Label>> return; <<Return_After_Label>>$/;"	b	subprogram:Input	file:
+Return_After_Label	input.adb	/^    <<Return_Before_Label>> return; <<Return_After_Label>>$/;"	b	subprogram:Input	file:
+Accept_Before_Label	input.adb	/^      <<Accept_Before_Label>> accept Start(Nr : in Natural) do$/;"	b	task:Server	file:
+Requeue_Before_Label	input.adb	/^	<<Requeue_Before_Label>> requeue Start; <<Requeue_After_Label>>$/;"	b	entry:Start	file:
+Requeue_After_Label	input.adb	/^	<<Requeue_Before_Label>> requeue Start; <<Requeue_After_Label>>$/;"	b	entry:Start	file:
+Accept_After_Label	input.adb	/^      end Start; <<Accept_After_Label>>$/;"	b	task:Server	file:
+Entry_Before_Label	input.adb	/^    <<Entry_Before_Label>> My_Task.Start (1); <<Entry_After_Label>>$/;"	b	anon:declare	file:
+Entry_After_Label	input.adb	/^    <<Entry_Before_Label>> My_Task.Start (1); <<Entry_After_Label>>$/;"	b	anon:declare	file:
+Delay_Before_Label	input.adb	/^    <<Delay_Before_Label>> delay 100.0; <<Delay_After_Label>>$/;"	b	anon:declare	file:
+Delay_After_Label	input.adb	/^    <<Delay_Before_Label>> delay 100.0; <<Delay_After_Label>>$/;"	b	anon:declare	file:
+Abort_Before_Label	input.adb	/^    <<Abort_Before_Label>> abort My_Task; <<Abort_After_Label>>$/;"	b	anon:declare	file:
+Abort_After_Label	input.adb	/^    <<Abort_Before_Label>> abort My_Task; <<Abort_After_Label>>$/;"	b	anon:declare	file:
+Select_Before_Statement	input.adb	/^      <<Select_Before_Statement>> select$/;"	b	anon:declare	file:
+Select_After_Statement	input.adb	/^      end select; <<Select_After_Statement>>$/;"	b	task:Server	file:
+Code_Before_Label	input.adb	/^  <<Code_Before_Label>>$/;"	b	task:Server	file:
+Code_After_Label	input.adb	/^  <<Code_After_Label>>$/;"	b	task:Server	file:
+Multiple_1_Before_Label	input.adb	/^  <<Multiple_1_Before_Label>> <<Multiple_2_Before_Label>> <<Multiple_3_Before_Label>> null; <<Mu/;"	b	task:Server	file:
+Multiple_2_Before_Label	input.adb	/^  <<Multiple_1_Before_Label>> <<Multiple_2_Before_Label>> <<Multiple_3_Before_Label>> null; <<Mu/;"	b	task:Server	file:
+Multiple_3_Before_Label	input.adb	/^  <<Multiple_1_Before_Label>> <<Multiple_2_Before_Label>> <<Multiple_3_Before_Label>> null; <<Mu/;"	b	task:Server	file:
+Multiple_1_After_Label	input.adb	/^  <<Multiple_1_Before_Label>> <<Multiple_2_Before_Label>> <<Multiple_3_Before_Label>> null; <<Mu/;"	b	task:Server	file:
+Multiple_2_After_Label	input.adb	/^  <<Multiple_1_Before_Label>> <<Multiple_2_Before_Label>> <<Multiple_3_Before_Label>> null; <<Mu/;"	b	task:Server	file:
+Multiple_3_After_Label	input.adb	/^  <<Multiple_1_Before_Label>> <<Multiple_2_Before_Label>> <<Multiple_3_Before_Label>> null; <<Mu/;"	b	task:Server	file:
+Raise_Before_Label	input.adb	/^  <<Raise_Before_Label>> raise constraint_error; <<Raise_After_Label>>$/;"	b	task:Server	file:
+Raise_After_Label	input.adb	/^  <<Raise_Before_Label>> raise constraint_error; <<Raise_After_Label>>$/;"	b	task:Server	file:
+If_Before_Label	input.adb	/^  <<If_Before_Label>> if X>1 then$/;"	b	task:Server	file:
+If_After_Label	input.adb	/^  end if; <<If_After_Label>> $/;"	b	task:Server	file:
+Case_Before_Label	input.adb	/^  <<Case_Before_Label>> case X is$/;"	b	task:Server	file:
+Case_Code_Before_Label	input.adb	/^    when 1 => <<Case_Code_Before_Label>> Ada.Text_IO.Put_Line ("1"); <<Case_Code_After_Label>> $/;"	b	task:Server	file:
+Case_Code_After_Label	input.adb	/^    when 1 => <<Case_Code_Before_Label>> Ada.Text_IO.Put_Line ("1"); <<Case_Code_After_Label>> $/;"	b	task:Server	file:
+Case_After_Label	input.adb	/^  end case; <<Case_After_Label>>$/;"	b	task:Server	file:
+Loop_Before_Label	input.adb	/^  <<Loop_Before_Label>> loop	$/;"	b	task:Server	file:
+Loop_Code_Before_Label	input.adb	/^    <<Loop_Code_Before_Label>> Ada.Text_IO.Put_Line ("1"); <<Loop_Code_After_Label>>$/;"	b	anon:loop	file:
+Loop_Code_After_Label	input.adb	/^    <<Loop_Code_Before_Label>> Ada.Text_IO.Put_Line ("1"); <<Loop_Code_After_Label>>$/;"	b	anon:loop	file:
+Loop_After_Label	input.adb	/^  end loop; <<Loop_After_Label>>$/;"	b	task:Server	file:
+While_Before_Label	input.adb	/^  <<While_Before_Label>> while X > 1 loop$/;"	b	task:Server	file:
+While_Code_Before_Label	input.adb	/^    <<While_Code_Before_Label>> X := X + 1; <<While_Code_After_Label>>$/;"	b	anon:loop	file:
+While_Code_After_Label	input.adb	/^    <<While_Code_Before_Label>> X := X + 1; <<While_Code_After_Label>>$/;"	b	anon:loop	file:
+While_After_Label	input.adb	/^  end loop; <<While_After_Label>>$/;"	b	task:Server	file:
+For_Before_Label	input.adb	/^  <<For_Before_Label>> for I in 1 .. X loop$/;"	b	task:Server	file:
+For_Code_Before_Label	input.adb	/^    <<For_Code_Before_Label>> Ada.Text_IO.Put_Line (X'Image); <<For_Code_After_Label>>  $/;"	b	anon:loop	file:
+For_Code_After_Label	input.adb	/^    <<For_Code_Before_Label>> Ada.Text_IO.Put_Line (X'Image); <<For_Code_After_Label>>  $/;"	b	anon:loop	file:
+For_After_Label	input.adb	/^  end loop; <<For_After_Label>>$/;"	b	task:Server	file:
+Declare_Before_Label	input.adb	/^  <<Declare_Before_Label>> declare$/;"	b	task:Server	file:
+Declare_After_Label	input.adb	/^  end; <<Declare_After_Label>>$/;"	b	task:Server	file:
+Begin_Before_Label	input.adb	/^  <<Begin_Before_Label>> begin$/;"	b	task:Server	file:
+Begin_After_Label	input.adb	/^  end; <<Begin_After_Label>>$/;"	b	task:Server	file:
+Return_Before_Label	input.adb	/^      <<Return_Before_Label>> return Coord : Coordinate do$/;"	b	subprogram:Extended_Return	file:
+Return_After_Label	input.adb	/^      end return; <<Return_After_Label>>$/;"	b	subprogram:Extended_Return	file:
