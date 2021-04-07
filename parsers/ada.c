@@ -494,8 +494,10 @@ static void freeAdaToken(adaTokenList *list, adaTokenInfo *token)
     {
       token->prev->next = token->next;
     }
-    else if(list != NULL && token->prev == NULL)
+    else if(list != NULL)
     {
+      /* Token to remove is head in list as 'token->prev == NULL' */
+      Assert(token->prev == NULL);
       list->head = token->next;
     }
 
@@ -504,8 +506,10 @@ static void freeAdaToken(adaTokenList *list, adaTokenInfo *token)
     {
       token->next->prev = token->prev;
     }
-    else if(list != NULL && token->next == NULL)
+    else if(list != NULL)
     {
+      /* Token to remove is tail of list as 'token->next == NULL') */
+      Assert(token->next == NULL);
       list->tail = token->prev;
     }
 
@@ -2020,9 +2024,8 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
            * found, if we didn't just fall through */
           if((pos + i) < lineLen)
           {
-            token = newAdaToken(&line[pos], i, ADA_KIND_LABEL, false, parent);
+            newAdaToken(&line[pos], i, ADA_KIND_LABEL, false, parent);
             skipPast(">>");
-            token = NULL;
           }
         } /* else if(strncasecmp(line[pos], "<<", strlen("<<")) == 0) */
         /* we need to check for a few special case keywords that might cause
