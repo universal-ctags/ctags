@@ -1,0 +1,6 @@
+def func0(a, b)
+    ...
+
+def func1(x,
+    y)
+    ...

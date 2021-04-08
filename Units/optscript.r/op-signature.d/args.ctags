@@ -1,0 +1,17 @@
+--langdef=X
+--map-X=.unknown
+--kinddef-X=d,def,definitions
+--fields=+{signature}
+--_tabledef-X=main
+--_tabledef-X=signature
+
+--_mtable-regex-X=main/def[ ]+([a-z0-9]+)(\(?)/\1/d/{{
+	\2 (\() eq {
+       . /signature _tenter
+    } if
+}}
+--_mtable-regex-X=main/.//
+
+--_mtable-regex-X=signature/([^)]+)\)//{{
+    mark (\() \1 dup _normalize_spaces! (\)) _buildstring signature: _tleave
+}}

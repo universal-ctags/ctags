@@ -97,6 +97,8 @@ static EsObject* getFieldValueForScope (const tagEntryInfo *, const fieldDefinit
 static EsObject* setFieldValueForScope (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* checkFieldValueForScope (const fieldDefinition *, const EsObject *);
 static EsObject* getFieldValueForExtras (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* getFieldValueForSignature (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* setFieldValueForSignature (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
@@ -251,6 +253,11 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.doesContainAnyChar = doesContainAnyCharInSignature,
 		.isValueAvailable	= isSignatureFieldAvailable,
 		.dataType			= FIELDTYPE_STRING,
+		.getterValueType    = NULL,
+		.getValueObject     = getFieldValueForSignature,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = setFieldValueForSignature,
 	},
 	[FIELD_SCOPE - FIELD_COMPACT_INPUT_LINE] = {
 		.letter				= 's',
@@ -1666,4 +1673,21 @@ static EsObject* getFieldValueForExtras (const tagEntryInfo *tag, const fieldDef
 		es_object_unref (extra);
 	}
 	return a;
+}
+
+static EsObject* getFieldValueForSignature (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	if (!tag->extensionFields.signature)
+		return es_nil;
+	return (opt_name_new_from_cstr (tag->extensionFields.signature));
+}
+
+static EsObject* setFieldValueForSignature (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
+{
+	if (tag->extensionFields.signature)
+		eFree ((char *)tag->extensionFields.signature);
+
+	const char *str = opt_string_get_cstr (obj);
+	tag->extensionFields.signature = eStrdup (str);
+	return es_false;
 }

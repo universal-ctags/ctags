@@ -7,7 +7,7 @@ C       compact        no      NONE             s--    no    -- compact input li
 E       extras         no      NONE             s--    no    r- Extra tag type information
 K       NONE           no      NONE             s--    no    -- Kind of tag in long-name form
 R       NONE           no      NONE             s--    no    -- Marker (R or D) representing whether tag is definition or reference
-S       signature      no      NONE             s--    no    -- Signature of routine (e.g. prototype or parameter list)
+S       signature      no      NONE             s--    no    rw Signature of routine (e.g. prototype or parameter list)
 T       epoch          no      NONE             -i-    no    -- the last modified time of the input file (only for F/file kind tag)
 Z       scope          no      NONE             s--    no    rw [tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
 a       access         no      NONE             s--    no    -- Access (or export) of class members
@@ -33,7 +33,7 @@ C       compact        no      NONE             s--    no    -- compact input li
 E       extras         no      NONE             s--    no    r- Extra tag type information
 K       NONE           no      NONE             s--    no    -- Kind of tag in long-name form
 R       NONE           no      NONE             s--    no    -- Marker (R or D) representing whether tag is definition or reference
-S       signature      no      NONE             s--    no    -- Signature of routine (e.g. prototype or parameter list)
+S       signature      no      NONE             s--    no    rw Signature of routine (e.g. prototype or parameter list)
 T       epoch          no      NONE             -i-    no    -- the last modified time of the input file (only for F/file kind tag)
 Z       scope          no      NONE             s--    no    rw [tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
 a       access         no      NONE             s--    no    -- Access (or export) of class members
@@ -59,7 +59,7 @@ K       NONE           no      NONE             s--    no    -- Kind of tag in l
 N       name           no      NONE             s--    no    rw tag name
 P       pattern        no      NONE             s-b    no    -- pattern
 R       NONE           no      NONE             s--    no    -- Marker (R or D) representing whether tag is definition or reference
-S       signature      no      NONE             s--    no    -- Signature of routine (e.g. prototype or parameter list)
+S       signature      no      NONE             s--    no    rw Signature of routine (e.g. prototype or parameter list)
 T       epoch          no      NONE             -i-    no    -- the last modified time of the input file (only for F/file kind tag)
 Z       scope          no      NONE             s--    no    rw [tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
 a       access         no      NONE             s--    no    -- Access (or export) of class members
@@ -85,7 +85,7 @@ K       NONE           no      NONE             s--    no    -- Kind of tag in l
 N       name           no      NONE             s--    no    rw tag name
 P       pattern        no      NONE             s-b    no    -- pattern
 R       NONE           no      NONE             s--    no    -- Marker (R or D) representing whether tag is definition or reference
-S       signature      no      NONE             s--    no    -- Signature of routine (e.g. prototype or parameter list)
+S       signature      no      NONE             s--    no    rw Signature of routine (e.g. prototype or parameter list)
 T       epoch          no      NONE             -i-    no    -- the last modified time of the input file (only for F/file kind tag)
 Z       scope          no      NONE             s--    no    rw [tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
 a       access         no      NONE             s--    no    -- Access (or export) of class members

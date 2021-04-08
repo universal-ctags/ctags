@@ -6,7 +6,7 @@ C	compact	no	NONE	s--	no	--	compact input line (used only in xref output)
 E	extras	no	NONE	s--	no	r-	Extra tag type information
 K	NONE	no	NONE	s--	no	--	Kind of tag in long-name form
 R	NONE	no	NONE	s--	no	--	Marker (R or D) representing whether tag is definition or reference
-S	signature	no	NONE	s--	no	--	Signature of routine (e.g. prototype or parameter list)
+S	signature	no	NONE	s--	no	rw	Signature of routine (e.g. prototype or parameter list)
 T	epoch	yes	NONE	-i-	no	--	the last modified time of the input file (only for F/file kind tag)
 Z	scope	no	NONE	s--	no	rw	[tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
 a	access	no	NONE	s--	no	--	Access (or export) of class members
