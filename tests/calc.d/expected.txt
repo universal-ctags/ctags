@@ -1,0 +1,4 @@
+answer=2
+answer=6
+answer=4
+answer=-2

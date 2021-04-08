@@ -1,0 +1,4 @@
+FILE <- (BEGINS_WITH_UPPER / FOLLOWED_BY_SPACE / .)*
+
+BEGINS_WITH_UPPER <- ![a-z] [a-zA-Z]+           { printf("BEGINS WITH UPPER: %s\n", $0); }
+FOLLOWED_BY_SPACE <- [a-zA-Z]+ ![a-zA-Z0-9\n]   { printf("FOLLOWED BY SPACE: %s\n", $0); }

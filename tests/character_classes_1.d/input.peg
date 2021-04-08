@@ -1,0 +1,32 @@
+%source {
+    void print_esc(const char* type, const char* ch) {
+        if (strncmp(type, "UNICODE", 7) == 0)
+            printf("%s: '%s'\n", type, ch);
+        else if (*ch >= '\x20' && *ch < '\x7f')
+            printf("%s: '%c'\n", type, *ch);
+        else
+            printf("%s: chr(%u)\n", type, *ch);
+    }
+}
+
+FILE <- (LOWER_LETTER / UPPER_LETTER / DIGIT / UNICODE / ESCAPED / CARET / SPACE / SPECIAL / OTHER)*
+
+# simple character class
+LOWER_LETTER <- [a-z]       { print_esc("LOWER", $0); }
+# octal escapes (FIXME: octals do not work)
+# UPPER_LETTER <- [\101-\132] { print_esc("UPPER", $0); }
+UPPER_LETTER <- [A-Z]       { print_esc("UPPER", $0); }
+# hexadecimal escapes
+DIGIT <- [\x30-\x39]        { print_esc("DIGIT", $0); }
+# some unicode chars
+UNICODE <- [\u20AC\u00A3]   { print_esc("UNICODE", $0); }
+# other ANSI escapes
+ESCAPED <- [\t\r\n\\\'\"]   { print_esc("ESCAPED", $0); }
+# caret
+CARET <- [\^]               { print_esc("CARET", $0); }
+# negated set
+SPECIAL <- [^-_@a-zA-Z0-9] { print_esc("SPECIAL", $0); }
+# single character class
+SPACE <- [ ]                { print_esc("SPACE", $0); }
+# catch non-matched
+OTHER <- .                  { print_esc("OTHER", $0); }

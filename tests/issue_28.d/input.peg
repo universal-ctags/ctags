@@ -1,0 +1,9 @@
+%source {
+#define PCC_ERROR(auxil) \
+    do { printf("Syntax error\n"); exit(1); } while (0)
+    /* NOTE: To guarantee the output order, stderr, which can lead a race condition with stdout, is not used. */
+}
+
+top <- rule+ { PRINT($0); }
+rule <- "A;" / _
+_ <- [ \n]*

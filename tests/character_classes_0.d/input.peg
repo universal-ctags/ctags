@@ -1,0 +1,9 @@
+FILE <- TOKEN (_ TOKEN)* _*
+TOKEN <- CLASS0 / CLASS1 / CLASS2 / CLASS3 / CLASS4 / CLASS5
+CLASS0 <- [\^a-z-] { printf("CLASS0: '%s'\n", $0); }
+CLASS1 <- [\\\]]   { printf("CLASS1: '%s'\n", $0); }
+CLASS2 <- [-あ-ん] { printf("CLASS2: '%s'\n", $0); }
+CLASS3 <- [𝓪-𝔃-]   { printf("CLASS3: '%s'\n", $0); }
+CLASS4 <- [^0-9]   { printf("CLASS4: '%s'\n", $0); }
+CLASS5 <- [^]      { printf("CLASS5: '%s'\n", $0); }
+_ <- ' ' / '\n'

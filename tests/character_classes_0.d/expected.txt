@@ -1,0 +1,8 @@
+CLASS0: '^'
+CLASS0: '-'
+CLASS1: '\'
+CLASS1: ']'
+CLASS2: 'ぬ'
+CLASS3: '𝓴'
+CLASS4: 'J'
+CLASS5: '7'
