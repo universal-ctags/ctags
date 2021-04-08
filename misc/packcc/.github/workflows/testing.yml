@@ -1,0 +1,38 @@
+name: run test cases
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  testing:
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-20.04]
+        compiler: [gcc, clang]
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CC: ${{ matrix.compiler }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: install bats
+      run: |
+        curl -L -o bats-core-1.2.1.tar.gz https://github.com/bats-core/bats-core/archive/v1.2.1.tar.gz
+        tar zxvf bats-core-1.2.1.tar.gz
+        cd bats-core-1.2.1 &&
+        sudo ./install.sh /usr/local
+    - name: install uncrustify
+      run: |
+        curl -LO http://launchpadlibrarian.net/516341795/uncrustify_0.72.0+dfsg1-2_amd64.deb
+        sudo dpkg -i uncrustify_0.72.0+dfsg1-2_amd64.deb || true
+    - name: build packcc
+      run: |
+        (
+        cd  build/$CC
+        make all check
+        )
