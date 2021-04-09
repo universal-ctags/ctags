@@ -1,0 +1,7 @@
+capture all
+capture first
+capture second
+capture multiple1 words
+capture multiple2 something
+more captures
+captured again and again

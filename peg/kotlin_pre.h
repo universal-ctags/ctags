@@ -15,16 +15,14 @@
 #include "numarray.h"
 #include "kind.h"
 #include "read.h"
+#include "peg_common.h"
 
 
 /*
 *   MACROS
 */
+#undef PCC_GETCHAR
 #define PCC_GETCHAR(auxil) getcFromKotlinFile(auxil)
-#define PCC_MALLOC(auxil,size) eMalloc(size)
-#define PCC_REALLOC(auxil,ptr,size) eRealloc(ptr,size)
-#define PCC_FREE(auxil,ptr) eFreeNoNullCheck(ptr)
-#define PCC_ERROR(auxil) reportError(auxil)
 
 /*
 *   DATA DECLARATIONS

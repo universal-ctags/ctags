@@ -1,0 +1,6 @@
+FILE <- TOKEN (_ TOKEN)* _*
+TOKEN <- (HEX0 / UNI0 / UNI1) { PRINT($0); }
+HEX0 <- "\x50\x61\x63\x6b\x43\x43"
+UNI0 <- "\u69CB\u6587\u89e3\u6790"
+UNI1 <- "\uD835\udcdf\uD835\udcea\uD835\udcec\uD835\udcf4\uD835\udcd2\uD835\udcd2"
+_ <- ' ' / '\n'

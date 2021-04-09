@@ -1,0 +1,64 @@
+Evaluating rule TOP @0 []
+  Evaluating rule RULE_A @0 []
+  Matched rule RULE_A @0 [Aaa]
+  Evaluating rule EOL @3 [
+]
+  Matched rule EOL @3 [
+]
+Matched rule TOP @0 [Aaa
+]
+A: Aaa
+Evaluating rule TOP @0 [B]
+  Evaluating rule RULE_A @0 [B]
+  Abandoning rule RULE_A @0 []
+  Evaluating rule RULE_B @0 [B]
+    Evaluating rule RULE_B1 @0 [B]
+      Evaluating rule RULE_A @2 [C]
+      Abandoning rule RULE_A @2 []
+    Abandoning rule RULE_B1 @0 [BB]
+    Evaluating rule RULE_B2 @0 [BBC]
+      Evaluating rule RULE_C @2 [C]
+        Evaluating rule RULE_A @5 [b]
+        Abandoning rule RULE_A @5 []
+        Evaluating rule RULE_B @5 [b]
+          Evaluating rule RULE_B1 @5 [b]
+            Evaluating rule RULE_A @7 [C]
+            Abandoning rule RULE_A @7 []
+          Abandoning rule RULE_B1 @5 [bb]
+          Evaluating rule RULE_B2 @5 [bbC]
+            Evaluating rule RULE_C @7 [C]
+              Evaluating rule RULE_A @9 [B]
+              Abandoning rule RULE_A @9 []
+              Evaluating rule RULE_B @9 [B]
+                Evaluating rule RULE_B1 @9 [B]
+                  Evaluating rule RULE_A @13 [
+]
+                  Abandoning rule RULE_A @13 []
+                Abandoning rule RULE_B1 @9 [Bbbb]
+                Evaluating rule RULE_B2 @9 [Bbbb
+]
+                  Evaluating rule RULE_C @13 [
+]
+                  Abandoning rule RULE_C @13 []
+                Matched rule RULE_B2 @9 [Bbbb]
+              Matched rule RULE_B @9 [Bbbb]
+            Matched rule RULE_C @7 [CCBbbb]
+          Matched rule RULE_B2 @5 [bbCCBbbb]
+        Matched rule RULE_B @5 [bbCCBbbb]
+      Matched rule RULE_C @2 [CccbbCCBbbb]
+    Matched rule RULE_B2 @0 [BBCccbbCCBbbb]
+  Matched rule RULE_B @0 [BBCccbbCCBbbb]
+  Evaluating rule EOL @13 [
+]
+  Matched rule EOL @13 [
+]
+Matched rule TOP @0 [BBCccbbCCBbbb
+]
+B2: Bbbb
+B: Bbbb
+C: CCBbbb
+B2: bbCCBbbb
+B: bbCCBbbb
+C: CccbbCCBbbb
+B2: BBCccbbCCBbbb
+B: BBCccbbCCBbbb

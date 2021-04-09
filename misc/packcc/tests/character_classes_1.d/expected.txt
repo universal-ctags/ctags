@@ -1,0 +1,23 @@
+LOWER: 'a'
+LOWER: 'b'
+LOWER: 'c'
+LOWER: 'z'
+ESCAPED: chr(10)
+UPPER: 'Z'
+UPPER: 'Y'
+UPPER: 'X'
+UPPER: 'A'
+ESCAPED: chr(10)
+DIGIT: '4'
+DIGIT: '5'
+DIGIT: '6'
+ESCAPED: chr(10)
+SPACE: ' '
+ESCAPED: chr(9)
+CARET: '^'
+OTHER: '_'
+OTHER: '-'
+OTHER: '@'
+SPECIAL: '/'
+ESCAPED: '\'
+ESCAPED: chr(10)

@@ -1,0 +1,31 @@
+%header { /* HEADER ONLY */ }
+
+%source {
+    int custom_function() {
+        return 42;
+    }
+}
+
+%common {
+    /* HEADER AND SOURCE */
+}
+
+%earlyheader { /* EARLY HEADER ONLY */ }
+
+%earlysource { /* EARLY SOURCE ONLY */ }
+
+%earlycommon {
+    /* EARLY HEADER AND SOURCE */
+}
+
+%value "double"
+
+%auxil "long"
+
+%prefix "my"
+
+FILE <- .*
+
+%%
+
+/* SOURCE AFTER GENERATED CODE */

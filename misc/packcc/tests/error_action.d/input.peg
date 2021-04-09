@@ -1,0 +1,17 @@
+FILE <- ((RULE1 / RULE2 / OTHER) '\n')*
+
+RULE1 <- "1" [A-Z] ":"
+        E1 ~{ printf("E1 failed: %s\n", $0); }
+        E2 ~{ printf("E2 failed: %s\n", $0); }
+        E3 ~{ printf("E3 failed: %s\n", $0); }
+        { PRINT($0); }
+
+RULE2 <- "2" [A-Z] ":"
+        (E1 E2 E3) ~{ printf("One of E[123] has failed: %s\n", $0); }
+        { PRINT($0); }
+
+E1 <- "1"
+E2 <- "2"
+E3 <- "3"
+
+OTHER <- [^\n]+

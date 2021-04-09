@@ -20,16 +20,12 @@
 #include "numarray.h"
 #include "kind.h"
 #include "read.h"
+#include "peg_common.h"
 
 
 /*
 *   MACROS
 */
-#define PCC_GETCHAR(auxil) getcFromInputFile()
-#define PCC_MALLCO(auxil,size) eMalloc(size)
-#define PCC_REALLOC(auxil,ptr,size) eRealloc(ptr,size)
-#define PCC_FREE(auxil,ptr) eFreeNoNullCheck(ptr)
-#define PCC_ERROR(auxil) reportError(auxil)
 
 /*
 *   DATA DECLARATIONS
