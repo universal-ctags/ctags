@@ -1,0 +1,4 @@
+Test	input.rs	/^struct Test {$/;"	s
+another	input.rs	/^    pub another: i32,$/;"	m	struct:Test
+field	input.rs	/^    field: i32,$/;"	m	struct:Test
+yet_another	input.rs	/^    pub(crate) yet_another: i32,$/;"	m	struct:Test

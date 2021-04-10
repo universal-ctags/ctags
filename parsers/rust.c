@@ -793,6 +793,16 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 				    || strcmp(vStringValue(lexer->token_str), "pub") == 0)
 				{
 					advanceToken(lexer, true);
+
+					/* Skip thevisibility specificaions.
+					 * https://doc.rust-lang.org/reference/visibility-and-privacy.html */
+					if (lexer->cur_token == '(')
+					{
+						advanceToken(lexer, true);
+						skipUntil (lexer, (int []){')'}, 1);
+						advanceToken(lexer, true);
+					}
+
 					if (lexer->cur_token != TOKEN_IDENT)
 					{
 						/* Something's up with this field, skip to the next one */
