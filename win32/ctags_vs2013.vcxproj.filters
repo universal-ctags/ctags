@@ -276,6 +276,9 @@
     <ClCompile Include="..\optlib\systemtap.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\terraform.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\yacc.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
