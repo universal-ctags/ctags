@@ -1,5 +1,5 @@
 --langdef=tf
---langmap=tf:.tf.tfvars
+--map-tf=+tf:.tf.tfvars
 --regex-tf=/^[[:space:]]*resource[[:space:]]*"([^"]*)"[[:space:]]*"([^"]*)"/\2/r,Resource/
 --regex-tf=/^[[:space:]]*data[[:space:]]*"([^"]*)"[[:space:]]*"([^"]*)"/\2/d,Data/
 --regex-tf=/^[[:space:]]*variable[[:space:]]*"([^"]*)"/\1/v,Variable/
