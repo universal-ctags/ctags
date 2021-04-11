@@ -1,3 +1,21 @@
+#
+# terraform.ctags: regex parse for Terraform (HCL).
+#
+# Author: Antony Southworth <https://github.com/antonysouthworth-halter>
+#
+# This source code is released for free distribution under the terms of the
+# GNU General Public License version 2 or (at your option) any later version.
+#
+# Derived from `vim-terraform-completion`:
+#   - https://github.com/juliosueiras/vim-terraform-completion/blob/master/ctags/terraform.ctags
+#
+# Changed the name from `terraform` to `tf` so vim will recognise it properly based
+# on file extension (*.tf).
+#
+# A notable abscence is `local`, because `locals` are defined inside a block and
+# it's way harder to write a good regex for that.
+#   - https://www.terraform.io/docs/language/values/locals.html
+
 --langdef=tf
 --map-tf=+tf:.tf.tfvars
 --regex-tf=/^[[:space:]]*resource[[:space:]]*"([^"]*)"[[:space:]]*"([^"]*)"/\2/r,Resource/
@@ -7,3 +25,4 @@
 --regex-tf=/^[[:space:]]*module[[:space:]]*"([^"]*)"/\1/m,Module/
 --regex-tf=/^[[:space:]]*output[[:space:]]*"([^"]*)"/\1/o,Output/
 --regex-tf=/^([a-z0-9_]+)[[:space:]]*=/\1/f,TFVar/
+
