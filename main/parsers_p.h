@@ -150,7 +150,7 @@
 	SystemTapParser, \
 	TclParser, \
 	TclOOParser, \
-  TerraformParser, \
+  TfParser, \
 	TexParser, \
 	TexBeamerParser, \
 	TTCNParser, \
