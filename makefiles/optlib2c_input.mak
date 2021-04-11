@@ -18,5 +18,6 @@ OPTLIB2C_INPUT = \
 	optlib/puppetManifest.ctags		\
 	optlib/scss.ctags			\
 	optlib/systemtap.ctags			\
+	optlib/terraform.ctags			\
 	\
 	$(NULL)

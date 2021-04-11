@@ -1,0 +1,9 @@
+--langdef=tf
+--langmap=tf:.tf.tfvars
+--regex-tf=/^[[:space:]]*resource[[:space:]]*"([^"]*)"[[:space:]]*"([^"]*)"/\2/r,Resource/
+--regex-tf=/^[[:space:]]*data[[:space:]]*"([^"]*)"[[:space:]]*"([^"]*)"/\2/d,Data/
+--regex-tf=/^[[:space:]]*variable[[:space:]]*"([^"]*)"/\1/v,Variable/
+--regex-tf=/^[[:space:]]*provider[[:space:]]*"([^"]*)"/\1/p,Provider/
+--regex-tf=/^[[:space:]]*module[[:space:]]*"([^"]*)"/\1/m,Module/
+--regex-tf=/^[[:space:]]*output[[:space:]]*"([^"]*)"/\1/o,Output/
+--regex-tf=/^([a-z0-9_]+)[[:space:]]*=/\1/f,TFVar/

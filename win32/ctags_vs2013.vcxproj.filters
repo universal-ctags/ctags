@@ -540,6 +540,9 @@
     <ClCompile Include="..\parsers\tcloo.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\terraform.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\tex.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
