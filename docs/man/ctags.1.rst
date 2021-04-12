@@ -911,7 +911,7 @@ Language Specific Options
 
 	If the first character in the list is '``+``', then the extensions in the list will be
 	appended to the current list; otherwise, the list will replace the
-	current list. See, also, the ``F/fileScope`` flag of ``--extras`` option.
+	current list. See, also, the ``fileScope``/``F`` flag of ``--extras`` option.
 
 	The default list is
 	``.h.H.hh.hpp.hxx.h++.inc.def``. To restore the default list, specify "``-h
@@ -919,7 +919,8 @@ Language Specific Options
 
 	Note that if an extension supplied to this option is not
 	already mapped to a particular language (see "`Determining file language`_", above),
-	you will also need to use either the ``--langmap`` or ``--language-force`` option.
+	you will also need to use either the ``--map-<LANG>``, ``--langmap`` or
+	``--language-force`` option.
 
 ``-I <identifier-list>``
 	Specifies a *<identifier-list>* of identifiers which are to be specially handled while
