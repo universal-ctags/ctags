@@ -2009,15 +2009,28 @@ extern void tagFilePosition (MIOPos *p)
 			   "failed to get file position of the tag file\n");
 }
 
-extern void setTagFilePosition (MIOPos *p)
+extern void setTagFilePosition (MIOPos *p, bool truncation)
 {
 	/* mini-geany doesn't set TagFile.mio. */
 	if 	(TagFile.mio == NULL)
 		return;
 
+
+	long t0 = 0;
+	if (truncation)
+		t0 = mio_tell (TagFile.mio);
+
 	if (mio_setpos (TagFile.mio, p) == -1)
 		error (FATAL|PERROR,
 			   "failed to set file position of the tag file\n");
+
+	if (truncation)
+	{
+		long t1 = mio_tell (TagFile.mio);
+		if (!mio_try_resize (TagFile.mio, (size_t)t1))
+			error (FATAL|PERROR,
+				   "failed to truncate the tag file %ld -> %ld\n", t0, t1);
+	}
 }
 
 extern const char* getTagFileDirectory (void)

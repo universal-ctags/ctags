@@ -43,6 +43,11 @@
 #include <stdlib.h>
 #include <limits.h>
 
+#ifndef _MSC_VER
+#define MAY_HAVE_FTRUNCATE
+#include <unistd.h>
+#endif
+
 #ifdef READTAGS_DSL
 #define xMalloc(n,Type)    (Type *)eMalloc((size_t)(n) * sizeof (Type))
 #define xRealloc(p,n,Type) (Type *)eRealloc((p), (n) * sizeof (Type))
@@ -649,9 +654,29 @@ static int mem_try_resize (MIO *mio, size_t new_size)
 	return success;
 }
 
+static int file_try_resize (MIO *mio, size_t new_size)
+{
+	mio_flush (mio);
+
+	FILE *fp = mio_file_get_fp (mio);
+
+#ifdef MAY_HAVE_FTRUNCATE
+	if (ftruncate(fileno(fp), (off_t)new_size) < 0)
+		return false;
+#else
+	/* See https://stackoverflow.com/questions/873454/how-to-truncate-a-file-in-c/874704#874704 */
+	if ((errno = _chsize_s(_fileno(fp), (__int64)new_size)) != 0)
+		return false;
+#endif
+	return true;
+}
+
 int mio_try_resize (MIO *mio, size_t new_size)
 {
-	return mem_try_resize (mio, new_size);
+	if (mio->type == MIO_TYPE_MEMORY)
+		return mem_try_resize (mio, new_size);
+	else
+		return file_try_resize (mio, new_size);
 }
 
 /*

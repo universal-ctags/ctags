@@ -3864,7 +3864,7 @@ static bool createTagsWithFallback1 (const langType language,
 		{
 			/*  Restore prior state of tag file.
 			*/
-			setTagFilePosition (&tagfpos);
+			setTagFilePosition (&tagfpos, true);
 			setNumTagsAdded (numTags);
 			writerRescanFailed (numTags);
 			tagFileResized = true;
