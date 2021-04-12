@@ -140,7 +140,7 @@ static const keywordTable BibKeywordTable [] = {
 	{ "techreport",	  KEYWORD_techreport		},
 	{ "unpublished",	KEYWORD_unpublished		}
 };
-  
+
 /*
  *	 FUNCTION DEFINITIONS
  */
@@ -323,7 +323,6 @@ static bool parseTag (tokenInfo *const token, bibKind kind)
 			goto out;
 		}
 	}
-  
 
  out:
 	deleteToken (name);
