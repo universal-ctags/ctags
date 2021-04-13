@@ -3101,6 +3101,83 @@ static EsObject* lrop_make_tag (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject *OPTSCRIPT_ERR_UNKNOWNROLE;
+
+static EsObject* lrop_make_reftag (OptVM *vm, EsObject *name)
+{
+	matchLoc *loc;
+
+	if (opt_vm_ostack_count (vm) < 1)
+		return OPT_ERR_UNDERFLOW;
+
+	int index;
+	EsObject *top = opt_vm_ostack_top (vm);
+	if (es_object_get_type (top) == OPT_TYPE_MATCHLOC)
+	{
+		if (opt_vm_ostack_count (vm) < 4)
+			return OPT_ERR_UNDERFLOW;
+		loc = es_pointer_get (top);
+		index = 1;
+	}
+	else
+	{
+		struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+		if (lcb->window->patbuf->regptype != REG_PARSER_SINGLE_LINE)
+			return OPT_ERR_TYPECHECK;
+		if (opt_vm_ostack_count (vm) < 3)
+			return OPT_ERR_UNDERFLOW;
+		loc = NULL;
+		index = 0;
+	}
+
+	EsObject *role = opt_vm_ostack_peek (vm, index++);
+	if (es_object_get_type (role) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+
+	EsObject *kind = opt_vm_ostack_peek (vm, index++);
+	if (es_object_get_type (kind) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+	EsObject *kind_sym = es_pointer_get (kind);
+	const char *kind_str = es_symbol_get (kind_sym);
+	langType lang = getInputLanguage ();
+	kindDefinition* kind_def = getLanguageKindForName (lang, kind_str);
+	if (!kind_def)
+		return OPTSCRIPT_ERR_UNKNOWNKIND;
+	int kind_index = kind_def->id;
+
+	EsObject *role_sym = es_pointer_get (role);
+	const char *role_str = es_symbol_get (role_sym);
+	roleDefinition* role_def = getLanguageRoleForName (lang, kind_index, role_str);
+	if (!role_def)
+		return OPTSCRIPT_ERR_UNKNOWNROLE;
+	int role_index = role_def->id;
+
+	EsObject *tname = opt_vm_ostack_peek (vm, index++);
+	if (es_object_get_type (tname) != OPT_TYPE_STRING)
+		return OPT_ERR_TYPECHECK;
+	const char *n = opt_string_get_cstr (tname);
+	if (n [0] == '\0')
+		return OPT_ERR_TYPECHECK; /* TODO */
+
+	tagEntryInfo *e = xMalloc (1, tagEntryInfo);
+	initRegexTag (e, eStrdup (n),
+				  kind_index, role_index, CORK_NIL, 0,
+				  loc? loc->line: 0, loc? &loc->pos: NULL,
+				  role_index == ROLE_DEFINITION_INDEX
+				  ? XTAG_UNKNOWN
+				  : XTAG_REFERENCE_TAGS);
+	EsObject *obj = es_pointer_new (OPT_TYPE_TAG, e);
+	if (es_error_p (obj))
+		return obj;
+
+	while (index-- > 0)
+		opt_vm_ostack_pop (vm);
+
+	opt_vm_ostack_push (vm, obj);
+	es_object_unref (obj);
+	return es_false;
+}
+
 /* tag COMMIT int */
 static EsObject* lrop_commit_tag (OptVM *vm, EsObject *name)
 {
@@ -3574,6 +3651,13 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		"name:str kind:name _TAG tag",
 	},
 	{
+		.name     = "_reftag",
+		.fn       = lrop_make_reftag,
+		.arity    = -1,
+		.help_str = "name:str kind:name role:name matchloc _REFTAG tag%"
+		"name:str kind:name role:name _REFTAG tag%",
+	},
+	{
 		.name     = "_commit",
 		.fn       = lrop_commit_tag,
 		.arity    = 1,
@@ -3690,6 +3774,7 @@ extern void initRegexOptscript (void)
 	OPTSCRIPT_ERR_UNKNOWNEXTRA = es_error_intern ("unknownextra");
 	OPTSCRIPT_ERR_UNKNOWNLANGUAGE = es_error_intern ("unknownlanguage");
 	OPTSCRIPT_ERR_UNKNOWNKIND = es_error_intern ("unknownkind");
+	OPTSCRIPT_ERR_UNKNOWNROLE = es_error_intern ("unknownrole");
 
 	optscriptInstallProcs (lregex_dict, lrop_get_match_string);
 
