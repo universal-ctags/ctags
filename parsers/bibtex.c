@@ -33,7 +33,7 @@
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
 #define isIdentChar(c) \
-	(isalpha (c) || isdigit (c) || (c) == '_' || (c) == '-' || (c) == '+')
+	(isalpha (c) || isdigit (c) || (c) == '_' || (c) == '-' || (c) == '+' || (c) == ':')
 
 /*
  *	 DATA DECLARATIONS
@@ -140,7 +140,7 @@ static const keywordTable BibKeywordTable [] = {
 	{ "techreport",	  KEYWORD_techreport		},
 	{ "unpublished",	KEYWORD_unpublished		}
 };
-  
+
 /*
  *	 FUNCTION DEFINITIONS
  */
@@ -323,7 +323,6 @@ static bool parseTag (tokenInfo *const token, bibKind kind)
 			goto out;
 		}
 	}
-  
 
  out:
 	deleteToken (name);
