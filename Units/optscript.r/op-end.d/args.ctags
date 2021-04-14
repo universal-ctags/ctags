@@ -1,0 +1,17 @@
+--fields=+en
+
+--langdef=X
+--map-X=.unknown
+--kinddef-X=d,def,definitions
+
+--regex-X=/[ \t]*def ([a-z])/\1/d/{exclusive}{{
+	. _scopetop { scope: } if
+    . _scopeset
+}}
+
+--regex-X=/[ \t]*(end)//{{
+	_scopetop {
+        1 _matchloc end:
+        _scopepop
+    } if
+}}

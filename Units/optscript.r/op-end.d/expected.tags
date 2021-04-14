@@ -1,0 +1,4 @@
+a	input.unknown	/^def a$/;"	d	line:1	end:9
+b	input.unknown	/^    def b$/;"	d	line:2	def:a	end:4
+c	input.unknown	/^    def c$/;"	d	line:5	def:a	end:8
+d	input.unknown	/^     	def d$/;"	d	line:6	def:a.c	end:7

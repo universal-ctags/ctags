@@ -10,7 +10,7 @@ S	signature	no	NONE	s--	no	rw	Signature of routine (e.g. prototype or parameter 
 T	epoch	yes	NONE	-i-	no	--	the last modified time of the input file (only for F/file kind tag)
 Z	scope	no	NONE	s--	no	rw	[tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
 a	access	no	NONE	s--	no	--	Access (or export) of class members
-e	end	no	NONE	-i-	no	--	end lines of various items
+e	end	no	NONE	-i-	no	rw	end lines of various items
 f	file	yes	NONE	--b	no	--	File-restricted scoping
 i	inherits	no	NONE	s-b	no	--	Inheritance information
 k	NONE	yes	NONE	s--	no	--	Kind of tag in one-letter form
