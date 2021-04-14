@@ -99,6 +99,7 @@ static EsObject* checkFieldValueForScope (const fieldDefinition *, const EsObjec
 static EsObject* getFieldValueForExtras (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* getFieldValueForSignature (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForSignature (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+static EsObject* getFieldValueForRoles (const tagEntryInfo *, const fieldDefinition *);
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
@@ -317,6 +318,11 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 		.doesContainAnyChar = NULL,
 		.isValueAvailable   = NULL,
 		.dataType           = FIELDTYPE_STRING,
+		.getterValueType    = "[ role1:name ... rolen:name ]",
+		.getValueObject     = getFieldValueForRoles,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = NULL,
 	},
 	[FIELD_REF_MARK - FIELD_ROLES] = {
 		.letter             = 'R',
@@ -1690,4 +1696,27 @@ static EsObject* setFieldValueForSignature (tagEntryInfo *tag, const fieldDefini
 	const char *str = opt_string_get_cstr (obj);
 	tag->extensionFields.signature = eStrdup (str);
 	return es_false;
+}
+
+static void makeRolesArray (const tagEntryInfo *const tag, int roleIndex, void *data)
+{
+	EsObject *a = data;
+
+	const roleDefinition *role = getTagRole (tag, roleIndex);
+	EsObject *r = opt_name_new_from_cstr (role->name);
+	opt_array_add (a, r);
+	es_object_unref (r);
+}
+
+static EsObject* getFieldValueForRoles (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	EsObject *a = opt_array_new ();
+
+	if (!foreachRoleBits (tag, makeRolesArray, a))
+	{
+		EsObject *r = opt_name_new_from_cstr (ROLE_DEFINITION_NAME);
+		opt_array_add (a, r);
+		es_object_unref (r);
+	}
+	return a;
 }
