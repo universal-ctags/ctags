@@ -842,32 +842,51 @@ static const char *renderFieldLineNumber (const tagEntryInfo *const tag,
 	return vStringValue (b);
 }
 
+struct renderRoleData {
+	vString* b;
+	int nRoleWritten;
+};
+
+static void renderRoleByIndex (const tagEntryInfo *const tag, int roleIndex, void *data)
+{
+	struct renderRoleData *rdata = data;
+
+	if (!isLanguageRoleEnabled (tag->langType, tag->kindIndex, roleIndex))
+		return;
+
+	if (rdata->nRoleWritten > 0)
+		vStringPut(rdata->b, ',');
+
+	const roleDefinition * role = getTagRole(tag, roleIndex);
+	renderRole (role, rdata->b);
+	rdata->nRoleWritten++;
+}
+
+static roleBitsType foreachRoleBits (const tagEntryInfo *const tag,
+									 void (* fn) (const tagEntryInfo *const, int, void *),
+									 void *data)
+{
+	roleBitsType rbits = tag->extensionFields.roleBits;
+	if (!rbits)
+		return rbits;
+
+	int roleCount = countLanguageRoles (tag->langType, tag->kindIndex);
+
+	for (int roleIndex = 0; roleIndex < roleCount; roleIndex++)
+	{
+		if ((rbits >> roleIndex) & (roleBitsType)1)
+			fn (tag, roleIndex, data);
+	}
+	return rbits;
+}
+
 static const char *renderFieldRoles (const tagEntryInfo *const tag,
 				    const char *value CTAGS_ATTR_UNUSED,
 				    vString* b)
 {
-	roleBitsType rbits = tag->extensionFields.roleBits;
-	const roleDefinition * role;
-	if (rbits)
-	{
-		int roleCount = countLanguageRoles (tag->langType, tag->kindIndex);
-		int nRoleWritten = 0;
+	struct renderRoleData data = { .b = b, .nRoleWritten = 0 };
 
-		for (int roleIndex = 0; roleIndex < roleCount; roleIndex++)
-		{
-			if (((rbits >> roleIndex) & (roleBitsType)1)
-				&& isLanguageRoleEnabled (tag->langType, tag->kindIndex, roleIndex))
-			{
-				if (nRoleWritten > 0)
-					vStringPut(b, ',');
-
-				role = getTagRole(tag, roleIndex);
-				renderRole (role, b);
-				nRoleWritten++;
-			}
-		}
-	}
-	else
+	if (!foreachRoleBits (tag, renderRoleByIndex, &data))
 		vStringCatS (b, ROLE_DEFINITION_NAME);
 	return vStringValue (b);
 }
