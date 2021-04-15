@@ -265,6 +265,7 @@ extern void initFieldObjects (void)
 		fobj->nameWithPrefix = fobj->def->name;
 		fobj->language = LANG_IGNORE;
 		fobj->sibling  = FIELD_UNKNOWN;
+		fobj->def->ftype = i + fieldObjectUsed;
 	}
 	fieldObjectUsed += ARRAY_SIZE (fieldDefinitionsFixed);
 
@@ -276,6 +277,7 @@ extern void initFieldObjects (void)
 		fobj->nameWithPrefix = fobj->def->name;
 		fobj->language = LANG_IGNORE;
 		fobj->sibling  = FIELD_UNKNOWN;
+		fobj->def->ftype = i + fieldObjectUsed;
 	}
 	fieldObjectUsed += ARRAY_SIZE (fieldDefinitionsExuberant);
 
@@ -300,6 +302,7 @@ extern void initFieldObjects (void)
 			fobj->nameWithPrefix = NULL;
 		fobj->language = LANG_IGNORE;
 		fobj->sibling  = FIELD_UNKNOWN;
+		fobj->def->ftype = i + fieldObjectUsed;
 	}
 	fieldObjectUsed += ARRAY_SIZE (fieldDefinitionsUniversal);
 
