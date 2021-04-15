@@ -100,9 +100,9 @@ static EsObject* getFieldValueForExtras (const tagEntryInfo *, const fieldDefini
 static EsObject* getFieldValueForSignature (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForSignature (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* getFieldValueForRoles (const tagEntryInfo *, const fieldDefinition *);
-static EsObject* getFieldValueForEnd (const tagEntryInfo *, const fieldDefinition *);
-static EsObject* checkFieldValueForEnd (const fieldDefinition *, const EsObject *);
-static EsObject* setFieldValueForEnd (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+static EsObject* getFieldValueForLineCommon (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* checkFieldValueForLineCommon (const fieldDefinition *, const EsObject *);
+static EsObject* setFieldValueForLineCommon (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
@@ -246,6 +246,11 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.doesContainAnyChar = NULL,
 		.isValueAvailable   = NULL,
 		.dataType           = FIELDTYPE_INTEGER,
+		.getterValueType    = "int",
+		.getValueObject     = getFieldValueForLineCommon,
+		.setterValueType    = "matchlok|int",
+		.checkValueForSetter= checkFieldValueForLineCommon,
+		.setValueObject     = setFieldValueForLineCommon,
 	},
 	[FIELD_SIGNATURE - FIELD_COMPACT_INPUT_LINE] = {
 		.letter				= 'S',
@@ -405,10 +410,10 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 		.isValueAvailable	= isEndFieldAvailable,
 		.dataType			= FIELDTYPE_INTEGER,
 		.getterValueType    = "int",
-		.getValueObject     = getFieldValueForEnd,
+		.getValueObject     = getFieldValueForLineCommon,
 		.setterValueType    = "matchlok|int",
-		.checkValueForSetter= checkFieldValueForEnd,
-		.setValueObject     = setFieldValueForEnd,
+		.checkValueForSetter= checkFieldValueForLineCommon,
+		.setValueObject     = setFieldValueForLineCommon,
 
 	},
 	[FIELD_EPOCH - FIELD_ROLES] = {
@@ -1730,19 +1735,24 @@ static EsObject* getFieldValueForRoles (const tagEntryInfo *tag, const fieldDefi
 	return a;
 }
 
-static EsObject* getFieldValueForEnd (const tagEntryInfo *tag, const fieldDefinition *fdef)
+static EsObject* getFieldValueForLineCommon (const tagEntryInfo *tag, const fieldDefinition *fdef)
 {
-	return ((int)tag->extensionFields.endLine == 0)
-		? es_nil
-		: es_integer_new ((int)tag->extensionFields.endLine);
+	if (fdef->ftype == FIELD_END_LINE)
+		return ((int)tag->extensionFields.endLine == 0)
+			? es_nil
+			: es_integer_new ((int)tag->extensionFields.endLine);
+	else
+		return ((int)tag->lineNumber == 0)
+			? es_nil
+			: es_integer_new ((int)tag->lineNumber);
 }
 
-static EsObject* checkFieldValueForEnd (const fieldDefinition *fdef, const EsObject *obj)
+static EsObject* checkFieldValueForLineCommon (const fieldDefinition *fdef, const EsObject *obj)
 {
 	return es_false;
 }
 
-static EsObject* setFieldValueForEnd (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
+static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
 {
 	int l;
 	if (es_object_get_type (obj) == OPT_TYPE_MATCHLOC)
@@ -1759,6 +1769,10 @@ static EsObject* setFieldValueForEnd (tagEntryInfo *tag, const fieldDefinition *
 	else
 		return OPT_ERR_TYPECHECK;
 
-	tag->extensionFields.endLine = l;
+	if (fdef->ftype == FIELD_END_LINE)
+		tag->extensionFields.endLine = l;
+	else
+		tag->lineNumber = l;
+
 	return es_false;
 }

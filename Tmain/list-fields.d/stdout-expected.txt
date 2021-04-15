@@ -16,7 +16,7 @@ i	inherits	no	NONE	s-b	no	--	Inheritance information
 k	NONE	yes	NONE	s--	no	--	Kind of tag in one-letter form
 l	language	no	NONE	s--	no	--	Language of input file containing tag
 m	implementation	no	NONE	s--	no	--	Implementation information
-n	line	no	NONE	-i-	no	--	Line number of tag definition
+n	line	no	NONE	-i-	no	rw	Line number of tag definition
 p	scopeKind	no	NONE	s--	no	--	[tags output] no effect, [xref and json output] kind of scope in long-name form
 r	roles	no	NONE	s--	no	r-	Roles
 s	NONE	yes	NONE	s--	no	--	[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope
