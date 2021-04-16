@@ -108,5 +108,9 @@ jobs:
         # Upload to coveralls.
         # lcoveralls --root . --retry-count 5 ${BUILDDIR}/coverage.info
 
+        echo '#### BEGIN DUMP ENV VARS #####'
+        env
+        echo '#### END DUMP ENV VARS #####'
+
         # Upload to codecov.
         bash <(curl -s https://codecov.io/bash) -f ${BUILDDIR}/coverage.info -Z -X gcov -X coveragepy -X search -X xcode -X gcovout -n travis-${{ matrix.os }}
