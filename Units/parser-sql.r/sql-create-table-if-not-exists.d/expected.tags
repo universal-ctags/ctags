@@ -1,0 +1,6 @@
+test	input.sql	/^CREATE TABLE IF NOT EXISTS test ($/;"	t
+id	input.sql	/^    id     INTEGER NOT NULL PRIMARY KEY,$/;"	E	table:test
+mytext	input.sql	/^    mytext TEXT    NOT NULL$/;"	E	table:test
+another_test	input.sql	/^CREATE TABLE another_test ($/;"	t
+id	input.sql	/^    id    INTEGER NOT NULL PRIMARY KEY,$/;"	E	table:another_test
+mynum	input.sql	/^    mynum INTEGER$/;"	E	table:another_test

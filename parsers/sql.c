@@ -2011,11 +2011,35 @@ static void parseTable (tokenInfo *const token)
 	 * MySQL allows omitting "as" like:
 	 *     create table FOO select...
 	 *     create table FOO (...) select...
+	 * (At least) MYSQL, PostgreSQL, and SQLite takes "IF NOT EXISTS"
+	 * between "table" and a table name:
+	 *     create table if not exists foo ...
 	 */
 
 	/* This could be a database, owner or table name */
 	readIdentifier (name);
 	readToken (token);
+
+	/* Skip "IF NOT EXISTS"
+	 * https://dev.mysql.com/doc/refman/8.0/en/create-table.html
+	 * https://www.postgresql.org/docs/current/sql-createtable.html
+	 * https://sqlite.org/lang_createtable.html
+	 */
+	if (isKeyword (name, KEYWORD_if)
+		&& (isType (token, TOKEN_IDENTIFIER)
+			&& vStringLength (token->string) == 3
+			&& strcasecmp ("not", vStringValue (token->string)) == 0))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_IDENTIFIER)
+			&& vStringLength (token->string) == 6
+			&& strcasecmp ("exists", vStringValue (token->string)) == 0)
+		{
+			readIdentifier (name);
+			readToken (token);
+		}
+	}
+
 	if (isType (token, TOKEN_PERIOD))
 	{
 		/*
