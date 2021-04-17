@@ -45,7 +45,7 @@ extern EsObject *optscriptReadAndDefine (OptVM *vm, EsObject *dict, const char *
 
 extern EsObject *optscriptLoad          (OptVM *vm, MIO *mio);
 
-extern void      optscriptHelp          (OptVM *vm, FILE *fp);
+extern void      optscriptHelp          (OptVM *vm, FILE *fp, EsObject *procdocs);
 
 
 typedef struct {

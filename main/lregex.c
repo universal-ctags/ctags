@@ -3470,7 +3470,13 @@ extern void initRegexOptscript (void)
 
 extern void	listRegexOpscriptOperators (FILE *fp)
 {
+	EsObject *procdocs;
+	if (!opt_dict_known_and_get_cstr (lregex_dict,
+									  "__procdocs",
+									  &procdocs))
+		procdocs = NULL;
+
 	opt_vm_dstack_push (optvm, lregex_dict);
-	optscriptHelp (optvm, fp);
+	optscriptHelp (optvm, fp, procdocs);
 	opt_vm_dstack_pop (optvm);
 }

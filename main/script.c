@@ -406,10 +406,42 @@ extern EsObject *optscriptReadAndDefine (OptVM *vm, EsObject *dict, const char *
 	return optscriptDefine (dict, name, obj);
 }
 
-extern void optscriptHelp (OptVM *vm, FILE *fp)
+static bool procdocs_add_key_val (EsObject *proc, EsObject *help_str, void *data)
+{
+	ptrArray *a = data;
+
+	if (es_object_get_type (help_str) == OPT_TYPE_STRING)
+		ptrArrayAdd (a, proc);
+
+	return true;
+}
+
+static const char* procdocs_get_help_str (EsObject *proc, void *data)
+{
+	EsObject *dict = data;
+	const char *name = opt_name_get_cstr (proc);
+	EsObject *help_str = NULL;
+
+	if (opt_dict_known_and_get_cstr (dict, name, &help_str))
+		return opt_string_get_cstr(help_str);
+	return NULL;
+}
+
+static void procdocs_add (ptrArray *a, void *data)
+{
+	EsObject *dict = data;
+	opt_dict_foreach (dict, procdocs_add_key_val, a);
+}
+
+static struct OptHelpExtender procdocs_help_extender = {
+	.add = procdocs_add,
+	.get_help_str = procdocs_get_help_str,
+};
+
+extern void optscriptHelp (OptVM *vm, FILE *fp, EsObject *procdocs)
 {
 	MIO *out = mio_new_fp (fp, NULL);
-	opt_vm_help (vm, out, NULL, NULL);
+	opt_vm_help (vm, out, procdocs? &procdocs_help_extender: NULL, procdocs);
 	mio_unref (out);
 }
 
