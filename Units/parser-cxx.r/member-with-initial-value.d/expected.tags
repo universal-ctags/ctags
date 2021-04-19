@@ -1,0 +1,12 @@
+__anon0afffb470108	input.cc	/^typedef struct {$/;"	s	file:
+i	input.cc	/^  int i;$/;"	m	struct:__anon0afffb470108	typeref:typename:int	file:
+S	input.cc	/^} S;$/;"	t	typeref:struct:__anon0afffb470108	file:
+c	input.cc	/^class c {$/;"	c	file:
+a	input.cc	/^  S a = {0};$/;"	m	class:c	typeref:typename:S	file:
+i	input.cc	/^  int i;$/;"	m	class:c	typeref:typename:int	file:
+t	input.cc	/^struct t {$/;"	s	file:
+b	input.cc	/^  S b = {0};$/;"	m	struct:t	typeref:typename:S	file:
+j	input.cc	/^  int j;$/;"	m	struct:t	typeref:typename:int	file:
+u	input.cc	/^union u {$/;"	u	file:
+c	input.cc	/^  S c = {0};$/;"	m	union:u	typeref:typename:S	file:
+k	input.cc	/^  int k;$/;"	m	union:u	typeref:typename:int	file:
