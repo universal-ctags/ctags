@@ -262,6 +262,7 @@ static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
 		cppBeginStatement();
 	}
 
+	int iNestedAngleBracketLevel = 0;
 	for(;;)
 	{
 		if(!cxxParserParseNextToken())
@@ -392,21 +393,24 @@ process_token:
 						}
 					break;
 					case CXXKeywordCLASS:
-						if(!cxxParserParseClassStructOrUnion(CXXKeywordCLASS,CXXTagCPPKindCLASS,CXXScopeTypeClass))
+						if(iNestedAngleBracketLevel == 0 &&
+						   !cxxParserParseClassStructOrUnion(CXXKeywordCLASS,CXXTagCPPKindCLASS,CXXScopeTypeClass))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return false;
 						}
 					break;
 					case CXXKeywordSTRUCT:
-						if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT,CXXScopeTypeStruct))
+						if(iNestedAngleBracketLevel == 0 &&
+						   !cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT,CXXScopeTypeStruct))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return false;
 						}
 					break;
 					case CXXKeywordUNION:
-						if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION,CXXScopeTypeUnion))
+						if(iNestedAngleBracketLevel == 0 &&
+						   !cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION,CXXScopeTypeUnion))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return false;
@@ -744,6 +748,12 @@ process_token:
 				else if (cxxScopeGetType() == CXXScopeTypeClass)
 					cxxSubparserUnknownIdentifierInClassNotify(g_cxx.pToken);
 			break;
+			case CXXTokenTypeSmallerThanSign:
+				iNestedAngleBracketLevel++;
+				break;
+			case CXXTokenTypeGreaterThanSign:
+				iNestedAngleBracketLevel--;
+				break;
 			default:
 				// something else we didn't handle
 			break;
