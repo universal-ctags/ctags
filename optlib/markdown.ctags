@@ -94,9 +94,9 @@
 
 --_mtable-regex-Markdown=main/^#//{_advanceTo=0start}{tjump=main_sharp}
 --_mtable-extend-Markdown=main+emptyLine
+--_mtable-extend-Markdown=main+code
 --_mtable-regex-Markdown=main/^([^\n]+)[\n]=+[\n]/\1/c/{_field=sectionMarker:=}{scope=push}{tenter=chapter}
 --_mtable-regex-Markdown=main/^([^\n]+)[\n]-+[\n]/\1/s/{_field=sectionMarker:-}{scope=push}{tenter=section}
---_mtable-extend-Markdown=main+code
 --_mtable-extend-Markdown=main+rest
 
 
