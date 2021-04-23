@@ -5,10 +5,13 @@
 
 --regex-X=/def[ ]+([a-z]+)[ ]*:[ ]*([a-z]+)/\1/d/{{
 	. [ (typename) \2 ] typeref:
-    . _scopetop {
-    } if scope:
+    . _scoperef
 }}
 
---regex-X=/package[ ]+([A-Z]+)[ ]*/\1/p/{{
+--regex-X=/^package[ ]+([A-Z]+)[ ]*/\1/p/{{
 	. _scopeset
+}}
+
+--regex-X=/^subpackage[ ]+([A-Z]+)[ ]*/\1/p/{{
+	. _scopepush
 }}

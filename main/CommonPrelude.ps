@@ -120,3 +120,13 @@
 
 % /x mark 40 (a) 32 32 10 (b) 10 10 9 9 (xyz) 9 9 41 _buildstring def
 % x _normalize_spaces! x pstack
+
+(tag:int _SCOPEREF -)
+/_scoperef {
+    _scopetop not { 0 } if scope:
+} __bddef
+
+(tag:int _SCOPEPUSH -)
+/_scopepush {
+    dup _scoperef _scopeset
+} __bddef
