@@ -6,6 +6,6 @@ test	input.pp	/^$test = "yay"$/;"	variable	line:6	language:PuppetManifest
 mode1	input.pp	/^$mode1 = $value1 ? {$/;"	variable	line:8	language:PuppetManifest
 mode2	input.pp	/^$mode2 = $value2 ? {$/;"	variable	line:12	language:PuppetManifest
 mode3	input.pp	/^$mode3 = $value3 ? {$/;"	variable	line:16	language:PuppetManifest
-/tmp/singleselector1	input.pp	/^file { "\/tmp\/singleselector1": ensure => file, mode => $mode1 }$/;"	resource	line:20	language:PuppetManifest	end:20
-/tmp/singleselector2	input.pp	/^file { "\/tmp\/singleselector2": ensure => file, mode => $mode2 }$/;"	resource	line:21	language:PuppetManifest	end:21
-/tmp/singleselector3	input.pp	/^file { "\/tmp\/singleselector3": ensure => file, mode => $mode3 }$/;"	resource	line:22	language:PuppetManifest	end:22
+/tmp/singleselector1	input.pp	/^file { "\/tmp\/singleselector1": ensure => file, mode => $mode1 }$/;"	resource	line:20	language:PuppetManifest	typeref:typename:file	end:20
+/tmp/singleselector2	input.pp	/^file { "\/tmp\/singleselector2": ensure => file, mode => $mode2 }$/;"	resource	line:21	language:PuppetManifest	typeref:typename:file	end:21
+/tmp/singleselector3	input.pp	/^file { "\/tmp\/singleselector3": ensure => file, mode => $mode3 }$/;"	resource	line:22	language:PuppetManifest	typeref:typename:file	end:22

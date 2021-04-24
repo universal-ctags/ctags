@@ -1,4 +1,4 @@
 mytype	input.pp	/^define mytype {$/;"	definition	line:3	language:PuppetManifest	end:5
-/tmp/classtest	input.pp	/^    file { "\/tmp\/classtest": ensure => file, mode => '0755' }$/;"	resource	line:4	language:PuppetManifest	scope:definition:mytype	end:4
+/tmp/classtest	input.pp	/^    file { "\/tmp\/classtest": ensure => file, mode => '0755' }$/;"	resource	line:4	language:PuppetManifest	scope:definition:mytype	typeref:typename:file	end:4
 testing	input.pp	/^class testing {$/;"	class	line:7	language:PuppetManifest	end:9
-componentname	input.pp	/^    mytype { "componentname": }$/;"	resource	line:8	language:PuppetManifest	scope:class:::testing	end:8
+componentname	input.pp	/^    mytype { "componentname": }$/;"	resource	line:8	language:PuppetManifest	scope:class:::testing	typeref:typename:mytype	end:8

@@ -1,21 +1,21 @@
 var	input.pp	/^$var = "value"$/;"	variable	line:3	language:PuppetManifest
-/tmp/fakefile	input.pp	/^     file { "\/tmp\/fakefile": mode => '0644', ensure => file }$/;"	resource	line:7	language:PuppetManifest	end:7
-/tmp/existsfile	input.pp	/^     file { "\/tmp\/existsfile": mode => '0755', ensure => file }$/;"	resource	line:10	language:PuppetManifest	end:10
+/tmp/fakefile	input.pp	/^     file { "\/tmp\/fakefile": mode => '0644', ensure => file }$/;"	resource	line:7	language:PuppetManifest	typeref:typename:file	end:7
+/tmp/existsfile	input.pp	/^     file { "\/tmp\/existsfile": mode => '0755', ensure => file }$/;"	resource	line:10	language:PuppetManifest	typeref:typename:file	end:10
 ovar	input.pp	/^$ovar = "yayness"$/;"	variable	line:14	language:PuppetManifest
-/tmp/nostillexistsfile	input.pp	/^         file { "\/tmp\/nostillexistsfile": mode => '0644', ensure => file }$/;"	resource	line:18	language:PuppetManifest	end:18
-/tmp/noexistsfile	input.pp	/^                 file { "\/tmp\/noexistsfile": mode => '0644', ensure => file }$/;"	resource	line:23	language:PuppetManifest	end:23
-/tmp/existsfile2	input.pp	/^                 file { "\/tmp\/existsfile2": mode => '0755', ensure => file }$/;"	resource	line:26	language:PuppetManifest	end:26
-/tmp/nostillexistsfile	input.pp	/^         file { "\/tmp\/nostillexistsfile": mode => '0644', ensure => file }$/;"	resource	line:34	language:PuppetManifest	end:34
-/tmp/existsfile3	input.pp	/^        file { "\/tmp\/existsfile3": mode => '0755', ensure => file }$/;"	resource	line:37	language:PuppetManifest	end:37
+/tmp/nostillexistsfile	input.pp	/^         file { "\/tmp\/nostillexistsfile": mode => '0644', ensure => file }$/;"	resource	line:18	language:PuppetManifest	typeref:typename:file	end:18
+/tmp/noexistsfile	input.pp	/^                 file { "\/tmp\/noexistsfile": mode => '0644', ensure => file }$/;"	resource	line:23	language:PuppetManifest	typeref:typename:file	end:23
+/tmp/existsfile2	input.pp	/^                 file { "\/tmp\/existsfile2": mode => '0755', ensure => file }$/;"	resource	line:26	language:PuppetManifest	typeref:typename:file	end:26
+/tmp/nostillexistsfile	input.pp	/^         file { "\/tmp\/nostillexistsfile": mode => '0644', ensure => file }$/;"	resource	line:34	language:PuppetManifest	typeref:typename:file	end:34
+/tmp/existsfile3	input.pp	/^        file { "\/tmp\/existsfile3": mode => '0755', ensure => file }$/;"	resource	line:37	language:PuppetManifest	typeref:typename:file	end:37
 bool	input.pp	/^$bool = true$/;"	variable	line:41	language:PuppetManifest
-/tmp/existsfile4	input.pp	/^        file { "\/tmp\/existsfile4": mode => '0755', ensure => file }$/;"	resource	line:45	language:PuppetManifest	end:45
+/tmp/existsfile4	input.pp	/^        file { "\/tmp\/existsfile4": mode => '0755', ensure => file }$/;"	resource	line:45	language:PuppetManifest	typeref:typename:file	end:45
 yay	input.pp	/^$yay = yay$/;"	variable	line:49	language:PuppetManifest
 a	input.pp	/^$a = yay$/;"	variable	line:50	language:PuppetManifest
 b	input.pp	/^$b = boo$/;"	variable	line:51	language:PuppetManifest
-/tmp/existsfile5	input.pp	/^    $a: { file { "\/tmp\/existsfile5": mode => '0755', ensure => file } }$/;"	resource	line:54	language:PuppetManifest	end:54
-/tmp/existsfile5	input.pp	/^    $b: { file { "\/tmp\/existsfile5": mode => '0644', ensure => file } }$/;"	resource	line:55	language:PuppetManifest	end:55
-/tmp/existsfile5	input.pp	/^    default: { file { "\/tmp\/existsfile5": mode => '0711', ensure => file } }$/;"	resource	line:56	language:PuppetManifest	end:56
+/tmp/existsfile5	input.pp	/^    $a: { file { "\/tmp\/existsfile5": mode => '0755', ensure => file } }$/;"	resource	line:54	language:PuppetManifest	typeref:typename:file	end:54
+/tmp/existsfile5	input.pp	/^    $b: { file { "\/tmp\/existsfile5": mode => '0644', ensure => file } }$/;"	resource	line:55	language:PuppetManifest	typeref:typename:file	end:55
+/tmp/existsfile5	input.pp	/^    default: { file { "\/tmp\/existsfile5": mode => '0711', ensure => file } }$/;"	resource	line:56	language:PuppetManifest	typeref:typename:file	end:56
 regexvar	input.pp	/^$regexvar = "exists regex"$/;"	variable	line:60	language:PuppetManifest
-/tmp/existsfile6	input.pp	/^    "no match": { file { "\/tmp\/existsfile6": mode => '0644', ensure => file } }$/;"	resource	line:62	language:PuppetManifest	end:62
-/tmp/${1}file6	input.pp	/^    \/(.*) regex$\/: { file { "\/tmp\/${1}file6": mode => '0755', ensure => file } }$/;"	resource	line:63	language:PuppetManifest	end:63
-/tmp/existsfile6	input.pp	/^    default: { file { "\/tmp\/existsfile6": mode => '0711', ensure => file } }$/;"	resource	line:64	language:PuppetManifest	end:64
+/tmp/existsfile6	input.pp	/^    "no match": { file { "\/tmp\/existsfile6": mode => '0644', ensure => file } }$/;"	resource	line:62	language:PuppetManifest	typeref:typename:file	end:62
+/tmp/${1}file6	input.pp	/^    \/(.*) regex$\/: { file { "\/tmp\/${1}file6": mode => '0755', ensure => file } }$/;"	resource	line:63	language:PuppetManifest	typeref:typename:file	end:63
+/tmp/existsfile6	input.pp	/^    default: { file { "\/tmp\/existsfile6": mode => '0711', ensure => file } }$/;"	resource	line:64	language:PuppetManifest	typeref:typename:file	end:64

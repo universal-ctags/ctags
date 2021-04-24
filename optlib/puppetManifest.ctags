@@ -201,8 +201,14 @@
 #
 # block
 #
---_mtable-regex-PuppetManifest=blockStart/@?::[a-zA-Z0-9:_]+[ \t\n]*\{//{tenter=resourceBlock}
---_mtable-regex-PuppetManifest=blockStart/@?[a-zA-Z][a-zA-Z0-9:_]*[ \t\n]*\{//{tenter=resourceBlock}
+--_mtable-regex-PuppetManifest=blockStart/(@)?(::[a-zA-Z0-9:_]+|[a-zA-Z][a-zA-Z0-9:_]*)[ \t\n]*\{//{tenter=resourceBlock}{{
+    \1 {
+       true
+    } {
+       false
+    } ifelse \2 true
+    % virtual:bool type:string true
+}}
 --_mtable-regex-PuppetManifest=blockStart/class[ \t\n]+//{tenter=classStart}
 --_mtable-regex-PuppetManifest=blockStart/define[ \t\n]+//{tenter=defineStart}
 --_mtable-regex-PuppetManifest=blockStart/case[ \t\n]+//{tenter=caseStart}
@@ -234,7 +240,9 @@
 #     "j": k => k /* THIS COMMENT CANNOT BE IGNORED WELL */
 # }
 --_mtable-regex-PuppetManifest=block/;?[ \t\n]*\}//{tleave}
---_mtable-regex-PuppetManifest=block/;//{tjump=resourceBlock}{scope=pop}
+--_mtable-regex-PuppetManifest=block/;//{tjump=resourceBlock}{scope=pop}{{
+    false
+}}
 #--_mtable-regex-PuppetManifest=block/;//{tleave}{scope=pop}
 --_mtable-regex-PuppetManifest=block/://
 --_mtable-extend-PuppetManifest=block+comment
@@ -272,8 +280,15 @@
 --_tabledef-PuppetManifest=resourceArray
 --_tabledef-PuppetManifest=resourceCollector
 
+# resourceBlock expects data on optscript:
+#
+# false RESOURCEBLOCK -
+# virtual:bool type:string true RESOURCEBLOCK -
+#
 --_mtable-extend-PuppetManifest=resourceBlock+ignoreWhiteSpace
---_mtable-regex-PuppetManifest=resourceBlock/\}//{tleave}
+--_mtable-regex-PuppetManifest=resourceBlock/\}//{tleave}{{
+    { pop pop } if
+}}
 --_mtable-regex-PuppetManifest=resourceBlock/'//{tenter=resourceName}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceBlock/"//{tenter=resourceName}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceBlock/\[//{tenter=resourceArray}
@@ -281,8 +296,21 @@
 --_mtable-extend-PuppetManifest=resourceBlock+comment
 --_mtable-regex-PuppetManifest=resourceBlock/.//{tenter=resourceBody}{scope=push}{placeholder}
 
---_mtable-regex-PuppetManifest=resourceName/'([^']+)'/\1/r/{tenter=resourceBody,end}{scope=push}
---_mtable-regex-PuppetManifest=resourceName/"([^"]+)"/\1/r/{tenter=resourceBody,end}{scope=push}
+# resourceName expects data on optscript:
+#
+# false RESOURCENAME false
+# virtual:bool type:string true RESOURCENAME virtual:bool type:string true
+#
+--_mtable-regex-PuppetManifest=resourceName/'([^']+)'/\1/r/{tenter=resourceBody,end}{scope=push}{{
+    dup {
+         1 index (typename) exch [ 3 1 roll ] . exch typeref:
+    } if
+}}
+--_mtable-regex-PuppetManifest=resourceName/"([^"]+)"/\1/r/{tenter=resourceBody,end}{scope=push}{{
+    dup {
+         1 index (typename) exch [ 3 1 roll ] . exch typeref:
+    } if
+}}
 --_mtable-regex-PuppetManifest=resourceName///{tquit}
 --_mtable-regex-PuppetManifest=resourceNameInArray/'([^']+)'/\1/r/{tleave}
 --_mtable-regex-PuppetManifest=resourceNameInArray/"([^"]+)"/\1/r/{tleave}

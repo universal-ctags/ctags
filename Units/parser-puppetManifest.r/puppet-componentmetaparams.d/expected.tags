@@ -1,3 +1,3 @@
-/tmp/component1	input.pp	/^file { "\/tmp\/component1":$/;"	resource	line:1	language:PuppetManifest	end:3
+/tmp/component1	input.pp	/^file { "\/tmp\/component1":$/;"	resource	line:1	language:PuppetManifest	typeref:typename:file	end:3
 thing	input.pp	/^define thing {$/;"	definition	line:5	language:PuppetManifest	end:7
-/tmp/component2	input.pp	/^thing { "\/tmp\/component2":$/;"	resource	line:9	language:PuppetManifest	end:11
+/tmp/component2	input.pp	/^thing { "\/tmp\/component2":$/;"	resource	line:9	language:PuppetManifest	typeref:typename:thing	end:11

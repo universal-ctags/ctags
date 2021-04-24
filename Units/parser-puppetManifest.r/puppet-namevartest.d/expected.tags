@@ -1,5 +1,5 @@
 filetest	input.pp	/^define filetest($mode, $ensure = file) {$/;"	definition	line:1	language:PuppetManifest	signature:($mode,$ensure)	end:6
 mode	input.pp	/^define filetest($mode, $ensure = file) {$/;"	param	line:1	language:PuppetManifest	scope:definition:filetest
 ensure	input.pp	/^define filetest($mode, $ensure = file) {$/;"	param	line:1	language:PuppetManifest	scope:definition:filetest
-/tmp/testfiletest	input.pp	/^filetest { "\/tmp\/testfiletest": mode => '0644'}$/;"	resource	line:8	language:PuppetManifest	end:8
-/tmp/testdirtest	input.pp	/^filetest { "\/tmp\/testdirtest": mode => '0755', ensure => directory}$/;"	resource	line:9	language:PuppetManifest	end:9
+/tmp/testfiletest	input.pp	/^filetest { "\/tmp\/testfiletest": mode => '0644'}$/;"	resource	line:8	language:PuppetManifest	typeref:typename:filetest	end:8
+/tmp/testdirtest	input.pp	/^filetest { "\/tmp\/testdirtest": mode => '0755', ensure => directory}$/;"	resource	line:9	language:PuppetManifest	typeref:typename:filetest	end:9

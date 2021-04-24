@@ -1,4 +1,4 @@
-/tmp/singleary1	input.pp	/^file { "\/tmp\/singleary1":$/;"	resource	line:3	language:PuppetManifest	end:5
-/tmp/singleary2	input.pp	/^file { "\/tmp\/singleary2":$/;"	resource	line:7	language:PuppetManifest	end:9
-/tmp/singleary3	input.pp	/^file { "\/tmp\/singleary3":$/;"	resource	line:11	language:PuppetManifest	end:14
-/tmp/singleary4	input.pp	/^file { "\/tmp\/singleary4":$/;"	resource	line:16	language:PuppetManifest	end:19
+/tmp/singleary1	input.pp	/^file { "\/tmp\/singleary1":$/;"	resource	line:3	language:PuppetManifest	typeref:typename:file	end:5
+/tmp/singleary2	input.pp	/^file { "\/tmp\/singleary2":$/;"	resource	line:7	language:PuppetManifest	typeref:typename:file	end:9
+/tmp/singleary3	input.pp	/^file { "\/tmp\/singleary3":$/;"	resource	line:11	language:PuppetManifest	typeref:typename:file	end:14
+/tmp/singleary4	input.pp	/^file { "\/tmp\/singleary4":$/;"	resource	line:16	language:PuppetManifest	typeref:typename:file	end:19

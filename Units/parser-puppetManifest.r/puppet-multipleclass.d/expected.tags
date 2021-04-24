@@ -1,4 +1,4 @@
 one	input.pp	/^class one {$/;"	class	line:1	language:PuppetManifest	end:3
-/tmp/multipleclassone	input.pp	/^    file { "\/tmp\/multipleclassone": content => "one" }$/;"	resource	line:2	language:PuppetManifest	scope:class:::one	end:2
+/tmp/multipleclassone	input.pp	/^    file { "\/tmp\/multipleclassone": content => "one" }$/;"	resource	line:2	language:PuppetManifest	scope:class:::one	typeref:typename:file	end:2
 two	input.pp	/^class two {$/;"	class	line:5	language:PuppetManifest	end:7
-/tmp/multipleclasstwo	input.pp	/^    file { "\/tmp\/multipleclasstwo": content => "two" }$/;"	resource	line:6	language:PuppetManifest	scope:class:::two	end:6
+/tmp/multipleclasstwo	input.pp	/^    file { "\/tmp\/multipleclasstwo": content => "two" }$/;"	resource	line:6	language:PuppetManifest	scope:class:::two	typeref:typename:file	end:6
