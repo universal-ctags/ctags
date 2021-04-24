@@ -1672,7 +1672,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 }
 
 // class_type ::=
-//       ps_class_identifier [ # ( … ) ] { :: class_identifier [ # ( … ) ] }
+//       ps_class_identifier [ # ( ... ) ] { :: class_identifier [ # ( ... ) ] }
 // "interface_identifier ." is also handled
 static int skipClassType (tokenInfo* token, int c)
 {
@@ -1714,7 +1714,7 @@ static int skipClassType (tokenInfo* token, int c)
 //   ...
 //   | virtual [ interface ] identifier [ # ( [ ... ] ) ]  [ . identifier ]
 //   | [ class_type :: | identifier :: | $unit :: ] identifier { [ ... ] }
-//   | [ identifier :: | $unit :: ] identifier [ # ( … ) ] { :: identifier [ # ( ... ) ] }
+//   | [ identifier :: | $unit :: ] identifier [ # ( ... ) ] { :: identifier [ # ( ... ) ] }
 //   | ...
 //
 //   mayPortDecl: may be a ANSI port declaration.  true for module, interface, or program.
