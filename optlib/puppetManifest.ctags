@@ -38,6 +38,7 @@
 --kinddef-PuppetManifest=n,node,nodes
 --kinddef-PuppetManifest=r,resource,resources
 --kinddef-PuppetManifest=v,variable,variables
+--kinddef-PuppetManifest=p,param,parameters
 
 #
 # Separators
@@ -74,6 +75,9 @@
 --_tabledef-PuppetManifest=skipArray
 --_tabledef-PuppetManifest=skipArgs
 --_tabledef-PuppetManifest=skipCollector
+
+--_tabledef-PuppetManifest=signature
+--_tabledef-PuppetManifest=skipDefaultValue
 
 --_tabledef-PuppetManifest=var
 
@@ -143,6 +147,45 @@
 --_mtable-regex-PuppetManifest=skipArgs/\(//{tenter=skipArgs}
 --_mtable-regex-PuppetManifest=skipArgs/\)//{tleave}
 --_mtable-extend-PuppetManifest=skipArgs+any
+
+#
+# signature
+#
+--_mtable-extend-PuppetManifest=signature+comment
+--_mtable-extend-PuppetManifest=signature+skipLiteral
+--_mtable-extend-PuppetManifest=signature+ignoreWhiteSpace
+--_mtable-regex-PuppetManifest=signature/\)//{tleave}{{
+    %
+    % fill signature
+    %
+    dup ?, eq { pop } if
+    ?) _buildstring _scopetop {
+        exch signature:
+    } {
+        % something wrong
+        pop
+    } ifelse
+}}
+--_mtable-regex-PuppetManifest=signature/\$([a-zA-Z][_a-zA-Z0-9:]*)[ \t]*([=,])[ \t]*/\1/p/{scope=ref}{{
+    % push the name of parameter for filling the signature field of definition
+    \2 0 get ?= eq {
+       /skipDefaultValue _tenter
+    } if
+    ?$ \1 ?,
+}}
+--_mtable-extend-PuppetManifest=signature+any
+
+#
+# skipDefaultValue
+#
+--_mtable-extend-PuppetManifest=skipDefaultValue+comment
+--_mtable-extend-PuppetManifest=skipDefaultValue+skipLiteral
+--_mtable-regex-PuppetManifest=skipDefaultValue/\[//{tenter=skipArray}
+--_mtable-regex-PuppetManifest=skipDefaultValue/\{//{tenter=skipBlock}
+--_mtable-regex-PuppetManifest=skipDefaultValue/\(//{tenter=skipArgs}
+--_mtable-regex-PuppetManifest=skipDefaultValue/,//{tleave}
+--_mtable-regex-PuppetManifest=skipDefaultValue/\)//{tleave}{_advanceTo=0start}
+--_mtable-extend-PuppetManifest=skipDefaultValue+any
 
 #
 # skipCollector
@@ -290,7 +333,10 @@
 # define
 #
 --_mtable-extend-PuppetManifest=defineStart+comment
---_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*\(/\1/d/{tenter=skipArgs,blockHeadPopAtLast}{scope=push}
+--_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*\(/\1/d/{tenter=signature,blockHeadPopAtLast}{scope=push}{{
+    % for gathering signature
+    mark ?(
+}}
 --_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*\{/\1/d/{tenter=block,endWithPop}{scope=push}
 
 #

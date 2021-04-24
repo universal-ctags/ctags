@@ -14,6 +14,7 @@ typedef enum {
 	K_NODE,
 	K_RESOURCE,
 	K_VARIABLE,
+	K_PARAM,
 } PuppetManifestKind;
 
 
@@ -40,6 +41,8 @@ static void initializePuppetManifestParser (const langType language)
 	addLanguageRegexTable (language, "skipArray");
 	addLanguageRegexTable (language, "skipArgs");
 	addLanguageRegexTable (language, "skipCollector");
+	addLanguageRegexTable (language, "signature");
+	addLanguageRegexTable (language, "skipDefaultValue");
 	addLanguageRegexTable (language, "var");
 	addLanguageRegexTable (language, "defineStart");
 	addLanguageRegexTable (language, "caseStart");
@@ -379,6 +382,79 @@ static void initializePuppetManifestParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "skipCollector",
 	                               "^.",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "signature",
+	                               "^/\\*",
+	                               "", "", "{tenter=comment_multiline}", NULL);
+	addLanguageTagMultiTableRegex (language, "signature",
+	                               "^\\#",
+	                               "", "", "{tenter=comment_oneline}", NULL);
+	addLanguageTagMultiTableRegex (language, "signature",
+	                               "^'",
+	                               "", "", "{tenter=ssliteral}", NULL);
+	addLanguageTagMultiTableRegex (language, "signature",
+	                               "^\"",
+	                               "", "", "{tenter=dsliteral}", NULL);
+	addLanguageTagMultiTableRegex (language, "signature",
+	                               "^[ \t\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "signature",
+	                               "^\\)",
+	                               "", "", "{tleave}"
+		"{{\n"
+		"    %\n"
+		"    % fill signature\n"
+		"    %\n"
+		"    dup ?, eq { pop } if\n"
+		"    ?) _buildstring _scopetop {\n"
+		"        exch signature:\n"
+		"    } {\n"
+		"        % something wrong\n"
+		"        pop\n"
+		"    } ifelse\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "signature",
+	                               "^\\$([a-zA-Z][_a-zA-Z0-9:]*)[ \t]*([=,])[ \t]*",
+	                               "\\1", "p", "{scope=ref}"
+		"{{\n"
+		"    % push the name of parameter for filling the signature field of definition\n"
+		"    \\2 0 get ?= eq {\n"
+		"       /skipDefaultValue _tenter\n"
+		"    } if\n"
+		"    ?$ \\1 ?,\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "signature",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^/\\*",
+	                               "", "", "{tenter=comment_multiline}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^\\#",
+	                               "", "", "{tenter=comment_oneline}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^'",
+	                               "", "", "{tenter=ssliteral}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^\"",
+	                               "", "", "{tenter=dsliteral}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^\\[",
+	                               "", "", "{tenter=skipArray}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^\\{",
+	                               "", "", "{tenter=skipBlock}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^\\(",
+	                               "", "", "{tenter=skipArgs}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^,",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^\\)",
+	                               "", "", "{tleave}{_advanceTo=0start}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipDefaultValue",
+	                               "^.",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "var",
 	                               "^(::[a-zA-Z0-9_:]+)[ \t\n]*=",
 	                               "\\1", "v", "{tenter=varexpr,end}", NULL);
@@ -393,7 +469,11 @@ static void initializePuppetManifestParser (const langType language)
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "defineStart",
 	                               "^([a-z][_a-zA-Z0-9:]*)[ \n\t]*\\(",
-	                               "\\1", "d", "{tenter=skipArgs,blockHeadPopAtLast}{scope=push}", NULL);
+	                               "\\1", "d", "{tenter=signature,blockHeadPopAtLast}{scope=push}"
+		"{{\n"
+		"    % for gathering signature\n"
+		"    mark ?(\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "defineStart",
 	                               "^([a-z][_a-zA-Z0-9:]*)[ \n\t]*\\{",
 	                               "\\1", "d", "{tenter=block,endWithPop}{scope=push}", NULL);
@@ -638,6 +718,9 @@ extern parserDefinition* PuppetManifestParser (void)
 		},
 		{
 		  true, 'v', "variable", "variables",
+		},
+		{
+		  true, 'p', "param", "parameters",
 		},
 	};
 

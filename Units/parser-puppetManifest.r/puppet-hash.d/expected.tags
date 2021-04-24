@@ -1,6 +1,7 @@
 hash	input.pp	/^$hash = { "file" => "\/tmp\/myhashfile1" }$/;"	variable	line:2	language:PuppetManifest
 hash2	input.pp	/^$hash2 = { "a" => { key => "\/tmp\/myhashfile2" }}$/;"	variable	line:9	language:PuppetManifest
-test	input.pp	/^define test($a = { "b" => "c" }) {$/;"	definition	line:16	language:PuppetManifest	end:21
+test	input.pp	/^define test($a = { "b" => "c" }) {$/;"	definition	line:16	language:PuppetManifest	signature:($a)	end:21
+a	input.pp	/^define test($a = { "b" => "c" }) {$/;"	param	line:16	language:PuppetManifest	scope:definition:test
 test	input.pp	/^    "test":$/;"	resource	line:24	language:PuppetManifest	end:26
 hash3	input.pp	/^$hash3 = { mykey => "\/tmp\/myhashfile4" }$/;"	variable	line:28	language:PuppetManifest
 key	input.pp	/^$key = "mykey"$/;"	variable	line:29	language:PuppetManifest
