@@ -222,6 +222,11 @@ typedef struct {
 	unsigned int advanceto_delta;
 } scriptWindow;
 
+enum hook {
+	HOOK_PRELUDE,
+	HOOK_MAX,
+};
+
 struct lregexControlBlock {
 	int currentScope;
 	ptrArray *entries [2];
@@ -233,8 +238,8 @@ struct lregexControlBlock {
 
 	EsObject *local_dict;
 
-	ptrArray *prelude;
-	ptrArray *prelude_code;
+	ptrArray *hook[HOOK_MAX];
+	ptrArray *hook_code[HOOK_MAX];
 
 	langType owner;
 
@@ -341,8 +346,8 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 	lcb->tstack = ptrArrayNew(NULL);
 	lcb->guest_req = guestRequestNew ();
 	lcb->local_dict = es_nil;
-	lcb->prelude = ptrArrayNew (eFree);
-	lcb->prelude_code = ptrArrayNew ((ptrArrayDeleteFunc)es_object_unref);
+	lcb->hook[HOOK_PRELUDE] = ptrArrayNew (eFree);
+	lcb->hook_code[HOOK_PRELUDE] = ptrArrayNew ((ptrArrayDeleteFunc)es_object_unref);
 	lcb->owner = parser->id;
 
 	return lcb;
@@ -369,11 +374,11 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 	es_object_unref (lcb->local_dict);
 	lcb->local_dict = es_nil;
 
-	ptrArrayDelete (lcb->prelude);
-	lcb->prelude = NULL;
+	ptrArrayDelete (lcb->hook[HOOK_PRELUDE]);
+	lcb->hook[HOOK_PRELUDE] = NULL;
 
-	ptrArrayDelete (lcb->prelude_code);
-	lcb->prelude_code = NULL;
+	ptrArrayDelete (lcb->hook_code[HOOK_PRELUDE]);
+	lcb->hook_code[HOOK_PRELUDE] = NULL;
 
 	eFree (lcb);
 }
@@ -2984,25 +2989,25 @@ extern EsObject* scriptEval (OptVM *vm, EsObject *optscript)
 
 static void scriptEvalPrelude (OptVM *vm, struct lregexControlBlock *lcb)
 {
-	if (ptrArrayCount (lcb->prelude_code) == 0)
+	if (ptrArrayCount (lcb->hook_code[HOOK_PRELUDE]) == 0)
 	{
-		for (int i = 0; i < ptrArrayCount (lcb->prelude); i++)
+		for (int i = 0; i < ptrArrayCount (lcb->hook[HOOK_PRELUDE]); i++)
 		{
-			const char *src = ptrArrayItem (lcb->prelude, i);
+			const char *src = ptrArrayItem (lcb->hook[HOOK_PRELUDE], i);
 			EsObject *code = scriptRead (vm, src);
 			if (es_error_p (code))
 				error (FATAL, "error when reading prelude code: %s", src);
-			ptrArrayAdd (lcb->prelude_code, es_object_ref (code));
+			ptrArrayAdd (lcb->hook_code[HOOK_PRELUDE], es_object_ref (code));
 			es_object_unref (code);
 		}
 	}
-	for (int i = 0; i < ptrArrayCount (lcb->prelude_code); i++)
+	for (int i = 0; i < ptrArrayCount (lcb->hook_code[HOOK_PRELUDE]); i++)
 	{
-		EsObject *code = ptrArrayItem (lcb->prelude_code, i);
+		EsObject *code = ptrArrayItem (lcb->hook_code[HOOK_PRELUDE], i);
 		EsObject * e = optscriptEval (vm, code);
 		if (es_error_p (e))
 			error (WARNING, "error when evaluating prelude code: %s",
-				   (char *)ptrArrayItem (lcb->prelude, i));
+				   (char *)ptrArrayItem (lcb->hook[HOOK_PRELUDE], i));
 	}
 }
 
@@ -3020,7 +3025,7 @@ static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb)
 
 extern void	addOptscriptPrelude (struct lregexControlBlock *lcb, const char *code)
 {
-	ptrArrayAdd (lcb->prelude, eStrdup (code));
+	ptrArrayAdd (lcb->hook[HOOK_PRELUDE], eStrdup (code));
 }
 
 /* Return true if available. */
