@@ -19,8 +19,8 @@
 #
 # rst2pdf is a separate tool and can also be installed via pip (e.g.,
 # 	"pip install rst2pdf")
-RST2MAN  = rst2man
-RST2HTML = rst2html
+RST2MAN  = $(shell command -v rst2man  || command -v rst2man.py  || command -v rst2man-3  || command -v rst2man-3.6  || command -v rst2man-3.7  || command -v rst2man-3.8  || command -v rst2man-3.9  || echo rst2man)
+RST2HTML = $(shell command -v rst2html || command -v rst2html.py || command -v rst2html-3 || command -v rst2html-3.6 || command -v rst2html-3.7 || command -v rst2html-3.8 || command -v rst2html-3.9 || echo rst2html)
 RST2PDF  = rst2pdf
 
 # rst2man had a bug about code-block:: handling.
