@@ -1,0 +1,6 @@
+one	input.pp	/^class one {$/;"	class	line:1	language:PuppetManifest	end:6
+/tmp/virtualtest1	input.pp	/^    @file { "\/tmp\/virtualtest1": content => "one" }$/;"	vresource	line:2	language:PuppetManifest	scope:class:::one	typeref:typename:file	end:2
+/tmp/virtualtest2	input.pp	/^    @file { "\/tmp\/virtualtest2": content => "two" }$/;"	vresource	line:3	language:PuppetManifest	scope:class:::one	typeref:typename:file	end:3
+/tmp/virtualtest3	input.pp	/^    @file { "\/tmp\/virtualtest3": content => "three" }$/;"	vresource	line:4	language:PuppetManifest	scope:class:::one	typeref:typename:file	end:4
+/tmp/virtualtest4	input.pp	/^    @file { "\/tmp\/virtualtest4": content => "four" }$/;"	vresource	line:5	language:PuppetManifest	scope:class:::one	typeref:typename:file	end:5
+two	input.pp	/^class two {$/;"	class	line:8	language:PuppetManifest	end:12

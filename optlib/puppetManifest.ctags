@@ -39,12 +39,40 @@
 --kinddef-PuppetManifest=r,resource,resources
 --kinddef-PuppetManifest=v,variable,variables
 --kinddef-PuppetManifest=p,param,parameters
+--kinddef-PuppetManifest=V,vresource,virtual resources
 
 #
 # Separators
 #
 --_scopesep-PuppetManifest=/c:::
 --_scopesep-PuppetManifest=*/*:::
+
+#
+# Prelude
+#
+--_prelude-PuppetManifest={{
+    % spec:dict<num,kind> TRYMAKETAG tag:int true
+    % spec:dict<num,kind> TRYMAKETAG false
+    /trymaketag {
+        {
+            {
+                1 index _matchstr {
+                    % key value str
+                    3 -1 roll
+                    % value str key
+                    _matchloc
+                    % value str loc
+                    3 -1 roll exch
+                    % str value loc
+                    _tag _commit
+                    stop
+                } {
+                    pop pop
+                } ifelse
+            } forall
+         } stopped
+    } def
+}}
 
 #
 # Tables
@@ -202,12 +230,12 @@
 # block
 #
 --_mtable-regex-PuppetManifest=blockStart/(@)?(::[a-zA-Z0-9:_]+|[a-zA-Z][a-zA-Z0-9:_]*)[ \t\n]*\{//{tenter=resourceBlock}{{
-    \1 {
-       true
+    \1 false eq {
+       /resource
     } {
-       false
+       /vresource
     } ifelse \2 true
-    % virtual:bool type:string true
+    % kind:name type:string true
 }}
 --_mtable-regex-PuppetManifest=blockStart/class[ \t\n]+//{tenter=classStart}
 --_mtable-regex-PuppetManifest=blockStart/define[ \t\n]+//{tenter=defineStart}
@@ -283,7 +311,7 @@
 # resourceBlock expects data on optscript:
 #
 # false RESOURCEBLOCK -
-# virtual:bool type:string true RESOURCEBLOCK -
+# kind:name type:string true RESOURCEBLOCK -
 #
 --_mtable-extend-PuppetManifest=resourceBlock+ignoreWhiteSpace
 --_mtable-regex-PuppetManifest=resourceBlock/\}//{tleave}{{
@@ -299,17 +327,32 @@
 # resourceName expects data on optscript:
 #
 # false RESOURCENAME false
-# virtual:bool type:string true RESOURCENAME virtual:bool type:string true
+# kind:name type:string true RESOURCENAME kind:name type:string true
 #
---_mtable-regex-PuppetManifest=resourceName/'([^']+)'/\1/r/{tenter=resourceBody,end}{scope=push}{{
+--_mtable-regex-PuppetManifest=resourceName/'([^']+)'|"([^"]+)"//{tenter=resourceBody,end}{{
     dup {
-         1 index (typename) exch [ 3 1 roll ] . exch typeref:
-    } if
-}}
---_mtable-regex-PuppetManifest=resourceName/"([^"]+)"/\1/r/{tenter=resourceBody,end}{scope=push}{{
-    dup {
-         1 index (typename) exch [ 3 1 roll ] . exch typeref:
-    } if
+        1 index (typename) exch [ 3 1 roll ]
+        % kind:name type:string true [ type:string (typename) ]
+        <<
+        4 index
+        % kind:name type:string true [ type:string (typename) ] << kind:name
+        1 exch dup 2 exch
+        >>
+        % kind:name type:string true [ type:string (typename) ] << 1 kind:name 2 kind:name >>
+        trymaketag
+        % kind:name type:string true [ type:string (typename) ] tag:int true %
+        % kind:name type:string true [ type:string (typename) ] false
+        {
+            dup _scopepush
+            exch typeref:
+        } {
+            pop
+        } ifelse
+    } {
+        << 1 /resource 2 /resource >> trymaketag {
+           _scopepush
+        } if
+    } ifelse
 }}
 --_mtable-regex-PuppetManifest=resourceName///{tquit}
 --_mtable-regex-PuppetManifest=resourceNameInArray/'([^']+)'/\1/r/{tleave}

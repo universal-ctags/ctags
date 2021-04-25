@@ -3254,7 +3254,6 @@ static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 	scriptWindow *window = lcb->window;
 
 	if (window == NULL
-		|| 0 >= g
 		|| window->nmatch <= g
 		|| window->pmatch [g].rm_so == -1)
 		return OPT_ERR_RANGECHECK;
