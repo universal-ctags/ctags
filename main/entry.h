@@ -46,7 +46,7 @@ struct sTagEntryInfo {
 	unsigned int isFileScope    :1;  /* is tag visible only within input file? */
 	unsigned int isFileEntry    :1;  /* is this just an entry for a file name? */
 	unsigned int truncateLineAfterTag :1;  /* truncate tag line at end of tag name? */
-	unsigned int placeholder    :1;	 /* This is just a part of scope context.
+	unsigned int placeholder    :1;	 /* is used only for keeping corkIndex based scope chain.
 					    Put this entry to cork queue but
 					    don't print it to tags file. */
 	unsigned int skipAutoFQEmission:1; /* If a parser makes a fq tag for the

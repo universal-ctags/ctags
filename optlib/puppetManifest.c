@@ -260,10 +260,7 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "classStart",
-	                               "^(::[a-z][_a-zA-Z0-9:]*)",
-	                               "\\1", "c", "{tenter=blockHead,endWithPop}{scope=push}", NULL);
-	addLanguageTagMultiTableRegex (language, "classStart",
-	                               "^([a-z][_a-zA-Z0-9:]*)",
+	                               "^(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)",
 	                               "\\1", "c", "{tenter=blockHead,endWithPop}{scope=push}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
 	                               "^[ \t\n]+",

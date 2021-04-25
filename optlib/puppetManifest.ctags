@@ -218,8 +218,7 @@
 # TODO: inherits:
 #
 --_mtable-extend-PuppetManifest=classStart+comment
---_mtable-regex-PuppetManifest=classStart/(::[a-z][_a-zA-Z0-9:]*)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
---_mtable-regex-PuppetManifest=classStart/([a-z][_a-zA-Z0-9:]*)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
+--_mtable-regex-PuppetManifest=classStart/(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
 
 #
 # resource

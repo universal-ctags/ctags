@@ -74,7 +74,6 @@ static bool doesContainAnyCharInInput (const tagEntryInfo *const tag, const char
 static bool doesContainAnyCharInFieldScope (const tagEntryInfo *const tag, const char *value, const char *chars);
 static bool doesContainAnyCharInSignature (const tagEntryInfo *const tag, const char *value, const char *chars);
 
-static bool     isLanguageFieldAvailable  (const tagEntryInfo *const tag);
 static bool     isTyperefFieldAvailable   (const tagEntryInfo *const tag);
 static bool     isFileFieldAvailable      (const tagEntryInfo *const tag);
 static bool     isInheritsFieldAvailable  (const tagEntryInfo *const tag);
@@ -86,154 +85,283 @@ static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 static bool     isEpochAvailable           (const tagEntryInfo *const tag);
 
-
-#define DEFINE_FIELD(L, N, V, H, DT, RE)				\
-	DEFINE_FIELD_FULL (L, N, V, H, NULL, DT, RE, NULL, NULL)
-#define DEFINE_FIELD_FULL(L, N, V, H, A, DT, RE, RN, DCAC)	\
-	{					\
-		.letter        = L,		\
-		.name          = N,		\
-		.description   = H,		\
-		.enabled       = V,		\
-		.render        = RE,		\
-		.renderNoEscaping= RN,		\
-		.doesContainAnyChar = DCAC, \
-		.isValueAvailable = A,		\
-		.dataType = DT, \
-	}
-
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
 static fieldDefinition fieldDefinitionsFixed [] = {
-        /* FIXED FIELDS */
-	DEFINE_FIELD_FULL ('N', "name",     true,
-			  "tag name",
-			  NULL,
-			  FIELDTYPE_STRING,
-			  renderFieldName, renderFieldNameNoEscape,
-			  doesContainAnyCharInName),
-	DEFINE_FIELD_FULL ('F', "input",    true,
-			   "input file",
-			   NULL,
-			   FIELDTYPE_STRING,
-			   renderFieldInput, renderFieldInputNoEscape,
-			   doesContainAnyCharInInput),
-	DEFINE_FIELD ('P', "pattern",  true,
-			   "pattern",
-			   FIELDTYPE_STRING|FIELDTYPE_BOOL,
-			   renderFieldPattern),
+	[FIELD_NAME] = {
+		.letter             = 'N',
+		.name               = "name",
+		.description        = "tag name",
+		.enabled            = true,
+		.render             = renderFieldName,
+		.renderNoEscaping   = renderFieldNameNoEscape,
+		.doesContainAnyChar = doesContainAnyCharInName,
+		.isValueAvailable   = NULL,
+		.dataType           = FIELDTYPE_STRING,
+	},
+	[FIELD_INPUT_FILE] = {
+		.letter             = 'F',
+		.name               = "input",
+		.description        = "input file",
+		.enabled            = true,
+		.render             = renderFieldInput,
+		.renderNoEscaping   = renderFieldInputNoEscape,
+		.doesContainAnyChar = doesContainAnyCharInInput,
+		.isValueAvailable   = NULL,
+		.dataType           = FIELDTYPE_STRING,
+	},
+	[FIELD_PATTERN] = {
+		.letter             = 'P',
+		.name               = "pattern",
+		.description        = "pattern",
+		.enabled            = true,
+		.render             = renderFieldPattern,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = NULL,
+		.dataType           = FIELDTYPE_STRING|FIELDTYPE_BOOL,
+	},
 };
 
 static fieldDefinition fieldDefinitionsExuberant [] = {
-	DEFINE_FIELD ('C', "compact",        false,
-			   "compact input line (used only in xref output)",
-			   FIELDTYPE_STRING,
-			   renderFieldCompactInputLine),
+	[FIELD_COMPACT_INPUT_LINE - FIELD_COMPACT_INPUT_LINE] = {
+		.letter             = 'C',
+		.name               = "compact",
+		.description        = "compact input line (used only in xref output)",
+		.enabled            = false,
+		.render             = renderFieldCompactInputLine,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = NULL,
+		.dataType           = FIELDTYPE_STRING,
+	},
+	[FIELD_ACCESS - FIELD_COMPACT_INPUT_LINE] = {
+		.letter             = 'a',
+		.name               = "access",
+		.description        = "Access (or export) of class members",
+		.enabled            = false,
+		.render             = renderFieldAccess,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = isAccessFieldAvailable,
+		.dataType           = FIELDTYPE_STRING,
+	},
+	[FIELD_FILE_SCOPE - FIELD_COMPACT_INPUT_LINE] = {
+		.letter             = 'f',
+		.name               = "file",
+		.description        = "File-restricted scoping",
+		.enabled            = true,
+		.render             = renderFieldFile,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = isFileFieldAvailable,
+		.dataType           = FIELDTYPE_BOOL,
+	},
+	[FIELD_INHERITANCE - FIELD_COMPACT_INPUT_LINE] = {
+		.letter             = 'i',
+		.name               = "inherits",
+		.description        = "Inheritance information",
+		.enabled            = false,
+		.render             = renderFieldInherits,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = isInheritsFieldAvailable,
+		.dataType           = FIELDTYPE_STRING|FIELDTYPE_BOOL,
+	},
+	[FIELD_KIND_LONG - FIELD_COMPACT_INPUT_LINE] = {
+		.letter             = 'K',
+		.name               = NULL,
+		.description        = "Kind of tag in long-name form",
+		.enabled            = false,
+		.render             = renderFieldKindName,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = NULL,
+		.dataType           = FIELDTYPE_STRING,
+	},
+	[FIELD_KIND - FIELD_COMPACT_INPUT_LINE] = {
+		.letter             ='k',
+		.name               = NULL,
+		.description        = "Kind of tag in one-letter form",
+		.enabled            = true,
+		.render             = renderFieldKindLetter,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = NULL,
+		.dataType           = FIELDTYPE_STRING,
+	},
+	[FIELD_LANGUAGE - FIELD_COMPACT_INPUT_LINE] = {
+		.letter             = 'l',
+		.name               = "language",
+		.description        = "Language of input file containing tag",
+		.enabled            = false,
+		.render             = renderFieldLanguage,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.dataType           = FIELDTYPE_STRING,
+	},
+	[FIELD_IMPLEMENTATION - FIELD_COMPACT_INPUT_LINE] = {
+		.letter             = 'm',
+		.name               = "implementation",
+		.description        = "Implementation information",
+		.enabled            = false,
+		.render             = renderFieldImplementation,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = isImplementationFieldAvailable,
+		.dataType           = FIELDTYPE_STRING,
 
-	/* EXTENSION FIELDS */
-	DEFINE_FIELD_FULL ('a', "access",         false,
-		      "Access (or export) of class members",
-			  isAccessFieldAvailable,
-			  FIELDTYPE_STRING,
-		      renderFieldAccess, NULL, NULL),
-	DEFINE_FIELD_FULL ('f', "file",           true,
-		      "File-restricted scoping",
-			  isFileFieldAvailable,
-			  FIELDTYPE_BOOL,
-		      renderFieldFile, NULL, NULL),
-	DEFINE_FIELD_FULL ('i', "inherits",       false,
-		      "Inheritance information",
-			  isInheritsFieldAvailable,
-			  FIELDTYPE_STRING|FIELDTYPE_BOOL,
-		      renderFieldInherits, NULL, NULL),
-	DEFINE_FIELD ('K', NULL,             false,
-		      "Kind of tag in long-name form",
-		      FIELDTYPE_STRING,
-		      renderFieldKindName),
-	DEFINE_FIELD ('k', NULL,             true,
-			   "Kind of tag in one-letter form",
-			   FIELDTYPE_STRING,
-			   renderFieldKindLetter),
-	DEFINE_FIELD_FULL ('l', "language",       false,
-			   "Language of input file containing tag",
-			   isLanguageFieldAvailable,
-			   FIELDTYPE_STRING,
-			   renderFieldLanguage, NULL, NULL),
-	DEFINE_FIELD_FULL ('m', "implementation", false,
-			   "Implementation information",
-			   isImplementationFieldAvailable,
-			   FIELDTYPE_STRING,
-			   renderFieldImplementation, NULL, NULL),
-	DEFINE_FIELD ('n', "line",           false,
-			   "Line number of tag definition",
-			   FIELDTYPE_INTEGER,
-			   renderFieldLineNumber),
-	DEFINE_FIELD_FULL ('S', "signature",     false,
-			   "Signature of routine (e.g. prototype or parameter list)",
-			   isSignatureFieldAvailable,
-			   FIELDTYPE_STRING,
-			   renderFieldSignature, renderFieldSignatureNoEscape,
-			   doesContainAnyCharInSignature),
-	DEFINE_FIELD_FULL ('s', NULL,             true,
-			   "[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope",
-			   NULL,
-			   FIELDTYPE_STRING,
-			   renderFieldScope, renderFieldScopeNoEscape,
-			   doesContainAnyCharInFieldScope),
-	DEFINE_FIELD_FULL ('t', "typeref",        true,
-			   "Type and name of a variable or typedef",
-			   isTyperefFieldAvailable,
-			   FIELDTYPE_STRING,
-			   renderFieldTyperef, NULL, NULL),
-	DEFINE_FIELD ('z', "kind",           false,
-			   "[tags output] prepend \"kind:\" to k/ (or K/) field output, [xref and json output] kind in long-name form",
-			   FIELDTYPE_STRING,
-			   /* Following renderer is for handling --_xformat=%{kind};
-			      and is not for tags output. */
-			   renderFieldKindName),
+	},
+	[FIELD_LINE_NUMBER - FIELD_COMPACT_INPUT_LINE] = {
+		.letter             = 'n',
+		.name               = "line",
+		.description        = "Line number of tag definition",
+		.enabled            = false,
+		.render             = renderFieldLineNumber,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = NULL,
+		.dataType           = FIELDTYPE_INTEGER,
+	},
+	[FIELD_SIGNATURE - FIELD_COMPACT_INPUT_LINE] = {
+		.letter				= 'S',
+		.name				= "signature",
+		.description		= "Signature of routine (e.g. prototype or parameter list)",
+		.enabled			= false,
+		.render				= renderFieldSignature,
+		.renderNoEscaping	= renderFieldSignatureNoEscape,
+		.doesContainAnyChar = doesContainAnyCharInSignature,
+		.isValueAvailable	= isSignatureFieldAvailable,
+		.dataType			= FIELDTYPE_STRING,
+	},
+	[FIELD_SCOPE - FIELD_COMPACT_INPUT_LINE] = {
+		.letter				= 's',
+		.name				= NULL,
+		.description		= "[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope",
+		.enabled			= true,
+		.render				= renderFieldScope,
+		.renderNoEscaping	= renderFieldScopeNoEscape,
+		.doesContainAnyChar = doesContainAnyCharInFieldScope,
+		.isValueAvailable	= NULL,
+		.dataType			= FIELDTYPE_STRING,
+	},
+	[FIELD_TYPE_REF - FIELD_COMPACT_INPUT_LINE] = {
+		.letter				= 't',
+		.name				= "typeref",
+		.description		= "Type and name of a variable or typedef",
+		.enabled			= true,
+		.render				= renderFieldTyperef,
+		.renderNoEscaping	= NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable	= isTyperefFieldAvailable,
+		.dataType			= FIELDTYPE_STRING,
+	},
+	[FIELD_KIND_KEY - FIELD_COMPACT_INPUT_LINE] = {
+		.letter				= 'z',
+		.name				= "kind",
+		.description		= "[tags output] prepend \"kind:\" to k/ (or K/) field output, [xref and json output] kind in long-name form",
+		.enabled			= false,
+		/* Following renderer is for handling --_xformat=%{kind};
+		   and is not for tags output. */
+		.render				= renderFieldKindName,
+		.renderNoEscaping	= NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable	= NULL,
+		.dataType			= FIELDTYPE_STRING,
+	},
 };
 
 static fieldDefinition fieldDefinitionsUniversal [] = {
-	DEFINE_FIELD ('r', "roles",    false,
-			   "Roles",
-			   FIELDTYPE_STRING,
-			   renderFieldRoles),
-	DEFINE_FIELD ('R',  NULL,     false,
-			   "Marker (R or D) representing whether tag is definition or reference",
-			   FIELDTYPE_STRING,
-			   renderFieldRefMarker),
-	DEFINE_FIELD_FULL ('Z', "scope",   false,
-			  "[tags output] prepend \"scope:\" key to s/scope field output, [xref and json output] the same as s/ field",
-			   NULL,
-			   FIELDTYPE_STRING,
-			   /* Following renderer is for handling --_xformat=%{scope};
-			      and is not for tags output. */
-			   renderFieldScope, renderFieldScopeNoEscape,
-			   doesContainAnyCharInFieldScope),
-	DEFINE_FIELD_FULL ('E', "extras",   false,
-			   "Extra tag type information",
-			   isExtrasFieldAvailable,
-			   FIELDTYPE_STRING,
-			   renderFieldExtras, NULL, NULL),
-	DEFINE_FIELD_FULL ('x', "xpath",   false,
-			   "xpath for the tag",
-			   isXpathFieldAvailable,
-			   FIELDTYPE_STRING,
-			   renderFieldXpath, NULL, NULL),
-	DEFINE_FIELD ('p', "scopeKind", false,
-			   "[tags output] no effect, [xref and json output] kind of scope in long-name form",
-			   FIELDTYPE_STRING,
-			   renderFieldScopeKindName),
-	DEFINE_FIELD_FULL ('e', "end", false,
-			   "end lines of various items",
-			   isEndFieldAvailable,
-			   FIELDTYPE_INTEGER,
-			   renderFieldEnd, NULL, NULL),
-	DEFINE_FIELD_FULL ('T', "epoch", true,
-					   "the last modified time of the input file (only for F/file kind tag)",
-					   isEpochAvailable,
-					   FIELDTYPE_INTEGER,
-					   renderFieldEpoch, NULL, NULL),
+	[FIELD_ROLES - FIELD_ROLES] = {
+		.letter             = 'r',
+		.name               = "roles",
+		.description        = "Roles",
+		.enabled            = false,
+		.render             = renderFieldRoles,
+		.renderNoEscaping   = NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable   = NULL,
+		.dataType           = FIELDTYPE_STRING,
+	},
+	[FIELD_REF_MARK - FIELD_ROLES] = {
+		.letter             = 'R',
+		.name				= NULL,
+		.description		= "Marker (R or D) representing whether tag is definition or reference",
+		.enabled			= false,
+		.render				= renderFieldRefMarker,
+		.renderNoEscaping	= NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable	= NULL,
+		.dataType			= FIELDTYPE_STRING,
+	},
+	[FIELD_SCOPE_KEY - FIELD_ROLES] = {
+		.letter             = 'Z',
+		.name               = "scope",
+		.description        = "[tags output] prepend \"scope:\" key to s/scope field output, [xref and json output] the same as s/ field",
+		.enabled            = false,
+		/* Following renderer is for handling --_xformat=%{scope};
+		   and is not for tags output. */
+		.render             = renderFieldScope,
+		.renderNoEscaping   = renderFieldScopeNoEscape,
+		.doesContainAnyChar = doesContainAnyCharInFieldScope,
+		.isValueAvailable   = NULL,
+		.dataType           = FIELDTYPE_STRING,
+	},
+	[FIELD_EXTRAS - FIELD_ROLES] = {
+		.letter				= 'E',
+		.name				= "extras",
+		.description		= "Extra tag type information",
+		.enabled			= false,
+		.render				= renderFieldExtras,
+		.renderNoEscaping	= NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable	= isExtrasFieldAvailable,
+		.dataType			= FIELDTYPE_STRING,
+	},
+	[FIELD_XPATH - FIELD_ROLES] = {
+		.letter				= 'x',
+		.name				= "xpath",
+		.description		= "xpath for the tag",
+		.enabled			= false,
+		.render				= renderFieldXpath,
+		.renderNoEscaping	= NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable	= isXpathFieldAvailable,
+		.dataType			= FIELDTYPE_STRING,
+	},
+	[FIELD_SCOPE_KIND_LONG - FIELD_ROLES] = {
+		.letter				= 'p',
+		.name				= "scopeKind",
+		.description		= "[tags output] no effect, [xref and json output] kind of scope in long-name form",
+		.enabled			= false,
+		.render				= renderFieldScopeKindName,
+		.renderNoEscaping	= NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable	= NULL,
+		.dataType			= FIELDTYPE_STRING,
+	},
+	[FIELD_END_LINE - FIELD_ROLES] = {
+		.letter				= 'e',
+		.name				= "end",
+		.description		= "end lines of various items",
+		.enabled			= false,
+		.render				= renderFieldEnd,
+		.renderNoEscaping	= NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable	= isEndFieldAvailable,
+		.dataType			= FIELDTYPE_INTEGER,
+	},
+	[FIELD_EPOCH - FIELD_ROLES] = {
+		.letter				= 'T',
+		.name				= "epoch",
+		.description		= "the last modified time of the input file (only for F/file kind tag)",
+		.enabled			= true,
+		.render				= renderFieldEpoch,
+		.renderNoEscaping	= NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable	= isEpochAvailable,
+		.dataType			= FIELDTYPE_INTEGER,
+	},
 };
 
 
@@ -265,6 +393,7 @@ extern void initFieldObjects (void)
 		fobj->nameWithPrefix = fobj->def->name;
 		fobj->language = LANG_IGNORE;
 		fobj->sibling  = FIELD_UNKNOWN;
+		fobj->def->ftype = i + fieldObjectUsed;
 	}
 	fieldObjectUsed += ARRAY_SIZE (fieldDefinitionsFixed);
 
@@ -276,6 +405,7 @@ extern void initFieldObjects (void)
 		fobj->nameWithPrefix = fobj->def->name;
 		fobj->language = LANG_IGNORE;
 		fobj->sibling  = FIELD_UNKNOWN;
+		fobj->def->ftype = i + fieldObjectUsed;
 	}
 	fieldObjectUsed += ARRAY_SIZE (fieldDefinitionsExuberant);
 
@@ -300,6 +430,7 @@ extern void initFieldObjects (void)
 			fobj->nameWithPrefix = NULL;
 		fobj->language = LANG_IGNORE;
 		fobj->sibling  = FIELD_UNKNOWN;
+		fobj->def->ftype = i + fieldObjectUsed;
 	}
 	fieldObjectUsed += ARRAY_SIZE (fieldDefinitionsUniversal);
 
@@ -711,32 +842,51 @@ static const char *renderFieldLineNumber (const tagEntryInfo *const tag,
 	return vStringValue (b);
 }
 
+struct renderRoleData {
+	vString* b;
+	int nRoleWritten;
+};
+
+static void renderRoleByIndex (const tagEntryInfo *const tag, int roleIndex, void *data)
+{
+	struct renderRoleData *rdata = data;
+
+	if (!isLanguageRoleEnabled (tag->langType, tag->kindIndex, roleIndex))
+		return;
+
+	if (rdata->nRoleWritten > 0)
+		vStringPut(rdata->b, ',');
+
+	const roleDefinition * role = getTagRole(tag, roleIndex);
+	renderRole (role, rdata->b);
+	rdata->nRoleWritten++;
+}
+
+static roleBitsType foreachRoleBits (const tagEntryInfo *const tag,
+									 void (* fn) (const tagEntryInfo *const, int, void *),
+									 void *data)
+{
+	roleBitsType rbits = tag->extensionFields.roleBits;
+	if (!rbits)
+		return rbits;
+
+	int roleCount = countLanguageRoles (tag->langType, tag->kindIndex);
+
+	for (int roleIndex = 0; roleIndex < roleCount; roleIndex++)
+	{
+		if ((rbits >> roleIndex) & (roleBitsType)1)
+			fn (tag, roleIndex, data);
+	}
+	return rbits;
+}
+
 static const char *renderFieldRoles (const tagEntryInfo *const tag,
 				    const char *value CTAGS_ATTR_UNUSED,
 				    vString* b)
 {
-	roleBitsType rbits = tag->extensionFields.roleBits;
-	const roleDefinition * role;
-	if (rbits)
-	{
-		int roleCount = countLanguageRoles (tag->langType, tag->kindIndex);
-		int nRoleWritten = 0;
+	struct renderRoleData data = { .b = b, .nRoleWritten = 0 };
 
-		for (int roleIndex = 0; roleIndex < roleCount; roleIndex++)
-		{
-			if (((rbits >> roleIndex) & (roleBitsType)1)
-				&& isLanguageRoleEnabled (tag->langType, tag->kindIndex, roleIndex))
-			{
-				if (nRoleWritten > 0)
-					vStringPut(b, ',');
-
-				role = getTagRole(tag, roleIndex);
-				renderRole (role, b);
-				nRoleWritten++;
-			}
-		}
-	}
-	else
+	if (!foreachRoleBits (tag, renderRoleByIndex, &data))
 		vStringCatS (b, ROLE_DEFINITION_NAME);
 	return vStringValue (b);
 }
@@ -750,7 +900,10 @@ static const char *renderFieldLanguage (const tagEntryInfo *const tag,
 	if (Option.lineDirectives && (tag->sourceLangType != LANG_IGNORE))
 		l = getLanguageName(tag->sourceLangType);
 	else
+	{
+		Assert (tag->langType != LANG_IGNORE);
 		l = getLanguageName(tag->langType);
+	}
 
 	return renderAsIs (b, WITH_DEFUALT_VALUE(l));
 }
@@ -897,11 +1050,6 @@ static const char *renderFieldEpoch (const tagEntryInfo *const tag,
 		return NULL;
 }
 
-static bool     isLanguageFieldAvailable (const tagEntryInfo *const tag)
-{
-	return (tag->langType == LANG_IGNORE)? false: true;
-}
-
 static bool     isTyperefFieldAvailable  (const tagEntryInfo *const tag)
 {
 	return (tag->extensionFields.typeRef [0] != NULL
@@ -936,13 +1084,12 @@ static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag)
 static bool     isExtrasFieldAvailable     (const tagEntryInfo *const tag)
 {
 	unsigned int i;
+
+	if (tag->extraDynamic)
+		return true;
 	for (i = 0; i < sizeof (tag->extra); i++)
-	{
 		if (tag->extra [i])
 			return true;
-		else if (tag->extraDynamic)
-			return true;
-	}
 
 	return false;
 }
