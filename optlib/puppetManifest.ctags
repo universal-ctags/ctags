@@ -332,16 +332,16 @@
 --_mtable-regex-PuppetManifest=resourceName/'([^']+)'|"([^"]+)"//{tenter=resourceBody,end}{{
     dup {
         1 index (typename) exch [ 3 1 roll ]
-        % kind:name type:string true [ type:string (typename) ]
+        % kind:name type:string true [ (typename) type:string ]
         <<
         4 index
-        % kind:name type:string true [ type:string (typename) ] << kind:name
+        % kind:name type:string true [ (typename) type:string ] << kind:name
         1 exch dup 2 exch
         >>
-        % kind:name type:string true [ type:string (typename) ] << 1 kind:name 2 kind:name >>
+        % kind:name type:string true [ (typename) type:string ] << 1 kind:name 2 kind:name >>
         trymaketag
-        % kind:name type:string true [ type:string (typename) ] tag:int true %
-        % kind:name type:string true [ type:string (typename) ] false
+        % kind:name type:string true [ (typename) type:string ] tag:int true %
+        % kind:name type:string true [ (typename) type:string ] false
         {
             dup _scopepush
             exch typeref:
@@ -355,8 +355,30 @@
     } ifelse
 }}
 --_mtable-regex-PuppetManifest=resourceName///{tquit}
---_mtable-regex-PuppetManifest=resourceNameInArray/'([^']+)'/\1/r/{tleave}
---_mtable-regex-PuppetManifest=resourceNameInArray/"([^"]+)"/\1/r/{tleave}
+
+# resourceNameInArray expects data on optscript:
+#
+# false RESOURCENAMEINARRAY false
+# kind:name type:string true RESOURCENAMEINARRAY kind:name type:string true
+#
+--_mtable-regex-PuppetManifest=resourceNameInArray/'([^']+)'|"([^"]+)"///{tleave}{{
+    dup {
+        % do the same as resourceName
+        1 index (typename) exch [ 3 1 roll ]
+        << 4 index 1 exch dup 2 exch >> trymaketag
+        {
+            dup _scoperef
+            exch typeref:
+        } {
+            pop
+        } ifelse
+
+    } {
+        << 1 /resource 2 /resource >> trymaketag {
+           _scoperef
+        } if
+    } ifelse
+}}
 --_mtable-regex-PuppetManifest=resourceNameInArray////{tquit}
 
 # --_mtable-extend-PuppetManifest=resourceBody+ignoreWhiteSpace
@@ -375,8 +397,7 @@
 
 --_mtable-extend-PuppetManifest=resourceArray+comment
 --_mtable-extend-PuppetManifest=resourceArray+ignoreWhiteSpace
---_mtable-regex-PuppetManifest=resourceArray/'//{tenter=resourceNameInArray}{_advanceTo=0start}
---_mtable-regex-PuppetManifest=resourceArray/"//{tenter=resourceNameInArray}{_advanceTo=0start}
+--_mtable-regex-PuppetManifest=resourceArray/['"]//{tenter=resourceNameInArray}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceArray/\]//{tleave}
 --_mtable-extend-PuppetManifest=resourceArray+any
 

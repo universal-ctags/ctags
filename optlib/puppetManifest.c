@@ -600,16 +600,16 @@ static void initializePuppetManifestParser (const langType language)
 		"{{\n"
 		"    dup {\n"
 		"        1 index (typename) exch [ 3 1 roll ]\n"
-		"        % kind:name type:string true [ type:string (typename) ]\n"
+		"        % kind:name type:string true [ (typename) type:string ]\n"
 		"        <<\n"
 		"        4 index\n"
-		"        % kind:name type:string true [ type:string (typename) ] << kind:name\n"
+		"        % kind:name type:string true [ (typename) type:string ] << kind:name\n"
 		"        1 exch dup 2 exch\n"
 		"        >>\n"
-		"        % kind:name type:string true [ type:string (typename) ] << 1 kind:name 2 kind:name >>\n"
+		"        % kind:name type:string true [ (typename) type:string ] << 1 kind:name 2 kind:name >>\n"
 		"        trymaketag\n"
-		"        % kind:name type:string true [ type:string (typename) ] tag:int true %\n"
-		"        % kind:name type:string true [ type:string (typename) ] false\n"
+		"        % kind:name type:string true [ (typename) type:string ] tag:int true %\n"
+		"        % kind:name type:string true [ (typename) type:string ] false\n"
 		"        {\n"
 		"            dup _scopepush\n"
 		"            exch typeref:\n"
@@ -626,11 +626,26 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^",
 	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceNameInArray",
-	                               "^'([^']+)'",
-	                               "\\1", "r", "{tleave}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceNameInArray",
-	                               "^\"([^\"]+)\"",
-	                               "\\1", "r", "{tleave}", NULL);
+	                               "^'([^']+)'|\"([^\"]+)\"",
+	                               "", "", "{tleave}"
+		"{{\n"
+		"    dup {\n"
+		"        % do the same as resourceName\n"
+		"        1 index (typename) exch [ 3 1 roll ]\n"
+		"        << 4 index 1 exch dup 2 exch >> trymaketag\n"
+		"        {\n"
+		"            dup _scoperef\n"
+		"            exch typeref:\n"
+		"        } {\n"
+		"            pop\n"
+		"        } ifelse\n"
+		"\n"
+		"    } {\n"
+		"        << 1 /resource 2 /resource >> trymaketag {\n"
+		"           _scoperef\n"
+		"        } if\n"
+		"    } ifelse\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceNameInArray",
 	                               "^",
 	                               "", "", "{tquit}", NULL);
@@ -674,10 +689,7 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceArray",
-	                               "^'",
-	                               "", "", "{tenter=resourceNameInArray}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceArray",
-	                               "^\"",
+	                               "^['\"]",
 	                               "", "", "{tenter=resourceNameInArray}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceArray",
 	                               "^\\]",
