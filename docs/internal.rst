@@ -853,15 +853,19 @@ Automatic parser guessing (TBW)
 Managing regular expression parsers (TBW)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Ghost kind in regex parser
+Ghost kind in regex parser (TBW)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. TODO: Q: what is the point of documenting this?
-	from comment on #2916: I must explain the ghost kind.
+	from comment on #2916: I (@masatake) must explain the ghost kind.
+	from comment on #2916:
+		I (@masatake) found I must explain "placeholder tag". The ghost kind is
+		useful for fill the find field of the placeholder tag. I will write about
+		the Ghost kind when I write about the placeholder tag. I will write about
+		the placeholder tag when I write about Optscript.
 
-If a whitespace is used as a kind letter, it is never printed when
-ctags is called with ``--list-kinds`` option.  This kind is
-automatically assigned to an empty name pattern.
+	If a whitespace is used as a kind letter, it is never printed when
+	ctags is called with ``--list-kinds`` option.  This kind is
+	automatically assigned to an empty name pattern.
 
-Normally you don't need to know this.
-
+	Normally you don't need to know this.
