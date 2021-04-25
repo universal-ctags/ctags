@@ -3279,11 +3279,8 @@ static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
-static EsObject* lrop_get_match_string (OptVM *vm, EsObject *name)
+static EsObject* lrop_get_match_string_common (OptVM *vm, int i, int npop)
 {
-	void * data = es_symbol_get_data (name);
-	int i = HT_PTR_TO_INT (data);
-
 	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
 	scriptWindow *window = lcb->window;
 	if (window == NULL
@@ -3291,6 +3288,8 @@ static EsObject* lrop_get_match_string (OptVM *vm, EsObject *name)
 		|| window->nmatch <= i
 		|| window->pmatch [i].rm_so == -1)
 	{
+		for (; npop > 0; npop--)
+			opt_vm_ostack_pop (vm);
 		opt_vm_ostack_push (vm, es_false);
 		return es_false;
 	}
@@ -3302,8 +3301,40 @@ static EsObject* lrop_get_match_string (OptVM *vm, EsObject *name)
 	EsObject *str = opt_string_new_from_cstr (cstr);
 	eFree ((void *)cstr);
 
+	for (; npop > 0; npop--)
+		opt_vm_ostack_pop (vm);
+
 	opt_vm_ostack_push (vm, str);
 	es_object_unref (str);
+	return es_false;
+}
+
+/* Handles \1, \2, ... */
+static EsObject* lrop_get_match_string_named_group (OptVM *vm, EsObject *name)
+{
+	void * data = es_symbol_get_data (name);
+	int i = HT_PTR_TO_INT (data);
+
+	return lrop_get_match_string_common (vm, i, 0);
+}
+
+static EsObject* lrop_get_match_string_gorup_on_stack (OptVM *vm, EsObject *name)
+{
+	EsObject *group = opt_vm_ostack_top (vm);
+	if (!es_integer_p (group))
+		return OPT_ERR_TYPECHECK;
+
+	int g = es_integer_get (group);
+	if (g < 1)
+		return OPT_ERR_RANGECHECK;
+
+	EsObject *r = lrop_get_match_string_common (vm, g, 1);
+	if (es_error_p (r))
+		return r;
+
+	r = opt_vm_ostack_top (vm);
+	if (es_object_get_type (r) == OPT_TYPE_STRING)
+		opt_vm_ostack_push (vm, es_true);
 	return es_false;
 }
 
@@ -3637,6 +3668,13 @@ static EsObject *lrop_markextra (OptVM *vm, EsObject *name)
 
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
+		.name     = "_matchstr",
+		.fn       = lrop_get_match_string_gorup_on_stack,
+		.arity    = 1,
+		.help_str = "group:int _MATCHSTR string true%"
+		"group:int _MATCHSTR false",
+	},
+	{
 		.name     = "_matchloc",
 		.fn       = lrop_get_match_loc,
 		.arity    = -1,
@@ -3776,7 +3814,7 @@ extern void initRegexOptscript (void)
 	OPTSCRIPT_ERR_UNKNOWNKIND = es_error_intern ("unknownkind");
 	OPTSCRIPT_ERR_UNKNOWNROLE = es_error_intern ("unknownrole");
 
-	optscriptInstallProcs (lregex_dict, lrop_get_match_string);
+	optscriptInstallProcs (lregex_dict, lrop_get_match_string_named_group);
 
 	optscriptRegisterOperators (lregex_dict,
 								lropOperators, ARRAY_SIZE(lropOperators));
