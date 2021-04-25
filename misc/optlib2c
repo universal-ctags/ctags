@@ -260,24 +260,24 @@ my $options =
 	 extend_table($_[0], $2, $3);
 	 return 1;
      } ],
-     [ qr/^--_prelude-([^=]*)=(\{\{)$/, sub {
+     [ qr/^--_(prelude|sequel)-([^=]*)=(\{\{)$/, sub {
 	 die "Don't use --_mtable-regex-<LANG>= option before defining the language"
 	   if (! defined $_[0]->{'langdef'});
 
-	 my $prelude = $_[0]->{'prelude'};
-	 my $slot = @$prelude;
-	 push @$prelude, $2;
+	 my $hook = $_[0]->{$1};
+	 my $slot = @$hook;
+	 push @$hook, $3;
 	 return sub {
-	   $prelude->[$slot] = $prelude->[$slot] . $_[0];
+	   $hook->[$slot] = $hook->[$slot] . $_[0];
 	 }
        }],
-     [ qr/^--_prelude-([^=]*)=(\{\{.*\}\})$/, sub {
+     [ qr/^--_(prelude|sequel)-([^=]*)=(\{\{.*\}\})$/, sub {
 	 die "Don't use --_mtable-regex-<LANG>= option before defining the language"
 	   if (! defined $_[0]->{'langdef'});
 
-	 my $prelude = $_[0]->{'prelude'};
-	 my $slot = @$prelude;
-	 push @$prelude, $2;
+	 my $hook = $_[0]->{$1};
+	 my $slot = @$hook;
+	 push @$hook, $3;
 	 return 1;
        }],
      [ qr/^--_scopesep-([^=]*)=([^,]?)\/([^:]+):(.+)/, sub {
@@ -615,6 +615,17 @@ EOF
 	}
 	print <<EOF;
 	addLanguageOptscriptPrelude (language,$prelude);
+EOF
+    }
+    for (@{$opts->{'sequel'}}) {
+	my $sequel = "";
+	for my $frag (split /\n/, $_) {
+	    $sequel = $sequel . "\n\t\t\"" . $frag . ($frag =~ /.*\}\}$/
+							? '"'
+							: '\n"');
+	}
+	print <<EOF;
+	addLanguageOptscriptSequel (language,$sequel);
 EOF
     }
     if ($opts->{'tablenames'}) {
@@ -1120,6 +1131,8 @@ sub main {
 		defaultRootScopeSeparator => undef,
 		hasSepSpeicifer => 0,
 		prelude => [ # ""
+			   ],
+		sequel =>  [ # ""
 			   ],
 	       );
 

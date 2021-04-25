@@ -380,6 +380,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Define new role for the kind in <LANG>."},
  {1,1,"  --_scopesep-<LANG>=[<parent_kind_letter>|*]/(<child_kind_letter>|*):<separator>"},
  {1,1,"       Specify scope separator between <PARENT_KIND> and <KIND>."},
+ {1,1,"  --_sequel-<LANG>={{ optscript-code }}"},
+ {1,1,"       Specify code run after parsing with <LANG> parser."},
  {1,1,"  --_tabledef-<LANG>=<name>"},
  {1,1,"       Define new regex table for <LANG>."},
  {1,0,""},
@@ -3328,6 +3330,8 @@ static void processLongOption (
 	else if (processScopesepOption (option, parameter))
 		;
 	else if (processPreludeOption (option, parameter))
+		;
+	else if (processSequelOption (option, parameter))
 		;
 	else if (processPretendOption (option, parameter))
 		;

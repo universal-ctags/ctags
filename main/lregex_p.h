@@ -75,6 +75,7 @@ extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, c
 extern void initRegexOptscript (void);
 extern void listRegexOpscriptOperators (FILE *fp);
 extern void addOptscriptPrelude (struct lregexControlBlock *lcb, const char *code);
+extern void addOptscriptSequel (struct lregexControlBlock *lcb, const char *code);
 
 extern void printMultitableStatistics (struct lregexControlBlock *lcb);
 

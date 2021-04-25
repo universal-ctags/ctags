@@ -224,6 +224,7 @@ typedef struct {
 
 enum hook {
 	HOOK_PRELUDE,
+	HOOK_SEQUEL,
 	HOOK_MAX,
 };
 
@@ -270,7 +271,7 @@ static void   guestRequestSubmit (struct guestRequest *);
 static EsObject *scriptRead (OptVM *vm, const char *src);
 static void scriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex, scriptWindow *window);
 static EsObject* scriptEval (OptVM *vm, EsObject *optscript);
-static void scriptEvalPrelude (OptVM *vm, struct lregexControlBlock *lcb);
+static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum hook hook);
 static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb);
 
 static void deleteTable (void *ptrn)
@@ -346,8 +347,12 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 	lcb->tstack = ptrArrayNew(NULL);
 	lcb->guest_req = guestRequestNew ();
 	lcb->local_dict = es_nil;
-	lcb->hook[HOOK_PRELUDE] = ptrArrayNew (eFree);
-	lcb->hook_code[HOOK_PRELUDE] = ptrArrayNew ((ptrArrayDeleteFunc)es_object_unref);
+
+	for (int i = 0; i< HOOK_MAX; i++)
+	{
+		lcb->hook[i] = ptrArrayNew (eFree);
+		lcb->hook_code[i] = ptrArrayNew ((ptrArrayDeleteFunc)es_object_unref);
+	}
 	lcb->owner = parser->id;
 
 	return lcb;
@@ -374,11 +379,14 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 	es_object_unref (lcb->local_dict);
 	lcb->local_dict = es_nil;
 
-	ptrArrayDelete (lcb->hook[HOOK_PRELUDE]);
-	lcb->hook[HOOK_PRELUDE] = NULL;
+	for (int i = 0; i < HOOK_MAX; i++)
+	{
+		ptrArrayDelete (lcb->hook[i]);
+		lcb->hook[i] = NULL;
 
-	ptrArrayDelete (lcb->hook_code[HOOK_PRELUDE]);
-	lcb->hook_code[HOOK_PRELUDE] = NULL;
+		ptrArrayDelete (lcb->hook_code[i]);
+		lcb->hook_code[i] = NULL;
+	}
 
 	eFree (lcb);
 }
@@ -2008,11 +2016,12 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 		lcb->local_dict = opt_dict_new (23);
 	opt_vm_dstack_push (optvm, lcb->local_dict);
 	opt_vm_set_app_data (optvm, lcb);
-	scriptEvalPrelude (optvm, lcb);
+	scriptEvalHook (optvm, lcb, HOOK_PRELUDE);
 }
 
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
 {
+	scriptEvalHook (optvm, lcb, HOOK_SEQUEL);
 	opt_vm_set_app_data (optvm, NULL);
 	opt_vm_clear (optvm);
 	opt_dict_clear (lcb->local_dict);
@@ -2987,27 +2996,27 @@ extern EsObject* scriptEval (OptVM *vm, EsObject *optscript)
 	return optscriptEval (vm, optscript);
 }
 
-static void scriptEvalPrelude (OptVM *vm, struct lregexControlBlock *lcb)
+static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum hook hook)
 {
-	if (ptrArrayCount (lcb->hook_code[HOOK_PRELUDE]) == 0)
+	if (ptrArrayCount (lcb->hook_code[hook]) == 0)
 	{
-		for (int i = 0; i < ptrArrayCount (lcb->hook[HOOK_PRELUDE]); i++)
+		for (int i = 0; i < ptrArrayCount (lcb->hook[hook]); i++)
 		{
-			const char *src = ptrArrayItem (lcb->hook[HOOK_PRELUDE], i);
+			const char *src = ptrArrayItem (lcb->hook[hook], i);
 			EsObject *code = scriptRead (vm, src);
 			if (es_error_p (code))
-				error (FATAL, "error when reading prelude code: %s", src);
-			ptrArrayAdd (lcb->hook_code[HOOK_PRELUDE], es_object_ref (code));
+				error (FATAL, "error when reading hook[%d] code: %s", hook, src);
+			ptrArrayAdd (lcb->hook_code[hook], es_object_ref (code));
 			es_object_unref (code);
 		}
 	}
-	for (int i = 0; i < ptrArrayCount (lcb->hook_code[HOOK_PRELUDE]); i++)
+	for (int i = 0; i < ptrArrayCount (lcb->hook_code[hook]); i++)
 	{
-		EsObject *code = ptrArrayItem (lcb->hook_code[HOOK_PRELUDE], i);
+		EsObject *code = ptrArrayItem (lcb->hook_code[hook], i);
 		EsObject * e = optscriptEval (vm, code);
 		if (es_error_p (e))
-			error (WARNING, "error when evaluating prelude code: %s",
-				   (char *)ptrArrayItem (lcb->hook[HOOK_PRELUDE], i));
+			error (WARNING, "error when evaluating hook[%d] code: %s",
+				   hook, (char *)ptrArrayItem (lcb->hook[i], i));
 	}
 }
 
@@ -3026,6 +3035,11 @@ static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb)
 extern void	addOptscriptPrelude (struct lregexControlBlock *lcb, const char *code)
 {
 	ptrArrayAdd (lcb->hook[HOOK_PRELUDE], eStrdup (code));
+}
+
+extern void	addOptscriptSequel (struct lregexControlBlock *lcb, const char *code)
+{
+	ptrArrayAdd (lcb->hook[HOOK_SEQUEL], eStrdup (code));
 }
 
 /* Return true if available. */
