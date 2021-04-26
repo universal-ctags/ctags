@@ -1622,6 +1622,8 @@ it will be recorded in that same manner in the tag file. See, however,
 the ``--tag-relative=(yes|no|always|never)`` option for how this behavior can be
 modified.
 
+.. _tag_entries:
+
 TAG ENTRIES
 -----------
 

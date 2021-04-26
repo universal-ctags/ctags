@@ -61,10 +61,11 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	man-pages.rst
 	parsers.rst
 	option-file.rst
-	optlib.rst
 	output-format.rst
+	running-multi-parsers.rst
 	interactive-mode.rst
 	news.rst
+	optlib.rst
 	extending.rst
 	tips.rst
 	testing.rst

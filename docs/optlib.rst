@@ -248,21 +248,222 @@ Experimental flags
 		Le4679d360100	/tmp/input.foo	/^(let ((f (lambda (x) (+ 1 x))))$/;"	l
 
 
-Ghost kind in regex parser
-......................................................................
+.. _extras:
 
-.. TODO: Q: what is the point of documenting this?
-	from comment on #2916: I must explain the ghost kind in internal.rst, not here.
+Conditional tagging with extras
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If a whitespace is used as a kind letter, it is never printed when
-ctags is called with ``--list-kinds`` option.  This kind is
-automatically assigned to an empty name pattern.
+.. NEEDS MORE REVIEWS
 
-Normally you don't need to know this.
+If a matched pattern should only be tagged when an ``extra`` flag is enabled,
+mark the pattern with ``{_extra=XNAME}`` where ``XNAME`` is the name of the
+extra. You must define a ``XNAME`` with the
+``--_extradef-<LANG>=XNAME,DESCRIPTION`` option before defining a regex flag
+marked ``{_extra=XNAME}``.
+
+.. code-block:: python
+
+	if __name__ == '__main__':
+		do_something()
+
+To capture the lines above in a python program (``input.py``), an ``extra`` flag can
+be used.
+
+.. code-block:: ctags
+	:emphasize-lines: 1-2
+
+	--_extradef-Python=main,__main__ entry points
+	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
+
+The above optlib (``python-main.ctags``) introduces ``main`` extra to the Python parser.
+The pattern matching is done only when the ``main`` is enabled.
+
+.. code-block:: console
+
+	$ ctags --options=python-main.ctags -o - --extras-Python='+{main}' input.py
+	__main__	input.py	/^if __name__ == '__main__':$/;"	f
+
+
+.. TODO: this "fields" section should probably be moved up this document, as a
+	subsection in the "Regex option argument flags" section
+
+.. _fields:
+
+Adding custom fields to the tag output
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. NEEDS MORE REVIEWS
+
+Exuberant Ctags allows just one of the specified groups in a regex pattern to
+be used as a part of the name of a tag entry.
+
+Universal Ctags allows using the other groups in the regex pattern.
+An optlib parser can have its specific fields. The groups can be used as a
+value of the fields of a tag entry.
+
+Let's think about `Unknown`, an imaginary language.
+Here is a source file (``input.unknown``) written in `Unknown`:
+
+.. code-block:: java
+
+	public func foo(n, m);
+	protected func bar(n);
+	private func baz(n,...);
+
+With ``--regex-Unknown=...`` Exuberant Ctags can capture ``foo``, ``bar``, and ``baz``
+as names. Universal Ctags can attach extra context information to the
+names as values for fields. Let's focus on ``bar``. ``protected`` is a
+keyword to control how widely the identifier ``bar`` can be accessed.
+``(n)`` is the parameter list of ``bar``. ``protected`` and ``(n)`` are
+extra context information of ``bar``.
+
+With the following optlib file (``unknown.ctags``), ctags can attach
+``protected`` to the field protection and ``(n)`` to the field signature.
+
+.. code-block:: ctags
+	:emphasize-lines: 5-9
+
+	--langdef=unknown
+	--kinddef-unknown=f,func,functions
+	--map-unknown=+.unknown
+
+	--_fielddef-unknown=protection,access scope
+	--_fielddef-unknown=signature,signatures
+
+	--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
+	--fields-unknown=+'{protection}{signature}'
+
+For the line ``protected func bar(n);`` you will get following tags output::
+
+	bar	input.unknown	/^protected func bar(n);$/;"	f	protection:protected	signature:(n)
+
+Let's see the detail of ``unknown.ctags``.
+
+.. code-block:: ctags
+
+	--_fielddef-unknown=protection,access scope
+
+``--_fielddef-<LANG>=name,description`` defines a new field for a parser
+specified by *<LANG>*.  Before defining a new field for the parser,
+the parser must be defined with ``--langdef=<LANG>``. ``protection`` is
+the field name used in tags output. ``access scope`` is the description
+used in the output of ``--list-fields`` and ``--list-fields=Unknown``.
+
+.. code-block:: ctags
+
+	--_fielddef-unknown=signature,signatures
+
+This defines a field named ``signature``.
+
+.. code-block:: ctags
+
+	--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
+
+This option requests making a tag for the name that is specified with the group 3 of the
+pattern, attaching the group 1 as a value for ``protection`` field to the tag, and attaching
+the group 4 as a value for ``signature`` field to the tag. You can use the long regex flag
+``_field`` for attaching fields to a tag with the following notation rule::
+
+	{_field=FIELDNAME:GROUP}
+
+
+``--fields-<LANG>=[+|-]{FIELDNAME}`` can be used to enable or disable specified field.
+
+When defining a new parser specific field, it is disabled by default. Enable the
+field explicitly to use the field. See ":ref:`Parser specific fields <parser-specific-fields>`"
+about ``--fields-<LANG>`` option.
+
+`passwd` parser is a simple example that uses ``--fields-<LANG>`` option.
+
+
+.. _roles:
+
+Capturing reference tags
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. NOT REVIEWED YET
+
+To make a reference tag with an optlib parser, specify a role with
+``_role`` long regex flag. Let's see an example:
+
+.. code-block:: ctags
+	:emphasize-lines: 3-6
+
+	--langdef=FOO
+	--kinddef-FOO=m,module,modules
+	--_roledef-FOO.m=imported,imported module
+	--regex-FOO=/import[ \t]+([a-z]+)/\1/m/{_role=imported}
+	--extras=+r
+	--fields=+r
+
+A role must be defined before specifying it as value for ``_role`` flag.
+``--_roledef-<LANG>.<KIND>=<ROLE>,<ROLEDESC>`` option is for defining a role.
+See the line, ``--regex-FOO=...``.  In this parser `FOO`, the name of an
+imported module is captured as a reference tag with role ``imported``.
+
+For specifying *<KIND>* where the role is defined, you can use either a
+kind letter or a kind name surrounded by '``{``' and '``}``'.
+
+The option has two parameters separated by a comma:
+
+*<ROLE>*
+
+	the role name, and
+
+*<ROLEDESC>*
+
+	the description of the role.
+
+The first parameter is the name of the role. The role is defined in
+the kind *<KIND>* of the language *<LANG>*. In the example,
+``imported`` role is defined in the ``module`` kind, which is specified
+with ``m``. You can use ``{module}``, the name of the kind instead.
+
+The kind specified in ``--_roledef-<LANG>.<KIND>`` option must be
+defined *before* using the option. See the description of
+``--kinddef-<LANG>`` for defining a kind.
+
+The roles are listed with ``--list-roles=<LANG>``. The name and description
+passed to ``--_roledef-<LANG>.<KIND>`` option are used in the output like::
+
+	$ ctags --langdef=FOO --kinddef-FOO=m,module,modules \
+				--_roledef-FOO.m='imported,imported module' --list-roles=FOO
+	#KIND(L/N) NAME     ENABLED DESCRIPTION
+	m/module   imported on      imported module
+
+
+If specifying ``_role`` regex flag multiple times with different roles, you can
+assign multiple roles to a reference tag.  See following input of C language
+
+.. code-block:: C
+
+	x  = 0;
+	i += 1;
+
+An ultra fine grained C parser may capture the variable ``x`` with
+``lvalue`` role and the variable ``i`` with ``lvalue`` and ``incremented``
+roles.
+
+You can implement such roles by extending the built-in C parser:
+
+.. code-block:: ctags
+	:emphasize-lines: 2-5
+
+	# c-extra.ctags
+	--_roledef-C.v=lvalue,locator values
+	--_roledef-C.v=incremented,incremented with ++ operator
+	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *=/\1/v/{_role=lvalue}
+	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *\+=/\1/v/{_role=lvalue}{_role=incremented}
+
+.. code-block:: console
+
+	$ ctags with --options=c-extra.ctags --extras=+r --fields=+r
+	i	input.c	/^i += 1;$/;"	v	roles:lvalue,incremented
+	x	input.c	/^x = 0;$/;"	v	roles:lvalue
 
 
 Scope tracking in a regex parser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 About the ``{scope=..}`` flag itself for scope tracking, see "FLAGS FOR
 --regex-<LANG> OPTION" section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
@@ -1203,236 +1404,15 @@ example. It is the primary parser for testing multi-table regex parsers, and
 used in the actual ctags program for parsing puppet manifest files.
 
 
-.. TODO: this "extras" section should probably be moved up this document, as a
-	subsection in the "Regex option argument flags" section
-
-.. _extras:
-
-Conditional tagging with extras
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. NEEDS MORE REVIEWS
-
-If a matched pattern should only be tagged when an ``extra`` flag is enabled,
-mark the pattern with ``{_extra=XNAME}`` where ``XNAME`` is the name of the
-extra. You must define a ``XNAME`` with the
-``--_extradef-<LANG>=XNAME,DESCRIPTION`` option before defining a regex flag
-marked ``{_extra=XNAME}``.
-
-.. code-block:: python
-
-	if __name__ == '__main__':
-		do_something()
-
-To capture the lines above in a python program (``input.py``), an ``extra`` flag can
-be used.
-
-.. code-block:: ctags
-	:emphasize-lines: 1-2
-
-	--_extradef-Python=main,__main__ entry points
-	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
-
-The above optlib (``python-main.ctags``) introduces ``main`` extra to the Python parser.
-The pattern matching is done only when the ``main`` is enabled.
-
-.. code-block:: console
-
-	$ ctags --options=python-main.ctags -o - --extras-Python='+{main}' input.py
-	__main__	input.py	/^if __name__ == '__main__':$/;"	f
-
-
-.. TODO: this "fields" section should probably be moved up this document, as a
-	subsection in the "Regex option argument flags" section
-
-.. _fields:
-
-Adding custom fields to the tag output
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. NEEDS MORE REVIEWS
-
-Exuberant Ctags allows just one of the specified groups in a regex pattern to
-be used as a part of the name of a tag entry.
-
-Universal Ctags allows using the other groups in the regex pattern.
-An optlib parser can have its specific fields. The groups can be used as a
-value of the fields of a tag entry.
-
-Let's think about `Unknown`, an imaginary language.
-Here is a source file (``input.unknown``) written in `Unknown`:
-
-.. code-block:: java
-
-	public func foo(n, m);
-	protected func bar(n);
-	private func baz(n,...);
-
-With ``--regex-Unknown=...`` Exuberant Ctags can capture ``foo``, ``bar``, and ``baz``
-as names. Universal Ctags can attach extra context information to the
-names as values for fields. Let's focus on ``bar``. ``protected`` is a
-keyword to control how widely the identifier ``bar`` can be accessed.
-``(n)`` is the parameter list of ``bar``. ``protected`` and ``(n)`` are
-extra context information of ``bar``.
-
-With the following optlib file (``unknown.ctags``), ctags can attach
-``protected`` to the field protection and ``(n)`` to the field signature.
-
-.. code-block:: ctags
-	:emphasize-lines: 5-9
-
-	--langdef=unknown
-	--kinddef-unknown=f,func,functions
-	--map-unknown=+.unknown
-
-	--_fielddef-unknown=protection,access scope
-	--_fielddef-unknown=signature,signatures
-
-	--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
-	--fields-unknown=+'{protection}{signature}'
-
-For the line ``protected func bar(n);`` you will get following tags output::
-
-	bar	input.unknown	/^protected func bar(n);$/;"	f	protection:protected	signature:(n)
-
-Let's see the detail of ``unknown.ctags``.
-
-.. code-block:: ctags
-
-	--_fielddef-unknown=protection,access scope
-
-``--_fielddef-<LANG>=name,description`` defines a new field for a parser
-specified by *<LANG>*.  Before defining a new field for the parser,
-the parser must be defined with ``--langdef=<LANG>``. ``protection`` is
-the field name used in tags output. ``access scope`` is the description
-used in the output of ``--list-fields`` and ``--list-fields=Unknown``.
-
-.. code-block:: ctags
-
-	--_fielddef-unknown=signature,signatures
-
-This defines a field named ``signature``.
-
-.. code-block:: ctags
-
-	--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
-
-This option requests making a tag for the name that is specified with the group 3 of the
-pattern, attaching the group 1 as a value for ``protection`` field to the tag, and attaching
-the group 4 as a value for ``signature`` field to the tag. You can use the long regex flag
-``_field`` for attaching fields to a tag with the following notation rule::
-
-  {_field=FIELDNAME:GROUP}
-
-
-``--fields-<LANG>=[+|-]{FIELDNAME}`` can be used to enable or disable specified field.
-
-When defining a new parser specific field, it is disabled by default. Enable the
-field explicitly to use the field. See ":ref:`Parser specific fields <parser-specific-fields>`"
-about ``--fields-<LANG>`` option.
-
-`passwd` parser is a simple example that uses ``--fields-<LANG>`` option.
-
-
-.. TODO: this "roles" section should probably be moved up this document, as a
-	subsection in the "Regex option argument flags" section
-
-.. _roles:
-
-Capturing reference tags
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. NOT REVIEWED YET
-
-To make a reference tag with an optlib parser, specify a role with
-``_role`` long regex flag. Let's see an example:
-
-.. code-block:: ctags
-	:emphasize-lines: 3-6
-
-	--langdef=FOO
-	--kinddef-FOO=m,module,modules
-	--_roledef-FOO.m=imported,imported module
-	--regex-FOO=/import[ \t]+([a-z]+)/\1/m/{_role=imported}
-	--extras=+r
-	--fields=+r
-
-A role must be defined before specifying it as value for ``_role`` flag.
-``--_roledef-<LANG>.<KIND>=<ROLE>,<ROLEDESC>`` option is for defining a role.
-See the line, ``--regex-FOO=...``.  In this parser `FOO`, the name of an
-imported module is captured as a reference tag with role ``imported``.
-
-For specifying *<KIND>* where the role is defined, you can use either a
-kind letter or a kind name surrounded by '``{``' and '``}``'.
-
-The option has two parameters separated by a comma:
-
-*<ROLE>*
-
-	the role name, and
-
-*<ROLEDESC>*
-
-	the description of the role.
-
-The first parameter is the name of the role. The role is defined in
-the kind *<KIND>* of the language *<LANG>*. In the example,
-``imported`` role is defined in the ``module`` kind, which is specified
-with ``m``. You can use ``{module}``, the name of the kind instead.
-
-The kind specified in ``--_roledef-<LANG>.<KIND>`` option must be
-defined *before* using the option. See the description of
-``--kinddef-<LANG>`` for defining a kind.
-
-The roles are listed with ``--list-roles=<LANG>``. The name and description
-passed to ``--_roledef-<LANG>.<KIND>`` option are used in the output like::
-
-	$ ctags --langdef=FOO --kinddef-FOO=m,module,modules \
-				--_roledef-FOO.m='imported,imported module' --list-roles=FOO
-	#KIND(L/N) NAME     ENABLED DESCRIPTION
-	m/module   imported on      imported module
-
-
-If specifying ``_role`` regex flag multiple times with different roles, you can
-assign multiple roles to a reference tag.  See following input of C language
-
-.. code-block:: C
-
-   x  = 0;
-   i += 1;
-
-An ultra fine grained C parser may capture the variable ``x`` with
-``lvalue`` role and the variable ``i`` with ``lvalue`` and ``incremented``
-roles.
-
-You can implement such roles by extending the built-in C parser:
-
-.. code-block:: ctags
-	:emphasize-lines: 2-5
-
-	# c-extra.ctags
-	--_roledef-C.v=lvalue,locator values
-	--_roledef-C.v=incremented,incremeted with ++ operator
-	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *=/\1/v/{_role=lvalue}
-	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *\+=/\1/v/{_role=lvalue}{_role=incremented}
-
-.. code-block:: console
-
-	$ ctags with --options=c-extra.ctags --extras=+r --fields=+r
-	i	input.c	/^i += 1;$/;"	v	roles:lvalue,incremented
-	x	input.c	/^x = 0;$/;"	v	roles:lvalue
-
-
 .. _guest-regex-flag:
 
-Running a guest parser with ``_guest`` regex flag
+Scheduling a guest parser with ``_guest`` regex flag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. NOT REVIEWED YET
 
 With ``_guest`` regex flag, you can run a parser (a guest parser) on an
 area of the current input file.
-See ":ref:`Applying a parser to specified areas of input file (guest/host) <host-guest-parsers>`"
-about the concept of the guest parser.
+See ":ref:`host-guest-parsers`" about the concept of the guest parser.
 
 The ``_guest`` regex flag specifies a *guest spec*, and attaches it to
 the associated regex pattern.
@@ -1575,8 +1555,7 @@ following input file::
 	         `- "1end" points here.                       |
 	                               "2start" points here. -+
 
-..
-	NOT REVIEWED YET
+.. NOT REVIEWED YET
 
 .. _defining-subparsers:
 
@@ -1654,28 +1633,16 @@ In addition you can enable/disable with the subparser usable
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
-Directions
+.. _optlib_directions:
+
+Direction flags
 .........................................................................
 
-As explained in ":ref:`Tagging definitions of higher(upper) level language (sub/base) <base-sub-parsers>`",
-you can choose direction(s) how a base parser and a guest parser work together with
-long flags putting after ``--langdef=Foo{base=Bar}``.
+As explained in ":ref:`multiple_parsers_directions`" in
+":ref:`multiple_parsers`", you can choose direction(s) how a base parser and a
+guest parser work together with direction flags.
 
-========================  ======================
-C level notation          Command line long flag
-========================  ======================
-SUBPARSER_BASE_RUNS_SUB   shared (default)
-SUBPARSER_SUB_RUNS_BASE   dedicated
-SUBPARSER_BI_DIRECTION    bidirectional
-========================  ======================
-
-``{shared}`` is the default behavior. If none of ``{shared}``, ``{dedicated}``, nor
-``{bidirectional}`` is specified, it implies ``{shared}``.
-
-Let's see actual difference of behaviors.
-
-
-The examples are taken from `#1409
+The following examples are taken from `#1409
 <https://github.com/universal-ctags/ctags/issues/1409>`_ submitted by @sgraham on
 github Universal Ctags repository.
 
@@ -1691,7 +1658,7 @@ C++ parser can capture ``main`` as a function. `Mojom` subparser defined in the
 later runs on C++ parser and is for capturing ``ABC``.
 
 shared combination
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ``{shared}`` is specified, for ``input.cc``, both tags capture by C++ parser
 and mojom parser are recorded to tags file. For ``input.mojom``, only
 tags captured by mojom parser are recorded to tags file.
@@ -1723,7 +1690,7 @@ Mojom parser uses C++ parser internally but tags captured by C++ parser are
 dropped in the output.
 
 dedicated combination
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ``{dedicated}`` is specified, for ``input.cc``, only tags capture by C++
 parser are recorded to tags file. For ``input.mojom``, both tags capture
 by C++ parser and mojom parser are recorded to tags file.
@@ -1753,7 +1720,7 @@ mojom-dedicated.ctags:
 Mojom parser works only when ``.mojom`` file is given as input.
 
 bidirectional combination
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ``{bidirectional}`` is specified, both tags capture by C++ parser and
 mojom parser are recorded to tags file for either input ``input.cc`` and
 ``input.mojom``.
@@ -1782,15 +1749,6 @@ mojom-bidirectional.ctags:
 	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-Listing subparsers
-.........................................................................
-Subparsers can be listed with ``--list-subparser``:
-
-.. code-block:: console
-
-    $ ctags --options=./linux.ctags --list-subparsers=C
-    #NAME                          BASEPARSER           DIRECTION
-    linux                          C                    base => sub {shared}
 
 .. _optlib2c:
 
