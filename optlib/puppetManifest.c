@@ -755,7 +755,7 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^\\(",
 	                               "", "", "{tenter=skipArgs,end}", NULL);
 	addLanguageTagMultiTableRegex (language, "varexpr",
-	                               "^\\$[a-zA-Z:][0-9a-zA-Z\"]*",
+	                               "^\\$[a-zA-Z:][0-9a-zA-Z:]*",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "varexpr",
 	                               "^[0-9]+(\\.[0-9]+(e([+-][0-9]+)))?",
