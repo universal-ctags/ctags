@@ -130,3 +130,13 @@
 /_scopepush {
     dup _scoperef _scopeset
 } __bddef
+
+(string _ISSTRING string true
+ any:!string _ISSTRING false)
+/_isstring {
+    dup type /stringtype eq {
+        true
+    } {
+        pop false
+    } ifelse
+} __bddef
