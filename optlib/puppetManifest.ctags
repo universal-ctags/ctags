@@ -40,6 +40,7 @@
 --kinddef-PuppetManifest=v,variable,variables
 --kinddef-PuppetManifest=p,param,parameters
 --kinddef-PuppetManifest=V,vresource,virtual resources
+--kinddef-PuppetManifest=t,type,type aliases
 
 #
 # Separators
@@ -114,6 +115,8 @@
 --_tabledef-PuppetManifest=ifStart
 
 --_tabledef-PuppetManifest=nodeStart
+
+--_tabledef-PuppetManifest=typeStart
 
 #
 # Utilities
@@ -242,6 +245,7 @@
 --_mtable-regex-PuppetManifest=blockStart/case[ \t\n]+//{tenter=caseStart}
 --_mtable-regex-PuppetManifest=blockStart/(if|elsif|else|unless)[ \t\n]+//{tenter=ifStart}
 --_mtable-regex-PuppetManifest=blockStart/node[ \t\n]+//{tenter=nodeStart}
+--_mtable-regex-PuppetManifest=blockStart/type[ \t\n]+//{tenter=typeStart}
 --_mtable-regex-PuppetManifest=blockStart/\$//{tenter=var}
 
 
@@ -497,3 +501,11 @@
 --_mtable-regex-PuppetManifest=nodeStart/"([^"]+)"/\1/n/
 --_mtable-regex-PuppetManifest=nodeStart/\{///{tenter=block,end}
 --_mtable-extend-PuppetManifest=nodeStart+any
+
+#
+# type
+#
+--_mtable-extend-PuppetManifest=typeStart+comment
+--_mtable-extend-PuppetManifest=typeStart+ignoreWhiteSpace
+--_mtable-regex-PuppetManifest=typeStart/([a-zA-Z][a-zA-Z0-9]*::[a-zA-Z][a-zA-Z0-9]+)[ \t\n]*=[ \t\n]*/\1/t/{tenter=varexpr,end}
+--_mtable-extend-PuppetManifest=typeStart+any
