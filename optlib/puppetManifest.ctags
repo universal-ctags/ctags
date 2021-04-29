@@ -444,7 +444,7 @@
 --_mtable-regex-PuppetManifest=varexpr/[a-zA-Z0-9:][0-9a-zA-Z:]*//
 --_mtable-regex-PuppetManifest=varexpr/[ \t]//
 --_mtable-regex-PuppetManifest=varexpr/\n//{tleave}
---_mtable-regex-PuppetManifest=varexpr/.//
+--_mtable-extend-PuppetManifest=varexpr+any
 
 #
 # define
