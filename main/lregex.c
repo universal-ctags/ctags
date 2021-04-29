@@ -218,6 +218,8 @@ typedef struct {
 	const regmatch_t* const pmatch;
 	int nmatch;
 	struct mTableActionSpec taction;
+	bool advanceto;
+	unsigned int advanceto_delta;
 } scriptWindow;
 
 struct lregexControlBlock {
@@ -1809,6 +1811,7 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 			.patbuf = patbuf,
 			.pmatch = pmatch,
 			.nmatch = BACK_REFERENCE_COUNT,
+			.advanceto = false,
 		};
 
 		if (patbuf->optscript && (! hasNameSlot (patbuf)))
@@ -1901,6 +1904,7 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 			.patbuf = patbuf,
 			.pmatch = pmatch,
 			.nmatch = BACK_REFERENCE_COUNT,
+			.advanceto = false,
 		};
 
 		if (patbuf->optscript && (! hasNameSlot (patbuf)))
@@ -2631,6 +2635,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 				.patbuf = ptrn,
 				.pmatch = pmatch,
 				.nmatch = BACK_REFERENCE_COUNT,
+				.advanceto = false,
 			};
 			initTaction (&window.taction);
 
@@ -2672,9 +2677,12 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 					guestRequestClear (lcb->guest_req);
 				}
 
-				delta = (ptrn->mgroup.nextFromStart
-						 ? pmatch [ptrn->mgroup.forNextScanning].rm_so
-						 : pmatch [ptrn->mgroup.forNextScanning].rm_eo);
+				if (window.advanceto)
+					delta = window.advanceto_delta;
+				else
+					delta = (ptrn->mgroup.nextFromStart
+							 ? pmatch [ptrn->mgroup.forNextScanning].rm_so
+							 : pmatch [ptrn->mgroup.forNextScanning].rm_eo);
 				*offset += delta;
 
 				switch (taction->action)
@@ -3254,15 +3262,16 @@ static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 	matchLoc *mloc = xMalloc (1, matchLoc);
 	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
 	{
+		mloc->delta = 0;
 		mloc->line = getInputLineNumber ();
 		mloc->pos = getInputFilePosition ();
 	}
 	else
 	{
-		off_t offset = (window->line + (start
-									   ? window->pmatch [g].rm_so
-										: window->pmatch [g].rm_eo))
-			- window->start;
+		mloc->delta = (start
+					   ? window->pmatch [g].rm_so
+					   : window->pmatch [g].rm_eo);
+		off_t offset = (window->line + mloc->delta) - window->start;
 		mloc->line = getInputLineNumberForFileOffset (offset);
 		mloc->pos  = getInputFilePositionForLine (mloc->line);
 	}
@@ -3666,6 +3675,23 @@ static EsObject *lrop_markextra (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject *lrop_advanceto (OptVM *vm, EsObject *name)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	if (lcb->window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
+		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
+
+	EsObject *mlocobj = opt_vm_ostack_top (vm);
+	if (es_object_get_type (mlocobj) != OPT_TYPE_MATCHLOC)
+		return OPT_ERR_TYPECHECK;
+
+	matchLoc *loc = es_pointer_get (mlocobj);
+	lcb->window->advanceto = true;
+	lcb->window->advanceto_delta = loc->delta;
+
+	return es_true;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchstr",
@@ -3793,7 +3819,13 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = 2,
 		.help_str = "tag:int|tag:tag extra:name _MARKEXTRA -%"
 		"tag:int|tag:tag lang.extra:name _MARKEXTRA -",
-	}
+	},
+	{
+		.name     = "_advanceto",
+		.fn       = lrop_advanceto,
+		.arity    = 1,
+		.help_str = "matchloc _ADVIANCETO -%"
+	},
 };
 
 extern void initRegexOptscript (void)

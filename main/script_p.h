@@ -52,6 +52,7 @@ extern void      optscriptHelp          (OptVM *vm, FILE *fp, EsObject *procdocs
 extern xtagType optscriptGetXtagType (const EsObject *extra);
 
 typedef struct {
+	unsigned long delta;		/* for _advanceto operator */
 	unsigned long line;
 	MIOPos pos;
 } matchLoc;
