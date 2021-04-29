@@ -407,8 +407,11 @@
 # var
 #
 --_tabledef-PuppetManifest=varexpr
---_mtable-regex-PuppetManifest=var/(::[a-zA-Z0-9_:]+)[ \t\n]*=/\1/v/{tenter=varexpr,end}
---_mtable-regex-PuppetManifest=var/([a-zA-Z_][a-zA-Z0-9_:]*)[ \t\n]*=/\1/v/{tenter=varexpr,end}{scope=ref}
+--_mtable-regex-PuppetManifest=var/(::[a-zA-Z0-9_:]+|[a-zA-Z_][a-zA-Z0-9_:]*)[ \t\n]*=/\1/v/{tenter=varexpr,end}{{
+    \1 0 get ?: eq not {
+       . _scoperef
+    } if
+}}
 
 --_mtable-extend-PuppetManifest=varexpr+comment
 --_mtable-regex-PuppetManifest=varexpr/'//{tenter=ssliteral,end}
@@ -427,11 +430,16 @@
 # define
 #
 --_mtable-extend-PuppetManifest=defineStart+comment
---_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*\(/\1/d/{tenter=signature,blockHeadPopAtLast}{scope=push}{{
-    % for gathering signature
-    mark ?(
+--_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*([({])/\1/d/{scope=push}{{
+    \2 0 get ?( eq {
+       % for gathering signature
+       mark ?(
+       % {tenter=signature,blockHeadPopAtLast}
+       /signature /blockHeadPopAtLast _tentercont
+    } {
+       /block /endWithPop _tentercont
+    } ifelse
 }}
---_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*\{/\1/d/{tenter=block,endWithPop}{scope=push}
 
 #
 # case
