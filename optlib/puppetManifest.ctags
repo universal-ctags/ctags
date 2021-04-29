@@ -230,10 +230,10 @@
 # block
 #
 --_mtable-regex-PuppetManifest=blockStart/(@)?(::[a-zA-Z0-9:_]+|[a-zA-Z][a-zA-Z0-9:_]*)[ \t\n]*\{//{tenter=resourceBlock}{{
-    \1 false eq {
-       /resource
-    } {
+    \1 _isstring {
        /vresource
+    } {
+       /resource
     } ifelse \2 true
     % kind:name type:string true
 }}
@@ -294,10 +294,12 @@
 #
 # class
 #
-# TODO: inherits:
-#
 --_mtable-extend-PuppetManifest=classStart+comment
---_mtable-regex-PuppetManifest=classStart/(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
+--_mtable-regex-PuppetManifest=classStart/(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*(inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*)?/\1/c/{tenter=blockHead,endWithPop}{scope=push}{{
+    \3 _isstring {
+       . exch inherits:
+    } if
+}}
 
 #
 # resource

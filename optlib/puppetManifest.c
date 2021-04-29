@@ -107,10 +107,10 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^(@)?(::[a-zA-Z0-9:_]+|[a-zA-Z][a-zA-Z0-9:_]*)[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}"
 		"{{\n"
-		"    \\1 false eq {\n"
-		"       /resource\n"
-		"    } {\n"
+		"    \\1 _isstring {\n"
 		"       /vresource\n"
+		"    } {\n"
+		"       /resource\n"
 		"    } ifelse \\2 true\n"
 		"    % kind:name type:string true\n"
 		"}}", NULL);
@@ -181,10 +181,10 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^(@)?(::[a-zA-Z0-9:_]+|[a-zA-Z][a-zA-Z0-9:_]*)[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}"
 		"{{\n"
-		"    \\1 false eq {\n"
-		"       /resource\n"
-		"    } {\n"
+		"    \\1 _isstring {\n"
 		"       /vresource\n"
+		"    } {\n"
+		"       /resource\n"
 		"    } ifelse \\2 true\n"
 		"    % kind:name type:string true\n"
 		"}}", NULL);
@@ -240,10 +240,10 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^(@)?(::[a-zA-Z0-9:_]+|[a-zA-Z][a-zA-Z0-9:_]*)[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}"
 		"{{\n"
-		"    \\1 false eq {\n"
-		"       /resource\n"
-		"    } {\n"
+		"    \\1 _isstring {\n"
 		"       /vresource\n"
+		"    } {\n"
+		"       /resource\n"
 		"    } ifelse \\2 true\n"
 		"    % kind:name type:string true\n"
 		"}}", NULL);
@@ -305,8 +305,13 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "classStart",
-	                               "^(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)",
-	                               "\\1", "c", "{tenter=blockHead,endWithPop}{scope=push}", NULL);
+	                               "^(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*(inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*)?",
+	                               "\\1", "c", "{tenter=blockHead,endWithPop}{scope=push}"
+		"{{\n"
+		"    \\3 _isstring {\n"
+		"       . exch inherits:\n"
+		"    } if\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
 	                               "^[ \t\n]+",
 	                               "", "", "", NULL);

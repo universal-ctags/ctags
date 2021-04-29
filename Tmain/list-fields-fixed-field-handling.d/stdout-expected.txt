@@ -13,7 +13,7 @@ Z       scope          no      NONE             s--    no    rw [tags output] pr
 a       access         no      NONE             s--    no    -- Access (or export) of class members
 e       end            no      NONE             -i-    no    rw end lines of various items
 f       file           no      NONE             --b    no    -- File-restricted scoping
-i       inherits       no      NONE             s-b    no    -- Inheritance information
+i       inherits       no      NONE             s-b    no    -w Inheritance information
 k       NONE           no      NONE             s--    no    -- Kind of tag in one-letter form
 l       language       no      NONE             s--    no    -- Language of input file containing tag
 m       implementation no      NONE             s--    no    -- Implementation information
@@ -39,7 +39,7 @@ Z       scope          no      NONE             s--    no    rw [tags output] pr
 a       access         no      NONE             s--    no    -- Access (or export) of class members
 e       end            no      NONE             -i-    no    rw end lines of various items
 f       file           no      NONE             --b    no    -- File-restricted scoping
-i       inherits       no      NONE             s-b    no    -- Inheritance information
+i       inherits       no      NONE             s-b    no    -w Inheritance information
 k       NONE           no      NONE             s--    no    -- Kind of tag in one-letter form
 l       language       no      NONE             s--    no    -- Language of input file containing tag
 m       implementation no      NONE             s--    no    -- Implementation information
@@ -65,7 +65,7 @@ Z       scope          no      NONE             s--    no    rw [tags output] pr
 a       access         no      NONE             s--    no    -- Access (or export) of class members
 e       end            no      NONE             -i-    no    rw end lines of various items
 f       file           no      NONE             --b    no    -- File-restricted scoping
-i       inherits       no      NONE             s-b    no    -- Inheritance information
+i       inherits       no      NONE             s-b    no    -w Inheritance information
 k       NONE           no      NONE             s--    no    -- Kind of tag in one-letter form
 l       language       no      NONE             s--    no    -- Language of input file containing tag
 m       implementation no      NONE             s--    no    -- Implementation information
@@ -91,7 +91,7 @@ Z       scope          no      NONE             s--    no    rw [tags output] pr
 a       access         no      NONE             s--    no    -- Access (or export) of class members
 e       end            no      NONE             -i-    no    rw end lines of various items
 f       file           no      NONE             --b    no    -- File-restricted scoping
-i       inherits       no      NONE             s-b    no    -- Inheritance information
+i       inherits       no      NONE             s-b    no    -w Inheritance information
 k       NONE           no      NONE             s--    no    -- Kind of tag in one-letter form
 l       language       no      NONE             s--    no    -- Language of input file containing tag
 m       implementation no      NONE             s--    no    -- Implementation information

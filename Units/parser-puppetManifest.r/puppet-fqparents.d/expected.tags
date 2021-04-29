@@ -1,5 +1,5 @@
 base	input.pp	/^class base {$/;"	class	line:1	language:PuppetManifest	end:5
 one	input.pp	/^    class one {$/;"	class	line:2	language:PuppetManifest	scope:class:::base	end:4
 /tmp/fqparent1	input.pp	/^        file { "\/tmp\/fqparent1": ensure => file }$/;"	resource	line:3	language:PuppetManifest	scope:class:::base::one	typeref:typename:file	end:3
-two::three	input.pp	/^class two::three inherits base::one {$/;"	class	line:7	language:PuppetManifest	end:9
+two::three	input.pp	/^class two::three inherits base::one {$/;"	class	line:7	language:PuppetManifest	inherits:base::one	end:9
 /tmp/fqparent2	input.pp	/^    file { "\/tmp\/fqparent2": ensure => file }$/;"	resource	line:8	language:PuppetManifest	scope:class:::two::three	typeref:typename:file	end:8

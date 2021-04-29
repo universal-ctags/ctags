@@ -1,10 +1,10 @@
 base	input.pp	/^class base {$/;"	class	line:3	language:PuppetManifest	end:5
 /tmp/deepclassheir1	input.pp	/^    file { "\/tmp\/deepclassheir1": ensure => file, mode => '0755' }$/;"	resource	line:4	language:PuppetManifest	scope:class:::base	typeref:typename:file	end:4
-sub1	input.pp	/^class sub1 inherits base {$/;"	class	line:7	language:PuppetManifest	end:9
+sub1	input.pp	/^class sub1 inherits base {$/;"	class	line:7	language:PuppetManifest	inherits:base	end:9
 /tmp/deepclassheir2	input.pp	/^    file { "\/tmp\/deepclassheir2": ensure => file, mode => '0755' }$/;"	resource	line:8	language:PuppetManifest	scope:class:::sub1	typeref:typename:file	end:8
-sub2	input.pp	/^class sub2 inherits sub1 {$/;"	class	line:11	language:PuppetManifest	end:13
+sub2	input.pp	/^class sub2 inherits sub1 {$/;"	class	line:11	language:PuppetManifest	inherits:sub1	end:13
 /tmp/deepclassheir3	input.pp	/^    file { "\/tmp\/deepclassheir3": ensure => file, mode => '0755' }$/;"	resource	line:12	language:PuppetManifest	scope:class:::sub2	typeref:typename:file	end:12
-sub3	input.pp	/^class sub3 inherits sub2 {$/;"	class	line:15	language:PuppetManifest	end:17
+sub3	input.pp	/^class sub3 inherits sub2 {$/;"	class	line:15	language:PuppetManifest	inherits:sub2	end:17
 /tmp/deepclassheir4	input.pp	/^    file { "\/tmp\/deepclassheir4": ensure => file, mode => '0755' }$/;"	resource	line:16	language:PuppetManifest	scope:class:::sub3	typeref:typename:file	end:16
-sub4	input.pp	/^class sub4 inherits sub3 {$/;"	class	line:19	language:PuppetManifest	end:21
+sub4	input.pp	/^class sub4 inherits sub3 {$/;"	class	line:19	language:PuppetManifest	inherits:sub3	end:21
 /tmp/deepclassheir5	input.pp	/^    file { "\/tmp\/deepclassheir5": ensure => file, mode => '0755' }$/;"	resource	line:20	language:PuppetManifest	scope:class:::sub4	typeref:typename:file	end:20
