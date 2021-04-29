@@ -231,6 +231,21 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^\\{",
 	                               "", "", "{tenter=block,endWithPop}", NULL);
 	addLanguageTagMultiTableRegex (language, "blockHeadPopAtLast",
+	                               "^[ \t\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "blockHeadPopAtLast",
+	                               "^inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*",
+	                               "", "", ""
+		"{{\n"
+		"    _scopetop {\n"
+		"        dup :kind /class eq {\n"
+		"           \\1 inherits:\n"
+		"        } {\n"
+		"           pop\n"
+		"        } ifelse\n"
+		"    } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "blockHeadPopAtLast",
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
@@ -305,12 +320,23 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "classStart",
-	                               "^(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*(inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*)?",
-	                               "\\1", "c", "{tenter=blockHead,endWithPop}{scope=push}"
+	                               "^(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*(\\(|\\{|inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*))[ \t\n]*",
+	                               "\\1", "c", "{scope=push}"
 		"{{\n"
 		"    \\3 _isstring {\n"
-		"       . exch inherits:\n"
-		"    } if\n"
+		"        . exch inherits:\n"
+		"        /blockHead /endWithPop _tentercont\n"
+		"    } {\n"
+		"        \\2 0 get ?( eq {\n"
+		"            % for gathering signature\n"
+		"            mark ?(\n"
+		"            % {tenter=signature,blockHeadPopAtLast}\n"
+		"            /signature /blockHeadPopAtLast _tentercont\n"
+		"        } {\n"
+		"            2 /start _matchloc _advanceto\n"
+		"            /blockHead /endWithPop _tentercont\n"
+		"        } ifelse\n"
+		"    } ifelse\n"
 		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
 	                               "^[ \t\n]+",

@@ -252,6 +252,16 @@
 
 --_mtable-extend-PuppetManifest=blockHeadPopAtLast+comment
 --_mtable-regex-PuppetManifest=blockHeadPopAtLast/\{//{tenter=block,endWithPop}
+--_mtable-extend-PuppetManifest=blockHeadPopAtLast+ignoreWhiteSpace
+--_mtable-regex-PuppetManifest=blockHeadPopAtLast/inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*//{{
+    _scopetop {
+        dup :kind /class eq {
+           \1 inherits:
+        } {
+           pop
+        } ifelse
+    } if
+}}
 --_mtable-extend-PuppetManifest=blockHeadPopAtLast+any
 
 --_mtable-extend-PuppetManifest=block+ignoreWhiteSpace
@@ -293,12 +303,22 @@
 
 #
 # class
-#
 --_mtable-extend-PuppetManifest=classStart+comment
---_mtable-regex-PuppetManifest=classStart/(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*(inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*)?/\1/c/{tenter=blockHead,endWithPop}{scope=push}{{
+--_mtable-regex-PuppetManifest=classStart/(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*(\(|\{|inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*))[ \t\n]*/\1/c/{scope=push}{{
     \3 _isstring {
-       . exch inherits:
-    } if
+        . exch inherits:
+        /blockHead /endWithPop _tentercont
+    } {
+        \2 0 get ?( eq {
+            % for gathering signature
+            mark ?(
+            % {tenter=signature,blockHeadPopAtLast}
+            /signature /blockHeadPopAtLast _tentercont
+        } {
+            2 /start _matchloc _advanceto
+            /blockHead /endWithPop _tentercont
+        } ifelse
+    } ifelse
 }}
 
 #

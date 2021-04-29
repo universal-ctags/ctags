@@ -1,0 +1,7 @@
+webserver::params	input.pp	/^class webserver::params {$/;"	c
+packages	input.pp	/^  $packages = $operatingsystem ? {$/;"	v	class:::webserver::params
+vhost_dir	input.pp	/^  $vhost_dir = $operatingsystem ? {$/;"	v	class:::webserver::params
+webserver	input.pp	/^class webserver($/;"	c	inherits:webserver::params	signature:($packages,$vhost_dir)
+packages	input.pp	/^  String $packages  = $webserver::params::packages,$/;"	p	class:::webserver
+vhost_dir	input.pp	/^  String $vhost_dir = $webserver::params::vhost_dir$/;"	p	class:::webserver
+vhost_dir	input.pp	/^ file { 'vhost_dir':$/;"	r	class:::webserver	typeref:typename:file
