@@ -103,6 +103,7 @@ static EsObject* getFieldValueForRoles (const tagEntryInfo *, const fieldDefinit
 static EsObject* getFieldValueForLineCommon (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* checkFieldValueForLineCommon (const fieldDefinition *, const EsObject *);
 static EsObject* setFieldValueForLineCommon (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+static EsObject* setFieldValueForInherits (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
@@ -191,6 +192,11 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.doesContainAnyChar = NULL,
 		.isValueAvailable   = isInheritsFieldAvailable,
 		.dataType           = FIELDTYPE_STRING|FIELDTYPE_BOOL,
+		.getterValueType    = NULL,
+		.getValueObject     = NULL,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = setFieldValueForInherits,
 	},
 	[FIELD_KIND_LONG - FIELD_COMPACT_INPUT_LINE] = {
 		.letter             = 'K',
@@ -1773,6 +1779,29 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 		tag->extensionFields.endLine = l;
 	else
 		tag->lineNumber = l;
+
+	return es_false;
+}
+
+static EsObject* setFieldValueForInherits (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
+{
+	if (es_object_get_type (obj) == OPT_TYPE_STRING)
+	{
+		if (tag->extensionFields.inheritance)
+			eFree ((void *)tag->extensionFields.inheritance);
+		const char *str = opt_string_get_cstr (obj);
+		tag->extensionFields.inheritance = eStrdup (str);
+	}
+	else if (es_object_equal (es_false, obj))
+	{
+		if (tag->extensionFields.inheritance)
+		{
+			eFree ((void *)tag->extensionFields.inheritance);
+			tag->extensionFields.inheritance = NULL;
+		}
+	}
+	else
+		return OPT_ERR_RANGECHECK; /* true is not acceptable. */
 
 	return es_false;
 }

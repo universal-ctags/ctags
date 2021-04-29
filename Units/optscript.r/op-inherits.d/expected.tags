@@ -1,0 +1,5 @@
+A	input.unknown	/^class A<O$/;"	c	inherits:O
+B	input.unknown	/^class B$/;"	c
+C	input.unknown	/^class C<P$/;"	c
+D	input.unknown	/^class D$/;"	c	inherits:Q
+E	input.unknown	/^class E<R$/;"	c	inherits:S
