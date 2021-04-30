@@ -310,7 +310,7 @@ Output Format Options
 	Specify the output format. The default is ``u-ctags``.
 	See tags(5) for ``u-ctags`` and ``e-ctags``.
 	See ``-e`` for ``etags``, and ``-x`` for ``xref``.
-	``json`` is experimental format, and available only if
+	``json`` format is available only if
 	the ctags executable is built with ``libjansson``.
 
 .. TODO: convert output-json.rst to ctags-json-output.1.rst (ctags-json-output(1)).

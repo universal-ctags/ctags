@@ -4,8 +4,9 @@
 JSON output
 ======================================================================
 
-Experimental JSON output has been added. ``--output-format=json`` can be
-used to enable it.
+`JSON <https://www.json.org/>`_  (strictly speaking `JSON Lines
+<https://jsonlines.org/>`_) output has been added.
+``--output-format=json`` option enables it.
 
 .. code-block:: console
 
