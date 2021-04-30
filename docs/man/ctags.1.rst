@@ -820,7 +820,7 @@ Option File Options
 	As a special case, if ``--options=NONE`` is specified as the first
 	option on the command line, preloading is disabled; the option
 	will disable the automatic reading of any configuration options
-	from either a file or the environment variable (see "`FILES`_").
+	from a file (see "`FILES`_").
 
 ``--options-maybe=<pathname>``
 	Same as ``--options`` but doesn't cause an error if file
@@ -1320,8 +1320,8 @@ Miscellaneous Options
 	and a brief message describing what action is being taken for each file
 	considered by ctags. Normally, ctags
 	does not read command line arguments until after options are read
-	from the configuration files (see "`FILES`_", below) and the CTAGS
-	environment variable. However, if this option is the first argument on
+	from the configuration files (see "`FILES`_", below).
+	However, if this option is the first argument on
 	the command line, it will take effect before any options are read from
 	these sources. The default is ``no``.
 
@@ -2119,26 +2119,6 @@ No qualified tags are generated for language objects inherited into a class.
 
 ENVIRONMENT VARIABLES
 ---------------------
-
-``CTAGS``
-	If this environment variable exists, it will be expected to contain a
-	set of default options which are read when ctags
-	starts, after the configuration files listed in "`FILES`_", below, are read,
-	but before any command line options are read. Options appearing on
-	the command line will override options specified in this variable.
-
-	Only options will be read from this variable.
-
-	Note that all white space
-	in this variable is considered a separator, making it impossible to pass
-	an option parameter containing an embedded space. If this is a problem,
-	use a configuration file instead.
-
-``ETAGS``
-	Similar to the ``CTAGS`` variable above, this variable, if found, will be
-	read when etags starts. If this variable is not
-	found, etags will try to use ``CTAGS`` instead.
-
 ``TMPDIR``
 	On Unix-like hosts where ``mkstemp(3)`` is available, the value of this
 	variable specifies the directory in which to place temporary files.
@@ -2181,9 +2161,8 @@ FILES
 
 	If any of these configuration files exist, each will be expected to
 	contain a set of default options which are read in the order listed
-	when ctags starts, but before the ``CTAGS`` environment
-	variable is read or any command line options are read. This makes it
-	possible to set up personal or project-level defaults.
+	when ctags starts, but before any command line options
+	are read. This makes it possible to set up personal or project-level defaults.
 
 	It
 	is possible to compile ctags to read an additional
@@ -2191,9 +2170,9 @@ FILES
 	indicated if the output produced by the ``--version`` option lists the
 	``custom-conf`` feature.
 
-	Options appearing in the ``CTAGS`` environment
-	variable or on the command line will override options specified in these
-	files. Only options will be read from these files.
+	Options appearing on the command line will override options
+	specified in these files. Only options will be read from these
+	files.
 
 	Note that the option
 	files are read in line-oriented mode in which spaces are significant

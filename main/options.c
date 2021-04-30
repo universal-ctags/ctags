@@ -597,7 +597,6 @@ static const char *const StageDescription [] = {
 	[OptionLoadingStageXdg] = "file(s) under $XDG_CONFIG_HOME and $HOME/.config",
 	[OptionLoadingStageHomeRecursive] = "file(s) under $HOME",
 	[OptionLoadingStageCurrentRecursive] = "file(s) under the current directory",
-	[OptionLoadingStageEnvVar] = "environment variable",
 	[OptionLoadingStageCmdline] = "command line",
 };
 
@@ -3762,40 +3761,10 @@ static void parseConfigurationFileOptions (void)
 	preload (preload_path_list);
 }
 
-static void parseEnvironmentOptions (void)
-{
-	const char *envOptions = NULL;
-	const char* var = NULL;
-
-	ENTER(EnvVar);
-	if (Option.etags)
-	{
-		var = ETAGS_ENVIRONMENT;
-		envOptions = getenv (var);
-	}
-	if (envOptions == NULL)
-	{
-		var = CTAGS_ENVIRONMENT;
-		envOptions = getenv (var);
-	}
-	if (envOptions != NULL  &&  envOptions [0] != '\0')
-	{
-		cookedArgs* const args = cArgNewFromString (envOptions);
-		verbose ("Reading options from $CTAGS\n");
-		parseOptions (args);
-		cArgDelete (args);
-		if (NonOptionEncountered)
-			error (WARNING, "Ignoring non-option in %s variable", var);
-	}
-}
-
 extern void readOptionConfiguration (void)
 {
 	if (! SkipConfiguration)
-	{
 		parseConfigurationFileOptions ();
-		parseEnvironmentOptions ();
-	}
 }
 
 /*

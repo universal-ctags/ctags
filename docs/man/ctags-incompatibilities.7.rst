@@ -28,6 +28,12 @@ Universal Ctags doesn't load ``~/.ctags`` at starting up time.
 File paths for preload files are changed.
 See "FILES" section of :ref:`ctags(1) <ctags(1)>`.
 
+Environment variables for arranging command lines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Universal Ctags doesn't read ``CTAGS`` and/or ``ETAGS`` environment
+variables.
+
 Incompatibilities in command line interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
