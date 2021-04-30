@@ -8,10 +8,10 @@ jobs:
   #
   # We assume GNU Make is available.
   #
-   fedora33_gmake:
+   fedora34_gmake:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:33
+       - image: docker.io/fedora:34
      steps:
        - run:
            name: Install Git
@@ -39,10 +39,10 @@ jobs:
              cd docs
              make html
 
-   fedora33_gmake_roundtrip:
+   fedora34_gmake_roundtrip:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:33
+       - image: docker.io/fedora:34
      steps:
        - run:
            name: Install Git
@@ -129,10 +129,10 @@ jobs:
            command: |
              MAKE=bmake bmake roundtrip CIRCLECI=1 ROUNDTRIP_MAX_ENTRIES=25
 
-   fedora_distcheck:
+   fedora34_distcheck:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:latest
+       - image: docker.io/fedora:34
      steps:
        - run:
            name: Install Git and Gdb
@@ -457,15 +457,15 @@ workflows:
     jobs:
       - ubuntu20_32bit
       - fedora30_bmake
-      - fedora_distcheck
+      - fedora34_distcheck
       - centos_make
-      - fedora33_gmake
+      - fedora34_gmake
       - fedora33_cross_aarch64
       - centos7_make
       - centos6
       - ubuntu20_mingw
       - centos_make_roundtrip
       - fedora30_bmake_roundtrip
-      - fedora33_gmake_roundtrip
+      - fedora34_gmake_roundtrip
       - centos7_make_roundtrip
       - centos6_roundtrip
