@@ -2141,6 +2141,12 @@ ENVIRONMENT VARIABLES
 FILES
 -----
 
+``tags``
+	The default tag file created by ctags.
+
+``TAGS``
+	The default tag file created by etags.
+
 ``$XDG_CONFIG_HOME/ctags/*.ctags``, or ``$HOME/.config/ctags/*.ctags`` if
 ``$XDG_CONFIG_HOME`` is not defined
 (on other than MS Windows)
@@ -2152,12 +2158,6 @@ FILES
 ``.ctags.d/*.ctags``
 
 ``ctags.d/*.ctags``
-
-``tags``
-	The default tag file created by ctags.
-
-``TAGS``
-	The default tag file created by etags.
 
 	If any of these configuration files exist, each will be expected to
 	contain a set of default options which are read in the order listed
