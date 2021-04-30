@@ -1,0 +1,2 @@
+--version...ok
+input.c...ok
