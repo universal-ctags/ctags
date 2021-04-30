@@ -7,4 +7,4 @@ CTAGS=$1
 
 is_feature_available ${CTAGS} json
 
-${CTAGS} --sort=no --output-format=json input.f
+${CTAGS} --quiet --options=NONE --sort=no --output-format=json input.f
