@@ -80,7 +80,6 @@
 			verbose ("Entering configuration stage: loading %s\n", StageDescription[Stage]); \
 		}																\
 	} while (0)
-#define ACCEPT(STAGE) (1UL << OptionLoadingStage##STAGE)
 
 /*
 *   Data declarations
