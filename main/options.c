@@ -193,13 +193,9 @@ struct localOptionValues {
 typedef enum eOptionLoadingStage {
 	OptionLoadingStageNone,
 	OptionLoadingStageCustom,
-	OptionLoadingStageDosCnf,
-	OptionLoadingStageEtc,
-	OptionLoadingStageLocalEtc,
 	OptionLoadingStageXdg,
 	OptionLoadingStageHomeRecursive,
 	OptionLoadingStageCurrentRecursive,
-	OptionLoadingStagePreload,
 	OptionLoadingStageEnvVar,
 	OptionLoadingStageCmdline,
 } OptionLoadingStage;
@@ -598,13 +594,9 @@ static struct Feature {
 static const char *const StageDescription [] = {
 	[OptionLoadingStageNone]   = "not initialized",
 	[OptionLoadingStageCustom] = "custom file",
-	[OptionLoadingStageDosCnf] = "DOS .cnf file",
-	[OptionLoadingStageEtc] = "file under /etc (e.g. ctags.conf)",
-	[OptionLoadingStageLocalEtc] = "file under /usr/local/etc (e.g. ctags.conf)",
 	[OptionLoadingStageXdg] = "file(s) under $XDG_CONFIG_HOME and $HOME/.config",
 	[OptionLoadingStageHomeRecursive] = "file(s) under $HOME",
 	[OptionLoadingStageCurrentRecursive] = "file(s) under the current directory",
-	[OptionLoadingStagePreload] = "optlib preload files",
 	[OptionLoadingStageEnvVar] = "environment variable",
 	[OptionLoadingStageCmdline] = "command line",
 };
