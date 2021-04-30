@@ -35,6 +35,15 @@ m4_ifndef([PKG_CHECK_EXISTS], [m4_fatal([must install pkg-config 0.18 or later b
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
+case $host in
+    *darwin*)
+        if test "${enable_static}" = "yes"; then
+            printf "\n%s\n" "macOS not support --enable-static." >&5
+            printf "\n%s\n" "macOS not support --enable-static." >&6
+            exit 1
+        fi
+esac
+
 AH_TEMPLATE([PACKAGE], [Package name.])
 AH_TEMPLATE([VERSION], [Package version.])
 AH_TEMPLATE([clock_t],
