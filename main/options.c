@@ -190,6 +190,20 @@ struct localOptionValues {
 	.withListHeader = true,
 };
 
+typedef enum eOptionLoadingStage {
+	OptionLoadingStageNone,
+	OptionLoadingStageCustom,
+	OptionLoadingStageDosCnf,
+	OptionLoadingStageEtc,
+	OptionLoadingStageLocalEtc,
+	OptionLoadingStageXdg,
+	OptionLoadingStageHomeRecursive,
+	OptionLoadingStageCurrentRecursive,
+	OptionLoadingStagePreload,
+	OptionLoadingStageEnvVar,
+	OptionLoadingStageCmdline,
+} OptionLoadingStage;
+
 static OptionLoadingStage Stage = OptionLoadingStageNone;
 #define STAGE_ANY ~0UL
 
