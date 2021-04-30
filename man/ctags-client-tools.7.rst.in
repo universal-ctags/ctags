@@ -254,11 +254,26 @@ REDUNDANT-KINDS
 ---------------
 TBW
 
+MULTIPLE-LANGUAGES FOR AN INPUT FILE
+------------------------------------
+Universal ctags can run multiple parsers.
+That means a parser, which supports multiple parsers, may output tags for
+different languages.  ``language``/``l`` field can be used to show the language
+for each tag.
 
-MULTIPE-LANGUAGES FOR AN INPUT FILE
------------------------------------
-TBW
+.. code-block:: console
 
+	$ cat /tmp/foo.html
+	<html>
+	<script>var x = 1</script>
+	<h1>title</h1>
+	</html>
+	$ ./ctags -o - --extras=+g /tmp/foo.html
+	title	/tmp/foo.html	/^  <h1>title<\/h1>$/;"	h
+	x	/tmp/foo.html	/var x = 1/;"	v
+	$ ./ctags -o - --extras=+g --fields=+l /tmp/foo.html
+	title	/tmp/foo.html	/^  <h1>title<\/h1>$/;"	h	language:HTML
+	x	/tmp/foo.html	/var x = 1/;"	v	language:JavaScript
 
 UTILIZING READTAGS
 -----------------------------------
