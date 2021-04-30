@@ -748,6 +748,8 @@ extern bool filesRequired (void)
 
 extern void checkOptions (void)
 {
+	flushDelayedMsgQeueue();
+
 	const char* notice;
 	if (Option.xref && (Option.customXfmt == NULL))
 	{

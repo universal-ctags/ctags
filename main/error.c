@@ -51,6 +51,49 @@ extern bool stderrDefaultErrorPrinter (const errorSelection selection,
 	return (selected (selection, FATAL) || Option.fatalWarnings)? true: false;
 }
 
+struct delayedMsg {
+	errorSelection selection;
+	vString *msg;
+};
+
+static ptrArray *delayedMsgQueue;
+
+static void deleteDelayedMsg (void *data)
+{
+	struct delayedMsg *dmsg = data;
+	vStringDelete (dmsg->msg);
+	eFree (dmsg);
+}
+
+extern void flushDelayedMsgQeueue (void)
+{
+	if (!delayedMsgQueue)
+		return;
+
+	for (unsigned int i = 0; i < ptrArrayCount (delayedMsgQueue); i++)
+	{
+		struct delayedMsg *dmesg = ptrArrayItem (delayedMsgQueue, i);
+		error (dmesg->selection, "%s", vStringValue (dmesg->msg));
+	}
+
+	ptrArrayDelete (delayedMsgQueue);
+	delayedMsgQueue = NULL;
+}
+
+static bool queueDelayedMsg (const errorSelection selection,
+							 const char *const format, va_list ap)
+{
+	if (delayedMsgQueue == NULL)
+		delayedMsgQueue = ptrArrayNew (deleteDelayedMsg);
+
+	struct delayedMsg *dmsg = xMalloc (1, struct delayedMsg);
+	dmsg->selection = (selection & ~DELAYED);
+	dmsg->msg = vStringNewVPrintf (format, ap);
+
+	ptrArrayAdd (delayedMsgQueue, dmsg);
+	return false;
+}
+
 extern void error (const errorSelection selection,
 		   const char *const format, ...)
 {
@@ -61,7 +104,10 @@ extern void error (const errorSelection selection,
 		return;
 
 	va_start (ap, format);
-	shouldExit = (* errorPrinter) (selection, format, ap, errorPrinterData);
+	if (selected (selection, DELAYED))
+		shouldExit = queueDelayedMsg (selection, format, ap);
+	else
+		shouldExit = (* errorPrinter) (selection, format, ap, errorPrinterData);
 	va_end (ap);
 
 	if (shouldExit)
