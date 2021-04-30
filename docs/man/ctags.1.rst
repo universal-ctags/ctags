@@ -312,9 +312,7 @@ Output Format Options
 	See ``-e`` for ``etags``, and ``-x`` for ``xref``.
 	``json`` format is available only if
 	the ctags executable is built with ``libjansson``.
-
-.. TODO: convert output-json.rst to ctags-json-output.1.rst (ctags-json-output(1)).
-   and add a link to it here.
+	See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` for more about ``json`` format.
 
 ``-e``
 	Same as ``--output-format=etags``.
@@ -1068,19 +1066,7 @@ Listing Options
 
 	JSTYPE
 		JSON type used in printing the value of field when ``--output-format=json``
-		is specified.
-
-		Following characters are used for representing types.
-
-		``s``
-			string
-		``i``
-			integer
-		``b``
-			boolean (true or false)
-
-		The representation of this field and the output format used in
-		``--output-format=json`` are still experimental.
+		is specified. See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`.
 
 	FIXED
 		Whether this field can be disabled or not in tags output.
