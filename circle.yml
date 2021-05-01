@@ -451,6 +451,22 @@ jobs:
              cd ctags
              make roundtrip CIRCLECI=1 ROUNDTRIP_MAX_ENTRIES=25
 
+   THIS_WILL_BE_FAILED_fedora34_CANARY:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/fedora:34
+     steps:
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+             dnf -y install gcc automake autoconf pkgconfig make
+       - run:
+           name: Run autogen.sh
+           command: |
+             bash ./autogen.sh
+
+
 workflows:
   version: 2
   build_and_test:
@@ -469,3 +485,4 @@ workflows:
       - fedora33_gmake_roundtrip
       - centos7_make_roundtrip
       - centos6_roundtrip
+      - THIS_WILL_BE_FAILED_fedora34_CANARY
