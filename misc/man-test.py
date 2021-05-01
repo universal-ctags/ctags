@@ -252,5 +252,5 @@ if (len(sys.argv) < 4) or (sys.argv[1] == '-h' or sys.argv[1] == '--help'):
     print_usage (2, sys.stderr)
 
 tmpdir = sys.argv[1]
-ctags = os.getcwd() + '/' + sys.argv[2]
+ctags = os.path.abspath(sys.argv[2])
 sys.exit(0 if man_tests (tmpdir, ctags, sys.argv[3:]) else 1)
