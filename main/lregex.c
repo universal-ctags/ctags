@@ -3111,7 +3111,7 @@ static EsObject* lrop_make_tag (OptVM *vm, EsObject *name)
 		return OPT_ERR_TYPECHECK;
 	const char *n = opt_string_get_cstr (tname);
 	if (n [0] == '\0')
-		return OPT_ERR_TYPECHECK; /* TODO */
+		return OPT_ERR_RANGECHECK; /* TODO */
 
 	tagEntryInfo *e = xMalloc (1, tagEntryInfo);
 	initRegexTag (e, eStrdup (n),
@@ -3185,7 +3185,7 @@ static EsObject* lrop_make_reftag (OptVM *vm, EsObject *name)
 		return OPT_ERR_TYPECHECK;
 	const char *n = opt_string_get_cstr (tname);
 	if (n [0] == '\0')
-		return OPT_ERR_TYPECHECK; /* TODO */
+		return OPT_ERR_RANGECHECK; /* TODO */
 
 	tagEntryInfo *e = xMalloc (1, tagEntryInfo);
 	initRegexTag (e, eStrdup (n),
@@ -3712,7 +3712,11 @@ static EsObject *lrop_advanceto (OptVM *vm, EsObject *name)
 {
 	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
 	if (lcb->window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
-		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
+	{
+		error (WARNING, "don't use `%s' operator in --regex-<LANG> option",
+			   es_symbol_get (name));
+		return OPTSCRIPT_ERR_NOTMTABLEPTRN; /* TODO */
+	}
 
 	EsObject *mlocobj = opt_vm_ostack_top (vm);
 	if (es_object_get_type (mlocobj) != OPT_TYPE_MATCHLOC)
