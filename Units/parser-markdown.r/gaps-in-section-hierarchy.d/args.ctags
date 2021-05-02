@@ -1,4 +1,4 @@
 --sort=no
---fields=+K
+--fields=+Ke
 --fields-Markdown=+{sectionMarker}
 --_scopesep-Markdown=*/*:|

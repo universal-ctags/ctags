@@ -37,6 +37,29 @@
 
 --_fielddef-Markdown=sectionMarker,character used for declaring section(#, ##, =, or -)
 
+
+--_prelude-Markdown={{
+    % group:int SCOPEPOPWITHADJUSTMENT -
+    /scopePopWithAdjustment {
+         _scopetop {
+            % group:int index:int
+            dup 3 -1 roll
+            % index:int index:int group:int
+            _matchloc end:
+            % index:int
+            dup :end
+            % index:int endline:int true
+            % or index:int false
+            {
+                dup 1 gt {
+                    1 sub end:
+                } { pop } ifelse
+            } if
+            _scopepop
+        } if
+    } def
+}}
+
 --_tabledef-Markdown=main
 --_tabledef-Markdown=main_sharp
 --_tabledef-Markdown=chapter
@@ -66,7 +89,9 @@
 --_mtable-regex-Markdown=emptyLine/^([\t ]*)[\n]+//
 
 --_mtable-extend-Markdown=gfmLeave+emptyLine
---_mtable-regex-Markdown=gfmLeave/^([^\n]+)[\n](=+|-+)[\n]//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-regex-Markdown=gfmLeave/^([^\n]+)[\n](=+|-+)[\n]//{tleave}{_advanceTo=0start}{{
+    1 scopePopWithAdjustment
+}}
 
 --_mtable-regex-Markdown=rest/^[^\n]*[\n]+//
 --_mtable-regex-Markdown=rest/^[^\n]*//{tquit}
@@ -103,7 +128,9 @@
 #
 # Chapter
 #
---_mtable-regex-Markdown=chapter_sharp/^#{1,1}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-regex-Markdown=chapter_sharp/(^#{1,1}[ \t]+[^\n]+)//{tleave}{_advanceTo=0start}{{
+    1 scopePopWithAdjustment
+}}
 --_mtable-regex-Markdown=chapter_sharp/^##[ \t]+([^\n]+)([ \t]+#+)[\n]*/\1/s/{_field=sectionMarker:##}{scope=push}{tenter=section,chapter}
 --_mtable-regex-Markdown=chapter_sharp/^##[ \t]+([^\n]+)[\n]*/\1/s/{_field=sectionMarker:#}{scope=push}{tenter=section,chapter}
 --_mtable-regex-Markdown=chapter_sharp/^###[ \t]+([^\n]+)([ \t]+#+)[\n]*/\1/S/{_field=sectionMarker:##}{scope=push}{tenter=subsection,chapter}
@@ -119,14 +146,18 @@
 --_mtable-regex-Markdown=chapter/^#//{_advanceTo=0start}{tjump=chapter_sharp}
 --_mtable-extend-Markdown=chapter+emptyLine
 --_mtable-regex-Markdown=chapter/^([^\n]+)[\n]-+[\n]/\1/s/{_field=sectionMarker:-}{scope=push}{tenter=section}
---_mtable-regex-Markdown=chapter/^([^\n]+)[\n]=+[\n]//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-regex-Markdown=chapter/^([^\n]+)[\n]=+[\n]//{tleave}{_advanceTo=0start}{{
+    1 scopePopWithAdjustment
+}}
 --_mtable-extend-Markdown=chapter+code
 --_mtable-extend-Markdown=chapter+rest
 
 #
 # Section
 #
---_mtable-regex-Markdown=section_sharp/^#{1,2}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-regex-Markdown=section_sharp/(^#{1,2}[ \t]+[^\n]+)//{tleave}{_advanceTo=0start}{{
+    1 scopePopWithAdjustment
+}}
 --_mtable-regex-Markdown=section_sharp/^###[ \t]+([^\n]+)([ \t]+#+)[\n]*/\1/S/{_field=sectionMarker:##}{scope=push}{tenter=subsection,section}
 --_mtable-regex-Markdown=section_sharp/^###[ \t]+([^\n]+)[\n]*/\1/S/{_field=sectionMarker:#}{scope=push}{tenter=subsection,section}
 --_mtable-regex-Markdown=section_sharp/^####[ \t]+([^\n]+)([ \t]+#+)[\n]*/\1/t/{_field=sectionMarker:##}{scope=push}{tenter=subsubsection,section}
@@ -146,7 +177,9 @@
 #
 # Subsection
 #
---_mtable-regex-Markdown=subsection_sharp/^#{1,3}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start,subsection}
+--_mtable-regex-Markdown=subsection_sharp/(^#{1,3}[ \t]+[^\n]+)//{tleave}{_advanceTo=0start,subsection}{{
+    1 scopePopWithAdjustment
+}}
 --_mtable-regex-Markdown=subsection_sharp/^####[ \t]+([^\n]+)([ \t]+#+)[\n]*/\1/t/{_field=sectionMarker:##}{scope=push}{tenter=subsubsection,subsection}
 --_mtable-regex-Markdown=subsection_sharp/^####[ \t]+([^\n]+)[\n]*/\1/t/{_field=sectionMarker:#}{scope=push}{tenter=subsubsection,subsection}
 --_mtable-regex-Markdown=subsection_sharp/^#####[ \t]+([^\n]+)([ \t]+#+)[\n]*/\1/T/{_field=sectionMarker:##}{scope=push}{tenter=l4subsection,subsection}
@@ -164,7 +197,9 @@
 #
 # SubSubsection
 #
---_mtable-regex-Markdown=subsubsection_sharp/^#{1,4}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-regex-Markdown=subsubsection_sharp/(^#{1,4}[ \t]+[^\n]+)//{tleave}{_advanceTo=0start}{{
+    1 scopePopWithAdjustment
+}}
 --_mtable-regex-Markdown=subsubsection_sharp/^#####[ \t]+([^\n]+)([ \t]+#+)[\n]*/\1/T/{_field=sectionMarker:##}{scope=push}{tenter=l4subsection,subsubsection}
 --_mtable-regex-Markdown=subsubsection_sharp/^#####[ \t]+([^\n]+)[\n]*/\1/T/{_field=sectionMarker:#}{scope=push}{tenter=l4subsection,subsubsection}
 --_mtable-regex-Markdown=subsubsection_sharp/^######[ \t]+([^\n]+)([ \t]+#+)[\n]*/\1/u/{_field=sectionMarker:##}{scope=push}{tenter=l5subsection,subsubsection}
@@ -180,7 +215,9 @@
 #
 # L4subsection
 #
---_mtable-regex-Markdown=l4subsection_sharp/^#{1,5}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-regex-Markdown=l4subsection_sharp/(^#{1,5}[ \t]+[^\n]+)//{tleave}{_advanceTo=0start}{{
+    1 scopePopWithAdjustment
+}}
 --_mtable-regex-Markdown=l4subsection_sharp/^######[ \t]+([^\n]+)([ \t]+#+)[\n]*/\1/u/{_field=sectionMarker:##}{scope=push}{tenter=l5subsection,l4subsection}
 --_mtable-regex-Markdown=l4subsection_sharp/^######[ \t]+([^\n]+)[\n]*/\1/u/{_field=sectionMarker:#}{scope=push}{tenter=l5subsection,l4subsection}
 --_mtable-regex-Markdown=l4subsection_sharp/.//{tjump=l4subsection}
@@ -194,7 +231,9 @@
 #
 # L5subsection
 #
---_mtable-regex-Markdown=l5subsection_sharp/^#{1,6}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-regex-Markdown=l5subsection_sharp/^#{1,6}[ \t]+([^\n]+)//{tleave}{_advanceTo=0start}{{
+    1 scopePopWithAdjustment
+}}
 --_mtable-regex-Markdown=l5subsection_sharp/.//{tjump=l5subsection}
 
 --_mtable-regex-Markdown=l5subsection/^#//{_advanceTo=0start}{tjump=l5subsection_sharp}

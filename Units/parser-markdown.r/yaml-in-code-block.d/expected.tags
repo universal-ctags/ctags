@@ -1,4 +1,4 @@
-Mline	input.md	/^### Mline$/;"	S	language:Markdown
-Mline2	input.md	/^### Mline2$/;"	S	language:Markdown
-EOF	input.md	/^cat <<EOF$/;"	h	language:Sh
+Mline	input.md	/^### Mline$/;"	S	language:Markdown	end:25
+Mline2	input.md	/^### Mline2$/;"	S	language:Markdown	end:26
+EOF	input.md	/^cat <<EOF$/;"	h	language:Sh	end:19
 hello	input.md	/^hello()$/;"	f	language:Sh
