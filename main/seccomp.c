@@ -43,6 +43,9 @@ int installSyscallFilter (void)
 	// The bowels of stdio want to know the size of a file, even for stdout.
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (fstat), 0);
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (fstat64), 0);
+#ifdef __SNR_newfstatat
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (newfstatat), 0);
+#endif
 
 	// seems unnecessary, but this comes from
 	// main/parse.c:2764 : tagFilePosition (&tagfpos);
