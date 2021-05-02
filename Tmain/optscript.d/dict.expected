@@ -1,0 +1,22 @@
+3
+true
+false
+true
+-dict:1-
+false
+3
+2
+1
+(a)
+false
+2
+3
+2
+(---- dictstack & cleardictstack ----)
+3
+4
+2
+(---- store ----)
+1
+-dict:1-
+null

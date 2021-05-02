@@ -23,6 +23,7 @@ if [ -z "${MAKE}" ]; then
 fi
 
 ctags_files=`${MAKE} -s -f makefiles/list-optlib2c-input.mak`
+txt_files=`${MAKE} -s -f makefiles/list-txt2cstr-input.mak`
 if autoreconf -vfi; then
 	if type perl > /dev/null; then
 		for i in ${ctags_files}; do
@@ -33,10 +34,23 @@ if autoreconf -vfi; then
 				exit 1
 			fi
 		done
+		for i in ${txt_files}; do
+			o=${i%.ps}.c
+			echo "txt2cstr: converting $i to $o"
+			if ! ./misc/txt2cstr $i > $o; then
+				echo "failed in running txt2cstr" 1>&2
+				exit 1
+			fi
+		done
+
 	else
 		for i in ${ctags_files}; do
 			o=${i%.ctags}.c
 			echo "use pre-translated file: $o"
+		done
+		for i in ${txt_files}; do
+			o=${i%.ps}.c
+			echo "use pre-converted file: $o"
 		done
 	fi
 else

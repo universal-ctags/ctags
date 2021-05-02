@@ -1,0 +1,8 @@
+A	input.unknown	/^subpackage A$/;"	p	package:Z
+X	input.unknown	/^package X$/;"	p
+Y	input.unknown	/^package Y$/;"	p
+Z	input.unknown	/^package Z$/;"	p
+a	input.unknown	/^def a:int = 1$/;"	d	package:X	typeref:typename:int
+b	input.unknown	/^def b:str = "abc"$/;"	d	package:X	typeref:typename:str
+c	input.unknown	/^def c:name = name$/;"	d	package:Y	typeref:typename:name
+f	input.unknown	/^def f:floag = 1.9$/;"	d	package:Z.A	typeref:typename:floag

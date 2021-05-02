@@ -1,0 +1,31 @@
+--langdef=hello
+--kinddef-hello=d,def,definitions
+--map-hello=+.hello
+
+--regex-hello=/^def +([-a-z]+):$/\1/d/{{
+	(world)
+	/putlast { 1 index length exch put } def
+	/tr {
+	    % str [int<from> int<to>] str'
+	    ()
+	    2 index {
+		% str [int<from> int<to>] str' int<chr>
+		dup 3 index 0 get
+		% str [int<from> int<to>] str' int<chr> int<chr> int<from>
+		eq {% str [int<from> int<to>] str' int<chr>
+		    pop
+		    dup 2 index 1 get putlast
+		} {% str [int<from> int<to>] str' int<chr>
+		    1 index exch putlast
+		} ifelse
+	    } forall
+	    % str [int<from> int<to>] str'
+	    exch pop
+	    0 exch putinterval
+	} def
+	. :name dup (-_) tr . exch name:
+}}
+
+--regex-hello=/^end//{{
+	(hello) pstack
+}}

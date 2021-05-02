@@ -1,0 +1,13 @@
+--sort=no
+--extras=+r
+--fields=+r
+
+--langdef=foo
+--map-foo=+.foo
+
+--kinddef-foo=v,var,variables
+--_roledef-foo.v=lval,left side value
+
+--regex-foo=/^([a-z]) *=.*$//{{
+    \1 /var /lval 1 _matchloc _reftag _commit pop
+}}

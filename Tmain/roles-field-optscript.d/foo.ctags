@@ -1,0 +1,27 @@
+--extras=+r
+--fields=+r
+
+--langdef=foo
+--map-foo=+.foo
+
+--kinddef-foo=v,var,variables
+
+--_roledef-foo.v=lval,left side value
+--_roledef-foo.v=inc,incremeted
+--_roledef-foo.v=dec,decremented
+
+--regex-foo=/([a-z]) *=/\1/v/{_role=lval}{{
+    \1 . :roles pstack clear
+}}
+
+--regex-foo=/([a-z])\+\+/\1/v/{_role=inc}{{
+    \1 . :roles pstack clear
+}}
+
+--regex-foo=/([a-z])\-\-/\1/v/{_role=dec}{{
+    \1 . :roles pstack clear
+}}
+
+--regex-foo=/def +([a-z])/\1/v/{{
+    \1 . :roles pstack clear
+}}

@@ -1,0 +1,7 @@
+--langdef=X
+--map-X=.unknown
+--kinddef-X=d,def,definitions
+
+--regex-X=/def[ ]+([a-z]+)[ ]*:[ ]*([a-z]+)/\1/d/{{
+	. [ (typename) \2 ] typeref:
+}}

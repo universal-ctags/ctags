@@ -1,4 +1,4 @@
-/tmp/classheir1	input.pp	/^   file { "\/tmp\/classheir1": ensure => file, mode => '0755' }$/;"	r	class:::base
+/tmp/classheir1	input.pp	/^   file { "\/tmp\/classheir1": ensure => file, mode => '0755' }$/;"	r	class:::base	typeref:typename:file
 ::base	input.pp	/^class base {$/;"	c
-::base::/tmp/classheir1	input.pp	/^   file { "\/tmp\/classheir1": ensure => file, mode => '0755' }$/;"	r	class:::base
+::base::/tmp/classheir1	input.pp	/^   file { "\/tmp\/classheir1": ensure => file, mode => '0755' }$/;"	r	class:::base	typeref:typename:file
 base	input.pp	/^class base {$/;"	c

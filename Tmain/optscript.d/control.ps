@@ -1,0 +1,59 @@
+/pc { pstack clear } def
+
+{ 3 2 add } exec pc
+/exectest { 10 2 add } def
+/exectest load exec pc
+3 9 /add load exec pc
+(string) exec pc
+
+true  { (executed if block) } if pc
+false { (executed if block) } if pc
+
+/trueaction  { (executed if block) } def
+/falseaction { (executed else block) } def
+
+true  { trueaction } { falseaction } ifelse pc
+false { trueaction } { falseaction } ifelse pc
+
+/counter 0 def
+3 { counter counter 1 add /counter exch def } repeat pc
+
+/counter 0 def
+{ counter counter 1 add /counter exch def
+  counter 5 eq { exit } if } loop pc
+
+/underflow { 100 index } def
+{ undefflow } stopped { [(jump here as expected) _newerror _errorname] } { (jump here unexpectedly) } ifelse pc
+
+/break { stop } def
+{ break } stopped { [(jump here as expected) _newerror _errorname] } { (jump here unexpectedly) } ifelse pc
+
+{ 3 2 { //add } exec } exec pc
+
+-1 -1 -5 { == } for
+1 2 10   { == } for
+
+(---------------- countexecstack ----------------) ==
+true { countexecstack == } if
+
+(---------------- execstack ----------------) ==
+countexecstack array execstack ==
+
+(---------------- exception handling ----------------) ==
+{
+    { exit } loop
+    (OK: this code just after loop should be executed) ==
+} stopped {
+    (FAIL: 'exit' should not be caught here.) ==
+} {
+    (OK: 'exit' should not be caught here.) ==
+} ifelse
+
+{
+    { stop } loop
+    (SOMETHING WRONG: this code just after loop should not be executed) ==
+} stopped {
+    (OK: 'stop' should be caught here.) ==
+} {
+    (FAIL: 'stop' should not be caught by loop.) ==
+} ifelse

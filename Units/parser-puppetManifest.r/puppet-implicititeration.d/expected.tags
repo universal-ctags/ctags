@@ -1,7 +1,7 @@
 files	input.pp	/^$files = ["\/tmp\/iterationatest", "\/tmp\/iterationbtest"]$/;"	variable	line:3	language:PuppetManifest
-/tmp/iterationctest	input.pp	/^file { ["\/tmp\/iterationctest", "\/tmp\/iterationdtest"]:$/;"	resource	line:7	language:PuppetManifest
-/tmp/iterationdtest	input.pp	/^file { ["\/tmp\/iterationctest", "\/tmp\/iterationdtest"]:$/;"	resource	line:7	language:PuppetManifest
-/tmp/iterationetest	input.pp	/^    ["\/tmp\/iterationetest", "\/tmp\/iterationftest"]: ensure => file, mode => '0755';$/;"	resource	line:13	language:PuppetManifest
-/tmp/iterationftest	input.pp	/^    ["\/tmp\/iterationetest", "\/tmp\/iterationftest"]: ensure => file, mode => '0755';$/;"	resource	line:13	language:PuppetManifest
-/tmp/iterationgtest	input.pp	/^    ["\/tmp\/iterationgtest", "\/tmp\/iterationhtest"]: ensure => file, mode => '0755';$/;"	resource	line:14	language:PuppetManifest
-/tmp/iterationhtest	input.pp	/^    ["\/tmp\/iterationgtest", "\/tmp\/iterationhtest"]: ensure => file, mode => '0755';$/;"	resource	line:14	language:PuppetManifest
+/tmp/iterationctest	input.pp	/^file { ["\/tmp\/iterationctest", "\/tmp\/iterationdtest"]:$/;"	resource	line:7	language:PuppetManifest	typeref:typename:file
+/tmp/iterationdtest	input.pp	/^file { ["\/tmp\/iterationctest", "\/tmp\/iterationdtest"]:$/;"	resource	line:7	language:PuppetManifest	typeref:typename:file
+/tmp/iterationetest	input.pp	/^    ["\/tmp\/iterationetest", "\/tmp\/iterationftest"]: ensure => file, mode => '0755';$/;"	resource	line:13	language:PuppetManifest	typeref:typename:file
+/tmp/iterationftest	input.pp	/^    ["\/tmp\/iterationetest", "\/tmp\/iterationftest"]: ensure => file, mode => '0755';$/;"	resource	line:13	language:PuppetManifest	typeref:typename:file
+/tmp/iterationgtest	input.pp	/^    ["\/tmp\/iterationgtest", "\/tmp\/iterationhtest"]: ensure => file, mode => '0755';$/;"	resource	line:14	language:PuppetManifest	typeref:typename:file
+/tmp/iterationhtest	input.pp	/^    ["\/tmp\/iterationgtest", "\/tmp\/iterationhtest"]: ensure => file, mode => '0755';$/;"	resource	line:14	language:PuppetManifest	typeref:typename:file

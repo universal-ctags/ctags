@@ -1,0 +1,23 @@
+true
+booleantype
+false
+booleantype
+null
+nulltype
+2
+integertype
+(abc)
+stringtype
+/name
+nametype
+--add--
+operatortype
+-mark-
+marktype
+[1 2 3]
+arraytype
+-dict:1-
+dicttype
+{add}
+arraytype
+/xyz

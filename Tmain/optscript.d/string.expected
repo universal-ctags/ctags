@@ -1,0 +1,76 @@
+(--------------- string ---------------)
+32
+32
+32
+(32 32 32 ->)
+(--------------- _strstr ---------------)
+true
+0
+(abcdefgab)
+(\(abcdefgab\) 0 true->)
+true
+5
+(abcdefgab)
+(\(abcdefgab\) 5 true ->)
+true
+6
+(abcdefg)
+(\(abcdefg\) 6 true ->)
+true
+0
+(abcdefg)
+(\(abcdefg\) 0 true ->)
+false
+(abcdefg)
+(\(abcdefg\) false ->)
+(--------------- _strrstr ---------------)
+true
+7
+(abcdefgab)
+(\(abcdefgab\) 7 true->)
+true
+5
+(abcdefgab)
+(\(abcdefgab\) 5 true ->)
+true
+6
+(abcdefg)
+(\(abcdefg\) 6 true ->)
+true
+7
+(abcdefg)
+(\(abcdefg\) 7 true ->)
+false
+(abcdefg)
+(\(abcdefg\) false ->)
+(--------------- _strchr/_strrchr ---------------)
+true
+0
+(aba)
+(\(aba\) 0 true ->)
+true
+2
+(aba)
+(\(aba\) 2 true ->)
+true
+1
+(aba)
+(\(aba\) 1 true ->)
+true
+1
+(aba)
+(\(aba\) 1 true ->)
+false
+(aba)
+(\(aba\) false ->)
+false
+(aba)
+(\(aba\) false ->)
+(--------------- _strpbrk ---------------)
+true
+1
+(a.b;c)
+(\(a.b;c\) 1 true ->)
+false
+(a.b;c)
+(\(a.b;c\) false ->)

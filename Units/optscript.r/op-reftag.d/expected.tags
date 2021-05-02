@@ -1,0 +1,2 @@
+a	input.foo	/^a=1$/;"	v	roles:lval
+b	input.foo	/^b=1$/;"	v	roles:lval

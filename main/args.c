@@ -161,18 +161,120 @@ static bool isCommentLine (char* line)
 	return (*line == '#');
 }
 
+static bool isOptscriptLine (char *line)
+{
+	size_t len = strlen (line);
+	if (len < 2)
+		return false;
+	if (line [len - 1] == '{' && line [len - 2] == '{')
+		return true;
+	return false;
+}
+
+static char* nextOptscriptLines (FILE* const fp, char *line)
+{
+	vString *vstr = vStringNewInit (line);
+	vStringPut (vstr, '\n');
+	eFree (line);
+
+	/* \n}}, \n=>1, }=>2, }=>3  */
+	int endMarkers = 0;
+	int c;
+	while (true)
+	{
+		c = fgetc (fp);
+		if (c == EOF)
+			break;
+
+		if (c == '\r' || c == '\n')
+		{
+			if (c == '\r')
+			{
+				c = fgetc (fp);
+				if (c != '\n')
+				{
+					ungetc(c, fp);
+					c = '\n';
+				}
+			}
+			if (c == '\n')
+			{
+				vStringPut (vstr, c);
+				if (endMarkers != 1)
+					endMarkers = 1;
+			}
+		}
+		else if (c == '}')
+		{
+			vStringPut (vstr, c);
+			if (endMarkers == 1 || endMarkers == 2)
+				endMarkers++;
+			if (endMarkers == 3)
+				break;
+		}
+		else
+		{
+			endMarkers = 0;
+			vStringPut (vstr, c);
+		}
+	}
+
+	if (c == EOF)
+	{
+		switch (endMarkers)
+		{
+		case 0:
+			vStringPut (vstr, '\n');
+			/* Fall through */
+		case 1:
+			vStringPut (vstr, '}');
+			/* Fall through */
+		case 2:
+			vStringPut (vstr, '}');
+		default:
+			break;
+		}
+	}
+
+	c = fgetc (fp);
+	while (c != EOF)
+	{
+		if (c == '\n')
+			break;
+		if (c == '\r')
+		{
+			c = fgetc (fp);
+			if (c == '\n')
+				break;
+			ungetc (c, fp);
+		}
+		c = fgetc (fp);
+	}
+	return vStringDeleteUnwrap (vstr);
+}
+
 static char* nextFileLineSkippingComments (FILE* const fp)
 {
 	char* result;
 	bool comment;
+	bool optscript;
 
 	do
 	{
 		result = nextFileLine (fp);
-		comment = (result && isCommentLine (result));
+		comment = false;
+		optscript = false;
+		if (result)
+		{
+			comment = isCommentLine (result);
+			optscript = isOptscriptLine (result);
+		}
 		if (comment)
 			eFree (result);
+		else if (optscript)
+			result = nextOptscriptLines (fp, result);
 	} while (comment);
+
 	return result;
 }
 

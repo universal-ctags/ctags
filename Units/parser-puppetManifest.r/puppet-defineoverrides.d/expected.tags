@@ -1,4 +1,4 @@
 file	input.pp	/^$file = "\/tmp\/defineoverrides1"$/;"	variable	line:3	language:PuppetManifest
 myfile	input.pp	/^define myfile($mode) {$/;"	definition	line:5	language:PuppetManifest	end:7
 base	input.pp	/^class base {$/;"	class	line:9	language:PuppetManifest	end:11
-sub	input.pp	/^class sub inherits base {$/;"	class	line:13	language:PuppetManifest	end:15
+sub	input.pp	/^class sub inherits base {$/;"	class	line:13	language:PuppetManifest	inherits:base	end:15

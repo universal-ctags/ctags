@@ -1,3 +1,5 @@
-testargs	input.pp	/^define testargs($file, $mode = '0755') {$/;"	definition	line:3	language:PuppetManifest	end:5
-testingname	input.pp	/^testargs { "testingname":$/;"	resource	line:7	language:PuppetManifest	end:9
-testingother	input.pp	/^testargs { "testingother":$/;"	resource	line:11	language:PuppetManifest	end:14
+testargs	input.pp	/^define testargs($file, $mode = '0755') {$/;"	definition	line:3	language:PuppetManifest	signature:($file,$mode)	end:5
+file	input.pp	/^define testargs($file, $mode = '0755') {$/;"	param	line:3	language:PuppetManifest	scope:definition:testargs
+mode	input.pp	/^define testargs($file, $mode = '0755') {$/;"	param	line:3	language:PuppetManifest	scope:definition:testargs
+testingname	input.pp	/^testargs { "testingname":$/;"	resource	line:7	language:PuppetManifest	typeref:typename:testargs	end:9
+testingother	input.pp	/^testargs { "testingother":$/;"	resource	line:11	language:PuppetManifest	typeref:typename:testargs	end:14

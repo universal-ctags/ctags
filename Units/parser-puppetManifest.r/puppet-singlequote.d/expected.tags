@@ -1,2 +1,2 @@
-/tmp/singlequote1	input.pp	/^file { "\/tmp\/singlequote1":$/;"	resource	line:3	language:PuppetManifest	end:6
-/tmp/singlequote2	input.pp	/^file { "\/tmp\/singlequote2":$/;"	resource	line:8	language:PuppetManifest	end:11
+/tmp/singlequote1	input.pp	/^file { "\/tmp\/singlequote1":$/;"	resource	line:3	language:PuppetManifest	typeref:typename:file	end:6
+/tmp/singlequote2	input.pp	/^file { "\/tmp\/singlequote2":$/;"	resource	line:8	language:PuppetManifest	typeref:typename:file	end:11

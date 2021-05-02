@@ -372,12 +372,16 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Copy patterns of a regex table to another regex table."},
  {1,1,"  --_mtable-regex-<LANG>=<table>/<line_pattern>/<name_pattern>/[<flags>]"},
  {1,1,"       Define multitable regular expression for locating tags in specific language."},
+ {1,1,"  --_prelude-<LANG>={{ optscript-code }}"},
+ {1,1,"       Specify code run before parsing with <LANG> parser."},
  {1,1,"  --_pretend-<NEWLANG>=<OLDLANG>"},
  {1,1,"       Make NEWLANG parser pretend OLDLANG parser in lang: field."},
  {1,1,"  --_roledef-<LANG>.<kind>=<name>,<description>"},
  {1,1,"       Define new role for the kind in <LANG>."},
  {1,1,"  --_scopesep-<LANG>=[<parent_kind_letter>|*]/(<child_kind_letter>|*):<separator>"},
  {1,1,"       Specify scope separator between <PARENT_KIND> and <KIND>."},
+ {1,1,"  --_sequel-<LANG>={{ optscript-code }}"},
+ {1,1,"       Specify code run after parsing with <LANG> parser."},
  {1,1,"  --_tabledef-<LANG>=<name>"},
  {1,1,"       Define new regex table for <LANG>."},
  {1,0,""},
@@ -452,6 +456,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Output list of flags which can be used with --langdef option."},
  {1,1,"  --_list-mtable-regex-flags"},
  {1,1,"       Output list of flags which can be used in a multitable regex parser definition."},
+ {1,1,"  --_list-operators"},
+ {1,1,"       Output list of optscript operators."},
  {1,0,""},
  {1,0,"Miscellaneous Options"},
  {1,0,"  --help"},
@@ -486,6 +492,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Dump keywords of initialized parser(s)."},
  {1,1,"  --_dump-options"},
  {1,1,"       Dump options."},
+ {1,1,"  --_dump-prelude"},
+ {1,1,"       Dump contents of optscript prelude."},
  {1,1,"  --_fatal-warnings"},
  {1,1,"       Make all warnings fatal."},
  {1,1,"  --_force-initializing"},
@@ -579,6 +587,7 @@ static struct Feature {
 	/* The test harnesses use this as hints for skipping test cases */
 	{"packcc", "has peg based parser(s)"},
 #endif
+	{"optscript", "can use the interpreter"},
 	{NULL,}
 };
 
@@ -2282,6 +2291,13 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 	exit (0);
 }
 
+static void processListOperators (const char *const option CTAGS_ATTR_UNUSED,
+								  const char *const parameter)
+{
+	listRegexOpscriptOperators (stdout);
+	exit (0);
+}
+
 static void freeSearchPathList (searchPathList** pathList)
 {
 	stringListClear (*pathList);
@@ -2795,6 +2811,7 @@ static void setBooleanToXtagWithWarning(booleanOption *const option, bool value)
  */
 
 static void processDumpOptionsOption (const char *const option, const char *const parameter);
+static void processDumpPreludeOption (const char *const option, const char *const parameter);
 
 static parametricOption ParametricOptions [] = {
 	{ "etags-include",          processEtagsInclude,            false,  STAGE_ANY },
@@ -2851,6 +2868,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_anonhash",              processAnonHashOption,          false,  STAGE_ANY },
 	{ "_dump-keywords",         processDumpKeywordsOption,      false,  STAGE_ANY },
 	{ "_dump-options",          processDumpOptionsOption,       false,  STAGE_ANY },
+	{ "_dump-prelude",          processDumpPreludeOption,       false,  STAGE_ANY },
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
 	{ "_force-initializing",    processForceInitOption,         false,  STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
@@ -2860,6 +2878,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_list-kinddef-flags",    processListKinddefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-langdef-flags",    processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
+	{ "_list-operators",        processListOperators,           true,   STAGE_ANY },
 #ifdef DO_TRACING
 	{ "_trace",                 processTraceOption,             false,  STAGE_ANY },
 #endif
@@ -3309,6 +3328,10 @@ static void processLongOption (
 	else if (processRoledefOption (option, parameter))
 		;
 	else if (processScopesepOption (option, parameter))
+		;
+	else if (processPreludeOption (option, parameter))
+		;
+	else if (processSequelOption (option, parameter))
 		;
 	else if (processPretendOption (option, parameter))
 		;
@@ -3899,6 +3922,13 @@ static void processDumpOptionsOption (const char *const option CTAGS_ATTR_UNUSED
 	fprintf(stdout, "# %s\n", "BooleanOptions");
 	for (unsigned int i = 0; i < ARRAY_SIZE(BooleanOptions); i++)
 		fprintf(stdout, "%s\n", BooleanOptions[i].name);
+}
+
+static void processDumpPreludeOption (const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	extern const char ctagsCommonPrelude[];
+	fprintf(stdout, "%s\n", ctagsCommonPrelude);
+	exit (0);
 }
 
 extern bool inSandbox (void)

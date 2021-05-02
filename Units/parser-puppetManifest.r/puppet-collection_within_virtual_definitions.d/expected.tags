@@ -1,6 +1,6 @@
 test	input.pp	/^define test($my_name) {$/;"	definition	line:1	language:PuppetManifest	end:6
-/tmp/collection_within_virtual_definitions1_$my_name.txt	input.pp	/^    file {"\/tmp\/collection_within_virtual_definitions1_$my_name.txt":$/;"	resource	line:2	language:PuppetManifest	scope:definition:test	end:4
+/tmp/collection_within_virtual_definitions1_$my_name.txt	input.pp	/^    file {"\/tmp\/collection_within_virtual_definitions1_$my_name.txt":$/;"	resource	line:2	language:PuppetManifest	scope:definition:test	typeref:typename:file	end:4
 test2	input.pp	/^define test2() {$/;"	definition	line:8	language:PuppetManifest	end:12
-/tmp/collection_within_virtual_definitions2_$name.txt	input.pp	/^    file {"\/tmp\/collection_within_virtual_definitions2_$name.txt":$/;"	resource	line:9	language:PuppetManifest	scope:definition:test2	end:11
-foo	input.pp	/^    @test {"foo":$/;"	resource	line:15	language:PuppetManifest	end:17
-foo2	input.pp	/^    @test2 {"foo2": }$/;"	resource	line:18	language:PuppetManifest	end:18
+/tmp/collection_within_virtual_definitions2_$name.txt	input.pp	/^    file {"\/tmp\/collection_within_virtual_definitions2_$name.txt":$/;"	resource	line:9	language:PuppetManifest	scope:definition:test2	typeref:typename:file	end:11
+foo	input.pp	/^    @test {"foo":$/;"	vresource	line:15	language:PuppetManifest	typeref:typename:test	end:17
+foo2	input.pp	/^    @test2 {"foo2": }$/;"	vresource	line:18	language:PuppetManifest	typeref:typename:test2	end:18

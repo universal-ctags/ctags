@@ -57,6 +57,7 @@
 #include "keyword_p.h"
 #include "main_p.h"
 #include "options_p.h"
+#include "optscript.h"
 #include "parse_p.h"
 #include "read_p.h"
 #include "routines_p.h"
@@ -578,6 +579,7 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	testEtagsInvocation ();
 	initOptions ();
 	readOptionConfiguration ();
+	initRegexOptscript ();
 	verbose ("Reading initial options from command line\n");
 	parseCmdlineOptions (args);
 	checkOptions ();

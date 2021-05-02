@@ -47,6 +47,7 @@ import threading
 SHELL = '/bin/sh'
 CTAGS = './ctags'
 READTAGS = './readtags'
+OPTSCRIPT = './optscript'
 WITH_TIMEOUT = 0
 WITH_VALGRIND = False
 COLORIZED_OUTPUT = True
@@ -1074,11 +1075,17 @@ def tmain_sub(test_name, basedir, subdir, build_subdir):
     else:
         readtags_path = os.path.join(basedir, READTAGS)
 
+    if isabs(OPTSCRIPT):
+        optscript_path = OPTSCRIPT
+    else:
+        optscript_path = os.path.join(basedir, OPTSCRIPT)
+
     start = time.time()
     ret = subprocess.run([SHELL, 'run.sh',
             ctags_path,
             build_subdir,
-            readtags_path],
+            readtags_path,
+            optscript_path],
             cwd=subdir,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     #print('execute time: %f' % (time.time() - start), file=strbuf)
@@ -1175,6 +1182,7 @@ def action_tmain(parser, action, *args):
     global WITH_VALGRIND
     global SHOW_DIFF_OUTPUT
     global READTAGS
+    global OPTSCRIPT
     global UNITS
     global NUM_WORKER_THREADS
     global SHELL
@@ -1189,6 +1197,8 @@ def action_tmain(parser, action, *args):
             help='how diff output for failed test cases in the summary.')
     parser.add_argument('--readtags',
             help='readtags executable file for testing')
+    parser.add_argument('--optscript',
+            help='optscript executable file for testing')
     parser.add_argument('--units', metavar='UNITS1[,UNITS2,...]',
             help='run only Tmain/UNIT*.d (.d is not needed)')
     parser.add_argument('--threads', type=int, default=NUM_WORKER_THREADS,
@@ -1208,6 +1218,8 @@ def action_tmain(parser, action, *args):
     SHOW_DIFF_OUTPUT = res.show_diff_output
     if res.readtags:
         READTAGS = res.readtags
+    if res.optscript:
+        OPTSCRIPT = res.optscript
     if res.units:
         UNITS = res.units.split(',')
     NUM_WORKER_THREADS = res.threads

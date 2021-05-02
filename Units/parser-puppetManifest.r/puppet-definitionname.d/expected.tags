@@ -1,15 +1,15 @@
 t	input.pp	/^define t {$/;"	definition	line:2	language:PuppetManifest	end:4
-/tmp/multipledefinet	input.pp	/^    file { "\/tmp\/multipledefinet": content => "one" }$/;"	resource	line:3	language:PuppetManifest	scope:definition:t	end:3
+/tmp/multipledefinet	input.pp	/^    file { "\/tmp\/multipledefinet": content => "one" }$/;"	resource	line:3	language:PuppetManifest	scope:definition:t	typeref:typename:file	end:3
 one_	input.pp	/^define one_ {$/;"	definition	line:6	language:PuppetManifest	end:8
-/tmp/multipledefineone_	input.pp	/^    file { "\/tmp\/multipledefineone_": content => "one" }$/;"	resource	line:7	language:PuppetManifest	scope:definition:one_	end:7
+/tmp/multipledefineone_	input.pp	/^    file { "\/tmp\/multipledefineone_": content => "one" }$/;"	resource	line:7	language:PuppetManifest	scope:definition:one_	typeref:typename:file	end:7
 on_e	input.pp	/^define on_e {$/;"	definition	line:10	language:PuppetManifest	end:12
-/tmp/multipledefineon_e	input.pp	/^    file { "\/tmp\/multipledefineon_e": content => "one" }$/;"	resource	line:11	language:PuppetManifest	scope:definition:on_e	end:11
+/tmp/multipledefineon_e	input.pp	/^    file { "\/tmp\/multipledefineon_e": content => "one" }$/;"	resource	line:11	language:PuppetManifest	scope:definition:on_e	typeref:typename:file	end:11
 o_ne::tw_o	input.pp	/^define o_ne::tw_o {$/;"	definition	line:15	language:PuppetManifest	end:17
-/tmp/multipledefineo_netw_o	input.pp	/^    file { "\/tmp\/multipledefineo_netw_o": content => "two" }$/;"	resource	line:16	language:PuppetManifest	scope:definition:o_ne::tw_o	end:16
+/tmp/multipledefineo_netw_o	input.pp	/^    file { "\/tmp\/multipledefineo_netw_o": content => "two" }$/;"	resource	line:16	language:PuppetManifest	scope:definition:o_ne::tw_o	typeref:typename:file	end:16
 o_ne::two_	input.pp	/^define o_ne::two_ {$/;"	definition	line:19	language:PuppetManifest	end:21
-/tmp/multipledefineo_netwo_	input.pp	/^    file { "\/tmp\/multipledefineo_netwo_": content => "two" }$/;"	resource	line:20	language:PuppetManifest	scope:definition:o_ne::two_	end:20
-t	input.pp	/^t { 't': }$/;"	resource	line:23	language:PuppetManifest	end:23
-one_	input.pp	/^one_ { 'one_': }$/;"	resource	line:24	language:PuppetManifest	end:24
-on_e	input.pp	/^on_e { 'on_e': }$/;"	resource	line:25	language:PuppetManifest	end:25
-o_ne::tw_o	input.pp	/^o_ne::tw_o { 'o_ne::tw_o': }$/;"	resource	line:26	language:PuppetManifest	end:26
-o_ne::two_	input.pp	/^o_ne::two_ { 'o_ne::two_': }$/;"	resource	line:27	language:PuppetManifest	end:27
+/tmp/multipledefineo_netwo_	input.pp	/^    file { "\/tmp\/multipledefineo_netwo_": content => "two" }$/;"	resource	line:20	language:PuppetManifest	scope:definition:o_ne::two_	typeref:typename:file	end:20
+t	input.pp	/^t { 't': }$/;"	resource	line:23	language:PuppetManifest	typeref:typename:t	end:23
+one_	input.pp	/^one_ { 'one_': }$/;"	resource	line:24	language:PuppetManifest	typeref:typename:one_	end:24
+on_e	input.pp	/^on_e { 'on_e': }$/;"	resource	line:25	language:PuppetManifest	typeref:typename:on_e	end:25
+o_ne::tw_o	input.pp	/^o_ne::tw_o { 'o_ne::tw_o': }$/;"	resource	line:26	language:PuppetManifest	typeref:typename:o_ne::tw_o	end:26
+o_ne::two_	input.pp	/^o_ne::two_ { 'o_ne::two_': }$/;"	resource	line:27	language:PuppetManifest	typeref:typename:o_ne::two_	end:27

@@ -38,12 +38,42 @@
 --kinddef-PuppetManifest=n,node,nodes
 --kinddef-PuppetManifest=r,resource,resources
 --kinddef-PuppetManifest=v,variable,variables
+--kinddef-PuppetManifest=p,param,parameters
+--kinddef-PuppetManifest=V,vresource,virtual resources
+--kinddef-PuppetManifest=t,type,type aliases
 
 #
 # Separators
 #
 --_scopesep-PuppetManifest=/c:::
 --_scopesep-PuppetManifest=*/*:::
+
+#
+# Prelude
+#
+--_prelude-PuppetManifest={{
+    % spec:dict<num,kind> TRYMAKETAG tag:int true
+    % spec:dict<num,kind> TRYMAKETAG false
+    /trymaketag {
+        {
+            {
+                1 index _matchstr {
+                    % key value str
+                    3 -1 roll
+                    % value str key
+                    _matchloc
+                    % value str loc
+                    3 -1 roll exch
+                    % str value loc
+                    _tag _commit
+                    stop
+                } {
+                    pop pop
+                } ifelse
+            } forall
+         } stopped
+    } def
+}}
 
 #
 # Tables
@@ -75,6 +105,9 @@
 --_tabledef-PuppetManifest=skipArgs
 --_tabledef-PuppetManifest=skipCollector
 
+--_tabledef-PuppetManifest=signature
+--_tabledef-PuppetManifest=skipDefaultValue
+
 --_tabledef-PuppetManifest=var
 
 --_tabledef-PuppetManifest=defineStart
@@ -82,6 +115,8 @@
 --_tabledef-PuppetManifest=ifStart
 
 --_tabledef-PuppetManifest=nodeStart
+
+--_tabledef-PuppetManifest=typeStart
 
 #
 # Utilities
@@ -145,6 +180,45 @@
 --_mtable-extend-PuppetManifest=skipArgs+any
 
 #
+# signature
+#
+--_mtable-extend-PuppetManifest=signature+comment
+--_mtable-extend-PuppetManifest=signature+skipLiteral
+--_mtable-extend-PuppetManifest=signature+ignoreWhiteSpace
+--_mtable-regex-PuppetManifest=signature/\)//{tleave}{{
+    %
+    % fill signature
+    %
+    dup ?, eq { pop } if
+    ?) _buildstring _scopetop {
+        exch signature:
+    } {
+        % something wrong
+        pop
+    } ifelse
+}}
+--_mtable-regex-PuppetManifest=signature/\$([a-zA-Z][_a-zA-Z0-9:]*)[ \t]*([=,])[ \t]*/\1/p/{scope=ref}{{
+    % push the name of parameter for filling the signature field of definition
+    \2 0 get ?= eq {
+       /skipDefaultValue _tenter
+    } if
+    ?$ \1 ?,
+}}
+--_mtable-extend-PuppetManifest=signature+any
+
+#
+# skipDefaultValue
+#
+--_mtable-extend-PuppetManifest=skipDefaultValue+comment
+--_mtable-extend-PuppetManifest=skipDefaultValue+skipLiteral
+--_mtable-regex-PuppetManifest=skipDefaultValue/\[//{tenter=skipArray}
+--_mtable-regex-PuppetManifest=skipDefaultValue/\{//{tenter=skipBlock}
+--_mtable-regex-PuppetManifest=skipDefaultValue/\(//{tenter=skipArgs}
+--_mtable-regex-PuppetManifest=skipDefaultValue/,//{tleave}
+--_mtable-regex-PuppetManifest=skipDefaultValue/\)//{tleave}{_advanceTo=0start}
+--_mtable-extend-PuppetManifest=skipDefaultValue+any
+
+#
 # skipCollector
 #
 --_mtable-extend-PuppetManifest=skipCollector+comment
@@ -158,13 +232,20 @@
 #
 # block
 #
---_mtable-regex-PuppetManifest=blockStart/@?::[a-zA-Z0-9:_]+[ \t\n]*\{//{tenter=resourceBlock}
---_mtable-regex-PuppetManifest=blockStart/@?[a-zA-Z][a-zA-Z0-9:_]*[ \t\n]*\{//{tenter=resourceBlock}
+--_mtable-regex-PuppetManifest=blockStart/(@)?(::[a-zA-Z0-9:_]+|[a-zA-Z][a-zA-Z0-9:_]*)[ \t\n]*\{//{tenter=resourceBlock}{{
+    \1 _isstring {
+       /vresource
+    } {
+       /resource
+    } ifelse \2 true
+    % kind:name type:string true
+}}
 --_mtable-regex-PuppetManifest=blockStart/class[ \t\n]+//{tenter=classStart}
 --_mtable-regex-PuppetManifest=blockStart/define[ \t\n]+//{tenter=defineStart}
 --_mtable-regex-PuppetManifest=blockStart/case[ \t\n]+//{tenter=caseStart}
 --_mtable-regex-PuppetManifest=blockStart/(if|elsif|else|unless)[ \t\n]+//{tenter=ifStart}
 --_mtable-regex-PuppetManifest=blockStart/node[ \t\n]+//{tenter=nodeStart}
+--_mtable-regex-PuppetManifest=blockStart/type[ \t\n]+//{tenter=typeStart}
 --_mtable-regex-PuppetManifest=blockStart/\$//{tenter=var}
 
 
@@ -175,6 +256,16 @@
 
 --_mtable-extend-PuppetManifest=blockHeadPopAtLast+comment
 --_mtable-regex-PuppetManifest=blockHeadPopAtLast/\{//{tenter=block,endWithPop}
+--_mtable-extend-PuppetManifest=blockHeadPopAtLast+ignoreWhiteSpace
+--_mtable-regex-PuppetManifest=blockHeadPopAtLast/inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*//{{
+    _scopetop {
+        dup :kind /class eq {
+           \1 inherits:
+        } {
+           pop
+        } ifelse
+    } if
+}}
 --_mtable-extend-PuppetManifest=blockHeadPopAtLast+any
 
 --_mtable-extend-PuppetManifest=block+ignoreWhiteSpace
@@ -191,7 +282,9 @@
 #     "j": k => k /* THIS COMMENT CANNOT BE IGNORED WELL */
 # }
 --_mtable-regex-PuppetManifest=block/;?[ \t\n]*\}//{tleave}
---_mtable-regex-PuppetManifest=block/;//{tjump=resourceBlock}{scope=pop}
+--_mtable-regex-PuppetManifest=block/;//{tjump=resourceBlock}{scope=pop}{{
+    false
+}}
 #--_mtable-regex-PuppetManifest=block/;//{tleave}{scope=pop}
 --_mtable-regex-PuppetManifest=block/://
 --_mtable-extend-PuppetManifest=block+comment
@@ -214,11 +307,23 @@
 
 #
 # class
-#
-# TODO: inherits:
-#
 --_mtable-extend-PuppetManifest=classStart+comment
---_mtable-regex-PuppetManifest=classStart/(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
+--_mtable-regex-PuppetManifest=classStart/(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*)[ \t\n]*(\(|\{|inherits[ \t\n]+(::[a-z][_a-zA-Z0-9:]*|[a-z][_a-zA-Z0-9:]*))[ \t\n]*/\1/c/{scope=push}{{
+    \3 _isstring {
+        . exch inherits:
+        /blockHead /endWithPop _tentercont
+    } {
+        \2 0 get ?( eq {
+            % for gathering signature
+            mark ?(
+            % {tenter=signature,blockHeadPopAtLast}
+            /signature /blockHeadPopAtLast _tentercont
+        } {
+            2 /start _matchloc _advanceto
+            /blockHead /endWithPop _tentercont
+        } ifelse
+    } ifelse
+}}
 
 #
 # resource
@@ -229,8 +334,15 @@
 --_tabledef-PuppetManifest=resourceArray
 --_tabledef-PuppetManifest=resourceCollector
 
+# resourceBlock expects data on optscript:
+#
+# false RESOURCEBLOCK -
+# kind:name type:string true RESOURCEBLOCK -
+#
 --_mtable-extend-PuppetManifest=resourceBlock+ignoreWhiteSpace
---_mtable-regex-PuppetManifest=resourceBlock/\}//{tleave}
+--_mtable-regex-PuppetManifest=resourceBlock/\}//{tleave}{{
+    { pop pop } if
+}}
 --_mtable-regex-PuppetManifest=resourceBlock/'//{tenter=resourceName}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceBlock/"//{tenter=resourceName}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceBlock/\[//{tenter=resourceArray}
@@ -238,11 +350,61 @@
 --_mtable-extend-PuppetManifest=resourceBlock+comment
 --_mtable-regex-PuppetManifest=resourceBlock/.//{tenter=resourceBody}{scope=push}{placeholder}
 
---_mtable-regex-PuppetManifest=resourceName/'([^']+)'/\1/r/{tenter=resourceBody,end}{scope=push}
---_mtable-regex-PuppetManifest=resourceName/"([^"]+)"/\1/r/{tenter=resourceBody,end}{scope=push}
+# resourceName expects data on optscript:
+#
+# false RESOURCENAME false
+# kind:name type:string true RESOURCENAME kind:name type:string true
+#
+--_mtable-regex-PuppetManifest=resourceName/'([^']+)'|"([^"]+)"//{tenter=resourceBody,end}{{
+    dup {
+        1 index (typename) exch [ 3 1 roll ]
+        % kind:name type:string true [ (typename) type:string ]
+        <<
+        4 index
+        % kind:name type:string true [ (typename) type:string ] << kind:name
+        1 exch dup 2 exch
+        >>
+        % kind:name type:string true [ (typename) type:string ] << 1 kind:name 2 kind:name >>
+        trymaketag
+        % kind:name type:string true [ (typename) type:string ] tag:int true %
+        % kind:name type:string true [ (typename) type:string ] false
+        {
+            dup _scopepush
+            exch typeref:
+        } {
+            pop
+        } ifelse
+    } {
+        << 1 /resource 2 /resource >> trymaketag {
+           _scopepush
+        } if
+    } ifelse
+}}
 --_mtable-regex-PuppetManifest=resourceName///{tquit}
---_mtable-regex-PuppetManifest=resourceNameInArray/'([^']+)'/\1/r/{tleave}
---_mtable-regex-PuppetManifest=resourceNameInArray/"([^"]+)"/\1/r/{tleave}
+
+# resourceNameInArray expects data on optscript:
+#
+# false RESOURCENAMEINARRAY false
+# kind:name type:string true RESOURCENAMEINARRAY kind:name type:string true
+#
+--_mtable-regex-PuppetManifest=resourceNameInArray/'([^']+)'|"([^"]+)"///{tleave}{{
+    dup {
+        % do the same as resourceName
+        1 index (typename) exch [ 3 1 roll ]
+        << 4 index 1 exch dup 2 exch >> trymaketag
+        {
+            dup _scoperef
+            exch typeref:
+        } {
+            pop
+        } ifelse
+
+    } {
+        << 1 /resource 2 /resource >> trymaketag {
+           _scoperef
+        } if
+    } ifelse
+}}
 --_mtable-regex-PuppetManifest=resourceNameInArray////{tquit}
 
 # --_mtable-extend-PuppetManifest=resourceBody+ignoreWhiteSpace
@@ -261,8 +423,7 @@
 
 --_mtable-extend-PuppetManifest=resourceArray+comment
 --_mtable-extend-PuppetManifest=resourceArray+ignoreWhiteSpace
---_mtable-regex-PuppetManifest=resourceArray/'//{tenter=resourceNameInArray}{_advanceTo=0start}
---_mtable-regex-PuppetManifest=resourceArray/"//{tenter=resourceNameInArray}{_advanceTo=0start}
+--_mtable-regex-PuppetManifest=resourceArray/['"]//{tenter=resourceNameInArray}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceArray/\]//{tleave}
 --_mtable-extend-PuppetManifest=resourceArray+any
 
@@ -270,8 +431,11 @@
 # var
 #
 --_tabledef-PuppetManifest=varexpr
---_mtable-regex-PuppetManifest=var/(::[a-zA-Z0-9_:]+)[ \t\n]*=/\1/v/{tenter=varexpr,end}
---_mtable-regex-PuppetManifest=var/([a-zA-Z_][a-zA-Z0-9_:]*)[ \t\n]*=/\1/v/{tenter=varexpr,end}{scope=ref}
+--_mtable-regex-PuppetManifest=var/(::[a-zA-Z0-9_:]+|[a-zA-Z_][a-zA-Z0-9_:]*)[ \t\n]*=/\1/v/{tenter=varexpr,end}{{
+    \1 0 get ?: eq not {
+       . _scoperef
+    } if
+}}
 
 --_mtable-extend-PuppetManifest=varexpr+comment
 --_mtable-regex-PuppetManifest=varexpr/'//{tenter=ssliteral,end}
@@ -279,19 +443,27 @@
 --_mtable-regex-PuppetManifest=varexpr/\[//{tenter=skipArray,end}
 --_mtable-regex-PuppetManifest=varexpr/\{//{tenter=skipBlock,end}
 --_mtable-regex-PuppetManifest=varexpr/\(//{tenter=skipArgs,end}
---_mtable-regex-PuppetManifest=varexpr/\$[a-zA-Z:][0-9a-zA-Z"]*//
+--_mtable-regex-PuppetManifest=varexpr/\$[a-zA-Z:][0-9a-zA-Z:]*//
 --_mtable-regex-PuppetManifest=varexpr/[0-9]+(\.[0-9]+(e([+-][0-9]+)))?//
 --_mtable-regex-PuppetManifest=varexpr/[a-zA-Z0-9:][0-9a-zA-Z:]*//
 --_mtable-regex-PuppetManifest=varexpr/[ \t]//
 --_mtable-regex-PuppetManifest=varexpr/\n//{tleave}
---_mtable-regex-PuppetManifest=varexpr/.//
+--_mtable-extend-PuppetManifest=varexpr+any
 
 #
 # define
 #
 --_mtable-extend-PuppetManifest=defineStart+comment
---_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*\(/\1/d/{tenter=skipArgs,blockHeadPopAtLast}{scope=push}
---_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*\{/\1/d/{tenter=block,endWithPop}{scope=push}
+--_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*([({])/\1/d/{scope=push}{{
+    \2 0 get ?( eq {
+       % for gathering signature
+       mark ?(
+       % {tenter=signature,blockHeadPopAtLast}
+       /signature /blockHeadPopAtLast _tentercont
+    } {
+       /block /endWithPop _tentercont
+    } ifelse
+}}
 
 #
 # case
@@ -329,3 +501,11 @@
 --_mtable-regex-PuppetManifest=nodeStart/"([^"]+)"/\1/n/
 --_mtable-regex-PuppetManifest=nodeStart/\{///{tenter=block,end}
 --_mtable-extend-PuppetManifest=nodeStart+any
+
+#
+# type
+#
+--_mtable-extend-PuppetManifest=typeStart+comment
+--_mtable-extend-PuppetManifest=typeStart+ignoreWhiteSpace
+--_mtable-regex-PuppetManifest=typeStart/([a-zA-Z][a-zA-Z0-9]*::[a-zA-Z][a-zA-Z0-9]+)[ \t\n]*=[ \t\n]*/\1/t/{tenter=varexpr,end}
+--_mtable-extend-PuppetManifest=typeStart+any

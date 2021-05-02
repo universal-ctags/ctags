@@ -1,5 +1,5 @@
 mode	input.pp	/^$mode = "640"$/;"	variable	line:2	language:PuppetManifest
 thing	input.pp	/^define thing {$/;"	definition	line:4	language:PuppetManifest	end:6
-/tmp/$name	input.pp	/^    file { "\/tmp\/$name": ensure => file, mode => $mode }$/;"	resource	line:5	language:PuppetManifest	scope:definition:thing	end:5
+/tmp/$name	input.pp	/^    file { "\/tmp\/$name": ensure => file, mode => $mode }$/;"	resource	line:5	language:PuppetManifest	scope:definition:thing	typeref:typename:file	end:5
 testing	input.pp	/^class testing {$/;"	class	line:8	language:PuppetManifest	end:11
 mode	input.pp	/^    $mode = "755"$/;"	variable	line:9	language:PuppetManifest	scope:class:::testing

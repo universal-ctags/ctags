@@ -1,0 +1,64 @@
+(--------------- string ---------------) ==
+(32 32 32 ->)
+3 string { } forall pstack clear
+(--------------- _strstr ---------------) ==
+((abcdefgab) 0 true->)
+(abcdefgab) (ab) _strstr pstack clear
+
+((abcdefgab) 5 true ->)
+(abcdefgab) (fg) _strstr pstack clear
+
+((abcdefg) 6 true ->)
+(abcdefg) (g) _strstr pstack clear
+
+((abcdefg) 0 true ->)
+(abcdefg) () _strstr pstack clear
+
+((abcdefg) false ->)
+(abcdefg) (z) _strstr pstack clear
+
+(--------------- _strrstr ---------------) ==
+((abcdefgab) 7 true->)
+(abcdefgab) (ab) _strrstr pstack clear
+
+((abcdefgab) 5 true ->)
+(abcdefgab) (fg) _strrstr pstack clear
+
+((abcdefg) 6 true ->)
+(abcdefg) (g) _strrstr pstack clear
+
+((abcdefg) 7 true ->)
+(abcdefg) () _strrstr pstack clear
+
+((abcdefg) false ->)
+(abcdefg) (z) _strrstr pstack clear
+
+(--------------- _strchr/_strrchr ---------------) ==
+
+/char { 0 get } def
+
+((aba) 0 true ->)
+(aba) (a) char _strchr pstack clear
+
+((aba) 2 true ->)
+(aba) (a) char _strrchr pstack clear
+
+((aba) 1 true ->)
+(aba) (b) char _strchr pstack clear
+
+((aba) 1 true ->)
+(aba) (b) char _strrchr pstack clear
+
+((aba) false ->)
+(aba) (c) char _strchr pstack clear
+
+((aba) false ->)
+(aba) (c) char _strrchr pstack clear
+
+(--------------- _strpbrk ---------------) ==
+
+((a.b;c) 1 true ->)
+(a.b;c) (;.) _strpbrk pstack clear
+
+((a.b;c) false ->)
+(a.b;c) (,-) _strpbrk pstack clear

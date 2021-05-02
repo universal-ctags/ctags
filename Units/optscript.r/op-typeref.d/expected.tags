@@ -1,0 +1,2 @@
+a	input.unknown	/^def a:int = 1$/;"	d	typeref:typename:int
+b	input.unknown	/^def b:str = "abc"$/;"	d	typeref:typename:str

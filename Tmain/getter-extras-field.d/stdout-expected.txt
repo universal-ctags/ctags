@@ -1,0 +1,4 @@
+eCommon	input.unknown	/^e$/;"	d	extras:reference
+a.b.eCommon2	input.unknown	/^e$/;"	d	extras:qualified,reference
+eLangspec	input.unknown	/^e$/;"	d	extras:foo
+eLangspec+Common	input.unknown	/^e$/;"	d	extras:reference,foo

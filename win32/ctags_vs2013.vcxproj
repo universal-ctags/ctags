@@ -101,7 +101,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../main;../gnu_regex;../parsers;../parsers/cxx;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../main;../gnu_regex;../parsers;../parsers/cxx;../fnmatch;../dsl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;;HAVE_REGCOMP;HAVE_STDBOOL_H;__USE_GNU;strcasecmp=stricmp;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -138,7 +138,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../main;../gnu_regex;../parsers;../parsers/cxx;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../main;../gnu_regex;../parsers;../parsers/cxx;../fnmatch;../dsl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;HAVE_REGCOMP;HAVE_STDBOOL_H;__USE_GNU;strcasecmp=stricmp;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -182,6 +182,7 @@
     <ClCompile Include="..\main\args.c" />
     <ClCompile Include="..\main\cmd.c" />
     <ClCompile Include="..\main\colprint.c" />
+    <ClCompile Include="..\main\CommonPrelude.c" />
     <ClCompile Include="..\main\debug.c" />
     <ClCompile Include="..\main\dependency.c" />
     <ClCompile Include="..\main\entry.c" />
@@ -211,6 +212,7 @@
     <ClCompile Include="..\main\read.c" />
     <ClCompile Include="..\main\repoinfo.c" />
     <ClCompile Include="..\main\routines.c" />
+    <ClCompile Include="..\main\script.c" />
     <ClCompile Include="..\main\selectors.c" />
     <ClCompile Include="..\main\sort.c" />
     <ClCompile Include="..\main\stats.c" />
@@ -236,6 +238,7 @@
     <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\optlib\markdown.c" />
     <ClCompile Include="..\optlib\meson.c" />
+    <ClCompile Include="..\optlib\mesonOptions.c" />
     <ClCompile Include="..\optlib\passwd.c" />
     <ClCompile Include="..\optlib\pod.c" />
     <ClCompile Include="..\optlib\puppetManifest.c" />
@@ -349,6 +352,8 @@
     <ClCompile Include="..\parsers\windres.c" />
     <ClCompile Include="..\parsers\yacc.c" />
     <ClCompile Include="..\parsers\yumrepo.c" />
+    <ClCompile Include="..\dsl\es.c" />
+    <clCompile Include="..\dsl\optscript.c" />
     <ClCompile Include="mkstemp\mkstemp.c" />
   </ItemGroup>
   <ItemGroup>
@@ -403,6 +408,7 @@
     <ClInclude Include="..\main\read_p.h" />
     <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\routines_p.h" />
+    <ClInclude Include="..\main\script.h" />
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort_p.h" />
     <ClInclude Include="..\main\stat_p.h" />
@@ -436,6 +442,8 @@
     <ClInclude Include="..\parsers\perl.h" />
     <ClInclude Include="..\parsers\tcl.h" />
     <ClInclude Include="..\parsers\tex.h" />
+    <ClInclude Include="..\dsl\es.h" />
+    <ClInclude Include="..\dsl\optscript.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,4 @@
+inject-nmi	input.hx	/^inject-nmi$/;"	q
+system_reset	input.hx	/^system_reset$/;"	q
+qmp_inject_nmi	input.hx	/^inject-nmi$/;"	q	extras:funcmap
+qmp_system_reset	input.hx	/^system_reset$/;"	q	extras:funcmap

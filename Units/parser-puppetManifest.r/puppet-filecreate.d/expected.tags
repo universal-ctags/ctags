@@ -1,4 +1,4 @@
-/tmp/createatest	input.pp	/^    "\/tmp\/createatest": ensure => file, mode => '0755';$/;"	resource	line:4	language:PuppetManifest	end:4
-/tmp/createbtest	input.pp	/^    "\/tmp\/createbtest": ensure => file, mode => '0755'$/;"	resource	line:5	language:PuppetManifest	end:6
-/tmp/createctest	input.pp	/^    "\/tmp\/createctest": ensure => file;$/;"	resource	line:9	language:PuppetManifest	end:9
-/tmp/createdtest	input.pp	/^    "\/tmp\/createdtest": ensure => file;$/;"	resource	line:10	language:PuppetManifest	end:10
+/tmp/createatest	input.pp	/^    "\/tmp\/createatest": ensure => file, mode => '0755';$/;"	resource	line:4	language:PuppetManifest	typeref:typename:file	end:4
+/tmp/createbtest	input.pp	/^    "\/tmp\/createbtest": ensure => file, mode => '0755'$/;"	resource	line:5	language:PuppetManifest	typeref:typename:file	end:6
+/tmp/createctest	input.pp	/^    "\/tmp\/createctest": ensure => file;$/;"	resource	line:9	language:PuppetManifest	typeref:typename:file	end:9
+/tmp/createdtest	input.pp	/^    "\/tmp\/createdtest": ensure => file;$/;"	resource	line:10	language:PuppetManifest	typeref:typename:file	end:10

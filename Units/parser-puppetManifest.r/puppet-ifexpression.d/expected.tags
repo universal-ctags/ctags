@@ -1,3 +1,3 @@
 one	input.pp	/^$one = 1$/;"	variable	line:1	language:PuppetManifest
 two	input.pp	/^$two = 2$/;"	variable	line:2	language:PuppetManifest
-/tmp/${1}iftest	input.pp	/^        "\/tmp\/${1}iftest": ensure => file, mode => '0755'$/;"	resource	line:10	language:PuppetManifest	end:11
+/tmp/${1}iftest	input.pp	/^        "\/tmp\/${1}iftest": ensure => file, mode => '0755'$/;"	resource	line:10	language:PuppetManifest	typeref:typename:file	end:11

@@ -1,0 +1,35 @@
+10 dict begin
+/three 3 def
+/three load ==
+currentdict /three known ==
+currentdict /four  known ==
+/three where pstack
+end
+/three where ==
+
+clear
+<< /a 1 /b 2 /c 3 >>
+begin a b c end pstack
+<< /a (a) >> begin
+/a load ==
+end
+
+<< /a 1 >> dup /a undef /a known == clear
+
+(---- countdictstack ----)
+countdictstack ==
+5 dict begin
+countdictstack ==
+end
+countdictstack ==
+
+(---- dictstack & cleardictstack ----) ==
+clear
+5 dict begin [] dictstack length == clear
+5 dict begin [] dictstack length == clear
+cleardictstack [] dictstack length == clear
+
+(---- store ----) ==
+<< /a 1 /b 2 /c 3 >> << /e 1 /f 2 /g 3 >> /a 0 store pop /a get ==
+
+<< /k null >> dup == /k get ==

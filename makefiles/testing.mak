@@ -11,6 +11,7 @@ clean-local: clean-units clean-tmain
 CTAGS_TEST = ./ctags$(EXEEXT)
 READ_TEST = ./readtags$(EXEEXT)
 MINI_GEANY_TEST = ./mini-geany$(EXEEXT)
+OPTSCRIPT_TEST = ./optscript$(EXEEXT)
 
 if HAVE_TIMEOUT
 TIMEOUT = 1
@@ -164,7 +165,7 @@ validate-input:
 #
 # Test main part, not parsers
 #
-tmain: $(CTAGS_TEST) $(READ_TEST)
+tmain: $(CTAGS_TEST) $(READ_TEST) $(OPTSCRIPT_TEST)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\

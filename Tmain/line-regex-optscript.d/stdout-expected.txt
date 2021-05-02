@@ -1,0 +1,1 @@
+x_y_z	input.hello	/^def x-y-z:$/;"	d

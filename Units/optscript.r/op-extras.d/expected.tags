@@ -1,0 +1,11 @@
+a	input.unknown	/^abcdaxyezb$/;"	d
+B	input.unknown	/^abcdaxyezb$/;"	d
+c	input.unknown	/^abcdaxyezb$/;"	d
+D	input.unknown	/^abcdaxyezb$/;"	d
+a	input.unknown	/^abcdaxyezb$/;"	d
+OK:no such extra	input.unknown	/^abcdaxyezb$/;"	d
+OK:no such language extra	input.unknown	/^abcdaxyezb$/;"	d
+eCommon	input.unknown	/^abcdaxyezb$/;"	d	extras:reference
+a.b.eCommon2	input.unknown	/^abcdaxyezb$/;"	d	extras:qualified,reference
+eLangspec	input.unknown	/^abcdaxyezb$/;"	d	extras:foo
+eLangspec+Common	input.unknown	/^abcdaxyezb$/;"	d	extras:reference,foo

@@ -1,0 +1,35 @@
+--langdef=X
+--map-X=.unknown
+--kinddef-X=d,def,definitions
+--kinddef-X=l,localvar,local variables
+--kinddef-X=g,globalvar,global variables
+
+--_tabledef-X=main
+--_tabledef-X=eqtbl
+--_tabledef-X=deftbl
+
+--_mtable-regex-X=eqtbl/([a-zA-Z_]+)/\1/l/{{
+    _tleave
+}}
+
+--_mtable-regex-X=eqtbl/.//{{
+    _tquit
+}}
+
+--_mtable-regex-X=deftbl/([a-zA-Z_]+)//{{
+    \1 /globalvar 1 /start _matchloc _tag _commit
+    _tleave
+}}
+
+--_mtable-regex-X=deftbl/.//{{
+    _tquit
+}}
+
+--_mtable-regex-X=main/(def +|=)//{{
+    \1 (=) eq {
+      /eqtbl  _tenter
+    } {
+      /deftbl _tenter
+    } ifelse
+}}
+--_mtable-regex-X=main/.//

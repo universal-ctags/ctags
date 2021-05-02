@@ -10,10 +10,10 @@ mode4	input.pp	/^$mode4 = $value4 ? {$/;"	variable	line:23	language:PuppetManife
 mode5	input.pp	/^$mode5 = yay ? {$/;"	variable	line:28	language:PuppetManifest
 mode6	input.pp	/^$mode6 = $mode5 ? {$/;"	variable	line:33	language:PuppetManifest
 mode7	input.pp	/^$mode7 = "test regex" ? {$/;"	variable	line:37	language:PuppetManifest
-/tmp/selectorvalues1	input.pp	/^file { "\/tmp\/selectorvalues1": ensure => file, mode => $mode1 }$/;"	resource	line:43	language:PuppetManifest	end:43
-/tmp/selectorvalues2	input.pp	/^file { "\/tmp\/selectorvalues2": ensure => file, mode => $mode2 }$/;"	resource	line:44	language:PuppetManifest	end:44
-/tmp/selectorvalues3	input.pp	/^file { "\/tmp\/selectorvalues3": ensure => file, mode => $mode3 }$/;"	resource	line:45	language:PuppetManifest	end:45
-/tmp/selectorvalues4	input.pp	/^file { "\/tmp\/selectorvalues4": ensure => file, mode => $mode4 }$/;"	resource	line:46	language:PuppetManifest	end:46
-/tmp/selectorvalues5	input.pp	/^file { "\/tmp\/selectorvalues5": ensure => file, mode => $mode5 }$/;"	resource	line:47	language:PuppetManifest	end:47
-/tmp/selectorvalues6	input.pp	/^file { "\/tmp\/selectorvalues6": ensure => file, mode => $mode6 }$/;"	resource	line:48	language:PuppetManifest	end:48
-/tmp/selectorvalues7	input.pp	/^file { "\/tmp\/selectorvalues7": ensure => file, mode => $mode7 }$/;"	resource	line:49	language:PuppetManifest	end:49
+/tmp/selectorvalues1	input.pp	/^file { "\/tmp\/selectorvalues1": ensure => file, mode => $mode1 }$/;"	resource	line:43	language:PuppetManifest	typeref:typename:file	end:43
+/tmp/selectorvalues2	input.pp	/^file { "\/tmp\/selectorvalues2": ensure => file, mode => $mode2 }$/;"	resource	line:44	language:PuppetManifest	typeref:typename:file	end:44
+/tmp/selectorvalues3	input.pp	/^file { "\/tmp\/selectorvalues3": ensure => file, mode => $mode3 }$/;"	resource	line:45	language:PuppetManifest	typeref:typename:file	end:45
+/tmp/selectorvalues4	input.pp	/^file { "\/tmp\/selectorvalues4": ensure => file, mode => $mode4 }$/;"	resource	line:46	language:PuppetManifest	typeref:typename:file	end:46
+/tmp/selectorvalues5	input.pp	/^file { "\/tmp\/selectorvalues5": ensure => file, mode => $mode5 }$/;"	resource	line:47	language:PuppetManifest	typeref:typename:file	end:47
+/tmp/selectorvalues6	input.pp	/^file { "\/tmp\/selectorvalues6": ensure => file, mode => $mode6 }$/;"	resource	line:48	language:PuppetManifest	typeref:typename:file	end:48
+/tmp/selectorvalues7	input.pp	/^file { "\/tmp\/selectorvalues7": ensure => file, mode => $mode7 }$/;"	resource	line:49	language:PuppetManifest	typeref:typename:file	end:49

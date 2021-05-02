@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+#
+# txt2cstr - a tool converting a text file into char[].
+#
+# Copyright (C) 2021 Masatake YAMATO
+# Copyright (C) 2021 Red Hat Inc.
+#
+
+use File::Basename;
+
+sub show_help {
+    print<<EOF;
+Usage:
+	$0 --help
+	$0 INPUT.txt > OUTPUT.c
+EOF
+}
+
+sub convert {
+    my $input = $_[0];
+    my $name  = basename $input;
+
+    $name =~ s/\.[a-z]+$//g;
+
+    open(INPUT, "< " . $input) or die("faild to open " . $input);
+
+    print "const char ctags$name []=\n";
+    while (<INPUT>) {
+	chop;
+	$_ =~ s/\\/\\\\/g;
+	$_ =~ s/\"/\\\"/g;
+	print '"' . "$_" . '\\n"' . "\n";
+    }
+    print ";\n";
+
+    close (INPUT);
+}
+
+sub main {
+    my $input;
+
+    for (@_) {
+	if ( ($_ eq '-h') || ($_ eq '--help') ) {
+	    show_help;
+	    exit 0;
+	} elsif ( /^-.*/ ) {
+	    die "unrecongnized option: $_";
+	} else {
+	    if ($input) {
+		die "Don't specify more than 1 input file: @_";
+	    }
+	    $input=$_;
+	}
+    }
+
+    unless ($input) {
+	die "No input file given";
+    }
+
+    convert $input;
+    0;
+}
+
+main @ARGV;
+
+# txt2cstr ends here

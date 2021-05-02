@@ -210,17 +210,8 @@ extern int makeSimplePlaceholder(const vString* const name)
 
 extern bool isLanguageEnabled (const langType language)
 {
-	const parserDefinition* const lang = LanguageTable [language].def;
-
-	if (!lang->enabled)
-		return false;
-
-	if ((lang->kindTable == NULL) &&
-		(!(lang->method & METHOD_REGEX)) &&
-		(!(lang->method & METHOD_XPATH)))
-		return false;
-	else
-		return true;
+	const parserDefinition* const def = LanguageTable [language].def;
+	return def->enabled;
 }
 
 extern bool isLanguageVisible (const langType language)
@@ -422,15 +413,12 @@ static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType
 
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
+		if (! isLanguageEnabled (i))
+			continue;
+
 		const parserObject* const parser = LanguageTable + i;
 		stringList* const aliases = parser->currentAliases;
 		vString* tmp;
-
-		/* isLanguageEnabled is not used here.
-		   It calls initializeParser which takes
-		   cost. */
-		if (! parser->def->enabled)
-			continue;
 
 		if (parser->def->name != NULL && strcasecmp (key, parser->def->name) == 0)
 		{
@@ -473,15 +461,12 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 	*spec = NULL;
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
+		if (! isLanguageEnabled (i))
+			continue;
+
 		parserObject *parser = LanguageTable + i;
 		stringList* const ptrns = parser->currentPatterns;
 		vString* tmp;
-
-		/* isLanguageEnabled is not used here.
-		   It calls initializeParser which takes
-		   cost. */
-		if (! parser->def->enabled)
-			continue;
 
 		if (ptrns != NULL && (tmp = stringListFileFinds (ptrns, baseName)))
 		{
@@ -494,15 +479,12 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
+		if (! isLanguageEnabled (i))
+			continue;
+
 		parserObject *parser = LanguageTable + i;
 		stringList* const exts = parser->currentExtensions;
 		vString* tmp;
-
-		/* isLanguageEnabled is not used here.
-		   It calls initializeParser which takes
-		   cost. */
-		if (! parser->def->enabled)
-			continue;
 
 		if (exts != NULL && (tmp = stringListExtensionFinds (exts,
 								     fileExtension (baseName))))
@@ -1489,9 +1471,8 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
         verbose ("	fallback[hint = %d]: %s\n", i, getLanguageName (language));
     }
 
-	/* We cannot use isLanguageEnabled() here. */
 	if (language == LANG_IGNORE
-		&& LanguageTable[LANG_FALLBACK].def->enabled)
+		&& isLanguageEnabled (LANG_FALLBACK))
 	{
 		language = LANG_FALLBACK;
 		verbose ("	last resort: using \"%s\" parser\n",
@@ -3549,8 +3530,7 @@ static void printLanguage (const langType language, parserDefinition** ltable)
 	if (lang->invisible)
 		return;
 
-	if (lang->kindTable != NULL  ||  (lang->method & METHOD_REGEX))
-		printf ("%s%s\n", lang->name, isLanguageEnabled (lang->id) ? "" : " [disabled]");
+	printf ("%s%s\n", lang->name, isLanguageEnabled (lang->id) ? "" : " [disabled]");
 }
 
 extern void printLanguageList (void)
@@ -3686,6 +3666,11 @@ static bool processLangDefineField (const langType language,
 	fdef->name = eStrndup(parameter, name_end - parameter);
 	fdef->description = desc;
 	fdef->isValueAvailable = NULL;
+	fdef->getValueObject = NULL;
+	fdef->getterValueType = NULL;
+	fdef->setValueObject = NULL;
+	fdef->setterValueType = NULL;
+	fdef->checkValueForSetter = NULL;
 	fdef->dataType = FIELDTYPE_STRING; /* TODO */
 	fdef->ftype = FIELD_UNKNOWN;
 	DEFAULT_TRASH_BOX(fdef, fieldDefinitionDestroy);
@@ -4349,6 +4334,12 @@ static void installTagRegexTable (const langType language)
 
 	if (lang->tagRegexTable != NULL)
 	{
+		/* ctags_cli_main() calls initRegexOptscript ().
+		 * However, mini-geany deasn't call ctags_cli_main().
+		 * So we call initRegexOptscript () here.
+		 */
+		initRegexOptscript ();
+
 	    for (i = 0; i < lang->tagRegexCount; ++i)
 		{
 			if (lang->tagRegexTable [i].mline)
@@ -5017,6 +5008,44 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 	parserObject* const parser = LanguageTable + language;
 	addTagMultiTableRegex (parser->lregexControlBlock, table_name, regex,
 						   name, kinds, flags, disabled);
+}
+
+extern void addLanguageOptscriptPrelude (langType language, const char *const src)
+{
+	addOptscriptPrelude (LanguageTable [language].lregexControlBlock, src);
+}
+
+extern void addLanguageOptscriptSequel (langType language, const char *const src)
+{
+	addOptscriptSequel (LanguageTable [language].lregexControlBlock, src);
+}
+
+static bool processHookOption (const char *const option, const char *const parameter, const char *prefix,
+							   void (* add) (langType, const char *))
+{
+	langType language = getLanguageComponentInOption (option, prefix);
+	if (language == LANG_IGNORE)
+		return false;
+
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A parameter is needed after \"%s\" option", option);
+
+	const char * code = flagsEval (parameter, NULL, 0, NULL);
+	if (code == NULL)
+		error (FATAL, "Cannot recognized a code block surrounded by `{{' and `}}' after \"%s\" option", option);
+	(* add) (language, code);
+
+	return true;
+}
+
+extern bool processPreludeOption (const char *const option, const char *const parameter)
+{
+	return processHookOption (option, parameter, "_prelude-", addLanguageOptscriptPrelude);
+}
+
+extern bool processSequelOption (const char *const option, const char *const parameter)
+{
+	return processHookOption (option, parameter, "_sequel-", addLanguageOptscriptSequel);
 }
 
 extern bool processPretendOption (const char *const option, const char *const parameter)

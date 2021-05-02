@@ -1,0 +1,142 @@
+%
+% Copyright (c) 2021, Masatake YAMATO
+% Copyright (c) 2021, Red Hat, Inc.
+%
+% This source code is released for free distribution under the terms of the
+% GNU General Public License version 2 or (at your option) any later version.
+%
+
+%
+% The documentation table
+%
+
+% __PROCDOCS:dict<proc:name, doc:string>
+/__procdocs 30 dict def
+
+% name value __BDEF -
+/__bdef { bind def }  bind def
+
+% doc:string key:name any:val __DOCDEF -
+/__bddef {
+    1 index exch __bdef
+    exch __procdocs 3 1 roll put
+} __bdef
+
+
+%
+% procedures
+%
+(any n:int _NDUP any1 ... anyn)
+/_ndup { { dup } repeat } __bddef
+
+(x:any x:any _DEDUP x:any
+ x:any y:any _DEDUP x:any y:any)
+/_dedup {
+    count 1 gt {
+        2 copy eq {
+            pop
+        } if
+    } if
+} __bddef
+
+(space:int space:int _DEDUP_SPACES space:int
+ otherthanspace:int space:int _DEDUP_SPACES otherthanspace:int space:int)
+/_dedup_spaces {
+    count 0 gt {
+        dup ?\_ eq {
+            _dedup
+        } if
+    } if
+} __bddef
+
+% 32 32 _dedup_spaces pstack clear (---) ==
+% 32 41 _dedup_spaces pstack clear (---) ==
+% 41 32 _dedup_spaces pstack clear (---) ==
+% 32 _dedup_spaces pstack clear (---) ==
+% 41 _dedup_spaces pstack clear (---) ==
+% quit
+
+/__buildstring {
+    {
+	    counttomark dup 1 eq {
+	        pop exch pop
+	        exit
+	    } {
+	        -1 roll 1 index exch _putlast!
+	    } ifelse
+    } loop
+} __bdef
+
+(mark char:int|substring:string... _BUILDSTRING string)
+/_buildstring {
+    0 string __buildstring
+} __bddef
+
+(string char:int|string _PUTLAST! -)
+/_putlast!  {
+    1 index length exch
+    dup type /integertype eq {
+	    put
+    } {
+	    putinterval
+    } ifelse
+} __bddef
+
+(target:string fromto:str _TR! -)
+/_tr! {
+    %
+    % () is not allowed.
+    % The reason must be be documented.
+    %
+    0 string
+    % str [int<from> int<to>] str'
+    2 index {
+	% str [int<from> int<to>] str' int<chr>
+	    dup 3 index 0 get
+	% str [int<from> int<to>] str' int<chr> int<chr> int<from>
+	    eq {% str [int<from> int<to>] str' int<chr>
+	        pop
+	        dup 2 index 1 get _putlast!
+	    } {% str [int<from> int<to>] str' int<chr>
+	        1 index exch _putlast!
+	    } ifelse
+    } forall
+    % str [int<from> int<to>] str'
+    exch pop
+    0 exch putinterval
+} __bddef
+
+(string _NORMALIZE_SPACES! -)
+/_normalize_spaces! {
+    dup
+    dup (\n ) _tr!
+    dup (\t ) _tr!
+    dup (\r ) _tr!
+    dup (\f ) _tr!
+    dup (\v ) _tr!
+    mark exch { _dedup_spaces } forall _buildstring
+    exch copy pop
+} __bddef
+
+% /x mark 40 (a) 32 32 10 (b) 10 10 9 9 (xyz) 9 9 41 _buildstring def
+% x _normalize_spaces! x pstack
+
+(tag:int _SCOPEREF -)
+/_scoperef {
+    _scopetop not { 0 } if scope:
+} __bddef
+
+(tag:int _SCOPEPUSH -)
+/_scopepush {
+    dup _scoperef _scopeset
+} __bddef
+
+(string _ISSTRING string true
+ any:!string _ISSTRING false)
+/_isstring {
+    dup type /stringtype eq {
+        true
+    } {
+        pop false
+    } ifelse
+} __bddef

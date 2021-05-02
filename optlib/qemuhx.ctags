@@ -1,6 +1,6 @@
 #
-#  Copyright (c) 2017, Red Hat, Inc.
-#  Copyright (c) 2017, Masatake YAMATO
+#  Copyright (c) 2017, 2021, Red Hat, Inc.
+#  Copyright (c) 2017, 2021, Masatake YAMATO
 #
 #  Author: Masatake YAMATO <yamato@redhat.com>
 #
@@ -26,6 +26,7 @@
 # `.hx' is the suffix for the tool.
 #
 # This optlib is a testbed for --_extradef option and `extra' regex long flag.
+# This optlib is a testbed for optscript.
 #
 
 --langdef=QemuHX
@@ -34,12 +35,10 @@
 --map-QemuHX=+.hx
 --_extradef-QemuHX=funcmap,Include mapping SQMP to C function name
 --extras-QemuHX=+{funcmap}
---mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/\1/q/{mgroup=1}
---mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/q/{mgroup=1}{_extra=funcmap}
---regex-QemuHX=/^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})/\1/i/
 
-#
-# TODO: introducing "tr" long flag.
-#       Convert `-' in the name to `_'.
-#	--regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/S/{_multiline=1}{extra=funcmap}{tr=-_}
-#
+--mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/\1/q/{mgroup=1}
+--mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/q/{mgroup=1}{_extra=funcmap}{{
+    . :name dup (-_) _tr!
+    . exch name:
+}}
+--regex-QemuHX=/^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})/\1/i/

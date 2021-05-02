@@ -1,62 +1,62 @@
-#LETTER	NAME	ENABLED	LANGUAGE	JSTYPE	FIXED	DESCRIPTION
-N	name	yes	NONE	s--	yes	tag name
-F	input	yes	NONE	s--	yes	input file
-P	pattern	yes	NONE	s-b	yes	pattern
-C	compact	no	NONE	s--	no	compact input line (used only in xref output)
-E	extras	no	NONE	s--	no	Extra tag type information
-K	NONE	no	NONE	s--	no	Kind of tag in long-name form
-R	NONE	no	NONE	s--	no	Marker (R or D) representing whether tag is definition or reference
-S	signature	no	NONE	s--	no	Signature of routine (e.g. prototype or parameter list)
-T	epoch	yes	NONE	-i-	no	the last modified time of the input file (only for F/file kind tag)
-Z	scope	no	NONE	s--	no	[tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
-a	access	no	NONE	s--	no	Access (or export) of class members
-e	end	no	NONE	-i-	no	end lines of various items
-f	file	yes	NONE	--b	no	File-restricted scoping
-i	inherits	no	NONE	s-b	no	Inheritance information
-k	NONE	yes	NONE	s--	no	Kind of tag in one-letter form
-l	language	no	NONE	s--	no	Language of input file containing tag
-m	implementation	no	NONE	s--	no	Implementation information
-n	line	no	NONE	-i-	no	Line number of tag definition
-p	scopeKind	no	NONE	s--	no	[tags output] no effect, [xref and json output] kind of scope in long-name form
-r	roles	no	NONE	s--	no	Roles
-s	NONE	yes	NONE	s--	no	[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope
-t	typeref	yes	NONE	s--	no	Type and name of a variable or typedef
-x	xpath	no	NONE	s--	no	xpath for the tag
-z	kind	no	NONE	s--	no	[tags output] prepend "kind:" to k/ (or K/) field output, [xref and json output] kind in long-name form
--	properties	no	AutoIt	s--	no	properties (static, volatile, ...)
--	macrodef	no	C	s--	no	macro definition
--	properties	no	C	s--	no	properties (static, inline, mutable,...)
--	captures	no	C++	s--	no	lambda capture list
--	macrodef	no	C++	s--	no	macro definition
--	name	yes	C++	s--	no	aliased names
--	properties	no	C++	s--	no	properties (static, inline, mutable,...)
--	specialization	no	C++	s--	no	template specialization parameters
--	template	no	C++	s--	no	template parameters
--	macrodef	no	CPreProcessor	s--	no	macro definition
--	macrodef	no	CUDA	s--	no	macro definition
--	properties	no	CUDA	s--	no	properties (static, inline, mutable,...)
--	access	yes	Elixir	s--	no	access
--	howImported	no	Go	s--	no	how the package is imported ("inline" for `.' or "init" for `_')
--	package	yes	Go	s--	no	the real package specified by the package name
--	packageName	yes	Go	s--	no	the name for referring the package
--	implements	yes	Inko	s--	no	Trait being implemented
--	assignment	yes	LdScript	s--	no	how a value is assigned to the symbol
--	sectionMarker	no	Markdown	s--	no	character used for declaring section(#, ##, =, or -)
--	wrapping	yes	Moose	s--	no	how a wrapper wrapping the method (around, after, or before)
--	langid	yes	NSIS	s--	no	language identifier specified in (License)LangString commands
--	category	yes	ObjectiveC	s--	no	category attached to the class
--	protocols	yes	ObjectiveC	s--	no	protocols that the class (or category) confirms to
--	home	yes	Passwd	s--	no	home directory
--	shell	yes	Passwd	s--	no	login shell
--	decorators	no	Python	s--	no	decorators on functions and classes
--	nameref	yes	Python	s--	no	the original name for the tag
--	assignmentop	no	R	s--	no	operator for assignment
--	constructor	yes	R	s--	no	function used for making value assigned to the nameattr tag
--	sectionMarker	no	ReStructuredText	s--	no	character used for declaring section
--	mixin	yes	Ruby	s--	no	how the class or module is mixed in (mixin:HOW:MODULE)
--	parameter	no	SystemVerilog	--b	no	parameter whose value can be overridden.
--	architecture	yes	VHDL	s--	no	architecture designing the entity
--	parameter	no	Verilog	--b	no	parameter whose value can be overridden.
+#LETTER	NAME	ENABLED	LANGUAGE	JSTYPE	FIXED	OP	DESCRIPTION
+N	name	yes	NONE	s--	yes	rw	tag name
+F	input	yes	NONE	s--	yes	--	input file
+P	pattern	yes	NONE	s-b	yes	--	pattern
+C	compact	no	NONE	s--	no	--	compact input line (used only in xref output)
+E	extras	no	NONE	s--	no	r-	Extra tag type information
+K	NONE	no	NONE	s--	no	--	Kind of tag in long-name form
+R	NONE	no	NONE	s--	no	--	Marker (R or D) representing whether tag is definition or reference
+S	signature	no	NONE	s--	no	rw	Signature of routine (e.g. prototype or parameter list)
+T	epoch	yes	NONE	-i-	no	--	the last modified time of the input file (only for F/file kind tag)
+Z	scope	no	NONE	s--	no	rw	[tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
+a	access	no	NONE	s--	no	--	Access (or export) of class members
+e	end	no	NONE	-i-	no	rw	end lines of various items
+f	file	yes	NONE	--b	no	--	File-restricted scoping
+i	inherits	no	NONE	s-b	no	-w	Inheritance information
+k	NONE	yes	NONE	s--	no	--	Kind of tag in one-letter form
+l	language	no	NONE	s--	no	--	Language of input file containing tag
+m	implementation	no	NONE	s--	no	--	Implementation information
+n	line	no	NONE	-i-	no	rw	Line number of tag definition
+p	scopeKind	no	NONE	s--	no	--	[tags output] no effect, [xref and json output] kind of scope in long-name form
+r	roles	no	NONE	s--	no	r-	Roles
+s	NONE	yes	NONE	s--	no	--	[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope
+t	typeref	yes	NONE	s--	no	rw	Type and name of a variable or typedef
+x	xpath	no	NONE	s--	no	--	xpath for the tag
+z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field output, [xref and json output] kind in long-name form
+-	properties	no	AutoIt	s--	no	--	properties (static, volatile, ...)
+-	macrodef	no	C	s--	no	--	macro definition
+-	properties	no	C	s--	no	--	properties (static, inline, mutable,...)
+-	captures	no	C++	s--	no	--	lambda capture list
+-	macrodef	no	C++	s--	no	--	macro definition
+-	name	yes	C++	s--	no	--	aliased names
+-	properties	no	C++	s--	no	--	properties (static, inline, mutable,...)
+-	specialization	no	C++	s--	no	--	template specialization parameters
+-	template	no	C++	s--	no	--	template parameters
+-	macrodef	no	CPreProcessor	s--	no	--	macro definition
+-	macrodef	no	CUDA	s--	no	--	macro definition
+-	properties	no	CUDA	s--	no	--	properties (static, inline, mutable,...)
+-	access	yes	Elixir	s--	no	--	access
+-	howImported	no	Go	s--	no	--	how the package is imported ("inline" for `.' or "init" for `_')
+-	package	yes	Go	s--	no	--	the real package specified by the package name
+-	packageName	yes	Go	s--	no	--	the name for referring the package
+-	implements	yes	Inko	s--	no	--	Trait being implemented
+-	assignment	yes	LdScript	s--	no	--	how a value is assigned to the symbol
+-	sectionMarker	no	Markdown	s--	no	--	character used for declaring section(#, ##, =, or -)
+-	wrapping	yes	Moose	s--	no	--	how a wrapper wrapping the method (around, after, or before)
+-	langid	yes	NSIS	s--	no	--	language identifier specified in (License)LangString commands
+-	category	yes	ObjectiveC	s--	no	--	category attached to the class
+-	protocols	yes	ObjectiveC	s--	no	--	protocols that the class (or category) confirms to
+-	home	yes	Passwd	s--	no	--	home directory
+-	shell	yes	Passwd	s--	no	--	login shell
+-	decorators	no	Python	s--	no	--	decorators on functions and classes
+-	nameref	yes	Python	s--	no	--	the original name for the tag
+-	assignmentop	no	R	s--	no	--	operator for assignment
+-	constructor	yes	R	s--	no	--	function used for making value assigned to the nameattr tag
+-	sectionMarker	no	ReStructuredText	s--	no	--	character used for declaring section
+-	mixin	yes	Ruby	s--	no	--	how the class or module is mixed in (mixin:HOW:MODULE)
+-	parameter	no	SystemVerilog	--b	no	--	parameter whose value can be overridden.
+-	architecture	yes	VHDL	s--	no	--	architecture designing the entity
+-	parameter	no	Verilog	--b	no	--	parameter whose value can be overridden.
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/

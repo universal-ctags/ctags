@@ -1,0 +1,102 @@
+/pc { pstack clear } def
+/dpc { get pstack clear } def
+(array) pc
+[/a /b] pc
+[/abc /efg] pc
+[/1 /b] pc
+[/a /2] pc
+[/123 /123] pc
+(dict) pc
+<< /a /b >>     /a dpc
+<</a /b>>       /a dpc
+<< /abc /efg >> /abc dpc
+<</abc /efg>>   /abc dpc
+<< /1 /2 >>     /1 dpc
+<</1 /2>>       /1 dpc
+<< /123 /123 >> /123 dpc
+<</123 /123>>   /123 dpc
+(cvn) pc
+(/a)    cvn pc
+% gsnd prints "//a /x" for the next code.
+(/a /x) cvn pc
+(immediate) pc
+/a 1 def
+//a pc
+(a\nb\tc\rd\fe) pc
+
+/str () def
+str 0 ?a put
+str 1 ?b put
+str 2 ?c put
+str 3 ?d put
+str 4 ?\n put
+str 5 ?\f put
+str 6 ?\r put
+str 7 ?\v put
+str 8 ?\t put
+str 9 ?\  put
+str 10 ?z put
+str ==
+/-a { add } def
+-500 500 -a ==
+[0] ==
+[-10] ==
+[0 -10] ==
+
+/abc =
+(efg) =
+
+/inject {
+    % target key val
+    2 index type /dicttype eq {
+        2 index 3 1 roll put
+    } {
+        2 index 0 get
+        % array key val dict
+        3 1 roll put
+    } ifelse
+} def
+
+/debug= {
+    /printer /=    inject dup =
+    /printer /==   inject dup ==
+    /printer /===  inject dup ===
+    /printer /==== inject dup ====
+    pop
+} def
+
+<< /printer null
+   /a 1
+   /b /ab
+   /c (efg)
+   /d <<
+          /e 2
+          /f /ef
+          /g (xyz)
+          /h <<
+                 /i 3
+                 /j /ij
+             >>
+      >>
+>>
+debug=
+
+[
+<< /printer null
+   /a 1
+   /b /ab
+   /c (efg)
+   /d <<
+          /e 2
+          /f /ef
+          /g (xyz)
+          /h <<
+                 /i 3
+                 /j /ij
+                 /k [ << /X 1 /Y [ 0 1 2 ] >> ]
+             >>
+      >>
+   /z [ << /A 1 /B [ 0 1 2 ] >> ]
+>>
+]
+debug=

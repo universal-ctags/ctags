@@ -73,6 +73,7 @@ LIB_PRIVATE_HEADS =		\
 	main/ptag_p.h		\
 	main/read_p.h		\
 	main/routines_p.h	\
+	main/script_p.h		\
 	main/sort_p.h		\
 	main/stats_p.h		\
 	main/subparser_p.h	\
@@ -121,6 +122,7 @@ LIB_SRCS =			\
 	main/rbtree.c			\
 	main/read.c			\
 	main/routines.c			\
+	main/script.c			\
 	main/seccomp.c			\
 	main/selectors.c		\
 	main/sort.c			\
@@ -137,6 +139,9 @@ LIB_SRCS =			\
 	main/writer-json.c		\
 	main/writer-xref.c		\
 	main/xtag.c			\
+	\
+	\
+	$(TXT2CSTR_SRCS) \
 	\
 	$(REPOINFO_SRCS) \
 	$(MIO_SRCS)      \
@@ -155,8 +160,16 @@ MINI_GEANY_SRCS = \
 	\
 	$(NULL)
 
+OPTSCRIPT_SRCS = \
+	extra-cmds/optscript-repl.c \
+	\
+	$(NULL)
+
 include makefiles/optlib2c_input.mak
 OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
+
+include makefiles/txt2cstr_input.mak
+TXT2CSTR_SRCS = $(TXT2CSTR_INPUT:.ps=.c)
 
 include makefiles/peg_input.mak
 PEG_SRCS = $(PEG_INPUT:.peg=.c)
@@ -326,8 +339,8 @@ YAML_SRCS = \
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c
 
-ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS)
-ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS)
+ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS) $(DSL_HEADS) $(OPTSCRIPT_DSL_HEADS)
+ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS) $(DSL_SRCS) $(OPTSCRIPT_DSL_SRCS)
 ALL_HEADS = $(ALL_LIB_HEADS) $(CMDLINE_HEADS)
 ALL_SRCS = $(ALL_LIB_SRCS) $(CMDLINE_SRCS)
 
@@ -345,6 +358,18 @@ FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 WIN32_HEADS = main/e_msoft.h
 WIN32_SRCS = win32/mkstemp/mkstemp.c
 WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
+
+OPTSCRIPT_DSL_HEADS = \
+	dsl/es.h \
+	dsl/optscript.h \
+	\
+	$(NULL)
+
+OPTSCRIPT_DSL_SRCS = \
+	dsl/es.c \
+	dsl/optscript.c \
+	\
+	$(NULL)
 
 READTAGS_DSL_HEADS = \
 	dsl/es.h \
@@ -395,4 +420,9 @@ PACKCC_SRCS = \
 	$(NULL)
 
 PACKCC_OBJS = $(PACKCC_SRCS:.c=.$(OBJEXT))
+
+OPTSCRIPT_DSL_OBJS = $(OPTSCRIPT_DSL_SRCS:.c=.$(OBJEXT))
+
+OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.$(OBJEXT))
+
 # vim: ts=8

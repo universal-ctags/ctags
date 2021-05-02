@@ -1,0 +1,28 @@
+--fields=+{inherits}
+--sort=no
+--fields=+{extras}
+
+--langdef=X
+--map-X=.unknown
+
+--kinddef-X=c,class,classes
+
+--regex-X=/^class[ \t]+([A-Z]+)(<([A-Z]+))?/\1/c/{scope=push}{{
+   \3 _isstring {
+      . \3 inherits:
+   } if
+}}
+
+--regex-X=/[ \t]*set_paring[ \t]+([A-Z]+)//{{
+   _scopetop {
+   \1 inherits:
+   } if
+}}
+
+--regex-X=/[ \t]*clear_paring//{{
+   _scopetop {
+      false inherits:
+   } if
+}}
+
+--regex-X=/^end//{scope=pop}{placeholder}

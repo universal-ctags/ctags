@@ -1,0 +1,36 @@
+5
+12
+12
+(string)
+(executed if block)
+(executed if block)
+(executed else block)
+2
+1
+0
+4
+3
+2
+1
+0
+[(jump here as expected) true /undefined]
+[(jump here as expected) false null]
+5
+-1
+-2
+-3
+-4
+-5
+1
+3
+5
+7
+9
+(---------------- countexecstack ----------------)
+3
+(---------------- execstack ----------------)
+[]
+(---------------- exception handling ----------------)
+(OK: this code just after loop should be executed)
+(OK: 'exit' should not be caught here.)
+(OK: 'stop' should be caught here.)

@@ -1,2 +1,2 @@
-#LETTER	NAME	ENABLED	LANGUAGE	JSTYPE	FIXED	DESCRIPTION
--	sectionMarker	no	ReStructuredText	s--	no	character used for declaring section
+#LETTER	NAME	ENABLED	LANGUAGE	JSTYPE	FIXED	OP	DESCRIPTION
+-	sectionMarker	no	ReStructuredText	s--	no	--	character used for declaring section

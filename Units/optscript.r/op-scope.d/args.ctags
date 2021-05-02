@@ -1,0 +1,17 @@
+--langdef=X
+--map-X=.unknown
+--kinddef-X=p,package,packages
+--kinddef-X=d,def,definitions
+
+--regex-X=/def[ ]+([a-z]+)[ ]*:[ ]*([a-z]+)/\1/d/{{
+	. [ (typename) \2 ] typeref:
+    . _scoperef
+}}
+
+--regex-X=/^package[ ]+([A-Z]+)[ ]*/\1/p/{{
+	. _scopeset
+}}
+
+--regex-X=/^subpackage[ ]+([A-Z]+)[ ]*/\1/p/{{
+	. _scopepush
+}}

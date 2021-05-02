@@ -29,7 +29,8 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/gen-repoinfo.bat \
 	       man/Makefile man/README man/tags.5.rst \
-	       $(PEG_INPUT) $(OPTLIB2C_INPUT) \
+	       makefiles/list-txt2cstr-input.mak misc/txt2cstr \
+	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(TXT2CSTR_INPUT) \
 	       docs Tmain Units
 
 CLEANFILES =
@@ -39,6 +40,7 @@ clean-local:
 	rm -f packcc$(BUILD_EXEEXT)
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
 		rm -rf $(OPTLIB2C_SRCS); \
+		rm -rf $(TXT2CSTR_SRCS); \
 	fi
 
 bin_PROGRAMS = ctags
@@ -99,7 +101,7 @@ endif
 
 PARSER_HEADS += $(PEG_EXTRA_HEADS)
 
-libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/peg -DHAVE_PACKCC
+libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/dsl -I$(srcdir)/peg -DHAVE_PACKCC
 if ENABLE_DEBUGGING
 libctags_a_CPPFLAGS+= $(DEBUG_CPPFLAGS)
 endif
@@ -150,6 +152,17 @@ SUFFIXES += .ctags
 $(OPTLIB2C_SRCS): $(OPTLIB2C) Makefile
 endif
 
+if RUN_TXT2CSTR
+txt2cstr_verbose = $(txt2cstr_verbose_@AM_V@)
+txt2cstr_verbose_ = $(txt2cstr_verbose_@AM_DEFAULT_V@)
+txt2cstr_verbose_0 = @echo TXT2CSTR "  $@";
+TXT2CSTR = $(srcdir)/misc/txt2cstr
+SUFFIXES += .ps
+.ps.c:
+	$(txt2cstr_verbose)$(TXT2CSTR) $< > $@
+$(TXT2CSTR_SRCS): $(TXT2CSTR) Makefile
+endif
+
 packcc_verbose = $(packcc_verbose_@AM_V@)
 packcc_verbose_ = $(packcc_verbose_@AM_DEFAULT_V@)
 packcc_verbose_0 = @echo PACKCC "    $@";
@@ -193,6 +206,18 @@ mini_geany_LDADD += $(LIBYAML_LIBS)
 mini_geany_LDADD += $(SECCOMP_LIBS)
 mini_geany_LDADD += $(ICONV_LIBS)
 mini_geany_SOURCES = $(MINI_GEANY_HEADS) $(MINI_GEANY_SRCS)
+
+bin_PROGRAMS += optscript
+optscript_CPPFLAGS = $(libctags_a_CPPFLAGS)
+optscript_CFLAGS = $(libctags_a_CFLAGS)
+optscript_LDADD  = libctags.a
+# TODO: remove these dependencies from optscript command.
+optscript_LDADD += $(LIBXML_LIBS)
+optscript_LDADD += $(JANSSON_LIBS)
+optscript_LDADD += $(LIBYAML_LIBS)
+optscript_LDADD += $(SECCOMP_LIBS)
+optscript_LDADD += $(ICONV_LIBS)
+optscript_SOURCES = $(OPTSCRIPT_SRCS)
 
 if INSTALL_ETAGS
 install-exec-hook:

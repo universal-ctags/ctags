@@ -46,7 +46,11 @@ extern parserDefinition* QemuHXParser (void)
 		{"^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---", "\\1",
 		"q", "{mgroup=1}", NULL, true},
 		{"^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---", "qmp_\\1",
-		"q", "{mgroup=1}{_extra=funcmap}", NULL, true},
+		"q", "{mgroup=1}{_extra=funcmap}"
+		"{{\n"
+		"    . :name dup (-_) _tr!\n"
+		"    . exch name:\n"
+		"}}", NULL, true},
 		{"^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})", "\\1",
 		"i", NULL, NULL, false},
 	};
@@ -59,6 +63,7 @@ extern parserDefinition* QemuHXParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->useCork       = CORK_QUEUE;
 	def->kindTable     = QemuHXKindTable;
 	def->kindCount     = ARRAY_SIZE(QemuHXKindTable);
 	def->xtagTable     = QemuHXXtagTable;

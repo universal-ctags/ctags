@@ -1,0 +1,2 @@
+func0	input.unknown	/^def func0(a, b)$/;"	d	signature:(a, b)
+func1	input.unknown	/^def func1(x,$/;"	d	signature:(x, y)

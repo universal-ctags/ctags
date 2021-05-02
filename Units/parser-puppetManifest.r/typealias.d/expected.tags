@@ -1,0 +1,1 @@
+MyModule::Tree	input.pp	/^type MyModule::Tree = Array[Variant[Data, Tree]]$/;"	t

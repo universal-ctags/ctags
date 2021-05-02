@@ -188,6 +188,8 @@ extern bool processLanguageEncodingOption (const char *const option, const char 
 #endif
 extern bool processRoledefOption (const char *const option, const char *const parameter);
 extern bool processScopesepOption (const char *const option, const char *const parameter);
+extern bool processPreludeOption (const char *const option, const char *const parameter);
+extern bool processSequelOption (const char *const option, const char *const parameter);
 extern bool processPretendOption (const char *const option, const char *const parameter);
 extern bool processRolesOption (const char *const option, const char *const parameter);
 

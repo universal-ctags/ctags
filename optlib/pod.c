@@ -10,6 +10,10 @@
 
 static void initializePodParser (const langType language CTAGS_ATTR_UNUSED)
 {
+	addLanguageOptscriptPrelude (language,
+		"{{	/kindTable\n"
+		"	[ /chapter /section /subsection /subsubsection ] def\n"
+		"}}");
 }
 
 extern parserDefinition* PodParser (void)
@@ -42,14 +46,14 @@ extern parserDefinition* PodParser (void)
 		},
 	};
 	static tagRegexTable PodTagRegexTable [] = {
-		{"^=head1[ \t]+(.+)", "\\1",
-		"c", NULL, NULL, false},
-		{"^=head2[ \t]+(.+)", "\\1",
-		"s", NULL, NULL, false},
-		{"^=head3[ \t]+(.+)", "\\1",
-		"S", NULL, NULL, false},
-		{"^=head4[ \t]+(.+)", "\\1",
-		"t", NULL, NULL, false},
+		{"^=head([1-4])[ \t]+(.+)", "",
+		"", ""
+		"{{\n"
+		"	\\2\n"
+		"	kindTable \\1 0 get ?1 sub get\n"
+		"	2 /start _matchloc\n"
+		"	_tag _commit pop\n"
+		"}}", NULL, false},
 	};
 
 
@@ -60,6 +64,7 @@ extern parserDefinition* PodParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->useCork       = CORK_QUEUE;
 	def->kindTable     = PodKindTable;
 	def->kindCount     = ARRAY_SIZE(PodKindTable);
 	def->tagRegexTable = PodTagRegexTable;

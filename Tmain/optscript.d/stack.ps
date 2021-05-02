@@ -1,0 +1,22 @@
+/a /b pstack
+pop   pstack
+mark  exch pstack
+dup   pstack
+clear
+/x /y /z 2 copy pstack
+pop pop  1 copy pstack
+pop      0 copy pstack
+2         index pstack
+clear
+/x /y /z  0 index ==
+/x /y /z  1 index ==
+/x /y /z  2 index ==
+clear
+/p /q /r  3 -1 roll pstack
+3  1 roll pstack
+count ==
+mark 4 1 roll
+counttomark ==
+/A 5 1 roll
+cleartomark
+pstack

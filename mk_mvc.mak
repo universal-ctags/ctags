@@ -14,7 +14,7 @@ REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -Dstrcasecmp=stricmp
 OBJEXT = obj
 COMMON_DEFINES =
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES) -DHAVE_REPOINFO_H
-INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers -Ilibreadtags
+INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers -Ilibreadtags -Idsl
 OPT = /O2 /WX
 PACKCC = packcc.exe
 REGEX_OBJS = $(REGEX_SRCS:.c=.obj)
@@ -23,8 +23,11 @@ WIN32_OBJS = $(WIN32_SRCS:.c=.obj)
 PEG_OBJS = $(PEG_SRCS:.c=.obj)
 PACKCC_OBJS = $(PACKCC_SRCS:.c=.obj)
 RES_OBJ = win32/ctags.res
-ALL_OBJS = $(ALL_SRCS:.c=.obj) $(REGEX_OBJS) $(FNMATCH_OBJS) $(WIN32_OBJS) $(PEG_OBJS) $(RES_OBJ)
+EXTRA_OBJS = $(REGEX_OBJS) $(FNMATCH_OBJS) $(WIN32_OBJS) $(PEG_OBJS) $(RES_OBJ)
+ALL_OBJS = $(ALL_SRCS:.c=.obj) $(EXTRA_OBJS)
+ALL_LIB_OBJS = $(ALL_LIB_SRCS:.c=.obj) $(EXTRA_OBJS)
 READTAGS_OBJS = $(READTAGS_SRCS:.c=.obj)
+OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.obj)
 
 !if "$(WITH_ICONV)" == "yes"
 DEFINES = $(DEFINES) -DHAVE_ICONV
@@ -62,6 +65,8 @@ PDBFLAG =
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foextra-cmds\ /c $<
 {libreadtags}.c{libreadtags}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Folibreadtags\ /c $<
+{dsl}.c{dsl}.obj::
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fodsl\ /c $<
 {win32\mkstemp}.c{win32\mkstemp}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fowin32\mkstemp\ /c $<
 {peg}.peg{peg}.c::
@@ -69,7 +74,7 @@ PDBFLAG =
 {peg}.c{peg}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fopeg\ /c $<
 
-all: $(PACKCC) ctags.exe readtags.exe
+all: $(PACKCC) ctags.exe readtags.exe optscript.exe
 
 ctags: ctags.exe
 
@@ -78,6 +83,9 @@ ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(REGEX_HEAD
 
 readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(REGEX_OBJS) $(REGEX_HEADS)
 	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) $(REGEX_OBJS) /link setargv.obj $(PDBFLAG)
+
+optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
+	$(CC) $(OPT) /Fe$@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) /link setargv.obj $(LIBS)
 
 $(REGEX_OBJS): $(REGEX_SRCS)
 	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
@@ -101,6 +109,6 @@ $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj extra-cmds\*.obj libreadtags\*.obj win32\mkstemp\*.obj win32\*.res main\repoinfo.h
-	- del ctags.exe readtags.exe $(PACKCC)
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj extra-cmds\*.obj libreadtags\*.obj dsl/*.o win32\mkstemp\*.obj win32\*.res main\repoinfo.h
+	- del ctags.exe readtags.exe optscript.exe $(PACKCC)
 	- del tags

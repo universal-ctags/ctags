@@ -1,10 +1,10 @@
 t	input.pp	/^class t {$/;"	class	line:1	language:PuppetManifest	end:3
-/tmp/multipleclasst	input.pp	/^    file { "\/tmp\/multipleclasst": content => "one" }$/;"	resource	line:2	language:PuppetManifest	scope:class:::t	end:2
+/tmp/multipleclasst	input.pp	/^    file { "\/tmp\/multipleclasst": content => "one" }$/;"	resource	line:2	language:PuppetManifest	scope:class:::t	typeref:typename:file	end:2
 one_	input.pp	/^class one_ {$/;"	class	line:5	language:PuppetManifest	end:7
-/tmp/multipleclassone_	input.pp	/^    file { "\/tmp\/multipleclassone_": content => "one" }$/;"	resource	line:6	language:PuppetManifest	scope:class:::one_	end:6
+/tmp/multipleclassone_	input.pp	/^    file { "\/tmp\/multipleclassone_": content => "one" }$/;"	resource	line:6	language:PuppetManifest	scope:class:::one_	typeref:typename:file	end:6
 on_e	input.pp	/^class on_e {$/;"	class	line:9	language:PuppetManifest	end:11
-/tmp/multipleclasson_e	input.pp	/^    file { "\/tmp\/multipleclasson_e": content => "one" }$/;"	resource	line:10	language:PuppetManifest	scope:class:::on_e	end:10
+/tmp/multipleclasson_e	input.pp	/^    file { "\/tmp\/multipleclasson_e": content => "one" }$/;"	resource	line:10	language:PuppetManifest	scope:class:::on_e	typeref:typename:file	end:10
 o_ne::tw_o	input.pp	/^class o_ne::tw_o {$/;"	class	line:14	language:PuppetManifest	end:16
-/tmp/multipleclasso_netw_o	input.pp	/^    file { "\/tmp\/multipleclasso_netw_o": content => "two" }$/;"	resource	line:15	language:PuppetManifest	scope:class:::o_ne::tw_o	end:15
+/tmp/multipleclasso_netw_o	input.pp	/^    file { "\/tmp\/multipleclasso_netw_o": content => "two" }$/;"	resource	line:15	language:PuppetManifest	scope:class:::o_ne::tw_o	typeref:typename:file	end:15
 o_ne::two_	input.pp	/^class o_ne::two_ {$/;"	class	line:18	language:PuppetManifest	end:20
-/tmp/multipleclasso_netwo_	input.pp	/^    file { "\/tmp\/multipleclasso_netwo_": content => "two" }$/;"	resource	line:19	language:PuppetManifest	scope:class:::o_ne::two_	end:19
+/tmp/multipleclasso_netwo_	input.pp	/^    file { "\/tmp\/multipleclasso_netwo_": content => "two" }$/;"	resource	line:19	language:PuppetManifest	scope:class:::o_ne::two_	typeref:typename:file	end:19

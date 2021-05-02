@@ -1,7 +1,7 @@
 base	input.pp	/^class base {$/;"	class	line:3	language:PuppetManifest	end:5
-/tmp/classincludes1	input.pp	/^    file { "\/tmp\/classincludes1": ensure => file, mode => '0755' }$/;"	resource	line:4	language:PuppetManifest	scope:class:::base	end:4
-sub1	input.pp	/^class sub1 inherits base {$/;"	class	line:7	language:PuppetManifest	end:9
-/tmp/classincludes2	input.pp	/^    file { "\/tmp\/classincludes2": ensure => file, mode => '0755' }$/;"	resource	line:8	language:PuppetManifest	scope:class:::sub1	end:8
-sub2	input.pp	/^class sub2 inherits base {$/;"	class	line:11	language:PuppetManifest	end:13
-/tmp/classincludes3	input.pp	/^    file { "\/tmp\/classincludes3": ensure => file, mode => '0755' }$/;"	resource	line:12	language:PuppetManifest	scope:class:::sub2	end:12
+/tmp/classincludes1	input.pp	/^    file { "\/tmp\/classincludes1": ensure => file, mode => '0755' }$/;"	resource	line:4	language:PuppetManifest	scope:class:::base	typeref:typename:file	end:4
+sub1	input.pp	/^class sub1 inherits base {$/;"	class	line:7	language:PuppetManifest	inherits:base	end:9
+/tmp/classincludes2	input.pp	/^    file { "\/tmp\/classincludes2": ensure => file, mode => '0755' }$/;"	resource	line:8	language:PuppetManifest	scope:class:::sub1	typeref:typename:file	end:8
+sub2	input.pp	/^class sub2 inherits base {$/;"	class	line:11	language:PuppetManifest	inherits:base	end:13
+/tmp/classincludes3	input.pp	/^    file { "\/tmp\/classincludes3": ensure => file, mode => '0755' }$/;"	resource	line:12	language:PuppetManifest	scope:class:::sub2	typeref:typename:file	end:12
 sub	input.pp	/^$sub = "sub2"$/;"	variable	line:15	language:PuppetManifest

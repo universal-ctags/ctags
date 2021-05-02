@@ -1,0 +1,17 @@
+class A<O
+end
+
+class B
+end
+
+class C<P
+      clear_paring
+end
+
+class D
+      set_paring Q
+end
+
+class E<R
+      set_paring S
+end

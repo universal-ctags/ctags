@@ -53,6 +53,7 @@ mini-geany
 mini-geany.exe
 missing
 mkinstalldirs
+optscript
 perf.data*
 readtags
 readtags.exe

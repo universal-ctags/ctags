@@ -1,0 +1,9 @@
+--fields=+n
+
+--langdef=X
+--map-X=.unknown
+--kinddef-X=d,def,definitions
+
+--regex-X=/[ \t]*def ([a-z])/\1/d/{exclusive}{{
+	. dup :line 2 mul line:
+}}

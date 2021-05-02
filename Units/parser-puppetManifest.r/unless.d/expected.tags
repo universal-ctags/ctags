@@ -1,2 +1,2 @@
 array	input.pp	/^$array = [ 3, 5, 7 ]$/;"	variable	line:1	language:PuppetManifest
-/tmp/x	input.pp	/^       file { "\/tmp\/x": }$/;"	resource	line:3	language:PuppetManifest	end:3
+/tmp/x	input.pp	/^       file { "\/tmp\/x": }$/;"	resource	line:3	language:PuppetManifest	typeref:typename:file	end:3

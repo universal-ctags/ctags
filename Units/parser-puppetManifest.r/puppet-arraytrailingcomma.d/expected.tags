@@ -1,2 +1,2 @@
-/tmp/arraytrailingcomma1	input.pp	/^    ["\/tmp\/arraytrailingcomma1","\/tmp\/arraytrailingcomma2", ]: content => "tmp"$/;"	resource	line:2	language:PuppetManifest
-/tmp/arraytrailingcomma2	input.pp	/^    ["\/tmp\/arraytrailingcomma1","\/tmp\/arraytrailingcomma2", ]: content => "tmp"$/;"	resource	line:2	language:PuppetManifest
+/tmp/arraytrailingcomma1	input.pp	/^    ["\/tmp\/arraytrailingcomma1","\/tmp\/arraytrailingcomma2", ]: content => "tmp"$/;"	resource	line:2	language:PuppetManifest	typeref:typename:file
+/tmp/arraytrailingcomma2	input.pp	/^    ["\/tmp\/arraytrailingcomma1","\/tmp\/arraytrailingcomma2", ]: content => "tmp"$/;"	resource	line:2	language:PuppetManifest	typeref:typename:file

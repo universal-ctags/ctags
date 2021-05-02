@@ -1,0 +1,14 @@
+package X
+
+def a:int = 1
+def b:str = "abc"
+
+package Y
+
+def c:name = name
+
+package Z
+
+subpackage A
+
+def f:floag = 1.9

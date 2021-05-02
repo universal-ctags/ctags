@@ -34,11 +34,20 @@
     <Filter Include="Source Files\gnu_regex">
       <UniqueIdentifier>{a49cb3ac-6c1b-4b33-9bb7-af130fadeee1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\dsl">
+      <UniqueIdentifier>{d6480ae4-8f0c-11eb-8e04-8c1645efab21}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files\Main">
       <UniqueIdentifier>{45974afc-d1c3-4696-a74a-60eeaa6e1441}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\dsl\es.c">
+      <Filter>Source Files\dsl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsl\optscript.c">
+      <Filter>Source Files\dsl</Filter>
+    </ClCompile>
     <ClCompile Include="..\fnmatch\fnmatch.c">
       <Filter>Source Files\fnmatch</Filter>
     </ClCompile>
@@ -52,6 +61,9 @@
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\colprint.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\CommonPrelude.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\debug.c">
@@ -141,6 +153,9 @@
     <ClCompile Include="..\main\routines.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\script.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\selectors.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -214,6 +229,9 @@
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\optlib\meson.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\optlib\mesonOptions.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\optlib\passwd.c">
@@ -560,6 +578,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dsl\dsl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsl/optscript.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\fnmatch\fnmatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -711,6 +735,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\routines_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\script_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\selectors.h">
