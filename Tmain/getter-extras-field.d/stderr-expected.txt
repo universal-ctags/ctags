@@ -1,0 +1,7 @@
+true
+[/reference]
+true
+[/qualified /reference]
+false
+true
+[/reference /X.foo]

@@ -48,7 +48,10 @@ extern OptVM *optscriptInit (void)
 {
 	opt_init ();
 	MIO *in  = mio_new_fp (stdin, NULL);
-	MIO *out = mio_new_fp (stdout, NULL);
+
+	/* stdout is for emitting tags.
+	 * The interpreter should not touch it; use only stderr. */
+	MIO *out = mio_new_fp (stderr, NULL);
 	MIO *err = mio_new_fp (stderr, NULL);
 
 	OptVM *optvm = opt_vm_new (in, out, err);
