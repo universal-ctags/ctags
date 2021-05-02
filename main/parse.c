@@ -210,17 +210,8 @@ extern int makeSimplePlaceholder(const vString* const name)
 
 extern bool isLanguageEnabled (const langType language)
 {
-	const parserDefinition* const lang = LanguageTable [language].def;
-
-	if (!lang->enabled)
-		return false;
-
-	if ((lang->kindTable == NULL) &&
-		(!(lang->method & METHOD_REGEX)) &&
-		(!(lang->method & METHOD_XPATH)))
-		return false;
-	else
-		return true;
+	const parserDefinition* const def = LanguageTable [language].def;
+	return def->enabled;
 }
 
 extern bool isLanguageVisible (const langType language)
@@ -422,15 +413,12 @@ static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType
 
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
+		if (! isLanguageEnabled (i))
+			continue;
+
 		const parserObject* const parser = LanguageTable + i;
 		stringList* const aliases = parser->currentAliases;
 		vString* tmp;
-
-		/* isLanguageEnabled is not used here.
-		   It calls initializeParser which takes
-		   cost. */
-		if (! parser->def->enabled)
-			continue;
 
 		if (parser->def->name != NULL && strcasecmp (key, parser->def->name) == 0)
 		{
@@ -473,15 +461,12 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 	*spec = NULL;
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
+		if (! isLanguageEnabled (i))
+			continue;
+
 		parserObject *parser = LanguageTable + i;
 		stringList* const ptrns = parser->currentPatterns;
 		vString* tmp;
-
-		/* isLanguageEnabled is not used here.
-		   It calls initializeParser which takes
-		   cost. */
-		if (! parser->def->enabled)
-			continue;
 
 		if (ptrns != NULL && (tmp = stringListFileFinds (ptrns, baseName)))
 		{
@@ -494,15 +479,12 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
+		if (! isLanguageEnabled (i))
+			continue;
+
 		parserObject *parser = LanguageTable + i;
 		stringList* const exts = parser->currentExtensions;
 		vString* tmp;
-
-		/* isLanguageEnabled is not used here.
-		   It calls initializeParser which takes
-		   cost. */
-		if (! parser->def->enabled)
-			continue;
 
 		if (exts != NULL && (tmp = stringListExtensionFinds (exts,
 								     fileExtension (baseName))))
@@ -1489,9 +1471,8 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
         verbose ("	fallback[hint = %d]: %s\n", i, getLanguageName (language));
     }
 
-	/* We cannot use isLanguageEnabled() here. */
 	if (language == LANG_IGNORE
-		&& LanguageTable[LANG_FALLBACK].def->enabled)
+		&& isLanguageEnabled (LANG_FALLBACK))
 	{
 		language = LANG_FALLBACK;
 		verbose ("	last resort: using \"%s\" parser\n",
@@ -3549,8 +3530,7 @@ static void printLanguage (const langType language, parserDefinition** ltable)
 	if (lang->invisible)
 		return;
 
-	if (lang->kindTable != NULL  ||  (lang->method & METHOD_REGEX))
-		printf ("%s%s\n", lang->name, isLanguageEnabled (lang->id) ? "" : " [disabled]");
+	printf ("%s%s\n", lang->name, isLanguageEnabled (lang->id) ? "" : " [disabled]");
 }
 
 extern void printLanguageList (void)
