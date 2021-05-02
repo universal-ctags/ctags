@@ -1,0 +1,11 @@
+--langdef=X
+--map-X=.unknown
+--kinddef-X=d,def,definitions
+
+--regex-X=/[ \t]*def ([a-z])/\1/d/{exclusive}{{
+    _traced {
+	    mark . :name (-debug) _buildstring /def _tag _commit pop
+    } if
+}}
+
+--_trace=X

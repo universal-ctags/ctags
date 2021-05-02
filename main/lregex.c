@@ -43,6 +43,7 @@
 #include "routines.h"
 #include "routines_p.h"
 #include "script_p.h"
+#include "trace.h"
 #include "trashbox.h"
 #include "xtag_p.h"
 
@@ -3632,6 +3633,20 @@ static EsObject* lrop_tquit (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject* lrop_traced (OptVM *vm, EsObject *name)
+{
+#ifdef DO_TRACING
+	langType lang = getInputLanguage ();
+	if (isLanguageTraced (lang))
+		opt_vm_ostack_push (vm, es_true);
+	else
+		opt_vm_ostack_push (vm, es_false);
+#else
+	opt_vm_ostack_push (vm, es_false);
+#endif
+	return false;
+}
+
 EsObject *OPTSCRIPT_ERR_UNKNOWNEXTRA;
 static EsObject* lrop_extraenabled (OptVM *vm, EsObject *name)
 {
@@ -3843,6 +3858,12 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.fn       = lrop_advanceto,
 		.arity    = 1,
 		.help_str = "matchloc _ADVIANCETO -%"
+	},
+	{
+		.name     = "_traced",
+		.fn       = lrop_traced,
+		.arity    = 0,
+		.help_str = "- _TRACED true|false",
 	},
 };
 
