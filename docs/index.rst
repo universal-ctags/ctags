@@ -66,6 +66,7 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	interactive-mode.rst
 	news.rst
 	optlib.rst
+	optscript.rst
 	extending.rst
 	tips.rst
 	testing.rst
