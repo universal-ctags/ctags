@@ -98,9 +98,10 @@ parser does not set ``CORK_QUEUE`` to ``useCork`` field. ``writeTagEntry`` calls
 xrefWriter, and jsonWriter.
 One of them is chosen depending on the arguments passed to ctags.
 
-If ``CORK_QUEUE`` is set to ``useCork``, the tag information goes to a queue on memory.
-The queue is flushed when ``useCork`` in unset. See "`cork API`_" for more
-details.
+If ``CORK_QUEUE`` is set to ``useCork``, the tag information goes to a
+queue (**corkQueue**) on memory, and a unique integer (**corkIndex**)
+is assigned identifying the tag information.  The queue is flushed
+when ``useCork`` in unset. See "`cork API`_" for more details.
 
 cork API
 ......................................................................
