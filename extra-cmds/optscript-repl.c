@@ -23,7 +23,7 @@ help (const char* progname, int exit_status)
 		out = stdout;
 
 	fprintf (out, "Usage: %s [options] [file|-]\n\n", progname);
-	fputs   (     "  -h|-?|--help          Print this option summary\n", out);
+	fputs   (     "  -h|--help             Print this option summary\n", out);
 	fputs   (     "  -l|--list-operators   List built-in operators\n", out);
 	fputs   (     "  -e|--eval CODE        Evaluate the CODE\n", out);
 	fputc   ('\n', out);
@@ -84,7 +84,6 @@ main(int argc, char **argv)
 	for (int i = 1; i < argc; i++)
 	{
 		if (strcmp (argv[i], "-h") == 0
-			|| strcmp (argv[i], "-?") == 0
 			|| strcmp (argv[i], "--help") == 0)
 			help (argv[0], 0);
 		else if (strcmp (argv[i], "-l") == 0
