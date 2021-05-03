@@ -1,25 +1,25 @@
-A	input.md	/^# A$/;"	chapter	sectionMarker:#
-B	input.md	/^### B$/;"	subsection	chapter:A	sectionMarker:#
-C	input.md	/^## C$/;"	section	chapter:A	sectionMarker:#
-D	input.md	/^### D$/;"	subsection	section:A|C	sectionMarker:#
-E	input.md	/^## E$/;"	section	chapter:A	sectionMarker:#
-F	input.md	/^# F$/;"	chapter	sectionMarker:#
-H	input.md	/^###### H$/;"	l5subsection	chapter:F	sectionMarker:#
-I	input.md	/^##### I$/;"	l4subsection	chapter:F	sectionMarker:#
-J	input.md	/^#### J$/;"	subsubsection	chapter:F	sectionMarker:#
-K	input.md	/^### K$/;"	subsection	chapter:F	sectionMarker:#
-L	input.md	/^## L$/;"	section	chapter:F	sectionMarker:#
-M	input.md	/^# M$/;"	chapter	sectionMarker:#
-N	input.md	/^### N ###$/;"	subsection	chapter:M	sectionMarker:##
-O	input.md	/^## O ##$/;"	section	chapter:M	sectionMarker:##
-P	input.md	/^###### P ######$/;"	l5subsection	section:M|O	sectionMarker:##
-Q	input.md	/^### Q ###$/;"	subsection	section:M|O	sectionMarker:##
-R	input.md	/^###### R ######$/;"	l5subsection	subsection:M|O|Q	sectionMarker:##
-S	input.md	/^S$/;"	chapter	sectionMarker:=
-T	input.md	/^###### T ######$/;"	l5subsection	chapter:S	sectionMarker:##
-U	input.md	/^U$/;"	section	chapter:S	sectionMarker:-
-V	input.md	/^# V #$/;"	chapter	sectionMarker:##
-W	input.md	/^W$/;"	section	chapter:V	sectionMarker:-
-X	input.md	/^X$/;"	chapter	sectionMarker:=
-Y	input.md	/^#### Y ####$/;"	subsubsection	chapter:X	sectionMarker:##
-Z	input.md	/^###### Z ######$/;"	l5subsection	subsubsection:X|Y	sectionMarker:##
+A	input.md	/^# A$/;"	chapter	end:10	sectionMarker:#
+B	input.md	/^### B$/;"	subsection	chapter:A	end:4	sectionMarker:#
+C	input.md	/^## C$/;"	section	chapter:A	end:8	sectionMarker:#
+D	input.md	/^### D$/;"	subsection	section:A|C	end:8	sectionMarker:#
+E	input.md	/^## E$/;"	section	chapter:A	end:10	sectionMarker:#
+F	input.md	/^# F$/;"	chapter	end:22	sectionMarker:#
+H	input.md	/^###### H$/;"	l5subsection	chapter:F	end:14	sectionMarker:#
+I	input.md	/^##### I$/;"	l4subsection	chapter:F	end:16	sectionMarker:#
+J	input.md	/^#### J$/;"	subsubsection	chapter:F	end:18	sectionMarker:#
+K	input.md	/^### K$/;"	subsection	chapter:F	end:20	sectionMarker:#
+L	input.md	/^## L$/;"	section	chapter:F	end:22	sectionMarker:#
+M	input.md	/^# M$/;"	chapter	end:34	sectionMarker:#
+N	input.md	/^### N ###$/;"	subsection	chapter:M	end:26	sectionMarker:##
+O	input.md	/^## O ##$/;"	section	chapter:M	end:34	sectionMarker:##
+P	input.md	/^###### P ######$/;"	l5subsection	section:M|O	end:30	sectionMarker:##
+Q	input.md	/^### Q ###$/;"	subsection	section:M|O	end:34	sectionMarker:##
+R	input.md	/^###### R ######$/;"	l5subsection	subsection:M|O|Q	end:34	sectionMarker:##
+S	input.md	/^S$/;"	chapter	end:42	sectionMarker:=
+T	input.md	/^###### T ######$/;"	l5subsection	chapter:S	end:39	sectionMarker:##
+U	input.md	/^U$/;"	section	chapter:S	end:42	sectionMarker:-
+V	input.md	/^# V #$/;"	chapter	end:47	sectionMarker:##
+W	input.md	/^W$/;"	section	chapter:V	end:47	sectionMarker:-
+X	input.md	/^X$/;"	chapter	end:53	sectionMarker:=
+Y	input.md	/^#### Y ####$/;"	subsubsection	chapter:X	end:53	sectionMarker:##
+Z	input.md	/^###### Z ######$/;"	l5subsection	subsubsection:X|Y	end:53	sectionMarker:##
