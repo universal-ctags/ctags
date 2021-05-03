@@ -8,14 +8,15 @@
 #include "xtag.h"
 
 
-static void initializeTfParser (const langType language CTAGS_ATTR_UNUSED)
+static void initializeTerraformParser (const langType language CTAGS_ATTR_UNUSED)
 {
 }
 
-extern parserDefinition* TfParser (void)
+extern parserDefinition* TerraformParser (void)
 {
 	static const char *const extensions [] = {
-		"tf.tfvars",
+		"tf",
+		"tfvars",
 		NULL
 	};
 
@@ -27,7 +28,27 @@ extern parserDefinition* TfParser (void)
 		NULL
 	};
 
-	static tagRegexTable TfTagRegexTable [] = {
+	static kindDefinition TerraformKindTable [] = {
+		{
+		  true, 'r', "Resource", "Terraform Resource",
+		},
+		{
+		  true, 'd', "Data", "Terraform Data",
+		},
+		{
+		  true, 'v', "Variable", "Terraform Variable",
+		},
+		{
+		  true, 'p', "Provider", "Terraform Provider",
+		},
+		{
+		  true, 'm', "Module", "Terraform Module",
+		},
+		{
+		  true, 'o', "Output", "Terraform Output",
+		},
+	};
+	static tagRegexTable TerraformTagRegexTable [] = {
 		{"^[[:space:]]*resource[[:space:]]*\"([^\"]*)\"[[:space:]]*\"([^\"]*)\"", "\\2",
 		"r,Resource", NULL, NULL, false},
 		{"^[[:space:]]*data[[:space:]]*\"([^\"]*)\"[[:space:]]*\"([^\"]*)\"", "\\2",
@@ -45,16 +66,18 @@ extern parserDefinition* TfParser (void)
 	};
 
 
-	parserDefinition* const def = parserNew ("tf");
+	parserDefinition* const def = parserNew ("terraform");
 
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->tagRegexTable = TfTagRegexTable;
-	def->tagRegexCount = ARRAY_SIZE(TfTagRegexTable);
-	def->initialize    = initializeTfParser;
+	def->kindTable     = TerraformKindTable;
+	def->kindCount     = ARRAY_SIZE(TerraformKindTable);
+	def->tagRegexTable = TerraformTagRegexTable;
+	def->tagRegexCount = ARRAY_SIZE(TerraformTagRegexTable);
+	def->initialize    = initializeTerraformParser;
 
 	return def;
 }
