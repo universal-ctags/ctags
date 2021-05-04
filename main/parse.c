@@ -2153,10 +2153,7 @@ extern void processLanguageDefineOption (
 		error (FATAL, "No language specified for \"%s\" option", option);
 	}
 	else if (getNamedLanguage (name, 0) != LANG_IGNORE)
-	{
-		/* name cannot be freed because it is used in the FATAL message. */
-		error (FATAL, "Language \"%s\" already defined", name);
-	}
+		error (FATAL|DELAYED, "Language \"%s\" already defined", name);
 	else if (strcmp(name, RSV_LANG_ALL) == 0)
 	{
 		eFree (name);
