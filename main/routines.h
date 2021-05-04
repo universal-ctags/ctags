@@ -34,21 +34,13 @@
 *   DATA DECLARATIONS
 */
 typedef int errorSelection;
-enum eErrorTypes {
-	FATAL   = 1 << 0,
-	WARNING = 1 << 1,
-	NOTICE  = 1 << 2,
-	PERROR  = 1 << 3,
-	DELAYED = 1 << 4,
-};
+enum eErrorTypes { FATAL = 1, WARNING = 2, NOTICE = 4, PERROR = 8, };
 
 /*
 *   FUNCTION PROTOTYPES
 */
 extern void error (const errorSelection selection, const char *const format, ...) CTAGS_ATTR_PRINTF (2, 3);
 #define notice(...) error (NOTICE, __VA_ARGS__)
-
-extern void flushDelayedMsgQeueue (void);
 
 /* Memory allocation functions */
 #ifdef NEED_PROTO_MALLOC

@@ -75,9 +75,6 @@ extern void vStringNCatSUnsafe (vString *const string, const char *const s, cons
 extern vString *vStringNewCopy (const vString *const string);
 extern vString *vStringNewInit (const char *const s);
 extern vString *vStringNewNInit (const char *const s, const size_t length);
-extern vString *vStringNewPrintf (const char *format, ...) CTAGS_ATTR_PRINTF (1, 2);
-extern vString *vStringNewVPrintf (const char *const format, va_list ap);
-
 extern void vStringCopy (vString *const string, const vString *const s);
 extern void vStringCopyS (vString *const string, const char *const s);
 extern void vStringNCopy (vString *const string, const vString *const s, const size_t length);

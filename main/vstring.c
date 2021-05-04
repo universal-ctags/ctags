@@ -101,38 +101,6 @@ extern vString *vStringNewNInit (const char *const s, const size_t length)
 	return vs;
 }
 
-extern vString *vStringNewVPrintf (const char *const format, va_list ap)
-{
-	static MIO *mio;
-	if (mio == NULL)
-	{
-		mio = mio_new_memory (NULL, 0, eRealloc, eFreeNoNullCheck);
-		DEFAULT_TRASH_BOX(mio, mio_unref);
-	}
-	else
-		mio_try_resize (mio, 0);
-
-	mio_vprintf (mio, format, ap);
-
-	size_t size;
-	unsigned char *data = mio_memory_get_data (mio, &size);
-
-	if (data == NULL)
-		return vStringNew ();
-
-	return vStringNewNInit ((char *)data, size);
-}
-
-extern vString *vStringNewPrintf (const char *format, ...)
-{
-	va_list ap;
-	va_start (ap, format);
-	vString *s = vStringNewVPrintf (format, ap);
-	va_end (ap);
-
-	return s;
-}
-
 static void stringCat (
 		vString *const string, const char *const s, const size_t length)
 {
