@@ -3,4 +3,4 @@
 
 CTAGS=$1
 
-${CTAGS} -o - --options=x.ctags input.unknown
+${CTAGS} --quiet --options=NONE -o - --options=x.ctags input.unknown
