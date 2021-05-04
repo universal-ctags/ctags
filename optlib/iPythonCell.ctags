@@ -1,0 +1,23 @@
+#
+#  iPythonCell.ctags --- a parser for python with IPythonCell comments
+#
+#  Copyright (c) 2021 Masatake YAMATO
+#  Copyright (c) 2021 Red Hat, Inc.
+#
+#  This source code is released for free distribution under the terms of the
+#  GNU General Public License version 2 or (at your option) any later version.
+#
+# References:
+#
+# - https://github.com/hanschen/vim-ipython-cell
+#
+# `##' cell format is disabled by default because it can cause too much
+# false-positive tagging. Use `--extras-IPythonCell=+{doubleSharps}'
+# to enable it.
+#
+--langdef=IPythonCell{base=Python}
+--kinddef-IPythonCell=c,cell,cells
+--_extradef-IPythonCell=doubleSharps, Include cells starting from ##
+
+--regex-IPythonCell=/^[ \t]*(# ?%%|# <codecell>)[ \t]*(.*[^ \t])$/\2/c/{exclusive}
+--regex-IPythonCell=/^[ \t]*##[ \t]*(.*[^ \t])$/\1/c/{_extra=doubleSharps}{exclusive}
