@@ -1,0 +1,4 @@
+--sort=no
+--fields=+{language}{extras}
+--extras=+{subparser}
+--regex-IPythonCell=/[ \t]*# CTAGS:[ ]?(.*)$/\1/c/
