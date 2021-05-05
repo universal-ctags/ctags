@@ -124,9 +124,8 @@ extern void vStringNCat (
 extern void vStringNCatS (
 		vString *const string, const char *const s, const size_t length)
 {
-	size_t len = strlen (s);
+	size_t len = strnlen (s, length);
 
-	len = len < length ? len : length;
 	stringCat (string, s, len);
 }
 
