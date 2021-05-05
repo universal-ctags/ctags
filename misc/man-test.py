@@ -57,6 +57,13 @@ def verify_test_case(t):
         msg = prefix + msg
     return msg
 
+def is_option(c):
+    if re.search('--[a-z_].*', c):
+        return True
+    elif re.search('^-[a-z]$', c):
+        return True
+    return False
+
 def run_test_case(tmpdir, ctags, t):
     d = tmpdir + '/' + str(os.getpid())
     os.makedirs (d,exist_ok=True)
@@ -76,13 +83,25 @@ def run_test_case(tmpdir, ctags, t):
 
     inputf=None
     with open(O, mode='w', encoding='utf-8') as Of:
+        in_pattern = False
         for c in t['cmdline'].split():
             if c == '--options=NONE':
                 continue
             elif c.startswith('input.'):
                 inputf = c
                 continue
-            print (c, file=Of)
+            elif c.startswith('--regex-'):
+                in_pattern = c
+            elif in_pattern and not is_option(c):
+                # TODO: This doesn't work if whitespace is repeated.
+                in_pattern = in_pattern + ' ' + c
+            else:
+                if in_pattern:
+                    print (in_pattern, file=Of)
+                    in_pattern = False
+                print (c, file=Of)
+        if in_pattern:
+            print (in_pattern, file=Of)
 
     with open(o, mode='w', encoding='utf-8') as h:
         cmdline = [ctags, '--quiet', '--options=NONE',
