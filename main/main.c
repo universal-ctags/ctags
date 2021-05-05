@@ -578,8 +578,8 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	initializeParsing ();
 	testEtagsInvocation ();
 	initOptions ();
-	readOptionConfiguration ();
 	initRegexOptscript ();
+	readOptionConfiguration ();
 	verbose ("Reading initial options from command line\n");
 	parseCmdlineOptions (args);
 	checkOptions ();
