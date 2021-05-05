@@ -48,6 +48,7 @@ IN_SOURCE_FILES = \
 	ctags-client-tools.7.rst.in \
 	ctags-faq.7.rst.in \
 	\
+	ctags-lang-iPythonCell.7.rst.in \
 	ctags-lang-julia.7.rst.in \
 	ctags-lang-python.7.rst.in \
 	ctags-lang-verilog.7.rst.in \

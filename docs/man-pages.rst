@@ -12,6 +12,7 @@ Man pages
 	ctags-optlib(7) <man/ctags-optlib.7.rst>
 	ctags-client-tools(7) <man/ctags-client-tools.7.rst>
 	ctags-faq(7) <man/ctags-faq.7.rst>
+	ctags-lang-iPythonCell(7) <man/ctags-lang-iPythonCell.7.rst>
 	ctags-lang-julia(7) <man/ctags-lang-julia.7.rst>
 	ctags-lang-python(7) <man/ctags-lang-python.7.rst>
 	ctags-lang-verilog(7) <man/ctags-lang-verilog.7.rst>

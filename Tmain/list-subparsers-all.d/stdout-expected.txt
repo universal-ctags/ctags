@@ -5,6 +5,7 @@ Automake             Make       base <= sub {dedicated}
 DBusIntrospect       XML        base <> sub {bidirectional}
 FunctionParameters   Perl       base <> sub {bidirectional}
 Glade                XML        base <> sub {bidirectional}
+IPythonCell          Python     base => sub {shared}
 ITcl                 Tcl        base <> sub {bidirectional}
 Maven2               XML        base <> sub {bidirectional}
 Moose                Perl       base <> sub {bidirectional}

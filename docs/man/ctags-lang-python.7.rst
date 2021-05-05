@@ -283,4 +283,4 @@ ctags has to analyze "Callable[[int], int]" deeper. We don't want to do so.
 
 SEE ALSO
 --------
-:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`
+:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`, :ref:`ctags-lang-iPythonCell(7) <ctags-lang-iPythonCell(7)>`

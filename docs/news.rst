@@ -410,6 +410,7 @@ The following parsers have been added:
 * Go
 * Haskell
 * Haxe
+* iPythonCell *optlib*, *pthon based subparser*
 * Inko *optlib*
 * JavaProperties
 * JSON

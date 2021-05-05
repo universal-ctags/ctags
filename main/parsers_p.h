@@ -92,6 +92,7 @@
 	HtmlParser, \
 	IniconfParser, \
 	InkoParser, \
+	IPythonCellParser, \
 	ITclParser, \
 	JavaParser, \
 	JavaPropertiesParser, \

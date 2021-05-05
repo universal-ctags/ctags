@@ -1,0 +1,4 @@
+x	input.py	/^x=1$/;"	v	language:Python
+DEFINE F	input.py	/^# CTAGS: DEFINE F$/;"	c	language:IPythonCell	extras:subparser
+F	input.py	/^def F():$/;"	f	language:Python
+DO NOTING	input.py	/^    # CTAGS: DO NOTING$/;"	c	language:IPythonCell	extras:subparser

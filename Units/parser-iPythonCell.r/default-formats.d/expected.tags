@@ -1,0 +1,27 @@
+np	input.py	/^import numpy as np$/;"	I	language:Python	nameref:module:numpy
+plt	input.py	/^from matplotlib import pyplot as plt$/;"	x	language:Python	nameref:unknown:pyplot
+generate sound	input.py	/^# %% generate sound$/;"	c	language:IPythonCell
+f	input.py	/^f = 12000$/;"	v	language:Python
+fs	input.py	/^fs = 44100$/;"	v	language:Python
+t	input.py	/^t = np.arange(0, 1, 1\/fs)$/;"	v	language:Python
+sound	input.py	/^sound = np.sin(2*np.pi*f * t)$/;"	v	language:Python
+plot sound	input.py	/^# %% plot sound$/;"	c	language:IPythonCell
+play sound	input.py	/^# %% play sound$/;"	c	language:IPythonCell
+no space	input.py	/^#%% no space$/;"	c	language:IPythonCell
+a	input.py	/^a=1$/;"	v	language:Python
+% extra percent chars with space	input.py	/^# %%% extra percent chars with space$/;"	c	language:IPythonCell
+b	input.py	/^b=1$/;"	v	language:Python
+% extra percent chars without space	input.py	/^#%%% extra percent chars without space$/;"	c	language:IPythonCell
+c	input.py	/^c=1$/;"	v	language:Python
+f	input.py	/^def f():$/;"	f	language:Python
+no space with prefix	input.py	/^    #%% no space with prefix$/;"	c	language:IPythonCell
+g	input.py	/^def g():$/;"	f	language:Python
+% extra percent chars with space and prefix	input.py	/^    # %%% extra percent chars with space and prefix$/;"	c	language:IPythonCell
+h	input.py	/^def h():$/;"	f	language:Python
+% extra percent chars without space with prefix	input.py	/^    #%%% extra percent chars without space with prefix$/;"	c	language:IPythonCell
+triangle without space	input.py	/^# <codecell>triangle without space$/;"	c	language:IPythonCell
+A	input.py	/^A=1$/;"	v	language:Python
+triangle with space	input.py	/^# <codecell> triangle with space$/;"	c	language:IPythonCell
+B	input.py	/^B=1$/;"	v	language:Python
+F	input.py	/^def F():$/;"	f	language:Python
+triangle with space and prefix	input.py	/^    # <codecell> triangle with space and prefix$/;"	c	language:IPythonCell
