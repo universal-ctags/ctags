@@ -135,9 +135,13 @@ for tags in $tagfiles; do
 	# remove it, plus the extra newline, using variable substitutions.
 	# Note: we use "printf '%s\n'" instead of "echo" because Dash's "echo"
 	# unconditionally expands some sequences, like "\t" and alike.
-	t="$(printf '%s\n' "$name" | expandEscapeSequences; printf _)"
-	t="${t%
-_}"
+    if [ "$name" = "\r" ] ; then
+        t="$(printf "\r")"
+    elif [ "$name" = "\n" ] ; then
+        t="$IFS"
+    else
+        t="$(printf '%s\n' "$name" | expandEscapeSequences)"
+    fi
 	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$t" | wc -l) ]; then
 	    printf 'FAILED: "%s" -t "%s" - "%s"\n' "${READTAGS}" "$tags" "$t"
 	    printf '	The raw tag name was "%s"\n' "$name"
