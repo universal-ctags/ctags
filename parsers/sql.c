@@ -117,6 +117,7 @@ enum eKeywordId {
 	KEYWORD_on,
 	KEYWORD_package,
 	KEYWORD_pragma,
+	KEYWORD_inquiry_directive,
 	KEYWORD_primary,
 	KEYWORD_procedure,
 	KEYWORD_publication,
@@ -326,6 +327,27 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "without",						KEYWORD_without			      },
 };
 
+const static struct keywordGroup predefinedInquiryDirective = {
+	.value = KEYWORD_inquiry_directive,
+	.addingUnlessExisting = false,
+	.keywords = {
+		/* https://docs.oracle.com/en/database/oracle/oracle-database/18/lnpls/plsql-language-fundamentals.html#GUID-3DABF5E1-AC84-448B-810F-31196991EA10 */
+		"PLSQL_LINE",
+		"PLSQL_UNIT",
+		"PLSQL_UNIT_OWNER",
+		"PLSQL_UNIT_TYPE",
+		/* https://docs.oracle.com/en/database/oracle/oracle-database/18/lnpls/overview.html#GUID-DF63BC59-22C2-4BA8-9240-F74D505D5102 */
+		"PLSCOPE_SETTINGS",
+		"PLSQL_CCFLAGS",
+		"PLSQL_CODE_TYPE",
+		"PLSQL_OPTIMIZE_LEVEL",
+		"PLSQL_WARNINGS",
+		"NLS_LENGTH_SEMANTICS",
+		"PERMIT_92_WRAP_FORMAT",
+		NULL
+	},
+};
+
 /* A table representing whether a keyword is "reserved word" or not.
  * "reserved word" cannot be used as an name.
  * See https://dev.mysql.com/doc/refman/8.0/en/keywords.html about the
@@ -388,6 +410,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	[KEYWORD_handler]       = {0 & 0&0&0&0 & 0&0 & 0},
 	[KEYWORD_if]            = {1 & 0&0&0&0 & 0&1 & 1},
 	[KEYWORD_index]         = {1 & 0&0&0&0 & 1&1 & 1},
+	[KEYWORD_inquiry_directive] = {        0        },
 	[KEYWORD_internal]      = {1 & 0&1&1&0 & 0&0 & 0},
 	[KEYWORD_is]            = {0, SqlReservedWordPredicatorForIsOrAs},
 	[KEYWORD_local]         = {0 & 0&1&1&1 & 0&0 & 0},
@@ -622,7 +645,12 @@ static void parseIdentifier (vString *const string, const int firstChar)
 }
 
 /* Parse a PostgreSQL: dollar-quoted string
- * https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING */
+ * https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING
+ *
+ * The syntax for dollar-quoted string ca collide with PL/SQL inquiry directive ($$name).
+ * https://docs.oracle.com/en/database/oracle/oracle-database/18/lnpls/plsql-language-fundamentals.html#GUID-E918087C-D5A8-4CEE-841B-5333DE6D4C15
+ * https://github.com/universal-ctags/ctags/issues/3006
+ */
 static tokenType parseDollarQuote (vString *const string, const int delimiter)
 {
 	unsigned int len = 0;
@@ -640,6 +668,7 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 			break;
 	}
 	tag[len] = 0;
+	bool empty_tag = (len == 2);
 
 	if (c != delimiter)
 	{
@@ -651,7 +680,26 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 	while ((c = getcFromInputFile ()) != EOF)
 	{
 		if (c != delimiter)
+		{
 			vStringPut (string, c);
+			if (empty_tag
+				&& KEYWORD_inquiry_directive == lookupCaseKeyword (vStringValue (string),
+																   Lang_sql))
+			{
+				/* PL/SQL inquiry directives */
+				int c0 = getcFromInputFile ();
+
+				if (c0 != delimiter && (isalnum(c0) || c0 == '_'))
+				{
+					vStringPut (string, c0);
+					continue;
+				}
+
+				ungetcToInputFile (c0);
+				/* Oracle PL/SQL's inquiry directive ($$name) */
+				return TOKEN_UNDEFINED;
+			}
+		}
 		else
 		{
 			char *end_p = tag;
@@ -2737,6 +2785,7 @@ static void initialize (const langType language)
 {
 	Assert (ARRAY_SIZE (SqlKinds) == SQLTAG_COUNT);
 	Lang_sql = language;
+	addKeywordGroup (&predefinedInquiryDirective, language);
 }
 
 static void findSqlTags (void)
