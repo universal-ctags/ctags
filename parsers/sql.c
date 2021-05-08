@@ -710,13 +710,13 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 				end_p++;
 			}
 
+			if (c != EOF)
+				ungetcToInputFile (c);
+
 			if (! *end_p) /* full tag match */
 				break;
 			else
-			{
-				ungetcToInputFile (c);
 				vStringNCatS (string, tag, (size_t) (end_p - tag));
-			}
 		}
 	}
 
