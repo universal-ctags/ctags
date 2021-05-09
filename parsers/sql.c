@@ -670,11 +670,13 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 			break;
 	}
 	tag[len] = 0;
+
 	bool empty_tag = (len == 2);
 
 	if (c != delimiter)
 	{
 		/* damn that's not valid, what can we do? */
+		ungetcToInputFile (c);
 		return TOKEN_UNDEFINED;
 	}
 
