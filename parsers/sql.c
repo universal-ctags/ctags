@@ -646,6 +646,11 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
+static bool isCCFlag(const char *str)
+{
+	return (anyKindEntryInScope(CORK_NIL, str, SQLTAG_PLSQL_CCFLAGS) != 0);
+}
+
 /* Parse a PostgreSQL: dollar-quoted string
  * https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING
  *
@@ -687,8 +692,9 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 		{
 			vStringPut (string, c);
 			if (empty_tag
-				&& KEYWORD_inquiry_directive == lookupCaseKeyword (vStringValue (string),
-																   Lang_sql))
+				&& (KEYWORD_inquiry_directive == lookupCaseKeyword (vStringValue (string),
+																	Lang_sql)
+					|| isCCFlag(vStringValue (string))))
 			{
 				/* PL/SQL inquiry directives */
 				int c0 = getcFromInputFile ();
@@ -2753,7 +2759,8 @@ static void parseCCFLAGS (tokenInfo *const token)
 			if (lookupCaseKeyword(vStringValue(ccflag), Lang_sql)
 				!= KEYWORD_inquiry_directive)
 			{
-				makeSimpleTag(ccflag, SQLTAG_PLSQL_CCFLAGS);
+				int index = makeSimpleTag(ccflag, SQLTAG_PLSQL_CCFLAGS);
+				registerEntry(index);
 				vStringClear(ccflag);
 				in_var = false;
 			}
@@ -2857,5 +2864,6 @@ extern parserDefinition* SqlParser (void)
 	def->initialize = initialize;
 	def->keywordTable = SqlKeywordTable;
 	def->keywordCount = ARRAY_SIZE (SqlKeywordTable);
+	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	return def;
 }
