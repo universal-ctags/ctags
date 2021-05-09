@@ -80,7 +80,6 @@
 			verbose ("Entering configuration stage: loading %s\n", StageDescription[Stage]); \
 		}																\
 	} while (0)
-#define ACCEPT(STAGE) (1UL << OptionLoadingStage##STAGE)
 
 /*
 *   Data declarations
@@ -190,6 +189,16 @@ struct localOptionValues {
 	.machinable = false,
 	.withListHeader = true,
 };
+
+typedef enum eOptionLoadingStage {
+	OptionLoadingStageNone,
+	OptionLoadingStageCustom,
+	OptionLoadingStageXdg,
+	OptionLoadingStageHomeRecursive,
+	OptionLoadingStageCurrentRecursive,
+	OptionLoadingStageEnvVar,
+	OptionLoadingStageCmdline,
+} OptionLoadingStage;
 
 static OptionLoadingStage Stage = OptionLoadingStageNone;
 #define STAGE_ANY ~0UL
@@ -594,14 +603,9 @@ static struct Feature {
 static const char *const StageDescription [] = {
 	[OptionLoadingStageNone]   = "not initialized",
 	[OptionLoadingStageCustom] = "custom file",
-	[OptionLoadingStageDosCnf] = "DOS .cnf file",
-	[OptionLoadingStageEtc] = "file under /etc (e.g. ctags.conf)",
-	[OptionLoadingStageLocalEtc] = "file under /usr/local/etc (e.g. ctags.conf)",
 	[OptionLoadingStageXdg] = "file(s) under $XDG_CONFIG_HOME and $HOME/.config",
 	[OptionLoadingStageHomeRecursive] = "file(s) under $HOME",
 	[OptionLoadingStageCurrentRecursive] = "file(s) under the current directory",
-	[OptionLoadingStagePreload] = "optlib preload files",
-	[OptionLoadingStageEnvVar] = "environment variable",
 	[OptionLoadingStageCmdline] = "command line",
 };
 
@@ -3780,40 +3784,10 @@ static void parseConfigurationFileOptions (void)
 	preload (preload_path_list);
 }
 
-static void parseEnvironmentOptions (void)
-{
-	const char *envOptions = NULL;
-	const char* var = NULL;
-
-	ENTER(EnvVar);
-	if (Option.etags)
-	{
-		var = ETAGS_ENVIRONMENT;
-		envOptions = getenv (var);
-	}
-	if (envOptions == NULL)
-	{
-		var = CTAGS_ENVIRONMENT;
-		envOptions = getenv (var);
-	}
-	if (envOptions != NULL  &&  envOptions [0] != '\0')
-	{
-		cookedArgs* const args = cArgNewFromString (envOptions);
-		verbose ("Reading options from $CTAGS\n");
-		parseOptions (args);
-		cArgDelete (args);
-		if (NonOptionEncountered)
-			error (WARNING, "Ignoring non-option in %s variable", var);
-	}
-}
-
 extern void readOptionConfiguration (void)
 {
 	if (! SkipConfiguration)
-	{
 		parseConfigurationFileOptions ();
-		parseEnvironmentOptions ();
-	}
 }
 
 /*

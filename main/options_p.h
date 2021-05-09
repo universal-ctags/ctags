@@ -70,20 +70,6 @@ typedef enum eTagRelative {
 	TREL_NEVER,
 } tagRelative;
 
-typedef enum eOptionLoadingStage {
-	OptionLoadingStageNone,
-	OptionLoadingStageCustom,
-	OptionLoadingStageDosCnf,
-	OptionLoadingStageEtc,
-	OptionLoadingStageLocalEtc,
-	OptionLoadingStageXdg,
-	OptionLoadingStageHomeRecursive,
-	OptionLoadingStageCurrentRecursive,
-	OptionLoadingStagePreload,
-	OptionLoadingStageEnvVar,
-	OptionLoadingStageCmdline,
-} OptionLoadingStage;
-
 /*  This stores the command line options.
  */
 typedef struct sOptionValues {
