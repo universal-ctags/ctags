@@ -27,8 +27,6 @@ struct sQCode
 /*
  * DATA DEFINITIONS
  */
-static DSLProcBind pbinds [] = {
-};
 
 
 /*
@@ -41,7 +39,7 @@ static int initialize (void)
 	if (initialized)
 		return 1;
 
-	if (!dsl_init (DSL_QUALIFIER, pbinds, sizeof(pbinds)/sizeof(pbinds [0])))
+	if (!dsl_init (DSL_QUALIFIER, NULL, 0))
 	{
 		fprintf(stderr, "MEMORY EXHAUSTED\n");
 		return 0;
