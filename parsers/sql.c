@@ -216,6 +216,7 @@ typedef enum {
 	SQLTAG_MLTABLE,
 	SQLTAG_MLCONN,
 	SQLTAG_MLPROP,
+	SQLTAG_PLSQL_CCFLAGS,
 	SQLTAG_COUNT
 } sqlKind;
 
@@ -243,6 +244,7 @@ static kindDefinition SqlKinds [] = {
 	{ true,  'x', "mltable",	  "MobiLink Table Scripts" },
 	{ true,  'y', "mlconn",		  "MobiLink Conn Scripts"  },
 	{ true,  'z', "mlprop",		  "MobiLink Properties "   }
+	{ true,  'C', "ccflag",		  "PLSQL_CCFLAGS"          },
 };
 
 static const keywordTable SqlKeywordTable [] = {
@@ -2720,12 +2722,57 @@ static void parseComment (tokenInfo *const token)
 	findCmdTerm (token, true);
 }
 
+static void parseCCFLAGS (tokenInfo *const token)
+{
+	readToken(token);
+	if (!isType (token, TOKEN_EQUAL))
+	{
+		findCmdTerm (token, true);
+		return;
+	}
+
+	readToken(token);
+	if (!isType (token, TOKEN_STRING))
+	{
+		findCmdTerm (token, true);
+		return;
+	}
+
+	bool in_var = true;
+	const char *s = vStringValue(token->string);
+	vString *ccflag = vStringNew();
+	/* http://web.deu.edu.tr/doc/oracle/B19306_01/server.102/b14237/initparams158.htm#REFRN10261 */
+	while (*s)
+	{
+		if (in_var && isIdentChar1((int)*s))
+			vStringPut(ccflag, *s);
+		else if (*s == ':' && !vStringIsEmpty(ccflag))
+		{
+			if (lookupCaseKeyword(vStringValue(ccflag), Lang_sql)
+				!= KEYWORD_inquiry_directive)
+			{
+				makeSimpleTag(ccflag, SQLTAG_PLSQL_CCFLAGS);
+				vStringClear(ccflag);
+				in_var = false;
+			}
+		}
+		else if (*s == ',')
+			in_var = true;
+		s++;
+	}
+	vStringDelete(ccflag);
+
+}
 
 static void parseKeywords (tokenInfo *const token)
 {
 		switch (token->keyword)
 		{
 			case KEYWORD_begin:			parseBlock (token, false); break;
+			case KEYWORD_inquiry_directive:
+				if (strcasecmp(vStringValue(token->string), "PLSQL_CCFLAGS") == 0)
+					parseCCFLAGS (token);
+				break;
 			case KEYWORD_comment:		parseComment (token); break;
 			case KEYWORD_cursor:		parseSimple (token, SQLTAG_CURSOR); break;
 			case KEYWORD_datatype:		parseDomain (token); break;
