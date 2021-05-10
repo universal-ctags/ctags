@@ -795,7 +795,7 @@ extern langType getLanguageComponentInOptionFull (const char *const option,
 	sep = strpbrk (lang, ":.");
 	if (sep)
 		lang_len = sep - lang;
-	language = getNamedLanguageFull (lang, lang_len, noPretending);
+	language = getNamedLanguageFull (lang, lang_len, noPretending, false);
 	if (language == LANG_IGNORE)
 	{
 		const char *langName = (lang_len == 0)? lang: eStrndup (lang, lang_len);
