@@ -49,6 +49,9 @@ extern bool stringListExtensionMatched (const stringList* const list, const char
 extern vString* stringListExtensionFinds (const stringList* const list, const char* const extension);
 extern bool stringListFileMatched (const stringList* const list, const char* const str);
 extern vString* stringListFileFinds (const stringList* const list, const char* const str);
+extern bool stringListCaseMatched (const stringList* const list, const char* const str);
+extern vString* stringListCaseFinds (const stringList* const list, const char* const str);
+
 extern void stringListPrint (const stringList *const current, FILE *fp);
 extern void stringListReverse (const stringList *const current);
 

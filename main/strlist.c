@@ -212,6 +212,16 @@ extern vString* stringListExtensionFinds (
 #endif
 }
 
+extern bool stringListCaseMatched (const stringList* const list, const char* const str)
+{
+	return stringListCaseFinds(list, str)? true: false;
+}
+
+extern vString* stringListCaseFinds (const stringList* const list, const char* const str)
+{
+	return stringListFinds (list, str, compareStringInsensitive);
+}
+
 static bool fileNameMatched (
 		const vString* const vpattern, const char* const fileName)
 {
