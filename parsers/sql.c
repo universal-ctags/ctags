@@ -117,6 +117,7 @@ enum eKeywordId {
 	KEYWORD_on,
 	KEYWORD_package,
 	KEYWORD_pragma,
+	KEYWORD_inquiry_directive,
 	KEYWORD_primary,
 	KEYWORD_procedure,
 	KEYWORD_publication,
@@ -215,6 +216,7 @@ typedef enum {
 	SQLTAG_MLTABLE,
 	SQLTAG_MLCONN,
 	SQLTAG_MLPROP,
+	SQLTAG_PLSQL_CCFLAGS,
 	SQLTAG_COUNT
 } sqlKind;
 
@@ -241,7 +243,8 @@ static kindDefinition SqlKinds [] = {
 	{ true,  'n', "synonym",	  "synonyms"			   },
 	{ true,  'x', "mltable",	  "MobiLink Table Scripts" },
 	{ true,  'y', "mlconn",		  "MobiLink Conn Scripts"  },
-	{ true,  'z', "mlprop",		  "MobiLink Properties "   }
+	{ true,  'z', "mlprop",		  "MobiLink Properties"    },
+	{ true,  'C', "ccflag",		  "PLSQL_CCFLAGS"          },
 };
 
 static const keywordTable SqlKeywordTable [] = {
@@ -326,6 +329,27 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "without",						KEYWORD_without			      },
 };
 
+const static struct keywordGroup predefinedInquiryDirective = {
+	.value = KEYWORD_inquiry_directive,
+	.addingUnlessExisting = false,
+	.keywords = {
+		/* https://docs.oracle.com/en/database/oracle/oracle-database/18/lnpls/plsql-language-fundamentals.html#GUID-3DABF5E1-AC84-448B-810F-31196991EA10 */
+		"PLSQL_LINE",
+		"PLSQL_UNIT",
+		"PLSQL_UNIT_OWNER",
+		"PLSQL_UNIT_TYPE",
+		/* https://docs.oracle.com/en/database/oracle/oracle-database/18/lnpls/overview.html#GUID-DF63BC59-22C2-4BA8-9240-F74D505D5102 */
+		"PLSCOPE_SETTINGS",
+		"PLSQL_CCFLAGS",
+		"PLSQL_CODE_TYPE",
+		"PLSQL_OPTIMIZE_LEVEL",
+		"PLSQL_WARNINGS",
+		"NLS_LENGTH_SEMANTICS",
+		"PERMIT_92_WRAP_FORMAT",
+		NULL
+	},
+};
+
 /* A table representing whether a keyword is "reserved word" or not.
  * "reserved word" cannot be used as an name.
  * See https://dev.mysql.com/doc/refman/8.0/en/keywords.html about the
@@ -388,6 +412,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	[KEYWORD_handler]       = {0 & 0&0&0&0 & 0&0 & 0},
 	[KEYWORD_if]            = {1 & 0&0&0&0 & 0&1 & 1},
 	[KEYWORD_index]         = {1 & 0&0&0&0 & 1&1 & 1},
+	[KEYWORD_inquiry_directive] = {        0        },
 	[KEYWORD_internal]      = {1 & 0&1&1&0 & 0&0 & 0},
 	[KEYWORD_is]            = {0, SqlReservedWordPredicatorForIsOrAs},
 	[KEYWORD_local]         = {0 & 0&1&1&1 & 0&0 & 0},
@@ -621,8 +646,18 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
+static bool isCCFlag(const char *str)
+{
+	return (anyKindEntryInScope(CORK_NIL, str, SQLTAG_PLSQL_CCFLAGS) != 0);
+}
+
 /* Parse a PostgreSQL: dollar-quoted string
- * https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING */
+ * https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING
+ *
+ * The syntax for dollar-quoted string ca collide with PL/SQL inquiry directive ($$name).
+ * https://docs.oracle.com/en/database/oracle/oracle-database/18/lnpls/plsql-language-fundamentals.html#GUID-E918087C-D5A8-4CEE-841B-5333DE6D4C15
+ * https://github.com/universal-ctags/ctags/issues/3006
+ */
 static tokenType parseDollarQuote (vString *const string, const int delimiter)
 {
 	unsigned int len = 0;
@@ -641,9 +676,12 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 	}
 	tag[len] = 0;
 
+	bool empty_tag = (len == 2);
+
 	if (c != delimiter)
 	{
 		/* damn that's not valid, what can we do? */
+		ungetcToInputFile (c);
 		return TOKEN_UNDEFINED;
 	}
 
@@ -651,7 +689,27 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 	while ((c = getcFromInputFile ()) != EOF)
 	{
 		if (c != delimiter)
+		{
 			vStringPut (string, c);
+			if (empty_tag
+				&& (KEYWORD_inquiry_directive == lookupCaseKeyword (vStringValue (string),
+																	Lang_sql)
+					|| isCCFlag(vStringValue (string))))
+			{
+				/* PL/SQL inquiry directives */
+				int c0 = getcFromInputFile ();
+
+				if (c0 != delimiter && (isalnum(c0) || c0 == '_'))
+				{
+					vStringPut (string, c0);
+					continue;
+				}
+
+				ungetcToInputFile (c0);
+				/* Oracle PL/SQL's inquiry directive ($$name) */
+				return TOKEN_UNDEFINED;
+			}
+		}
 		else
 		{
 			char *end_p = tag;
@@ -662,13 +720,13 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 				end_p++;
 			}
 
+			if (c != EOF)
+				ungetcToInputFile (c);
+
 			if (! *end_p) /* full tag match */
 				break;
 			else
-			{
-				ungetcToInputFile (c);
 				vStringNCatS (string, tag, (size_t) (end_p - tag));
-			}
 		}
 	}
 
@@ -2672,12 +2730,58 @@ static void parseComment (tokenInfo *const token)
 	findCmdTerm (token, true);
 }
 
+static void parseCCFLAGS (tokenInfo *const token)
+{
+	readToken(token);
+	if (!isType (token, TOKEN_EQUAL))
+	{
+		findCmdTerm (token, true);
+		return;
+	}
+
+	readToken(token);
+	if (!isType (token, TOKEN_STRING))
+	{
+		findCmdTerm (token, true);
+		return;
+	}
+
+	bool in_var = true;
+	const char *s = vStringValue(token->string);
+	vString *ccflag = vStringNew();
+	/* http://web.deu.edu.tr/doc/oracle/B19306_01/server.102/b14237/initparams158.htm#REFRN10261 */
+	while (*s)
+	{
+		if (in_var && isIdentChar1((int)*s))
+			vStringPut(ccflag, *s);
+		else if (*s == ':' && !vStringIsEmpty(ccflag))
+		{
+			if (lookupCaseKeyword(vStringValue(ccflag), Lang_sql)
+				!= KEYWORD_inquiry_directive)
+			{
+				int index = makeSimpleTag(ccflag, SQLTAG_PLSQL_CCFLAGS);
+				registerEntry(index);
+				vStringClear(ccflag);
+				in_var = false;
+			}
+		}
+		else if (*s == ',')
+			in_var = true;
+		s++;
+	}
+	vStringDelete(ccflag);
+
+}
 
 static void parseKeywords (tokenInfo *const token)
 {
 		switch (token->keyword)
 		{
 			case KEYWORD_begin:			parseBlock (token, false); break;
+			case KEYWORD_inquiry_directive:
+				if (strcasecmp(vStringValue(token->string), "PLSQL_CCFLAGS") == 0)
+					parseCCFLAGS (token);
+				break;
 			case KEYWORD_comment:		parseComment (token); break;
 			case KEYWORD_cursor:		parseSimple (token, SQLTAG_CURSOR); break;
 			case KEYWORD_datatype:		parseDomain (token); break;
@@ -2737,6 +2841,7 @@ static void initialize (const langType language)
 {
 	Assert (ARRAY_SIZE (SqlKinds) == SQLTAG_COUNT);
 	Lang_sql = language;
+	addKeywordGroup (&predefinedInquiryDirective, language);
 }
 
 static void findSqlTags (void)
@@ -2759,5 +2864,6 @@ extern parserDefinition* SqlParser (void)
 	def->initialize = initialize;
 	def->keywordTable = SqlKeywordTable;
 	def->keywordCount = ARRAY_SIZE (SqlKeywordTable);
+	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	return def;
 }

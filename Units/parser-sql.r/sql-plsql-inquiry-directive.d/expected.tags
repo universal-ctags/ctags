@@ -1,0 +1,14 @@
+demo_pkg	input.sql	/^create or replace package body demo_pkg is$/;"	P
+demo_pkg.test_var	input.sql	/^test_var varchar2(64) := $$PLSQL_UNIT;$/;"	v	package:demo_pkg
+test_var	input.sql	/^test_var varchar2(64) := $$PLSQL_UNIT;$/;"	v	package:demo_pkg
+demo_pkg.test_func	input.sql	/^function test_func return varchar2$/;"	f	package:demo_pkg
+test_func	input.sql	/^function test_func return varchar2$/;"	f	package:demo_pkg
+demo_pkg1	input-1.sql	/^create or replace package body demo_pkg1 is$/;"	P
+demo_pkg1.test_var1	input-1.sql	/^test_var1 varchar2(64) := $$PLSQL_UNIT_OWNER;$/;"	v	package:demo_pkg1
+test_var1	input-1.sql	/^test_var1 varchar2(64) := $$PLSQL_UNIT_OWNER;$/;"	v	package:demo_pkg1
+demo_pkg1.test_func1	input-1.sql	/^function test_func1 return varchar2$/;"	f	package:demo_pkg1
+test_func1	input-1.sql	/^function test_func1 return varchar2$/;"	f	package:demo_pkg1
+Some_Flag	input-2.sql	/^PLSQL_CCFlags = 'Some_Flag:1, PLSQL_CCFlags:99'$/;"	C
+foo	input-2.sql	/^CREATE TABLE foo($/;"	t
+foo.col	input-2.sql	/^    col text$/;"	E	table:foo
+col	input-2.sql	/^    col text$/;"	E	table:foo
