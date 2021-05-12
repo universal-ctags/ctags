@@ -3861,7 +3861,7 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.name     = "_advanceto",
 		.fn       = lrop_advanceto,
 		.arity    = 1,
-		.help_str = "matchloc _ADVIANCETO -%"
+		.help_str = "matchloc _ADVANCETO -%"
 	},
 	{
 		.name     = "_traced",
