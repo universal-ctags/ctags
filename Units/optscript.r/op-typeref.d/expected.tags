@@ -1,2 +1,6 @@
-a	input.unknown	/^def a:int = 1$/;"	d	typeref:typename:int
-b	input.unknown	/^def b:str = "abc"$/;"	d	typeref:typename:str
+T	input.unknown	/^type T$/;"	t
+a	input.unknown	/^def a:int = 1$/;"	d	typeref:postfix:int
+b	input.unknown	/^def b:str = "abc"$/;"	d	typeref:postfix:str
+c	input.unknown	/^def <boolean>c = true$/;"	d	typeref:typename:boolean
+d	input.unknown	/^def T^d = 1.0$/;"	d	typeref:type:T
+e	input.unknown	/^def float^!e = 1.0$/;"	d

@@ -1,2 +1,10 @@
 def a:int = 1
 def b:str = "abc"
+
+def <boolean>c = true
+
+type T
+
+def T^d = 1.0
+
+def float^!e = 1.0
