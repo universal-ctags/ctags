@@ -54,6 +54,7 @@ IN_SOURCE_FILES = \
 	ctags-lang-verilog.7.rst.in \
 	ctags-lang-inko.7.rst.in \
 	ctags-lang-r.7.rst.in \
+	ctags-lang-sql.7.rst.in \
 	\
 	readtags.1.rst.in \
 	\

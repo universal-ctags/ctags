@@ -259,6 +259,7 @@ man_MANS = \
 	man/ctags-lang-verilog.7 \
 	man/ctags-lang-inko.7 \
 	man/ctags-lang-r.7 \
+	man/ctags-lang-sql.7 \
 	\
 	$(NULL)
 rst2man_verbose = $(rst2man_verbose_@AM_V@)
