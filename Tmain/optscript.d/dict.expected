@@ -20,3 +20,14 @@ false
 1
 -dict:1-
 null
+(---- using types other than name as key objects ----)
+(3)
+(true)
+(false)
+(abc)
+(xyz)
+(3)
+(true)
+(false)
+(abc)
+(xyz)

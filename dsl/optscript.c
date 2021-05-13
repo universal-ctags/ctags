@@ -2061,6 +2061,8 @@ opt_es_hash (const void * const key)
 
 	if (es_integer_p (key))
 		return hashInthash (key);
+	else if (es_boolean_p (key))
+		return es_object_equal (key, es_true)? 1: 0;
 
 	return hashPtrhash (k);
 }
@@ -2152,6 +2154,12 @@ dict_op_known_and_get(EsObject* dict, EsObject *key, EsObject **val)
 {
 	hashTable *t = es_pointer_get (dict);
 	Assert (t);
+
+	if (es_object_get_type (key) == OPT_TYPE_STRING)
+	{
+		const char * cstr = opt_string_get_cstr (key);
+		key = es_symbol_intern (cstr);
+	}
 
 	if (es_object_get_type (key) == OPT_TYPE_NAME)
 		key = es_pointer_get (key);
@@ -2450,13 +2458,33 @@ op__make_dict (OptVM *vm, EsObject *name)
 	if (n % 2)
 		return OPT_ERR_RANGECHECK;
 
+	for (int i = 0; i < (n / 2); i++)
+	{
+		EsObject *key = ptrArrayItemFromLast (vm->ostack, 2 * i + 1);
+
+		if (es_object_get_type (key) != OPT_TYPE_NAME
+			&& es_object_get_type (key) != OPT_TYPE_STRING
+			&& !es_integer_p (key) && !es_boolean_p (key))
+			return OPT_ERR_TYPECHECK;
+	}
+
 	EsObject *d = dict_new (n % 2 + 1, ATTR_READABLE|ATTR_WRITABLE); /* FIXME: + 1 */
 	for (int i = 0; i < (n / 2); i++)
 	{
 		EsObject *val = ptrArrayLast (vm->ostack);
 		EsObject *key = ptrArrayItemFromLast (vm->ostack, 1);
-		/* FIXME, CHECK DATA TYPE OF KEY */
+		bool converted = false;
+
+		if (es_object_get_type (key) == OPT_TYPE_STRING)
+		{
+			const char *cstr = opt_string_get_cstr (key);
+			key = opt_name_new_from_cstr (cstr);
+			converted = true;
+		}
 		dict_op_def (d, key, val);
+		if (converted)
+			es_object_unref (key);
+
 		ptrArrayDeleteLastInBatch (vm->ostack, 2);
 	}
 	ptrArrayDeleteLast (vm->ostack); /* Remove the mark */
@@ -3986,13 +4014,24 @@ static EsObject*
 op__put_dict (OptVM *vm, EsObject *name,
 			  EsObject *v, EsObject *k, EsObject *dict)
 {
-	/* TODO */
-	if (es_null (k))
-		return OPT_ERR_TYPECHECK;
-	if (es_object_get_type (k) != OPT_TYPE_NAME)
+	EsObject *key = k;
+
+	if (es_null (key))
 		return OPT_ERR_TYPECHECK;
 
-	dict_op_def (dict, k, v);
+	if (es_object_get_type (key) == OPT_TYPE_STRING)
+	{
+		const char *cstr = opt_string_get_cstr (key);
+		key = opt_name_new_from_cstr (cstr);
+	}
+
+	if (es_object_get_type (key) != OPT_TYPE_NAME
+		&& !es_integer_p (key) && !es_boolean_p (key))
+		return OPT_ERR_TYPECHECK;
+
+	dict_op_def (dict, key, v);
+	if (key != k)
+		es_object_unref (key);
 	ptrArrayDeleteLastInBatch (vm->ostack, 3);
 	return es_false;
 }
