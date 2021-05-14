@@ -144,6 +144,7 @@ extern bool doesLanguageHaveForeignDependency (const langType language, const la
 extern bool processLanguageRegexOption (langType language, enum regexParserType regptype, const char *const parameter);
 extern void notifyLanguageRegexInputStart (langType language);
 extern void notifyLanguageRegexInputEnd (langType language);
+extern void notifyLanguageRegexMakeTagEntry (langType language, int corkIndex);
 
 extern void matchLanguageRegex (const langType language, const vString* const line);
 extern void freeRegexResources (void);
