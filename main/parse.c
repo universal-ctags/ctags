@@ -5017,18 +5017,13 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 						   name, kinds, flags, disabled);
 }
 
-extern void addLanguageOptscriptPrelude (langType language, const char *const src)
+extern void addLanguageOptscriptToHook (langType language, enum scriptHook hook, const char *const src)
 {
-	addOptscriptPrelude (LanguageTable [language].lregexControlBlock, src);
-}
-
-extern void addLanguageOptscriptSequel (langType language, const char *const src)
-{
-	addOptscriptSequel (LanguageTable [language].lregexControlBlock, src);
+	addOptscriptToHook (LanguageTable [language].lregexControlBlock, hook, src);
 }
 
 static bool processHookOption (const char *const option, const char *const parameter, const char *prefix,
-							   void (* add) (langType, const char *))
+							   enum scriptHook hook)
 {
 	langType language = getLanguageComponentInOption (option, prefix);
 	if (language == LANG_IGNORE)
@@ -5040,19 +5035,19 @@ static bool processHookOption (const char *const option, const char *const param
 	const char * code = flagsEval (parameter, NULL, 0, NULL);
 	if (code == NULL)
 		error (FATAL, "Cannot recognized a code block surrounded by `{{' and `}}' after \"%s\" option", option);
-	(* add) (language, code);
+	addLanguageOptscriptToHook (language, hook, code);
 
 	return true;
 }
 
 extern bool processPreludeOption (const char *const option, const char *const parameter)
 {
-	return processHookOption (option, parameter, "_prelude-", addLanguageOptscriptPrelude);
+	return processHookOption (option, parameter, "_prelude-", SCRIPT_HOOK_PRELUDE);
 }
 
 extern bool processSequelOption (const char *const option, const char *const parameter)
 {
-	return processHookOption (option, parameter, "_sequel-", addLanguageOptscriptSequel);
+	return processHookOption (option, parameter, "_sequel-", SCRIPT_HOOK_SEQUEL);
 }
 
 extern bool processPretendOption (const char *const option, const char *const parameter)

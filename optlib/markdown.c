@@ -20,7 +20,7 @@ typedef enum {
 
 static void initializeMarkdownParser (const langType language)
 {
-	addLanguageOptscriptPrelude (language,
+	addLanguageOptscriptToHook (language, SCRIPT_HOOK_PRELUDE,
 		"{{    % group:int SCOPEPOPWITHADJUSTMENT -\n"
 		"    /scopePopWithAdjustment {\n"
 		"         _scopetop {\n"

@@ -10,7 +10,7 @@
 
 static void initializePodParser (const langType language CTAGS_ATTR_UNUSED)
 {
-	addLanguageOptscriptPrelude (language,
+	addLanguageOptscriptToHook (language, SCRIPT_HOOK_PRELUDE,
 		"{{	/kindTable\n"
 		"	[ /chapter /section /subsection /subsubsection ] def\n"
 		"}}");

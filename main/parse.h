@@ -70,6 +70,13 @@ typedef enum {
 	CORK_SYMTAB = (1 << 1),
 } corkUsage;
 
+/* optlib2c requires the declaration here. */
+enum scriptHook {
+	SCRIPT_HOOK_PRELUDE,
+	SCRIPT_HOOK_SEQUEL,
+	SCRIPT_HOOK_MAX,
+};
+
 struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
@@ -170,8 +177,7 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 										  const char* const name, const char* const kinds, const char* const flags,
 										  bool *disabled);
 
-extern void addLanguageOptscriptPrelude (langType language, const char *const src);
-extern void addLanguageOptscriptSequel (langType language, const char *const src);
+extern void addLanguageOptscriptToHook (langType language, enum scriptHook hook, const char *const src);
 
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
 extern vString *anonGenerateNew (const char *prefix, int kind);
