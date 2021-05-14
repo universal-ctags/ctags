@@ -89,6 +89,7 @@ static bool     isEpochAvailable           (const tagEntryInfo *const tag);
 
 static EsObject* getFieldValueForName (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForName (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+static EsObject* getFieldValueForInput (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* getFieldValueForKind (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* getFieldValueForTyperef (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForTyperef (tagEntryInfo *, const fieldDefinition *, const EsObject *);
@@ -134,6 +135,11 @@ static fieldDefinition fieldDefinitionsFixed [] = {
 		.doesContainAnyChar = doesContainAnyCharInInput,
 		.isValueAvailable   = NULL,
 		.dataType           = FIELDTYPE_STRING,
+		.getterValueType    = NULL,
+		.getValueObject     = getFieldValueForInput,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = NULL,
 	},
 	[FIELD_PATTERN] = {
 		.letter             = 'P',
@@ -1543,6 +1549,11 @@ static EsObject* setFieldValueForName (tagEntryInfo *tag, const fieldDefinition 
 	const char *cstr = opt_string_get_cstr (val);
 	tag->name = eStrdup (cstr);
 	return es_false;
+}
+
+static EsObject* getFieldValueForInput (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	return opt_string_new_from_cstr (tag->inputFileName);
 }
 
 static EsObject* getFieldValueForKind (const tagEntryInfo *tag, const fieldDefinition *fdef)
