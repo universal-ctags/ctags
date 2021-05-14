@@ -275,6 +275,8 @@ static EsObject* scriptEval (OptVM *vm, EsObject *optscript);
 static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum hook hook);
 static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb);
 
+static char* make_match_string (scriptWindow *window, int group);
+
 static void deleteTable (void *ptrn)
 {
 	struct regexTable *t = ptrn;
@@ -3353,21 +3355,14 @@ static EsObject* lrop_get_match_string_common (OptVM *vm, int i, int npop)
 {
 	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
 	scriptWindow *window = lcb->window;
-	if (window == NULL
-		|| 0 >= i
-		|| window->nmatch <= i
-		|| window->pmatch [i].rm_so == -1)
+	const char *cstr = make_match_string (window, i);
+	if (!cstr)
 	{
 		for (; npop > 0; npop--)
 			opt_vm_ostack_pop (vm);
 		opt_vm_ostack_push (vm, es_false);
 		return es_false;
 	}
-
-	const int len = window->pmatch [i].rm_eo - window->pmatch [i].rm_so;
-	const char *start = window->line + window->pmatch [i].rm_so;
-
-	const char *cstr = eStrndup (start, len);
 	EsObject *str = opt_string_new_from_cstr (cstr);
 	eFree ((void *)cstr);
 
@@ -3406,6 +3401,20 @@ static EsObject* lrop_get_match_string_gorup_on_stack (OptVM *vm, EsObject *name
 	if (es_object_get_type (r) == OPT_TYPE_STRING)
 		opt_vm_ostack_push (vm, es_true);
 	return es_false;
+}
+
+static char* make_match_string (scriptWindow *window, int group)
+{
+	if (window == NULL
+		|| 0 >= group
+		|| window->nmatch <= group
+		|| window->pmatch [group].rm_so == -1)
+		return NULL;
+
+	const int len = window->pmatch [group].rm_eo - window->pmatch [group].rm_so;
+	const char *start = window->line + window->pmatch [group].rm_so;
+
+	return eStrndup (start, len);
 }
 
 static EsObject* lrop_set_scope (OptVM *vm, EsObject *name)
