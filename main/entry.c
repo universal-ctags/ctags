@@ -1652,12 +1652,17 @@ extern size_t        countEntryInCorkQueue (void)
 	return ptrArrayCount (TagFile.corkQueue);
 }
 
+extern void markTagPlaceholder (tagEntryInfo *e, bool placeholder)
+{
+	e->placeholder = placeholder;
+}
+
 extern int makePlaceholder (const char *const name)
 {
 	tagEntryInfo e;
 
 	initTagEntry (&e, name, KIND_GHOST_INDEX);
-	e.placeholder = 1;
+	markTagPlaceholder(&e, true);
 
 	/*
 	 * makePlaceholder may be called even before reading any bytes
