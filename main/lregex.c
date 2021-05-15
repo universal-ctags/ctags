@@ -3297,7 +3297,10 @@ static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 
 	EsObject * mlocobj = es_pointer_new (OPT_TYPE_MATCHLOC, mloc);
 	if (es_error_p (mlocobj))
+	{
+		eFree (mloc);
 		return mlocobj;
+	}
 
 	if (group != tmp)
 		opt_vm_ostack_pop (vm);
