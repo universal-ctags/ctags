@@ -2044,6 +2044,15 @@ static void pre_lang_def_flag_base_long (const char* const optflag, const char* 
 
 	}
 
+	langType cpreproc = getNamedLanguage ("CPreProcessor", 0);
+	if (base == cpreproc)
+	{
+		error (WARNING,
+			   "Because of an internal limitation, Making a sub parser based on the CPreProcessor parser is not allowed: %s",
+			   param);
+		return;
+	}
+
 	flag_data->base = eStrdup(param);
 }
 
@@ -3708,7 +3717,6 @@ static rescanReason createTagsForFile (const langType language,
 
 	Assert (lang->parser || lang->parser2);
 
-	notifyLanguageRegexInputStart (language);
 	notifyInputStart ();
 
 	if (lang->parser != NULL)
@@ -3717,7 +3725,6 @@ static rescanReason createTagsForFile (const langType language,
 		rescan = lang->parser2 (passCount);
 
 	notifyInputEnd ();
-	notifyLanguageRegexInputEnd (language);
 
 	return rescan;
 }
