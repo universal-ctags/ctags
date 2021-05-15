@@ -3713,6 +3713,7 @@ op_repeat (OptVM *vm, EsObject *name)
 		e = vm_call_proc (vm, proc);
 		if (es_object_equal (e, OPT_ERR_INVALIDEXIT))
 		{
+			dict_op_def (vm->error, OPT_KEY_newerror, es_false);
 			e = es_false;
 			break;
 		}
