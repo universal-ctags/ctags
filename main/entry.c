@@ -1935,7 +1935,7 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 
 extern bool isTagExtra (const tagEntryInfo *const tag)
 {
-	for (unsigned int i = 0; i < XTAG_COUNT; i++)
+	for (unsigned int i = 0; i < countXtags(); i++)
 		if (isTagExtraBitMarked (tag, i))
 			return true;
 	return false;

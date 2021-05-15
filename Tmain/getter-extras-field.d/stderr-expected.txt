@@ -2,6 +2,7 @@ true
 [/reference]
 true
 [/qualified /reference]
-false
+true
+[/X.foo]
 true
 [/reference /X.foo]
