@@ -3310,6 +3310,45 @@ static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static matchLoc* make_mloc_from_tagEntryInfo(tagEntryInfo *e)
+{
+	matchLoc *mloc = xMalloc (1, matchLoc);
+	mloc->delta = 0;
+	mloc->line = e->lineNumber;
+	mloc->pos = e->filePosition;
+
+	return mloc;
+}
+
+static EsObject* lrop_get_tag_loc (OptVM *vm, EsObject *name)
+{
+	EsObject *nobj = opt_vm_ostack_top (vm);
+
+	if (es_object_get_type (nobj) != ES_TYPE_INTEGER)
+		return OPT_ERR_TYPECHECK;
+
+	int n = es_integer_get(nobj);
+	if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
+			return OPT_ERR_RANGECHECK;
+
+	tagEntryInfo *e = getEntryInCorkQueue (n);
+	if (e == NULL)
+		return OPT_ERR_TYPECHECK; /* ??? */
+
+	matchLoc *mloc = make_mloc_from_tagEntryInfo (e);
+	EsObject * mlocobj = es_pointer_new (OPT_TYPE_MATCHLOC, mloc);
+	if (es_error_p (mlocobj))
+	{
+		eFree (mloc);
+		return mlocobj;
+	}
+
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_push (vm, mlocobj);
+	es_object_unref (mlocobj);
+	return es_false;
+}
+
 static EsObject* lrop_get_match_string_common (OptVM *vm, int i, int npop)
 {
 	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
@@ -3767,6 +3806,12 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = -1,
 		.help_str = "group:int /start|/end _MATCHLOC matchloc%"
 		"group:int _MATCHLOC matchloc",
+	},
+	{
+		.name     = "_tagloc",
+		.fn       = lrop_get_tag_loc,
+		.arity    = 1,
+		.help_str = "index:int _TAGLOC matchloc",
 	},
 	{
 		.name     = "_tag",
