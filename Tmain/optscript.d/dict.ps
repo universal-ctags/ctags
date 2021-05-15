@@ -33,3 +33,21 @@ cleardictstack [] dictstack length == clear
 << /a 1 /b 2 /c 3 >> << /e 1 /f 2 /g 3 >> /a 0 store pop /a get ==
 
 << /k null >> dup == /k get ==
+
+(---- using types other than name as key objects ----) ==
+
+/d 10 dict def
+
+d dup 3 (3) put 3 get == clear
+d dup true (true) put true get == clear
+d dup false (false) put false get == clear
+d dup (abc) (abc) put (abc) get == clear
+d dup /xyz (xyz) put (xyz) get == clear
+
+/d0 << 3 (3) true (true) false (false) (abc) (abc) /xyz (xyz) >> def
+
+d0 3     get == clear
+d0 true  get == clear
+d0 false get == clear
+d0 (abc) get == clear
+d0 (xyz) get == clear
