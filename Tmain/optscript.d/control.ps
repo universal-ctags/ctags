@@ -33,6 +33,35 @@ false { trueaction } { falseaction } ifelse pc
 -1 -1 -5 { == } for
 1 2 10   { == } for
 
+(exit in for:) =
+/counter 0 def
+0 2 10 { counter 1 add /counter exch def
+         6 eq { exit } if
+       } for
+counter 4 eq {
+    (=> passed) =
+} {
+    (=> failed) =
+} ifelse
+
+(exit in forall string:) =
+(abc) { dup ?b eq { exit } { pop } ifelse } forall
+?b eq {
+    (=> passed) =
+} if
+
+(exit in forall array:) =
+[?a ?b ?c]  { dup ?b eq { exit } { pop } ifelse } forall
+?b eq {
+    (=> passed) =
+} if
+
+(exit in forall dict:) =
+<< ?a /a ?b /b ?c /c >> { pop dup ?b eq { exit } { pop } ifelse } forall
+?b eq {
+    (=> passed) =
+} if
+
 (---------------- countexecstack ----------------) ==
 true { countexecstack == } if
 

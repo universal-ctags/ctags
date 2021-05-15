@@ -3773,6 +3773,12 @@ op_for (OptVM *vm, EsObject *name)
 		r = vm_call_proc (vm, proc);
 		es_object_unref (iobj);
 
+		if (es_object_equal (r, OPT_ERR_INVALIDEXIT))
+		{
+			dict_op_def (vm->error, OPT_KEY_newerror, es_false);
+			r = es_false;
+			break;
+		}
 		if (es_error_p (r))
 			break;
 	}
@@ -4180,6 +4186,11 @@ op_forall (OptVM *vm, EsObject *name)
 	es_object_unref (proc);
 	es_object_unref (obj);
 
+	if (es_object_equal (e, OPT_ERR_INVALIDEXIT))
+	{
+		dict_op_def (vm->error, OPT_KEY_newerror, es_false);
+		e = es_false;
+	}
 	return e;
 }
 
