@@ -4061,9 +4061,6 @@ op__forall_array (OptVM *vm, EsObject *name,
 	if (((int)c) < 0)
 		return OPT_ERR_INTERNALERROR; /* TODO: integer overflow */
 
-	ptrArrayRemoveLast (vm->ostack);
-	ptrArrayRemoveLast (vm->ostack);
-
 	EsObject *e = es_false;
 	for (int i = 0; i < c; i++)
 	{
@@ -4076,8 +4073,6 @@ op__forall_array (OptVM *vm, EsObject *name,
 			break;
 	}
 
-	es_object_unref (proc);
-	es_object_unref (obj);
 	return e;
 }
 
@@ -4127,14 +4122,8 @@ op__forall_dict (OptVM *vm, EsObject *name,
 		.proc = proc
 	};
 
-	ptrArrayRemoveLast (vm->ostack);
-	ptrArrayRemoveLast (vm->ostack);
-
 	if (!hashTableForeachItem (ht, dict_forall_cb, &data))
 		r = data.err;
-
-	es_object_unref (proc);
-	es_object_unref (obj);
 
 	return r;
 }
@@ -4148,9 +4137,6 @@ op__forall_string (OptVM *vm, EsObject *name,
 	if (((int)c) < 0)
 		return OPT_ERR_INTERNALERROR; /* TODO: integer overflow */
 
-	ptrArrayRemoveLast (vm->ostack);
-	ptrArrayRemoveLast (vm->ostack);
-
 	EsObject *e = es_false;
 	for (int i = 0; i < c; i++)
 	{
@@ -4162,9 +4148,6 @@ op__forall_string (OptVM *vm, EsObject *name,
 		if (es_error_p (e))
 			break;
 	}
-
-	es_object_unref (proc);
-	es_object_unref (obj);
 
 	return e;
 }
@@ -4180,14 +4163,24 @@ op_forall (OptVM *vm, EsObject *name)
 	EsObject *obj = ptrArrayItemFromLast (vm->ostack, 1);
 
 	int t = es_object_get_type (obj);
+	EsObject * (* proc_driver) (OptVM *, EsObject *,
+								EsObject *, EsObject *) = NULL;
 	if (t == OPT_TYPE_ARRAY)
-		return op__forall_array (vm, name, proc, obj);
+		proc_driver = op__forall_array;
 	else if (t == OPT_TYPE_DICT)
-		return op__forall_dict (vm, name, proc, obj);
+		proc_driver = op__forall_dict;
 	else if (t == OPT_TYPE_STRING)
-		return op__forall_string (vm, name, proc, obj);
+		proc_driver = op__forall_string;
+	else
+		return OPT_ERR_TYPECHECK;
 
-	return OPT_ERR_TYPECHECK;
+	ptrArrayRemoveLast (vm->ostack);
+	ptrArrayRemoveLast (vm->ostack);
+	EsObject *e = (*proc_driver) (vm, name, proc, obj);
+	es_object_unref (proc);
+	es_object_unref (obj);
+
+	return e;
 }
 
 static EsObject*
