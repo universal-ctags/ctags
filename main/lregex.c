@@ -3732,6 +3732,27 @@ static EsObject *lrop_advanceto (OptVM *vm, EsObject *name)
 	return es_true;
 }
 
+static EsObject *lrop_markplaceholder (OptVM *vm, EsObject *name)
+{
+	EsObject *tag = opt_vm_ostack_top (vm);
+
+	if (!es_integer_p (tag))
+		return OPT_ERR_TYPECHECK;
+
+	int n = es_integer_get (tag);
+	if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
+		return OPT_ERR_RANGECHECK;
+
+	tagEntryInfo *e = getEntryInCorkQueue (n);
+	if (e == NULL)
+		return OPTSCRIPT_ERR_NOTAGENTRY;
+
+	markTagPlaceholder (e, true);
+
+	opt_vm_ostack_pop (vm);
+	return es_false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchstr",
@@ -3872,6 +3893,12 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = 0,
 		.help_str = "- _TRACED true|false",
 	},
+	{
+		.name     = "_markplaceholder",
+		.fn       = lrop_markplaceholder,
+		.arity    = 1,
+		.help_str = "tag:int _MARKPLACEHOLDER -",
+	}
 };
 
 extern void initRegexOptscript (void)

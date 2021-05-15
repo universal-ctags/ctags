@@ -1,0 +1,11 @@
+--sort=no
+--langdef=UnknownX
+--map-UnknownX=.unknown
+
+--kinddef-UnknownX=d,def,definitions
+
+--regex-UnknownX=/([ \t]*)def +([a-zA-Z]):/\2/d/{{
+    \1 length 5 gt {
+        . _markplaceholder
+    } if
+}}
