@@ -276,6 +276,7 @@ static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum hook
 static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb);
 
 static char* make_match_string (scriptWindow *window, int group);
+static matchLoc *make_mloc (scriptWindow *window, int group, bool start);
 
 static void deleteTable (void *ptrn)
 {
@@ -3275,27 +3276,9 @@ static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
 	scriptWindow *window = lcb->window;
 
-	if (window == NULL
-		|| window->nmatch <= g
-		|| window->pmatch [g].rm_so == -1)
+	matchLoc *mloc = make_mloc (window, g, start);
+	if (mloc == NULL)
 		return OPT_ERR_RANGECHECK;
-
-	matchLoc *mloc = xMalloc (1, matchLoc);
-	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
-	{
-		mloc->delta = 0;
-		mloc->line = getInputLineNumber ();
-		mloc->pos = getInputFilePosition ();
-	}
-	else
-	{
-		mloc->delta = (start
-					   ? window->pmatch [g].rm_so
-					   : window->pmatch [g].rm_eo);
-		off_t offset = (window->line + mloc->delta) - window->start;
-		mloc->line = getInputLineNumberForFileOffset (offset);
-		mloc->pos  = getInputFilePositionForLine (mloc->line);
-	}
 
 	EsObject * mlocobj = es_pointer_new (OPT_TYPE_MATCHLOC, mloc);
 	if (es_error_p (mlocobj))
@@ -3415,6 +3398,33 @@ static char* make_match_string (scriptWindow *window, int group)
 	const char *start = window->line + window->pmatch [group].rm_so;
 
 	return eStrndup (start, len);
+}
+
+static matchLoc *make_mloc (scriptWindow *window, int group, bool start)
+{
+	if (window == NULL
+		|| 0 > group
+		|| window->nmatch <= group
+		|| window->pmatch [group].rm_so == -1)
+		return NULL;
+
+	matchLoc *mloc = xMalloc (1, matchLoc);
+	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
+	{
+		mloc->delta = 0;
+		mloc->line = getInputLineNumber ();
+		mloc->pos = getInputFilePosition ();
+	}
+	else
+	{
+		mloc->delta = (start
+					   ? window->pmatch [group].rm_so
+					   : window->pmatch [group].rm_eo);
+		off_t offset = (window->line + mloc->delta) - window->start;
+		mloc->line = getInputLineNumberForFileOffset (offset);
+		mloc->pos  = getInputFilePositionForLine (mloc->line);
+	}
+	return mloc;
 }
 
 static EsObject* lrop_set_scope (OptVM *vm, EsObject *name)
