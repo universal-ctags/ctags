@@ -1667,7 +1667,6 @@ static EsObject* checkFieldValueForScope (const fieldDefinition *fdef, const EsO
 
 static EsObject* getFieldValueForExtras (const tagEntryInfo *tag, const fieldDefinition *fdef)
 {
-
 	if (!isTagExtra (tag))
 		return es_nil;
 
