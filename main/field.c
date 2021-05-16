@@ -1770,6 +1770,13 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 		l = es_integer_get (obj);
 		if (l < 1)
 			return OPT_ERR_RANGECHECK;
+
+		/* If the new line number is too large,
+		   we cannot fill tag->filePosition wit
+		   getInputFilePositionForLine(); */
+		if (fdef->ftype == FIELD_LINE_NUMBER
+			&& l < getInputLineNumber())
+			return OPT_ERR_RANGECHECK;
 	}
 	else
 		return OPT_ERR_TYPECHECK;
@@ -1777,7 +1784,10 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 	if (fdef->ftype == FIELD_END_LINE)
 		tag->extensionFields.endLine = l;
 	else
+	{
 		tag->lineNumber = l;
+		tag->filePosition = getInputFilePositionForLine (l);
+	}
 
 	return es_false;
 }
