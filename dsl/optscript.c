@@ -976,6 +976,16 @@ vm_read_skip_comment(OptVM *vm)
 	}
 }
 
+#define is_meta_char(c) ((c) == '%'				\
+						 || (c) == '/'			\
+						 || (c) == '('			\
+						 || (c) == '{'			\
+						 || (c) == '}'			\
+						 || (c) == '['			\
+						 || (c) == ']'			\
+						 || (c) == '<'			\
+						 || (c) == '>')
+
 static EsObject*
 vm_read_char (OptVM *vm)
 {
@@ -1016,7 +1026,7 @@ vm_read_char (OptVM *vm)
 			return OPT_ERR_SYNTAX;
 		}
 		c = mio_getc (vm->in);
-		if (!(c == EOF || isspace (c)))
+		if (!(c == EOF || isspace (c) || is_meta_char (c)))
 			return OPT_ERR_SYNTAX;
 		mio_ungetc (vm->in, c);
 		return es_integer_new (i);
@@ -1026,7 +1036,7 @@ vm_read_char (OptVM *vm)
 		i = c;
 
 		c = mio_getc (vm->in);
-		if (!(c == EOF || isspace (c)))
+		if (!(c == EOF || isspace (c) || is_meta_char (c)))
 			return OPT_ERR_SYNTAX;
 		mio_ungetc (vm->in, c);
 
@@ -1099,16 +1109,6 @@ vm_read_string (OptVM *vm)
 			vStringPut (s, c);
 	}
 }
-
-#define is_meta_char(c) ((c) == '%'				\
-						 || (c) == '/'			\
-						 || (c) == '('			\
-						 || (c) == '{'			\
-						 || (c) == '}'			\
-						 || (c) == '['			\
-						 || (c) == ']'			\
-						 || (c) == '<'			\
-						 || (c) == '>')
 
 static EsObject*
 vm_read_generic(OptVM *vm, int c,
