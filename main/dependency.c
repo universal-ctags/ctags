@@ -43,7 +43,7 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 {
 	if (dtype == DEPTYPE_KIND_OWNER)
 		linkKindDependency (masterKCB, slaveKCB);
-	else if (dtype == DEPTYPE_SUBPARSER)
+	else if (dtype == DEPTYPE_SUBPARSER || dtype == DEPTYPE_FOREIGNER)
 	{
 		slaveParser *s = xMalloc (1, slaveParser);
 
@@ -118,8 +118,9 @@ extern void initializeDependencies (parserDefinition *parser,
 	for (i = 0; i < parser->dependencyCount; i++)
 	{
 		parserDependency *d = parser->dependencies + i;
-		if (d->type == DEPTYPE_SUBPARSER &&
-			((subparser *)(d->data))->direction & SUBPARSER_SUB_RUNS_BASE)
+		if ((d->type == DEPTYPE_SUBPARSER &&
+			 ((subparser *)(d->data))->direction & SUBPARSER_SUB_RUNS_BASE)
+			|| (d->type == DEPTYPE_FOREIGNER))
 		{
 			langType baseParser;
 			baseParser = getNamedLanguage (d->upperParser, 0);
@@ -320,6 +321,9 @@ extern void subparserColprintAddSubparsers (struct colprintTable *table,
 	pushLanguage (scb->owner);
 	foreachSlaveParser(tmp)
 	{
+		if (tmp->type != DEPTYPE_SUBPARSER)
+			continue;
+
 		struct colprintLine *line = colprintTableGetNewLine(table);
 
 		colprintLineAppendColumnCString (line, getLanguageName (tmp->id));
