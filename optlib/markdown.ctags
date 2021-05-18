@@ -60,6 +60,7 @@
     } def
 }}
 
+--_tabledef-Markdown=frontmatter
 --_tabledef-Markdown=main
 --_tabledef-Markdown=main_sharp
 --_tabledef-Markdown=chapter
@@ -98,6 +99,24 @@
 
 --_mtable-regex-Markdown=code/^[ \t]*````*[ \t]*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]//{tenter=codeblockBacktick}{_guest=\1,0end,}
 --_mtable-regex-Markdown=code/^[ \t]*~~~~*[ \t]*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]//{tenter=codeblockTildes}{_guest=\1,0end,}
+
+#
+# Frontmatter
+#
+# https://gohugo.io/content-management/front-matter/
+#
+
+# YAML area
+--_mtable-regex-Markdown=frontmatter/(---[\n]).*(---[\n])//{tjump=main}
+
+# JSON area
+--_mtable-regex-Markdown=frontmatter/(;;;[\n]).*(;;;[\n])//{tjump=main}
+
+# TOML area
+--_mtable-regex-Markdown=frontmatter/(\+\+\+[\n]).*(\+\+\+[\n])//{tjump=main}
+
+# No frontmatter
+--_mtable-regex-Markdown=frontmatter/.//{_advanceTo=0start}{tjump=main}
 
 
 #
