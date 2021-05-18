@@ -20,7 +20,7 @@
 #
 # Usage:
 #
-#  ./enumstr.sh <input-file> <enum-name> <fname> [PREFIX_FOR_TRIMMING] [--use-lower-bits-as-is]
+#  ./enumstr.sh <input-file> <enum-name> <funname> [PREFIX_FOR_TRIMMING] [--use-lower-bits-as-is]
 #
 # Example:
 #
