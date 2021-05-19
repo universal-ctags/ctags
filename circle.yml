@@ -394,10 +394,10 @@ jobs:
        - run:
            name: Install tools for building
            command: |
-             yum install -y git gcc make autoconf automake pkgconfig
-             yum install -y https://repo.ius.io/ius-release-el6.rpm
-             yum --enablerepo=ius-archive -y install python36
-             ln -s /usr/bin/python36 /usr/bin/python3
+             yum install -y git gcc make autoconf automake pkgconfig xz
+             curl -LO https://github.com/leleliu008/python-prebuild/releases/download/3.9.5/python-3.9.5-x86_64-linux-glibc.tar.xz
+             tar xf python-3.9.5-x86_64-linux-glibc.tar.xz -C /opt
+             echo 'export PATH=/opt/python-3.9.5-x86_64-linux-glibc/bin:$PATH' >> $BASH_ENV
        - run:
            name: Get the source code of u-ctags
            command: |
@@ -430,10 +430,10 @@ jobs:
        - run:
            name: Install tools for building
            command: |
-             yum install -y git gcc make autoconf automake pkgconfig
-             yum install -y https://repo.ius.io/ius-release-el6.rpm
-             yum --enablerepo=ius-archive -y install python36
-             ln -s /usr/bin/python36 /usr/bin/python3
+             yum install -y git gcc make autoconf automake pkgconfig xz
+             curl -LO https://github.com/leleliu008/python-prebuild/releases/download/3.9.5/python-3.9.5-x86_64-linux-glibc.tar.xz
+             tar xf python-3.9.5-x86_64-linux-glibc.tar.xz -C /opt
+             echo 'export PATH=/opt/python-3.9.5-x86_64-linux-glibc/bin:$PATH' >> $BASH_ENV
        - run:
            name: Get the source code of u-ctags
            command: |
