@@ -25,19 +25,22 @@
 #define DO_TRACING
 #endif
 
+bool isTraced (void);
+void traceLanguage (langType language);
+bool isLanguageTraced (langType language);
+
+void traceEnter(const char * szFunction,const char * szFormat,...);
+void traceLeave(const char * szFunction,const char * szFormat,...);
+void tracePrint(const char * szFunction,const char * szFormat,...);
+
+void tracePrintPrefix(const char * szFunction);
+void tracePrintFmt(const char * szFormat,...);
+void tracePrintNewline(void);
+
+void traceMain(void);
+bool isMainTraced(void);
+
 #ifdef DO_TRACING
-
-	bool isTraced (void);
-	void traceLanguage (langType language);
-	bool isLanguageTraced (langType language);
-
-	void traceEnter(const char * szFunction,const char * szFormat,...);
-	void traceLeave(const char * szFunction,const char * szFormat,...);
-	void tracePrint(const char * szFunction,const char * szFormat,...);
-
-	void tracePrintPrefix(const char * szFunction);
-	void tracePrintFmt(const char * szFormat,...);
-	void tracePrintNewline(void);
 
 	#define TRACE_ENTER() traceEnter(__func__,"")
 	#define TRACE_LEAVE() traceLeave(__func__,"")
@@ -74,9 +77,6 @@
 				Assert(false); \
 			} \
 		} while(0)
-
-	void traceMain(void);
-	bool isMainTraced(void);
 
 #else //!DO_TRACING
 
