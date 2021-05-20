@@ -2044,6 +2044,15 @@ static void pre_lang_def_flag_base_long (const char* const optflag, const char* 
 
 	}
 
+	langType cpreproc = getNamedLanguage ("CPreProcessor", 0);
+	if (base == cpreproc)
+	{
+		error (WARNING,
+			   "Because of an internal limitation, Making a sub parser based on the CPreProcessor parser is not allowed: %s",
+			   param);
+		return;
+	}
+
 	flag_data->base = eStrdup(param);
 }
 
@@ -3708,7 +3717,6 @@ static rescanReason createTagsForFile (const langType language,
 
 	Assert (lang->parser || lang->parser2);
 
-	notifyLanguageRegexInputStart (language);
 	notifyInputStart ();
 
 	if (lang->parser != NULL)
@@ -3717,7 +3725,6 @@ static rescanReason createTagsForFile (const langType language,
 		rescan = lang->parser2 (passCount);
 
 	notifyInputEnd ();
-	notifyLanguageRegexInputEnd (language);
 
 	return rescan;
 }
@@ -5010,18 +5017,13 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 						   name, kinds, flags, disabled);
 }
 
-extern void addLanguageOptscriptPrelude (langType language, const char *const src)
+extern void addLanguageOptscriptToHook (langType language, enum scriptHook hook, const char *const src)
 {
-	addOptscriptPrelude (LanguageTable [language].lregexControlBlock, src);
-}
-
-extern void addLanguageOptscriptSequel (langType language, const char *const src)
-{
-	addOptscriptSequel (LanguageTable [language].lregexControlBlock, src);
+	addOptscriptToHook (LanguageTable [language].lregexControlBlock, hook, src);
 }
 
 static bool processHookOption (const char *const option, const char *const parameter, const char *prefix,
-							   void (* add) (langType, const char *))
+							   enum scriptHook hook)
 {
 	langType language = getLanguageComponentInOption (option, prefix);
 	if (language == LANG_IGNORE)
@@ -5033,19 +5035,19 @@ static bool processHookOption (const char *const option, const char *const param
 	const char * code = flagsEval (parameter, NULL, 0, NULL);
 	if (code == NULL)
 		error (FATAL, "Cannot recognized a code block surrounded by `{{' and `}}' after \"%s\" option", option);
-	(* add) (language, code);
+	addLanguageOptscriptToHook (language, hook, code);
 
 	return true;
 }
 
 extern bool processPreludeOption (const char *const option, const char *const parameter)
 {
-	return processHookOption (option, parameter, "_prelude-", addLanguageOptscriptPrelude);
+	return processHookOption (option, parameter, "_prelude-", SCRIPT_HOOK_PRELUDE);
 }
 
 extern bool processSequelOption (const char *const option, const char *const parameter)
 {
-	return processHookOption (option, parameter, "_sequel-", addLanguageOptscriptSequel);
+	return processHookOption (option, parameter, "_sequel-", SCRIPT_HOOK_SEQUEL);
 }
 
 extern bool processPretendOption (const char *const option, const char *const parameter)

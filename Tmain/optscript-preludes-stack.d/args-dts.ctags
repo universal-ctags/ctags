@@ -1,0 +1,33 @@
+--langdef=DTS10{base=DTS}
+--_prelude-DTS10={{
+    (prelude DTS10) ==
+}}
+--_sequel-DTS10={{
+    (sequel DTS10) ==
+}}
+
+
+--langdef=DTS11{base=DTS}
+--_prelude-DTS11={{
+    (prelude DTS11) ==
+}}
+--_sequel-DTS11={{
+    (sequel DTS11) ==
+}}
+
+--langdef=DTS20{base=DTS10}
+--_prelude-DTS20={{
+    (prelude DTS20) ==
+}}
+--_sequel-DTS20={{
+    (sequel DTS20) ==
+}}
+
+
+--langdef=DTS30{base=DTS20}
+--_prelude-DTS30={{
+    (prelude DTS30) ==
+}}
+--_sequel-DTS30={{
+    (sequel DTS30) ==
+}}

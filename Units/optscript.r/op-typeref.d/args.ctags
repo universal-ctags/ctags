@@ -1,7 +1,35 @@
 --langdef=X
 --map-X=.unknown
 --kinddef-X=d,def,definitions
+--kinddef-X=t,type,type definitions
 
+--_prelude-X={{
+    /typedict 5 dict def
+}}
+
+--regex-X=/^type[ ]+([A-Z]+)$/\1/t/{{
+    typedict \1 cvn . put
+}}
+
+# [string string]
 --regex-X=/def[ ]+([a-z]+)[ ]*:[ ]*([a-z]+)/\1/d/{{
-	. [ (typename) \2 ] typeref:
+	. [ (postfix) \2 ] typeref:
+}}
+
+# string
+--regex-X=/def[ ]+<([a-z]+)>[ ]*([a-z]+)/\2/d/{{
+	.  \1 typeref:
+}}
+
+# index
+--regex-X=/def[ ]+([A-Z]+)\^([a-z]+)/\2/d/{{
+    typedict \1 cvn known {
+        . typedict \1 cvn get typeref:
+    } if
+}}
+
+# false
+--regex-X=/def[ ]+([a-z]+)\^!([a-z]+)/\2/d/{{
+	. \1 typeref:
+    . false typeref:
 }}

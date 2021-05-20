@@ -1,0 +1,33 @@
+--langdef=CPreProcessor10{base=CPreProcessor}
+--_prelude-CPreProcessor10={{
+    (prelude CPreProcessor10) ==
+}}
+--_sequel-CPreProcessor10={{
+    (sequel CPreProcessor10) ==
+}}
+
+
+--langdef=CPreProcessor11{base=CPreProcessor}
+--_prelude-CPreProcessor11={{
+    (prelude CPreProcessor11) ==
+}}
+--_sequel-CPreProcessor11={{
+    (sequel CPreProcessor11) ==
+}}
+
+--langdef=CPreProcessor20{base=CPreProcessor10}
+--_prelude-CPreProcessor20={{
+    (prelude CPreProcessor20) ==
+}}
+--_sequel-CPreProcessor20={{
+    (sequel CPreProcessor20) ==
+}}
+
+
+--langdef=CPreProcessor30{base=CPreProcessor20}
+--_prelude-CPreProcessor30={{
+    (prelude CPreProcessor30) ==
+}}
+--_sequel-CPreProcessor30={{
+    (sequel CPreProcessor30) ==
+}}

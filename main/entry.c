@@ -1652,12 +1652,17 @@ extern size_t        countEntryInCorkQueue (void)
 	return ptrArrayCount (TagFile.corkQueue);
 }
 
+extern void markTagPlaceholder (tagEntryInfo *e, bool placeholder)
+{
+	e->placeholder = placeholder;
+}
+
 extern int makePlaceholder (const char *const name)
 {
 	tagEntryInfo e;
 
 	initTagEntry (&e, name, KIND_GHOST_INDEX);
-	e.placeholder = 1;
+	markTagPlaceholder(&e, true);
 
 	/*
 	 * makePlaceholder may be called even before reading any bytes
@@ -1930,7 +1935,7 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 
 extern bool isTagExtra (const tagEntryInfo *const tag)
 {
-	for (unsigned int i = 0; i < XTAG_COUNT; i++)
+	for (unsigned int i = 0; i < countXtags(); i++)
 		if (isTagExtraBitMarked (tag, i))
 			return true;
 	return false;

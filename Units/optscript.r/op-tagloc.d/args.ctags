@@ -1,0 +1,12 @@
+--langdef=FOO
+--map-FOO=.foo
+--kinddef-FOO=d,def,definitions
+--_extradef-FOO=withprefix,name with prefix
+--extras-FOO=+{withprefix}
+--fields=+{extras}
+--regex-FOO=/def +([a-zA-Z]+)/\1/d/{{
+    mark (<prefix>) . :name _buildstring
+    . :kind
+    . _tagloc _tag _commit
+    /FOO.withprefix _markextra
+}}

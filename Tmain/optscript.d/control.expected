@@ -26,6 +26,14 @@
 5
 7
 9
+exit in for:
+=> passed
+exit in forall string:
+=> passed
+exit in forall array:
+=> passed
+exit in forall dict:
+=> passed
 (---------------- countexecstack ----------------)
 3
 (---------------- execstack ----------------)

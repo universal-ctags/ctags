@@ -1,49 +1,49 @@
 # writer=default
 N	name	yes	NONE	s--	yes	rw	tag name
-F	input	yes	NONE	s--	yes	--	input file
+F	input	yes	NONE	s--	yes	r-	input file
 P	pattern	yes	NONE	s-b	yes	--	pattern
 # writer=u-ctags 
 N	name	yes	NONE	s--	yes	rw	tag name
-F	input	yes	NONE	s--	yes	--	input file
+F	input	yes	NONE	s--	yes	r-	input file
 P	pattern	yes	NONE	s-b	yes	--	pattern
 # writer=e-ctags 
 N	name	yes	NONE	s--	yes	rw	tag name
-F	input	yes	NONE	s--	yes	--	input file
+F	input	yes	NONE	s--	yes	r-	input file
 P	pattern	yes	NONE	s-b	yes	--	pattern
 # writer=etags 
-F	input	yes	NONE	s--	no	--	input file
+F	input	yes	NONE	s--	no	r-	input file
 N	name	yes	NONE	s--	no	rw	tag name
 P	pattern	yes	NONE	s-b	no	--	pattern
 # writer=xref 
-F	input	yes	NONE	s--	no	--	input file
+F	input	yes	NONE	s--	no	r-	input file
 N	name	yes	NONE	s--	no	rw	tag name
 P	pattern	yes	NONE	s-b	no	--	pattern
 # writer=json 
-F	input	yes	NONE	s--	no	--	input file
+F	input	yes	NONE	s--	no	r-	input file
 N	name	yes	NONE	s--	no	rw	tag name
 P	pattern	yes	NONE	s-b	no	--	pattern
 # writer=xref N
-F	input	yes	NONE	s--	no	--	input file
+F	input	yes	NONE	s--	no	r-	input file
 N	name	no	NONE	s--	no	rw	tag name
 P	pattern	yes	NONE	s-b	no	--	pattern
 # writer=xref F
-F	input	no	NONE	s--	no	--	input file
+F	input	no	NONE	s--	no	r-	input file
 N	name	yes	NONE	s--	no	rw	tag name
 P	pattern	yes	NONE	s-b	no	--	pattern
 # writer=xref P
-F	input	yes	NONE	s--	no	--	input file
+F	input	yes	NONE	s--	no	r-	input file
 N	name	yes	NONE	s--	no	rw	tag name
 P	pattern	no	NONE	s-b	no	--	pattern
 # writer=json N
-F	input	yes	NONE	s--	no	--	input file
+F	input	yes	NONE	s--	no	r-	input file
 N	name	no	NONE	s--	no	rw	tag name
 P	pattern	yes	NONE	s-b	no	--	pattern
 # writer=json F
-F	input	no	NONE	s--	no	--	input file
+F	input	no	NONE	s--	no	r-	input file
 N	name	yes	NONE	s--	no	rw	tag name
 P	pattern	yes	NONE	s-b	no	--	pattern
 # writer=json P
-F	input	yes	NONE	s--	no	--	input file
+F	input	yes	NONE	s--	no	r-	input file
 N	name	yes	NONE	s--	no	rw	tag name
 P	pattern	no	NONE	s-b	no	--	pattern
 # writer=json --fields=-N

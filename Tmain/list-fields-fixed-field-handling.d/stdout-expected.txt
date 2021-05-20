@@ -1,7 +1,7 @@
 # --output-format=u-ctags --fields=n --list-fields
 #LETTER NAME           ENABLED LANGUAGE         JSTYPE FIXED OP DESCRIPTION
 N       name           yes     NONE             s--    yes   rw tag name
-F       input          yes     NONE             s--    yes   -- input file
+F       input          yes     NONE             s--    yes   r- input file
 P       pattern        yes     NONE             s-b    yes   -- pattern
 C       compact        no      NONE             s--    no    -- compact input line (used only in xref output)
 E       extras         no      NONE             s--    no    r- Extra tag type information
@@ -27,7 +27,7 @@ z       kind           no      NONE             s--    no    r- [tags output] pr
 # --fields=n --output-format=u-ctags --list-fields
 #LETTER NAME           ENABLED LANGUAGE         JSTYPE FIXED OP DESCRIPTION
 N       name           yes     NONE             s--    yes   rw tag name
-F       input          yes     NONE             s--    yes   -- input file
+F       input          yes     NONE             s--    yes   r- input file
 P       pattern        yes     NONE             s-b    yes   -- pattern
 C       compact        no      NONE             s--    no    -- compact input line (used only in xref output)
 E       extras         no      NONE             s--    no    r- Extra tag type information
@@ -54,7 +54,7 @@ z       kind           no      NONE             s--    no    r- [tags output] pr
 #LETTER NAME           ENABLED LANGUAGE         JSTYPE FIXED OP DESCRIPTION
 C       compact        no      NONE             s--    no    -- compact input line (used only in xref output)
 E       extras         no      NONE             s--    no    r- Extra tag type information
-F       input          no      NONE             s--    no    -- input file
+F       input          no      NONE             s--    no    r- input file
 K       NONE           no      NONE             s--    no    -- Kind of tag in long-name form
 N       name           no      NONE             s--    no    rw tag name
 P       pattern        no      NONE             s-b    no    -- pattern
@@ -80,7 +80,7 @@ z       kind           no      NONE             s--    no    r- [tags output] pr
 #LETTER NAME           ENABLED LANGUAGE         JSTYPE FIXED OP DESCRIPTION
 C       compact        no      NONE             s--    no    -- compact input line (used only in xref output)
 E       extras         no      NONE             s--    no    r- Extra tag type information
-F       input          no      NONE             s--    no    -- input file
+F       input          no      NONE             s--    no    r- input file
 K       NONE           no      NONE             s--    no    -- Kind of tag in long-name form
 N       name           no      NONE             s--    no    rw tag name
 P       pattern        no      NONE             s-b    no    -- pattern

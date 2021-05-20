@@ -89,6 +89,7 @@ static bool     isEpochAvailable           (const tagEntryInfo *const tag);
 
 static EsObject* getFieldValueForName (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForName (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+static EsObject* getFieldValueForInput (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* getFieldValueForKind (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* getFieldValueForTyperef (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForTyperef (tagEntryInfo *, const fieldDefinition *, const EsObject *);
@@ -134,6 +135,11 @@ static fieldDefinition fieldDefinitionsFixed [] = {
 		.doesContainAnyChar = doesContainAnyCharInInput,
 		.isValueAvailable   = NULL,
 		.dataType           = FIELDTYPE_STRING,
+		.getterValueType    = NULL,
+		.getValueObject     = getFieldValueForInput,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = NULL,
 	},
 	[FIELD_PATTERN] = {
 		.letter             = 'P',
@@ -295,9 +301,9 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.doesContainAnyChar = NULL,
 		.isValueAvailable	= isTyperefFieldAvailable,
 		.dataType			= FIELDTYPE_STRING,
-		.getterValueType    = "[string|false string|false]",
+		.getterValueType    = "[string string]",
 		.getValueObject     = getFieldValueForTyperef,
-		.setterValueType    = "[string|false string|false]|false",
+		.setterValueType    = "[string string]|string|index:int|false",
 		.checkValueForSetter= checkFieldValueForTyperef,
 		.setValueObject     = setFieldValueForTyperef,
 	},
@@ -1545,6 +1551,11 @@ static EsObject* setFieldValueForName (tagEntryInfo *tag, const fieldDefinition 
 	return es_false;
 }
 
+static EsObject* getFieldValueForInput (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	return opt_string_new_from_cstr (tag->inputFileName);
+}
+
 static EsObject* getFieldValueForKind (const tagEntryInfo *tag, const fieldDefinition *fdef)
 {
 	const char *kind_name = getLanguageKindName (tag->langType, tag->kindIndex);
@@ -1573,18 +1584,21 @@ static EsObject* getFieldValueForTyperef (const tagEntryInfo *tag, const fieldDe
 
 static EsObject* setFieldValueForTyperef (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
 {
+	const char *tmp[2] = {NULL, NULL};
+
+	for (int i = 0 ; i < 2; i++)
+	{
+		if (tag->extensionFields.typeRef [i])
+			tmp [i] = tag->extensionFields.typeRef [i];
+	}
+
 	if (es_boolean_p (obj))
 	{
 		for (int i = 0 ; i < 2; i++)
 		{
 			if (tag->extensionFields.typeRef [i])
-			{
-				/* TODO: (void *) */
-				eFree ((void *)tag->extensionFields.typeRef [i]);
 				tag->extensionFields.typeRef [i] = NULL;
-			}
 		}
-		return es_false;
 	}
 	else if (es_object_get_type (obj) == OPT_TYPE_ARRAY)
 	{
@@ -1594,23 +1608,44 @@ static EsObject* setFieldValueForTyperef (tagEntryInfo *tag, const fieldDefiniti
 			if (es_boolean_p (e))
 			{
 				if (tag->extensionFields.typeRef [i])
-				{
-					/* TODO: (void *) */
-					eFree ((void *)tag->extensionFields.typeRef [i]);
 					tag->extensionFields.typeRef [i] = NULL;
-				}
 			}
 			else if (es_object_get_type (e) == OPT_TYPE_STRING)
 			{
-				if (tag->extensionFields.typeRef [i])
-					eFree ((void *)tag->extensionFields.typeRef [i]); /* TODO: (void *) */
 				tag->extensionFields.typeRef [i] = eStrdup (opt_string_get_cstr (e));
 			}
 		}
-		return es_false;
 	}
-	AssertNotReached();
-	return OPT_ERR_TYPECHECK;
+	else if (es_object_get_type (obj) == OPT_TYPE_STRING)
+	{
+		const char *str = opt_string_get_cstr (obj);
+		tag->extensionFields.typeRef [0] = eStrdup ("typename");
+		tag->extensionFields.typeRef [1] = eStrdup (str);
+	}
+	else if (es_integer_p (obj))
+	{
+		int index = es_integer_get (obj);
+		tagEntryInfo *e = getEntryInCorkQueue (index);
+		if (e)
+		{
+			const char *name = e->name;
+			const char *kindName = getLanguageKindName (e->langType, e->kindIndex);
+
+			tag->extensionFields.typeRef [0] = eStrdup (kindName);
+			tag->extensionFields.typeRef [1] = eStrdup (name);
+		}
+	}
+	else
+	{
+		AssertNotReached();
+		return OPT_ERR_TYPECHECK;
+	}
+
+	for (int i = 0; i < 2; i++)
+		if (tmp [i])
+			eFree ((char*)tmp[i]);
+
+	return es_false;
 }
 
 static EsObject* checkFieldValueForTyperef (const fieldDefinition *fdef, const EsObject *obj)
@@ -1631,6 +1666,14 @@ static EsObject* checkFieldValueForTyperef (const fieldDefinition *fdef, const E
 			if (es_object_get_type (e) != OPT_TYPE_STRING)
 				return OPT_ERR_TYPECHECK;
 		}
+	}
+	else if (es_object_get_type (obj) == OPT_TYPE_STRING)
+		;
+	else if (es_integer_p (obj))
+	{
+		int index = es_integer_get (obj);
+		if (index >= countEntryInCorkQueue ())
+			return OPTSCRIPT_ERR_NOTAGENTRY;
 	}
 	else
 		return OPT_ERR_TYPECHECK;
@@ -1667,7 +1710,6 @@ static EsObject* checkFieldValueForScope (const fieldDefinition *fdef, const EsO
 
 static EsObject* getFieldValueForExtras (const tagEntryInfo *tag, const fieldDefinition *fdef)
 {
-
 	if (!isTagExtra (tag))
 		return es_nil;
 
@@ -1771,6 +1813,13 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 		l = es_integer_get (obj);
 		if (l < 1)
 			return OPT_ERR_RANGECHECK;
+
+		/* If the new line number is too large,
+		   we cannot fill tag->filePosition wit
+		   getInputFilePositionForLine(); */
+		if (fdef->ftype == FIELD_LINE_NUMBER
+			&& l < getInputLineNumber())
+			return OPT_ERR_RANGECHECK;
 	}
 	else
 		return OPT_ERR_TYPECHECK;
@@ -1778,7 +1827,10 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 	if (fdef->ftype == FIELD_END_LINE)
 		tag->extensionFields.endLine = l;
 	else
+	{
 		tag->lineNumber = l;
+		tag->filePosition = getInputFilePositionForLine (l);
+	}
 
 	return es_false;
 }

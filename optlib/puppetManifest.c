@@ -22,7 +22,7 @@ typedef enum {
 
 static void initializePuppetManifestParser (const langType language)
 {
-	addLanguageOptscriptPrelude (language,
+	addLanguageOptscriptToHook (language, SCRIPT_HOOK_PRELUDE,
 		"{{    % spec:dict<num,kind> TRYMAKETAG tag:int true\n"
 		"    % spec:dict<num,kind> TRYMAKETAG false\n"
 		"    /trymaketag {\n"

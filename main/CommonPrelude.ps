@@ -140,3 +140,21 @@
         pop false
     } ifelse
 } __bddef
+
+(array key _AMEMBER true|fales)
+/_amember {
+    false 3 1 roll
+    % false array key
+    exch {
+        % false key elt
+        1 index
+        % false key elt key
+        eq {
+            % false key
+            exch pop true exch
+            exit
+        } if
+        % false key
+    } forall
+    pop
+} __bddef

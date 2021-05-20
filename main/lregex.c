@@ -223,12 +223,6 @@ typedef struct {
 	unsigned int advanceto_delta;
 } scriptWindow;
 
-enum hook {
-	HOOK_PRELUDE,
-	HOOK_SEQUEL,
-	HOOK_MAX,
-};
-
 struct lregexControlBlock {
 	int currentScope;
 	ptrArray *entries [2];
@@ -240,8 +234,8 @@ struct lregexControlBlock {
 
 	EsObject *local_dict;
 
-	ptrArray *hook[HOOK_MAX];
-	ptrArray *hook_code[HOOK_MAX];
+	ptrArray *hook[SCRIPT_HOOK_MAX];
+	ptrArray *hook_code[SCRIPT_HOOK_MAX];
 
 	langType owner;
 
@@ -272,8 +266,11 @@ static void   guestRequestSubmit (struct guestRequest *);
 static EsObject *scriptRead (OptVM *vm, const char *src);
 static void scriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex, scriptWindow *window);
 static EsObject* scriptEval (OptVM *vm, EsObject *optscript);
-static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum hook hook);
+static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum scriptHook hook);
 static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb);
+
+static char* make_match_string (scriptWindow *window, int group);
+static matchLoc *make_mloc (scriptWindow *window, int group, bool start);
 
 static void deleteTable (void *ptrn)
 {
@@ -349,7 +346,7 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 	lcb->guest_req = guestRequestNew ();
 	lcb->local_dict = es_nil;
 
-	for (int i = 0; i< HOOK_MAX; i++)
+	for (int i = 0; i< SCRIPT_HOOK_MAX; i++)
 	{
 		lcb->hook[i] = ptrArrayNew (eFree);
 		lcb->hook_code[i] = ptrArrayNew ((ptrArrayDeleteFunc)es_object_unref);
@@ -380,7 +377,7 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 	es_object_unref (lcb->local_dict);
 	lcb->local_dict = es_nil;
 
-	for (int i = 0; i < HOOK_MAX; i++)
+	for (int i = 0; i < SCRIPT_HOOK_MAX; i++)
 	{
 		ptrArrayDelete (lcb->hook[i]);
 		lcb->hook[i] = NULL;
@@ -2017,12 +2014,12 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 		lcb->local_dict = opt_dict_new (23);
 	opt_vm_dstack_push (optvm, lcb->local_dict);
 	opt_vm_set_app_data (optvm, lcb);
-	scriptEvalHook (optvm, lcb, HOOK_PRELUDE);
+	scriptEvalHook (optvm, lcb, SCRIPT_HOOK_PRELUDE);
 }
 
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
 {
-	scriptEvalHook (optvm, lcb, HOOK_SEQUEL);
+	scriptEvalHook (optvm, lcb, SCRIPT_HOOK_SEQUEL);
 	opt_vm_set_app_data (optvm, NULL);
 	opt_vm_clear (optvm);
 	opt_dict_clear (lcb->local_dict);
@@ -2997,7 +2994,7 @@ extern EsObject* scriptEval (OptVM *vm, EsObject *optscript)
 	return optscriptEval (vm, optscript);
 }
 
-static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum hook hook)
+static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum scriptHook hook)
 {
 	if (ptrArrayCount (lcb->hook_code[hook]) == 0)
 	{
@@ -3033,14 +3030,9 @@ static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb)
 	lcb->window = NULL;
 }
 
-extern void	addOptscriptPrelude (struct lregexControlBlock *lcb, const char *code)
+extern void	addOptscriptToHook (struct lregexControlBlock *lcb, enum scriptHook hook, const char *code)
 {
-	ptrArrayAdd (lcb->hook[HOOK_PRELUDE], eStrdup (code));
-}
-
-extern void	addOptscriptSequel (struct lregexControlBlock *lcb, const char *code)
-{
-	ptrArrayAdd (lcb->hook[HOOK_SEQUEL], eStrdup (code));
+	ptrArrayAdd (lcb->hook[hook], eStrdup (code));
 }
 
 /* Return true if available. */
@@ -3273,34 +3265,58 @@ static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
 	scriptWindow *window = lcb->window;
 
-	if (window == NULL
-		|| window->nmatch <= g
-		|| window->pmatch [g].rm_so == -1)
+	matchLoc *mloc = make_mloc (window, g, start);
+	if (mloc == NULL)
 		return OPT_ERR_RANGECHECK;
-
-	matchLoc *mloc = xMalloc (1, matchLoc);
-	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
-	{
-		mloc->delta = 0;
-		mloc->line = getInputLineNumber ();
-		mloc->pos = getInputFilePosition ();
-	}
-	else
-	{
-		mloc->delta = (start
-					   ? window->pmatch [g].rm_so
-					   : window->pmatch [g].rm_eo);
-		off_t offset = (window->line + mloc->delta) - window->start;
-		mloc->line = getInputLineNumberForFileOffset (offset);
-		mloc->pos  = getInputFilePositionForLine (mloc->line);
-	}
 
 	EsObject * mlocobj = es_pointer_new (OPT_TYPE_MATCHLOC, mloc);
 	if (es_error_p (mlocobj))
+	{
+		eFree (mloc);
 		return mlocobj;
+	}
 
 	if (group != tmp)
 		opt_vm_ostack_pop (vm);
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_push (vm, mlocobj);
+	es_object_unref (mlocobj);
+	return es_false;
+}
+
+static matchLoc* make_mloc_from_tagEntryInfo(tagEntryInfo *e)
+{
+	matchLoc *mloc = xMalloc (1, matchLoc);
+	mloc->delta = 0;
+	mloc->line = e->lineNumber;
+	mloc->pos = e->filePosition;
+
+	return mloc;
+}
+
+static EsObject* lrop_get_tag_loc (OptVM *vm, EsObject *name)
+{
+	EsObject *nobj = opt_vm_ostack_top (vm);
+
+	if (es_object_get_type (nobj) != ES_TYPE_INTEGER)
+		return OPT_ERR_TYPECHECK;
+
+	int n = es_integer_get(nobj);
+	if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
+			return OPT_ERR_RANGECHECK;
+
+	tagEntryInfo *e = getEntryInCorkQueue (n);
+	if (e == NULL)
+		return OPT_ERR_TYPECHECK; /* ??? */
+
+	matchLoc *mloc = make_mloc_from_tagEntryInfo (e);
+	EsObject * mlocobj = es_pointer_new (OPT_TYPE_MATCHLOC, mloc);
+	if (es_error_p (mlocobj))
+	{
+		eFree (mloc);
+		return mlocobj;
+	}
+
 	opt_vm_ostack_pop (vm);
 	opt_vm_ostack_push (vm, mlocobj);
 	es_object_unref (mlocobj);
@@ -3311,21 +3327,14 @@ static EsObject* lrop_get_match_string_common (OptVM *vm, int i, int npop)
 {
 	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
 	scriptWindow *window = lcb->window;
-	if (window == NULL
-		|| 0 >= i
-		|| window->nmatch <= i
-		|| window->pmatch [i].rm_so == -1)
+	const char *cstr = make_match_string (window, i);
+	if (!cstr)
 	{
 		for (; npop > 0; npop--)
 			opt_vm_ostack_pop (vm);
 		opt_vm_ostack_push (vm, es_false);
 		return es_false;
 	}
-
-	const int len = window->pmatch [i].rm_eo - window->pmatch [i].rm_so;
-	const char *start = window->line + window->pmatch [i].rm_so;
-
-	const char *cstr = eStrndup (start, len);
 	EsObject *str = opt_string_new_from_cstr (cstr);
 	eFree ((void *)cstr);
 
@@ -3364,6 +3373,47 @@ static EsObject* lrop_get_match_string_gorup_on_stack (OptVM *vm, EsObject *name
 	if (es_object_get_type (r) == OPT_TYPE_STRING)
 		opt_vm_ostack_push (vm, es_true);
 	return es_false;
+}
+
+static char* make_match_string (scriptWindow *window, int group)
+{
+	if (window == NULL
+		|| 0 >= group
+		|| window->nmatch <= group
+		|| window->pmatch [group].rm_so == -1)
+		return NULL;
+
+	const int len = window->pmatch [group].rm_eo - window->pmatch [group].rm_so;
+	const char *start = window->line + window->pmatch [group].rm_so;
+
+	return eStrndup (start, len);
+}
+
+static matchLoc *make_mloc (scriptWindow *window, int group, bool start)
+{
+	if (window == NULL
+		|| 0 > group
+		|| window->nmatch <= group
+		|| window->pmatch [group].rm_so == -1)
+		return NULL;
+
+	matchLoc *mloc = xMalloc (1, matchLoc);
+	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
+	{
+		mloc->delta = 0;
+		mloc->line = getInputLineNumber ();
+		mloc->pos = getInputFilePosition ();
+	}
+	else
+	{
+		mloc->delta = (start
+					   ? window->pmatch [group].rm_so
+					   : window->pmatch [group].rm_eo);
+		off_t offset = (window->line + mloc->delta) - window->start;
+		mloc->line = getInputLineNumberForFileOffset (offset);
+		mloc->pos  = getInputFilePositionForLine (mloc->line);
+	}
+	return mloc;
 }
 
 static EsObject* lrop_set_scope (OptVM *vm, EsObject *name)
@@ -3729,6 +3779,27 @@ static EsObject *lrop_advanceto (OptVM *vm, EsObject *name)
 	return es_true;
 }
 
+static EsObject *lrop_markplaceholder (OptVM *vm, EsObject *name)
+{
+	EsObject *tag = opt_vm_ostack_top (vm);
+
+	if (!es_integer_p (tag))
+		return OPT_ERR_TYPECHECK;
+
+	int n = es_integer_get (tag);
+	if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
+		return OPT_ERR_RANGECHECK;
+
+	tagEntryInfo *e = getEntryInCorkQueue (n);
+	if (e == NULL)
+		return OPTSCRIPT_ERR_NOTAGENTRY;
+
+	markTagPlaceholder (e, true);
+
+	opt_vm_ostack_pop (vm);
+	return es_false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchstr",
@@ -3743,6 +3814,12 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = -1,
 		.help_str = "group:int /start|/end _MATCHLOC matchloc%"
 		"group:int _MATCHLOC matchloc",
+	},
+	{
+		.name     = "_tagloc",
+		.fn       = lrop_get_tag_loc,
+		.arity    = 1,
+		.help_str = "index:int _TAGLOC matchloc",
 	},
 	{
 		.name     = "_tag",
@@ -3861,7 +3938,7 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.name     = "_advanceto",
 		.fn       = lrop_advanceto,
 		.arity    = 1,
-		.help_str = "matchloc _ADVIANCETO -%"
+		.help_str = "matchloc _ADVANCETO -%"
 	},
 	{
 		.name     = "_traced",
@@ -3869,6 +3946,12 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = 0,
 		.help_str = "- _TRACED true|false",
 	},
+	{
+		.name     = "_markplaceholder",
+		.fn       = lrop_markplaceholder,
+		.arity    = 1,
+		.help_str = "tag:int _MARKPLACEHOLDER -",
+	}
 };
 
 extern void initRegexOptscript (void)

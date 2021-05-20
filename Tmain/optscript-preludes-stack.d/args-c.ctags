@@ -1,0 +1,33 @@
+--langdef=C10{base=C}
+--_prelude-C10={{
+    (prelude C10) ==
+}}
+--_sequel-C10={{
+    (sequel C10) ==
+}}
+
+
+--langdef=C11{base=C}
+--_prelude-C11={{
+    (prelude C11) ==
+}}
+--_sequel-C11={{
+    (sequel C11) ==
+}}
+
+--langdef=C20{base=C10}
+--_prelude-C20={{
+    (prelude C20) ==
+}}
+--_sequel-C20={{
+    (sequel C20) ==
+}}
+
+
+--langdef=C30{base=C20}
+--_prelude-C30={{
+    (prelude C30) ==
+}}
+--_sequel-C30={{
+    (sequel C30) ==
+}}

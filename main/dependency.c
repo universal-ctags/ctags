@@ -145,17 +145,18 @@ extern void notifyInputStart (void)
 {
 	subparser *s;
 
-	foreachSubparser(s, false)
-	{
-		langType lang = getSubparserLanguage (s);
-		notifyLanguageRegexInputStart (lang);
+	/* for running prelude of optlib */
+	langType lang = getInputLanguage ();
+	notifyLanguageRegexInputStart (lang);
 
+	foreachSubparser(s, true)
+	{
+		enterSubparser(s);
 		if (s->inputStart)
-		{
-			enterSubparser(s);
 			s->inputStart (s);
-			leaveSubparser();
-		}
+		/* propagate the event recursively */
+		notifyInputStart ();
+		leaveSubparser();
 	}
 }
 
@@ -163,18 +164,19 @@ extern void notifyInputEnd   (void)
 {
 	subparser *s;
 
-	foreachSubparser(s, false)
+	foreachSubparser(s, true)
 	{
+		enterSubparser(s);
+		/* propagate the event recursively */
+		notifyInputEnd ();
 		if (s->inputEnd)
-		{
-			enterSubparser(s);
 			s->inputEnd (s);
-			leaveSubparser();
-		}
-
-		langType lang = getSubparserLanguage (s);
-		notifyLanguageRegexInputEnd (lang);
+		leaveSubparser();
 	}
+
+	/* for running sequel of optlib */
+	langType lang = getInputLanguage ();
+	notifyLanguageRegexInputEnd (lang);
 }
 
 extern void notifyMakeTagEntry (const tagEntryInfo *tag, int corkIndex)

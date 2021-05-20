@@ -614,7 +614,7 @@ EOF
 							: '\n"');
 	}
 	print <<EOF;
-	addLanguageOptscriptPrelude (language,$prelude);
+	addLanguageOptscriptToHook (language, SCRIPT_HOOK_PRELUDE,$prelude);
 EOF
     }
     for (@{$opts->{'sequel'}}) {
@@ -625,7 +625,7 @@ EOF
 							: '\n"');
 	}
 	print <<EOF;
-	addLanguageOptscriptSequel (language,$sequel);
+	addLanguageOptscriptToHook (language, SCRIPT_HOOK_SEQUEL,$sequel);
 EOF
     }
     if ($opts->{'tablenames'}) {
