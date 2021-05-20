@@ -19,6 +19,7 @@
 #include "parse.h"
 #include "read.h"
 #include "subparser.h"
+#include "trace.h"
 #include "types.h"
 #include "yaml.h"
 
@@ -148,8 +149,16 @@ static void findYamlTags (void)
 			leaveSubparser ();
 		}
 
-		verbose("yaml token:%s<%d>@Line:%"PRIuPTR"\n", tokenTypeName[token.type], token.type,
+		TRACE_PRINT("yaml token:%s<%d>@Line:%"PRIuPTR"", tokenTypeName[token.type], token.type,
 				token.start_mark.line + 1);
+		if (isTraced() && token.type == YAML_SCALAR_TOKEN)
+		{
+			TRACE_PRINT_FMT("	");
+			for (size_t i = 0; i < token.data.scalar.length; i++)
+				TRACE_PRINT_FMT("%c", token.data.scalar.value[i]);
+			TRACE_PRINT_NEWLINE();
+		}
+
 		if (token.type == YAML_STREAM_END_TOKEN)
 			done = true;
 

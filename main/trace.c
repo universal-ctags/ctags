@@ -117,4 +117,20 @@ bool isMainTraced(void)
 	return tracingMain;
 }
 
+#else
+bool isTraced (void) { return false; }
+void traceLanguage (langType language) {}
+bool isLanguageTraced (langType language) { return false; }
+
+void traceEnter(const char * szFunction,const char * szFormat,...) {}
+void traceLeave(const char * szFunction,const char * szFormat,...) {}
+void tracePrint(const char * szFunction,const char * szFormat,...) {}
+
+void tracePrintPrefix(const char * szFunction) {}
+void tracePrintFmt(const char * szFormat,...) {}
+void tracePrintNewline(void) {}
+
+void traceMain(void);
+bool isMainTraced(void) { return false; }
+
 #endif // DO_TRACING

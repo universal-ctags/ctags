@@ -42,6 +42,7 @@ static void initializeMarkdownParser (const langType language)
 		"    } def\n"
 		"}}");
 
+	addLanguageRegexTable (language, "frontmatter");
 	addLanguageRegexTable (language, "main");
 	addLanguageRegexTable (language, "main_sharp");
 	addLanguageRegexTable (language, "chapter");
@@ -63,6 +64,18 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageRegexTable (language, "codeblockBacktick");
 	addLanguageRegexTable (language, "codeblockTildes");
 
+	addLanguageTagMultiTableRegex (language, "frontmatter",
+	                               "^(---[\n]).*(---[\n])",
+	                               "", "", "{tjump=main}", NULL);
+	addLanguageTagMultiTableRegex (language, "frontmatter",
+	                               "^(;;;[\n]).*(;;;[\n])",
+	                               "", "", "{tjump=main}", NULL);
+	addLanguageTagMultiTableRegex (language, "frontmatter",
+	                               "^(\\+\\+\\+[\n]).*(\\+\\+\\+[\n])",
+	                               "", "", "{tjump=main}", NULL);
+	addLanguageTagMultiTableRegex (language, "frontmatter",
+	                               "^.",
+	                               "", "", "{_advanceTo=0start}{tjump=main}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^#",
 	                               "", "", "{_advanceTo=0start}{tjump=main_sharp}", NULL);
