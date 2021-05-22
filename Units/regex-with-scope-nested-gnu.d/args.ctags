@@ -1,0 +1,22 @@
+# To check the output easier
+--sort=no
+--fields=+e
+
+--langdef=foo
+    --map-foo=+.foo
+    --regex-foo=/^#.*//{exclusive}
+    --regex-foo=/^[[:blank:]]*define[[:blank:]]+([[:alnum:]_]+)[[:blank:]]*\{/\1/d,definition/{scope=push}
+    --regex-foo=/^[[:blank:]]*\{/_/d,definition/{scope=push}{placeholder}
+    --regex-foo=/^[[:blank:]]*package[[:blank:]]+([[:alnum:]_]+)/\1/p,package/{scope=push}
+    --regex-foo=/^[[:blank:]]*end[[:blank:]]*$//{scope=pop}{exclusive}
+    --regex-foo=/^[[:blank:]]*\}[[:blank:]]*$//{scope=pop}{exclusive}
+    --regex-foo=/^[[:blank:]]*ns[[:blank:]]+([[:alnum:]_]+)/\1/n,namespace/{scope=set}
+    --regex-foo=/^[[:blank:]]*var[[:blank:]]+([[:alnum:]_]+)/\1/v,var/{scope=ref}
+    --regex-foo=/^[[:blank:]]*global//{scope=clear}{exclusive}
+
+--langdef=bar{base=foo}
+   --kinddef-bar=s,scope,scopes
+   --kinddef-bar=d,definition,definitions
+   --regex-bar=/^# open:([[:alnum:]_]+)/\1/s/{scope=push}
+   --regex-bar=/^# def:([[:alnum:]_]+)/\1/d/{scope=ref}
+   --regex-bar=/^# close//{scope=pop}{exclusive}
