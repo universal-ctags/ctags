@@ -1,0 +1,6 @@
+# Taken from #1473 opened by WillDHB
+--langdef=mltest
+--mline-regex-mltest=/@subscribe([[:space:]])*([a-z ]+)[[:space:]]*([a-zA-Z]*)\(([a-zA-Z]*)/\3-\4/s,subscription/{mgroup=3}
+--excmd=mixed
+--fields=+ln
+--language-force=mltest
