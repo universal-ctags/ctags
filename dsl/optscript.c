@@ -338,6 +338,7 @@ declop(_strrstr);
 declop(_strchr);
 declop(_strrchr);
 declop(_strpbrk);
+declop(_strrpbrk);
 
 /* Relation, logical, and bit operators
    tested in relalogbit.ps */
@@ -554,6 +555,8 @@ opt_init (void)
 		   "string chr _STRRCHR string false");
 	defop (opt_system_dict, _strpbrk, 2, "string accept _STRPBRK string offset true%"
 		   "string accept _STRPBRK string false");
+	defop (opt_system_dict, _strrpbrk, 2, "string accept _STRRPBRK string offset true%"
+		   "string accept _STRRPBRK string false");
 
 	defop (opt_system_dict, exec,           1, "any EXEC -");
 	defop (opt_system_dict, if,             2, "bool proc IF -");
@@ -3388,7 +3391,7 @@ op__strrchr (OptVM *vm, EsObject *name)
 }
 
 static EsObject*
-op__strpbrk (OptVM *vm, EsObject *name)
+op__strpbrk_common (OptVM *vm, EsObject *name, bool from_tail)
 {
 	EsObject *acceptobj = ptrArrayLast (vm->ostack);
 	EsObject *strobj = ptrArrayItemFromLast (vm->ostack, 1);
@@ -3402,7 +3405,7 @@ op__strpbrk (OptVM *vm, EsObject *name)
 	vString *acceptv = es_pointer_get (acceptobj);
 
 	const char *str = vStringValue (strv);
-	char *p = strpbrk (str, vStringValue (acceptv));
+	char *p = (from_tail? strrpbrk: strpbrk) (str, vStringValue (acceptv));
 	if (p)
 	{
 		int d = p - str;
@@ -3421,6 +3424,18 @@ op__strpbrk (OptVM *vm, EsObject *name)
 		vm_ostack_push (vm, es_false);
 		return es_false;
 	}
+}
+
+static EsObject*
+op__strpbrk (OptVM *vm, EsObject *name)
+{
+	return op__strpbrk_common (vm, name, false);
+}
+
+static EsObject*
+op__strrpbrk (OptVM *vm, EsObject *name)
+{
+	return op__strpbrk_common (vm, name, true);
 }
 
 
