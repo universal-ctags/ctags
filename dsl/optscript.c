@@ -691,6 +691,12 @@ opt_dict_known_and_get_cstr (EsObject *dict, const char* name, EsObject **val)
 }
 
 bool
+opt_dict_known_and_get (EsObject *dict, EsObject *key, EsObject **val)
+{
+	return dict_op_known_and_get (dict, key, val);
+}
+
+bool
 opt_dict_foreach (EsObject *dict, bool (* fn) (EsObject *, EsObject *, void*), void *data)
 {
 	if (es_object_get_type (dict) != OPT_TYPE_DICT)
