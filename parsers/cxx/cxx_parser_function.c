@@ -834,7 +834,8 @@ bool cxxParserLookForFunctionSignature(
 				{
 					if(
 							(!cxxTokenIsKeyword(pToken,CXXKeywordNEW)) &&
-							(!cxxTokenIsKeyword(pToken,CXXKeywordDELETE))
+							(!cxxTokenIsKeyword(pToken,CXXKeywordDELETE)) &&
+							(!cxxKeywordMayBePartOfTypeName(pToken->eKeyword))
 						)
 					{
 						CXX_DEBUG_LEAVE_TEXT("Unexpected token after the operator keyword");

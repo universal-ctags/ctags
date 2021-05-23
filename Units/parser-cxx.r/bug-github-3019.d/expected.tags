@@ -1,0 +1,6 @@
+X	input.cpp	/^struct X {$/;"	s	file:
+operator int	input.cpp	/^    operator int() const { return 7; }$/;"	f	struct:X	file:
+operator int*	input.cpp	/^    explicit operator int*() const { return nullptr; }$/;"	f	struct:X	file:
+arr_t	input.cpp	/^    using arr_t = int[3];$/;"	t	struct:X	typeref:typename:int[3]	file:
+operator arr_t*	input.cpp	/^    operator arr_t*() const { return nullptr; } \/\/ OK if done through typedef$/;"	f	struct:X	file:
+main	input.cpp	/^int main()$/;"	f	typeref:typename:int
