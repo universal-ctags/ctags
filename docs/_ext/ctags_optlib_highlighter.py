@@ -41,7 +41,7 @@ from pygments.token import *
 #   python -m pygments -x -l ctags_highlighter.py:CtagsOptlibLexer foo.ctags  | less -r
 #
 
-class CtagsOtplibLexer(RegexLexer):
+class CtagsOptlibLexer(RegexLexer):
     name = 'ctags'
     aliases = ['ctags']
     filenames = ['*.ctags']
