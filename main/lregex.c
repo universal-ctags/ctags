@@ -1377,7 +1377,7 @@ static void regex_flag_extend_short (char c CTAGS_ATTR_UNUSED, void* data)
 	*cflags |= REG_EXTENDED;
 }
 
-static void regex_flag_extend_long (const char* const c CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
+static void regex_flag_extend_long (const char* const s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
 {
 	regex_flag_extend_short('e', data);
 }
