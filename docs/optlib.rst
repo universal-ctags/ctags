@@ -33,9 +33,9 @@ thus easily become a built-in parser. See ":ref:`optlib2c`" for details.
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Universal Ctags currently uses `the POSIX Extended Regular Expressions (ERE)
+Universal Ctags uses `the POSIX Extended Regular Expressions (ERE)
 <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html>`_
-syntax as same as Exuberant Ctags.
+syntax as same as Exuberant Ctags by default.
 
 During building Universal Ctags the ``configure`` script runs compatibility
 tests of the regex engine in the system library.  If tests pass the engine is
@@ -107,6 +107,24 @@ single literal character control codes before passing the pattern to glibc.
 You should always test your regex patterns against test files with strings that
 do and do not match. Pay particular emphasis to when it should *not* match, and
 how *much* it matches when it should.
+
+Perl-compatible regular expressions (PCRE2) engine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Universal Ctags optionally supports `Perl-Compatible Regular Expressions (PCRE2)
+<https://www.pcre.org/current/doc/html/pcre2syntax.html>`_ syntax
+only if the Universal Ctags is built with ``pcre2`` library.
+See the output of ``--list-features`` option to know whether your Universal
+Ctags is built-with ``pcre2`` or not.
+
+PCRE2 *does* support many "modern" extensions.
+For example this pattern::
+
+       foo.*?bar
+
+Will match just the first part, ``foobar``, not this entire string,::
+
+       foobar, bar, and even more bar
 
 Regex option argument flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -313,6 +313,13 @@ representation. ``--list-regex-flags`` lists all the flags.
 	The pattern is interpreted as a POSIX extended regular
 	expression (default).
 
+``pcre2`` (one-letter form ``p``, experimental)
+	The pattern is interpreted as a PCRE2 regular expression explained
+	in pcre2syntax(3).  This flag is available only if the ctags is
+	built with ``pcre2`` library. See the output of
+	``--list-features`` option to know whether your ctags is
+	built-with ``pcre2`` or not.
+
 ``icase`` (one-letter form ``i``)
 	The regular expression is to be applied in a case-insensitive
 	manner.
@@ -458,7 +465,7 @@ The official Universal Ctags web site at:
 
 https://ctags.io/
 
-ctags(1), tags(5), regex(3), regex(7), egrep(1)
+ctags(1), tags(5), regex(3), regex(7), egrep(1), pcre2syntax(3)
 
 AUTHOR
 ------
