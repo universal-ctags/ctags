@@ -111,6 +111,9 @@
     <ClCompile Include="..\main\kind.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\lregex-default.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\lregex.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>

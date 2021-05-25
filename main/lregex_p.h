@@ -19,9 +19,18 @@
 *   INCLUDE FILES
 */
 #include "general.h"
+#include "flags_p.h"
 #include "kind_p.h"
 #include "lregex.h"
 #include "parse.h"
+
+#include <regex.h>
+
+/*
+*   MACRO DEFINITIONS
+*/
+/* Back-references \0 through \9 */
+#define BACK_REFERENCE_COUNT 10
 
 /*
 *   DATA DECLARATIONS
@@ -33,6 +42,31 @@ enum regexParserType {
 };
 
 struct lregexControlBlock;
+
+typedef struct sRegexCompiledCode {
+	struct regexBackend *backend;
+	void * code;
+} regexCompiledCode;
+
+struct regexBackend {
+	flagDefinition *fdefs;
+	unsigned int fdef_count;
+
+	void              (* set_icase_flag) (int *);
+	regexCompiledCode (* compile)     (struct regexBackend *,
+									   const char* const,
+									   int);
+	int               (* match)       (struct regexBackend *,
+									   void *, const char *, size_t,
+									   regmatch_t[BACK_REFERENCE_COUNT]);
+	void              (* delete_code) (void *);
+};
+
+struct flagDefsDescriptor {
+	struct regexBackend *backend;
+	int flags;
+	enum regexParserType regptype;
+};
 
 /*
 *   FUNCTION PROTOTYPES
@@ -79,5 +113,10 @@ extern void listRegexOpscriptOperators (FILE *fp);
 extern void addOptscriptToHook (struct lregexControlBlock *lcb, enum scriptHook hook, const char *code);
 
 extern void printMultitableStatistics (struct lregexControlBlock *lcb);
+
+extern void basic_regex_flag_short (char c, void* data);
+extern void basic_regex_flag_long (const char* const s, const char* const unused, void* data);
+extern void extend_regex_flag_short (char c, void* data);
+extern void extend_regex_flag_long (const char* const s, const char* const unused, void* data);
 
 #endif	/* CTAGS_MAIN_LREGEX_PRIVATEH */

@@ -196,6 +196,7 @@
     <ClCompile Include="..\main\htable.c" />
     <ClCompile Include="..\main\keyword.c" />
     <ClCompile Include="..\main\kind.c" />
+    <ClCompile Include="..\main\lregex-default.c" />
     <ClCompile Include="..\main\lregex.c" />
     <ClCompile Include="..\main\lxpath.c" />
     <ClCompile Include="..\main\main.c" />

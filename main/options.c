@@ -2196,25 +2196,25 @@ static void processListPseudoTagsOptions (
 
 static void processListRegexFlagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
+		const char *const parameter)
 {
-	printRegexFlags (localOption.withListHeader, localOption.machinable, stdout);
+	printRegexFlags (localOption.withListHeader, localOption.machinable, parameter, stdout);
 	exit (0);
 }
 
 static void processListMultilineRegexFlagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
+		const char *const parameter)
 {
-	printMultilineRegexFlags (localOption.withListHeader, localOption.machinable, stdout);
+	printMultilineRegexFlags (localOption.withListHeader, localOption.machinable, parameter, stdout);
 	exit (0);
 }
 
 static void processListMultitableRegexFlagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
+		const char *const parameter)
 {
-	printMultitableRegexFlags (localOption.withListHeader, localOption.machinable, stdout);
+	printMultitableRegexFlags (localOption.withListHeader, localOption.machinable, parameter, stdout);
 	exit (0);
 }
 
