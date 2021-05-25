@@ -1361,6 +1361,10 @@ static flagDefinition backendFlagDefs[] = {
 	  NULL, "interpreted as a Posix basic regular expression."},
 	{ 'e', "extend", extend_regex_flag_short, extend_regex_flag_long,
 	  NULL, "interpreted as a Posix extended regular expression (default)"},
+#ifdef HAVE_PCRE2
+	{ 'p', "pcre2",  pcre2_regex_flag_short, pcre2_regex_flag_long,
+	  NULL, "use pcre2 regex engine"},
+#endif
 };
 
 static void regex_flag_icase_short (char c CTAGS_ATTR_UNUSED, void* data)
@@ -1380,7 +1384,7 @@ static flagDefinition backendCommonRegexFlagDefs[] = {
 };
 
 
-static struct flagDefsDescriptor choose_backend (const char *flags, enum regexParserType regptype)
+static struct flagDefsDescriptor choose_backend (const char *flags, enum regexParserType regptype, bool error_if_no_backend)
 {
 	struct flagDefsDescriptor desc = {
 		.backend  = NULL,
@@ -1396,17 +1400,22 @@ static struct flagDefsDescriptor choose_backend (const char *flags, enum regexPa
 
 	/* Choose the default backend. */
 	if (desc.backend == NULL)
+	{
+		if (flags && error_if_no_backend)
+			error (FATAL, "No sunch backend for the name: \"%s\"", flags);
+
 		flagsEval (DEFAULT_REGEX_BACKEND,
 				   backendFlagDefs,
 				   ARRAY_SIZE(backendFlagDefs),
 				   &desc);
+	}
 	return desc;
 }
 
 static regexCompiledCode compileRegex (enum regexParserType regptype,
 									   const char* const regexp, const char* const flags)
 {
-	struct flagDefsDescriptor desc = choose_backend (flags, regptype);
+	struct flagDefsDescriptor desc = choose_backend (flags, regptype, false);
 
 	/* Evaluate backend specific flags */
 	flagsEval (flags,
@@ -2373,7 +2382,10 @@ extern void printRegexFlags (bool withListHeader, bool machinable, const char *f
 
 	if (flags && *flags != '\0')
 	{
-		struct flagDefsDescriptor desc = choose_backend (flags, REG_PARSER_SINGLE_LINE);
+		/* Print backend specific flags.
+		 * This code is just stub because there is no backend having a specific flag.
+		 * The help message for this option is not updated. */
+		struct flagDefsDescriptor desc = choose_backend (flags, REG_PARSER_SINGLE_LINE, true);
 		flagsColprintAddDefinitions (table, desc.backend->fdefs, desc.backend->fdef_count);
 	}
 	else
@@ -2396,7 +2408,10 @@ extern void printMultilineRegexFlags (bool withListHeader, bool machinable, cons
 
 	if (flags && *flags != '\0')
 	{
-		struct flagDefsDescriptor desc = choose_backend (flags, REG_PARSER_MULTI_LINE);
+		/* Print backend specific flags.
+		 * This code is just stub because there is no backend having a specific flag.
+		 * The help message for this option is not updated. */
+		struct flagDefsDescriptor desc = choose_backend (flags, REG_PARSER_MULTI_LINE, true);
 		flagsColprintAddDefinitions (table, desc.backend->fdefs, desc.backend->fdef_count);
 	}
 	else
@@ -2418,7 +2433,10 @@ extern void printMultitableRegexFlags (bool withListHeader, bool machinable, con
 
 	if (flags && *flags != '\0')
 	{
-		struct flagDefsDescriptor desc = choose_backend (flags, REG_PARSER_MULTI_TABLE);
+		/* Print backend specific flags.
+		 * This code is just stub because there is no backend having a specific flag.
+		 * The help message for this option is not updated. */
+		struct flagDefsDescriptor desc = choose_backend (flags, REG_PARSER_MULTI_TABLE, true);
 		flagsColprintAddDefinitions (table, desc.backend->fdefs, desc.backend->fdef_count);
 	}
 	else

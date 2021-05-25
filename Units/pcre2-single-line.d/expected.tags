@@ -1,0 +1,9 @@
+P0	input.foo	/^package P0$/;"	p
+abc	input.foo	/^var "abc"$/;"	v
+capture_me_in_bar	input.foo	/^def |capture_me_in_bar|$/;"	d
+capture_me_in_slash	input.foo	/^def \/capture_me_in_slash\/$/;"	d
+f0	input.foo	/^func 'f0'$/;"	f
+f1	input.foo	/^func "f1"$/;"	f
+f2	input.foo	/^func f2$/;"	f
+f3	input.foo	/^FunC f3$/;"	f
+m0	input.foo	/^macro m0$/;"	m

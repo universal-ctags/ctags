@@ -27,6 +27,12 @@ ifeq (yes, $(WITH_ICONV))
 DEFINES += -DHAVE_ICONV
 LIBS += -liconv
 endif
+ifeq (yes, $(WITH_PCRE2))
+CFLAGS += -DHAVE_LIBPCRE2=1 $(shell pkg-config --cflags libpcre2-8)
+LIBS += $(shell pkg-config --libs libpcre2-8)
+PARSER_SRCS += $(PCRE2_SRCS)
+PARSER_HEADS += $(PCRE2_HEADS)
+endif
 ifeq (yes, $(WITH_YAML))
 CFLAGS += -DHAVE_LIBYAML=1 $(shell pkg-config --cflags yaml-0.1)
 LIBS += $(shell pkg-config --libs yaml-0.1)

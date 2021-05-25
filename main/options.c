@@ -603,6 +603,9 @@ static struct Feature {
 	{"packcc", "has peg based parser(s)"},
 #endif
 	{"optscript", "can use the interpreter"},
+#ifdef HAVE_PCRE2
+	{"pcre2", "has pcre2 regex engine"},
+#endif
 	{NULL,}
 };
 

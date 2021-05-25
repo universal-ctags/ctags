@@ -118,5 +118,9 @@ extern void basic_regex_flag_short (char c, void* data);
 extern void basic_regex_flag_long (const char* const s, const char* const unused, void* data);
 extern void extend_regex_flag_short (char c, void* data);
 extern void extend_regex_flag_long (const char* const s, const char* const unused, void* data);
+#ifdef HAVE_PCRE2
+extern void pcre2_regex_flag_short (char c, void* data);
+extern void pcre2_regex_flag_long (const char* const s, const char* const unused, void* data);
+#endif
 
 #endif	/* CTAGS_MAIN_LREGEX_PRIVATEH */

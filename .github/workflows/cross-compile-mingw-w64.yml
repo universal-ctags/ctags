@@ -31,6 +31,7 @@ jobs:
               --disable-xml \
               --disable-json \
               --disable-yaml \
+              --disable-pcre2 \
               CC=${{ matrix.target }}-gcc \
               CFLAGS='-v' \
               AR=${{ matrix.target }}-ar \

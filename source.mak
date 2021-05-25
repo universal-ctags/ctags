@@ -375,6 +375,12 @@ YAML_SRCS = \
 	\
 	$(NULL)
 
+PCRE2_HEADS =
+PCRE2_SRCS = \
+	    main/lregex-pcre2.c \
+	    \
+	    $(NULL)
+
 OPTSCRIPT_DSL_HEADS = \
 	dsl/es.h \
 	dsl/optscript.h \

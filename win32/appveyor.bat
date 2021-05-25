@@ -142,7 +142,7 @@ if "%normalbuild%"=="no" (
   bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-python3-sphinx && break || sleep 15; done"
 )
 :: Install necessary packages
-bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{jansson,libxml2,libyaml} && break || sleep 15; done"
+bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{jansson,libxml2,libyaml,pcre2} && break || sleep 15; done"
 
 bash -lc "./autogen.sh"
 :: Use static link.
@@ -240,7 +240,7 @@ goto :eof
 :: ----------------------------------------------------------------------
 :: Using Cygwin, iconv enabled
 @echo on
-c:\cygwin64\setup-x86_64.exe -qnNdO -P dos2unix,libiconv-devel,libjansson-devel,libxml2-devel,libyaml-devel,perl
+c:\cygwin64\setup-x86_64.exe -qnNdO -P dos2unix,libiconv-devel,libjansson-devel,libxml2-devel,libyaml-devel,pcre2,perl
 PATH c:\cygwin64\bin;%PATH%
 set CHERE_INVOKING=yes
 bash -lc "./autogen.sh"
