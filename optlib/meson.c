@@ -35,25 +35,25 @@ static void initializeMesonParser (const langType language)
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^custom_target[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^custom_target[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "c", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^(alias|run)_target[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^(alias|run)_target[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\2", "r", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "b", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^project[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^project[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "P", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^subdir[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^subdir[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "S", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^test[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^test[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "t", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^([a-zA-Z_][a-zA-Z_0-9]*)[ \t\n]*=[ \t\n]*",
@@ -74,7 +74,7 @@ static void initializeMesonParser (const langType language)
 	                               "^\\\\'",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "string",
-	                               "^[^\\']+",
+	                               "^[^\\\\']+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "string",
 	                               "^'",
@@ -101,16 +101,16 @@ static void initializeMesonParser (const langType language)
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
-	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
-	                               "^custom_target[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^custom_target[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "c", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
-	                               "^(alias|run)_target[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^(alias|run)_target[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\2", "r", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
-	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "b", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
 	                               "^[])}]",
@@ -134,16 +134,16 @@ static void initializeMesonParser (const langType language)
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
 	addLanguageTagMultiTableRegex (language, "common",
-	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "common",
-	                               "^custom_target[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^custom_target[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "c", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "common",
-	                               "^(alias|run)_target[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^(alias|run)_target[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\2", "r", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "common",
-	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "b", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
 	                               "^[ \t\n]+",
@@ -161,16 +161,16 @@ static void initializeMesonParser (const langType language)
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
-	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
-	                               "^custom_target[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^custom_target[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "c", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
-	                               "^(alias|run)_target[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^(alias|run)_target[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\2", "r", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
-	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*",
+	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "b", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
 	                               "^[])}]",
