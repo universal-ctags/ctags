@@ -152,18 +152,21 @@ extern void vStringCatS (vString *const string, const char *const s)
 
 /*  Strip trailing newline from string.
  */
-extern void vStringStripNewline (vString *const string)
+extern bool vStringStripNewline (vString *const string)
 {
 	const size_t final = string->length - 1;
 
 	if (string->length == 0)
-		return;
+		return false;
 
 	if (string->buffer [final] == '\n')
 	{
 		string->buffer [final] = '\0';
 		string->length--;
+		return true;
 	}
+
+	return false;
 }
 
 /*  Strip leading white space from string.
