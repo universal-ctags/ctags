@@ -4,3 +4,28 @@ operator int*	input.cpp	/^    explicit operator int*() const { return nullptr; }
 arr_t	input.cpp	/^    using arr_t = int[3];$/;"	t	struct:X	typeref:typename:int[3]	file:
 operator arr_t*	input.cpp	/^    operator arr_t*() const { return nullptr; } \/\/ OK if done through typedef$/;"	f	struct:X	file:
 main	input.cpp	/^int main()$/;"	f	typeref:typename:int
+myint	input-1.cpp	/^typedef int myint;$/;"	t	typeref:typename:int	file:
+Point	input-1.cpp	/^struct Point {$/;"	s	file:
+Point	input-1.cpp	/^  Point (int i): x(i), y(i) {}$/;"	f	struct:Point	file:
+x	input-1.cpp	/^  int x,y;$/;"	m	struct:Point	typeref:typename:int	file:
+y	input-1.cpp	/^  int x,y;$/;"	m	struct:Point	typeref:typename:int	file:
+Int	input-1.cpp	/^class Int {$/;"	c	file:
+Int	input-1.cpp	/^  Int (int i = 0): val(i), p(i) {}$/;"	f	class:Int	file:
+operator myint	input-1.cpp	/^  operator myint() const { return val; }$/;"	f	class:Int	file:
+operator const myint	input-1.cpp	/^  operator const myint() const { return val; }$/;"	f	class:Int	file:
+operator myint*	input-1.cpp	/^  operator myint*() const { return NULL; }$/;"	f	class:Int	file:
+operator const myint*	input-1.cpp	/^  operator const myint*() const { return NULL; }$/;"	f	class:Int	file:
+operator myint*const	input-1.cpp	/^  operator myint*const() const { return NULL; }$/;"	f	class:Int	file:
+operator const myint*const	input-1.cpp	/^  operator const myint*const() const { return NULL; }$/;"	f	class:Int	file:
+operator int	input-1.cpp	/^  operator int() const { return val; }$/;"	f	class:Int	file:
+operator int*	input-1.cpp	/^  operator int *() const { return 0; }$/;"	f	class:Int	file:
+operator const int*	input-1.cpp	/^  operator const int *() const { return 0; }$/;"	f	class:Int	file:
+operator const int*const	input-1.cpp	/^  operator const int *const() const { return 0; }$/;"	f	class:Int	file:
+operator int*const	input-1.cpp	/^  operator int *const() const { return 0; }$/;"	f	class:Int	file:
+operator struct Point*	input-1.cpp	/^  operator struct Point *() const { return (Point *)&p; }$/;"	f	class:Int	file:
+operator const struct Point*	input-1.cpp	/^  operator const struct Point *() const { return 0; }$/;"	f	class:Int	file:
+operator const struct Point*const	input-1.cpp	/^  operator const struct Point *const() const { return 0; }$/;"	f	class:Int	file:
+operator struct Point*const	input-1.cpp	/^  operator struct Point *const() const { return 0; }$/;"	f	class:Int	file:
+val	input-1.cpp	/^  int val;$/;"	m	class:Int	typeref:typename:int	file:
+p	input-1.cpp	/^  struct Point p;$/;"	m	class:Int	typeref:struct:Point	file:
+main	input-1.cpp	/^int main(void)$/;"	f	typeref:typename:int
