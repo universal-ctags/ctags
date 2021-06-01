@@ -10,6 +10,7 @@
 *.obj
 *.od
 *.pdf
+*.pyc
 *.ssexwsp
 *.ssexwsp.user
 *.tar.gz
