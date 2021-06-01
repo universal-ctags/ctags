@@ -1,5 +1,16 @@
 #!/bin/sh
 
+tools=""
+
+# Report the paths causing trouble frequently
+echo '##################################################################'
+echo '#                     The paths for tools                        #'
+echo '##################################################################'
+for t in autoreconf aclocal pkg-config; do
+	type $t
+done
+echo '##################################################################'
+
 set -xe
 
 type autoreconf > /dev/null 2>&1 || {
