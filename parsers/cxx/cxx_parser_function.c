@@ -834,7 +834,9 @@ bool cxxParserLookForFunctionSignature(
 				{
 					if(
 							(!cxxTokenIsKeyword(pToken,CXXKeywordNEW)) &&
-							(!cxxTokenIsKeyword(pToken,CXXKeywordDELETE))
+							(!cxxTokenIsKeyword(pToken,CXXKeywordDELETE)) &&
+							(!cxxKeywordMayBePartOfTypeName(pToken->eKeyword)) &&
+							(!cxxTokenIsKeyword(pToken,CXXKeywordVOLATILE))
 						)
 					{
 						CXX_DEBUG_LEAVE_TEXT("Unexpected token after the operator keyword");
@@ -1140,7 +1142,14 @@ next_token:
 		CXXToken * t = pInfo->pIdentifierStart->pNext;
 		while(t != pInfo->pIdentifierEnd)
 		{
-			t->bFollowedBySpace = false;
+			// If a keyword or an identifier followed by another keyword
+			// or an identifier need a space.
+			t->bFollowedBySpace = (
+				(cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier|CXXTokenTypeKeyword))
+				&& cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeIdentifier|CXXTokenTypeKeyword)
+				)
+				? true
+				: false;
 			t = t->pNext;
 		}
 	} else {

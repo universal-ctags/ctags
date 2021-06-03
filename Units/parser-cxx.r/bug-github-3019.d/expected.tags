@@ -1,0 +1,62 @@
+X	input.cpp	/^struct X {$/;"	s	file:
+operator int	input.cpp	/^    operator int() const { return 7; }$/;"	f	struct:X	file:
+operator int*	input.cpp	/^    explicit operator int*() const { return nullptr; }$/;"	f	struct:X	file:
+arr_t	input.cpp	/^    using arr_t = int[3];$/;"	t	struct:X	typeref:typename:int[3]	file:
+operator arr_t*	input.cpp	/^    operator arr_t*() const { return nullptr; } \/\/ OK if done through typedef$/;"	f	struct:X	file:
+main	input.cpp	/^int main()$/;"	f	typeref:typename:int
+myint	input-1.cpp	/^typedef int myint;$/;"	t	typeref:typename:int	file:
+Point	input-1.cpp	/^struct Point {$/;"	s	file:
+Point	input-1.cpp	/^  Point (int i): x(i), y(i) {}$/;"	f	struct:Point	file:
+x	input-1.cpp	/^  int x,y;$/;"	m	struct:Point	typeref:typename:int	file:
+y	input-1.cpp	/^  int x,y;$/;"	m	struct:Point	typeref:typename:int	file:
+Int	input-1.cpp	/^class Int {$/;"	c	file:
+Int	input-1.cpp	/^  Int (int i = 0): val(i), p(i) {}$/;"	f	class:Int	file:
+operator myint	input-1.cpp	/^  operator myint() const { return val; }$/;"	f	class:Int	file:
+operator const myint	input-1.cpp	/^  operator const myint() const { return val; }$/;"	f	class:Int	file:
+operator myint*	input-1.cpp	/^  operator myint*() const { return NULL; }$/;"	f	class:Int	file:
+operator const myint*	input-1.cpp	/^  operator const myint*() const { return NULL; }$/;"	f	class:Int	file:
+operator myint*const	input-1.cpp	/^  operator myint*const() const { return NULL; }$/;"	f	class:Int	file:
+operator const myint*const	input-1.cpp	/^  operator const myint*const() const { return NULL; }$/;"	f	class:Int	file:
+operator int	input-1.cpp	/^  operator int() const { return val; }$/;"	f	class:Int	file:
+operator int*	input-1.cpp	/^  operator int *() const { return 0; }$/;"	f	class:Int	file:
+operator const int*	input-1.cpp	/^  operator const int *() const { return 0; }$/;"	f	class:Int	file:
+operator const int*const	input-1.cpp	/^  operator const int *const() const { return 0; }$/;"	f	class:Int	file:
+operator int*const	input-1.cpp	/^  operator int *const() const { return 0; }$/;"	f	class:Int	file:
+operator struct Point*	input-1.cpp	/^  operator struct Point *() const { return (Point *)&p; }$/;"	f	class:Int	file:
+operator const struct Point*	input-1.cpp	/^  operator const struct Point *() const { return 0; }$/;"	f	class:Int	file:
+operator const struct Point*const	input-1.cpp	/^  operator const struct Point *const() const { return 0; }$/;"	f	class:Int	file:
+operator struct Point*const	input-1.cpp	/^  operator struct Point *const() const { return 0; }$/;"	f	class:Int	file:
+val	input-1.cpp	/^  int val;$/;"	m	class:Int	typeref:typename:int	file:
+p	input-1.cpp	/^  struct Point p;$/;"	m	class:Int	typeref:struct:Point	file:
+main	input-1.cpp	/^int main(void)$/;"	f	typeref:typename:int
+muchar	input-2.cpp	/^typedef char muchar;$/;"	t	typeref:typename:char	file:
+Range	input-2.cpp	/^struct Range {$/;"	s	file:
+Range	input-2.cpp	/^  Range (int b, int e): begin(b), end(end) {}$/;"	f	struct:Range	file:
+begin	input-2.cpp	/^  int begin, end;$/;"	m	struct:Range	typeref:typename:int	file:
+end	input-2.cpp	/^  int begin, end;$/;"	m	struct:Range	typeref:typename:int	file:
+Char	input-2.cpp	/^class Char {$/;"	c	file:
+Char	input-2.cpp	/^  Char (char i = 0): val(i), r(i, i) {}$/;"	f	class:Char	file:
+operator volatile muchar	input-2.cpp	/^  operator volatile muchar() const { return val; }$/;"	f	class:Char	file:
+operator volatile const muchar*	input-2.cpp	/^  operator volatile const muchar*() const { return 0; }$/;"	f	class:Char	file:
+operator volatile const muchar*const	input-2.cpp	/^  operator volatile const muchar*const() const { return 0; }$/;"	f	class:Char	file:
+operator volatile int*	input-2.cpp	/^  operator volatile int *() const { return 0; }$/;"	f	class:Char	file:
+operator volatile int*volatile	input-2.cpp	/^  operator volatile int *volatile() const { return 0; }$/;"	f	class:Char	file:
+operator int*volatile	input-2.cpp	/^  operator int *volatile() const { return 0; }$/;"	f	class:Char	file:
+operator volatile const int*	input-2.cpp	/^  operator volatile const int *() const { return 0; }$/;"	f	class:Char	file:
+operator volatile const int*volatile	input-2.cpp	/^  operator volatile const int *volatile() const { return 0; }$/;"	f	class:Char	file:
+operator int*volatile const	input-2.cpp	/^  operator int *volatile const() const { return 0; }$/;"	f	class:Char	file:
+operator volatile const int*	input-2.cpp	/^  operator volatile const int *() volatile { return 0; }$/;"	f	class:Char	file:
+operator volatile const int*volatile	input-2.cpp	/^  operator volatile const int *volatile() volatile { return 0; }$/;"	f	class:Char	file:
+operator int*volatile const	input-2.cpp	/^  operator int *volatile const() volatile { return 0; }$/;"	f	class:Char	file:
+operator volatile struct Range*	input-2.cpp	/^  operator volatile struct Range *() const { return 0; }$/;"	f	class:Char	file:
+operator volatile struct Range*volatile	input-2.cpp	/^  operator volatile struct Range *volatile() const { return 0; }$/;"	f	class:Char	file:
+operator struct Range*volatile	input-2.cpp	/^  operator struct Range *volatile() const { return 0; }$/;"	f	class:Char	file:
+operator volatile const struct Range*	input-2.cpp	/^  operator volatile const struct Range *() const { return 0; }$/;"	f	class:Char	file:
+operator volatile const struct Range*volatile	input-2.cpp	/^  operator volatile const struct Range *volatile() const { return 0; }$/;"	f	class:Char	file:
+operator struct Range*volatile const	input-2.cpp	/^  operator struct Range *volatile const() const { return 0; }$/;"	f	class:Char	file:
+operator volatile const struct Range*	input-2.cpp	/^  operator volatile const struct Range *() volatile { return 0; }$/;"	f	class:Char	file:
+operator volatile const struct Range*volatile	input-2.cpp	/^  operator volatile const struct Range *volatile() volatile { return 0; }$/;"	f	class:Char	file:
+operator struct Range*volatile const	input-2.cpp	/^  operator struct Range *volatile const() volatile { return 0; }      $/;"	f	class:Char	file:
+val	input-2.cpp	/^  int val;$/;"	m	class:Char	typeref:typename:int	file:
+r	input-2.cpp	/^  struct Range r;$/;"	m	class:Char	typeref:struct:Range	file:
+main	input-2.cpp	/^int main(void)$/;"	f	typeref:typename:int
