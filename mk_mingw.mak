@@ -2,6 +2,11 @@
 
 include source.mak
 
+# to be replaced by gnulib/regex.{ch}
+REGEX_HEADS = gnu_regex/regex.h
+REGEX_SRCS = gnu_regex/regex.c
+REGEX_OBJS = $(REGEX_SRCS:.c=.$(OBJEXT))
+
 REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -DHAVE_STDINT_H -Dstrcasecmp=stricmp
 
 CFLAGS = -Wall -std=gnu99

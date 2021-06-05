@@ -99,3 +99,15 @@ Units/**/Makefile.in
 Tmain/dist.m4
 Units/dist.m4
 VALGRIND.tmp.core.*
+gnulib/inttypes.h
+gnulib/langinfo.h
+gnulib/libgnu.a
+gnulib/limits.h
+gnulib/locale.h
+gnulib/malloc/dynarray-skeleton.gl.h
+gnulib/malloc/dynarray.gl.h
+gnulib/stdlib.h
+gnulib/unistd.h
+gnulib/wchar.h
+gnulib/wctype.h
+gnulib/sys/types.h
