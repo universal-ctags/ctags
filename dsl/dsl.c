@@ -421,7 +421,7 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 		object = es_object_autounref (es_cons (car, es_cdr (object)));
 		return dsl_eval0 (object, env);
 	}
-	else
+	else if (es_symbol_p(car))
 	{
 		EsObject *cdr = es_cdr (object);
 		int l;
@@ -460,6 +460,8 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 			pb->cache = r;
 		return r;
 	}
+	else
+		dsl_throw (CALLABLE_REQUIRED, car);
 }
 
 EsObject *dsl_eval (DSLCode *code, DSLEnv *env)
