@@ -381,7 +381,6 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 		}
 		else
 			dsl_throw (UNBOUND_VARIABLE, object);
-
 	}
 	else if (es_atom (object))
 		return object;
