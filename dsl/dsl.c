@@ -384,7 +384,9 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 	}
 	else if (es_atom (object))
 		return object;
-	else if (es_regex_p(car = es_car (object)))
+
+	car = es_car (object);
+	if (es_regex_p(car))
 	{
 		EsObject *cdr = es_cdr (object);
 		int l = length (cdr);
