@@ -1,0 +1,8 @@
+A	input.cpp	/^class A$/;"	c	file:
+f1	input.cpp	/^		typename std::enable_if<2 << 3,int>::type f1(X x)$/;"	f	class:A	typeref:typename:std::enable_if<2<<3,int>::type	file:	template:<typename X>
+X	input.cpp	/^	template<typename X> $/;"	Z	function:A::f1	typeref:meta:typename
+x	input.cpp	/^		typename std::enable_if<2 << 3,int>::type f1(X x)$/;"	z	function:A::f1	typeref:typename:X	file:
+f2	input.cpp	/^		typename std::enable_if<!false,int>::type f2(X x)$/;"	f	class:A	typeref:typename:std::enable_if<!false,int>::type	file:	template:<typename X>
+X	input.cpp	/^	template<typename X> $/;"	Z	function:A::f2	typeref:meta:typename
+x	input.cpp	/^		typename std::enable_if<!false,int>::type f2(X x)$/;"	z	function:A::f2	typeref:typename:X	file:
+B	input.cpp	/^class B$/;"	c	file:
