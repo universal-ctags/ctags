@@ -45,17 +45,14 @@ enum CXXCharType
 	CXXCharTypeHexadecimalDigit = (1 << 3),
 	// Hex digits x X u U l L and .
 	CXXCharTypeValidInNumber = (1 << 4),
-	// A named single char token. (uInfo >> 16) & 0xff
-	// contains the type of the token.
+	// A named single char token.
 	CXXCharTypeNamedSingleCharToken = (1 << 5),
-	// A named single or repeated char token. (uInfo >> 16) & 0xff
-	// is single type, (uInfo >> 24) & 0xff is multi type
+	// A named single or repeated char token.
 	CXXCharTypeNamedSingleOrRepeatedCharToken = (1 << 6),
 	// An operator (we merge them)
 	CXXCharTypeOperator = (1 << 7),
-	// A named single or operator (when repeated).
-	// (uInfo >> 16) & 0xff is single type
-	CXXCharTypeNamedSingleOrOperatorToken = (1 << 8)
+	// Full custom handling. Mostly operators or brackets.
+	CXXCharTypeCustomHandling = (1 << 8)
 };
 
 typedef struct _CXXCharTypeData
@@ -440,7 +437,7 @@ static CXXCharTypeData g_aCharTable[128] =
 	},
 	// 060 (0x3c) '<'
 	{
-		CXXCharTypeNamedSingleOrOperatorToken,
+		CXXCharTypeCustomHandling,
 		CXXTokenTypeSmallerThanSign,
 		0
 	},
@@ -636,7 +633,7 @@ static CXXCharTypeData g_aCharTable[128] =
 	},
 	// 091 (0x5b) '['
 	{
-		CXXCharTypeNamedSingleCharToken,
+		CXXCharTypeCustomHandling,
 		CXXTokenTypeOpeningSquareParenthesis,
 		0
 	},
@@ -1586,25 +1583,73 @@ bool cxxParserParseNextToken(void)
 		return true;
 	}
 
-	if(uInfo & CXXCharTypeNamedSingleOrOperatorToken)
+	if(uInfo & CXXCharTypeCustomHandling)
 	{
 		t->eType = g_aCharTable[g_cxx.iChar].uSingleTokenType;
 		vStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
-		uInfo = UINFO(g_cxx.iChar);
-		if(uInfo & (CXXCharTypeOperator | CXXCharTypeNamedSingleOrOperatorToken))
+		switch(t->eType)
 		{
-			t->eType = CXXTokenTypeOperator;
-			do {
-				vStringPut(t->pszWord,g_cxx.iChar);
-				g_cxx.iChar = cppGetc();
-				uInfo = UINFO(g_cxx.iChar);
-			} while(
-					uInfo &
-						(CXXCharTypeOperator | CXXCharTypeNamedSingleOrOperatorToken)
-				);
+			case CXXTokenTypeSmallerThanSign:
+				// The < sign is used in templates and is problematic if parsed incorrectly.
+				// We must exctract only the valid operator types: <, <<, <<=, <= <=>
+				switch(g_cxx.iChar)
+				{
+					case '<':
+						// <<
+						t->eType = CXXTokenTypeOperator;
+						vStringPut(t->pszWord,g_cxx.iChar);
+						g_cxx.iChar = cppGetc();
+						if(g_cxx.iChar == '=')
+						{
+							// <<=
+							vStringPut(t->pszWord,g_cxx.iChar);
+							g_cxx.iChar = cppGetc();
+						}
+					break;
+					case '=':
+						// <=
+						t->eType = CXXTokenTypeOperator;
+						vStringPut(t->pszWord,g_cxx.iChar);
+						g_cxx.iChar = cppGetc();
+						if(g_cxx.iChar == '>')
+						{
+							// <=>
+							vStringPut(t->pszWord,g_cxx.iChar);
+							g_cxx.iChar = cppGetc();
+						}
+					break;
+					default:
+						// fall down
+					break;
+				}
+
+				t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
+			break;
+			case CXXTokenTypeOpeningSquareParenthesis:
+				// special handling for [[ attribute ]] which can appear almost anywhere
+				// in the source code and is kind of annoying for the parser.
+
+				t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
+
+				if(t->bFollowedBySpace)
+				{
+					// The tokens can be separated by a space, at least according to gcc.
+					do {
+						g_cxx.iChar = cppGetc();
+					} while(cppIsspace(g_cxx.iChar));
+				}
+
+				if(g_cxx.iChar == '[')
+					return cxxParserParseNextTokenCondenseCXX11Attribute();
+			break;
+			default:
+				CXX_DEBUG_ASSERT(false,"There should be a custom handler for this token type");
+				// treat as single token type in non debug builds
+				t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
+			break;
 		}
-		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
+
 		return true;
 	}
 
@@ -1614,22 +1659,6 @@ bool cxxParserParseNextToken(void)
 		vStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
-		if(t->eType == CXXTokenTypeOpeningSquareParenthesis)
-		{
-			// special handling for [[ attribute ]] which can appear almost anywhere
-			// in the source code and is kind of annoying for the parser.
-
-			if(t->bFollowedBySpace)
-			{
-				// The tokens can be separated by a space, at least according to gcc.
-				do {
-					g_cxx.iChar = cppGetc();
-				} while(cppIsspace(g_cxx.iChar));
-			}
-
-			if(g_cxx.iChar == '[')
-				return cxxParserParseNextTokenCondenseCXX11Attribute();
-		}
 		return true;
 	}
 
