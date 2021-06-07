@@ -75,6 +75,12 @@ public:
 	void operator delete[](void *);
 
 	operator Type() const;
+
+	// requires -std=c++20 to compile
+	auto operator<=>(const X&a) const -> decltype(1 <=> 2)
+	{
+		return std::strong_ordering::less;
+	}
 };
 
 X & X::operator *= (int x)

@@ -11,8 +11,8 @@
 *.od
 *.pdf
 *.pyc
-*.ssexwsp
-*.ssexwsp.user
+*.c3workspace
+*.c3workspace.user
 *.tar.gz
 *.TMP
 *.tmp
