@@ -46,7 +46,7 @@ jobs:
     - run: make V=1 CFLAGS='-g -O0'
     - run: make install
     - run: file /usr/bin/ctags
-    - run: ctags --version
+    - run: ctags --verbose --version
     
     - run: make tmain UNITS=getter-extras-field V=1 APPVEYOR=1
      

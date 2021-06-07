@@ -3805,7 +3805,7 @@ extern void initOptions (void)
 	installLanguageMapDefaults ();
 	verbose ("  Installing default language aliases:\n");
 	installLanguageAliasesDefaults ();
-	fprintf(stderr, "%s %s:%s\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 	/* always excluded by default */
 	verbose ("  Installing default exclude patterns:\n");
 	processExcludeOption (NULL, "{arch}");
@@ -3869,7 +3869,7 @@ extern void initOptions (void)
 
 	processExcludeOption (NULL, "*.pyc");
 	processExcludeOption (NULL, "*.pyo");
-	fprintf(stderr, "%s %s:%s\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 }
 
 extern void freeOptionResources (void)
