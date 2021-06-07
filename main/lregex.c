@@ -1420,7 +1420,9 @@ static regex_t* compileRegex (enum regexParserType regptype,
 		   &cflags);
 
 	result = xMalloc (1, regex_t);
+	verbose ("before regcomp\n");
 	errcode = regcomp (result, regexp, cflags);
+	verbose ("after regcomp\n");
 	if (errcode != 0)
 	{
 		char errmsg[256];
@@ -1810,8 +1812,10 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 	if (patbuf->disabled && *(patbuf->disabled))
 		return false;
 
+	verbose ("before regexec in %s\n", __func__);
 	match = regexec (patbuf->pattern, vStringValue (line),
 			 BACK_REFERENCE_COUNT, pmatch, 0);
+	verbose ("after regexec in %s\n", __func__);
 	if (match == 0)
 	{
 		result = true;
@@ -1894,8 +1898,10 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 	current = start = vStringValue (allLines);
 	do
 	{
+		verbose ("before regexec in %s\n", __func__);
 		match = regexec (patbuf->pattern, current,
 						 BACK_REFERENCE_COUNT, pmatch, 0);
+		verbose ("after regexec in %s\n", __func__);
 		if (match != 0)
 		{
 			entry->statistics.unmatch++;
@@ -2632,8 +2638,10 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		if (ptrn->disabled && *(ptrn->disabled))
 			continue;
 
+		verbose ("before regexec in %s\n", __func__);
 		match = regexec (ptrn->pattern, current,
 						 BACK_REFERENCE_COUNT, pmatch, 0);
+		verbose ("after regexec in %s\n", __func__);
 
 		if (match == 0)
 		{
@@ -3038,6 +3046,7 @@ extern void	addOptscriptToHook (struct lregexControlBlock *lcb, enum scriptHook 
 /* Return true if available. */
 extern bool checkRegex (void)
 {
+	verbose ("enter checkRegex\n");
 #if defined (CHECK_REGCOMP)
 	{
 		/* Check for broken regcomp() on Cygwin */
@@ -3052,7 +3061,7 @@ extern bool checkRegex (void)
 	/* We are using bundled regex engine. */
 	regexAvailable = true;
 #endif
-
+	verbose ("leave checkRegex\n");
 	return regexAvailable;
 }
 
