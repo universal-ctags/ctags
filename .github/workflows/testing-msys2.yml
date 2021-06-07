@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        msystem: [MSYS, MINGW32, MINGW64]
+        msystem: [MINGW64]
 
     defaults:
       run:
