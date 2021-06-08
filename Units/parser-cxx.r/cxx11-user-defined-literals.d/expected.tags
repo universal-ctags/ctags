@@ -1,0 +1,2 @@
+operator ""_e	input.h	/^float operator ""_e(const char*)$/;"	f	typeref:typename:float
+operator ""_print	input.h	/^void operator"" _print ( const char* str )$/;"	f	typeref:typename:void

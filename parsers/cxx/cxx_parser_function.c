@@ -868,6 +868,13 @@ bool cxxParserLookForFunctionSignature(
 						CXX_DEBUG_LEAVE_TEXT("Unexpected token after the operator keyword");
 						return false;
 					}
+				} else if(cxxTokenTypeIs(pToken,CXXTokenTypeStringConstant)) {
+					// check for operator "" _fn ()
+					if (strcmp (vStringValue(pToken->pszWord), "\"\"") != 0)
+					{
+						CXX_DEBUG_LEAVE_TEXT("Non-empty string after operator");
+						return false;
+					}
 				} else if(!cxxTokenTypeIsOneOf(
 						pToken,
 						CXXTokenTypeAnd | CXXTokenTypeAssignment |
