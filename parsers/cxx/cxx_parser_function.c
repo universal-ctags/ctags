@@ -1817,6 +1817,7 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 {
 	// emit parameters
+	CXX_DEBUG_ENTER();
 
 	unsigned int i = 0;
 	while(i < pInfo->uCount)
@@ -1827,7 +1828,7 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 			);
 
 		if(!tag)
-			return;
+			break;
 
 		CXXToken * pTypeName;
 
@@ -1877,6 +1878,7 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 
 		i++;
 	}
+	CXX_DEBUG_LEAVE();
 }
 
 
