@@ -999,7 +999,8 @@ static bool cxxParserParseNextTokenCondenseCXX11Attribute(void)
 			"This function should be called only after we have parsed ["
 		);
 
-	// Input stream: [[foo]]...
+	// Input stream: [[...
+	//   If the syntax is correct then this is an attribute sequence [[foo]]
 	//
 	// g_cxx.pToken points the first '['.
 	// g_cxx.iChar points the second '['.
@@ -1037,7 +1038,8 @@ static bool cxxParserParseNextTokenCondenseCXX11Attribute(void)
 			"Should have a parenthesis chain as last token!"
 		);
 	CXX_DEBUG_ASSERT(
-			(g_cxx.pToken->pChain->iCount == 3) &&
+			// at least [ + [*] + ]
+			(g_cxx.pToken->pChain->iCount >= 3) &&
 			cxxTokenTypeIs(
 					cxxTokenChainAt(g_cxx.pToken->pChain,1),
 					CXXTokenTypeSquareParenthesisChain
