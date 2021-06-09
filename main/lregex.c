@@ -1403,9 +1403,56 @@ static flagDefinition regexFlagDefs[] = {
 	  NULL, "applied in a case-insensitive manner"},
 };
 
+static vString* prepossessPattern (enum regexParserType regptype,
+								   const char* const regexp)
+{
+	char c;
+	const char* p = regexp;
+	vString *pp = vStringNew ();
+
+	bool after_escape = false;
+
+	while ((c = *p++))
+	{
+		if (after_escape)
+		{
+			after_escape = false;
+			switch (c)
+			{
+			case 's':
+				vStringCatS (pp, (regptype == REG_PARSER_MULTI_LINE)? "[ \t\r\n\f]": "[ \t]");
+				break;
+			case 'S':
+				vStringCatS (pp, (regptype == REG_PARSER_MULTI_LINE)? "[^ \t\r\n\f]": "[^ \t]");
+				break;
+			case 'w':
+				vStringCatS (pp, "[0-9a-zA-Z_]");
+				break;
+			case 'W':
+				vStringCatS (pp, "[^0-9a-zA-Z_]");
+				break;
+			default:
+				vStringPut (pp, '\\');
+				vStringPut (pp, c);
+			}
+		}
+		else if (c == '\\')
+			after_escape = true;
+		else
+			vStringPut (pp, c);
+	}
+
+	if (strcmp (regexp, vStringValue (pp)))
+		verbose ("regex pattern pp: %s -> %s\n", regexp, vStringValue (pp));
+
+	return pp;
+}
+
 static regex_t* compileRegex (enum regexParserType regptype,
 							  const char* const regexp, const char* const flags)
 {
+	vString *pp_regexp = prepossessPattern (regptype, regexp);
+
 	int cflags = REG_EXTENDED | REG_NEWLINE;
 
 	if (regptype == REG_PARSER_MULTI_TABLE)
@@ -1420,7 +1467,7 @@ static regex_t* compileRegex (enum regexParserType regptype,
 		   &cflags);
 
 	result = xMalloc (1, regex_t);
-	errcode = regcomp (result, regexp, cflags);
+	errcode = regcomp (result, vStringValue (pp_regexp), cflags);
 	if (errcode != 0)
 	{
 		char errmsg[256];
@@ -1430,6 +1477,8 @@ static regex_t* compileRegex (enum regexParserType regptype,
 		eFree (result);
 		result = NULL;
 	}
+
+	vStringDelete (pp_regexp);
 	return result;
 }
 
