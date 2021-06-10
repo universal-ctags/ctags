@@ -8,14 +8,14 @@ generate_bats() {
     cat <<EOF
 #!/usr/bin/env bats
 
-load $TESTDIR/utils.sh
+load "\$TESTDIR/utils.sh"
 
 @test "Testing $1 - generation" {
-    ${skip_all}test_generate "$1"
+    ${skip_all}test_generate
 }
 
 @test "Testing $1 - compilation" {
-    ${skip_all}test_compile "$1"
+    ${skip_all}test_compile
 }
 EOF
     for input in "$1"/input*.txt; do
@@ -40,12 +40,12 @@ EOF
 build() {
     if [ -z "$PACKCC" ]; then
         export PACKCC="$TESTDIR/packcc"
-        "${CC:-cc}" -o "$PACKCC" $ROOTDIR/src/packcc.c
+        ${CC:-cc} --coverage -O0 -o "$PACKCC" $ROOTDIR/src/packcc.c
     fi
 }
 
 clean() {
-    rm -f packcc *.d/test.bats *.d/parser{,.c,.h}
+    rm -f packcc{,.gcda,.gcno,.c.gcov} *.d/test.bats *.d/parser{,.c,.h}
 }
 
 main() {
@@ -65,6 +65,10 @@ main() {
     done
 
     bats "$@" ./*.d
+
+    if [ -f "packcc.gcda" ]; then
+        echo "$(gcov packcc | grep "Lines executed") (see $TESTDIR/packcc.c.gcov for details)"
+    fi
 }
 
 main "$@"
