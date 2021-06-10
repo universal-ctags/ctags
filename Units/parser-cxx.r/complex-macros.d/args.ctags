@@ -11,6 +11,6 @@
 -D STRINGIFY(token)=#token
 -D IMPLEMENT_FUNCTIONS(_prefix)=void _prefix ## a(){ }; void _prefix ## b(){ };
 -D DECLARE_VARS(_prefix)=int _prefix ## a; int _prefix ## b;
--D DECLARE_FUNCTION_4(Ret,Class,Method,...)=Ret Class##__##Method(Class *this, ##__VA_ARGS__)
+-D DECLARE_FUNCTION_4(Ret,Class,Method,...)=Ret Class##__##Method(Class *that, ##__VA_ARGS__)
 -D DECLARE_FUNCTION_4_BEGIN(...)={
 -D DECLARE_FUNCTION_4_END(...)=}

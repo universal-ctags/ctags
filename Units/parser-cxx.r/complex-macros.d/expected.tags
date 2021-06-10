@@ -21,13 +21,14 @@ p6a	input.cpp	/^DECLARE_TWO_VERSIONS_OF_FUNCTIONS(p5,p6)$/;"	p	typeref:typename:
 token	input.cpp	/^#define STRINGIFY(token) #token$/;"	D	macro:STRINGIFY
 STRINGIFY	input.cpp	/^#define STRINGIFY(/;"	d	file:	signature:(token)
 test	input.cpp	/^const char * test = "" STRINGIFY(; int notVisible;);$/;"	v	typeref:typename:const char *
-Ret	input.cpp	/^#define DECLARE_FUNCTION_4(Ret,Class,Method,...) Ret Class##__##Method(Class *this, ##__VA_ARGS_/;"	D	macro:DECLARE_FUNCTION_4
-Class	input.cpp	/^#define DECLARE_FUNCTION_4(Ret,Class,Method,...) Ret Class##__##Method(Class *this, ##__VA_ARGS_/;"	D	macro:DECLARE_FUNCTION_4
-Method	input.cpp	/^#define DECLARE_FUNCTION_4(Ret,Class,Method,...) Ret Class##__##Method(Class *this, ##__VA_ARGS_/;"	D	macro:DECLARE_FUNCTION_4
+Ret	input.cpp	/^#define DECLARE_FUNCTION_4(Ret,Class,Method,...) Ret Class##__##Method(Class *that, ##__VA_ARGS_/;"	D	macro:DECLARE_FUNCTION_4
+Class	input.cpp	/^#define DECLARE_FUNCTION_4(Ret,Class,Method,...) Ret Class##__##Method(Class *that, ##__VA_ARGS_/;"	D	macro:DECLARE_FUNCTION_4
+Method	input.cpp	/^#define DECLARE_FUNCTION_4(Ret,Class,Method,...) Ret Class##__##Method(Class *that, ##__VA_ARGS_/;"	D	macro:DECLARE_FUNCTION_4
 DECLARE_FUNCTION_4	input.cpp	/^#define DECLARE_FUNCTION_4(/;"	d	file:	signature:(Ret,Class,Method,...)
 DECLARE_FUNCTION_4_BEGIN	input.cpp	/^#define DECLARE_FUNCTION_4_BEGIN(/;"	d	file:	signature:(...)
 DECLARE_FUNCTION_4_END	input.cpp	/^#define DECLARE_FUNCTION_4_END(/;"	d	file:	signature:(...)
-foo__bar	input.cpp	/^DECLARE_FUNCTION_4(int,foo,bar,int x)$/;"	f	typeref:typename:int	signature:(foo * this,int x)
+foo__bar	input.cpp	/^DECLARE_FUNCTION_4(int,foo,bar,int x)$/;"	f	typeref:typename:int	signature:(foo * that,int x)
+that	input.cpp	/^DECLARE_FUNCTION_4(int,foo,bar,int x)$/;"	z	function:foo__bar	typeref:typename:foo *	file:
 x	input.cpp	/^DECLARE_FUNCTION_4(int,foo,bar,int x)$/;"	z	function:foo__bar	typeref:typename:int	file:
 _prefix	input.cpp	/^#define IMPLEMENT_FUNCTIONS(_prefix) \\$/;"	D	macro:IMPLEMENT_FUNCTIONS
 IMPLEMENT_FUNCTIONS	input.cpp	/^#define IMPLEMENT_FUNCTIONS(/;"	d	file:	signature:(_prefix)
