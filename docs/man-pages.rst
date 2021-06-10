@@ -18,5 +18,6 @@ Man pages
 	ctags-lang-verilog(7) <man/ctags-lang-verilog.7.rst>
 	ctags-lang-inko(7) <man/ctags-lang-inko.7.rst>
 	ctags-lang-r(7) <man/ctags-lang-r.7.rst>
+	ctags-lang-sql(7) <man/ctags-lang-sql.7.rst>
 	ctags-incompatibilities(7) <man/ctags-incompatibilities.7.rst>
 	readtags(1) <man/readtags.1.rst>

@@ -27,6 +27,7 @@
 #include "routines.h"
 #include "vstring.h"
 #include "xtag.h"
+#include "promise.h"
 
 /*
  *	On-line "Oracle Database PL/SQL Language Reference":
@@ -100,6 +101,7 @@ enum eKeywordId {
 	KEYWORD_index,
 	KEYWORD_internal,
 	KEYWORD_is,
+	KEYWORD_language,
 	KEYWORD_local,
 	KEYWORD_loop,
 	KEYWORD_ml_conn,
@@ -184,6 +186,22 @@ typedef struct sTokenInfoSQL {
 	int         begin_end_nest_lvl;
 	unsigned long lineNumber;
 	MIOPos filePosition;
+
+	/* When the "guest" extra is enabled, a promise is
+	 * made always when reading a string (literal or dollar quote).
+	 * The lexer stores the id of promise to this member.
+	 * When making the promise, the language of guest parser
+	 * may not be determined yet.
+	 *
+	 *   CREATE FUNCTION ... AS ' sub code_written_in_perl {... ' LANGUAGE plperl;
+	 *
+	 * After reading a string, the parser may find LANGUAGE keyword. In the case,
+	 * the parser updates the language of the promies.
+	 *
+	 * This field is filled only when `guest` extra is enabled.
+	 *
+	 */
+	int promise;
 } tokenInfo;
 
 /*
@@ -283,6 +301,7 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "index",							KEYWORD_index			      },
 	{ "internal",						KEYWORD_internal		      },
 	{ "is",								KEYWORD_is				      },
+	{ "language",						KEYWORD_language              },
 	{ "local",							KEYWORD_local			      },
 	{ "loop",							KEYWORD_loop			      },
 	{ "ml_add_connection_script",		KEYWORD_ml_conn			      },
@@ -415,6 +434,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	[KEYWORD_inquiry_directive] = {        0        },
 	[KEYWORD_internal]      = {1 & 0&1&1&0 & 0&0 & 0},
 	[KEYWORD_is]            = {0, SqlReservedWordPredicatorForIsOrAs},
+	[KEYWORD_language]      = {            0        },
 	[KEYWORD_local]         = {0 & 0&1&1&1 & 0&0 & 0},
 	[KEYWORD_loop]          = {1 & 1&1&1&1 & 0&1 & 0},
 	[KEYWORD_ml_conn]       = {0 & 0&0&0&0 & 0&0 & 0},
@@ -467,6 +487,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 
 /* Recursive calls */
 static void parseBlock (tokenInfo *const token, const bool local);
+static void parseBlockFull (tokenInfo *const token, const bool local, langType lang);
 static void parseDeclare (tokenInfo *const token, const bool local);
 static void parseKeywords (tokenInfo *const token);
 static tokenType parseSqlFile (tokenInfo *const token);
@@ -554,6 +575,7 @@ static tokenInfo *newToken (void)
 	token->begin_end_nest_lvl = 0;
 	token->lineNumber         = getInputLineNumber ();
 	token->filePosition       = getInputFilePosition ();
+	token->promise            = -1;
 
 	return token;
 }
@@ -609,8 +631,26 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
  *	 Parsing functions
  */
 
-static void parseString (vString *const string, const int delimiter)
+static void parseString (vString *const string, const int delimiter, int *promise)
 {
+	int offset[2];
+	unsigned long linenum[3];
+	enum { START, END, SOURCE };
+
+	int c0;
+
+	if (promise && !isXtagEnabled(XTAG_GUEST))
+		promise = NULL;
+
+	if (promise)
+	{
+		c0 = getcFromInputFile ();
+		linenum[START] = getInputLineNumber ();
+		offset[START]  = getInputLineOffset ();
+		linenum[SOURCE] = getSourceLineNumber ();
+		ungetcToInputFile(c0);
+	}
+
 	bool end = false;
 	while (! end)
 	{
@@ -625,7 +665,20 @@ static void parseString (vString *const string, const int delimiter)
 		}
 		*/
 		else if (c == delimiter)
+		{
+			if (promise)
+			{
+				ungetcToInputFile(c);
+				linenum[END] = getInputLineNumber ();
+				offset[END]  = getInputLineOffset ();
+				(void)getcFromInputFile ();
+				*promise = makePromise (NULL,
+										linenum [START], offset [START],
+										linenum [END], offset [END],
+										linenum [SOURCE]);
+			}
 			end = true;
+		}
 		else
 			vStringPut (string, c);
 	}
@@ -658,8 +711,12 @@ static bool isCCFlag(const char *str)
  * https://docs.oracle.com/en/database/oracle/oracle-database/18/lnpls/plsql-language-fundamentals.html#GUID-E918087C-D5A8-4CEE-841B-5333DE6D4C15
  * https://github.com/universal-ctags/ctags/issues/3006
  */
-static tokenType parseDollarQuote (vString *const string, const int delimiter)
+static tokenType parseDollarQuote (vString *const string, const int delimiter, int *promise)
 {
+	int offset[2];
+	unsigned long linenum[3];
+	enum { START, END, SOURCE };
+
 	unsigned int len = 0;
 	char tag[32 /* arbitrary limit */] = {0};
 	int c = 0;
@@ -683,6 +740,16 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 		/* damn that's not valid, what can we do? */
 		ungetcToInputFile (c);
 		return TOKEN_UNDEFINED;
+	}
+
+	if (promise && !isXtagEnabled(XTAG_GUEST))
+		promise = NULL;
+
+	if (promise)
+	{
+		linenum[START] = getInputLineNumber ();
+		offset[START]  = getInputLineOffset ();
+		linenum[SOURCE] = getSourceLineNumber ();
 	}
 
 	/* and read the content (until a matching end tag) */
@@ -724,7 +791,20 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter)
 				ungetcToInputFile (c);
 
 			if (! *end_p) /* full tag match */
+			{
+				if (promise)
+				{
+					linenum[END] = getInputLineNumber ();
+					offset[END]  = getInputLineOffset ();
+					if (offset[END] > len)
+						offset[END] =- len;
+					*promise = makePromise (NULL,
+											linenum [START], offset [START],
+											linenum [END], offset [END],
+											linenum [SOURCE]);
+				}
 				break;
+			}
 			else
 				vStringNCatS (string, tag, (size_t) (end_p - tag));
 		}
@@ -740,6 +820,7 @@ static void readToken (tokenInfo *const token)
 	token->type			= TOKEN_UNDEFINED;
 	token->keyword		= KEYWORD_NONE;
 	vStringClear (token->string);
+	token->promise      = -1;
 
 getNextChar:
 	do
@@ -778,7 +859,7 @@ getNextChar:
 		case '\'':
 		case '"':
 				  token->type = TOKEN_STRING;
-				  parseString (token->string, c);
+				  parseString (token->string, c, &token->promise);
 				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
@@ -856,7 +937,7 @@ getNextChar:
 				  }
 
 		case '$':
-				  token->type = parseDollarQuote (token->string, c);
+				  token->type = parseDollarQuote (token->string, c, &token->promise);
 				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
@@ -1061,6 +1142,28 @@ static void skipArgumentList (tokenInfo *const token)
 	}
 }
 
+static langType getNamedLanguageFromToken(tokenInfo *const token)
+{
+	langType lang = LANG_IGNORE;
+
+	if (isType (token, TOKEN_IDENTIFIER))
+	{
+		if (vStringLength (token->string) > 2
+			&& vStringValue (token->string) [0] == 'p'
+			&& vStringValue (token->string) [1] == 'l')
+		{
+			/* Remove first 'pl' and last 'u' for extracting the
+			 * name of the language. */
+			bool unsafe = (vStringLast(token->string) == 'u');
+			lang = getNamedLanguageOrAlias (vStringValue (token->string) + 2,
+											vStringLength (token->string)
+											- 2
+											- (unsafe? 1: 0));
+		}
+	}
+	return lang;
+}
+
 static void parseSubProgram (tokenInfo *const token)
 {
 	tokenInfo *const name  = newToken ();
@@ -1178,6 +1281,8 @@ static void parseSubProgram (tokenInfo *const token)
 	}
 	else
 	{
+		langType lang = LANG_IGNORE;
+
 		while (! isKeyword (token, KEYWORD_is) &&
 			   ! isKeyword (token, KEYWORD_begin) &&
 			   ! isKeyword (token, KEYWORD_at) &&
@@ -1196,6 +1301,12 @@ static void parseSubProgram (tokenInfo *const token)
 					/* Reads to the next token after the TOKEN_CLOSE_PAREN */
 					skipArgumentList(token);
 				}
+			} else if (lang == LANG_IGNORE
+					   && isKeyword (token, KEYWORD_language)) {
+				readToken (token);
+				lang = getNamedLanguageFromToken (token);
+				if (lang != LANG_IGNORE)
+					readToken (token);
 			} else {
 				readToken (token);
 			}
@@ -1233,7 +1344,7 @@ static void parseSubProgram (tokenInfo *const token)
 				makeSqlTag (name, kind);
 			}
 
-			parseBlock (token, true);
+			parseBlockFull (token, true, lang);
 			vStringClear (token->scope);
 			token->scopeKind = SQLTAG_COUNT;
 		}
@@ -1842,6 +1953,13 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 
 static void parseBlock (tokenInfo *const token, const bool local)
 {
+	parseBlockFull (token, local, LANG_IGNORE);
+}
+
+static void parseBlockFull (tokenInfo *const token, const bool local, langType lang)
+{
+	int promise = -1;
+
 	if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
 	{
 		parseLabel (token);
@@ -1854,6 +1972,27 @@ static void parseBlock (tokenInfo *const token, const bool local)
 		{
 			/* Likely a PostgreSQL FUNCTION name AS '...'
 			 * https://www.postgresql.org/docs/current/static/sql-createfunction.html */
+			promise = token->promise;
+			token->promise = -1;
+
+			readToken (token);
+			while (! isCmdTerm (token)
+				   && !isType (token, TOKEN_EOF))
+			{
+				if (lang == LANG_IGNORE &&
+					isKeyword (token, KEYWORD_language))
+				{
+					readToken (token);
+					lang = getNamedLanguageFromToken (token);
+					if (lang != LANG_IGNORE)
+						readToken (token);
+				}
+				else
+					readToken (token);
+			}
+
+			if (promise != -1 && lang != LANG_IGNORE)
+				promiseUpdateLanguage(promise, lang);
 		}
 		else
 		{
@@ -2856,10 +2995,12 @@ static void findSqlTags (void)
 extern parserDefinition* SqlParser (void)
 {
 	static const char *const extensions [] = { "sql", NULL };
+	static const char *const aliases [] = {"pgsql", NULL };
 	parserDefinition* def = parserNew ("SQL");
 	def->kindTable	= SqlKinds;
 	def->kindCount	= ARRAY_SIZE (SqlKinds);
 	def->extensions = extensions;
+	def->aliases    = aliases;
 	def->parser		= findSqlTags;
 	def->initialize = initialize;
 	def->keywordTable = SqlKeywordTable;

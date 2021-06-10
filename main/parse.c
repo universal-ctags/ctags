@@ -361,7 +361,8 @@ extern roleDefinition* getLanguageRoleForName (const langType language, int kind
 	return getRoleForName (LanguageTable [language].kindControlBlock, kindIndex, roleName);
 }
 
-extern langType getNamedLanguageFull (const char *const name, size_t len, bool noPretending)
+extern langType getNamedLanguageFull (const char *const name, size_t len, bool noPretending,
+									  bool include_aliases)
 {
 	langType result = LANG_IGNORE;
 	unsigned int i;
@@ -383,6 +384,12 @@ extern langType getNamedLanguageFull (const char *const name, size_t len, bool n
 
 			if (strcasecmp (vStringValue (vstr), lang->name) == 0)
 				result = i;
+			else if (include_aliases)
+			{
+				stringList* const aliases = LanguageTable [i].currentAliases;
+				if (aliases && stringListCaseMatched (aliases, vStringValue (vstr)))
+					result = i;
+			}
 			vStringDelete (vstr);
 		}
 
@@ -396,7 +403,12 @@ extern langType getNamedLanguageFull (const char *const name, size_t len, bool n
 
 extern langType getNamedLanguage (const char *const name, size_t len)
 {
-	return getNamedLanguageFull (name, len, false);
+	return getNamedLanguageFull (name, len, false, false);
+}
+
+extern langType getNamedLanguageOrAlias (const char *const name, size_t len)
+{
+	return getNamedLanguageFull (name, len, false, true);
 }
 
 static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType start_index,
@@ -5062,7 +5074,7 @@ extern bool processPretendOption (const char *const option, const char *const pa
 	if (parameter == NULL || parameter[0] == '\0')
 		error (FATAL, "A parameter is needed after \"%s\" option", option);
 
-	old_language = getNamedLanguageFull (parameter, 0, true);
+	old_language = getNamedLanguageFull (parameter, 0, true, false);
 	if (old_language == LANG_IGNORE)
 		error (FATAL, "Unknown language \"%s\" in option \"--%s=%s\"",
 			   parameter, option, parameter);

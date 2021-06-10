@@ -2747,7 +2747,11 @@ extern parserDefinition* JavaScriptParser (void)
 	// which have JS function definitions, so we just use the JS parser
 	static const char *const extensions [] = { "js", "jsx", "mjs", NULL };
 	static const char *const aliases [] = { "js", "node", "nodejs",
-	                                        "seed", "gjs", NULL };
+	                                        "seed", "gjs",
+											/* Used in PostgreSQL
+											 * https://github.com/plv8/plv8 */
+											"v8",
+											NULL };
 	parserDefinition *const def = parserNew ("JavaScript");
 	def->extensions = extensions;
 	def->aliases = aliases;

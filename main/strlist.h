@@ -45,10 +45,26 @@ extern bool stringListHasTest (const stringList *const current,
 				  bool (*test)(const char *s, void *userData),
 				  void *userData);
 extern bool stringListDeleteItemExtension (stringList* const current, const char* const extension);
+
+/*
+ * stringListExtension{Matched,Finds}
+ * They compares strcmp or strcasecmp.
+ * The choice of case-sensitive or case-insensitive is platform-dependent.
+ *
+ * stringListFile{Matched,Finds}:
+ * They do glob-matching with fnmatch().
+ * The choice of case-sensitive or case-insensitive is platform-dependent.
+ *
+ * stringListCase{Matched,Finds}:
+ * They always work case-insensitive way.
+ */
 extern bool stringListExtensionMatched (const stringList* const list, const char* const extension);
 extern vString* stringListExtensionFinds (const stringList* const list, const char* const extension);
 extern bool stringListFileMatched (const stringList* const list, const char* const str);
 extern vString* stringListFileFinds (const stringList* const list, const char* const str);
+extern bool stringListCaseMatched (const stringList* const list, const char* const str);
+extern vString* stringListCaseFinds (const stringList* const list, const char* const str);
+
 extern void stringListPrint (const stringList *const current, FILE *fp);
 extern void stringListReverse (const stringList *const current);
 

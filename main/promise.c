@@ -68,7 +68,7 @@ int  makePromise   (const char *parser,
 {
 	struct promise *p;
 	int r;
-	langType lang;
+	langType lang = LANG_IGNORE;
 
 	if ((!isThinStreamSpec(startLine,
 						   startCharOffset,
@@ -78,9 +78,12 @@ int  makePromise   (const char *parser,
 		&& ( !isXtagEnabled (XTAG_GUEST)))
 		return -1;
 
-	lang = getNamedLanguage (parser, 0);
-	if (lang == LANG_IGNORE)
-		return -1;
+	if (parser)
+	{
+		lang = getNamedLanguage (parser, 0);
+		if (lang == LANG_IGNORE)
+			return -1;
+	}
 
 	if ( promise_count == promise_allocated)
 	{
@@ -164,15 +167,17 @@ bool forcePromises (void)
 	{
 		current_promise = i;
 		struct promise *p = promises + i;
-		tagFileResized = runParserInNarrowedInputStream (p->lang,
-								 p->startLine,
-								 p->startCharOffset,
-								 p->endLine,
-								 p->endCharOffset,
-								 p->sourceLineOffset,
-								 i)
-			? true
-			: tagFileResized;
+
+		if (p->lang != LANG_IGNORE && isLanguageEnabled (p->lang))
+			tagFileResized = runParserInNarrowedInputStream (p->lang,
+															 p->startLine,
+															 p->startCharOffset,
+															 p->endLine,
+															 p->endCharOffset,
+															 p->sourceLineOffset,
+															 i)
+				? true
+				: tagFileResized;
 	}
 
 	freeModifiers (0);
@@ -305,4 +310,13 @@ void runModifiers (int promise,
 					 m->data);
 	}
 	ptrArrayDelete (modifiers);
+}
+
+void promiseUpdateLanguage  (int promise, langType lang)
+{
+	Assert (promise >= 0);
+
+	struct promise *p = promises + promise;
+
+	p->lang = lang;
 }
