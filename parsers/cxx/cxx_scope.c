@@ -75,6 +75,7 @@ unsigned int cxxScopeGetVariableKind(void)
 		case CXXScopeTypeFunction:
 			return CXXTagKindLOCAL;
 		break;
+		//case CXXScopeTypePrototype:
 		//case CXXScopeTypeNamespace:
 		//case CXXScopeTypeEnum:
 		default:
@@ -101,6 +102,8 @@ unsigned int cxxScopeGetKind(void)
 			return CXXTagKindENUM;
 		case CXXScopeTypeFunction:
 			return CXXTagKindFUNCTION;
+		case CXXScopeTypePrototype:
+			return CXXTagKindPROTOTYPE;
 		case CXXScopeTypeStruct:
 			return CXXTagKindSTRUCT;
 		case CXXScopeTypeUnion:

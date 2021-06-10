@@ -1,0 +1,4 @@
+f	input.cc	/^template <class T> int f (T t);$/;"	prototype	typeref:typename:int	file:
+T	input.cc	/^template <class T> int f (T t);$/;"	tparam	prototype:f	typeref:meta:class
+g	input.cc	/^template <class S> int g (S s) {$/;"	function	typeref:typename:int
+S	input.cc	/^template <class S> int g (S s) {$/;"	tparam	function:g	typeref:meta:class
