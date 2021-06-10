@@ -57,7 +57,7 @@ CXX_COMMON_HEADER_ROLES(CUDA);
 	{ true,  'u', "union",      "union names", .syncWith = _syncWith },			\
 	{ true,  'v', "variable",   "variable definitions", .syncWith = _syncWith },		\
 	{ false, 'x', "externvar",  "external and forward variable declarations", .syncWith = _syncWith }, \
-	{ false, 'z', "parameter",  "function parameters inside function definitions", .syncWith = _syncWith }, \
+	{ false, 'z', "parameter",  "function parameters inside function or prototype definitions", .syncWith = _syncWith }, \
 	{ false, 'L', "label",      "goto labels", .syncWith = _syncWith }, \
 	{ false, 'D', "macroparam", "parameters inside macro definitions", .syncWith = _syncWith }
 
@@ -645,7 +645,7 @@ int cxxTagCommit(void)
 
 	enum CXXScopeType eScopeType = cxxScopeGetType();
 
-	if(eScopeType == CXXScopeTypeFunction)
+	if(eScopeType == CXXScopeTypeFunction || eScopeType == CXXScopeTypePrototype)
 	{
 		// old ctags didn't do this, and --extra=+q is mainly
 		// for backward compatibility so...

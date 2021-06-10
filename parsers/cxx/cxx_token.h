@@ -91,6 +91,9 @@ typedef struct _CXXToken
 CXXToken * cxxTokenCreate(void);
 void cxxTokenDestroy(CXXToken * t);
 
+// A shortcut for quickly creating a fake token.
+CXXToken * cxxTokenCopy(CXXToken *pToken);
+
 // A shortcut for quickly creating keyword tokens.
 CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,CXXKeyword eKeyword);
 

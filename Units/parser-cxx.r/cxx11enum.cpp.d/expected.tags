@@ -47,5 +47,6 @@ CEC1_member1	input.cpp	/^	enum class CEC1 : unsigned long int { CEC1_member1 };$
 CES1	input.cpp	/^	enum struct CES1 : int { CES1_member1 };$/;"	g	class:Class	typeref:typename:int	file:	end:30	properties:scopedenum
 CES1_member1	input.cpp	/^	enum struct CES1 : int { CES1_member1 };$/;"	e	enum:Class::CES1	file:
 Function1	input.cpp	/^	virtual enum CEC1 Function1(enum CE1 parameter);$/;"	p	class:Class	typeref:enum:CEC1	file:	end:31	properties:virtual
+parameter	input.cpp	/^	virtual enum CEC1 Function1(enum CE1 parameter);$/;"	z	prototype:Class::Function1	typeref:enum:CE1	file:
 E1_var1	input.cpp	/^enum E1 E1_var1;$/;"	v	typeref:enum:E1	end:41
 EC1_var1	input.cpp	/^enum EC1 EC1_var1[10][10];$/;"	v	typeref:enum:EC1[10][10]	end:42

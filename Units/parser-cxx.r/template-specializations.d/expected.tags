@@ -1,27 +1,47 @@
 A	input.cpp	/^struct A {$/;"	s	file:	template:<typename T>
 T	input.cpp	/^template<typename T>$/;"	Z	struct:A	typeref:meta:typename
 f	input.cpp	/^    void f(T); \/\/ member, declared in the primary template$/;"	p	struct:A	typeref:typename:void	file:	signature:(T)
+__anonc12ce61d010d	input.cpp	/^    void f(T); \/\/ member, declared in the primary template$/;"	z	prototype:A::f	typeref:typename:T	file:
 h	input.cpp	/^    void h(T) {} \/\/ member, defined in the primary template$/;"	f	struct:A	typeref:typename:void	file:	signature:(T)
+__anonc12ce61d020d	input.cpp	/^    void h(T) {} \/\/ member, defined in the primary template$/;"	z	function:A::h	typeref:typename:T	file:
 g1	input.cpp	/^    template<class X1> void g1(T, X1); \/\/ member template$/;"	p	struct:A	typeref:typename:void	file:	signature:(T,X1)	template:<class X1>
 X1	input.cpp	/^    template<class X1> void g1(T, X1); \/\/ member template$/;"	Z	prototype:A::g1	typeref:meta:class
+__anonc12ce61d030d	input.cpp	/^    template<class X1> void g1(T, X1); \/\/ member template$/;"	z	prototype:A::g1	typeref:typename:T	file:
+__anonc12ce61d040d	input.cpp	/^    template<class X1> void g1(T, X1); \/\/ member template$/;"	z	prototype:A::g1	typeref:typename:X1	file:
 g2	input.cpp	/^    template<class X2> void g2(T, X2); \/\/ member template$/;"	p	struct:A	typeref:typename:void	file:	signature:(T,X2)	template:<class X2>
 X2	input.cpp	/^    template<class X2> void g2(T, X2); \/\/ member template$/;"	Z	prototype:A::g2	typeref:meta:class
+__anonc12ce61d050d	input.cpp	/^    template<class X2> void g2(T, X2); \/\/ member template$/;"	z	prototype:A::g2	typeref:typename:T	file:
+__anonc12ce61d060d	input.cpp	/^    template<class X2> void g2(T, X2); \/\/ member template$/;"	z	prototype:A::g2	typeref:typename:X2	file:
 f	input.cpp	/^template<> void A<int>::f(int);$/;"	p	class:A	typeref:typename:void	file:	signature:(int)	template:<>	properties:scopespecialization,specialization
+__anonc12ce61d070d	input.cpp	/^template<> void A<int>::f(int);$/;"	z	prototype:A::f	typeref:typename:int	file:
 h	input.cpp	/^template<> void A<int>::h(int) {}$/;"	f	class:A	typeref:typename:void	signature:(int)	template:<>	properties:scopespecialization,specialization
+__anonc12ce61d080d	input.cpp	/^template<> void A<int>::h(int) {}$/;"	z	function:A::h	typeref:typename:int	file:
 g1	input.cpp	/^template<class X1> void A<T>::g1(T, X1) { }$/;"	f	class:A	typeref:typename:void	signature:(T,X1)	template:<class X1>	properties:scopespecialization,specialization
 X1	input.cpp	/^template<class X1> void A<T>::g1(T, X1) { }$/;"	Z	function:A::g1	typeref:meta:class
+__anonc12ce61d090d	input.cpp	/^template<class X1> void A<T>::g1(T, X1) { }$/;"	z	function:A::g1	typeref:typename:T	file:
+__anonc12ce61d0a0d	input.cpp	/^template<class X1> void A<T>::g1(T, X1) { }$/;"	z	function:A::g1	typeref:typename:X1	file:
 g1	input.cpp	/^template<class X1> void A<int>::g1(int, X1);$/;"	p	class:A	typeref:typename:void	file:	signature:(int,X1)	template:<class X1>	properties:scopespecialization,specialization
 X1	input.cpp	/^template<class X1> void A<int>::g1(int, X1);$/;"	Z	prototype:A::g1	typeref:meta:class
+__anonc12ce61d0b0d	input.cpp	/^template<class X1> void A<int>::g1(int, X1);$/;"	z	prototype:A::g1	typeref:typename:int	file:
+__anonc12ce61d0c0d	input.cpp	/^template<class X1> void A<int>::g1(int, X1);$/;"	z	prototype:A::g1	typeref:typename:X1	file:
 g2	input.cpp	/^template<> void A<int>::g2<char>(int, char); \/\/ for X2 = char$/;"	p	class:A	typeref:typename:void	file:	signature:(int,char)	template:<>	specialization:<char>	properties:scopespecialization,specialization
+__anonc12ce61d0d0d	input.cpp	/^template<> void A<int>::g2<char>(int, char); \/\/ for X2 = char$/;"	z	prototype:A::g2	typeref:typename:int	file:
+__anonc12ce61d0e0d	input.cpp	/^template<> void A<int>::g2<char>(int, char); \/\/ for X2 = char$/;"	z	prototype:A::g2	typeref:typename:char	file:
 g1	input.cpp	/^template<> void A<int>::g1(int, char);$/;"	p	class:A	typeref:typename:void	file:	signature:(int,char)	template:<>	properties:scopespecialization,specialization
+__anonc12ce61d0f0d	input.cpp	/^template<> void A<int>::g1(int, char);$/;"	z	prototype:A::g1	typeref:typename:int	file:
+__anonc12ce61d100d	input.cpp	/^template<> void A<int>::g1(int, char);$/;"	z	prototype:A::g1	typeref:typename:char	file:
 m	input.cpp	/^template<typename X> void m(X)$/;"	f	typeref:typename:void	signature:(X)	template:<typename X>
 X	input.cpp	/^template<typename X> void m(X)$/;"	Z	function:m	typeref:meta:typename
+__anonc12ce61d110d	input.cpp	/^template<typename X> void m(X)$/;"	z	function:m	typeref:typename:X	file:
 m	input.cpp	/^template<> void m<int>(int)$/;"	f	typeref:typename:void	signature:(int)	template:<>	specialization:<int>	properties:specialization
+__anonc12ce61d120d	input.cpp	/^template<> void m<int>(int)$/;"	z	function:m	typeref:typename:int	file:
 m	input.cpp	/^template<> void m<A<int>>(A<int> a)$/;"	f	typeref:typename:void	signature:(A<int> a)	template:<>	specialization:<A<int>>	properties:specialization
 a	input.cpp	/^template<> void m<A<int>>(A<int> a)$/;"	z	function:m	typeref:typename:A<int>	file:
 B	input.cpp	/^struct B { };$/;"	s	file:
 m	input.cpp	/^template<> void m<B>(B)$/;"	f	typeref:typename:void	signature:(B)	template:<>	specialization:<B>	properties:specialization
+__anonc12ce61d130d	input.cpp	/^template<> void m<B>(B)$/;"	z	function:m	typeref:typename:B	file:
 m	input.cpp	/^template<> void m(char)$/;"	f	typeref:typename:void	signature:(char)	template:<>	properties:specialization
+__anonc12ce61d140d	input.cpp	/^template<> void m(char)$/;"	z	function:m	typeref:typename:char	file:
 C	input.cpp	/^class C {};$/;"	c	file:	template:<class T1,class T2,int I>
 T1	input.cpp	/^template<class T1, class T2, int I>$/;"	Z	class:C	typeref:meta:class
 T2	input.cpp	/^template<class T1, class T2, int I>$/;"	Z	class:C	typeref:meta:class

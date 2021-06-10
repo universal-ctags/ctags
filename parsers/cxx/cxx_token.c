@@ -110,6 +110,19 @@ void cxxTokenForceDestroy(CXXToken * t)
 	eFree(t);
 }
 
+CXXToken * cxxTokenCopy(CXXToken * pToken)
+{
+	CXXToken * pRetToken = cxxTokenCreate();
+	pRetToken->iLineNumber = pToken->iLineNumber;
+	pRetToken->oFilePosition = pToken->oFilePosition;
+	pRetToken->eType = pToken->eType;
+	pRetToken->eKeyword = pToken->eKeyword;
+	pToken->bFollowedBySpace = pToken->bFollowedBySpace;
+	vStringCat(pRetToken->pszWord,pToken->pszWord);
+
+	return pRetToken;
+}
+
 CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,CXXKeyword eKeyword)
 {
 	CXXToken * pToken = cxxTokenCreate();

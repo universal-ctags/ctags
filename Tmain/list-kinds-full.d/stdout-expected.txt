@@ -14,7 +14,7 @@ t	typedef	yes	no	0	C	typedefs
 u	union	yes	no	0	C	union names
 v	variable	yes	no	0	C	variable definitions
 x	externvar	no	no	0	C	external and forward variable declarations
-z	parameter	no	no	0	C	function parameters inside function definitions
+z	parameter	no	no	0	C	function parameters inside function or prototype definitions
 #LETTER	NAME	ENABLED	REFONLY	NROLES	MASTER	DESCRIPTION
 A	alias	no	no	0	NONE	namespace aliases
 D	macroparam	no	no	0	C	parameters inside macro definitions
@@ -37,4 +37,4 @@ t	typedef	yes	no	0	C	typedefs
 u	union	yes	no	0	C	union names
 v	variable	yes	no	0	C	variable definitions
 x	externvar	no	no	0	C	external and forward variable declarations
-z	parameter	no	no	0	C	function parameters inside function definitions
+z	parameter	no	no	0	C	function parameters inside function or prototype definitions

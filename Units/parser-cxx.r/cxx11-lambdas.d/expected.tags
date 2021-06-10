@@ -17,24 +17,26 @@ l4	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	local	function:tes
 l3	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	local	function:test	typeref:typename:auto	file:	end:21
 __anon4e7b1b580502	input.cpp	/^	auto l5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	function	function:test	typeref:typename:X<double,double>	file:	signature:(X<int,int> x,X<long,long>) 	end:23	captures:[]
 x	input.cpp	/^	auto l5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	parameter	function:test::__anon4e7b1b580502	typeref:typename:X<int,int>	file:
+__anon4e7b1b58060d	input.cpp	/^	auto l5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	parameter	function:test::__anon4e7b1b580502	typeref:typename:X<long,long>	file:
 l5	input.cpp	/^	auto l5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	local	function:test	typeref:typename:auto	file:
-__anon4e7b1b580602	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	function	function:test	typeref:typename:int	file:	signature:(int a,int b) 	end:28	captures:[l1,l2,l3]
-a	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580602	typeref:typename:int	file:
-b	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580602	typeref:typename:int	file:
+__anon4e7b1b580702	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	function	function:test	typeref:typename:int	file:	signature:(int a,int b) 	end:28	captures:[l1,l2,l3]
+a	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580702	typeref:typename:int	file:
+b	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580702	typeref:typename:int	file:
 v1	input.cpp	/^	int v1 = call($/;"	local	function:test	typeref:typename:int	file:	end:29
-__anon4e7b1b580702	input.cpp	/^auto lg1 = [] { return 0; };$/;"	function	file:	end:32	captures:[] 
+__anon4e7b1b580802	input.cpp	/^auto lg1 = [] { return 0; };$/;"	function	file:	end:32	captures:[] 
 lg1	input.cpp	/^auto lg1 = [] { return 0; };$/;"	variable	typeref:typename:auto	end:32
-__anon4e7b1b580802	input.cpp	/^auto lg2 = [](int a,int b) { return a > b ? a : b; };$/;"	function	file:	signature:(int a,int b) 	end:34	captures:[]
-a	input.cpp	/^auto lg2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:__anon4e7b1b580802	typeref:typename:int	file:
-b	input.cpp	/^auto lg2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:__anon4e7b1b580802	typeref:typename:int	file:
+__anon4e7b1b580902	input.cpp	/^auto lg2 = [](int a,int b) { return a > b ? a : b; };$/;"	function	file:	signature:(int a,int b) 	end:34	captures:[]
+a	input.cpp	/^auto lg2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:__anon4e7b1b580902	typeref:typename:int	file:
+b	input.cpp	/^auto lg2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:__anon4e7b1b580902	typeref:typename:int	file:
 lg2	input.cpp	/^auto lg2 = [](int a,int b) { return a > b ? a : b; };$/;"	variable	typeref:typename:auto	end:34
-__anon4e7b1b580902	input.cpp	/^auto lg3 = [=](int a,int b) -> int {$/;"	function	typeref:typename:int	file:	signature:(int a,int b) 	end:39	captures:[=]
-a	input.cpp	/^auto lg3 = [=](int a,int b) -> int {$/;"	parameter	function:__anon4e7b1b580902	typeref:typename:int	file:
-b	input.cpp	/^auto lg3 = [=](int a,int b) -> int {$/;"	parameter	function:__anon4e7b1b580902	typeref:typename:int	file:
-__anon4e7b1b580a02	input.cpp	/^	auto lg4 = [a,b](int c){ return a+b+c; };$/;"	function	function:__anon4e7b1b580902	file:	signature:(int c)	end:37	captures:[a,b]
-c	input.cpp	/^	auto lg4 = [a,b](int c){ return a+b+c; };$/;"	parameter	function:__anon4e7b1b580902::__anon4e7b1b580a02	typeref:typename:int	file:
-lg4	input.cpp	/^	auto lg4 = [a,b](int c){ return a+b+c; };$/;"	local	function:__anon4e7b1b580902	typeref:typename:auto	file:	end:37
+__anon4e7b1b580a02	input.cpp	/^auto lg3 = [=](int a,int b) -> int {$/;"	function	typeref:typename:int	file:	signature:(int a,int b) 	end:39	captures:[=]
+a	input.cpp	/^auto lg3 = [=](int a,int b) -> int {$/;"	parameter	function:__anon4e7b1b580a02	typeref:typename:int	file:
+b	input.cpp	/^auto lg3 = [=](int a,int b) -> int {$/;"	parameter	function:__anon4e7b1b580a02	typeref:typename:int	file:
+__anon4e7b1b580b02	input.cpp	/^	auto lg4 = [a,b](int c){ return a+b+c; };$/;"	function	function:__anon4e7b1b580a02	file:	signature:(int c)	end:37	captures:[a,b]
+c	input.cpp	/^	auto lg4 = [a,b](int c){ return a+b+c; };$/;"	parameter	function:__anon4e7b1b580a02::__anon4e7b1b580b02	typeref:typename:int	file:
+lg4	input.cpp	/^	auto lg4 = [a,b](int c){ return a+b+c; };$/;"	local	function:__anon4e7b1b580a02	typeref:typename:auto	file:	end:37
 lg3	input.cpp	/^auto lg3 = [=](int a,int b) -> int {$/;"	variable	typeref:typename:auto	end:39
-__anon4e7b1b580b02	input.cpp	/^auto lg5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	function	typeref:typename:X<double,double>	file:	signature:(X<int,int> x,X<long,long>) 	end:41	captures:[]
-x	input.cpp	/^auto lg5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	parameter	function:__anon4e7b1b580b02	typeref:typename:X<int,int>	file:
+__anon4e7b1b580c02	input.cpp	/^auto lg5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	function	typeref:typename:X<double,double>	file:	signature:(X<int,int> x,X<long,long>) 	end:41	captures:[]
+x	input.cpp	/^auto lg5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	parameter	function:__anon4e7b1b580c02	typeref:typename:X<int,int>	file:
+__anon4e7b1b580d0d	input.cpp	/^auto lg5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	parameter	function:__anon4e7b1b580c02	typeref:typename:X<long,long>	file:
 lg5	input.cpp	/^auto lg5 = [](X<int,int> x,X<long,long>) -> X<double,double> { return X<double,double>(); };$/;"	variable	typeref:typename:auto

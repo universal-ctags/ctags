@@ -21,6 +21,7 @@
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
+#include "trashbox.h"
 
 #include <string.h>
 
@@ -1789,8 +1790,9 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 	CXXTypedVariableSet oParamInfo;
+	bool bParams = cxxTagKindEnabled(CXXTagKindPARAMETER);
 
-	if(!cxxParserLookForFunctionSignature(g_cxx.pTokenChain,pInfo,&oParamInfo))
+	if(!cxxParserLookForFunctionSignature(g_cxx.pTokenChain,pInfo,bParams?&oParamInfo:NULL))
 	{
 		CXX_DEBUG_LEAVE_TEXT("No parenthesis found: no function");
 		return 0;
@@ -1806,7 +1808,7 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 			piCorkQueueIndex
 		);
 
-	if(cxxTagKindEnabled(CXXTagKindPARAMETER))
+	if(bParams)
 		cxxParserEmitFunctionParameterTags(&oParamInfo);
 
 	CXX_DEBUG_LEAVE();
@@ -1868,6 +1870,10 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 		}
 
 		tag->isFileScope = true;
+
+		if (pInfo->uAnonymous & (0x1u << i))
+			markTagExtraBit(tag, XTAG_ANONYMOUS);
+
 		cxxTagCommit();
 
 		if(pTypeName)
@@ -2148,10 +2154,22 @@ try_again:
 					}
 				}
 
-				if(pIdentifier)
+				if(pIdentifier || isXtagEnabled(XTAG_ANONYMOUS))
 				{
 					pParamInfo->aTypeStarts[pParamInfo->uCount] = pStart;
 					pParamInfo->aTypeEnds[pParamInfo->uCount] = t->pPrev;
+					pParamInfo->uAnonymous &= ~(0x1u << pParamInfo->uCount);
+					if(!pIdentifier)
+					{
+						/* This block handles parameter having no name lie
+						 *
+						 *   void f(int *);
+						 */
+						pIdentifier = cxxTokenCreateAnonymousIdentifier(CXXTagKindPARAMETER);
+						pIdentifier->iLineNumber = t->pPrev->iLineNumber;
+						pIdentifier->oFilePosition = t->pPrev->oFilePosition;
+						pParamInfo->uAnonymous |= (0x1u << pParamInfo->uCount);
+					}
 					pParamInfo->aIdentifiers[pParamInfo->uCount] = pIdentifier;
 					pParamInfo->uCount++;
 
@@ -2176,6 +2194,35 @@ try_again:
 			} else {
 				pParamInfo = NULL; // reset so condition will be faster to check
 			}
+		} else if (pParamInfo
+				   && (pParamInfo->uCount < CXX_TYPED_VARIABLE_SET_ITEM_COUNT)
+				   && (!cxxTokenIsKeyword(pStart, CXXKeywordVOID))
+				   && (!cxxTokenTypeIs(pStart,CXXTokenTypeMultipleDots))
+				   && isXtagEnabled(XTAG_ANONYMOUS)) {
+			/* This block handles parameter having no name like
+			 *
+			 *    int f (int);
+			 *
+			 * In C language, you will find such a thing in a prototype.
+			 * In C++ language, you will find it even in a function definition.
+			 *
+			 */
+			CXXToken * pFakeStart = cxxTokenCopy(pStart);
+			CXXToken * pFakeId = cxxTokenCreateAnonymousIdentifier(CXXTagKindPARAMETER);
+			pFakeId->iLineNumber = pStart->iLineNumber;
+			pFakeId->oFilePosition = pStart->oFilePosition;
+
+			pFakeStart->pNext = pFakeId;
+			pFakeId->pPrev = pFakeStart;
+
+			pParamInfo->aTypeStarts[pParamInfo->uCount] = pFakeStart;
+			pParamInfo->aTypeEnds[pParamInfo->uCount] = pFakeId;
+			pParamInfo->aIdentifiers[pParamInfo->uCount] = pFakeId;
+			pParamInfo->uAnonymous |= (0x1u << pParamInfo->uCount);
+			pParamInfo->uCount++;
+
+			PARSER_TRASH_BOX (pFakeStart, cxxTokenDestroy);
+			/* pFakeId may be destroyed via pParamInfo->aIdentifiers[i]. */
 		}
 
 		if(cxxTokenTypeIs(t,CXXTokenTypeClosingParenthesis))
