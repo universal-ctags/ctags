@@ -2,7 +2,7 @@
 
 ## Overview ##
 
-**PackCC** is a packrat parser generator for C. Its main features are as follows:
+**PackCC** is a parser generator for C. Its main features are as follows:
 
 - Generates your parser in C from a grammar described in a **PEG**,
 - Gives your parser great efficiency by **packrat parsing**,
@@ -34,6 +34,8 @@ For convenience, the build environments using GCC, Clang, and Microsoft Visual S
 
 ### Using GCC ###
 
+#### Other than MinGW ####
+
 `packcc` will be built in both directories `build/gcc/debug/bin` and `build/gcc/release/bin` using `gcc` by executing the following commands:
 
 ```
@@ -44,7 +46,21 @@ make check  # bats-core and uncrustify are required (see tests/README.md)
 
 `packcc` in the directory `build/gcc/release/bin` is suitable for practical use.
 
+#### MinGW ####
+
+`packcc` will be built in both directories `build/mingw-gcc/debug/bin` and `build/mingw-gcc/release/bin` using `gcc` by executing the following commands:
+
+```
+cd build/mingw-gcc
+make
+make check  # bats-core and uncrustify are required (see tests/README.md)
+```
+
+`packcc` in the directory `build/mingw-gcc/release/bin` is suitable for practical use.
+
 ### Using Clang ###
+
+#### Other than MinGW ####
 
 `packcc` will be built in both directories `build/clang/debug/bin` and `build/clang/release/bin` using `clang` by executing the following commands:
 
@@ -55,6 +71,18 @@ make check  # bats-core and uncrustify are required (see tests/README.md)
 ```
 
 `packcc` in the directory `build/clang/release/bin` is suitable for practical use.
+
+#### MinGW ####
+
+`packcc` will be built in both directories `build/mingw-clang/debug/bin` and `build/mingw-clang/release/bin` using `clang` by executing the following commands:
+
+```
+cd build/mingw-clang
+make
+make check  # bats-core and uncrustify are required (see tests/README.md)
+```
+
+`packcc` in the directory `build/mingw-clang/release/bin` is suitable for practical use.
 
 ### Using Microsoft Visual Studio ###
 

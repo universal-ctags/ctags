@@ -68,6 +68,9 @@ static size_t strnlen_(const char *str, size_t maxlen) {
 #define __attribute__(x)
 #endif
 
+#undef TRUE  /* to avoid macro definition conflicts with the system header file of IBM AIX */
+#undef FALSE
+
 #define VERSION "1.5.0"
 
 #ifndef BUFFER_INIT_SIZE
@@ -910,7 +913,7 @@ static size_t populate_bits(size_t x) {
     x |= x >>  4;
     x |= x >>  8;
     x |= x >> 16;
-#ifndef _M_IX86 /* not Windows for x86 (32-bit) */
+#if (defined __SIZEOF_SIZE_T__ && __SIZEOF_SIZE_T__ == 8) /* gcc or clang */ || defined _WIN64 /* MSVC */
     x |= x >> 32;
 #endif
     return x;

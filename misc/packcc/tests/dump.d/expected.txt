@@ -1,0 +1,163 @@
+Rule(name:'statement', ref:0, vars.len:1, capts.len:0, codes.len:2) {
+  Alternate(max:2, len:2) {
+    Sequence(max:8, len:5) {
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      Reference(var:'e', index:0, name:'expression', rule:'expression')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      Reference(var:'(null)', index:void, name:'EOL', rule:'EOL')
+      Action(index:0, value:{ printf(\"answer=%d\\n\", e); }, vars:
+        'e'
+      )
+    }
+    Sequence(max:4, len:3) {
+      Quantity(min:0, max-1) {
+        Sequence(max:2, len:2) {
+          Predicate(neg:1) {
+            Reference(var:'(null)', index:void, name:'EOL', rule:'EOL')
+          }
+          Charclass(value:'null')
+        }
+      }
+      Reference(var:'(null)', index:void, name:'EOL', rule:'EOL')
+      Action(index:1, value:{ printf(\"error\\n\"); }, vars:none)
+    }
+  }
+}
+Rule(name:'expression', ref:2, vars.len:1, capts.len:0, codes.len:1) {
+  Sequence(max:2, len:2) {
+    Reference(var:'e', index:0, name:'term', rule:'term')
+    Action(index:0, value:{ __ = e; }, vars:
+      'e'
+    )
+  }
+}
+Rule(name:'term', ref:3, vars.len:3, capts.len:0, codes.len:3) {
+  Alternate(max:4, len:3) {
+    Sequence(max:8, len:6) {
+      Reference(var:'l', index:0, name:'term', rule:'term')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      String(value:'+')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      Reference(var:'r', index:1, name:'factor', rule:'factor')
+      Action(index:0, value:{ __ = l + r; }, vars:
+        'l'
+        'r'
+      )
+    }
+    Sequence(max:8, len:6) {
+      Reference(var:'l', index:0, name:'term', rule:'term')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      String(value:'-')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      Reference(var:'r', index:1, name:'factor', rule:'factor')
+      Action(index:1, value:{ __ = l - r; }, vars:
+        'l'
+        'r'
+      )
+    }
+    Sequence(max:2, len:2) {
+      Reference(var:'e', index:2, name:'factor', rule:'factor')
+      Action(index:2, value:{ __ = e; }, vars:
+        'e'
+      )
+    }
+  }
+}
+Rule(name:'factor', ref:5, vars.len:3, capts.len:0, codes.len:3) {
+  Alternate(max:4, len:3) {
+    Sequence(max:8, len:6) {
+      Reference(var:'l', index:0, name:'factor', rule:'factor')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      String(value:'*')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      Reference(var:'r', index:1, name:'unary', rule:'unary')
+      Action(index:0, value:{ __ = l * r; }, vars:
+        'l'
+        'r'
+      )
+    }
+    Sequence(max:8, len:6) {
+      Reference(var:'l', index:0, name:'factor', rule:'factor')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      String(value:'/')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      Reference(var:'r', index:1, name:'unary', rule:'unary')
+      Action(index:1, value:{ __ = l / r; }, vars:
+        'l'
+        'r'
+      )
+    }
+    Sequence(max:2, len:2) {
+      Reference(var:'e', index:2, name:'unary', rule:'unary')
+      Action(index:2, value:{ __ = e; }, vars:
+        'e'
+      )
+    }
+  }
+}
+Rule(name:'unary', ref:5, vars.len:1, capts.len:0, codes.len:3) {
+  Alternate(max:4, len:3) {
+    Sequence(max:4, len:4) {
+      String(value:'+')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      Reference(var:'e', index:0, name:'unary', rule:'unary')
+      Action(index:0, value:{ __ = +e; }, vars:
+        'e'
+      )
+    }
+    Sequence(max:4, len:4) {
+      String(value:'-')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      Reference(var:'e', index:0, name:'unary', rule:'unary')
+      Action(index:1, value:{ __ = -e; }, vars:
+        'e'
+      )
+    }
+    Sequence(max:2, len:2) {
+      Reference(var:'e', index:0, name:'primary', rule:'primary')
+      Action(index:2, value:{ __ = e; }, vars:
+        'e'
+      )
+    }
+  }
+}
+Rule(name:'primary', ref:1, vars.len:1, capts.len:1, codes.len:2) {
+  Alternate(max:2, len:2) {
+    Sequence(max:2, len:2) {
+      Capture(index:0) {
+        Quantity(min:1, max-1) {
+          Charclass(value:'0-9')
+        }
+      }
+      Action(index:0, value:{ __ = atoi(_1); }, vars:
+        $1
+      )
+    }
+    Sequence(max:8, len:6) {
+      String(value:'(')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      Reference(var:'e', index:0, name:'expression', rule:'expression')
+      Reference(var:'(null)', index:void, name:'_', rule:'_')
+      String(value:')')
+      Action(index:1, value:{ __ = e; }, vars:
+        'e'
+      )
+    }
+  }
+}
+Rule(name:'_', ref:14, vars.len:0, capts.len:0, codes.len:0) {
+  Quantity(min:0, max-1) {
+    Charclass(value:' \t')
+  }
+}
+Rule(name:'EOL', ref:3, vars.len:0, capts.len:0, codes.len:0) {
+  Alternate(max:4, len:4) {
+    String(value:'\n')
+    String(value:'\r\n')
+    String(value:'\r')
+    String(value:';')
+  }
+}
+value_type: 'int'
+auxil_type: 'void *'
+prefix: 'calc'
