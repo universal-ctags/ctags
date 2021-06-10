@@ -1732,7 +1732,9 @@ int cxxParserEmitFunctionTags(
 
 	if(bPushScopes)
 	{
-		cxxScopePush(pIdentifier,CXXScopeTypeFunction,CXXScopeAccessUnknown);
+		cxxScopePush(pIdentifier,
+					 (uTagKind == CXXTagKindPROTOTYPE)? CXXScopeTypePrototype: CXXScopeTypeFunction,
+					 CXXScopeAccessUnknown);
 		iScopesPushed++;
 	} else {
 		cxxTokenDestroy(pIdentifier);
