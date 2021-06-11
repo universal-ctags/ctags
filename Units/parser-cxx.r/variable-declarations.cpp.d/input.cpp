@@ -18,6 +18,7 @@ struct Struct1
 	std::string m12[3] { std::string("one"),"two",{'t', 'h', 'r', 'e', 'e'} };
 	int m13 {false};
 	std::string * m14 { new std::string("test") };
+	decltype(int) m15;
 } v01, v02[10];
 
 enum Enum1
@@ -98,4 +99,5 @@ int anotherFunc(int n06)
 	void (Struct1::*l33)() = NULL;
 	void (Struct1::*l34)(int) = NULL;
 	int (Struct1::*l35)(int) = NULL;
+	decltype(l36) l35;
 }
