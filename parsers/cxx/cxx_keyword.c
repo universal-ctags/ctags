@@ -230,7 +230,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"decltype",
 		CXXLanguageCPP,
-		0
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"default",
