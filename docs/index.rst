@@ -68,8 +68,8 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	optlib.rst
 	optscript.rst
 	extending.rst
-	tips.rst
-	testing.rst
+	testing-ctags.rst
+	testing-parser.rst
 	reporting.rst
 	contributions.rst
 	other-projects.rst
