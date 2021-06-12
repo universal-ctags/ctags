@@ -354,8 +354,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				}
 
 				if(
-					cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword) &&
-					(t->pPrev->eKeyword == CXXKeywordDECLTYPE) &&
+					cxxTokenIsKeyword(t->pPrev,CXXKeywordDECLTYPE) &&
 					t->pNext
 				)
 				{
@@ -605,10 +604,7 @@ got_identifier:
 							// macro
 							cxxTokenTypeIs(pTokenBefore->pPrev,CXXTokenTypeIdentifier) ||
 							// decltype
-							(
-								cxxTokenTypeIs(pTokenBefore->pPrev,CXXTokenTypeKeyword) &&
-								(pTokenBefore->pPrev->eKeyword == CXXKeywordDECLTYPE)
-							)
+							cxxTokenIsKeyword(pTokenBefore->pPrev,CXXKeywordDECLTYPE)
 						)
 					)
 				{
