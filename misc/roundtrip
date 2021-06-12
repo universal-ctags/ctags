@@ -22,7 +22,6 @@ export LC_ALL=C
 
 READTAGS=${1:-./readtags}
 UNITS=${2:-./Units}
-MAX_ENTRIES=$3
 s=0
 
 if ! [ -f "${READTAGS}" ]; then
@@ -40,14 +39,6 @@ if ! [ -x "${UNITS}" ]; then
     exit 1
 fi
 
-limit_entries()
-{
-    if [ -n "${MAX_ENTRIES}" ]; then
-	head -${MAX_ENTRIES}
-    else
-	cat
-    fi
-}
 
 # Expand CTags escape sequences (and keep the original, too)
 # See docs/format.rst
@@ -126,7 +117,7 @@ IFS='
 
 tagfiles=$(find "$UNITS" -name expected.tags)
 for tags in $tagfiles; do
-    tagnames=$(sed -e 's/^\([^	]*\)	.*/\1/' "$tags" | limit_entries)
+    tagnames=$(sed -e 's/^\([^	]*\)	.*/\1/' "$tags")
     for name in $tagnames; do
 	# Yes, there is a reason for this craziness.  We need to properly
 	# handle embedded newlines (expanded from "\n"), including trailing
