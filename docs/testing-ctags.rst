@@ -127,6 +127,8 @@ See `Profiling with gperftools
 <https://wiki.geany.org/howtos/profiling/gperftools>`_ and `#383
 <https://github.com/universal-ctags/ctags/issues/383>`_.
 
+See also `codebase <https://github.com/universal-ctags/codebase>`_.
+
 Checking coverage
 ------------------------------------------------------------
 Before starting coverage measuring, you need to specify
