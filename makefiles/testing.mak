@@ -243,8 +243,11 @@ tinst:
 if USE_READCMD
 roundtrip: $(READTAGS_TEST)
 	$(V_RUN) \
+	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI)$(GITHUBACTIONS) = x; then	\
+		ROUNDTRIP_FLAGS=--minitrip;			\
+	fi;							\
 	builddir=$$(pwd); \
-	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
+	$(SHELL) $(srcdir)/misc/roundtrip $(READTAGS_TEST) $${builddir}/Units $(ROUNDTRIP_FLAGS)
 else
 roundtrip:
 endif

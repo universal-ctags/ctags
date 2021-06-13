@@ -22,6 +22,22 @@ export LC_ALL=C
 
 READTAGS=${1:-./readtags}
 UNITS=${2:-./Units}
+shift 2
+
+MINITRIP=
+while [ $# -gt 0 ]; do
+    case $1 in
+	--minitrip)
+	    MINITRIP=minitrip
+	    ;;
+	*)
+	    echo "Unexpected argument: $1" 1>&2
+	    exit 1
+	    ;;
+    esac
+    shift
+done
+
 s=0
 
 if ! [ -f "${READTAGS}" ]; then
@@ -115,8 +131,17 @@ OLD_IFS="$IFS"
 IFS='
 '
 
+ntagfiles=0
+ntrips=0
 tagfiles=$(find "$UNITS" -name expected.tags)
 for tags in $tagfiles; do
+    ntagfiles=$(expr $ntagfiles + 1)
+    dir=$(dirname "$tags")
+    if [ -n "$MINITRIP" -a ! -e "$dir/$MINITRIP" ]; then
+	continue
+    fi
+    ntrips=$(expr $ntrips + 1)
+
     tagnames=$(sed -e 's/^\([^	]*\)	.*/\1/' "$tags")
     for name in $tagnames; do
 	# Yes, there is a reason for this craziness.  We need to properly
@@ -138,5 +163,11 @@ _}"
 done
 
 IFS="$OLD_IFS"
+
+note=
+if [ -n "$MINITRIP" ]; then
+    note="[$MINITRIP]"
+fi
+printf "%s/%s%s...%d\n" "$ntrips" "$ntagfiles" "$note" "$s"
 
 exit $s
