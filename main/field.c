@@ -85,7 +85,7 @@ static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag);
 static bool     isExtrasFieldAvailable    (const tagEntryInfo *const tag);
 static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
-static bool     isEpochAvailable           (const tagEntryInfo *const tag);
+static bool     isEpochAvailable          (const tagEntryInfo *const tag);
 
 static EsObject* getFieldValueForName (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForName (tagEntryInfo *, const fieldDefinition *, const EsObject *);
