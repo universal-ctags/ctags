@@ -1,0 +1,6 @@
+f	input.h	/^inline void f(int x, int y) {}$/;"	f	typeref:typename:void	signature:(int x,int y)
+x	input.h	/^inline void f(int x, int y) {}$/;"	z	function:f	typeref:typename:int	file:	nth:0
+y	input.h	/^inline void f(int x, int y) {}$/;"	z	function:f	typeref:typename:int	file:	nth:1
+X	input.h	/^#define F(X,Y) (X+Y)$/;"	D	macro:F	nth:0
+Y	input.h	/^#define F(X,Y) (X+Y)$/;"	D	macro:F	nth:1
+F	input.h	/^#define F(/;"	d	signature:(X,Y)

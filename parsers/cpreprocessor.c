@@ -839,7 +839,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 	}
 }
 
-static void makeParamTag (vString *name, bool placeholder)
+static void makeParamTag (vString *name, short nth, bool placeholder)
 {
 	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_MACRO);
 	langType lang = standing_alone ? Cpp.lang: Cpp.clientLang;
@@ -851,10 +851,11 @@ static void makeParamTag (vString *name, bool placeholder)
 	r = makeSimpleTag (name, Cpp.macroParamKindIndex);
 	popLanguage ();
 
-	if (placeholder)
+	tagEntryInfo *e = getEntryInCorkQueue (r);
+	if (e)
 	{
-		tagEntryInfo *e = getEntryInCorkQueue (r);
-		if (e)
+		e->extensionFields.nth = nth;
+		if (placeholder)
 			e->placeholder = 1;
 	}
 }
@@ -902,6 +903,7 @@ static int directiveDefine (const int c, bool undef)
 			unsigned long 	lineNumber = getInputLineNumber ();
 			MIOPos filePosition = getInputFilePosition ();
 			int p = cppGetcFromUngetBufferOrFile ();
+			short nth = 0;
 
 			if (p == '(')
 			{
@@ -919,7 +921,7 @@ static int directiveDefine (const int c, bool undef)
 
 					if (vStringLength (param) > 0)
 					{
-						makeParamTag (param, vStringChar(param, 0) == '.');
+						makeParamTag (param, nth++, vStringChar(param, 0) == '.');
 						vStringClear (param);
 					}
 					if (p == '\\')
