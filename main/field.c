@@ -70,6 +70,7 @@ static const char *renderFieldXpath (const tagEntryInfo *const tag, const char *
 static const char *renderFieldScopeKindName(const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldEnd (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldEpoch (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldNth (const tagEntryInfo *const tag, const char *value, vString* b);
 
 static bool doesContainAnyCharInName (const tagEntryInfo *const tag, const char *value, const char *chars);
 static bool doesContainAnyCharInInput (const tagEntryInfo *const tag, const char*value, const char *chars);
@@ -86,6 +87,7 @@ static bool     isExtrasFieldAvailable    (const tagEntryInfo *const tag);
 static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 static bool     isEpochAvailable          (const tagEntryInfo *const tag);
+static bool     isNthAvailable            (const tagEntryInfo *const tag);
 
 static EsObject* getFieldValueForName (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForName (tagEntryInfo *, const fieldDefinition *, const EsObject *);
@@ -437,6 +439,17 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 		.renderNoEscaping	= NULL,
 		.doesContainAnyChar = NULL,
 		.isValueAvailable	= isEpochAvailable,
+		.dataType			= FIELDTYPE_INTEGER,
+	},
+	[FIELD_NTH - FIELDS_UCTAGS_START] = {
+		.letter				= 'o',
+		.name				= "nth",
+		.description		= "the order in the parent scope",
+		.enabled			= false,
+		.render				= renderFieldNth,
+		.renderNoEscaping	= NULL,
+		.doesContainAnyChar = NULL,
+		.isValueAvailable	= isNthAvailable,
 		.dataType			= FIELDTYPE_INTEGER,
 	},
 };
@@ -1125,6 +1138,21 @@ static const char *renderFieldEpoch (const tagEntryInfo *const tag,
 		return renderAsIs (b, buf);
 	else
 		return NULL;
+#undef buf_len
+}
+
+static const char *renderFieldNth (const tagEntryInfo *const tag,
+								   const char *value, vString* b)
+{
+#define buf_len 12
+	static char buf[buf_len];
+
+	if (tag->extensionFields.nth > NO_NTH_FIELD
+		&& snprintf (buf, buf_len, "%d", (int)tag->extensionFields.nth) > 0)
+		return renderAsIs (b, buf);
+	else
+		return NULL;
+#undef buf_len
 }
 
 static bool     isTyperefFieldAvailable  (const tagEntryInfo *const tag)
@@ -1190,6 +1218,12 @@ static bool isEpochAvailable (const tagEntryInfo *const tag)
 	return (tag->kindIndex == KIND_FILE_INDEX)
 		? true
 		: false;
+}
+
+static bool isNthAvailable (const tagEntryInfo *const tag)
+{
+	Assert (tag->langType >= NO_NTH_FIELD);
+	return (tag->extensionFields.nth != NO_NTH_FIELD)? true: false;
 }
 
 extern bool isFieldEnabled (fieldType type)

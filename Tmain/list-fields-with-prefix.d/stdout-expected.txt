@@ -2,6 +2,7 @@ E       UCTAGSextras         no      NONE             s--    no    r- Extra tag 
 T       UCTAGSepoch          yes     NONE             -i-    no    -- the last modified time of the input file (only for F/file kind tag)
 Z       UCTAGSscope          no      NONE             s--    no    rw [tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
 e       UCTAGSend            no      NONE             -i-    no    rw end lines of various items
+o       UCTAGSnth            no      NONE             -i-    no    -- the order in the parent scope
 p       UCTAGSscopeKind      no      NONE             s--    no    -- [tags output] no effect, [xref and json output] kind of scope in long-name form
 r       UCTAGSroles          no      NONE             s--    no    r- Roles
 x       UCTAGSxpath          no      NONE             s--    no    -- xpath for the tag

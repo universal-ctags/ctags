@@ -1701,6 +1701,10 @@ The meaning of major fields is as follows (long-name flag/one-letter flag):
 ``name``/``N``
 	The name of language objects.
 
+``nth``/``o``
+	The order in the parent scope.
+	(i.e. 4th parameter in the function).
+
 ``pattern``/``P``
 	Can be used to search the ``name`` in ``input``
 

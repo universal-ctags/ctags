@@ -91,6 +91,11 @@ output: Foo 1
 output: doIt 2
 status: 0
 
+field: o
+output: Foo 
+output: doIt 
+status: 0
+
 field: p
 output: Foo 
 output: doIt class

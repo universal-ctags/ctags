@@ -17,6 +17,7 @@ k	NONE	yes	NONE	s--	no	--	Kind of tag in one-letter form
 l	language	no	NONE	s--	no	--	Language of input file containing tag
 m	implementation	no	NONE	s--	no	--	Implementation information
 n	line	no	NONE	-i-	no	rw	Line number of tag definition
+o	nth	no	NONE	-i-	no	--	the order in the parent scope
 p	scopeKind	no	NONE	s--	no	--	[tags output] no effect, [xref and json output] kind of scope in long-name form
 r	roles	no	NONE	s--	no	r-	Roles
 s	NONE	yes	NONE	s--	no	--	[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope

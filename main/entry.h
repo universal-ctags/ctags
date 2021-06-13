@@ -100,6 +100,8 @@ struct sTagEntryInfo {
 #endif
 		unsigned long endLine;
 		time_t epoch;
+#define NO_NTH_FIELD -1
+		short nth;
 	} extensionFields;  /* list of extension fields*/
 
 	/* `usedParserFields' tracks how many parser own fields are
