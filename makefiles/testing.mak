@@ -169,7 +169,7 @@ tmain: $(CTAGS_TEST) $(READTAGS_TEST) $(OPTSCRIPT_TEST)
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
-	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI) = x; then	\
+	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI)$(GITHUBACTIONS) = x; then	\
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
 	builddir=$$(pwd); \
