@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS_D=-std=gnu89 -Wall -Wextra -Wno-unused-parameter -Wno-overlength-strings -pedantic -O0 -g2
-CFLAGS_R=-std=gnu89 -Wall -Wextra -Wno-unused-parameter -Wno-overlength-strings -pedantic -O2 -DNDEBUG
+CFLAGS_D=-std=gnu89 -fsigned-char -Wall -Wextra -Wno-unused-parameter -Wno-overlength-strings -pedantic -O0 -g2
+CFLAGS_R=-std=gnu89 -fsigned-char -Wall -Wextra -Wno-unused-parameter -Wno-overlength-strings -pedantic -O2 -DNDEBUG
 LDFLAGS_D=
 LDFLAGS_R=
 
@@ -24,7 +24,7 @@ SRCS= \
   $(patsubst %,$(TMPDIR_R)/%.c,$(EXAMPLES)) \
   $(patsubst %,$(TMPDIR_R)/%.h,$(EXAMPLES))
 
-.PHONY: all clean
+.PHONY: all check clean
 
 .SECONDARY: $(SRCS)
 
@@ -48,8 +48,9 @@ $(TMPDIR_D)/examples/%.c $(TMPDIR_D)/examples/%.h: $(SRCDIR)/examples/%.peg $(BI
 $(TMPDIR_R)/examples/%.c $(TMPDIR_R)/examples/%.h: $(SRCDIR)/examples/%.peg $(BINDIR_R)/packcc
 	mkdir -p $(dir $@) && $(BINDIR_R)/packcc -o $(basename $@) $<
 
-check: $(BINDIR_R)/packcc
-	PACKCC=$$PWD/$^ $(TESTDIR)/test.sh
+check: $(BINDIR_D)/packcc $(BINDIR_R)/packcc
+	@echo "== Debug Version =="   && PACKCC=$$PWD/$(BINDIR_D)/packcc CC="$(CC) $(CFLAGS_D)" $(TESTDIR)/test.sh
+	@echo "== Release Version ==" && PACKCC=$$PWD/$(BINDIR_R)/packcc CC="$(CC) $(CFLAGS_R)" $(TESTDIR)/test.sh
 
 clean:
 	rm -f $(BINS) $(SRCS)

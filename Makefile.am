@@ -48,8 +48,9 @@ noinst_LIBRARIES = libctags.a
 noinst_PROGRAMS =
 noinst_PROGRAMS += mini-geany
 
+PACKCC_CPPFLAGS_FOR_BUILD  = -fsigned-char
 if HAVE_STRNLEN_FOR_BUILD
-EXTRA_CPPFLAGS_FOR_BUILD = -DPCC_USE_SYSTEM_STRNLEN
+PACKCC_CPPFLAGS_FOR_BUILD += -DPCC_USE_SYSTEM_STRNLEN
 endif
 
 PACKCC = $(top_builddir)/packcc$(BUILD_EXEEXT)
@@ -58,7 +59,7 @@ cc4b_verbose = $(cc4b_verbose_@AM_V@)
 cc4b_verbose_ = $(cc4b_verbose_@AM_DEFAULT_V@)
 cc4b_verbose_0 = @echo CC4BUILD "  $@";
 $(PACKCC): $(top_srcdir)/misc/packcc/src/packcc.c
-	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(EXTRA_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/misc/packcc/src/packcc.c
+	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(PACKCC_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/misc/packcc/src/packcc.c
 
 if USE_READCMD
 bin_PROGRAMS+= readtags

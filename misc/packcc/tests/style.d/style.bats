@@ -10,7 +10,6 @@ check_uncrustify_version() {
 }
 
 test_style() {
-    check_uncrustify_version
     if ! command -v "uncrustify" &> /dev/null; then
         skip "uncrustify is not installed"
     elif ! check_uncrustify_version &> /dev/null; then
@@ -29,8 +28,7 @@ test_style() {
 }
 
 @test "Testing style.d - generated" {
-    cp -f ../src/examples/calc.peg style.d/parser.peg  ## NOTE: Copy is adopted instead of using a link, considering MinGW.
-    test_generate "style.d" "parser.peg"
+    test_generate "$ROOTDIR/src/examples/calc.peg"
     test_style "style.d/parser.h"
     test_style "style.d/parser.c"
 }
