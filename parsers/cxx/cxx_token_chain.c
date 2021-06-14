@@ -1161,6 +1161,7 @@ void cxxTokenChainNormalizeTypeNameSpacingInRange(CXXToken * pFrom,CXXToken * pT
 	// unsigned short int[3];
 	// ClassA<ClassB<type *,type>> <-- fixme: not sure about the trailing >>
 	// Class<Something> (*)(type[])
+	// decltype(something)
 
 	CXXToken * t = pFrom;
 
@@ -1173,8 +1174,18 @@ void cxxTokenChainNormalizeTypeNameSpacingInRange(CXXToken * pFrom,CXXToken * pT
 		{
 			cxxTokenChainNormalizeTypeNameSpacing(t->pChain);
 			t->bFollowedBySpace = false;
+		} else if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
+		{
+			t->bFollowedBySpace = t->pNext &&
+				(t->eKeyword != CXXKeywordDECLTYPE) &&
+				cxxTokenTypeIsOneOf(
+						t->pNext,
+						CXXTokenTypeParenthesisChain | CXXTokenTypeIdentifier |
+							CXXTokenTypeKeyword | CXXTokenTypeStar |
+							CXXTokenTypeAnd | CXXTokenTypeMultipleAnds
+					);
 		} else if(cxxTokenTypeIsOneOf(t,
-					CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
+					CXXTokenTypeIdentifier |
 						CXXTokenTypeGreaterThanSign |
 						CXXTokenTypeAnd | CXXTokenTypeMultipleAnds
 				))

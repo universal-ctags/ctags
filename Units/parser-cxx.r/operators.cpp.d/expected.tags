@@ -17,7 +17,7 @@ operator delete	input.cpp	/^	void operator delete(void *);$/;"	p	class:X	typeref
 operator new[]	input.cpp	/^	void * operator new[](size_t);$/;"	p	class:X	typeref:typename:void *	file:
 operator delete[]	input.cpp	/^	void operator delete[](void *);$/;"	p	class:X	typeref:typename:void	file:
 operator Type	input.cpp	/^	operator Type() const;$/;"	p	class:X	file:
-operator <=>	input.cpp	/^	auto operator<=>(const X&a) const -> decltype(1 <=> 2)$/;"	f	class:X	typeref:typename:decltype (1<=>2)	file:
+operator <=>	input.cpp	/^	auto operator<=>(const X&a) const -> decltype(1 <=> 2)$/;"	f	class:X	typeref:typename:decltype(1<=>2)	file:
 operator *=	input.cpp	/^X & X::operator *= (int x)$/;"	f	class:X	typeref:typename:X &
 operator *=	input.cpp	/^X & X::operator *= (const X & x)$/;"	f	class:X	typeref:typename:X &
 operator &&	input.cpp	/^X X::operator && (const X &a)$/;"	f	class:X	typeref:typename:X

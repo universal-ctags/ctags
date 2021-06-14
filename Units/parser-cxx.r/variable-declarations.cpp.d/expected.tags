@@ -32,6 +32,7 @@ l31	input.cpp	/^	std::string * l31(new std::string("test"));$/;"	l	function:main
 l32	input.cpp	/^	auto l32 = new std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> >;$/;"	l	function:main	typeref:typename:auto	file:
 l33	input.cpp	/^	void (Struct1::*l33)() = NULL;$/;"	l	function:anotherFunc	typeref:typename:void (Struct1::*)()	file:
 l34	input.cpp	/^	void (Struct1::*l34)(int) = NULL;$/;"	l	function:anotherFunc	typeref:typename:void (Struct1::*)(int)	file:
+l35	input.cpp	/^	decltype(l36) l35;$/;"	l	function:anotherFunc	typeref:typename:decltype(l36)	file:
 l35	input.cpp	/^	int (Struct1::*l35)(int) = NULL;$/;"	l	function:anotherFunc	typeref:typename:int (Struct1::*)(int)	file:
 m01	input.cpp	/^	unsigned int m01;$/;"	m	struct:Struct1	typeref:typename:unsigned int	file:
 m02	input.cpp	/^	std::string m02;$/;"	m	struct:Struct1	typeref:typename:std::string	file:
@@ -47,6 +48,7 @@ m11	input.cpp	/^	std::array<int, 3> m11 { {1,2,3} };$/;"	m	struct:Struct1	typere
 m12	input.cpp	/^	std::string m12[3] { std::string("one"),"two",{'t', 'h', 'r', 'e', 'e'} };$/;"	m	struct:Struct1	typeref:typename:std::string[3]	file:
 m13	input.cpp	/^	int m13 {false};$/;"	m	struct:Struct1	typeref:typename:int	file:
 m14	input.cpp	/^	std::string * m14 { new std::string("test") };$/;"	m	struct:Struct1	typeref:typename:std::string *	file:
+m15	input.cpp	/^	decltype(int) m15;$/;"	m	struct:Struct1	typeref:typename:decltype(int)	file:
 v01	input.cpp	/^} v01, v02[10];$/;"	v	typeref:struct:Struct1
 v02	input.cpp	/^} v01, v02[10];$/;"	v	typeref:struct:Struct1[10]
 v03	input.cpp	/^} v03, * v04;$/;"	v	typeref:enum:Enum1
