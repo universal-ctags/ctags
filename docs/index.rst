@@ -70,6 +70,7 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	extending.rst
 	testing-ctags.rst
 	testing-parser.rst
+	testing-readtags.rst
 	reporting.rst
 	contributions.rst
 	other-projects.rst
