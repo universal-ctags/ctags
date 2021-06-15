@@ -1422,6 +1422,8 @@ static regex_t* compileRegex (enum regexParserType regptype,
 	result = xMalloc (1, regex_t);
 	verbose ("before regcomp\n");
 	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
+	fprintf(stderr, "result: %p, regexp: %p, cflags: %d\n", result, regexp, cflags); fflush(stderr);
+	fprintf(stderr, "regexp: %s, strlen(regexp): %ld\n", regexp, strlen(regexp)); fflush(stderr);
 	errcode = regcomp (result, regexp, cflags);
 	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 	verbose ("after regcomp\n");
