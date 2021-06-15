@@ -9,15 +9,20 @@
 
 include source.mak
 
+OBJEXT = obj
+
+# to be replaced by gnulib/regex.{ch}
+REGEX_HEADS = gnu_regex/regex.h
+REGEX_SRCS = gnu_regex/regex.c
+REGEX_OBJS = $(REGEX_SRCS:.c=.$(OBJEXT))
+
 REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -Dstrcasecmp=stricmp
 
-OBJEXT = obj
 COMMON_DEFINES =
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DREADTAGS_DSL
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers -Ilibreadtags -Idsl
 OPT = /O2 /WX
 PACKCC = packcc.exe
-REGEX_OBJS = $(REGEX_SRCS:.c=.obj)
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.obj)
 WIN32_OBJS = $(WIN32_SRCS:.c=.obj)
 PEG_OBJS = $(PEG_SRCS:.c=.obj)

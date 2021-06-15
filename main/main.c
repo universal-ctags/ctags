@@ -552,6 +552,7 @@ static void sanitizeEnviron (void)
 extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 {
 	cookedArgs *args;
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__);
 
 #if defined(WIN32) && defined(HAVE_MKSTEMP)
 	/* MinGW-w64's mkstemp() uses rand() for generating temporary files. */
@@ -577,15 +578,20 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	previewFirstOption (args);
 	initializeParsing ();
 	testEtagsInvocation ();
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 	initOptions ();
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 	initRegexOptscript ();
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 	readOptionConfiguration ();
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 	verbose ("Reading initial options from command line\n");
 	parseCmdlineOptions (args);
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 	checkOptions ();
-
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 	runMainLoop (args);
-
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
 	/*  Clean up.
 	 */
 	cArgDelete (args);

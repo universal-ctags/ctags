@@ -3,4 +3,8 @@
 
 CTAGS=$1
 
-${CTAGS} --quiet --options=NONE -o - --options=x.ctags input.unknown
+gdb -batch \
+	-ex "cd $(pwd)" \
+	-ex "run  --verbose --options=NONE -o - --options=x.ctags input.unknown" \
+	-ex 'print $pc' \
+	-ex "bt" ${CTAGS} \

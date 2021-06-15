@@ -6,7 +6,7 @@
 
 #	Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.59])
+AC_PREREQ([2.64])
 AC_INIT([universal-ctags],[5.9.0])
 
 if ! test -e "${srcdir}/config.h.in"; then
@@ -98,9 +98,6 @@ AH_TEMPLATE([ICONV_USE_LIB_PREFIX],
 AH_TEMPLATE([TMPDIR],
 	[If you wish to change the directory in which temporary files are stored,
 	define this label to the directory desired.])
-AH_TEMPLATE([CHECK_REGCOMP],
-	[Define this label if you wish to check the regcomp() function at run time
-	for correct behavior. This function is currently broken on Cygwin.])
 AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
 	[Define this is you have a prototype for putenv() in <stdlib.h>, but
 	doesn't declare its argument as "const char *".])
@@ -249,6 +246,10 @@ AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
 
 AC_PROG_CC
 AC_PROG_CC_C99
+# For gnulib.
+#  Typically, this is immediately after AC_PROG_CC, ...
+gl_EARLY
+
 AC_PROG_RANLIB
 AC_C_BIGENDIAN
 
@@ -529,6 +530,11 @@ PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
 PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 	       [-Wall])
 
+# For gnulib.
+#   Place it further down in the file, typically where you normally check for
+#   header files or functions.
+gl_INIT
+
 # Checks for library functions
 # ----------------------------
 AC_CHECK_FUNCS(fnmatch,[have_fnmatch=yes],[
@@ -585,45 +591,6 @@ if test "$have_setenv" != yes ; then
 		fi
 	fi
 fi
-
-dnl
-dnl
-dnl Check regcomp
-dnl
-dnl If it is found but broken, abort with a message.
-dnl If it is found but cannot be test brokenness, define CHECK_REGCOMP.
-dnl If it is not found, use bundled implementation.
-dnl
-dnl If CHECK_REGCOMP is defined, ctags itself check the brokenness at runtime
-dnl (cross-compiling is assumed here).
-dnl
-dnl
-dnl The final result can be check with ./ctags --list-features.
-dnl
-dnl
-AC_CHECK_FUNCS(regcomp,[
-AC_MSG_CHECKING(if regcomp works)
-AC_RUN_IFELSE([AC_LANG_SOURCE([
-#include <sys/types.h>
-#include <regex.h>
-int main(void) {
-	regex_t patbuf;
-	return (regcomp (&patbuf, "/hello/", 0) != 0);
-}
-])],[regcomp_works=yes],[regcomp_works=no],[AC_DEFINE(CHECK_REGCOMP)])
-AC_MSG_RESULT($regcomp_works)
-if test no = "$regcomp_works"; then
-	AC_MSG_ERROR([regcomp() on this system is broken.])
-fi
-have_regcomp=yes
-],[
-dnl Using bundled regex implementation
-AC_LIBOBJ([regex])
-REGCOMP_CPPFLAGS="-I${srcdir}/gnu_regex -D__USE_GNU"
-AC_DEFINE(HAVE_REGCOMP)
-have_regcomp=no])
-AC_SUBST([REGCOMP_CPPFLAGS])
-AM_CONDITIONAL([HAVE_REGCOMP], [test "xyes" = "x$have_regcomp"])
 
 have_scandir=no
 AC_CHECK_FUNCS(scandir,have_scandir=yes)
@@ -821,7 +788,7 @@ fi
 
 AC_CHECK_FUNCS(mblen)
 
-AC_CONFIG_FILES([Makefile
+AC_CONFIG_FILES([Makefile gnulib/Makefile
 		 man/ctags.1.rst
 		 man/ctags-client-tools.7.rst
 		 man/ctags-incompatibilities.7.rst

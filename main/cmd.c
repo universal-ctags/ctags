@@ -11,12 +11,13 @@
 #include "general.h"  /* must always come first */
 
 #include "main_p.h"
-
+#include <stdio.h>
 
 /*
 *   FUNCTION DEFINITIONS
 */
 int main(int argc, char **argv)
 {
+	fprintf(stderr, "%s %s:%d\n", __FUNCTION__, __FILE__, __LINE__);
 	return ctags_cli_main (argc, argv);
 }
