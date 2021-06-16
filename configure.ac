@@ -486,6 +486,8 @@ fi
 case "$host" in
   i?86-*-mingw* | x86_64-*-mingw*)
 	host_mingw=yes
+	# See https://github.com/universal-ctags/ctags/pull/3069
+	gl_cv_have_weak=no
 	AC_DEFINE(MSDOS_STYLE_PATH)
 	;;
 esac
