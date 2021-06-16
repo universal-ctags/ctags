@@ -160,6 +160,8 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 		int * piCorkQueueIndex
 	);
 
+/* This must be smaller than (sizeof(unsigned int) * 8).
+ * See CXXTypedVariableSet::uAnonymous. */
 #define CXX_TYPED_VARIABLE_SET_ITEM_COUNT 24
 
 typedef struct _CXXTypedVariableSet
@@ -175,6 +177,8 @@ typedef struct _CXXTypedVariableSet
 	CXXToken * aTypeEnds[CXX_TYPED_VARIABLE_SET_ITEM_COUNT];
 	// The identifier tokens
 	CXXToken * aIdentifiers[CXX_TYPED_VARIABLE_SET_ITEM_COUNT];
+
+	unsigned int uAnonymous;
 } CXXTypedVariableSet;
 
 bool cxxParserTokenChainLooksLikeFunctionParameterList(

@@ -1478,9 +1478,11 @@ void cxxParserAnalyzeOtherStatement(void)
 	}
 
 	// prefer function.
+	CXXTypedVariableSet oParamInfo;
+	const bool bPrototypeParams = cxxTagKindEnabled(CXXTagKindPROTOTYPE) && cxxTagKindEnabled(CXXTagKindPARAMETER);
 check_function_signature:
 
-	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
+	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,bPrototypeParams?&oParamInfo:NULL))
 	{
 		CXX_DEBUG_PRINT("Found function prototype");
 
@@ -1500,6 +1502,10 @@ check_function_signature:
 				CXXToken * t = cxxTokenChainLast(g_cxx.pTokenChain);
 				cxxParserSetEndLineForTagInCorkQueue (piCorkQueueIndex, t->iLineNumber);
 			}
+
+			if(bPrototypeParams)
+				cxxParserEmitFunctionParameterTags(&oParamInfo);
+
 			while(iScopesPushed > 0)
 			{
 				cxxScopePop();

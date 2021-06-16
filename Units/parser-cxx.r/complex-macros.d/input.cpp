@@ -41,7 +41,7 @@ DECLARE_TWO_VERSIONS_OF_FUNCTIONS(p5,p6)
 const char * test = "" STRINGIFY(; int notVisible;);
 
 // Unbalanced brackets (this comes from a nasty example in a github issue)
-#define DECLARE_FUNCTION_4(Ret,Class,Method,...) Ret Class##__##Method(Class *this, ##__VA_ARGS__)
+#define DECLARE_FUNCTION_4(Ret,Class,Method,...) Ret Class##__##Method(Class *that, ##__VA_ARGS__)
 #define DECLARE_FUNCTION_4_BEGIN(...) { /*not really this, but this is what ctags should see*/
 #define DECLARE_FUNCTION_4_END(...) } /*not really this, but this is what ctags should see*/
 

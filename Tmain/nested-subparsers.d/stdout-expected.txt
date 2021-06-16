@@ -14,7 +14,7 @@ t  typedefs
 u  union names
 v  variable definitions
 x  external and forward variable declarations [off]
-z  function parameters inside function definitions [off]
+z  function parameters inside function or prototype definitions [off]
 L  goto labels [off]
 D  parameters inside macro definitions [off]
 #
@@ -49,7 +49,7 @@ t       typedef    yes     no      0      C      typedefs
 u       union      yes     no      0      C      union names
 v       variable   yes     no      0      C      variable definitions
 x       externvar  no      no      0      C      external and forward variable declarations
-z       parameter  no      no      0      C      function parameters inside function definitions
+z       parameter  no      no      0      C      function parameters inside function or prototype definitions
 #
 # list kinds-full Event
 #

@@ -30,6 +30,7 @@ enum CXXScopeType
 	CXXScopeTypeUnion,
 	CXXScopeTypeStruct,
 	CXXScopeTypeVariable, // template variables, mainly
+	CXXScopeTypePrototype,
 	CXXScopeTypeLAST
 };
 
