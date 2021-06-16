@@ -33,7 +33,7 @@ struct Struct p12();
 Struct p13();
 union Union p14();
 Union p15();
-class Class * p15();
+class Class * p15p();
 Class & p16();
 const enum Enum p17();
 Enum p18();

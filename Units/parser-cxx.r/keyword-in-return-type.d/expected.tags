@@ -1,0 +1,6 @@
+a	input.cc	/^struct Class0 * a();$/;"	p	typeref:struct:Class0 *	file:
+b	input.cc	/^struct Class0 * b() { exit(0); }$/;"	f	typeref:struct:Class0 *
+c	input.cc	/^class Class1 * c();$/;"	p	typeref:class:Class1 *	file:
+d	input.cc	/^class Class1 * d() { exit(0); }$/;"	f	typeref:class:Class1 *
+e	input.cc	/^union Class1 * e();$/;"	p	typeref:union:Class1 *	file:
+f	input.cc	/^union Class1 * f() { exit(0); }$/;"	f	typeref:union:Class1 *
