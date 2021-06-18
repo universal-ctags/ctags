@@ -22,7 +22,7 @@ iPythonCell is a subparser stacked on top of the Python parser.
 It works when:
 
 * The Python parser is enabled,
-* the ``subparser`` extra is enabeld, and
+* the ``subparser`` extra is enabled, and
 * the iPythonCell parser itself is enabled.
 
 iPythonCell extracts cells explained as in vim-ipython-cell

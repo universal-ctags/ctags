@@ -408,8 +408,8 @@ could always start the search from say the beginning of the file.
 
 When both the search pattern and the line number are presented, you could make
 good use of the line number, by going to the line first, then searching for the
-nearest occurence of the pattern. A way to do this is to search both forward
-and backward for the pattern, and when there is a occurence on both sides, go
+nearest occurrence of the pattern. A way to do this is to search both forward
+and backward for the pattern, and when there is a occurrence on both sides, go
 to the nearer one.
 
 What's good about this is when there are multiple identical lines in the source
@@ -460,7 +460,7 @@ Due to this reason, Universal Ctags turns to use the actual line number. A
 client tool could distinguish them by the ``TAG_OUTPUT_EXCMD`` pseudo tag, it's
 "combine" for the old scheme, and "combineV2" for the present scheme. But
 probably there's no need to treat them differently, since "search for the
-nearest occurence from the line" gives good result on both schemes.
+nearest occurrence from the line" gives good result on both schemes.
 
 JSON OUTPUT
 -----------
