@@ -28,7 +28,6 @@ uname -mrsv 2>/dev/null
 AM_INIT_AUTOMAKE([foreign subdir-objects tar-ustar])
 AM_SILENT_RULES([yes])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIR([m4])
 
 m4_ifndef([PKG_CHECK_EXISTS], [m4_fatal([must install pkg-config 0.18 or later before running ./autogen.sh])])
 
