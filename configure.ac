@@ -102,6 +102,10 @@ AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
 	doesn't declare its argument as "const char *".])
 AH_TEMPLATE([MSDOS_STYLE_PATH],
 	[Define to 1 if your system uses MS-DOS style path.])
+AH_TEMPLATE([MANUAL_GLOBBING],
+	[Define to 1 if your system doesn't expand wildcards.])
+AH_TEMPLATE([HAVE__FINDFIRST],
+	[Define to 1 if your system have _findfirst().])
 AH_TEMPLATE([ENABLE_GCOV],
 	[Define to 1 if gcov is instrumented.])
 
@@ -488,6 +492,8 @@ case "$host" in
 	# See https://github.com/universal-ctags/ctags/pull/3069
 	gl_cv_have_weak=no
 	AC_DEFINE(MSDOS_STYLE_PATH)
+	AC_DEFINE(MANUAL_GLOBBING)
+	AC_DEFINE(HAVE__FINDFIRST)
 	;;
 esac
 AM_CONDITIONAL([HOST_MINGW], [test "x${host_mingw}" = "xyes"])
