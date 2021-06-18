@@ -63,7 +63,7 @@ jobs:
        - run:
            name: Test
            command: |
-             make roundtrip CIRCLECI=1 ROUNDTRIP_MAX_ENTRIES=25
+             make roundtrip CIRCLECI=1
 
   #
   # On Fedora 31 bmake package cannot be installed because a package
@@ -127,7 +127,7 @@ jobs:
        - run:
            name: Test
            command: |
-             MAKE=bmake bmake roundtrip CIRCLECI=1 ROUNDTRIP_MAX_ENTRIES=25
+             MAKE=bmake bmake roundtrip CIRCLECI=1
 
    fedora33_distcheck:
      working_directory: ~/universal-ctags
@@ -226,7 +226,7 @@ jobs:
        - run:
            name: Test
            command: |
-             make roundtrip CIRCLECI=1 ROUNDTRIP_MAX_ENTRIES=25
+             make roundtrip CIRCLECI=1
    centos7_make:
      working_directory: ~/universal-ctags
      docker:
@@ -275,7 +275,7 @@ jobs:
        - run:
            name: Test
            command: |
-             make roundtrip CIRCLECI=1 ROUNDTRIP_MAX_ENTRIES=25
+             make roundtrip CIRCLECI=1
 
    ubuntu20_mingw:
      working_directory: ~/universal-ctags
@@ -449,7 +449,7 @@ jobs:
            name: Test
            command: |
              cd ctags
-             make roundtrip CIRCLECI=1 ROUNDTRIP_MAX_ENTRIES=25
+             make roundtrip CIRCLECI=1
 
    THIS_WILL_BE_FAILED_fedora34_CANARY:
      working_directory: ~/universal-ctags

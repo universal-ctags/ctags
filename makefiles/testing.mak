@@ -9,7 +9,7 @@ check: tmain units tlib man-test
 clean-local: clean-units clean-tmain
 
 CTAGS_TEST = ./ctags$(EXEEXT)
-READ_TEST = ./readtags$(EXEEXT)
+READTAGS_TEST = ./readtags$(EXEEXT)
 MINI_GEANY_TEST = ./mini-geany$(EXEEXT)
 OPTSCRIPT_TEST = ./optscript$(EXEEXT)
 
@@ -18,8 +18,6 @@ TIMEOUT = 1
 else
 TIMEOUT = 0
 endif
-
-ROUNDTRIP_MAX_ENTRIES=
 
 LANGUAGES=
 CATEGORIES=
@@ -165,13 +163,13 @@ validate-input:
 #
 # Test main part, not parsers
 #
-tmain: $(CTAGS_TEST) $(READ_TEST) $(OPTSCRIPT_TEST)
+tmain: $(CTAGS_TEST) $(READTAGS_TEST) $(OPTSCRIPT_TEST)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
-	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI) = x; then	\
+	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI)$(GITHUBACTIONS) = x; then	\
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
 	builddir=$$(pwd); \
@@ -243,10 +241,13 @@ tinst:
 # Test readtags
 #
 if USE_READCMD
-roundtrip: $(READ_TEST)
+roundtrip: $(READTAGS_TEST)
 	$(V_RUN) \
+	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI)$(GITHUBACTIONS) = x; then	\
+		ROUNDTRIP_FLAGS=--minitrip;			\
+	fi;							\
 	builddir=$$(pwd); \
-	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units $(ROUNDTRIP_MAX_ENTRIES)
+	$(SHELL) $(srcdir)/misc/roundtrip $(READTAGS_TEST) $${builddir}/Units $(ROUNDTRIP_FLAGS)
 else
 roundtrip:
 endif
