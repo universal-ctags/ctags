@@ -31,7 +31,7 @@
     <Filter Include="Source Files\win32\mkstemp">
       <UniqueIdentifier>{71dfb57e-e1b2-4795-96d8-05a2d16af795}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\gnu_regex">
+    <Filter Include="Source Files\gnulib">
       <UniqueIdentifier>{a49cb3ac-6c1b-4b33-9bb7-af130fadeee1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\dsl">
@@ -51,8 +51,17 @@
     <ClCompile Include="..\fnmatch\fnmatch.c">
       <Filter>Source Files\fnmatch</Filter>
     </ClCompile>
-    <ClCompile Include="..\gnu_regex\regex.c">
-      <Filter>Source Files\gnu_regex</Filter>
+    <ClCompile Include="..\gnulib\regex.c">
+      <Filter>Source Files\gnulib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gnulib\nl_langinfo.c">
+      <Filter>Source Files\gnulib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gnulib\setlocale_null.c">
+      <Filter>Source Files\gnulib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gnulib\malloc\dynarray_resize.c">
+      <Filter>Source Files\gnulib</Filter>
     </ClCompile>
     <ClCompile Include="..\main\args.c">
       <Filter>Source Files\Main</Filter>
@@ -590,7 +599,7 @@
     <ClInclude Include="..\fnmatch\fnmatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gnu_regex\regex.h">
+    <ClInclude Include="..\gnulib\regex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\args_p.h">
