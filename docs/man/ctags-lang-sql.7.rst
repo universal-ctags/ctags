@@ -36,12 +36,12 @@ the source code to choose a proper guest parser.
 
 In the above examples, ``plpythonu`` and ``plv8`` are the names of
 procedural languages. The SQL parser trims `pl` at the start and `u`
-at the end of the name before finding a ctags parser.  For
-``plpythonu`` and ``plv8``, the SQL parser extracts ``python`` and
+at the end of the name before finding a parser ctags having.  For
+``plpythonu`` and ```plv8``, the SQL parser extracts ``python`` and
 ``v8`` as the candidates of guest parsers.
 
 For ``plpythonu``, ctags can run its Python parser.  ctags doesn't
-have a parser named ``v8``. However, the JavaScript parser in ctags has
+have a parser named ``v8``. However, JavaScript parser of ctags has
 ``v8`` as an alias. So ctags can run the JavaScript parser as the
 guest parser for ``plv8``.
 
