@@ -429,6 +429,7 @@ OPTSCRIPT_DSL_OBJS = $(OPTSCRIPT_DSL_SRCS:.c=.$(OBJEXT))
 READTAGS_DSL_HEADS = \
 	dsl/es.h \
 	dsl/dsl.h \
+	dsl/formatter.h \
 	dsl/qualifier.h \
 	dsl/sorter.h \
 	\
@@ -439,6 +440,7 @@ READTAGS_DSL_HEADS = \
 READTAGS_DSL_SRCS = \
 	dsl/es.c \
 	dsl/dsl.c \
+	dsl/formatter.c \
 	dsl/qualifier.c \
 	dsl/sorter.c \
 	\

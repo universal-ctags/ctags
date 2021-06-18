@@ -24,6 +24,7 @@ enum eDSLEngineType {
 	DSL_COMMON,
 	DSL_QUALIFIER,
 	DSL_SORTER,
+	DSL_FORMATTER,
 	DSL_ENGINE_COUNT
 };
 typedef enum eDSLEngineType DSLEngineType;
