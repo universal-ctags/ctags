@@ -56,6 +56,7 @@ static EsObject* sform_begin0 (EsObject *args, DSLEnv *env);
 static EsObject* sfrom_and  (EsObject *args, DSLEnv *env);
 static EsObject* sform_or  (EsObject *args, DSLEnv *env);
 static EsObject* sform_if  (EsObject *args, DSLEnv *env);
+static EsObject* sform_cond  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_not  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_eq  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_lt  (EsObject *args, DSLEnv *env);
@@ -133,6 +134,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(or <any> ...) -> <boolean>" },
 	{ "if",      sform_if,       NULL, DSL_PATTR_SELF_EVAL|DSL_PATTR_CHECK_ARITY, 3,
 	  .helpstr = "(if <any:cond> <expr:true> <expr:false>) -> <any:true>|<any:false>" },
+	{ "cond",    sform_cond,     NULL, DSL_PATTR_SELF_EVAL, 0,
+	  .helpstr = "(cond (<any:cond0> ... <any:expr0>) ... (<any:condN> ... <any:exprN>)) -> <any:exprI>|false" } ,
 	{ "not",     builtin_not,    NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(not <any>) -> <boolean>" },
 	{ "eq?",     builtin_eq,     NULL, DSL_PATTR_CHECK_ARITY, 2,
@@ -536,11 +539,11 @@ static EsObject* builtin_null  (EsObject *args, DSLEnv *env)
 	return es_null(es_car (args))? es_true: es_false;
 }
 
-static EsObject* sform_begin  (EsObject *args, DSLEnv *env)
+static EsObject* sform_begin_common  (const char *fn, EsObject *args, DSLEnv *env)
 {
 	if (es_null (args))
 		dsl_throw (TOO_FEW_ARGUMENTS,
-				   es_symbol_intern ("begin"));
+				   es_symbol_intern (fn));
 
 	EsObject *o = es_false;
 	while (! es_null (args))
@@ -552,6 +555,11 @@ static EsObject* sform_begin  (EsObject *args, DSLEnv *env)
 		args = es_cdr (args);
 	}
 	return o;
+}
+
+static EsObject* sform_begin  (EsObject *args, DSLEnv *env)
+{
+	return sform_begin_common ("begin", args, env);
 }
 
 static EsObject* sform_begin0  (EsObject *args, DSLEnv *env)
@@ -623,6 +631,35 @@ static EsObject* sform_if (EsObject *args, DSLEnv *env)
 		return o;
 	else
 		return dsl_eval0 (es_car (es_cdr (es_cdr (args))), env);
+
+	return es_false;
+}
+
+static EsObject* sform_cond (EsObject *args, DSLEnv *env)
+{
+
+	while (!es_null(args))
+	{
+		EsObject *o = es_car (args);
+		args = es_cdr (args);
+
+		if (!es_cons_p (o))
+			dsl_throw (WRONG_TYPE_ARGUMENT, o);
+
+		EsObject *condition = es_car(o);
+		EsObject *actions   = es_cdr(o);
+
+		EsObject *result = dsl_eval0 (condition, env);
+		if (es_error_p (result))
+			return result;
+
+		if (!es_object_equal (result, es_false))
+		{
+			if (es_null (actions))
+				return result;
+			return sform_begin_common("cond", actions, env);
+		}
+	}
 
 	return es_false;
 }
