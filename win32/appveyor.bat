@@ -212,7 +212,7 @@ goto :eof
 :: Using MinGW without autotools, iconv disabled
 @echo on
 path C:\MinGW\bin;C:\MinGW\msys\1.0\bin;%path%
-make -f mk_mingw.mak -j2
+make -f mk_mingw.mak V=1 -j2
 
 @echo off
 goto :eof
