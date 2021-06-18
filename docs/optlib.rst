@@ -526,7 +526,7 @@ Example 2:
 .. code-block:: console
 
 	$ ctags --options=/tmp/pp.ctags -o - /tmp/input.pp
-	bar	/tmp/input.pp	/^    include bar$/;"	v	class:foo
+	bar	/tmp/input.pp	/^    int bar$/;"	v	class:foo
 	foo	/tmp/input.pp	/^class foo {$/;"	c
 
 
