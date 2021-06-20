@@ -1,0 +1,2 @@
+V	input.cpp	/^using V = std::vector<T>;$/;"	typedef	typeref:typename:std::vector<T>	file:	template:<class T>
+T	input.cpp	/^template <class T>$/;"	tparam	scope:typedef:V	typeref:meta:class

@@ -573,7 +573,7 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	}
 
 	if(uKeywordState & CXXParserKeywordStateSeenTypedef)
-		cxxParserExtractTypedef(g_cxx.pTokenChain,true);
+		cxxParserExtractTypedef(g_cxx.pTokenChain,true,false);
 	else
 		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 
@@ -718,7 +718,7 @@ bool cxxParserParseEnum(void)
 		{
 			 // [typedef] enum X Y; <-- typedef has been removed!
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
-				cxxParserExtractTypedef(g_cxx.pTokenChain,true);
+				cxxParserExtractTypedef(g_cxx.pTokenChain,true,false);
 			else
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 		}
@@ -1088,7 +1088,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		{
 			// [typedef] struct X Y; <-- typedef has been removed!
 			if(uInitialKeywordState & CXXParserKeywordStateSeenTypedef)
-				cxxParserExtractTypedef(g_cxx.pTokenChain,true);
+				cxxParserExtractTypedef(g_cxx.pTokenChain,true,false);
 			else if(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenFriend))
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 		}

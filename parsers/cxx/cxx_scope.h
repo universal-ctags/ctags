@@ -31,6 +31,7 @@ enum CXXScopeType
 	CXXScopeTypeStruct,
 	CXXScopeTypeVariable, // template variables, mainly
 	CXXScopeTypePrototype,
+	CXXScopeTypeTypedef,  // template variables used in "using A = B<T>"
 	CXXScopeTypeLAST
 };
 

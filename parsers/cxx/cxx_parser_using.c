@@ -67,6 +67,9 @@ bool cxxParserParseUsingClause(void)
 	if(pAssignment)
 	{
 		CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
+		bool bGotTemplate = g_cxx.pTemplateTokenChain &&
+			(g_cxx.pTemplateTokenChain->iCount > 0) &&
+			cxxParserCurrentLanguageIsCPP();
 
 		if(cxxTokenTypeIs(pFirst,CXXTokenTypeIdentifier))
 		{
@@ -88,7 +91,7 @@ bool cxxParserParseUsingClause(void)
 			// in typedefs it's at the end
 			cxxTokenChainAppend(g_cxx.pTokenChain,pFirst);
 
-			cxxParserExtractTypedef(g_cxx.pTokenChain,false);
+			cxxParserExtractTypedef(g_cxx.pTokenChain,false,bGotTemplate);
 		}
 	} else {
 		CXX_DEBUG_ASSERT(
