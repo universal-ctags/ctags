@@ -532,3 +532,17 @@ Rules for reviewing a pull request
 
 * Put your rough schedule as a comment if you don't have time, but you
   want to review.
+
+Testing a PR locally before being merged
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may want to test a PR locally before it is merged into the master
+repository. For example, suppose you want to test ``USERNAME``'s PR with branch
+name ``main-fix-foo``;::
+
+  git checkout -b tmp-main-fix-foo master
+  git pull https://github.com/USERNAME/ctags.git main-fix-foo
+
+This creates a branch ``tmp-main-fix-fix-foo`` from a branch ``master`` and
+switches to it, then pulls the branch ``main-fix-foo`` from
+``https://github.com/USERNAME/ctags.git``.
