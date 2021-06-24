@@ -67,7 +67,7 @@ bool cxxParserParseGenericTypedef(void)
 		}
 	}
 
-	cxxParserExtractTypedef(g_cxx.pTokenChain,true);
+	cxxParserExtractTypedef(g_cxx.pTokenChain,true,false);
 	CXX_DEBUG_LEAVE();
 	return true;
 }
@@ -153,7 +153,8 @@ bool cxxParserParseGenericTypedef(void)
 //
 void cxxParserExtractTypedef(
 		CXXTokenChain * pChain,
-		bool bExpectTerminatorAtEnd
+		bool bExpectTerminatorAtEnd,
+		bool bGotTemplate
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -438,8 +439,22 @@ skip_to_comma_or_end:
 
 			tag->isFileScope = !isInputHeaderFile();
 
+			if(bGotTemplate)
+				cxxTagHandleTemplateFields();
+
 			cxxTagCommit();
-			cxxTokenDestroy(t);
+
+			if (
+					bGotTemplate &&
+					cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
+				)
+			{
+				cxxScopePush(t,CXXScopeTypeTypedef,CXXScopeAccessUnknown);
+				cxxParserEmitTemplateParameterTags();
+				cxxScopePop();
+			} else {
+				cxxTokenDestroy(t);
+			}
 			if(pTypeName)
 				cxxTokenDestroy(pTypeName);
 		}

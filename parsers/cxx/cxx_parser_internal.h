@@ -210,7 +210,8 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo);
 bool cxxParserParseGenericTypedef(void);
 void cxxParserExtractTypedef(
 		CXXTokenChain * pChain,
-		bool bExpectTerminatorAtEnd
+		bool bExpectTerminatorAtEnd,
+		bool bGotTemplate
 	);
 
 // cxx_parser_namespace.c

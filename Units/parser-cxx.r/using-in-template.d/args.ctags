@@ -1,0 +1,4 @@
+--sort=no
+--kinds-C++=*
+--fields=+stKZ
+--fields-C++=+{template}
