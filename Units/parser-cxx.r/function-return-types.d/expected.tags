@@ -14,6 +14,7 @@ p12	input.cpp	/^struct Struct p12();$/;"	p	typeref:struct:Struct	file:	end:32
 p13	input.cpp	/^Struct p13();$/;"	p	typeref:typename:Struct	file:	end:33
 p14	input.cpp	/^union Union p14();$/;"	p	typeref:union:Union	file:	end:34
 p15	input.cpp	/^Union p15();$/;"	p	typeref:typename:Union	file:	end:35
+p15p	input.cpp	/^class Class * p15p();$/;"	p	typeref:class:Class *	file:	end:36
 p16	input.cpp	/^Class & p16();$/;"	p	typeref:typename:Class &	file:	end:37
 p17	input.cpp	/^const enum Enum p17();$/;"	p	typeref:typename:const enum Enum	file:	end:38
 p18	input.cpp	/^Enum p18();$/;"	p	typeref:typename:Enum	file:	end:39

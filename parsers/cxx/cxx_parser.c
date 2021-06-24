@@ -966,10 +966,10 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 	unsigned int uTerminatorTypes = CXXTokenTypeEOF | CXXTokenTypeSingleColon |
 			CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket |
-			CXXTokenTypeSmallerThanSign;
+			CXXTokenTypeSmallerThanSign | CXXTokenTypeParenthesisChain;
 
 	if(uTagKind != CXXTagCPPKindCLASS)
-		uTerminatorTypes |= CXXTokenTypeParenthesisChain | CXXTokenTypeAssignment;
+		uTerminatorTypes |= CXXTokenTypeAssignment;
 
 	bool bRet;
 
