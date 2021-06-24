@@ -64,9 +64,9 @@ jobs:
           ./ctags --list-features
         )
     - name: make check
-      run: make -C $BUILDDIR check TRAVIS=1
+      run: make -C $BUILDDIR check GITHUBACTIONS=1
     - name: make roundtrip
-      run: make -C $BUILDDIR roundtrip TRAVIS=1
+      run: make -C $BUILDDIR roundtrip GITHUBACTIONS=1
     - name: make dist
       run: make -C $BUILDDIR dist
     - name: make for testing ctags in sandbox
@@ -88,7 +88,7 @@ jobs:
       run: |
         (
           cd $BUILDDIR/universal-ctags*[0-9]
-          make -C ${BUILDDIR} tmain TRAVIS=1 UNITS=${SANDBOX_CASES}
+          make -C ${BUILDDIR} tmain GITHUBACTIONS=1 UNITS=${SANDBOX_CASES}
           make -C ${BUILDDIR}  clean
         )
     - name: send coverage info

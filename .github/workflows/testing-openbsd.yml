@@ -39,4 +39,4 @@ jobs:
           run ctags --version
           # bugs to fix
           #run make check
-          run make roundtrip
+          run make roundtrip GITHUBACTIONS=1
