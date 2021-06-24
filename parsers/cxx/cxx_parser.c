@@ -966,7 +966,8 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 	unsigned int uTerminatorTypes = CXXTokenTypeEOF | CXXTokenTypeSingleColon |
 			CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket |
-			CXXTokenTypeSmallerThanSign | CXXTokenTypeParenthesisChain;
+			CXXTokenTypeSmallerThanSign | (cxxParserCurrentLanguageIsCPP()? CXXTokenTypeKeyword: 0) |
+			CXXTokenTypeParenthesisChain;
 
 	if(uTagKind != CXXTagCPPKindCLASS)
 		uTerminatorTypes |= CXXTokenTypeAssignment;
@@ -982,6 +983,15 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			cxxKeywordEnableFinal(false);
 			CXX_DEBUG_LEAVE_TEXT("Could not parse class/struct/union name");
 			return false;
+		}
+
+		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword))
+		{
+			/* The statement declears or defines an operator,
+			 * not a class, struct not union. */
+			if(g_cxx.pToken->eKeyword == CXXKeywordOPERATOR)
+				return true;
+			continue;
 		}
 
 		if(

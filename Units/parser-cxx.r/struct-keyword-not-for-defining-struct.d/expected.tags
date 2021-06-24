@@ -1,0 +1,6 @@
+Currency	input.cc	/^typedef struct Currency$/;"	s	file:
+Dollar	input.cc	/^    int Dollar;$/;"	m	struct:Currency	typeref:typename:int	file:
+Cents	input.cc	/^    int Cents;$/;"	m	struct:Currency	typeref:typename:int	file:
+operator =	input.cc	/^    struct Currency &operator=(Currency& value)$/;"	f	struct:Currency	typeref:struct:Currency &	file:
+value	input.cc	/^    struct Currency &operator=(Currency& value)$/;"	z	function:Currency::operator =	typeref:typename:Currency &	file:
+test	input.cc	/^void test()$/;"	f	typeref:typename:void
