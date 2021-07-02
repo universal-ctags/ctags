@@ -9,25 +9,22 @@
 
 include source.mak
 
-# to be replaced by gnulib/regex.{ch}
-REGEX_HEADS = gnu_regex/regex.h
-REGEX_SRCS = gnu_regex/regex.c
-
-REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -Dstrcasecmp=stricmp
+GNULIB_HEADS = gnulib/regex.h
+GNULIB_SRCS = gnulib/regex.c gnulib/nl_langinfo.c gnulib/setlocale_null.c gnulib/malloc/dynarray_resize.c
 
 OBJEXT = obj
 COMMON_DEFINES =
-DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DREADTAGS_DSL
-INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers -Ilibreadtags -Idsl
+DEFINES = -DWIN32 $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DHAVE_PACKCC -DREADTAGS_DSL
+INCLUDES = -I. -Ignulib -Imain -Ifnmatch -Iparsers -Ilibreadtags -Idsl
 OPT = /O2 /WX
 PACKCC = packcc.exe
-REGEX_OBJS = $(REGEX_SRCS:.c=.obj)
+GNULIB_OBJS = $(GNULIB_SRCS:.c=.obj)
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.obj)
 WIN32_OBJS = $(WIN32_SRCS:.c=.obj)
 PEG_OBJS = $(PEG_SRCS:.c=.obj)
 PACKCC_OBJS = $(PACKCC_SRCS:.c=.obj)
 RES_OBJ = win32/ctags.res
-EXTRA_OBJS = $(REGEX_OBJS) $(FNMATCH_OBJS) $(WIN32_OBJS) $(PEG_OBJS) $(RES_OBJ)
+EXTRA_OBJS = $(GNULIB_OBJS) $(FNMATCH_OBJS) $(WIN32_OBJS) $(PEG_OBJS) $(RES_OBJ)
 ALL_OBJS = $(ALL_SRCS:.c=.obj) $(EXTRA_OBJS)
 ALL_LIB_OBJS = $(ALL_LIB_SRCS:.c=.obj) $(EXTRA_OBJS)
 READTAGS_OBJS = $(READTAGS_SRCS:.c=.obj)
@@ -78,22 +75,23 @@ PDBFLAG =
 	$(PACKCC) $<
 {peg}.c{peg}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fopeg\ /c $<
+{gnulib}.c{gnulib}.obj::
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fognulib\ /c $<
+{gnulib\malloc}.c{gnulib\malloc}.obj::
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fognulib\malloc\ /c $<
 
-all: $(PACKCC) ctags.exe readtags.exe optscript.exe
+all: copy_gnulib_heads $(PACKCC) ctags.exe readtags.exe optscript.exe
 
 ctags: ctags.exe
 
-ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS) $(WIN32_HEADS) $(REPOINFO_HEADS)
+ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(GNULIB_HEADS) $(FNMATCH_HEADS) $(WIN32_HEADS) $(REPOINFO_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LIBS) $(PDBFLAG)
 
-readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(READTAGS_DSL_OBJS) $(READTAGS_DSL_HEADS) $(REGEX_OBJS) $(REGEX_HEADS)
-	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) $(READTAGS_DSL_OBJS) $(REGEX_OBJS) /link setargv.obj $(PDBFLAG)
+readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(READTAGS_DSL_OBJS) $(READTAGS_DSL_HEADS) $(GNULIB_OBJS) $(GNULIB_HEADS)
+	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) $(READTAGS_DSL_OBJS) $(GNULIB_OBJS) /link setargv.obj $(PDBFLAG)
 
 optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) /link setargv.obj $(LIBS)
-
-$(REGEX_OBJS): $(REGEX_SRCS)
-	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
 
 $(FNMATCH_OBJS): $(FNMATCH_SRCS)
 	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(FNMATCH_SRCS)
@@ -112,8 +110,12 @@ peg\kotlin.c peg\kotlin.h: peg\kotlin.peg $(PACKCC)
 $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 	$(RC) /nologo /l 0x409 /Fo$@ $*.rc
 
+copy_gnulib_heads:
+	copy win32\config_mvc.h config.h
+	copy win32\gnulib_h\langinfo.h gnulib
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj extra-cmds\*.obj libreadtags\*.obj dsl/*.o win32\mkstemp\*.obj win32\*.res main\repoinfo.h
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnulib\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj extra-cmds\*.obj libreadtags\*.obj dsl/*.o win32\mkstemp\*.obj win32\*.res main\repoinfo.h
 	- del ctags.exe readtags.exe optscript.exe $(PACKCC)
 	- del tags
+	- del config.h gnulib\langinfo.h gnulib\*.obj gnulib\malloc\*.obj
