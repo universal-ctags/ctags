@@ -56,7 +56,7 @@
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module lock shall be considered present. */
-#define GNULIB_LOCK 1
+/* !!!#define GNULIB_LOCK 1 */
 
 /* Define to 1 when the gnulib module btowc should be tested. */
 #define GNULIB_TEST_BTOWC 1
@@ -95,7 +95,7 @@
 /* #undef HAVE_CHSIZE */
 
 /* Define to 1 if you have the <crtdefs.h> header file. */
-#define HAVE_CRTDEFS_H 1
+/* !!!#define HAVE_CRTDEFS_H 1 */
 
 /* Define to 1 if you have the declaration of `alarm', and to 0 if you don't.
    */
@@ -178,7 +178,7 @@
 /* #undef HAVE_FTRUNCATE */
 
 /* Define this value if support multibyte character encoding. */
-#define HAVE_ICONV 1
+/* !!!#define HAVE_ICONV 1 */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
@@ -196,7 +196,7 @@
 #define HAVE_ISWCTYPE 1
 
 /* Define this value if jansson is available. */
-#define HAVE_JANSSON 1
+/* !!!#define HAVE_JANSSON 1 */
 
 /* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
 /* #undef HAVE_LANGINFO_CODESET */
@@ -208,10 +208,10 @@
 #define HAVE_LIBINTL_H 1
 
 /* Define this value if libxml is available. */
-#define HAVE_LIBXML 1
+/* !!!#define HAVE_LIBXML 1 */
 
 /* Define this value if libyaml is available. */
-#define HAVE_LIBYAML 1
+/* !!!#define HAVE_LIBYAML 1 */
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
@@ -364,7 +364,7 @@
 /* #undef HAVE_TOWLOWER */
 
 /* Define to 1 if you have the `truncate' function. */
-#define HAVE_TRUNCATE 1
+/* !!!#define HAVE_TRUNCATE 1 */
 
 /* Define to 1 if typeof works with your compiler. */
 #define HAVE_TYPEOF 1
