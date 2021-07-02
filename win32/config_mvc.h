@@ -181,7 +181,7 @@
 #define HAVE_ICONV 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
+/* !!!#define HAVE_INTTYPES_H 1 */
 
 /* Define to 1 if you have the <io.h> header file. */
 #define HAVE_IO_H 1
@@ -196,7 +196,7 @@
 #define HAVE_ISWCTYPE 1
 
 /* Define this value if jansson is available. */
-#define HAVE_JANSSON 1
+/* !!!#define HAVE_JANSSON 1 */
 
 /* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
 /* #undef HAVE_LANGINFO_CODESET */
@@ -208,10 +208,10 @@
 #define HAVE_LIBINTL_H 1
 
 /* Define this value if libxml is available. */
-#define HAVE_LIBXML 1
+/* !!!#define HAVE_LIBXML 1 */
 
 /* Define this value if libyaml is available. */
-#define HAVE_LIBYAML 1
+/* !!!#define HAVE_LIBYAML 1 */
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
@@ -253,17 +253,17 @@
 #define HAVE_OPENDIR 1
 
 /* Define if you have the <pthread.h> header and the POSIX threads API. */
-#define HAVE_PTHREAD_API 1
+/* !!!#define HAVE_PTHREAD_API 1 */
 
 /* Define if the <pthread.h> defines PTHREAD_MUTEX_RECURSIVE. */
-#define HAVE_PTHREAD_MUTEX_RECURSIVE 1
+/* !!!#define HAVE_PTHREAD_MUTEX_RECURSIVE 1 */
 
 /* Define if the POSIX multithreading library has read/write locks. */
-#define HAVE_PTHREAD_RWLOCK 1
+/* !!!#define HAVE_PTHREAD_RWLOCK 1 */
 
 /* Define if the 'pthread_rwlock_rdlock' function prefers a writer to a
    reader. */
-#define HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER 1
+/* !!!#define HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER 1 */
 
 /* Define to 1 if you have the `putenv' function. */
 #define HAVE_PUTENV 1
@@ -421,7 +421,7 @@
 
 
 /* Define to 1 if the compiler supports the keyword '__inline'. */
-#define HAVE___INLINE 1
+/* !!!#define HAVE___INLINE 1 */
 
 /* Define this value if the platform uses "lib" as prefix for iconv functions.
    */
@@ -556,7 +556,7 @@
 /* #undef USE_ISOC_THREADS */
 
 /* Define if the POSIX multithreading library can be used. */
-#define USE_POSIX_THREADS 1
+/* !!!#define USE_POSIX_THREADS 1 */
 
 /* Define if references to the POSIX multithreading library should be made
    weak. */
@@ -744,7 +744,7 @@
 #define _REGEX_INCLUDE_LIMITS_H 1
 
 /* Define if you want regoff_t to be at least as wide POSIX requires. */
-#define _REGEX_LARGE_OFFSETS 1
+/* !!!#define _REGEX_LARGE_OFFSETS 1*/
 
 /* For standard stat data types on VMS. */
 #define _USE_STD_STAT 1
@@ -921,7 +921,7 @@
 #define _GL_UNUSED _GL_ATTRIBUTE_MAYBE_UNUSED
 #define _UNUSED_PARAMETER_ _GL_ATTRIBUTE_MAYBE_UNUSED
 
-#if _GL_HAS_ATTRIBUTE (malloc)
+#if 0 /* !!!_GL_HAS_ATTRIBUTE (malloc) */
 # define _GL_ATTRIBUTE_MALLOC __attribute__ ((__malloc__))
 #else
 # define _GL_ATTRIBUTE_MALLOC
@@ -1043,6 +1043,7 @@
      warning: to disable this warning use -fgnu89-inline or the gnu_inline function attribute
    It defines a macro __GNUC_GNU_INLINE__ to indicate this situation.
  */
+#if 0 /* !!!disable inline processing */
 #if (((defined __APPLE__ && defined __MACH__) \
       || defined __DragonFly__ || defined __FreeBSD__) \
      && (defined __header_inline \
@@ -1112,6 +1113,10 @@
 #ifndef __cplusplus
 /* #undef inline */
 #endif
+#endif /* !!!disable inline processing */
+
+/* #define inline __inline */
+#define inline
 
 /* Work around a bug in Apple GCC 4.0.1 build 5465: In C99 mode, it supports
    the ISO C 99 semantics of 'extern inline' (unlike the GNU C semantics of
@@ -1185,16 +1190,16 @@
 #define re_syntax_options rpl_re_syntax_options
 
 /* Define to rpl_regcomp if the replacement should be used. */
-#define regcomp rpl_regcomp
+/* !!!#define regcomp rpl_regcomp */
 
 /* Define to rpl_regerror if the replacement should be used. */
-#define regerror rpl_regerror
+/* !!!#define regerror rpl_regerror */
 
 /* Define to rpl_regexec if the replacement should be used. */
-#define regexec rpl_regexec
+/* !!!#define regexec rpl_regexec */
 
 /* Define to rpl_regfree if the replacement should be used. */
-#define regfree rpl_regfree
+/* !!!#define regfree rpl_regfree */
 
 /* Define remove to unlink if you have unlink(), but not remove(). */
 /* #undef remove */
@@ -1202,7 +1207,7 @@
 /* Define to the equivalent of the C99 'restrict' keyword, or to
    nothing if this is not supported.  Do not define if restrict is
    supported only directly.  */
-#define restrict __restrict__
+/* !!!#define restrict __restrict__*/
 /* Work around a bug in older versions of Sun C++, which did not
    #define __restrict__ or support _Restrict or __restrict__
    even though the corresponding Sun C compiler ended up with
@@ -1219,3 +1224,6 @@
 
 /* Define to __typeof__ if your compiler spells it that way. */
 /* #undef typeof */
+
+/* _WIN32 is defined implicitly */
+# include "setlocale_null.h"
