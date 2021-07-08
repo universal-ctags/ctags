@@ -204,6 +204,7 @@ static void makeTagEntryNotify (subparser *s, const tagEntryInfo *tag, int corkI
 	{
 		tagEntryInfo moose_e;
 		initTagEntry (&moose_e, tag->name, K_METHOD);
+		setTagPositionFromTag (&moose_e, tag);
 		moose_e.extensionFields.scopeIndex = moose->classCork;
 		makeTagEntry (&moose_e);
 	}

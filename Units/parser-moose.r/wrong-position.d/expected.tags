@@ -1,0 +1,4 @@
+Test	input.pl	/^package Test;$/;"	class	line:1	language:Moose
+Test	input.pl	/^package Test;$/;"	package	line:1	language:Perl
+get_by_id	input.pl	/^sub get_by_id ()$/;"	method	line:5	language:Moose	class:Test
+get_by_id	input.pl	/^sub get_by_id ()$/;"	subroutine	line:5	language:Perl

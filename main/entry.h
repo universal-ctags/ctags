@@ -145,6 +145,7 @@ extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex);
 
 extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
 
+extern void setTagPositionFromTag (tagEntryInfo *const dst, const tagEntryInfo *const src);
 
 #define CORK_NIL 0
 tagEntryInfo *getEntryInCorkQueue   (int n);
