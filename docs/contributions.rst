@@ -537,7 +537,19 @@ Testing a PR locally before being merged
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You may want to test a PR locally before it is merged into the master
-repository. For example, suppose you want to test ``USERNAME``'s PR with branch
+repository.
+
+If you want to test a PR #2234 on a repository `upstream` as branch name
+`BRANCHNAME`;::
+
+  $ git fetch upstream pull/2234/head:BRANCHNAME
+  $ git checkout BRANCHNAME
+
+This creates a branch `BRANCHNAME`, and pulls the PR into the branch, and
+switches to the branch. The branch name `BRANCHNAME` does not have to be the
+same as the branch name of the PR.
+
+Alternatively suppose you want to test ``USERNAME``'s PR with branch
 name ``main-fix-foo``;::
 
   git checkout -b tmp-main-fix-foo master
