@@ -1771,6 +1771,13 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 	return r;
 }
 
+extern void setTagPositionFromTag (tagEntryInfo *const dst,
+								   const tagEntryInfo *const src)
+{
+		dst->lineNumber = src->lineNumber;
+		dst->filePosition = src->filePosition;
+}
+
 static void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      langType langType_,
