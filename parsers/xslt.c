@@ -70,7 +70,7 @@ static kindDefinition XsltKinds [] = {
 	  .referenceOnly = false, ATTACH_ROLES (XsltParameterRoles) },
 	{ true,  'm', "matchedTemplate", "matched template",
 	  .referenceOnly = false, ATTACH_ROLES (XsltMatchedTemplateRoles) },
-	{ true,  'n', "namedTemplate",   "matched template",
+	{ true,  'n', "namedTemplate",   "named template",
 	  .referenceOnly = false, ATTACH_ROLES (XsltNamedTemplateRoles) },
 	{ true,  'v', "variable", "variables" },
 };
