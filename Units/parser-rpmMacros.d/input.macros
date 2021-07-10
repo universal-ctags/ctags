@@ -1,0 +1,8 @@
+#%comment
+%a 1
+%b() %{nil}
+%c a\
+%B \
+%C
+%d 1
+%e 1

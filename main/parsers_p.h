@@ -136,6 +136,7 @@
 	RSpecParser, \
 	RexxParser, \
 	RobotParser, \
+	RpmMacrosParser, \
 	RpmSpecParser, \
 	RstParser, \
 	RubyParser, \

@@ -1,0 +1,20 @@
+a	input.macros	/^%a 1$/;"	m
+b	input.macros	/^%b() %{nil}$/;"	m	signature:()
+c	input.macros	/^%c a\\$/;"	m	end:6
+d	input.macros	/^%d 1$/;"	m
+e	input.macros	/^%e 1$/;"	m
+a0	input-0.macros	/^%a0 1$/;"	m
+b0	input-0.macros	/^%b0() %{nil}$/;"	m	signature:()
+c0	input-0.macros	/^%c0 a\\$/;"	m	end:5
+d0	input-0.macros	/^%d0 1$/;"	m
+e0	input-0.macros	/^%e0 1$/;"	m
+a1	input-1.macros	/^%a1 1$/;"	m
+b1	input-1.macros	/^%b1() %{nil}$/;"	m	signature:()
+c1	input-1.macros	/^%c1 a\\$/;"	m	end:6
+d1	input-1.macros	/^%d1 1$/;"	m
+e1	input-1.macros	/^%e1 1$/;"	m
+a2	input-2.macros	/^%a2 1$/;"	m
+b2	input-2.macros	/^%b2() %{nil}$/;"	m	signature:()
+c2	input-2.macros	/^%c2 a\\$/;"	m	end:6
+d2	input-2.macros	/^%d2 1$/;"	m
+e2	input-2.macros	/^%e2 1$/;"	m

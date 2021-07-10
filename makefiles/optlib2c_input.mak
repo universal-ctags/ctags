@@ -17,6 +17,7 @@ OPTLIB2C_INPUT = \
 	optlib/pod.ctags			\
 	optlib/puppetManifest.ctags		\
 	optlib/qemuhx.ctags			\
+	optlib/rpmMacros.ctags			\
 	optlib/scss.ctags			\
 	optlib/systemtap.ctags			\
 	\

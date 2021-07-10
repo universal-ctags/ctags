@@ -249,6 +249,9 @@
     <ClCompile Include="..\optlib\qemuhx.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\rpmMacros.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\scss.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
