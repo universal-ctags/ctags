@@ -7,12 +7,12 @@
 # 3. Execute: nmake -f mk_mvc.mak
 #
 
+OBJEXT = obj
 include source.mak
 
 GNULIB_HEADS = gnulib/regex.h
 GNULIB_SRCS = gnulib/regex.c gnulib/nl_langinfo.c gnulib/setlocale_null.c gnulib/malloc/dynarray_resize.c
 
-OBJEXT = obj
 COMMON_DEFINES =
 DEFINES = -DWIN32 $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DHAVE_PACKCC -DREADTAGS_DSL
 INCLUDES = -I. -Ignulib -Imain -Ifnmatch -Iparsers -Ilibreadtags -Idsl
