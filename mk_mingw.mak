@@ -1,5 +1,6 @@
 # Makefile for Universal Ctags under Win32 with MinGW compiler
 
+OBJEXT = o
 include source.mak
 
 GNULIB_HEADS = gnulib/regex.h
@@ -14,7 +15,6 @@ CC = gcc
 WINDRES = windres
 OPTLIB2C = ./misc/optlib2c
 PACKCC   = ./packcc.exe
-OBJEXT = o
 RES_OBJ = win32/ctags.res.o
 EXTRA_OBJS  =
 EXTRA_OBJS += $(GNULIB_OBJS)
