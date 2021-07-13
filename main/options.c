@@ -555,6 +555,10 @@ static struct Feature {
 	{"wildcards", "can use glob matching"},
 	{"regex", "can use regular expression based pattern matching"},
 
+/* https://lists.gnu.org/archive/html/bug-gnulib/2011-07/msg00435.html */
+#ifdef _REGEX_INCLUDE_LIMITS_H
+	{"gnulib_regex", "linked with the Gnulib regular expression library"},
+#endif
 #ifndef EXTERNAL_SORT
 	{"internal-sort", "uses internal sort routine instead of invoking sort command"},
 #endif
