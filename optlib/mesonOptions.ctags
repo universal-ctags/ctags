@@ -1,5 +1,5 @@
 #
-#  mesonOptions.ctags --- multitable regex parser for meso_options files
+#  mesonOptions.ctags --- multitable regex parser for meson_options files
 #
 #  Copyright (c) 2021 Masatake YAMATO
 #  Copyright (c) 2021 Red Hat, Inc.
