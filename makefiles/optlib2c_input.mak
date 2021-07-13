@@ -15,8 +15,9 @@ OPTLIB2C_INPUT = \
 	optlib/mesonOptions.ctags		\
 	optlib/passwd.ctags			\
 	optlib/pod.ctags			\
-	optlib/qemuhx.ctags			\
 	optlib/puppetManifest.ctags		\
+	optlib/qemuhx.ctags			\
+	optlib/rpmMacros.ctags			\
 	optlib/scss.ctags			\
 	optlib/systemtap.ctags			\
 	\

@@ -1,0 +1,52 @@
+#
+#  rpmMacros.ctags --- multitable regex parser for /usr/lib/rpm/macros files
+#
+#  Copyright (c) 2021 Masatake YAMATO
+#  Copyright (c) 2021 Red Hat, Inc.
+#
+#  This source code is released for free distribution under the terms of the
+#  GNU General Public License version 2 or (at your option) any later version.
+#
+# References:
+#
+# - https://rpm.org/user_doc/macros.html
+#
+# TODO:
+#
+# - Run Lua parser as a subparser
+#
+--langdef=RpmMacros
+--map-RpmMacros=+(macros.*)
+
+# This one is too general.
+# --map-RpmMacros=+(macros)
+
+--kinddef-RpmMacros=m,macro,macros
+
+--_tabledef-RpmMacros=main
+--_tabledef-RpmMacros=contline
+
+--_mtable-regex-RpmMacros=main/^#[^\n]*\n?//
+--_mtable-regex-RpmMacros=main/^%([_a-zA-Z0-9]+)(\([^)]*\))*[^\n]*([^\n])\n?/\1/m/{{
+    \2 false ne {
+       . \2 signature:
+    } if
+    \3 (\\) eq {
+       % push the current tag for attaching end: later
+       .
+       % Skip next line if \ is at the enf of the current line.
+       /contline _tenter
+    } if
+}}
+--_mtable-regex-RpmMacros=main/.//
+
+--_mtable-regex-RpmMacros=contline/(\n)//{{
+   1 /start _matchloc end:
+   _tleave
+}}
+--_mtable-regex-RpmMacros=contline/^[^\n]*([^\n])\n?///{{
+    \1 (\\) eq not {
+       1 /end _matchloc end:
+       _tleave
+    } if
+}}
