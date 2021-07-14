@@ -443,6 +443,7 @@ The following parsers have been added:
 * RelaxNG *libxml*
 * ReStructuredText
 * Robot
+* RpmMacros *optlib*
 * RpmSpec
 * RSpec *optlib*
 * Rust
