@@ -176,8 +176,12 @@ jobs:
        - run:
            name: Test
            command: |
+             find -name 'core*'
              ulimit -c 0
+             ulimit -c
+             for f in /proc/sys/kernel/core*; do echo $f; cat $f; done
              make distcheck
+             find -name 'core*'
 
    centos_make:
      working_directory: ~/universal-ctags
