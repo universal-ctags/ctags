@@ -176,6 +176,7 @@ jobs:
        - run:
            name: Test
            command: |
+             ulimit -c 0
              make distcheck
 
    centos_make:
