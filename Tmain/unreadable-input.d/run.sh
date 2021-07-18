@@ -8,6 +8,16 @@ INPUT0=/tmp/u-ctags/input-0.c
 
 . ../utils.sh
 
+if ! type pidof > /dev/null 2>&1; then
+	# pidof is needed to find auditd.
+	skip "pidof command is not available"
+fi
+
+if ! pidof auditd > /dev/null 2>&1; then
+	# sudo expects auditd is running.
+	skip "auditd is not running"
+fi
+
 if [ $(id -u) = 0 ] && ! sudo -u '#1' $CTAGS --version > /dev/null; then
 	skip "sudo needed in this test case doesn't work expectedly on this platform (execution)"
 fi

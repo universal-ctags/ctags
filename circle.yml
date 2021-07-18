@@ -16,7 +16,7 @@ jobs:
        - run:
            name: Install Git
            command: |
-             yum -y install git gdb
+             yum -y install git gdb procps-ng
        - checkout
        - run:
            name: Install build tools
@@ -135,9 +135,9 @@ jobs:
        - image: docker.io/fedora:33
      steps:
        - run:
-           name: Install Git and Gdb
+           name: Install Git, Gdb and Procps-NG
            command: |
-             dnf -y install git gdb
+             dnf -y install git gdb procps-ng
        - checkout
        - run:
            name: Install build tools
