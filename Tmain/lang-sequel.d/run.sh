@@ -7,4 +7,4 @@ CTAGS=$1
 
 . ../utils.sh
 
-${CTAGS} --quiet --options=NONE --options=./args.ctags input.unknown
+${CTAGS} --quiet --options=NONE --options=./args.ctags -o - input.unknown
