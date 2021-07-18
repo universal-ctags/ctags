@@ -125,7 +125,7 @@ libctags_a_CFLAGS  += $(SECCOMP_CFLAGS)
 nodist_libctags_a_SOURCES = $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
 CLEANFILES += $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
-$(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
+EXTRA_libctags_a_DEPENDENCIES = $(REPOINFO_HEADS)
 repoinfo_verbose = $(repoinfo_verbose_@AM_V@)
 repoinfo_verbose_ = $(repoinfo_verbose_@AM_DEFAULT_V@)
 repoinfo_verbose_0 = @echo REPOINFO "  $@";
