@@ -18,6 +18,8 @@
 #include "kind.h"
 #include "lregex.h"
 #include "lxpath.h"
+#include "hint.h"
+#include "ptag.h"
 #include "vstring.h"
 
 /*
@@ -41,6 +43,8 @@ typedef rescanReason (*rescanParser) (const unsigned int passCount);
 typedef void (*parserInitialize) (langType language);
 typedef void (*initStatistics) (langType language);
 typedef void (*printStatistics) (langType langType);
+typedef void (*metaHintPreloader) (ptagType ptag, langType receiverLangType, langType hintLangType, const char *rest_part, hintEntry *metaHint);
+typedef void (*hintPreloader) (langType receiverLangType, hintEntry *hint);
 
 /* Per language finalizer is called anytime when ctags exits.
    (Exceptions are a kind of options are given when invoked. Here
@@ -120,6 +124,9 @@ struct sParserDefinition {
 	const char *defaultScopeSeparator;
 	const char *defaultRootScopeSeparator;
 
+	metaHintPreloader preloadMetaHint;
+	hintPreloader preloadHint;
+
 	initStatistics initStats;
 	printStatistics printStats;
 
@@ -154,7 +161,11 @@ extern bool isLanguageEnabled (const langType language);
 extern bool isLanguageKindEnabled (const langType language, int kindIndex);
 extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int roleIndex);
 
+extern bool isLanguageKindAvailableInHint (const langType language, int kindIndex);
+extern bool isLanguageRoleAvailableInHint (const langType language, int kindIndex, int roleIndex);
+
 extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
+extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
 
 extern void initializeParser (langType language);
 extern unsigned int getLanguageCorkUsage (langType language);

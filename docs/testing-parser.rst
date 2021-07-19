@@ -99,7 +99,9 @@ have its own directory under Units directory.
 *Units/TEST/args.ctags* **optional**
 
 	``-o -`` is used as default optional argument when running a
-	unit test ctags. If you want to add more options, enumerate
+	unit test ctags. ``--_hint-file=hint.tags`` is also used as
+	default optional argument when **hint.tags** exists.
+	If you want to add more options, enumerate
 	options in **args.ctags** file.
 
 	Remember you have to put one option in one line; don't
@@ -135,6 +137,11 @@ have its own directory under Units directory.
 
 	language parsers enabled/available can be checked with passing
 	``--list-languages`` to ctags.
+
+*Units/TEST/hint.tags* **optional**
+
+	If **hint.tags** exists, ``--_hint-file=hint.tags`` is added
+	to the command line for testing.
 
 Note for importing a test case from Test directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

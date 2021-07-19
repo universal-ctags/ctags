@@ -26,6 +26,7 @@
 #include "param.h"
 #include "parse.h"
 #include "xtag.h"
+#include "hint.h"
 
 #include "cxx/cxx_debug.h"
 
@@ -109,6 +110,7 @@ typedef struct sCppState {
 
 	cppMacroInfo * macroInUse;
 	hashTable * fileMacroTable;
+	hashTable * hintNegativeCache;
 
 } cppState;
 
@@ -224,11 +226,15 @@ static cppState Cpp = {
 	}  /* directive */
 };
 
+static int cppStatHintRequest;
+static int cppStatHintRequestFound;
+
 /*
 *   FUNCTION DECLARATIONS
 */
 
 static hashTable *makeMacroTable (void);
+static hashTable *makeHintNagativeCache (void);
 static cppMacroInfo * saveMacro(hashTable *table, const char * macro);
 
 /*
@@ -339,15 +345,33 @@ static void cppInitCommon(langType clientLang,
 	Cpp.directive.name = vStringNewOrClear (Cpp.directive.name);
 
 	Cpp.macroInUse = NULL;
+
+	bool useHint = (isHintAvailable()
+					&& (
+						true	/* TODO */
+						|| isLanguageKindAvailableInHint (clientLang, Cpp.defineMacroKindIndex)
+						)
+					&& isFieldAvailableInHint (FIELD_SIGNATURE)
+					&& (
+						true	/* TODO */
+						|| isFieldAvailableInHint (Cpp.macrodefFieldIndex)
+						));
+
 	Cpp.fileMacroTable =
 		(doesExpandMacros
-		 && isFieldEnabled (FIELD_SIGNATURE)
-		 && isFieldEnabled (Cpp.macrodefFieldIndex)
+		 && ((isFieldEnabled (FIELD_SIGNATURE)
+			  && isFieldEnabled (Cpp.macrodefFieldIndex))
+			 || useHint)
 		 && (getLanguageCorkUsage ((clientLang == LANG_IGNORE)
 								   ? Cpp.lang
 								   : clientLang) & CORK_SYMTAB))
 		? makeMacroTable ()
 		: NULL;
+	Cpp.hintNegativeCache =
+		(Cpp.fileMacroTable && useHint)
+		? makeHintNagativeCache ()
+		: NULL;
+
 }
 
 extern void cppInit (const bool state, const bool hasAtLiteralStrings,
@@ -407,6 +431,12 @@ extern void cppTerminate (void)
 	{
 		hashTableDelete (Cpp.fileMacroTable);
 		Cpp.fileMacroTable = NULL;
+	}
+
+	if (Cpp.hintNegativeCache)
+	{
+		hashTableDelete (Cpp.hintNegativeCache);
+		Cpp.hintNegativeCache = NULL;
 	}
 }
 
@@ -1728,6 +1758,66 @@ extern cppMacroInfo * cppFindMacroFromSymtab (const char *const name)
 	return info;
 }
 
+static bool buildMacroInfoFromHint (const char *name,
+									hintEntry *hint,
+									void * data)
+{
+	cppMacroInfo **info = data;
+
+	const char *lang = hintFieldForType (hint, FIELD_LANGUAGE);
+	if (lang == NULL)
+		return true;			/* continue */
+
+	if (lang[0] != 'C')
+		return true;
+
+	if (lang[1] == '\0'
+		|| ((lang[1] == '+')
+			&& (lang[2] == '+')
+			&& (lang[3] == '\0'))
+		|| ((lang[1] == 'U')
+			&& (lang[2] == 'D')
+			&& (lang[3] == 'A')
+			&& (lang[4] == '\0'))
+		|| ((lang[1] == 'P')
+			&& (strcmp (lang + 2, "reProcessor") == 0)))
+	{
+		if (!(hint->kind && ((hint->kind [0] == 'd'
+							  && hint->kind [1] == '\0')
+							 || (strcmp (hint->kind, "macro") == 0))))
+			return true;
+
+		const char *macrodef_field = hintFieldForType (hint, Cpp.macrodefFieldIndex);
+		const char *signature_field = hintFieldForType (hint, FIELD_SIGNATURE);
+
+		vString *macrodef = vStringNewInit (name);
+		if (signature_field)
+			vStringCatS (macrodef, signature_field);
+		vStringPut (macrodef, '=');
+		if (macrodef_field)
+			vStringCatS (macrodef, macrodef_field);
+
+		*info = saveMacro (Cpp.fileMacroTable, vStringValue (macrodef));
+		vStringDelete (macrodef);
+
+		return false;
+	}
+	return true;
+}
+
+extern cppMacroInfo * cppFindMacroFromHintFile (const char *const name)
+{
+	cppStatHintRequest++;
+
+	cppMacroInfo *info = NULL;
+	foreachHintEntries (name, TAG_FULLMATCH, buildMacroInfoFromHint, &info);
+
+	if (info)
+		cppStatHintRequestFound++;
+
+	return info;
+}
+
 /*  Determines whether or not "name" should be ignored, per the ignore list.
  */
 extern cppMacroInfo * cppFindMacro (const char *const name)
@@ -1750,6 +1840,20 @@ extern cppMacroInfo * cppFindMacro (const char *const name)
 		info = cppFindMacroFromSymtab(name);
 		if (info)
 			return info;
+
+		if (!isHintAvailable ())
+			return NULL;
+
+		if (Cpp.hintNegativeCache
+			&& hashTableGetItem (Cpp.hintNegativeCache, (char *)name))
+			return NULL;
+
+		info = cppFindMacroFromHintFile (name);
+		if (info)
+			return info;
+
+		if (Cpp.hintNegativeCache)
+			hashTablePutItem (Cpp.hintNegativeCache, eStrdup (name), "");
 	}
 	return NULL;
 }
@@ -2196,6 +2300,17 @@ static hashTable *makeMacroTable (void)
 		);
 }
 
+static hashTable *makeHintNagativeCache (void)
+{
+	return hashTableNew(
+		1024,
+		hashCstrhash,
+		hashCstreq,
+		eFree,
+		NULL
+		);
+}
+
 static void initializeCpp (const langType language)
 {
 	Cpp.lang = language;
@@ -2275,6 +2390,14 @@ static parameterHandlerTable CpreProParameterHandlerTable [] = {
 	}
 };
 
+extern void cppPrintStats (langType lang)
+{
+	fprintf(stderr, "Looking up macro definitions in hints: %d\n", cppStatHintRequest);
+	fprintf(stderr, "Found macro definitions in hints: %d\n", cppStatHintRequestFound);
+	fprintf(stderr, "Hints hit percentage: %lf\n",
+			(((double)cppStatHintRequestFound) / ((double)cppStatHintRequest)) * 100.0);
+}
+
 extern parserDefinition* CPreProParser (void)
 {
 	parserDefinition* const def = parserNew ("CPreProcessor");
@@ -2289,6 +2412,8 @@ extern parserDefinition* CPreProParser (void)
 
 	def->parameterHandlerTable = CpreProParameterHandlerTable;
 	def->parameterHandlerCount = ARRAY_SIZE(CpreProParameterHandlerTable);
+
+	def->printStats = cppPrintStats;
 
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	return def;

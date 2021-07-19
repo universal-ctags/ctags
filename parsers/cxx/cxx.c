@@ -17,6 +17,8 @@
 #include "cxx_scope.h"
 #include "cxx_tag.h"
 
+#include "../cpreprocessor.h"
+
 #include "dependency.h"
 #include "selectors.h"
 
@@ -93,6 +95,7 @@ parserDefinition * CParser (void)
 	def->initialize = cxxCParserInitialize;
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
+	def->printStats = cppPrintStats;
 	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
 
 	return def;
@@ -128,6 +131,7 @@ parserDefinition * CppParser (void)
 	def->initialize = cxxCppParserInitialize;
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
+	def->printStats = cppPrintStats;
 	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
 
 	return def;
@@ -157,6 +161,7 @@ parserDefinition * CUDAParser (void)
 	def->initialize = cxxCUDAParserInitialize;
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = NULL;
+	def->printStats = cppPrintStats;
 	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
 
 	return def;

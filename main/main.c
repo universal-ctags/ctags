@@ -54,6 +54,7 @@
 #include "entry_p.h"
 #include "error_p.h"
 #include "field_p.h"
+#include "hint_p.h"
 #include "keyword_p.h"
 #include "main_p.h"
 #include "options_p.h"
@@ -583,6 +584,8 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	verbose ("Reading initial options from command line\n");
 	parseCmdlineOptions (args);
 	checkOptions ();
+
+	proprocessHints ();
 
 	runMainLoop (args);
 

@@ -1,0 +1,3 @@
+# u-ctags -o hint.tags --options=hint.ctags mymod0.py
+--sort=no
+--fields=+{language}

@@ -1,0 +1,3 @@
+BEGIN	input.c	/^#define BEGIN /;"	d	file:
+END	input.c	/^#define END /;"	d	file:
+add2	input.c	/^DEF(add2, int, (int a, int b), a + b)$/;"	f	typeref:typename:int

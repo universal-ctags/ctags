@@ -1,0 +1,6 @@
+C0	input.py	/^from mymod0 import C0$/;"	class	module:mymod0	roles:imported	extras:reference
+f0	input.py	/^from mymod0 import f0$/;"	function	module:mymod0	roles:imported	extras:reference
+mymod0	input.py	/^from mymod0 import C0$/;"	module	roles:namespace	extras:reference
+mymod0	input.py	/^from mymod0 import f0$/;"	module	roles:namespace	extras:reference
+mymod0	input.py	/^from mymod0 import v0$/;"	module	roles:namespace	extras:reference
+v0	input.py	/^from mymod0 import v0$/;"	variable	module:mymod0	roles:imported	extras:reference

@@ -29,6 +29,7 @@ typedef struct sXtagObject {
 	xtagDefinition *def;
 	langType language;
 	xtagType sibling;
+	bool availableInHint;
 } xtagObject;
 
 static bool isPseudoTagsEnabled (xtagDefinition *pdef CTAGS_ATTR_UNUSED)
@@ -386,4 +387,14 @@ extern xtagType nextSiblingXtag (xtagType type)
 
 	xobj = xtagObjects + type;
 	return xobj->sibling;
+}
+
+extern void makeXtagAvailableInHint (xtagType type)
+{
+	xtagObjects [type].availableInHint = true;
+}
+
+extern bool isXtagAvailableInHint (xtagType type)
+{
+	return xtagObjects [type].availableInHint;
 }

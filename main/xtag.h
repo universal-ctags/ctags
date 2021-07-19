@@ -63,5 +63,6 @@ struct sXtagDefinition {
 };
 
 extern bool isXtagEnabled (xtagType type);
+extern bool isXtagAvailableInHint (xtagType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

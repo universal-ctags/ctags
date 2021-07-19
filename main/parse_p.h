@@ -13,10 +13,12 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "hint.h"
 #include "kind.h"
 #include "lregex_p.h"
 #include "parse.h"
 #include "parsers_p.h"  /* contains list of parsers */
+#include "ptag_p.h"
 #include "strlist.h"
 #ifdef EXTERNAL_PARSER_LIST_FILE
 #include EXTERNAL_PARSER_LIST_FILE
@@ -66,7 +68,6 @@ extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern langType getNamedLanguageFull (const char *const name, size_t len, bool noPretending, bool include_aliases);
 
 extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
-extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
 extern roleDefinition* getLanguageRole(const langType language, int kindIndex, int roleIndex);
 extern roleDefinition* getLanguageRoleForName (const langType language, int kindIndex,
 											   const char *roleName);
@@ -175,5 +176,11 @@ extern bool makeRoleDescriptionsPseudoTags (const langType language,
 
 extern void printLanguageMultitableStatistics (langType language);
 extern void printParserStatisticsIfUsed (langType lang);
+
+extern void parserPreloadMetaHint (ptagType ptag, langType lang, const char *rest_part, hintEntry *hint);
+extern void parserPreloadHint     (langType lang, hintEntry *hint);
+
+extern void makeLanguageKindAvailableInHint (langType lang, int kindIndex);
+extern void makeLanguageRoleAvailableInHint (langType lang, int kindIndex, int roleIndex);
 
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */

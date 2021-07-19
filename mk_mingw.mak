@@ -7,7 +7,7 @@ REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -DHAVE_STDINT_H -Dst
 CFLAGS = -Wall -std=gnu99
 COMMON_DEFINES=-DUSE_SYSTEM_STRNLEN
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES)
-INCLUDES = -I. -Ignu_regex -Ifnmatch -iquote parsers -iquote main -iquote dsl
+INCLUDES = -I. -Ignu_regex -Ifnmatch -iquote parsers -iquote main -iquote dsl -iquote libreadtags
 CC = gcc
 WINDRES = windres
 OPTLIB2C = ./misc/optlib2c

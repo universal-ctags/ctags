@@ -30,6 +30,7 @@
 typedef struct sRoleObject {
 	roleDefinition *def;
 	freeRoleDefFunc free;
+	bool availableInHint;
 } roleObject;
 
 struct roleControlBlock {
@@ -41,6 +42,7 @@ struct roleControlBlock {
 typedef struct sKindObject {
 	kindDefinition *def;
 	freeKindDefFunc free;
+	bool availableInHint;
 	struct roleControlBlock *rcb;
 	ptrArray * dynamicSeparators;
 } kindObject;
@@ -96,6 +98,7 @@ static void initRoleObject (roleObject *robj, roleDefinition *rdef, freeRoleDefF
 	robj->def = rdef;
 	robj->free = freefunc;
 	robj->def->id = roleId;
+	robj->availableInHint = false;
 }
 
 static struct roleControlBlock* allocRoleControlBlock (kindObject *kind)
@@ -138,6 +141,7 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 		kindObject *kind = kcb->kind + i;
 		kind->def = parser->kindTable + i;
 		kind->free = NULL;
+		kind->availableInHint = false;
 		kind->def->id = i;
 		kind->rcb = allocRoleControlBlock (kind);
 		kind->dynamicSeparators = NULL;
@@ -188,6 +192,7 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 	kcb->kind = xRealloc (kcb->kind, kcb->count, kindObject);
 	kcb->kind [def->id].def = def;
 	kcb->kind [def->id].free = freeKindDef;
+	kcb->kind [def->id].availableInHint = false;
 	kcb->kind [def->id].rcb = allocRoleControlBlock(kcb->kind + def->id);
 	kcb->kind [def->id].dynamicSeparators = NULL;
 
@@ -694,4 +699,24 @@ extern void roleColprintTablePrint (struct colprintTable *table, bool noparser,
 {
 	colprintTableSort (table, roleColprintCompareLines);
 	colprintTablePrint (table, noparser? 1: 0, withListHeader, machinable, fp);
+}
+
+extern bool isKindAvailableInHint (struct kindControlBlock* kcb, int kindIndex)
+{
+	return kcb->kind [kindIndex].availableInHint;
+}
+
+extern void makeKindAvailableInHint (struct kindControlBlock* kcb, int kindIndex)
+{
+	kcb->kind [kindIndex].availableInHint = true;
+}
+
+extern bool isRoleAvailableInHint (struct kindControlBlock* kcb, int kindIndex, int roleIndex)
+{
+	return kcb->kind [kindIndex].rcb->role[roleIndex].availableInHint;
+}
+
+extern void makeRoleAvailableInHint (struct kindControlBlock* kcb, int kindIndex, int roleIndex)
+{
+	kcb->kind [kindIndex].rcb->role[roleIndex].availableInHint = true;
 }

@@ -45,6 +45,7 @@ extern fieldType getFieldTypeForOption (char letter);
 extern fieldType getFieldTypeForName (const char *name);
 extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language);
 extern bool enableField (fieldType type, bool state);
+extern void makeFieldAvailableInHint (fieldType type);
 extern bool isCommonField (fieldType type);
 extern int     getFieldOwner (fieldType type);
 extern const char* getFieldDescription (fieldType type);

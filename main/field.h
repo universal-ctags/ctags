@@ -112,5 +112,6 @@ struct sFieldDefinition {
 */
 
 extern bool isFieldEnabled (fieldType type);
+extern bool isFieldAvailableInHint (fieldType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

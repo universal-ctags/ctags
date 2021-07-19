@@ -33,6 +33,7 @@ extern xtagType  getXtagTypeForLetter (char letter);
 extern xtagType  getXtagTypeForNameAndLanguage (const char *name, langType language);
 
 extern bool enableXtag (xtagType type, bool state);
+extern void makeXtagAvailableInHint (xtagType type);
 extern bool isXtagFixed (xtagType type);
 extern bool isCommonXtag (xtagType type);
 

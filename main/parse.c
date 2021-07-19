@@ -5144,6 +5144,56 @@ static parserDefinition *FallbackParser (void)
 	return def;
 }
 
+extern void parserPreloadMetaHint (ptagType ptag, langType lang,
+								   const char *rest_part, hintEntry *hint)
+{
+	if (lang == LANG_IGNORE)
+	{
+		for (int i = 0; i < (int) LanguageCount; i++)
+			if (LanguageTable [i].def->preloadMetaHint)
+				LanguageTable [i].def->preloadMetaHint (ptag,
+														i, lang,
+														rest_part,
+														hint);
+	}
+	else
+		if (LanguageTable [lang].def->preloadMetaHint)
+			LanguageTable [lang].def->preloadMetaHint (ptag,
+													   lang, lang,
+													   rest_part,
+													   hint);
+}
+
+extern void parserPreloadHint (langType lang, hintEntry *hint)
+{
+	if (LanguageTable [lang].def->preloadHint)
+		LanguageTable [lang].def->preloadHint (lang, hint);
+}
+
+extern bool isLanguageKindAvailableInHint (const langType lang, int kindIndex)
+{
+	struct kindControlBlock *kcb = LanguageTable [lang].kindControlBlock;
+	return isKindAvailableInHint (kcb, kindIndex);
+}
+
+extern void makeLanguageKindAvailableInHint (langType lang, int kindIndex)
+{
+	struct kindControlBlock *kcb = LanguageTable [lang].kindControlBlock;
+	makeKindAvailableInHint (kcb, kindIndex);
+}
+
+extern bool isLanguageRoleAvailableInHint (const langType lang, int kindIndex, int roleIndex)
+{
+	struct kindControlBlock *kcb = LanguageTable [lang].kindControlBlock;
+	return isRoleAvailableInHint (kcb, kindIndex, roleIndex);
+}
+
+extern void makeLanguageRoleAvailableInHint (langType lang, int kindIndex, int roleIndex)
+{
+	struct kindControlBlock *kcb = LanguageTable [lang].kindControlBlock;
+	makeRoleAvailableInHint (kcb, kindIndex, roleIndex);
+}
+
 /*
  * A dummy parser for printing pseudo tags in xref output
  */

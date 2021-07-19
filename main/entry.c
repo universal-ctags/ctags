@@ -84,7 +84,7 @@
 
 /*  Maintains the state of the tag file.
  */
-typedef struct eTagFile {
+typedef struct eTagSinkInfo {
 	char *name;
 	char *directory;
 	MIO *mio;
@@ -97,7 +97,7 @@ typedef struct eTagFile {
 	ptrArray *corkQueue;
 
 	bool patternCacheValid;
-} tagFile;
+} tagSinkInfo;
 
 typedef struct sTagEntryInfoX  {
 	tagEntryInfo slot;
@@ -110,7 +110,7 @@ typedef struct sTagEntryInfoX  {
 *   DATA DEFINITIONS
 */
 
-static tagFile TagFile = {
+static tagSinkInfo TagFile = {
     NULL,               /* tag file name */
     NULL,               /* tag file directory (absolute) */
     NULL,               /* file pointer */
