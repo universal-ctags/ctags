@@ -44,17 +44,24 @@ AC_DEFUN([gl_EARLY],
 
   AC_REQUIRE([AM_PROG_CC_C_O])
   # Code from module absolute-header:
+  # Code from module alloca-opt:
   # Code from module attribute:
   # Code from module btowc:
   # Code from module builtin-expect:
   # Code from module c99:
+  # Code from module ctype:
   # Code from module dynarray:
   # Code from module extensions:
   # Code from module extern-inline:
+  # Code from module flexmember:
+  # Code from module fnmatch:
+  # Code from module fnmatch-h:
   # Code from module hard-locale:
+  # Code from module idx:
   # Code from module include_next:
   # Code from module intprops:
   # Code from module inttypes-incomplete:
+  # Code from module isblank:
   # Code from module langinfo:
   # Code from module libc-config:
   # Code from module limits-h:
@@ -64,7 +71,10 @@ AC_DEFUN([gl_EARLY],
   # Code from module lock:
   # Code from module mbrtowc:
   # Code from module mbsinit:
+  # Code from module mbsrtowcs:
   # Code from module mbtowc:
+  # Code from module memchr:
+  # Code from module mempcpy:
   # Code from module multiarch:
   # Code from module nl_langinfo:
   # Code from module regex:
@@ -80,6 +90,9 @@ AC_DEFUN([gl_EARLY],
   # Code from module stdint:
   # Code from module stdlib:
   # Code from module streq:
+  # Code from module string:
+  # Code from module strnlen:
+  # Code from module strnlen1:
   # Code from module sys_types:
   # Code from module threadlib:
   gl_THREADLIB_EARLY
@@ -92,6 +105,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module windows-once:
   # Code from module windows-recmutex:
   # Code from module windows-rwlock:
+  # Code from module wmemchr:
+  # Code from module wmempcpy:
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -112,6 +127,7 @@ AC_DEFUN([gl_INIT],
   m4_pushdef([GL_MODULE_INDICATOR_PREFIX], [GL])
   gl_COMMON
   gl_source_base='gnulib'
+  gl_FUNC_ALLOCA
   gl_FUNC_BTOWC
   if test $HAVE_BTOWC = 0 || test $REPLACE_BTOWC = 1; then
     AC_LIBOBJ([btowc])
@@ -119,13 +135,30 @@ AC_DEFUN([gl_INIT],
   fi
   gl_WCHAR_MODULE_INDICATOR([btowc])
   gl___BUILTIN_EXPECT
+  gl_CTYPE_H
+  gl_CTYPE_H_REQUIRE_DEFAULTS
   AC_PROG_MKDIR_P
   AC_REQUIRE([gl_EXTERN_INLINE])
+  AC_C_FLEXIBLE_ARRAY_MEMBER
+  gl_FUNC_FNMATCH_POSIX
+  if test $HAVE_FNMATCH = 0 || test $REPLACE_FNMATCH = 1; then
+    AC_LIBOBJ([fnmatch])
+    gl_PREREQ_FNMATCH
+  fi
+  gl_FNMATCH_MODULE_INDICATOR([fnmatch])
+  gl_FNMATCH_H
+  gl_FNMATCH_H_REQUIRE_DEFAULTS
   AC_REQUIRE([gl_FUNC_SETLOCALE_NULL])
   LIB_HARD_LOCALE="$LIB_SETLOCALE_NULL"
   AC_SUBST([LIB_HARD_LOCALE])
   gl_INTTYPES_INCOMPLETE
   gl_INTTYPES_H_REQUIRE_DEFAULTS
+  gl_FUNC_ISBLANK
+  if test $HAVE_ISBLANK = 0; then
+    AC_LIBOBJ([isblank])
+  fi
+  gl_MODULE_INDICATOR([isblank])
+  gl_CTYPE_MODULE_INDICATOR([isblank])
   gl_LANGINFO_H
   gl_LANGINFO_H_REQUIRE_DEFAULTS
   gl___INLINE
@@ -161,12 +194,31 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_MBSINIT
   fi
   gl_WCHAR_MODULE_INDICATOR([mbsinit])
+  gl_FUNC_MBSRTOWCS
+  if test $HAVE_MBSRTOWCS = 0 || test $REPLACE_MBSRTOWCS = 1; then
+    AC_LIBOBJ([mbsrtowcs])
+    AC_LIBOBJ([mbsrtowcs-state])
+    gl_PREREQ_MBSRTOWCS
+  fi
+  gl_WCHAR_MODULE_INDICATOR([mbsrtowcs])
   gl_FUNC_MBTOWC
   if test $HAVE_MBTOWC = 0 || test $REPLACE_MBTOWC = 1; then
     AC_LIBOBJ([mbtowc])
     gl_PREREQ_MBTOWC
   fi
   gl_STDLIB_MODULE_INDICATOR([mbtowc])
+  gl_FUNC_MEMCHR
+  if test $REPLACE_MEMCHR = 1; then
+    AC_LIBOBJ([memchr])
+    gl_PREREQ_MEMCHR
+  fi
+  gl_STRING_MODULE_INDICATOR([memchr])
+  gl_FUNC_MEMPCPY
+  if test $HAVE_MEMPCPY = 0; then
+    AC_LIBOBJ([mempcpy])
+    gl_PREREQ_MEMPCPY
+  fi
+  gl_STRING_MODULE_INDICATOR([mempcpy])
   gl_MULTIARCH
   gl_FUNC_NL_LANGINFO
   if test $HAVE_NL_LANGINFO = 0 || test $REPLACE_NL_LANGINFO = 1; then
@@ -195,6 +247,14 @@ AC_DEFUN([gl_INIT],
   gl_STDINT_H
   gl_STDLIB_H
   gl_STDLIB_H_REQUIRE_DEFAULTS
+  gl_STRING_H
+  gl_STRING_H_REQUIRE_DEFAULTS
+  gl_FUNC_STRNLEN
+  if test $HAVE_DECL_STRNLEN = 0 || test $REPLACE_STRNLEN = 1; then
+    AC_LIBOBJ([strnlen])
+    gl_PREREQ_STRNLEN
+  fi
+  gl_STRING_MODULE_INDICATOR([strnlen])
   gl_SYS_TYPES_H
   gl_SYS_TYPES_H_REQUIRE_DEFAULTS
   AC_PROG_MKDIR_P
@@ -235,6 +295,16 @@ AC_DEFUN([gl_INIT],
       AC_LIBOBJ([windows-rwlock])
       ;;
   esac
+  gl_FUNC_WMEMCHR
+  if test $HAVE_WMEMCHR = 0; then
+    AC_LIBOBJ([wmemchr])
+  fi
+  gl_WCHAR_MODULE_INDICATOR([wmemchr])
+  gl_FUNC_WMEMPCPY
+  if test $HAVE_WMEMPCPY = 0; then
+    AC_LIBOBJ([wmempcpy])
+  fi
+  gl_WCHAR_MODULE_INDICATOR([wmempcpy])
   # End of code from modules
   m4_ifval(gl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gl_LIBSOURCES_DIR])[ ||
@@ -382,19 +452,27 @@ AC_DEFUN([gltests_LIBSOURCES], [
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
   lib/_Noreturn.h
+  lib/alloca.in.h
   lib/arg-nonnull.h
   lib/attribute.h
   lib/btowc.c
   lib/c++defs.h
   lib/cdefs.h
+  lib/ctype.in.h
   lib/dynarray.h
+  lib/flexmember.h
+  lib/fnmatch.c
+  lib/fnmatch.in.h
+  lib/fnmatch_loop.c
   lib/glthread/lock.c
   lib/glthread/lock.h
   lib/glthread/threadlib.c
   lib/hard-locale.c
   lib/hard-locale.h
+  lib/idx.h
   lib/intprops.h
   lib/inttypes.in.h
+  lib/isblank.c
   lib/langinfo.in.h
   lib/lc-charset-dispatch.c
   lib/lc-charset-dispatch.h
@@ -415,10 +493,16 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/mbrtowc-impl.h
   lib/mbrtowc.c
   lib/mbsinit.c
+  lib/mbsrtowcs-impl.h
+  lib/mbsrtowcs-state.c
+  lib/mbsrtowcs.c
   lib/mbtowc-impl.h
   lib/mbtowc-lock.c
   lib/mbtowc-lock.h
   lib/mbtowc.c
+  lib/memchr.c
+  lib/memchr.valgrind
+  lib/mempcpy.c
   lib/nl_langinfo-lock.c
   lib/nl_langinfo.c
   lib/regcomp.c
@@ -435,6 +519,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/stdint.in.h
   lib/stdlib.in.h
   lib/streq.h
+  lib/string.in.h
+  lib/strnlen.c
+  lib/strnlen1.c
+  lib/strnlen1.h
   lib/sys_types.in.h
   lib/unistd.c
   lib/unistd.in.h
@@ -453,18 +541,27 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/windows-recmutex.h
   lib/windows-rwlock.c
   lib/windows-rwlock.h
+  lib/wmemchr-impl.h
+  lib/wmemchr.c
+  lib/wmempcpy.c
   m4/00gnulib.m4
   m4/__inline.m4
   m4/absolute-header.m4
+  m4/alloca.m4
   m4/btowc.m4
   m4/builtin-expect.m4
   m4/codeset.m4
+  m4/ctype_h.m4
   m4/eealloc.m4
   m4/extensions.m4
   m4/extern-inline.m4
+  m4/flexmember.m4
+  m4/fnmatch.m4
+  m4/fnmatch_h.m4
   m4/gnulib-common.m4
   m4/include_next.m4
   m4/inttypes.m4
+  m4/isblank.m4
   m4/langinfo_h.m4
   m4/limits-h.m4
   m4/localcharset.m4
@@ -476,8 +573,12 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lock.m4
   m4/mbrtowc.m4
   m4/mbsinit.m4
+  m4/mbsrtowcs.m4
   m4/mbstate_t.m4
   m4/mbtowc.m4
+  m4/memchr.m4
+  m4/mempcpy.m4
+  m4/mmap-anon.m4
   m4/multiarch.m4
   m4/nl_langinfo.m4
   m4/off_t.m4
@@ -491,6 +592,8 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stddef_h.m4
   m4/stdint.m4
   m4/stdlib_h.m4
+  m4/string_h.m4
+  m4/strnlen.m4
   m4/sys_types_h.m4
   m4/threadlib.m4
   m4/unistd_h.m4
@@ -501,5 +604,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/wcrtomb.m4
   m4/wctype_h.m4
   m4/wint_t.m4
+  m4/wmemchr.m4
+  m4/wmempcpy.m4
   m4/zzgnulib.m4
 ])
