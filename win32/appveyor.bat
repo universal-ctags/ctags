@@ -34,8 +34,10 @@ exit 1
 :msbuild_build
 :: ----------------------------------------------------------------------
 :: Using VC12 (VC2013) with msbuild, iconv disabled
-cd win32
 @echo on
+copy win32\config_mvc.h config.h
+copy win32\gnulib_h\langinfo.h gnulib
+cd win32
 msbuild ctags_vs2013.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=%CONFIGURATION%
 
 @echo off

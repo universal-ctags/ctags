@@ -1,3 +1,11 @@
+ACLOCAL_AMFLAGS = -I m4
+#AM_CPPFLAGS = -I$(top_builddir)/gnulib -I$(top_srcdir)/gnulib
+GNULIB_DIR = gnulib
+GNULIB_CPPFLAGS = -I$(top_builddir)/$(GNULIB_DIR) -I$(top_srcdir)/$(GNULIB_DIR)
+GNULIB_LIBS = $(GNULIB_DIR)/libgnu.a $(LIBPTHREAD)
+$(GNULIB_DIR)/libgnu.a:
+	$(MAKE) -C $(GNULIB_DIR) libgnu.a
+SUBDIRS = $(GNULIB_DIR)
 
 include $(top_srcdir)/source.mak
 
@@ -12,8 +20,6 @@ EXTRA_DIST   = README.md autogen.sh \
 	       makefiles/list-optlib2c-input.mak misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
 	       .indent.pro .uncrustify.cfg \
-	       gnu_regex/README.txt gnu_regex/regcomp.c gnu_regex/regexec.c \
-	       gnu_regex/regex_internal.c gnu_regex/regex_internal.h \
 	       misc/ctags-optlib-mode.el \
 	       misc/mk-interactive-request.sh misc/roundtrip misc/tinst \
 	       $(PACKCC_FILES) \
@@ -30,7 +36,7 @@ EXTRA_DIST   = README.md autogen.sh \
 	       man/Makefile man/README man/tags.5.rst \
 	       makefiles/list-txt2cstr-input.mak misc/txt2cstr \
 	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(TXT2CSTR_INPUT) \
-	       docs Tmain Units
+	       docs Tmain Units m4/gnulib-cache.m4
 
 CLEANFILES =
 MOSTLYCLEANFILES =
@@ -66,22 +72,15 @@ bin_PROGRAMS+= readtags
 readtags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/libreadtags
 readtags_CFLAGS = $(COVERAGE_CFLAGS) $(WARNING_CFLAGS)
 dist_readtags_SOURCES = $(READTAGS_SRCS) $(READTAGS_HEADS)
+readtags_CPPFLAGS += $(GNULIB_CPPFLAGS)
 readtags_CPPFLAGS += -DREADTAGS_DSL -I$(srcdir)/dsl
+readtags_LDADD = $(GNULIB_LIBS)
 dist_readtags_SOURCES += $(READTAGS_DSL_SRCS) $(READTAGS_DSL_HEADS)
-if !HAVE_REGCOMP
-readtags_CPPFLAGS += $(REGCOMP_CPPFLAGS)
-dist_readtags_SOURCES += $(REGEX_SRCS) $(REGEX_HEADS)
-endif
 endif
 
 if !HAVE_FNMATCH
 LIB_SRCS += $(FNMATCH_SRCS)
 LIB_HEADS += $(FNMATCH_HEADS)
-endif
-
-if !HAVE_REGCOMP
-LIB_SRCS += $(REGEX_SRCS)
-LIB_HEADS += $(REGEX_HEADS)
 endif
 
 if HAVE_LIBXML
@@ -109,7 +108,7 @@ if HAVE_STRNLEN
 libctags_a_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
 endif
 libctags_a_CPPFLAGS+= $(FNMATCH_CPPFLAGS)
-libctags_a_CPPFLAGS+= $(REGCOMP_CPPFLAGS)
+libctags_a_CPPFLAGS+= $(GNULIB_CPPFLAGS)
 libctags_a_CPPFLAGS+= -DHAVE_REPOINFO_H
 
 libctags_a_CFLAGS   =
@@ -178,6 +177,7 @@ dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)
 ctags_CPPFLAGS = $(libctags_a_CPPFLAGS)
 ctags_CFLAGS = $(libctags_a_CFLAGS)
 ctags_LDADD  = libctags.a
+ctags_LDADD += $(GNULIB_LIBS)
 ctags_LDADD += $(LIBXML_LIBS)
 ctags_LDADD += $(JANSSON_LIBS)
 ctags_LDADD += $(LIBYAML_LIBS)
@@ -200,6 +200,7 @@ endif
 mini_geany_CPPFLAGS = $(libctags_a_CPPFLAGS)
 mini_geany_CFLAGS = $(libctags_a_CFLAGS)
 mini_geany_LDADD  = libctags.a
+mini_geany_LDADD += $(GNULIB_LIBS)
 mini_geany_LDADD += $(LIBXML_LIBS)
 mini_geany_LDADD += $(JANSSON_LIBS)
 mini_geany_LDADD += $(LIBYAML_LIBS)
@@ -212,6 +213,7 @@ optscript_CPPFLAGS = $(libctags_a_CPPFLAGS)
 optscript_CFLAGS = $(libctags_a_CFLAGS)
 optscript_LDADD  = libctags.a
 # TODO: remove these dependencies from optscript command.
+optscript_LDADD += $(GNULIB_LIBS)
 optscript_LDADD += $(LIBXML_LIBS)
 optscript_LDADD += $(JANSSON_LIBS)
 optscript_LDADD += $(LIBYAML_LIBS)
