@@ -81,7 +81,9 @@
 #include <stdlib.h>
 
 #if !defined c11_threads_in_use
-# if HAVE_THREADS_H && USE_POSIX_THREADS_WEAK
+# if HAVE_THREADS_H && USE_POSIX_THREADS_FROM_LIBC
+#  define c11_threads_in_use() 1
+# elif HAVE_THREADS_H && USE_POSIX_THREADS_WEAK
 #  include <threads.h>
 #  pragma weak thrd_exit
 #  define c11_threads_in_use() (thrd_exit != NULL)
