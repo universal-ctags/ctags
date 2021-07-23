@@ -3,14 +3,15 @@
 OBJEXT = o
 include source.mak
 
-GNULIB_HEADS = gnulib/regex.h
+GNULIB_HEADS = gnulib/regex.h gnulib/fnmatch.h
 GNULIB_SRCS =  gnulib/regex.c gnulib/localeconv.c gnulib/nl_langinfo.c gnulib/setlocale_null.c gnulib/malloc/dynarray_resize.c
+GNULIB_SRCS += gnulib/fnmatch.c gnulib/mempcpy.c gnulib/wmempcpy.c
 GNULIB_OBJS = $(GNULIB_SRCS:.c=.$(OBJEXT))
 
 CFLAGS = -Wall -std=gnu99
 COMMON_DEFINES =
 DEFINES = -DWIN32 $(COMMON_DEFINES) -DHAVE_CONFIG_H -DHAVE_PACKCC
-INCLUDES = -I. -Ignulib -Ifnmatch -iquote parsers -iquote main -iquote dsl
+INCLUDES = -I. -Ignulib -iquote parsers -iquote main -iquote dsl
 CC = gcc
 WINDRES = windres
 OPTLIB2C = ./misc/optlib2c
@@ -18,7 +19,6 @@ PACKCC   = ./packcc.exe
 RES_OBJ = win32/ctags.res.o
 EXTRA_OBJS  =
 EXTRA_OBJS += $(GNULIB_OBJS)
-EXTRA_OBJS += $(FNMATCH_OBJS)
 EXTRA_OBJS += $(WIN32_OBJS)
 EXTRA_OBJS += $(PEG_OBJS)
 EXTRA_OBJS += $(RES_OBJ)
@@ -105,7 +105,7 @@ $(PACKCC_OBJS): $(PACKCC_SRCS)
 $(PACKCC): $(PACKCC_OBJS)
 	$(V_CC) $(CC_FOR_PACKCC) $(OPT) -o $@ $^
 
-ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(GNULIB_HEADS) $(FNMATCH_HEADS) $(WIN32_HEADS)
+ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(GNULIB_HEADS) $(WIN32_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_OBJS) $(LIBS)
 
 $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
@@ -124,11 +124,11 @@ optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DS
 
 copy_gnulib_heads:
 	cp win32/config_mingw.h config.h
-	cp win32/gnulib_h/langinfo.h win32/gnulib_h/locale.h win32/gnulib_h/unistd.h gnulib
+	cp win32/gnulib_h/langinfo.h win32/gnulib_h/locale.h win32/gnulib_h/unistd.h win32/gnulib_h/fnmatch.h win32/gnulib_h/string.h win32/gnulib_h/wchar.h gnulib
 
 clean:
 	$(SILENT) echo Cleaning
 	$(SILENT) rm -f ctags.exe readtags.exe optscript.exe $(PACKCC)
 	$(SILENT) rm -f tags
-	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnulib/*.o fnmatch/*.o misc/packcc/*.o peg/*.o extra-cmds/*.o libreadtags/*.o dsl/*.o win32/*.o win32/mkstemp/*.o
-	$(SILENT) rm -f config.h gnulib/langinfo.h gnulib/locale.h gnulib/unistd.h
+	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnulib/*.o misc/packcc/*.o peg/*.o extra-cmds/*.o libreadtags/*.o dsl/*.o win32/*.o win32/mkstemp/*.o
+	$(SILENT) rm -f config.h gnulib/langinfo.h gnulib/locale.h gnulib/unistd.h gnulib/fnmatch.h gnulib/string.h gnulib/wchar.h

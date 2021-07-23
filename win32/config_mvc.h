@@ -1227,3 +1227,9 @@
 
 /* _WIN32 is defined implicitly */
 # include "setlocale_null.h"
+
+/* for fnmatch() */
+#include <sys/types.h>
+#include <wchar.h>
+void *mempcpy (void *dest, const void *src, size_t n);
+wchar_t *wmempcpy (wchar_t *dest, const wchar_t *src, size_t n);

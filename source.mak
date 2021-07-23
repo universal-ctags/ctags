@@ -347,10 +347,6 @@ ALL_SRCS = $(ALL_LIB_SRCS) $(CMDLINE_SRCS)
 ENVIRONMENT_HEADS =
 ENVIRONMENT_SRCS =
 
-FNMATCH_HEADS = fnmatch/fnmatch.h
-FNMATCH_SRCS = fnmatch/fnmatch.c
-FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
-
 WIN32_HEADS = main/e_msoft.h
 WIN32_SRCS = win32/mkstemp/mkstemp.c
 WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
