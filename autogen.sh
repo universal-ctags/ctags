@@ -11,7 +11,10 @@ for t in autoreconf aclocal pkg-config; do
 done
 echo '##################################################################'
 
-set -xe
+set -e	# errexit (exit on error)
+if [ ! -z "${CI}" ]; then
+	set -x	# xtrace (execution trace)
+fi
 
 type autoreconf > /dev/null 2>&1 || {
 	echo "No autotools (autoconf and automake) found" 1>&2
