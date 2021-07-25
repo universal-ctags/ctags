@@ -1,7 +1,5 @@
 #!/bin/sh
 
-tools=""
-
 # Report the paths causing trouble frequently
 echo '##################################################################'
 echo '#                     The paths for tools                        #'
