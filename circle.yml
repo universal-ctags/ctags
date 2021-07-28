@@ -380,77 +380,6 @@ jobs:
            name: Test
            command: |
              test -f out/bin/ctags && ( file out/bin/ctags | grep -q 'ARM aarch64' )
-   centos6:
-     working_directory: ~/universal-ctags
-     docker:
-       - image: centos:6.10
-     steps:
-       - run:
-           name: Rearrange CentOS-Base.repo file
-           command: |
-             sed -i 's|#baseurl=|baseurl=|g'       /etc/yum.repos.d/CentOS-Base.repo
-             sed -i 's|mirrorlist=|#mirrorlist=|g' /etc/yum.repos.d/CentOS-Base.repo
-             sed -i 's|mirror|vault|g'             /etc/yum.repos.d/CentOS-Base.repo
-             sed -i 's|http:|https:|g'             /etc/yum.repos.d/CentOS-Base.repo
-       - run:
-           name: Install tools for building
-           command: |
-             yum install -y git gcc make autoconf automake pkgconfig xz
-             curl -LO https://github.com/leleliu008/python-prebuild/releases/download/3.9.5/python-3.9.5-x86_64-linux-glibc.tar.xz
-             tar xf python-3.9.5-x86_64-linux-glibc.tar.xz -C /opt
-             echo 'export PATH=/opt/python-3.9.5-x86_64-linux-glibc/bin:$PATH' >> $BASH_ENV
-       - run:
-           name: Get the source code of u-ctags
-           command: |
-             git clone https://github.com/universal-ctags/ctags
-       - run:
-           name: Build
-           command: |
-             cd ctags
-             bash ./autogen.sh
-             ./configure --enable-debugging
-             make -j 2
-       - run:
-           name: Test
-           command: |
-             cd ctags
-             make check CIRCLECI=1
-
-   centos6_roundtrip:
-     working_directory: ~/universal-ctags
-     docker:
-       - image: centos:6.10
-     steps:
-       - run:
-           name: Rearrange CentOS-Base.repo file
-           command: |
-             sed -i 's|#baseurl=|baseurl=|g'       /etc/yum.repos.d/CentOS-Base.repo
-             sed -i 's|mirrorlist=|#mirrorlist=|g' /etc/yum.repos.d/CentOS-Base.repo
-             sed -i 's|mirror|vault|g'             /etc/yum.repos.d/CentOS-Base.repo
-             sed -i 's|http:|https:|g'             /etc/yum.repos.d/CentOS-Base.repo
-       - run:
-           name: Install tools for building
-           command: |
-             yum install -y git gcc make autoconf automake pkgconfig xz
-             curl -LO https://github.com/leleliu008/python-prebuild/releases/download/3.9.5/python-3.9.5-x86_64-linux-glibc.tar.xz
-             tar xf python-3.9.5-x86_64-linux-glibc.tar.xz -C /opt
-             echo 'export PATH=/opt/python-3.9.5-x86_64-linux-glibc/bin:$PATH' >> $BASH_ENV
-       - run:
-           name: Get the source code of u-ctags
-           command: |
-             git clone https://github.com/universal-ctags/ctags
-       - run:
-           name: Build
-           command: |
-             cd ctags
-             bash ./autogen.sh
-             ./configure --enable-debugging
-             make -j 2
-       - run:
-           name: Test
-           command: |
-             cd ctags
-             make roundtrip CIRCLECI=1
 
    THIS_WILL_BE_FAILED_fedora34_CANARY:
      working_directory: ~/universal-ctags
@@ -479,11 +408,9 @@ workflows:
       - fedora33_gmake
       - fedora33_cross_aarch64
       - centos7_make
-      - centos6
       - ubuntu20_mingw
       - centos_make_roundtrip
       - fedora30_bmake_roundtrip
       - fedora33_gmake_roundtrip
       - centos7_make_roundtrip
-      - centos6_roundtrip
       # - THIS_WILL_BE_FAILED_fedora34_CANARY
