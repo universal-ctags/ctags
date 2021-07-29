@@ -51,6 +51,6 @@ jobs:
           ./ctags --list-features
         )
     - name: make check
-      run: make -C $BUILDDIR check GITHUBACTIONS=1
+      run: make -C $BUILDDIR check
     - name: make roundtrip
-      run: make -C $BUILDDIR roundtrip GITHUBACTIONS=1
+      run: make -C $BUILDDIR roundtrip

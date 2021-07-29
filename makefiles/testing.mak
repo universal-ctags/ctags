@@ -103,7 +103,7 @@ units: $(CTAGS_TEST)
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
-	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI)$(GITHUBACTIONS) = x; then	\
+	if ! test x$(CI) = x; then	\
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
 	builddir=$$(pwd); \
@@ -136,7 +136,6 @@ units: $(CTAGS_TEST)
 		--with-timeout=`expr $(TIMEOUT) '*' 10`\
 		$${SHELL_OPT} \
 		$${SHOW_DIFF_OUTPUT}"; \
-	 TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) CIRCLECI=$(CIRCLECI) GITHUBACTIONS=$(GITHUBACTIONS)\
 		 $${PROG} $${c} $(srcdir)/Units $${builddir}/Units
 
 clean-units:
@@ -158,7 +157,6 @@ validate-input:
 		VALIDATORS="--validators=$(VALIDATORS)"; \
 	fi; \
 	c="$(srcdir)/misc/units validate-input $${VALIDATORS}"; \
-	TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) CIRCLECI=$(CIRCLECI) GITHUBACTIONS=$(GITHUBACTIONS)\
 		$(SHELL) $${c} $(srcdir)/Units $(srcdir)/misc/validators
 #
 # Test main part, not parsers
@@ -169,7 +167,7 @@ tmain: $(CTAGS_TEST) $(READTAGS_TEST) $(OPTSCRIPT_TEST)
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
-	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI)$(GITHUBACTIONS) = x; then	\
+	if ! test x$(CI) = x; then	\
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
 	builddir=$$(pwd); \
@@ -198,7 +196,6 @@ tmain: $(CTAGS_TEST) $(READTAGS_TEST) $(OPTSCRIPT_TEST)
 		$${VALGRIND} \
 		$${SHELL_OPT} \
 		$${SHOW_DIFF_OUTPUT}"; \
-	TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) CIRCLECI=$(CIRCLECI) GITHUBACTIONS=$(GITHUBACTIONS)\
 		$${PROG} $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
 clean-tmain:
@@ -243,7 +240,7 @@ tinst:
 if USE_READCMD
 roundtrip: $(READTAGS_TEST)
 	$(V_RUN) \
-	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI)$(GITHUBACTIONS) = x; then	\
+	if ! test x$(CI) = x; then	\
 		ROUNDTRIP_FLAGS=--minitrip;			\
 	fi;							\
 	builddir=$$(pwd); \
