@@ -31,5 +31,5 @@ jobs:
           run make install
           run file ctags
           run ctags --version
-          run make check GITHUBACTIONS=1
-          run make roundtrip GITHUBACTIONS=1
+          run make check
+          run make roundtrip

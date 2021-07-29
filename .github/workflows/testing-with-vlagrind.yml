@@ -26,4 +26,4 @@ jobs:
     - name: make
       run: make CFLAGS='-g -O0'
     - name: make units
-      run: make units VG=1 GITHUBACTIONS=1
+      run: make units VG=1

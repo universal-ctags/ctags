@@ -163,7 +163,7 @@ if "%normalbuild%-%ARCH%"=="yes-x64" (
   @echo Tests for msys2 x64 are skipped.
   exit 0
 )
-bash -lc "make check APPVEYOR=1 PYTHON=py"
+bash -lc "make check PYTHON=py"
 
 @echo off
 goto :eof
@@ -256,7 +256,7 @@ c:\cygwin64\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 :: Run tests
-bash -lc "make check APPVEYOR=1 PYTHON=py"
+bash -lc "make check PYTHON=py"
 
 @echo off
 goto :eof
