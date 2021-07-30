@@ -33,9 +33,29 @@ thus easily become a built-in parser. See ":ref:`optlib2c`" for details.
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Universal Ctags currently uses the same regex engine as Exuberant Ctags:
-the POSIX.2 regex engine in GNU glibc-2.10.1. By default it uses the Extended
-Regular Expressions (ERE) syntax, as used by most engines today; however it does
+Universal Ctags currently uses `the POSIX.1 Extended Regular Expressions (ERE)
+<https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html>`_
+syntax as same as Exuberant Ctags.
+
+During building Universal Ctags the ``configure`` script runs compatibility
+tests of the regex engine in the system library.  If tests pass the engine is
+used, otherwise the regex engine imported from `the GNU Gnulib library
+<https://www.gnu.org/software/gnulib/manual/gnulib.html#Regular-expressions>`_
+is used. In the latter case, ``ctags --list-features`` will contain
+``gnulib_regex``.
+
+See ``regex(7)`` or `the GNU Gnulib Manual
+<https://www.gnu.org/software/gnulib/manual/gnulib.html#Regular-expressions>`_
+for the details of the regular expression syntax.
+
+.. note::
+
+	The GNU regex engine supports some GNU extensions described `here
+	<https://www.gnu.org/software/gnulib/manual/gnulib.html#posix_002dextended-regular-expression-syntax>`_.
+	Note that an optlib parser using the extensions may not work with Universal
+	Ctags on some other systems.
+
+The POSIX.1 Extended Regular Expressions (ERE) does
 *not* support many of the "modern" extensions such as lazy captures,
 non-capturing grouping, atomic grouping, possessive quantifiers, look-ahead/behind,
 etc. It is also notoriously slow when backtracking, and has some known "quirks"
