@@ -4,7 +4,7 @@
 echo '##################################################################'
 echo '#                     The paths for tools                        #'
 echo '##################################################################'
-for t in autoreconf aclocal pkg-config; do
+for t in autoreconf aclocal pkg-config autoconf automake; do
 	type $t
 done
 echo '##################################################################'
