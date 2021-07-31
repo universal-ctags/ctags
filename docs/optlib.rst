@@ -60,21 +60,17 @@ The POSIX Extended Regular Expressions (ERE) does
 non-capturing grouping, atomic grouping, possessive quantifiers, look-ahead/behind,
 etc. It may be notoriously slow when backtracking.
 
-And it may also have some known "quirks"
-with respect to escaping special characters in bracket expressions.
-For example, a pattern of ``[^\]]+`` is invalid in POSIX ERE, because the '``]``' is
-*not* special inside a bracket expression, and thus should **not** be escaped.
-Most regex engines ignore this subtle detail in POSIX ERE, and instead allow
-escaping it with '``\]``' inside the bracket expression and treat it as the
-literal character '``]``'. GNU glibc, however, does not generate an error but
-instead considers it undefined behavior, and in fact it will match very odd
-things. Instead you **must** use the more unintuitive ``[^]]+`` syntax. The same
-is technically true of other special characters inside a bracket expression,
-such as ``[^\)]+``, which should instead be ``[^)]+``. The ``[^\)]+`` will
-appear to work usually, but only because what it is really doing is matching any
-character but '``\``' *or* '``)``'. The only exceptions for using '``\``' inside a
-bracket expression are for '``\t``' and '``\n``', which ctags converts to their
-single literal character control codes before passing the pattern to glibc.
+A common error is forgetting that a
+POSIX ERE engine is always *greedy*; the '``*``' and '``+``' quantifiers match
+as much as possible, before backtracking from the end of their match.
+
+For example this pattern::
+
+	foo.*bar
+
+Will match this entire string, not just the first part::
+
+	foobar, bar, and even more bar
 
 Another detail to keep in mind is how the regex engine treats newlines.
 Universal Ctags compiles the regular expressions in the ``--regex-<LANG>`` and
@@ -92,20 +88,25 @@ for ``--regex-<LANG>``, and **never use them** in non-matching bracket expressio
 for ``--mline-regex-<LANG>`` patterns. For the experimental ``--_mtable-regex-<LANG>``
 you can safely use '``\n``' because that regex is not compiled with ``REG_NEWLINE``.
 
+And it may also have some known "quirks"
+with respect to escaping special characters in bracket expressions.
+For example, a pattern of ``[^\]]+`` is invalid in POSIX ERE, because the '``]``' is
+*not* special inside a bracket expression, and thus should **not** be escaped.
+Most regex engines ignore this subtle detail in POSIX ERE, and instead allow
+escaping it with '``\]``' inside the bracket expression and treat it as the
+literal character '``]``'. GNU glibc, however, does not generate an error but
+instead considers it undefined behavior, and in fact it will match very odd
+things. Instead you **must** use the more unintuitive ``[^]]+`` syntax. The same
+is technically true of other special characters inside a bracket expression,
+such as ``[^\)]+``, which should instead be ``[^)]+``. The ``[^\)]+`` will
+appear to work usually, but only because what it is really doing is matching any
+character but '``\``' *or* '``)``'. The only exceptions for using '``\``' inside a
+bracket expression are for '``\t``' and '``\n``', which ctags converts to their
+single literal character control codes before passing the pattern to glibc.
+
 You should always test your regex patterns against test files with strings that
 do and do not match. Pay particular emphasis to when it should *not* match, and
-how *much* it matches when it should. A common error is forgetting that a
-POSIX ERE engine is always *greedy*; the '``*``' and '``+``' quantifiers match
-as much as possible, before backtracking from the end of their match.
-
-For example this pattern::
-
-	foo.*bar
-
-Will match this entire string, not just the first part::
-
-	foobar, bar, and even more bar
-
+how *much* it matches when it should.
 
 Regex option argument flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
