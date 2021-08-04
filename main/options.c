@@ -554,7 +554,9 @@ static struct Feature {
 	/* Following two features are always available on universal ctags */
 	{"wildcards", "can use glob matching"},
 	{"regex", "can use regular expression based pattern matching"},
-
+#ifdef USE_GNULIB_FNMATCH
+	{"gnulib_fnmatch", "linked with the Gnulib fnmatch library"},
+#endif
 /* https://lists.gnu.org/archive/html/bug-gnulib/2011-07/msg00435.html */
 #ifdef _REGEX_INCLUDE_LIMITS_H
 	{"gnulib_regex", "linked with the Gnulib regular expression library"},

@@ -548,6 +548,9 @@
    define this label to the directory desired. */
 #define TMPDIR "/tmp"
 
+/* Define to 1 when using fnmatch implementation in bundled gnulib. */
+#define USE_GNULIB_FNMATCH
+
 /* Define if the combination of the ISO C and POSIX multithreading APIs can be
    used. */
 /* #undef USE_ISOC_AND_POSIX_THREADS */
