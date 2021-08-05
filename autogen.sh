@@ -11,6 +11,8 @@ for t in autoreconf aclocal pkg-config autoconf automake; do
 	fi
 	echo '##################################################################'
 done
+
+echo '#                        Generating files                        #'
 echo '##################################################################'
 
 set -e	# errexit (exit on error)
