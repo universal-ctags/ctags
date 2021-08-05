@@ -362,11 +362,7 @@ How to add a new man page for your parser
 4. add ``ctags-lang-LANGUAGE(7)`` to (toctree of) ``docs/man-pages.rst``.
 5. do ``git add`` for
     * ``man/ctags-lang-LANGUAGE.7.rst.in``
-    * ``configure.ac``
-    * ``Makefile.am``
-    * ``man/Makefile``
     * ``docs/man/ctags-lang-LANGUAGE.7.rst``
-    * ``docs/man-pages.rst``
 6. git commit with a log header: "``docs(man): add a man page for LANGUAGE``".
 7. make a pull request
 
