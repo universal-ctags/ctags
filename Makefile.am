@@ -5,7 +5,7 @@ GNULIB_CPPFLAGS = -I$(top_builddir)/$(GNULIB_DIR) -I$(top_srcdir)/$(GNULIB_DIR)
 GNULIB_LIBS = $(GNULIB_DIR)/libgnu.a $(LIBPTHREAD)
 $(GNULIB_DIR)/libgnu.a:
 	$(MAKE) -C $(GNULIB_DIR) libgnu.a
-SUBDIRS = $(GNULIB_DIR)
+SUBDIRS = $(GNULIB_DIR) . man
 
 include $(top_srcdir)/source.mak
 
@@ -33,7 +33,6 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/ctags_vs2013.sln \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/gen-repoinfo.bat \
-	       man/Makefile man/README man/tags.5.rst \
 	       makefiles/list-txt2cstr-input.mak misc/txt2cstr \
 	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(TXT2CSTR_INPUT) \
 	       docs Tmain Units m4/gnulib-cache.m4
@@ -236,38 +235,3 @@ dist-hook:
 include $(top_srcdir)/makefiles/testing.mak
 
 include $(top_srcdir)/makefiles/help.mak
-
-if HAVE_RST2MAN
-# TODO: the list of man pages should be shared with man/Makefile.
-man_MANS = \
-	man/ctags.1 \
-	man/readtags.1 \
-	\
-	man/tags.5 \
-	\
-	man/ctags-client-tools.7 \
-	man/ctags-incompatibilities.7 \
-	man/ctags-optlib.7 \
-	man/ctags-faq.7 \
-	\
-	man/ctags-lang-iPythonCell.7 \
-	man/ctags-lang-julia.7 \
-	man/ctags-lang-python.7 \
-	man/ctags-lang-verilog.7 \
-	man/ctags-lang-inko.7 \
-	man/ctags-lang-r.7 \
-	man/ctags-lang-sql.7 \
-	\
-	$(NULL)
-rst2man_verbose = $(rst2man_verbose_@AM_V@)
-rst2man_verbose_ = $(rst2man_verbose_@AM_DEFAULT_V@)
-rst2man_verbose_0 = @echo RST2MAN "   $@";
-SUFFIXES += .1.rst .1 .5.rst .5 .7.rst .7
-.1.rst.1:
-	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@
-.5.rst.5:
-	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@
-.7.rst.7:
-	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@
-CLEANFILES += $(man_MANS)
-endif

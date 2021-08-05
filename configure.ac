@@ -365,6 +365,7 @@ if ! test "x$RST2MAN" = "xno"; then
    AC_MSG_RESULT($RST2MAN_SUPPORTING_SYNTAX_HIGHLIGHT_OPTION)
 fi
 AC_SUBST(RST2MAN_OPTIONS)
+AM_CONDITIONAL([HAS_GNU_SED], [sed --version 2>/dev/null | grep -q GNU])
 
 # Checks for operating environment
 # --------------------------------
@@ -783,21 +784,7 @@ fi
 
 AC_CHECK_FUNCS(mblen)
 
-AC_CONFIG_FILES([Makefile gnulib/Makefile
-		 man/ctags.1.rst
-		 man/ctags-client-tools.7.rst
-		 man/ctags-incompatibilities.7.rst
-		 man/ctags-optlib.7.rst
-		 man/ctags-faq.7.rst
-		 man/ctags-lang-iPythonCell.7.rst
-		 man/ctags-lang-julia.7.rst
-		 man/ctags-lang-python.7.rst
-		 man/ctags-lang-verilog.7.rst
-		 man/ctags-lang-inko.7.rst
-		 man/ctags-lang-r.7.rst
-		 man/ctags-lang-sql.7.rst
-		 man/readtags.1.rst
-		 ])
+AC_CONFIG_FILES([Makefile gnulib/Makefile man/Makefile])
 
 AC_OUTPUT
 

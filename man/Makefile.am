@@ -1,8 +1,6 @@
 #
-# This is a stand-alone Makefile for Universal-ctags maintainers.
+# This is a Makefile.am read by the Autotools.
 # GNU Make is needed.
-#
-# This doesn't work with Makefile.am at the top of source tree.
 #
 #	Copyright (c) 2017, Masatake YAMMATO
 #	Copyright (c) 2017, Red Hat, Inc.
@@ -31,48 +29,49 @@ RST2MAN_FLAGS = $(shell if $(RST2MAN) --help | grep -q -e --syntax-highlight; th
 RST2HTML_FLAGS =
 RST2PDF_FLAGS =
 
-# To avoid running configure for quick previewing do:
-#
-# $ make QUICK=1
-#
-QUICK    =
-CONFIGURE_FLAGS =
+SUFFIXES = .rst .html .pdf .in
 
-
-.SUFFIXES: .rst .html .pdf .in
-
-IN_SOURCE_FILES = \
-	ctags.1.rst.in \
-	ctags-optlib.7.rst.in \
-	ctags-incompatibilities.7.rst.in \
-	ctags-client-tools.7.rst.in \
-	ctags-faq.7.rst.in \
+# The man_MANS or dist_man_MANS requires conventional file names for man files.
+# For example `$(basename $(files))` is not accepted.
+GEN_IN_MAN_FILES = \
+	ctags.1 \
+	ctags-optlib.7 \
+	ctags-incompatibilities.7 \
+	ctags-client-tools.7 \
+	ctags-faq.7 \
 	\
-	ctags-lang-iPythonCell.7.rst.in \
-	ctags-lang-julia.7.rst.in \
-	ctags-lang-python.7.rst.in \
-	ctags-lang-verilog.7.rst.in \
-	ctags-lang-inko.7.rst.in \
-	ctags-lang-r.7.rst.in \
-	ctags-lang-sql.7.rst.in \
+	ctags-lang-iPythonCell.7 \
+	ctags-lang-julia.7 \
+	ctags-lang-python.7 \
+	ctags-lang-verilog.7 \
+	ctags-lang-inko.7 \
+	ctags-lang-r.7 \
+	ctags-lang-sql.7 \
 	\
-	readtags.1.rst.in \
+	readtags.1 \
 	\
 	$(NULL)
 
-SOURCE_FILES = \
-	tags.5.rst \
+GEN_MAN_FILES = \
+	tags.5 \
 	\
 	$(NULL)
 
-gen_rst_files = $(basename $(IN_SOURCE_FILES))
-rst_files  = $(gen_rst_files) $(SOURCE_FILES)
-man_pages  = $(basename $(rst_files))
+man_pages  = $(GEN_IN_MAN_FILES) $(GEN_MAN_FILES)
+rst_files  = $(addsuffix .rst,$(man_pages))
 html_pages = $(addsuffix .html,$(man_pages))
 pdf_pages  = $(addsuffix .pdf,$(man_pages))
 doc_files  = $(addprefix ../docs/man/,$(rst_files))
 
-all: man html pdf
+# for automake
+# generate man pages only when rst2man is installed
+if HAVE_RST2MAN
+man_MANS = $(man_pages)
+endif
+EXTRA_DIST = README $(addsuffix .rst.in,$(GEN_IN_MAN_FILES)) $(addsuffix .rst,$(GEN_MAN_FILES))
+CLEANFILES = $(man_pages) $(addsuffix .rst,$(GEN_IN_MAN_FILES)) $(html_pages) $(pdf_pages)
+
+.PHONY: man html pdf update-docs
 
 man: $(man_pages)
 html: $(html_pages)
@@ -92,8 +91,7 @@ cites := ${subst .,(,${addsuffix ),${man_pages}}}
 # ctags(1) tags(5) ...
 # => -e 's/\<ctags(1)/:ref:`& <&>`/g' -e 's/\<ctags(5)/:ref:`& <&>`/g' ...
 #
-is_gnu_sed := $(shell sed --version 2>/dev/null | grep -q GNU && echo 1)
-ifeq ($(is_gnu_sed),1)
+if HAS_GNU_SED
 reppat := $(foreach m,$(cites),-e 's/\<$(m)/:ref:`& <&>`/g')
 else
 reppat := $(foreach m,$(cites),-e 's/[[:<:]]$(m)/:ref:`& <&>`/g')
@@ -104,19 +102,17 @@ update-docs: $(doc_files)
 # Delete the line "------" in the first 10 lines of ../docs/man/*.rst to
 # suppress unnecessary section indices.
 ../docs/man/%.rst: %.rst
+	$(MKDIR_P) ../docs/man
 	sed $(reppat) -e '1,10s/^-*$$//' < $< > $@
 
+# use `[@]` not to be replaced by automake
 %.rst: %.rst.in
-ifeq ($(QUICK),)
-	(cd ..; ./configure $(CONFIGURE_FLAGS))
-else
 	version=`sed -n -e 's/AC_INIT(.*, *\[\(.*\)\])/\1/p' ../configure.ac`; \
 	sed \
-		-e s/@CTAGS_NAME_EXECUTABLE@/ctags/g \
-		-e s/@ETAGS_NAME_EXECUTABLE@/etags/g \
-		-e s/@VERSION@/$$version/g \
+		-e s/[@]CTAGS_NAME_EXECUTABLE[@]/ctags/g \
+		-e s/[@]ETAGS_NAME_EXECUTABLE[@]/etags/g \
+		-e s/[@]VERSION[@]/$$version/g \
 	< $< > $@
-endif
 
 %: %.rst
 	$(RST2MAN) $(RST2MAN_FLAGS) $< > $@
@@ -124,6 +120,3 @@ endif
 	$(RST2HTML) $(RST2HTML_FLAGS) $< > $@
 %.pdf: %.rst
 	$(RST2PDF) $(RST2PDF_FLAGS) $< -o $@
-
-clean:
-	rm -f $(gen_rst_files) $(man_pages) $(html_pages) $(pdf_pages)

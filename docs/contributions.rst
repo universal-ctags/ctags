@@ -357,20 +357,22 @@ How to add a new man page for your parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. write what the users of your parser may want to (or should) know to ``man/ctags-lang-LANGUAGE.7.rst.in``
-2. add ``man/ctags-lang-LANGUAGE.7.rst`` to the list of ``AC_CONFIG_FILES`` in ``configure.ac``.
-3. add ``man/ctags-lang-LANGUAGE.7`` to ``man_MANS`` of ``Makefile.am``.
-4. add ``man/ctags-lang-LANGUAGE.7.rst.in`` to ``IN_SOURCE_FILES`` of ``man/Makefile``.
-5. run ``cd man; make QUICK=1 update-docs``. This step generates the rst file at ``docs/man/ctags-lang-LANGUAGE.7.rst``.
-6. add ``ctags-lang-LANGUAGE(7)`` to (toctree of) ``docs/man-pages.rst``.
-7. do ``git add`` for
+2. add ``man/ctags-lang-LANGUAGE.7`` to ``GEN_IN_MAN_FILES`` of ``man/Makefile.am``.
+3. run ``make -C man update-docs``. This step generates the rst file at ``docs/man/ctags-lang-LANGUAGE.7.rst``.
+4. add ``ctags-lang-LANGUAGE(7)`` to (toctree of) ``docs/man-pages.rst``.
+5. do ``git add`` for
     * ``man/ctags-lang-LANGUAGE.7.rst.in``
     * ``configure.ac``
     * ``Makefile.am``
     * ``man/Makefile``
     * ``docs/man/ctags-lang-LANGUAGE.7.rst``
     * ``docs/man-pages.rst``
-8. git commit with a log header: "``docs(man): add a man page for LANGUAGE``".
-9. make a pull request
+6. git commit with a log header: "``docs(man): add a man page for LANGUAGE``".
+7. make a pull request
+
+.. TODO: Why do we have to git add ``docs/man/ctags-lang-LANGUAGE.7.rst``?
+	A system which uses it has Sphinx. It should be able to generate
+	``docs/man/ctags-lang-LANGUAGE.7.rst``.
 
 Committing and submitting a pull request
 ---------------------------------------------------------------------
