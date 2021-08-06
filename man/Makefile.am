@@ -10,22 +10,8 @@
 #	later version.
 #
 
-# rst2man and rst2html are part of python-docutils, and if not found
-# 	can be installed using pip ("pip install docutils"). On some
-#	systems, rst2man and rst2html are actually installed as rst2man.py
-#	and rst2html.py - create a symlink of that's the case.
-#
-# rst2pdf is a separate tool and can also be installed via pip (e.g.,
-# 	"pip install rst2pdf")
-RST2MAN  = $(shell command -v rst2man  || command -v rst2man.py  || command -v rst2man-3  || command -v rst2man-3.6  || command -v rst2man-3.7  || command -v rst2man-3.8  || command -v rst2man-3.9  || echo rst2man)
-RST2HTML = $(shell command -v rst2html || command -v rst2html.py || command -v rst2html-3 || command -v rst2html-3.6 || command -v rst2html-3.7 || command -v rst2html-3.8 || command -v rst2html-3.9 || echo rst2html)
-RST2PDF  = rst2pdf
-
-# rst2man had a bug about code-block:: handling.
-# https://sourceforge.net/p/docutils/patches/141
-RST2MAN_FLAGS = $(shell if $(RST2MAN) --help | grep -q -e --syntax-highlight; then \
-				echo --syntax-highlight=none; \
-			fi)
+# Note: RST2MAN, RST2HTML, RST2PDF, and RST2MAN_OPTIONS are defined by configure.ac
+RST2MAN_FLAGS = $(RST2MAN_OPTIONS)
 RST2HTML_FLAGS =
 RST2PDF_FLAGS =
 
@@ -107,16 +93,29 @@ update-docs: $(doc_files)
 
 # use `[@]` not to be replaced by automake
 %.rst: %.rst.in
-	version=`sed -n -e 's/AC_INIT(.*, *\[\(.*\)\])/\1/p' ../configure.ac`; \
 	sed \
 		-e s/[@]CTAGS_NAME_EXECUTABLE[@]/ctags/g \
 		-e s/[@]ETAGS_NAME_EXECUTABLE[@]/etags/g \
-		-e s/[@]VERSION[@]/$$version/g \
+		-e s/[@]VERSION[@]/$(VERSION)/g \
 	< $< > $@
 
 %: %.rst
+if HAVE_RST2MAN
 	$(RST2MAN) $(RST2MAN_FLAGS) $< > $@
+else
+	$(error Cannot make $@: rst2man is not installed)
+endif
+
 %.html: %.rst
+if HAVE_RST2HTML
 	$(RST2HTML) $(RST2HTML_FLAGS) $< > $@
+else
+	$(error Cannot make $@: rst2html is not installed)
+endif
+
 %.pdf: %.rst
+if HAVE_RST2PDF
 	$(RST2PDF) $(RST2PDF_FLAGS) $< -o $@
+else
+	$(error Cannot make $@: rst2pdf is not installed)
+endif
