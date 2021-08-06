@@ -548,6 +548,9 @@
    define this label to the directory desired. */
 #define TMPDIR "/tmp"
 
+/* Define to 1 when using fnmatch implementation in bundled gnulib. */
+#define USE_GNULIB_FNMATCH
+
 /* Define if the combination of the ISO C and POSIX multithreading APIs can be
    used. */
 /* #undef USE_ISOC_AND_POSIX_THREADS */
@@ -1227,3 +1230,9 @@
 
 /* _WIN32 is defined implicitly */
 # include "setlocale_null.h"
+
+/* for fnmatch() */
+#include <sys/types.h>
+#include <wchar.h>
+void *mempcpy (void *dest, const void *src, size_t n);
+wchar_t *wmempcpy (wchar_t *dest, const wchar_t *src, size_t n);

@@ -22,9 +22,6 @@
     <Filter Include="Source Files\Parsers\cxx">
       <UniqueIdentifier>{f9b4c892-3488-4eac-9ab2-b69086a06c43}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\fnmatch">
-      <UniqueIdentifier>{748be28c-6285-41a4-b8cc-670c3d3ef67d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\win32">
       <UniqueIdentifier>{492b86f3-82b5-455e-89cb-b4213f937614}</UniqueIdentifier>
     </Filter>
@@ -48,10 +45,13 @@
     <ClCompile Include="..\dsl\optscript.c">
       <Filter>Source Files\dsl</Filter>
     </ClCompile>
-    <ClCompile Include="..\fnmatch\fnmatch.c">
-      <Filter>Source Files\fnmatch</Filter>
+    <ClCompile Include="..\gnulib\fnmatch.c">
+      <Filter>Source Files\gnulib</Filter>
     </ClCompile>
     <ClCompile Include="..\gnulib\regex.c">
+      <Filter>Source Files\gnulib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gnulib\mempcpy.c">
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
     <ClCompile Include="..\gnulib\nl_langinfo.c">
@@ -61,6 +61,9 @@
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
     <ClCompile Include="..\gnulib\malloc\dynarray_resize.c">
+      <Filter>Source Files\gnulib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gnulib\wmempcpy.c">
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
     <ClCompile Include="..\main\args.c">
@@ -599,7 +602,7 @@
     <ClInclude Include="..\dsl/optscript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\fnmatch\fnmatch.h">
+    <ClInclude Include="..\gnulib\fnmatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gnulib\regex.h">

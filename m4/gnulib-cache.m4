@@ -38,11 +38,13 @@
 #  --no-libtool \
 #  --macro-prefix=gl \
 #  --no-vc-files \
+#  fnmatch \
 #  regex
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
 gl_MODULES([
+  fnmatch
   regex
 ])
 gl_AVOID([])

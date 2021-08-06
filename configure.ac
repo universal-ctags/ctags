@@ -104,7 +104,8 @@ AH_TEMPLATE([MSDOS_STYLE_PATH],
 	[Define to 1 if your system uses MS-DOS style path.])
 AH_TEMPLATE([ENABLE_GCOV],
 	[Define to 1 if gcov is instrumented.])
-
+AH_TEMPLATE([USE_GNULIB_FNMATCH],
+	[Define to 1 when using fnmatch implementation in bundled gnulib.])
 
 # Define convenience macros
 # -------------------------
@@ -536,16 +537,9 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 #   header files or functions.
 gl_INIT
 
-# Checks for library functions
-# ----------------------------
-AC_CHECK_FUNCS(fnmatch,[have_fnmatch=yes],[
-AC_LIBOBJ([fnmatch])
-FNMATCH_CPPFLAGS="-I${srcdir}/fnmatch"
-AC_DEFINE(HAVE_FNMATCH)
-have_fnmatch=no])
-AC_SUBST([FNMATCH_CPPFLAGS])
-AC_CHECK_HEADERS(fnmatch.h)
-AM_CONDITIONAL([HAVE_FNMATCH], [test "x$have_fnmatch" = "xyes"])
+if test "$REPLACE_FNMATCH" != 0; then
+	AC_DEFINE([USE_GNULIB_FNMATCH])
+fi
 
 AC_CHECK_FUNCS(asprintf)
 AC_CHECK_FUNCS(strstr)
