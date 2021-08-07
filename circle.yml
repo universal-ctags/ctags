@@ -159,6 +159,10 @@ jobs:
                 exit 0
              fi
        - run:
+           name: Run configure
+           command: |
+             ./configure
+       - run:
            name: verify man pages in docs directory are updated
            command: |
              make -B -C man QUICK=1 update-docs
@@ -169,10 +173,6 @@ jobs:
              else
                 exit 0
              fi
-       - run:
-           name: Run configure
-           command: |
-             ./configure
        - run:
            name: Test
            command: |
