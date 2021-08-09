@@ -1985,8 +1985,8 @@ tmain_compare()
     msg=$(printf '%-60s' "${aspect}")
     generated=${build_subdir}/${aspect}-diff.txt
     if diff -U 0 --strip-trailing-cr \
-	    ${build_subdir}/${aspect}-actual.txt \
 	    ${subdir}/${aspect}-expected.txt \
+	    ${build_subdir}/${aspect}-actual.txt \
 	    > ${generated} 2>&1; then
 	run_result ok "${msg}" '/dev/null'
 	rm ${generated}

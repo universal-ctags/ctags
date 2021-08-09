@@ -1025,7 +1025,7 @@ def tmain_compare(subdir, build_subdir, aspect, file):
         with open(generated, 'wb') as f:
             subprocess.run(['diff', '-U',
                 str(DIFF_U_NUM), '--strip-trailing-cr',
-                actual, expected],
+                expected, actual],
                 stdout=f, stderr=subprocess.STDOUT)
         run_result('error', msg, None, 'diff: ' + generated, file=file)
         return False
