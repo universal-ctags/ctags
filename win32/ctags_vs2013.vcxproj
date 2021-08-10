@@ -417,10 +417,10 @@
     <ClInclude Include="..\main\read_p.h" />
     <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\routines_p.h" />
-    <ClInclude Include="..\main\script.h" />
+    <ClInclude Include="..\main\script_p.h" />
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort_p.h" />
-    <ClInclude Include="..\main\stat_p.h" />
+    <ClInclude Include="..\main\stats_p.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\subparser.h" />
     <ClInclude Include="..\main\subparser_p.h" />
@@ -449,6 +449,7 @@
     <ClInclude Include="..\parsers\m4.h" />
     <ClInclude Include="..\parsers\make.h" />
     <ClInclude Include="..\parsers\perl.h" />
+    <ClInclude Include="..\parsers\r.h" />
     <ClInclude Include="..\parsers\tcl.h" />
     <ClInclude Include="..\parsers\tex.h" />
     <ClInclude Include="resource.h" />

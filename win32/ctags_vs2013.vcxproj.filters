@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -49,7 +49,7 @@
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
     <ClCompile Include="..\gnulib\malloc\dynarray_resize.c">
-      <Filter>Source Files\gnulib</Filter>
+      <Filter>Source Files\gnulib\malloc</Filter>
     </ClCompile>
     <ClCompile Include="..\gnulib\mempcpy.c">
       <Filter>Source Files\gnulib</Filter>
@@ -596,7 +596,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\dsl\dsl.h">
+    <ClInclude Include="..\dsl\es.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\dsl\optscript.h">
@@ -764,7 +764,7 @@
     <ClInclude Include="..\main\sort_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\stat_p.h">
+    <ClInclude Include="..\main\stats_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\strlist.h">
@@ -849,6 +849,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\perl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parsers\r.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\tcl.h">
