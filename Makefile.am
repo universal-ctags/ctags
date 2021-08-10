@@ -39,6 +39,7 @@ EXTRA_DIST   = README.md autogen.sh \
 
 CLEANFILES =
 MOSTLYCLEANFILES =
+MAINTAINERCLEANFILES = autom4te.cache
 
 # for distcheck
 clean-local:

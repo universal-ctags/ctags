@@ -1,12 +1,15 @@
 # -*- makefile -*-
-.PHONY: check units fuzz noise tmain tinst tlib clean-units clean-tlib clean-tmain clean-gcov run-gcov codecheck cppcheck dicts validate-input check-genfile
+.PHONY: check units fuzz noise tmain tinst tlib man-test clean-units clean-tlib clean-tmain clean-gcov clean-man-test run-gcov codecheck cppcheck dicts validate-input check-genfile
 
 EXTRA_DIST += misc/units misc/units.py misc/man-test.py
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
+MAN_TEST_TMPDIR = ManTest
 
 check: tmain units tlib man-test check-genfile
 
-clean-local: clean-units clean-tmain
+# We may use CLEANFILES, DISTCLEANFILES, or etc.
+# clean-tlib and clean-gcov are not included
+clean-local: clean-units clean-tmain clean-man-test
 
 CTAGS_TEST = ./ctags$(EXEEXT)
 READTAGS_TEST = ./readtags$(EXEEXT)
@@ -282,8 +285,10 @@ cppcheck:
 #
 man-test: $(CTAGS_TEST)
 	$(V_RUN) \
-	builddir=$$(pwd); \
-	$(PYTHON) $(srcdir)/misc/man-test.py $${builddir}/ManTest $(CTAGS_TEST) $(srcdir)/man/ctags-lang-*.7.rst.in
+	$(PYTHON) $(srcdir)/misc/man-test.py $(MAN_TEST_TMPDIR) $(CTAGS_TEST) $(srcdir)/man/ctags-lang-*.7.rst.in
+
+clean-man-test:
+	rm -rf $(MAN_TEST_TMPDIR)
 
 # check if generated files are committed.
 #   Note: "make -B" cannot be used here, since it reruns automake
