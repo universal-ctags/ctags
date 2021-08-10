@@ -48,7 +48,7 @@
     <ClCompile Include="..\gnulib\fnmatch.c">
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
-    <ClCompile Include="..\gnulib\regex.c">
+    <ClCompile Include="..\gnulib\malloc\dynarray_resize.c">
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
     <ClCompile Include="..\gnulib\mempcpy.c">
@@ -57,14 +57,17 @@
     <ClCompile Include="..\gnulib\nl_langinfo.c">
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
-    <ClCompile Include="..\gnulib\setlocale_null.c">
+    <ClCompile Include="..\gnulib\regex.c">
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
-    <ClCompile Include="..\gnulib\malloc\dynarray_resize.c">
+    <ClCompile Include="..\gnulib\setlocale_null.c">
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
     <ClCompile Include="..\gnulib\wmempcpy.c">
       <Filter>Source Files\gnulib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\CommonPrelude.c">
+      <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\args.c">
       <Filter>Source Files\Main</Filter>
@@ -73,9 +76,6 @@
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\colprint.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\CommonPrelude.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\debug.c">
@@ -186,10 +186,10 @@
     <ClCompile Include="..\main\trashbox.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\vstring.c">
+    <ClCompile Include="..\main\unwindi.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\unwindi.c">
+    <ClCompile Include="..\main\vstring.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\writer-ctags.c">
@@ -270,13 +270,13 @@
     <ClCompile Include="..\optlib\systemtap.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\ada.c">
-      <Filter>Source Files\Parsers</Filter>
-    </ClCompile>
     <ClCompile Include="..\parsers\abaqus.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\abc.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\ada.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\ant.c">
@@ -480,13 +480,13 @@
     <ClCompile Include="..\parsers\pascal.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\perl.c">
-      <Filter>Source Files\Parsers</Filter>
-    </ClCompile>
     <ClCompile Include="..\parsers\perl-function-parameters.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\perl-moose.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\perl.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\perl6.c">
@@ -558,10 +558,10 @@
     <ClCompile Include="..\parsers\tcloo.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\tex.c">
+    <ClCompile Include="..\parsers\tex-beamer.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\tex-beamer.c">
+    <ClCompile Include="..\parsers\tex.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\ttcn.c">
@@ -599,7 +599,7 @@
     <ClInclude Include="..\dsl\dsl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\dsl/optscript.h">
+    <ClInclude Include="..\dsl\optscript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gnulib\fnmatch.h">
@@ -788,10 +788,10 @@
     <ClInclude Include="..\main\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\vstring.h">
+    <ClInclude Include="..\main\unwindi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\unwindi.h">
+    <ClInclude Include="..\main\vstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\writer_p.h">
