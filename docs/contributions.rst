@@ -357,20 +357,19 @@ How to add a new man page for your parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. write what the users of your parser may want to (or should) know to ``man/ctags-lang-LANGUAGE.7.rst.in``
-2. add ``man/ctags-lang-LANGUAGE.7.rst`` to the list of ``AC_CONFIG_FILES`` in ``configure.ac``.
-3. add ``man/ctags-lang-LANGUAGE.7`` to ``man_MANS`` of ``Makefile.am``.
-4. add ``man/ctags-lang-LANGUAGE.7.rst.in`` to ``IN_SOURCE_FILES`` of ``man/Makefile``.
-5. run ``cd man; make QUICK=1 update-docs``. This step generates the rst file at ``docs/man/ctags-lang-LANGUAGE.7.rst``.
-6. add ``ctags-lang-LANGUAGE(7)`` to (toctree of) ``docs/man-pages.rst``.
-7. do ``git add`` for
+2. add ``ctags-lang-LANGUAGE.7`` to ``man/generated-man.list``.
+3. run ``autogen.sh; ./configure`` as you do when building the ctags executable just after ``git clone``.
+   This is an optional step for making man page from the top level ``Makefile``.
+   This step generates ``m4/generated-man.m4`` and ``makefiles/generated-am.am``.
+4. run ``cd man; make QUICK=1 update-docs``. This step generates the rst file at ``docs/man/ctags-lang-LANGUAGE.7.rst``.
+5. add ``ctags-lang-LANGUAGE(7)`` to (toctree of) ``docs/man-pages.rst``.
+6. do ``git add`` for
     * ``man/ctags-lang-LANGUAGE.7.rst.in``
-    * ``configure.ac``
-    * ``Makefile.am``
-    * ``man/Makefile``
+	* ``man/generated-man.list``
     * ``docs/man/ctags-lang-LANGUAGE.7.rst``
     * ``docs/man-pages.rst``
-8. git commit with a log header: "``docs(man): add a man page for LANGUAGE``".
-9. make a pull request
+7. git commit with a log header: "``docs(man): add a man page for LANGUAGE``".
+8. make a pull request
 
 Committing and submitting a pull request
 ---------------------------------------------------------------------

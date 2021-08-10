@@ -36,7 +36,8 @@ EXTRA_DIST   = README.md autogen.sh \
 	       man/Makefile man/README man/tags.5.rst \
 	       makefiles/list-txt2cstr-input.mak misc/txt2cstr \
 	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(TXT2CSTR_INPUT) \
-	       docs Tmain Units m4/gnulib-cache.m4
+	       docs Tmain Units m4/gnulib-cache.m4 \
+	       man/generated-man.list
 
 CLEANFILES =
 MOSTLYCLEANFILES =
@@ -238,27 +239,8 @@ include $(top_srcdir)/makefiles/testing.mak
 include $(top_srcdir)/makefiles/help.mak
 
 if HAVE_RST2MAN
-# TODO: the list of man pages should be shared with man/Makefile.
-man_MANS = \
-	man/ctags.1 \
-	man/readtags.1 \
-	\
-	man/tags.5 \
-	\
-	man/ctags-client-tools.7 \
-	man/ctags-incompatibilities.7 \
-	man/ctags-optlib.7 \
-	man/ctags-faq.7 \
-	\
-	man/ctags-lang-iPythonCell.7 \
-	man/ctags-lang-julia.7 \
-	man/ctags-lang-python.7 \
-	man/ctags-lang-verilog.7 \
-	man/ctags-lang-inko.7 \
-	man/ctags-lang-r.7 \
-	man/ctags-lang-sql.7 \
-	\
-	$(NULL)
+include $(top_srcdir)/makefiles/generated-man.am
+
 rst2man_verbose = $(rst2man_verbose_@AM_V@)
 rst2man_verbose_ = $(rst2man_verbose_@AM_DEFAULT_V@)
 rst2man_verbose_0 = @echo RST2MAN "   $@";

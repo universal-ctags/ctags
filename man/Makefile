@@ -41,24 +41,7 @@ CONFIGURE_FLAGS =
 
 .SUFFIXES: .rst .html .pdf .in
 
-IN_SOURCE_FILES = \
-	ctags.1.rst.in \
-	ctags-optlib.7.rst.in \
-	ctags-incompatibilities.7.rst.in \
-	ctags-client-tools.7.rst.in \
-	ctags-faq.7.rst.in \
-	\
-	ctags-lang-iPythonCell.7.rst.in \
-	ctags-lang-julia.7.rst.in \
-	ctags-lang-python.7.rst.in \
-	ctags-lang-verilog.7.rst.in \
-	ctags-lang-inko.7.rst.in \
-	ctags-lang-r.7.rst.in \
-	ctags-lang-sql.7.rst.in \
-	\
-	readtags.1.rst.in \
-	\
-	$(NULL)
+IN_SOURCE_FILES = $(foreach m,$(file <generated-man.list),$(m).rst.in)
 
 SOURCE_FILES = \
 	tags.5.rst \

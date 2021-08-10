@@ -34,6 +34,9 @@ if [ -z "${MAKE}" ]; then
 	fi
 fi
 
+misc/generate-man-am.sh man/generated-man.list > makefiles/generated-man.am
+misc/generate-man-m4.sh man/generated-man.list > m4/generated-man.m4
+
 ctags_files=`${MAKE} -s -f makefiles/list-optlib2c-input.mak`
 txt_files=`${MAKE} -s -f makefiles/list-txt2cstr-input.mak`
 if autoreconf -vfi; then

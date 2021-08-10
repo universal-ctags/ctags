@@ -114,3 +114,5 @@ gnulib/unistd.h
 gnulib/wchar.h
 gnulib/wctype.h
 gnulib/sys/types.h
+m4/generated-man.m4
+makefile/generated-man.am
