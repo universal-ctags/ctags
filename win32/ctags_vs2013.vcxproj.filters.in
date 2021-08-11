@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Parsers">
+      <UniqueIdentifier>{f77929ed-5bdf-496f-9ea6-c3c6180e6ca5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\optlib">
+      <UniqueIdentifier>{3f3f2216-39c2-44f3-8bea-13db663a5c09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Parsers\cxx">
+      <UniqueIdentifier>{f9b4c892-3488-4eac-9ab2-b69086a06c43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\win32">
+      <UniqueIdentifier>{492b86f3-82b5-455e-89cb-b4213f937614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\win32\mkstemp">
+      <UniqueIdentifier>{71dfb57e-e1b2-4795-96d8-05a2d16af795}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gnulib">
+      <UniqueIdentifier>{a49cb3ac-6c1b-4b33-9bb7-af130fadeee1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dsl">
+      <UniqueIdentifier>{d6480ae4-8f0c-11eb-8e04-8c1645efab21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Main">
+      <UniqueIdentifier>{45974afc-d1c3-4696-a74a-60eeaa6e1441}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+@SRCS@
+  </ItemGroup>
+  <ItemGroup>
+@HEADS@
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ctags.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -338,3 +338,16 @@ if HAVE_RST2MAN
 		echo "Files under docs/man are up to date." ; \
 	fi
 endif
+# win32/ctags_vs2013.vcxproj* : committed for win32 build without POSIX tools
+#   regenerate files w/o out-of-source build and w/ GNU make
+	$(chkgen_verbose)if test "$(top_srcdir)" = "$(top_builddir)" \
+		&& ($(MAKE) --version) 2>/dev/null | grep -q GNU ; then \
+		$(MAKE) -BC win32 ; \
+	fi
+	$(chkgen_verbose)if ! git diff --exit-code -- win32; then \
+		echo "Files under win32/ are not up to date." ; \
+		echo "Please execute 'make -BC win32' and commit them." ; \
+		exit 1 ; \
+	else \
+		echo "Files under win32 are up to date." ; \
+	fi
