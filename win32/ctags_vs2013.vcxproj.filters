@@ -591,7 +591,7 @@
     <ClCompile Include="..\parsers\yumrepo.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
-    <ClCompile Include="mkstemp\mkstemp.c">
+    <ClCompile Include="..\win32\mkstemp\mkstemp.c">
       <Filter>Source Files\win32\mkstemp</Filter>
     </ClCompile>
   </ItemGroup>

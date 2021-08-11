@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -178,12 +178,7 @@
     <ClCompile Include="..\gnulib\malloc\dynarray_resize.c" />
     <ClCompile Include="..\gnulib\mempcpy.c" />
     <ClCompile Include="..\gnulib\nl_langinfo.c" />
-    <ClCompile Include="..\gnulib\regex.c">
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
-    </ClCompile>
+    <ClCompile Include="..\gnulib\regex.c" />
     <ClCompile Include="..\gnulib\setlocale_null.c" />
     <ClCompile Include="..\gnulib\wmempcpy.c" />
     <ClCompile Include="..\main\CommonPrelude.c" />
@@ -361,7 +356,7 @@
     <ClCompile Include="..\parsers\windres.c" />
     <ClCompile Include="..\parsers\yacc.c" />
     <ClCompile Include="..\parsers\yumrepo.c" />
-    <ClCompile Include="mkstemp\mkstemp.c" />
+    <ClCompile Include="..\win32\mkstemp\mkstemp.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dsl\es.h" />
