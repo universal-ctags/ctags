@@ -2,11 +2,17 @@
 
 # Report the paths causing trouble frequently
 echo '##################################################################'
-echo '#                     The paths for tools                        #'
+echo '#                The paths and versions for tools                #'
 echo '##################################################################'
-for t in autoreconf aclocal pkg-config; do
-	type $t
+for t in autoreconf aclocal pkg-config autoconf automake; do
+	if type $t; then
+		echo '------------------------------------------------------------------'
+		$t --version
+	fi
+	echo '##################################################################'
 done
+
+echo '#                        Generating files                        #'
 echo '##################################################################'
 
 set -e	# errexit (exit on error)
