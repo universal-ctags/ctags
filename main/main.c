@@ -121,8 +121,9 @@ static bool recurseUsingOpendir (const char *const dirName)
 	}
 	return resize;
 }
+#endif
 
-#elif defined (HAVE__FINDFIRST)
+#ifdef HAVE__FINDFIRST
 
 static bool createTagsForWildcardEntry (
 		const char *const pattern, const size_t dirLength,
@@ -145,9 +146,8 @@ static bool createTagsForWildcardUsingFindfirst (const char *const pattern)
 {
 	bool resize = false;
 	const size_t dirLength = baseFilename (pattern) - pattern;
-#if defined (HAVE__FINDFIRST)
 	struct _finddata_t fileInfo;
-	findfirst_t hFile = _findfirst (pattern, &fileInfo);
+	intptr_t hFile = _findfirst (pattern, &fileInfo);
 	if (hFile != -1L)
 	{
 		do
@@ -157,7 +157,6 @@ static bool createTagsForWildcardUsingFindfirst (const char *const pattern)
 		} while (_findnext (hFile, &fileInfo) == 0);
 		_findclose (hFile);
 	}
-#endif
 	return resize;
 }
 
