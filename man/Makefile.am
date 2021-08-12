@@ -14,6 +14,7 @@
 RST2MAN_FLAGS = $(RST2MAN_OPTIONS)
 RST2HTML_FLAGS =
 RST2PDF_FLAGS =
+DOCS_DIR = ../docs/man
 
 SUFFIXES = .rst .html .pdf .in
 
@@ -44,7 +45,7 @@ man_in_files = $(addsuffix .in,$(man_pages))
 rst_files  = $(addsuffix .rst,$(man_pages))
 html_pages = $(addsuffix .html,$(man_pages))
 pdf_pages  = $(addsuffix .pdf,$(man_pages))
-doc_files  = $(addprefix ../docs/man/,$(rst_files))
+doc_files  = $(addprefix $(DOCS_DIR)/,$(rst_files))
 
 # for automake
 # generate man pages only when rst2man is installed
@@ -62,55 +63,31 @@ man-in: $(man_in_files)
 html: $(html_pages)
 pdf: $(pdf_pages)
 
-#
-# Convert the names of man page files (without suffix) to man page citations.
-#
-# ctags.1 tags.5 ...
-# => ctags(1) tags(5) ...
-#
-cites := ${subst .,(,${addsuffix ),${man_pages}}}
-
-#
-# Convert the man page citations to sed patterns for making hyperlinks.
-#
-# ctags(1) tags(5) ...
-# => -e 's/\<ctags(1)/:ref:`& <&>`/g' -e 's/\<ctags(5)/:ref:`& <&>`/g' ...
-#
-if HAS_GNU_SED
-reppat := $(foreach m,$(cites),-e 's/\<$(m)/:ref:`& <&>`/g')
-else
-reppat := $(foreach m,$(cites),-e 's/[[:<:]]$(m)/:ref:`& <&>`/g')
-endif
-
-update-docs: $(doc_files)
-
-# Delete the line "------" in the first 10 lines of ../docs/man/*.rst to
-# suppress unnecessary section indices.
-../docs/man/%.rst: %.rst
-	$(MKDIR_P) ../docs/man
-	sed $(reppat) -e '1,10s/^-*$$//' < $< > $@
-
 # use `[@]` not to be replaced by automake
-%.rst: %.rst.in
-	sed \
+REPLACE_CONF_VARS =	sed \
 		-e s/[@]CTAGS_NAME_EXECUTABLE[@]/ctags/g \
 		-e s/[@]ETAGS_NAME_EXECUTABLE[@]/etags/g \
-		-e s/[@]VERSION[@]/$(VERSION)/g \
-	< $< > $@
+		-e s/[@]VERSION[@]/$(VERSION)/g
 
-%: %.in
-	sed \
-		-e s/[@]CTAGS_NAME_EXECUTABLE[@]/ctags/g \
-		-e s/[@]ETAGS_NAME_EXECUTABLE[@]/etags/g \
-		-e s/[@]VERSION[@]/$(VERSION)/g \
-	< $< > $@
-
+#
+# generate man
+#
+# generate *.in to be distributed
 %.in: %.rst.in
 if HAVE_RST2MAN
 	$(RST2MAN) $(RST2MAN_FLAGS) $< > $@
 else
 	$(error Cannot make $@: rst2man is not installed)
 endif
+
+%: %.in
+	$(REPLACE_CONF_VARS) < $< > $@
+
+#
+# generate HTML and PDF
+#
+%.rst: %.rst.in
+	$(REPLACE_CONF_VARS) < $< > $@
 
 %.html: %.rst
 if HAVE_RST2HTML
@@ -125,3 +102,27 @@ if HAVE_RST2PDF
 else
 	$(error Cannot make $@: rst2pdf is not installed)
 endif
+
+#
+# generate $(DOCS_DIR)/*.rst for Sphinx document
+#
+update-docs: $(doc_files)
+
+# Convert the names of man page files (without suffix) to man page citations.
+#   ctags.1 tags.5 ... => ctags(1) tags(5) ...
+cites := ${subst .,(,${addsuffix ),${man_pages}}}
+
+# Convert the man page citations to sed patterns for making hyperlinks.
+#   ctags(1) tags(5) ...
+#     => -e 's/\<ctags(1)/:ref:`& <&>`/g' -e 's/\<ctags(5)/:ref:`& <&>`/g' ...
+if HAS_GNU_SED
+reppat := $(foreach m,$(cites),-e 's/\<$(m)/:ref:`& <&>`/g')
+else
+reppat := $(foreach m,$(cites),-e 's/[[:<:]]$(m)/:ref:`& <&>`/g')
+endif
+
+# Delete the line "------" in the first 10 lines of $(DOCS_DIR)/*.rst to
+# suppress unnecessary section indices.
+$(DOCS_DIR)/%.rst: %.rst
+	$(MKDIR_P) $(DOCS_DIR)
+	sed $(reppat) -e '1,10s/^-*$$//' < $< > $@
