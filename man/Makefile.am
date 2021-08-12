@@ -35,15 +35,11 @@ GEN_IN_MAN_FILES = \
 	ctags-lang-sql.7 \
 	\
 	readtags.1 \
-	\
-	$(NULL)
-
-GEN_MAN_FILES = \
 	tags.5 \
 	\
 	$(NULL)
 
-man_pages  = $(GEN_IN_MAN_FILES) $(GEN_MAN_FILES)
+man_pages  = $(GEN_IN_MAN_FILES)
 rst_files  = $(addsuffix .rst,$(man_pages))
 html_pages = $(addsuffix .html,$(man_pages))
 pdf_pages  = $(addsuffix .pdf,$(man_pages))
@@ -54,7 +50,7 @@ doc_files  = $(addprefix ../docs/man/,$(rst_files))
 if HAVE_RST2MAN
 man_MANS = $(man_pages)
 endif
-EXTRA_DIST = README $(addsuffix .rst.in,$(GEN_IN_MAN_FILES)) $(addsuffix .rst,$(GEN_MAN_FILES))
+EXTRA_DIST = README $(addsuffix .rst.in,$(GEN_IN_MAN_FILES))
 CLEANFILES = $(man_pages) $(addsuffix .rst,$(GEN_IN_MAN_FILES)) $(html_pages) $(pdf_pages)
 
 .PHONY: man html pdf update-docs
