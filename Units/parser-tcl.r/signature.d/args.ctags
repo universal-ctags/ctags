@@ -1,5 +1,4 @@
 --sort=no
 --kinds-Tcl=+z
---fields=+S
+--fields=+So
 --extras=+q
-

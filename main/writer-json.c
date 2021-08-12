@@ -183,7 +183,7 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 		enableField (FIELD_SCOPE_KIND_LONG, true);
 	}
 
-	for (k = FIELD_EXTENSION_START; k <= FIELD_BUILTIN_LAST; k++)
+	for (k = FIELD_JSON_LOOP_START; k <= FIELD_BUILTIN_LAST; k++)
 		renderExtensionFieldMaybe (k, tag, response);
 }
 

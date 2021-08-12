@@ -1868,6 +1868,7 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 		} else {
 			pTypeName = NULL;
 		}
+		tag->extensionFields.nth = i;
 
 		tag->isFileScope = true;
 

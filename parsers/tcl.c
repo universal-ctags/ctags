@@ -69,6 +69,7 @@ struct sCollector {
 	vString *str;
 	int depth;
 	int scopeIndex;
+	int nth;
 };
 
 /*
@@ -447,6 +448,7 @@ static void collectSignature (const tokenInfo *const token, collector * col)
 		tagEntryInfo e;
 		initTagEntry (&e, tokenString (token), K_PARAMETER);
 		e.extensionFields.scopeIndex = col->scopeIndex;
+		e.extensionFields.nth = col->nth++;
 		makeTagEntry (&e);
 	}
 	else if (tokenIsTypeVal (token, '{'))
@@ -561,6 +563,7 @@ static void parseProc (tokenInfo *const token,
 				.str = signature,
 				.depth = 1,
 				.scopeIndex = index,
+				.nth = 0,
 			};
 			tokenSkipOverPairFull (token, &col);
 		}

@@ -305,15 +305,10 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 		sep [0] = '\0';
 	}
 
-	length += renderExtensionFieldMaybe (writer, FIELD_INHERITANCE, tag, sep, mio);
-	length += renderExtensionFieldMaybe (writer, FIELD_ACCESS, tag, sep, mio);
-	length += renderExtensionFieldMaybe (writer, FIELD_IMPLEMENTATION, tag, sep, mio);
-	length += renderExtensionFieldMaybe (writer, FIELD_SIGNATURE, tag, sep, mio);
-	length += renderExtensionFieldMaybe (writer, FIELD_ROLES, tag, sep, mio);
-	length += renderExtensionFieldMaybe (writer, FIELD_EXTRAS, tag, sep, mio);
-	length += renderExtensionFieldMaybe (writer, FIELD_XPATH, tag, sep, mio);
-	length += renderExtensionFieldMaybe (writer, FIELD_END_LINE, tag, sep, mio);
-	length += renderExtensionFieldMaybe (writer, FIELD_EPOCH, tag, sep, mio);
+	for (int k = FIELD_ECTAGS_LOOP_START; k <= FIELD_ECTAGS_LOOP_LAST; k++)
+		length += renderExtensionFieldMaybe (writer, k, tag, sep, mio);
+	for (int k = FIELD_UCTAGS_LOOP_START; k <= FIELD_BUILTIN_LAST; k++)
+		length += renderExtensionFieldMaybe (writer, k, tag, sep, mio);
 
 	return length;
 }
