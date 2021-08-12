@@ -143,7 +143,7 @@ jobs:
            name: Install build tools
            command: |
              dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
-             dnf -y install jq puppet
+             dnf -y install jq puppet python3-docutils
        - run:
            name: Run autogen.sh
            command: |
