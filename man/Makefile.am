@@ -40,6 +40,7 @@ GEN_IN_MAN_FILES = \
 	$(NULL)
 
 man_pages  = $(GEN_IN_MAN_FILES)
+man_in_files = $(addsuffix .in,$(man_pages))
 rst_files  = $(addsuffix .rst,$(man_pages))
 html_pages = $(addsuffix .html,$(man_pages))
 pdf_pages  = $(addsuffix .pdf,$(man_pages))
@@ -50,12 +51,14 @@ doc_files  = $(addprefix ../docs/man/,$(rst_files))
 if HAVE_RST2MAN
 man_MANS = $(man_pages)
 endif
-EXTRA_DIST = README $(addsuffix .rst.in,$(GEN_IN_MAN_FILES))
+EXTRA_DIST = README $(addsuffix .rst.in,$(GEN_IN_MAN_FILES)) $(man_in_files)
 CLEANFILES = $(man_pages) $(addsuffix .rst,$(GEN_IN_MAN_FILES)) $(html_pages) $(pdf_pages)
+MAINTAINERCLEANFILES =  $(man_in_files)
 
-.PHONY: man html pdf update-docs
+.PHONY: man man-in html pdf update-docs
 
 man: $(man_pages)
+man-in: $(man_in_files)
 html: $(html_pages)
 pdf: $(pdf_pages)
 
@@ -95,7 +98,14 @@ update-docs: $(doc_files)
 		-e s/[@]VERSION[@]/$(VERSION)/g \
 	< $< > $@
 
-%: %.rst
+%: %.in
+	sed \
+		-e s/[@]CTAGS_NAME_EXECUTABLE[@]/ctags/g \
+		-e s/[@]ETAGS_NAME_EXECUTABLE[@]/etags/g \
+		-e s/[@]VERSION[@]/$(VERSION)/g \
+	< $< > $@
+
+%.in: %.rst.in
 if HAVE_RST2MAN
 	$(RST2MAN) $(RST2MAN_FLAGS) $< > $@
 else
