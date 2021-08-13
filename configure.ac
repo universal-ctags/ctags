@@ -354,9 +354,22 @@ AC_CHECK_PROGS([perl_found], [perl], [yes], [no])
 AM_CONDITIONAL([RUN_OPTLIB2C], [test "${perl_found}" = "yes"])
 AM_CONDITIONAL([RUN_TXT2CSTR], [test "${perl_found}" = "yes"])
 
+# rst2man and rst2html are part of python-docutils, and if not found
+# 	can be installed using pip ("pip install docutils"). On some
+#	systems, rst2man and rst2html are actually installed as rst2man.py
+#	and rst2html.py - create a symlink of that's the case.
 AC_PATH_PROGS(RST2MAN, [rst2man rst2man.py rst2man-3 rst2man-3.6 rst2man-3.7 rst2man-3.8 rst2man-3.9], [no])
 AM_CONDITIONAL([HAVE_RST2MAN], [test "x$RST2MAN" != "xno"])
+AC_PATH_PROGS(RST2HTML, [rst2html rst2html.py rst2html-3 rst2html-3.6 rst2html-3.7 rst2html-3.8 rst2html-3.9], [no])
+AM_CONDITIONAL([HAVE_RST2HTML], [test "x$RST2HTML" != "xno"])
 
+# rst2pdf is a separate tool and can also be installed via pip (e.g.,
+# 	"pip install rst2pdf")
+AC_PATH_PROGS(RST2PDF, [rst2pdf], [no])
+AM_CONDITIONAL([HAVE_RST2PDF], [test "x$RST2PDF" != "xno"])
+
+# rst2man had a bug about code-block:: handling.
+# https://sourceforge.net/p/docutils/patches/141
 RST2MAN_OPTIONS=
 if ! test "x$RST2MAN" = "xno"; then
    RST2MAN_SUPPORTING_SYNTAX_HIGHLIGHT_OPTION=no
@@ -369,6 +382,7 @@ if ! test "x$RST2MAN" = "xno"; then
    AC_MSG_RESULT($RST2MAN_SUPPORTING_SYNTAX_HIGHLIGHT_OPTION)
 fi
 AC_SUBST(RST2MAN_OPTIONS)
+AM_CONDITIONAL([HAS_GNU_SED], [sed --version 2>/dev/null | grep -q GNU])
 
 # Checks for operating environment
 # --------------------------------
@@ -789,21 +803,7 @@ fi
 
 AC_CHECK_FUNCS(mblen)
 
-AC_CONFIG_FILES([Makefile gnulib/Makefile
-		 man/ctags.1.rst
-		 man/ctags-client-tools.7.rst
-		 man/ctags-incompatibilities.7.rst
-		 man/ctags-optlib.7.rst
-		 man/ctags-faq.7.rst
-		 man/ctags-lang-iPythonCell.7.rst
-		 man/ctags-lang-julia.7.rst
-		 man/ctags-lang-python.7.rst
-		 man/ctags-lang-verilog.7.rst
-		 man/ctags-lang-inko.7.rst
-		 man/ctags-lang-r.7.rst
-		 man/ctags-lang-sql.7.rst
-		 man/readtags.1.rst
-		 ])
+AC_CONFIG_FILES([Makefile gnulib/Makefile man/Makefile])
 
 AC_OUTPUT
 

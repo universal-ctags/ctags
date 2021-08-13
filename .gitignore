@@ -88,6 +88,7 @@ man/readtags.1.rst
 man/readtags.1.html
 man/tags.5
 man/tags.5.html
+man/*.[157].in
 ManTest
 misc/mini-geany.actual
 Tmain/**/Makefile
