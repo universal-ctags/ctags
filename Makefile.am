@@ -40,11 +40,14 @@ EXTRA_DIST   = README.md autogen.sh \
 CLEANFILES =
 MOSTLYCLEANFILES =
 
+# for distcheck
 clean-local:
 	rm -f packcc$(BUILD_EXEEXT)
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
 		rm -rf $(OPTLIB2C_SRCS); \
 		rm -rf $(TXT2CSTR_SRCS); \
+	else \
+		$(MAKE) -C docs clean; \
 	fi
 
 bin_PROGRAMS = ctags
@@ -139,6 +142,7 @@ optlib2c_verbose = $(optlib2c_verbose_@AM_V@)
 optlib2c_verbose_ = $(optlib2c_verbose_@AM_DEFAULT_V@)
 optlib2c_verbose_0 = @echo OPTLIB2C "  $@";
 OPTLIB2C = $(srcdir)/misc/optlib2c
+OPTLIB2C_DIR = optlib
 SUFFIXES += .ctags
 .ctags.c:
 	$(optlib2c_verbose)$(OPTLIB2C) $< > $@
@@ -150,6 +154,7 @@ txt2cstr_verbose = $(txt2cstr_verbose_@AM_V@)
 txt2cstr_verbose_ = $(txt2cstr_verbose_@AM_DEFAULT_V@)
 txt2cstr_verbose_0 = @echo TXT2CSTR "  $@";
 TXT2CSTR = $(srcdir)/misc/txt2cstr
+TXT2CSTR_DIR = main
 SUFFIXES += .ps
 .ps.c:
 	$(txt2cstr_verbose)$(TXT2CSTR) $< > $@

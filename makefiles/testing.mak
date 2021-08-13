@@ -1,10 +1,10 @@
 # -*- makefile -*-
-.PHONY: check units fuzz noise tmain tinst tlib clean-units clean-tlib clean-tmain clean-gcov run-gcov codecheck cppcheck dicts validate-input
+.PHONY: check units fuzz noise tmain tinst tlib clean-units clean-tlib clean-tmain clean-gcov run-gcov codecheck cppcheck dicts validate-input check-genfile
 
 EXTRA_DIST += misc/units misc/units.py misc/man-test.py
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
 
-check: tmain units tlib man-test
+check: tmain units tlib man-test check-genfile
 
 clean-local: clean-units clean-tmain
 
@@ -284,3 +284,52 @@ man-test: $(CTAGS_TEST)
 	$(V_RUN) \
 	builddir=$$(pwd); \
 	$(PYTHON) $(srcdir)/misc/man-test.py $${builddir}/ManTest $(CTAGS_TEST) $(srcdir)/man/ctags-lang-*.7.rst.in
+
+# check if generated files are committed.
+#   Note: "make -B" cannot be used here, since it reruns automake
+chkgen_verbose = $(chkgen_verbose_@AM_V@)
+chkgen_verbose_ = $(chkgen_verbose_@AM_DEFAULT_V@)
+chkgen_verbose_0 = @echo CHKGEN "    $@";
+check-genfile:
+# OPTLIB2C_SRCS : committed for win32 build
+	$(chkgen_verbose)rm -f $(OPTLIB2C_SRCS)
+	$(chkgen_verbose)$(MAKE) $(OPTLIB2C_SRCS)
+	$(chkgen_verbose)if ! git diff --exit-code $(OPTLIB2C_DIR); then \
+		echo "Files under $(OPTLIB2C_DIR) are not up to date." ; \
+		echo "If you change $(OPTLIB2C_DIR)/foo.ctags, don't forget to add $(OPTLIB2C_DIR)/foo.c to your commit." ; \
+		exit 1 ; \
+	else \
+		echo "Files under $(OPTLIB2C_DIR) are up to date." ; \
+	fi
+# TXT2CSTR_SRCS : committed for win32 build
+	$(chkgen_verbose)rm -f $(TXT2CSTR_SRCS)
+	$(chkgen_verbose)$(MAKE) $(TXT2CSTR_SRCS)
+	$(chkgen_verbose)if ! git diff --exit-code $(TXT2CSTR_DIR); then \
+		echo "Files under $(TXT2CSTR_DIR) are not up to date." ; \
+		echo "If you change $(TXT2CSTR_DIR)/foo.ps, don't forget to add $(TXT2CSTR_DIR)/foo.c to your commit." ; \
+		exit 1 ; \
+	else \
+		echo "Files under $(TXT2CSTR_DIR) are up to date." ; \
+	fi
+if HAVE_RST2MAN
+# man/*.in : committed for man pages to be genrated without rst2man
+#   make clean-docs remove both man/*.in and docs/man/*.rst
+	$(chkgen_verbose)$(MAKE) -C man clean-docs
+	$(chkgen_verbose)$(MAKE) -C man man-in
+	$(chkgen_verbose)if ! git diff --exit-code -- man; then \
+		echo "Files under man/ are not up to date." ; \
+		echo "Please execute 'make -C man man-in' and commit them." ; \
+		exit 1 ; \
+	else \
+		echo "Files under man are up to date." ; \
+	fi
+# docs/man/*.rst : committed for Read the Docs
+	$(chkgen_verbose)$(MAKE) -C man update-docs
+	$(chkgen_verbose)if ! git diff --exit-code -- docs/man; then \
+		echo "Files under docs/man/ are not up to date." ; \
+		echo "Please execute 'make -C man update-docs' and commit them." ; \
+		exit 1 ; \
+	else \
+		echo "Files under docs/man are up to date." ; \
+	fi
+endif

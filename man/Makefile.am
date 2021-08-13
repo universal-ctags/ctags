@@ -56,7 +56,7 @@ EXTRA_DIST = README $(addsuffix .rst.in,$(GEN_IN_MAN_FILES)) $(man_in_files)
 CLEANFILES = $(man_pages) $(addsuffix .rst,$(GEN_IN_MAN_FILES)) $(html_pages) $(pdf_pages)
 MAINTAINERCLEANFILES =  $(man_in_files)
 
-.PHONY: man man-in html pdf update-docs
+.PHONY: man man-in html pdf update-docs clean-docs
 
 man: $(man_pages)
 man-in: $(man_in_files)
@@ -146,3 +146,7 @@ endif
 $(DOCS_DIR)/%.rst: %.rst
 	@$(MKDIR_P) $(DOCS_DIR)
 	$(sed_verbose)sed $(reppat) -e '1,10s/^-*$$//' < $< > $@
+
+# remove generated files to be commited (used for `make checkgen`)
+clean-docs:
+	$(rm_verbose)rm -f $(man_in_files) $(doc_files)
