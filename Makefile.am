@@ -43,7 +43,6 @@ MAINTAINERCLEANFILES = autom4te.cache
 
 # for distcheck
 clean-local:
-	rm -f packcc$(BUILD_EXEEXT)
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
 		rm -rf $(OPTLIB2C_SRCS); \
 		rm -rf $(TXT2CSTR_SRCS); \
@@ -51,24 +50,30 @@ clean-local:
 		$(MAKE) -C docs clean; \
 	fi
 
+maintainer-clean-local:
+	rm -rf .deps misc/packcc/.dirstamp
+
 bin_PROGRAMS = ctags
 noinst_LIBRARIES = libctags.a
 
 noinst_PROGRAMS =
 noinst_PROGRAMS += mini-geany
 
+# packcc always uses native compiler even when cross-compiling.
+# packcc cannot use the standard Automake rule.
 PACKCC_CPPFLAGS_FOR_BUILD  = -fsigned-char
 if HAVE_STRNLEN_FOR_BUILD
 PACKCC_CPPFLAGS_FOR_BUILD += -DPCC_USE_SYSTEM_STRNLEN
 endif
 
 PACKCC = $(top_builddir)/packcc$(BUILD_EXEEXT)
+CLEANFILES += $(PACKCC)
 
 cc4b_verbose = $(cc4b_verbose_@AM_V@)
 cc4b_verbose_ = $(cc4b_verbose_@AM_DEFAULT_V@)
 cc4b_verbose_0 = @echo CC4BUILD "  $@";
-$(PACKCC): $(top_srcdir)/misc/packcc/src/packcc.c
-	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(PACKCC_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/misc/packcc/src/packcc.c
+$(PACKCC): $(top_srcdir)/$(PACKCC_SRCS)
+	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(PACKCC_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/$(PACKCC_SRCS)
 
 if USE_READCMD
 bin_PROGRAMS+= readtags
