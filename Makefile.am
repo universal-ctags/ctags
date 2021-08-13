@@ -17,7 +17,7 @@ PACKCC_FILES = misc/packcc/.gitignore   \
 	       $(NULL)
 
 EXTRA_DIST   = README.md autogen.sh \
-	       makefiles/list-optlib2c-input.mak misc/optlib2c \
+	       misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
 	       .indent.pro .uncrustify.cfg \
 	       misc/ctags-optlib-mode.el \
@@ -33,7 +33,7 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/ctags_vs2013.sln \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/gen-repoinfo.bat \
-	       makefiles/list-txt2cstr-input.mak misc/txt2cstr \
+	       misc/txt2cstr \
 	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(TXT2CSTR_INPUT) \
 	       docs Tmain Units m4/gnulib-cache.m4
 
