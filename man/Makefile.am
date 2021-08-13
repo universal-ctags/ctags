@@ -69,36 +69,56 @@ REPLACE_CONF_VARS =	sed \
 		-e s/[@]ETAGS_NAME_EXECUTABLE[@]/etags/g \
 		-e s/[@]VERSION[@]/$(VERSION)/g
 
+rst2man_verbose    = $(rst2man_verbose_@AM_V@)
+rst2man_verbose_   = $(rst2man_verbose_@AM_DEFAULT_V@)
+rst2man_verbose_0  = @echo RST2MAN "   $@";
+
+rst2html_verbose   = $(rst2html_verbose_@AM_V@)
+rst2html_verbose_  = $(rst2html_verbose_@AM_DEFAULT_V@)
+rst2html_verbose_0 = @echo RST2HTML "  $@";
+
+rst2pdf_verbose    = $(rst2pdf_verbose_@AM_V@)
+rst2pdf_verbose_   = $(rst2pdf_verbose_@AM_DEFAULT_V@)
+rst2pdf_verbose_0  = @echo RST2MAN "   $@";
+
+sed_verbose        = $(sed_verbose_@AM_V@)
+sed_verbose_       = $(sed_verbose_@AM_DEFAULT_V@)
+sed_verbose_0      = @echo SED "       $@";
+
+rm_verbose         = $(rm_verbose_@AM_V@)
+rm_verbose_        = $(rm_verbose_@AM_DEFAULT_V@)
+rm_verbose_0       = @echo RM "        $@";
+
 #
 # generate man
 #
 # generate *.in to be distributed
 %.in: %.rst.in
 if HAVE_RST2MAN
-	$(RST2MAN) $(RST2MAN_FLAGS) $< > $@
+	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_FLAGS) $< > $@
 else
 	$(error Cannot make $@: rst2man is not installed)
 endif
 
 %: %.in
-	$(REPLACE_CONF_VARS) < $< > $@
+	$(sed_verbose)$(REPLACE_CONF_VARS) < $< > $@
 
 #
 # generate HTML and PDF
 #
 %.rst: %.rst.in
-	$(REPLACE_CONF_VARS) < $< > $@
+	$(sed_verbose)$(REPLACE_CONF_VARS) < $< > $@
 
 %.html: %.rst
 if HAVE_RST2HTML
-	$(RST2HTML) $(RST2HTML_FLAGS) $< > $@
+	$(rst2html_verbose)$(RST2HTML) $(RST2HTML_FLAGS) $< > $@
 else
 	$(error Cannot make $@: rst2html is not installed)
 endif
 
 %.pdf: %.rst
 if HAVE_RST2PDF
-	$(RST2PDF) $(RST2PDF_FLAGS) $< -o $@
+	$(rst2pdf_verbose)$(RST2PDF) $(RST2PDF_FLAGS) $< -o $@
 else
 	$(error Cannot make $@: rst2pdf is not installed)
 endif
@@ -124,5 +144,5 @@ endif
 # Delete the line "------" in the first 10 lines of $(DOCS_DIR)/*.rst to
 # suppress unnecessary section indices.
 $(DOCS_DIR)/%.rst: %.rst
-	$(MKDIR_P) $(DOCS_DIR)
-	sed $(reppat) -e '1,10s/^-*$$//' < $< > $@
+	@$(MKDIR_P) $(DOCS_DIR)
+	$(sed_verbose)sed $(reppat) -e '1,10s/^-*$$//' < $< > $@
