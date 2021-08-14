@@ -1,4 +1,7 @@
+#
 # Shared macros
+#
+#   $(NULL) at the end of a list makes diff readable
 
 # REPOINFO_HEADS is included from REPOINFO_SRCS
 # only when the building environment has ability
@@ -90,7 +93,9 @@ LIB_HEADS =			\
 	$(MAIN_PUBLIC_HEADS)	\
 	$(LIB_PRIVATE_HEADS)	\
 	\
-	$(MIO_HEADS)
+	$(MIO_HEADS)		\
+	\
+	$(NULL)
 
 LIB_SRCS =			\
 	main/args.c			\
@@ -140,7 +145,6 @@ LIB_SRCS =			\
 	main/writer-xref.c		\
 	main/xtag.c			\
 	\
-	\
 	$(TXT2CSTR_SRCS) \
 	\
 	$(REPOINFO_SRCS) \
@@ -154,6 +158,9 @@ CMDLINE_SRCS = \
 	\
 	$(NULL)
 
+DEBUG_HEADS = main/debug.h
+DEBUG_SRCS = main/debug.c
+
 MINI_GEANY_HEADS =
 MINI_GEANY_SRCS = \
 	main/mini-geany.c \
@@ -164,6 +171,7 @@ OPTSCRIPT_SRCS = \
 	extra-cmds/optscript-repl.c \
 	\
 	$(NULL)
+OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.$(OBJEXT))
 
 OPTLIB2C_INPUT = \
 	optlib/RSpec.ctags			\
@@ -365,21 +373,6 @@ YAML_SRCS = \
 	\
 	$(NULL)
 
-DEBUG_HEADS = main/debug.h
-DEBUG_SRCS = main/debug.c
-
-ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS) $(DSL_HEADS) $(OPTSCRIPT_DSL_HEADS)
-ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS) $(DSL_SRCS) $(OPTSCRIPT_DSL_SRCS)
-ALL_HEADS = $(ALL_LIB_HEADS) $(CMDLINE_HEADS)
-ALL_SRCS = $(ALL_LIB_SRCS) $(CMDLINE_SRCS)
-
-ENVIRONMENT_HEADS =
-ENVIRONMENT_SRCS =
-
-WIN32_HEADS = main/e_msoft.h
-WIN32_SRCS = win32/mkstemp/mkstemp.c
-WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
-
 OPTSCRIPT_DSL_HEADS = \
 	dsl/es.h \
 	dsl/optscript.h \
@@ -391,6 +384,7 @@ OPTSCRIPT_DSL_SRCS = \
 	dsl/optscript.c \
 	\
 	$(NULL)
+OPTSCRIPT_DSL_OBJS = $(OPTSCRIPT_DSL_SRCS:.c=.$(OBJEXT))
 
 READTAGS_DSL_HEADS = \
 	dsl/es.h \
@@ -411,16 +405,7 @@ READTAGS_DSL_SRCS = \
 	$(MIO_SRCS) \
 	\
 	$(NULL)
-
 READTAGS_DSL_OBJS = $(QUALIFIER_SRCS:.c=.$(OBJEXT))
-
-ALL_OBJS = \
-	$(ALL_SRCS:.c=.$(OBJEXT)) \
-	$(LIBOBJS)
-
-ALL_LIB_OBJS = \
-	$(ALL_LIB_SRCS:.c=.$(OBJEXT)) \
-	$(LIBOBJS)
 
 READTAGS_SRCS  = \
 	libreadtags/readtags.c      \
@@ -429,21 +414,35 @@ READTAGS_SRCS  = \
 	\
 	$(NULL)
 READTAGS_HEADS = \
-	       libreadtags/readtags.h \
-	       extra-cmds/printtags.h  \
-	       \
-	       $(NULL)
+	libreadtags/readtags.h \
+	extra-cmds/printtags.h  \
+	\
+	$(NULL)
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 
 PACKCC_SRCS = \
 	misc/packcc/src/packcc.c \
 	\
 	$(NULL)
-
 PACKCC_OBJS = $(PACKCC_SRCS:.c=.$(OBJEXT))
 
-OPTSCRIPT_DSL_OBJS = $(OPTSCRIPT_DSL_SRCS:.c=.$(OBJEXT))
+WIN32_HEADS = main/e_msoft.h
+WIN32_SRCS = win32/mkstemp/mkstemp.c
+WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
 
-OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.$(OBJEXT))
+ENVIRONMENT_HEADS =
+ENVIRONMENT_SRCS =
+
+ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS) $(DSL_HEADS) $(OPTSCRIPT_DSL_HEADS)
+ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS) $(DSL_SRCS) $(OPTSCRIPT_DSL_SRCS)
+ALL_LIB_OBJS = \
+	$(ALL_LIB_SRCS:.c=.$(OBJEXT)) \
+	$(LIBOBJS)
+
+ALL_HEADS = $(ALL_LIB_HEADS) $(CMDLINE_HEADS)
+ALL_SRCS = $(ALL_LIB_SRCS) $(CMDLINE_SRCS)
+ALL_OBJS = \
+	$(ALL_SRCS:.c=.$(OBJEXT)) \
+	$(LIBOBJS)
 
 # vim: ts=8
