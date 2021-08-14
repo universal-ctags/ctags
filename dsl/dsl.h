@@ -67,6 +67,7 @@ typedef struct sDSLCode DSLCode;
 #define DSL_ERR_BOOLEAN_REQUIRED    (es_error_intern("boolean-required"))
 #define DSL_ERR_INTEGER_REQUIRED    (es_error_intern("integer-required"))
 #define DSL_ERR_NUMBER_REQUIRED     (es_error_intern("number-required"))
+#define DSL_ERR_CALLABLE_REQUIRED   (es_error_intern("callable-required"))
 #define DSL_ERR_WRONG_TYPE_ARGUMENT (es_error_intern("wrong-type-argument"))
 #define DSL_ERR_NO_ALT_ENTRY        (es_error_intern("the-alternative-entry-unavailable"))
 

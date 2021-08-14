@@ -1,0 +1,4 @@
+abc	input.c	/^typedef struct abc {$/;"	kind:s	file:
+ghi	input.c	/^	int ghi;$/;"	kind:m	file:	struct:abc	typeref:typename:int
+jkl	input.c	/^} jkl;$/;"	kind:t	file:	typeref:struct:abc
+pqr	input.c	/^jkl pqr(void)$/;"	kind:f	typeref:typename:jkl

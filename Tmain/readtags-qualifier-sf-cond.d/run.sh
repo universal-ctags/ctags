@@ -19,9 +19,5 @@ if ! ( "${READTAGS}" -h | grep -q -e -S ); then
 fi
 
 ${V} ${READTAGS} -e -t output.tags \
-	 -Q '(if (prefix? $name "a") #f ((string->regexp (string-append (regexp-quote $name) ".?")) $name))' \
-	 -l
-
-${V} ${READTAGS} -e -t output.tags \
-	 -Q '(if (prefix? $name "a") #f ((string->regexp (string-append (regexp-quote "[{.*+]}^$()|?\\") ".?")) $name))' \
+	 -Q '(cond ((eq? $kind "m") (#/.h./ $name)) ((eq? $kind "t")) ((#/.n./ $name) #f) (#t))' \
 	 -l
