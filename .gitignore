@@ -17,6 +17,7 @@
 *.TMP
 *.tmp
 *~
+/Makefile
 /packcc
 /packcc.exe
 .deps
@@ -48,7 +49,6 @@ depcomp
 gdb-backtrace.txt
 install-sh
 libctags.a
-Makefile
 Makefile.in
 mini-geany
 mini-geany.exe
@@ -77,6 +77,7 @@ win32/*.user
 win32/[Dd]ebug/
 win32/[Rr]elease/
 _build
+man/Makefile
 man/ctags.1
 man/ctags.1.html
 man/ctags.1.rst
@@ -100,6 +101,7 @@ Units/**/Makefile.in
 Tmain/dist.m4
 Units/dist.m4
 VALGRIND.tmp.core.*
+gnulib/Makefile
 gnulib/alloca.h
 gnulib/ctype.h
 gnulib/inttypes.h
