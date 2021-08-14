@@ -57,7 +57,6 @@ bin_PROGRAMS = ctags
 noinst_LIBRARIES = libctags.a
 
 noinst_PROGRAMS =
-noinst_PROGRAMS += mini-geany
 
 # packcc always uses native compiler even when cross-compiling.
 # packcc cannot use the standard Automake rule.
@@ -202,6 +201,7 @@ $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 MOSTLYCLEANFILES += $(RES_OBJ)
 endif
 
+noinst_PROGRAMS += mini-geany
 mini_geany_CPPFLAGS = $(libctags_a_CPPFLAGS)
 mini_geany_CFLAGS = $(libctags_a_CFLAGS)
 mini_geany_LDADD  = libctags.a
