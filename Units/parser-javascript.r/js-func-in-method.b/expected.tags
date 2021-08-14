@@ -1,0 +1,3 @@
+Class0	input.js	/^class Class0 {$/;"	c
+f0	input.js	/^    f0() {$/;"	m	class:Class0
+f00	input.js	/^	f00 = function() {}$/;"	f	method:Class0.f0
