@@ -1,6 +1,7 @@
 fun1	input.sql	/^CREATE OR REPLACE FUNCTION fun1() RETURNS VARCHAR AS '$/;"	f
 fun2	input.sql	/^CREATE OR REPLACE FUNCTION fun2() RETURNS VARCHAR LANGUAGE plpgsql AS $\$$/;"	f
 test	input.sql	/^CREATE FUNCTION test(keys text[], vals text[]) RETURNS text AS$/;"	f
+test2	input.sql	/^CREATE FUNCTION test2(keys text[], vals text[]) RETURNS text AS $ABCDEFGHIJKLMNOPQRSTUVWXYZ\$$/;"	f
 test1_var1	input.sql	/^	test1_var1 VARCHAR(64) := $$ABC$$;$/;"	v
 test1_var2	input.sql	/^	test1_var2 VARCHAR(64) := $xyz$XYZ$xyz$;$/;"	v
 test1_var3	input.sql	/^	test1_var3     INTEGER := 1;$/;"	v
@@ -8,3 +9,4 @@ test2_var1	input.sql	/^	test2_var1 VARCHAR(64) := 'ABC2';$/;"	v
 test2_var2	input.sql	/^	test2_var2 VARCHAR(64) := 'XYZ2';$/;"	v
 test2_var3	input.sql	/^	test2_var3        INTEGER := 2;$/;"	v
 o	input.sql	/^	var o = {};$/;"	v
+q	input.sql	/^var q={}; return "{}";$/;"	v
