@@ -31,3 +31,8 @@ $$
 	return JSON.stringify(o);
 $$
 LANGUAGE plv8 IMMUTABLE STRICT;
+
+CREATE FUNCTION test2(keys text[], vals text[]) RETURNS text AS $ABCDEFGHIJKLMNOPQRSTUVWXYZ$
+var q={}; return "{}";
+ $ABCDEFGHIJKLMNOPQRSTUVWXYZ$ LANGUAGE plv8 IMMUTABLE STRICT;
+-- The fist whitespace is needed to trigger the original bug.

@@ -797,7 +797,7 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter, i
 					linenum[END] = getInputLineNumber ();
 					offset[END]  = getInputLineOffset ();
 					if (offset[END] > len)
-						offset[END] =- len;
+						offset[END] -= len;
 					*promise = makePromise (NULL,
 											linenum [START], offset [START],
 											linenum [END], offset [END],
