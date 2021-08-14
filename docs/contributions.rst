@@ -262,7 +262,7 @@ Build script
 To add your optlib parser, ``foo.ctags``, into ``ctags`` do the following steps;
 
 * put ``foo.ctags`` file on ``optlib/`` directory
-* add ``foo.ctags`` on ``OPTLIB2C_INPUT`` variable in ``makefiles/optlib2c_input.mak``
+* add ``foo.ctags`` on ``OPTLIB2C_INPUT`` variable in ``source.mak``
 * add ``fooParser`` on ``PARSER_LIST`` macro variable in ``main/parser_p.h``
 * add ``foo`` on the list in the section "New parsers" in ``docs/news.rst``
 * add ``"..\optlib\foo.c"`` in ``win32/ctags_vs2013.vcxproj``

@@ -165,13 +165,42 @@ OPTSCRIPT_SRCS = \
 	\
 	$(NULL)
 
-include makefiles/optlib2c_input.mak
+OPTLIB2C_INPUT = \
+	optlib/RSpec.ctags			\
+	optlib/cmake.ctags			\
+	optlib/ctags-optlib.ctags		\
+	optlib/elixir.ctags			\
+	optlib/elm.ctags			\
+	optlib/gdbinit.ctags			\
+	optlib/inko.ctags			\
+	optlib/iPythonCell.ctags		\
+	optlib/kconfig.ctags			\
+	optlib/man.ctags			\
+	optlib/markdown.ctags			\
+	optlib/meson.ctags			\
+	optlib/mesonOptions.ctags		\
+	optlib/passwd.ctags			\
+	optlib/pod.ctags			\
+	optlib/puppetManifest.ctags		\
+	optlib/qemuhx.ctags			\
+	optlib/rpmMacros.ctags			\
+	optlib/scss.ctags			\
+	optlib/systemtap.ctags			\
+	\
+	$(NULL)
 OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
 
-include makefiles/txt2cstr_input.mak
+TXT2CSTR_INPUT = \
+	main/CommonPrelude.ps			\
+	\
+	$(NULL)
 TXT2CSTR_SRCS = $(TXT2CSTR_INPUT:.ps=.c)
 
-include makefiles/peg_input.mak
+PEG_INPUT = \
+       peg/varlink.peg				\
+       peg/kotlin.peg				\
+       \
+       $(NULL)
 PEG_SRCS = $(PEG_INPUT:.peg=.c)
 PEG_HEADS = $(PEG_INPUT:.peg=.h)
 PEG_EXTRA_HEADS = peg/peg_common.h $(PEG_INPUT:.peg=_pre.h) $(PEG_INPUT:.peg=_post.h)
