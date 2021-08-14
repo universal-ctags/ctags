@@ -430,6 +430,42 @@ WIN32_HEADS = main/e_msoft.h
 WIN32_SRCS = win32/mkstemp/mkstemp.c
 WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
 
+# common to MVC and MINGW
+COMMON_GNULIB_HEADS = \
+	gnulib/regex.h			\
+	gnulib/fnmatch.h		\
+	\
+	$(NULL)
+COMMON_GNULIB_SRCS = \
+	gnulib/regex.c			\
+	gnulib/nl_langinfo.c		\
+	gnulib/setlocale_null.c		\
+	gnulib/malloc/dynarray_resize.c	\
+	gnulib/fnmatch.c		\
+	gnulib/mempcpy.c		\
+	gnulib/wmempcpy.c		\
+	\
+	$(NULL)
+
+MVC_GNULIB_HEADS = \
+	$(COMMON_GNULIB_HEADS)		\
+	\
+	$(NULL)
+MVC_GNULIB_SRCS = \
+	$(COMMON_GNULIB_SRCS)		\
+	\
+	$(NULL)
+
+MINGW_GNULIB_HEADS = \
+	$(COMMON_GNULIB_HEADS)		\
+	\
+	$(NULL)
+MINGW_GNULIB_SRCS = \
+	$(COMMON_GNULIB_SRCS)		\
+	gnulib/localeconv.c		\
+	\
+	$(NULL)
+
 ENVIRONMENT_HEADS =
 ENVIRONMENT_SRCS =
 
