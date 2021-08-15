@@ -18,7 +18,7 @@ PACKCC = packcc.exe
 GNULIB_OBJS = $(MVC_GNULIB_SRCS:.c=.obj)
 WIN32_OBJS = $(WIN32_SRCS:.c=.obj)
 PEG_OBJS = $(PEG_SRCS:.c=.obj)
-PACKCC_OBJS = $(PACKCC_SRCS:.c=.obj)
+PACKCC_OBJ = $(PACKCC_SRC:.c=.obj)
 RES_OBJ = win32/ctags.res
 EXTRA_OBJS = $(GNULIB_OBJS) $(WIN32_OBJS) $(PEG_OBJS) $(RES_OBJ)
 ALL_OBJS = $(ALL_SRCS:.c=.obj) $(EXTRA_OBJS)
@@ -89,11 +89,11 @@ readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(READTAGS_DSL_OBJS) $(READTAGS
 optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) /link setargv.obj $(LIBS)
 
-$(PACKCC_OBJS): $(PACKCC_SRCS)
-	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(COMMON_DEFINES) $(PACKCC_SRCS)
+$(PACKCC_OBJ): $(PACKCC_SRC)
+	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(COMMON_DEFINES) $(PACKCC_SRC)
 
-$(PACKCC): $(PACKCC_OBJS)
-	$(CC) $(OPT) /Fe$@ $(PACKCC_OBJS) /link setargv.obj $(PDBFLAG)
+$(PACKCC): $(PACKCC_OBJ)
+	$(CC) $(OPT) /Fe$@ $(PACKCC_OBJ) /link setargv.obj $(PDBFLAG)
 
 main\repoinfo.obj: main\repoinfo.c main\repoinfo.h
 

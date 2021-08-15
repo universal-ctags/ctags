@@ -96,10 +96,10 @@ all: copy_gnulib_heads $(PACKCC) ctags.exe readtags.exe optscript.exe
 
 ctags: ctags.exe
 
-$(PACKCC_OBJS): $(PACKCC_SRCS)
+$(PACKCC_OBJ): $(PACKCC_SRC)
 	$(V_CC) $(CC_FOR_PACKCC) -c $(OPT) $(CFLAGS) $(COMMON_DEFINES) -o $@ $<
 
-$(PACKCC): $(PACKCC_OBJS)
+$(PACKCC): $(PACKCC_OBJ)
 	$(V_CC) $(CC_FOR_PACKCC) $(OPT) -o $@ $^
 
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(MINGW_GNULIB_HEADS) $(WIN32_HEADS)

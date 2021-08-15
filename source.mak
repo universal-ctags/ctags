@@ -420,11 +420,8 @@ READTAGS_HEADS = \
 	$(NULL)
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 
-PACKCC_SRCS = \
-	misc/packcc/src/packcc.c \
-	\
-	$(NULL)
-PACKCC_OBJS = $(PACKCC_SRCS:.c=.$(OBJEXT))
+PACKCC_SRC = misc/packcc/src/packcc.c
+PACKCC_OBJ = $(PACKCC_SRC:.c=.$(OBJEXT))
 
 WIN32_HEADS = main/e_msoft.h
 WIN32_SRCS = win32/mkstemp/mkstemp.c

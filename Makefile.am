@@ -71,8 +71,8 @@ CLEANFILES += $(PACKCC)
 cc4b_verbose = $(cc4b_verbose_@AM_V@)
 cc4b_verbose_ = $(cc4b_verbose_@AM_DEFAULT_V@)
 cc4b_verbose_0 = @echo CC4BUILD "  $@";
-$(PACKCC): $(top_srcdir)/$(PACKCC_SRCS)
-	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(PACKCC_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/$(PACKCC_SRCS)
+$(PACKCC): $(srcdir)/$(PACKCC_SRC)
+	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(PACKCC_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(srcdir)/$(PACKCC_SRC)
 
 if USE_READCMD
 bin_PROGRAMS+= readtags
