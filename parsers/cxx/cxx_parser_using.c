@@ -118,6 +118,8 @@ bool cxxParserParseUsingClause(void)
 		if(g_cxx.pTokenChain->iCount > 0)
 		{
 			tagEntryInfo * tag;
+			int iScopeCount = 0;
+			CXXTokenChain *pOriginalScope = NULL;
 
 			if(bUsingNamespace)
 			{
@@ -145,10 +147,34 @@ bool cxxParserParseUsingClause(void)
 						"Found using clause '%s' which imports a name",
 						vStringValue(t->pszWord)
 					);
+
+				// Backup the original scope stack
+				int iSize = cxxScopeGetSize();
+				if(iSize > 0)
+				{
+					pOriginalScope = cxxTokenChainCreate();
+					while(iSize--)
+					{
+						CXXToken *t0 = cxxScopeTakeTop();
+						cxxTokenChainPrepend(pOriginalScope, t0);
+					}
+				}
+
+				// Push temporary scopes for the name
+				while(cxxTokenChainFirst(g_cxx.pTokenChain) != t)
+				{
+					CXXToken *pTokenScope = cxxTokenChainTakeFirst(g_cxx.pTokenChain);
+					if(cxxTokenTypeIs(pTokenScope,CXXTokenTypeIdentifier))
+					{
+						cxxScopePush(pTokenScope,CXXScopeTypeName,CXXScopeAccessUnknown);
+						iScopeCount++;
+					}
+					else
+						cxxTokenDestroy(pTokenScope);
+				}
+
 				tag = cxxRefTagBegin(CXXTagCPPKindNAME,
 									 CXXTagCPPNameRoleUSED, t);
-
-				// FIXME: We need something like "nameref:<condensed>" here!
 			}
 
 			if(tag)
@@ -156,6 +182,19 @@ bool cxxParserParseUsingClause(void)
 				tag->isFileScope = (cxxScopeGetType() == CXXScopeTypeNamespace) &&
 							(!isInputHeaderFile());
 				cxxTagCommit();
+			}
+
+			// Destory the temporary scopes for the name
+			while(iScopeCount--)
+				cxxScopePop();
+
+			// Recover the original scope stack
+			if(pOriginalScope)
+			{
+				CXXToken *t0;
+				while((t0 = cxxTokenChainTakeFirst(pOriginalScope)))
+					cxxScopePushTop(t0);
+				cxxTokenChainDestroy(pOriginalScope);
 			}
 		}
 	}

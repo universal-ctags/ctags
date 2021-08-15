@@ -32,6 +32,8 @@ enum CXXScopeType
 	CXXScopeTypeVariable, // template variables, mainly
 	CXXScopeTypePrototype,
 	CXXScopeTypeTypedef,  // template variables used in "using A = B<T>"
+	CXXScopeTypeName,	  /* for representing scope information of
+							 foo in "using some::thing::foo" */
 	CXXScopeTypeLAST
 };
 

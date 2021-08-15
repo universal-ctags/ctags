@@ -1,9 +1,14 @@
 A	input.cpp	/^class A$/;"	class	file:	roles:def
 B	input.cpp	/^class B : public A$/;"	class	file:	roles:def
+C	input.cpp	/^	class C : A$/;"	class	namespace:X	file:	roles:def
+D	input.cpp	/^class D : X::C$/;"	class	file:	roles:def
+X	input.cpp	/^namespace X$/;"	namespace	file:	roles:def
 std	input.cpp	/^using namespace std;$/;"	namespace	file:	roles:used
 string	input.cpp	/^#include <string>/;"	header	roles:system
-string	input.cpp	/^using std::string;$/;"	name	file:	roles:used
-test	input.cpp	/^	using A::test;$/;"	name	class:B	roles:used
+string	input.cpp	/^using std::string;$/;"	name	name:std	roles:used
+test	input.cpp	/^	using A::test;$/;"	name	name:A	roles:used
 test	input.cpp	/^	void test();$/;"	prototype	class:A	typeref:typename:void	file:	signature:()	roles:def
 test	input.cpp	/^	void test(x t);$/;"	prototype	class:B	typeref:typename:void	file:	signature:(x t)	roles:def
+test2	input.cpp	/^		void test2();$/;"	prototype	class:X::C	typeref:typename:void	file:	signature:()	roles:def
+test2	input.cpp	/^	using X::C::test2;$/;"	name	name:X::C	roles:used
 x	input.cpp	/^using x = std::string;$/;"	typedef	typeref:typename:std::string	file:	roles:def
