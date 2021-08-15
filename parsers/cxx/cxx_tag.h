@@ -54,6 +54,11 @@ enum CXXTagCPPNamespaceRole
 	CXXTagCPPNamespaceRoleUSED,
 };
 
+enum CXXTagCPPNameRole
+{
+	CXXTagCPPNameRoleUSED,
+};
+
 // The fields common to all (sub)languages this parser supports.
 enum CXXTagCommonField
 {

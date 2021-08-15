@@ -72,13 +72,18 @@ static roleDefinition g_aCXXCPPNamespaceRoles [] = {
 	{ true, "used", "specified with \"using namespace\"" },
 };
 
+static roleDefinition g_aCXXCPPNameRoles [] = {
+	{ true, "used", "specified with \"using foo::bar\"" },
+};
+
 static kindDefinition g_aCXXCPPKinds [] = {
 	CXX_COMMON_KINDS(CXX,"class, struct, and union members", LANG_AUTO),
 	{ true,  'c', "class",      "classes" },
 	{ true,  'n', "namespace",  "namespaces",
 	  .referenceOnly = false, ATTACH_ROLES(g_aCXXCPPNamespaceRoles) },
 	{ false, 'A', "alias",      "namespace aliases" },
-	{ false, 'N', "name",       "names imported via using scope::symbol" },
+	{ true,  'N', "name",       "names imported via using scope::symbol",
+	  .referenceOnly = true, ATTACH_ROLES(g_aCXXCPPNameRoles) },
 	{ false, 'Z', "tparam",     "template parameters" },
 };
 

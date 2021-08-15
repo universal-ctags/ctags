@@ -145,7 +145,8 @@ bool cxxParserParseUsingClause(void)
 						"Found using clause '%s' which imports a name",
 						vStringValue(t->pszWord)
 					);
-				tag = cxxTagBegin(CXXTagCPPKindNAME,t);
+				tag = cxxRefTagBegin(CXXTagCPPKindNAME,
+									 CXXTagCPPNameRoleUSED, t);
 
 				// FIXME: We need something like "nameref:<condensed>" here!
 			}

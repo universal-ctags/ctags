@@ -18,6 +18,7 @@ Automake       d/directory       script             on      directory for SCRIPT
 C              d/macro           undef              on      undefined
 C              h/header          local              on      local header
 C              h/header          system             on      system header
+C++            N/name            used               on      specified with "using foo::bar"
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
 C++            h/header          system             on      system header
@@ -110,6 +111,7 @@ Automake       d/directory       script             on      directory for SCRIPT
 C              d/macro           undef              on      undefined
 C              h/header          local              on      local header
 C              h/header          system             on      system header
+C++            N/name            used               on      specified with "using foo::bar"
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
 C++            h/header          system             on      system header
