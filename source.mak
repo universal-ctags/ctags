@@ -1,4 +1,7 @@
+#
 # Shared macros
+#
+#   $(NULL) at the end of a list makes diff readable
 
 # REPOINFO_HEADS is included from REPOINFO_SRCS
 # only when the building environment has ability
@@ -90,7 +93,9 @@ LIB_HEADS =			\
 	$(MAIN_PUBLIC_HEADS)	\
 	$(LIB_PRIVATE_HEADS)	\
 	\
-	$(MIO_HEADS)
+	$(MIO_HEADS)		\
+	\
+	$(NULL)
 
 LIB_SRCS =			\
 	main/args.c			\
@@ -140,7 +145,6 @@ LIB_SRCS =			\
 	main/writer-xref.c		\
 	main/xtag.c			\
 	\
-	\
 	$(TXT2CSTR_SRCS) \
 	\
 	$(REPOINFO_SRCS) \
@@ -154,6 +158,9 @@ CMDLINE_SRCS = \
 	\
 	$(NULL)
 
+DEBUG_HEADS = main/debug.h
+DEBUG_SRCS = main/debug.c
+
 MINI_GEANY_HEADS =
 MINI_GEANY_SRCS = \
 	main/mini-geany.c \
@@ -164,14 +171,44 @@ OPTSCRIPT_SRCS = \
 	extra-cmds/optscript-repl.c \
 	\
 	$(NULL)
+OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.$(OBJEXT))
 
-include makefiles/optlib2c_input.mak
+OPTLIB2C_INPUT = \
+	optlib/RSpec.ctags			\
+	optlib/cmake.ctags			\
+	optlib/ctags-optlib.ctags		\
+	optlib/elixir.ctags			\
+	optlib/elm.ctags			\
+	optlib/gdbinit.ctags			\
+	optlib/inko.ctags			\
+	optlib/iPythonCell.ctags		\
+	optlib/kconfig.ctags			\
+	optlib/man.ctags			\
+	optlib/markdown.ctags			\
+	optlib/meson.ctags			\
+	optlib/mesonOptions.ctags		\
+	optlib/passwd.ctags			\
+	optlib/pod.ctags			\
+	optlib/puppetManifest.ctags		\
+	optlib/qemuhx.ctags			\
+	optlib/rpmMacros.ctags			\
+	optlib/scss.ctags			\
+	optlib/systemtap.ctags			\
+	\
+	$(NULL)
 OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
 
-include makefiles/txt2cstr_input.mak
+TXT2CSTR_INPUT = \
+	main/CommonPrelude.ps			\
+	\
+	$(NULL)
 TXT2CSTR_SRCS = $(TXT2CSTR_INPUT:.ps=.c)
 
-include makefiles/peg_input.mak
+PEG_INPUT = \
+       peg/varlink.peg				\
+       peg/kotlin.peg				\
+       \
+       $(NULL)
 PEG_SRCS = $(PEG_INPUT:.peg=.c)
 PEG_HEADS = $(PEG_INPUT:.peg=.h)
 PEG_EXTRA_HEADS = peg/peg_common.h $(PEG_INPUT:.peg=_pre.h) $(PEG_INPUT:.peg=_post.h)
@@ -336,21 +373,6 @@ YAML_SRCS = \
 	\
 	$(NULL)
 
-DEBUG_HEADS = main/debug.h
-DEBUG_SRCS = main/debug.c
-
-ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS) $(DSL_HEADS) $(OPTSCRIPT_DSL_HEADS)
-ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS) $(DSL_SRCS) $(OPTSCRIPT_DSL_SRCS)
-ALL_HEADS = $(ALL_LIB_HEADS) $(CMDLINE_HEADS)
-ALL_SRCS = $(ALL_LIB_SRCS) $(CMDLINE_SRCS)
-
-ENVIRONMENT_HEADS =
-ENVIRONMENT_SRCS =
-
-WIN32_HEADS = main/e_msoft.h
-WIN32_SRCS = win32/mkstemp/mkstemp.c
-WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
-
 OPTSCRIPT_DSL_HEADS = \
 	dsl/es.h \
 	dsl/optscript.h \
@@ -362,6 +384,7 @@ OPTSCRIPT_DSL_SRCS = \
 	dsl/optscript.c \
 	\
 	$(NULL)
+OPTSCRIPT_DSL_OBJS = $(OPTSCRIPT_DSL_SRCS:.c=.$(OBJEXT))
 
 READTAGS_DSL_HEADS = \
 	dsl/es.h \
@@ -382,16 +405,7 @@ READTAGS_DSL_SRCS = \
 	$(MIO_SRCS) \
 	\
 	$(NULL)
-
 READTAGS_DSL_OBJS = $(QUALIFIER_SRCS:.c=.$(OBJEXT))
-
-ALL_OBJS = \
-	$(ALL_SRCS:.c=.$(OBJEXT)) \
-	$(LIBOBJS)
-
-ALL_LIB_OBJS = \
-	$(ALL_LIB_SRCS:.c=.$(OBJEXT)) \
-	$(LIBOBJS)
 
 READTAGS_SRCS  = \
 	libreadtags/readtags.c      \
@@ -400,21 +414,68 @@ READTAGS_SRCS  = \
 	\
 	$(NULL)
 READTAGS_HEADS = \
-	       libreadtags/readtags.h \
-	       extra-cmds/printtags.h  \
-	       \
-	       $(NULL)
+	libreadtags/readtags.h \
+	extra-cmds/printtags.h  \
+	\
+	$(NULL)
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 
-PACKCC_SRCS = \
-	misc/packcc/src/packcc.c \
+PACKCC_SRC = misc/packcc/src/packcc.c
+PACKCC_OBJ = $(PACKCC_SRC:.c=.$(OBJEXT))
+
+WIN32_HEADS = main/e_msoft.h
+WIN32_SRCS = win32/mkstemp/mkstemp.c
+WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
+
+# common to MVC and MINGW
+COMMON_GNULIB_HEADS = \
+	gnulib/regex.h			\
+	gnulib/fnmatch.h		\
+	\
+	$(NULL)
+COMMON_GNULIB_SRCS = \
+	gnulib/regex.c			\
+	gnulib/nl_langinfo.c		\
+	gnulib/setlocale_null.c		\
+	gnulib/malloc/dynarray_resize.c	\
+	gnulib/fnmatch.c		\
+	gnulib/mempcpy.c		\
+	gnulib/wmempcpy.c		\
 	\
 	$(NULL)
 
-PACKCC_OBJS = $(PACKCC_SRCS:.c=.$(OBJEXT))
+MVC_GNULIB_HEADS = \
+	$(COMMON_GNULIB_HEADS)		\
+	\
+	$(NULL)
+MVC_GNULIB_SRCS = \
+	$(COMMON_GNULIB_SRCS)		\
+	\
+	$(NULL)
 
-OPTSCRIPT_DSL_OBJS = $(OPTSCRIPT_DSL_SRCS:.c=.$(OBJEXT))
+MINGW_GNULIB_HEADS = \
+	$(COMMON_GNULIB_HEADS)		\
+	\
+	$(NULL)
+MINGW_GNULIB_SRCS = \
+	$(COMMON_GNULIB_SRCS)		\
+	gnulib/localeconv.c		\
+	\
+	$(NULL)
 
-OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.$(OBJEXT))
+ENVIRONMENT_HEADS =
+ENVIRONMENT_SRCS =
+
+ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS) $(DSL_HEADS) $(OPTSCRIPT_DSL_HEADS)
+ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS) $(DSL_SRCS) $(OPTSCRIPT_DSL_SRCS)
+ALL_LIB_OBJS = \
+	$(ALL_LIB_SRCS:.c=.$(OBJEXT)) \
+	$(LIBOBJS)
+
+ALL_HEADS = $(ALL_LIB_HEADS) $(CMDLINE_HEADS)
+ALL_SRCS = $(ALL_LIB_SRCS) $(CMDLINE_SRCS)
+ALL_OBJS = \
+	$(ALL_SRCS:.c=.$(OBJEXT)) \
+	$(LIBOBJS)
 
 # vim: ts=8

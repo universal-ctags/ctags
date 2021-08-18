@@ -10,18 +10,15 @@
 OBJEXT = obj
 include source.mak
 
-GNULIB_HEADS = gnulib/regex.h gnulib/fnmatch.h
-GNULIB_SRCS = gnulib/regex.c gnulib/nl_langinfo.c gnulib/setlocale_null.c gnulib/malloc/dynarray_resize.c gnulib/fnmatch.c gnulib/mempcpy.c gnulib/wmempcpy.c
-
 COMMON_DEFINES =
 DEFINES = -DWIN32 $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DHAVE_PACKCC -DREADTAGS_DSL
 INCLUDES = -I. -Ignulib -Imain -Iparsers -Ilibreadtags -Idsl
 OPT = /O2 /WX
 PACKCC = packcc.exe
-GNULIB_OBJS = $(GNULIB_SRCS:.c=.obj)
+GNULIB_OBJS = $(MVC_GNULIB_SRCS:.c=.obj)
 WIN32_OBJS = $(WIN32_SRCS:.c=.obj)
 PEG_OBJS = $(PEG_SRCS:.c=.obj)
-PACKCC_OBJS = $(PACKCC_SRCS:.c=.obj)
+PACKCC_OBJ = $(PACKCC_SRC:.c=.obj)
 RES_OBJ = win32/ctags.res
 EXTRA_OBJS = $(GNULIB_OBJS) $(WIN32_OBJS) $(PEG_OBJS) $(RES_OBJ)
 ALL_OBJS = $(ALL_SRCS:.c=.obj) $(EXTRA_OBJS)
@@ -83,20 +80,20 @@ all: copy_gnulib_heads $(PACKCC) ctags.exe readtags.exe optscript.exe
 
 ctags: ctags.exe
 
-ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(GNULIB_HEADS) $(WIN32_HEADS) $(REPOINFO_HEADS)
+ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(MVC_GNULIB_HEADS) $(WIN32_HEADS) $(REPOINFO_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LIBS) $(PDBFLAG)
 
-readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(READTAGS_DSL_OBJS) $(READTAGS_DSL_HEADS) $(GNULIB_OBJS) $(GNULIB_HEADS)
+readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(READTAGS_DSL_OBJS) $(READTAGS_DSL_HEADS) $(GNULIB_OBJS) $(MVC_GNULIB_HEADS)
 	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) $(READTAGS_DSL_OBJS) $(GNULIB_OBJS) /link setargv.obj $(PDBFLAG)
 
 optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) /link setargv.obj $(LIBS)
 
-$(PACKCC_OBJS): $(PACKCC_SRCS)
-	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(COMMON_DEFINES) $(PACKCC_SRCS)
+$(PACKCC_OBJ): $(PACKCC_SRC)
+	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(COMMON_DEFINES) $(PACKCC_SRC)
 
-$(PACKCC): $(PACKCC_OBJS)
-	$(CC) $(OPT) /Fe$@ $(PACKCC_OBJS) /link setargv.obj $(PDBFLAG)
+$(PACKCC): $(PACKCC_OBJ)
+	$(CC) $(OPT) /Fe$@ $(PACKCC_OBJ) /link setargv.obj $(PDBFLAG)
 
 main\repoinfo.obj: main\repoinfo.c main\repoinfo.h
 

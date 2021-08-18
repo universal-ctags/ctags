@@ -1760,7 +1760,7 @@ source code. Your optlib parser can thus easily become a built-in parser.
 To add your optlib file, ``foo.ctags``, into ctags do the following steps;
 
 * copy ``foo.ctags`` file on ``optlib/`` directory
-* add ``foo.ctags`` on ``OPTLIB2C_INPUT`` variable in ``makefiles/optlib2c_input.mak``
+* add ``foo.ctags`` on ``OPTLIB2C_INPUT`` variable in ``source.mak``
 * add ``fooParser`` on ``PARSER_LIST`` macro variable in ``main/parser_p.h``
 
 You are encouraged to submit your :file:`.ctags` file to our repository on

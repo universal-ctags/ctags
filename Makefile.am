@@ -3,8 +3,8 @@ ACLOCAL_AMFLAGS = -I m4
 GNULIB_DIR = gnulib
 GNULIB_CPPFLAGS = -I$(top_builddir)/$(GNULIB_DIR) -I$(top_srcdir)/$(GNULIB_DIR)
 GNULIB_LIBS = $(GNULIB_DIR)/libgnu.a $(LIBPTHREAD)
-$(GNULIB_DIR)/libgnu.a:
-	$(MAKE) -C $(GNULIB_DIR) libgnu.a
+$(GNULIB_LIBS):
+	$(MAKE) -C $(GNULIB_DIR) all
 SUBDIRS = $(GNULIB_DIR) . man
 
 include $(top_srcdir)/source.mak
@@ -39,32 +39,40 @@ EXTRA_DIST   = README.md autogen.sh \
 
 CLEANFILES =
 MOSTLYCLEANFILES =
+MAINTAINERCLEANFILES = autom4te.cache
 
+# for distcheck
 clean-local:
-	rm -f packcc$(BUILD_EXEEXT)
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
 		rm -rf $(OPTLIB2C_SRCS); \
 		rm -rf $(TXT2CSTR_SRCS); \
+	else \
+		$(MAKE) -C docs clean; \
 	fi
+
+maintainer-clean-local:
+	rm -rf .deps misc/packcc/.dirstamp
 
 bin_PROGRAMS = ctags
 noinst_LIBRARIES = libctags.a
 
 noinst_PROGRAMS =
-noinst_PROGRAMS += mini-geany
 
+# packcc always uses native compiler even when cross-compiling.
+# packcc cannot use the standard Automake rule.
 PACKCC_CPPFLAGS_FOR_BUILD  = -fsigned-char
 if HAVE_STRNLEN_FOR_BUILD
 PACKCC_CPPFLAGS_FOR_BUILD += -DPCC_USE_SYSTEM_STRNLEN
 endif
 
 PACKCC = $(top_builddir)/packcc$(BUILD_EXEEXT)
+CLEANFILES += $(PACKCC)
 
 cc4b_verbose = $(cc4b_verbose_@AM_V@)
 cc4b_verbose_ = $(cc4b_verbose_@AM_DEFAULT_V@)
 cc4b_verbose_0 = @echo CC4BUILD "  $@";
-$(PACKCC): $(top_srcdir)/misc/packcc/src/packcc.c
-	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(PACKCC_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/misc/packcc/src/packcc.c
+$(PACKCC): $(srcdir)/$(PACKCC_SRC)
+	$(cc4b_verbose)$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(PACKCC_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(srcdir)/$(PACKCC_SRC)
 
 if USE_READCMD
 bin_PROGRAMS+= readtags
@@ -117,7 +125,8 @@ libctags_a_CFLAGS  += $(SECCOMP_CFLAGS)
 nodist_libctags_a_SOURCES = $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
 CLEANFILES += $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
-EXTRA_libctags_a_DEPENDENCIES = $(REPOINFO_HEADS)
+EXTRA_libctags_a_DEPENDENCIES = $(GNULIB_LIBS)
+$(REPOINFO_SRCS): $(REPOINFO_HEADS)
 repoinfo_verbose = $(repoinfo_verbose_@AM_V@)
 repoinfo_verbose_ = $(repoinfo_verbose_@AM_DEFAULT_V@)
 repoinfo_verbose_0 = @echo REPOINFO "  $@";
@@ -138,6 +147,7 @@ optlib2c_verbose = $(optlib2c_verbose_@AM_V@)
 optlib2c_verbose_ = $(optlib2c_verbose_@AM_DEFAULT_V@)
 optlib2c_verbose_0 = @echo OPTLIB2C "  $@";
 OPTLIB2C = $(srcdir)/misc/optlib2c
+OPTLIB2C_DIR = optlib
 SUFFIXES += .ctags
 .ctags.c:
 	$(optlib2c_verbose)$(OPTLIB2C) $< > $@
@@ -149,6 +159,7 @@ txt2cstr_verbose = $(txt2cstr_verbose_@AM_V@)
 txt2cstr_verbose_ = $(txt2cstr_verbose_@AM_DEFAULT_V@)
 txt2cstr_verbose_0 = @echo TXT2CSTR "  $@";
 TXT2CSTR = $(srcdir)/misc/txt2cstr
+TXT2CSTR_DIR = main
 SUFFIXES += .ps
 .ps.c:
 	$(txt2cstr_verbose)$(TXT2CSTR) $< > $@
@@ -190,6 +201,7 @@ $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 MOSTLYCLEANFILES += $(RES_OBJ)
 endif
 
+noinst_PROGRAMS += mini-geany
 mini_geany_CPPFLAGS = $(libctags_a_CPPFLAGS)
 mini_geany_CFLAGS = $(libctags_a_CFLAGS)
 mini_geany_LDADD  = libctags.a

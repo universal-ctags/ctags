@@ -3,10 +3,7 @@
 OBJEXT = o
 include source.mak
 
-GNULIB_HEADS = gnulib/regex.h gnulib/fnmatch.h
-GNULIB_SRCS =  gnulib/regex.c gnulib/localeconv.c gnulib/nl_langinfo.c gnulib/setlocale_null.c gnulib/malloc/dynarray_resize.c
-GNULIB_SRCS += gnulib/fnmatch.c gnulib/mempcpy.c gnulib/wmempcpy.c
-GNULIB_OBJS = $(GNULIB_SRCS:.c=.$(OBJEXT))
+GNULIB_OBJS = $(MINGW_GNULIB_SRCS:.c=.$(OBJEXT))
 
 CFLAGS = -Wall -std=gnu99
 COMMON_DEFINES =
@@ -99,13 +96,13 @@ all: copy_gnulib_heads $(PACKCC) ctags.exe readtags.exe optscript.exe
 
 ctags: ctags.exe
 
-$(PACKCC_OBJS): $(PACKCC_SRCS)
+$(PACKCC_OBJ): $(PACKCC_SRC)
 	$(V_CC) $(CC_FOR_PACKCC) -c $(OPT) $(CFLAGS) $(COMMON_DEFINES) -o $@ $<
 
-$(PACKCC): $(PACKCC_OBJS)
+$(PACKCC): $(PACKCC_OBJ)
 	$(V_CC) $(CC_FOR_PACKCC) $(OPT) -o $@ $^
 
-ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(GNULIB_HEADS) $(WIN32_HEADS)
+ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(MINGW_GNULIB_HEADS) $(WIN32_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_OBJS) $(LIBS)
 
 $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
@@ -116,7 +113,7 @@ extra-cmds/%.o: extra-cmds/%.c
 libreadtags/%.o: libreadtags/%.c
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Ilibreadtags -o $@ $<
 
-readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(GNULIB_OBJS) $(GNULIB_HEADS)
+readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(GNULIB_OBJS) $(MINGW_GNULIB_HEADS)
 	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(GNULIB_OBJS) $(LIBS)
 
 optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
