@@ -244,7 +244,7 @@ roundtrip: $(READTAGS_TEST)
 		ROUNDTRIP_FLAGS=--minitrip;			\
 	fi;							\
 	builddir=$$(pwd); \
-	$(SHELL) $(srcdir)/misc/roundtrip $(READTAGS_TEST) $${builddir}/Units $(ROUNDTRIP_FLAGS)
+	$(SHELL) $(srcdir)/misc/roundtrip $(READTAGS_TEST) $${builddir}/Units $${ROUNDTRIP_FLAGS}
 else
 roundtrip:
 endif
