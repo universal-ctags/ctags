@@ -65,7 +65,7 @@ if HAVE_STRNLEN_FOR_BUILD
 PACKCC_CPPFLAGS_FOR_BUILD += -DPCC_USE_SYSTEM_STRNLEN
 endif
 
-PACKCC = $(top_builddir)/packcc$(BUILD_EXEEXT)
+PACKCC = packcc$(BUILD_EXEEXT)
 CLEANFILES += $(PACKCC)
 
 cc4b_verbose = $(cc4b_verbose_@AM_V@)
@@ -171,9 +171,9 @@ packcc_verbose_ = $(packcc_verbose_@AM_DEFAULT_V@)
 packcc_verbose_0 = @echo PACKCC "    $@";
 SUFFIXES += .peg
 .peg.c:
-	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
+	$(packcc_verbose)./$(PACKCC) -o peg/$(*F) "$<"
 .peg.h:
-	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
+	$(packcc_verbose)./$(PACKCC) -o peg/$(*F) "$<"
 # You cannot use $(PACKCC) as a target name here.
 $(PEG_SRCS) $(PEG_HEADS): $(PACKCC) Makefile
 dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)
