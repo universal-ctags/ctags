@@ -109,12 +109,10 @@ units: $(CTAGS_TEST)
 	if ! test x$(CI) = x; then	\
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
-	builddir=$$(pwd); \
 	if ! test x$(PYTHON) = x; then	\
 		PROG=$(PYTHON);		\
 		SCRIPT=$(srcdir)/misc/units.py;	\
 		if type cygpath > /dev/null 2>&1; then	\
-			builddir=$$(cygpath -m "$$(pwd)");	\
 			if ! test x$(SHELL) = x; then	\
 				SHELL_OPT=--shell=$$(cygpath -m $(SHELL));	\
 			fi;	\
@@ -127,7 +125,7 @@ units: $(CTAGS_TEST)
 		PROG=$(SHELL);		\
 		SCRIPT=$(srcdir)/misc/units;	\
 	fi;	\
-	mkdir -p $${builddir}/Units && \
+	mkdir -p Units && \
 	\
 	c="$${SCRIPT} run \
 		--ctags=$(CTAGS_TEST) \
@@ -139,12 +137,12 @@ units: $(CTAGS_TEST)
 		--with-timeout=`expr $(TIMEOUT) '*' 10`\
 		$${SHELL_OPT} \
 		$${SHOW_DIFF_OUTPUT}"; \
-		 $${PROG} $${c} $(srcdir)/Units $${builddir}/Units
+		 $${PROG} $${c} $(srcdir)/Units ./Units
 
 clean-units:
 	$(SILENT) echo Cleaning test units
-	$(SILENT) if test -d $$(pwd)/Units; then \
-		$(SHELL) $(srcdir)/misc/units clean $$(pwd)/Units; \
+	$(SILENT) if test -d Units; then \
+		$(SHELL) $(srcdir)/misc/units clean ./Units; \
 	fi
 
 #
@@ -173,12 +171,10 @@ tmain: $(CTAGS_TEST) $(READTAGS_TEST) $(OPTSCRIPT_TEST)
 	if ! test x$(CI) = x; then	\
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
-	builddir=$$(pwd); \
 	if ! test x$(PYTHON) = x; then	\
 		PROG=$(PYTHON);		\
 		SCRIPT=$(srcdir)/misc/units.py;	\
 		if type cygpath > /dev/null 2>&1; then	\
-			builddir=$$(cygpath -m "$$(pwd)");	\
 			if ! test x$(SHELL) = x; then	\
 				SHELL_OPT=--shell=$$(cygpath -m $(SHELL));	\
 			fi;	\
@@ -191,7 +187,7 @@ tmain: $(CTAGS_TEST) $(READTAGS_TEST) $(OPTSCRIPT_TEST)
 		PROG=$(SHELL);		\
 		SCRIPT=$(srcdir)/misc/units;	\
 	fi;	\
-	mkdir -p $${builddir}/Tmain && \
+	mkdir -p Tmain && \
 	\
 	c="$${SCRIPT} tmain \
 		--ctags=$(CTAGS_TEST) \
@@ -199,22 +195,21 @@ tmain: $(CTAGS_TEST) $(READTAGS_TEST) $(OPTSCRIPT_TEST)
 		$${VALGRIND} \
 		$${SHELL_OPT} \
 		$${SHOW_DIFF_OUTPUT}"; \
-		$${PROG} $${c} $(srcdir)/Tmain $${builddir}/Tmain
+		$${PROG} $${c} $(srcdir)/Tmain ./Tmain
 
 clean-tmain:
 	$(SILENT) echo Cleaning main part tests
-	$(SILENT) if test -d $$(pwd)/Tmain; then \
-		$(SHELL) $(srcdir)/misc/units clean-tmain $$(pwd)/Tmain; \
+	$(SILENT) if test -d Tmain; then \
+		$(SHELL) $(srcdir)/misc/units clean-tmain ./Tmain; \
 	fi
 
 tlib: $(MINI_GEANY_TEST)
 	$(V_RUN) \
-	builddir=$$(pwd); \
-	mkdir -p $${builddir}/misc; \
+	mkdir -p misc; \
 	if test -s '$(MINI_GEANY_TEST)'; then \
 		if $(SHELL) $(srcdir)/misc/tlib $(MINI_GEANY_TEST) \
 			$(srcdir)/misc/mini-geany.expected \
-			$${builddir}/misc/mini-geany.actual \
+			./misc/mini-geany.actual \
 			$(VG); then \
 			echo 'mini-geany: OK'; \
 		else \
@@ -225,17 +220,15 @@ tlib: $(MINI_GEANY_TEST)
 	fi
 clean-tlib:
 	$(SILENT) echo Cleaning libctags part tests
-	$(SILENT) builddir=$$(pwd); \
-		rm -f $${builddir}/misc/mini-geany.actual
+	$(SILENT) rm -f misc/mini-geany.actual
 
 #
 # Test installation
 #
 tinst:
 	$(V_RUN) \
-	builddir=$$(pwd); \
-	rm -rf $$builddir/$(TINST_ROOT); \
-	$(SHELL) $(srcdir)/misc/tinst $(srcdir) $$builddir/$(TINST_ROOT)
+	rm -rf $(TINST_ROOT); \
+	$(SHELL) $(srcdir)/misc/tinst $(srcdir) ./$(TINST_ROOT)
 
 #
 # Test readtags
@@ -246,8 +239,7 @@ roundtrip: $(READTAGS_TEST)
 	if ! test x$(CI) = x; then	\
 		ROUNDTRIP_FLAGS=--minitrip;			\
 	fi;							\
-	builddir=$$(pwd); \
-	$(SHELL) $(srcdir)/misc/roundtrip $(READTAGS_TEST) $${builddir}/Units $${ROUNDTRIP_FLAGS}
+	$(SHELL) $(srcdir)/misc/roundtrip $(READTAGS_TEST) ./Units $${ROUNDTRIP_FLAGS}
 else
 roundtrip:
 endif
