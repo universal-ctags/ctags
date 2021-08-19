@@ -396,4 +396,4 @@ workflows:
       - fedora30_bmake_roundtrip
       - fedora33_gmake_roundtrip
       - centos7_make_roundtrip
-      # - THIS_WILL_BE_FAILED_fedora34_CANARY
+      - THIS_WILL_BE_FAILED_fedora34_CANARY
