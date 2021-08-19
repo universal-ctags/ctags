@@ -46,6 +46,10 @@ int installSyscallFilter (void)
 #ifdef __SNR_newfstatat
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (newfstatat), 0);
 #endif
+#ifdef __SNR_statx
+	// armhf fallback
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (statx), 0);
+#endif
 
 	// seems unnecessary, but this comes from
 	// main/parse.c:2764 : tagFilePosition (&tagfpos);
