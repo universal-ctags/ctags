@@ -8,10 +8,10 @@ jobs:
   #
   # We assume GNU Make is available.
   #
-   fedora33_gmake:
+   fedora34_gmake:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:33
+       - image: docker.io/fedora:34
      steps:
        - run:
            name: Install Git, Gdb and Procps-NG
@@ -39,10 +39,10 @@ jobs:
              cd docs
              make html
 
-   fedora33_gmake_roundtrip:
+   fedora34_gmake_roundtrip:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:33
+       - image: docker.io/fedora:34
      steps:
        - run:
            name: Install Git and Gdb
@@ -129,10 +129,10 @@ jobs:
            command: |
              MAKE=bmake bmake roundtrip
 
-   fedora33_distcheck:
+   fedora34_distcheck:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:33
+       - image: docker.io/fedora:34
      steps:
        - run:
            name: Install Git, Gdb and Procps-NG
@@ -364,36 +364,19 @@ jobs:
            command: |
              test -f out/bin/ctags && ( file out/bin/ctags | grep -q 'ARM aarch64' )
 
-   THIS_WILL_BE_FAILED_fedora34_CANARY:
-     working_directory: ~/universal-ctags
-     docker:
-       - image: docker.io/fedora:34
-     steps:
-       - checkout
-       - run:
-           name: Install build tools
-           command: |
-             dnf -y install gcc automake autoconf pkgconfig make
-       - run:
-           name: Run autogen.sh
-           command: |
-             bash ./autogen.sh
-
-
 workflows:
   version: 2
   build_and_test:
     jobs:
       - ubuntu20_32bit
       - fedora30_bmake
-      - fedora33_distcheck
+      - fedora34_distcheck
       - centos_make
-      - fedora33_gmake
+      - fedora34_gmake
       - fedora33_cross_aarch64
       - centos7_make
       - ubuntu20_mingw
       - centos_make_roundtrip
       - fedora30_bmake_roundtrip
-      - fedora33_gmake_roundtrip
+      - fedora34_gmake_roundtrip
       - centos7_make_roundtrip
-      # - THIS_WILL_BE_FAILED_fedora34_CANARY

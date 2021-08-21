@@ -28,6 +28,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: update package information
       run: sudo apt-get -y -o APT::Immediate-Configure=false update
     - name: install tools and libraries
