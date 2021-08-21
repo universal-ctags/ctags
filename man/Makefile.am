@@ -58,6 +58,8 @@ MAINTAINERCLEANFILES =  $(man_in_files)
 
 .PHONY: man man-in html pdf update-docs clean-docs
 
+all-am: update-docs
+
 man: $(man_pages)
 man-in: $(man_in_files)
 html: $(html_pages)
@@ -148,5 +150,6 @@ $(DOCS_DIR)/%.rst: %.rst
 	$(sed_verbose)sed $(reppat) -e '1,10s/^-*$$//' < $< > $@
 
 # remove generated files to be commited (used for `make checkgen`)
+clean-local: clean-docs
 clean-docs:
 	$(rm_verbose)rm -f $(man_in_files) $(doc_files)
