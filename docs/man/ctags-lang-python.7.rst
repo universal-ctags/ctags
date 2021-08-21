@@ -67,7 +67,7 @@ Summary
 	==== ========== ================== ===================
 	`X`  module     namespace          N/A
 	`Y`  unknown    indirectlyImported scope:module:`X`
-	`Z`  unknown    definition         nameref:unknown:`X`
+	`Z`  unknown    definition         nameref:unknown:`Y`
 	==== ========== ================== ===================
 
 ..
@@ -82,7 +82,7 @@ Summary
 	from X import Y       Y    unknown    imported           scope:module:X
 	from X import Y as Z  X    module     namespace
 	from X import Y as Z  Y    unknown    indirectlyImported scope:module:X
-	from X import Y as Z  Z    unknown    definition         nameref:unknown:X
+	from X import Y as Z  Z    unknown    definition         nameref:unknown:Y
 	===================== ==== ========== ================== ===================
 
 ..  a table having merged cells cannot be converted to man page
