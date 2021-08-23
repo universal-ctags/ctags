@@ -38,5 +38,8 @@ trim_trailing_whitespace = true
 [win32/*]
 end_of_line = crlf
 
+[win32/*.vcxproj*.in]
+end_of_line = lf
+
 [win32/*.vcxproj*]
 insert_final_newline = false
