@@ -19,7 +19,7 @@ indent_size = 4
 indent_style = space
 trim_trailing_whitespace = true
 
-[*.mak]
+[{Makefile*,*.mak}]
 indent_size = 8
 indent_style = tab
 trim_trailing_whitespace = true
@@ -29,10 +29,7 @@ indent_size = 4
 indent_style = tab
 trim_trailing_whitespace = true
 
-[fnmatch/*.{c,h}]
-tab_width = 8
-
-[gnu_regex/*.{c,h}]
+[gnulib/*.{c,h}]
 tab_width = 8
 
 [misc/optlib2c]
