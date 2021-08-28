@@ -31,3 +31,10 @@ arraytype
 (--arraytype--)
 (--dicttype--)
 (--arraytype--)
+3
+abc
+/abc
+true
+{}
+[]
+true
