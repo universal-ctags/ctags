@@ -33,8 +33,6 @@ struct sTclSubparser {
 	subparser subparser;
 
 	/* `pstate' is needed to call newTclToken(). */
-	void (* packageRequirementNotify) (tclSubparser *s, char *package,
-									   void *pstate);
 	void (* namespaceImportNotify) (tclSubparser *s, char *namespace,
 									void *pstate);
 	/* Return CORK_NIL if the command line is NOT consumed.
