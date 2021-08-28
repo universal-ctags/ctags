@@ -377,23 +377,6 @@ static const char* getLastComponentInIdentifier(tokenInfo *const token)
 		return NULL;
 }
 
-static void notifyPackageRequirement (tokenInfo *const token)
-{
-	subparser *sub;
-
-	foreachSubparser (sub, false)
-	{
-		tclSubparser *tclsub = (tclSubparser *)sub;
-
-		if (tclsub->packageRequirementNotify)
-		{
-			enterSubparser(sub);
-			tclsub->packageRequirementNotify (tclsub, tokenString (token),
-											  TCL_PSTATE(token));
-			leaveSubparser();
-		}
-	}
-}
 
 static void notifyNamespaceImport (tokenInfo *const token)
 {
@@ -676,12 +659,6 @@ static void parsePackage (tokenInfo *const token)
 		{
 			if (tokenString(token)[0] == '-')
 				goto next;
-
-			if (tokenIsType (token, TCL_IDENTIFIER)
-				&& (vStringLength (token->string) > 0))
-			{
-				notifyPackageRequirement (token);
-			}
 		}
 	}
 	skipToEndOfCmdline(token);

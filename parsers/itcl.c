@@ -18,7 +18,6 @@
 
 struct itclSubparser {
 	tclSubparser tcl;
-	bool foundITclPackageRequired;
 	bool foundITclNamespaceImported;
 };
 
@@ -256,23 +255,12 @@ static int commandNotify (tclSubparser *s, char *command,
 	struct itclSubparser *itcl = (struct itclSubparser *)s;
 	int r = CORK_NIL;
 
-	if (!itcl->foundITclPackageRequired)
-		return r;
-
 	if ((itcl->foundITclNamespaceImported
 		 && (strcmp (command, "class") == 0))
 		|| (strcmp (command, "itcl::class") == 0))
 		r = parseClass (s, parentIndex, pstate);
 
 	return r;
-}
-
-static void packageRequirementNotify (tclSubparser *s, char *package,
-									  void *pstate CTAGS_ATTR_UNUSED)
-{
-	struct itclSubparser *itcl = (struct itclSubparser *)s;
-	if (strcmp (package, "Itcl") == 0)
-		itcl->foundITclPackageRequired = true;
 }
 
 static void namespaceImportNotify (tclSubparser *s, char *namespace,
@@ -289,7 +277,6 @@ static void inputStart (subparser *s)
 {
 	struct itclSubparser *itcl = (struct itclSubparser *)s;
 
-	itcl->foundITclPackageRequired = false;
 	itcl->foundITclNamespaceImported = false;
 }
 
@@ -300,7 +287,6 @@ struct itclSubparser itclSubparser = {
 			.inputStart = inputStart,
 		},
 		.commandNotify = commandNotify,
-		.packageRequirementNotify = packageRequirementNotify,
 		.namespaceImportNotify = namespaceImportNotify,
 	},
 };
