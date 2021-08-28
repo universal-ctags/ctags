@@ -33,17 +33,66 @@ thus easily become a built-in parser. See ":ref:`optlib2c`" for details.
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Universal Ctags currently uses the same regex engine as Exuberant Ctags:
-the POSIX.2 regex engine in GNU glibc-2.10.1. By default it uses the Extended
-Regular Expressions (ERE) syntax, as used by most engines today; however it does
+Universal Ctags currently uses `the POSIX Extended Regular Expressions (ERE)
+<https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html>`_
+syntax as same as Exuberant Ctags.
+
+During building Universal Ctags the ``configure`` script runs compatibility
+tests of the regex engine in the system library.  If tests pass the engine is
+used, otherwise the regex engine imported from `the GNU Gnulib library
+<https://www.gnu.org/software/gnulib/manual/gnulib.html#Regular-expressions>`_
+is used. In the latter case, ``ctags --list-features`` will contain
+``gnulib_regex``.
+
+See ``regex(7)`` or `the GNU Gnulib Manual
+<https://www.gnu.org/software/gnulib/manual/gnulib.html#Regular-expressions>`_
+for the details of the regular expression syntax.
+
+.. note::
+
+	The GNU regex engine supports some GNU extensions described `here
+	<https://www.gnu.org/software/gnulib/manual/gnulib.html#posix_002dextended-regular-expression-syntax>`_.
+	Note that an optlib parser using the extensions may not work with Universal
+	Ctags on some other systems.
+
+The POSIX Extended Regular Expressions (ERE) does
 *not* support many of the "modern" extensions such as lazy captures,
 non-capturing grouping, atomic grouping, possessive quantifiers, look-ahead/behind,
-etc. It is also notoriously slow when backtracking, and has some known "quirks"
-with respect to escaping special characters in bracket expressions.
+etc. It may be notoriously slow when backtracking.
 
-For example, a pattern of ``[^\]]+`` is invalid in POSIX.2, because the '``]``' is
+A common error is forgetting that a
+POSIX ERE engine is always *greedy*; the '``*``' and '``+``' quantifiers match
+as much as possible, before backtracking from the end of their match.
+
+For example this pattern::
+
+	foo.*bar
+
+Will match this entire string, not just the first part::
+
+	foobar, bar, and even more bar
+
+Another detail to keep in mind is how the regex engine treats newlines.
+Universal Ctags compiles the regular expressions in the ``--regex-<LANG>`` and
+``--mline-regex-<LANG>`` options with ``REG_NEWLINE`` set. What that means is documented
+in the
+`POSIX specification <https://pubs.opengroup.org/onlinepubs/9699919799/functions/regcomp.html>`_.
+One obvious effect is that the regex special dot any-character '``.``' does not match
+newline characters, the '``^``' anchor *does* match right after a newline, and
+the '``$``' anchor matches right before a newline. A more subtle issue is this text from the
+chapter "`Regular Expressions <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html>`_";
+"the use of literal <newline>s or any escape sequence equivalent produces undefined
+results". What that means is using a regex pattern with ``[^\n]+`` is invalid,
+and indeed in glibc produces very odd results. **Never use** '``\n``' in patterns
+for ``--regex-<LANG>``, and **never use them** in non-matching bracket expressions
+for ``--mline-regex-<LANG>`` patterns. For the experimental ``--_mtable-regex-<LANG>``
+you can safely use '``\n``' because that regex is not compiled with ``REG_NEWLINE``.
+
+And it may also have some known "quirks"
+with respect to escaping special characters in bracket expressions.
+For example, a pattern of ``[^\]]+`` is invalid in POSIX ERE, because the '``]``' is
 *not* special inside a bracket expression, and thus should **not** be escaped.
-Most regex engines ignore this subtle detail in POSIX.2, and instead allow
+Most regex engines ignore this subtle detail in POSIX ERE, and instead allow
 escaping it with '``\]``' inside the bracket expression and treat it as the
 literal character '``]``'. GNU glibc, however, does not generate an error but
 instead considers it undefined behavior, and in fact it will match very odd
@@ -55,36 +104,9 @@ character but '``\``' *or* '``)``'. The only exceptions for using '``\``' inside
 bracket expression are for '``\t``' and '``\n``', which ctags converts to their
 single literal character control codes before passing the pattern to glibc.
 
-Another detail to keep in mind is how the regex engine treats newlines.
-Universal Ctags compiles the regular expressions in the ``--regex-<LANG>`` and
-``--mline-regex-<LANG>`` options with ``REG_NEWLINE`` set. What that means is documented
-in the
-`POSIX spec <https://pubs.opengroup.org/onlinepubs/009695399/functions/regcomp.html>`_.
-One obvious effect is that the regex special dot any-character '``.``' does not match
-newline characters, the '``^``' anchor *does* match right after a newline, and
-the '``$``' anchor matches right before a newline. A more subtle issue is this text from the
-chapter "`Regular Expressions <https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html>`_";
-"the use of literal <newline>s or any escape sequence equivalent produces undefined
-results". What that means is using a regex pattern with ``[^\n]+`` is invalid,
-and indeed in glibc produces very odd results. **Never use** '``\n``' in patterns
-for ``--regex-<LANG>``, and **never use them** in non-matching bracket expressions
-for ``--mline-regex-<LANG>`` patterns. For the experimental ``--_mtable-regex-<LANG>``
-you can safely use '``\n``' because that regex is not compiled with ``REG_NEWLINE``.
-
 You should always test your regex patterns against test files with strings that
 do and do not match. Pay particular emphasis to when it should *not* match, and
-how *much* it matches when it should. A common error is forgetting that a
-POSIX.2 ERE engine is always *greedy*; the '``*``' and '``+``' quantifiers match
-as much as possible, before backtracking from the end of their match.
-
-For example this pattern::
-
-	foo.*bar
-
-Will match this entire string, not just the first part::
-
-	foobar, bar, and even more bar
-
+how *much* it matches when it should.
 
 Regex option argument flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
