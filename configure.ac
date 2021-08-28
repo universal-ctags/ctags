@@ -510,6 +510,9 @@ case "$host" in
 	AC_DEFINE(MANUAL_GLOBBING)
 	AC_DEFINE(HAVE__FINDFIRST)
 	;;
+  *-cygwin*)
+	gl_cv_have_weak=no
+	;;
 esac
 AM_CONDITIONAL([HOST_MINGW], [test "x${host_mingw}" = "xyes"])
 
