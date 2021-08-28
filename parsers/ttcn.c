@@ -344,6 +344,7 @@ static int getNonWhiteSpaceChar (void)
 			{
 				/* Line comment */
 				while (((c = getcFromInputFile()) != EOF) && (c != '\n'));
+				continue;
 			}
 			else if (c2=='*')
 			{
@@ -358,6 +359,7 @@ static int getNonWhiteSpaceChar (void)
 						ungetcToInputFile(c2);
 					}
 				}
+				continue;
 			}
 			else
 			{
