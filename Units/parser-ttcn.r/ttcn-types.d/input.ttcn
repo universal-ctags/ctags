@@ -14,7 +14,9 @@ type record Tee
 {
     record of integer nestedIntegersRecord,
     record length (0..5) of integer nestedRangedIntegersRecord,
+    /* a comment */
     set of integer nestedIntegersSet,
+    // a comment
     set length (2..4) of integer nestedRangerdIntegersSet,
     enumerated {e_type1, e_type2} nestedEnum,
     union {Type1 t1, Type2 t2} nestedUnion
