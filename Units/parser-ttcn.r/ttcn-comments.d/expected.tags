@@ -1,2 +1,8 @@
 f	input.ttcn	/^var integer f := 64\/2$/;"	v
 g	input.ttcn	/^var integer g := 64 \/ 2$/;"	v
+Coffee0	input-0.ttcn	/^type record Coffee0$/;"	t
+id0	input-0.ttcn	/^    integer id0,$/;"	m
+description0	input-0.ttcn	/^    charstring description0$/;"	m
+Coffee1	input-1.ttcn	/^type record Coffee1$/;"	t
+id1	input-1.ttcn	/^    integer id1,$/;"	m
+description1	input-1.ttcn	/^    charstring description1$/;"	m

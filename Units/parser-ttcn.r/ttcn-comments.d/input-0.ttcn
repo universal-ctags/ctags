@@ -1,0 +1,6 @@
+type record Coffee0
+{
+    // whitespaces after comment	
+    integer id0,
+    charstring description0
+}

@@ -31,6 +31,7 @@
 #include "parse.h"      /* always include */
 #include "read.h"       /* to define file fileReadLine() */
 #include "routines.h"
+#include "debug.h"
 
 /*    DATA    */
 
@@ -370,6 +371,7 @@ static int getNonWhiteSpaceChar (void)
 		}
 		break;
 	}
+	Assert (c == EOF || !isspace(c));
 	return c;
 }
 
