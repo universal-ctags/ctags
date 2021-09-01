@@ -1,0 +1,3 @@
+f	input.base	/^f() [$/;"	b	language:Base
+f0	input-0.sub	/^f0() [$/;"	b	language:Base
+v0	input-0.sub	/^	@def v0 1;$/;"	d	language:Sub
