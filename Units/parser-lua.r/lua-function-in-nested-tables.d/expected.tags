@@ -1,0 +1,4 @@
+c	input.lua	/^a.b.c = function()$/;"	f	unknown:a.b
+a.b.c	input.lua	/^a.b.c = function()$/;"	f	unknown:a.b	extras:qualified
+cz	input.lua	/^ax.by.cz = function()$/;"	f	unknown:ax.by
+ax.by.cz	input.lua	/^ax.by.cz = function()$/;"	f	unknown:ax.by	extras:qualified
