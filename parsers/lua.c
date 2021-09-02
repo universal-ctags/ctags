@@ -60,7 +60,7 @@ static bool is_a_code_line (const unsigned char *line)
 
 static bool isLuaIdentifier (char c)
 {
-	return (bool) !(isspace(c)  || c == '(' || c == ')' || c == '=');
+	return (bool) !(isspace(c)  || c == '(' || c == ')' || c == '=' || c == '.' || c == ':');
 }
 
 static void extract_next_token (const char *begin, const char *end_sentinel, vString *name)
@@ -92,7 +92,12 @@ static void extract_next_token (const char *begin, const char *end_sentinel, vSt
 
 	for (const char *c = begin; c <= end; ++c)
 	{
-		if (isLuaIdentifier (*c))
+		if (*c == '.' || *c == ':')
+		{
+			/* Do not include module names in function name */
+			vStringClear (name);
+		}
+		else if (isLuaIdentifier (*c))
 			vStringPut (name, (int) *c);
 		else
 		{
