@@ -1,0 +1,3 @@
+X	input.tcl	/^class create X {$/;"	c	language:TclOO
+add	input.tcl	/^    method add v {$/;"	m	language:TclOO	class:X
+doSomething	input.tcl	/^    }; method doSomething {v} {$/;"	m	language:TclOO	class:X

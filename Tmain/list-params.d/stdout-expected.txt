@@ -1,10 +1,11 @@
 # ALL
-#LANGUAGE      NAME    DESCRIPTION
-CPreProcessor  _expand expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
-CPreProcessor  define  define replacement for an identifier (name(params,...)=definition)
-CPreProcessor  if0     examine code within "#if 0" branch (true or [false])
-CPreProcessor  ignore  a token to be specially handled
-Fypp           guest   parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+#LANGUAGE      NAME     DESCRIPTION
+CPreProcessor  _expand  expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
+CPreProcessor  define   define replacement for an identifier (name(params,...)=definition)
+CPreProcessor  if0      examine code within "#if 0" branch (true or [false])
+CPreProcessor  ignore   a token to be specially handled
+Fypp           guest    parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+TclOO          forceUse enable the parser even when `oo' namespace is not specified in the input (true or [false])
 
 # ALL MACHINABLE
 #LANGUAGE	NAME	DESCRIPTION
@@ -13,6 +14,7 @@ CPreProcessor	define	define replacement for an identifier (name(params,...)=defi
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
 Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+TclOO	forceUse	enable the parser even when `oo' namespace is not specified in the input (true or [false])
 
 # ALL MACHINABLE NOHEADER
 CPreProcessor	_expand	expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
@@ -20,6 +22,7 @@ CPreProcessor	define	define replacement for an identifier (name(params,...)=defi
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
 Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+TclOO	forceUse	enable the parser even when `oo' namespace is not specified in the input (true or [false])
 
 # CPP
 #NAME    DESCRIPTION

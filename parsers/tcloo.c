@@ -8,6 +8,7 @@
 
 #include "general.h"  /* must always come first */
 #include "tcl.h"
+#include "param.h"
 #include "parse.h"
 #include "entry.h"
 #include "tokeninfo.h"
@@ -34,6 +35,8 @@ static kindDefinition TclOOKinds[] = {
 	{ true, 'm', "method", "methods",
 	  ATTACH_SEPARATORS(TclOOGenericSeparators) },
 };
+
+static bool tclooForceUse;
 
 static void parseMethod (tokenInfo *token, int owner)
 {
@@ -141,7 +144,7 @@ static void inputStart (subparser *s)
 {
 	struct tclooSubparser *tcloo = (struct tclooSubparser *)s;
 
-	tcloo->foundTclOONamespaceImported = false;
+	tcloo->foundTclOONamespaceImported = tclooForceUse;
 }
 
 static struct tclooSubparser tclooSubparser = {
@@ -160,6 +163,19 @@ static void findTclOOTags(void)
 	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
 
+static void tclooForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
+									  const char *name, const char *arg)
+{
+	tclooForceUse = paramParserBool (arg, tclooForceUse, name, "parameter");
+}
+
+static parameterHandlerTable TclOOParameterHandlerTable [] = {
+	{ .name = "forceUse",
+	  .desc = "enable the parser even when `oo' namespace is not specified in the input (true or [false])" ,
+	  .handleParameter = tclooForceUseParamHandler,
+	},
+};
+
 extern parserDefinition* TclOOParser (void)
 {
 	parserDefinition* const def = parserNew("TclOO");
@@ -177,6 +193,9 @@ extern parserDefinition* TclOOParser (void)
 	def->parser = findTclOOTags;
 	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
+
+	def->parameterHandlerTable = TclOOParameterHandlerTable;
+	def->parameterHandlerCount = ARRAY_SIZE(TclOOParameterHandlerTable);
 
 	return def;
 }
