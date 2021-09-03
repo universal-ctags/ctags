@@ -2858,7 +2858,7 @@ extern bool processKindsOption (
  *
  * --_param-<LANG>.name=argument
  *
- *  * The notation was
+ * The notation was
  * --_param-<LANG>:name=argument
  *
  *
