@@ -44,12 +44,12 @@
 --_mtable-regex-RpmMacros=main/.//
 
 --_mtable-regex-RpmMacros=contline/(\n)//{{
-   1 /start _matchloc end:
+   @1 end:
    _tleave
 }}
 --_mtable-regex-RpmMacros=contline/^[^\n]*([^\n])\n?///{{
     \1 (\\) eq not {
-       1 /end _matchloc end:
+       1@ end:
        _tleave
     } if
 }}
