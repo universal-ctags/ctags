@@ -407,7 +407,7 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"  -I [+|-]<list>|@<file>"},
  {1,0,"       A <list> of tokens to be specially handled is read from either the"},
  {1,0,"       command line or the specified <file>."},
- {1,0,"  --param-<LANG>:<name>=<argument>"},
+ {1,0,"  --param-<LANG>.<name>=<argument>"},
  {1,0,"       Set <LANG> specific parameter. Available parameters can be listed with --list-params."},
  {1,0,""},
  {1,0,"Listing Options"},
@@ -796,11 +796,17 @@ extern langType getLanguageComponentInOptionFull (const char *const option,
 	}
 
 	/* Extract <LANG> from
-	 * --param-<LANG>:<PARAM>=..., and
+	 * --param-<LANG>.<PARAM>=..., and
 	 * --_roledef-<LANG>.<KIND>=... */
+
+	/*  `:' is only for keeping self compatibility. */
 	sep = strpbrk (lang, ":.");
 	if (sep)
+	{
+		if (*sep == ':')
+			error (WARNING, "using `:' as a separator is obsolete; use `.' instead: --%s", option);
 		lang_len = sep - lang;
+	}
 	language = getNamedLanguageFull (lang, lang_len, noPretending, false);
 	if (language == LANG_IGNORE)
 	{
@@ -2018,8 +2024,9 @@ extern bool processParamOption (
 		return false;
 
 	sep = option + strlen ("param-") + strlen (getLanguageName (language));
-	if (*sep != ':')
-		error (FATAL, "no separator(:) is given for %s=%s", option, value);
+	/* `:' is only for keeping self compatibility */
+	if (! (*sep == '.' || *sep == ':' ))
+		error (FATAL, "no separator(.) is given for %s=%s", option, value);
 	name = sep + 1;
 
 	if (value == NULL || value [0] == '\0')

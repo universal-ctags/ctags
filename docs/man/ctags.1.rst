@@ -684,7 +684,7 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 	description of ``MASTER`` column of ``--list-kinds-full``.
 
 ..	COMMENT:
-	``--param-<LANG>:name=argument`` is moved to "Language Specific Options"
+	``--param-<LANG>.name=argument`` is moved to "Language Specific Options"
 
 ``--pattern-length-limit=<N>``
 	Truncate patterns of tag entries after *<N>* characters. Disable by setting to 0
@@ -993,7 +993,7 @@ Language Specific Options
 	would cause the source file to be incorrectly parsed. Correct behavior
 	can be restored by specifying "``-I CLASS=class``".
 
-``--param-<LANG>:<name>=<argument>``
+``--param-<LANG>.<name>=<argument>``
 	Set a *<LANG>* specific parameter, a parameter specific to the *<LANG>*.
 
 	Available parameters can be listed with ``--list-params``.
