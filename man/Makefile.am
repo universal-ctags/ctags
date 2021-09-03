@@ -30,6 +30,7 @@ GEN_IN_MAN_FILES = \
 	ctags-lang-iPythonCell.7 \
 	ctags-lang-julia.7 \
 	ctags-lang-python.7 \
+	ctags-lang-tcl.7 \
 	ctags-lang-verilog.7 \
 	ctags-lang-inko.7 \
 	ctags-lang-r.7 \
