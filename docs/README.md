@@ -60,6 +60,7 @@ See also [Writing Documents](https://docs.ctags.io/en/latest/contributions.html#
 - "`IN MAN PAGE`" means the topic is also explained in the man page of ctags.
 - "`.. TODO: ...`": TODO comments for documents.
 - "`.. TODO(code): ...`": TODO comments for programming codes.
+- "`.. TESTCASE: ...`": A test case for the feature documented is at ....
 
 ##  Generating man pages ###
 

@@ -1,0 +1,12 @@
+--sort=no
+--fields=+{language}
+
+--langdef=Base
+--map-Base=.base
+--kinddef-Base=b,basefunc,functions in Base language
+--regex-Base=/(^[a-z0-9]+)\(/\1/b/
+
+--langdef=Sub{base=Base}{bidirectional}
+--map-Sub=.sub
+--kinddef-Sub=s,subdef,definitions in Sub language
+--regex-Sub=/[ \t]*@def[ \t]+([a-z0-9]+).*;$/\1/d/

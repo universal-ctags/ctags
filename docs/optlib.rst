@@ -1660,6 +1660,8 @@ In addition you can enable/disable with the subparser usable
 Direction flags
 .........................................................................
 
+.. TESTCASE: Units/flags-langdef-directions.r
+
 As explained in ":ref:`multiple_parsers_directions`" in
 ":ref:`multiple_parsers`", you can choose direction(s) how a base parser and a
 guest parser work together with direction flags.

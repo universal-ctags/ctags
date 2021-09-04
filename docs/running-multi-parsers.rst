@@ -264,6 +264,8 @@ subparser can be chosen only top down way or bottom up ways.
 Direction flags
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
+.. TESTCASE: Units/flags-langdef-directions.r
+
 *Direction flags* specify how a base parser and a subparser work together. You
 can choose directions by putting a long flag after
 ``--langdef=<SUB_LANG>{base=<BASE_LANG>}``.
