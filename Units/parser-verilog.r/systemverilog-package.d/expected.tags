@@ -45,3 +45,9 @@ mul	input.sv	/^    function MyData mul(MyData x, y);$/;"	f	package:MyPackage
 x	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul
 y	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul
 var_to_check_context	input.sv	/^reg var_to_check_context;$/;"	r
+mod_a	input.sv	/^module mod_a$/;"	m
+in_a	input.sv	/^    input var logic in_a$/;"	p	module:mod_a
+sig_a	input.sv	/^    logic sig_a;$/;"	r	module:mod_a
+mod_b	input.sv	/^module mod_b$/;"	m
+in_b	input.sv	/^    input var logic in_b$/;"	p	module:mod_b
+sig_b	input.sv	/^    logic sig_b;$/;"	r	module:mod_b
