@@ -252,7 +252,6 @@ static EsObject*    vm_dstack_pop           (OptVM *vm);
 static void         vm_dstack_clear         (OptVM *vm);
 
 static EsObject*    vm_estack_push          (OptVM *vm, EsObject *p);
-static int          vm_estack_count         (OptVM *vm);
 static EsObject*    vm_estack_pop           (OptVM *vm);
 
 #define declop(OP)										\
@@ -1518,12 +1517,6 @@ vm_estack_push (OptVM *vm, EsObject *p)
 {
 	ptrArrayAdd (vm->estack, es_object_ref (p));
 	return es_false;
-}
-
-static int
-vm_estack_count (OptVM *vm)
-{
-	return ptrArrayCount (vm->estack);
 }
 
 static EsObject*
