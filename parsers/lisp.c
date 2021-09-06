@@ -120,7 +120,7 @@ static int  lisp_hint2kind (const vString *const hint)
 	int n;
 
 	/* 4 means strlen("(def"). */
-#define EQN(X) strncmp(vStringValue (hint) + 4, X + 3, n) == 0
+#define EQN(X) strncmp(vStringValue (hint) + 4, &X[3], n) == 0
 	switch (vStringLength (hint) - 4)
 	{
 	case 2:
@@ -155,7 +155,7 @@ static int  elisp_hint2kind (const vString *const hint)
 	int n;
 
 	/* 4 means strlen("(def"). */
-#define EQN(X) strncmp(vStringValue (hint) + 4, X + 3, n) == 0
+#define EQN(X) strncmp(vStringValue (hint) + 4, &X[3], n) == 0
 	switch (vStringLength (hint) - 4)
 	{
 	case 2:
