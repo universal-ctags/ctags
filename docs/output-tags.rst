@@ -526,12 +526,12 @@ A parser defines a set of parameters. Each parameter has name and
 takes an argument. A user can set a parameter with following notation
 ::
 
-   --param-<LANG>:name=arg
+   --param-<LANG>.name=arg
 
 An example of specifying a parameter
 ::
 
-   --param-CPreProcessor:if0=true
+   --param-CPreProcessor.if0=true
 
 Here `if0` is a name of parameter of CPreProcessor parser and
 `true` is the value of it.

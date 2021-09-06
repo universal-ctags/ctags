@@ -2856,10 +2856,10 @@ extern bool processKindsOption (
  * How --param should be change to align --roles-<LANG> notation
  * ---------------------------------------------------------------------
  *
- * --_param-<LANG>.name=argument
+ * --param-<LANG>.name=argument
  *
- *  * The notation was
- * --_param-<LANG>:name=argument
+ * The notation was
+ * --param-<LANG>:name=argument
  *
  *
  * How --paramdef should be to align --roles-<LANG> notation

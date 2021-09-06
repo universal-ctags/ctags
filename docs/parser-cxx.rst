@@ -178,7 +178,7 @@ SAME file can be expanded with following options:
 
 .. code-block:: text
 
-   --param-CPreProcessor:_expand=1
+   --param-CPreProcessor._expand=1
    --fields-C=+{macrodef}
    --fields-C++=+{macrodef}
    --fields-CUDA=+{macrodef}
@@ -209,7 +209,7 @@ The output without options:
 The output with options:
 .. code-block::
 
-   $ ctags --param-CPreProcessor:_expand=1 --fields-C=+'{macrodef}' --fields=+'{signature}' -o - input.c
+   $ ctags --param-CPreProcessor._expand=1 --fields-C=+'{macrodef}' --fields=+'{signature}' -o - input.c
    BEGIN	input.c	/^#define BEGIN /;"	d	language:C	file:	macrodef:{
    DEFUN	input.c	/^#define DEFUN(/;"	d	language:C	file:	signature:(NAME)	macrodef:int NAME (int x, int y)
    END	input.c	/^#define END /;"	d	language:C	file:	macrodef:}

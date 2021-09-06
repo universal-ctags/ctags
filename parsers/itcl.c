@@ -9,6 +9,7 @@
 #include "general.h"  /* must always come first */
 #include "tcl.h"
 #include "entry.h"
+#include "param.h"
 #include "parse.h"
 #include "read.h"
 #include "keyword.h"
@@ -69,6 +70,8 @@ static const keywordTable ITclKeywordTable[] = {
 	{ "common",			KEYWORD_COMMON		},
 	{ "proc",			KEYWORD_PROC		},
 };
+
+static bool itclForceUse;
 
 static keywordId resolveKeyword (vString *string)
 {
@@ -277,7 +280,7 @@ static void inputStart (subparser *s)
 {
 	struct itclSubparser *itcl = (struct itclSubparser *)s;
 
-	itcl->foundITclNamespaceImported = false;
+	itcl->foundITclNamespaceImported = itclForceUse;
 }
 
 struct itclSubparser itclSubparser = {
@@ -295,6 +298,19 @@ static void findITclTags(void)
 {
 	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
+
+static void itclForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
+									  const char *name, const char *arg)
+{
+	itclForceUse = paramParserBool (arg, itclForceUse, name, "parameter");
+}
+
+static parameterHandlerTable ItclParameterHandlerTable [] = {
+	{ .name = "forceUse",
+	  .desc = "enable the parser even when `itcl' namespace is not specified in the input (true or [false])" ,
+	  .handleParameter = itclForceUseParamHandler,
+	},
+};
 
 extern parserDefinition* ITclParser (void)
 {
@@ -318,6 +334,9 @@ extern parserDefinition* ITclParser (void)
 
 	def->keywordTable = ITclKeywordTable;
 	def->keywordCount = ARRAY_SIZE (ITclKeywordTable);
+
+	def->parameterHandlerTable = ItclParameterHandlerTable;
+	def->parameterHandlerCount = ARRAY_SIZE(ItclParameterHandlerTable);
 
 	return def;
 }
