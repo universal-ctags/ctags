@@ -2238,7 +2238,7 @@ get_sequence       (MIO* fp,
 				case 't': c0 = '\t'; break;
 				case 'r': c0 = '\r'; break;
 				case 'f': c0 = '\f'; break;
-				default:  c0 = c0  ; break;
+				default:  break;
 				}
 				seed = token_append(seed, c0);
 				in_escape = 0;
