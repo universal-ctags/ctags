@@ -87,3 +87,21 @@ package MyPackage;
 endpackage : MyPackage
 
 reg var_to_check_context;
+
+// multiple package import declarations, #3150
+module mod_a
+    import A::*, B::*;
+(
+    input var logic in_a
+);
+    logic sig_a;
+endmodule
+
+module mod_b
+    import A::*;
+    import B::*;
+(
+    input var logic in_b
+);
+    logic sig_b;
+endmodule
