@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "debug.h"
+#include "entry.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -24,11 +25,24 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_FUNCTION
+	K_FUNCTION,
+	K_UNKNOWN,
 } luaKind;
 
+typedef enum {
+	LUA_UNKNOWN_REFERENCED,
+} luaUnknownRole;
+
+static roleDefinition LuaUnknownRoles [] = {
+	{ false, "referenced", "referenced somehow" },
+};
+
 static kindDefinition LuaKinds [] = {
-	{ true, 'f', "function", "functions" }
+	{ true, 'f', "function", "functions" },
+
+	/* `unknown' is a kind just for making FQ tag for functions. */
+	{ false, 'X', "unknown",  "unknown language object",
+	  .referenceOnly = true, ATTACH_ROLES(LuaUnknownRoles) },
 };
 
 /*
@@ -60,7 +74,19 @@ static bool is_a_code_line (const unsigned char *line)
 
 static bool isLuaIdentifier (char c)
 {
-	return (bool) !(isspace(c)  || c == '(' || c == ')' || c == '=');
+	return (bool) !(isspace(c)  || c == '(' || c == ')' || c == '=' || c == '.' || c == ':');
+}
+
+static void set_scope (int child, int parent)
+{
+	if (parent == CORK_NIL || child == CORK_NIL)
+		return;
+
+	tagEntryInfo *e = getEntryInCorkQueue (child);
+	if (!e)
+		return;
+
+	e->extensionFields.scopeIndex = parent;
 }
 
 static void extract_next_token (const char *begin, const char *end_sentinel, vString *name)
@@ -90,9 +116,20 @@ static void extract_next_token (const char *begin, const char *end_sentinel, vSt
 
 	Assert (begin <= end);
 
+	int lastCorkIndx = CORK_NIL;
 	for (const char *c = begin; c <= end; ++c)
 	{
-		if (isLuaIdentifier (*c))
+		if (*c == '.' || *c == ':')
+		{
+			int r = makeSimpleRefTag(name,
+									 K_UNKNOWN, LUA_UNKNOWN_REFERENCED);
+			set_scope(r, lastCorkIndx);
+			lastCorkIndx = r;
+
+			/* Do not include module names in function name */
+			vStringClear (name);
+		}
+		else if (isLuaIdentifier (*c))
 			vStringPut (name, (int) *c);
 		else
 		{
@@ -103,7 +140,8 @@ static void extract_next_token (const char *begin, const char *end_sentinel, vSt
 		}
 	}
 
-	makeSimpleTag (name, K_FUNCTION);
+	int d = makeSimpleTag (name, K_FUNCTION);
+	set_scope(d, lastCorkIndx);
 	vStringClear (name);
 }
 
@@ -128,11 +166,41 @@ static void extract_prev_token (const char *end, const char *begin_sentinel, vSt
 	while (begin_sentinel <= begin && isLuaIdentifier (*begin))
 		begin--;
 
+	int targetCorkIndex = CORK_NIL;
 	if (end - begin)
 	{
 		vStringNCatS (name, begin + 1, end - begin);
-		makeSimpleTag (name, K_FUNCTION);
+		targetCorkIndex = makeSimpleTag (name, K_FUNCTION);
 		vStringClear (name);
+	}
+
+	if (targetCorkIndex == CORK_NIL || begin_sentinel == begin)
+		return;
+
+	/* Fill the scope field of the function. */
+	end = begin;
+	while (begin_sentinel <= (begin + 1))
+	{
+		bool on_boundary = false;
+		if (begin < begin_sentinel || !isLuaIdentifier (*begin))
+		{
+			if (end - begin)
+			{
+				vStringNCatS (name, begin + 1, end - begin);
+				int r = makeSimpleRefTag (name,
+										  K_UNKNOWN, LUA_UNKNOWN_REFERENCED);
+				set_scope (targetCorkIndex, r);
+				targetCorkIndex = r;
+				vStringClear (name);
+			}
+			if (begin_sentinel <= begin && ! (*begin == ':' || *begin == '.'))
+				break;
+			on_boundary = true;
+		}
+		begin--;
+
+		if(on_boundary)
+			end = begin;
 	}
 }
 
@@ -183,5 +251,7 @@ extern parserDefinition* LuaParser (void)
 	def->kindCount  = ARRAY_SIZE (LuaKinds);
 	def->extensions = extensions;
 	def->parser     = findLuaTags;
+	def->useCork    = CORK_QUEUE;
+	def->requestAutomaticFQTag = true;
 	return def;
 }

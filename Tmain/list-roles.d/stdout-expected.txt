@@ -51,6 +51,7 @@ Kconfig        k/kconfig         source             on      kconfig file loaded 
 LdScript       i/inputSection    discarded          on      discarded when linking
 LdScript       i/inputSection    mapped             on      mapped to output section
 LdScript       s/symbol          entrypoint         on      entry points
+Lua            X/unknown         referenced         off     referenced somehow
 M4             I/macrofile       included           on      included macro
 M4             I/macrofile       sincluded          on      silently included macro
 M4             d/macro           undef              on      undefined
@@ -142,6 +143,7 @@ Kconfig        k/kconfig         source             on      kconfig file loaded 
 LdScript       i/inputSection    discarded          on      discarded when linking
 LdScript       i/inputSection    mapped             on      mapped to output section
 LdScript       s/symbol          entrypoint         on      entry points
+Lua            X/unknown         referenced         off     referenced somehow
 M4             I/macrofile       included           on      included macro
 M4             I/macrofile       sincluded          on      silently included macro
 M4             d/macro           undef              on      undefined
