@@ -932,6 +932,7 @@ static void parseTexFile (tokenInfo *const token)
 				case KEYWORD_bibliography:
 					eof = parseTagFull (token, TEXTAG_XINPUT, TEX_XINPUT_BIBLIOGRAPHY,
 										false, &tokenUnprocessed);
+					break;
 				case KEYWORD_newcommand:
 					eof = parseNewcommand (token, &tokenUnprocessed);
 					break;
