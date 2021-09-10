@@ -824,30 +824,20 @@ static bool defaultDoesContainAnyChar (const tagEntryInfo *const tag CTAGS_ATTR_
 extern bool  doesFieldHaveTabOrNewlineChar (fieldType type, const tagEntryInfo *tag, int index)
 {
 	fieldObject *fobj = fieldObjects + type;
-	const char *value;
 	bool (* doesContainAnyChar) (const tagEntryInfo *const, const char*, const char*) = fobj->def->doesContainAnyChar;
 
 	Assert (tag);
-	Assert (index == NO_PARSER_FIELD || ((unsigned int)index) < tag->usedParserFields);
+	Assert (index == NO_PARSER_FIELD || (index >= 0 && ((unsigned int)index) < tag->usedParserFields));
+
+	if (index == NO_PARSER_FIELD)
+		return false;
 
 	if (doesContainAnyChar == NULL)
-	{
-		if (index == NO_PARSER_FIELD)
-			return false;
-		else
-			doesContainAnyChar = defaultDoesContainAnyChar;
-	}
+		doesContainAnyChar = defaultDoesContainAnyChar;
 
-	if (index >= 0)
-	{
-		const tagField *f = getParserFieldForIndex (tag, index);
+	const tagField *f = getParserFieldForIndex (tag, index);
 
-		value = f->value;
-	}
-	else
-		value = NULL;
-
-	return (* doesContainAnyChar) (tag, value, "\t\n");
+	return (* doesContainAnyChar) (tag, f->value, "\t\n");
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
