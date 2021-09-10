@@ -51,7 +51,8 @@
 --regex-Kconfig=/^[ \t]*#.*$//{placeholder}
 
 --regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$/\2/c/{scope=ref}
---regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$/CONFIG_\2/c/{scope=ref}{_extra=configPrefixed}{exclusive}
+--regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$/CONFIG_\2/c/{scope=ref}{_extra=configPrefixed}
+--regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$/CONFIG_\2_MODULE/c/{scope=ref}{_extra=configPrefixed}{exclusive}
 
 --regex-Kconfig=/^[ \t]*menu[ \t]+"([^"]+)"[ \t]*/\1/m/{scope=push}{exclusive}
 --regex-Kconfig=/^[ \t]*endmenu[ \t]*//{scope=pop}{placeholder}{exclusive}
