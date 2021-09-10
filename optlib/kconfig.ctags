@@ -9,7 +9,7 @@
 #  Reference
 #     https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html
 #
-#  
+#
 #  This parser was originally written in C as proplosed in #2553 by Maxime.
 #  Masatake converted it to an optlib file.
 #
@@ -43,7 +43,7 @@
 # Date:   Thu Jun 22 12:21:20 2006 +0900
 #
 #    kbuild: adding symbols in Kconfig and defconfig to TAGS
-#    
+#
 --_extradef-Kconfig=configPrefixed,prepend CONFIG_ to config names
 --extras-Kconfig=+{configPrefixed}
 
