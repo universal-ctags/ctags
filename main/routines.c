@@ -742,7 +742,6 @@ static char* concat (const char *s1, const char *s2, const char *s3)
 	strcpy (result, s1);
 	strcpy (result + len1, s2);
 	strcpy (result + len1 + len2, s3);
-	result [len1 + len2 + len3] = '\0';
 
 	return result;
 }

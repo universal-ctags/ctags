@@ -142,7 +142,7 @@ static char* nextFileLine (FILE* const fp)
 			{
 				c = fgetc (fp);
 				if (c != '\n')
-					c = ungetc (c, fp);
+					ungetc (c, fp);
 			}
 			vStringStripTrailing (vs);
 			result = xMalloc (vStringLength (vs) + 1, char);

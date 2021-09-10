@@ -796,23 +796,23 @@ static bool isOpenScriptLanguagePhp (int c)
 	int quote = 0;
 
 	/* <script[:white:]+language[:white:]*= */
-	if (c                                   != '<' ||
-		tolower ((c = getcFromInputFile ()))         != 's' ||
-		tolower ((c = getcFromInputFile ()))         != 'c' ||
-		tolower ((c = getcFromInputFile ()))         != 'r' ||
-		tolower ((c = getcFromInputFile ()))         != 'i' ||
-		tolower ((c = getcFromInputFile ()))         != 'p' ||
-		tolower ((c = getcFromInputFile ()))         != 't' ||
-		! isSpace ((c = getcFromInputFile ()))              ||
-		tolower ((c = skipWhitespaces (c))) != 'l' ||
-		tolower ((c = getcFromInputFile ()))         != 'a' ||
-		tolower ((c = getcFromInputFile ()))         != 'n' ||
-		tolower ((c = getcFromInputFile ()))         != 'g' ||
-		tolower ((c = getcFromInputFile ()))         != 'u' ||
-		tolower ((c = getcFromInputFile ()))         != 'a' ||
-		tolower ((c = getcFromInputFile ()))         != 'g' ||
-		tolower ((c = getcFromInputFile ()))         != 'e' ||
-		(c = skipWhitespaces (getcFromInputFile ())) != '=')
+	if (c                                      != '<' ||
+		tolower (getcFromInputFile ())         != 's' ||
+		tolower (getcFromInputFile ())         != 'c' ||
+		tolower (getcFromInputFile ())         != 'r' ||
+		tolower (getcFromInputFile ())         != 'i' ||
+		tolower (getcFromInputFile ())         != 'p' ||
+		tolower (getcFromInputFile ())         != 't' ||
+		! isSpace ((c = getcFromInputFile ()))        ||
+		tolower (skipWhitespaces (c))          != 'l' ||
+		tolower (getcFromInputFile ())         != 'a' ||
+		tolower (getcFromInputFile ())         != 'n' ||
+		tolower (getcFromInputFile ())         != 'g' ||
+		tolower (getcFromInputFile ())         != 'u' ||
+		tolower (getcFromInputFile ())         != 'a' ||
+		tolower (getcFromInputFile ())         != 'g' ||
+		tolower (getcFromInputFile ())         != 'e' ||
+		skipWhitespaces (getcFromInputFile ()) != '=')
 		return false;
 
 	/* (php|'php'|"php")> */
@@ -822,11 +822,11 @@ static bool isOpenScriptLanguagePhp (int c)
 		quote = c;
 		c = getcFromInputFile ();
 	}
-	if (tolower (c)                         != 'p' ||
-		tolower ((c = getcFromInputFile ()))         != 'h' ||
-		tolower ((c = getcFromInputFile ()))         != 'p' ||
-		(quote != 0 && (c = getcFromInputFile ()) != quote) ||
-		(c = skipWhitespaces (getcFromInputFile ())) != '>')
+	if (tolower (c)                            != 'p' ||
+		tolower (getcFromInputFile ())         != 'h' ||
+		tolower (getcFromInputFile ())         != 'p' ||
+		((quote != 0) && (getcFromInputFile () != quote)) ||
+		skipWhitespaces (getcFromInputFile ()) != '>')
 		return false;
 
 	return true;

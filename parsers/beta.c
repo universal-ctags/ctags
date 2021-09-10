@@ -110,7 +110,6 @@ static void findBetaTags (void)
 		{
 			if (!incomment && !inquote)
 			{
-				foundfragmenthere = true;
 				/* skip past -- and whitespace.  Also skip back past 'dopart'
 				   or 'attributes' to the :.  We have to do this because there
 				   is no sensible way to include whitespace in a ctags token
