@@ -145,8 +145,8 @@ static char* nextFileLine (FILE* const fp)
 					ungetc (c, fp);
 			}
 			vStringStripTrailing (vs);
-			result = xMalloc (vStringLength (vs) + 1, char);
 			vStringStripLeading (vs);
+			result = xMalloc (vStringLength (vs) + 1, char);
 			strcpy (result, vStringValue (vs));
 		}
 		vStringDelete (vs);
