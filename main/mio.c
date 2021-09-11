@@ -847,7 +847,7 @@ int mio_vprintf (MIO *mio, const char *format, va_list ap)
 
 			/* backup character at n+1 that will be overwritten by a \0 ... */
 			c = mio->impl.mem.buf[mio->impl.mem.pos + (n - 1)];
-			rv = vsprintf ((char *)&mio->impl.mem.buf[mio->impl.mem.pos], format, ap);
+			rv = vsnprintf ((char *)&mio->impl.mem.buf[mio->impl.mem.pos], mio->impl.mem.size, format, ap);
 			/* ...and restore it */
 			mio->impl.mem.buf[mio->impl.mem.pos + (n - 1)] = c;
 			if (rv >= 0 && (size_t)rv == (n - 1))
