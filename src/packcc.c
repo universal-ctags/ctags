@@ -64,14 +64,14 @@ static size_t strnlen_(const char *str, size_t maxlen) {
 #include <unistd.h> /* for unlink() */
 #endif
 
-#ifndef __attribute__
+#ifndef __has_attribute
 #define __attribute__(x)
 #endif
 
 #undef TRUE  /* to avoid macro definition conflicts with the system header file of IBM AIX */
 #undef FALSE
 
-#define VERSION "1.5.0"
+#define VERSION "1.5.1"
 
 #ifndef BUFFER_INIT_SIZE
 #define BUFFER_INIT_SIZE 256
@@ -285,7 +285,8 @@ typedef enum code_reach_tag {
 
 static const char *g_cmdname = "packcc"; /* replaced later with actual one */
 
-static int print_error(const char *format, ...) __attribute__((format(printf, 1, 2))) {
+__attribute__((format(printf, 1, 2)))
+static int print_error(const char *format, ...) {
     int n;
     va_list a;
     va_start(a, format);
@@ -352,7 +353,8 @@ static int fputs_e(const char *s, FILE *stream) {
     return r;
 }
 
-static int fprintf_e(FILE *stream, const char *format, ...) __attribute__((format(printf, 2, 3))) {
+__attribute__((format(printf, 2, 3)))
+static int fprintf_e(FILE *stream, const char *format, ...) {
     int n;
     va_list a;
     va_start(a, format);
@@ -1436,8 +1438,8 @@ static void verify_captures(context_t *ctx, node_t *node, node_const_array_t *ca
                 if (node->data.expand.index == capts->buf[i]->data.capture.index) break;
             }
             if (i >= capts->len && node->data.expand.index != VOID_VALUE) {
-                print_error("%s:" FMT_LU ":" FMT_LU ": Capture %d not available at this position\n",
-                    ctx->iname, (ulong_t)(node->data.expand.line + 1), (ulong_t)(node->data.expand.col + 1), node->data.expand.index + 1);
+                print_error("%s:" FMT_LU ":" FMT_LU ": Capture " FMT_LU " not available at this position\n",
+                    ctx->iname, (ulong_t)(node->data.expand.line + 1), (ulong_t)(node->data.expand.col + 1), (ulong_t)(node->data.expand.index + 1));
                 ctx->errnum++;
             }
         }
@@ -2730,16 +2732,12 @@ static code_reach_t generate_predicating_code(generate_t *gen, const node_t *exp
     }
     write_characters(gen->stream, ' ', indent);
     fputs_e("const size_t p = ctx->cur;\n", gen->stream);
-    write_characters(gen->stream, ' ', indent);
-    fputs_e("const size_t n = chunk->thunks.len;\n", gen->stream);
     if (neg) {
         const int l = ++gen->label;
         r = generate_code(gen, expr, l, indent, FALSE);
         if (r != CODE_REACH__ALWAYS_FAIL) {
             write_characters(gen->stream, ' ', indent);
             fputs_e("ctx->cur = p;\n", gen->stream);
-            write_characters(gen->stream, ' ', indent);
-            fputs_e("pcc_thunk_array__revert(ctx->auxil, &chunk->thunks, n);\n", gen->stream);
             write_characters(gen->stream, ' ', indent);
             fprintf_e(gen->stream, "goto L%04d;\n", onfail);
         }
@@ -2748,8 +2746,6 @@ static code_reach_t generate_predicating_code(generate_t *gen, const node_t *exp
             fprintf_e(gen->stream, "L%04d:;\n", l);
             write_characters(gen->stream, ' ', indent);
             fputs_e("ctx->cur = p;\n", gen->stream);
-            write_characters(gen->stream, ' ', indent);
-            fputs_e("pcc_thunk_array__revert(ctx->auxil, &chunk->thunks, n);\n", gen->stream);
         }
         switch (r) {
         case CODE_REACH__ALWAYS_SUCCEED: r = CODE_REACH__ALWAYS_FAIL; break;
@@ -2764,8 +2760,6 @@ static code_reach_t generate_predicating_code(generate_t *gen, const node_t *exp
         if (r != CODE_REACH__ALWAYS_FAIL) {
             write_characters(gen->stream, ' ', indent);
             fputs_e("ctx->cur = p;\n", gen->stream);
-            write_characters(gen->stream, ' ', indent);
-            fputs_e("pcc_thunk_array__revert(ctx->auxil, &chunk->thunks, n);\n", gen->stream);
         }
         if (r == CODE_REACH__BOTH) {
             write_characters(gen->stream, ' ', indent);
@@ -2776,8 +2770,6 @@ static code_reach_t generate_predicating_code(generate_t *gen, const node_t *exp
             fprintf_e(gen->stream, "L%04d:;\n", l);
             write_characters(gen->stream, ' ', indent);
             fputs_e("ctx->cur = p;\n", gen->stream);
-            write_characters(gen->stream, ' ', indent);
-            fputs_e("pcc_thunk_array__revert(ctx->auxil, &chunk->thunks, n);\n", gen->stream);
             write_characters(gen->stream, ' ', indent);
             fprintf_e(gen->stream, "goto L%04d;\n", onfail);
         }
@@ -4283,8 +4275,8 @@ static bool_t generate(context_t *ctx) {
                     }
                     fprintf_e(
                         sstream,
-                        "static void pcc_action_%s_%d(%s_context_t *__pcc_ctx, pcc_thunk_t *__pcc_in, pcc_value_t *__pcc_out) {\n",
-                        r->name, d, get_prefix(ctx)
+                        "static void pcc_action_%s_" FMT_LU "(%s_context_t *__pcc_ctx, pcc_thunk_t *__pcc_in, pcc_value_t *__pcc_out) {\n",
+                        r->name, (ulong_t)d, get_prefix(ctx)
                     );
                     fputs_e(
                         "#define auxil (__pcc_ctx->auxil)\n"
@@ -4303,8 +4295,8 @@ static bool_t generate(context_t *ctx) {
                     }
                     fputs_e(
                         "#define _0 pcc_get_capture_string(__pcc_ctx, &__pcc_in->data.leaf.capt0)\n"
-                        "#define _0s ((const size_t)__pcc_in->data.leaf.capt0.range.start)\n"
-                        "#define _0e ((const size_t)__pcc_in->data.leaf.capt0.range.end)\n",
+                        "#define _0s ((const size_t)(__pcc_ctx->pos + __pcc_in->data.leaf.capt0.range.start))\n"
+                        "#define _0e ((const size_t)(__pcc_ctx->pos + __pcc_in->data.leaf.capt0.range.end))\n",
                         sstream
                     );
                     k = 0;
