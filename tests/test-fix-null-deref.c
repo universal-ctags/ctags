@@ -41,7 +41,6 @@ main (void)
 	fprintf (stderr, "ok\n");
 
 	tagEntry e;
-	tagResult r;
 
 	/* Without fix, this program crashes in tagsFirst(). */
 	tagsFirst (t, &e);

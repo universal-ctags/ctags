@@ -157,7 +157,8 @@ main (void)
 	}
 	fprintf (stderr, "ok\n");
 
-	fprintf (stderr, "opening a / (EISDIR is expected)...");
+	fprintf (stderr, "opening a / (an error is expected)...");
+	info.status.error_number = 0;
 	t = tagsOpen ("/", &info);
 	if (t != NULL)
 	{
@@ -169,12 +170,12 @@ main (void)
 		fprintf (stderr, "unexpected result (opened != 0)\n");
 		return 1;
 	}
-	else if (info.status.error_number != EISDIR)
+	else if (info.status.error_number == 0)
 	{
-		fprintf (stderr, "unexpected result (error_number != EISDIR)\n");
+		fprintf (stderr, "no error\n");
 		return 1;
 	}
-	fprintf (stderr, "ok\n");
+	fprintf (stderr, "ok (errno: %d)\n", info.status.error_number);
 
 	fprintf (stderr, "closing the unopened tag file...");
 	if (tagsClose (t) == TagSuccess)
@@ -275,9 +276,9 @@ main (void)
 	for (int i = 0; i < 6; i++)
 	{
 		char tagf_name_tmpl [] = "./api-tagsOpen-incomplete-program-author-%d.tags";
-		char tagf_name [sizeof (tagf_name_tmpl)];
+		char tagf_name [sizeof (tagf_name_tmpl) - 1];
 		fprintf (stderr, "opening a tags file with incomplete PROGRAM_AUTHOR field [trimming level: %d]...", i);
-		sprintf (tagf_name, tagf_name_tmpl, i);
+		snprintf (tagf_name, sizeof (tagf_name), tagf_name_tmpl, i);
 		t = tagsOpen (tagf_name, &info);
 		if (t == NULL)
 		{
