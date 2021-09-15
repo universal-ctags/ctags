@@ -7,6 +7,8 @@
 *   This module contains functions for generating tags for VHDL files.
 *
 *   References:
+*     https://rti.etf.bg.ac.rs/rti/ri5rvl/tutorial/TUTORIAL/IEEE/HTML/1076_TOC.HTM
+*     https://tams.informatik.uni-hamburg.de/vhdl/tools/grammar/vhdl93-bnf.html
 *     http://www.vhdl.renerta.com/mobile/index.html
 *     https://www.hdlworks.com/hdl_corner/vhdl_ref/
 *     https://www.ics.uci.edu/~jmoorkan/vhdlref/Synario%20VHDL%20Manual.pdf
