@@ -350,9 +350,8 @@ static bool isIdentifierMatch (const tokenInfo * const token,
 	const char *name)
 {
 	return (bool) (isType (token, TOKEN_IDENTIFIER) &&
-		strcasecmp (vStringValue (token->string), name) == 0);
-	/* XXX this is copy/paste from eiffel.c and slightly modified */
-	/* shouldn't we use strNcasecmp ? */
+		strncasecmp (vStringValue (token->string), name,
+					 vStringLength (token->string)) == 0);
 }
 
 static bool isSemicolonOrKeywordOrIdent (const tokenInfo * const token,
