@@ -589,7 +589,8 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 {
 	bool ended = false;
 	tagEntryInfo *e = getEntryInCorkQueue (parent);
-	const char *end_id = e->name;
+	/* If e is NULL, the input may be broken as VHDL code
+	 * or unsupported syntax in this parser. */
 
 	do
 	{
@@ -597,8 +598,9 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 		if (isKeyword (token, KEYWORD_END))
 		{
 			readToken (token);
-			ended = isSemicolonOrKeywordOrIdent (token,
-												 end_keyword, end_id);
+			if (e)
+				ended = isSemicolonOrKeywordOrIdent (token,
+													 end_keyword, e->name);
 			if (!isType (token, TOKEN_SEMICOLON))
 				skipToCharacterInInputFile (';');
 			if (ended)
