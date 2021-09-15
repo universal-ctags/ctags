@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Test
           command: |
-            make check
+            make check VERBOSE=1
   fedora31_distcheck:
     working_directory: ~/libreadtags
     docker:

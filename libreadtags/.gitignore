@@ -31,9 +31,11 @@ test-driver
 
 tests/*.log
 tests/*.trs
+tests/test-api-tagsClose
 tests/test-api-tagsFind
 tests/test-api-tagsFirst
 tests/test-api-tagsFirstPseudoTag
 tests/test-api-tagsOpen
+tests/test-api-tagsSetSortType
 tests/test-fix-null-deref
 tests/test-fix-unescaping

@@ -65,14 +65,14 @@ check_finding0 (tagFile *t, const char *name, const int options,
 				if (err == x->err)
 				{
 					if (err == 0)
-						fprintf (stderr, "not found, and it is expected\n", err);
+						fprintf (stderr, "not found, and it is expected\n");
 					else
 						fprintf (stderr, "error as expected: %d\n", err);
 					continue;
 				}
 				else
 				{
-					fprintf (stderr, "errer number doesn't match: %d (expected: %d)\n",
+					fprintf (stderr, "error number doesn't match: %d (expected: %d)\n",
 							 err, x->err);
 					return 1;
 				}
