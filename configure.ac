@@ -350,7 +350,7 @@ AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_SYS_LARGEFILE
 
-AC_CHECK_PROGS([perl_found], [perl], [yes], [no])
+AC_CHECK_PROG([perl_found], [perl], [yes], [no])
 AM_CONDITIONAL([RUN_OPTLIB2C], [test "${perl_found}" = "yes"])
 AM_CONDITIONAL([RUN_TXT2CSTR], [test "${perl_found}" = "yes"])
 
