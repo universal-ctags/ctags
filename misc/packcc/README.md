@@ -339,7 +339,7 @@ Some macros are prepared to customize the parser. The macro definition should be
 
 ```
 %source {
-#define PCC_GETCHAR(auxil) get_character(auxil->input)
+#define PCC_GETCHAR(auxil) get_character((auxil)->input)
 #define PCC_BUFFERSIZE 1024
 }
 ```
@@ -430,8 +430,7 @@ A very simple implementation could look like this:
 ```C
 static const char *dbg_str[] = { "Evaluating rule", "Matched rule", "Abandoning rule" };
 #define PCC_DEBUG(event, rule, level, pos, buffer, length) \
-    fprintf(stderr, "%*s%s %s @%d [%.*s]\n", level * 2, "", dbg_str[event], rule, pos, length, buffer)
-}
+    fprintf(stderr, "%*s%s %s @%zu [%.*s]\n", (int)((level) * 2), "", dbg_str[event], rule, pos, (int)(length), buffer)
 ```
 
 The default is to do nothing:
