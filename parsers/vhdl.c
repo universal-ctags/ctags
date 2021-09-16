@@ -7,6 +7,8 @@
 *   This module contains functions for generating tags for VHDL files.
 *
 *   References:
+*     https://rti.etf.bg.ac.rs/rti/ri5rvl/tutorial/TUTORIAL/IEEE/HTML/1076_TOC.HTM
+*     https://tams.informatik.uni-hamburg.de/vhdl/tools/grammar/vhdl93-bnf.html
 *     http://www.vhdl.renerta.com/mobile/index.html
 *     https://www.hdlworks.com/hdl_corner/vhdl_ref/
 *     https://www.ics.uci.edu/~jmoorkan/vhdlref/Synario%20VHDL%20Manual.pdf
@@ -348,9 +350,8 @@ static bool isIdentifierMatch (const tokenInfo * const token,
 	const char *name)
 {
 	return (bool) (isType (token, TOKEN_IDENTIFIER) &&
-		strcasecmp (vStringValue (token->string), name) == 0);
-	/* XXX this is copy/paste from eiffel.c and slightly modified */
-	/* shouldn't we use strNcasecmp ? */
+		strncasecmp (vStringValue (token->string), name,
+					 vStringLength (token->string)) == 0);
 }
 
 static bool isSemicolonOrKeywordOrIdent (const tokenInfo * const token,
@@ -589,7 +590,8 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 {
 	bool ended = false;
 	tagEntryInfo *e = getEntryInCorkQueue (parent);
-	const char *end_id = e->name;
+	/* If e is NULL, the input may be broken as VHDL code
+	 * or unsupported syntax in this parser. */
 
 	do
 	{
@@ -597,8 +599,9 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 		if (isKeyword (token, KEYWORD_END))
 		{
 			readToken (token);
-			ended = isSemicolonOrKeywordOrIdent (token,
-												 end_keyword, end_id);
+			if (e)
+				ended = isSemicolonOrKeywordOrIdent (token,
+													 end_keyword, e->name);
 			if (!isType (token, TOKEN_SEMICOLON))
 				skipToCharacterInInputFile (';');
 			if (ended)
