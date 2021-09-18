@@ -279,7 +279,10 @@ To add your parser file, ``foo.c``, into ``ctags`` do the following steps;
 * add ``"..\parsers\foo.c"`` in ``win32/ctags_vs2013.vcxproj``
 * add ``"..\parsers\foo.c"`` in  ``win32/ctags_vs2013.vcxproj.filters``
 
-Without updating win32 files our CI process run on Appveyor will fail.
+If you have GNU make, ``make -C win32`` updates the win32 files described above
+from ``makefile.mak``.
+Without updating win32 files our CI process run on
+Appveyor will fail.
 
 See `this pull request <https://github.com/universal-ctags/ctags/pull/2765>`_
 for the `Meson` parser as an example of optlib parser.

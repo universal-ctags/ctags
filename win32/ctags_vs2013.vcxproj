@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -172,22 +172,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\dsl\es.c" />
+    <ClCompile Include="..\dsl\optscript.c" />
     <ClCompile Include="..\gnulib\fnmatch.c" />
-    <ClCompile Include="..\gnulib\regex.c">
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
-    </ClCompile>
+    <ClCompile Include="..\gnulib\malloc\dynarray_resize.c" />
     <ClCompile Include="..\gnulib\mempcpy.c" />
     <ClCompile Include="..\gnulib\nl_langinfo.c" />
+    <ClCompile Include="..\gnulib\regex.c" />
     <ClCompile Include="..\gnulib\setlocale_null.c" />
-    <ClCompile Include="..\gnulib\malloc\dynarray_resize.c" />
     <ClCompile Include="..\gnulib\wmempcpy.c" />
+    <ClCompile Include="..\main\CommonPrelude.c" />
     <ClCompile Include="..\main\args.c" />
     <ClCompile Include="..\main\cmd.c" />
     <ClCompile Include="..\main\colprint.c" />
-    <ClCompile Include="..\main\CommonPrelude.c" />
     <ClCompile Include="..\main\debug.c" />
     <ClCompile Include="..\main\dependency.c" />
     <ClCompile Include="..\main\entry.c" />
@@ -238,8 +235,8 @@
     <ClCompile Include="..\optlib\elixir.c" />
     <ClCompile Include="..\optlib\elm.c" />
     <ClCompile Include="..\optlib\gdbinit.c" />
-    <ClCompile Include="..\optlib\inko.c" />
     <ClCompile Include="..\optlib\iPythonCell.c" />
+    <ClCompile Include="..\optlib\inko.c" />
     <ClCompile Include="..\optlib\kconfig.c" />
     <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\optlib\markdown.c" />
@@ -322,9 +319,9 @@
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\parsers\pascal.c" />
-    <ClCompile Include="..\parsers\perl.c" />
     <ClCompile Include="..\parsers\perl-function-parameters.c" />
     <ClCompile Include="..\parsers\perl-moose.c" />
+    <ClCompile Include="..\parsers\perl.c" />
     <ClCompile Include="..\parsers\perl6.c" />
     <ClCompile Include="..\parsers\php.c" />
     <ClCompile Include="..\parsers\powershell.c" />
@@ -348,8 +345,8 @@
     <ClCompile Include="..\parsers\systemdunit.c" />
     <ClCompile Include="..\parsers\tcl.c" />
     <ClCompile Include="..\parsers\tcloo.c" />
-    <ClCompile Include="..\parsers\tex.c" />
     <ClCompile Include="..\parsers\tex-beamer.c" />
+    <ClCompile Include="..\parsers\tex.c" />
     <ClCompile Include="..\parsers\ttcn.c" />
     <ClCompile Include="..\parsers\txt2tags.c" />
     <ClCompile Include="..\parsers\typescript.c" />
@@ -359,11 +356,11 @@
     <ClCompile Include="..\parsers\windres.c" />
     <ClCompile Include="..\parsers\yacc.c" />
     <ClCompile Include="..\parsers\yumrepo.c" />
-    <ClCompile Include="..\dsl\es.c" />
-    <clCompile Include="..\dsl\optscript.c" />
-    <ClCompile Include="mkstemp\mkstemp.c" />
+    <ClCompile Include="..\win32\mkstemp\mkstemp.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dsl\es.h" />
+    <ClInclude Include="..\dsl\optscript.h" />
     <ClInclude Include="..\gnulib\fnmatch.h" />
     <ClInclude Include="..\gnulib\regex.h" />
     <ClInclude Include="..\main\args_p.h" />
@@ -415,10 +412,10 @@
     <ClInclude Include="..\main\read_p.h" />
     <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\routines_p.h" />
-    <ClInclude Include="..\main\script.h" />
+    <ClInclude Include="..\main\script_p.h" />
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort_p.h" />
-    <ClInclude Include="..\main\stat_p.h" />
+    <ClInclude Include="..\main\stats_p.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\subparser.h" />
     <ClInclude Include="..\main\subparser_p.h" />
@@ -447,10 +444,9 @@
     <ClInclude Include="..\parsers\m4.h" />
     <ClInclude Include="..\parsers\make.h" />
     <ClInclude Include="..\parsers\perl.h" />
+    <ClInclude Include="..\parsers\r.h" />
     <ClInclude Include="..\parsers\tcl.h" />
     <ClInclude Include="..\parsers\tex.h" />
-    <ClInclude Include="..\dsl\es.h" />
-    <ClInclude Include="..\dsl\optscript.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

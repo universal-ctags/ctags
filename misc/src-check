@@ -92,11 +92,12 @@ check_vStringCatS_usage()
 
 check_eof_chars_in_vcxproj()
 {
-    local r=2
+    local r=4
     local f
 
     # *.vcxproj* should not have the last CRLF.
-    for f in win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters; do
+    for f in win32/ctags_vs2013.vcxproj.in win32/ctags_vs2013.vcxproj.filters.in \
+             win32/ctags_vs2013.vcxproj    win32/ctags_vs2013.vcxproj.filters; do
 	header "Check the EOF characters of $f"
 	local s=$(od -t c  -j $(expr $(stat -c %s $f) - 1) $f)
 	if echo "$s" | grep -q '>$'; then
