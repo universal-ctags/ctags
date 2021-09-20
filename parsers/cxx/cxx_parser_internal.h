@@ -157,7 +157,8 @@ typedef struct _CXXFunctionSignatureInfo
 int cxxParserMaybeParseKnRStyleFunctionDefinition(void);
 int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 		CXXFunctionSignatureInfo * pInfo,
-		int * piCorkQueueIndex
+		int * piCorkQueueIndex,
+		int * piCorkQueueIndexFQ
 	);
 
 /* This must be smaller than (sizeof(unsigned int) * 8).
@@ -201,7 +202,8 @@ int cxxParserEmitFunctionTags(
 		CXXFunctionSignatureInfo * pInfo,
 		unsigned int uTagKind,
 		unsigned int uOptions,
-		int * piCorkQueueIndex
+		int * piCorkQueueIndex,
+		int * piCorkQueueIndexFQ
 	);
 
 void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo);

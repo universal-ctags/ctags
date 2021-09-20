@@ -831,6 +831,7 @@ bool cxxParserParseEnum(void)
 	tagEntryInfo * tag = cxxTagBegin(CXXTagKindENUM,pEnumName);
 
 	int iCorkQueueIndex = CORK_NIL;
+	int iCorkQueueIndexFQ = CORK_NIL;
 
 	if(tag)
 	{
@@ -852,7 +853,7 @@ bool cxxParserParseEnum(void)
 		if(bIsScopedEnum)
 			pszProperties = cxxTagSetProperties(CXXTagPropertyScopedEnum);
 
-		iCorkQueueIndex = cxxTagCommit();
+		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
 
 		if (pszProperties)
 			vStringDelete (pszProperties);
@@ -894,7 +895,7 @@ bool cxxParserParseEnum(void)
 			if(tag)
 			{
 				tag->isFileScope = !isInputHeaderFile();
-				cxxTagCommit();
+				cxxTagCommit(NULL);
 			}
 		}
 
@@ -906,7 +907,11 @@ bool cxxParserParseEnum(void)
 	}
 
 	if(iCorkQueueIndex > CORK_NIL)
+	{
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+		if(iCorkQueueIndexFQ > CORK_NIL)
+			cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndexFQ);
+	}
 
 	while(iPushedScopes > 0)
 	{
@@ -1261,6 +1266,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	tagEntryInfo * tag = cxxTagBegin(uTagKind,pClassName);
 
 	int iCorkQueueIndex = CORK_NIL;
+	int iCorkQueueIndexFQ = CORK_NIL;
 
 	bool bGotTemplate = g_cxx.pTemplateTokenChain &&
 			(g_cxx.pTemplateTokenChain->iCount > 0) &&
@@ -1315,7 +1321,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 		tag->isFileScope = !isInputHeaderFile();
 
-		iCorkQueueIndex = cxxTagCommit();
+		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
 
 	}
 
@@ -1343,7 +1349,11 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	}
 
 	if(iCorkQueueIndex > CORK_NIL)
+	{
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+		if(iCorkQueueIndexFQ > CORK_NIL)
+			cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndexFQ);
+	}
 
 	iPushedScopes++;
 	while(iPushedScopes > 0)
@@ -1505,12 +1515,14 @@ check_function_signature:
 			// out its proper scope. Better avoid emitting this one.
 			CXX_DEBUG_PRINT("But it has been preceded by the 'friend' keyword: this is not a real prototype");
 		} else {
-			int iCorkQueueIndex;
-			int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes, &iCorkQueueIndex);
+			int iCorkQueueIndex, iCorkQueueIndexFQ;
+			int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,&iCorkQueueIndex,&iCorkQueueIndexFQ);
 			if (iCorkQueueIndex != CORK_NIL)
 			{
 				CXXToken * t = cxxTokenChainLast(g_cxx.pTokenChain);
 				cxxParserSetEndLineForTagInCorkQueue (iCorkQueueIndex, t->iLineNumber);
+				if (iCorkQueueIndexFQ != CORK_NIL)
+					cxxParserSetEndLineForTagInCorkQueue (iCorkQueueIndexFQ, t->iLineNumber);
 			}
 
 			if(bPrototypeParams)

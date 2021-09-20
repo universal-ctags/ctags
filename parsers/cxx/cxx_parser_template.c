@@ -851,7 +851,7 @@ void cxxParserEmitTemplateParameterTags(void)
 				g_cxx.oTemplateParameters.aTypeEnds[i]
 			);
 
-		cxxTagCommit();
+		cxxTagCommit(NULL);
 		if (pTypeToken)
 			cxxTokenDestroy(pTypeToken);
 	}

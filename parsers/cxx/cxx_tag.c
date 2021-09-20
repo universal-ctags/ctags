@@ -601,8 +601,11 @@ void cxxTagHandleTemplateFields()
 
 }
 
-int cxxTagCommit(void)
+int cxxTagCommit(int *piCorkQueueIndexFQ)
 {
+	if(piCorkQueueIndexFQ)
+		*piCorkQueueIndexFQ = CORK_NIL;
+
 	if(g_oCXXTag.isFileScope)
 	{
 		if(!isXtagEnabled(XTAG_FILE_SCOPE))
@@ -681,7 +684,9 @@ int cxxTagCommit(void)
 			g_oCXXTag.lineNumber
 		);
 
-	makeTagEntry(&g_oCXXTag);
+	int iCorkQueueIndexFQ = makeTagEntry(&g_oCXXTag);
+	if(piCorkQueueIndexFQ)
+		*piCorkQueueIndexFQ = iCorkQueueIndexFQ;
 
 	vStringDelete(x);
 
@@ -691,5 +696,5 @@ int cxxTagCommit(void)
 void cxxTag(unsigned int uKind,CXXToken * pToken)
 {
 	if(cxxTagBegin(uKind,pToken) != NULL)
-		cxxTagCommit();
+		cxxTagCommit(NULL);
 }
