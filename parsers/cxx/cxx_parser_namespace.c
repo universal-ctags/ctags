@@ -23,7 +23,7 @@
 #include "read.h"
 
 
-#define MAX_NESTED_NAMESPACES 8
+#define MAX_NESTED_NAMESPACES 16
 
 
 bool cxxParserParseNamespace(void)
