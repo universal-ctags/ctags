@@ -1,0 +1,17 @@
+DEAMER_LANGUAGE_DATASTRUCTURE_DEFINITION_OBJECT_MAIN_THREAT_THREAT_ANALYZER_DEAMER_LEXICON_TYPE_H	input.cxx	/^#define DEAMER_LANGUAGE_DATASTRUCTURE_DEFINITION_OBJECT_MAIN_THREAT_THREAT_ANALYZER_DEAMER_LEXIC/;"	d	file:	end:24
+deamer	input.cxx	/^namespace deamer::language::type::definition::object::main::threat::deamer::lexicon$/;"	n	file:	end:42
+language	input.cxx	/^namespace deamer::language::type::definition::object::main::threat::deamer::lexicon$/;"	n	namespace:deamer	file:	end:42
+type	input.cxx	/^namespace deamer::language::type::definition::object::main::threat::deamer::lexicon$/;"	n	namespace:deamer::language	file:	end:42
+definition	input.cxx	/^namespace deamer::language::type::definition::object::main::threat::deamer::lexicon$/;"	n	namespace:deamer::language::type	file:	end:42
+object	input.cxx	/^namespace deamer::language::type::definition::object::main::threat::deamer::lexicon$/;"	n	namespace:deamer::language::type::definition	file:	end:42
+main	input.cxx	/^namespace deamer::language::type::definition::object::main::threat::deamer::lexicon$/;"	n	namespace:deamer::language::type::definition::object	file:	end:42
+threat	input.cxx	/^namespace deamer::language::type::definition::object::main::threat::deamer::lexicon$/;"	n	namespace:deamer::language::type::definition::object::main	file:	end:42
+deamer	input.cxx	/^namespace deamer::language::type::definition::object::main::threat::deamer::lexicon$/;"	n	namespace:deamer::language::type::definition::object::main::threat	file:	end:42
+lexicon	input.cxx	/^namespace deamer::language::type::definition::object::main::threat::deamer::lexicon$/;"	n	namespace:deamer::language::type::definition::object::main::threat::deamer	file:	end:42
+Type	input.cxx	/^	enum class Type$/;"	g	namespace:deamer::language::type::definition::object::main::threat::deamer::lexicon	file:	end:41
+Unknown	input.cxx	/^		Unknown = 0,$/;"	e	enum:deamer::language::type::definition::object::main::threat::deamer::lexicon::Type	file:
+UnusedTerminal	input.cxx	/^		UnusedTerminal = 1,$/;"	e	enum:deamer::language::type::definition::object::main::threat::deamer::lexicon::Type	file:
+DeletedTerminalReferencedInGrammar	input.cxx	/^		DeletedTerminalReferencedInGrammar = 2,$/;"	e	enum:deamer::language::type::definition::object::main::threat::deamer::lexicon::Type	file:
+CrashTerminalReferencedInGrammar	input.cxx	/^		CrashTerminalReferencedInGrammar = 3,$/;"	e	enum:deamer::language::type::definition::object::main::threat::deamer::lexicon::Type	file:
+TerminalIsBaseSetOfLaterTerminal	input.cxx	/^		TerminalIsBaseSetOfLaterTerminal = 4,$/;"	e	enum:deamer::language::type::definition::object::main::threat::deamer::lexicon::Type	file:
+NonStandardNamingConvention	input.cxx	/^		NonStandardNamingConvention = 5,$/;"	e	enum:deamer::language::type::definition::object::main::threat::deamer::lexicon::Type	file:
