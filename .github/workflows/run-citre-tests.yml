@@ -38,8 +38,8 @@ jobs:
         run: make
       - name: report features
         run: ./ctags --list-features
-      - name: install Emacs
-        run: sudo apt-get -y -o APT::Immediate-Configure=false install emacs
+      - name: install Emacs and GLOBAL
+        run: sudo apt-get -y -o APT::Immediate-Configure=false install emacs global
       - name: checkout Citre repo
         uses: actions/checkout@v2
         with:
