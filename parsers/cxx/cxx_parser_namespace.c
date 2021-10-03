@@ -23,7 +23,7 @@
 #include "read.h"
 
 
-#define MAX_NESTED_NAMESPACES 8
+#define MAX_NESTED_NAMESPACES 16
 
 
 bool cxxParserParseNamespace(void)
@@ -331,10 +331,13 @@ bool cxxParserParseNamespace(void)
 		cxxScopePop();
 		iScopeCount--;
 
-		if(aCorkQueueIndices[iScopeCount].leafnm > CORK_NIL)
-			cxxParserMarkEndLineForTagInCorkQueue(aCorkQueueIndices[iScopeCount].leafnm);
-		if(aCorkQueueIndices[iScopeCount].fqnm > CORK_NIL)
-			cxxParserMarkEndLineForTagInCorkQueue(aCorkQueueIndices[iScopeCount].fqnm);
+		if(iScopeCount < MAX_NESTED_NAMESPACES)
+    {
+			if(aCorkQueueIndices[iScopeCount].leafnm > CORK_NIL)
+				cxxParserMarkEndLineForTagInCorkQueue(aCorkQueueIndices[iScopeCount].leafnm);
+			if(aCorkQueueIndices[iScopeCount].fqnm > CORK_NIL)
+				cxxParserMarkEndLineForTagInCorkQueue(aCorkQueueIndices[iScopeCount].fqnm);
+    }
 	}
 
 	CXX_DEBUG_LEAVE_TEXT("Finished parsing namespace");
