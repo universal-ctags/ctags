@@ -38,13 +38,13 @@ jobs:
         run: make
       - name: report features
         run: ./ctags --list-features
-      - name: install Emacs and GLOBAL
-        run: sudo apt-get -y -o APT::Immediate-Configure=false install emacs global
+      - name: install Emacs
+        run: sudo apt-get -y -o APT::Immediate-Configure=false install emacs
       - name: checkout Citre repo
         uses: actions/checkout@v2
         with:
           repository: 'universal-ctags/citre'
           path: 'citre'
-      - name: run Citre unit tests
+      - name: run Citre unit tests for ctags backend
         working-directory: 'citre'
-        run: make test
+        run: make test-ctags
