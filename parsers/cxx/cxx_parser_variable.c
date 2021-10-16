@@ -103,6 +103,7 @@ CXXToken * cxxParserFindFirstPossiblyNestedAndQualifiedIdentifier(
 bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uFlags)
 {
 	int iCorkIndex = CORK_NIL;
+	int iCorkIndexFQ = CORK_NIL;
 
 	CXX_DEBUG_ENTER();
 
@@ -763,7 +764,7 @@ got_identifier:
 			if(bGotTemplate)
 				cxxTagHandleTemplateFields();
 
-			iCorkIndex = cxxTagCommit();
+			iCorkIndex = cxxTagCommit(&iCorkIndexFQ);
 
 			if(pTypeToken)
 				cxxTokenDestroy(pTypeToken);
@@ -826,6 +827,11 @@ got_identifier:
 			{
 				cxxParserSetEndLineForTagInCorkQueue (iCorkIndex, t->iLineNumber);
 				iCorkIndex = CORK_NIL;
+				if(iCorkIndexFQ != CORK_NIL)
+				{
+					cxxParserSetEndLineForTagInCorkQueue (iCorkIndexFQ, t->iLineNumber);
+					iCorkIndexFQ = CORK_NIL;
+				}
 			}
 			CXX_DEBUG_LEAVE_TEXT("Noting else");
 			return bGotVariable;
@@ -836,6 +842,11 @@ got_identifier:
 		{
 			cxxParserSetEndLineForTagInCorkQueue (iCorkIndex, t->iLineNumber);
 			iCorkIndex = CORK_NIL;
+			if(iCorkIndexFQ != CORK_NIL)
+			{
+				cxxParserSetEndLineForTagInCorkQueue (iCorkIndexFQ, t->iLineNumber);
+				iCorkIndexFQ = CORK_NIL;
+			}
 		}
 
 		CXX_DEBUG_PRINT("At a comma, might have other declarations here");

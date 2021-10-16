@@ -152,7 +152,7 @@ bool cxxParserParseUsingClause(void)
 			{
 				tag->isFileScope = (cxxScopeGetType() == CXXScopeTypeNamespace) &&
 							(!isInputHeaderFile());
-				cxxTagCommit();
+				cxxTagCommit(NULL);
 			}
 		}
 	}

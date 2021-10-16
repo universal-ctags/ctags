@@ -141,6 +141,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 
 	int iScopes;
 	int iCorkQueueIndex = CORK_NIL;
+	int iCorkQueueIndexFQ = CORK_NIL;
 
 	CXXFunctionSignatureInfo oInfo;
 
@@ -148,7 +149,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	{
 		// very likely a function definition
 		// (but may be also a toplevel block, like "extern "C" { ... }")
-		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket(&oInfo,&iCorkQueueIndex);
+		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket(&oInfo,&iCorkQueueIndex,&iCorkQueueIndexFQ);
 
 		// FIXME: Handle syntax (5) of list initialization:
 		//        Class::Class() : member { arg1, arg2, ... } {...
@@ -237,8 +238,11 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
  	}
 
 	if(iCorkQueueIndex > CORK_NIL)
+	{
 		cxxParserSetEndLineForTagInCorkQueue(iCorkQueueIndex,uEndPosition);
-
+		if(iCorkQueueIndexFQ > CORK_NIL)
+			cxxParserSetEndLineForTagInCorkQueue(iCorkQueueIndexFQ,uEndPosition);
+	}
 	while(iScopes > 0)
 	{
 		cxxScopePop();
@@ -702,7 +706,7 @@ process_token:
 					if(tag)
 					{
 						tag->isFileScope = true;
-						cxxTagCommit();
+						cxxTagCommit(NULL);
 					}
 				} else {
 					// what is this? (default: and similar things have been handled at keyword level)

@@ -442,7 +442,7 @@ skip_to_comma_or_end:
 			if(bGotTemplate)
 				cxxTagHandleTemplateFields();
 
-			cxxTagCommit();
+			cxxTagCommit(NULL);
 
 			if (
 					bGotTemplate &&

@@ -181,7 +181,7 @@ void cxxTagHandleTemplateFields();
 
 // Commit the composed tag. Must follow a successful cxxTagBegin() call.
 // Returns the index of the tag in the cork queue.
-int cxxTagCommit(void);
+int cxxTagCommit(int *piCorkQueueIndexFQ);
 
 // Same as cxxTagBegin() eventually followed by cxxTagCommit()
 void cxxTag(unsigned int uKind,CXXToken * pToken);

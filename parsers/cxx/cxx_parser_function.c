@@ -280,6 +280,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 	tagEntryInfo * tag = cxxTagBegin(CXXTagKindFUNCTION,pIdentifier);
 
 	int iCorkQueueIndex = CORK_NIL;
+	int iCorkQueueIndexFQ = CORK_NIL;
 
 	if(tag)
 	{
@@ -302,7 +303,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 
-		iCorkQueueIndex = cxxTagCommit();
+		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
 
 		if(pszSignature)
 			vStringDelete(pszSignature);
@@ -348,7 +349,11 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 	}
 
 	if(iCorkQueueIndex > CORK_NIL)
+	{
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+		if(iCorkQueueIndexFQ > CORK_NIL)
+			cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndexFQ);
+	}
 
 	cxxScopePop();
 	return 1;
@@ -1407,7 +1412,8 @@ int cxxParserEmitFunctionTags(
 		CXXFunctionSignatureInfo * pInfo,
 		unsigned int uTagKind,
 		unsigned int uOptions,
-		int * piCorkQueueIndex
+		int * piCorkQueueIndex,
+		int * piCorkQueueIndexFQ
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -1416,6 +1422,8 @@ int cxxParserEmitFunctionTags(
 
 	if(piCorkQueueIndex)
 		*piCorkQueueIndex = CORK_NIL;
+	if(piCorkQueueIndexFQ)
+		*piCorkQueueIndexFQ = CORK_NIL;
 
 	enum CXXScopeType eOuterScopeType = cxxScopeGetType();
 
@@ -1703,7 +1711,7 @@ int cxxParserEmitFunctionTags(
 			pszProperties = cxxTagSetProperties(uProperties);
 		}
 
-		int iCorkQueueIndex = cxxTagCommit();
+		int iCorkQueueIndex = cxxTagCommit(piCorkQueueIndexFQ);
 
 		if(piCorkQueueIndex)
 			*piCorkQueueIndex = iCorkQueueIndex;
@@ -1765,7 +1773,8 @@ int cxxParserEmitFunctionTags(
 //
 int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 		CXXFunctionSignatureInfo * pInfo,
-		int * piCorkQueueIndex
+		int * piCorkQueueIndex,
+		int * piCorkQueueIndexFQ
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -1805,7 +1814,8 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 			pInfo,
 			CXXTagKindFUNCTION,
 			CXXEmitFunctionTagsPushScopes,
-			piCorkQueueIndex
+			piCorkQueueIndex,
+			piCorkQueueIndexFQ
 		);
 
 	if(bParams)
@@ -1875,7 +1885,7 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 		if (pInfo->uAnonymous & (0x1u << i))
 			markTagExtraBit(tag, XTAG_ANONYMOUS);
 
-		cxxTagCommit();
+		cxxTagCommit(NULL);
 
 		if(pTypeName)
 		{

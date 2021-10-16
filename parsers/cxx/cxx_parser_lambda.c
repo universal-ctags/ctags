@@ -228,6 +228,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 	}
 
 	int iCorkQueueIndex = CORK_NIL;
+	int iCorkQueueIndexFQ = CORK_NIL;
 
 	if(tag)
 	{
@@ -266,7 +267,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 
-		iCorkQueueIndex = cxxTagCommit();
+		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
 
 		if(pTypeName)
 			cxxTokenDestroy(pTypeName);
@@ -297,7 +298,11 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 	bool bRet = cxxParserParseBlock(true);
 
 	if(iCorkQueueIndex > CORK_NIL)
+	{
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+		if(iCorkQueueIndexFQ > CORK_NIL)
+			cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndexFQ);
+	}
 
 	cxxScopePop();
 

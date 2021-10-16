@@ -65,10 +65,12 @@ bool cxxParserParseNamespace(void)
 
 	int i;
 
-	int aCorkQueueIndices[MAX_NESTED_NAMESPACES];
-
+	struct { int leafnm, fqnm; } aCorkQueueIndices[MAX_NESTED_NAMESPACES];
 	for(i=0;i<MAX_NESTED_NAMESPACES;i++)
-		aCorkQueueIndices[i] = CORK_NIL;
+	{
+		aCorkQueueIndices[i].leafnm = CORK_NIL;
+		aCorkQueueIndices[i].fqnm   = CORK_NIL;
+	}
 
 	if(!cxxParserParseNextToken())
 	{
@@ -146,7 +148,7 @@ bool cxxParserParseNamespace(void)
 							false
 						);
 
-					cxxTagCommit();
+					cxxTagCommit(NULL);
 
 					cxxTokenDestroy(pAliasedName);
 				}
@@ -244,10 +246,13 @@ bool cxxParserParseNamespace(void)
 
 				vString * pszProperties = uProperties ? cxxTagSetProperties(uProperties) : NULL;
 
-				int iCorkQueueIndex = cxxTagCommit();
-
+				int iCorkQueueIndexFQ;
+				int iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
 				if(iScopeCount < MAX_NESTED_NAMESPACES)
-					aCorkQueueIndices[iScopeCount] = iCorkQueueIndex;
+				{
+					aCorkQueueIndices[iScopeCount].leafnm = iCorkQueueIndex;
+					aCorkQueueIndices[iScopeCount].fqnm   = iCorkQueueIndexFQ;
+				}
 
 				if(pszProperties)
 					vStringDelete(pszProperties);
@@ -283,7 +288,9 @@ bool cxxParserParseNamespace(void)
 
 			vString * pszProperties = uProperties ? cxxTagSetProperties(uProperties) : NULL;
 
-			aCorkQueueIndices[0] = cxxTagCommit();
+			int iCorkQueueIndexFQ;
+			aCorkQueueIndices[0].leafnm = cxxTagCommit(&iCorkQueueIndexFQ);
+			aCorkQueueIndices[0].fqnm   = iCorkQueueIndexFQ;
 
 			if(pszProperties)
 				vStringDelete(pszProperties);
@@ -324,8 +331,13 @@ bool cxxParserParseNamespace(void)
 		cxxScopePop();
 		iScopeCount--;
 
-		if(iScopeCount < MAX_NESTED_NAMESPACES && aCorkQueueIndices[iScopeCount] > CORK_NIL)
-			cxxParserMarkEndLineForTagInCorkQueue(aCorkQueueIndices[iScopeCount]);
+		if(iScopeCount < MAX_NESTED_NAMESPACES)
+    {
+			if(aCorkQueueIndices[iScopeCount].leafnm > CORK_NIL)
+				cxxParserMarkEndLineForTagInCorkQueue(aCorkQueueIndices[iScopeCount].leafnm);
+			if(aCorkQueueIndices[iScopeCount].fqnm > CORK_NIL)
+				cxxParserMarkEndLineForTagInCorkQueue(aCorkQueueIndices[iScopeCount].fqnm);
+    }
 	}
 
 	CXX_DEBUG_LEAVE_TEXT("Finished parsing namespace");
