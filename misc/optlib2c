@@ -44,6 +44,12 @@ my $options =
 	   parse_optlib ($1, $_[0]);
 	   return 1;
        } ],
+     [ qr/^--__selector-(.*)=(.*)/, sub {
+	 die "Don't use --__selector-<LANG>= option before defining the language"
+	     if (! defined $_[0]->{'langdef'});
+	 $_[0]->{'selector'} = $2;
+	 return 1;
+       } ],
      #
      # TODO: We should not assume the order of flags.
      #
@@ -592,6 +598,11 @@ EOF
 #include "subparser.h"
 EOF
     }
+    if (defined $opts->{'selector'}) {
+	print <<EOF;
+#include "selectors.h"
+EOF
+    }
     print <<EOF;
 
 
@@ -949,6 +960,16 @@ EOF
 EOF
 }
 
+sub emit_selector {
+    my $opts = shift;
+
+    if (defined $opts->{'selector'}) {
+	print <<EOF;
+	static selectLanguage selectors[] = { $opts->{'selector'}, NULL };
+EOF
+    }
+}
+
 sub emit_fields_initialization {
     my $opts = shift;
     my $enabled = $opts->{"disabled"} ? "false": "true";
@@ -965,6 +986,13 @@ sub emit_fields_initialization {
 	def->extensions    = extensions;
 	def->patterns      = patterns;
 	def->aliases       = aliases;
+EOF
+    if (defined $opts->{'selector'}) {
+	print <<EOF;
+	def->selectLanguage= selectors;
+EOF
+    }
+print <<EOF;
 	def->method        = ${method};
 EOF
 
@@ -1059,6 +1087,7 @@ EOF
     emit_xtags           $opts;
     emit_regexs          $opts;
     emit_dependencies    $opts;
+    emit_selector         $opts;
 
     print "\n";
 
@@ -1134,6 +1163,7 @@ sub main {
 			   ],
 		sequel =>  [ # ""
 			   ],
+		selector => undef,
 	       );
 
     for (@_) {
