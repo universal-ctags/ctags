@@ -588,7 +588,7 @@ sub emit_header {
 EOF
 
     if (defined $opts->{'base'}) {
-    print <<EOF;
+	print <<EOF;
 #include "subparser.h"
 EOF
     }
