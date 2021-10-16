@@ -1,0 +1,88 @@
+B_ENVIRONMENT	input.l	/^%x B_ENVIRONMENT E_ENVIRONMENT VERBATIM INCLUDE MATH COMMENT VERB DEF$/;"	c	language:LEX
+E_ENVIRONMENT	input.l	/^%x B_ENVIRONMENT E_ENVIRONMENT VERBATIM INCLUDE MATH COMMENT VERB DEF$/;"	c	language:LEX
+VERBATIM	input.l	/^%x B_ENVIRONMENT E_ENVIRONMENT VERBATIM INCLUDE MATH COMMENT VERB DEF$/;"	c	language:LEX
+INCLUDE	input.l	/^%x B_ENVIRONMENT E_ENVIRONMENT VERBATIM INCLUDE MATH COMMENT VERB DEF$/;"	c	language:LEX
+MATH	input.l	/^%x B_ENVIRONMENT E_ENVIRONMENT VERBATIM INCLUDE MATH COMMENT VERB DEF$/;"	c	language:LEX
+COMMENT	input.l	/^%x B_ENVIRONMENT E_ENVIRONMENT VERBATIM INCLUDE MATH COMMENT VERB DEF$/;"	c	language:LEX
+VERB	input.l	/^%x B_ENVIRONMENT E_ENVIRONMENT VERBATIM INCLUDE MATH COMMENT VERB DEF$/;"	c	language:LEX
+DEF	input.l	/^%x B_ENVIRONMENT E_ENVIRONMENT VERBATIM INCLUDE MATH COMMENT VERB DEF$/;"	c	language:LEX
+AFTER_DISPLAY	input.l	/^%x AFTER_DISPLAY ENV_DEF ICOR GETICOR$/;"	c	language:LEX
+ENV_DEF	input.l	/^%x AFTER_DISPLAY ENV_DEF ICOR GETICOR$/;"	c	language:LEX
+ICOR	input.l	/^%x AFTER_DISPLAY ENV_DEF ICOR GETICOR$/;"	c	language:LEX
+GETICOR	input.l	/^%x AFTER_DISPLAY ENV_DEF ICOR GETICOR$/;"	c	language:LEX
+START	input.l	/^%s START$/;"	c	language:LEX
+b_group	input.l	/^b_group ("{"|\\\\bgroup)$/;"	r	language:LEX
+e_group	input.l	/^e_group ("}"|\\\\egroup)$/;"	r	language:LEX
+b_math	input.l	/^b_math \\\\\\($/;"	r	language:LEX
+e_math	input.l	/^e_math \\\\\\)$/;"	r	language:LEX
+math	input.l	/^math \\\$$/;"	r	language:LEX
+b_display	input.l	/^b_display \\\\\\[$/;"	r	language:LEX
+e_display	input.l	/^e_display \\\\\\]$/;"	r	language:LEX
+display	input.l	/^display \\$\\\$$/;"	r	language:LEX
+par	input.l	/^par ([ \\t]*\\n[ \\t]*\\n[ \\t\\n]*)$/;"	r	language:LEX
+non_par_ws	input.l	/^non_par_ws ([ \\t]+\\n?[ \\t]*|[ \\t]*\\n[ \\t]*|[ \\t]*\\n?[ \\t]+)$/;"	r	language:LEX
+ws	input.l	/^ws [ \\n\\t](%[^\\n]\\n)*$/;"	r	language:LEX
+space	input.l	/^space ({ws}|\\~|\\\\space)$/;"	r	language:LEX
+hard_space	input.l	/^hard_space (\\~|\\\\space)$/;"	r	language:LEX
+u_letter	input.l	/^u_letter [A-ZÆØÅ] $/;"	r	language:LEX
+l_letter	input.l	/^l_letter [a-zæøå] $/;"	r	language:LEX
+punct	input.l	/^punct [\\!\\.\\?]$/;"	r	language:LEX
+atoz	input.l	/^atoz [a-zA-Z]$/;"	r	language:LEX
+letter	input.l	/^letter [A-ZÆØÅa-zæøå]$/;"	r	language:LEX
+c_bin	input.l	/^c_bin ("-"|"+"|"\\\\cdot"|"\\\\oplus"|"\\\\otimes"|"\\\\times")$/;"	r	language:LEX
+l_bin	input.l	/^l_bin (",")$/;"	r	language:LEX
+general_abbrev	input.l	/^general_abbrev {letter}+{punct}$/;"	r	language:LEX
+non_abbrev	input.l	/^non_abbrev {u_letter}{u_letter}+{punct}$/;"	r	language:LEX
+italic_spec	input.l	/^italic_spec (sl|it)$/;"	r	language:LEX
+normal_spec	input.l	/^normal_spec normalshape$/;"	r	language:LEX
+swap_spec	input.l	/^swap_spec em$/;"	r	language:LEX
+font_spec	input.l	/^font_spec (rm|bf|{italic_spec}|tt|{swap_spec}|mediumseries|{normal_spec})$/;"	r	language:LEX
+primitive	input.l	/^primitive \\\\(above|advance|catcode|chardef|closein|closeout|copy|count|countdef|cr|crcr|csname/;"	r	language:LEX
+symbol	input.l	/^symbol ("$"("\\\\"{atoz}+|.)"$"|"\\\\#"|"\\\\$"|"\\\\%"|"\\\\ref")$/;"	r	language:LEX
+YY_SKIP_YYWRAP	input.l	/^#define YY_SKIP_YYWRAP$/;"	d	language:C	file:
+yywrap	input.l	/^int yywrap() { return 1; }$/;"	f	language:C	typeref:typename:int
+GROUP_STACK_SIZE	input.l	/^#define GROUP_STACK_SIZE /;"	d	language:C	file:
+INPUT_STACK_SIZE	input.l	/^#define INPUT_STACK_SIZE /;"	d	language:C	file:
+PROGNAME	input.l	/^#define PROGNAME /;"	d	language:C	file:
+CG_NAME	input.l	/^#define CG_NAME /;"	d	language:C	file:
+CG_TYPE	input.l	/^#define CG_TYPE /;"	d	language:C	file:
+CG_LINE	input.l	/^#define CG_LINE /;"	d	language:C	file:
+CG_ITALIC	input.l	/^#define CG_ITALIC /;"	d	language:C	file:
+CG_FILE	input.l	/^#define CG_FILE /;"	d	language:C	file:
+returnval	input.l	/^char returnval[100];$/;"	v	language:C	typeref:typename:char[100]
+line_count	input.l	/^int line_count = 1;$/;"	v	language:C	typeref:typename:int
+warn_count	input.l	/^int warn_count = 0;$/;"	v	language:C	typeref:typename:int
+file_name	input.l	/^char *file_name;$/;"	v	language:C	typeref:typename:char *
+verb_char	input.l	/^char verb_char;$/;"	v	language:C	typeref:typename:char
+tex_group	input.l	/^typedef struct tex_group $/;"	s	language:C	file:
+s_name	input.l	/^    unsigned char *s_name;$/;"	m	language:C	struct:tex_group	typeref:typename:unsigned char *	file:
+s_type	input.l	/^    int s_type;$/;"	m	language:C	struct:tex_group	typeref:typename:int	file:
+s_line	input.l	/^    int s_line;$/;"	m	language:C	struct:tex_group	typeref:typename:int	file:
+italic	input.l	/^    int italic;$/;"	m	language:C	struct:tex_group	typeref:typename:int	file:
+s_file	input.l	/^    char *s_file; $/;"	m	language:C	struct:tex_group	typeref:typename:char *	file:
+tex_group	input.l	/^ } tex_group;$/;"	t	language:C	typeref:struct:tex_group	file:
+gstack	input.l	/^tex_group *gstack;$/;"	v	language:C	typeref:typename:tex_group *
+gstack_size	input.l	/^int gstack_size = GROUP_STACK_SIZE;$/;"	v	language:C	typeref:typename:int
+gstackp	input.l	/^int gstackp = 0;$/;"	v	language:C	typeref:typename:int
+input_	input.l	/^typedef struct input_ $/;"	s	language:C	file:
+stream	input.l	/^    YY_BUFFER_STATE stream;$/;"	m	language:C	struct:input_	typeref:typename:YY_BUFFER_STATE	file:
+name	input.l	/^    char *name;$/;"	m	language:C	struct:input_	typeref:typename:char *	file:
+linenum	input.l	/^    int linenum;$/;"	m	language:C	struct:input_	typeref:typename:int	file:
+input_	input.l	/^ } input_;$/;"	t	language:C	typeref:struct:input_	file:
+istack	input.l	/^input_ *istack;$/;"	v	language:C	typeref:typename:input_ *
+istack_size	input.l	/^int istack_size = INPUT_STACK_SIZE;$/;"	v	language:C	typeref:typename:int
+istackp	input.l	/^int istackp = 0;$/;"	v	language:C	typeref:typename:int
+def_count	input.l	/^int def_count = 0;$/;"	v	language:C	typeref:typename:int
+main	input.l	/^int main( argc, argv )$/;"	f	language:C
+strstr	input.l	/^strstr(string, substring)$/;"	f	language:C
+push	input.l	/^void push(p_name, p_type, p_line)$/;"	f	language:C
+input_file	input.l	/^void input_file(file_nam)$/;"	f	language:C
+pop	input.l	/^void pop()$/;"	f	language:C	typeref:typename:void
+bg_command	input.l	/^char *bg_command(name)$/;"	f	language:C
+eg_command	input.l	/^char *eg_command(name,type)$/;"	f	language:C
+g_checkend	input.l	/^void g_checkend(n)$/;"	f	language:C
+e_checkend	input.l	/^void e_checkend(n, name)$/;"	f	language:C
+f_checkend	input.l	/^void f_checkend(name)$/;"	f	language:C
+print_bad_match	input.l	/^void print_bad_match(end_command,type)$/;"	f	language:C
+check_top_level_end	input.l	/^int check_top_level_end(end_command,type)$/;"	f	language:C
+linecount	input.l	/^void linecount()$/;"	f	language:C	typeref:typename:void

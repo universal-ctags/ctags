@@ -28,6 +28,9 @@ const char *
 selectByRexxCommentAndDosbatchLabelPrefix (MIO *, langType *, unsigned int);
 
 const char *
+selectLispOrLEXByLEXMarker (MIO *, langType *, unsigned int);
+
+const char *
 selectByXpathFileSpec (MIO *input, langType *candidates, unsigned int nCandidates);
 
 #endif

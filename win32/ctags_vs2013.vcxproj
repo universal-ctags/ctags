@@ -238,6 +238,7 @@
     <ClCompile Include="..\optlib\iPythonCell.c" />
     <ClCompile Include="..\optlib\inko.c" />
     <ClCompile Include="..\optlib\kconfig.c" />
+    <ClCompile Include="..\optlib\lex.c" />
     <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\optlib\markdown.c" />
     <ClCompile Include="..\optlib\meson.c" />
