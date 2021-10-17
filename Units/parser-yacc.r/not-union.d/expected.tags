@@ -1,3 +1,12 @@
+HOSTCOND	input.y	/^%token HOSTCOND DCOND SCOND DPORT SPORT LEQ GEQ NEQ AUTOBOUND$/;"	t	language:YACC
+DCOND	input.y	/^%token HOSTCOND DCOND SCOND DPORT SPORT LEQ GEQ NEQ AUTOBOUND$/;"	t	language:YACC
+SCOND	input.y	/^%token HOSTCOND DCOND SCOND DPORT SPORT LEQ GEQ NEQ AUTOBOUND$/;"	t	language:YACC
+DPORT	input.y	/^%token HOSTCOND DCOND SCOND DPORT SPORT LEQ GEQ NEQ AUTOBOUND$/;"	t	language:YACC
+SPORT	input.y	/^%token HOSTCOND DCOND SCOND DPORT SPORT LEQ GEQ NEQ AUTOBOUND$/;"	t	language:YACC
+LEQ	input.y	/^%token HOSTCOND DCOND SCOND DPORT SPORT LEQ GEQ NEQ AUTOBOUND$/;"	t	language:YACC
+GEQ	input.y	/^%token HOSTCOND DCOND SCOND DPORT SPORT LEQ GEQ NEQ AUTOBOUND$/;"	t	language:YACC
+NEQ	input.y	/^%token HOSTCOND DCOND SCOND DPORT SPORT LEQ GEQ NEQ AUTOBOUND$/;"	t	language:YACC
+AUTOBOUND	input.y	/^%token HOSTCOND DCOND SCOND DPORT SPORT LEQ GEQ NEQ AUTOBOUND$/;"	t	language:YACC
 applet	input.y	/^applet: null expr$/;"	l	language:YACC
 null	input.y	/^null:   \/* NOTHING *\/ { $$ = NULL; }$/;"	l	language:YACC
 expr	input.y	/^expr:	DCOND HOSTCOND$/;"	l	language:YACC

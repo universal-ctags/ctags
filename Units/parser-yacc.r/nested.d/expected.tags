@@ -1,16 +1,48 @@
-CfgFile	input.y	/^CfgFile		$/;"	l	language:YACC
-CfgEntryList	input.y	/^CfgEntryList	:	CfgEntryList CfgEntry$/;"	l	language:YACC
-CfgEntry	input.y	/^CfgEntry	:	EventDef ActionDef$/;"	l	language:YACC
-VarDef	input.y	/^VarDef		:	Ident EQUALS NameSpec$/;"	l	language:YACC
-EventDef	input.y	/^EventDef	:	EventType OPAREN OptNameSpec CPAREN$/;"	l	language:YACC
-EventType	input.y	/^EventType	:	BELL		{ $$= XkbBellNotify; }$/;"	l	language:YACC
-ActionDef	input.y	/^ActionDef	:	ActionType OptString$/;"	l	language:YACC
-ActionType	input.y	/^ActionType	:	NONE	 { $$ = NoAction; }$/;"	l	language:YACC
-OptNameSpec	input.y	/^OptNameSpec	:	NameSpec { $$= $1; }$/;"	l	language:YACC
-NameSpec	input.y	/^NameSpec	:	Ident	{ $$= $1; }$/;"	l	language:YACC
-Ident	input.y	/^Ident		:	IDENT	{ $$= scanStr; scanStr= NULL; }$/;"	l	language:YACC
-OptString	input.y	/^OptString	:	String	{ $$= $1; }$/;"	l	language:YACC
-String	input.y	/^String		:	STRING	{ $$= scanStr; scanStr= NULL; }$/;"	l	language:YACC
+END_OF_FILE	input.y	/^	END_OF_FILE	0$/;"	t	language:YACC
+ERROR	input.y	/^	ERROR		255$/;"	t	language:YACC
+BELL	input.y	/^	BELL		1$/;"	t	language:YACC
+ACCESSX	input.y	/^	ACCESSX		2$/;"	t	language:YACC
+MESSAGE	input.y	/^	MESSAGE		3$/;"	t	language:YACC
+NONE	input.y	/^	NONE		20$/;"	t	language:YACC
+IGNORE	input.y	/^	IGNORE		21$/;"	t	language:YACC
+ECHO	input.y	/^	ECHO		22$/;"	t	language:YACC
+PRINT_EV	input.y	/^	PRINT_EV	23$/;"	t	language:YACC
+SHELL	input.y	/^	SHELL		24$/;"	t	language:YACC
+SOUND	input.y	/^	SOUND		25$/;"	t	language:YACC
+EQUALS	input.y	/^	EQUALS		40$/;"	t	language:YACC
+PLUS	input.y	/^	PLUS		41$/;"	t	language:YACC
+MINUS	input.y	/^	MINUS		42$/;"	t	language:YACC
+DIVIDE	input.y	/^	DIVIDE		43$/;"	t	language:YACC
+TIMES	input.y	/^	TIMES		44$/;"	t	language:YACC
+OBRACE	input.y	/^	OBRACE		45$/;"	t	language:YACC
+CBRACE	input.y	/^	CBRACE		46$/;"	t	language:YACC
+OPAREN	input.y	/^	OPAREN		47$/;"	t	language:YACC
+CPAREN	input.y	/^	CPAREN		48$/;"	t	language:YACC
+OBRACKET	input.y	/^	OBRACKET	49$/;"	t	language:YACC
+CBRACKET	input.y	/^	CBRACKET	50$/;"	t	language:YACC
+DOT	input.y	/^	DOT		51$/;"	t	language:YACC
+COMMA	input.y	/^	COMMA		52$/;"	t	language:YACC
+SEMI	input.y	/^	SEMI		53$/;"	t	language:YACC
+EXCLAM	input.y	/^	EXCLAM		54$/;"	t	language:YACC
+INVERT	input.y	/^	INVERT		55$/;"	t	language:YACC
+STRING	input.y	/^	STRING		60$/;"	t	language:YACC
+INTEGER	input.y	/^	INTEGER		61$/;"	t	language:YACC
+FLOAT	input.y	/^	FLOAT		62$/;"	t	language:YACC
+IDENT	input.y	/^	IDENT		63$/;"	t	language:YACC
+KEYNAME	input.y	/^	KEYNAME		64$/;"	t	language:YACC
+CfgFile	input.y	/^CfgFile		$/;"	l	language:YACC	typeref:typename:entry
+CfgEntryList	input.y	/^CfgEntryList	:	CfgEntryList CfgEntry$/;"	l	language:YACC	typeref:typename:entry
+CfgEntry	input.y	/^CfgEntry	:	EventDef ActionDef$/;"	l	language:YACC	typeref:typename:entry
+VarDef	input.y	/^VarDef		:	Ident EQUALS NameSpec$/;"	l	language:YACC	typeref:typename:entry
+EventDef	input.y	/^EventDef	:	EventType OPAREN OptNameSpec CPAREN$/;"	l	language:YACC	typeref:typename:entry
+EventType	input.y	/^EventType	:	BELL		{ $$= XkbBellNotify; }$/;"	l	language:YACC	typeref:typename:ival
+ActionDef	input.y	/^ActionDef	:	ActionType OptString$/;"	l	language:YACC	typeref:typename:act
+ActionType	input.y	/^ActionType	:	NONE	 { $$ = NoAction; }$/;"	l	language:YACC	typeref:typename:ival
+OptNameSpec	input.y	/^OptNameSpec	:	NameSpec { $$= $1; }$/;"	l	language:YACC	typeref:typename:str
+NameSpec	input.y	/^NameSpec	:	Ident	{ $$= $1; }$/;"	l	language:YACC	typeref:typename:str
+Ident	input.y	/^Ident		:	IDENT	{ $$= scanStr; scanStr= NULL; }$/;"	l	language:YACC	typeref:typename:str
+OptString	input.y	/^OptString	:	String	{ $$= $1; }$/;"	l	language:YACC	typeref:typename:str
+String	input.y	/^String		:	STRING	{ $$= scanStr; scanStr= NULL; }$/;"	l	language:YACC	typeref:typename:str
 YYDEBUG	input.y	/^#define	YYDEBUG /;"	d	language:C	file:	extras:fileScope,guest
 DEBUG_VAR	input.y	/^#define	DEBUG_VAR /;"	d	language:C	file:	extras:fileScope,guest
 __anon5f5ae8c8010a	input.y	/union	{$/;"	u	language:C	file:	extras:fileScope,guest,anonymous

@@ -273,6 +273,9 @@
     <ClCompile Include="..\optlib\systemtap.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\yacc.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\abaqus.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
@@ -586,9 +589,6 @@
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\windres.c">
-      <Filter>Source Files\parsers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\yacc.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\yumrepo.c">
