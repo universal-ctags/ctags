@@ -15,6 +15,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "selectors.h"
 #include "vstring.h"
 
 #include <string.h>
@@ -357,12 +358,15 @@ extern parserDefinition* LispParser (void)
 		"clisp", NULL
 	};
 
+	static selectLanguage selectors[] = { selectLispOrLEXByLEXMarker, NULL };
+
 	parserDefinition* def = parserNew ("Lisp");
 	def->kindTable      = LispKinds;
 	def->kindCount  = ARRAY_SIZE (LispKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findLispTags;
+	def->selectLanguage = selectors;
 	return def;
 }
 

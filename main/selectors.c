@@ -34,6 +34,9 @@ static const char *TR_ASM     = "Asm";
 static const char *TR_REXX     = "REXX";
 static const char *TR_DOSBATCH = "DosBatch";
 
+static const char *TR_LISP     = "Lisp";
+static const char *TR_LEX      = "LEX";
+
 #define startsWith(line,prefix) \
   (strncmp(line, prefix, strlen(prefix)) == 0? true: false)
 
@@ -299,6 +302,24 @@ selectByRexxCommentAndDosbatchLabelPrefix (MIO *input,
 
     return selectByLines (input, tasteREXXOrDosBatch,
 			  NULL, &in_rexx_comment);
+}
+
+static const char *
+tasteLispOrLEXLines (const char *line, void *data CTAGS_ATTR_UNUSED)
+{
+	if (strcmp(line, "%{\n") == 0
+		|| strcmp(line, "%top{\n") == 0
+		|| strcmp(line, "%%\n") == 0)
+		return TR_LEX;
+	return TR_UNKNOWN;
+}
+
+const char *
+selectLispOrLEXByLEXMarker (MIO *input,
+							langType *candidates CTAGS_ATTR_UNUSED,
+							unsigned int nCandidates CTAGS_ATTR_UNUSED)
+{
+	return selectByLines (input, tasteLispOrLEXLines, TR_LISP, NULL);
 }
 
 #ifdef HAVE_LIBXML

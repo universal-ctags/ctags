@@ -183,6 +183,7 @@ OPTLIB2C_INPUT = \
 	optlib/inko.ctags			\
 	optlib/iPythonCell.ctags		\
 	optlib/kconfig.ctags			\
+	optlib/lex.ctags			\
 	optlib/man.ctags			\
 	optlib/markdown.ctags			\
 	optlib/meson.ctags			\

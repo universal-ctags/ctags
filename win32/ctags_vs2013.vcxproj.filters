@@ -237,6 +237,9 @@
     <ClCompile Include="..\optlib\kconfig.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\lex.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\man.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>

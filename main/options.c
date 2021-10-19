@@ -3354,6 +3354,10 @@ static void processLongOption (
 		;
 	else if (processRolesOption (option, parameter))
 		;
+	else if (option[0] == '_' && option[1] == '_')
+		/* ctags ignores an argument started from --__.
+		 * optlib2c may handle the argument. */
+		;
 	else
 		error (FATAL, "Unknown option: --%s", option);
 }

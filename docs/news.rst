@@ -418,6 +418,7 @@ The following parsers have been added:
 * Kconfig *optlib*
 * Kotlin *peg/packcc*
 * GNU linker script(LdScript)
+* LEX *optlib*
 * Man page *optlib*
 * Markdown *optlib*
 * Maven2 *libxml*

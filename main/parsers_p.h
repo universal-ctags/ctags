@@ -101,6 +101,7 @@
 	JuliaParser, \
 	KconfigParser, \
 	LdScriptParser, \
+	LEXParser, \
 	LispParser, \
 	LiterateHaskellParser, \
 	LuaParser, \
