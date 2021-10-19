@@ -1,0 +1,4 @@
+v	input.py	/^v: float | str = 'a'$/;"	v	typeref:typename:float|str
+f	input.py	/^def f(list: List[int|str], param: int | None) -> float|str:$/;"	f	typeref:typename:float|str
+list	input.py	/^def f(list: List[int|str], param: int | None) -> float|str:$/;"	z	function:f	typeref:typename:List[int|str]	file:
+param	input.py	/^def f(list: List[int|str], param: int | None) -> float|str:$/;"	z	function:f	typeref:typename:int|None	file:
