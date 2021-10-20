@@ -2924,6 +2924,9 @@ static int  makePromiseForAreaSpecifiedWithOffsets (const char *parser,
 	unsigned long startLineOffset = getInputFileOffsetForLine (startLine);
 	unsigned long endLineOffset = getInputFileOffsetForLine (endLine);
 
+	Assert(startOffset >= startLineOffset);
+	Assert(endOffset >= endLineOffset);
+
 	return makePromise (parser,
 						startLine, startOffset - startLineOffset,
 						endLine, endOffset - endLineOffset,
