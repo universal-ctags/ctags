@@ -21,6 +21,7 @@
 #include "xtag.h"
 #include "numarray.h"
 #include "routines.h"
+#include "options.h"
 
 #include <string.h>
 
@@ -69,6 +70,10 @@ int  makePromise   (const char *parser,
 	struct promise *p;
 	int r;
 	langType lang = LANG_IGNORE;
+
+	verbose("makePromise: %s start(line: %lu, offset: %lu, srcline: %lu), end(line: %lu, offset: %lu)\n",
+			parser? parser: "*", startLine, startCharOffset, sourceLineOffset,
+			endLine, endCharOffset);
 
 	if ((!isThinStreamSpec(startLine,
 						   startCharOffset,
