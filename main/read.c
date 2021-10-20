@@ -191,7 +191,7 @@ extern MIOPos getInputFilePositionForLine (unsigned int line)
 extern long getInputFileOffsetForLine (unsigned int line)
 {
 	compoundPos *cpos = getInputFileCompoundPosForLine (line);
-	return cpos->offset;
+	return cpos->offset - (File.bomFound? 3: 0);
 }
 
 extern langType getInputLanguage (void)
@@ -361,6 +361,9 @@ static int compoundPosForOffset (const void* oft, const void *p)
 extern unsigned long getInputLineNumberForFileOffset(long offset)
 {
 	compoundPos *p;
+
+	if (File.bomFound)
+		offset += 3;
 
 	p = bsearch (&offset, File.lineFposMap.pos, File.lineFposMap.count, sizeof (compoundPos),
 		     compoundPosForOffset);
