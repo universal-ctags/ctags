@@ -164,7 +164,7 @@
 	VhdlParser, \
 	VimParser, \
 	WindResParser, \
-	YaccParser, \
+	YACCParser, \
 	YumRepoParser, \
 	ZephirParser
 

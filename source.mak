@@ -195,6 +195,7 @@ OPTLIB2C_INPUT = \
 	optlib/rpmMacros.ctags			\
 	optlib/scss.ctags			\
 	optlib/systemtap.ctags			\
+	optlib/yacc.ctags			\
 	\
 	$(NULL)
 OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
@@ -346,7 +347,6 @@ PARSER_SRCS =				\
 	parsers/vhdl.c			\
 	parsers/vim.c			\
 	parsers/windres.c		\
-	parsers/yacc.c			\
 	parsers/yumrepo.c		\
 	\
 	$(OPTLIB2C_SRCS)		\

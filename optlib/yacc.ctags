@@ -1,0 +1,183 @@
+#
+# yacc.ctags --- multitable regex parser for yacc/bison input
+#
+# Copyright (c) 2001-2002, Nick Hibma <n_hibma@van-laarhoven.org>
+# Copyright (c) 2021, Red Hat, Inc.
+# Copyright (c) 2021, Masatake YAMATO
+#
+# Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+# The original version of this parser is written in C (+ regex patterns).
+#
+# References:
+#
+# - https://www.gnu.org/software/bison/manual/html_node/Grammar-File.html
+#
+
+--langdef=YACC
+--map-YACC=+.y
+
+#
+# Kind definitions
+#
+
+--kinddef-YACC=t,token,tokens
+--kinddef-YACC=l,label,labels
+
+#
+#
+#
+--_prelude-YACC={{
+    /token-type false def
+    /type-dict 57 dict def
+}}
+
+#
+# Tables declaration
+#
+
+--_tabledef-YACC=toplevel
+--_tabledef-YACC=comment
+--_tabledef-YACC=cPrologue
+--_tabledef-YACC=grammar
+--_tabledef-YACC=cEpilogue
+--_tabledef-YACC=token
+--_tabledef-YACC=cUnion
+--_tabledef-YACC=cString
+--_tabledef-YACC=iString
+--_tabledef-YACC=rule
+--_tabledef-YACC=cActionCommon
+--_tabledef-YACC=cAction
+--_tabledef-YACC=type
+--_tabledef-YACC=cCharlit
+
+#
+# Tables definitions
+#
+--_mtable-regex-YACC=comment/[^*]+//
+--_mtable-regex-YACC=comment/\*\///{tleave}
+--_mtable-regex-YACC=comment/.//
+
+--_mtable-regex-YACC=cPrologue/[^%]+//
+--_mtable-regex-YACC=cPrologue/%\}//{tleave}{_guest=,,0start}
+--_mtable-regex-YACC=cPrologue/.//
+
+--_mtable-regex-YACC=cActionCommon/[^"\/\{\}]+//
+--_mtable-regex-YACC=cActionCommon/"//{tenter=cString}
+--_mtable-regex-YACC=cActionCommon/'//{tenter=cCharlit}
+--_mtable-regex-YACC=cActionCommon/\/\*//{tenter=comment}
+--_mtable-regex-YACC=cActionCommon/\{//{tenter=cAction}
+
+--_mtable-extend-YACC=cAction+cActionCommon
+--_mtable-regex-YACC=cAction/\}//{tleave}
+
+--_mtable-regex-YACC=rule/[^\{;]+//
+--_mtable-regex-YACC=rule/\{//{tenter=cAction}
+--_mtable-regex-YACC=rule/;//{tleave}
+--_mtable-regex-YACC=rule/.//
+
+--_mtable-regex-YACC=grammar/%%//{tjump=cEpilogue}{_guest=C,0end,}
+--_mtable-regex-YACC=grammar/([a-zA-Z_.][-a-zA-Z_.0-9]+)[ \t\n]*:[ \t\n]*/\1/l/{tenter=rule}{{
+    type-dict \1 known {
+        type-dict \1 get . exch typeref:
+    } if
+}}
+--_mtable-regex-YACC=grammar/.//
+
+--_mtable-regex-YACC=cEpilogue/.+//{_guest=,,0end}
+
+--_mtable-regex-YACC=cString/[\\"]+//
+--_mtable-regex-YACC=cString/\\.//
+--_mtable-regex-YACC=cString/"//{tleave}
+
+--_mtable-regex-YACC=cCharlit/[^\\]'//{tleave}
+--_mtable-regex-YACC=cCharlit/\\.'//{tleave}
+--_mtable-regex-YACC=cCharlit/'//{tleave}
+--_mtable-regex-YACC=cCharlit/.//
+
+--_mtable-regex-YACC=iString/"//{tenter=cString}
+--_mtable-regex-YACC=iString/\)//{tleave}
+--_mtable-regex-YACC=iString/.//
+
+#
+# %token TAG? ( ID NUMBER? STRING? )+ ( TAG ( ID NUMBER? STRING? )+ )*
+# TODO: %left  TAG? ( ID NUMBER?)+ ( TAG ( ID NUMBER? )+ )*
+#       The directives %precedence, %right and %nonassoc behave like
+#       %left.
+#
+--_mtable-regex-YACC=token/N?_[ \t]*\(//{tenter=iString}
+--_mtable-regex-YACC=token/([_a-zA-Z][_a-zA-Z0-9]*)[ \t\n]*/\1/t/{{
+    token-type false ne {
+        . token-type typeref:
+    } if
+}}
+# TODO condense multiple whitespaces in type name
+--_mtable-regex-YACC=token/<[ \t]*([_a-zA-Z][_a-zA-Z0-9 *]*)[ \t]*>[ \t\n]*//{{
+    /token-type \1 def
+}}
+--_mtable-regex-YACC=token/"//{tenter=cString}
+--_mtable-regex-YACC=token/'//{tenter=cCharlit}
+--_mtable-regex-YACC=token/-?[ \t\n]*(0x)?[0-9]+[ \t\n]*//
+--_mtable-regex-YACC=token/%//{tleave}{_advanceTo=0start}{{
+    /token-type false def
+}}
+--_mtable-regex-YACC=token/.|\n//
+
+--_mtable-extend-YACC=cUnion+cActionCommon
+--_mtable-regex-YACC=cUnion/\}//{tleave}{_guest=,,0end}{tleave}
+
+#
+# %type  TAG? ( ID | CHAR | STRING )+ ( TAG ( ID | CHAR | STRING )+ )*
+# %nterm TAG? ID+ ( TAG ID+ )*
+#
+--_mtable-regex-YACC=type/N?_[ \t]*\(//{tenter=iString}
+--_mtable-regex-YACC=type/([_a-zA-Z][_a-zA-Z0-9]*)[ \t\n]*//{{
+    token-type false ne {
+        type-dict \1 token-type put
+    } if
+}}
+--_mtable-regex-YACC=type/<[ \t]*([_a-zA-Z][_a-zA-Z0-9 *]*)[ \t]*>[ \t\n]*//{{
+    /token-type \1 def
+}}
+--_mtable-regex-YACC=type/"//{tenter=cString}
+--_mtable-regex-YACC=type/'//{tenter=cCharlit}
+--_mtable-regex-YACC=type/%//{tleave}{_advanceTo=0start}{{
+    /token-type false def
+}}
+--_mtable-regex-YACC=type/.|\n//
+
+--_mtable-regex-YACC=toplevel/\/\*//{tenter=comment}
+--_mtable-regex-YACC=toplevel/%token[ \t\n]+//{tenter=token}{{
+    /token-type false def
+}}
+--_mtable-regex-YACC=toplevel/%(union)[^\{]*\{//{tenter=cUnion}{_guest=C,1start,}
+--_mtable-regex-YACC=toplevel/%(code[^\{]*)?\{//{tenter=cPrologue}{_guest=C,0end,}
+--_mtable-regex-YACC=toplevel/%(type|nterm)[ \n\t]*//{tenter=type}{{
+    /token-type false def
+}}
+
+--_mtable-regex-YACC=toplevel/%%//{tjump=grammar}
+--_mtable-regex-YACC=toplevel/[^\n]*\n//
+
+# TODO: %initial-action skip?
+#
+# -- Directive: %defines DEFINES-FILE
+#     Same as above, but save in the file DEFINES-FILE.
+#  -- Directive: %language "LANGUAGE"
+#  -- Directive: %output "FILE"
+#     Generate the parser implementation in FILE.
