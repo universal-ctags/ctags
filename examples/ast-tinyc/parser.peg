@@ -1,0 +1,587 @@
+# This code is hereby placed in the public domain.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHORS ''AS IS'' AND ANY EXPRESS
+# OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+%prefix "parser"
+
+%value "ast_node_t *"
+%auxil "system_t *"
+
+%header {
+#include "system.h"
+}
+
+%source {
+#define PCC_ERROR(auxil) system__handle_syntax_error(auxil, SYNTAX_ERROR_UNKNOWN, range__void()) /* <-- caused by incompleteness of the grammar */
+#define PCC_GETCHAR(auxil) system__read_source_file(auxil)
+#define PCC_MALLOC(auxil, size) system__allocate_memory(auxil, size)
+#define PCC_REALLOC(auxil, ptr, size) system__reallocate_memory(auxil, ptr, size)
+#define PCC_FREE(auxil, ptr) system__deallocate_memory(auxil, ptr)
+}
+
+program
+   <- _ l:statement_list _ end_of_file
+    {
+        $$ = l;
+    }
+    / _ end_of_file
+    {
+        $$ = system__create_ast_node_variadic(auxil, AST_NODE_TYPE_STATEMENT_LIST, range__new($0s, $0e));
+    }
+
+statement_list
+   <- s:statement _ l:statement_list
+    {
+        $$ = l;
+        $$->range = range__new($0s, $0e);
+        ast_node__prepend_child($$, s);
+    }
+    / s:statement
+    {
+        $$ = system__create_ast_node_variadic(auxil, AST_NODE_TYPE_STATEMENT_LIST, range__new($0s, $0e));
+        ast_node__prepend_child($$, s);
+    }
+
+statement
+   <- kw_if _ e:expression_in_parentheses _ s:statement _ kw_else _ t:statement
+    {
+        $$ = system__create_ast_node_ternary(auxil, AST_NODE_TYPE_STATEMENT_IF_ELSE, range__new($0s, $0e), e, s, t);
+    }
+    / kw_if _ e:expression_in_parentheses _ s:statement
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_STATEMENT_IF, range__new($0s, $0e), e, s);
+    }
+    / kw_while _ e:expression_in_parentheses _ s:statement
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_STATEMENT_WHILE, range__new($0s, $0e), e, s);
+    }
+    / kw_do _ s:statement _ kw_while _ e:expression_in_parentheses _ ';'
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_STATEMENT_DO_WHILE, range__new($0s, $0e), e, s);
+    }
+    / '{' _ l:statement_list _ '}'
+    {
+        $$ = l;
+    }
+    / '{' _ '}'
+    {
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_STATEMENT_VOID, range__new($0s, $0e));
+    }
+    / e:expression _ ';'
+    {
+        $$ = e;
+    }
+    / ';'
+    {
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_STATEMENT_VOID, range__new($0s, $0e));
+    }
+    ## error handling ##
+    / kw_if _ e:expression_in_parentheses _ s:statement _ kw_else
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_ELSE_WITHOUT_STATEMENT, range__new($0s, $0e));
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_ERROR_SKIP_IF_2, range__new($0s, $0e), e, s);
+    }
+    / kw_if _ e:expression_in_parentheses
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_IF_WITHOUT_STATEMENT, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP_IF_1, range__new($0s, $0e), e);
+    }
+    / kw_if
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_IF_WITHOUT_CONDITION, range__new($0s, $0e));
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_ERROR_SKIP_IF_0, range__new($0s, $0e));
+    }
+    / kw_else _ s:statement
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_LONE_ELSE, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP_ELSE_1, range__new($0s, $0e), s);
+    }
+    / kw_else
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_LONE_ELSE, range__new($0s, $0e));
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_ERROR_SKIP_ELSE_0, range__new($0s, $0e));
+    }
+    / kw_while _ e:expression_in_parentheses
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_WHILE_WITHOUT_STATEMENT, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP_WHILE_1, range__new($0s, $0e), e);
+    }
+    / kw_while
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_WHILE_WITHOUT_CONDITION, range__new($0s, $0e));
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_ERROR_SKIP_WHILE_0, range__new($0s, $0e));
+    }
+    / kw_do _ s:statement _ kw_while _ e:expression_in_parentheses
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_NO_ENDING_SEMICOLON, range__new($0s, $0e));
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_ERROR_SKIP_DO_2, range__new($0s, $0e), s, e);
+    }
+    / kw_do _ s:statement _ kw_while
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_WHILE_WITHOUT_STATEMENT, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP_DO_1, range__new($0s, $0e), s);
+    }
+    / kw_do _ s:statement
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_DO_WITHOUT_WHILE, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP_DO_1, range__new($0s, $0e), s);
+    }
+    / kw_do
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_DO_WITHOUT_STATEMENT, range__new($0s, $0e));
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_ERROR_SKIP_DO_0, range__new($0s, $0e));
+    }
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_in_parentheses
+   <- '(' _ e:expression _ ')'
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression
+   <- l:expression _ ',' _ e:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_COMMA, range__new($0s, $0e), l, e);
+    }
+    / e:expression_assignment
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_assignment
+   <- e:expression_condition _ '&=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_AND, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '|=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_OR, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '^=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_XOR, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '+=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_ADD, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '-=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_SUB, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '*=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_MUL, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '/=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_DIV, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '%=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_MOD, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '<<=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_SHL, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '>>=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN_SHR, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition _ '=' _ r:expression_assignment
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ASSIGN, range__new($0s, $0e), e, r);
+    }
+    / e:expression_condition
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_condition
+   <- e:expression_or2 _ '?' _ l:expression _ ':' _ r:expression_condition
+    {
+        $$ = system__create_ast_node_ternary(auxil, AST_NODE_TYPE_OPERATOR_COND, range__new($0s, $0e), e, l, r);
+    }
+    / e:expression_or2
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_or2
+   <- l:expression_or2 _ '||' _ e:expression_and2
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_OR2, range__new($0s, $0e), l, e);
+    }
+    / e:expression_and2
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_and2
+   <- l:expression_and2 _ '&&' _ e:expression_or
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_AND2, range__new($0s, $0e), l, e);
+    }
+    / e:expression_or
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_or
+   <- l:expression_or _ '|' _ e:expression_xor
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_OR, range__new($0s, $0e), l, e);
+    }
+    / e:expression_xor
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_xor
+   <- l:expression_xor _ '^' _ e:expression_and
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_XOR, range__new($0s, $0e), l, e);
+    }
+    / e:expression_and
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_and
+   <- l:expression_and _ '&' _ e:expression_equality
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_AND, range__new($0s, $0e), l, e);
+    }
+    / e:expression_equality
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_equality
+   <- l:expression_equality _ '==' _ e:expression_relation
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_EQ, range__new($0s, $0e), l, e);
+    }
+    / l:expression_equality _ '!=' _ e:expression_relation
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_NE, range__new($0s, $0e), l, e);
+    }
+    / e:expression_relation
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_relation
+   <- l:expression_relation _ '<=' _ e:expression_shift
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_LE, range__new($0s, $0e), l, e);
+    }
+    / l:expression_relation _ '>=' _ e:expression_shift
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_GE, range__new($0s, $0e), l, e);
+    }
+    / l:expression_relation _ '<' _ e:expression_shift
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_LT, range__new($0s, $0e), l, e);
+    }
+    / l:expression_relation _ '>' _ e:expression_shift
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_GT, range__new($0s, $0e), l, e);
+    }
+    / e:expression_shift
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_shift
+   <- l:expression_shift _ '<<' _ e:expression_addition
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_SHL, range__new($0s, $0e), l, e);
+    }
+    / l:expression_shift _ '>>' _ e:expression_addition
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_SHR, range__new($0s, $0e), l, e);
+    }
+    / e:expression_addition
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_addition
+   <- l:expression_addition _ '+' _ e:expression_multiplication
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_ADD, range__new($0s, $0e), l, e);
+    }
+    / l:expression_addition _ '-' _ e:expression_multiplication
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_SUB, range__new($0s, $0e), l, e);
+    }
+    / e:expression_multiplication
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_multiplication
+   <- l:expression_multiplication _ '*' _ e:expression_unary
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_MUL, range__new($0s, $0e), l, e);
+    }
+    / l:expression_multiplication _ '/' _ e:expression_unary
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_DIV, range__new($0s, $0e), l, e);
+    }
+    / l:expression_multiplication _ '%' _ e:expression_unary
+    {
+        $$ = system__create_ast_node_binary(auxil, AST_NODE_TYPE_OPERATOR_MOD, range__new($0s, $0e), l, e);
+    }
+    / e:expression_unary
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_unary
+   <- '++' _ e:expression_unary
+    {
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_OPERATOR_INC, range__new($0s, $0e), e);
+    }
+    / '--' _ e:expression_unary
+    {
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_OPERATOR_DEC, range__new($0s, $0e), e);
+    }
+    / '+' _ e:expression_unary
+    {
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_OPERATOR_PLUS, range__new($0s, $0e), e);
+    }
+    / '-' _ e:expression_unary
+    {
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_OPERATOR_MINUS, range__new($0s, $0e), e);
+    }
+    / '!' _ e:expression_unary
+    {
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_OPERATOR_NOT, range__new($0s, $0e), e);
+    }
+    / '~' _ e:expression_unary
+    {
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_OPERATOR_INV, range__new($0s, $0e), e);
+    }
+    / e:expression_postfix
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_postfix
+   <- e:expression_postfix _ '++'
+    {
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_OPERATOR_POST_INC, range__new($0s, $0e), e);
+    }
+    / e:expression_postfix _ '--'
+    {
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_OPERATOR_POST_DEC, range__new($0s, $0e), e);
+    }
+    / e:expression_primary
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+expression_primary
+   <- e:identifier
+    {
+        $$ = e;
+    }
+    / e:integer
+    {
+        $$ = e;
+    }
+    / '(' _ e:expression _ ')'
+    {
+        $$ = e;
+    }
+    ## error handling ##
+    / e:error_skip
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNEXPECTED_TOKEN, range__new($0s, $0e));
+        $$ = system__create_ast_node_unary(auxil, AST_NODE_TYPE_ERROR_SKIP, range__new($0s, $0e), e);
+    }
+
+error_skip
+   <- '{' l:statement_list '}'?
+    {
+        $$ = l;
+    }
+    / '(' e:expression ')'?
+    {
+        $$ = e;
+    }
+    / '[' e:expression ']'?
+    {
+        $$ = e;
+    }
+    / (L/D)+
+    {
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_UNEXPECTED_TOKEN, range__new($0s, $0e));
+    }
+    / !_ .
+    {
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_UNEXPECTED_TOKEN, range__new($0s, $0e));
+    }
+
+identifier
+   <- !keyword L(L/D)*
+    {
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_IDENTIFIER, range__new($0s, $0e));
+    }
+
+integer
+   <- '0'[xX]X+
+    {
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_INTEGER_HEX, range__new($0s, $0e));
+    }
+    / '0'O+
+    {
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_INTEGER_OCT, range__new($0s, $0e));
+    }
+    / !'0' D+
+    {
+        $$ = system__create_ast_node_terminal(auxil, AST_NODE_TYPE_INTEGER_DEC, range__new($0s, $0e));
+    }
+
+keyword
+   <- kw_if
+    / kw_else
+    / kw_do
+    / kw_while
+
+kw_if    <- 'if'    !(L/D)
+kw_else  <- 'else'  !(L/D)
+kw_do    <- 'do'    !(L/D)
+kw_while <- 'while' !(L/D)
+
+O <- [0-7]
+D <- [0-9]
+X <- [0-9a-fA-F]
+L <- [a-zA-Z_]
+
+_ <- ( space / comment )*
+comment
+   <- '/*' ( !'*/' . )* '*/'
+    ## error handling ##
+    / '/*' ( !'*/' . )*
+    {
+        system__handle_syntax_error(auxil, SYNTAX_ERROR_UNCLOSED_COMMENT_BLOCK, range__new($0s, $0e));
+    }
+space <- blank / end_of_line
+blank <- [ \t\v\f]
+end_of_line <- '\r\n' / '\n' / '\r'
+end_of_file <- !.

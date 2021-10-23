@@ -4,14 +4,16 @@ CFLAGS_R=-std=gnu89 -fsigned-char -Wall -Wextra -Wno-unused-parameter -Wno-overl
 LDFLAGS_D=
 LDFLAGS_R=
 
-SRCDIR=../../src
-TESTDIR=../../tests
+ROOTDIR=../..
+SRCDIR=$(ROOTDIR)/src
+TESTDIR=$(ROOTDIR)/tests
+EXDIR=$(ROOTDIR)/examples
 TMPDIR_D=debug/tmp
 TMPDIR_R=release/tmp
 BINDIR_D=debug/bin
 BINDIR_R=release/bin
 
-EXAMPLES:=$(patsubst $(SRCDIR)/examples/%.peg,examples/%,$(wildcard $(SRCDIR)/examples/*.peg))
+EXAMPLES:=$(patsubst $(EXDIR)/%.peg,examples/%,$(wildcard $(EXDIR)/*.peg))
 
 BINS= \
   $(BINDIR_D)/packcc \
@@ -42,10 +44,10 @@ $(BINDIR_D)/examples/%: $(TMPDIR_D)/examples/%.c $(TMPDIR_D)/examples/%.h
 $(BINDIR_R)/examples/%: $(TMPDIR_R)/examples/%.c $(TMPDIR_R)/examples/%.h
 	mkdir -p $(dir $@) && $(CC) $(CFLAGS_R) -I. -o $@ $< $(LDFLAGS_R)
 
-$(TMPDIR_D)/examples/%.c $(TMPDIR_D)/examples/%.h: $(SRCDIR)/examples/%.peg $(BINDIR_D)/packcc
+$(TMPDIR_D)/examples/%.c $(TMPDIR_D)/examples/%.h: $(EXDIR)/%.peg $(BINDIR_D)/packcc
 	mkdir -p $(dir $@) && $(BINDIR_D)/packcc -o $(basename $@) $<
 
-$(TMPDIR_R)/examples/%.c $(TMPDIR_R)/examples/%.h: $(SRCDIR)/examples/%.peg $(BINDIR_R)/packcc
+$(TMPDIR_R)/examples/%.c $(TMPDIR_R)/examples/%.h: $(EXDIR)/%.peg $(BINDIR_R)/packcc
 	mkdir -p $(dir $@) && $(BINDIR_R)/packcc -o $(basename $@) $<
 
 check: $(BINDIR_D)/packcc $(BINDIR_R)/packcc

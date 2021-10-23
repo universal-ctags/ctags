@@ -1,8 +1,8 @@
 packcc
 packcc.exe
-packcc.gcda
-packcc.gcno
-packcc.c.gcov
+*.gcda
+*.gcno
+*.gcov
 */parser.c
 */parser.h
 */parser
