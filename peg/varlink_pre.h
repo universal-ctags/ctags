@@ -11,10 +11,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "entry.h"
-#include "numarray.h"
 #include "kind.h"
-#include "read.h"
 #include "peg_common.h"
 
 
@@ -57,19 +54,13 @@ typedef enum  {
 } methodParamState;
 
 struct parserCtx {
-	int scope_cork_index;
-	intArray *kind_stack;
+	struct parserBaseCtx base;
 	methodParamState mparam_state;
-	bool found_syntax_error;
 };
 
 /*
 *   FUNCTION PROTOTYPES
 */
-static void pushKind (struct parserCtx *auxil, int kind);
-static void popKind (struct parserCtx *auxil, bool popScopeToo);
 static void pushKindContextual (struct parserCtx *auxil);
-static int peekKind (struct parserCtx *auxil);
 static void setMethodParamState (struct parserCtx *auxil, methodParamState s);
-static void reportError (struct parserCtx *auxil);
 static int makeVarlinkTag (struct parserCtx *auxil, const char *name, long offset);
