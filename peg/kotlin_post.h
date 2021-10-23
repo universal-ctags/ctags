@@ -36,12 +36,12 @@ static void makeKotlinTag (struct parserCtx *auxil, const char *name, long offse
         initTagEntry(&e, name, k);
     } else
     {
-        size_t len = strlen(name) - 2;
-        char *stripped = (char *)eMalloc(len+1);
-        memcpy(stripped, name + 1, len);
-        stripped[len] = '\0';
-        initTagEntry(&e, stripped, k);
-        eFree(stripped);
+        size_t len = strlen(name);
+        Assert(len >= 2);
+        len -= 2;
+        vString *stripped = vStringNewNInit(name + 1, len);
+        initTagEntry(&e, vStringValue(stripped), k);
+        vStringDelete(stripped);
     }
     e.lineNumber = getInputLineNumberForFileOffset (offset);
     e.filePosition = getInputFilePositionForLine (e.lineNumber);
