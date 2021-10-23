@@ -1,0 +1,17 @@
+Calculator	input.thrift	/^service Calculator extends shared.SharedService {$/;"	v	inherits:shared.SharedService
+ping	input.thrift	/^   void ping(),$/;"	f	service:Calculator	typeref:typename:void	signature:()
+add	input.thrift	/^   i32 add(1:i32 num1, 2:i32 num2),$/;"	f	service:Calculator	typeref:typename:i32 	signature:(1:i32 num1, 2:i32 num2)
+num1	input.thrift	/^   i32 add(1:i32 num1, 2:i32 num2),$/;"	z	function:Calculator.add	typeref:typename:i32 
+num2	input.thrift	/^   i32 add(1:i32 num1, 2:i32 num2),$/;"	z	function:Calculator.add	typeref:typename:i32 
+calculate	input.thrift	/^   i32 calculate(1:i32 logid, 2:Work w) throws (1:InvalidOperation ouch),$/;"	f	service:Calculator	typeref:typename:i32 	signature:(1:i32 logid, 2:Work w)	throws:(1:InvalidOperation ouch)
+logid	input.thrift	/^   i32 calculate(1:i32 logid, 2:Work w) throws (1:InvalidOperation ouch),$/;"	z	function:Calculator.calculate	typeref:typename:i32 
+w	input.thrift	/^   i32 calculate(1:i32 logid, 2:Work w) throws (1:InvalidOperation ouch),$/;"	z	function:Calculator.calculate	typeref:typename:Work
+ouch	input.thrift	/^   i32 calculate(1:i32 logid, 2:Work w) throws (1:InvalidOperation ouch),$/;"	Z	function:Calculator.calculate	typeref:typename:InvalidOperation
+zip	input.thrift	/^   oneway void zip()$/;"	f	service:Calculator	typeref:typename:void	signature:()
+BadFish	input-0.thrift	/^exception BadFish {$/;"	x
+fish	input-0.thrift	/^  1: string       fish,       \/\/The problem fish$/;"	m	exception:BadFish	typeref:typename:string       
+error_code	input-0.thrift	/^  2: i16          error_code, \/\/The service specific error code$/;"	m	exception:BadFish	typeref:typename:i16          
+TradeHistory	input-0.thrift	/^service TradeHistory {$/;"	v
+GetLastSale	input-0.thrift	/^  double GetLastSale(1: string fish)$/;"	f	service:TradeHistory	typeref:typename:double 	signature:(1: string fish)	throws:(1: BadFish bf)
+fish	input-0.thrift	/^  double GetLastSale(1: string fish)$/;"	z	function:TradeHistory.GetLastSale	typeref:typename:string 
+bf	input-0.thrift	/^    throws (1: BadFish bf),$/;"	Z	function:TradeHistory.GetLastSale	typeref:typename:BadFish

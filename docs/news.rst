@@ -455,6 +455,7 @@ The following parsers have been added:
 * SystemVerilog
 * SVG *libxml*
 * TclOO (see :ref:`The new Tcl parser <tcl>`)
+* Thrift *peg/packcc*
 * TTCN
 * Txt2tags
 * TypeScript

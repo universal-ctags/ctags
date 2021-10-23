@@ -209,6 +209,7 @@ TXT2CSTR_SRCS = $(TXT2CSTR_INPUT:.ps=.c)
 PEG_INPUT = \
        peg/varlink.peg				\
        peg/kotlin.peg				\
+       peg/thrift.peg				\
        \
        $(NULL)
 PEG_SRCS = $(PEG_INPUT:.peg=.c)

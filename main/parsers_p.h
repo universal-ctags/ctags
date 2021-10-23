@@ -37,7 +37,8 @@
 #ifdef HAVE_PACKCC
 #define PEG_PARSER_LIST						\
 	VarlinkParser, \
-	KotlinParser
+	KotlinParser,  \
+	ThriftParser
 #else
 #define PEG_PARSER_LIST
 #endif

@@ -1,0 +1,226 @@
+#
+# This file is derived from
+# https://raw.githubusercontent.com/samuel/go-thrift/master/parser/grammar.peg
+# (commit id: 586f6174a55deba8cbe982f15ecc28a901e44f4a)
+#
+# Reference:
+#     - https://thrift.apache.org/docs/idl
+#     - https://diwakergupta.github.io/thrift-missing-guide/
+#
+#
+# Copyright (c) 2012, Samuel Stauffer <samuel@descolada.com>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright
+#   notice, this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright
+#   notice, this list of conditions and the following disclaimer in the
+#   documentation and/or other materials provided with the distribution.
+# * Neither the name of the author nor the
+#   names of its contributors may be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+%prefix "pthrift"
+
+%auxil "struct parserCtx *"
+
+%earlysource {
+    #include "general.h"
+}
+
+%header {
+    struct parserCtx;
+}
+
+%source {
+#include "thrift_pre.h"
+#include "routines.h"
+}
+
+Grammar <- __ ( Statement __ )* (EOF / SyntaxError)
+SyntaxError <- .
+
+# MODIFIED
+Include <- <( "include" / "cpp_include" )> _ <Literal> EOS {{
+    if ($1[0] == 'i')
+    {
+        vString *f = unliteral ($2);
+	if (vStringLength(f) > 0)
+            makeThriftTagFull (auxil, vStringValue (f), $2s, K_THRIFTFILE, THRIFT_THRIFT_FILE_INCLUDED, false);
+	vStringDelete (f);
+    }
+    /* TODO: cpp_include */
+}}
+
+Statement <- Include / Namespace / Const / Enum / TypeDef / Struct / Exception / Union / Service
+
+Namespace <- "namespace" _ <[-*a-z.]+> _ <Identifier> {
+    int r = makeThriftTag (auxil, $2, $2s, K_NAMESPACE, false);
+    attachParserFieldToCorkEntry (r, ThriftFields[F_TARGET].ftype, $1);
+} EOS
+
+Const <- "const" _ <FieldType> _ <Identifier> {
+    int r = makeThriftTag (auxil, $2, $2s, K_CONST, false);
+    tagEntryInfo *e = getEntryInCorkQueue (r);
+    if (e)
+    {
+        e->extensionFields.typeRef[0] = eStrdup ("typename");
+        e->extensionFields.typeRef[1] = eStrdup ($1);
+    }
+} __ "=" __ ConstValue _ ListSeparator? EOS
+# MODIFIED
+
+Enum <- "enum" { PUSH_KIND (auxil, K_ENUM); } _ <Identifier> {
+    makeThriftTag (auxil, $1, $1s, USE_KIND_STACK, true);
+} __ '{' __ (EnumValue __)* '}' _ TypeAnnotations? EOS { POP_KIND (auxil, true); }
+
+EnumValue <- <Identifier> {
+    makeThriftTag (auxil, $1, $1s, K_ENUMERATOR, false);
+} _ ('=' _ IntConstant)? _ TypeAnnotations? ListSeparator?
+
+
+TypeDef <- "typedef" _ <FieldType> _ <Identifier> {
+    int r = makeThriftTag (auxil, $2, $2s, K_TYPEDEF, false);
+    tagEntryInfo *e = getEntryInCorkQueue (r);
+    if (e)
+    {
+        e->extensionFields.typeRef[0] = eStrdup ("typename");
+        e->extensionFields.typeRef[1] = eStrdup ($1);
+    }
+} _ TypeAnnotations? EOS
+
+Struct <- "struct" { PUSH_KIND (auxil, K_STRUCT); }_ StructLike { POP_KIND (auxil, true); }
+Exception <- "exception" { PUSH_KIND (auxil, K_EXCEPTION); } _ StructLike { POP_KIND (auxil, true); }
+Union <- "union" { PUSH_KIND (auxil, K_UNION); }  _ StructLike { POP_KIND (auxil, true); }
+StructLike <- <Identifier> {
+    makeThriftTag (auxil, $1, $1s, USE_KIND_STACK, true);
+    PUSH_KIND (auxil, K_MEMBER);
+} __ '{' __ FieldList '}' _ TypeAnnotations? EOS { POP_KIND (auxil, false); }
+
+FieldList <- (Field __)*
+
+Field <- IntConstant _ ':' _ FieldReq? _ <FieldType> _ <Identifier> {
+    int r = makeThriftTag (auxil, $2, $2s, USE_KIND_STACK, false);
+    tagEntryInfo *e = getEntryInCorkQueue (r);
+    if (e)
+    {
+        e->extensionFields.typeRef[0] = eStrdup ("typename");
+        e->extensionFields.typeRef[1] = eStrdup ($1);
+    }
+} __ ('=' _ ConstValue)? _ TypeAnnotations? ListSeparator?
+
+FieldReq <- ("required" / "optional")
+
+Service <- "service" _ <Identifier> {
+    makeThriftTag (auxil, $1, $1s, K_SERVICE, true);
+} _ ("extends" __ <Identifier> {
+        int r = BASE_SCOPE (auxil);
+        tagEntryInfo *e = getEntryInCorkQueue (r);
+        if (e)
+            e->extensionFields.inheritance = eStrdup ($2);
+} __)? __ '{' __ (Function __)* ('}' / EndOfServiceError) _ TypeAnnotations?  EOS {
+    POP_SCOPE (auxil);
+}
+EndOfServiceError <- .
+
+Function <- ("oneway" __)? <FunctionType> __ <Identifier> {
+    int r = makeThriftTag (auxil, $2, $2s, K_FUNCTION, true);
+    tagEntryInfo *e = getEntryInCorkQueue (r);
+    if (e)
+    {
+        e->extensionFields.typeRef[0] = eStrdup ("typename");
+        e->extensionFields.typeRef[1] = eStrdup ($1);
+    }
+    PUSH_KIND (auxil, K_PARAMETER);
+} _ <'(' __ FieldList ')'> {
+    int r = BASE_SCOPE (auxil);
+    tagEntryInfo *e = getEntryInCorkQueue (r);
+    if (e)
+         e->extensionFields.signature = eStrdup ($3);
+} __ Throws? _ TypeAnnotations? ListSeparator? { POP_KIND (auxil, true); }
+
+FunctionType <- ("void" / FieldType)
+
+Throws <- "throws" { PUSH_KIND (auxil, K_THROWSPARAM); } __ < '(' __ FieldList ')' > {
+    int r = BASE_SCOPE (auxil);
+    attachParserFieldToCorkEntry (r, ThriftFields[F_THROWS].ftype, $1);
+    POP_KIND (auxil, false);
+}
+
+FieldType <- (BaseType / ContainerType / Identifier)
+
+# DefinitionType <- (BaseType / ContainerType)
+
+BaseType <- BaseTypeName _ TypeAnnotations?
+
+BaseTypeName <- ("bool" / "byte" / "i16" / "i32" / "i64" / "double" / "string" / "binary" )
+
+ContainerType <- (MapType / SetType / ListType)
+
+MapType <- CppType? "map" WS "<" WS FieldType WS "," WS FieldType WS ">" _ TypeAnnotations?
+
+SetType <- CppType? "set" WS "<" WS FieldType WS ">" _ TypeAnnotations?
+
+ListType <- "list" WS "<" WS FieldType WS ">" _ TypeAnnotations?
+
+CppType <- "cpp_type" Literal
+
+ConstValue <- Literal / DoubleConstant / IntConstant / ConstMap / ConstList / Identifier
+
+TypeAnnotations <- '(' __ TypeAnnotation* ')'
+
+TypeAnnotation <- Identifier _ ('=' __ Literal)? ListSeparator? __
+
+IntConstant <- [-+]? Digit+
+
+DoubleConstant <- [-+]? Digit* '.' Digit* ( ['Ee'] IntConstant )?
+
+ConstList <- '[' __ (ConstValue __ ListSeparator? __)* __ ']'
+
+# MODIFIED
+ConstMap <- '{' __ (ConstValue __ ':' __ ConstValue __ (ListSeparator? / &'}') __)* '}'
+
+# ...
+Literal <- (('"' ("\\\"" / [^"])* '"') / ("'" ("\\'" / [^'])* "'"))
+# '"
+
+Identifier <- (Letter / '_')+ (Letter / Digit / [._])*
+
+ListSeparator <- [,;]
+Letter <- [A-Za-z]
+Digit <- [0-9]
+
+# //
+
+SourceChar <- .
+Comment <- MultiLineComment / SingleLineComment
+MultiLineComment <- "/*" ( !"*/" SourceChar )* "*/"
+MultiLineCommentNoLineTerminator <- "/*" ( !( "*/" / EOL ) SourceChar )* "*/"
+SingleLineComment <- ("//" ( !EOL SourceChar )*) / ("#" ( !EOL SourceChar )*)
+
+__ <- ( Whitespace / EOL / Comment )*
+_ <- ( Whitespace / MultiLineCommentNoLineTerminator )*
+WS <- Whitespace*
+
+Whitespace <- [ \t\r]
+EOL <- '\n'
+EOS <- __ ';' / _ SingleLineComment? EOL / __ EOF
+
+EOF <- !.
+
+%%
+#include "thrift_post.h"
