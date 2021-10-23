@@ -11,11 +11,6 @@
 /*
 *   INCLUDE FILES
 */
-/* This one is not needed anymore because the inclusion is specified
-   in Makefile.am
-#include "general.h"
-*/
-
 #include "entry.h"
 #include "numarray.h"
 #include "kind.h"
