@@ -1530,14 +1530,7 @@ static void parseDeclare (tokenInfo *const token, const bool local)
 			default:
 				if (isType (token, TOKEN_IDENTIFIER))
 				{
-					if (local)
-					{
-						makeSqlTag (token, SQLTAG_LOCAL_VARIABLE);
-					}
-					else
-					{
-						makeSqlTag (token, SQLTAG_VARIABLE);
-					}
+					makeSqlTag (token, local? SQLTAG_LOCAL_VARIABLE: SQLTAG_VARIABLE);
 				}
 				break;
 		}
@@ -1590,10 +1583,7 @@ static void parseDeclareANSI (tokenInfo *const token, const bool local)
 		else if (isType (token, TOKEN_IDENTIFIER) ||
 				 isType (token, TOKEN_STRING))
 		{
-			if (local)
-				makeSqlTag (token, SQLTAG_LOCAL_VARIABLE);
-			else
-				makeSqlTag (token, SQLTAG_VARIABLE);
+			makeSqlTag (token, local? SQLTAG_LOCAL_VARIABLE: SQLTAG_VARIABLE);
 		}
 		findToken (token, TOKEN_SEMICOLON);
 		readToken (token);
