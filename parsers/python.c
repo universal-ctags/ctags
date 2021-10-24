@@ -1228,12 +1228,17 @@ static bool skipVariableTypeAnnotation (tokenInfo *const token, vString *const r
 	if (readNext)
 		readToken (token);
 	/* skip subscripts and calls */
-	while (token->type == '[' || token->type == '(' || token->type == '.')
+	while (token->type == '[' || token->type == '(' || token->type == '.' || token->type == '|')
 	{
 		switch (token->type)
 		{
 			case '[': readNext = skipOverPair (token, '[', ']', repr, true); break;
 			case '(': readNext = skipOverPair (token, '(', ')', repr, true); break;
+			case '|':
+				reprCat (repr, token);
+				skipVariableTypeAnnotation (token, repr);
+				readNext = false;
+				break;
 			case '.':
 				reprCat (repr, token);
 				readToken (token);
