@@ -11,7 +11,6 @@
 /*
 *   INCLUDE FILES
 */
-#include "debug.h"
 #include "options.h"
 #include "parse.h"
 #include "routines.h"
