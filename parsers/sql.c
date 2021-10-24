@@ -2056,7 +2056,7 @@ static void parsePackage (tokenInfo *const token)
 	 * or by specifying a package body
 	 *	   CREATE OR REPLACE PACKAGE BODY pkg_name AS
 	 *	   CREATE OR REPLACE PACKAGE BODY owner.pkg_name AS
- */
+	 */
 	tokenInfo *const name = newToken ();
 	readIdentifier (name);
 	if (isKeyword (name, KEYWORD_body))
