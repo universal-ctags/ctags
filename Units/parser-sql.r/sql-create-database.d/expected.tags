@@ -1,0 +1,5 @@
+lusiadas	input.sql	/^CREATE DATABASE lusiadas;$/;"	b
+sales	input.sql	/^CREATE DATABASE sales OWNER salesapp TABLESPACE salesspace;$/;"	b
+music	input.sql	/^CREATE DATABASE music$/;"	b
+music2	input.sql	/^CREATE DATABASE music2$/;"	b
+test	input.sql	/^create database 'test' || replace(current_date, '-', '');$/;"	b

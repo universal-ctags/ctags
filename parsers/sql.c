@@ -78,6 +78,7 @@ enum eKeywordId {
 	KEYWORD_constraint,
 	KEYWORD_create,
 	KEYWORD_cursor,
+	KEYWORD_database,
 	KEYWORD_datatype,
 	KEYWORD_declare,
 	KEYWORD_do,
@@ -130,6 +131,7 @@ enum eKeywordId {
 	KEYWORD_result,
 	KEYWORD_return,
 	KEYWORD_returns,
+	KEYWORD_schema,
 	KEYWORD_select,
 	KEYWORD_service,
 	KEYWORD_subtype,
@@ -217,9 +219,11 @@ typedef enum {
 	SQLTAG_BLOCK_LABEL,
 	SQLTAG_PACKAGE,
 	SQLTAG_SERVICE,
+	SQLTAG_SCHEMA,
 	SQLTAG_TRIGGER,
 	SQLTAG_PUBLICATION,
 	SQLTAG_VIEW,
+	SQLTAG_DATABASE,
 	SQLTAG_CURSOR,
 	SQLTAG_PROTOTYPE,
 	SQLTAG_EVENT,
@@ -245,9 +249,11 @@ static kindDefinition SqlKinds [] = {
 	{ true,  'L', "label",		  "block label"			   },
 	{ true,  'P', "package",	  "packages"			   },
 	{ true,  'R', "service",	  "services"			   },
+	{ true,  'S', "schema",		  "schemas"			  	   },
 	{ true,  'T', "trigger",	  "triggers"			   },
 	{ true,  'U', "publication",  "publications"		   },
 	{ true,  'V', "view",		  "views"				   },
+	{ true,  'b', "database",	  "database"			   },
 	{ true,  'c', "cursor",		  "cursors"				   },
 	{ false, 'd', "prototype",	  "prototypes"			   },
 	{ true,  'e', "event",		  "events"				   },
@@ -278,6 +284,7 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "constraint",						KEYWORD_constraint		      },
 	{ "create",							KEYWORD_create				  },
 	{ "cursor",							KEYWORD_cursor			      },
+	{ "database",						KEYWORD_database		      },
 	{ "datatype",						KEYWORD_datatype		      },
 	{ "declare",						KEYWORD_declare			      },
 	{ "do",								KEYWORD_do				      },
@@ -329,6 +336,7 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "result",							KEYWORD_result			      },
 	{ "return",							KEYWORD_return			      },
 	{ "returns",						KEYWORD_returns			      },
+	{ "schema",							KEYWORD_schema			      },
 	{ "select",							KEYWORD_select			      },
 	{ "service",						KEYWORD_service			      },
 	{ "subtype",						KEYWORD_subtype			      },
@@ -399,6 +407,8 @@ static bool SqlReservedWordPredicatorForIsOrAs (tokenInfo *const token);
 static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	/*
 	 * RESERVED_BIT: MYSQL & POSTGRESQL&SQL2016&SQL2011&SQL92 & ORACLE11g&PLSQL & SQLANYWERE
+	 *
+	 * {  0  } means we have not inspect whether the keyword is reserved or not.
 	 */
 	[KEYWORD_at]            = {0 & 0&1&1&1 & 0&1 & 0},
 	[KEYWORD_begin]         = {0 & 0&1&1&1 & 0&1 & 1},
@@ -410,6 +420,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	[KEYWORD_constraint]    = {1 & 1&1&1&1 & 0&1 & 1},
 	[KEYWORD_create]        = {1 & 1&1&1&1 & 1&1 & 1},
 	[KEYWORD_cursor]        = {1 & 0&1&1&1 & 0&1 & 1},
+	[KEYWORD_database]      = {         0           },
 	[KEYWORD_datatype]      = {0 & 0&0&0&0 & 0&0 & 0},
 	[KEYWORD_declare]       = {1 & 0&1&1&1 & 0&1 & 1},
 	[KEYWORD_do]            = {0 & 1&0&0&0 & 0&1 & 1},
@@ -462,6 +473,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	[KEYWORD_result]        = {0 & 0&1&1&0 & 0&0 & 0},
 	[KEYWORD_return]        = {1 & 0&1&1&0 & 0&1 & 1},
 	[KEYWORD_returns]       = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_schema]        = {0 & 0&0&0&0 & 0&0 & 0},
 	[KEYWORD_select]        = {1 & 1&1&1&1 & 1&1 & 1},
 	[KEYWORD_service]       = {0 & 0&0&0&0 & 0&0 & 0},
 	[KEYWORD_subtype]       = {0 & 0&0&0&0 & 0&1 & 0},
@@ -2169,6 +2181,44 @@ static void parseColumnsAndAliases (tokenInfo *const token)
 	deleteToken (lastId);
 }
 
+/* Skip "IF NOT EXISTS"
+ * https://dev.mysql.com/doc/refman/8.0/en/create-table.html
+ * https://www.postgresql.org/docs/current/sql-createtable.html
+ * https://sqlite.org/lang_createtable.html
+ */
+static bool parseIdAfterIfNotExists(tokenInfo *const name,
+									tokenInfo *const token,
+									bool authorization_following)
+{
+	if (isKeyword (name, KEYWORD_if)
+		&& (isType (token, TOKEN_IDENTIFIER)
+			&& vStringLength (token->string) == 3
+			&& strcasecmp ("not", vStringValue (token->string)) == 0))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_IDENTIFIER)
+			&& vStringLength (token->string) == 6
+			&& strcasecmp ("exists", vStringValue (token->string)) == 0)
+		{
+			readIdentifier (name);
+			if (authorization_following
+				&& isType (name, TOKEN_IDENTIFIER)
+				&& vStringLength (name->string) == 13
+				&& strcasecmp("authorization", vStringValue(name->string)) == 0)
+			{
+				/*
+				 * PostgreSQL:
+				 * - CREATE SCHEMA IF NOT EXISTS AUTHORIZATION role_specification
+				 */
+				readIdentifier (name);
+			}
+			readToken (token);
+			return true;
+		}
+	}
+	return false;
+}
+
 static void parseTable (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
@@ -2207,25 +2257,7 @@ static void parseTable (tokenInfo *const token)
 	readIdentifier (name);
 	readToken (token);
 
-	/* Skip "IF NOT EXISTS"
-	 * https://dev.mysql.com/doc/refman/8.0/en/create-table.html
-	 * https://www.postgresql.org/docs/current/sql-createtable.html
-	 * https://sqlite.org/lang_createtable.html
-	 */
-	if (isKeyword (name, KEYWORD_if)
-		&& (isType (token, TOKEN_IDENTIFIER)
-			&& vStringLength (token->string) == 3
-			&& strcasecmp ("not", vStringValue (token->string)) == 0))
-	{
-		readToken (token);
-		if (isType (token, TOKEN_IDENTIFIER)
-			&& vStringLength (token->string) == 6
-			&& strcasecmp ("exists", vStringValue (token->string)) == 0)
-		{
-			readIdentifier (name);
-			readToken (token);
-		}
-	}
+	parseIdAfterIfNotExists(name, token, false);
 
 	if (isType (token, TOKEN_PERIOD))
 	{
@@ -2902,6 +2934,70 @@ static void parseCCFLAGS (tokenInfo *const token)
 
 }
 
+static void parseDatabase (tokenInfo *const token, enum eKeywordId keyword)
+{
+	tokenInfo * name;
+
+	/*
+	 * In MySQL and HPL/SQL, "CREATE DATABASE" and "CREATE SCHEMA"
+	 * are the same. However, In PostgreSQL, they are different.
+	 * Too support PostgreSQL, we prepare different kinds for them.
+	 *
+	 * MySQL
+	 * A. CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] db_name ...;
+	 *
+	 * PostgreSQL
+	 *
+	 * B. CREATE DATABASE name ...;
+	 *
+	 * C. CREATE SCHEMA schema_name [ AUTHORIZATION role_specification ] [ schema_element [ ... ] ]
+	 * D. CREATE SCHEMA AUTHORIZATION role_specification [ schema_element [ ... ] ]
+	 * E. CREATE SCHEMA IF NOT EXISTS schema_name [ AUTHORIZATION role_specification ]
+	 * F. CREATE SCHEMA IF NOT EXISTS AUTHORIZATION role_specification
+	 *
+	 * HPL/SQL
+	 * G. CREATE DATABASE | SCHEMA [IF NOT EXISTS] dbname_expr...;
+	 */
+	readIdentifier (token);
+	if (keyword == KEYWORD_schema
+		&& isType (token, TOKEN_IDENTIFIER)
+		&& vStringLength (token->string) == 13
+		&& strcasecmp("authorization", vStringValue(token->string)) == 0)
+	{
+		/* D. */
+		readIdentifier (token);
+		makeSqlTag (token, SQLTAG_SCHEMA);
+		findCmdTerm (token, false);
+		return;
+	}
+
+	name = newToken ();
+	copyToken (name, token);
+	readIdentifier (token);
+	parseIdAfterIfNotExists (name, token, true);
+
+	makeSqlTag (name,
+				keyword == KEYWORD_database
+				? SQLTAG_DATABASE: SQLTAG_SCHEMA);
+	deleteToken (name);
+
+	/* TODO:
+	 *
+	 * In PostgreSQL, CREATE FOO can follow to CREATE SCHEMA like:
+	 *
+	 * -- https://www.postgresql.org/docs/current/sql-createschema.html
+	 *
+	 *     CREATE SCHEMA hollywood
+	 *         CREATE TABLE films (title text, release date, awards text[])
+	 *         CREATE VIEW winners AS
+	 *             SELECT title, release FROM films WHERE awards IS NOT NULL;
+	 *
+	 * In above example, "hollywood.films" and "hollywood.winners" should be
+	 * tagged.
+	 */
+	findCmdTerm (token, true);
+}
+
 static void parseKeywords (tokenInfo *const token)
 {
 		switch (token->keyword)
@@ -2913,6 +3009,7 @@ static void parseKeywords (tokenInfo *const token)
 				break;
 			case KEYWORD_comment:		parseComment (token); break;
 			case KEYWORD_cursor:		parseSimple (token, SQLTAG_CURSOR); break;
+			case KEYWORD_database:		parseDatabase (token, KEYWORD_database); break;
 			case KEYWORD_datatype:		parseDomain (token); break;
 			case KEYWORD_declare:		parseBlock (token, false); break;
 			case KEYWORD_domain:		parseDomain (token); break;
@@ -2936,6 +3033,7 @@ static void parseKeywords (tokenInfo *const token)
 			case KEYWORD_package:		parsePackage (token); break;
 			case KEYWORD_procedure:		parseSubProgram (token); break;
 			case KEYWORD_publication:	parsePublication (token); break;
+			case KEYWORD_schema:		parseDatabase (token, KEYWORD_schema); break;
 			case KEYWORD_service:		parseService (token); break;
 			case KEYWORD_subtype:		parseSimple (token, SQLTAG_SUBTYPE); break;
 			case KEYWORD_synonym:		parseSynonym (token); break;

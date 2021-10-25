@@ -1,0 +1,4 @@
+myschema	input.sql	/^CREATE SCHEMA myschema;$/;"	S
+joe	input.sql	/^CREATE SCHEMA AUTHORIZATION joe;$/;"	S
+test	input.sql	/^CREATE SCHEMA IF NOT EXISTS test AUTHORIZATION joe;$/;"	S
+hollywood	input.sql	/^CREATE SCHEMA hollywood$/;"	S
