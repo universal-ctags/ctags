@@ -29,7 +29,7 @@ is enabled.
 The SQL parser looks for a token coming after ``LANGUAGE`` keyword in
 the source code to choose a proper guest parser.
 
-.. code-block:: SQL
+.. code-block:: psql
 
    ... LANGUAGE plpythonu AS '... user-defined function ' ...
    ... AS $$ user-defined function $$ LANGUAGE plv8 ...
@@ -51,7 +51,7 @@ tagging code including a user-defined function in a string literal [GH3006]_:
 
 "input.sql"
 
-.. code-block:: SQL
+.. code-block:: psql
 
 	CREATE OR REPLACE FUNCTION fun1() RETURNS VARCHAR AS '
 	DECLARE
@@ -77,7 +77,7 @@ tagging code including a user-defined function in a dollar quote [GH3006]_:
 
 "input.sql"
 
-.. code-block:: SQL
+.. code-block:: psql
 
 	CREATE OR REPLACE FUNCTION fun2() RETURNS VARCHAR LANGUAGE plpgsql AS $$
 	DECLARE
@@ -101,7 +101,7 @@ with "--options=NONE -o - --sort=no --extras=+{guest} input.sql"
 
 tagging code including a user-defined written in JavaScript:
 
-.. code-block:: SQL
+.. code-block:: psql
 
 	-- Derived from https://github.com/plv8/plv8/blob/r3.0alpha/sql/plv8.sql
 	CREATE FUNCTION test(keys text[], vals text[]) RETURNS text AS
