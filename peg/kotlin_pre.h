@@ -11,10 +11,7 @@
 *   INCLUDE FILES
 */
 
-#include "entry.h"
-#include "numarray.h"
 #include "kind.h"
-#include "read.h"
 #include "peg_common.h"
 
 
@@ -51,9 +48,7 @@ static kindDefinition KotlinKinds [] = {
 };
 
 struct parserCtx {
-    int scope_cork_index;
-    intArray *kind_stack;
-    bool found_syntax_error;
+    struct parserBaseCtx base;
     int parenthesis_level;
     #ifdef DEBUG
     long fail_offset;
@@ -64,11 +59,6 @@ struct parserCtx {
 *   FUNCTION PROTOTYPES
 */
 static int getcFromKotlinFile(struct parserCtx *auxil);
-static void popScope(struct parserCtx *auxil);
-static void pushKind (struct parserCtx *auxil, int kind);
-static void popKind (struct parserCtx *auxil, bool popScopeToo);
-static int peekKind (struct parserCtx *auxil);
-static void reportError (struct parserCtx *auxil);
 static void makeKotlinTag (struct parserCtx *auxil, const char *name, long offset, bool pushScope);
 #ifdef DEBUG
 static void reportFailure(struct parserCtx *auxil, long offset);

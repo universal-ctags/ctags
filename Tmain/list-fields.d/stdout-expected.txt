@@ -56,6 +56,8 @@ z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field outpu
 -	sectionMarker	no	ReStructuredText	s--	no	--	character used for declaring section
 -	mixin	yes	Ruby	s--	no	--	how the class or module is mixed in (mixin:HOW:MODULE)
 -	parameter	no	SystemVerilog	--b	no	--	parameter whose value can be overridden.
+-	target	yes	Thrift	s--	no	--	the target language specified at "namespace"
+-	throws	yes	Thrift	s--	no	--	throws list of function
 -	architecture	yes	VHDL	s--	no	--	architecture designing the entity
 -	parameter	no	Verilog	--b	no	--	parameter whose value can be overridden.
 #

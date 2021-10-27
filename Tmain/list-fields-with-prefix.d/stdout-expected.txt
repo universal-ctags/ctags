@@ -38,5 +38,7 @@ x       UCTAGSxpath          no      NONE             s--    no    -- xpath for 
 -       UCTAGSsectionMarker  no      ReStructuredText s--    no    -- character used for declaring section
 -       UCTAGSmixin          yes     Ruby             s--    no    -- how the class or module is mixed in (mixin:HOW:MODULE)
 -       UCTAGSparameter      no      SystemVerilog    --b    no    -- parameter whose value can be overridden.
+-       UCTAGStarget         yes     Thrift           s--    no    -- the target language specified at "namespace"
+-       UCTAGSthrows         yes     Thrift           s--    no    -- throws list of function
 -       UCTAGSarchitecture   yes     VHDL             s--    no    -- architecture designing the entity
 -       UCTAGSparameter      no      Verilog          --b    no    -- parameter whose value can be overridden.

@@ -28,7 +28,7 @@ test_style() {
 }
 
 @test "Testing style.d - generated" {
-    test_generate "$ROOTDIR/src/examples/calc.peg"
+    test_generate "$ROOTDIR/examples/calc.peg"
     test_style "style.d/parser.h"
     test_style "style.d/parser.c"
 }

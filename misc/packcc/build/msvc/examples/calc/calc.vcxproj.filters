@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\..\src\examples\calc.peg">
+    <CustomBuild Include="..\..\..\..\examples\calc.peg">
       <Filter>Source Files</Filter>
     </CustomBuild>
   </ItemGroup>

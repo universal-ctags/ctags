@@ -3,7 +3,7 @@
 load "$TESTDIR/utils.sh"
 
 @test "Testing calc.d - generation" {
-    test_generate "$ROOTDIR/src/examples/calc.peg"
+    test_generate "$ROOTDIR/examples/calc.peg"
 }
 
 @test "Testing calc.d - compilation" {

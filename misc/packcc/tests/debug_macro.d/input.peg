@@ -1,6 +1,6 @@
 %source {
 static const char *dbg_str[] = { "Evaluating rule", "Matched rule", "Abandoning rule" };
-#define PCC_DEBUG(event, rule, level, pos, buffer, length) \
+#define PCC_DEBUG(auxil, event, rule, level, pos, buffer, length) \
     fprintf(stdout, "%*s%s %s @%zu [%.*s]\n", (int)((level) * 2), "", dbg_str[event], rule, pos, (int)(length), buffer)
     /* NOTE: To guarantee the output order, stderr, which can lead a race condition with stdout, is not used. */
 }

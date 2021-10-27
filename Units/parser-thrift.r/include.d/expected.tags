@@ -1,0 +1,4 @@
+a.thrift	input.thrift	/^include "a.thrift"$/;"	T	roles:included
+A.thrift	input.thrift	/^include 'A.thrift'$/;"	T	roles:included
+b"c'd\\e\\n.thrift	input.thrift	/^include "b\\"c\\'d\\\\e\\n.thrift"$/;"	T	roles:included
+B'C"D\\E\\N.thrift	input.thrift	/^include 'B\\'C\\"D\\\\E\\N.thrift'$/;"	T	roles:included
