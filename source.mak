@@ -111,6 +111,7 @@ LIB_SRCS =			\
 	main/keyword.c			\
 	main/kind.c			\
 	main/lregex.c			\
+	main/lregex-default.c		\
 	main/lxpath.c			\
 	main/main.c			\
 	main/mbcs.c			\
@@ -374,6 +375,12 @@ YAML_SRCS = \
 	parsers/ansibleplaybook.c	\
 	\
 	$(NULL)
+
+PCRE2_HEADS =
+PCRE2_SRCS = \
+	    main/lregex-pcre2.c \
+	    \
+	    $(NULL)
 
 OPTSCRIPT_DSL_HEADS = \
 	dsl/es.h \

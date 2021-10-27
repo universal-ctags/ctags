@@ -145,9 +145,9 @@ extern void matchLanguageRegex (const langType language, const vString* const li
 extern void freeRegexResources (void);
 extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);
-extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp);
-extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE *fp);
-extern void printMultitableRegexFlags (bool withListHeader, bool machinable, FILE *fp);
+extern void printRegexFlags (bool withListHeader, bool machinable, const char *flags, FILE *fp);
+extern void printMultilineRegexFlags (bool withListHeader, bool machinable, const char *flags, FILE *fp);
+extern void printMultitableRegexFlags (bool withListHeader, bool machinable, const char *flags, FILE *fp);
 extern bool doesLanguageExpectCorkInRegex (const langType language);
 
 /* Multiline Regex Interface */

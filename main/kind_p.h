@@ -13,6 +13,7 @@
 */
 
 #include "general.h"
+#include "kind.h"
 #include "vstring.h"
 
 

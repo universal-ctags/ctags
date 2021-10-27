@@ -695,6 +695,20 @@ AS_IF([test "x$enable_yaml" != "xno"], [
 ])
 AM_CONDITIONAL(HAVE_LIBYAML, test "x$have_libyaml" = xyes)
 
+AC_ARG_ENABLE([pcre2],
+	[AS_HELP_STRING([--disable-pcre2],
+		[disable pcre2 support])])
+
+AH_TEMPLATE([HAVE_PCRE2],
+	[Define this value if pcre2 is available.])
+AS_IF([test "x$enable_pcre2" != "xno"], [
+	PKG_CHECK_MODULES(PCRE2, libpcre2-8,
+			       [have_libpcre2_8=yes
+			       AC_DEFINE(HAVE_PCRE2)],
+			       [AS_IF([test "x$enable_pcre2" = "xyes"], [
+			           AC_MSG_ERROR([libpcre2-8 not found])])])
+])
+AM_CONDITIONAL(HAVE_PCRE2, test "x$have_libpcre2_8" = xyes)
 
 # Checks for missing prototypes
 # -----------------------------

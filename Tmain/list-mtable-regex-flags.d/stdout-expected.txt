@@ -2,6 +2,7 @@
 b       basic                                         interpreted as a Posix basic regular expression.
 e       extend                                        interpreted as a Posix extended regular expression (default)
 i       icase                                         applied in a case-insensitive manner
+p       pcre2                                         use pcre2 regex engine
 -       fatal="MESSAGE"                               print the given MESSAGE and exit
 -       mgroup=N                                      a group in pattern determining the line number of tag
 -       placeholder                                   don't put this tag to tags file.

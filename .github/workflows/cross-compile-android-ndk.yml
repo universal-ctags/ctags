@@ -60,6 +60,7 @@ jobs:
               --disable-xml \
               --disable-json \
               --disable-yaml \
+              --disable-pcre2 \
               CC="$CC" \
               CFLAGS="\"$CFLAGS\"" \
               CPPFLAGS="\"$CPPFLAGS\"" \

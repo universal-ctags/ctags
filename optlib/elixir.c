@@ -81,7 +81,7 @@ extern parserDefinition* ElixirParser (void)
 		"p", "{scope=set}", NULL, false},
 		{"^[ \t]*defmodule[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"m", "{scope=set}", NULL, false},
-		{"^[ \t]*def((p?)|macro(p?))[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3}|and|or|in|not|when|not in)[ \t]+[a-zA-Z0-9_?!]", "\\5",
+		{"^[ \t]*def((p?)|macro(p?))[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3}|and|or|in|(not( +in)?)|when)[ \t]+[a-zA-Z0-9_?!]", "\\5",
 		"o", "{scope=ref}{exclusive}", NULL, false},
 		{"^[ \t]*def[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
 		"f", "{scope=ref}{_field=access:public}", NULL, false},

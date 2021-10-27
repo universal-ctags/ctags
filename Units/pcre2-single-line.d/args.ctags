@@ -1,0 +1,14 @@
+--langdef=Foo
+--map-Foo=.foo
+--kinddef-Foo=d,def,definitions
+--kinddef-Foo=v,var,variables
+--kinddef-Foo=f,func,functions
+--kinddef-Foo=m,macro,macros
+--kinddef-Foo=p,pkg,packages
+
+
+--regex-Foo=/def\s+(\W)(\w+)\1/\2/d/p
+--regex-Foo=/var\s+(\W)(\w+)\1/\2/v/{pcre2}
+--regex-Foo=/func\s+["']?(.+?)['"]?$/\1/f/pi
+--regex-Foo=/macro\s+["']?(.+?)['"]?$/\1/m/{pcre2}{icase}
+--regex-Foo=/package\s+["']?(.+?)['"]?$/\1/p/i{pcre2}

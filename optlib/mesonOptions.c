@@ -48,7 +48,7 @@ extern parserDefinition* MesonOptionsParser (void)
 		},
 	};
 	static tagRegexTable MesonOptionsTagRegexTable [] = {
-		{"^option[ \t\n]*\\([ \t\n]*'([^']*[^\\])'[ \t\n]*,[ \t\n]*type[ \t\n]*:[ \t\n]*'([a-z]+)'", "",
+		{"^option[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*,[ \t\n]*type[ \t\n]*:[ \t\n]*'([a-z]+)'", "",
 		"", ""
 		"{{\n"
 		"    % \\1 points a tag name.\n"

@@ -353,6 +353,14 @@ can be used to control ctags generation programmatically.
 
 See :ref:`interactive-mode` for more details.
 
+PCRE2 regular expression
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With ``{pcre2}`` (or ``p``) flag, PCRE2 expressions can be used in
+``--regex-<LANG>=``, ``--mline-regex-<LANG>=``, and
+``--_mtable-regex-<LANG>=`` if the ctags is built with ``pcre2`` library.
+
+
 Incompatible changes in command line
 ---------------------------------------------------------------------
 

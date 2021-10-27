@@ -27,7 +27,7 @@
 --kinddef-MesonOptions=a,array,arrays
 --kinddef-MesonOptions=f,feature,features
 
---mline-regex-MesonOptions=/^option[ \t\n]*\([ \t\n]*'([^']*[^\])'[ \t\n]*,[ \t\n]*type[ \t\n]*:[ \t\n]*'([a-z]+)'//{{
+--mline-regex-MesonOptions=/^option[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*,[ \t\n]*type[ \t\n]*:[ \t\n]*'([a-z]+)'//{{
     % \1 points a tag name.
     \1
     % \2 may point a kind. This must be converted to a name from a string.

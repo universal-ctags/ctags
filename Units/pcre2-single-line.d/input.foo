@@ -1,0 +1,10 @@
+def |capture_me_in_bar|
+def {dont_capture_me}
+def /capture_me_in_slash/
+var "abc"
+func 'f0'
+func "f1"
+func f2
+FunC f3
+macro m0
+package P0
