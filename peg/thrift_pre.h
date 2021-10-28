@@ -15,6 +15,8 @@
 #include "field.h"
 #include "peg_common.h"
 
+#include "parsers/cxx/cxx_tag.h"
+
 /*
 *   MACROS
 */

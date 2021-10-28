@@ -14,6 +14,7 @@
 #include "options.h"
 #include "parse.h"
 #include "routines.h"
+#include "dependency.h"
 
 static int makeThriftTagFull (struct parserCtx *auxil, const char *name, long offset, int kind, int role,
 							  bool pushScope)
@@ -99,11 +100,18 @@ extern parserDefinition* ThriftParser (void)
 {
 	static const char *const extensions [] = { "thrift", NULL };
 	parserDefinition* def = parserNew ("Thrift");
+
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_FOREIGNER, "C++", NULL },
+	};
+
 	def->kindTable  = ThriftKinds;
 	def->kindCount  = ARRAY_SIZE (ThriftKinds);
 	def->fieldTable = ThriftFields;
 	def->fieldCount = ARRAY_SIZE (ThriftFields);
 	def->extensions = extensions;
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 	def->parser     = findThriftTags;
 	def->useCork    = true;
 	def->enabled    = true;
