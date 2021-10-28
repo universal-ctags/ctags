@@ -55,8 +55,8 @@ Grammar <- __ ( Statement __ )* (EOF / SyntaxError)
 SyntaxError <- .
 
 # MODIFIED
-Include <- <( "include" / "cpp_include" )> _ <Literal> EOS {{
     if ($1[0] == 'i')
+Include <- <( "include" / "cpp_include" )> _ <Literal> EOS {
     {
         vString *f = unliteral ($2);
 	if (vStringLength(f) > 0)
@@ -64,7 +64,7 @@ Include <- <( "include" / "cpp_include" )> _ <Literal> EOS {{
 	vStringDelete (f);
     }
     /* TODO: cpp_include */
-}}
+}
 
 Statement <- Include / Namespace / Const / Enum / TypeDef / Struct / Exception / Union / Service
 
