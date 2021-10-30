@@ -1356,6 +1356,17 @@ static regexPattern *addCompiledCallbackPattern (struct lregexControlBlock *lcb,
 	return ptrn;
 }
 
+#ifndef HAVE_PCRE2
+static void no_pcre2_regex_flag_short (char c, void* data)
+{
+	error (WARNING, "'p' flag is specied but pcre2 regex engine is not linked.");
+}
+static void no_pcre2_regex_flag_long (const char* const s, const char* const unused CTAGS_ATTR_UNUSED, void* data)
+{
+	error (WARNING, "{pcre2} flag is specied but pcre2 regex engine is not linked.");
+}
+#endif
+
 static flagDefinition backendFlagDefs[] = {
 	{ 'b', "basic",  basic_regex_flag_short,  basic_regex_flag_long,
 	  NULL, "interpreted as a Posix basic regular expression."},
@@ -1364,6 +1375,9 @@ static flagDefinition backendFlagDefs[] = {
 #ifdef HAVE_PCRE2
 	{ 'p', "pcre2",  pcre2_regex_flag_short, pcre2_regex_flag_long,
 	  NULL, "use pcre2 regex engine"},
+#else
+	{ 'p', "pcre2",  no_pcre2_regex_flag_short, no_pcre2_regex_flag_long,
+	  NULL, "pcre2 is NOT linked!"},
 #endif
 };
 
