@@ -1,0 +1,6 @@
+Buffer	input.adb	/^separate (Buffer);$/;"	p	roles:subunit
+Test	input.adb	/^package body Test is$/;"	p	package:Buffer	roles:def
+Parent	input-1.adb	/^package body Parent is$/;"	p	roles:def
+Variable	input-1.adb	/^    Variable : String := "Hello, there.";$/;"	v	package:Parent	file:	roles:def
+Parent	input-1.adb	/^separate(Parent)$/;"	p	roles:subunit
+Inner	input-1.adb	/^procedure Inner is$/;"	r	package:Parent	roles:def

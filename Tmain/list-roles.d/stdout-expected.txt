@@ -3,6 +3,7 @@
 #
 #
 #LANGUAGE      KIND(L/N)         NAME               ENABLED DESCRIPTION
+Ada            p/package         subunit            on      package name referenced in separate()
 Asm            s/section         placement          on      placement where the assembled code goes
 AutoIt         S/script          local              on      local include
 AutoIt         S/script          system             on      system include
@@ -96,6 +97,7 @@ Vera           h/header          system             on      system header
 # all.*
 #
 #LANGUAGE      KIND(L/N)         NAME               ENABLED DESCRIPTION
+Ada            p/package         subunit            on      package name referenced in separate()
 Asm            s/section         placement          on      placement where the assembled code goes
 AutoIt         S/script          local              on      local include
 AutoIt         S/script          system             on      system include

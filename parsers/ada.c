@@ -149,15 +149,23 @@ typedef enum eAdaKinds
 	ADA_KIND_IDENTIFIER,
 	ADA_KIND_AUTOMATIC_VARIABLE,
 	ADA_KIND_ANONYMOUS,      /* for non-identified loops and blocks */
-	ADA_KIND_SEPARATE,       /* for defining the parent token name of a child
-							  * sub-unit */
 	ADA_KIND_COUNT            /* must be last */
 } adaKind;
+
+typedef enum {
+	ADA_PACKAGE_SUBUNIT,
+} adaPackageRole;
+
+static roleDefinition AdaPackageRoles [] = {
+	{ true, "subunit",
+	  "package name referenced in separate()" },
+};
 
 static kindDefinition AdaKinds[] =
 {
 	{ true,   'P', "packspec",    "package specifications" },
-	{ true,   'p', "package",     "packages" },
+	{ true,   'p', "package",     "packages",
+	  .referenceOnly = true, ATTACH_ROLES(AdaPackageRoles) },
 	{ false,  'T', "typespec",    "type specifications" },
 	{ true,   't', "type",        "types" },
 	{ false,  'U', "subspec",     "subtype specifications" },
@@ -181,8 +189,6 @@ static kindDefinition AdaKinds[] =
 	{ true,   'i', "identifier",  "loop/declare identifiers"},
 	{ false,  'a', "autovar",     "automatic variables" },
 	{ false,  'y', "anon",        "loops and blocks with no identifier" },
-	// something separately declared/defined
-	{ true,   'S', "separate",    "(ctags internal use)" }
 };
 
 typedef struct sAdaTokenList
@@ -318,6 +324,9 @@ static void makeSpec (adaKind *kind);
 static adaTokenInfo *newAdaToken (const char *name, int len,
 								  adaKind kind, bool isSpec,
 								  adaTokenInfo *parent);
+static adaTokenInfo *newAdaTokenFull (const char *name, int len,
+									  adaKind kind, int role, bool isSpec,
+									  adaTokenInfo *parent);
 static void freeAdaToken (adaTokenList *list, adaTokenInfo *token);
 static void appendAdaToken (adaTokenInfo *parent, adaTokenInfo *token);
 
@@ -413,8 +422,8 @@ static void makeSpec (adaKind *kind)
 	}
 }
 
-static adaTokenInfo *newAdaToken (const char *name, int len, adaKind kind,
-								  bool isSpec, adaTokenInfo *parent)
+static adaTokenInfo *newAdaTokenFull (const char *name, int len, adaKind kind, int role,
+									  bool isSpec, adaTokenInfo *parent)
 {
 	char *tmpName = NULL;
 	adaTokenInfo *token = xMalloc (1, adaTokenInfo);
@@ -445,7 +454,7 @@ static adaTokenInfo *newAdaToken (const char *name, int len, adaKind kind,
 	 * of that spec. */
 	if ((parent != NULL) && (parent->isPrivate == false) &&
 		((parent->kind == ADA_KIND_UNDEFINED) ||
-		 (parent->kind == ADA_KIND_SEPARATE) ||
+		 (parent->kind == ADA_KIND_PACKAGE && isRoleAssigned(&parent->tag, ADA_PACKAGE_SUBUNIT)) ||
 		 ((parent->isSpec == true) && ((parent->kind == ADA_KIND_PACKAGE) ||
 									   (parent->kind == ADA_KIND_SUBPROGRAM) ||
 									   (parent->kind == ADA_KIND_PROTECTED) ||
@@ -464,6 +473,8 @@ static adaTokenInfo *newAdaToken (const char *name, int len, adaKind kind,
 	if (kind > ADA_KIND_UNDEFINED)
 	{
 		token->tag.kindIndex = kind;
+		if (role != ROLE_DEFINITION_INDEX)
+			assignRole(&token->tag, role);
 	}
 	else
 	{
@@ -475,6 +486,12 @@ static adaTokenInfo *newAdaToken (const char *name, int len, adaKind kind,
 	appendAdaToken (parent, token);
 
 	return token;
+}
+
+static adaTokenInfo *newAdaToken (const char *name, int len, adaKind kind,
+								  bool isSpec, adaTokenInfo *parent)
+{
+	return newAdaTokenFull (name, len, kind, ROLE_DEFINITION_INDEX, isSpec, parent);
 }
 
 static void freeAdaToken (adaTokenList *list, adaTokenInfo *token)
@@ -1647,16 +1664,21 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 					for (i = 1; (pos + i) < lineLen && line[pos + i] != ')' &&
 							 !isspace (line[pos + i]); i++);
 
-					/* if this is a separate declaration, all it really does is create
+					/* the original comment before we introduced reference tags:
+					 * -----------------------------------------------------------------
+					 * if this is a separate declaration, all it really does is create
 					 * a false high level token for everything in this file to belong
 					 * to... But we don't know what kind it is, so we declare it as
 					 * ADA_KIND_SEPARATE, which will cause it not to be placed in
 					 * the tag file, and the item in this file will be printed as
 					 * separate:<name> instead of package:<name> or whatever the
 					 * parent kind really is (assuming the ctags option will be on
-					 * for printing such info to the tag file) */
-					token = newAdaToken (&line[pos], i, ADA_KIND_SEPARATE, false,
-										 parent);
+					 * for printing such info to the tag file)
+					 * -----------------------------------------------------------------
+					 * Now we have reference tags. So we can use ADA_KIND_PACKAGE as kind.
+					 */
+					token = newAdaTokenFull (&line[pos], i, ADA_KIND_PACKAGE, ADA_PACKAGE_SUBUNIT,
+											 false, parent);
 
 					/* since this is a false top-level token, set parent to be
 					 * token */
@@ -2243,15 +2265,9 @@ static void storeAdaTags (adaTokenInfo *token, const char *parentScope)
 	/* fill in the scope data */
 	if (token->parent != NULL)
 	{
-		if (token->parent->kind > ADA_KIND_UNDEFINED &&
-			token->parent->kind < ADA_KIND_COUNT)
+		if (token->parent->kind != ADA_KIND_UNDEFINED)
 		{
 			token->tag.extensionFields.scopeKindIndex = token->parent->kind;
-			token->tag.extensionFields.scopeName = token->parent->name;
-		}
-		else if (token->parent->kind == ADA_KIND_SEPARATE)
-		{
-			token->tag.extensionFields.scopeKindIndex = ADA_KIND_SEPARATE;
 			token->tag.extensionFields.scopeName = token->parent->name;
 		}
 	}
