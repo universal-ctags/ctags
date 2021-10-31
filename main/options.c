@@ -2907,24 +2907,24 @@ static parametricOption ParametricOptions [] = {
 
 static booleanOption BooleanOptions [] = {
 	{ "append",         &Option.append,                 true,  STAGE_ANY },
-	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),   false, STAGE_ANY, setBooleanToXtagWithWarning },
-	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, setBooleanToXtagWithWarning },
+	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),      false, STAGE_ANY, setBooleanToXtagWithWarning },
+	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),      false, STAGE_ANY, setBooleanToXtagWithWarning },
 	{ "filter",         &Option.filter,                 true,  STAGE_ANY },
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, false, STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         false, STAGE_ANY },
 	{ "links",          &Option.followLinks,            false, STAGE_ANY },
-	{ "machinable",     &localOption.machinable,             true,  STAGE_ANY },
+	{ "machinable",     &localOption.machinable,        true,  STAGE_ANY },
 	{ "put-field-prefix", &Option.putFieldPrefix,       false, STAGE_ANY },
 	{ "print-language", &Option.printLanguage,          true,  STAGE_ANY },
 	{ "quiet",          &Option.quiet,                  false, STAGE_ANY },
 #ifdef RECURSE_SUPPORTED
 	{ "recurse",        &Option.recurse,                false, STAGE_ANY },
 #endif
-	{ "verbose",        &ctags_verbose,                false, STAGE_ANY },
+	{ "verbose",        &ctags_verbose,                 false, STAGE_ANY },
 #ifdef WIN32
 	{ "use-slash-as-filename-separator", (bool *)&Option.useSlashAsFilenameSeparator, false, STAGE_ANY },
 #endif
-	{ "with-list-header", &localOption.withListHeader,       true,  STAGE_ANY },
+	{ "with-list-header", &localOption.withListHeader,  true,  STAGE_ANY },
 	{ "_fatal-warnings",&Option.fatalWarnings,          false, STAGE_ANY },
 };
 
