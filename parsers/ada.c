@@ -1589,11 +1589,14 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
       continue;
     }
     else if(adaKeywordCmp(ADA_KEYWORD_PRAGMA) ||
-            adaKeywordCmp(ADA_KEYWORD_WITH) ||
+            ((mode != ADA_GENERIC) && adaKeywordCmp(ADA_KEYWORD_WITH)) ||
             adaKeywordCmp(ADA_KEYWORD_USE))
     {
       /* set the token to NULL so we accidentally don't pick up something
-       * from earlier */
+       * from earlier
+       * Do not skip lines having 'with' when 'mode == ADA_GENERIC'
+       * this to intercept 'formal subprograms' of a generic declaration.
+       * see: ARM 12.1(22) */
       skipPast(";");
       continue;
     }
@@ -1693,11 +1696,23 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
         if(adaKeywordCmp(ADA_KEYWORD_PACKAGE))
         {
           token = adaParseBlock(parent, ADA_KIND_PACKAGE);
+
+          /* The above 'adaParseBlock' has read the end of a 'generic package declaration',
+           * reset the mode back to the original mode.
+           * see: ARM 12.1(24) */
+          Assert (parent);
+          mode = (parent->parent)? ADA_DECLARATIONS: ADA_ROOT;
         }
         else if(adaKeywordCmp(ADA_KEYWORD_PROCEDURE) ||
                 adaKeywordCmp(ADA_KEYWORD_FUNCTION))
         {
           token = adaParseSubprogram(parent, ADA_KIND_SUBPROGRAM);
+
+          /* The above 'adaParseBlock' as read the end of a 'generic function/procedure declaration',
+           * reset the mode back to the original mode.
+           * see: ARM 12.1(21/22) */
+          Assert (parent);
+          mode = (parent->parent)? ADA_DECLARATIONS: ADA_ROOT;
         }
         else if(adaKeywordCmp(ADA_KEYWORD_TASK))
         {
@@ -1770,10 +1785,8 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
         if(token != NULL)
         {
           /* if any generic params have been gathered, attach them to
-           * token, and set the mode back to ADA_ROOT or ADA_DECLARATIONS */
+           * token. */
           appendAdaTokenList(token, &genericParamsRoot.children);
-          Assert (parent);
-          mode = (parent->parent)? ADA_DECLARATIONS: ADA_ROOT;
         } /* if(token != NULL) */
 
         break;
