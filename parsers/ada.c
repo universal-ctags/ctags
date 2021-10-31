@@ -2081,30 +2081,31 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 			}
 			else
 			{
+				int i_end;
 				/* set token to NULL so we don't accidentally not find an identifier,
 				 * But then fall through to the != NULL check */
 				token = NULL;
 
 				/* there is a possibility that this may be a loop or block
-				 * identifier, so check for a <random_word>: statement */
+				 * identifier, so check for a <random_word>[ ]?: statement */
 				for (i = 1; (pos + i) < lineLen; i++)
-				{
-					/* if we hit a non-identifier character (anything But letters, _
-					 * and ':' then this is not an identifier */
-					if (!isalnum (line[pos + i]) && line[pos + i] != '_' &&
-						line[pos + i] != ':')
-					{
-						/* if this is not an identifier then we should just bail out of
-						 * this loop now */
+					if(!(isalnum (line[pos + i]) || line[pos + i] == '_'))
 						break;
-					}
-					else if ((line[pos + i] == ':') && (line[pos + i + 1] != '='))
-					{
-						token = newAdaToken (&line[pos], i, ADA_KIND_IDENTIFIER, false,
-											 parent);
+				i_end = i;		/* Records the end of identifier. */
+
+				/* Skip whitespaces between the identifier and ':' */
+				for (; (pos + i) < lineLen; i++)
+					if (!isspace((unsigned char)(line[pos + i])))
 						break;
-					}
-				} /* for (i = 1; (pos + i) < lineLen; i++) */
+
+				if ((pos + i) < lineLen
+					&& (line[pos + i] == ':')
+					&& (
+						((pos + i + 1) == lineLen)
+						|| (line[pos + i + 1] != '=')
+						))
+					token = newAdaToken (&line[pos], i_end, ADA_KIND_IDENTIFIER, false,
+										 parent);
 
 				/* if we created a token, we found an identifier.  Now check for a
 				 * declare or begin statement to see if we need to start parsing
