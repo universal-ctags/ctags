@@ -401,7 +401,7 @@ struct SqlReservedWord {
  * ORACLE11g, PLSQL
  * => https://docs.oracle.com/cd/B28359_01/appdev.111/b31231/appb.htm#CJHIIICD
  * SQLANYWERE
- * => http://dcx.sap.com/1200/en/dbreference/alhakeywords.html
+ * => http://dcx.sap.com/1200/en/dbreference/alhakeywords.html <the page is gone>
  */
 static bool SqlReservedWordPredicatorForIsOrAs (tokenInfo *const token);
 static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
