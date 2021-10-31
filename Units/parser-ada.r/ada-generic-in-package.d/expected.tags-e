@@ -1,0 +1,8 @@
+
+input.ads,278
+package My_Package isMy_Package/s2,48
+  package Conversions isConversions/s6,108
+    function From_Big_Real (Arg : Integer) return Num;From_Big_Real/f7,133
+    type Num is digits <>;Num5,81
+  type Missing_Tag is recordMissing_Tag/t10,208
+    Num : Integer;Num11,237

@@ -1,0 +1,9 @@
+
+input.adb,486
+procedure My_Package isMy_Package/p1,0
+  package Generic_Integer_Images isGeneric_Integer_Images/s5,71
+    function Digit_To_Character (X : Unsigned_Type) return Character;Digit_To_Character/f6,107
+    type Unsigned_Type is range <>;Unsigned_Type4,35
+  package body Generic_Integer_Images isGeneric_Integer_Images/b9,208
+    function Digit_To_Character (X : Unsigned_Type) return Character isDigit_To_Character/f10,249
+  type Signed_Address is rangeSigned_Address/t14,379

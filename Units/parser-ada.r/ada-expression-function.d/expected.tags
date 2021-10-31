@@ -1,0 +1,9 @@
+Test	input.adb	/^procedure Test is$/;"	r
+My_Type	input.adb	/^  My_Type : Boolean := True;$/;"	v	subprogram:Test	file:
+Tagged_Procedure	input.adb	/^  procedure Tagged_Procedure is$/;"	r	subprogram:Test	file:
+Boolean_As_String	input.adb	/^    function Boolean_As_String return String is$/;"	r	subprogram:Tagged_Procedure	file:
+Another_Boolean_As_String	input.adb	/^    function Another_Boolean_As_String return String is$/;"	r	subprogram:Tagged_Procedure	file:
+p0	input.adb	/^    procedure p0 is	$/;"	r	subprogram:Tagged_Procedure	file:
+Yet_Boolean_As_String	input.adb	/^    function Yet_Boolean_As_String return String is$/;"	r	subprogram:Tagged_Procedure	file:
+p1	input.adb	/^    procedure p1 is	$/;"	r	subprogram:Tagged_Procedure	file:
+Not_Tagged_Procedure	input.adb	/^  procedure Not_Tagged_Procedure is$/;"	r	subprogram:Test	file:
