@@ -55,16 +55,23 @@ Grammar <- __ ( Statement __ )* (EOF / SyntaxError)
 SyntaxError <- .
 
 # MODIFIED
-Include <- <( "include" / "cpp_include" )> _ <Literal> EOS {{
-    if ($1[0] == 'i')
+Include <- <( "include" / "cpp_include" )> _ <Literal> EOS {
+    vString *f = unliteral ($2);
+    if (vStringLength(f) > 0)
     {
-        vString *f = unliteral ($2);
-	if (vStringLength(f) > 0)
+        if ($1[0] == 'i')
             makeThriftTagFull (auxil, vStringValue (f), $2s, K_THRIFTFILE, THRIFT_THRIFT_FILE_INCLUDED, false);
-	vStringDelete (f);
+        else
+        {
+            tagEntryInfo e;
+            initForeignRefTagEntry (&e, vStringValue(f), getNamedLanguage ("C++", 0), CXXTagKindINCLUDE, CR_HEADER_LOCAL);
+            e.lineNumber = getInputLineNumberForFileOffset ($2s);
+            e.filePosition = getInputFilePositionForLine (e.lineNumber);
+            makeTagEntry (&e);
+        }
     }
-    /* TODO: cpp_include */
-}}
+    vStringDelete (f);
+}
 
 Statement <- Include / Namespace / Const / Enum / TypeDef / Struct / Exception / Union / Service
 

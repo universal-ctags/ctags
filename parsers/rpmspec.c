@@ -31,6 +31,7 @@
 #include "routines.h"
 #include "trace.h"
 
+#include "dependency.h"
 #include "autoconf.h"
 
 typedef enum {
@@ -385,10 +386,17 @@ extern parserDefinition* RpmSpecParser (void)
 		"rpm-spec",				/* the mode name in Emacs */
 		NULL };
 	parserDefinition* const def = parserNew ("RpmSpec");
+
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_FOREIGNER, "Autoconf", NULL },
+	};
+
 	def->kindTable = RpmSpecKinds;
 	def->kindCount = ARRAY_SIZE (RpmSpecKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 	def->initialize = initializeRpmSpecParser;
 	def->parser = findRpmSpecTags;
 	def->method     = METHOD_REGEX;

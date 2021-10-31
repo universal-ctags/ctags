@@ -139,6 +139,15 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  int kindIndex);
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 			     int kindIndex, int roleIndex);
+
+/* initForeignRefTagEntry() is for making a tag for the language X when parsing
+ * source code of Y language.
+ * From the view point of the language Y, we call the language X a foreign
+ * language.
+ *
+ * When making a tag for a foreign with this function, you must declare the
+ * language X in the parser of Y with DEPTYPE_FOREIGNER dependency.
+ */
 extern void initForeignRefTagEntry (tagEntryInfo *const e, const char *const name,
 									langType type,
 									int kindIndex, int roleIndex);

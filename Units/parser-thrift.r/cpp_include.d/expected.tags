@@ -1,0 +1,2 @@
+iostream	input.thrift	/^cpp_include "iostream"$/;"	h	line:1	language:C++	roles:local
+vector	input.thrift	/^cpp_include 'vector'$/;"	h	line:2	language:C++	roles:local

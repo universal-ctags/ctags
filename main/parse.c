@@ -1865,19 +1865,37 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 	unsigned int i;
 	parserDependency *d;
 	langType upper;
+	parserDefinition *lowerParser;
 	parserObject *upperParser;
 
 	for (i = 0; i < parser->dependencyCount; i++)
 	{
 		d = parser->dependencies + i;
-		upper = getNamedLanguage (d->upperParser, 0);
+
+		if (d->type == DEPTYPE_FOREIGNER)
+		{
+			upper = parser->id;
+			langType lower = getNamedLanguage (d->upperParser, 0);
+			if (lower == LANG_IGNORE)
+				error (FATAL,
+					   "Unknown language: \"%s\" as a foreigner for %s",
+					   d->upperParser, parser->name);
+
+			lowerParser = LanguageTable [lower].def;
+		}
+		else
+		{
+			upper = getNamedLanguage (d->upperParser, 0);
+			lowerParser = parser;
+		}
+
 		upperParser = LanguageTable + upper;
 
 		linkDependencyAtInitializeParsing (d->type, upperParser->def,
 										   upperParser->slaveControlBlock,
 										   upperParser->kindControlBlock,
-										   parser,
-										   (LanguageTable + parser->id)->kindControlBlock,
+										   lowerParser,
+										   (LanguageTable + lowerParser->id)->kindControlBlock,
 										   d->data);
 	}
 }
@@ -3743,11 +3761,39 @@ static rescanReason createTagsForFile (const langType language,
 
 extern void notifyLanguageRegexInputStart (langType language)
 {
-	notifyRegexInputStart((LanguageTable + language)->lregexControlBlock);
+	parserObject *pobj = LanguageTable + language;
+	parserDefinition *pdef = pobj->def;
+
+	notifyRegexInputStart(pobj->lregexControlBlock);
+	for (unsigned int i = 0; i < pdef->dependencyCount; i++)
+	{
+		parserDependency *d = pdef->dependencies + i;
+		if (d->type != DEPTYPE_FOREIGNER)
+			continue;
+		langType foreigner = getNamedLanguage (d->upperParser, 0);
+		if (foreigner == LANG_IGNORE)
+			continue;
+
+		notifyLanguageRegexInputStart (foreigner);
+	}
 }
 
 extern void notifyLanguageRegexInputEnd (langType language)
 {
+	parserObject *pobj = LanguageTable + language;
+	parserDefinition *pdef = pobj->def;
+
+	for (unsigned int i = 0; i < pdef->dependencyCount; i++)
+	{
+		parserDependency *d = pdef->dependencies + i;
+		if (d->type != DEPTYPE_FOREIGNER)
+			continue;
+		langType foreigner = getNamedLanguage (d->upperParser, 0);
+		if (foreigner == LANG_IGNORE)
+			continue;
+
+		notifyLanguageRegexInputEnd (foreigner);
+	}
 	notifyRegexInputEnd((LanguageTable + language)->lregexControlBlock);
 }
 
