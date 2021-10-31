@@ -411,7 +411,7 @@ static void makeSpec (adaKind *kind)
 		*kind = ADA_KIND_UNDEFINED;
 		break;
 	}
-} /* static void makeSpec (adaKind *kind) */
+}
 
 static adaTokenInfo *newAdaToken (const char *name, int len, adaKind kind,
 								  bool isSpec, adaTokenInfo *parent)
@@ -475,7 +475,7 @@ static adaTokenInfo *newAdaToken (const char *name, int len, adaKind kind,
 	appendAdaToken (parent, token);
 
 	return token;
-} /* static adaTokenInfo *newAdaToken (const char *name, int len, ... ) */
+}
 
 static void freeAdaToken (adaTokenList *list, adaTokenInfo *token)
 {
@@ -523,8 +523,8 @@ static void freeAdaToken (adaTokenList *list, adaTokenInfo *token)
 		/* now that this node has had everything hanging off of it rearranged,
 		 * delete this node */
 		eFree (token);
-	} /* if (token != NULL) */
-} /* static void freeAdaToken (adaTokenList *list, adaTokenInfo *token) */
+	}
+}
 
 static void appendAdaToken (adaTokenInfo *parent, adaTokenInfo *token)
 {
@@ -550,8 +550,8 @@ static void appendAdaToken (adaTokenInfo *parent, adaTokenInfo *token)
 		{
 			parent->children.head = token;
 		}
-	} /* if (parent != NULL && token != NULL) */
-} /* static void appendAdaToken (adaTokenInfo *parent, adaTokenInfo *token) */
+	}
+}
 
 static void initAdaTokenList (adaTokenList *list)
 {
@@ -595,7 +595,7 @@ static void appendAdaTokenList (adaTokenInfo *parent, adaTokenList *children)
 		 * node, zero out the children list */
 		initAdaTokenList (children);
 	}
-} /* static void appendAdaTokenList (adaTokenInfo *parent, ... ) */
+}
 
 static void readNewLine (void)
 {
@@ -618,7 +618,7 @@ static void readNewLine (void)
 			{
 				return;
 			}
-		} /* if (line == NULL) */
+		}
 
 		lineLen = strlen (line);
 
@@ -626,8 +626,8 @@ static void readNewLine (void)
 		{
 			return;
 		}
-	} /* while (true) */
-} /* static void readNewLine (void) */
+	}
+}
 
 static void movePos (int amount)
 {
@@ -686,7 +686,7 @@ static bool cmp (const char *buf, int len, const char *match)
 	}
 
 	return status;
-} /* static bool cmp (char *buf, int len, char *match) */
+}
 
 static bool adaCmp (const char *match)
 {
@@ -711,7 +711,7 @@ static bool adaCmp (const char *match)
 	}
 
 	return status;
-} /* static bool adaCmp (char *match) */
+}
 
 /* just a version of adaCmp that is a bit more optimized for keywords */
 static bool adaKeywordCmp (adaKeyword keyword)
@@ -737,7 +737,7 @@ static bool adaKeywordCmp (adaKeyword keyword)
 	}
 
 	return status;
-} /* static bool adaKeywordCmp (adaKeyword keyword) */
+}
 
 static void skipUntilWhiteSpace (void)
 {
@@ -768,12 +768,12 @@ static void skipUntilWhiteSpace (void)
 			lineLen = strlen (line);
 
 			return;
-		} /* if (pos >= lineLen) */
+		}
 
 		/* now check for comments here */
 		skipComments ();
-	} /* while (!isspace (line[pos])) */
-} /* static void skipUntilWhiteSpace (void) */
+	}
+}
 
 static void skipWhiteSpace (void)
 {
@@ -787,8 +787,8 @@ static void skipWhiteSpace (void)
 
 		/* now check for comments here */
 		skipComments ();
-	} /* while (isspace (line[pos])) */
-} /* static void skipWhiteSpace (void) */
+	}
+}
 
 static void skipComments (void)
 {
@@ -845,7 +845,7 @@ static void skipPast (const char *past)
 		/* now check for comments here */
 		skipCommentsAndStringLiteral ();
 	}
-} /* static void skipPast (char *past) */
+}
 
 static void skipPastKeyword (adaKeyword keyword)
 {
@@ -861,7 +861,7 @@ static void skipPastKeyword (adaKeyword keyword)
 		/* now check for comments here */
 		skipComments ();
 	}
-} /* static void skipPastKeyword (adaKeyword keyword) */
+}
 
 static void skipPastWord (void)
 {
@@ -896,12 +896,12 @@ static void skipPastWord (void)
 			lineLen = strlen (line);
 
 			return;
-		} /* if (pos >= lineLen) */
+		}
 
 		/* now check for comments here */
 		skipComments ();
-	} /* while (!isspace (line[pos])) */
-} /* static void skipPastWord (void) */
+	}
+}
 
 static void skipPastLambda (skipCompFn cmpfn, void *data)
 {
@@ -917,7 +917,7 @@ static void skipPastLambda (skipCompFn cmpfn, void *data)
 		/* now check for comments here */
 		skipCommentsAndStringLiteral ();
 	}
-} /* static void skipPast (char *past) */
+}
 
 struct cmpKeywordOrWordData
 {
@@ -1054,7 +1054,7 @@ static adaTokenInfo *adaParseBlock (adaTokenInfo *parent, adaKind kind)
 			}
 
 			break;
-		} /* if (adaKeywordCmp (ADA_KEYWORD_IS)) */
+		}
 		else if (adaKeywordCmp (ADA_KEYWORD_RENAMES))
 		{
 			skipPast (";");
@@ -1076,10 +1076,10 @@ static adaTokenInfo *adaParseBlock (adaTokenInfo *parent, adaKind kind)
 			freeAdaToken (&parent->children, token);
 			token = NULL;
 		}
-	} /* while (token != NULL) - while the end of spec, or beginning of body not found */
+	}
 
 	return token;
-} /* static adaTokenInfo *adaParseBlock (adaTokenInfo *parent, adaKind kind) */
+}
 
 static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 {
@@ -1133,8 +1133,8 @@ static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 				}
 				movePos (1);
 			}
-		} /* if (kind == ADA_KIND_ENTRY && tmpToken == NULL) */
-	} /* if (line[pos] == '(' && token != NULL) */
+		}
+	}
 
 	/* loop infinitely until we hit a "is", "do" or ";", this will skip over
 	 * the returns keyword, returned-type for functions as well as any one of a
@@ -1173,7 +1173,7 @@ static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 			}
 
 			break;
-		} /* if (adaKeywordCmp (ADA_KEYWORD_IS)) */
+		}
 		else if (adaKeywordCmp (ADA_KEYWORD_RENAMES))
 		{
 			skipPast (";");
@@ -1197,10 +1197,10 @@ static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 			movePos (1); /* make sure to advance even if we aren't actually on a word */
 			skipPastWord ();
 		}
-	} /* while (exception != EXCEPTION_EOF && token != NULL) */
+	}
 
 	return token;
-} /* static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, ... ) */
+}
 
 static adaTokenInfo *adaParseType (adaTokenInfo *parent, adaKind kind)
 {
@@ -1287,7 +1287,7 @@ static adaTokenInfo *adaParseType (adaTokenInfo *parent, adaKind kind)
 							break;
 						}
 						skipPast (";");
-					} /* if (adaKeywordCmp (ADA_KEYWORD_END)) */
+					}
 					/* handle variant types */
 					else if (adaKeywordCmp (ADA_KEYWORD_CASE))
 					{
@@ -1302,10 +1302,10 @@ static adaTokenInfo *adaParseType (adaTokenInfo *parent, adaKind kind)
 						adaParseVariables (token, ADA_KIND_RECORD_COMPONENT);
 						skipPast (";");
 					}
-				} /* while (true) - end of record not found */
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_RECORD)) */
+				}
+			}
 		}
-	} /* if (adaKeywordCmp (ADA_KEYWORD_IS)) */
+	}
 	else
 	{
 		token->isSpec = true;
@@ -1314,7 +1314,7 @@ static adaTokenInfo *adaParseType (adaTokenInfo *parent, adaKind kind)
 	skipPast (";");
 
 	return token;
-} /* static adaTokenInfo *adaParseType (adaTokenInfo *parent, adaKind kind) */
+}
 
 static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 {
@@ -1373,7 +1373,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 			{
 				tokenStart = -1;
 			}
-		} /* if (isAdaComment (buf, bufPos, bufLen)) */
+		}
 		/* we have to keep track of any () pairs that may be in the variable
 		 * declarations.  And then quit if we hit a ';' the real end ')', or also
 		 * a variable initialization... Once we hit := then we have hit the end of
@@ -1460,8 +1460,8 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 			buf = xRealloc (buf, bufLen + 1, char);
 			memcpy ((void *) &buf[bufPos], (void *) line, lineLen);
 			buf[bufLen] = '\0';
-		} /* if (bufPos >= bufLen) */
-	} /* while (exception != EXCEPTION_EOF) */
+		}
+	}
 
 	/* There is a special case if we are gathering enumeration values and we hit
 	 * a ')', that is allowed so we need to move varEndPos to where the ')' is */
@@ -1491,7 +1491,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 				/* move i past the '\0' that we put at the end of each line stored in
 				 * buf */
 				for ( ; i < varEndPos && buf[i] != '\0'; i++);
-			} /* if (isAdaComment (buf, i, varEndPos)) */
+			}
 			else if (tokenStart != -1 && (isspace (buf[i]) || buf[i] == ',' ||
 										  buf[i] == '\0'))
 			{
@@ -1508,7 +1508,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 					token->tag.filePosition = filePos[filePosIndex];
 				}
 				tokenStart = -1;
-			} /* if (tokenStart != -1 && (isspace (buf[i]) || buf[i] == ',')) */
+			}
 			else if (tokenStart == -1 && !(isspace (buf[i]) || buf[i] == ',' ||
 										   buf[i] == '\0'))
 			{
@@ -1521,7 +1521,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 			{
 				filePosIndex++;
 			}
-		} /* for (i = 0; i < varEndPos; i++) */
+		}
 
 		/* if token start was 'started' then we should store the last token */
 		if (tokenStart != -1)
@@ -1534,7 +1534,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 			token->tag.lineNumber = lineNum + filePosIndex;
 			token->tag.filePosition = filePos[filePosIndex];
 		}
-	} /* if (varEndPos != -1) */
+	}
 
 	/* now get the pos variable to point to the correct place in line where we
 	 * left off in our temp buf, and free our temporary buffer.  This is a
@@ -1547,7 +1547,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 	eFree ((void *) filePos);
 
 	return token;
-} /* static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, ... ) */
+}
 
 static adaTokenInfo *adaParseLoopVar (adaTokenInfo *parent)
 {
@@ -1564,7 +1564,7 @@ static adaTokenInfo *adaParseLoopVar (adaTokenInfo *parent)
 	skipPastKeyword (ADA_KEYWORD_LOOP);
 
 	return token;
-} /* static adaTokenInfo *adaParseLoopVar (adaTokenInfo *parent) */
+}
 
 static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 {
@@ -1631,7 +1631,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				 * and collect the formal parameters */
 				mode = ADA_GENERIC;
 				break;
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_GENERIC)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_SEPARATE))
 			{
 				/* skip any possible whitespace */
@@ -1665,13 +1665,13 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 
 					/* skip past the ')' */
 					skipPast (")");
-				} /* if (line[pos] == '(') */
+				}
 				else
 				{
 					/* move to the end of this statement */
 					skipPast (";");
 				}
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_SEPARATE)) */
+			}
 			else
 			{
 				/* otherwise, nothing was found so just skip until the end of this
@@ -1688,7 +1688,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				/* if any generic params have been gathered, attach them to
 				 * token */
 				appendAdaTokenList (token, &genericParamsRoot.children);
-			} /* if (token != NULL) */
+			}
 
 			break;
 
@@ -1739,7 +1739,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 
 				/* skip to the end of this formal type declaration */
 				skipPast (";");
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_TYPE)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_WITH))
 			{
 				skipWhiteSpace ();
@@ -1773,7 +1773,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 
 				/* skip to the end of this formal type declaration */
 				skipPast (";");
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_WITH)) */
+			}
 			else
 			{
 				/* otherwise, nothing was found so just skip until the end of this
@@ -1790,7 +1790,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				/* if any generic params have been gathered, attach them to
 				 * token. */
 				appendAdaTokenList (token, &genericParamsRoot.children);
-			} /* if (token != NULL) */
+			}
 
 			break;
 
@@ -1866,7 +1866,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 					/* return the token */
 					freeAdaTokenList (&genericParamsRoot.children);
 					return token;
-				} /* if (adaCmp (parent->name)) */
+				}
 				else
 				{
 					/* set the token to NULL so we accidentally don't pick up something
@@ -1874,7 +1874,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 					token = NULL;
 					skipPast (";");
 				}
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_END)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_ENTRY))
 			{
 				token = adaParseSubprogram (parent, ADA_KIND_ENTRY);
@@ -1919,7 +1919,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 					 * token */
 					appendAdaTokenList (token, &genericParamsRoot.children);
 				}
-			} /* if (token != NULL) */
+			}
 			break;
 
 		case ADA_CODE:
@@ -1935,7 +1935,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				token->tag.filePosition = matchFilePos;
 
 				adaParse (ADA_DECLARATIONS, token);
-			} /* if (adaKeywordCmp (ADA_KEYWORD_DECLARE)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_BEGIN))
 			{
 				/* if we are starting a code block here, and not down at the
@@ -1951,12 +1951,12 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				token->tag.filePosition = matchFilePos;
 
 				adaParse (ADA_CODE, token);
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_BEGIN)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_EXCEPTION))
 			{
 				mode = ADA_EXCEPTIONS;
 				break;
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_EXCEPTION)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_END))
 			{
 				/* if we have hit an end then we must see if the next word matches
@@ -1971,7 +1971,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 					/* return the token */
 					freeAdaTokenList (&genericParamsRoot.children);
 					return token;
-				} /* if (adaCmp (parent->name)) */
+				}
 				else if (adaKeywordCmp (ADA_KEYWORD_LOOP))
 				{
 					/* a loop with an identifier has this syntax:
@@ -1986,19 +1986,19 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 						/* return the token */
 						freeAdaTokenList (&genericParamsRoot.children);
 						return token;
-					} /* if (adaCmp (parent->name)) */
-				} /* else if (adaKeywordCmp (ADA_KEYWORD_LOOP)) */
+					}
+				}
 				else
 				{
 					/* otherwise, nothing was found so just skip until the end of
 					 * this statement */
 					skipPast (";");
 				}
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_END)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_ACCEPT))
 			{
 				adaParseSubprogram (parent, ADA_KIND_ENTRY);
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_ACCEPT)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_FOR))
 			{
 				/* if this is a for loop, then we may need to pick up the
@@ -2010,7 +2010,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 									 ADA_KIND_ANONYMOUS, false, parent);
 				adaParseLoopVar (token);
 				adaParse (ADA_CODE, token);
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_FOR)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_WHILE))
 			{
 				token = newAdaToken (AdaKeywords[ADA_KEYWORD_LOOP],
@@ -2021,7 +2021,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				skipPastKeyword (ADA_KEYWORD_LOOP);
 				skipWhiteSpace ();
 				adaParse (ADA_CODE, token);
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_WHILE)) */
+			}
 			else if (adaKeywordCmp (ADA_KEYWORD_LOOP))
 			{
 				token = newAdaToken (AdaKeywords[ADA_KEYWORD_LOOP],
@@ -2035,7 +2035,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				/* parse the loop body */
 				skipWhiteSpace ();
 				adaParse (ADA_CODE, token);
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_LOOP)) */
+			}
 			else if (line != NULL &&
 					 strncasecmp (&line[pos], "<<", strlen ("<<")) == 0)
 			{
@@ -2056,7 +2056,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 					newAdaToken (&line[pos], i, ADA_KIND_LABEL, false, parent);
 					skipPast (">>");
 				}
-			} /* else if (strncasecmp (line[pos], "<<", strlen ("<<")) == 0) */
+			}
 			/* we need to check for a few special case keywords that might cause
 			 * the simple ; ending statement checks to fail, first the simple
 			 * one word keywords and then the start <stuff> end statements */
@@ -2142,7 +2142,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 						/* parse the loop (it may have something to tag which will be
 						 * a 'child' of the loop) */
 						adaParse (ADA_CODE, token);
-					} /* else if (adaKeywordCmp (ADA_KEYWORD_WHILE)) */
+					}
 					else if (adaKeywordCmp (ADA_KEYWORD_LOOP))
 					{
 						skipWhiteSpace ();
@@ -2158,16 +2158,17 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 						freeAdaToken (&parent->children, token);
 						token = NULL;
 					}
-				} /* if (token != NULL) */
+				}
 				else
 				{
 					/* since nothing was found, simply skip to the end of this
 					 * statement */
 					skipPast (";");
 				}
-			} /* else... No keyword tag fields found, look for others such as
-			   * loop and declare identifiers labels or just skip over this
-			   * line */
+			}
+			/* else... No keyword tag fields found, look for others such as
+			 * loop and declare identifiers labels or just skip over this
+			 * line */
 
 			break;
 
@@ -2195,14 +2196,14 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 					/* return the token */
 					freeAdaTokenList (&genericParamsRoot.children);
 					return token;
-				} /* if (adaCmp (parent->name)) */
+				}
 				else
 				{
 					/* otherwise, nothing was found so just skip until the end of
 					 * this statement */
 					skipPast (";");
 				}
-			} /* else if (adaKeywordCmp (ADA_KEYWORD_END)) */
+			}
 			else
 			{
 				/* otherwise, nothing was found so just skip until the end of
@@ -2214,12 +2215,12 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 
 		default:
 			Assert (0);
-		} /* switch (mode) */
-	} /* while (exception == EXCEPTION_NONE)  */
+		}
+	}
 
 	freeAdaTokenList (&genericParamsRoot.children);
 	return token;
-} /* static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent) */
+}
 
 static void storeAdaTags (adaTokenInfo *token, const char *parentScope)
 {
@@ -2253,7 +2254,7 @@ static void storeAdaTags (adaTokenInfo *token, const char *parentScope)
 			token->tag.extensionFields.scopeKindIndex = ADA_KIND_SEPARATE;
 			token->tag.extensionFields.scopeName = token->parent->name;
 		}
-	} /* else if (token->parent->kind == ADA_KIND_ANONYMOUS) */
+	}
 
 	/* one check before we try to make a tag... If this is an anonymous
 	 * declare block then it's name is empty.  Give it one */
@@ -2305,7 +2306,7 @@ static void storeAdaTags (adaTokenInfo *token, const char *parentScope)
 				token->tag.name = currentScope;
 				markTagExtraBit (&token->tag, XTAG_QUALIFIED_TAGS);
 				makeTagEntry (&token->tag);
-			} /* if (parentScope != NULL) */
+			}
 			else
 			{
 				/* if the parent scope is null then the current token does not have
@@ -2314,8 +2315,8 @@ static void storeAdaTags (adaTokenInfo *token, const char *parentScope)
 				 * no extra entry. */
 				currentScope = token->name;
 			}
-		} /* if ((isXtagsEnabled (XTAG_QUALIFIED_TAGS) == true) && ... */
-	} /* if ((token->kind > ADA_KIND_UNDEFINED) && ... */
+		}
+	}
 
 	/* now make the child tags */
 	tmp = token->children.head;
@@ -2340,7 +2341,7 @@ static void storeAdaTags (adaTokenInfo *token, const char *parentScope)
 	{
 		eFree ((void *) currentScope);
 	}
-} /* static void storeAdaTags (adaTokenInfo *token, const char *parentScope) */
+}
 
 /* main parse function */
 static void findAdaTags (void)
@@ -2387,7 +2388,7 @@ static void findAdaTags (void)
  out:
 	/* clean up tokens */
 	freeAdaTokenList (&root.children);
-} /* static void findAdaTags (void) */
+}
 
 /* parser definition function */
 extern parserDefinition* AdaParser (void)
@@ -2399,4 +2400,4 @@ extern parserDefinition* AdaParser (void)
 	def->extensions = extensions;
 	def->parser = findAdaTags;
 	return def;
-} /* extern parserDefinition* AdaParser (void) */
+}
