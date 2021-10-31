@@ -74,6 +74,7 @@ enum eKeywordId {
 	KEYWORD_call,
 	KEYWORD_case,
 	KEYWORD_check,
+	KEYWORD_commit,
 	KEYWORD_comment,
 	KEYWORD_constraint,
 	KEYWORD_create,
@@ -280,6 +281,7 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "call",							KEYWORD_call			      },
 	{ "case",							KEYWORD_case			      },
 	{ "check",							KEYWORD_check			      },
+	{ "commit",							KEYWORD_commit				  },
 	{ "comment",						KEYWORD_comment			      },
 	{ "constraint",						KEYWORD_constraint		      },
 	{ "create",							KEYWORD_create				  },
@@ -416,6 +418,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	[KEYWORD_call]          = {1 & 0&1&1&0 & 0&0 & 1},
 	[KEYWORD_case]          = {1 & 1&1&1&1 & 0&1 & 1},
 	[KEYWORD_check]         = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_commit]        = {0 & 0&1&1&1 & 0&0 & 0}, /* SQLANYWERE:??? */
 	[KEYWORD_comment]       = {0 & 0&0&0&0 & 1&1 & 1},
 	[KEYWORD_constraint]    = {1 & 1&1&1&1 & 0&1 & 1},
 	[KEYWORD_create]        = {1 & 1&1&1&1 & 1&1 & 1},
@@ -2007,15 +2010,51 @@ static void parseBlockFull (tokenInfo *const token, const bool local, langType l
 	}
 	if (isKeyword (token, KEYWORD_begin))
 	{
+		bool is_transaction = false;
+
 		readToken (token);
-		/*
-		 * Check for ANSI declarations which always follow
-		 * a BEGIN statement.  This routine will not advance
-		 * the token if none are found.
+
+		/* BEGIN of Postgresql initiates a transaction.
+		 *
+		 *   BEGIN [ WORK | TRANSACTION ] [ transaction_mode [, ...] ]
+		 *
+		 * BEGIN of MySQL does the same.
+		 *
+		 *   BEGIN [WORK]
+		 *
+		 * BEGIN of SQLite does the same.
+		 *
+		 *   BEGIN [[DEFERRED | IMMEDIATE | EXCLUSIVE] TRANSACTION]
+		 *
 		 */
-		parseDeclareANSI (token, local);
+		if (isCmdTerm(token))
+		{
+			is_transaction = true;
+			readToken (token);
+		}
+		else if (isType (token, TOKEN_IDENTIFIER)
+				 && (strcasecmp (vStringValue(token->string), "work") == 0
+					 || strcasecmp (vStringValue(token->string), "transaction") == 0
+					 || (
+						 strcasecmp (vStringValue(token->string), "deferred") == 0
+						 || strcasecmp (vStringValue(token->string), "immediate") == 0
+						 || strcasecmp (vStringValue(token->string), "exclusive") == 0
+						 )
+					 ))
+			is_transaction = true;
+		else
+		{
+			/*
+			 * Check for ANSI declarations which always follow
+			 * a BEGIN statement.  This routine will not advance
+			 * the token if none are found.
+			 */
+			parseDeclareANSI (token, local);
+		}
+
 		token->begin_end_nest_lvl++;
 		while (! isKeyword (token, KEYWORD_end) &&
+			   ! (is_transaction && isKeyword(token, KEYWORD_commit)) &&
 			   ! isType (token, TOKEN_EOF))
 		{
 			parseStatements (token, false);
