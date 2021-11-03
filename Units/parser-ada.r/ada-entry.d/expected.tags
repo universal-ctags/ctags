@@ -3,6 +3,8 @@ Input_0	input_0.gpr	/^project Input_0 is$/;"	P
 Input_1	input_1.adb	/^package body Input_1 is$/;"	p
 Ma_Tasche	input_1.adb	/^   task body Ma_Tasche is$/;"	k	package:Input_1	file:
 Var_Continuer	input_1.adb	/^      Var_Continuer : Boolean := False;$/;"	v	task:Ma_Tasche	file:
+Boucle_Principale	input_1.adb	/^      Boucle_Principale :$/;"	i	task:Ma_Tasche	file:
+Accepter	input_1.adb	/^         accept Accepter$/;"	e	identifier:Boucle_Principale	file:
 Mon_Autre_Tasche	input_1.adb	/^   task body Mon_Autre_Tasche is$/;"	k	package:Input_1	file:
 Une_Autre_Tasche_1	input_1.adb	/^   Une_Autre_Tasche_1 : Tasche_Type_1_T;$/;"	v	package:Input_1	file:
 Tasche_Type_1_T	input_1.adb	/^   task body Tasche_Type_1_T is$/;"	k	package:Input_1	file:

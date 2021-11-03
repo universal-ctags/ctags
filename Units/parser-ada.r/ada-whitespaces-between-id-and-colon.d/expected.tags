@@ -1,0 +1,3 @@
+Go	input.adb	/^procedure Go is$/;"	r
+Loop_Label	input.adb	/^  Loop_Label :$/;"	i	subprogram:Go	file:
+Not_Tagged	input.adb	/^      procedure Not_Tagged is$/;"	r	anon:declare	file:
