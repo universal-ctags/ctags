@@ -1,0 +1,13 @@
+neighborhoods	input.sql	/^CREATE TABLE "neighborhoods" (gid serial,$/;"	t
+gid	input.sql	/^CREATE TABLE "neighborhoods" (gid serial,$/;"	E	table:neighborhoods
+objectid	input.sql	/^"objectid" numeric(10,0),$/;"	E	table:neighborhoods
+pri_neigh_	input.sql	/^"pri_neigh_" varchar(3),$/;"	E	table:neighborhoods
+pri_neigh	input.sql	/^"pri_neigh" varchar(50),$/;"	E	table:neighborhoods
+sec_neigh_	input.sql	/^"sec_neigh_" varchar(3),$/;"	E	table:neighborhoods
+sec_neigh	input.sql	/^"sec_neigh" varchar(50),$/;"	E	table:neighborhoods
+shape_area	input.sql	/^"shape_area" numeric,$/;"	E	table:neighborhoods
+shape_len	input.sql	/^"shape_len" numeric);$/;"	E	table:neighborhoods
+neighborhoods_geom_gist	input.sql	/^CREATE INDEX "neighborhoods_geom_gist" ON "neighborhoods" USING GIST ("geom");$/;"	i	table:neighborhoods
+player	input.sql	/^CREATE TABLE "player" (uid serial, "name" varchar(50));$/;"	t
+uid	input.sql	/^CREATE TABLE "player" (uid serial, "name" varchar(50));$/;"	E	table:player
+name	input.sql	/^CREATE TABLE "player" (uid serial, "name" varchar(50));$/;"	E	table:player
