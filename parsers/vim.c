@@ -689,7 +689,6 @@ static void parseVimBallFile (const unsigned char *line)
 {
 	vString *fname = vStringNew ();
 	const unsigned char *cp;
-	int file_line_count;
 	int i;
 
 	/*
@@ -729,17 +728,13 @@ static void parseVimBallFile (const unsigned char *line)
 			vStringClear (fname);
 		}
 
-		file_line_count = 0;
 		/* Next line should be the line count of the file */
 		line = readVimLine ();
 		if (line == NULL)
 		{
 			goto cleanUp;
 		}
-		else
-		{
-			file_line_count = atoi ((const char *) line);
-		}
+		int file_line_count = atoi ((const char *) line);
 
 		/* Read all lines of the file */
 		for (i = 0; i < file_line_count; i++)

@@ -376,7 +376,7 @@ static void findAsmTags (void)
 		{
 			while (isspace ((int) *cp))
 				++cp;
-			cp = readSymbol (cp, name);
+			readSymbol (cp, name);
 			nameFollows = true;
 		}
 		makeAsmTag (name, operator, labelCandidate, nameFollows, directive,
