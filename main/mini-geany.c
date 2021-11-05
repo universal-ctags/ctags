@@ -94,6 +94,7 @@ static void ctagsInit(void)
 
 	initializeParsing ();
 	initOptions ();
+	initRegexOptscript ();
 
 	/* make sure all parsers are initialized */
 	initializeParser (LANG_AUTO);
