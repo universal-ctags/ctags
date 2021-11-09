@@ -17,6 +17,7 @@
 
 #include "make.h"
 
+#include "entry.h"
 #include "kind.h"
 #include "parse.h"
 #include "read.h"
@@ -106,12 +107,12 @@ static bool isSpecialTarget (vString *const name)
 	return true;
 }
 
-static void makeSimpleMakeTag (vString *const name, makeKind kind)
+static int makeSimpleMakeTag (vString *const name, makeKind kind)
 {
 	if (!isLanguageEnabled (getInputLanguage ()))
-		return;
+		return CORK_NIL;
 
-	makeSimpleTag (name, kind);
+	return makeSimpleTag (name, kind);
 }
 
 static void makeSimpleMakeRefTag (const vString* const name, const int kind,
@@ -133,12 +134,13 @@ static void newTarget (vString *const name)
 	makeSimpleMakeTag (name, K_TARGET);
 }
 
-static void newMacro (vString *const name, bool with_define_directive, bool appending)
+static int newMacro (vString *const name, bool with_define_directive, bool appending)
 {
+	int r = CORK_NIL;
 	subparser *s;
 
 	if (!appending)
-		makeSimpleMakeTag (name, K_MACRO);
+		r = makeSimpleMakeTag (name, K_MACRO);
 
 	foreachSubparser(s, false)
 	{
@@ -148,6 +150,8 @@ static void newMacro (vString *const name, bool with_define_directive, bool appe
 			m->newMacroNotify (m, vStringValue(name), with_define_directive, appending);
 		leaveSubparser();
 	}
+
+	return r;
 }
 
 static void valueFound (vString *const name)
@@ -210,7 +214,7 @@ static void findMakeTags (void)
 {
 	stringList *identifiers = stringListNew ();
 	bool newline = true;
-	bool in_define = false;
+	int  current_macro = CORK_NIL;
 	bool in_value  = false;
 	bool in_rule = false;
 	bool variable_possible = true;
@@ -296,13 +300,18 @@ static void findMakeTags (void)
 
 			if (stringListCount (identifiers) == 1)
 			{
-				if (in_define && ! strcmp (vStringValue (name), "endef"))
-					in_define = false;
-				else if (in_define)
+				if ((current_macro != CORK_NIL) && ! strcmp (vStringValue (name), "endef"))
+				{
+					tagEntryInfo *e = getEntryInCorkQueue(current_macro);
+
+					current_macro = CORK_NIL;
+					if (e)
+						e->extensionFields.endLine = getInputLineNumber ();
+				}
+				else if (current_macro != CORK_NIL)
 					skipLine ();
 				else if (! strcmp (vStringValue (name), "define"))
 				{
-					in_define = true;
 					c = skipToNonWhite (nextChar ());
 					vStringClear (name);
 					/* all remaining characters on the line are the name -- even spaces */
@@ -315,7 +324,7 @@ static void findMakeTags (void)
 						ungetcToInputFile (c);
 					vStringStripTrailing (name);
 
-					newMacro (name, true, false);
+					current_macro = newMacro (name, true, false);
 				}
 				else if (! strcmp (vStringValue (name), "export"))
 					stringListClear (identifiers);
@@ -376,5 +385,6 @@ extern parserDefinition* MakefileParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findMakeTags;
+	def->useCork = CORK_QUEUE;
 	return def;
 }
