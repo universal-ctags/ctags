@@ -1,4 +1,4 @@
-all	input.mak	/^all: foo bar$/;"	t
-bar	input.mak	/^foo bar: baz$/;"	t
-baz	input.mak	/^baz:$/;"	t
-foo	input.mak	/^foo bar: baz$/;"	t
+all	input.mak	/^all: foo bar$/;"	t	line:2	end:3
+bar	input.mak	/^foo bar: baz$/;"	t	line:4	end:6
+baz	input.mak	/^baz:$/;"	t	line:7	end:8
+foo	input.mak	/^foo bar: baz$/;"	t	line:4	end:6
