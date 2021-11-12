@@ -17,7 +17,9 @@
 
 #include "make.h"
 
+#include "entry.h"
 #include "kind.h"
+#include "numarray.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -106,12 +108,12 @@ static bool isSpecialTarget (vString *const name)
 	return true;
 }
 
-static void makeSimpleMakeTag (vString *const name, makeKind kind)
+static int makeSimpleMakeTag (vString *const name, makeKind kind)
 {
 	if (!isLanguageEnabled (getInputLanguage ()))
-		return;
+		return CORK_NIL;
 
-	makeSimpleTag (name, kind);
+	return makeSimpleTag (name, kind);
 }
 
 static void makeSimpleMakeRefTag (const vString* const name, const int kind,
@@ -123,22 +125,23 @@ static void makeSimpleMakeRefTag (const vString* const name, const int kind,
 	makeSimpleRefTag (name, kind, roleIndex);
 }
 
-static void newTarget (vString *const name)
+static int newTarget (vString *const name)
 {
 	/* Ignore GNU Make's "special targets". */
 	if  (isSpecialTarget (name))
 	{
-		return;
+		return CORK_NIL;
 	}
-	makeSimpleMakeTag (name, K_TARGET);
+	return makeSimpleMakeTag (name, K_TARGET);
 }
 
-static void newMacro (vString *const name, bool with_define_directive, bool appending)
+static int newMacro (vString *const name, bool with_define_directive, bool appending)
 {
+	int r = CORK_NIL;
 	subparser *s;
 
 	if (!appending)
-		makeSimpleMakeTag (name, K_MACRO);
+		r = makeSimpleMakeTag (name, K_MACRO);
 
 	foreachSubparser(s, false)
 	{
@@ -148,6 +151,8 @@ static void newMacro (vString *const name, bool with_define_directive, bool appe
 			m->newMacroNotify (m, vStringValue(name), with_define_directive, appending);
 		leaveSubparser();
 	}
+
+	return r;
 }
 
 static void valueFound (vString *const name)
@@ -206,13 +211,25 @@ static void readIdentifier (const int first, vString *const id)
 	ungetcToInputFile (c);
 }
 
+static void endTargets (intArray *targets, unsigned long lnum)
+{
+	for (unsigned int i = 0; i < intArrayCount (targets); i++)
+	{
+		int cork_index = intArrayItem (targets, i);
+		tagEntryInfo *e = getEntryInCorkQueue (cork_index);
+		if (e)
+			e->extensionFields.endLine = lnum;
+	}
+	intArrayClear (targets);
+}
+
 static void findMakeTags (void)
 {
 	stringList *identifiers = stringListNew ();
 	bool newline = true;
-	bool in_define = false;
+	int  current_macro = CORK_NIL;
 	bool in_value  = false;
-	bool in_rule = false;
+	intArray *current_targets = intArrayNew ();
 	bool variable_possible = true;
 	bool appending = false;
 	int c;
@@ -226,7 +243,7 @@ static void findMakeTags (void)
 	{
 		if (newline)
 		{
-			if (in_rule)
+			if (!intArrayIsEmpty (current_targets))
 			{
 				if (c == '\t' || (c = skipToNonWhite (c)) == '#')
 				{
@@ -234,13 +251,13 @@ static void findMakeTags (void)
 					c = nextChar ();
 				}
 				else if (c != '\n')
-					in_rule = false;
+					endTargets (current_targets, getInputLineNumber () - 1);
 			}
 			else if (in_value)
 				in_value = false;
 
 			stringListClear (identifiers);
-			variable_possible = (bool)(!in_rule);
+			variable_possible = intArrayIsEmpty (current_targets);
 			newline = false;
 		}
 		if (c == '\n')
@@ -271,9 +288,12 @@ static void findMakeTags (void)
 			{
 				unsigned int i;
 				for (i = 0; i < stringListCount (identifiers); i++)
-					newTarget (stringListItem (identifiers, i));
+				{
+					int r = newTarget (stringListItem (identifiers, i));
+					if (r != CORK_NIL)
+						intArrayAdd (current_targets, r);
+				}
 				stringListClear (identifiers);
-				in_rule = true;
 			}
 		}
 		else if (variable_possible && c == '=' &&
@@ -282,7 +302,7 @@ static void findMakeTags (void)
 			newMacro (stringListItem (identifiers, 0), false, appending);
 
 			in_value = true;
-			in_rule = false;
+			endTargets (current_targets, getInputLineNumber () - 1);
 			appending = false;
 		}
 		else if (variable_possible && isIdentifier (c))
@@ -296,13 +316,18 @@ static void findMakeTags (void)
 
 			if (stringListCount (identifiers) == 1)
 			{
-				if (in_define && ! strcmp (vStringValue (name), "endef"))
-					in_define = false;
-				else if (in_define)
+				if ((current_macro != CORK_NIL) && ! strcmp (vStringValue (name), "endef"))
+				{
+					tagEntryInfo *e = getEntryInCorkQueue(current_macro);
+
+					current_macro = CORK_NIL;
+					if (e)
+						e->extensionFields.endLine = getInputLineNumber ();
+				}
+				else if (current_macro != CORK_NIL)
 					skipLine ();
 				else if (! strcmp (vStringValue (name), "define"))
 				{
-					in_define = true;
 					c = skipToNonWhite (nextChar ());
 					vStringClear (name);
 					/* all remaining characters on the line are the name -- even spaces */
@@ -315,7 +340,7 @@ static void findMakeTags (void)
 						ungetcToInputFile (c);
 					vStringStripTrailing (name);
 
-					newMacro (name, true, false);
+					current_macro = newMacro (name, true, false);
 				}
 				else if (! strcmp (vStringValue (name), "export"))
 					stringListClear (identifiers);
@@ -357,6 +382,9 @@ static void findMakeTags (void)
 			variable_possible = false;
 	}
 
+	endTargets (current_targets, getInputLineNumber ());
+
+	intArrayDelete (current_targets);
 	stringListDelete (identifiers);
 }
 
@@ -376,5 +404,6 @@ extern parserDefinition* MakefileParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findMakeTags;
+	def->useCork = CORK_QUEUE;
 	return def;
 }

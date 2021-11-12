@@ -72,6 +72,11 @@
 		return current->count;											\
 	}																	\
 																		\
+	extern bool prefix##ArrayIsEmpty (const prefix##Array *const current)	\
+	{																	\
+		return (prefix##ArrayCount(current) == 0);						\
+	}																	\
+																		\
 	extern type prefix##ArrayItem (const prefix##Array *const current, const unsigned int indx)	\
 	{																	\
 		Assert (current != NULL);										\
