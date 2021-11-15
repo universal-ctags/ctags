@@ -842,14 +842,14 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 static void makeParamTag (vString *name, short nth, bool placeholder)
 {
 	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_MACRO);
-	langType lang = standing_alone ? Cpp.lang: Cpp.clientLang;
 
 	Assert (Cpp.macroParamKindIndex != KIND_GHOST_INDEX);
 
-	int r;
-	pushLanguage (lang);
-	r = makeSimpleTag (name, Cpp.macroParamKindIndex);
-	popLanguage ();
+	if (standing_alone)
+		pushLanguage (Cpp.lang);
+	int r = makeSimpleTag (name, Cpp.macroParamKindIndex);
+	if (standing_alone)
+		popLanguage ();
 
 	tagEntryInfo *e = getEntryInCorkQueue (r);
 	if (e)
