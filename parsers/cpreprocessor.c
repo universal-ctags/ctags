@@ -826,7 +826,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 
 	if (isLanguageRoleEnabled(lang, Cpp.headerKindIndex, role_index))
 	{
-		if (doesCPreProRunAsStandaloneParser (CPREPRO_HEADER))
+		if (standing_alone)
 			pushLanguage (Cpp.lang);
 
 		initRefTagEntry (&e, name, Cpp.headerKindIndex, role_index);
@@ -834,7 +834,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 		e.truncateLineAfterTag = true;
 		makeTagEntry (&e);
 
-		if (doesCPreProRunAsStandaloneParser (CPREPRO_HEADER))
+		if (standing_alone)
 			popLanguage ();
 	}
 }
