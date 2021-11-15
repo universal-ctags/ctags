@@ -337,7 +337,7 @@ static optionDescription LongOptionDescription [] = {
  {0,0,"  --put-field-prefix"},
  {0,0,"       Put \"" CTAGS_FIELD_PREFIX "\" as prefix for the name of fields newly introduced in"},
  {0,0,"       universal-ctags."},
- {1,0,"  --roles-(<LANG>|all).(<kind>|all)=[+|-][<roles>|*]"},
+ {1,0,"  --roles-(<LANG>|all).(<kind>|*)=[+|-][<roles>|*]"},
  {1,0,"       Enable/disable tag roles for kinds of language <LANG>."},
  {0,0,"  --tag-relative=(yes|no|always|never)"},
  {0,0,"       Should paths be relative to location of tag file [no; yes when -e]?"},
