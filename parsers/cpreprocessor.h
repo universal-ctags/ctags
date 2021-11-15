@@ -64,6 +64,7 @@
 
 
 #define RoleTemplateUndef { true, "undef", "undefined" }
+#define RoleTemplateCondition { false, "condition", "used in part of #if/#ifdef/#elif conditions" }
 
 #define RoleTemplateSystem { true, "system", "system header" }
 #define RoleTemplateLocal  { true, "local", "local header" }
@@ -83,6 +84,7 @@ extern void cppInit (const bool state,
 		     const bool hasSingleQuoteLiteralNumbers,
 		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
+		     int macroConditionRoleIndex,
 		     int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex,
 		     int macroParamKindIndex,

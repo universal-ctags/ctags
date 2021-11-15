@@ -188,6 +188,7 @@ void cxxTag(unsigned int uKind,CXXToken * pToken);
 
 typedef enum {
 	CR_MACRO_UNDEF,
+	CR_MACRO_CONDITION,
 } cMacroRole;
 
 typedef enum {

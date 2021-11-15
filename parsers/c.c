@@ -309,10 +309,12 @@ static int AnonymousID = 0;
 /* Used to index into the CKinds table. */
 typedef enum {
 	CR_MACRO_UNDEF,
+	CR_MACRO_CONDITION,
 } cMacroRole;
 
 static roleDefinition CMacroRoles [] = {
 	RoleTemplateUndef,
+	RoleTemplateCondition,
 };
 
 typedef enum {
@@ -439,10 +441,12 @@ static kindDefinition JavaKinds [] = {
 /* Used to index into the VeraKinds table. */
 typedef enum {
 	VR_MACRO_UNDEF,
+	VR_MACRO_CONDITION,
 } veraMacroRole;
 
 static roleDefinition VeraMacroRoles [] = {
 	RoleTemplateUndef,
+	RoleTemplateCondition,
 };
 
 
@@ -3469,7 +3473,8 @@ static rescanReason findCTags (const unsigned int passCount)
 	int kind_for_define = KIND_GHOST_INDEX;
 	int kind_for_header = KIND_GHOST_INDEX;
 	int kind_for_param  = KIND_GHOST_INDEX;
-	int role_for_macro_undef   = ROLE_DEFINITION_INDEX;
+	int role_for_macro_undef = ROLE_DEFINITION_INDEX;
+	int role_for_macro_condition = ROLE_DEFINITION_INDEX;
 	int role_for_header_system   = ROLE_DEFINITION_INDEX;
 	int role_for_header_local   = ROLE_DEFINITION_INDEX;
 
@@ -3483,6 +3488,7 @@ static rescanReason findCTags (const unsigned int passCount)
 		kind_for_header = CK_HEADER;
 		kind_for_param = CK_MACRO_PARAM,
 		role_for_macro_undef = CR_MACRO_UNDEF;
+		role_for_macro_condition = CR_MACRO_CONDITION;
 		role_for_header_system = CR_HEADER_SYSTEM;
 		role_for_header_local = CR_HEADER_LOCAL;
 	}
@@ -3492,13 +3498,14 @@ static rescanReason findCTags (const unsigned int passCount)
 		kind_for_header = VK_HEADER;
 		kind_for_param  = VK_MACRO_PARAM,
 		role_for_macro_undef = VR_MACRO_UNDEF;
+		role_for_macro_condition = VR_MACRO_CONDITION;
 		role_for_header_system = VR_HEADER_SYSTEM;
 		role_for_header_local = VR_HEADER_LOCAL;
 	}
 
 	cppInit ((bool) (passCount > 1), isInputLanguage (Lang_csharp), isInputLanguage(Lang_cpp),
 		 isInputLanguage(Lang_vera),
-		 kind_for_define, role_for_macro_undef, kind_for_param,
+		 kind_for_define, role_for_macro_undef, role_for_macro_condition, kind_for_param,
 		 kind_for_header, role_for_header_system, role_for_header_local,
 		 FIELD_UNKNOWN);
 

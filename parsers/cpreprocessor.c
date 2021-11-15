@@ -60,6 +60,7 @@ enum eState {
 	DRCTV_DEFINE,  /* "#define" encountered */
 	DRCTV_HASH,    /* initial '#' read; determine directive */
 	DRCTV_IF,      /* "#if" or "#ifdef" encountered */
+	DRCTV_ELIF,    /* "#elif" encountered */
 	DRCTV_PRAGMA,  /* #pragma encountered */
 	DRCTV_UNDEF,   /* "#undef" encountered */
 	DRCTV_INCLUDE, /* "#include" encountered */
@@ -88,6 +89,7 @@ typedef struct sCppState {
 	bool useClientLangDefineMacroKindIndex;
 	int defineMacroKindIndex;
 	int macroUndefRoleIndex;
+	int macroConditionRoleIndex;
 
 	bool useClientLangMacroParamKindIndex;
 	int macroParamKindIndex;
@@ -115,10 +117,12 @@ typedef struct sCppState {
 
 typedef enum {
 	CPREPRO_MACRO_KIND_UNDEF_ROLE,
+	CPREPRO_MACRO_KIND_CONDITION_ROLE,
 } cPreProMacroRole;
 
 static roleDefinition CPREPROMacroRoles [] = {
 	RoleTemplateUndef,
+	RoleTemplateCondition,
 };
 
 
@@ -201,6 +205,7 @@ static cppState Cpp = {
 	.useClientLangDefineMacroKindIndex = false,
 	.defineMacroKindIndex = CPREPRO_MACRO,
 	.macroUndefRoleIndex = CPREPRO_MACRO_KIND_UNDEF_ROLE,
+	.macroConditionRoleIndex = CPREPRO_MACRO_KIND_CONDITION_ROLE,
 	.useClientLangMacroParamKindIndex = false,
 	.macroParamKindIndex = CPREPRO_PARAM,
 	.useClientLangHeaderKindIndex = false,
@@ -251,6 +256,7 @@ static void cppInitCommon(langType clientLang,
 		     const bool hasSingleQuoteLiteralNumbers,
 		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
+		     int macroConditionRoleIndex,
 		     int macroParamKindIndex,
 		     int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex,
@@ -288,6 +294,7 @@ static void cppInitCommon(langType clientLang,
 		Cpp.useClientLangDefineMacroKindIndex = true;
 
 		Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
+		Cpp.macroConditionRoleIndex = macroConditionRoleIndex;
 		Cpp.macrodefFieldIndex = macrodefFieldIndex;
 	}
 	else
@@ -296,6 +303,7 @@ static void cppInitCommon(langType clientLang,
 		Cpp.useClientLangDefineMacroKindIndex = false;
 
 		Cpp.macroUndefRoleIndex = CPREPRO_MACRO_KIND_UNDEF_ROLE;
+		Cpp.macroConditionRoleIndex = CPREPRO_MACRO_KIND_CONDITION_ROLE;
 		Cpp.macrodefFieldIndex = CPreProFields [F_MACRODEF].ftype;
 	}
 
@@ -355,6 +363,7 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
 		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
+		     int macroConditionRoleIndex,
 		     int macroParamKindIndex,
 		     int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex,
@@ -364,7 +373,8 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 
 	cppInitCommon (client, state, hasAtLiteralStrings,
 				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
-				   defineMacroKindIndex, macroUndefRoleIndex, macroParamKindIndex,
+				   defineMacroKindIndex, macroUndefRoleIndex, macroConditionRoleIndex,
+				   macroParamKindIndex,
 				   headerKindIndex, headerSystemRoleIndex, headerLocalRoleIndex,
 				   macrodefFieldIndex);
 }
@@ -1008,6 +1018,10 @@ static bool directiveIf (const int c)
 	return ignore;
 }
 
+static void directiveElif (const int c)
+{
+	Cpp.directive.state = DRCTV_NONE;
+}
 
 static void directiveInclude (const int c)
 {
@@ -1043,7 +1057,7 @@ static bool directiveHash (const int c)
 		CXX_DEBUG_PRINT("Found #elif or #else: ignore is %d",ignore);
 		if (! ignore  &&  stringMatch (directive, "else"))
 			chooseBranch ();
-		Cpp.directive.state = DRCTV_NONE;
+		Cpp.directive.state = (directive[2] == 'i')? DRCTV_ELIF: DRCTV_NONE;
 		DebugStatement ( if (ignore != ignore0) debugCppIgnore (ignore); )
 	}
 	else if (stringMatch (directive, "endif"))
@@ -1063,7 +1077,7 @@ static bool directiveHash (const int c)
 
 /*  Handles a pre-processor directive whose first character is given by "c".
  */
-static bool handleDirective (const int c, int *macroCorkIndex)
+static bool handleDirective (const int c, int *macroCorkIndex, bool *inspect_conidtion)
 {
 	bool ignore = isIgnore ();
 
@@ -1074,7 +1088,14 @@ static bool handleDirective (const int c, int *macroCorkIndex)
 			*macroCorkIndex = directiveDefine (c, false);
 			break;
 		case DRCTV_HASH:    ignore = directiveHash (c);  break;
-		case DRCTV_IF:      ignore = directiveIf (c);    break;
+		case DRCTV_IF:
+			ignore = directiveIf (c);
+			*inspect_conidtion = true;
+			break;
+		case DRCTV_ELIF:
+			directiveElif (c);
+			*inspect_conidtion = true;
+			break;
 		case DRCTV_PRAGMA:  directivePragma (c);         break;
 		case DRCTV_UNDEF:   directiveUndef (c);          break;
 		case DRCTV_INCLUDE: directiveInclude (c);        break;
@@ -1315,6 +1336,48 @@ static void attachFields (int macroCorkIndex, unsigned long endLine, const char 
 		attachParserFieldToCorkEntry (macroCorkIndex, Cpp.macrodefFieldIndex, macrodef);
 }
 
+static vString * conditionMayFlush (vString* condition, bool del)
+{
+	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_MACRO);
+
+	if (condition == NULL)
+		return condition;
+
+	size_t len = vStringLength(condition);
+	if (len > 0
+		&& (! (
+				(len == 7
+				 && strcmp (vStringValue (condition), "defined") == 0)
+			   )))
+	{
+		if (standing_alone)
+			pushLanguage (Cpp.lang);
+
+		makeSimpleRefTag (condition, Cpp.defineMacroKindIndex, Cpp.macroConditionRoleIndex);
+
+		if (standing_alone)
+			popLanguage ();
+	}
+
+	if (del)
+	{
+		vStringDelete (condition);
+		return NULL;
+	}
+
+	vStringClear(condition);
+	return condition;
+}
+
+static void conditionMayPut (vString *condition, int c)
+{
+	if (condition == NULL)
+		return;
+
+	if (vStringLength (condition) > 0
+		|| (!isdigit(c)))
+		vStringPut(condition, c);
+}
 
 /*  This function returns the next character, stripping out comments,
  *  C pre-processor directives, and the contents of single and double
@@ -1328,6 +1391,7 @@ extern int cppGetc (void)
 	int c;
 	int macroCorkIndex = CORK_NIL;
 	vString *macrodef = NULL;
+	vString *condition = NULL;
 
 
 	do {
@@ -1346,6 +1410,7 @@ process:
 								  macrodef? vStringValue (macrodef): NULL);
 					macroCorkIndex = CORK_NIL;
 				}
+				condition = conditionMayFlush(condition, true);
 				break;
 
 			case TAB:
@@ -1353,9 +1418,12 @@ process:
 				if (macrodef && vStringLength (macrodef) > 0
 					&& vStringLast (macrodef) != ' ')
 					vStringPut (macrodef, ' ');
+				condition = conditionMayFlush(condition, false);
 				break;  /* ignore most white space */
 
 			case NEWLINE:
+				if (directive)
+					condition = conditionMayFlush(condition, true);
 				if (directive  &&  ! ignore)
 				{
 					directive = false;
@@ -1371,6 +1439,8 @@ process:
 				break;
 
 			case DOUBLE_QUOTE:
+				condition = conditionMayFlush(condition, false);
+
 				if (Cpp.directive.state == DRCTV_INCLUDE)
 					goto enter;
 				else
@@ -1392,6 +1462,8 @@ process:
 				break;
 
 			case '#':
+				condition = conditionMayFlush(condition, false);
+
 				if (Cpp.directive.accept)
 				{
 					directive = true;
@@ -1403,6 +1475,8 @@ process:
 				break;
 
 			case SINGLE_QUOTE:
+				condition = conditionMayFlush(condition, false);
+
 				Cpp.directive.accept = false;
 				c = skipToEndOfChar ();
 
@@ -1415,6 +1489,8 @@ process:
 
 			case '/':
 			{
+				condition = conditionMayFlush(condition, false);
+
 				const Comment comment = isComment ();
 
 				if (comment == COMMENT_C)
@@ -1438,6 +1514,8 @@ process:
 
 			case BACKSLASH:
 			{
+				condition = conditionMayFlush(condition, false);
+
 				int next = cppGetcFromUngetBufferOrFile ();
 
 				if (next == NEWLINE)
@@ -1453,6 +1531,8 @@ process:
 
 			case '?':
 			{
+				condition = conditionMayFlush(condition, false);
+
 				int next = cppGetcFromUngetBufferOrFile ();
 				if (next != '?')
 				{
@@ -1490,6 +1570,8 @@ process:
 			 */
 			case '<':
 			{
+				condition = conditionMayFlush(condition, false);
+
 				/*
 				   Quoted from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/n3237.html:
 				   ------
@@ -1537,6 +1619,8 @@ process:
 			}
 			case ':':
 			{
+				condition = conditionMayFlush(condition, false);
+
 				int next = cppGetcFromUngetBufferOrFile ();
 				if (next == '>')
 					c = ']';
@@ -1550,6 +1634,8 @@ process:
 			}
 			case '%':
 			{
+				condition = conditionMayFlush(condition, false);
+
 				int next = cppGetcFromUngetBufferOrFile ();
 				switch (next)
 				{
@@ -1567,6 +1653,8 @@ process:
 			default:
 				if (c == '@' && Cpp.hasAtLiteralStrings)
 				{
+					condition = conditionMayFlush(condition, false);
+
 					int next = cppGetcFromUngetBufferOrFile ();
 					if (next == DOUBLE_QUOTE)
 					{
@@ -1585,6 +1673,8 @@ process:
 				}
 				else if (c == 'R' && Cpp.hasCxxRawLiteralStrings)
 				{
+					conditionMayPut(condition, c);
+
 					/* OMG!11 HACK!!11  Get the previous character.
 					 *
 					 * We need to know whether the previous character was an identifier or not,
@@ -1644,22 +1734,34 @@ process:
 						cppUngetc(next);
 					if (macrodef)
 						vStringPut (macrodef, c);
-
+					conditionMayPut(condition, c);
 				}
 				else
 				{
 					if (macrodef)
 						vStringPut (macrodef, c);
+					if (isalnum(c) || c == '_')
+						conditionMayPut(condition, c);
+					else
+						condition = conditionMayFlush(condition, false);
 				}
 			enter:
 				Cpp.directive.accept = false;
 				if (directive)
 				{
-					ignore = handleDirective (c, &macroCorkIndex);
+					bool inspect_conidtion = false;
+					ignore = handleDirective (c, &macroCorkIndex, &inspect_conidtion);
 					if (Cpp.macrodefFieldIndex != FIELD_UNKNOWN
 						&& macroCorkIndex != CORK_NIL
 						&& macrodef == NULL)
 						macrodef = vStringNew ();
+					if (condition == NULL
+						&& inspect_conidtion)
+					{
+						condition = vStringNew ();
+						if (isalpha(c) || c == '_')
+							conditionMayPut(condition, c);
+					}
 				}
 				break;
 		}
@@ -1667,6 +1769,9 @@ process:
 
 	if (macrodef)
 		vStringDelete (macrodef);
+
+	if (condition)
+		vStringDelete (condition);
 
 	DebugStatement ( debugPutc (DEBUG_CPP, c); )
 	DebugStatement ( if (c == NEWLINE)
@@ -1678,7 +1783,8 @@ process:
 static void findCppTags (void)
 {
 	cppInitCommon (Cpp.lang, 0, false, false, false,
-				   KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX,
+				   KIND_GHOST_INDEX, 0, 0,
+				   KIND_GHOST_INDEX,
 				   KIND_GHOST_INDEX, 0, 0,
 				   FIELD_UNKNOWN);
 
