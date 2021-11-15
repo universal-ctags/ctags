@@ -1076,8 +1076,8 @@ static bool handleDirective (const int c, int *macroCorkIndex)
 		case DRCTV_HASH:    ignore = directiveHash (c);  break;
 		case DRCTV_IF:      ignore = directiveIf (c);    break;
 		case DRCTV_PRAGMA:  directivePragma (c);         break;
-		case DRCTV_UNDEF:   directiveUndef (c);         break;
-		case DRCTV_INCLUDE: directiveInclude (c);         break;
+		case DRCTV_UNDEF:   directiveUndef (c);          break;
+		case DRCTV_INCLUDE: directiveInclude (c);        break;
 	}
 	return ignore;
 }
