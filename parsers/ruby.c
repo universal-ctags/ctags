@@ -678,24 +678,23 @@ static void deleteBlockData (NestingLevel *nl)
 
 static bool doesLineIncludeConstant (const unsigned char **cp, vString *constant)
 {
-	const unsigned char **p = cp;
+	const unsigned char *p = *cp;
 
-	if (isspace (**p))
-		skipWhitespace (p);
+	if (isspace (*p))
+		skipWhitespace (&p);
 
-	if (isupper (**p))
+	if (isupper (*p))
 	{
-		while (**p != 0 && isIdentChar (**p))
+		while (*p != 0 && isIdentChar (*p))
 		{
-			vStringPut (constant, **p);
-			++*p;
+			vStringPut (constant, *p);
+			++p;
 		}
-		if (isspace (**p))
-			skipWhitespace (p);
-
-		if (**p == '=')
+		if (isspace (*p))
+			skipWhitespace (&p);
+		if (*p == '=')
 		{
-			*cp = *p;
+			*cp = p;
 			return true;
 		}
 		vStringClear (constant);
