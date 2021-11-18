@@ -16,3 +16,18 @@ public:
 	void test(x t);
 	using A::test;
 };
+
+namespace X
+{
+	class C : A
+	{
+	public:
+		void test2();
+	};
+}
+
+class D : X::C
+{
+public:
+	using X::C::test2;
+};

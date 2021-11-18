@@ -19,8 +19,7 @@ z	parameter	no	no	0	C	function parameters inside function or prototype definitio
 A	alias	no	no	0	NONE	namespace aliases
 D	macroparam	no	no	0	C	parameters inside macro definitions
 L	label	no	no	0	C	goto labels
-N	name	no	no	0	NONE	names imported via using scope::symbol
-U	using	no	yes	0	NONE	using namespace statements
+N	name	yes	yes	1	NONE	names imported via using scope::symbol
 Z	tparam	no	no	0	NONE	template parameters
 c	class	yes	no	0	NONE	classes
 d	macro	yes	no	1	C	macro definitions
@@ -30,7 +29,7 @@ g	enum	yes	no	0	C	enumeration names
 h	header	yes	yes	2	C	included header files
 l	local	no	no	0	C	local variables
 m	member	yes	no	0	C	class, struct, and union members
-n	namespace	yes	no	0	NONE	namespaces
+n	namespace	yes	no	1	NONE	namespaces
 p	prototype	no	no	0	C	function prototypes
 s	struct	yes	no	0	C	structure names
 t	typedef	yes	no	0	C	typedefs
