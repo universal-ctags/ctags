@@ -826,7 +826,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 
 	if (isLanguageRoleEnabled(lang, Cpp.headerKindIndex, role_index))
 	{
-		if (doesCPreProRunAsStandaloneParser (CPREPRO_HEADER))
+		if (standing_alone)
 			pushLanguage (Cpp.lang);
 
 		initRefTagEntry (&e, name, Cpp.headerKindIndex, role_index);
@@ -834,7 +834,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 		e.truncateLineAfterTag = true;
 		makeTagEntry (&e);
 
-		if (doesCPreProRunAsStandaloneParser (CPREPRO_HEADER))
+		if (standing_alone)
 			popLanguage ();
 	}
 }
@@ -842,14 +842,14 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 static void makeParamTag (vString *name, short nth, bool placeholder)
 {
 	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_MACRO);
-	langType lang = standing_alone ? Cpp.lang: Cpp.clientLang;
 
 	Assert (Cpp.macroParamKindIndex != KIND_GHOST_INDEX);
 
-	int r;
-	pushLanguage (lang);
-	r = makeSimpleTag (name, Cpp.macroParamKindIndex);
-	popLanguage ();
+	if (standing_alone)
+		pushLanguage (Cpp.lang);
+	int r = makeSimpleTag (name, Cpp.macroParamKindIndex);
+	if (standing_alone)
+		popLanguage ();
 
 	tagEntryInfo *e = getEntryInCorkQueue (r);
 	if (e)
@@ -1076,8 +1076,8 @@ static bool handleDirective (const int c, int *macroCorkIndex)
 		case DRCTV_HASH:    ignore = directiveHash (c);  break;
 		case DRCTV_IF:      ignore = directiveIf (c);    break;
 		case DRCTV_PRAGMA:  directivePragma (c);         break;
-		case DRCTV_UNDEF:   directiveUndef (c);         break;
-		case DRCTV_INCLUDE: directiveInclude (c);         break;
+		case DRCTV_UNDEF:   directiveUndef (c);          break;
+		case DRCTV_INCLUDE: directiveInclude (c);        break;
 	}
 	return ignore;
 }

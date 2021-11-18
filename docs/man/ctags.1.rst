@@ -735,7 +735,7 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 	In the above example, the prefix is put to ``end`` field which is
 	newly introduced in Universal Ctags.
 
-``--roles-(<LANG>|all).(<kind>|all)=[+|-][<roles>|*]``
+``--roles-(<LANG>|all).(<kind>|*)=[+|-][<roles>|*]``
 	Specifies a list of kind-specific roles of tags to include in the
 	output file for a particular language.
 	*<kind>* specifies the kind where the *<roles>* are defined.
