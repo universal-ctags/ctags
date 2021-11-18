@@ -99,6 +99,8 @@ typedef struct sCppState {
 
 	int macrodefFieldIndex;
 
+	bool skip__cplusplus_branch;
+
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
 		bool	accept;          /* is a directive syntactically permitted? */
@@ -245,18 +247,9 @@ extern unsigned int cppGetDirectiveNestLevel (void)
 	return Cpp.directive.nestLevel;
 }
 
-static void cppInitCommon(langType clientLang,
-		     const bool state, const bool hasAtLiteralStrings,
-		     const bool hasCxxRawLiteralStrings,
-		     const bool hasSingleQuoteLiteralNumbers,
-		     int defineMacroKindIndex,
-		     int macroUndefRoleIndex,
-		     int macroParamKindIndex,
-		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macrodefFieldIndex)
+static void cppInitCommon(langType clientLang, const struct cppInitData *initData)
 {
-	BraceFormat = state;
+	BraceFormat = initData->state;
 
 	CXX_DEBUG_PRINT("cppInit: brace format is %d",BraceFormat);
 
@@ -278,17 +271,17 @@ static void cppInitCommon(langType clientLang,
 	Cpp.charOrStringContents = vStringNew();
 
 	Cpp.resolveRequired = false;
-	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
-	Cpp.hasCxxRawLiteralStrings = hasCxxRawLiteralStrings;
-	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
+	Cpp.hasAtLiteralStrings = initData->hasAtLiteralStrings;
+	Cpp.hasCxxRawLiteralStrings = initData->hasCxxRawLiteralStrings;
+	Cpp.hasSingleQuoteLiteralNumbers = initData->hasSingleQuoteLiteralNumbers;
 
-	if (defineMacroKindIndex != KIND_GHOST_INDEX)
+	if (initData->defineMacroKindIndex != KIND_GHOST_INDEX)
 	{
-		Cpp.defineMacroKindIndex = defineMacroKindIndex;
+		Cpp.defineMacroKindIndex = initData->defineMacroKindIndex;
 		Cpp.useClientLangDefineMacroKindIndex = true;
 
-		Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
-		Cpp.macrodefFieldIndex = macrodefFieldIndex;
+		Cpp.macroUndefRoleIndex = initData->macroUndefRoleIndex;
+		Cpp.macrodefFieldIndex = initData->macrodefFieldIndex;
 	}
 	else
 	{
@@ -299,9 +292,9 @@ static void cppInitCommon(langType clientLang,
 		Cpp.macrodefFieldIndex = CPreProFields [F_MACRODEF].ftype;
 	}
 
-	if (macroParamKindIndex != KIND_GHOST_INDEX)
+	if (initData->macroParamKindIndex != KIND_GHOST_INDEX)
 	{
-		Cpp.macroParamKindIndex = macroParamKindIndex;
+		Cpp.macroParamKindIndex = initData->macroParamKindIndex;
 		Cpp.useClientLangMacroParamKindIndex = true;
 	}
 	else
@@ -310,13 +303,13 @@ static void cppInitCommon(langType clientLang,
 		Cpp.useClientLangMacroParamKindIndex = false;
 	}
 
-	if (headerKindIndex != KIND_GHOST_INDEX)
+	if (initData->headerKindIndex != KIND_GHOST_INDEX)
 	{
-		Cpp.headerKindIndex = headerKindIndex;
+		Cpp.headerKindIndex = initData->headerKindIndex;
 		Cpp.useClientLangHeaderKindIndex = true;
 
-		Cpp.headerSystemRoleIndex = headerSystemRoleIndex;
-		Cpp.headerLocalRoleIndex =  headerLocalRoleIndex;
+		Cpp.headerSystemRoleIndex = initData->headerSystemRoleIndex;
+		Cpp.headerLocalRoleIndex =  initData->headerLocalRoleIndex;
 	}
 	else
 	{
@@ -326,6 +319,8 @@ static void cppInitCommon(langType clientLang,
 		Cpp.headerSystemRoleIndex = CPREPRO_HEADER_KIND_SYSTEM_ROLE;
 		Cpp.headerLocalRoleIndex = CPREPRO_HEADER_KIND_LOCAL_ROLE;
 	}
+
+	Cpp.skip__cplusplus_branch = initData->skip__cplusplus_branch;
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = true;
@@ -350,23 +345,10 @@ static void cppInitCommon(langType clientLang,
 		: NULL;
 }
 
-extern void cppInit (const bool state, const bool hasAtLiteralStrings,
-		     const bool hasCxxRawLiteralStrings,
-		     const bool hasSingleQuoteLiteralNumbers,
-		     int defineMacroKindIndex,
-		     int macroUndefRoleIndex,
-		     int macroParamKindIndex,
-		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macrodefFieldIndex)
+extern void cppInit (const struct cppInitData *initData)
 {
 	langType client = getInputLanguage ();
-
-	cppInitCommon (client, state, hasAtLiteralStrings,
-				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
-				   defineMacroKindIndex, macroUndefRoleIndex, macroParamKindIndex,
-				   headerKindIndex, headerSystemRoleIndex, headerLocalRoleIndex,
-				   macrodefFieldIndex);
+	cppInitCommon (client, initData);
 }
 
 static void cppClearMacroInUse (cppMacroInfo **pM)
@@ -996,10 +978,32 @@ static void directivePragma (int c)
 	Cpp.directive.state = DRCTV_NONE;
 }
 
+static bool isDefCondition (const int c, const char *condition)
+{
+	if (*condition == '\0')
+		return true;
+	else if (c == EOF)
+		return false;
+
+	if (*condition != '\0' && c == condition[0])
+	{
+		const int next = cppGetcFromUngetBufferOrFile ();
+		return isDefCondition (next, condition + 1);
+	}
+
+	return false;
+}
+
 static bool directiveIf (const int c)
 {
 	DebugStatement ( const bool ignore0 = isIgnore (); )
-	const bool ignore = pushConditional ((bool) (c != '0'));
+	bool firstBranchChosen = true;
+
+	if (c == '0'
+		|| (Cpp.skip__cplusplus_branch && isDefCondition (c, "__cplusplus")))
+		firstBranchChosen = false;
+
+	const bool ignore = pushConditional (firstBranchChosen);
 
 	Cpp.directive.state = DRCTV_NONE;
 	DebugStatement ( debugCppNest (true, Cpp.directive.nestLevel);
@@ -1677,10 +1681,22 @@ process:
 
 static void findCppTags (void)
 {
-	cppInitCommon (Cpp.lang, 0, false, false, false,
-				   KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX,
-				   KIND_GHOST_INDEX, 0, 0,
-				   FIELD_UNKNOWN);
+	struct cppInitData initData = {
+		.state = 0,
+		.hasAtLiteralStrings = false,
+		.hasCxxRawLiteralStrings = false,
+		.hasSingleQuoteLiteralNumbers = false,
+		.defineMacroKindIndex = KIND_GHOST_INDEX,
+		.macroUndefRoleIndex = 0,
+		.macroParamKindIndex = KIND_GHOST_INDEX,
+		.macrodefFieldIndex = FIELD_UNKNOWN,
+		.headerKindIndex = KIND_GHOST_INDEX,
+		.headerSystemRoleIndex = 0,
+		.headerLocalRoleIndex = 0,
+		.skip__cplusplus_branch = false,
+	};
+
+	cppInitCommon (Cpp.lang, &initData);
 
 	findRegexTagsMainloop (cppGetc);
 

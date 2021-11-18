@@ -1850,7 +1850,8 @@ bool cxxParserParseIfForWhileSwitchCatchParenthesis(void)
 	return true;
 }
 
-static rescanReason cxxParserMain(const unsigned int passCount)
+static rescanReason cxxParserMain(const unsigned int passCount,
+								  bool cppSkip__cpluscplus_branch)
 {
 	cxxScopeClear();
 	cxxTokenAPINewFile();
@@ -1865,19 +1866,22 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 
 	Assert(passCount < 3);
 
-	cppInit(
-			(bool) (passCount > 1),
-			false,
-			true, // raw literals
-			false,
-			kind_for_define,
-			role_for_macro_undef,
-			kind_for_macro_param,
-			kind_for_header,
-			role_for_header_system,
-			role_for_header_local,
-			g_cxx.pFieldOptions[CXXTagFieldMacrodef].ftype
-		);
+	const struct cppInitData initData = {
+		.state = (bool) (passCount > 1),
+		.hasAtLiteralStrings = false,
+		.hasCxxRawLiteralStrings = true, // raw literals
+		.hasSingleQuoteLiteralNumbers = false,
+		.defineMacroKindIndex = kind_for_define,
+		.macroUndefRoleIndex = role_for_macro_undef,
+		.macroParamKindIndex = kind_for_macro_param,
+		.macrodefFieldIndex = g_cxx.pFieldOptions[CXXTagFieldMacrodef].ftype,
+		.headerKindIndex = kind_for_header,
+		.headerSystemRoleIndex = role_for_header_system,
+		.headerLocalRoleIndex = role_for_header_local,
+		.skip__cplusplus_branch = cppSkip__cpluscplus_branch,
+	};
+
+	cppInit(&initData);
 
 	g_cxx.iChar = ' ';
 
@@ -1912,7 +1916,7 @@ rescanReason cxxCParserMain(const unsigned int passCount)
 	g_cxx.bConfirmedCPPLanguage = false;
 	cxxKeywordEnablePublicProtectedPrivate(false);
 
-	rescanReason r = cxxParserMain(passCount);
+	rescanReason r = cxxParserMain(passCount, true);
 	CXX_DEBUG_LEAVE();
 	return r;
 }
@@ -1926,7 +1930,7 @@ rescanReason cxxCUDAParserMain(const unsigned int passCount)
 	g_cxx.bConfirmedCPPLanguage = false;
 	cxxKeywordEnablePublicProtectedPrivate(false);
 
-	rescanReason r = cxxParserMain(passCount);
+	rescanReason r = cxxParserMain(passCount, true);
 	CXX_DEBUG_LEAVE();
 	return r;
 }
@@ -1942,7 +1946,7 @@ rescanReason cxxCppParserMain(const unsigned int passCount)
 	g_cxx.bConfirmedCPPLanguage = !isInputHeaderFile();
 	cxxKeywordEnablePublicProtectedPrivate(g_cxx.bConfirmedCPPLanguage);
 
-	rescanReason r = cxxParserMain(passCount);
+	rescanReason r = cxxParserMain(passCount, false);
 	CXX_DEBUG_LEAVE();
 	return r;
 }

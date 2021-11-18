@@ -3496,11 +3496,21 @@ static rescanReason findCTags (const unsigned int passCount)
 		role_for_header_local = VR_HEADER_LOCAL;
 	}
 
-	cppInit ((bool) (passCount > 1), isInputLanguage (Lang_csharp), isInputLanguage(Lang_cpp),
-		 isInputLanguage(Lang_vera),
-		 kind_for_define, role_for_macro_undef, kind_for_param,
-		 kind_for_header, role_for_header_system, role_for_header_local,
-		 FIELD_UNKNOWN);
+	const struct cppInitData initData = {
+		.state = (bool) (passCount > 1),
+		.hasAtLiteralStrings = isInputLanguage (Lang_csharp),
+		.hasCxxRawLiteralStrings = isInputLanguage(Lang_cpp),
+		.hasSingleQuoteLiteralNumbers = isInputLanguage(Lang_vera),
+		.defineMacroKindIndex = kind_for_define,
+		.macroUndefRoleIndex = role_for_macro_undef,
+		.macroParamKindIndex = kind_for_param,
+		.macrodefFieldIndex = FIELD_UNKNOWN,
+		.headerKindIndex = kind_for_header,
+		.headerSystemRoleIndex = role_for_header_system,
+		.headerLocalRoleIndex = role_for_header_local,
+		.skip__cplusplus_branch = !isInputLanguage (Lang_cpp),
+	};
+	cppInit (&initData);
 
 	Signature = vStringNew ();
 

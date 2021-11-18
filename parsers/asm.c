@@ -311,9 +311,21 @@ static void findAsmTags (void)
 	vString *operator = vStringNew ();
 	const unsigned char *line;
 
-	cppInit (false, false, false, false,
-			 KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
-			 FIELD_UNKNOWN);
+	const struct cppInitData initData = {
+		.state = false,
+		.hasAtLiteralStrings = false,
+		.hasCxxRawLiteralStrings = false,
+		.hasSingleQuoteLiteralNumbers = false,
+		.defineMacroKindIndex = KIND_GHOST_INDEX,
+		.macroUndefRoleIndex = 0,
+		.macroParamKindIndex = KIND_GHOST_INDEX,
+		.macrodefFieldIndex = FIELD_UNKNOWN,
+		.headerKindIndex = KIND_GHOST_INDEX,
+		.headerSystemRoleIndex = 0,
+		.headerLocalRoleIndex = 0,
+		.skip__cplusplus_branch = false,
+	};
+	cppInit (&initData);
 
 	 int lastMacroCorkIndex = CORK_NIL;
 
