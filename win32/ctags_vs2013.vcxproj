@@ -448,6 +448,7 @@
     <ClInclude Include="..\parsers\make.h" />
     <ClInclude Include="..\parsers\perl.h" />
     <ClInclude Include="..\parsers\r.h" />
+    <ClInclude Include="..\parsers\ruby.h" />
     <ClInclude Include="..\parsers\tcl.h" />
     <ClInclude Include="..\parsers\tex.h" />
     <ClInclude Include="resource.h" />

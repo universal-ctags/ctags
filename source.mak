@@ -238,6 +238,7 @@ PARSER_HEADS = \
 	parsers/make.h \
 	parsers/perl.h \
 	parsers/r.h \
+	parsers/ruby.h \
 	parsers/tcl.h \
 	parsers/tex.h \
 	\

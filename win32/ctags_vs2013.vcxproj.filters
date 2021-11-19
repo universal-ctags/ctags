@@ -863,6 +863,9 @@
     <ClInclude Include="..\parsers\r.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\parsers\ruby.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\parsers\tcl.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -25,7 +25,10 @@
 #include "read.h"
 #include "routines.h"
 #include "strlist.h"
+#include "subparser.h"
 #include "vstring.h"
+
+#include "ruby.h"
 
 /*
 *   DATA DECLARATIONS
@@ -82,6 +85,8 @@ static fieldDefinition RubyFields[] = {
 
 struct blockData {
 	stringList *mixin;
+	rubySubparser *subparser;
+	int subparserCorkIndex;
 };
 
 static NestingLevels* nesting = NULL;
@@ -205,7 +210,8 @@ static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
 	return *s != original_pos;
 }
 
-static bool canMatchKeyword (const unsigned char** s, const char* literal)
+#define canMatchKeyword rubyCanMatchKeyword
+extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal)
 {
 	return canMatch (s, literal, notIdentChar);
 }
@@ -214,7 +220,8 @@ static bool canMatchKeyword (const unsigned char** s, const char* literal)
  * Extends canMatch. Works similarly, but allows assignment to precede
  * the keyword, as block assignment is a common Ruby idiom.
  */
-static bool canMatchKeywordWithAssign (const unsigned char** s, const char* literal)
+#define canMatchKeywordWithAssign rubyCanMatchKeywordWithAssign
+extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* literal)
 {
 	const unsigned char* original_pos = *s;
 
@@ -360,7 +367,8 @@ static bool charIsIn (char ch, const char* list)
 }
 
 /* Advances 'cp' over leading whitespace. */
-static void skipWhitespace (const unsigned char** cp)
+#define skipWhitespace rubySkipWhitespace
+extern void rubySkipWhitespace (const unsigned char** cp)
 {
 	while (isspace (**cp))
 	{
@@ -452,6 +460,16 @@ static rubyKind parseIdentifier (
 	return kind;
 }
 
+extern bool rubyParseMethodName (const unsigned char **cp, vString* vstr)
+{
+	return (parseIdentifier (cp, vstr, K_METHOD) == K_METHOD);
+}
+
+extern bool rubyParseModuleName (const unsigned char **cp, vString* vstr)
+{
+	return (parseIdentifier (cp, vstr, K_MODULE) == K_MODULE);
+}
+
 static void parseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
 {
 	while (**cp != 0 && **cp != boundary)
@@ -464,6 +482,13 @@ static void parseString (const unsigned char** cp, unsigned char boundary, vStri
 	/* skip the last found '"' */
 	if (**cp == boundary)
 		++*cp;
+}
+
+extern bool rubyParseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
+{
+	const unsigned char *p = *cp;
+	parseString (cp, boundary, vstr);
+	return (p != *cp);
 }
 
 static void parseSignature (const unsigned char** cp, vString* vstr)
@@ -646,6 +671,17 @@ static void enterUnnamedScope (void)
 	nestingLevelsPush (nesting, r);
 }
 
+static void parasiteToScope (rubySubparser *subparser, int subparserCorkIndex)
+{
+	NestingLevel *nl = nestingLevelsGetCurrent (nesting);
+	struct blockData *bdata =  nestingLevelGetUserData (nl);
+	bdata->subparser = subparser;
+	bdata->subparserCorkIndex = subparserCorkIndex;
+
+	if (subparser->enterBlockNotify)
+		subparser->enterBlockNotify (subparser, subparserCorkIndex);
+}
+
 static void attachMixinField (int corkIndex, stringList *mixinSpec)
 {
 	vString *mixinField = stringListItem (mixinSpec, 0);
@@ -671,6 +707,16 @@ static void deleteBlockData (NestingLevel *nl)
 	tagEntryInfo *e = getEntryInCorkQueue (nl->corkIndex);
 	if (e && !e->placeholder)
 			e->extensionFields.endLine = getInputLineNumber ();
+
+	tagEntryInfo *sub_e;
+	if (bdata->subparserCorkIndex != CORK_NIL
+		&& (sub_e = getEntryInCorkQueue (bdata->subparserCorkIndex)))
+	{
+		sub_e->extensionFields.endLine = getInputLineNumber ();
+		if (bdata->subparser)
+			bdata->subparser->leaveBlockNotify (bdata->subparser,
+												bdata->subparserCorkIndex);
+	}
 
 	if (bdata->mixin)
 		stringListDelete (bdata->mixin);
@@ -862,6 +908,33 @@ static int readAndEmitDef (const unsigned char **cp)
 	return corkIndex;
 }
 
+static rubySubparser *notifyLine (const unsigned char **cp)
+{
+	subparser *sub;
+	rubySubparser *rubysub = NULL;
+
+	foreachSubparser (sub, false)
+	{
+		rubysub = (rubySubparser *)sub;
+		rubysub->corkIndex = CORK_NIL;
+
+		if (rubysub->lineNotify)
+		{
+			enterSubparser(sub);
+			const unsigned char *base = *cp;
+			rubysub->corkIndex = rubysub->lineNotify(rubysub, cp);
+			leaveSubparser();
+			if (rubysub->corkIndex != CORK_NIL)
+				break;
+			*cp = base;
+		}
+	}
+
+	if (rubysub && rubysub->corkIndex != CORK_NIL)
+		return rubysub;
+	return NULL;
+}
+
 static void findRubyTags (void)
 {
 	const unsigned char *line;
@@ -882,6 +955,7 @@ static void findRubyTags (void)
 	*/
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
+		rubySubparser *subparser = CORK_NIL;
 		const unsigned char *cp = line;
 		/* if we expect a separator after a while, for, or until statement
 		 * separators are "do", ";" or newline */
@@ -1028,6 +1102,8 @@ static void findRubyTags (void)
 			/* TODO: store the method for controlling visibility
 			 * to the "access:" field of the tag.*/
 		}
+		else
+			subparser = notifyLine(&cp);
 
 
 		while (*cp != '\0')
@@ -1057,7 +1133,11 @@ static void findRubyTags (void)
 			else if (canMatchKeyword (&cp, "do"))
 			{
 				if (! expect_separator)
+				{
 					enterUnnamedScope ();
+					if (subparser && subparser->corkIndex)
+						parasiteToScope (subparser, subparser->corkIndex);
+				}
 				else
 					expect_separator = false;
 			}
