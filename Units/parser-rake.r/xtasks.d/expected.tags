@@ -1,0 +1,15 @@
+spec	input.rake	/^namespace :spec do$/;"	namespace
+setup	input.rake	/^  task :setup => ["app:test:vmdb:setup"]$/;"	task	namespace:spec
+spec	input.rake	/^RSpec::Core::RakeTask.new(:spec => ['app:test:spec_deps', 'app:test:providers_common']) do |t|$/;"	xtask	typeref:typename:RSpec::Core::RakeTask.new
+cucumber	input.rake	/^Cucumber::Rake::Task.new(:cucumber)$/;"	xtask	typeref:typename:Cucumber::Rake::Task.new
+spec	input.rake	/^RSpec::Core::RakeTask.new(:spec) do |t|$/;"	xtask	typeref:typename:RSpec::Core::RakeTask.new
+spec	input.rake	/^namespace :spec do$/;"	namespace
+ui	input.rake	/^  RSpec::Core::RakeTask.new(:ui) do |t|$/;"	xtask	namespace:spec	typeref:typename:RSpec::Core::RakeTask.new
+rubocop	input.rake	/^task :rubocop do$/;"	task
+clobber	input.rake	/^task :clobber do$/;"	task
+rdoc	input.rake	/^task :rdoc do$/;"	task
+relish	input.rake	/^task :relish, :version do |_t, args|$/;"	task
+relish_staging	input.rake	/^task :relish_staging do$/;"	task
+default	input.rake	/^task :default => [:spec, :cucumber, :rubocop]$/;"	task
+verify_private_key_present	input.rake	/^task :verify_private_key_present do$/;"	task
+build	input.rake	/^task :build => :verify_private_key_present$/;"	task
