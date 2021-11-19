@@ -283,7 +283,7 @@ static void inputStart (subparser *s)
 	itcl->foundITclNamespaceImported = itclForceUse;
 }
 
-struct itclSubparser itclSubparser = {
+static struct itclSubparser itclSubparser = {
 	.tcl = {
 		.subparser = {
 			.direction = SUBPARSER_BI_DIRECTION,
