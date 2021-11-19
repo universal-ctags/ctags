@@ -141,6 +141,7 @@
 	QtMocParser, \
 	RMarkdownParser, \
 	RParser, \
+	RakeParser, \
 	R6ClassParser, \
 	RSpecParser, \
 	RexxParser, \

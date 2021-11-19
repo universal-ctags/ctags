@@ -358,6 +358,7 @@ PARSER_SRCS =				\
 	parsers/r-r6class.c		\
 	parsers/r-s4class.c		\
 	parsers/r.c			\
+	parsers/rake.c			\
 	parsers/rexx.c			\
 	parsers/rmarkdown.c		\
 	parsers/robot.c			\

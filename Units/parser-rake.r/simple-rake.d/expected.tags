@@ -1,0 +1,15 @@
+name0	input.rake	/^task :name0$/;"	task
+name1	input.rake	/^task name1: [:prereq1, :prereq2]$/;"	task
+name2	input.rake	/^task 'name2' => %w[prereq1 prereq2]$/;"	task
+name3	input.rake	/^task name3: %w[prereq1 prereq2]$/;"	task
+name4	input.rake	/^task name4: [:prereq1, :prereq2] do |t|$/;"	task
+prog	input.rake	/^file "prog" => ["a.o", "b.o"] do |t|$/;"	File
+testdata/examples/doc	input.rake	/^directory "testdata\/examples\/doc"$/;"	directory
+copy_files	input.rake	/^multitask copy_files: %w[copy_src copy_doc copy_bin] do$/;"	multitask
+main	input.rake	/^namespace "main" do$/;"	namespace
+build	input.rake	/^  task :build do$/;"	task	namespace:main
+main:build	input.rake	/^  task :build do$/;"	task	namespace:main
+samples	input.rake	/^namespace "samples" do$/;"	namespace
+build	input.rake	/^  task :build do$/;"	task	namespace:samples
+samples:build	input.rake	/^  task :build do$/;"	task	namespace:samples
+build	input.rake	/^task build: %w[main:build samples:build]$/;"	task

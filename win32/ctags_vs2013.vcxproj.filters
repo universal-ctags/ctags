@@ -534,6 +534,9 @@
     <ClCompile Include="..\parsers\r.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\rake.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\rexx.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
