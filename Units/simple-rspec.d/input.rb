@@ -24,3 +24,25 @@ RSpec.describe Calculator do
     end
   end
 end
+
+# Taken from rspec-core/spec/rspec/core/example_group_spec.rb
+module RSpec::Core
+  RSpec.describe ExampleGroup do
+    %w[ describe context let before it it_behaves_like ].each do |method|
+      context "when calling `#{method}`, an example group API, from within an example" do
+        it "tells the user they are in the wrong scope for that API" do
+          ex = nil
+
+          RSpec.describe do
+            ex = example { __send__(method, "foo") }
+          end.run
+
+          expect(ex).to fail_with(ExampleGroup::WrongScopeError)
+        end
+      end
+    end
+
+    describe Object, "describing nested example_groups", :little_less_nested => 'yep' do
+    end
+  end
+end

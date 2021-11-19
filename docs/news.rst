@@ -455,7 +455,7 @@ The following parsers have been added:
 * Robot
 * RpmMacros *optlib*
 * RpmSpec
-* RSpec *optlib*
+* RSpec *Ruby based subparser*
 * Rust
 * S4Class *R based subparser*
 * SCSS *optlib*

@@ -230,7 +230,6 @@
     <ClCompile Include="..\main\writer-xref.c" />
     <ClCompile Include="..\main\writer.c" />
     <ClCompile Include="..\main\xtag.c" />
-    <ClCompile Include="..\optlib\RSpec.c" />
     <ClCompile Include="..\optlib\cmake.c" />
     <ClCompile Include="..\optlib\ctags-optlib.c" />
     <ClCompile Include="..\optlib\elixir.c" />
@@ -338,6 +337,7 @@
     <ClCompile Include="..\parsers\rexx.c" />
     <ClCompile Include="..\parsers\robot.c" />
     <ClCompile Include="..\parsers\rpmspec.c" />
+    <ClCompile Include="..\parsers\rspec.c" />
     <ClCompile Include="..\parsers\rst.c" />
     <ClCompile Include="..\parsers\ruby.c" />
     <ClCompile Include="..\parsers\rust.c" />

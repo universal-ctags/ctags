@@ -213,9 +213,6 @@
     <ClCompile Include="..\main\xtag.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
-    <ClCompile Include="..\optlib\RSpec.c">
-      <Filter>Source Files\optlib</Filter>
-    </ClCompile>
     <ClCompile Include="..\optlib\cmake.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
@@ -535,6 +532,9 @@
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\rpmspec.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\rspec.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\rst.c">
