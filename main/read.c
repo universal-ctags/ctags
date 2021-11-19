@@ -245,9 +245,9 @@ extern bool doesInputLanguageAllowNullTag (void)
 	return doesLanguageAllowNullTag (getInputLanguage ());
 }
 
-extern bool doesInputLanguageRequestAutomaticFQTag (void)
+extern bool doesInputLanguageRequestAutomaticFQTag (const tagEntryInfo *e)
 {
-	return doesLanguageRequestAutomaticFQTag (getInputLanguage ());
+	return doesLanguageRequestAutomaticFQTag (e->langType);
 }
 
 extern const char *getSourceFileTagPath (void)

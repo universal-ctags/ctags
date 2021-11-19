@@ -40,7 +40,7 @@ extern unsigned int countInputLanguageKinds (void);
 extern unsigned int countInputLanguageRoles (int kindIndex);
 
 extern bool doesInputLanguageAllowNullTag (void);
-extern bool doesInputLanguageRequestAutomaticFQTag (void);
+extern bool doesInputLanguageRequestAutomaticFQTag (const tagEntryInfo *e);
 extern bool doesParserRunAsGuest (void);
 extern bool doesSubparserRun (void);
 extern langType getLanguageForBaseParser (void);
