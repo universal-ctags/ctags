@@ -87,6 +87,7 @@
 	FunctionParametersParser, \
 	FyppParser,	   \
 	GdbinitParser, \
+	GDScriptParser, \
 	GoParser, \
 	HaskellParser, \
 	HaxeParser, \

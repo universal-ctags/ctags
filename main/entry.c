@@ -1776,6 +1776,7 @@ extern void setTagPositionFromTag (tagEntryInfo *const dst,
 								   const tagEntryInfo *const src)
 {
 		dst->lineNumber = src->lineNumber;
+		dst->boundaryInfo = src->boundaryInfo;
 		dst->filePosition = src->filePosition;
 }
 
@@ -1915,6 +1916,11 @@ static void    markTagExtraBitFull     (tagEntryInfo *const tag, xtagType extra,
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)
 {
 	markTagExtraBitFull (tag, extra, true);
+}
+
+extern void    unmarkTagExtraBit    (tagEntryInfo *const tag, xtagType extra)
+{
+	markTagExtraBitFull (tag, extra, false);
 }
 
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)

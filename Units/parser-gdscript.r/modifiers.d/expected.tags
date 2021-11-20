@@ -1,0 +1,14 @@
+anon_class_025551790100	input.gd	/^# Taken from godot-demo-projects\/3d\/voxel\/world\/chunk.gd$/;"	c
+_create_block_collider	input.gd	/^func _create_block_collider(block_sub_position):$/;"	m	class:anon_class_025551790100
+block_sub_position	input.gd	/^func _create_block_collider(block_sub_position):$/;"	z	method:anon_class_025551790100._create_block_collider	file:
+collider	input.gd	/^        var collider = CollisionShape.new()$/;"	l	method:anon_class_025551790100._create_block_collider	file:
+calculate_block_uvs	input.gd	/^static func calculate_block_uvs(block_id):$/;"	m	class:anon_class_025551790100	annotations:static
+block_id	input.gd	/^static func calculate_block_uvs(block_id):$/;"	z	method:anon_class_025551790100.calculate_block_uvs	file:
+row	input.gd	/^        var row = block_id \/ TEXTURE_SHEET_WIDTH$/;"	l	method:anon_class_025551790100.calculate_block_uvs	file:
+col	input.gd	/^        var col = block_id % TEXTURE_SHEET_WIDTH$/;"	l	method:anon_class_025551790100.calculate_block_uvs	file:
+id	input.gd	/^func id(a):$/;"	m	class:anon_class_025551790100
+a	input.gd	/^func id(a):$/;"	z	method:anon_class_025551790100.id	file:
+r	input.gd	/^remote func r(b):$/;"	m	class:anon_class_025551790100	annotations:remote
+b	input.gd	/^remote func r(b):$/;"	z	method:anon_class_025551790100.r	file:
+x	input.gd	/^remote static func x(c):$/;"	m	class:anon_class_025551790100	annotations:remote,static
+c	input.gd	/^remote static func x(c):$/;"	z	method:anon_class_025551790100.x	file:

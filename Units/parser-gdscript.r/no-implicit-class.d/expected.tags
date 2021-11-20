@@ -1,0 +1,27 @@
+BaseClass	input.gd	/^extends BaseClass$/;"	c	roles:extended	extras:reference
+MyClass	input.gd	/^class_name MyClass, "res:\/\/path\/to\/optional\/icon.svg"$/;"	c	roles:def
+a	input.gd	/^@export_range(start=0, end=100, step=1) var a = 5$/;"	v	roles:def	annotations:export_range(start=0, end=100, step=1)
+s	input.gd	/^var s = "Hello"$/;"	v	roles:def	annotations:export
+arr	input.gd	/^@onready var arr = [1, 2, 3]$/;"	v	roles:def	annotations:onready
+dict	input.gd	/^var dict = {"key": "value", 2: 3}$/;"	v	roles:def
+typed_var	input.gd	/^var typed_var: int$/;"	v	typeref:typename:int	roles:def
+inferred_type	input.gd	/^inferred_type\\$/;"	v	roles:def	annotations:onready,export_multiline
+ANSWER	input.gd	/^const ANSWER = 42$/;"	C	roles:def
+THE_NAME	input.gd	/^const THE_NAME:String = "Charly"$/;"	C	typeref:typename:String	roles:def
+anon_enum_84e343bf0104	input.gd	/^enum {UNIT_NEUTRAL, UNIT_ENEMY, UNIT_ALL}$/;"	g	roles:def	extras:anonymous
+UNIT_NEUTRAL	input.gd	/^enum {UNIT_NEUTRAL, UNIT_ENEMY, UNIT_ALL}$/;"	e	enum:anon_enum_84e343bf0104	file:	roles:def
+UNIT_ENEMY	input.gd	/^enum {UNIT_NEUTRAL, UNIT_ENEMY, UNIT_ALL}$/;"	e	enum:anon_enum_84e343bf0104	file:	roles:def
+UNIT_ALL	input.gd	/^enum {UNIT_NEUTRAL, UNIT_ENEMY, UNIT_ALL}$/;"	e	enum:anon_enum_84e343bf0104	file:	roles:def
+Named	input.gd	/^enum Named {THING_1, THING_2, ANOTHER_THING=1}$/;"	g	roles:def
+THING_1	input.gd	/^enum Named {THING_1, THING_2, ANOTHER_THING=1}$/;"	e	enum:Named	file:	roles:def
+THING_2	input.gd	/^enum Named {THING_1, THING_2, ANOTHER_THING=1}$/;"	e	enum:Named	file:	roles:def
+ANOTHER_THING	input.gd	/^enum Named {THING_1, THING_2, ANOTHER_THING=1}$/;"	e	enum:Named	file:	roles:def
+v2	input.gd	/^var v2 = Vector2(1, 2)$/;"	v	roles:def
+v3	input.gd	/^var v3 = Vector3(1, 2, 3)$/;"	v	roles:def
+some_function	input.gd	/^func some_function(param1: Vector3, param2: int) -> int:$/;"	m	typeref:typename:int	signature:(param1: Vector3, param2: int)	roles:def	annotations:master
+something	input.gd	/^func something(p1, p2):$/;"	m	signature:(p1, p2)	roles:def	annotations:puppet
+Something	input.gd	/^class Something:$/;"	c	inherits:	roles:def
+a	input.gd	/^    var a = 10$/;"	v	class:Something	roles:def
+_private_var	input.gd	/^    const _private_var:String = "hi\\n\\\\escape"$/;"	C	class:Something	typeref:typename:String	roles:def
+foooooooo	input.gd	/^	func foooooooo() -> String:$/;"	m	class:Something	typeref:typename:String	signature:()	roles:def
+_init	input.gd	/^func _init():$/;"	m	signature:()	roles:def

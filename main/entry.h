@@ -207,6 +207,7 @@ int           anyKindsEntryInScopeRecursive (int corkIndex,
 											 const int * kinds, int count);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
+extern void    unmarkTagExtraBit   (tagEntryInfo *const tag, xtagType extra);
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
 /* If any extra bit is on, return true. */
