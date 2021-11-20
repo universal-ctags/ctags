@@ -293,6 +293,7 @@ PARSER_SRCS =				\
 	parsers/flex.c			\
 	parsers/fortran.c		\
 	parsers/fypp.c			\
+	parsers/gdscript.c		\
 	parsers/go.c			\
 	parsers/haskell.c		\
 	parsers/haxe.c			\

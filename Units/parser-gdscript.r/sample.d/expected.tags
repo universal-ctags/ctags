@@ -1,0 +1,26 @@
+a	input.gd	/^@export_range(start=0, end=100, step=1) var a = 5$/;"	v	annotations:export_range(start=0, end=100, step=1)
+s	input.gd	/^var s = "Hello"$/;"	v	annotations:export
+arr	input.gd	/^@onready var arr = [1, 2, 3]$/;"	v	annotations:onready
+dict	input.gd	/^var dict = {"key": "value", 2: 3}$/;"	v
+typed_var	input.gd	/^var typed_var: int$/;"	v	typeref:typename:int
+inferred_type	input.gd	/^inferred_type\\$/;"	v	annotations:onready,export_multiline
+ANSWER	input.gd	/^const ANSWER = 42$/;"	v	typeref:typename:const
+THE_NAME	input.gd	/^const THE_NAME:String = "Charly"$/;"	v	typeref:typename:const String
+anon_enum_e3cc11790105	input.gd	/^enum {UNIT_NEUTRAL, UNIT_ENEMY, UNIT_ALL}$/;"	g
+Named	input.gd	/^enum Named {THING_1, THING_2, ANOTHER_THING=1}$/;"	g
+v2	input.gd	/^var v2 = Vector2(1, 2)$/;"	v
+v3	input.gd	/^var v3 = Vector3(1, 2, 3)$/;"	v
+some_function	input.gd	/^func some_function(param1: Vector3, param2: int) -> int:$/;"	f	typeref:typename:int	annotations:master
+param1	input.gd	/^func some_function(param1: Vector3, param2: int) -> int:$/;"	z	function:some_function	typeref:typename:Vector3	file:
+param2	input.gd	/^func some_function(param1: Vector3, param2: int) -> int:$/;"	z	function:some_function	typeref:typename:int	file:
+local_var	input.gd	/^    var local_var = 5$/;"	l	function:some_function	file:
+local_var2	input.gd	/^    var local_var2 = param1 + 3$/;"	l	function:some_function	file:
+something	input.gd	/^func something(p1, p2):$/;"	f	annotations:puppet
+p1	input.gd	/^func something(p1, p2):$/;"	z	function:something	file:
+p2	input.gd	/^func something(p1, p2):$/;"	z	function:something	file:
+Something	input.gd	/^class Something:$/;"	c
+a	input.gd	/^    var a = 10$/;"	v	class:Something
+_private_var	input.gd	/^    const _private_var:String = "hi\\n\\\\escape"$/;"	v	class:Something	typeref:typename:const String
+foooooooo	input.gd	/^	func foooooooo() -> String:$/;"	m	class:Something	typeref:typename:String
+_init	input.gd	/^func _init():$/;"	f
+lv	input.gd	/^    var lv = Something.new()$/;"	l	function:_init	file:
