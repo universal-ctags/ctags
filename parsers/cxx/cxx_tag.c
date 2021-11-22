@@ -22,6 +22,7 @@
 #define CXX_COMMON_MACRO_ROLES(__langPrefix) \
 	static roleDefinition __langPrefix##MacroRoles [] = { \
 		RoleTemplateUndef, \
+		RoleTemplateCondition, \
 	}
 
 CXX_COMMON_MACRO_ROLES(C);

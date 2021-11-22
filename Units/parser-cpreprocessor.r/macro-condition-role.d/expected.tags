@@ -1,0 +1,7 @@
+X0	input.h	/^#ifdef X0$/;"	d	line:1	roles:condition
+HAVE_FEAT	input.h	/^#if defined HAVE_FEAT && (Y_2k1 && _0Z \\$/;"	d	line:2	roles:condition
+Y_2k1	input.h	/^#if defined HAVE_FEAT && (Y_2k1 && _0Z \\$/;"	d	line:2	roles:condition
+_0Z	input.h	/^#if defined HAVE_FEAT && (Y_2k1 && _0Z \\$/;"	d	line:2	roles:condition
+_A_0_	input.h	/^						  || \/* C *\/ _A_0_)$/;"	d	line:3	roles:condition
+X1	input.h	/^#ifndef X1$/;"	d	line:5	roles:condition
+Y1	input.h	/^#elif Y1$/;"	d	line:7	roles:condition

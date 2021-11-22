@@ -43,25 +43,32 @@ Automake       d/directory ltlibrary on      directory for LTLIBRARIES primary
 Automake       d/directory man       on      directory for MANS primary
 Automake       d/directory program   on      directory for PROGRAMS primary
 Automake       d/directory script    on      directory for SCRIPTS primary
+C              d/macro     condition off     used in part of #if/#ifdef/#elif conditions
 C              d/macro     undef     on      undefined
 C              h/header    local     on      local header
 C              h/header    system    on      system header
+C++            d/macro     condition off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro     undef     on      undefined
 C++            h/header    local     on      local header
 C++            h/header    system    on      system header
+CPreProcessor  d/macro     condition off     used in part of #if/#ifdef/#elif conditions
 CPreProcessor  d/macro     undef     on      undefined
 CPreProcessor  h/header    local     on      local header
 CPreProcessor  h/header    system    on      system header
+CUDA           d/macro     condition off     used in part of #if/#ifdef/#elif conditions
 CUDA           d/macro     undef     on      undefined
 CUDA           h/header    local     on      local header
 CUDA           h/header    system    on      system header
 M4             d/macro     undef     on      undefined
+OldC           d/macro     condition off     used in part of #if/#ifdef/#elif conditions
 OldC           d/macro     undef     on      undefined
 OldC           h/header    local     on      local header
 OldC           h/header    system    on      system header
+OldC++         d/macro     condition off     used in part of #if/#ifdef/#elif conditions
 OldC++         d/macro     undef     on      undefined
 OldC++         h/header    local     on      local header
 OldC++         h/header    system    on      system header
+Vera           d/macro     condition off     used in part of #if/#ifdef/#elif conditions
 Vera           d/macro     undef     on      undefined
 Vera           h/header    local     on      local header
 Vera           h/header    system    on      system header
