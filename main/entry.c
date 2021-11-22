@@ -1503,9 +1503,10 @@ static bool isTagWritable(const tagEntryInfo *const tag)
 	}
 	else if (isLanguageKindRefOnly(tag->langType, tag->kindIndex))
 	{
-		error (WARNING, "definition tag for refonly kind(%s) is made: %s",
+		error (WARNING, "PARSER BUG: a definition tag for a refonly kind(%s.%s) of is made: %s found in %s.",
+			   getLanguageName(tag->langType),
 			   getLanguageKind(tag->langType, tag->kindIndex)->name,
-			   tag->name);
+			   tag->name, tag->inputFileName);
 		/* This one is not so critical. */
 	}
 

@@ -165,7 +165,7 @@ static kindDefinition AdaKinds[] =
 {
 	{ true,   'P', "packspec",    "package specifications" },
 	{ true,   'p', "package",     "packages",
-	  .referenceOnly = true, ATTACH_ROLES(AdaPackageRoles) },
+	  .referenceOnly = false, ATTACH_ROLES(AdaPackageRoles) },
 	{ false,  'T', "typespec",    "type specifications" },
 	{ true,   't', "type",        "types" },
 	{ false,  'U', "subspec",     "subtype specifications" },
