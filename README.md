@@ -30,7 +30,7 @@ dedicated project as Universal Ctags.
 The goal of this project is to maintain a common/unified working space where
 people interested in making ctags better can work together.
 
-Some major features of Universal Ctags are:
+Some of the major features of Universal Ctags are:
 
 * more numbers of improved language support
     * new extended C/C++ language parser, etc.
