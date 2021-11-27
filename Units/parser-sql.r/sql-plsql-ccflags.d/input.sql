@@ -1,0 +1,1 @@
+ALTER SESSION SET PLSQL_CCFlags = 'UW_Flag:1, Some_Flag:2, PLSQL_CCFlags:42';
