@@ -69,13 +69,6 @@ extern parserDefinition* ElixirParser (void)
 		  true, 'y', "type", "types (@type ...)",
 		},
 	};
-	static fieldDefinition ElixirFieldTable [] = {
-		{
-		  .enabled     = true,
-		  .name        = "access",
-		  .description = "access",
-		},
-	};
 	static tagRegexTable ElixirTagRegexTable [] = {
 		{"^[ \t]*defprotocol[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"p", "{scope=set}", NULL, false},
@@ -84,9 +77,9 @@ extern parserDefinition* ElixirParser (void)
 		{"^[ \t]*def((p?)|macro(p?))[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3}|and|or|in|(not( +in)?)|when)[ \t]+[a-zA-Z0-9_?!]", "\\5",
 		"o", "{scope=ref}{exclusive}", NULL, false},
 		{"^[ \t]*def[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
-		"f", "{scope=ref}{_field=access:public}", NULL, false},
+		"f", "{scope=ref}{{. (public) access:}}", NULL, false},
 		{"^[ \t]*defp[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
-		"f", "{scope=ref}{_field=access:private}", NULL, false},
+		"f", "{scope=ref}{{. (private) access:}}", NULL, false},
 		{"^[ \t]*(@|def)callback[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\2",
 		"c", "{scope=ref}", NULL, false},
 		{"^[ \t]*defdelegate[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
@@ -94,25 +87,25 @@ extern parserDefinition* ElixirParser (void)
 		{"^[ \t]*defexception[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"e", "{scope=ref}", NULL, false},
 		{"^[ \t]*defguard[ \t]+(is_[a-zA-Z0-9_?!]+)", "\\1",
-		"g", "{scope=ref}{_field=access:public}", NULL, false},
+		"g", "{scope=ref}{{. (public) access:}}", NULL, false},
 		{"^[ \t]*defguardp[ \t]+(is_[a-zA-Z0-9_?!]+)", "\\1",
-		"g", "{scope=ref}{_field=access:private}", NULL, false},
+		"g", "{scope=ref}{{. (private) access:}}", NULL, false},
 		{"^[ \t]*defimpl[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"i", "{scope=ref}", NULL, false},
 		{"^[ \t]*defmacro[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\1",
-		"a", "{scope=ref}{_field=access:public}", NULL, false},
+		"a", "{scope=ref}{{. (public) access:}}", NULL, false},
 		{"^[ \t]*defmacrop[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\1",
-		"a", "{scope=ref}{_field=access:private}", NULL, false},
+		"a", "{scope=ref}{{. (private) access:}}", NULL, false},
 		{"^[ \t]*Record\\.defrecord[ \t(]+:([a-zA-Z0-9_]+)(\\)?)", "\\1",
-		"r", "{scope=ref}{_field=access:public}", NULL, false},
+		"r", "{scope=ref}{{. (public) access:}}", NULL, false},
 		{"^[ \t]*Record\\.defrecordp[ \t(]+:([a-zA-Z0-9_]+)(\\)?)", "\\1",
-		"r", "{scope=ref}{_field=access:private}", NULL, false},
+		"r", "{scope=ref}{{. (private) access:}}", NULL, false},
 		{"^[ \t]*test[ \t(]+\"([a-z_][a-zA-Z0-9_?! ]*)\"*(\\)?)[ \t]*do", "\\1",
 		"t", "{scope=ref}", NULL, false},
 		{"^[ \t]*@(type|opaque)[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\2",
-		"y", "{scope=ref}{_field=access:public}", NULL, false},
+		"y", "{scope=ref}{{. (public) access:}}", NULL, false},
 		{"^[ \t]*@typep[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
-		"y", "{scope=ref}{_field=access:private}", NULL, false},
+		"y", "{scope=ref}{{. (private) access:}}", NULL, false},
 	};
 
 
@@ -126,8 +119,6 @@ extern parserDefinition* ElixirParser (void)
 	def->useCork       = CORK_QUEUE;
 	def->kindTable     = ElixirKindTable;
 	def->kindCount     = ARRAY_SIZE(ElixirKindTable);
-	def->fieldTable    = ElixirFieldTable;
-	def->fieldCount    = ARRAY_SIZE(ElixirFieldTable);
 	def->tagRegexTable = ElixirTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(ElixirTagRegexTable);
 	def->initialize    = initializeElixirParser;
