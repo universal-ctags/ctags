@@ -1,0 +1,470 @@
+org.apache.hive.service.rpc.thrift	input.thrift	/^namespace java org.apache.hive.service.rpc.thrift$/;"	n	target:java
+apache.hive.service.rpc.thrift	input.thrift	/^namespace cpp apache.hive.service.rpc.thrift$/;"	n	target:cpp
+TProtocolVersion	input.thrift	/^enum TProtocolVersion {$/;"	g
+HIVE_CLI_SERVICE_PROTOCOL_V1	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V1,$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V2	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V2$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V3	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V3$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V4	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V4$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V5	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V5$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V6	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V6$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V7	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V7$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V8	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V8$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V9	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V9$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V10	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V10$/;"	e	enum:TProtocolVersion
+HIVE_CLI_SERVICE_PROTOCOL_V11	input.thrift	/^  HIVE_CLI_SERVICE_PROTOCOL_V11$/;"	e	enum:TProtocolVersion
+TTypeId	input.thrift	/^enum TTypeId {$/;"	g
+BOOLEAN_TYPE	input.thrift	/^  BOOLEAN_TYPE,$/;"	e	enum:TTypeId
+TINYINT_TYPE	input.thrift	/^  TINYINT_TYPE,$/;"	e	enum:TTypeId
+SMALLINT_TYPE	input.thrift	/^  SMALLINT_TYPE,$/;"	e	enum:TTypeId
+INT_TYPE	input.thrift	/^  INT_TYPE,$/;"	e	enum:TTypeId
+BIGINT_TYPE	input.thrift	/^  BIGINT_TYPE,$/;"	e	enum:TTypeId
+FLOAT_TYPE	input.thrift	/^  FLOAT_TYPE,$/;"	e	enum:TTypeId
+DOUBLE_TYPE	input.thrift	/^  DOUBLE_TYPE,$/;"	e	enum:TTypeId
+STRING_TYPE	input.thrift	/^  STRING_TYPE,$/;"	e	enum:TTypeId
+TIMESTAMP_TYPE	input.thrift	/^  TIMESTAMP_TYPE,$/;"	e	enum:TTypeId
+BINARY_TYPE	input.thrift	/^  BINARY_TYPE,$/;"	e	enum:TTypeId
+ARRAY_TYPE	input.thrift	/^  ARRAY_TYPE,$/;"	e	enum:TTypeId
+MAP_TYPE	input.thrift	/^  MAP_TYPE,$/;"	e	enum:TTypeId
+STRUCT_TYPE	input.thrift	/^  STRUCT_TYPE,$/;"	e	enum:TTypeId
+UNION_TYPE	input.thrift	/^  UNION_TYPE,$/;"	e	enum:TTypeId
+USER_DEFINED_TYPE	input.thrift	/^  USER_DEFINED_TYPE,$/;"	e	enum:TTypeId
+DECIMAL_TYPE	input.thrift	/^  DECIMAL_TYPE,$/;"	e	enum:TTypeId
+NULL_TYPE	input.thrift	/^  NULL_TYPE,$/;"	e	enum:TTypeId
+DATE_TYPE	input.thrift	/^  DATE_TYPE,$/;"	e	enum:TTypeId
+VARCHAR_TYPE	input.thrift	/^  VARCHAR_TYPE,$/;"	e	enum:TTypeId
+CHAR_TYPE	input.thrift	/^  CHAR_TYPE,$/;"	e	enum:TTypeId
+INTERVAL_YEAR_MONTH_TYPE	input.thrift	/^  INTERVAL_YEAR_MONTH_TYPE,$/;"	e	enum:TTypeId
+INTERVAL_DAY_TIME_TYPE	input.thrift	/^  INTERVAL_DAY_TIME_TYPE,$/;"	e	enum:TTypeId
+TIMESTAMPLOCALTZ_TYPE	input.thrift	/^  TIMESTAMPLOCALTZ_TYPE$/;"	e	enum:TTypeId
+PRIMITIVE_TYPES	input.thrift	/^const set<TTypeId> PRIMITIVE_TYPES = [$/;"	C	typeref:typename:set<TTypeId> 
+COMPLEX_TYPES	input.thrift	/^const set<TTypeId> COMPLEX_TYPES = [$/;"	C	typeref:typename:set<TTypeId> 
+COLLECTION_TYPES	input.thrift	/^const set<TTypeId> COLLECTION_TYPES = [$/;"	C	typeref:typename:set<TTypeId> 
+TYPE_NAMES	input.thrift	/^const map<TTypeId,string> TYPE_NAMES = {$/;"	C	typeref:typename:map<TTypeId,string> 
+TTypeEntryPtr	input.thrift	/^typedef i32 TTypeEntryPtr$/;"	t	typeref:typename:i32 
+CHARACTER_MAXIMUM_LENGTH	input.thrift	/^const string CHARACTER_MAXIMUM_LENGTH = "characterMaximumLength"$/;"	C	typeref:typename:string 
+PRECISION	input.thrift	/^const string PRECISION = "precision"$/;"	C	typeref:typename:string 
+SCALE	input.thrift	/^const string SCALE = "scale"$/;"	C	typeref:typename:string 
+TTypeQualifierValue	input.thrift	/^union TTypeQualifierValue {$/;"	u
+i32Value	input.thrift	/^  1: optional i32 i32Value$/;"	m	union:TTypeQualifierValue	typeref:typename:i32 
+stringValue	input.thrift	/^  2: optional string stringValue$/;"	m	union:TTypeQualifierValue	typeref:typename:string 
+TTypeQualifiers	input.thrift	/^struct TTypeQualifiers {$/;"	s
+qualifiers	input.thrift	/^  1: required map <string, TTypeQualifierValue> qualifiers$/;"	m	struct:TTypeQualifiers	typeref:typename:map <string, TTypeQualifierValue> 
+TPrimitiveTypeEntry	input.thrift	/^struct TPrimitiveTypeEntry {$/;"	s
+type	input.thrift	/^  1: required TTypeId type$/;"	m	struct:TPrimitiveTypeEntry	typeref:typename:TTypeId
+typeQualifiers	input.thrift	/^  2: optional TTypeQualifiers typeQualifiers$/;"	m	struct:TPrimitiveTypeEntry	typeref:typename:TTypeQualifiers
+TArrayTypeEntry	input.thrift	/^struct TArrayTypeEntry {$/;"	s
+objectTypePtr	input.thrift	/^  1: required TTypeEntryPtr objectTypePtr$/;"	m	struct:TArrayTypeEntry	typeref:typename:TTypeEntryPtr
+TMapTypeEntry	input.thrift	/^struct TMapTypeEntry {$/;"	s
+keyTypePtr	input.thrift	/^  1: required TTypeEntryPtr keyTypePtr$/;"	m	struct:TMapTypeEntry	typeref:typename:TTypeEntryPtr
+valueTypePtr	input.thrift	/^  2: required TTypeEntryPtr valueTypePtr$/;"	m	struct:TMapTypeEntry	typeref:typename:TTypeEntryPtr
+TStructTypeEntry	input.thrift	/^struct TStructTypeEntry {$/;"	s
+nameToTypePtr	input.thrift	/^  1: required map<string, TTypeEntryPtr> nameToTypePtr$/;"	m	struct:TStructTypeEntry	typeref:typename:map<string, TTypeEntryPtr> 
+TUnionTypeEntry	input.thrift	/^struct TUnionTypeEntry {$/;"	s
+nameToTypePtr	input.thrift	/^  1: required map<string, TTypeEntryPtr> nameToTypePtr$/;"	m	struct:TUnionTypeEntry	typeref:typename:map<string, TTypeEntryPtr> 
+TUserDefinedTypeEntry	input.thrift	/^struct TUserDefinedTypeEntry {$/;"	s
+typeClassName	input.thrift	/^  1: required string typeClassName$/;"	m	struct:TUserDefinedTypeEntry	typeref:typename:string 
+TTypeEntry	input.thrift	/^union TTypeEntry {$/;"	u
+primitiveEntry	input.thrift	/^  1: TPrimitiveTypeEntry primitiveEntry$/;"	m	union:TTypeEntry	typeref:typename:TPrimitiveTypeEntry
+arrayEntry	input.thrift	/^  2: TArrayTypeEntry arrayEntry$/;"	m	union:TTypeEntry	typeref:typename:TArrayTypeEntry
+mapEntry	input.thrift	/^  3: TMapTypeEntry mapEntry$/;"	m	union:TTypeEntry	typeref:typename:TMapTypeEntry
+structEntry	input.thrift	/^  4: TStructTypeEntry structEntry$/;"	m	union:TTypeEntry	typeref:typename:TStructTypeEntry
+unionEntry	input.thrift	/^  5: TUnionTypeEntry unionEntry$/;"	m	union:TTypeEntry	typeref:typename:TUnionTypeEntry
+userDefinedTypeEntry	input.thrift	/^  6: TUserDefinedTypeEntry userDefinedTypeEntry$/;"	m	union:TTypeEntry	typeref:typename:TUserDefinedTypeEntry
+TTypeDesc	input.thrift	/^struct TTypeDesc {$/;"	s
+types	input.thrift	/^  1: required list<TTypeEntry> types$/;"	m	struct:TTypeDesc	typeref:typename:list<TTypeEntry> 
+TColumnDesc	input.thrift	/^struct TColumnDesc {$/;"	s
+columnName	input.thrift	/^  1: required string columnName$/;"	m	struct:TColumnDesc	typeref:typename:string 
+typeDesc	input.thrift	/^  2: required TTypeDesc typeDesc$/;"	m	struct:TColumnDesc	typeref:typename:TTypeDesc
+position	input.thrift	/^  3: required i32 position$/;"	m	struct:TColumnDesc	typeref:typename:i32 
+comment	input.thrift	/^  4: optional string comment$/;"	m	struct:TColumnDesc	typeref:typename:string 
+TTableSchema	input.thrift	/^struct TTableSchema {$/;"	s
+columns	input.thrift	/^  1: required list<TColumnDesc> columns$/;"	m	struct:TTableSchema	typeref:typename:list<TColumnDesc> 
+TBoolValue	input.thrift	/^struct TBoolValue {$/;"	s
+value	input.thrift	/^  1: optional bool value$/;"	m	struct:TBoolValue	typeref:typename:bool 
+TByteValue	input.thrift	/^struct TByteValue {$/;"	s
+value	input.thrift	/^  1: optional byte value$/;"	m	struct:TByteValue	typeref:typename:byte 
+TI16Value	input.thrift	/^struct TI16Value {$/;"	s
+value	input.thrift	/^  1: optional i16 value$/;"	m	struct:TI16Value	typeref:typename:i16 
+TI32Value	input.thrift	/^struct TI32Value {$/;"	s
+value	input.thrift	/^  1: optional i32 value$/;"	m	struct:TI32Value	typeref:typename:i32 
+TI64Value	input.thrift	/^struct TI64Value {$/;"	s
+value	input.thrift	/^  1: optional i64 value$/;"	m	struct:TI64Value	typeref:typename:i64 
+TDoubleValue	input.thrift	/^struct TDoubleValue {$/;"	s
+value	input.thrift	/^  1: optional double value$/;"	m	struct:TDoubleValue	typeref:typename:double 
+TStringValue	input.thrift	/^struct TStringValue {$/;"	s
+value	input.thrift	/^  1: optional string value$/;"	m	struct:TStringValue	typeref:typename:string 
+TColumnValue	input.thrift	/^union TColumnValue {$/;"	u
+boolVal	input.thrift	/^  1: TBoolValue   boolVal      \/\/ BOOLEAN$/;"	m	union:TColumnValue	typeref:typename:TBoolValue
+byteVal	input.thrift	/^  2: TByteValue   byteVal      \/\/ TINYINT$/;"	m	union:TColumnValue	typeref:typename:TByteValue
+i16Val	input.thrift	/^  3: TI16Value    i16Val       \/\/ SMALLINT$/;"	m	union:TColumnValue	typeref:typename:TI16Value
+i32Val	input.thrift	/^  4: TI32Value    i32Val       \/\/ INT$/;"	m	union:TColumnValue	typeref:typename:TI32Value
+i64Val	input.thrift	/^  5: TI64Value    i64Val       \/\/ BIGINT, TIMESTAMP$/;"	m	union:TColumnValue	typeref:typename:TI64Value
+doubleVal	input.thrift	/^  6: TDoubleValue doubleVal    \/\/ FLOAT, DOUBLE$/;"	m	union:TColumnValue	typeref:typename:TDoubleValue
+stringVal	input.thrift	/^  7: TStringValue stringVal    \/\/ STRING, LIST, MAP, STRUCT, UNIONTYPE, BINARY, DECIMAL, NULL,/;"	m	union:TColumnValue	typeref:typename:TStringValue
+TRow	input.thrift	/^struct TRow {$/;"	s
+colVals	input.thrift	/^  1: required list<TColumnValue> colVals$/;"	m	struct:TRow	typeref:typename:list<TColumnValue> 
+TBoolColumn	input.thrift	/^struct TBoolColumn {$/;"	s
+values	input.thrift	/^  1: required list<bool> values$/;"	m	struct:TBoolColumn	typeref:typename:list<bool> 
+nulls	input.thrift	/^  2: required binary nulls$/;"	m	struct:TBoolColumn	typeref:typename:binary 
+TByteColumn	input.thrift	/^struct TByteColumn {$/;"	s
+values	input.thrift	/^  1: required list<byte> values$/;"	m	struct:TByteColumn	typeref:typename:list<byte> 
+nulls	input.thrift	/^  2: required binary nulls$/;"	m	struct:TByteColumn	typeref:typename:binary 
+TI16Column	input.thrift	/^struct TI16Column {$/;"	s
+values	input.thrift	/^  1: required list<i16> values$/;"	m	struct:TI16Column	typeref:typename:list<i16> 
+nulls	input.thrift	/^  2: required binary nulls$/;"	m	struct:TI16Column	typeref:typename:binary 
+TI32Column	input.thrift	/^struct TI32Column {$/;"	s
+values	input.thrift	/^  1: required list<i32> values$/;"	m	struct:TI32Column	typeref:typename:list<i32> 
+nulls	input.thrift	/^  2: required binary nulls$/;"	m	struct:TI32Column	typeref:typename:binary 
+TI64Column	input.thrift	/^struct TI64Column {$/;"	s
+values	input.thrift	/^  1: required list<i64> values$/;"	m	struct:TI64Column	typeref:typename:list<i64> 
+nulls	input.thrift	/^  2: required binary nulls$/;"	m	struct:TI64Column	typeref:typename:binary 
+TDoubleColumn	input.thrift	/^struct TDoubleColumn {$/;"	s
+values	input.thrift	/^  1: required list<double> values$/;"	m	struct:TDoubleColumn	typeref:typename:list<double> 
+nulls	input.thrift	/^  2: required binary nulls$/;"	m	struct:TDoubleColumn	typeref:typename:binary 
+TStringColumn	input.thrift	/^struct TStringColumn {$/;"	s
+values	input.thrift	/^  1: required list<string> values$/;"	m	struct:TStringColumn	typeref:typename:list<string> 
+nulls	input.thrift	/^  2: required binary nulls$/;"	m	struct:TStringColumn	typeref:typename:binary 
+TBinaryColumn	input.thrift	/^struct TBinaryColumn {$/;"	s
+values	input.thrift	/^  1: required list<binary> values$/;"	m	struct:TBinaryColumn	typeref:typename:list<binary> 
+nulls	input.thrift	/^  2: required binary nulls$/;"	m	struct:TBinaryColumn	typeref:typename:binary 
+TColumn	input.thrift	/^union TColumn {$/;"	u
+boolVal	input.thrift	/^  1: TBoolColumn   boolVal      \/\/ BOOLEAN$/;"	m	union:TColumn	typeref:typename:TBoolColumn
+byteVal	input.thrift	/^  2: TByteColumn   byteVal      \/\/ TINYINT$/;"	m	union:TColumn	typeref:typename:TByteColumn
+i16Val	input.thrift	/^  3: TI16Column    i16Val       \/\/ SMALLINT$/;"	m	union:TColumn	typeref:typename:TI16Column
+i32Val	input.thrift	/^  4: TI32Column    i32Val       \/\/ INT$/;"	m	union:TColumn	typeref:typename:TI32Column
+i64Val	input.thrift	/^  5: TI64Column    i64Val       \/\/ BIGINT, TIMESTAMP$/;"	m	union:TColumn	typeref:typename:TI64Column
+doubleVal	input.thrift	/^  6: TDoubleColumn doubleVal    \/\/ FLOAT, DOUBLE$/;"	m	union:TColumn	typeref:typename:TDoubleColumn
+stringVal	input.thrift	/^  7: TStringColumn stringVal    \/\/ STRING, LIST, MAP, STRUCT, UNIONTYPE, DECIMAL, NULL$/;"	m	union:TColumn	typeref:typename:TStringColumn
+binaryVal	input.thrift	/^  8: TBinaryColumn binaryVal    \/\/ BINARY$/;"	m	union:TColumn	typeref:typename:TBinaryColumn
+TRowSet	input.thrift	/^struct TRowSet {$/;"	s
+startRowOffset	input.thrift	/^  1: required i64 startRowOffset$/;"	m	struct:TRowSet	typeref:typename:i64 
+rows	input.thrift	/^  2: required list<TRow> rows$/;"	m	struct:TRowSet	typeref:typename:list<TRow> 
+columns	input.thrift	/^  3: optional list<TColumn> columns$/;"	m	struct:TRowSet	typeref:typename:list<TColumn> 
+binaryColumns	input.thrift	/^  4: optional binary binaryColumns$/;"	m	struct:TRowSet	typeref:typename:binary 
+columnCount	input.thrift	/^  5: optional i32 columnCount$/;"	m	struct:TRowSet	typeref:typename:i32 
+TStatusCode	input.thrift	/^enum TStatusCode {$/;"	g
+SUCCESS_STATUS	input.thrift	/^  SUCCESS_STATUS,$/;"	e	enum:TStatusCode
+SUCCESS_WITH_INFO_STATUS	input.thrift	/^  SUCCESS_WITH_INFO_STATUS,$/;"	e	enum:TStatusCode
+STILL_EXECUTING_STATUS	input.thrift	/^  STILL_EXECUTING_STATUS,$/;"	e	enum:TStatusCode
+ERROR_STATUS	input.thrift	/^  ERROR_STATUS,$/;"	e	enum:TStatusCode
+INVALID_HANDLE_STATUS	input.thrift	/^  INVALID_HANDLE_STATUS$/;"	e	enum:TStatusCode
+TStatus	input.thrift	/^struct TStatus {$/;"	s
+statusCode	input.thrift	/^  1: required TStatusCode statusCode$/;"	m	struct:TStatus	typeref:typename:TStatusCode
+infoMessages	input.thrift	/^  2: optional list<string> infoMessages$/;"	m	struct:TStatus	typeref:typename:list<string> 
+sqlState	input.thrift	/^  3: optional string sqlState  \/\/ as defined in the ISO\/IEF CLI specification$/;"	m	struct:TStatus	typeref:typename:string 
+errorCode	input.thrift	/^  4: optional i32 errorCode    \/\/ internal error code$/;"	m	struct:TStatus	typeref:typename:i32 
+errorMessage	input.thrift	/^  5: optional string errorMessage$/;"	m	struct:TStatus	typeref:typename:string 
+TOperationState	input.thrift	/^enum TOperationState {$/;"	g
+INITIALIZED_STATE	input.thrift	/^  INITIALIZED_STATE,$/;"	e	enum:TOperationState
+RUNNING_STATE	input.thrift	/^  RUNNING_STATE,$/;"	e	enum:TOperationState
+FINISHED_STATE	input.thrift	/^  FINISHED_STATE,$/;"	e	enum:TOperationState
+CANCELED_STATE	input.thrift	/^  CANCELED_STATE,$/;"	e	enum:TOperationState
+CLOSED_STATE	input.thrift	/^  CLOSED_STATE,$/;"	e	enum:TOperationState
+ERROR_STATE	input.thrift	/^  ERROR_STATE,$/;"	e	enum:TOperationState
+UKNOWN_STATE	input.thrift	/^  UKNOWN_STATE,$/;"	e	enum:TOperationState
+PENDING_STATE	input.thrift	/^  PENDING_STATE,$/;"	e	enum:TOperationState
+TIMEDOUT_STATE	input.thrift	/^  TIMEDOUT_STATE,$/;"	e	enum:TOperationState
+TIdentifier	input.thrift	/^typedef string TIdentifier$/;"	t	typeref:typename:string 
+TPattern	input.thrift	/^typedef string TPattern$/;"	t	typeref:typename:string 
+TPatternOrIdentifier	input.thrift	/^typedef string TPatternOrIdentifier$/;"	t	typeref:typename:string 
+THandleIdentifier	input.thrift	/^struct THandleIdentifier {$/;"	s
+guid	input.thrift	/^  1: required binary guid,$/;"	m	struct:THandleIdentifier	typeref:typename:binary 
+secret	input.thrift	/^  2: required binary secret,$/;"	m	struct:THandleIdentifier	typeref:typename:binary 
+TSessionHandle	input.thrift	/^struct TSessionHandle {$/;"	s
+sessionId	input.thrift	/^  1: required THandleIdentifier sessionId$/;"	m	struct:TSessionHandle	typeref:typename:THandleIdentifier
+TOperationType	input.thrift	/^enum TOperationType {$/;"	g
+EXECUTE_STATEMENT	input.thrift	/^  EXECUTE_STATEMENT,$/;"	e	enum:TOperationType
+GET_TYPE_INFO	input.thrift	/^  GET_TYPE_INFO,$/;"	e	enum:TOperationType
+GET_CATALOGS	input.thrift	/^  GET_CATALOGS,$/;"	e	enum:TOperationType
+GET_SCHEMAS	input.thrift	/^  GET_SCHEMAS,$/;"	e	enum:TOperationType
+GET_TABLES	input.thrift	/^  GET_TABLES,$/;"	e	enum:TOperationType
+GET_TABLE_TYPES	input.thrift	/^  GET_TABLE_TYPES,$/;"	e	enum:TOperationType
+GET_COLUMNS	input.thrift	/^  GET_COLUMNS,$/;"	e	enum:TOperationType
+GET_FUNCTIONS	input.thrift	/^  GET_FUNCTIONS,$/;"	e	enum:TOperationType
+UNKNOWN	input.thrift	/^  UNKNOWN,$/;"	e	enum:TOperationType
+PROCEDURAL_SQL	input.thrift	/^  PROCEDURAL_SQL$/;"	e	enum:TOperationType
+TOperationHandle	input.thrift	/^struct TOperationHandle {$/;"	s
+operationId	input.thrift	/^  1: required THandleIdentifier operationId$/;"	m	struct:TOperationHandle	typeref:typename:THandleIdentifier
+operationType	input.thrift	/^  2: required TOperationType operationType$/;"	m	struct:TOperationHandle	typeref:typename:TOperationType
+hasResultSet	input.thrift	/^  3: required bool hasResultSet$/;"	m	struct:TOperationHandle	typeref:typename:bool 
+modifiedRowCount	input.thrift	/^  4: optional double modifiedRowCount$/;"	m	struct:TOperationHandle	typeref:typename:double 
+TOpenSessionReq	input.thrift	/^struct TOpenSessionReq {$/;"	s
+client_protocol	input.thrift	/^  1: required TProtocolVersion client_protocol = TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V10$/;"	m	struct:TOpenSessionReq	typeref:typename:TProtocolVersion
+username	input.thrift	/^  2: optional string username$/;"	m	struct:TOpenSessionReq	typeref:typename:string 
+password	input.thrift	/^  3: optional string password$/;"	m	struct:TOpenSessionReq	typeref:typename:string 
+configuration	input.thrift	/^  4: optional map<string, string> configuration$/;"	m	struct:TOpenSessionReq	typeref:typename:map<string, string> 
+TOpenSessionResp	input.thrift	/^struct TOpenSessionResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TOpenSessionResp	typeref:typename:TStatus
+serverProtocolVersion	input.thrift	/^  2: required TProtocolVersion serverProtocolVersion = TProtocolVersion.HIVE_CLI_SERVICE_PROTOCO/;"	m	struct:TOpenSessionResp	typeref:typename:TProtocolVersion
+sessionHandle	input.thrift	/^  3: optional TSessionHandle sessionHandle$/;"	m	struct:TOpenSessionResp	typeref:typename:TSessionHandle
+configuration	input.thrift	/^  4: optional map<string, string> configuration$/;"	m	struct:TOpenSessionResp	typeref:typename:map<string, string> 
+TSetClientInfoReq	input.thrift	/^struct TSetClientInfoReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle,$/;"	m	struct:TSetClientInfoReq	typeref:typename:TSessionHandle
+configuration	input.thrift	/^  2: optional map<string, string> configuration$/;"	m	struct:TSetClientInfoReq	typeref:typename:map<string, string> 
+TSetClientInfoResp	input.thrift	/^struct TSetClientInfoResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TSetClientInfoResp	typeref:typename:TStatus
+TCloseSessionReq	input.thrift	/^struct TCloseSessionReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TCloseSessionReq	typeref:typename:TSessionHandle
+TCloseSessionResp	input.thrift	/^struct TCloseSessionResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TCloseSessionResp	typeref:typename:TStatus
+TGetInfoType	input.thrift	/^enum TGetInfoType {$/;"	g
+CLI_MAX_DRIVER_CONNECTIONS	input.thrift	/^  CLI_MAX_DRIVER_CONNECTIONS =           0,$/;"	e	enum:TGetInfoType
+CLI_MAX_CONCURRENT_ACTIVITIES	input.thrift	/^  CLI_MAX_CONCURRENT_ACTIVITIES =        1,$/;"	e	enum:TGetInfoType
+CLI_DATA_SOURCE_NAME	input.thrift	/^  CLI_DATA_SOURCE_NAME =                 2,$/;"	e	enum:TGetInfoType
+CLI_FETCH_DIRECTION	input.thrift	/^  CLI_FETCH_DIRECTION =                  8,$/;"	e	enum:TGetInfoType
+CLI_SERVER_NAME	input.thrift	/^  CLI_SERVER_NAME =                      13,$/;"	e	enum:TGetInfoType
+CLI_SEARCH_PATTERN_ESCAPE	input.thrift	/^  CLI_SEARCH_PATTERN_ESCAPE =            14,$/;"	e	enum:TGetInfoType
+CLI_DBMS_NAME	input.thrift	/^  CLI_DBMS_NAME =                        17,$/;"	e	enum:TGetInfoType
+CLI_DBMS_VER	input.thrift	/^  CLI_DBMS_VER =                         18,$/;"	e	enum:TGetInfoType
+CLI_ACCESSIBLE_TABLES	input.thrift	/^  CLI_ACCESSIBLE_TABLES =                19,$/;"	e	enum:TGetInfoType
+CLI_ACCESSIBLE_PROCEDURES	input.thrift	/^  CLI_ACCESSIBLE_PROCEDURES =            20,$/;"	e	enum:TGetInfoType
+CLI_CURSOR_COMMIT_BEHAVIOR	input.thrift	/^  CLI_CURSOR_COMMIT_BEHAVIOR =           23,$/;"	e	enum:TGetInfoType
+CLI_DATA_SOURCE_READ_ONLY	input.thrift	/^  CLI_DATA_SOURCE_READ_ONLY =            25,$/;"	e	enum:TGetInfoType
+CLI_DEFAULT_TXN_ISOLATION	input.thrift	/^  CLI_DEFAULT_TXN_ISOLATION =            26,$/;"	e	enum:TGetInfoType
+CLI_IDENTIFIER_CASE	input.thrift	/^  CLI_IDENTIFIER_CASE =                  28,$/;"	e	enum:TGetInfoType
+CLI_IDENTIFIER_QUOTE_CHAR	input.thrift	/^  CLI_IDENTIFIER_QUOTE_CHAR =            29,$/;"	e	enum:TGetInfoType
+CLI_MAX_COLUMN_NAME_LEN	input.thrift	/^  CLI_MAX_COLUMN_NAME_LEN =              30,$/;"	e	enum:TGetInfoType
+CLI_MAX_CURSOR_NAME_LEN	input.thrift	/^  CLI_MAX_CURSOR_NAME_LEN =              31,$/;"	e	enum:TGetInfoType
+CLI_MAX_SCHEMA_NAME_LEN	input.thrift	/^  CLI_MAX_SCHEMA_NAME_LEN =              32,$/;"	e	enum:TGetInfoType
+CLI_MAX_CATALOG_NAME_LEN	input.thrift	/^  CLI_MAX_CATALOG_NAME_LEN =             34,$/;"	e	enum:TGetInfoType
+CLI_MAX_TABLE_NAME_LEN	input.thrift	/^  CLI_MAX_TABLE_NAME_LEN =               35,$/;"	e	enum:TGetInfoType
+CLI_SCROLL_CONCURRENCY	input.thrift	/^  CLI_SCROLL_CONCURRENCY =               43,$/;"	e	enum:TGetInfoType
+CLI_TXN_CAPABLE	input.thrift	/^  CLI_TXN_CAPABLE =                      46,$/;"	e	enum:TGetInfoType
+CLI_USER_NAME	input.thrift	/^  CLI_USER_NAME =                        47,$/;"	e	enum:TGetInfoType
+CLI_TXN_ISOLATION_OPTION	input.thrift	/^  CLI_TXN_ISOLATION_OPTION =             72,$/;"	e	enum:TGetInfoType
+CLI_INTEGRITY	input.thrift	/^  CLI_INTEGRITY =                        73,$/;"	e	enum:TGetInfoType
+CLI_GETDATA_EXTENSIONS	input.thrift	/^  CLI_GETDATA_EXTENSIONS =               81,$/;"	e	enum:TGetInfoType
+CLI_NULL_COLLATION	input.thrift	/^  CLI_NULL_COLLATION =                   85,$/;"	e	enum:TGetInfoType
+CLI_ALTER_TABLE	input.thrift	/^  CLI_ALTER_TABLE =                      86,$/;"	e	enum:TGetInfoType
+CLI_ORDER_BY_COLUMNS_IN_SELECT	input.thrift	/^  CLI_ORDER_BY_COLUMNS_IN_SELECT =       90,$/;"	e	enum:TGetInfoType
+CLI_SPECIAL_CHARACTERS	input.thrift	/^  CLI_SPECIAL_CHARACTERS =               94,$/;"	e	enum:TGetInfoType
+CLI_MAX_COLUMNS_IN_GROUP_BY	input.thrift	/^  CLI_MAX_COLUMNS_IN_GROUP_BY =          97,$/;"	e	enum:TGetInfoType
+CLI_MAX_COLUMNS_IN_INDEX	input.thrift	/^  CLI_MAX_COLUMNS_IN_INDEX =             98,$/;"	e	enum:TGetInfoType
+CLI_MAX_COLUMNS_IN_ORDER_BY	input.thrift	/^  CLI_MAX_COLUMNS_IN_ORDER_BY =          99,$/;"	e	enum:TGetInfoType
+CLI_MAX_COLUMNS_IN_SELECT	input.thrift	/^  CLI_MAX_COLUMNS_IN_SELECT =            100,$/;"	e	enum:TGetInfoType
+CLI_MAX_COLUMNS_IN_TABLE	input.thrift	/^  CLI_MAX_COLUMNS_IN_TABLE =             101,$/;"	e	enum:TGetInfoType
+CLI_MAX_INDEX_SIZE	input.thrift	/^  CLI_MAX_INDEX_SIZE =                   102,$/;"	e	enum:TGetInfoType
+CLI_MAX_ROW_SIZE	input.thrift	/^  CLI_MAX_ROW_SIZE =                     104,$/;"	e	enum:TGetInfoType
+CLI_MAX_STATEMENT_LEN	input.thrift	/^  CLI_MAX_STATEMENT_LEN =                105,$/;"	e	enum:TGetInfoType
+CLI_MAX_TABLES_IN_SELECT	input.thrift	/^  CLI_MAX_TABLES_IN_SELECT =             106,$/;"	e	enum:TGetInfoType
+CLI_MAX_USER_NAME_LEN	input.thrift	/^  CLI_MAX_USER_NAME_LEN =                107,$/;"	e	enum:TGetInfoType
+CLI_OJ_CAPABILITIES	input.thrift	/^  CLI_OJ_CAPABILITIES =                  115,$/;"	e	enum:TGetInfoType
+CLI_XOPEN_CLI_YEAR	input.thrift	/^  CLI_XOPEN_CLI_YEAR =                   10000,$/;"	e	enum:TGetInfoType
+CLI_CURSOR_SENSITIVITY	input.thrift	/^  CLI_CURSOR_SENSITIVITY =               10001,$/;"	e	enum:TGetInfoType
+CLI_DESCRIBE_PARAMETER	input.thrift	/^  CLI_DESCRIBE_PARAMETER =               10002,$/;"	e	enum:TGetInfoType
+CLI_CATALOG_NAME	input.thrift	/^  CLI_CATALOG_NAME =                     10003,$/;"	e	enum:TGetInfoType
+CLI_COLLATION_SEQ	input.thrift	/^  CLI_COLLATION_SEQ =                    10004,$/;"	e	enum:TGetInfoType
+CLI_MAX_IDENTIFIER_LEN	input.thrift	/^  CLI_MAX_IDENTIFIER_LEN =               10005,$/;"	e	enum:TGetInfoType
+CLI_ODBC_KEYWORDS	input.thrift	/^  CLI_ODBC_KEYWORDS =                    10006$/;"	e	enum:TGetInfoType
+TGetInfoValue	input.thrift	/^union TGetInfoValue {$/;"	u
+stringValue	input.thrift	/^  1: string stringValue$/;"	m	union:TGetInfoValue	typeref:typename:string 
+smallIntValue	input.thrift	/^  2: i16 smallIntValue$/;"	m	union:TGetInfoValue	typeref:typename:i16 
+integerBitmask	input.thrift	/^  3: i32 integerBitmask$/;"	m	union:TGetInfoValue	typeref:typename:i32 
+integerFlag	input.thrift	/^  4: i32 integerFlag$/;"	m	union:TGetInfoValue	typeref:typename:i32 
+binaryValue	input.thrift	/^  5: i32 binaryValue$/;"	m	union:TGetInfoValue	typeref:typename:i32 
+lenValue	input.thrift	/^  6: i64 lenValue$/;"	m	union:TGetInfoValue	typeref:typename:i64 
+TGetInfoReq	input.thrift	/^struct TGetInfoReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetInfoReq	typeref:typename:TSessionHandle
+infoType	input.thrift	/^  2: required TGetInfoType infoType$/;"	m	struct:TGetInfoReq	typeref:typename:TGetInfoType
+TGetInfoResp	input.thrift	/^struct TGetInfoResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetInfoResp	typeref:typename:TStatus
+infoValue	input.thrift	/^  2: required TGetInfoValue infoValue$/;"	m	struct:TGetInfoResp	typeref:typename:TGetInfoValue
+TExecuteStatementReq	input.thrift	/^struct TExecuteStatementReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TExecuteStatementReq	typeref:typename:TSessionHandle
+statement	input.thrift	/^  2: required string statement$/;"	m	struct:TExecuteStatementReq	typeref:typename:string 
+confOverlay	input.thrift	/^  3: optional map<string, string> confOverlay$/;"	m	struct:TExecuteStatementReq	typeref:typename:map<string, string> 
+runAsync	input.thrift	/^  4: optional bool runAsync = false$/;"	m	struct:TExecuteStatementReq	typeref:typename:bool 
+queryTimeout	input.thrift	/^  5: optional i64 queryTimeout = 0$/;"	m	struct:TExecuteStatementReq	typeref:typename:i64 
+TExecuteStatementResp	input.thrift	/^struct TExecuteStatementResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TExecuteStatementResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TExecuteStatementResp	typeref:typename:TOperationHandle
+TGetTypeInfoReq	input.thrift	/^struct TGetTypeInfoReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetTypeInfoReq	typeref:typename:TSessionHandle
+TGetTypeInfoResp	input.thrift	/^struct TGetTypeInfoResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetTypeInfoResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TGetTypeInfoResp	typeref:typename:TOperationHandle
+TGetCatalogsReq	input.thrift	/^struct TGetCatalogsReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetCatalogsReq	typeref:typename:TSessionHandle
+TGetCatalogsResp	input.thrift	/^struct TGetCatalogsResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetCatalogsResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TGetCatalogsResp	typeref:typename:TOperationHandle
+TGetSchemasReq	input.thrift	/^struct TGetSchemasReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetSchemasReq	typeref:typename:TSessionHandle
+catalogName	input.thrift	/^  2: optional TIdentifier catalogName$/;"	m	struct:TGetSchemasReq	typeref:typename:TIdentifier
+schemaName	input.thrift	/^  3: optional TPatternOrIdentifier schemaName$/;"	m	struct:TGetSchemasReq	typeref:typename:TPatternOrIdentifier
+TGetSchemasResp	input.thrift	/^struct TGetSchemasResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetSchemasResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TGetSchemasResp	typeref:typename:TOperationHandle
+TGetTablesReq	input.thrift	/^struct TGetTablesReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetTablesReq	typeref:typename:TSessionHandle
+catalogName	input.thrift	/^  2: optional TPatternOrIdentifier catalogName$/;"	m	struct:TGetTablesReq	typeref:typename:TPatternOrIdentifier
+schemaName	input.thrift	/^  3: optional TPatternOrIdentifier schemaName$/;"	m	struct:TGetTablesReq	typeref:typename:TPatternOrIdentifier
+tableName	input.thrift	/^  4: optional TPatternOrIdentifier tableName$/;"	m	struct:TGetTablesReq	typeref:typename:TPatternOrIdentifier
+tableTypes	input.thrift	/^  5: optional list<string> tableTypes$/;"	m	struct:TGetTablesReq	typeref:typename:list<string> 
+TGetTablesResp	input.thrift	/^struct TGetTablesResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetTablesResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TGetTablesResp	typeref:typename:TOperationHandle
+TGetTableTypesReq	input.thrift	/^struct TGetTableTypesReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetTableTypesReq	typeref:typename:TSessionHandle
+TGetTableTypesResp	input.thrift	/^struct TGetTableTypesResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetTableTypesResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TGetTableTypesResp	typeref:typename:TOperationHandle
+TGetColumnsReq	input.thrift	/^struct TGetColumnsReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetColumnsReq	typeref:typename:TSessionHandle
+catalogName	input.thrift	/^  2: optional TIdentifier catalogName$/;"	m	struct:TGetColumnsReq	typeref:typename:TIdentifier
+schemaName	input.thrift	/^  3: optional TPatternOrIdentifier schemaName$/;"	m	struct:TGetColumnsReq	typeref:typename:TPatternOrIdentifier
+tableName	input.thrift	/^  4: optional TPatternOrIdentifier tableName$/;"	m	struct:TGetColumnsReq	typeref:typename:TPatternOrIdentifier
+columnName	input.thrift	/^  5: optional TPatternOrIdentifier columnName$/;"	m	struct:TGetColumnsReq	typeref:typename:TPatternOrIdentifier
+TGetColumnsResp	input.thrift	/^struct TGetColumnsResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetColumnsResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TGetColumnsResp	typeref:typename:TOperationHandle
+TGetFunctionsReq	input.thrift	/^struct TGetFunctionsReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetFunctionsReq	typeref:typename:TSessionHandle
+catalogName	input.thrift	/^  2: optional TIdentifier catalogName$/;"	m	struct:TGetFunctionsReq	typeref:typename:TIdentifier
+schemaName	input.thrift	/^  3: optional TPatternOrIdentifier schemaName$/;"	m	struct:TGetFunctionsReq	typeref:typename:TPatternOrIdentifier
+functionName	input.thrift	/^  4: required TPatternOrIdentifier functionName$/;"	m	struct:TGetFunctionsReq	typeref:typename:TPatternOrIdentifier
+TGetFunctionsResp	input.thrift	/^struct TGetFunctionsResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetFunctionsResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TGetFunctionsResp	typeref:typename:TOperationHandle
+TGetPrimaryKeysReq	input.thrift	/^struct TGetPrimaryKeysReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetPrimaryKeysReq	typeref:typename:TSessionHandle
+catalogName	input.thrift	/^  2: optional TIdentifier catalogName$/;"	m	struct:TGetPrimaryKeysReq	typeref:typename:TIdentifier
+schemaName	input.thrift	/^  3: optional TIdentifier schemaName$/;"	m	struct:TGetPrimaryKeysReq	typeref:typename:TIdentifier
+tableName	input.thrift	/^  4: optional TIdentifier tableName$/;"	m	struct:TGetPrimaryKeysReq	typeref:typename:TIdentifier
+TGetPrimaryKeysResp	input.thrift	/^struct TGetPrimaryKeysResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetPrimaryKeysResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TGetPrimaryKeysResp	typeref:typename:TOperationHandle
+TGetCrossReferenceReq	input.thrift	/^struct TGetCrossReferenceReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetCrossReferenceReq	typeref:typename:TSessionHandle
+parentCatalogName	input.thrift	/^  2: optional TIdentifier parentCatalogName$/;"	m	struct:TGetCrossReferenceReq	typeref:typename:TIdentifier
+parentSchemaName	input.thrift	/^  3: optional TIdentifier parentSchemaName$/;"	m	struct:TGetCrossReferenceReq	typeref:typename:TIdentifier
+parentTableName	input.thrift	/^  4: optional TIdentifier parentTableName$/;"	m	struct:TGetCrossReferenceReq	typeref:typename:TIdentifier
+foreignCatalogName	input.thrift	/^  5: optional TIdentifier foreignCatalogName$/;"	m	struct:TGetCrossReferenceReq	typeref:typename:TIdentifier
+foreignSchemaName	input.thrift	/^  6: optional TIdentifier foreignSchemaName$/;"	m	struct:TGetCrossReferenceReq	typeref:typename:TIdentifier
+foreignTableName	input.thrift	/^  7: optional TIdentifier foreignTableName$/;"	m	struct:TGetCrossReferenceReq	typeref:typename:TIdentifier
+TGetCrossReferenceResp	input.thrift	/^struct TGetCrossReferenceResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetCrossReferenceResp	typeref:typename:TStatus
+operationHandle	input.thrift	/^  2: optional TOperationHandle operationHandle$/;"	m	struct:TGetCrossReferenceResp	typeref:typename:TOperationHandle
+TGetOperationStatusReq	input.thrift	/^struct TGetOperationStatusReq {$/;"	s
+operationHandle	input.thrift	/^  1: required TOperationHandle operationHandle$/;"	m	struct:TGetOperationStatusReq	typeref:typename:TOperationHandle
+getProgressUpdate	input.thrift	/^  2: optional bool getProgressUpdate$/;"	m	struct:TGetOperationStatusReq	typeref:typename:bool 
+TGetOperationStatusResp	input.thrift	/^struct TGetOperationStatusResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetOperationStatusResp	typeref:typename:TStatus
+operationState	input.thrift	/^  2: optional TOperationState operationState$/;"	m	struct:TGetOperationStatusResp	typeref:typename:TOperationState
+sqlState	input.thrift	/^  3: optional string sqlState$/;"	m	struct:TGetOperationStatusResp	typeref:typename:string 
+errorCode	input.thrift	/^  4: optional i32 errorCode$/;"	m	struct:TGetOperationStatusResp	typeref:typename:i32 
+errorMessage	input.thrift	/^  5: optional string errorMessage$/;"	m	struct:TGetOperationStatusResp	typeref:typename:string 
+taskStatus	input.thrift	/^  6: optional string taskStatus$/;"	m	struct:TGetOperationStatusResp	typeref:typename:string 
+operationStarted	input.thrift	/^  7: optional i64 operationStarted$/;"	m	struct:TGetOperationStatusResp	typeref:typename:i64 
+operationCompleted	input.thrift	/^  8: optional i64 operationCompleted$/;"	m	struct:TGetOperationStatusResp	typeref:typename:i64 
+hasResultSet	input.thrift	/^  9: optional bool hasResultSet$/;"	m	struct:TGetOperationStatusResp	typeref:typename:bool 
+progressUpdateResponse	input.thrift	/^  10: optional TProgressUpdateResp progressUpdateResponse$/;"	m	struct:TGetOperationStatusResp	typeref:typename:TProgressUpdateResp
+numModifiedRows	input.thrift	/^  11: optional i64 numModifiedRows$/;"	m	struct:TGetOperationStatusResp	typeref:typename:i64 
+TCancelOperationReq	input.thrift	/^struct TCancelOperationReq {$/;"	s
+operationHandle	input.thrift	/^  1: required TOperationHandle operationHandle$/;"	m	struct:TCancelOperationReq	typeref:typename:TOperationHandle
+TCancelOperationResp	input.thrift	/^struct TCancelOperationResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TCancelOperationResp	typeref:typename:TStatus
+TCloseOperationReq	input.thrift	/^struct TCloseOperationReq {$/;"	s
+operationHandle	input.thrift	/^  1: required TOperationHandle operationHandle$/;"	m	struct:TCloseOperationReq	typeref:typename:TOperationHandle
+TCloseOperationResp	input.thrift	/^struct TCloseOperationResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TCloseOperationResp	typeref:typename:TStatus
+TGetResultSetMetadataReq	input.thrift	/^struct TGetResultSetMetadataReq {$/;"	s
+operationHandle	input.thrift	/^  1: required TOperationHandle operationHandle$/;"	m	struct:TGetResultSetMetadataReq	typeref:typename:TOperationHandle
+TGetResultSetMetadataResp	input.thrift	/^struct TGetResultSetMetadataResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetResultSetMetadataResp	typeref:typename:TStatus
+schema	input.thrift	/^  2: optional TTableSchema schema$/;"	m	struct:TGetResultSetMetadataResp	typeref:typename:TTableSchema
+TFetchOrientation	input.thrift	/^enum TFetchOrientation {$/;"	g
+FETCH_NEXT	input.thrift	/^  FETCH_NEXT,$/;"	e	enum:TFetchOrientation
+FETCH_PRIOR	input.thrift	/^  FETCH_PRIOR,$/;"	e	enum:TFetchOrientation
+FETCH_RELATIVE	input.thrift	/^  FETCH_RELATIVE,$/;"	e	enum:TFetchOrientation
+FETCH_ABSOLUTE	input.thrift	/^  FETCH_ABSOLUTE,$/;"	e	enum:TFetchOrientation
+FETCH_FIRST	input.thrift	/^  FETCH_FIRST,$/;"	e	enum:TFetchOrientation
+FETCH_LAST	input.thrift	/^  FETCH_LAST$/;"	e	enum:TFetchOrientation
+TFetchResultsReq	input.thrift	/^struct TFetchResultsReq {$/;"	s
+operationHandle	input.thrift	/^  1: required TOperationHandle operationHandle$/;"	m	struct:TFetchResultsReq	typeref:typename:TOperationHandle
+orientation	input.thrift	/^  2: required TFetchOrientation orientation = TFetchOrientation.FETCH_NEXT$/;"	m	struct:TFetchResultsReq	typeref:typename:TFetchOrientation
+maxRows	input.thrift	/^  3: required i64 maxRows$/;"	m	struct:TFetchResultsReq	typeref:typename:i64 
+fetchType	input.thrift	/^  4: optional i16 fetchType = 0$/;"	m	struct:TFetchResultsReq	typeref:typename:i16 
+TFetchResultsResp	input.thrift	/^struct TFetchResultsResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TFetchResultsResp	typeref:typename:TStatus
+hasMoreRows	input.thrift	/^  2: optional bool hasMoreRows$/;"	m	struct:TFetchResultsResp	typeref:typename:bool 
+results	input.thrift	/^  3: optional TRowSet results$/;"	m	struct:TFetchResultsResp	typeref:typename:TRowSet
+TGetDelegationTokenReq	input.thrift	/^struct  TGetDelegationTokenReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TGetDelegationTokenReq	typeref:typename:TSessionHandle
+owner	input.thrift	/^  2: required string owner$/;"	m	struct:TGetDelegationTokenReq	typeref:typename:string 
+renewer	input.thrift	/^  3: required string renewer$/;"	m	struct:TGetDelegationTokenReq	typeref:typename:string 
+TGetDelegationTokenResp	input.thrift	/^struct TGetDelegationTokenResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TGetDelegationTokenResp	typeref:typename:TStatus
+delegationToken	input.thrift	/^  2: optional string delegationToken$/;"	m	struct:TGetDelegationTokenResp	typeref:typename:string 
+TCancelDelegationTokenReq	input.thrift	/^struct TCancelDelegationTokenReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TCancelDelegationTokenReq	typeref:typename:TSessionHandle
+delegationToken	input.thrift	/^  2: required string delegationToken$/;"	m	struct:TCancelDelegationTokenReq	typeref:typename:string 
+TCancelDelegationTokenResp	input.thrift	/^struct TCancelDelegationTokenResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TCancelDelegationTokenResp	typeref:typename:TStatus
+TRenewDelegationTokenReq	input.thrift	/^struct TRenewDelegationTokenReq {$/;"	s
+sessionHandle	input.thrift	/^  1: required TSessionHandle sessionHandle$/;"	m	struct:TRenewDelegationTokenReq	typeref:typename:TSessionHandle
+delegationToken	input.thrift	/^  2: required string delegationToken$/;"	m	struct:TRenewDelegationTokenReq	typeref:typename:string 
+TRenewDelegationTokenResp	input.thrift	/^struct TRenewDelegationTokenResp {$/;"	s
+status	input.thrift	/^  1: required TStatus status$/;"	m	struct:TRenewDelegationTokenResp	typeref:typename:TStatus
+TJobExecutionStatus	input.thrift	/^enum TJobExecutionStatus {$/;"	g
+IN_PROGRESS	input.thrift	/^    IN_PROGRESS,$/;"	e	enum:TJobExecutionStatus
+COMPLETE	input.thrift	/^    COMPLETE,$/;"	e	enum:TJobExecutionStatus
+NOT_AVAILABLE	input.thrift	/^    NOT_AVAILABLE$/;"	e	enum:TJobExecutionStatus
+TProgressUpdateResp	input.thrift	/^struct TProgressUpdateResp {$/;"	s
+headerNames	input.thrift	/^  1: required list<string> headerNames$/;"	m	struct:TProgressUpdateResp	typeref:typename:list<string> 
+rows	input.thrift	/^  2: required list<list<string>> rows$/;"	m	struct:TProgressUpdateResp	typeref:typename:list<list<string>> 
+progressedPercentage	input.thrift	/^  3: required double progressedPercentage$/;"	m	struct:TProgressUpdateResp	typeref:typename:double 
+status	input.thrift	/^  4: required TJobExecutionStatus status$/;"	m	struct:TProgressUpdateResp	typeref:typename:TJobExecutionStatus
+footerSummary	input.thrift	/^  5: required string footerSummary$/;"	m	struct:TProgressUpdateResp	typeref:typename:string 
+startTime	input.thrift	/^  6: required i64 startTime$/;"	m	struct:TProgressUpdateResp	typeref:typename:i64 
+TGetQueryIdReq	input.thrift	/^struct TGetQueryIdReq {$/;"	s
+operationHandle	input.thrift	/^  1: required TOperationHandle operationHandle$/;"	m	struct:TGetQueryIdReq	typeref:typename:TOperationHandle
+TGetQueryIdResp	input.thrift	/^struct TGetQueryIdResp {$/;"	s
+queryId	input.thrift	/^  1: required string queryId$/;"	m	struct:TGetQueryIdResp	typeref:typename:string 
+TCLIService	input.thrift	/^service TCLIService {$/;"	v
+OpenSession	input.thrift	/^  TOpenSessionResp OpenSession(1:TOpenSessionReq req);$/;"	f	service:TCLIService	typeref:typename:TOpenSessionResp	signature:(1:TOpenSessionReq req)
+req	input.thrift	/^  TOpenSessionResp OpenSession(1:TOpenSessionReq req);$/;"	z	function:TCLIService.OpenSession	typeref:typename:TOpenSessionReq
+CloseSession	input.thrift	/^  TCloseSessionResp CloseSession(1:TCloseSessionReq req);$/;"	f	service:TCLIService	typeref:typename:TCloseSessionResp	signature:(1:TCloseSessionReq req)
+req	input.thrift	/^  TCloseSessionResp CloseSession(1:TCloseSessionReq req);$/;"	z	function:TCLIService.CloseSession	typeref:typename:TCloseSessionReq
+GetInfo	input.thrift	/^  TGetInfoResp GetInfo(1:TGetInfoReq req);$/;"	f	service:TCLIService	typeref:typename:TGetInfoResp	signature:(1:TGetInfoReq req)
+req	input.thrift	/^  TGetInfoResp GetInfo(1:TGetInfoReq req);$/;"	z	function:TCLIService.GetInfo	typeref:typename:TGetInfoReq
+ExecuteStatement	input.thrift	/^  TExecuteStatementResp ExecuteStatement(1:TExecuteStatementReq req);$/;"	f	service:TCLIService	typeref:typename:TExecuteStatementResp	signature:(1:TExecuteStatementReq req)
+req	input.thrift	/^  TExecuteStatementResp ExecuteStatement(1:TExecuteStatementReq req);$/;"	z	function:TCLIService.ExecuteStatement	typeref:typename:TExecuteStatementReq
+GetTypeInfo	input.thrift	/^  TGetTypeInfoResp GetTypeInfo(1:TGetTypeInfoReq req);$/;"	f	service:TCLIService	typeref:typename:TGetTypeInfoResp	signature:(1:TGetTypeInfoReq req)
+req	input.thrift	/^  TGetTypeInfoResp GetTypeInfo(1:TGetTypeInfoReq req);$/;"	z	function:TCLIService.GetTypeInfo	typeref:typename:TGetTypeInfoReq
+GetCatalogs	input.thrift	/^  TGetCatalogsResp GetCatalogs(1:TGetCatalogsReq req);$/;"	f	service:TCLIService	typeref:typename:TGetCatalogsResp	signature:(1:TGetCatalogsReq req)
+req	input.thrift	/^  TGetCatalogsResp GetCatalogs(1:TGetCatalogsReq req);$/;"	z	function:TCLIService.GetCatalogs	typeref:typename:TGetCatalogsReq
+GetSchemas	input.thrift	/^  TGetSchemasResp GetSchemas(1:TGetSchemasReq req);$/;"	f	service:TCLIService	typeref:typename:TGetSchemasResp	signature:(1:TGetSchemasReq req)
+req	input.thrift	/^  TGetSchemasResp GetSchemas(1:TGetSchemasReq req);$/;"	z	function:TCLIService.GetSchemas	typeref:typename:TGetSchemasReq
+GetTables	input.thrift	/^  TGetTablesResp GetTables(1:TGetTablesReq req);$/;"	f	service:TCLIService	typeref:typename:TGetTablesResp	signature:(1:TGetTablesReq req)
+req	input.thrift	/^  TGetTablesResp GetTables(1:TGetTablesReq req);$/;"	z	function:TCLIService.GetTables	typeref:typename:TGetTablesReq
+GetTableTypes	input.thrift	/^  TGetTableTypesResp GetTableTypes(1:TGetTableTypesReq req);$/;"	f	service:TCLIService	typeref:typename:TGetTableTypesResp	signature:(1:TGetTableTypesReq req)
+req	input.thrift	/^  TGetTableTypesResp GetTableTypes(1:TGetTableTypesReq req);$/;"	z	function:TCLIService.GetTableTypes	typeref:typename:TGetTableTypesReq
+GetColumns	input.thrift	/^  TGetColumnsResp GetColumns(1:TGetColumnsReq req);$/;"	f	service:TCLIService	typeref:typename:TGetColumnsResp	signature:(1:TGetColumnsReq req)
+req	input.thrift	/^  TGetColumnsResp GetColumns(1:TGetColumnsReq req);$/;"	z	function:TCLIService.GetColumns	typeref:typename:TGetColumnsReq
+GetFunctions	input.thrift	/^  TGetFunctionsResp GetFunctions(1:TGetFunctionsReq req);$/;"	f	service:TCLIService	typeref:typename:TGetFunctionsResp	signature:(1:TGetFunctionsReq req)
+req	input.thrift	/^  TGetFunctionsResp GetFunctions(1:TGetFunctionsReq req);$/;"	z	function:TCLIService.GetFunctions	typeref:typename:TGetFunctionsReq
+GetPrimaryKeys	input.thrift	/^  TGetPrimaryKeysResp GetPrimaryKeys(1:TGetPrimaryKeysReq req);$/;"	f	service:TCLIService	typeref:typename:TGetPrimaryKeysResp	signature:(1:TGetPrimaryKeysReq req)
+req	input.thrift	/^  TGetPrimaryKeysResp GetPrimaryKeys(1:TGetPrimaryKeysReq req);$/;"	z	function:TCLIService.GetPrimaryKeys	typeref:typename:TGetPrimaryKeysReq
+GetCrossReference	input.thrift	/^  TGetCrossReferenceResp GetCrossReference(1:TGetCrossReferenceReq req);$/;"	f	service:TCLIService	typeref:typename:TGetCrossReferenceResp	signature:(1:TGetCrossReferenceReq req)
+req	input.thrift	/^  TGetCrossReferenceResp GetCrossReference(1:TGetCrossReferenceReq req);$/;"	z	function:TCLIService.GetCrossReference	typeref:typename:TGetCrossReferenceReq
+GetOperationStatus	input.thrift	/^  TGetOperationStatusResp GetOperationStatus(1:TGetOperationStatusReq req);$/;"	f	service:TCLIService	typeref:typename:TGetOperationStatusResp	signature:(1:TGetOperationStatusReq req)
+req	input.thrift	/^  TGetOperationStatusResp GetOperationStatus(1:TGetOperationStatusReq req);$/;"	z	function:TCLIService.GetOperationStatus	typeref:typename:TGetOperationStatusReq
+CancelOperation	input.thrift	/^  TCancelOperationResp CancelOperation(1:TCancelOperationReq req);$/;"	f	service:TCLIService	typeref:typename:TCancelOperationResp	signature:(1:TCancelOperationReq req)
+req	input.thrift	/^  TCancelOperationResp CancelOperation(1:TCancelOperationReq req);$/;"	z	function:TCLIService.CancelOperation	typeref:typename:TCancelOperationReq
+CloseOperation	input.thrift	/^  TCloseOperationResp CloseOperation(1:TCloseOperationReq req);$/;"	f	service:TCLIService	typeref:typename:TCloseOperationResp	signature:(1:TCloseOperationReq req)
+req	input.thrift	/^  TCloseOperationResp CloseOperation(1:TCloseOperationReq req);$/;"	z	function:TCLIService.CloseOperation	typeref:typename:TCloseOperationReq
+GetResultSetMetadata	input.thrift	/^  TGetResultSetMetadataResp GetResultSetMetadata(1:TGetResultSetMetadataReq req);$/;"	f	service:TCLIService	typeref:typename:TGetResultSetMetadataResp	signature:(1:TGetResultSetMetadataReq req)
+req	input.thrift	/^  TGetResultSetMetadataResp GetResultSetMetadata(1:TGetResultSetMetadataReq req);$/;"	z	function:TCLIService.GetResultSetMetadata	typeref:typename:TGetResultSetMetadataReq
+FetchResults	input.thrift	/^  TFetchResultsResp FetchResults(1:TFetchResultsReq req);$/;"	f	service:TCLIService	typeref:typename:TFetchResultsResp	signature:(1:TFetchResultsReq req)
+req	input.thrift	/^  TFetchResultsResp FetchResults(1:TFetchResultsReq req);$/;"	z	function:TCLIService.FetchResults	typeref:typename:TFetchResultsReq
+GetDelegationToken	input.thrift	/^  TGetDelegationTokenResp GetDelegationToken(1:TGetDelegationTokenReq req);$/;"	f	service:TCLIService	typeref:typename:TGetDelegationTokenResp	signature:(1:TGetDelegationTokenReq req)
+req	input.thrift	/^  TGetDelegationTokenResp GetDelegationToken(1:TGetDelegationTokenReq req);$/;"	z	function:TCLIService.GetDelegationToken	typeref:typename:TGetDelegationTokenReq
+CancelDelegationToken	input.thrift	/^  TCancelDelegationTokenResp CancelDelegationToken(1:TCancelDelegationTokenReq req);$/;"	f	service:TCLIService	typeref:typename:TCancelDelegationTokenResp	signature:(1:TCancelDelegationTokenReq req)
+req	input.thrift	/^  TCancelDelegationTokenResp CancelDelegationToken(1:TCancelDelegationTokenReq req);$/;"	z	function:TCLIService.CancelDelegationToken	typeref:typename:TCancelDelegationTokenReq
+RenewDelegationToken	input.thrift	/^  TRenewDelegationTokenResp RenewDelegationToken(1:TRenewDelegationTokenReq req);$/;"	f	service:TCLIService	typeref:typename:TRenewDelegationTokenResp	signature:(1:TRenewDelegationTokenReq req)
+req	input.thrift	/^  TRenewDelegationTokenResp RenewDelegationToken(1:TRenewDelegationTokenReq req);$/;"	z	function:TCLIService.RenewDelegationToken	typeref:typename:TRenewDelegationTokenReq
+GetQueryId	input.thrift	/^  TGetQueryIdResp GetQueryId(1:TGetQueryIdReq req);$/;"	f	service:TCLIService	typeref:typename:TGetQueryIdResp	signature:(1:TGetQueryIdReq req)
+req	input.thrift	/^  TGetQueryIdResp GetQueryId(1:TGetQueryIdReq req);$/;"	z	function:TCLIService.GetQueryId	typeref:typename:TGetQueryIdReq
+SetClientInfo	input.thrift	/^  TSetClientInfoResp SetClientInfo(1:TSetClientInfoReq req);$/;"	f	service:TCLIService	typeref:typename:TSetClientInfoResp	signature:(1:TSetClientInfoReq req)
+req	input.thrift	/^  TSetClientInfoResp SetClientInfo(1:TSetClientInfoReq req);$/;"	z	function:TCLIService.SetClientInfo	typeref:typename:TSetClientInfoReq
