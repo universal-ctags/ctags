@@ -100,6 +100,8 @@ static EsObject* getFieldValueForScope (const tagEntryInfo *, const fieldDefinit
 static EsObject* setFieldValueForScope (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* checkFieldValueForScope (const fieldDefinition *, const EsObject *);
 static EsObject* getFieldValueForExtras (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* getFieldValueForAccess (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* setFieldValueForAccess (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* getFieldValueForSignature (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForSignature (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* getFieldValueForRoles (const tagEntryInfo *, const fieldDefinition *);
@@ -298,6 +300,11 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.doesContainAnyChar = NULL,
 		.isValueAvailable   = isAccessFieldAvailable,
 		.dataType           = FIELDTYPE_STRING,
+		.getterValueType    = NULL,
+		.getValueObject     = getFieldValueForAccess,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = setFieldValueForAccess,
 	},
 	[FIELD_IMPLEMENTATION - FIELD_ECTAGS_START] = {
 		.letter             = 'm',
@@ -1777,21 +1784,41 @@ static EsObject* getFieldValueForExtras (const tagEntryInfo *tag, const fieldDef
 	return a;
 }
 
+static EsObject* getFieldValueForCOMMON (const char *field, const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	if (!field)
+		return es_nil;
+	return (opt_name_new_from_cstr (field));
+}
+
+static EsObject* setFieldValueForCOMMON (const char **field, tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
+{
+	if (*field)
+		eFree ((char *)*field);
+
+	const char *str = opt_string_get_cstr (obj);
+	*field = eStrdup (str);
+	return es_false;
+}
+
+static EsObject* getFieldValueForAccess (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	return getFieldValueForCOMMON(tag->extensionFields.access, tag, fdef);
+}
+
+static EsObject* setFieldValueForAccess (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
+{
+	return setFieldValueForCOMMON(&tag->extensionFields.access, tag, fdef, obj);
+}
+
 static EsObject* getFieldValueForSignature (const tagEntryInfo *tag, const fieldDefinition *fdef)
 {
-	if (!tag->extensionFields.signature)
-		return es_nil;
-	return (opt_name_new_from_cstr (tag->extensionFields.signature));
+	return getFieldValueForCOMMON(tag->extensionFields.signature, tag, fdef);
 }
 
 static EsObject* setFieldValueForSignature (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
 {
-	if (tag->extensionFields.signature)
-		eFree ((char *)tag->extensionFields.signature);
-
-	const char *str = opt_string_get_cstr (obj);
-	tag->extensionFields.signature = eStrdup (str);
-	return es_false;
+	return setFieldValueForCOMMON(&tag->extensionFields.signature, tag, fdef, obj);
 }
 
 static void makeRolesArray (const tagEntryInfo *const tag, int roleIndex, void *data)
