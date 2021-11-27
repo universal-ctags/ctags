@@ -73,7 +73,15 @@
 --regex-Elixir=/^[ \t]*defp[ \t]+([a-z_][a-zA-Z0-9_?!]*)/\1/f/{scope=ref}{{. (private) access:}}
 --regex-Elixir=/^[ \t]*(@|def)callback[ \t]+([a-z_][a-zA-Z0-9_?!]*)/\2/c/{scope=ref}
 --regex-Elixir=/^[ \t]*defdelegate[ \t]+([a-z_][a-zA-Z0-9_?!]*)/\1/d/{scope=ref}
---regex-Elixir=/^[ \t]*defexception[ \t]+([A-Z][a-zA-Z0-9_]*\.)*([A-Z][a-zA-Z0-9_?!]*)/\2/e/{scope=ref}
+--regex-Elixir=/^[ \t]*defexception[ \t]+([A-Z][a-zA-Z0-9_]*\.)*([A-Z][a-zA-Z0-9_?!]*)/\2/e/{scope=ref}{exclusive}
+--regex-Elixir=/^[ \t]*defexception[ \t]+//{exclusive}{{
+    _scopetop {
+        dup :kind /module eq {
+            dup
+            :name /exception _tag _commit exch scope:
+        } if
+    } if
+}}
 --regex-Elixir=/^[ \t]*defguard[ \t]+(is_[a-zA-Z0-9_?!]+)/\1/g/{scope=ref}{{. (public) access:}}
 --regex-Elixir=/^[ \t]*defguardp[ \t]+(is_[a-zA-Z0-9_?!]+)/\1/g/{scope=ref}{{. (private) access:}}
 --regex-Elixir=/^[ \t]*defimpl[ \t]+([A-Z][a-zA-Z0-9_]*\.)*([A-Z][a-zA-Z0-9_?!]*)/\2/i/{scope=ref}

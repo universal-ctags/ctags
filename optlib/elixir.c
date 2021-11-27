@@ -85,7 +85,17 @@ extern parserDefinition* ElixirParser (void)
 		{"^[ \t]*defdelegate[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
 		"d", "{scope=ref}", NULL, false},
 		{"^[ \t]*defexception[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
-		"e", "{scope=ref}", NULL, false},
+		"e", "{scope=ref}{exclusive}", NULL, false},
+		{"^[ \t]*defexception[ \t]+", "",
+		"", "{exclusive}"
+		"{{\n"
+		"    _scopetop {\n"
+		"        dup :kind /module eq {\n"
+		"            dup\n"
+		"            :name /exception _tag _commit exch scope:\n"
+		"        } if\n"
+		"    } if\n"
+		"}}", NULL, false},
 		{"^[ \t]*defguard[ \t]+(is_[a-zA-Z0-9_?!]+)", "\\1",
 		"g", "{scope=ref}{{. (public) access:}}", NULL, false},
 		{"^[ \t]*defguardp[ \t]+(is_[a-zA-Z0-9_?!]+)", "\\1",
