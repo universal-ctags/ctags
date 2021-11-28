@@ -39,6 +39,14 @@ static roleDefinition PerlModuleRoles [] = {
 	{ true, "unused", "specified in `no' built-in function" },
 };
 
+typedef enum {
+	R_HEREDOC_ENDLABEL,
+} perlHeredocRole;
+
+static roleDefinition PerlHeredocRoles [] = {
+	{ true, "endmarker", "end marker" },
+};
+
 static kindDefinition PerlKinds [] = {
 	{ true,  'c', "constant",               "constants" },
 	{ true,  'f', "format",                 "formats" },
@@ -48,6 +56,19 @@ static kindDefinition PerlKinds [] = {
 	{ false, 'd', "subroutineDeclaration",  "subroutine declarations" },
 	{ false, 'M', "module",                 "modules",
 	  .referenceOnly = true,  ATTACH_ROLES(PerlModuleRoles)},
+	{ false, 'h', "heredoc", "marker for here document",
+	  .referenceOnly = false, ATTACH_ROLES (PerlHeredocRoles) },
+};
+
+struct hereDocMarker {
+	vString *marker;
+	bool indented;
+	int corkIndex;
+};
+
+struct hereDocMarkerManager {
+	ptrArray *markers;
+	size_t current;
 };
 
 /*
@@ -363,6 +384,177 @@ static void parseQuotedWords(const unsigned char *cp,
 	} while ((cp = readLineFromInputFile()) != NULL);
 }
 
+/*
+ * Extract heredoc markers and skip the heredoc areas.
+ *
+ * - https://perldoc.perl.org/perlop#%3C%3CEOF
+ */
+static struct hereDocMarker *hereDocMarkerNew (bool indented)
+{
+	struct hereDocMarker *marker = xMalloc(1, struct hereDocMarker);
+
+	marker->indented = indented;
+	marker->marker = vStringNew();
+	marker->corkIndex = CORK_NIL;
+
+	return marker;
+}
+
+static void hereDocMarkerDelete (struct hereDocMarker *marker)
+{
+	vStringDelete (marker->marker);
+	eFree (marker);
+}
+
+static unsigned char *readHereDocMarker (unsigned char *line,
+										 vString *marker,
+										 unsigned char quote_char)
+{
+	unsigned char *cp = line;
+	bool backslash = false;
+
+	for (cp = line; *cp != '\0'; cp++)
+	{
+		if (backslash)
+		{
+			vStringPut (marker, *cp);
+			backslash = false;
+			continue;
+		}
+
+		if (quote_char == '"' && (*cp == '\\'))
+		{
+			backslash = true;
+			continue;
+		}
+
+		if (quote_char && *cp == quote_char)
+		{
+			cp++;
+			break;
+		}
+
+		if (!quote_char && !isIdentifier(*cp))
+			break;
+
+		vStringPut (marker, *cp);
+	}
+
+	return cp;
+}
+
+static void collectHereDocMarkers (struct hereDocMarkerManager *mgr,
+								   const unsigned char *line)
+{
+	unsigned char *starter = (unsigned char*)strstr((char *)line, "<<");
+	unsigned char *cp = NULL;
+	bool indented = false;
+	unsigned char quote_char = 0;
+
+	if (starter == NULL)
+		return;
+
+	cp = starter + 2;
+	while (isspace (*cp))
+		cp++;
+
+	if (*cp == '\0')
+		return;
+
+	/* Is shift operator? */
+	if (isdigit (*cp))
+	{
+		/* Scan the rest of the string. */
+		collectHereDocMarkers (mgr, ++cp);
+		return;
+	}
+
+	if (*cp == '~') {
+		indented = true;
+		cp++;
+		if (*cp == '\0')
+			return;
+		while (isspace (*cp))
+			cp++;
+		if (*cp == '\0')
+			return;
+	}
+
+	switch (*cp)
+	{
+	case '\'':
+	case '"':
+	case '`':
+		quote_char = *cp;
+		/* Fall through */
+	case '\\':
+		cp++;
+		if (*cp == '\0')
+			return;
+		break;
+	default:
+		break;
+	}
+
+	struct hereDocMarker *marker = hereDocMarkerNew (indented);
+	const unsigned char *last_cp = cp;
+	cp = readHereDocMarker(cp, marker->marker, quote_char);
+	if (vStringLength (marker->marker) > 0)
+	{
+		marker->corkIndex = makeSimpleTag (marker->marker,
+										   KIND_PERL_HEREDOCMARKER);
+		ptrArrayAdd (mgr->markers, marker);
+	}
+	else
+		hereDocMarkerDelete (marker);
+
+	if (*cp != '\0' && cp != last_cp)
+		collectHereDocMarkers (mgr, cp);
+}
+
+static bool isInHereDoc (struct hereDocMarkerManager *mgr,
+						 const unsigned char *line)
+{
+	if (ptrArrayCount (mgr->markers) == 0)
+		return false;
+
+	const unsigned char *cp = line;
+	struct hereDocMarker *current = ptrArrayItem (mgr->markers, mgr->current);
+	if (current->indented)
+	{
+		while (isspace(*cp))
+			cp++;
+	}
+	if (strncmp((const char *)cp, vStringValue (current->marker), vStringLength (current->marker)) == 0
+		&& (cp [vStringLength (current->marker)] == '\0'
+			|| (!isIdentifier (cp [vStringLength (current->marker)]))))
+	{
+		tagEntryInfo *tag = getEntryInCorkQueue (current->corkIndex);
+		if (tag)
+			tag->extensionFields.endLine = getInputLineNumber();
+		mgr->current++;
+		if (mgr->current == ptrArrayCount (mgr->markers))
+		{
+			ptrArrayClear (mgr->markers);
+			mgr->current = 0;
+		}
+	}
+	return true;
+}
+
+static void initHereDocMarkerManager(struct hereDocMarkerManager *mgr)
+{
+	mgr->markers = ptrArrayNew((ptrArrayDeleteFunc)hereDocMarkerDelete);
+	mgr->current = 0;
+}
+
+static void finiHereDocMarkerManager(struct hereDocMarkerManager *mgr)
+{
+	ptrArrayDelete (mgr->markers);
+	mgr->markers = NULL;
+	mgr->current = 0;
+}
+
 /* Algorithm adapted from from GNU etags.
  * Perl support by Bart Robinson <lomew@cs.utah.edu>
  * Perl sub names: look for /^ [ \t\n]sub [ \t\n]+ [^ \t\n{ (]+/
@@ -395,6 +587,9 @@ static void findPerlTags (void)
 		RESPECT_DATA	= (1 << 1),
 	} respect_token = RESPECT_END | RESPECT_DATA;
 
+	struct hereDocMarkerManager hdoc_mgr;
+	initHereDocMarkerManager (&hdoc_mgr);
+
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		bool spaceRequired = false;
@@ -402,6 +597,9 @@ static void findPerlTags (void)
 		const unsigned char *cp = line;
 		perlKind kind = KIND_PERL_NONE;
 		tagEntryInfo e;
+
+		if (isInHereDoc (&hdoc_mgr, line))
+			continue;
 
 		if (skipPodDoc)
 		{
@@ -462,6 +660,8 @@ static void findPerlTags (void)
 
 		while (isspace (*cp))
 			cp++;
+
+		collectHereDocMarkers (&hdoc_mgr, cp);
 
 		if (strncmp((const char*) cp, "sub", (size_t) 3) == 0)
 		{
@@ -710,6 +910,7 @@ static void findPerlTags (void)
 
 END_MAIN_WHILE:
 	vStringDelete (name);
+	finiHereDocMarkerManager (&hdoc_mgr);
 	if (package != NULL)
 		vStringDelete (package);
 }

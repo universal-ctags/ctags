@@ -1,0 +1,12 @@
+myfunc0	input.pl	/^sub myfunc0$/;"	s	line:1
+foo	input.pl	/^   print <<"foo", <<~\\bar; # you can stack them$/;"	h	line:5	end:10
+bar	input.pl	/^   print <<"foo", <<~\\bar; # you can stack them$/;"	h	line:5	end:15
+myfunc3	input.pl	/^sub myfunc3$/;"	s	line:17
+THIS	input.pl	/^   myfunc0(<< "THIS", 23, <<'THAT');$/;"	h	line:21	end:33
+THAT	input.pl	/^   myfunc0(<< "THIS", 23, <<'THAT');$/;"	h	line:21	end:41
+myfunc9	input.pl	/^sub myfunc9$/;"	s	line:42
+AB"CD	input.pl	/^myfunc0(<< "AB\\"CD", << 'EF\\GH');$/;"	h	line:46	end:53
+EF\\GH	input.pl	/^myfunc0(<< "AB\\"CD", << 'EF\\GH');$/;"	h	line:46	end:59
+myfunc12	input.pl	/^sub myfunc12$/;"	s	line:61
+END	input-0.pl	/^(($argc == (1 << 0x1)) or ($argc >= (1<<1) and $opt_write)) or die <<END;$/;"	h	line:2	end:10
+foo	input-0.pl	/^sub foo {$/;"	s	line:12

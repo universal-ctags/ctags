@@ -1,1 +1,2 @@
+EOM	input.pl	/^$this->print_log(<<EOM);$/;"	h
 test	input.pl	/^sub test {$/;"	s
