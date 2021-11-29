@@ -374,6 +374,8 @@ declop(execstack);
  * tested in typeattrconv.ps */
 declop(type);
 declop(cvn);
+declop(cvs);
+
 /* cvlit, cvx, xcheck, executeonly, noacess, readonly,
    rcheck, wcheck, cvi, cvr, cvrs, cvs,... */
 
@@ -567,6 +569,7 @@ opt_init (void)
 
 	defop (opt_system_dict, type,   1, "any TYPE name");
 	defop (opt_system_dict, cvn,    1, "string CVN name");
+	defop (opt_system_dict, cvs,    2, "any string CVS string");
 
 	defop (opt_system_dict, null,   0, "- NULL null");
 	defop (opt_system_dict, bind,   1, "proc BIND proc");
@@ -3812,10 +3815,9 @@ op_for (OptVM *vm, EsObject *name)
 /*
  * Operators for type, attribute and their conversion
  */
-static EsObject*
-op_type (OptVM *vm, EsObject *name)
+static const char*
+get_type_name (EsObject *o)
 {
-	EsObject *o = ptrArrayRemoveLast (vm->ostack);
 	const char *n;
 
 	if (o == es_nil)
@@ -3829,6 +3831,17 @@ op_type (OptVM *vm, EsObject *name)
 		int t = es_object_get_type (o);
 		n = es_type_get_name (t);
 	}
+
+	return n;
+}
+
+static EsObject*
+op_type (OptVM *vm, EsObject *name)
+{
+	EsObject *o = ptrArrayRemoveLast (vm->ostack);
+	const char *n;
+
+	n = get_type_name (o);
 
 	EsObject *p = name_newS (n, ATTR_EXECUTABLE|ATTR_READABLE);
 	vm_ostack_push (vm, p);
@@ -3851,6 +3864,57 @@ op_cvn (OptVM *vm, EsObject *name)
 	ptrArrayDeleteLast (vm->ostack);
 	vm_ostack_push (vm, n);
 	es_object_unref (n);
+	return es_false;
+}
+
+static EsObject *
+op_cvs (OptVM *vm, EsObject *name)
+{
+	EsObject *o = ptrArrayLast (vm->ostack);
+	if (es_object_get_type (o) != OPT_TYPE_STRING)
+		return OPT_ERR_TYPECHECK;
+
+	EsObject *any = ptrArrayItemFromLast (vm->ostack, 1);
+	vString *vstr = es_pointer_get (o);
+	int t = es_object_get_type (any);
+
+	if (t == OPT_TYPE_STRING)
+	{
+		vString *vany = es_pointer_get (any);
+		vStringCopy (vstr, vany);
+	}
+	else if (t == OPT_TYPE_NAME || t == ES_TYPE_SYMBOL)
+	{
+		if (t == OPT_TYPE_NAME)
+			any = es_pointer_get (any);
+
+		const char *cany = es_symbol_get (any);
+		vStringCopyS (vstr, cany);
+	}
+	else if (t == ES_TYPE_INTEGER)
+	{
+		int iany = es_integer_get (any);
+#define buf_len 13
+		char buf[buf_len];
+		if (!(snprintf (buf, buf_len, "%d", iany) > 0))
+			buf [0] = '\0';
+		vStringCopyS (vstr, buf);
+	}
+	else if (t == ES_TYPE_BOOLEAN)
+		vStringCopyS (vstr, any == es_true? "true": "false");
+	else
+	{
+		const char *type_name = get_type_name (any);
+		vStringCopyS (vstr, "--");
+		vStringCatS (vstr, type_name);
+		vStringCatS (vstr, "--");
+	}
+
+	es_object_ref (o);
+	ptrArrayDeleteLastInBatch (vm->ostack, 2);
+	vm_ostack_push (vm, o);
+	es_object_unref (o);
+
 	return es_false;
 }
 

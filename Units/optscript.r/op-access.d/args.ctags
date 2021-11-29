@@ -1,0 +1,15 @@
+--sort=no
+--langdef=X
+--map-X=.unknown
+--kinddef-X=v,var,variables
+--fields=+{access}
+--regex-X=/^(pub|priv) +var +([a-z]+)$/\2/v/{{
+    . \1 (pub) eq {(public)}{(private)} ifelse access:
+    mark . :access {
+      0 string cvs
+      (-) \2 _buildstring
+      /var _tag _commit pop
+    } {
+      cleartomark
+    } ifelse
+}}

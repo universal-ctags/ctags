@@ -9,7 +9,7 @@ R	NONE	no	NONE	s--	no	--	Marker (R or D) representing whether tag is definition 
 S	signature	no	NONE	s--	no	rw	Signature of routine (e.g. prototype or parameter list)
 T	epoch	yes	NONE	-i-	no	--	the last modified time of the input file (only for F/file kind tag)
 Z	scope	no	NONE	s--	no	rw	[tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
-a	access	no	NONE	s--	no	--	Access (or export) of class members
+a	access	no	NONE	s--	no	rw	Access (or export) of class members
 e	end	no	NONE	-i-	no	rw	end lines of various items
 f	file	yes	NONE	--b	no	--	File-restricted scoping
 i	inherits	no	NONE	s-b	no	-w	Inheritance information
@@ -36,7 +36,6 @@ z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field outpu
 -	macrodef	no	CPreProcessor	s--	no	--	macro definition
 -	macrodef	no	CUDA	s--	no	--	macro definition
 -	properties	no	CUDA	s--	no	--	properties (static, inline, mutable,...)
--	access	yes	Elixir	s--	no	--	access
 -	howImported	no	Go	s--	no	--	how the package is imported ("inline" for `.' or "init" for `_')
 -	package	yes	Go	s--	no	--	the real package specified by the package name
 -	packageName	yes	Go	s--	no	--	the name for referring the package

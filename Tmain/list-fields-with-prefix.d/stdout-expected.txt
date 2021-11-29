@@ -18,7 +18,6 @@ x       UCTAGSxpath          no      NONE             s--    no    -- xpath for 
 -       UCTAGSmacrodef       no      CPreProcessor    s--    no    -- macro definition
 -       UCTAGSmacrodef       no      CUDA             s--    no    -- macro definition
 -       UCTAGSproperties     no      CUDA             s--    no    -- properties (static, inline, mutable,...)
--       UCTAGSaccess         yes     Elixir           s--    no    -- access
 -       UCTAGShowImported    no      Go               s--    no    -- how the package is imported ("inline" for `.' or "init" for `_')
 -       UCTAGSpackage        yes     Go               s--    no    -- the real package specified by the package name
 -       UCTAGSpackageName    yes     Go               s--    no    -- the name for referring the package

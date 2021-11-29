@@ -1,0 +1,3 @@
+ModuleError	input.ex	/^defmodule ModuleError do$/;"	module
+ModuleError	input.ex	/^  defexception [:message]$/;"	exception	module:ModuleError
+exception	input.ex	/^  def exception(value) do$/;"	function	module:ModuleError	access:public
