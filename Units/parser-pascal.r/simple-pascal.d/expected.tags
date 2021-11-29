@@ -1,0 +1,4 @@
+helloproc	input.pas	/^PROCEDURE helloproc(param1: STRING; param2: BYTE);$/;"	p	signature:(param1: STRING; param2: BYTE)
+max	input.pas	/^FUNCTION max(num1, num2: INTEGER): INTEGER;$/;"	f	typeref:typename:INTEGER	signature:(num1, num2: INTEGER)
+noargs	input.pas	/^FUNCTION noargs: STRING;$/;"	f	typeref:typename:STRING	signature:()
+emptyargs	input.pas	/^FUNCTION emptyargs(): STRING;$/;"	f	typeref:typename:STRING	signature:()
