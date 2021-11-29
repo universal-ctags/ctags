@@ -75,8 +75,7 @@ static kindDefinition g_aCXXCPPKinds [] = {
 	{ true,  'n', "namespace",  "namespaces" },
 	{ false, 'A', "alias",      "namespace aliases" },
 	{ false, 'N', "name",       "names imported via using scope::symbol" },
-	{ false, 'U', "using",      "using namespace statements",
-			.referenceOnly = true },
+	{ false, 'U', "using",      "using namespace statements" },
 	{ false, 'Z', "tparam",     "template parameters" },
 };
 
