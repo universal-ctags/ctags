@@ -21,3 +21,13 @@ dicttype
 {add}
 arraytype
 /xyz
+(abc)
+(efg)
+(true)
+(false)
+(99)
+(-309)
+(--nulltype--)
+(--arraytype--)
+(--dicttype--)
+(--arraytype--)
