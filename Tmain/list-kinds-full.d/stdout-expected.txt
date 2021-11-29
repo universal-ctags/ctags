@@ -20,7 +20,7 @@ A	alias	no	no	0	NONE	namespace aliases
 D	macroparam	no	no	0	C	parameters inside macro definitions
 L	label	no	no	0	C	goto labels
 N	name	no	no	0	NONE	names imported via using scope::symbol
-U	using	no	yes	0	NONE	using namespace statements
+U	using	no	no	0	NONE	using namespace statements
 Z	tparam	no	no	0	NONE	template parameters
 c	class	yes	no	0	NONE	classes
 d	macro	yes	no	2	C	macro definitions
