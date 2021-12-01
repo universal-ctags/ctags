@@ -1,0 +1,16 @@
+anon_class_e8da5fd50100	input.gd	/^extends Node$/;"	class	inherits:Node
+finished	input.gd	/^signal finished(next_state_name)$/;"	signal	class:anon_class_e8da5fd50100	signature:(next_state_name)
+next_state_name	input.gd	/^signal finished(next_state_name)$/;"	parameter	signal:anon_class_e8da5fd50100.finished	file:
+enter	input.gd	/^func enter():$/;"	method	class:anon_class_e8da5fd50100	signature:()
+exit	input.gd	/^func exit():$/;"	method	class:anon_class_e8da5fd50100	signature:()
+handle_input	input.gd	/^func handle_input(_event):$/;"	method	class:anon_class_e8da5fd50100	signature:(_event)
+_event	input.gd	/^func handle_input(_event):$/;"	parameter	method:anon_class_e8da5fd50100.handle_input	file:
+update	input.gd	/^func update(_delta):$/;"	method	class:anon_class_e8da5fd50100	signature:(_delta)
+_delta	input.gd	/^func update(_delta):$/;"	parameter	method:anon_class_e8da5fd50100.update	file:
+_on_animation_finished	input.gd	/^func _on_animation_finished(_anim_name):$/;"	method	class:anon_class_e8da5fd50100	signature:(_anim_name)
+_anim_name	input.gd	/^func _on_animation_finished(_anim_name):$/;"	parameter	method:anon_class_e8da5fd50100._on_animation_finished	file:
+anon_class_88c08fb20100	input-0.gd	/^signal start_game$/;"	class
+start_game	input-0.gd	/^signal start_game$/;"	signal	class:anon_class_88c08fb20100
+C	input-1.gd	/^class_name C, "res:\/\/path\/to\/optional\/icon.svg"$/;"	class	inherits:B
+sdf	input-1.gd	/^signal sdf$/;"	signal	class:C
+s	input-1.gd	/^var s = "hello"$/;"	variable	class:C

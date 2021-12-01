@@ -1,0 +1,29 @@
+anon_class_186e00360100	input.gd	/^# Taken from godot-demo-projects\/networking\/webrtc_signaling\/server\/ws_webrtc_server.gd$/;"	c	inherits:Node
+TIMEOUT	input.gd	/^const TIMEOUT = 1000 # Unresponsive clients times out after 1 sec$/;"	C	class:anon_class_186e00360100
+SEAL_TIME	input.gd	/^const SEAL_TIME = 10000 # A sealed room will be closed after this time$/;"	C	class:anon_class_186e00360100
+ALFNUM	input.gd	/^const ALFNUM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"$/;"	C	class:anon_class_186e00360100
+_alfnum	input.gd	/^var _alfnum = ALFNUM.to_ascii()$/;"	v	class:anon_class_186e00360100
+rand	input.gd	/^var rand: RandomNumberGenerator = RandomNumberGenerator.new()$/;"	v	class:anon_class_186e00360100	typeref:typename:RandomNumberGenerator
+lobbies	input.gd	/^var lobbies: Dictionary = {}$/;"	v	class:anon_class_186e00360100	typeref:typename:Dictionary
+server	input.gd	/^var server: WebSocketServer = WebSocketServer.new()$/;"	v	class:anon_class_186e00360100	typeref:typename:WebSocketServer
+peers	input.gd	/^var peers: Dictionary = {}$/;"	v	class:anon_class_186e00360100	typeref:typename:Dictionary
+Peer	input.gd	/^class Peer extends Reference:$/;"	c	class:anon_class_186e00360100	inherits:Reference
+id	input.gd	/^	var id = -1$/;"	v	class:anon_class_186e00360100.Peer
+lobby	input.gd	/^	var lobby = ""$/;"	v	class:anon_class_186e00360100.Peer
+time	input.gd	/^	var time = OS.get_ticks_msec()$/;"	v	class:anon_class_186e00360100.Peer
+_init	input.gd	/^	func _init(peer_id):$/;"	m	class:anon_class_186e00360100.Peer	signature:(peer_id)
+Lobby	input.gd	/^class Lobby extends Reference:$/;"	c	class:anon_class_186e00360100	inherits:Reference
+peers	input.gd	/^	var peers: Array = []$/;"	v	class:anon_class_186e00360100.Lobby	typeref:typename:Array
+host	input.gd	/^	var host: int = -1$/;"	v	class:anon_class_186e00360100.Lobby	typeref:typename:int
+sealed	input.gd	/^	var sealed: bool = false$/;"	v	class:anon_class_186e00360100.Lobby	typeref:typename:bool
+time	input.gd	/^	var time = 0$/;"	v	class:anon_class_186e00360100.Lobby
+_init	input.gd	/^	func _init(host_id: int):$/;"	m	class:anon_class_186e00360100.Lobby	signature:(host_id: int)
+join	input.gd	/^	func join(peer_id, server) -> bool:$/;"	m	class:anon_class_186e00360100.Lobby	typeref:typename:bool	signature:(peer_id, server)
+leave	input.gd	/^	func leave(peer_id, server) -> bool:$/;"	m	class:anon_class_186e00360100.Lobby	typeref:typename:bool	signature:(peer_id, server)
+seal	input.gd	/^	func seal(peer_id, server) -> bool:$/;"	m	class:anon_class_186e00360100.Lobby	typeref:typename:bool	signature:(peer_id, server)
+Circle2D	input.gd	/^class Circle2D:$/;"	c	class:anon_class_186e00360100	inherits:Node2D
+center	input.gd	/^	var center$/;"	v	class:anon_class_186e00360100.Circle2D
+radius	input.gd	/^	var radius$/;"	v	class:anon_class_186e00360100.Circle2D
+color	input.gd	/^	var color$/;"	v	class:anon_class_186e00360100.Circle2D
+_draw	input.gd	/^	func _draw():$/;"	m	class:anon_class_186e00360100.Circle2D	signature:()
+_init	input.gd	/^func _init():$/;"	m	class:anon_class_186e00360100	signature:()

@@ -1,0 +1,5 @@
+--sort=no
+--fields=+{inherits}{signature}
+--kinds-GDScript=-{local}
+--kinds-GDScript=-{parameter}
+--extras-GDScript=+{implicitClass}

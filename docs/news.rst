@@ -414,6 +414,7 @@ The following parsers have been added:
 * Falcon
 * FunctionParameters *perl based subparser*
 * Gdbinit script *optlib*
+* GDScript
 * Glade *libxml*
 * Go
 * Haskell
