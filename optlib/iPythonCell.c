@@ -36,7 +36,7 @@ extern parserDefinition* IPythonCellParser (void)
 		{
 		  .enabled     = false,
 		  .name        = "doubleSharps",
-		  .description = " Include cells starting from ##",
+		  .description = "Include cells starting from ##",
 		},
 	};
 	static tagRegexTable IPythonCellTagRegexTable [] = {

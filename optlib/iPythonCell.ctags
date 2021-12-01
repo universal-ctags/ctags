@@ -17,7 +17,7 @@
 #
 --langdef=IPythonCell{base=Python}
 --kinddef-IPythonCell=c,cell,cells
---_extradef-IPythonCell=doubleSharps, Include cells starting from ##
+--_extradef-IPythonCell=doubleSharps,Include cells starting from ##
 
 --regex-IPythonCell=/^[ \t]*(# ?%%|# <codecell>)[ \t]*(.*[^ \t])$/\2/c/{exclusive}
 --regex-IPythonCell=/^[ \t]*##[ \t]*(.*[^ \t])$/\1/c/{_extra=doubleSharps}{exclusive}
