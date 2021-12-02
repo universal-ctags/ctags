@@ -189,6 +189,22 @@ with "--options=NONE --fields=+Ki --extras-GDScript=+{implicitClass} -o - input.
 
 	C	input.gd	/^class_name C$/;"	class	inherits:B
 
+When `--extras=+r` is given, the parser extracts the class specified with the
+`extends` keyword as a referece tag of ``class`` kind with ``extended`` role.
+
+"input.gd"
+
+.. code-block:: GDScript
+
+	extends B
+
+"output.tags"
+with "--options=NONE --fields=+rEK --extras=+r -o - input.gd"
+
+.. code-block:: tags
+
+	B	input.gd	/^extends B$/;"	class	roles:extended	extras:reference
+
 SEE ALSO
 --------
 ctags(1)
