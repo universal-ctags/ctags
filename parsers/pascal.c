@@ -44,14 +44,14 @@ static void createPascalTag (
 	if (PascalKinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
 	{
 		initTagEntry (tag, vStringValue (name), kind);
-		if (arglist != NULL && !vStringIsEmpty(arglist))
+		if (arglist != NULL && !vStringIsEmpty (arglist))
 		{
-			tag->extensionFields.signature = vStringValue(arglist);
+			tag->extensionFields.signature = vStringValue (arglist);
 		}
-		if (vartype && !vStringIsEmpty(vartype))
+		if (vartype && !vStringIsEmpty (vartype))
 		{
 			tag->extensionFields.typeRef[0] = "typename";
-			tag->extensionFields.typeRef[1] = vStringValue(vartype);
+			tag->extensionFields.typeRef[1] = vStringValue (vartype);
 		}
 	}
 	else
@@ -86,7 +86,7 @@ static bool tail (const char *cp)
 	return result;
 }
 
-static void parseArglist(const char *buf, vString *arglist, vString *vartype)
+static void parseArglist (const char *buf, vString *arglist, vString *vartype)
 {
 	const char *start, *end;
 	int level;
@@ -95,7 +95,7 @@ static void parseArglist(const char *buf, vString *arglist, vString *vartype)
 		return;
 
 	/* parse argument list which can be missing like in "function ginit:integer;" */
-	if (NULL != (start = strchr(buf, '(')))
+	if (NULL != (start = strchr (buf, '(')))
 	{
 		for (level = 1, end = start + 1; level > 0; ++end)
 		{
@@ -118,30 +118,30 @@ static void parseArglist(const char *buf, vString *arglist, vString *vartype)
 	{
 		char *var, *var_start;
 
-		if (NULL != (var = strchr(end, ':')))
+		if (NULL != (var = strchr (end, ':')))
 		{
 			var++; /* skip ':' */
-			while (isspace((int) *var))
+			while (isspace ((int) *var))
 				++var;
 
-			if (starttoken(*var))
+			if (starttoken (*var))
 			{
 				var_start = var;
 				var++;
-				while (intoken(*var))
+				while (intoken (*var))
 					var++;
-				if (endtoken(*var))
+				if (endtoken (*var))
 				{
-					vStringNCatS(vartype, var_start, var - var_start);
+					vStringNCatS (vartype, var_start, var - var_start);
 				}
 			}
 		}
 	}
 
 	if (NULL == start) /* no argument list */
-		vStringCatS(arglist, "()");
+		vStringCatS (arglist, "()");
 	else
-		vStringNCatS(arglist, start, end - start);
+		vStringNCatS (arglist, start, end - start);
 }
 
 /* Algorithm adapted from from GNU etags.
@@ -153,8 +153,8 @@ static void parseArglist(const char *buf, vString *arglist, vString *vartype)
 static void findPascalTags (void)
 {
 	vString *name = vStringNew ();
-	vString *arglist = vStringNew();
-	vString *vartype = vStringNew();
+	vString *arglist = vStringNew ();
+	vString *vartype = vStringNew ();
 	tagEntryInfo tag;
 	pascalKind kind = K_FUNCTION;
 		/* each of these flags is true iff: */
@@ -280,7 +280,7 @@ static void findPascalTags (void)
 
 			vStringClear (arglist);
 			vStringClear (vartype);
-			parseArglist((const char*) cp, arglist, (kind == K_FUNCTION) ? vartype : NULL);
+			parseArglist ((const char*) cp, arglist, (kind == K_FUNCTION) ? vartype : NULL);
 
 			createPascalTag (&tag, name, kind, arglist, (kind == K_FUNCTION) ? vartype : NULL);
 			dbp = cp;  /* set dbp to e-o-token */
