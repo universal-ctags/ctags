@@ -47,7 +47,6 @@ guest parser for ``plv8``.
 
 EXAMPLES
 --------
-
 tagging code including a user-defined function in a string literal [GH3006]_:
 
 "input.sql"
