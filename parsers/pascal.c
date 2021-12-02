@@ -25,11 +25,12 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_FUNCTION, K_PROCEDURE
+	K_FUNCTION, K_TYPE, K_PROCEDURE
 } pascalKind;
 
 static kindDefinition PascalKinds [] = {
 	{ true, 'f', "function",  "functions"},
+	{ true, 't', "type",      "types"},
 	{ true, 'p', "procedure", "procedures"}
 };
 
@@ -145,7 +146,7 @@ static void parseArglist(const char *buf, vString *arglist, vString *vartype)
 }
 
 /* Algorithm adapted from from GNU etags.
- * Locates tags for procedures & functions.  Doesn't do any type- or
+ * Locates tags for procedures & functions.  Doesn't do full type- or
  * var-definitions.  It does look for the keyword "extern" or "forward"
  * immediately following the procedure statement; if found, the tag is
  * skipped.
@@ -159,7 +160,7 @@ static void findPascalTags (void)
 	pascalKind kind = K_FUNCTION;
 		/* each of these flags is true iff: */
 	bool incomment = false;  /* point is inside a comment */
-	int comment_char = '\0';    /* type of current comment */
+	int comment_char = '\0'; /* type of current comment */
 	bool inquote = false;    /* point is inside '..' string */
 	bool get_tagname = false;/* point is after PROCEDURE/FUNCTION
 		keyword, so next item = potential tag */
@@ -234,6 +235,13 @@ static void findPascalTags (void)
 					break;
 				}
 				continue;
+			case '=':
+				if (found_tag && kind == K_TYPE)
+				{
+					verify_tag = true;
+					break;
+				}
+				continue;
 		}
 		if (found_tag && verify_tag && *dbp != ' ')
 		{
@@ -256,6 +264,14 @@ static void findPascalTags (void)
 					verify_tag = false;
 				}
 			}
+			else if (tolower ((int) *dbp) == 't')
+			{
+				if (tail ("type"))      /*  check for type declaration */
+				{
+					found_tag = false;
+					verify_tag = false;
+				}
+			}
 			if (found_tag && verify_tag)  /* not external proc, so make tag */
 			{
 				found_tag = false;
@@ -264,7 +280,7 @@ static void findPascalTags (void)
 				continue;
 			}
 		}
-		if (get_tagname)  /* grab name of proc or fn */
+		if (get_tagname)  /* grab identifier */
 		{
 			const unsigned char *cp;
 
@@ -274,13 +290,16 @@ static void findPascalTags (void)
 			/* grab block name */
 			while (isspace ((int) *dbp))
 				++dbp;
+			if (!starttoken(*dbp))
+				continue;
 			for (cp = dbp  ;  *cp != '\0' && !endtoken (*cp)  ;  cp++)
 				continue;
 			vStringNCopyS (name, (const char*) dbp,  cp - dbp);
 
 			vStringClear (arglist);
 			vStringClear (vartype);
-			parseArglist((const char*) cp, arglist, (kind == K_FUNCTION) ? vartype : NULL);
+			if (kind == K_FUNCTION || kind == K_PROCEDURE)
+				parseArglist((const char*) cp, arglist, (kind == K_FUNCTION) ? vartype : NULL);
 
 			createPascalTag (&tag, name, kind, arglist, (kind == K_FUNCTION) ? vartype : NULL);
 			dbp = cp;  /* set dbp to e-o-token */
@@ -320,6 +339,13 @@ static void findPascalTags (void)
 						kind = K_FUNCTION;
 					}
 					break;
+				case 't':
+					if (tail ("ype"))
+					{
+						get_tagname = true;
+						kind = K_TYPE;
+					}
+					break;
 			}
 		}  /* while not eof */
 	}
@@ -333,7 +359,7 @@ extern parserDefinition* PascalParser (void)
 	static const char *const extensions [] = { "p", "pas", NULL };
 	parserDefinition* def = parserNew ("Pascal");
 	def->extensions = extensions;
-	def->kindTable      = PascalKinds;
+	def->kindTable  = PascalKinds;
 	def->kindCount  = ARRAY_SIZE (PascalKinds);
 	def->parser     = findPascalTags;
 	return def;
