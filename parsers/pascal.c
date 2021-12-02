@@ -44,7 +44,7 @@ static void createPascalTag (
 	if (PascalKinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
 	{
 		initTagEntry (tag, vStringValue (name), kind);
-		if (arglist != NULL && !vStringIsEmpty (arglist))
+		if (arglist && !vStringIsEmpty (arglist))
 		{
 			tag->extensionFields.signature = vStringValue (arglist);
 		}
