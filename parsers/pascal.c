@@ -38,10 +38,22 @@ static kindDefinition PascalKinds [] = {
 */
 
 static void createPascalTag (
-		tagEntryInfo* const tag, const vString* const name, const int kind)
+		tagEntryInfo* const tag, const vString* const name, const int kind,
+		const vString *arglist, const vString *vartype)
 {
 	if (PascalKinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
+	{
 		initTagEntry (tag, vStringValue (name), kind);
+		if (arglist != NULL && !vStringIsEmpty(arglist))
+		{
+			tag->extensionFields.signature = vStringValue(arglist);
+		}
+		if (vartype && !vStringIsEmpty(vartype))
+		{
+			tag->extensionFields.typeRef[0] = "typename";
+			tag->extensionFields.typeRef[1] = vStringValue(vartype);
+		}
+	}
 	else
 		/* TODO: Passing NULL as name makes an assertion behind initTagEntry failure */
 		initTagEntry (tag, NULL, KIND_GHOST_INDEX);
@@ -74,6 +86,64 @@ static bool tail (const char *cp)
 	return result;
 }
 
+static void parseArglist(const char *buf, vString *arglist, vString *vartype)
+{
+	const char *start, *end;
+	int level;
+
+	if (NULL == buf || arglist == NULL)
+		return;
+
+	/* parse argument list which can be missing like in "function ginit:integer;" */
+	if (NULL != (start = strchr(buf, '(')))
+	{
+		for (level = 1, end = start + 1; level > 0; ++end)
+		{
+			if ('\0' == *end)
+				break;
+			else if ('(' == *end)
+				++ level;
+			else if (')' == *end)
+				-- level;
+		}
+	}
+	else /* if no argument list was found, continue looking for a return value */
+	{
+		start = NULL;
+		end = buf;
+	}
+
+	/* parse return type if requested by passing a non-NULL vartype argument */
+	if (NULL != vartype)
+	{
+		char *var, *var_start;
+
+		if (NULL != (var = strchr(end, ':')))
+		{
+			var++; /* skip ':' */
+			while (isspace((int) *var))
+				++var;
+
+			if (starttoken(*var))
+			{
+				var_start = var;
+				var++;
+				while (intoken(*var))
+					var++;
+				if (endtoken(*var))
+				{
+					vStringNCatS(vartype, var_start, var - var_start);
+				}
+			}
+		}
+	}
+
+	if (NULL == start) /* no argument list */
+		vStringCatS(arglist, "()");
+	else
+		vStringNCatS(arglist, start, end - start);
+}
+
 /* Algorithm adapted from from GNU etags.
  * Locates tags for procedures & functions.  Doesn't do any type- or
  * var-definitions.  It does look for the keyword "extern" or "forward"
@@ -83,6 +153,8 @@ static bool tail (const char *cp)
 static void findPascalTags (void)
 {
 	vString *name = vStringNew ();
+	vString *arglist = vStringNew();
+	vString *vartype = vStringNew();
 	tagEntryInfo tag;
 	pascalKind kind = K_FUNCTION;
 		/* each of these flags is true iff: */
@@ -205,7 +277,12 @@ static void findPascalTags (void)
 			for (cp = dbp  ;  *cp != '\0' && !endtoken (*cp)  ;  cp++)
 				continue;
 			vStringNCopyS (name, (const char*) dbp,  cp - dbp);
-			createPascalTag (&tag, name, kind);
+
+			vStringClear (arglist);
+			vStringClear (vartype);
+			parseArglist((const char*) cp, arglist, (kind == K_FUNCTION) ? vartype : NULL);
+
+			createPascalTag (&tag, name, kind, arglist, (kind == K_FUNCTION) ? vartype : NULL);
 			dbp = cp;  /* set dbp to e-o-token */
 			get_tagname = false;
 			found_tag = true;
@@ -246,6 +323,8 @@ static void findPascalTags (void)
 			}
 		}  /* while not eof */
 	}
+	vStringDelete (arglist);
+	vStringDelete (vartype);
 	vStringDelete (name);
 }
 
