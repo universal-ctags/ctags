@@ -956,6 +956,57 @@ static void deleteTypedParam (struct typedParam *p)
 	eFree (p);
 }
 
+static void parseArglist (tokenInfo *const token, const int kind,
+						  vString *const arglist, ptrArray *const parameters)
+{
+	int prevTokenType = token->type;
+	int depth = 1;
+
+	if (kind != K_CLASS)
+		reprCat (arglist, token);
+
+	do
+	{
+		if (token->type != TOKEN_WHITESPACE &&
+			/* for easy `*args` and `**kwargs` support, we also ignore
+			 * `*`, which anyway can't otherwise screw us up */
+			token->type != '*')
+		{
+			prevTokenType = token->type;
+		}
+
+		readTokenFull (token, true);
+		if (kind != K_CLASS || token->type != ')' || depth > 1)
+			reprCat (arglist, token);
+
+		if (token->type == '(' ||
+			token->type == '[' ||
+			token->type == '{')
+			depth ++;
+		else if (token->type == ')' ||
+				 token->type == ']' ||
+				 token->type == '}')
+			depth --;
+		else if (kind != K_CLASS && depth == 1 &&
+				 token->type == TOKEN_IDENTIFIER &&
+				 (prevTokenType == '(' || prevTokenType == ',') &&
+				 PythonKinds[K_PARAMETER].enabled)
+		{
+			tokenInfo *parameterName;
+			vString *parameterType;
+			struct typedParam *parameter;
+
+			parameterName = newToken ();
+			copyToken (parameterName, token);
+			parameterType = parseParamTypeAnnotation (token, arglist);
+
+			parameter = makeTypedParam (parameterName, parameterType);
+			ptrArrayAdd (parameters, parameter);
+		}
+	}
+	while (token->type != TOKEN_EOF && depth > 0);
+}
+
 static bool parseClassOrDef (tokenInfo *const token,
                                 const vString *const decorators,
                                 pythonKind kind, bool isCDef)
@@ -985,54 +1036,10 @@ static bool parseClassOrDef (tokenInfo *const token,
 	/* collect parameters or inheritance */
 	if (token->type == '(')
 	{
-		int prevTokenType = token->type;
-		int depth = 1;
-
 		arglist = vStringNew ();
-		if (kind != K_CLASS)
-			reprCat (arglist, token);
-
 		parameters = ptrArrayNew ((ptrArrayDeleteFunc)deleteTypedParam);
-		do
-		{
-			if (token->type != TOKEN_WHITESPACE &&
-			    /* for easy `*args` and `**kwargs` support, we also ignore
-			     * `*`, which anyway can't otherwise screw us up */
-			    token->type != '*')
-			{
-				prevTokenType = token->type;
-			}
 
-			readTokenFull (token, true);
-			if (kind != K_CLASS || token->type != ')' || depth > 1)
-				reprCat (arglist, token);
-
-			if (token->type == '(' ||
-			    token->type == '[' ||
-			    token->type == '{')
-				depth ++;
-			else if (token->type == ')' ||
-			         token->type == ']' ||
-			         token->type == '}')
-				depth --;
-			else if (kind != K_CLASS && depth == 1 &&
-			         token->type == TOKEN_IDENTIFIER &&
-			         (prevTokenType == '(' || prevTokenType == ',') &&
-			         PythonKinds[K_PARAMETER].enabled)
-			{
-				tokenInfo *parameterName;
-				vString *parameterType;
-				struct typedParam *parameter;
-
-				parameterName = newToken ();
-				copyToken (parameterName, token);
-				parameterType = parseParamTypeAnnotation (token, arglist);
-
-				parameter = makeTypedParam (parameterName, parameterType);
-				ptrArrayAdd (parameters, parameter);
-			}
-		}
-		while (token->type != TOKEN_EOF && depth > 0);
+		parseArglist (token, kind, arglist, parameters);
 	}
 
 	if (kind == K_CLASS)
