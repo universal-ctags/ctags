@@ -23,6 +23,7 @@
 #include "debug.h"
 #include "xtag.h"
 #include "objpool.h"
+#include "ptrarray.h"
 
 #define isIdentifierChar(c) \
 	(isalnum (c) || (c) == '_' || (c) >= 0x80)
@@ -935,15 +936,33 @@ static vString *parseReturnTypeAnnotation (tokenInfo *const token)
 	return NULL;
 }
 
+struct typedParam {
+	tokenInfo *token;
+	vString *type;
+};
+
+static struct typedParam *makeTypedParam (tokenInfo *token, vString *type)
+{
+	struct typedParam *p = xMalloc (1, struct typedParam);
+	p->token = token;
+	p->type = type;
+	return p;
+}
+
+static void deleteTypedParam (struct typedParam *p)
+{
+	deleteToken (p->token);
+	vStringDelete (p->type);	/* NULL is acceptable. */
+	eFree (p);
+}
+
 static bool parseClassOrDef (tokenInfo *const token,
                                 const vString *const decorators,
                                 pythonKind kind, bool isCDef)
 {
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
-	tokenInfo *parameterTokens[16] = { NULL };
-	vString   *parameterTypes [ARRAY_SIZE(parameterTokens)] = { NULL };
-	unsigned int parameterCount = 0;
+	ptrArray *parameters = NULL;
 	NestingLevel *lv;
 	int corkIndex;
 
@@ -973,6 +992,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 		if (kind != K_CLASS)
 			reprCat (arglist, token);
 
+		parameters = ptrArrayNew ((ptrArrayDeleteFunc)deleteTypedParam);
 		do
 		{
 			if (token->type != TOKEN_WHITESPACE &&
@@ -998,14 +1018,18 @@ static bool parseClassOrDef (tokenInfo *const token,
 			else if (kind != K_CLASS && depth == 1 &&
 			         token->type == TOKEN_IDENTIFIER &&
 			         (prevTokenType == '(' || prevTokenType == ',') &&
-			         parameterCount < ARRAY_SIZE (parameterTokens) &&
 			         PythonKinds[K_PARAMETER].enabled)
 			{
-				tokenInfo *parameterName = newToken ();
+				tokenInfo *parameterName;
+				vString *parameterType;
+				struct typedParam *parameter;
 
+				parameterName = newToken ();
 				copyToken (parameterName, token);
-				parameterTokens[parameterCount] = parameterName;
-				parameterTypes [parameterCount++] = parseParamTypeAnnotation (token, arglist);
+				parameterType = parseParamTypeAnnotation (token, arglist);
+
+				parameter = makeTypedParam (parameterName, parameterType);
+				ptrArrayAdd (parameters, parameter);
 			}
 		}
 		while (token->type != TOKEN_EOF && depth > 0);
@@ -1022,24 +1046,24 @@ static bool parseClassOrDef (tokenInfo *const token,
 	deleteToken (name);
 	vStringDelete (arglist);
 
-	if (parameterCount > 0)
+	if (parameters && !ptrArrayIsEmpty (parameters))
 	{
 		unsigned int i;
 
-		for (i = 0; i < parameterCount; i++)
+		for (i = 0; i < ptrArrayCount (parameters); i++)
 		{
-			int paramCorkIndex = makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
-			deleteToken (parameterTokens[i]);
+			struct typedParam *parameter = ptrArrayItem (parameters, i);
+			int paramCorkIndex = makeSimplePythonTag (parameter->token, K_PARAMETER);
 			tagEntryInfo *e = getEntryInCorkQueue (paramCorkIndex);
-			if (e && parameterTypes[i])
+			if (e && parameter->type)
 			{
 				e->extensionFields.typeRef [0] = eStrdup ("typename");
-				e->extensionFields.typeRef [1] = vStringDeleteUnwrap (parameterTypes[i]);
-				parameterTypes[i] = NULL;
+				e->extensionFields.typeRef [1] = vStringDeleteUnwrap (parameter->type);
+				parameter->type = NULL;
 			}
-			vStringDelete (parameterTypes[i]); /* NULL is acceptable. */
 		}
 	}
+	ptrArrayDelete (parameters); /* NULL is acceptable. */
 
 	tagEntryInfo *e;
 	vString *t;
