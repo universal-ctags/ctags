@@ -949,6 +949,16 @@ static struct typedParam *makeTypedParam (tokenInfo *token, vString *type)
 	return p;
 }
 
+static struct typedParam *makeTypedParamWithCopy (const tokenInfo *token, const vString *type)
+{
+	tokenInfo *token_copied = newToken ();
+	copyToken (token_copied, token);
+
+
+	vString *type_copied = type? vStringNewCopy (type): NULL;
+	return makeTypedParam (token_copied, type_copied);
+}
+
 static void deleteTypedParam (struct typedParam *p)
 {
 	deleteToken (p->token);
@@ -1007,6 +1017,116 @@ static void parseArglist (tokenInfo *const token, const int kind,
 	while (token->type != TOKEN_EOF && depth > 0);
 }
 
+static void parseCArglist (tokenInfo *const token, const int kind,
+						  vString *const arglist, ptrArray *const parameters)
+{
+	int depth = 1;
+	tokenInfo *pname = newToken ();
+	vString *ptype = vStringNew ();
+	vStringCat (arglist, token->string);	/* '(' */
+
+	while (true)
+	{
+		readToken (token);
+		if (token->type == TOKEN_EOF)
+		{
+			/* Unexpected input. */
+			vStringClear (arglist);
+			ptrArrayClear (parameters);
+			break;
+		}
+
+		if (depth == 1 && (token->type == ',' || token->type == ')'))
+		{
+			if (pname->type == TOKEN_IDENTIFIER)
+			{
+				struct typedParam *p;
+
+				/*
+				 * Clean up the type string.
+				 * The type string includes the parameter name at the end.
+				 * 1. Trim the parameter name at the end.
+				 * 2. Then, trim the white space at the end of the type string.
+				 * 3. If the type string is not empty,
+				 *    3.a append (the type stirng + ' ' + the parameter name) to arglist.
+				 *    3.b else just append the parameter name to arglist.
+				 *
+				 * FIXME:
+				 * This doesn't work well with an array and a function pointer.
+				 *
+				 *   f(..., int seq [dim], ...)
+				 *      in this case, dim is extacted as a parameter.
+				 *
+				 *   f(..., int (*fn)(int), ...)
+				 *      in this case , int is extacted as a parameter.
+				 */
+				Assert (vStringLength (ptype) >= vStringLength (pname->string));
+				size_t ptype_len = vStringLength (ptype) - vStringLength (pname->string);
+				vStringTruncate (ptype, ptype_len);
+
+				if (vStringLength (ptype) > 0)
+				{
+					vStringStripTrailing (ptype);
+					if (vStringLength (ptype) > 0)
+					{
+						vStringCat (arglist, ptype);
+						vStringPut (arglist, ' ');
+					}
+				}
+				vStringCat (arglist, pname->string);
+
+				p = makeTypedParamWithCopy (pname, vStringIsEmpty(ptype)? NULL: ptype);
+				ptrArrayAdd (parameters, p);
+			}
+			if (token->type == ')')
+			{
+				vStringPut (arglist, ')');
+				break;
+			}
+			vStringCatS (arglist, ", ");
+			vStringClear (ptype);
+			pname->type = TOKEN_UNDEFINED;
+			continue;
+		}
+
+		if (token->type == '(' ||
+			token->type == '[' ||
+			token->type == '{')
+		{
+			vStringPut (ptype, token->type);
+			depth ++;
+			continue;
+		}
+
+		if (token->type == ')' ||
+			token->type == ']' ||
+			token->type == '}')
+		{
+			vStringPut (ptype, token->type);
+			depth --;
+			continue;
+		}
+
+		if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_KEYWORD)
+		{
+			if (vStringLength (ptype) > 0
+				&& (isalnum ((unsigned char)vStringLast (ptype))
+					|| vStringLast (ptype) == ','))
+				vStringPut (ptype, ' ');
+			vStringCat (ptype, token->string);
+
+			if (!isdigit ((unsigned char)vStringLast (token->string)))
+				copyToken (pname, token);
+			continue;
+		}
+
+		vStringCat (ptype, token->string);
+	}
+
+	vStringDelete (ptype);
+	deleteToken (pname);
+}
+
 static bool parseClassOrDef (tokenInfo *const token,
                                 const vString *const decorators,
                                 pythonKind kind, bool isCDef)
@@ -1039,7 +1159,10 @@ static bool parseClassOrDef (tokenInfo *const token,
 		arglist = vStringNew ();
 		parameters = ptrArrayNew ((ptrArrayDeleteFunc)deleteTypedParam);
 
-		parseArglist (token, kind, arglist, parameters);
+		if (isCDef && kind != K_CLASS)
+			parseCArglist (token, kind, arglist, parameters);
+		else
+			parseArglist (token, kind, arglist, parameters);
 	}
 
 	if (kind == K_CLASS)

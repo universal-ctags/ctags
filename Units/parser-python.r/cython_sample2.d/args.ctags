@@ -1,3 +1,4 @@
---fields=ksS
+--fields=ksSt
+--kinds-Python=+z
 --extras=+r
 --sort=no
