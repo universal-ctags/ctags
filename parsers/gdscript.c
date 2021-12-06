@@ -822,7 +822,7 @@ static vString *parseReturnTypeAnnotation (tokenInfo *const token)
 
 static bool parseClassOrDef (tokenInfo *const token,
 							 const stringList *const decorators,
-							 gdscriptKind kind, bool isCDef)
+							 gdscriptKind kind)
 {
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
@@ -1287,7 +1287,7 @@ static void findGDScriptTags (void)
 			default:
 				AssertNotReached();
 			}
-			readNext = parseClassOrDef (token, decorators, kind, false);
+			readNext = parseClassOrDef (token, decorators, kind);
 		}
 		else if (token->keyword == KEYWORD_extends)
 		{
