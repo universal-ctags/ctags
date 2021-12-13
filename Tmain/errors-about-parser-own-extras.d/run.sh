@@ -2,7 +2,7 @@
 # License: GPL-2
 
 CTAGS="$1"
-O="--quiet --options=NONE --with-list-header=no"
+O="--verbose --options=NONE --with-list-header=no"
 
 echo '#lang' 1>&2
 ${CTAGS} ${O} --extras-NOSUCHLANG=-'{whitespaceSwapped}' --list-extras

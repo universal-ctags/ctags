@@ -23,7 +23,7 @@ jobs:
       with:
         msystem: ${{ matrix.msystem }}
         update: true
-        install: git make automake1.16 autoconf
+        install: git make automake1.16 autoconf gdb
 
     - if:  matrix.msystem == 'MSYS'
       run: pacman -S --noconfirm gcc libiconv-devel pkg-config python dos2unix
