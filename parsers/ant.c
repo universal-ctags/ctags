@@ -128,11 +128,11 @@ static tagXpathTableTable antXpathTableTable[] = {
 #else
 static tagRegexTable antTagRegexTable [] = {
 	{"^[ \t]*<[ \t]*project[^>]+name=\"([^\"]+)\".*", "\\1",
-	 "p,project,projects", "{scope=set}", NULL, false},
+	 "p,project,projects", NULL, NULL, false},
 	{"^[ \t]*<[ \t]*target[^>]+name=\"([^\"]+)\".*", "\\1",
-	 "t,target,targets", "{scope=set}", NULL, false},
+	 "t,target,targets", NULL, NULL, false},
 	{"^[ \t]*<[ \t]*property[^>]+name=\"([^\"]+)\".*", "\\1",
-	 "P,property,property", "{scope=set}", NULL, false},
+	 "P,property,property", NULL, NULL, false},
 };
 #endif
 

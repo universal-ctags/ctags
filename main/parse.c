@@ -4411,7 +4411,9 @@ static void installTagRegexTable (const langType language)
 		 * However, mini-geany deasn't call ctags_cli_main().
 		 * So we call initRegexOptscript () here.
 		 */
+		fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 		initRegexOptscript ();
+		fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 
 	    for (i = 0; i < lang->tagRegexCount; ++i)
 		{
