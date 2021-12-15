@@ -102,7 +102,7 @@ static regexCompiledCode compile (struct regexBackend *backend,
 {
 	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	regex_t *regex_code = xMalloc (1, regex_t);
-	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+	fprintf(stderr, "%s: %d: %s\n", __func__, __LINE__, regexp);
 	int errcode = regcomp (regex_code, regexp, flags);
 	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	if (errcode != 0)
