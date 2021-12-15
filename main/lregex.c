@@ -1432,16 +1432,19 @@ static regexCompiledCode compileRegex (enum regexParserType regptype,
 	struct flagDefsDescriptor desc = choose_backend (flags, regptype, false);
 
 	/* Evaluate backend specific flags */
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	flagsEval (flags,
 			   desc.backend->fdefs,
 			   desc.backend->fdef_count,
 			   &desc.flags);
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	flagsEval (flags,
 			   backendCommonRegexFlagDefs,
 			   ARRAY_SIZE (backendCommonRegexFlagDefs),
 			   &desc);
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	return desc.backend->compile (desc.backend, regexp, desc.flags);
 }
 

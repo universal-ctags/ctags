@@ -100,8 +100,11 @@ static regexCompiledCode compile (struct regexBackend *backend,
 								  const char *const regexp,
 								  int flags)
 {
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	regex_t *regex_code = xMalloc (1, regex_t);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	int errcode = regcomp (regex_code, regexp, flags);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	if (errcode != 0)
 	{
 		char errmsg[256];
@@ -109,8 +112,10 @@ static regexCompiledCode compile (struct regexBackend *backend,
 		error (WARNING, "regcomp: %s", errmsg);
 		regfree (regex_code);
 		eFree (regex_code);
+		fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 		return (regexCompiledCode) { .backend = NULL, .code = NULL };
 	}
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	return (regexCompiledCode) { .backend = &defaultRegexBackend, .code = regex_code };
 }
 
