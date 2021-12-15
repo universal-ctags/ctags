@@ -1,4 +1,0 @@
- ABC();
-int main(void)
-{
-}

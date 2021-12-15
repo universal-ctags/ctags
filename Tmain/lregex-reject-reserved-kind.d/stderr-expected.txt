@@ -1,2 +1,0 @@
-ctags: Kind letter 'F' used in regex definition "a" of foo language is reserved in ctags main
-ctags: Kind name "file" used in regex definition "a" of foo language is reserved in ctags main

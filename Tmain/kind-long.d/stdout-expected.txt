@@ -1,3 +1,0 @@
-L       label      yes     no      0      C      goto labels
-D       macroparam no      no      0      C      parameters inside macro definitions
-d       macro      no      no      2      C      macro definitions

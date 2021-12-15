@@ -1,4 +1,0 @@
---langdef=Hook{base=Event}
---kinddef-Hook=h,hook,hooks
---regex-Hook=/DEFINE_HOOK\((.*)\);/\1/h/'
-

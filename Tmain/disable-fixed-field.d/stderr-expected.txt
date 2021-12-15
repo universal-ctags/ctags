@@ -1,6 +1,0 @@
-ctags: Warning: Cannot disable fixed field: 'N'{name} in ctags output mode
-ctags: Warning: Cannot disable fixed field: 'F'{input} in ctags output mode
-ctags: Warning: Cannot disable fixed field: 'P'{pattern} in ctags output mode
-ctags: Warning: Cannot disable fixed field: 'N'{name} in ctags output mode
-ctags: Warning: Cannot disable fixed field: 'F'{input} in ctags output mode
-ctags: Warning: Cannot disable fixed field: 'P'{pattern} in ctags output mode

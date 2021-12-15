@@ -1,7 +1,0 @@
-# u-ctags --options=x.ctags -o output.tags input.x
---langdef=X
---map-X=.x
---languages=X
---kinddef-X=a,anything,something anythings
---regex-X=/^(.*)$/\1/a/
-

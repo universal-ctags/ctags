@@ -1,5 +1,0 @@
---langdef=Plugin{base=C}
---kinddef-Plugin=f,File,files
---kinddef-Plugin=n,name,name
---regex-Plugin=/LOAD_PLUGIN\((.*),[ \t]*(.*)\);/\1/f/
---regex-Plugin=/LOAD_PLUGIN\((.*),[ \t]*(.*)\);/\2/n/

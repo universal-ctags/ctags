@@ -1,20 +1,0 @@
-a	./input.java	/^public class Foo extends Bar {static Logger a = Logger.getLogger(Foo.class.getName()); static Lo/;"	f
-b	./input.java	/^public class Foo extends Bar {static Logger a = Logger.getLogger(Foo.class.getName()); static Lo/;"	f
-a	./input.java	/^public cla/;"	f
-b	./input.java	/^public cla/;"	f
-a	./input.java	/^public class Foo extends Bar {static Logger a = Logger.getLogger(Foo.class.getName()); static Logger b = Logger.getLogger(Foo.class.getName());}$/;"	f
-b	./input.java	/^public class Foo extends Bar {static Logger a = Logger.getLogger(Foo.class.getName()); static Logger b = Logger.getLogger(Foo.class.getName());}$/;"	f
---- multi-byte handling
-a	./input-utf8.py	/^a='√©√†/;"	v
-a	./input-utf8.py	/^a='√©√†/;"	v
-a	./input-iso-8859-1.py	/^a='ÄÅÇÉ/;"	v
---- multi-byte handling (etags)
-
-input-utf8.py,14
-a='√©√†a1,0
-
-input-utf8.py,14
-a='√©√†a1,0
-
-input-iso-8859-1.py,16
-a='ÄÅÇÉa3,141

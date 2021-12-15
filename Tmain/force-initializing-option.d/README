@@ -1,2 +1,0 @@
-This test case expects the exit status will be 0 if an erorr doesn't
-occur during initializing a parser.

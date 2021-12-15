@@ -1,8 +1,0 @@
-c  classes
-f  methods
-m  modules
-S  singleton methods
-C  constants
-A  accessors
-a  aliases
-L  libraries
