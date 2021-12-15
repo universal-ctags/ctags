@@ -2135,7 +2135,9 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 	if (!regexAvailable)
 		return NULL;
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	regexCompiledCode cp = compileRegex (regptype, regex, flags);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	if (cp.code == NULL)
 	{
 		error (WARNING, "pattern: %s", regex);
@@ -2151,13 +2153,19 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 		return NULL;
 	}
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+
 	char kindLetter;
 	char* kindName;
 	char* description;
 	kindDefinition* fileKind;
 
 	bool explictly_defined =  parseKinds (kinds, &kindLetter, &kindName, &description);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+
 	fileKind = getLanguageKind (lcb->owner, KIND_FILE_INDEX);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+
 	if (kindLetter == fileKind->letter)
 		error (FATAL,
 			   "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
@@ -2182,6 +2190,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 							   NULL);
 	Assert (option_bsae);
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	for (const char * p = kindName; *p; p++)
 	{
 		if (p == kindName)
@@ -2213,16 +2222,23 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 		}
 	}
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	regexPattern *rptr = addCompiledTagPattern (lcb, table_index,
 												regptype, &cp, name,
 												kindLetter, kindName, description, flags,
 												explictly_defined,
 												disabled);
+
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	rptr->pattern_string = escapeRegexPattern(regex);
+
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 
 	eFree (kindName);
 	if (description)
 		eFree (description);
+
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 
 	if (*name == '\0')
 	{
@@ -2237,6 +2253,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 			error (WARNING, "%s: regexp missing name pattern", regex);
 	}
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	return rptr;
 }
 

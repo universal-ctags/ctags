@@ -4425,12 +4425,16 @@ static void installTagRegexTable (const langType language)
 									  lang->tagRegexTable [i].flags,
 									  (lang->tagRegexTable [i].disabled));
 			else
+			{
+				fprintf(stderr, "%s: %d[%d]\n", __func__, __LINE__, i);
 				addTagRegex (parser->lregexControlBlock,
 							 lang->tagRegexTable [i].regex,
 							 lang->tagRegexTable [i].name,
 							 lang->tagRegexTable [i].kinds,
 							 lang->tagRegexTable [i].flags,
 							 (lang->tagRegexTable [i].disabled));
+				fprintf(stderr, "%s: %d[%d]\n", __func__, __LINE__, i);
+			}
 		}
 	}
 }
