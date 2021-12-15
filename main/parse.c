@@ -1806,21 +1806,29 @@ static void initializeParserOne (langType lang)
 	verbose ("Initialize parser: %s\n", parser->def->name);
 	parser->initialized = true;
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	installKeywordTable (lang);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	installTagXpathTable (lang);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	installFieldDefinition     (lang);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	installXtagDefinition      (lang);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 
 	/* regex definitions refers xtag definitions.
 	   So installing RegexTable must be after installing
 	   xtag definitions. */
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	installTagRegexTable (lang);
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	if (parser->def->initialize != NULL)
 		parser->def->initialize (lang);
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	initializeDependencies (parser->def, parser->slaveControlBlock);
-
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	Assert (parser->fileKind != NULL);
 	Assert (!doesParserUseKind (parser->kindControlBlock, parser->fileKind->letter));
 
