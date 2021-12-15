@@ -2072,21 +2072,31 @@ static void processListAliasesOption (
 static void processListExtrasOption (
 		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
 {
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	struct colprintTable * table = xtagColprintTableNew ();
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 
 	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 	{
+		fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 		xtagColprintAddCommonLines (table);
-
+		fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 		initializeParser (LANG_AUTO);
+		fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 		for (unsigned int i = 0; i < countParsers (); i++)
 		{
 			if (isLanguageVisible(i))
+			{
+				fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 				xtagColprintAddLanguageLines (table, i);
+				fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+			}
 		}
+		fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	}
 	else
 	{
+		fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
@@ -2095,8 +2105,11 @@ static void processListExtrasOption (
 		xtagColprintAddLanguageLines (table, language);
 	}
 
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	xtagColprintTablePrint (table, localOption.withListHeader, localOption.machinable, stdout);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	colprintTableDelete (table);
+	fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	exit (0);
 }
 
