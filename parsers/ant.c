@@ -127,7 +127,7 @@ static tagXpathTableTable antXpathTableTable[] = {
 
 #else
 static tagRegexTable antTagRegexTable [] = {
-	{"^[^>]+name=\"([^\"]+)\".*", "\\1",
+	{"=\"([^\"]+)\".*", "\\1",
 	 "p,project,projects", NULL, NULL, false},
 };
 #endif
