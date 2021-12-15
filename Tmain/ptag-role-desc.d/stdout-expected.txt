@@ -1,2 +1,0 @@
-!_TAG_ROLE_DESCRIPTION!C!header	local	/local header/
-!_TAG_ROLE_DESCRIPTION!C!header	system	/system header/

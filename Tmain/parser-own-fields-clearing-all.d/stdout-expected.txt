@@ -1,4 +1,0 @@
-# default
--       assignment yes     LdScript s--    no    -- how a value is assigned to the symbol
-# clear all
--       assignment no      LdScript s--    no    -- how a value is assigned to the symbol

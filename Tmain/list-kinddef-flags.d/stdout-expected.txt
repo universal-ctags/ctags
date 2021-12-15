@@ -1,2 +1,0 @@
-#LETTER NAME     DESCRIPTION
--       _refonly use this kind reference tags only

@@ -1,7 +1,0 @@
-Error: /undefined in a
-Operand stack:
-top|   |bottom
-Execution stack:
-top|   a   {a}   --if--   |bottom
-Dictionary stack:
-top|   -dict:1-   -dict:88-   |bottom

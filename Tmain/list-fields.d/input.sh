@@ -1,5 +1,0 @@
-source x
-function y()
-{
-}
-

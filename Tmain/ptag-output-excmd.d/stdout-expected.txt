@@ -1,4 +1,0 @@
-!_TAG_OUTPUT_EXCMD	number	/number, pattern, mixed, or combineV2/
-!_TAG_OUTPUT_EXCMD	pattern	/number, pattern, mixed, or combineV2/
-!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
-!_TAG_OUTPUT_EXCMD	combineV2	/number, pattern, mixed, or combineV2/

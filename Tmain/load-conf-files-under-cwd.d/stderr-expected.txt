@@ -1,2 +1,0 @@
-ctags: Notice: hello
-ctags: Notice: world

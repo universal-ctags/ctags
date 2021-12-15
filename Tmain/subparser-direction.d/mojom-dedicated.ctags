@@ -1,4 +1,0 @@
---langdef=mojom{base=C++}{dedicated}
---kinddef-mojom=f,function,functions
---map-mojom=+.mojom
---regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/

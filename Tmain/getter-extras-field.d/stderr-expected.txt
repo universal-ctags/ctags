@@ -1,8 +1,0 @@
-true
-[/reference]
-true
-[/qualified /reference]
-true
-[/X.foo]
-true
-[/reference /X.foo]

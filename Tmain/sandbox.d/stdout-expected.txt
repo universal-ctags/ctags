@@ -1,3 +1,0 @@
-{"_type": "program", "name": "Universal Ctags", "version": "5.9.0"}
-{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^int main(void) { return 0; }/", "typeref": "typename:int", "kind": "function"}
-{"_type": "completed", "command": "generate-tags"}

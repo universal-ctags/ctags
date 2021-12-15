@@ -1,3 +1,0 @@
-eof	./input.foo	/^/;"	e
-eof	./input2.foo	/^a/;"	e
-eof	./input2.foo	/^a/;"	e
