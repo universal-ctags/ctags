@@ -129,10 +129,6 @@ static tagXpathTableTable antXpathTableTable[] = {
 static tagRegexTable antTagRegexTable [] = {
 	{"^[ \t]*<[ \t]*project[^>]+name=\"([^\"]+)\".*", "\\1",
 	 "p,project,projects", NULL, NULL, false},
-	{"^[ \t]*<[ \t]*target[^>]+name=\"([^\"]+)\".*", "\\1",
-	 "t,target,targets", NULL, NULL, false},
-	{"^[ \t]*<[ \t]*property[^>]+name=\"([^\"]+)\".*", "\\1",
-	 "P,property,property", NULL, NULL, false},
 };
 #endif
 
