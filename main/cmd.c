@@ -10,13 +10,13 @@
 */
 #include "general.h"  /* must always come first */
 
-#include "main_p.h"
-
+#include <regex.h>
 
 /*
 *   FUNCTION DEFINITIONS
 */
 int main(int argc, char **argv)
 {
-	return ctags_cli_main (argc, argv);
+	regex_t code;
+	return regcomp (&code, "a", 5);
 }
