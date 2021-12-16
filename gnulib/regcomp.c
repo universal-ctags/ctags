@@ -779,17 +779,20 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
     }
   preg->used = sizeof (re_dfa_t);
 
-  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__); /* BEFORE CRASH */
   err = init_dfa (dfa, length);
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   if (__glibc_unlikely (err == REG_NOERROR && lock_init (dfa->lock) != 0))
     err = REG_ESPACE;
   if (__glibc_unlikely (err != REG_NOERROR))
     {
+      fprintf(stderr, "%s: %d\n", __func__, __LINE__);
       free_dfa_content (dfa);
       preg->buffer = NULL;
       preg->allocated = 0;
       return err;
     }
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 #ifdef DEBUG
   /* Note: length+1 will not overflow since it is checked in init_dfa.  */
   dfa->re_str = re_malloc (char, length + 1);
@@ -869,6 +872,7 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
 static reg_errcode_t
 init_dfa (re_dfa_t *dfa, size_t pat_len)
 {
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   __re_size_t table_size;
 #ifndef _LIBC
   const char *codeset_name;
@@ -886,7 +890,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
 			max_i18n_object_size))));
 
   memset (dfa, '\0', sizeof (re_dfa_t));
-
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   /* Force allocation of str_tree_storage the first time.  */
   dfa->str_tree_storage_idx = BIN_TREE_STORAGE_SIZE;
 
@@ -897,7 +901,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
   if (__glibc_unlikely (MIN (IDX_MAX, SIZE_MAX / max_object_size) / 2
 			<= pat_len))
     return REG_ESPACE;
-
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   dfa->nodes_alloc = pat_len + 1;
   dfa->nodes = re_malloc (re_token_t, dfa->nodes_alloc);
 
@@ -908,7 +912,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
 
   dfa->state_table = calloc (sizeof (struct re_state_table_entry), table_size);
   dfa->state_hash_mask = table_size - 1;
-
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   dfa->mb_cur_max = MB_CUR_MAX;
 #ifdef _LIBC
   if (dfa->mb_cur_max == 6
@@ -923,7 +927,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
       && (codeset_name[2] == 'F' || codeset_name[2] == 'f')
       && strcmp (codeset_name + 3 + (codeset_name[3] == '-'), "8") == 0)
     dfa->is_utf8 = 1;
-
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   /* We check exhaustively in the loop below if this charset is a
      superset of ASCII.  */
   dfa->map_notascii = 0;
@@ -932,6 +936,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
 #ifdef RE_ENABLE_I18N
   if (dfa->mb_cur_max > 1)
     {
+      fprintf(stderr, "%s: %d\n", __func__, __LINE__);
       if (dfa->is_utf8)
 	dfa->sb_char = (re_bitset_ptr_t) utf8_sb_map;
       else
@@ -941,7 +946,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
 	  dfa->sb_char = (re_bitset_ptr_t) calloc (sizeof (bitset_t), 1);
 	  if (__glibc_unlikely (dfa->sb_char == NULL))
 	    return REG_ESPACE;
-
+	  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 	  /* Set the bits corresponding to single byte chars.  */
 	  for (i = 0, ch = 0; i < BITSET_WORDS; ++i)
 	    for (j = 0; j < BITSET_WORD_BITS; ++j, ++ch)
@@ -955,9 +960,11 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
 # endif
 	      }
 	}
+        fprintf(stderr, "%s: %d\n", __func__, __LINE__);
     }
 #endif
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   if (__glibc_unlikely (dfa->nodes == NULL || dfa->state_table == NULL))
     return REG_ESPACE;
   return REG_NOERROR;
