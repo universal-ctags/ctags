@@ -8,7 +8,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"  /* must always come first */
+#include <config.h>
 
 #include <regex.h>
 
