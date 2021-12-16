@@ -21,6 +21,8 @@
 # include <locale/weight.h>
 #endif
 
+#include <stdio.h>
+
 static reg_errcode_t re_compile_internal (regex_t *preg, const char * pattern,
 					  size_t length, reg_syntax_t syntax);
 static void re_compile_fastmap_iter (regex_t *bufp,
@@ -460,18 +462,29 @@ re_compile_fastmap_iter (regex_t *bufp, const re_dfastate_t *init_state,
 int
 regcomp (regex_t *__restrict preg, const char *__restrict pattern, int cflags)
 {
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+
   reg_errcode_t ret;
   reg_syntax_t syntax = ((cflags & REG_EXTENDED) ? RE_SYNTAX_POSIX_EXTENDED
 			 : RE_SYNTAX_POSIX_BASIC);
+
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 
   preg->buffer = NULL;
   preg->allocated = 0;
   preg->used = 0;
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+
   /* Try to allocate space for the fastmap.  */
   preg->fastmap = re_malloc (char, SBC_MAX);
+
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+
   if (__glibc_unlikely (preg->fastmap == NULL))
     return REG_ESPACE;
+
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 
   syntax |= (cflags & REG_ICASE) ? RE_ICASE : 0;
 
@@ -485,16 +498,22 @@ regcomp (regex_t *__restrict preg, const char *__restrict pattern, int cflags)
     }
   else
     preg->newline_anchor = 0;
+
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   preg->no_sub = !!(cflags & REG_NOSUB);
   preg->translate = NULL;
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   ret = re_compile_internal (preg, pattern, strlen (pattern), syntax);
+
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 
   /* POSIX doesn't distinguish between an unmatched open-group and an
      unmatched close-group: both are REG_EPAREN.  */
   if (ret == REG_ERPAREN)
     ret = REG_EPAREN;
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   /* We have already checked preg->fastmap != NULL.  */
   if (__glibc_likely (ret == REG_NOERROR))
     /* Compute the fastmap now, since regexec cannot modify the pattern
@@ -507,6 +526,7 @@ regcomp (regex_t *__restrict preg, const char *__restrict pattern, int cflags)
       preg->fastmap = NULL;
     }
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   return (int) ret;
 }
 libc_hidden_def (__regcomp)
@@ -730,6 +750,7 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
   re_dfa_t *dfa;
   re_string_t regexp;
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   /* Initialize the pattern buffer.  */
   preg->fastmap_accurate = 0;
   preg->syntax = syntax;
@@ -739,6 +760,7 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
   preg->can_be_null = 0;
   preg->regs_allocated = REGS_UNALLOCATED;
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   /* Initialize the dfa.  */
   dfa = preg->buffer;
   if (__glibc_unlikely (preg->allocated < sizeof (re_dfa_t)))
@@ -747,14 +769,17 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
 	 enough space.  This loses if buffer's address is bogus, but
 	 that is the user's responsibility.  If ->buffer is NULL this
 	 is a simple allocation.  */
+      fprintf(stderr, "%s: %d\n", __func__, __LINE__);
       dfa = re_realloc (preg->buffer, re_dfa_t, 1);
       if (dfa == NULL)
 	return REG_ESPACE;
       preg->allocated = sizeof (re_dfa_t);
       preg->buffer = dfa;
+      fprintf(stderr, "%s: %d\n", __func__, __LINE__);
     }
   preg->used = sizeof (re_dfa_t);
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   err = init_dfa (dfa, length);
   if (__glibc_unlikely (err == REG_NOERROR && lock_init (dfa->lock) != 0))
     err = REG_ESPACE;
@@ -771,8 +796,11 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
   strncpy (dfa->re_str, pattern, length + 1);
 #endif
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   err = re_string_construct (&regexp, pattern, length, preg->translate,
 			     (syntax & RE_ICASE) != 0, dfa);
+
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   if (__glibc_unlikely (err != REG_NOERROR))
     {
     re_compile_internal_free_return:
@@ -785,14 +813,25 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
       return err;
     }
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+
   /* Parse the regular expression, and build a structure tree.  */
   preg->re_nsub = 0;
+
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   dfa->str_tree = parse (&regexp, preg, syntax, &err);
+
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+
   if (__glibc_unlikely (dfa->str_tree == NULL))
     goto re_compile_internal_free_return;
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+
   /* Analyze the tree and create the nfa.  */
   err = analyze (preg);
+
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   if (__glibc_unlikely (err != REG_NOERROR))
     goto re_compile_internal_free_return;
 
@@ -802,13 +841,16 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
     optimize_utf8 (dfa);
 #endif
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   /* Then create the initial state of the dfa.  */
   err = create_initial_state (dfa);
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   /* Release work areas.  */
   free_workarea_compile (preg);
   re_string_destruct (&regexp);
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   if (__glibc_unlikely (err != REG_NOERROR))
     {
       lock_fini (dfa->lock);
@@ -817,6 +859,7 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
       preg->allocated = 0;
     }
 
+  fprintf(stderr, "%s: %d\n", __func__, __LINE__);
   return err;
 }
 
