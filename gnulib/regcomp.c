@@ -782,8 +782,16 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
   fprintf(stderr, "%s: %d\n", __func__, __LINE__); /* BEFORE CRASH */
   err = init_dfa (dfa, length);
   fprintf(stderr, "%s: %d\n", __func__, __LINE__);
-  if (__glibc_unlikely (err == REG_NOERROR && lock_init (dfa->lock) != 0))
-    err = REG_ESPACE;
+  if (__glibc_unlikely (err == REG_NOERROR
+			&& (fprintf(stderr, "%s: %d\n", __func__, __LINE__), 1)
+			&& lock_init (dfa->lock) != 0
+			&& (fprintf(stderr, "%s: %d\n", __func__, __LINE__), 1)
+			))
+    {
+      fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+      err = REG_ESPACE;
+      fprintf(stderr, "%s: %d\n", __func__, __LINE__);
+    }
   if (__glibc_unlikely (err != REG_NOERROR))
     {
       fprintf(stderr, "%s: %d\n", __func__, __LINE__);
