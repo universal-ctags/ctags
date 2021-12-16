@@ -560,6 +560,10 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 #   header files or functions.
 gl_INIT
 
+AC_DEFINE([GNULIB_REGEX_SINGLE_THREAD], [1],
+  [Define if all programs in this package call functions of the Gnulib
+   'regex' module only from a single thread.])
+
 if test "$REPLACE_FNMATCH" != 0; then
 	AC_DEFINE([USE_GNULIB_FNMATCH])
 fi
