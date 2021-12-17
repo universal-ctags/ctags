@@ -726,6 +726,7 @@ static reg_errcode_t
 re_compile_internal (regex_t *preg, const char * pattern, size_t length,
 		     reg_syntax_t syntax)
 {
+  extern ssize_t write(int fd, const void *buf, size_t count);
   reg_errcode_t err = REG_NOERROR;
   re_dfa_t *dfa;
   re_string_t regexp;
@@ -756,7 +757,14 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
   preg->used = sizeof (re_dfa_t);
 
   err = init_dfa (dfa, length);
-  if (__glibc_unlikely (err == REG_NOERROR && lock_init (dfa->lock) != 0))
+  if (__glibc_unlikely (err == REG_NOERROR
+			&& (write(2, "In the next line, I will die.\n",
+				  strlen("In the next line, I will die.\n"))
+			    , 1)
+			&& lock_init (dfa->lock) != 0
+			&& (write(2, "Unexpectedly I survived.\n",
+				  strlen("Unexpectedly I survived.\n"))
+			    , 1)))
     err = REG_ESPACE;
   if (__glibc_unlikely (err != REG_NOERROR))
     {
