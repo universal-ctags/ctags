@@ -760,7 +760,6 @@ extern parserDefinition* LdScriptParser (void)
 	def->aliases    = aliases;
 	def->keywordTable = LdScriptKeywordTable;
 	def->keywordCount = ARRAY_SIZE (LdScriptKeywordTable);
-	def->initialize = initialize;
 	def->fieldTable = LdScriptFields;
 	def->fieldCount = ARRAY_SIZE (LdScriptFields);
 

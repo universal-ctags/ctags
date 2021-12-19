@@ -1546,7 +1546,7 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 
 	if (includeExtensionFlags ()
 	    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
-	    && doesInputLanguageRequestAutomaticFQTag ()
+	    && doesInputLanguageRequestAutomaticFQTag (tag)
 		&& !isTagExtraBitMarked (tag, XTAG_QUALIFIED_TAGS)
 		&& !tag->skipAutoFQEmission)
 	{
@@ -1616,7 +1616,7 @@ extern void uncorkTagFile(void)
 
 		writeTagEntry (tag);
 
-		if (doesInputLanguageRequestAutomaticFQTag ()
+		if (doesInputLanguageRequestAutomaticFQTag (tag)
 		    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
 			&& !isTagExtraBitMarked (tag, XTAG_QUALIFIED_TAGS)
 			&& !tag->skipAutoFQEmission

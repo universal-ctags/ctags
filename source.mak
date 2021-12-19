@@ -175,7 +175,6 @@ OPTSCRIPT_SRCS = \
 OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.$(OBJEXT))
 
 OPTLIB2C_INPUT = \
-	optlib/RSpec.ctags			\
 	optlib/cmake.ctags			\
 	optlib/ctags-optlib.ctags		\
 	optlib/elixir.ctags			\
@@ -238,6 +237,7 @@ PARSER_HEADS = \
 	parsers/make.h \
 	parsers/perl.h \
 	parsers/r.h \
+	parsers/ruby.h \
 	parsers/tcl.h \
 	parsers/tex.h \
 	\
@@ -330,6 +330,7 @@ PARSER_SRCS =				\
 	parsers/rexx.c			\
 	parsers/robot.c			\
 	parsers/rpmspec.c		\
+	parsers/rspec.c			\
 	parsers/rst.c			\
 	parsers/ruby.c			\
 	parsers/rust.c			\

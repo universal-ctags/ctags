@@ -1,0 +1,9 @@
+Order	input.rb	/^RSpec.describe Order do$/;"	describe	line:6	language:RSpec	end:18
+with no items	input.rb	/^  context "with no items" do$/;"	context	line:7	language:RSpec	describe:Order	end:11
+with one item	input.rb	/^  context "with one item" do$/;"	context	line:13	language:RSpec	describe:Order	end:17
+Calculator	input.rb	/^RSpec.describe Calculator do$/;"	describe	line:20	language:RSpec	end:26
+#add	input.rb	/^  describe '#add' do$/;"	describe	line:21	language:RSpec	describe:Calculator	end:25
+Core	input.rb	/^module RSpec::Core$/;"	module	line:29	language:Ruby	module:RSpec	end:48
+ExampleGroup	input.rb	/^  RSpec.describe ExampleGroup do$/;"	describe	line:30	language:RSpec	end:47
+when calling `#{method}`, an example group API, from within an example	input.rb	/^      context "when calling `#{method}`, an example group API, from within an example" do$/;"	context	line:32	language:RSpec	describe:ExampleGroup	end:42
+Object describing nested example_groups	input.rb	/^    describe Object, "describing nested example_groups", :little_less_nested => 'yep' do$/;"	describe	line:45	language:RSpec	describe:ExampleGroup	end:46
