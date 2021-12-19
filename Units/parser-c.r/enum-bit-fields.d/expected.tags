@@ -1,0 +1,28 @@
+s0	input.c	/^struct s0 {$/;"	s	file:
+__anon4724ae570103	input.c	/^	enum {ID0} e0:1;$/;"	g	struct:s0	file:
+ID0	input.c	/^	enum {ID0} e0:1;$/;"	e	enum:s0::__anon4724ae570103	file:
+e0	input.c	/^	enum {ID0} e0:1;$/;"	m	struct:s0	typeref:enum:s0::__anon4724ae570103:1	file:
+x0	input.c	/^	int x0;$/;"	m	struct:s0	typeref:typename:int	file:
+E1	input.c	/^enum E1 {ID1};$/;"	g	file:
+ID1	input.c	/^enum E1 {ID1};$/;"	e	enum:E1	file:
+s1	input.c	/^struct s1 {$/;"	s	file:
+e1	input.c	/^	enum E1 e1:1;$/;"	m	struct:s1	typeref:enum:E1:1	file:
+x1	input.c	/^	int x1;$/;"	m	struct:s1	typeref:typename:int	file:
+s2	input.c	/^struct s2 {$/;"	s	file:
+E2	input.c	/^	enum E2 {ID2} e2:1;$/;"	g	struct:s2	file:
+ID2	input.c	/^	enum E2 {ID2} e2:1;$/;"	e	enum:s2::E2	file:
+e2	input.c	/^	enum E2 {ID2} e2:1;$/;"	m	struct:s2	typeref:enum:s2::E2:1	file:
+x2	input.c	/^	int x2;$/;"	m	struct:s2	typeref:typename:int	file:
+E3	input.c	/^enum E3 {ID3};$/;"	g	file:
+ID3	input.c	/^enum E3 {ID3};$/;"	e	enum:E3	file:
+s3	input.c	/^struct s3 {$/;"	s	file:
+e3	input.c	/^	enum E3 e3:1;$/;"	m	struct:s3	typeref:enum:E3:1	file:
+x3	input.c	/^	int x3;$/;"	m	struct:s3	typeref:typename:int	file:
+E4	input.c	/^enum E4 {ID4};$/;"	g	file:
+ID4	input.c	/^enum E4 {ID4};$/;"	e	enum:E4	file:
+bits	input.c	/^#define bits /;"	d	file:	macrodef:7
+s4	input.c	/^struct s4 {$/;"	s	file:
+e4_1	input.c	/^	enum E4 e4_1:1, e4_2:2, e4_3:bits;$/;"	m	struct:s4	typeref:enum:E4:1	file:
+e4_2	input.c	/^	enum E4 e4_1:1, e4_2:2, e4_3:bits;$/;"	m	struct:s4	typeref:enum:E4:2	file:
+e4_3	input.c	/^	enum E4 e4_1:1, e4_2:2, e4_3:bits;$/;"	m	struct:s4	typeref:enum:E4:7	file:
+x4	input.c	/^	int x4;$/;"	m	struct:s4	typeref:typename:int	file:
