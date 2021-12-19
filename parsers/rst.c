@@ -383,6 +383,7 @@ static void findRstTags (void)
 		if (!isspace(*line))
 		{
 			vStringCatS(name, (const char*)line);
+			vStringStripTrailing (name);
 			filepos = getInputFilePosition();
 		}
 	}
