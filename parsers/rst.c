@@ -66,8 +66,6 @@ static fieldDefinition RstFields [] = {
 	},
 };
 
-static char kindchars[SECTION_COUNT];
-
 static NestingLevels *nestingLevels = NULL;
 
 /*
@@ -192,7 +190,7 @@ static bool issame(const char *str)
 }
 
 
-static int get_kind(char c)
+static int get_kind(char c, char kindchars[])
 {
 	int i;
 
@@ -313,6 +311,7 @@ static void findRstTags (void)
 	MIOPos filepos;
 	const unsigned char *line;
 	const unsigned char *markup_line;
+	char kindchars[SECTION_COUNT];
 
 	memset(&filepos, 0, sizeof(filepos));
 	memset(kindchars, 0, sizeof kindchars);
@@ -370,7 +369,7 @@ static void findRstTags (void)
 			ispunct(line[0]) && issame((const char*) line))
 		{
 			char c = line[0];
-			int kind = get_kind(c);
+			int kind = get_kind(c, kindchars);
 
 			if (kind >= 0)
 			{
