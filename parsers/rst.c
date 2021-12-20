@@ -375,6 +375,7 @@ static void findRstTags (void)
 			if (kind >= 0)
 			{
 				makeSectionRstTag(name, kind, filepos, c);
+				vStringClear(name);
 				continue;
 			}
 		}
