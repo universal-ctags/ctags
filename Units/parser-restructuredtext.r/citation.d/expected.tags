@@ -1,6 +1,6 @@
-KVM VCPU Requests	input.rst	/^KVM VCPU Requests$/;"	c
-VCPU Request Internals	input.rst	/^VCPU Request Internals$/;"	s	chapter:KVM VCPU Requests
-References	input.rst	/^References$/;"	s	chapter:KVM VCPU Requests
+KVM VCPU Requests	input.rst	/^KVM VCPU Requests$/;"	c	sectionMarker:=	overline:
+VCPU Request Internals	input.rst	/^VCPU Request Internals$/;"	s	chapter:KVM VCPU Requests	sectionMarker:=
+References	input.rst	/^References$/;"	s	chapter:KVM VCPU Requests	sectionMarker:=
 atomic-ops	input.rst	/^.. [atomic-ops] Documentation\/core-api\/atomic_ops.rst$/;"	C	section:References
 memory-barriers	input.rst	/^.. [memory-barriers] Documentation\/memory-barriers.txt$/;"	C	section:References
 lwn-mb	input.rst	/^.. [lwn-mb] https:\/\/lwn.net\/Articles\/573436\/$/;"	C	section:References

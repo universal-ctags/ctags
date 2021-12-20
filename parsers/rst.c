@@ -56,6 +56,7 @@ static kindDefinition RstKinds[] = {
 
 typedef enum {
 	F_SECTION_MARKER,
+	F_SECTION_OVERLINE,
 } rstField;
 
 static fieldDefinition RstFields [] = {
@@ -63,6 +64,12 @@ static fieldDefinition RstFields [] = {
 		.name = "sectionMarker",
 		.description = "character used for declaring section",
 		.enabled = false,
+	},
+	{
+		.name = "overline",
+		.description = "whether using overline & underline for declaring section",
+		.enabled = false,
+		.dataType = FIELDTYPE_BOOL
 	},
 };
 
@@ -135,7 +142,7 @@ static int makeTargetRstTag(const vString* const name, rstKind kindex)
 }
 
 static void makeSectionRstTag(const vString* const name, const int kind, const MIOPos filepos,
-		       char marker)
+		       char marker, bool overline)
 {
 	const NestingLevel *const nl = getNestingLevel(kind);
 	tagEntryInfo *parent;
@@ -177,6 +184,10 @@ static void makeSectionRstTag(const vString* const name, const int kind, const M
 
 		m[0] = marker;
 		attachParserField (&e, false, RstFields [F_SECTION_MARKER].ftype, m);
+
+		if (overline)
+			attachParserField (&e, false, RstFields [F_SECTION_OVERLINE].ftype, "");
+
 		r = makeTagEntry (&e);
 	}
 	nestingLevelsPush(nestingLevels, r);
@@ -417,7 +428,7 @@ static void findRstTags (void)
 
 			if (kind >= 0)
 			{
-				makeSectionRstTag(name, kind, filepos, c);
+				makeSectionRstTag(name, kind, filepos, c, o);
 				vStringClear(name);
 				continue;
 			}

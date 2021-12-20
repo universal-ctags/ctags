@@ -1,1 +1,2 @@
 --sort=no
+--fields-ReStructuredText=+{overline}{sectionMarker}
