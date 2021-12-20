@@ -68,6 +68,10 @@ static fieldDefinition RstFields [] = {
 
 static NestingLevels *nestingLevels = NULL;
 
+struct sectionTracker {
+	char kindchar;
+};
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -190,18 +194,18 @@ static bool issame(const char *str)
 }
 
 
-static int get_kind(char c, char kindchars[])
+static int get_kind(char c, struct sectionTracker tracker[])
 {
 	int i;
 
 	for (i = 0; i < SECTION_COUNT; i++)
 	{
-		if (kindchars[i] == c)
+		if (tracker[i].kindchar == c)
 			return i;
 
-		if (kindchars[i] == 0)
+		if (tracker[i].kindchar == 0)
 		{
-			kindchars[i] = c;
+			tracker[i].kindchar = c;
 			return i;
 		}
 	}
@@ -311,10 +315,10 @@ static void findRstTags (void)
 	MIOPos filepos;
 	const unsigned char *line;
 	const unsigned char *markup_line;
-	char kindchars[SECTION_COUNT];
+	struct sectionTracker section_tracker[SECTION_COUNT];
 
 	memset(&filepos, 0, sizeof(filepos));
-	memset(kindchars, 0, sizeof kindchars);
+	memset(section_tracker, 0, sizeof section_tracker);
 	nestingLevels = nestingLevelsNew(0);
 
 	while ((line = readLineFromInputFile ()) != NULL)
@@ -369,7 +373,7 @@ static void findRstTags (void)
 			ispunct(line[0]) && issame((const char*) line))
 		{
 			char c = line[0];
-			int kind = get_kind(c, kindchars);
+			int kind = get_kind(c, section_tracker);
 
 			if (kind >= 0)
 			{
