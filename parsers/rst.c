@@ -70,6 +70,13 @@ static NestingLevels *nestingLevels = NULL;
 
 struct sectionTracker {
 	char kindchar;
+	bool overline;
+};
+
+struct olineTracker
+{
+	char c;
+	size_t len;
 };
 
 /*
@@ -194,18 +201,19 @@ static bool issame(const char *str)
 }
 
 
-static int get_kind(char c, struct sectionTracker tracker[])
+static int get_kind(char c, bool overline, struct sectionTracker tracker[])
 {
 	int i;
 
 	for (i = 0; i < SECTION_COUNT; i++)
 	{
-		if (tracker[i].kindchar == c)
+		if (tracker[i].kindchar == c && tracker[i].overline == overline)
 			return i;
 
 		if (tracker[i].kindchar == 0)
 		{
 			tracker[i].kindchar = c;
+			tracker[i].overline = overline;
 			return i;
 		}
 	}
@@ -308,7 +316,23 @@ static int capture_markup (const unsigned char *target_line, char defaultTermina
 	return r;
 }
 
-/* TODO: parse overlining & underlining as distinct sections. */
+static void overline_clear(struct olineTracker *ol)
+{
+	ol->c = 0;
+	ol->len = 0;
+}
+
+static void overline_set(struct olineTracker *ol, char c, size_t len)
+{
+	ol->c = c;
+	ol->len = len;
+}
+
+static bool has_overline(struct olineTracker *ol)
+{
+	return (ol->c != 0);
+}
+
 static void findRstTags (void)
 {
 	vString *name = vStringNew ();
@@ -316,15 +340,18 @@ static void findRstTags (void)
 	const unsigned char *line;
 	const unsigned char *markup_line;
 	struct sectionTracker section_tracker[SECTION_COUNT];
+	struct olineTracker overline;
 
 	memset(&filepos, 0, sizeof(filepos));
 	memset(section_tracker, 0, sizeof section_tracker);
+	overline_clear(&overline);
 	nestingLevels = nestingLevelsNew(0);
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		if ((markup_line = is_markup_line (line, '_')) != NULL)
 		{
+			overline_clear(&overline);
 			/* Handle .. _target:
 			 * http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#hyperlink-targets
 			 */
@@ -336,6 +363,7 @@ static void findRstTags (void)
 		}
 		else if ((markup_line = is_markup_line (line, '[')) != NULL)
 		{
+			overline_clear(&overline);
 			/* Handle .. [citation]
 			 * https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#citations
 			 */
@@ -347,6 +375,7 @@ static void findRstTags (void)
 		}
 		else if ((markup_line = is_markup_line (line, '|')) != NULL)
 		{
+			overline_clear(&overline);
 			/* Hanle .. |substitute definition|
 			 * https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#substitution-definitions
 			 */
@@ -368,12 +397,23 @@ static void findRstTags (void)
 		if (name_len < 0)
 			name_len = name_len_bytes;
 
+		/* overline may come after an empty line (or begging of file). */
+		if (name_len_bytes == 0 && line_len > 0 &&
+			ispunct(line[0]) && issame((const char*) line))
+		{
+			overline_set(&overline, *line, line_len);
+			continue;
+		}
+
 		/* underlines must be the same length or more */
 		if (line_len >= name_len && name_len > 0 &&
 			ispunct(line[0]) && issame((const char*) line))
 		{
 			char c = line[0];
-			int kind = get_kind(c, section_tracker);
+			bool o = (overline.c == c && overline.len == line_len);
+			int kind = get_kind(c, o, section_tracker);
+
+			overline_clear(&overline);
 
 			if (kind >= 0)
 			{
@@ -382,6 +422,28 @@ static void findRstTags (void)
 				continue;
 			}
 		}
+
+		if (has_overline(&overline))
+		{
+			if (name_len > 0)
+			{
+				/*
+				 * Though we saw an overline and a section title text,
+				 * we cannot find the associated underline.
+				 * In that case, we must reset the state of tracking
+				 * overline.
+				 */
+				overline_clear(&overline);
+			}
+
+			/*
+			 * We san an overline. The line is the candidate
+			 * of a section title text. Skip the prefixed whitespaces.
+			 */
+			while (isspace(*line))
+				line++;
+		}
+
 		vStringClear (name);
 		if (!isspace(*line))
 		{
