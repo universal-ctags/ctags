@@ -38,10 +38,10 @@ typedef enum {
 	K_SECTION,
 	K_SUBSECTION,
 	K_SUBSUBSECTION,
-	K_CITATION,
+	SECTION_COUNT,
+	K_CITATION = SECTION_COUNT,
 	K_TARGET,
 	K_SUBSTDEF,
-	SECTION_COUNT
 } rstKind;
 
 static kindDefinition RstKinds[] = {
