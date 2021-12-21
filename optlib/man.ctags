@@ -45,4 +45,4 @@
 --regex-Man=/^\.TH[[:space:]]{1,}"([^"]{1,})".*/\1/t/{exclusive}{icase}{scope=push}
 --regex-Man=/^\.TH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/t/{exclusive}{icase}{scope=push}
 --regex-Man=/^\.SH[[:space:]]{1,}"([^"]{1,})".*/\1/s/{exclusive}{icase}{scope=ref}
---regex-Man=/^\.SH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/s/{exclusive}{icase}{scope=ref}
+--regex-Man=/^\.SH[[:space:]]{1,}(.{1,})/\1/s/{exclusive}{icase}{scope=ref}
