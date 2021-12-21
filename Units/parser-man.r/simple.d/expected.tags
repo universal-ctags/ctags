@@ -1,6 +1,6 @@
-AUTHOR	input.1	/^.SH AUTHOR$/;"	s	title:CTAGS
 CTAGS	input.1	/^.TH CTAGS 1 "Version 0.0.0" "Darren Hiebert" "Universal Ctags"$/;"	t
-DESCRIPTION	input.1	/^.SH "DESCRIPTION"$/;"	s	title:CTAGS
 NAME	input.1	/^.SH "NAME"$/;"	s	title:CTAGS
-SEE ALSO	input.1	/^.SH SEE ALSO$/;"	s	title:CTAGS
 SYNOPSIS	input.1	/^.SH SYNOPSIS$/;"	s	title:CTAGS
+DESCRIPTION	input.1	/^.SH "DESCRIPTION"$/;"	s	title:CTAGS
+AUTHOR	input.1	/^.SH AUTHOR$/;"	s	title:CTAGS
+SEE ALSO	input.1	/^.SH SEE ALSO$/;"	s	title:CTAGS
