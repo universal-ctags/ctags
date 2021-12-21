@@ -53,7 +53,7 @@ extern parserDefinition* ManParser (void)
 		"t", "{exclusive}{icase}{scope=push}", NULL, false},
 		{"^\\.SH[[:space:]]{1,}\"([^\"]{1,})\".*", "\\1",
 		"s", "{exclusive}{icase}{scope=ref}", NULL, false},
-		{"^\\.SH[[:space:]]{1,}([^[:space:]]{1,}).*", "\\1",
+		{"^\\.SH[[:space:]]{1,}(.{1,})", "\\1",
 		"s", "{exclusive}{icase}{scope=ref}", NULL, false},
 	};
 
