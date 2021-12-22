@@ -3423,7 +3423,7 @@ static EsObject* lrop_get_match_string_named_group (OptVM *vm, EsObject *name)
 	return lrop_get_match_string_common (vm, i, 0);
 }
 
-static EsObject* lrop_get_match_string_gorup_on_stack (OptVM *vm, EsObject *name)
+static EsObject* lrop_get_match_string_group_on_stack (OptVM *vm, EsObject *name)
 {
 	EsObject *group = opt_vm_ostack_top (vm);
 	if (!es_integer_p (group))
@@ -3871,7 +3871,7 @@ static EsObject *lrop_markplaceholder (OptVM *vm, EsObject *name)
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchstr",
-		.fn       = lrop_get_match_string_gorup_on_stack,
+		.fn       = lrop_get_match_string_group_on_stack,
 		.arity    = 1,
 		.help_str = "group:int _MATCHSTR string true%"
 		"group:int _MATCHSTR false",
