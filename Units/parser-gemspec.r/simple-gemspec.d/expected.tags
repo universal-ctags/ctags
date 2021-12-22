@@ -1,0 +1,12 @@
+rspec/core/version	input.gemspec	/^require "rspec\/core\/version"$/;"	L	roles:required
+rspec-core	input.gemspec	/^  s.name        = "rspec-core"$/;"	g	roles:def
+rspec-support	input.gemspec	/^    s.add_runtime_dependency "rspec-support", "= #{RSpec::Core::Version::STRING}"$/;"	g	roles:runtimeDep
+rspec-support	input.gemspec	/^    s.add_runtime_dependency "rspec-support", "~> #{RSpec::Core::Version::STRING.split('.')[0..1/;"	g	roles:runtimeDep
+cucumber	input.gemspec	/^  s.add_development_dependency "cucumber", "~> 1.3"$/;"	g	roles:develDep
+minitest	input.gemspec	/^  s.add_development_dependency "minitest", "~> 5.3"$/;"	g	roles:develDep
+aruba	input.gemspec	/^  s.add_development_dependency "aruba",    "~> 0.14.9"$/;"	g	roles:develDep
+coderay	input.gemspec	/^  s.add_development_dependency "coderay",  "~> 1.1.1"$/;"	g	roles:develDep
+mocha	input.gemspec	/^  s.add_development_dependency "mocha",        "~> 0.13.0"$/;"	g	roles:develDep
+rr	input.gemspec	/^  s.add_development_dependency "rr",           "~> 1.0.4"$/;"	g	roles:develDep
+flexmock	input.gemspec	/^  s.add_development_dependency "flexmock",     "~> 0.9.0"$/;"	g	roles:develDep
+thread_order	input.gemspec	/^  s.add_development_dependency "thread_order", "~> 1.1.0"$/;"	g	roles:develDep

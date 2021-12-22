@@ -88,6 +88,7 @@
 	FyppParser,	   \
 	GdbinitParser, \
 	GDScriptParser, \
+	GemSpecParser, \
 	GoParser, \
 	HaskellParser, \
 	HaxeParser, \

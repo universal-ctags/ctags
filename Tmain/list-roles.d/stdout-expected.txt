@@ -42,6 +42,8 @@ DTD            p/parameterEntity partOfAttDef       on      part of attribute de
 Elm            m/module          imported           on      imported module
 Flex           I/import          import             on      imports
 GDScript       c/class           extended           on      used as a base class for extending
+GemSpec        g/gem             develDep           on      specifying development dependency
+GemSpec        g/gem             runtimeDep         on      specifying runtime dependency
 Go             p/package         imported           on      imported package
 Go             u/unknown         receiverType       on      receiver type
 HTML           C/stylesheet      extFile            on      referenced as external files
@@ -143,6 +145,8 @@ DTD            p/parameterEntity partOfAttDef       on      part of attribute de
 Elm            m/module          imported           on      imported module
 Flex           I/import          import             on      imports
 GDScript       c/class           extended           on      used as a base class for extending
+GemSpec        g/gem             develDep           on      specifying development dependency
+GemSpec        g/gem             runtimeDep         on      specifying runtime dependency
 Go             p/package         imported           on      imported package
 Go             u/unknown         receiverType       on      receiver type
 HTML           C/stylesheet      extFile            on      referenced as external files
