@@ -1,18 +1,18 @@
-a0	input.md	/^# a0$/;"	c	end:6
-b0	input.md	/^## b0$/;"	s	chapter:a0	end:6
-c0	input.md	/^### c0$/;"	S	section:a0""b0	end:6
-a1	input.md	/^# a1$/;"	c	end:8
-a2	input.md	/^# a2$/;"	c	end:25
-b20	input.md	/^## b20$/;"	s	chapter:a2	end:12
-b21	input.md	/^## b21$/;"	s	chapter:a2	end:16
-c21	input.md	/^### c21$/;"	S	section:a2""b21	end:16
-b22	input.md	/^## b22$/;"	s	chapter:a2	end:22
-c220	input.md	/^### c220$/;"	S	section:a2""b22	end:20
-c221	input.md	/^### c221$/;"	S	section:a2""b22	end:22
-b23	input.md	/^b23$/;"	s	chapter:a2	end:25
-a3	input.md	/^a3$/;"	c	end:37
-b31	input.md	/^b31$/;"	s	chapter:a3	end:31
-b32	input.md	/^b32$/;"	s	chapter:a3	end:37
-c320	input.md	/^### c320$/;"	S	section:a3""b32	end:35
-c321	input.md	/^### c321$/;"	S	section:a3""b32	end:37
-a4	input.md	/^a4$/;"	c	end:39
+a0	input.md	/^# a0$/;"	c
+b0	input.md	/^## b0$/;"	s	chapter:a0
+c0	input.md	/^### c0$/;"	S	section:a0""b0
+a1	input.md	/^# a1$/;"	c
+a2	input.md	/^# a2$/;"	c
+b20	input.md	/^## b20$/;"	s	chapter:a2
+b21	input.md	/^## b21$/;"	s	chapter:a2
+c21	input.md	/^### c21$/;"	S	section:a2""b21
+b22	input.md	/^## b22$/;"	s	chapter:a2
+c220	input.md	/^### c220$/;"	S	section:a2""b22
+c221	input.md	/^### c221$/;"	S	section:a2""b22
+b23	input.md	/^b23$/;"	s	chapter:a2
+a3	input.md	/^a3$/;"	c
+b31	input.md	/^b31$/;"	s	chapter:a3
+b32	input.md	/^b32$/;"	s	chapter:a3
+c320	input.md	/^### c320$/;"	S	section:a3""b32
+c321	input.md	/^### c321$/;"	S	section:a3""b32
+a4	input.md	/^a4$/;"	c

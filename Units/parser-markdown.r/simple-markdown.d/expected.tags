@@ -1,30 +1,30 @@
-a	input.md	/^# a$/;"	c	end:12	sectionMarker:#
-b	input.md	/^## b$/;"	s	chapter:a	end:12	sectionMarker:#
-c	input.md	/^### c$/;"	S	section:a""b	end:12	sectionMarker:#
-d	input.md	/^#### d$/;"	t	subsection:a""b""c	end:12	sectionMarker:#
-e	input.md	/^##### e$/;"	T	subsubsection:a""b""c""d	end:12	sectionMarker:#
-f	input.md	/^###### f$/;"	u	l4subsection:a""b""c""d""e	end:12	sectionMarker:#
-g	input.md	/^# g #$/;"	c	end:13	sectionMarker:##
-h	input.md	/^# h ##$/;"	c	end:61	sectionMarker:##
-i	input.md	/^## i #$/;"	s	chapter:h	end:16	sectionMarker:##
-j	input.md	/^## j ##$/;"	s	chapter:h	end:17	sectionMarker:##
-k	input.md	/^## k ###$/;"	s	chapter:h	end:61	sectionMarker:##
-l	input.md	/^### l #$/;"	S	section:h""k	end:20	sectionMarker:##
-m	input.md	/^### m ##$/;"	S	section:h""k	end:21	sectionMarker:##
-n	input.md	/^### n ###$/;"	S	section:h""k	end:22	sectionMarker:##
-o	input.md	/^### o ###$/;"	S	section:h""k	end:61	sectionMarker:##
-p	input.md	/^#### p #$/;"	t	subsection:h""k""o	end:25	sectionMarker:##
-q	input.md	/^#### q #####$/;"	t	subsection:h""k""o	end:61	sectionMarker:##
-r	input.md	/^##### r #$/;"	T	subsubsection:h""k""o""q	end:28	sectionMarker:##
-s	input.md	/^##### s ######$/;"	T	subsubsection:h""k""o""q	end:61	sectionMarker:##
-t	input.md	/^###### t #$/;"	u	l4subsection:h""k""o""q""s	end:59	sectionMarker:##
-u	input.md	/^###### u #######$/;"	u	l4subsection:h""k""o""q""s	end:61	sectionMarker:##
-A	input.md	/^A$/;"	c	end:64	sectionMarker:=
-B	input.md	/^B$/;"	c	end:74	sectionMarker:=
-C	input.md	/^C$/;"	c	end:105	sectionMarker:=
-D	input.md	/^D$/;"	s	chapter:C	end:100	sectionMarker:-
-E	input.md	/^E$/;"	s	chapter:C	end:103	sectionMarker:-
-F	input.md	/^F$/;"	s	chapter:C	end:105	sectionMarker:-
+a	input.md	/^# a$/;"	c	sectionMarker:#
+b	input.md	/^## b$/;"	s	chapter:a	sectionMarker:#
+c	input.md	/^### c$/;"	S	section:a""b	sectionMarker:#
+d	input.md	/^#### d$/;"	t	subsection:a""b""c	sectionMarker:#
+e	input.md	/^##### e$/;"	T	subsubsection:a""b""c""d	sectionMarker:#
+f	input.md	/^###### f$/;"	u	l4subsection:a""b""c""d""e	sectionMarker:#
+g	input.md	/^# g #$/;"	c	sectionMarker:##
+h	input.md	/^# h ##$/;"	c	sectionMarker:##
+i	input.md	/^## i #$/;"	s	chapter:h	sectionMarker:##
+j	input.md	/^## j ##$/;"	s	chapter:h	sectionMarker:##
+k	input.md	/^## k ###$/;"	s	chapter:h	sectionMarker:##
+l	input.md	/^### l #$/;"	S	section:h""k	sectionMarker:##
+m	input.md	/^### m ##$/;"	S	section:h""k	sectionMarker:##
+n	input.md	/^### n ###$/;"	S	section:h""k	sectionMarker:##
+o	input.md	/^### o ###$/;"	S	section:h""k	sectionMarker:##
+p	input.md	/^#### p #$/;"	t	subsection:h""k""o	sectionMarker:##
+q	input.md	/^#### q #####$/;"	t	subsection:h""k""o	sectionMarker:##
+r	input.md	/^##### r #$/;"	T	subsubsection:h""k""o""q	sectionMarker:##
+s	input.md	/^##### s ######$/;"	T	subsubsection:h""k""o""q	sectionMarker:##
+t	input.md	/^###### t #$/;"	u	l4subsection:h""k""o""q""s	sectionMarker:##
+u	input.md	/^###### u #######$/;"	u	l4subsection:h""k""o""q""s	sectionMarker:##
+A	input.md	/^A$/;"	c	sectionMarker:=
+B	input.md	/^B$/;"	c	sectionMarker:=
+C	input.md	/^C$/;"	c	sectionMarker:=
+D	input.md	/^D$/;"	s	chapter:C	sectionMarker:-
+E	input.md	/^E$/;"	s	chapter:C	sectionMarker:-
+F	input.md	/^F$/;"	s	chapter:C	sectionMarker:-
 x	input.md	/^function x$/;"	f
 y	input.md	/^function y$/;"	f
 z	input.md	/^z()$/;"	f
