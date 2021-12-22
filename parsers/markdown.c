@@ -217,6 +217,7 @@ static void findMarkdownTags(void)
 				{
 					startSourceLineNumber = getSourceLineNumber ();
 					startLineNumber = getInputLineNumber ();
+					vStringDelete(codeLang);
 					codeLang = vStringNewInit((const char *)(line + 3));
 					vStringStripLeading(codeLang);
 					vStringStripTrailing(codeLang);
