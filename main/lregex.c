@@ -3352,6 +3352,23 @@ static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject* ldrop_get_line_from_matchloc (OptVM *vm, EsObject *name)
+{
+	EsObject *mlocobj = opt_vm_ostack_top (vm);
+	if (es_object_get_type (mlocobj) != OPT_TYPE_MATCHLOC)
+		return OPT_ERR_TYPECHECK;
+
+	matchLoc *mloc = es_pointer_get (mlocobj);
+	EsObject *lineobj = es_integer_new (mloc->line);
+	if (es_error_p (lineobj))
+		return lineobj;
+
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_push (vm, lineobj);
+	es_object_unref (lineobj);
+	return es_false;
+}
+
 static matchLoc* make_mloc_from_tagEntryInfo(tagEntryInfo *e)
 {
 	matchLoc *mloc = xMalloc (1, matchLoc);
@@ -3882,6 +3899,12 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = -1,
 		.help_str = "group:int /start|/end _MATCHLOC matchloc%"
 		"group:int _MATCHLOC matchloc",
+	},
+	{
+		.name     = "_matchloc2line",
+		.fn       = ldrop_get_line_from_matchloc,
+		.arity    = 1,
+		.help_str = "matchloc _MATCHLOC2LINE int:line",
 	},
 	{
 		.name     = "_tagloc",

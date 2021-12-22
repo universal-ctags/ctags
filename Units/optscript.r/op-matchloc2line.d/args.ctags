@@ -1,0 +1,12 @@
+--fields=+n
+
+--langdef=X
+--map-X=.unknown
+--kinddef-X=l,line,lines
+
+--regex-X=/^DEF ([A-Z])//{{
+  0 string dup 1 _matchloc _matchloc2line exch cvs
+  /line
+  1 _matchloc
+  _tag _commit pop
+}}
