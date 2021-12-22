@@ -429,7 +429,7 @@ The following parsers have been added:
 * GNU linker script(LdScript)
 * LEX *optlib*
 * Man page *optlib*
-* Markdown *optlib*
+* Markdown
 * Maven2 *libxml*
 * MesonBuild (Meson) *optlib*
 * MesonOptions *optlib+script*

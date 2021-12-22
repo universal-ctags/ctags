@@ -185,7 +185,6 @@ OPTLIB2C_INPUT = \
 	optlib/kconfig.ctags			\
 	optlib/lex.ctags			\
 	optlib/man.ctags			\
-	optlib/markdown.ctags			\
 	optlib/meson.ctags			\
 	optlib/mesonOptions.ctags		\
 	optlib/passwd.ctags			\
@@ -309,6 +308,7 @@ PARSER_SRCS =				\
 	parsers/lua.c			\
 	parsers/m4.c			\
 	parsers/make.c			\
+	parsers/markdown.c			\
 	parsers/matlab.c		\
 	parsers/myrddin.c		\
 	parsers/nsis.c			\
