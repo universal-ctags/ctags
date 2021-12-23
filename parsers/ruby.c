@@ -695,7 +695,7 @@ static void attachMixinField (int corkIndex, stringList *mixinSpec)
 								  vStringValue (mixinField));
 }
 
-static void deleteBlockData (NestingLevel *nl)
+static void deleteBlockData (NestingLevel *nl, void *data CTAGS_ATTR_UNUSED)
 {
 	struct blockData *bdata = nestingLevelGetUserData (nl);
 
