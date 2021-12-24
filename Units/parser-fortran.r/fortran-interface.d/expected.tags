@@ -1,4 +1,5 @@
 +	input.f90	/^  interface operator(+)/;"	i	module:test_interface
+__anon502b83b10105	input.f90	/^  interface ! anonymous interface$/;"	i	module:test_interface
 add	input.f90	/^    type(atype) function add(/;"	P	module:test_interface
 atype	input.f90	/^  type atype$/;"	t	module:test_interface
 get	input.f90	/^  interface get$/;"	i	module:test_interface

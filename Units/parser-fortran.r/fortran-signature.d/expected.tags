@@ -1,3 +1,4 @@
+__anon06616a720105	input.f90	/^  interface$/;"	i	module:test_signature
 a	input.f90	/^    integer :: a$/;"	L	subroutine:fnb	file:
 a	input.f90	/^    integer a,/;"	L	subroutine:suba	file:
 arg	input.f90	/^      type(atype) :: arg$/;"	L	prototype:subb	file:
