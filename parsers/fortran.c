@@ -1764,7 +1764,7 @@ static void parseStructureStmt (tokenInfo *const token)
 		strcmp (vStringValue (token->string), "/") == 0)
 	{  /* read structure name */
 		readToken (token);
-		if (isType (token, TOKEN_IDENTIFIER))
+		if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 		{
 			name = newTokenFrom (token);
 			name->type = TOKEN_IDENTIFIER;
@@ -1933,8 +1933,9 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 		qualifierToken = parseQualifierSpecList (token);
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
+		token->type = TOKEN_IDENTIFIER;
 		if (qualifierToken)
 		{
 			if (qualifierToken->parentType)
@@ -2002,7 +2003,7 @@ static void parseInterfaceBlock (tokenInfo *const token)
 		if (isType (token, TOKEN_OPERATOR))
 			name = newTokenFrom (token);
 	}
-	else if (isType (token, TOKEN_IDENTIFIER))
+	else if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
 		name = newTokenFrom (token);
 		name->type = TOKEN_IDENTIFIER;
@@ -2062,7 +2063,7 @@ static void parseEnumBlock (tokenInfo *const token)
 	parseKindSelector (token);
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
 		name = newTokenFrom (token);
 		name->type = TOKEN_IDENTIFIER;
@@ -2402,8 +2403,9 @@ static void parseModule (tokenInfo *const token, bool isSubmodule)
 	}
 
 	readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
+		token->type = TOKEN_IDENTIFIER;
 		if (isSubmodule)
 		{
 			attachParentType (token, parentIdentifier);
@@ -2517,9 +2519,10 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 			isKeyword (token, KEYWORD_function) ||
 			isKeyword (token, KEYWORD_subroutine));
 	readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
 		tokenInfo* name = newTokenFrom (token);
+		token->type = TOKEN_IDENTIFIER;
 		if (tag == TAG_SUBROUTINE ||
 			tag == TAG_PROTOTYPE)
 			name->signature = parseSignature (token);
