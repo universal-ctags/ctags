@@ -294,6 +294,7 @@ PARSER_SRCS =				\
 	parsers/fortran.c		\
 	parsers/fypp.c			\
 	parsers/gdscript.c		\
+	parsers/gemspec.c		\
 	parsers/go.c			\
 	parsers/haskell.c		\
 	parsers/haxe.c			\

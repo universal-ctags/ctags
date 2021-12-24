@@ -414,6 +414,7 @@ The following parsers have been added:
 * Falcon
 * FunctionParameters *perl based subparser*
 * Gdbinit script *optlib*
+* GemSpec *Ruby based subparser*
 * GDScript
 * Glade *libxml*
 * Go

@@ -426,6 +426,9 @@
     <ClCompile Include="..\parsers\gdscript.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\gemspec.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\go.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
