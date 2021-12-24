@@ -409,8 +409,7 @@ static const tokenInfo* ancestorScope (void)
 	{
 		tokenInfo *const token = Ancestors.list + i - 1;
 		if (token->type == TOKEN_IDENTIFIER &&
-			token->tag != TAG_UNDEFINED  && token->tag != TAG_INTERFACE &&
-			token->tag != TAG_ENUM)
+			token->tag != TAG_UNDEFINED)
 			result = token;
 	}
 	return result;
