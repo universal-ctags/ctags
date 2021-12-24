@@ -90,6 +90,7 @@ static NestingLevel *getNestingLevel(const int kind, unsigned long adjustment_wh
 	return nl;
 }
 
+
 static int makeMarkdownTag (const vString* const name, const int kind, const bool two_line)
 {
 	int r = CORK_NIL;
@@ -133,22 +134,21 @@ static int makeSectionMarkdownTag (const vString* const name, const int kind, co
 }
 
 
-static bool process_name(vString *const name, const int kind,
-						 const unsigned char *line, const int line_len)
+static vString *get_heading(const int kind, const unsigned char *line,
+	const int line_len, bool *delimited)
 {
-	bool delimited = false;
 	int start = kind + 1;
 	int end = line_len - 1;
+	vString *name = vStringNew();
 
 	Assert (kind >= 0 && kind < K_SECTION_COUNT);
 	Assert (line_len > start);
 
-	vStringClear(name);
-
+	*delimited = false;
 	while (line[end] == line[0])
 	{
 		--end;
-		delimited = true;
+		*delimited = true;
 	}
 	while (isspace(line[start])) ++start;
 	while (isspace(line[end])) --end;
@@ -156,38 +156,9 @@ static bool process_name(vString *const name, const int kind,
 	if (start <= end)
 		vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
 
-	return delimited;
+	return name;
 }
 
-
-/* computes the length of an UTF-8 string
- * if the string doesn't look like UTF-8, return -1
- * FIXME consider East_Asian_Width Unicode property */
-static int utf8_strlen(const char *buf, int buf_len)
-{
-	int len = 0;
-	const char *end = buf + buf_len;
-
-	for (len = 0; buf < end; len ++)
-	{
-		/* perform quick and naive validation (no sub-byte checking) */
-		if (! (*buf & 0x80))
-			buf ++;
-		else if ((*buf & 0xe0) == 0xc0)
-			buf += 2;
-		else if ((*buf & 0xf0) == 0xe0)
-			buf += 3;
-		else if ((*buf & 0xf8) == 0xf0)
-			buf += 4;
-		else /* not a valid leading UTF-8 byte, abort */
-			return -1;
-
-		if (buf > end) /* incomplete last byte */
-			return -1;
-	}
-
-	return len;
-}
 
 static void fillEndField (NestingLevel *nl, void *ctxData)
 {
@@ -199,9 +170,10 @@ static void fillEndField (NestingLevel *nl, void *ctxData)
 	}
 }
 
+
 static void findMarkdownTags(void)
 {
-	vString *name = vStringNew();
+	vString *prev_line = vStringNew();
 	vString *codeLang = vStringNew();
 	const unsigned char *line;
 	char in_code_char = 0;
@@ -213,8 +185,7 @@ static void findMarkdownTags(void)
 	while ((line = readLineFromInputFile()) != NULL)
 	{
 		int line_len = strlen((const char*) line);
-		int name_len_bytes = vStringLength(name);
-		int name_len = utf8_strlen(vStringValue(name), name_len_bytes);
+		bool line_processed = false;
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -230,8 +201,8 @@ static void findMarkdownTags(void)
 				{
 					startSourceLineNumber = getSourceLineNumber ();
 					startLineNumber = getInputLineNumber ();
-					vStringDelete(codeLang);
-					codeLang = vStringNewInit((const char *)(line + 3));
+					vStringClear(codeLang);
+					vStringCatS(codeLang, (const char *)(line + 3));
 					vStringStripLeading(codeLang);
 					vStringStripTrailing(codeLang);
 				}
@@ -241,49 +212,56 @@ static void findMarkdownTags(void)
 					if (codeLang->size > 0)
 						makePromise (vStringValue(codeLang), startLineNumber, 0,
 							endLineNumber, 0, startSourceLineNumber);
-
 				}
+
+				line_processed = true;
 			}
 		}
 
+		/* code block */
 		if (in_code_char)
-			continue;
+			line_processed = true;
 
-		/* if the name doesn't look like UTF-8, assume one-byte charset */
-		if (name_len < 0) name_len = name_len_bytes;
+		/* code block using indent */
+		else if ((line_len > 1 && line[0] == '\t') || (line_len > 4 &&
+			isspace(line[0]) && isspace(line[1]) && isspace(line[2]) && isspace(line[3])))
+			line_processed = true;
 
-		/* if its a title underline, or a delimited block marking character */
-		if (line[0] == '=' || line[0] == '-' || line[0] == '#')
+		/* if it's a title underline, or a delimited block marking character */
+		else if (line[0] == '=' || line[0] == '-' || line[0] == '#')
 		{
 			int n_same;
 			for (n_same = 1; line[n_same] == line[0]; ++n_same);
 
 			/* is it a two line title */
-			if (n_same == line_len)
+			if (line[0] == '=' || line[0] == '-')
 			{
-				if ((line[0] == '=' || line[0] == '-') && line_len >= name_len)
-				{
-					char marker[2] = { line[0], '\0' };
-					int kind = line[0] == '=' ? K_CHAPTER : K_SECTION;
-					makeSectionMarkdownTag(name, kind, marker);
-					continue;
-				}
+				char marker[2] = { line[0], '\0' };
+				int kind = line[0] == '=' ? K_CHAPTER : K_SECTION;
+				vStringStripLeading(prev_line);
+				vStringStripTrailing(prev_line);
+				if (vStringLength(prev_line) > 0)
+					makeSectionMarkdownTag(prev_line, kind, marker);
 			}
-
 			/* otherwise is it a one line title */
 			else if (line[0] == '#' && n_same <= K_SECTION_COUNT && isspace(line[n_same]))
 			{
 				int kind = n_same - 1;
-				bool delimited = process_name(name, kind, line, line_len);
-				makeSectionMarkdownTag(name, kind, delimited ? "##" : "#");
-				continue;
+				bool delimited = false;
+				vString *name = get_heading(kind, line, line_len, &delimited);
+				if (vStringLength(name) > 0)
+					makeSectionMarkdownTag(name, kind, delimited ? "##" : "#");
+				vStringDelete(name);
 			}
+
+			line_processed = true;
 		}
-		vStringClear(name);
-		if (! isspace(*line))
-			vStringCatS(name, (const char*) line);
+
+		vStringClear(prev_line);
+		if (!line_processed)
+			vStringCatS(prev_line, (const char*) line);
 	}
-	vStringDelete(name);
+	vStringDelete(prev_line);
 	vStringDelete(codeLang);
 	{
 		unsigned int line = (unsigned int)getInputLineNumber ();

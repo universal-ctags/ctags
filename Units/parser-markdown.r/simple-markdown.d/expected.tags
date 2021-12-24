@@ -21,10 +21,13 @@ t	input.md	/^###### t #$/;"	u	l4subsection:h""k""o""q""s	end:59	sectionMarker:##
 u	input.md	/^###### u #######$/;"	u	l4subsection:h""k""o""q""s	end:61	sectionMarker:##
 A	input.md	/^A$/;"	c	end:64	sectionMarker:=
 B	input.md	/^B$/;"	c	end:74	sectionMarker:=
-C	input.md	/^C$/;"	c	end:105	sectionMarker:=
+C	input.md	/^C$/;"	c	end:120	sectionMarker:=
 D	input.md	/^D$/;"	s	chapter:C	end:100	sectionMarker:-
 E	input.md	/^E$/;"	s	chapter:C	end:103	sectionMarker:-
-F	input.md	/^F$/;"	s	chapter:C	end:105	sectionMarker:-
+F	input.md	/^F$/;"	s	chapter:C	end:106	sectionMarker:-
+G	input.md	/^ G$/;"	s	chapter:C	end:109	sectionMarker:-
+H	input.md	/^  H$/;"	s	chapter:C	end:112	sectionMarker:-
+I	input.md	/^   I$/;"	s	chapter:C	end:120	sectionMarker:-
 x	input.md	/^function x$/;"	f
 y	input.md	/^function y$/;"	f
 z	input.md	/^z()$/;"	f
