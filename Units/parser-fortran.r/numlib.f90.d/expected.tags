@@ -1,6 +1,6 @@
 __anon1963f93b0305	input.f90	/^      interface$/;"	i	module:numerical_libraries
 __anon1963f93b0405	input.f90	/^      interface$/;"	i	prototype:b2lsf
-a2ald	input.f90	/^      subroutine a2ald /;"	P	module:numerical_libraries
-b2lsf	input.f90	/^      subroutine b2lsf /;"	P	module:numerical_libraries
-fcn	input.f90	/^         subroutine fcn(/;"	P	prototype:b2lsf
+a2ald	input.f90	/^      subroutine a2ald /;"	P	interface:__anon1963f93b0305
+b2lsf	input.f90	/^      subroutine b2lsf /;"	P	interface:__anon1963f93b0305
+fcn	input.f90	/^         subroutine fcn(/;"	P	interface:__anon1963f93b0405
 numerical_libraries	input.f90	/^      module numerical_libraries$/;"	m
