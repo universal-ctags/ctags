@@ -160,6 +160,15 @@ static vString *get_heading(const int kind, const unsigned char *line,
 }
 
 
+static bool is_indented(const unsigned char *line, int line_len)
+{
+	int indent = 0;
+	for (int i = 0; i < line_len && isspace(line[i]) && indent < 4; i++)
+		indent += line[i] == '\t' ? 4 : 1;
+	return indent >= 4;
+}
+
+
 static void fillEndField (NestingLevel *nl, void *ctxData)
 {
 	tagEntryInfo *e = getEntryOfNestingLevel (nl);
@@ -223,8 +232,7 @@ static void findMarkdownTags(void)
 			line_processed = true;
 
 		/* code block using indent */
-		else if ((line_len > 1 && line[0] == '\t') || (line_len > 4 &&
-			isspace(line[0]) && isspace(line[1]) && isspace(line[2]) && isspace(line[3])))
+		else if (is_indented(line, line_len))
 			line_processed = true;
 
 		/* if it's a title underline, or a delimited block marking character */

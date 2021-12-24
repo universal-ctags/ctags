@@ -118,3 +118,6 @@ F
 
 	indented_with_tab
 -
+
+ 	indented_with_space_and_tab
+-
