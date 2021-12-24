@@ -7,6 +7,8 @@ Named4	input.f90	/^  enum*8 Named4$/;"	E	module:Constants
 Named5	input.f90	/^  enum(8) :: Named5$/;"	E	module:Constants
 Named6	input.f90	/^  enum*8 :: Named6$/;"	E	module:Constants
 Named7	input.f90	/^  enum, bind(c) :: Named7$/;"	E	module:Constants
+__anoncfbded350103	input.f90	/^  enum, bind(c) ! unnamed 1$/;"	E	module:Constants
+__anoncfbded350203	input.f90	/^  enum ! unnamed 2$/;"	E	module:Constants
 a	input.f90	/^    enumerat/;"	N	module:Constants
 b	input.f90	/^    enumerator :: a, b,/;"	N	module:Constants
 black	input.f90	/^    enumerator :: red =1, blue, black /;"	N	module:Constants

@@ -1,4 +1,5 @@
-a	input.f	/^                    integer a$/;"	k	type:anonymous
+__anon76fabc930106	input.f	/^                structure level3a, level3b$/;"	t	type:nested
+a	input.f	/^                    integer a$/;"	k	type:__anon76fabc930106
 clouds	input.f	/^                character*20  clouds /;"	k	type:weather
 clouds	input.f	/^        character*20   clouds$/;"	k	type:weather
 day	input.f	/^                integer*1     month \/08\/, day /;"	k	type:weather
