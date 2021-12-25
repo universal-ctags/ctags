@@ -121,3 +121,8 @@ F
 
  	indented_with_space_and_tab
 -
+
+text
+- ignored
+-
+

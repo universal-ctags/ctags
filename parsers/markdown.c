@@ -246,9 +246,20 @@ static void findMarkdownTags(void)
 			{
 				char marker[2] = { line[0], '\0' };
 				int kind = line[0] == '=' ? K_CHAPTER : K_SECTION;
+				bool whitespace_terminated = true;
+
+				for (int i = n_same; i < line_len; i++)
+				{
+					if (!isspace(line[i]))
+					{
+						whitespace_terminated = false;
+						break;
+					}
+				}
+
 				vStringStripLeading(prev_line);
 				vStringStripTrailing(prev_line);
-				if (vStringLength(prev_line) > 0)
+				if (whitespace_terminated && vStringLength(prev_line) > 0)
 					makeSectionMarkdownTag(prev_line, kind, marker);
 			}
 			/* otherwise is it a one line title */
