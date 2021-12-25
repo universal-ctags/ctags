@@ -65,6 +65,7 @@ enum eKeywordId {
 	KEYWORD_newcommand,
 	KEYWORD_renewcommand,
 	KEYWORD_providecommand,
+	KEYWORD_def,
 	KEYWORD_newcounter,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -173,6 +174,7 @@ static const keywordTable TexKeywordTable [] = {
 	{ "newcommand",		KEYWORD_newcommand			},
 	{ "renewcommand",	KEYWORD_renewcommand		},
 	{ "providecommand",	KEYWORD_providecommand		},
+	{ "def",			KEYWORD_def					},
 	{ "newcounter",		KEYWORD_newcounter			},
 };
 
@@ -606,13 +608,13 @@ static bool parseWithStrategy (tokenInfo *token,
 		}
 		else if (s->type == '*' && isType (token, '*'))
 			next_token = true;
-		else if (s->type == '{' && isType (token, '{'))
+		else if ((s->type == '{' && isType (token, '{')) || (s->type == '\\' && isType (token, TOKEN_IDENTIFIER)))
 		{
 			int depth = 1;
 
 			next_token = true;
 
-			if (!readToken (token))
+			if (s->type == '{' && !readToken (token))
 			{
 				eof = true;
 				break;
@@ -621,6 +623,11 @@ static bool parseWithStrategy (tokenInfo *token,
 			{
 				copyToken (name, token);
 				vStringClear (name->string);
+			}
+			if (s->type == '\\')
+			{
+				vStringCat (name->string, token->string);
+				depth = 0;
 			}
 
 			/* Handle the case the code like \section{} */
@@ -845,6 +852,37 @@ static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 	return eof;
 }
 
+static bool parseDef (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	bool eof = false;
+
+	/* \def\cmd{replacement} */
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '\\',
+			.flags = 0,
+			.kindIndex = TEXTAG_COMMAND,
+			.roleIndex = ROLE_DEFINITION_INDEX,
+			.name = NULL,
+			.unique = false,
+		},
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+		eof = true;
+
+	return eof;
+}
+
 static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 {
 	bool eof = false;
@@ -941,6 +979,9 @@ static void parseTexFile (tokenInfo *const token)
 				case KEYWORD_renewcommand:
 				case KEYWORD_providecommand:
 					eof = parseNewcommand (token, &tokenUnprocessed);
+					break;
+				case KEYWORD_def:
+					eof = parseDef (token, &tokenUnprocessed);
 					break;
 				case KEYWORD_newcounter:
 					eof = parseNewcounter (token, &tokenUnprocessed);
