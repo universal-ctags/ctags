@@ -570,6 +570,56 @@ Example 2:
 	foo	/tmp/input.pp	/^class foo {$/;"	c
 
 
+Example 3:
+
+.. code-block::
+
+	# in /tmp/input.docdoc
+	title T
+	...
+	section S0
+	...
+	section S1
+	...
+
+.. code-block:: ctags
+	:emphasize-lines: 15,21
+
+	# in /tmp/doc.ctags:
+	--langdef=doc
+	--map-doc=+.docdoc
+	--kinddef-doc=s,section,sections
+	--kinddef-doc=S,subsection,subsections
+
+	--_tabledef-doc=main
+	--_tabledef-doc=section
+	--_tabledef-doc=subsection
+
+	--_mtable-regex-doc=main/section +([^\n]+)\n/\1/s/{scope=push}{tenter=section}
+	--_mtable-regex-doc=main/[^\n]+\n|[^\n]+|\n//
+	--_mtable-regex-doc=main///{scope=clear}{tquit}
+
+	--_mtable-regex-doc=section/section +([^\n]+)\n/\1/s/{scope=replace}
+	--_mtable-regex-doc=section/subsection +([^\n]+)\n/\1/S/{scope=push}{tenter=subsection}
+	--_mtable-regex-doc=section/[^\n]+\n|[^\n]+|\n//
+	--_mtable-regex-doc=section///{scope=clear}{tquit}
+
+	--_mtable-regex-doc=subsection/(section )//{_advanceTo=0start}{tleave}{scope=pop}
+	--_mtable-regex-doc=subsection/subsection +([^\n]+)\n/\1/S/{scope=replace}
+	--_mtable-regex-doc=subsection/[^\n]+\n|[^\n]+|\n//
+	--_mtable-regex-doc=subsection///{scope=clear}{tquit}
+
+.. code-block:: console
+
+	% ctags --sort=no --fields=+nl --options=/tmp/doc.ctags -o - /tmp/input.docdoc
+	SEC0	/tmp/input.docdoc	/^section SEC0$/;"	s	line:1	language:doc
+	SUB0-1	/tmp/input.docdoc	/^subsection SUB0-1$/;"	S	line:3	language:doc	section:SEC0
+	SUB0-2	/tmp/input.docdoc	/^subsection SUB0-2$/;"	S	line:5	language:doc	section:SEC0
+	SEC1	/tmp/input.docdoc	/^section SEC1$/;"	s	line:7	language:doc
+	SUB1-1	/tmp/input.docdoc	/^subsection SUB1-1$/;"	S	line:9	language:doc	section:SEC1
+	SUB1-2	/tmp/input.docdoc	/^subsection SUB1-2$/;"	S	line:11	language:doc	section:SEC1
+
+
 NOTE: This flag doesn't work well with ``--mline-regex-<LANG>=``.
 
 Overriding the letter for file kind

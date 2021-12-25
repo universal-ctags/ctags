@@ -76,7 +76,8 @@ enum scopeAction {
 	SCOPE_POP     = 1UL << 1,
 	SCOPE_PUSH    = 1UL << 2,
 	SCOPE_CLEAR   = 1UL << 3,
-	SCOPE_PLACEHOLDER = 1UL << 4,
+	SCOPE_REF_AFTER_POP = 1UL << 4,
+	SCOPE_PLACEHOLDER = 1UL << 5,
 };
 
 enum tableAction {
@@ -576,6 +577,8 @@ static void scope_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
 		*bfields |= SCOPE_CLEAR;
 	else if (strcmp (v, "set") == 0)
 		*bfields |= (SCOPE_CLEAR | SCOPE_PUSH);
+	else if (strcmp (v, "replace") == 0)
+		*bfields |= (SCOPE_POP|SCOPE_REF_AFTER_POP|SCOPE_PUSH);
 	else
 		error (FATAL, "Unexpected value for scope flag in regex definition: scope=%s", v);
 }
@@ -589,7 +592,7 @@ static void placeholder_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
 
 static flagDefinition scopePtrnFlagDef[] = {
 	{ '\0', "scope",     NULL, scope_ptrn_flag_eval,
-	  "ACTION", "use scope stack: ACTION = ref|push|pop|clear|set"},
+	  "ACTION", "use scope stack: ACTION = ref|push|pop|clear|set|replace"},
 	{ '\0', "placeholder",  NULL, placeholder_ptrn_flag_eval,
 	  NULL, "don't put this tag to tags file."},
 };
@@ -1300,7 +1303,12 @@ static void patternEvalFlags (struct lregexControlBlock *lcb,
 	}
 
 	if (regptype == REG_PARSER_SINGLE_LINE || regptype == REG_PARSER_MULTI_TABLE)
+	{
 		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &ptrn->scopeActions);
+		if ((ptrn->scopeActions & (SCOPE_REF|SCOPE_REF_AFTER_POP)) == (SCOPE_REF|SCOPE_REF_AFTER_POP))
+			error (WARNING, "%s: don't combine \"replace\" with the other scope action.",
+				   getLanguageName (lcb->owner));
+	}
 
 	if (regptype == REG_PARSER_MULTI_LINE || regptype == REG_PARSER_MULTI_TABLE)
 	{
@@ -1564,6 +1572,16 @@ static bool hasNameSlot (const regexPattern* const patbuf)
 			|| patbuf->anonymous_tag_prefix);
 }
 
+static int scopeActionRef (int currentScope)
+{
+	int scope = currentScope;
+	tagEntryInfo *entry;
+	while ((entry = getEntryInCorkQueue (scope)) && entry->placeholder)
+		/* Look at parent */
+		scope = entry->extensionFields.scopeIndex;
+	return scope;
+}
+
 static void matchTagPattern (struct lregexControlBlock *lcb,
 		const char* line,
 		const regexPattern* const patbuf,
@@ -1585,14 +1603,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	vStringStripTrailing (name);
 
 	if (patbuf->scopeActions & SCOPE_REF)
-	{
-		tagEntryInfo *entry;
-
-		scope = lcb->currentScope;
-		while ((entry = getEntryInCorkQueue (scope)) && entry->placeholder)
-			/* Look at parent */
-			scope = entry->extensionFields.scopeIndex;
-	}
+		scope = scopeActionRef (lcb->currentScope);
 	if (patbuf->scopeActions & SCOPE_CLEAR)
 	{
 		unsigned long endline = getInputLineNumberInRegPType(patbuf->regptype, offset);
@@ -1614,10 +1625,24 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		tagEntryInfo *entry = getEntryInCorkQueue (lcb->currentScope);
 
 		if (entry && (entry->extensionFields.endLine == 0))
+		{
 			entry->extensionFields.endLine = getInputLineNumberInRegPType(patbuf->regptype, offset);
+
+			/*
+			 * SCOPE_POP|SCOPE_REF_AFTER_POP implies that "replace" was specified as the
+			 * scope action. If the specified action is "replace", getInputLineNumberInRegPType()
+			 * returns the start line of the NEW scope. The popped scope is ended BEFORE
+			 * the new scope. There is a gap. We must adjust the "end:" field here.
+			 */
+			if ((patbuf->scopeActions & SCOPE_REF_AFTER_POP) &&
+				entry->extensionFields.endLine > 1)
+				entry->extensionFields.endLine--;
+		}
 
 		lcb->currentScope = entry? entry->extensionFields.scopeIndex: CORK_NIL;
 	}
+	if (patbuf->scopeActions & SCOPE_REF_AFTER_POP)
+		scope = scopeActionRef (lcb->currentScope);
 
 	if (vStringLength (name) == 0 && (placeholder == false))
 	{

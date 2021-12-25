@@ -329,7 +329,7 @@ representation. ``--list-regex-flags`` lists all the flags.
 	can be an empty string.  See the following description of
 	``scope=...`` flag about how this is useful.
 
-``scope=(ref|push|pop|clear|set)``
+``scope=(ref|push|pop|clear|set|replace)``
 
 	Specify what to do with the internal scope stack.
 
@@ -342,7 +342,7 @@ representation. ``--list-regex-flags`` lists all the flags.
 	``--regex-<LANG>`` is pushed to the stack. ``{scope=push}``
 	implies ``{scope=ref}``.
 
-	You can fill the scope field of captured tag with
+	You can fill the scope field (``scope:``) of captured tag with
 	``{scope=ref}``. If ``{scope=ref}`` flag is given,
 	@CTAGS_NAME_EXECUTABLE@ attaches the tag at the top to the tag
 	captured with ``--regex-<LANG>`` as the value for the ``scope:``
@@ -355,6 +355,21 @@ representation. ``--list-regex-flags`` lists all the flags.
 	Specifying ``{scope=clear}`` removes all the tags in the scope.
 	Specifying ``{scope=set}`` removes all the tags in the scope, and
 	then pushes the captured tag as ``{scope=push}`` does.
+
+	``{scope=replace}`` does the three things sequentially. First it
+	does the same as ``{scope=pop}``, then fills the ``scope:`` field
+	of the tag captured with ``--regex-<LANG>``, and pushes the tag to
+	the scope stack as if ``{scope=push}`` was given finally.
+	You cannot specify another scope action together with
+	``{scope=replace}``.
+
+	You don't want to specify ``{scope=pop}{scope=push}`` as an
+	alternative to ``{scope=replace}``; ``{scope=pop}{scope=push}``
+	fills the ``scope:`` field of the tag captured with ``--regex-<LANG>``
+	first, then pops the tag at the top of the stack, and pushes
+	the captured tag to the scope stack finally. The timing when
+	filling the end field is different between ``{scope=replace}`` and
+	``{scope=pop}{scope=push}``.
 
 	In some cases, you may want to use ``--regex-<LANG>`` only for its
 	side effects: using it only to manipulate the stack but not for
