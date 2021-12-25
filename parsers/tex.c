@@ -66,6 +66,7 @@ enum eKeywordId {
 	KEYWORD_renewcommand,
 	KEYWORD_providecommand,
 	KEYWORD_def,
+	KEYWORD_declaremathoperator,
 	KEYWORD_newcounter,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -120,6 +121,7 @@ typedef enum {
 	TEXTAG_XINPUT,
 	TEXTAG_BIBITEM,
 	TEXTAG_COMMAND,
+	TEXTAG_OPERATOR,
 	TEXTAG_COUNTER,
 	TEXTAG_COUNT
 } texKind;
@@ -152,6 +154,7 @@ static kindDefinition TexKinds [] = {
 	  .referenceOnly = true, ATTACH_ROLES(TexInputRoles)   },
 	{ true,  'B', "bibitem",		  "bibliography items" },
 	{ true,  'C', "command",		  "command created with \\newcommand" },
+	{ true,  'o', "operator",		  "math operator created with \\DeclareMathOperator" },
 	{ true,  'N', "counter",		  "counter created with \\newcounter" },
 };
 
@@ -175,6 +178,7 @@ static const keywordTable TexKeywordTable [] = {
 	{ "renewcommand",	KEYWORD_renewcommand		},
 	{ "providecommand",	KEYWORD_providecommand		},
 	{ "def",			KEYWORD_def					},
+	{ "DeclareMathOperator",	KEYWORD_declaremathoperator	},
 	{ "newcounter",		KEYWORD_newcounter			},
 };
 
@@ -809,7 +813,7 @@ static bool parseEnv (tokenInfo *const token, bool begin, bool *tokenUnprocessed
 
 }
 
-static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
+static bool parseNewcommandFull (tokenInfo *const token, bool *tokenUnprocessed, texKind kind)
 {
 	bool eof = false;
 
@@ -818,7 +822,7 @@ static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 		{
 			.type = '{',
 			.flags = 0,
-			.kindIndex = TEXTAG_COMMAND,
+			.kindIndex = kind,
 			.roleIndex = ROLE_DEFINITION_INDEX,
 			.name = NULL,
 			.unique = false,
@@ -850,6 +854,11 @@ static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 		eof = true;
 
 	return eof;
+}
+
+static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	return parseNewcommandFull (token, tokenUnprocessed, TEXTAG_COMMAND);
 }
 
 static bool parseDef (tokenInfo *const token, bool *tokenUnprocessed)
@@ -982,6 +991,9 @@ static void parseTexFile (tokenInfo *const token)
 					break;
 				case KEYWORD_def:
 					eof = parseDef (token, &tokenUnprocessed);
+					break;
+				case KEYWORD_declaremathoperator:
+					eof = parseNewcommandFull (token, &tokenUnprocessed, TEXTAG_OPERATOR);
 					break;
 				case KEYWORD_newcounter:
 					eof = parseNewcounter (token, &tokenUnprocessed);
