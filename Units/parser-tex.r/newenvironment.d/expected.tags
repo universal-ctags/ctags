@@ -1,2 +1,3 @@
 boxed	input.tex	/^\\newenvironment{boxed}$/;"	e
 boxedA	input.tex	/^\\renewenvironment{boxedA}$/;"	e
+theorem	input.tex	/^\\newtheorem{theorem}{Theorem}$/;"	t

@@ -69,6 +69,7 @@ enum eKeywordId {
 	KEYWORD_declaremathoperator,
 	KEYWORD_newenvironment,
 	KEYWORD_renewenvironment,
+	KEYWORD_newtheorem,
 	KEYWORD_newcounter,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -125,6 +126,7 @@ typedef enum {
 	TEXTAG_COMMAND,
 	TEXTAG_OPERATOR,
 	TEXTAG_ENVIRONMENT,
+	TEXTAG_THEOREM,
 	TEXTAG_COUNTER,
 	TEXTAG_COUNT
 } texKind;
@@ -159,6 +161,7 @@ static kindDefinition TexKinds [] = {
 	{ true,  'C', "command",		  "command created with \\newcommand" },
 	{ true,  'o', "operator",		  "math operator created with \\DeclareMathOperator" },
 	{ true,  'e', "environment",	  "environment created with \\newenvironment" },
+	{ true,  't', "theorem",		  "theorem created with \\newtheorem" },
 	{ true,  'N', "counter",		  "counter created with \\newcounter" },
 };
 
@@ -185,6 +188,7 @@ static const keywordTable TexKeywordTable [] = {
 	{ "DeclareMathOperator",	KEYWORD_declaremathoperator	},
 	{ "newenvironment",	KEYWORD_newenvironment		},
 	{ "renewenvironment",	KEYWORD_renewenvironment},
+	{ "newtheorem",		KEYWORD_newtheorem			},
 	{ "newcounter",		KEYWORD_newcounter			},
 };
 
@@ -940,6 +944,50 @@ static bool parseNewEnvironment (tokenInfo *const token, bool *tokenUnprocessed)
 	return eof;
 }
 
+static bool parseNewTheorem (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	bool eof = false;
+	/*	\newtheorem{name}{title}
+		\newtheorem{name}{title}[numbered_within]
+		\newtheorem{name}[numbered_like]{title} */
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = TEXTAG_THEOREM,
+			.roleIndex = ROLE_DEFINITION_INDEX,
+			.name = NULL,
+			.unique = false,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+		eof = true;
+
+	return eof;
+}
+
 static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 {
 	bool eof = false;
@@ -1047,6 +1095,9 @@ static void parseTexFile (tokenInfo *const token)
 				case KEYWORD_newenvironment:
 				case KEYWORD_renewenvironment:
 					eof = parseNewEnvironment (token, &tokenUnprocessed);
+					break;
+				case KEYWORD_newtheorem:
+					eof = parseNewTheorem (token, &tokenUnprocessed);
 					break;
 				case KEYWORD_newcounter:
 					eof = parseNewcounter (token, &tokenUnprocessed);
