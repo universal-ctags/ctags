@@ -1,5 +1,5 @@
 X	input.foo	/^# open:X$/;"	s	end:47
-NS1	input.foo	/^ns NS1$/;"	n	end:16
+NS1	input.foo	/^ns NS1$/;"	n	end:15
 x	input.foo	/^define x {$/;"	d	namespace:NS1	end:14
 y	input.foo	/^	define y {$/;"	d	definition:NS1.x	end:7
 v_y_0	input.foo	/^	       var v_y_0$/;"	v	definition:NS1.x.y
