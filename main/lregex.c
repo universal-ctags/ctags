@@ -1596,6 +1596,16 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	if (patbuf->scopeActions & SCOPE_CLEAR)
 	{
 		unsigned long endline = getInputLineNumberInRegPType(patbuf->regptype, offset);
+
+		/*
+		 * SCOPE_CLEAR|SCOPE_PUSH implies that "set" was specified as the scope action.
+		 * If the specified action is "set", getInputLineNumberInRegPType()
+		 * returns the start line of the NEW scope. The cleared scopes are ended BEFORE
+		 * the new scope. There is a gap. We must adjust the "end:" field here.
+		 */
+		if (patbuf->scopeActions & SCOPE_PUSH && endline > 0)
+			endline--;
+
 		fillEndLineFieldOfUpperScopes (lcb, endline);
 		lcb->currentScope = CORK_NIL;
 	}

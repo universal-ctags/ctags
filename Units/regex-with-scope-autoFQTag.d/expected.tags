@@ -1,4 +1,4 @@
-NS1	input.foo	/^ns NS1$/;"	n	end:16
+NS1	input.foo	/^ns NS1$/;"	n	end:15
 x	input.foo	/^define x {$/;"	d	namespace:NS1	end:14
 NS1.x	input.foo	/^define x {$/;"	d	namespace:NS1	end:14
 y	input.foo	/^	define y {$/;"	d	definition:NS1.x	end:7
