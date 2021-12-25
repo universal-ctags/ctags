@@ -63,6 +63,8 @@ enum eKeywordId {
 	KEYWORD_bibitem,
 	KEYWORD_bibliography,
 	KEYWORD_newcommand,
+	KEYWORD_renewcommand,
+	KEYWORD_providecommand,
 	KEYWORD_newcounter,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -169,6 +171,8 @@ static const keywordTable TexKeywordTable [] = {
 	{ "bibitem",		KEYWORD_bibitem				},
 	{ "bibliography",	KEYWORD_bibliography		},
 	{ "newcommand",		KEYWORD_newcommand			},
+	{ "renewcommand",	KEYWORD_renewcommand		},
+	{ "providecommand",	KEYWORD_providecommand		},
 	{ "newcounter",		KEYWORD_newcounter			},
 };
 
@@ -934,6 +938,8 @@ static void parseTexFile (tokenInfo *const token)
 										false, &tokenUnprocessed);
 					break;
 				case KEYWORD_newcommand:
+				case KEYWORD_renewcommand:
+				case KEYWORD_providecommand:
 					eof = parseNewcommand (token, &tokenUnprocessed);
 					break;
 				case KEYWORD_newcounter:
