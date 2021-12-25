@@ -8,8 +8,29 @@
 #include "xtag.h"
 
 
-static void initializeManParser (const langType language CTAGS_ATTR_UNUSED)
+static void initializeManParser (const langType language)
 {
+
+	addLanguageRegexTable (language, "main");
+
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^([^\n.]|\\.[^\nst])[^\n]*\n",
+	                               "", "", "{icase}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^\\.TH[\t ]+\"([^\"]+)\"[^\n]*\n",
+	                               "\\1", "t", "{icase}{scope=push}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^\\.TH[\t ]+([^\t \n]+)[^\n]*\n",
+	                               "\\1", "t", "{icase}{scope=push}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^\\.SH[\t ]+\"([^\"\n]+)\"[^\n]*\n",
+	                               "\\1", "s", "{icase}{scope=ref}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^\\.SH[\t ]+([^\n]+)\n",
+	                               "\\1", "s", "{icase}{scope=ref}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^[^\n]*\n|[^\n]+",
+	                               "", "", "", NULL);
 }
 
 extern parserDefinition* ManParser (void)
@@ -46,17 +67,6 @@ extern parserDefinition* ManParser (void)
 		  true, 's', "section", "sections",
 		},
 	};
-	static tagRegexTable ManTagRegexTable [] = {
-		{"^\\.TH[[:space:]]{1,}\"([^\"]{1,})\".*", "\\1",
-		"t", "{exclusive}{icase}{scope=push}", NULL, false},
-		{"^\\.TH[[:space:]]{1,}([^[:space:]]{1,}).*", "\\1",
-		"t", "{exclusive}{icase}{scope=push}", NULL, false},
-		{"^\\.SH[[:space:]]{1,}\"([^\"]{1,})\".*", "\\1",
-		"s", "{exclusive}{icase}{scope=ref}", NULL, false},
-		{"^\\.SH[[:space:]]{1,}(.{1,})", "\\1",
-		"s", "{exclusive}{icase}{scope=ref}", NULL, false},
-	};
-
 
 	parserDefinition* const def = parserNew ("Man");
 
@@ -68,8 +78,6 @@ extern parserDefinition* ManParser (void)
 	def->useCork       = CORK_QUEUE;
 	def->kindTable     = ManKindTable;
 	def->kindCount     = ARRAY_SIZE(ManKindTable);
-	def->tagRegexTable = ManTagRegexTable;
-	def->tagRegexCount = ARRAY_SIZE(ManTagRegexTable);
 	def->initialize    = initializeManParser;
 
 	return def;
