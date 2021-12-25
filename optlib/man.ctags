@@ -44,6 +44,28 @@
 
 --_tabledef-Man=main
 --_tabledef-Man=section
+--_tabledef-Man=sectionheading
+
+--_prelude-Man={{
+    % /replace SCOPE-ACTION -
+    % /push SCOPE-ACTION -
+    /scope-action {
+        /replace eq {
+             _scopetop pop 1 /start _matchloc _matchloc2line dup 2 gt {
+                 2 sub end:
+             } {
+                 pop
+                 pop
+             } ifelse
+             _scopepop
+        } if
+
+        _scopetop {
+            . exch scope:
+        } if
+        . _scopepush
+    } def
+}}
 
 --_tabledef-Man=EOF
 --_tabledef-Man=SKIP
@@ -62,9 +84,20 @@
 --_mtable-regex-Man=main/\.TH[\t ]+([^\t \n]+)[^\n]*\n/\1/t/{icase}{scope=set}
 --_mtable-regex-Man=main/\.SH[\t ]+"([^"\n]+)"[^\n]*\n/\1/s/{icase}{scope=push}{tenter=section}
 --_mtable-regex-Man=main/\.SH[\t ]+([^\n]+)\n/\1/s/{icase}{scope=push}{tenter=section}
+--_mtable-regex-Man=main/\.SH[\t ]*\n//{icase}{tenter=sectionheading}{{
+    /push
+}}
 --_mtable-extend-Man=main+REST
 
 --_mtable-extend-Man=section+GUARD
 --_mtable-regex-Man=section/\.SH[\t ]+"([^"\n]+)"[^\n]*\n/\1/s/{icase}{scope=replace}
 --_mtable-regex-Man=section/\.SH[\t ]+([^\n]+)\n/\1/s/{icase}{scope=replace}
+--_mtable-regex-Man=section/\.SH[\t ]*\n//{icase}{tenter=sectionheading}{{
+    /replace
+}}
 --_mtable-extend-Man=section+REST
+
+--_mtable-regex-Man=sectionheading/[ \t]*([^\n]+)\n/\1/s/{tleave}{{
+    scope-action
+}}
+--_mtable-extend-Man=sectionheading+REST

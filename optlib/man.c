@@ -10,9 +10,30 @@
 
 static void initializeManParser (const langType language)
 {
+	addLanguageOptscriptToHook (language, SCRIPT_HOOK_PRELUDE,
+		"{{    % /replace SCOPE-ACTION -\n"
+		"    % /push SCOPE-ACTION -\n"
+		"    /scope-action {\n"
+		"        /replace eq {\n"
+		"             _scopetop pop 1 /start _matchloc _matchloc2line dup 2 gt {\n"
+		"                 2 sub end:\n"
+		"             } {\n"
+		"                 pop\n"
+		"                 pop\n"
+		"             } ifelse\n"
+		"             _scopepop\n"
+		"        } if\n"
+		"\n"
+		"        _scopetop {\n"
+		"            . exch scope:\n"
+		"        } if\n"
+		"        . _scopepush\n"
+		"    } def\n"
+		"}}");
 
 	addLanguageRegexTable (language, "main");
 	addLanguageRegexTable (language, "section");
+	addLanguageRegexTable (language, "sectionheading");
 	addLanguageRegexTable (language, "EOF");
 	addLanguageRegexTable (language, "SKIP");
 	addLanguageRegexTable (language, "REST");
@@ -34,6 +55,12 @@ static void initializeManParser (const langType language)
 	                               "^\\.SH[\t ]+([^\n]+)\n",
 	                               "\\1", "s", "{icase}{scope=push}{tenter=section}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
+	                               "^\\.SH[\t ]*\n",
+	                               "", "", "{icase}{tenter=sectionheading}"
+		"{{\n"
+		"    /push\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
 	                               "^[^\n]*\n|[^\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
@@ -49,9 +76,27 @@ static void initializeManParser (const langType language)
 	                               "^\\.SH[\t ]+([^\n]+)\n",
 	                               "\\1", "s", "{icase}{scope=replace}", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
+	                               "^\\.SH[\t ]*\n",
+	                               "", "", "{icase}{tenter=sectionheading}"
+		"{{\n"
+		"    /replace\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
 	                               "^[^\n]*\n|[^\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
+	                               "^",
+	                               "", "", "{scope=clear}{tquit}", NULL);
+	addLanguageTagMultiTableRegex (language, "sectionheading",
+	                               "^[ \t]*([^\n]+)\n",
+	                               "\\1", "s", "{tleave}"
+		"{{\n"
+		"    scope-action\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "sectionheading",
+	                               "^[^\n]*\n|[^\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "sectionheading",
 	                               "^",
 	                               "", "", "{scope=clear}{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "EOF",
