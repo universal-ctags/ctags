@@ -12,25 +12,63 @@ static void initializeManParser (const langType language)
 {
 
 	addLanguageRegexTable (language, "main");
+	addLanguageRegexTable (language, "section");
+	addLanguageRegexTable (language, "EOF");
+	addLanguageRegexTable (language, "SKIP");
+	addLanguageRegexTable (language, "REST");
+	addLanguageRegexTable (language, "GUARD");
 
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^([^\n.]|\\.[^\nst])[^\n]*\n",
 	                               "", "", "{icase}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^\\.TH[\t ]+\"([^\"]+)\"[^\n]*\n",
-	                               "\\1", "t", "{icase}{scope=push}", NULL);
+	                               "\\1", "t", "{icase}{scope=set}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^\\.TH[\t ]+([^\t \n]+)[^\n]*\n",
-	                               "\\1", "t", "{icase}{scope=push}", NULL);
+	                               "\\1", "t", "{icase}{scope=set}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^\\.SH[\t ]+\"([^\"\n]+)\"[^\n]*\n",
-	                               "\\1", "s", "{icase}{scope=ref}", NULL);
+	                               "\\1", "s", "{icase}{scope=push}{tenter=section}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^\\.SH[\t ]+([^\n]+)\n",
-	                               "\\1", "s", "{icase}{scope=ref}", NULL);
+	                               "\\1", "s", "{icase}{scope=push}{tenter=section}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^[^\n]*\n|[^\n]+",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^",
+	                               "", "", "{scope=clear}{tquit}", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
+	                               "^([^\n.]|\\.[^\nst])[^\n]*\n",
+	                               "", "", "{icase}", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
+	                               "^\\.SH[\t ]+\"([^\"\n]+)\"[^\n]*\n",
+	                               "\\1", "s", "{icase}{scope=replace}", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
+	                               "^\\.SH[\t ]+([^\n]+)\n",
+	                               "\\1", "s", "{icase}{scope=replace}", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
+	                               "^[^\n]*\n|[^\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
+	                               "^",
+	                               "", "", "{scope=clear}{tquit}", NULL);
+	addLanguageTagMultiTableRegex (language, "EOF",
+	                               "^",
+	                               "", "", "{scope=clear}{tquit}", NULL);
+	addLanguageTagMultiTableRegex (language, "SKIP",
+	                               "^[^\n]*\n|[^\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "REST",
+	                               "^[^\n]*\n|[^\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "REST",
+	                               "^",
+	                               "", "", "{scope=clear}{tquit}", NULL);
+	addLanguageTagMultiTableRegex (language, "GUARD",
+	                               "^([^\n.]|\\.[^\nst])[^\n]*\n",
+	                               "", "", "{icase}", NULL);
 }
 
 extern parserDefinition* ManParser (void)
