@@ -42,7 +42,11 @@
 --kinddef-Man=t,title,titles
 --kinddef-Man=s,section,sections
 
---regex-Man=/^\.TH[[:space:]]{1,}"([^"]{1,})".*/\1/t/{exclusive}{icase}{scope=push}
---regex-Man=/^\.TH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/t/{exclusive}{icase}{scope=push}
---regex-Man=/^\.SH[[:space:]]{1,}"([^"]{1,})".*/\1/s/{exclusive}{icase}{scope=ref}
---regex-Man=/^\.SH[[:space:]]{1,}(.{1,})/\1/s/{exclusive}{icase}{scope=ref}
+--_tabledef-Man=main
+
+--_mtable-regex-Man=main/([^\n.]|\.[^\nst])[^\n]*\n//{icase}
+--_mtable-regex-Man=main/\.TH[\t ]+"([^"]+)"[^\n]*\n/\1/t/{icase}{scope=push}
+--_mtable-regex-Man=main/\.TH[\t ]+([^\t \n]+)[^\n]*\n/\1/t/{icase}{scope=push}
+--_mtable-regex-Man=main/\.SH[\t ]+"([^"\n]+)"[^\n]*\n/\1/s/{icase}{scope=ref}
+--_mtable-regex-Man=main/\.SH[\t ]+([^\n]+)\n/\1/s/{icase}{scope=ref}
+--_mtable-regex-Man=main/[^\n]*\n|[^\n]+//
