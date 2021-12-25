@@ -43,10 +43,28 @@
 --kinddef-Man=s,section,sections
 
 --_tabledef-Man=main
+--_tabledef-Man=section
 
---_mtable-regex-Man=main/([^\n.]|\.[^\nst])[^\n]*\n//{icase}
---_mtable-regex-Man=main/\.TH[\t ]+"([^"]+)"[^\n]*\n/\1/t/{icase}{scope=push}
---_mtable-regex-Man=main/\.TH[\t ]+([^\t \n]+)[^\n]*\n/\1/t/{icase}{scope=push}
---_mtable-regex-Man=main/\.SH[\t ]+"([^"\n]+)"[^\n]*\n/\1/s/{icase}{scope=ref}
---_mtable-regex-Man=main/\.SH[\t ]+([^\n]+)\n/\1/s/{icase}{scope=ref}
---_mtable-regex-Man=main/[^\n]*\n|[^\n]+//
+--_tabledef-Man=EOF
+--_tabledef-Man=SKIP
+--_tabledef-Man=REST
+--_tabledef-Man=GUARD
+
+
+--_mtable-regex-Man=GUARD/([^\n.]|\.[^\nst])[^\n]*\n//{icase}
+--_mtable-regex-Man=SKIP/[^\n]*\n|[^\n]+//
+--_mtable-regex-Man=EOF///{scope=clear}{tquit}
+--_mtable-extend-Man=REST+SKIP
+--_mtable-extend-Man=REST+EOF
+
+--_mtable-extend-Man=main+GUARD
+--_mtable-regex-Man=main/\.TH[\t ]+"([^"]+)"[^\n]*\n/\1/t/{icase}{scope=set}
+--_mtable-regex-Man=main/\.TH[\t ]+([^\t \n]+)[^\n]*\n/\1/t/{icase}{scope=set}
+--_mtable-regex-Man=main/\.SH[\t ]+"([^"\n]+)"[^\n]*\n/\1/s/{icase}{scope=push}{tenter=section}
+--_mtable-regex-Man=main/\.SH[\t ]+([^\n]+)\n/\1/s/{icase}{scope=push}{tenter=section}
+--_mtable-extend-Man=main+REST
+
+--_mtable-extend-Man=section+GUARD
+--_mtable-regex-Man=section/\.SH[\t ]+"([^"\n]+)"[^\n]*\n/\1/s/{icase}{scope=replace}
+--_mtable-regex-Man=section/\.SH[\t ]+([^\n]+)\n/\1/s/{icase}{scope=replace}
+--_mtable-extend-Man=section+REST
