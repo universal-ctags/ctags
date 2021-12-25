@@ -1,0 +1,29 @@
+\documentclass{article}
+\newenvironment{boxed}
+    {\begin{center}
+    \begin{tabular}{|p{0.9\textwidth}|}
+    \hline\\
+    }
+    { 
+    \\\\\hline
+    \end{tabular} 
+    \end{center}
+    }
+\renewenvironment{boxedA}
+    {\begin{center}
+    \begin{tabular}{|p{0.9\textwidth}|}
+    \hline\\
+    }
+    { 
+    \\\\\hline
+    \end{tabular} 
+    \end{center}
+    }
+\begin{document}
+\begin{boxed}
+foo
+\end{boxed}
+\begin{boxedA}
+foo
+\end{boxedA}
+\end{document}

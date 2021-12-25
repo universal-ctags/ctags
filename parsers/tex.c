@@ -67,6 +67,8 @@ enum eKeywordId {
 	KEYWORD_providecommand,
 	KEYWORD_def,
 	KEYWORD_declaremathoperator,
+	KEYWORD_newenvironment,
+	KEYWORD_renewenvironment,
 	KEYWORD_newcounter,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -122,6 +124,7 @@ typedef enum {
 	TEXTAG_BIBITEM,
 	TEXTAG_COMMAND,
 	TEXTAG_OPERATOR,
+	TEXTAG_ENVIRONMENT,
 	TEXTAG_COUNTER,
 	TEXTAG_COUNT
 } texKind;
@@ -155,6 +158,7 @@ static kindDefinition TexKinds [] = {
 	{ true,  'B', "bibitem",		  "bibliography items" },
 	{ true,  'C', "command",		  "command created with \\newcommand" },
 	{ true,  'o', "operator",		  "math operator created with \\DeclareMathOperator" },
+	{ true,  'e', "environment",	  "environment created with \\newenvironment" },
 	{ true,  'N', "counter",		  "counter created with \\newcounter" },
 };
 
@@ -179,6 +183,8 @@ static const keywordTable TexKeywordTable [] = {
 	{ "providecommand",	KEYWORD_providecommand		},
 	{ "def",			KEYWORD_def					},
 	{ "DeclareMathOperator",	KEYWORD_declaremathoperator	},
+	{ "newenvironment",	KEYWORD_newenvironment		},
+	{ "renewenvironment",	KEYWORD_renewenvironment},
 	{ "newcounter",		KEYWORD_newcounter			},
 };
 
@@ -892,6 +898,48 @@ static bool parseDef (tokenInfo *const token, bool *tokenUnprocessed)
 	return eof;
 }
 
+static bool parseNewEnvironment (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	bool eof = false;
+	/* \newenvironment{nam}[args]{begdef}{enddef} */
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = TEXTAG_ENVIRONMENT,
+			.roleIndex = ROLE_DEFINITION_INDEX,
+			.name = NULL,
+			.unique = false,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+		eof = true;
+
+	return eof;
+}
+
 static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 {
 	bool eof = false;
@@ -921,6 +969,7 @@ static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 
 	return eof;
 }
+
 static void parseTexFile (tokenInfo *const token)
 {
 	bool eof = false;
@@ -994,6 +1043,10 @@ static void parseTexFile (tokenInfo *const token)
 					break;
 				case KEYWORD_declaremathoperator:
 					eof = parseNewcommandFull (token, &tokenUnprocessed, TEXTAG_OPERATOR);
+					break;
+				case KEYWORD_newenvironment:
+				case KEYWORD_renewenvironment:
+					eof = parseNewEnvironment (token, &tokenUnprocessed);
 					break;
 				case KEYWORD_newcounter:
 					eof = parseNewcounter (token, &tokenUnprocessed);

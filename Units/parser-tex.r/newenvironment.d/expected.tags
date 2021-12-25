@@ -1,0 +1,2 @@
+boxed	input.tex	/^\\newenvironment{boxed}$/;"	e
+boxedA	input.tex	/^\\renewenvironment{boxedA}$/;"	e
