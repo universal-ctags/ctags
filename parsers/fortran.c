@@ -1181,7 +1181,7 @@ static void skipOverParens (tokenInfo *const token)
 	skipOverParensFull (token, NULL, NULL);
 }
 
-static void skipOverSqaures (tokenInfo *const token)
+static void skipOverSquares (tokenInfo *const token)
 {
 	skipOverSquaresFull (token, NULL, NULL);
 }
@@ -1470,7 +1470,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 
 			case KEYWORD_codimension:
 				readToken (token);
-				skipOverSqaures (token);
+				skipOverSquares (token);
 				break;
 
 			default: skipToToken (token, TOKEN_STATEMENT_END); break;
@@ -1522,7 +1522,7 @@ static void parseEntityDecl (tokenInfo *const token,
 	if (isType (token, TOKEN_PAREN_OPEN))
 		skipOverParens (token);
 	if (isType (token, TOKEN_SQUARE_OPEN))
-		skipOverSqaures (token);
+		skipOverSquares (token);
 	if (isType (token, TOKEN_OPERATOR) &&
 			strcmp (vStringValue (token->string), "*") == 0)
 	{
@@ -1551,7 +1551,7 @@ static void parseEntityDecl (tokenInfo *const token,
 				if (isType (token, TOKEN_PAREN_OPEN))
 					skipOverParens (token);
 				if (isType (token, TOKEN_SQUARE_OPEN))
-					skipOverSqaures (token);
+					skipOverSquares (token);
 			}
 		}
 	}
