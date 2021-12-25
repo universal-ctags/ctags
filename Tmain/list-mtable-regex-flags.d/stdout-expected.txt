@@ -6,7 +6,7 @@ p       pcre2                                         use pcre2 regex engine
 -       fatal="MESSAGE"                               print the given MESSAGE and exit
 -       mgroup=N                                      a group in pattern determining the line number of tag
 -       placeholder                                   don't put this tag to tags file.
--       scope=ACTION                                  use scope stack: ACTION = ref|push|pop|clear|set
+-       scope=ACTION                                  use scope stack: ACTION = ref|push|pop|clear|set|replace
 -       tenter=TABLE[,CONT]                           enter to given regext table (with specifying continuation)
 -       tjump=TABLE                                   jump to another regext table(don't push the current table to state stack)
 -       tleave                                        leave from the current regext table
