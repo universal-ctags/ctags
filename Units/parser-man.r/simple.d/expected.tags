@@ -1,8 +1,20 @@
-CTAGS	input.1	/^.TH CTAGS 1 "Version 0.0.0" "Darren Hiebert" "Universal Ctags"$/;"	t	end:37
+CTAGS	input.1	/^.TH CTAGS 1 "Version 0.0.0" "Darren Hiebert" "Universal Ctags"$/;"	t	end:89
 NAME	input.1	/^.SH "NAME"$/;"	s	title:CTAGS	end:6
 ABSTRACT	input.1	/^ABSTRACT$/;"	s	title:CTAGS	end:9
 SYNOPSIS	input.1	/^.SH SYNOPSIS$/;"	s	title:CTAGS	end:16
 DESCRIPTION	input.1	/^.SH "DESCRIPTION"$/;"	s	title:CTAGS	end:25
-AUTHOR	input.1	/^AUTHOR$/;"	s	title:CTAGS	end:30
-ACKNOWLEDGMENT	input.1	/^ACKNOWLEDGMENT$/;"	s	title:CTAGS	end:34
-SEE ALSO	input.1	/^.SH SEE ALSO$/;"	s	title:CTAGS	end:37
+AUTHOR	input.1	/^AUTHOR$/;"	s	title:CTAGS	end:52
+subsection1	input.1	/^.SS subsection1$/;"	S	section:CTAGS""AUTHOR	end:34
+subsection2	input.1	/^.SS "subsection2"$/;"	S	section:CTAGS""AUTHOR	end:38
+subsection3	input.1	/^subsection3$/;"	S	section:CTAGS""AUTHOR	end:43
+sub section 4	input.1	/^.SS sub section 4$/;"	S	section:CTAGS""AUTHOR	end:47
+sub section 5	input.1	/^sub section 5$/;"	S	section:CTAGS""AUTHOR	end:52
+ACKNOWLEDGMENT	input.1	/^ACKNOWLEDGMENT$/;"	s	title:CTAGS	end:83
+subsection6	input.1	/^subsection6$/;"	S	section:CTAGS""ACKNOWLEDGMENT	end:61
+subsection7	input.1	/^subsection7$/;"	S	section:CTAGS""ACKNOWLEDGMENT	end:66
+subsection8	input.1	/^.SS "subsection8"$/;"	S	section:CTAGS""ACKNOWLEDGMENT	end:70
+subsection9	input.1	/^.SS subsection9$/;"	S	section:CTAGS""ACKNOWLEDGMENT	end:74
+sub section 10	input.1	/^.SS sub section 10$/;"	S	section:CTAGS""ACKNOWLEDGMENT	end:78
+sub section 11	input.1	/^sub section 11$/;"	S	section:CTAGS""ACKNOWLEDGMENT	end:83
+SEE ALSO	input.1	/^.SH SEE ALSO$/;"	s	title:CTAGS	end:89
+sub section 12	input.1	/^sub section 12$/;"	S	section:CTAGS""SEE ALSO	end:89
