@@ -162,12 +162,14 @@ static vString *get_heading(const int kind, const unsigned char *line,
 }
 
 
-static bool is_indented(const unsigned char *line, int line_len)
+static int get_first_char_pos(const unsigned char *line, int line_len, bool *indented)
 {
 	int indent = 0;
-	for (int i = 0; i < line_len && isspace(line[i]) && indent < 4; i++)
+	int i;
+	for (i = 0; i < line_len && isspace(line[i]); i++)
 		indent += line[i] == '\t' ? 4 : 1;
-	return indent >= 4;
+	*indented = indent >= 4;
+	return i;
 }
 
 
@@ -197,15 +199,17 @@ static void findMarkdownTags(void)
 	{
 		int line_len = strlen((const char*) line);
 		bool line_processed = false;
+		bool indented;
+		int pos = get_first_char_pos(line, line_len, &indented);
 
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 2 && !indented; i++)
 		{
 			char code_chars[] = { '`', '~' };
 			char c = code_chars[i % 2];
 			char other_c = code_chars[(i + 1) % 2];
 
 			if (in_code_char != other_c && line_len >= 3 &&
-				line[0] == c && line[1] == c && line[2] == c)
+				line[pos] == c && line[pos+1] == c && line[pos+2] == c)
 			{
 				in_code_char = in_code_char ? 0 : c;
 				if (in_code_char)
@@ -213,7 +217,7 @@ static void findMarkdownTags(void)
 					startSourceLineNumber = getSourceLineNumber ();
 					startLineNumber = getInputLineNumber ();
 					vStringClear(codeLang);
-					vStringCatS(codeLang, (const char *)(line + 3));
+					vStringCatS(codeLang, (const char *)(line + pos + 3));
 					vStringStripLeading(codeLang);
 					vStringStripTrailing(codeLang);
 				}
@@ -234,23 +238,23 @@ static void findMarkdownTags(void)
 			line_processed = true;
 
 		/* code block using indent */
-		else if (is_indented(line, line_len))
+		else if (indented)
 			line_processed = true;
 
 		/* if it's a title underline, or a delimited block marking character */
-		else if (line[0] == '=' || line[0] == '-' || line[0] == '#')
+		else if (line[pos] == '=' || line[pos] == '-' || line[pos] == '#')
 		{
 			int n_same;
-			for (n_same = 1; line[n_same] == line[0]; ++n_same);
+			for (n_same = 1; line[n_same] == line[pos]; ++n_same);
 
 			/* is it a two line title */
-			if (line[0] == '=' || line[0] == '-')
+			if (line[pos] == '=' || line[pos] == '-')
 			{
-				char marker[2] = { line[0], '\0' };
-				int kind = line[0] == '=' ? K_CHAPTER : K_SECTION;
+				char marker[2] = { line[pos], '\0' };
+				int kind = line[pos] == '=' ? K_CHAPTER : K_SECTION;
 				bool whitespace_terminated = true;
 
-				for (int i = n_same; i < line_len; i++)
+				for (int i = pos + n_same; i < line_len; i++)
 				{
 					if (!isspace(line[i]))
 					{
@@ -265,7 +269,7 @@ static void findMarkdownTags(void)
 					makeSectionMarkdownTag(prev_line, kind, marker);
 			}
 			/* otherwise is it a one line title */
-			else if (line[0] == '#' && n_same <= K_SECTION_COUNT && isspace(line[n_same]))
+			else if (line[pos] == '#' && n_same <= K_SECTION_COUNT && isspace(line[n_same]))
 			{
 				int kind = n_same - 1;
 				bool delimited = false;
