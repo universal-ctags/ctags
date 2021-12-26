@@ -10,8 +10,8 @@ for the differences between GDScript and Python. A short list of major
 differences:
 
 - Files are classes. All symbols are attributes of the class defined by the
-file.
+  file.
 - There are no functions because all symbols are class attributes, so all
-"functions" are methods.
+  "functions" are methods.
 - Variables are explicitly declared with the `var` keyword.
 - Enum, signal and const keywords are added.
