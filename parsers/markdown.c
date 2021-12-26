@@ -213,22 +213,25 @@ static void findMarkdownTags(void)
 		if (inPreambule)
 			continue;
 
-		for (int i = 0; i < 2 && !indented; i++)
+		/* fenced code block */
+		if (line[pos] == '`' || line[pos] == '~')
 		{
-			char code_chars[] = { '`', '~' };
-			char c = code_chars[i % 2];
-			char other_c = code_chars[(i + 1) % 2];
+			char c = line[pos];
+			char other_c = c == '`' ? '~' : '`';
+			int n_same;
+			for (n_same = 1; line[n_same] == line[pos]; ++n_same);
 
-			if (in_code_char != other_c && line_len >= 3 &&
-				line[pos] == c && line[pos+1] == c && line[pos+2] == c)
+			if (in_code_char != other_c && n_same >= 3)
 			{
 				in_code_char = in_code_char ? 0 : c;
-				if (in_code_char)
+				if (in_code_char == c && strstr((const char *)(line + pos + n_same), "```") != NULL)
+					in_code_char = 0;
+				else if (in_code_char)
 				{
 					startSourceLineNumber = getSourceLineNumber ();
 					startLineNumber = getInputLineNumber ();
 					vStringClear(codeLang);
-					vStringCatS(codeLang, (const char *)(line + pos + 3));
+					vStringCatS(codeLang, (const char *)(line + pos + n_same));
 					vStringStripLeading(codeLang);
 					vStringStripTrailing(codeLang);
 				}
