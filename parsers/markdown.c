@@ -137,6 +137,7 @@ static int makeSectionMarkdownTag (const vString* const name, const int kind, co
 static vString *get_heading(const int kind, const unsigned char *line,
 	const int line_len, bool *delimited)
 {
+	int pos = 0;
 	int start = kind + 1;
 	int end = line_len - 1;
 	vString *name = vStringNew();
@@ -145,7 +146,8 @@ static vString *get_heading(const int kind, const unsigned char *line,
 	Assert (line_len > start);
 
 	*delimited = false;
-	while (line[end] == line[0])
+	while (isspace(line[pos])) ++pos;
+	while (line[end] == line[pos] && end - 1 >= 0 && line[end - 1] != '\\')
 	{
 		--end;
 		*delimited = true;

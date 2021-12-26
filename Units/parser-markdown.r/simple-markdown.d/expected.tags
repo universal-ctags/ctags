@@ -28,6 +28,7 @@ F	input.md	/^F$/;"	s	chapter:C	end:106	sectionMarker:-
 G	input.md	/^ G$/;"	s	chapter:C	end:109	sectionMarker:-
 H	input.md	/^  H$/;"	s	chapter:C	end:112	sectionMarker:-
 I	input.md	/^   I$/;"	s	chapter:C	end:128	sectionMarker:-
+C\\#	input.md	/^# C\\#$/;"	c	end:129	sectionMarker:#
 x	input.md	/^function x$/;"	f
 y	input.md	/^function y$/;"	f
 z	input.md	/^z()$/;"	f
