@@ -192,6 +192,7 @@ static void findMarkdownTags(void)
 	char in_code_char = 0;
 	long startSourceLineNumber = 0;
 	long startLineNumber = 0;
+	bool inPreambule = false;
 
 	nestingLevels = nestingLevelsNewFull(0, fillEndField);
 
@@ -201,6 +202,16 @@ static void findMarkdownTags(void)
 		bool line_processed = false;
 		bool indented;
 		int pos = get_first_char_pos(line, line_len, &indented);
+		int lineNum = getInputLineNumber ();
+
+		if (lineNum == 1 || inPreambule)
+		{
+			if (line[pos] == '-' && line[pos + 1] == '-' && line[pos + 2] == '-')
+				inPreambule = !inPreambule;
+		}
+
+		if (inPreambule)
+			continue;
 
 		for (int i = 0; i < 2 && !indented; i++)
 		{
