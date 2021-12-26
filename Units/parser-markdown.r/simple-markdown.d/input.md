@@ -141,3 +141,6 @@ ignored
     -
 
 ```foo```
+
+> quoted
+---

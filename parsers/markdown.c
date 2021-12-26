@@ -256,13 +256,16 @@ static void findMarkdownTags(void)
 			line_processed = true;
 
 		/* if it's a title underline, or a delimited block marking character */
-		else if (line[pos] == '=' || line[pos] == '-' || line[pos] == '#')
+		else if (line[pos] == '=' || line[pos] == '-' || line[pos] == '#' || line[pos] == '>')
 		{
 			int n_same;
 			for (n_same = 1; line[n_same] == line[pos]; ++n_same);
 
+			/* quote */
+			if (line[pos] == '>')
+				;  /* just to make sure line_processed = true so it won't be in a heading */
 			/* is it a two line title */
-			if (line[pos] == '=' || line[pos] == '-')
+			else if (line[pos] == '=' || line[pos] == '-')
 			{
 				char marker[2] = { line[pos], '\0' };
 				int kind = line[pos] == '=' ? K_CHAPTER : K_SECTION;
