@@ -66,6 +66,16 @@ typedef struct {
 	AsmKind kind;
 } opKind;
 
+typedef enum {
+	F_PROPERTIES,
+} asmField;
+
+static fieldDefinition AsmFields[] = {
+	{ .name = "properties",
+	  .description = "properties (req, vararg for parameters)",
+	  .enabled = true },
+};
+
 /*
 *   DATA DEFINITIONS
 */
@@ -326,6 +336,7 @@ static void  readMacroParameters (int index, const unsigned char *cp)
 	while (*cp)
 	{
 		const unsigned char *tmp;
+		tagEntryInfo *e = NULL;
 
 		while (isspace ((int) *cp))
 			++cp;
@@ -337,7 +348,7 @@ static void  readMacroParameters (int index, const unsigned char *cp)
 
 		{
 			int r = makeSimpleTag (name, K_PARAM);
-			tagEntryInfo *e = getEntryInCorkQueue (r);
+			e = getEntryInCorkQueue (r);
 			if (e)
 				e->extensionFields.scopeIndex = index;
 		}
@@ -345,6 +356,20 @@ static void  readMacroParameters (int index, const unsigned char *cp)
 		if (*cp == ':')
 		{
 			cp++;
+			if (strncmp((const char *)cp, "req" ,3) == 0)
+			{
+				cp += 3;
+				if (e)
+					attachParserField (e, true, AsmFields[F_PROPERTIES].ftype,
+									   "req");
+			}
+			else if (strncmp((const char *)cp, "vararg", 6) == 0)
+			{
+				cp += 6;
+				if (e)
+					attachParserField (e, true, AsmFields[F_PROPERTIES].ftype,
+									   "vararg");
+			}
 			cp = (const unsigned char *)strpbrk ((const char *)cp , " \t,=");
 			if (cp == NULL)
 				break;
@@ -484,5 +509,7 @@ extern parserDefinition* AsmParser (void)
 	def->keywordCount = ARRAY_SIZE (AsmKeywords);
 	def->selectLanguage = selectors;
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
+	def->fieldTable = AsmFields;
+	def->fieldCount = ARRAY_SIZE (AsmFields);
 	return def;
 }
