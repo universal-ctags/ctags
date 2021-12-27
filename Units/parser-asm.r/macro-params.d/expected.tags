@@ -12,3 +12,11 @@ m	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	m	end:16
 p1	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	z	macro:m
 p2	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	z	macro:m
 p3	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	z	macro:m
+func_define	input.asm	/^	.macro	func_define	name,nr=0$/;"	m	end:27
+name	input.asm	/^	.macro	func_define	name,nr=0$/;"	z	macro:func_define
+nr	input.asm	/^	.macro	func_define	name,nr=0$/;"	z	macro:func_define
+\\name	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	m	macro:func_define	end:26
+arg1	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	z	macro:func_define.\\name
+arg2	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	z	macro:func_define.\\name
+arg3	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	z	macro:func_define.\\name
+arg4	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	z	macro:func_define.\\name
