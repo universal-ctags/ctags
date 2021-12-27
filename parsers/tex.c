@@ -693,6 +693,10 @@ static bool parseWithStrategy (tokenInfo *token,
 		}
 	}
 
+	/* The last token is optional and not present - let the caller know */
+	if (!next_token)
+		*tokenUnprocessed = true;
+
 	if (name)
 		deleteToken (name);
 
@@ -991,7 +995,7 @@ static bool parseNewTheorem (tokenInfo *const token, bool *tokenUnprocessed)
 static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 {
 	bool eof = false;
-	/* \newccounter {counter}[parentCounter] */
+	/* \newcounter {counter}[parentCounter] */
 	struct TexParseStrategy strategy [] = {
 		{
 			.type = '{',
@@ -1003,7 +1007,7 @@ static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 		},
 		{
 			.type = '[',
-			.flags = 0,
+			.flags = TEX_NAME_FLAG_OPTIONAL,
 			.kindIndex = KIND_GHOST_INDEX,
 			.name = NULL,
 		},
