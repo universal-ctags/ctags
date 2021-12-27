@@ -330,6 +330,7 @@ static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned cha
 {
 	vString *name = vStringNew ();
 	vString *signature = vStringNew ();
+	int nth = 0;
 
 	if (*cp == ',')
 		++cp;
@@ -351,7 +352,10 @@ static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned cha
 			int r = makeSimpleTag (name, K_PARAM);
 			e = getEntryInCorkQueue (r);
 			if (e)
+			{
 				e->extensionFields.scopeIndex = index;
+				e->extensionFields.nth = nth++;
+			}
 			if (vStringLength (signature) > 0 && vStringLast (signature) != ' ')
 				vStringPut (signature, ' ');
 			vStringCat (signature, name);
