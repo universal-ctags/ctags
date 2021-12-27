@@ -469,22 +469,26 @@ static tokenInfo *newToken (void)
 	return token;
 }
 
-static tokenInfo *newTokenFrom (tokenInfo *const token)
+static tokenInfo *newTokenFromFull (tokenInfo *const token, bool copyStr)
 {
 	tokenInfo *result = xMalloc (1, tokenInfo);
 	*result = *token;
-	result->string = vStringNewCopy (token->string);
+	result->string = copyStr? vStringNewCopy (token->string): vStringNew();
 	token->secondary = NULL;
 	token->parentType = NULL;
 	token->signature = NULL;
 	return result;
 }
 
+static tokenInfo *newTokenFrom (tokenInfo *const token)
+{
+	return newTokenFromFull (token, true);
+}
+
 static tokenInfo *newAnonTokenFrom (tokenInfo *const token, unsigned int uTagKind)
 {
-	tokenInfo *result = newTokenFrom (token);
+	tokenInfo *result = newTokenFromFull (token, false);
 	result->anonymous = true;
-	vStringClear (result->string);
 	anonGenerate (result->string, "__anon", uTagKind);
 	return result;
 }
