@@ -326,9 +326,10 @@ static const unsigned char *asmReadLineFromInputFile (void)
 		return (unsigned char *)vStringValue (line);
 }
 
-static void  readMacroParameters (int index, const unsigned char *cp)
+static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned char *cp)
 {
 	vString *name = vStringNew ();
+	vString *signature = vStringNew ();
 
 	if (*cp == ',')
 		++cp;
@@ -351,6 +352,9 @@ static void  readMacroParameters (int index, const unsigned char *cp)
 			e = getEntryInCorkQueue (r);
 			if (e)
 				e->extensionFields.scopeIndex = index;
+			if (vStringLength (signature) > 0 && vStringLast (signature) != ' ')
+				vStringPut (signature, ' ');
+			vStringCat (signature, name);
 		}
 
 		if (*cp == ':')
@@ -362,6 +366,7 @@ static void  readMacroParameters (int index, const unsigned char *cp)
 				if (e)
 					attachParserField (e, true, AsmFields[F_PROPERTIES].ftype,
 									   "req");
+				vStringCatS (signature, ":req");
 			}
 			else if (strncmp((const char *)cp, "vararg", 6) == 0)
 			{
@@ -369,6 +374,7 @@ static void  readMacroParameters (int index, const unsigned char *cp)
 				if (e)
 					attachParserField (e, true, AsmFields[F_PROPERTIES].ftype,
 									   "vararg");
+				vStringCatS (signature, ":vararg");
 			}
 			cp = (const unsigned char *)strpbrk ((const char *)cp , " \t,=");
 			if (cp == NULL)
@@ -376,10 +382,16 @@ static void  readMacroParameters (int index, const unsigned char *cp)
 		}
 		if (*cp == '=')
 		{
-			cp++;
+			const unsigned char *start = cp;
 			cp = (const unsigned char *)strpbrk ((const char *)cp , " \t,");
-			if (cp == NULL)
+
+			if (cp)
+				vStringNCatS (signature, (const char *)start, cp - start);
+			else
+			{
+				vStringCatS (signature, (const char *)start);
 				break;
+			}
 		}
 
 		while (isspace ((int) *cp))
@@ -389,6 +401,12 @@ static void  readMacroParameters (int index, const unsigned char *cp)
 			cp++;
 	}
 
+	if (vStringLength (signature) > 0)
+	{
+		e->extensionFields.signature = vStringDeleteUnwrap (signature);
+		signature = NULL;
+	}
+	vStringDelete (signature);	/* NULL is acceptable. */
 	vStringDelete (name);
 }
 
@@ -469,7 +487,7 @@ static void findAsmTags (void)
 		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive, &scope);
 		tagEntryInfo *e = getEntryInCorkQueue (r);
 		if (e && e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))
-			readMacroParameters (r, cp);
+			readMacroParameters (r, e, cp);
 	}
 
 	cppTerminate ();

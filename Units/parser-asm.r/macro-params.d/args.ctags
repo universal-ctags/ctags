@@ -1,4 +1,4 @@
 --sort=no
 --kinds-Asm=+z
---fields=+e
+--fields=+eS
 --fields-Asm=+{properties}
