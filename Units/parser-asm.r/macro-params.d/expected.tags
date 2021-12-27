@@ -1,0 +1,14 @@
+comm	input.asm	/^	.macro comm$/;"	m	end:4
+plus1	input.asm	/^	.macro plus1 p, p1$/;"	m	end:7
+p	input.asm	/^	.macro plus1 p, p1$/;"	z	macro:plus1
+p1	input.asm	/^	.macro plus1 p, p1$/;"	z	macro:plus1
+plus2	input.asm	/^	.macro plus2 p p1$/;"	m	end:10
+p	input.asm	/^	.macro plus2 p p1$/;"	z	macro:plus2
+p1	input.asm	/^	.macro plus2 p p1$/;"	z	macro:plus2
+reserve_str	input.asm	/^	.macro reserve_str p1=0 p2$/;"	m	end:13
+p1	input.asm	/^	.macro reserve_str p1=0 p2$/;"	z	macro:reserve_str
+p2	input.asm	/^	.macro reserve_str p1=0 p2$/;"	z	macro:reserve_str
+m	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	m	end:16
+p1	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	z	macro:m
+p2	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	z	macro:m
+p3	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	z	macro:m

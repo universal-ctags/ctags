@@ -32,6 +32,7 @@ typedef enum {
 	K_PSUEDO_MACRO_END = -2,
 	K_NONE = -1, K_DEFINE, K_LABEL, K_MACRO, K_TYPE,
 	K_SECTION,
+	K_PARAM,
 } AsmKind;
 
 typedef enum {
@@ -81,6 +82,7 @@ static kindDefinition AsmKinds [] = {
 	{ true, 't', "type",   "types (structs and records)"   },
 	{ true, 's', "section",   "sections",
 	  .referenceOnly = true, ATTACH_ROLES(asmSectionRoles)},
+	{ false,'z', "parameter", "parameters for a macro" },
 };
 
 static const keywordTable AsmKeywords [] = {
@@ -184,7 +186,7 @@ static bool isDefineOperator (const vString *const operator)
 	return result;
 }
 
-static void makeAsmTag (
+static int makeAsmTag (
 		const vString *const name,
 		const vString *const operator,
 		const bool labelCandidate,
@@ -192,6 +194,8 @@ static void makeAsmTag (
 		const bool directive,
 		int *lastMacroCorkIndex)
 {
+	int r = CORK_NIL;
+
 	if (vStringLength (name) > 0)
 	{
 		bool found;
@@ -199,18 +203,18 @@ static void makeAsmTag (
 		if (found)
 		{
 			if (kind > K_NONE)
-				makeSimpleTag (name, kind);
+				r = makeSimpleTag (name, kind);
 		}
 		else if (isDefineOperator (operator))
 		{
 			if (! nameFollows)
-				makeSimpleTag (name, K_DEFINE);
+				r = makeSimpleTag (name, K_DEFINE);
 		}
 		else if (labelCandidate)
 		{
 			operatorKind (name, &found);
 			if (! found)
-				makeSimpleTag (name, K_LABEL);
+				r = makeSimpleTag (name, K_LABEL);
 		}
 		else if (directive)
 		{
@@ -227,6 +231,7 @@ static void makeAsmTag (
 													 kind_for_directive);
 				if (*lastMacroCorkIndex != CORK_NIL)
 					registerEntry (*lastMacroCorkIndex);
+				r = *lastMacroCorkIndex;
 				break;
 			case K_PSUEDO_MACRO_END:
 				macro_tag = getEntryInCorkQueue (*lastMacroCorkIndex);
@@ -235,15 +240,16 @@ static void makeAsmTag (
 				*lastMacroCorkIndex = CORK_NIL;
 				break;
 			case K_SECTION:
-				makeSimpleRefTag (operator,
-								  kind_for_directive,
-								  ASM_SECTION_PLACEMENT);
+				r = makeSimpleRefTag (operator,
+									  kind_for_directive,
+									  ASM_SECTION_PLACEMENT);
 				break;
 			default:
-				makeSimpleTag (operator, kind_for_directive);
+				r = makeSimpleTag (operator, kind_for_directive);
 			}
 		}
 	}
+	return r;
 }
 
 static const unsigned char *readSymbol (
@@ -303,6 +309,57 @@ static const unsigned char *asmReadLineFromInputFile (void)
 		return NULL;
 	else
 		return (unsigned char *)vStringValue (line);
+}
+
+static void  readMacroParameters (int index, const unsigned char *cp)
+{
+	vString *name = vStringNew ();
+
+	if (*cp == ',')
+		++cp;
+
+	while (*cp)
+	{
+		const unsigned char *tmp;
+
+		while (isspace ((int) *cp))
+			++cp;
+
+		tmp = cp;
+		cp = readSymbol (cp, name);
+		if (cp == tmp)
+			break;
+
+		{
+			int r = makeSimpleTag (name, K_PARAM);
+			tagEntryInfo *e = getEntryInCorkQueue (r);
+			if (e)
+				e->extensionFields.scopeIndex = index;
+		}
+
+		if (*cp == ':')
+		{
+			cp++;
+			cp = (const unsigned char *)strpbrk ((const char *)cp , " \t,=");
+			if (cp == NULL)
+				break;
+		}
+		if (*cp == '=')
+		{
+			cp++;
+			cp = (const unsigned char *)strpbrk ((const char *)cp , " \t,");
+			if (cp == NULL)
+				break;
+		}
+
+		while (isspace ((int) *cp))
+			++cp;
+
+		if (*cp == ',')
+			cp++;
+	}
+
+	vStringDelete (name);
 }
 
 static void findAsmTags (void)
@@ -379,8 +436,11 @@ static void findAsmTags (void)
 			cp = readSymbol (cp, name);
 			nameFollows = true;
 		}
-		makeAsmTag (name, operator, labelCandidate, nameFollows, directive,
-					&lastMacroCorkIndex);
+		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive,
+							&lastMacroCorkIndex);
+		tagEntryInfo *e = getEntryInCorkQueue (r);
+		if (e && e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))
+			readMacroParameters (r, cp);
 	}
 
 	cppTerminate ();
