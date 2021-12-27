@@ -24,6 +24,7 @@ s	NONE	yes	NONE	s--	no	--	[tags output] scope (kind:name) of tag definition, [xr
 t	typeref	yes	NONE	s--	no	rw	Type and name of a variable or typedef
 x	xpath	no	NONE	s--	no	--	xpath for the tag
 z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field output, [xref and json output] kind in long-name form
+-	properties	yes	Asm	s--	no	--	properties (req, vararg for parameters)
 -	properties	no	AutoIt	s--	no	--	properties (static, volatile, ...)
 -	macrodef	no	C	s--	no	--	macro definition
 -	properties	no	C	s--	no	--	properties (static, inline, mutable,...)
