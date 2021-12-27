@@ -192,7 +192,7 @@ static int makeAsmTag (
 		const bool labelCandidate,
 		const bool nameFollows,
 		const bool directive,
-		int *lastMacroCorkIndex)
+		int *scope)
 {
 	int r = CORK_NIL;
 
@@ -227,17 +227,22 @@ static int makeAsmTag (
 			case K_NONE:
 				break;
 			case K_MACRO:
-				*lastMacroCorkIndex = makeSimpleTag (operator,
-													 kind_for_directive);
-				if (*lastMacroCorkIndex != CORK_NIL)
-					registerEntry (*lastMacroCorkIndex);
-				r = *lastMacroCorkIndex;
+				r = makeSimpleTag (operator, kind_for_directive);
+				macro_tag = getEntryInCorkQueue (r);
+				if (macro_tag)
+				{
+					macro_tag->extensionFields.scopeIndex = *scope;
+					registerEntry (r);
+					*scope = r;
+				}
 				break;
 			case K_PSUEDO_MACRO_END:
-				macro_tag = getEntryInCorkQueue (*lastMacroCorkIndex);
+				macro_tag = getEntryInCorkQueue (*scope);
 				if (macro_tag)
+				{
 					macro_tag->extensionFields.endLine = getInputLineNumber ();
-				*lastMacroCorkIndex = CORK_NIL;
+					*scope = macro_tag->extensionFields.scopeIndex;
+				}
 				break;
 			case K_SECTION:
 				r = makeSimpleRefTag (operator,
@@ -372,7 +377,7 @@ static void findAsmTags (void)
 			 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
 			 FIELD_UNKNOWN);
 
-	 int lastMacroCorkIndex = CORK_NIL;
+	 int scope = CORK_NIL;
 
 	while ((line = asmReadLineFromInputFile ()) != NULL)
 	{
@@ -436,8 +441,7 @@ static void findAsmTags (void)
 			cp = readSymbol (cp, name);
 			nameFollows = true;
 		}
-		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive,
-							&lastMacroCorkIndex);
+		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive, &scope);
 		tagEntryInfo *e = getEntryInCorkQueue (r);
 		if (e && e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))
 			readMacroParameters (r, cp);

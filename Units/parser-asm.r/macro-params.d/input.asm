@@ -14,3 +14,14 @@
 
 	.macro m p1:req, p2=0, p3:vararg
 	.endm
+
+	;; Taken From linux/arch/m68k/kernel/head.S
+	.macro	func_define	name,nr=0
+	.macro	\name	arg1,arg2,arg3,arg4
+		move_stack	\nr,\arg1,\arg2,\arg3,\arg4
+		func_call	\name
+	.if	\nr
+		lea	%sp@(\nr*4),%sp
+	.endif
+	.endm
+	.endm
