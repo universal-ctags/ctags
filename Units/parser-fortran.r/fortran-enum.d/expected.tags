@@ -7,39 +7,41 @@ Named4	input.f90	/^  enum*8 Named4$/;"	E	module:Constants
 Named5	input.f90	/^  enum(8) :: Named5$/;"	E	module:Constants
 Named6	input.f90	/^  enum*8 :: Named6$/;"	E	module:Constants
 Named7	input.f90	/^  enum, bind(c) :: Named7$/;"	E	module:Constants
-a	input.f90	/^    enumerat/;"	N	module:Constants
-b	input.f90	/^    enumerator :: a, b,/;"	N	module:Constants
-black	input.f90	/^    enumerator :: red =1, blue, black /;"	N	module:Constants
-blue	input.f90	/^    enumerator :: red =1, blue,/;"	N	module:Constants
-bronze	input.f90	/^    enumerator gold, silver, bronze$/;"	N	module:Constants
-c	input.f90	/^    enumerator :: a, b, c$/;"	N	module:Constants
-gold	input.f90	/^    enumerator gold,/;"	N	module:Constants
+__anoncfbded350103	input.f90	/^  enum, bind(c) ! unnamed 1$/;"	E	module:Constants
+__anoncfbded350203	input.f90	/^  enum ! unnamed 2$/;"	E	module:Constants
+a	input.f90	/^    enumerat/;"	N	enum:__anoncfbded350203
+b	input.f90	/^    enumerator :: a, b,/;"	N	enum:__anoncfbded350203
+black	input.f90	/^    enumerator :: red =1, blue, black /;"	N	enum:__anoncfbded350103
+blue	input.f90	/^    enumerator :: red =1, blue,/;"	N	enum:__anoncfbded350103
+bronze	input.f90	/^    enumerator gold, silver, bronze$/;"	N	enum:__anoncfbded350103
+c	input.f90	/^    enumerator :: a, b, c$/;"	N	enum:__anoncfbded350203
+gold	input.f90	/^    enumerator gold,/;"	N	enum:__anoncfbded350103
 hc	input.f90	/^  real, parameter :: hc /;"	v	module:Constants
-lavender	input.f90	/^    enumerator :: pink, lavender$/;"	N	module:Constants
+lavender	input.f90	/^    enumerator :: pink, lavender$/;"	N	enum:__anoncfbded350103
 pi	input.f90	/^  real, parameter :: pi /;"	v	module:Constants
-pink	input.f90	/^    enumerator :: pink,/;"	N	module:Constants
-purple	input.f90	/^    enumerator :: purple$/;"	N	module:Constants
-red	input.f90	/^    enumerator :: red /;"	N	module:Constants
-silver	input.f90	/^    enumerator gold, silver,/;"	N	module:Constants
-x1	input.f90	/^    enumerator :: x1,/;"	N	module:Constants
-x2	input.f90	/^    enumerator :: x2,/;"	N	module:Constants
-x3	input.f90	/^    enumerator :: x3,/;"	N	module:Constants
-x4	input.f90	/^    enumerator :: x4,/;"	N	module:Constants
-x5	input.f90	/^    enumerator :: x5,/;"	N	module:Constants
-x6	input.f90	/^    enumerator :: x6,/;"	N	module:Constants
-x7	input.f90	/^    enumerator :: x7,/;"	N	module:Constants
-y1	input.f90	/^    enumerator :: x1, y1,/;"	N	module:Constants
-y2	input.f90	/^    enumerator :: x2, y2,/;"	N	module:Constants
-y3	input.f90	/^    enumerator :: x3, y3,/;"	N	module:Constants
-y4	input.f90	/^    enumerator :: x4, y4,/;"	N	module:Constants
-y5	input.f90	/^    enumerator :: x5, y5,/;"	N	module:Constants
-y6	input.f90	/^    enumerator :: x6, y6,/;"	N	module:Constants
-y7	input.f90	/^    enumerator :: x7, y7,/;"	N	module:Constants
-yellow	input.f90	/^    enumerator yellow$/;"	N	module:Constants
-z1	input.f90	/^    enumerator :: x1, y1, z1$/;"	N	module:Constants
-z2	input.f90	/^    enumerator :: x2, y2, z2$/;"	N	module:Constants
-z3	input.f90	/^    enumerator :: x3, y3, z3$/;"	N	module:Constants
-z4	input.f90	/^    enumerator :: x4, y4, z4$/;"	N	module:Constants
-z5	input.f90	/^    enumerator :: x5, y5, z5$/;"	N	module:Constants
-z6	input.f90	/^    enumerator :: x6, y6, z6$/;"	N	module:Constants
-z7	input.f90	/^    enumerator :: x7, y7, z7$/;"	N	module:Constants
+pink	input.f90	/^    enumerator :: pink,/;"	N	enum:__anoncfbded350103
+purple	input.f90	/^    enumerator :: purple$/;"	N	enum:__anoncfbded350103
+red	input.f90	/^    enumerator :: red /;"	N	enum:__anoncfbded350103
+silver	input.f90	/^    enumerator gold, silver,/;"	N	enum:__anoncfbded350103
+x1	input.f90	/^    enumerator :: x1,/;"	N	enum:Named1
+x2	input.f90	/^    enumerator :: x2,/;"	N	enum:Named2
+x3	input.f90	/^    enumerator :: x3,/;"	N	enum:Named3
+x4	input.f90	/^    enumerator :: x4,/;"	N	enum:Named4
+x5	input.f90	/^    enumerator :: x5,/;"	N	enum:Named5
+x6	input.f90	/^    enumerator :: x6,/;"	N	enum:Named6
+x7	input.f90	/^    enumerator :: x7,/;"	N	enum:Named7
+y1	input.f90	/^    enumerator :: x1, y1,/;"	N	enum:Named1
+y2	input.f90	/^    enumerator :: x2, y2,/;"	N	enum:Named2
+y3	input.f90	/^    enumerator :: x3, y3,/;"	N	enum:Named3
+y4	input.f90	/^    enumerator :: x4, y4,/;"	N	enum:Named4
+y5	input.f90	/^    enumerator :: x5, y5,/;"	N	enum:Named5
+y6	input.f90	/^    enumerator :: x6, y6,/;"	N	enum:Named6
+y7	input.f90	/^    enumerator :: x7, y7,/;"	N	enum:Named7
+yellow	input.f90	/^    enumerator yellow$/;"	N	enum:__anoncfbded350103
+z1	input.f90	/^    enumerator :: x1, y1, z1$/;"	N	enum:Named1
+z2	input.f90	/^    enumerator :: x2, y2, z2$/;"	N	enum:Named2
+z3	input.f90	/^    enumerator :: x3, y3, z3$/;"	N	enum:Named3
+z4	input.f90	/^    enumerator :: x4, y4, z4$/;"	N	enum:Named4
+z5	input.f90	/^    enumerator :: x5, y5, z5$/;"	N	enum:Named5
+z6	input.f90	/^    enumerator :: x6, y6, z6$/;"	N	enum:Named6
+z7	input.f90	/^    enumerator :: x7, y7, z7$/;"	N	enum:Named7

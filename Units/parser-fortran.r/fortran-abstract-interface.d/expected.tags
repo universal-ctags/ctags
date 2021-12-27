@@ -1,3 +1,4 @@
+__anonadfcf4320105	input.f90	/^  abstract interface$/;"	i	module:test
 add	input.f90	/^    procedure(suba), deferred :: add$/;"	M	type:atype
 atype	input.f90	/^  type, abstract :: atype$/;"	t	module:test
 b	input.f90	/^      class(atype) :: self, b$/;"	L	prototype:suba	file:
@@ -5,5 +6,5 @@ btype	input.f90	/^  type, abstract, extends(atype) :: btype$/;"	t	module:test
 c	input.f90	/^      integer c,/;"	L	prototype:suba	file:
 d	input.f90	/^      integer c, d$/;"	L	prototype:suba	file:
 self	input.f90	/^      class(atype) :: self,/;"	L	prototype:suba	file:
-suba	input.f90	/^    subroutine suba(/;"	P	module:test
+suba	input.f90	/^    subroutine suba(/;"	P	interface:__anonadfcf4320105
 test	input.f90	/^module test$/;"	m

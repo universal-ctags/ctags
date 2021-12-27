@@ -209,6 +209,7 @@ typedef struct sTokenInfo {
 	struct sTokenInfo *secondary;
 	unsigned long lineNumber;
 	MIOPos filePosition;
+	bool anonymous;
 } tokenInfo;
 
 /*
@@ -408,8 +409,7 @@ static const tokenInfo* ancestorScope (void)
 	{
 		tokenInfo *const token = Ancestors.list + i - 1;
 		if (token->type == TOKEN_IDENTIFIER &&
-			token->tag != TAG_UNDEFINED  && token->tag != TAG_INTERFACE &&
-			token->tag != TAG_ENUM)
+			token->tag != TAG_UNDEFINED)
 			result = token;
 	}
 	return result;
@@ -464,18 +464,32 @@ static tokenInfo *newToken (void)
 	token->isMethod     = false;
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
+	token->anonymous    = false;
 
 	return token;
 }
 
-static tokenInfo *newTokenFrom (tokenInfo *const token)
+static tokenInfo *newTokenFromFull (tokenInfo *const token, bool copyStr)
 {
 	tokenInfo *result = xMalloc (1, tokenInfo);
 	*result = *token;
-	result->string = vStringNewCopy (token->string);
+	result->string = copyStr? vStringNewCopy (token->string): vStringNew();
 	token->secondary = NULL;
 	token->parentType = NULL;
 	token->signature = NULL;
+	return result;
+}
+
+static tokenInfo *newTokenFrom (tokenInfo *const token)
+{
+	return newTokenFromFull (token, true);
+}
+
+static tokenInfo *newAnonTokenFrom (tokenInfo *const token, unsigned int uTagKind)
+{
+	tokenInfo *result = newTokenFromFull (token, false);
+	result->anonymous = true;
+	anonGenerate (result->string, "__anon", uTagKind);
 	return result;
 }
 
@@ -529,6 +543,9 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 
 		if (token->tag == TAG_COMMON_BLOCK)
 			e.lineNumberEntry = canUseLineNumberAsLocator();
+
+		if (token->anonymous)
+			markTagExtraBit (&e, XTAG_ANONYMOUS);
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
@@ -1181,7 +1198,7 @@ static void skipOverParens (tokenInfo *const token)
 	skipOverParensFull (token, NULL, NULL);
 }
 
-static void skipOverSqaures (tokenInfo *const token)
+static void skipOverSquares (tokenInfo *const token)
 {
 	skipOverSquaresFull (token, NULL, NULL);
 }
@@ -1470,7 +1487,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 
 			case KEYWORD_codimension:
 				readToken (token);
-				skipOverSqaures (token);
+				skipOverSquares (token);
 				break;
 
 			default: skipToToken (token, TOKEN_STATEMENT_END); break;
@@ -1522,7 +1539,7 @@ static void parseEntityDecl (tokenInfo *const token,
 	if (isType (token, TOKEN_PAREN_OPEN))
 		skipOverParens (token);
 	if (isType (token, TOKEN_SQUARE_OPEN))
-		skipOverSqaures (token);
+		skipOverSquares (token);
 	if (isType (token, TOKEN_OPERATOR) &&
 			strcmp (vStringValue (token->string), "*") == 0)
 	{
@@ -1551,7 +1568,7 @@ static void parseEntityDecl (tokenInfo *const token,
 				if (isType (token, TOKEN_PAREN_OPEN))
 					skipOverParens (token);
 				if (isType (token, TOKEN_SQUARE_OPEN))
-					skipOverSqaures (token);
+					skipOverSquares (token);
 			}
 		}
 	}
@@ -1743,25 +1760,27 @@ static void parseUnionStmt (tokenInfo *const token)
  */
 static void parseStructureStmt (tokenInfo *const token)
 {
-	tokenInfo *name;
+	tokenInfo *name = NULL;
 	Assert (isKeyword (token, KEYWORD_structure));
 	readToken (token);
 	if (isType (token, TOKEN_OPERATOR) &&
 		strcmp (vStringValue (token->string), "/") == 0)
 	{  /* read structure name */
 		readToken (token);
-		if (isType (token, TOKEN_IDENTIFIER))
-			makeFortranTag (token, TAG_DERIVED_TYPE);
-		name = newTokenFrom (token);
+		if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
+		{
+			name = newTokenFrom (token);
+			name->type = TOKEN_IDENTIFIER;
+		}
 		skipPast (token, TOKEN_OPERATOR);
 	}
-	else
+	if (name == NULL)
 	{  /* fake out anonymous structure */
-		name = newToken ();
+		name = newAnonTokenFrom (token, TAG_COMPONENT);
 		name->type = TOKEN_IDENTIFIER;
 		name->tag = TAG_DERIVED_TYPE;
-		vStringCopyS (name->string, "anonymous");
 	}
+	makeFortranTag (name, TAG_DERIVED_TYPE);
 	while (isType (token, TOKEN_IDENTIFIER))
 	{  /* read field names */
 		makeFortranTag (token, TAG_COMPONENT);
@@ -1917,8 +1936,9 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 		qualifierToken = parseQualifierSpecList (token);
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
+		token->type = TOKEN_IDENTIFIER;
 		if (qualifierToken)
 		{
 			if (qualifierToken->parentType)
@@ -1977,29 +1997,27 @@ static void parseInterfaceBlock (tokenInfo *const token)
 	tokenInfo *name = NULL;
 	Assert (isKeyword (token, KEYWORD_interface));
 	readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
-	{
-		makeFortranTag (token, TAG_INTERFACE);
-		name = newTokenFrom (token);
-	}
-	else if (isKeyword (token, KEYWORD_assignment) ||
+	if (isKeyword (token, KEYWORD_assignment) ||
 			 isKeyword (token, KEYWORD_operator))
 	{
 		readToken (token);
 		if (isType (token, TOKEN_PAREN_OPEN))
 			readToken (token);
 		if (isType (token, TOKEN_OPERATOR))
-		{
-			makeFortranTag (token, TAG_INTERFACE);
 			name = newTokenFrom (token);
-		}
+	}
+	else if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
+	{
+		name = newTokenFrom (token);
+		name->type = TOKEN_IDENTIFIER;
 	}
 	if (name == NULL)
 	{
-		name = newToken ();
+		name = newAnonTokenFrom (token, TAG_INTERFACE);
 		name->type = TOKEN_IDENTIFIER;
 		name->tag = TAG_INTERFACE;
 	}
+	makeFortranTag (name, TAG_INTERFACE);
 	ancestorPush (name);
 	while (! isKeyword (token, KEYWORD_end) &&
 		   ! isType (token, TOKEN_EOF))
@@ -2048,16 +2066,18 @@ static void parseEnumBlock (tokenInfo *const token)
 	parseKindSelector (token);
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
+	{
 		name = newTokenFrom (token);
+		name->type = TOKEN_IDENTIFIER;
+	}
 	if (name == NULL)
 	{
-		name = newToken ();
+		name = newAnonTokenFrom (token, TAG_ENUM);
 		name->type = TOKEN_IDENTIFIER;
 		name->tag = TAG_ENUM;
 	}
-	else
-		makeFortranTag (name, TAG_ENUM);
+	makeFortranTag (name, TAG_ENUM);
 	skipToNextStatement (token);
 	ancestorPush (name);
 	while (! isKeyword (token, KEYWORD_end) &&
@@ -2386,8 +2406,9 @@ static void parseModule (tokenInfo *const token, bool isSubmodule)
 	}
 
 	readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
+		token->type = TOKEN_IDENTIFIER;
 		if (isSubmodule)
 		{
 			attachParentType (token, parentIdentifier);
@@ -2501,9 +2522,10 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 			isKeyword (token, KEYWORD_function) ||
 			isKeyword (token, KEYWORD_subroutine));
 	readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
 		tokenInfo* name = newTokenFrom (token);
+		token->type = TOKEN_IDENTIFIER;
 		if (tag == TAG_SUBROUTINE ||
 			tag == TAG_PROTOTYPE)
 			name->signature = parseSignature (token);
