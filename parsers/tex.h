@@ -42,8 +42,8 @@ enum TexNameFlag {
 };
 
 struct TexParseStrategy {
-	/* Expected token type '<', '[', '*', and '{' are supported.
-	 * 0 means the end of strategies.
+	/* Expected token type '<', '[', '*', '{', and '\\' are supported.
+	 * 0 means the end of strategies. '\\' means {} pair may be omitted.
 	 *
 	 * A string between <>, [], or {} (pairs) can be tagged or store to
 	 * a vString. See kindIndex and name field of this structure.

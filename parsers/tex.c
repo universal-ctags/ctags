@@ -622,13 +622,15 @@ static bool parseWithStrategy (tokenInfo *token,
 		}
 		else if (s->type == '*' && isType (token, '*'))
 			next_token = true;
-		else if ((s->type == '{' && isType (token, '{')) || (s->type == '\\' && isType (token, TOKEN_IDENTIFIER)))
+		else if (((s->type == '{' || s->type == '\\') && isType (token, '{')) ||
+			(s->type == '\\' && isType (token, TOKEN_IDENTIFIER)))
 		{
 			int depth = 1;
+			bool missing_parens = isType (token, TOKEN_IDENTIFIER);
 
 			next_token = true;
 
-			if (s->type == '{' && !readToken (token))
+			if (!missing_parens && !readToken (token))
 			{
 				eof = true;
 				break;
@@ -638,7 +640,7 @@ static bool parseWithStrategy (tokenInfo *token,
 				copyToken (name, token);
 				vStringClear (name->string);
 			}
-			if (s->type == '\\')
+			if (missing_parens)
 			{
 				vStringCat (name->string, token->string);
 				depth = 0;
@@ -831,10 +833,12 @@ static bool parseNewcommandFull (tokenInfo *const token, bool *tokenUnprocessed,
 {
 	bool eof = false;
 
-	/* \newcommand {cmd}[args][opt]{def} */
+	/* \newcommand{cmd}[args][opt]{def} */
+	/* \newcommand\cmd[args][opt]{def} */
+	/* \def\cmd{replacement} */
 	struct TexParseStrategy strategy [] = {
 		{
-			.type = '{',
+			.type = '\\',
 			.flags = 0,
 			.kindIndex = kind,
 			.roleIndex = ROLE_DEFINITION_INDEX,
@@ -873,37 +877,6 @@ static bool parseNewcommandFull (tokenInfo *const token, bool *tokenUnprocessed,
 static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 {
 	return parseNewcommandFull (token, tokenUnprocessed, TEXTAG_COMMAND);
-}
-
-static bool parseDef (tokenInfo *const token, bool *tokenUnprocessed)
-{
-	bool eof = false;
-
-	/* \def\cmd{replacement} */
-	struct TexParseStrategy strategy [] = {
-		{
-			.type = '\\',
-			.flags = 0,
-			.kindIndex = TEXTAG_COMMAND,
-			.roleIndex = ROLE_DEFINITION_INDEX,
-			.name = NULL,
-			.unique = false,
-		},
-		{
-			.type = '{',
-			.flags = 0,
-			.kindIndex = KIND_GHOST_INDEX,
-			.name = NULL,
-		},
-		{
-			.type = 0
-		}
-	};
-
-	if (parseWithStrategy (token, strategy, tokenUnprocessed))
-		eof = true;
-
-	return eof;
 }
 
 static bool parseNewEnvironment (tokenInfo *const token, bool *tokenUnprocessed)
@@ -1088,10 +1061,8 @@ static void parseTexFile (tokenInfo *const token)
 				case KEYWORD_newcommand:
 				case KEYWORD_renewcommand:
 				case KEYWORD_providecommand:
-					eof = parseNewcommand (token, &tokenUnprocessed);
-					break;
 				case KEYWORD_def:
-					eof = parseDef (token, &tokenUnprocessed);
+					eof = parseNewcommand (token, &tokenUnprocessed);
 					break;
 				case KEYWORD_declaremathoperator:
 					eof = parseNewcommandFull (token, &tokenUnprocessed, TEXTAG_OPERATOR);
