@@ -225,7 +225,7 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.dataType           = FIELDTYPE_INTEGER,
 		.getterValueType    = "int",
 		.getValueObject     = getFieldValueForLineCommon,
-		.setterValueType    = "matchlok|int",
+		.setterValueType    = "matchloc|int",
 		.checkValueForSetter= checkFieldValueForLineCommon,
 		.setValueObject     = setFieldValueForLineCommon,
 	},
@@ -432,7 +432,7 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 		.dataType			= FIELDTYPE_INTEGER,
 		.getterValueType    = "int",
 		.getValueObject     = getFieldValueForLineCommon,
-		.setterValueType    = "matchlok|int",
+		.setterValueType    = "matchloc|int",
 		.checkValueForSetter= checkFieldValueForLineCommon,
 		.setValueObject     = setFieldValueForLineCommon,
 
