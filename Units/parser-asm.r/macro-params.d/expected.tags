@@ -1,0 +1,22 @@
+comm	input.asm	/^	.macro comm$/;"	m	end:4
+plus1	input.asm	/^	.macro plus1 p, p1$/;"	m	signature:p p1	end:7
+p	input.asm	/^	.macro plus1 p, p1$/;"	z	macro:plus1	nth:0
+p1	input.asm	/^	.macro plus1 p, p1$/;"	z	macro:plus1	nth:1
+plus2	input.asm	/^	.macro plus2 p p1$/;"	m	signature:p p1	end:10
+p	input.asm	/^	.macro plus2 p p1$/;"	z	macro:plus2	nth:0
+p1	input.asm	/^	.macro plus2 p p1$/;"	z	macro:plus2	nth:1
+reserve_str	input.asm	/^	.macro reserve_str p1=0 p2$/;"	m	signature:p1=0 p2	end:13
+p1	input.asm	/^	.macro reserve_str p1=0 p2$/;"	z	macro:reserve_str	nth:0
+p2	input.asm	/^	.macro reserve_str p1=0 p2$/;"	z	macro:reserve_str	nth:1
+m	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	m	signature:p1:req p2=0 p3:vararg	end:16
+p1	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	z	macro:m	nth:0	properties:req
+p2	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	z	macro:m	nth:1
+p3	input.asm	/^	.macro m p1:req, p2=0, p3:vararg$/;"	z	macro:m	nth:2	properties:vararg
+func_define	input.asm	/^	.macro	func_define	name,nr=0$/;"	m	signature:name nr=0	end:27
+name	input.asm	/^	.macro	func_define	name,nr=0$/;"	z	macro:func_define	nth:0
+nr	input.asm	/^	.macro	func_define	name,nr=0$/;"	z	macro:func_define	nth:1
+\\name	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	m	macro:func_define	signature:arg1 arg2 arg3 arg4	end:26
+arg1	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	z	macro:func_define.\\name	nth:0
+arg2	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	z	macro:func_define.\\name	nth:1
+arg3	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	z	macro:func_define.\\name	nth:2
+arg4	input.asm	/^	.macro	\\name	arg1,arg2,arg3,arg4$/;"	z	macro:func_define.\\name	nth:3

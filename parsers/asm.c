@@ -32,6 +32,7 @@ typedef enum {
 	K_PSUEDO_MACRO_END = -2,
 	K_NONE = -1, K_DEFINE, K_LABEL, K_MACRO, K_TYPE,
 	K_SECTION,
+	K_PARAM,
 } AsmKind;
 
 typedef enum {
@@ -65,6 +66,16 @@ typedef struct {
 	AsmKind kind;
 } opKind;
 
+typedef enum {
+	F_PROPERTIES,
+} asmField;
+
+static fieldDefinition AsmFields[] = {
+	{ .name = "properties",
+	  .description = "properties (req, vararg for parameters)",
+	  .enabled = true },
+};
+
 /*
 *   DATA DEFINITIONS
 */
@@ -81,6 +92,7 @@ static kindDefinition AsmKinds [] = {
 	{ true, 't', "type",   "types (structs and records)"   },
 	{ true, 's', "section",   "sections",
 	  .referenceOnly = true, ATTACH_ROLES(asmSectionRoles)},
+	{ false,'z', "parameter", "parameters for a macro" },
 };
 
 static const keywordTable AsmKeywords [] = {
@@ -184,14 +196,16 @@ static bool isDefineOperator (const vString *const operator)
 	return result;
 }
 
-static void makeAsmTag (
+static int makeAsmTag (
 		const vString *const name,
 		const vString *const operator,
 		const bool labelCandidate,
 		const bool nameFollows,
 		const bool directive,
-		int *lastMacroCorkIndex)
+		int *scope)
 {
+	int r = CORK_NIL;
+
 	if (vStringLength (name) > 0)
 	{
 		bool found;
@@ -199,18 +213,18 @@ static void makeAsmTag (
 		if (found)
 		{
 			if (kind > K_NONE)
-				makeSimpleTag (name, kind);
+				r = makeSimpleTag (name, kind);
 		}
 		else if (isDefineOperator (operator))
 		{
 			if (! nameFollows)
-				makeSimpleTag (name, K_DEFINE);
+				r = makeSimpleTag (name, K_DEFINE);
 		}
 		else if (labelCandidate)
 		{
 			operatorKind (name, &found);
 			if (! found)
-				makeSimpleTag (name, K_LABEL);
+				r = makeSimpleTag (name, K_LABEL);
 		}
 		else if (directive)
 		{
@@ -223,27 +237,34 @@ static void makeAsmTag (
 			case K_NONE:
 				break;
 			case K_MACRO:
-				*lastMacroCorkIndex = makeSimpleTag (operator,
-													 kind_for_directive);
-				if (*lastMacroCorkIndex != CORK_NIL)
-					registerEntry (*lastMacroCorkIndex);
+				r = makeSimpleTag (operator, kind_for_directive);
+				macro_tag = getEntryInCorkQueue (r);
+				if (macro_tag)
+				{
+					macro_tag->extensionFields.scopeIndex = *scope;
+					registerEntry (r);
+					*scope = r;
+				}
 				break;
 			case K_PSUEDO_MACRO_END:
-				macro_tag = getEntryInCorkQueue (*lastMacroCorkIndex);
+				macro_tag = getEntryInCorkQueue (*scope);
 				if (macro_tag)
+				{
 					macro_tag->extensionFields.endLine = getInputLineNumber ();
-				*lastMacroCorkIndex = CORK_NIL;
+					*scope = macro_tag->extensionFields.scopeIndex;
+				}
 				break;
 			case K_SECTION:
-				makeSimpleRefTag (operator,
-								  kind_for_directive,
-								  ASM_SECTION_PLACEMENT);
+				r = makeSimpleRefTag (operator,
+									  kind_for_directive,
+									  ASM_SECTION_PLACEMENT);
 				break;
 			default:
-				makeSimpleTag (operator, kind_for_directive);
+				r = makeSimpleTag (operator, kind_for_directive);
 			}
 		}
 	}
+	return r;
 }
 
 static const unsigned char *readSymbol (
@@ -305,6 +326,94 @@ static const unsigned char *asmReadLineFromInputFile (void)
 		return (unsigned char *)vStringValue (line);
 }
 
+static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned char *cp)
+{
+	vString *name = vStringNew ();
+	vString *signature = vStringNew ();
+	int nth = 0;
+
+	if (*cp == ',')
+		++cp;
+
+	while (*cp)
+	{
+		const unsigned char *tmp;
+		tagEntryInfo *e = NULL;
+
+		while (isspace ((int) *cp))
+			++cp;
+
+		tmp = cp;
+		cp = readSymbol (cp, name);
+		if (cp == tmp)
+			break;
+
+		{
+			int r = makeSimpleTag (name, K_PARAM);
+			e = getEntryInCorkQueue (r);
+			if (e)
+			{
+				e->extensionFields.scopeIndex = index;
+				e->extensionFields.nth = nth++;
+			}
+			if (vStringLength (signature) > 0 && vStringLast (signature) != ' ')
+				vStringPut (signature, ' ');
+			vStringCat (signature, name);
+		}
+
+		if (*cp == ':')
+		{
+			cp++;
+			if (strncmp((const char *)cp, "req" ,3) == 0)
+			{
+				cp += 3;
+				if (e)
+					attachParserField (e, true, AsmFields[F_PROPERTIES].ftype,
+									   "req");
+				vStringCatS (signature, ":req");
+			}
+			else if (strncmp((const char *)cp, "vararg", 6) == 0)
+			{
+				cp += 6;
+				if (e)
+					attachParserField (e, true, AsmFields[F_PROPERTIES].ftype,
+									   "vararg");
+				vStringCatS (signature, ":vararg");
+			}
+			cp = (const unsigned char *)strpbrk ((const char *)cp , " \t,=");
+			if (cp == NULL)
+				break;
+		}
+		if (*cp == '=')
+		{
+			const unsigned char *start = cp;
+			cp = (const unsigned char *)strpbrk ((const char *)cp , " \t,");
+
+			if (cp)
+				vStringNCatS (signature, (const char *)start, cp - start);
+			else
+			{
+				vStringCatS (signature, (const char *)start);
+				break;
+			}
+		}
+
+		while (isspace ((int) *cp))
+			++cp;
+
+		if (*cp == ',')
+			cp++;
+	}
+
+	if (vStringLength (signature) > 0)
+	{
+		e->extensionFields.signature = vStringDeleteUnwrap (signature);
+		signature = NULL;
+	}
+	vStringDelete (signature);	/* NULL is acceptable. */
+	vStringDelete (name);
+}
+
 static void findAsmTags (void)
 {
 	vString *name = vStringNew ();
@@ -315,7 +424,7 @@ static void findAsmTags (void)
 			 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
 			 FIELD_UNKNOWN);
 
-	 int lastMacroCorkIndex = CORK_NIL;
+	 int scope = CORK_NIL;
 
 	while ((line = asmReadLineFromInputFile ()) != NULL)
 	{
@@ -379,8 +488,10 @@ static void findAsmTags (void)
 			cp = readSymbol (cp, name);
 			nameFollows = true;
 		}
-		makeAsmTag (name, operator, labelCandidate, nameFollows, directive,
-					&lastMacroCorkIndex);
+		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive, &scope);
+		tagEntryInfo *e = getEntryInCorkQueue (r);
+		if (e && e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))
+			readMacroParameters (r, e, cp);
 	}
 
 	cppTerminate ();
@@ -420,5 +531,7 @@ extern parserDefinition* AsmParser (void)
 	def->keywordCount = ARRAY_SIZE (AsmKeywords);
 	def->selectLanguage = selectors;
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
+	def->fieldTable = AsmFields;
+	def->fieldCount = ARRAY_SIZE (AsmFields);
 	return def;
 }
