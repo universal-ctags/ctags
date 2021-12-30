@@ -15,7 +15,6 @@
  */
 #include "general.h"    /* must always come first */
 #include <ctype.h>      /* to define isalpha () */
-#include <setjmp.h>
 #ifdef DEBUG
 #include <stdio.h>
 #endif
