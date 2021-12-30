@@ -1,0 +1,34 @@
+\documentclass{article}
+\newtheorem{theoremA}{Theorem A}
+\newenvironment{boxed}
+    {\begin{center}
+    \begin{tabular}{|p{0.9\textwidth}|}
+    \hline\\
+    }
+    { 
+    \\\\\hline
+    \end{tabular} 
+    \end{center}
+    }
+\renewenvironment{boxedA}
+    {\begin{center}
+    \begin{tabular}{|p{0.9\textwidth}|}
+    \hline\\
+    }
+    { 
+    \\\\\hline
+    \end{tabular} 
+    \end{center}
+    }
+\newtheorem{theorem}{Theorem}
+\begin{document}
+\begin{boxed}
+foo
+\end{boxed}
+\begin{boxedA}
+foo
+\end{boxedA}
+\begin{theorem}
+bar
+\end{theorem}
+\end{document}

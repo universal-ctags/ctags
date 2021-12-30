@@ -63,6 +63,13 @@ enum eKeywordId {
 	KEYWORD_bibitem,
 	KEYWORD_bibliography,
 	KEYWORD_newcommand,
+	KEYWORD_renewcommand,
+	KEYWORD_providecommand,
+	KEYWORD_def,
+	KEYWORD_declaremathoperator,
+	KEYWORD_newenvironment,
+	KEYWORD_renewenvironment,
+	KEYWORD_newtheorem,
 	KEYWORD_newcounter,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -117,6 +124,9 @@ typedef enum {
 	TEXTAG_XINPUT,
 	TEXTAG_BIBITEM,
 	TEXTAG_COMMAND,
+	TEXTAG_OPERATOR,
+	TEXTAG_ENVIRONMENT,
+	TEXTAG_THEOREM,
 	TEXTAG_COUNTER,
 	TEXTAG_COUNT
 } texKind;
@@ -149,6 +159,9 @@ static kindDefinition TexKinds [] = {
 	  .referenceOnly = true, ATTACH_ROLES(TexInputRoles)   },
 	{ true,  'B', "bibitem",		  "bibliography items" },
 	{ true,  'C', "command",		  "command created with \\newcommand" },
+	{ true,  'o', "operator",		  "math operator created with \\DeclareMathOperator" },
+	{ true,  'e', "environment",	  "environment created with \\newenvironment" },
+	{ true,  't', "theorem",		  "theorem created with \\newtheorem" },
 	{ true,  'N', "counter",		  "counter created with \\newcounter" },
 };
 
@@ -169,6 +182,13 @@ static const keywordTable TexKeywordTable [] = {
 	{ "bibitem",		KEYWORD_bibitem				},
 	{ "bibliography",	KEYWORD_bibliography		},
 	{ "newcommand",		KEYWORD_newcommand			},
+	{ "renewcommand",	KEYWORD_renewcommand		},
+	{ "providecommand",	KEYWORD_providecommand		},
+	{ "def",			KEYWORD_def					},
+	{ "DeclareMathOperator",	KEYWORD_declaremathoperator	},
+	{ "newenvironment",	KEYWORD_newenvironment		},
+	{ "renewenvironment",	KEYWORD_renewenvironment},
+	{ "newtheorem",		KEYWORD_newtheorem			},
 	{ "newcounter",		KEYWORD_newcounter			},
 };
 
@@ -602,13 +622,15 @@ static bool parseWithStrategy (tokenInfo *token,
 		}
 		else if (s->type == '*' && isType (token, '*'))
 			next_token = true;
-		else if (s->type == '{' && isType (token, '{'))
+		else if (((s->type == '{' || s->type == '\\') && isType (token, '{')) ||
+			(s->type == '\\' && isType (token, TOKEN_IDENTIFIER)))
 		{
 			int depth = 1;
+			bool missing_parens = isType (token, TOKEN_IDENTIFIER);
 
 			next_token = true;
 
-			if (!readToken (token))
+			if (!missing_parens && !readToken (token))
 			{
 				eof = true;
 				break;
@@ -617,6 +639,11 @@ static bool parseWithStrategy (tokenInfo *token,
 			{
 				copyToken (name, token);
 				vStringClear (name->string);
+			}
+			if (missing_parens)
+			{
+				vStringCat (name->string, token->string);
+				depth = 0;
 			}
 
 			/* Handle the case the code like \section{} */
@@ -667,6 +694,10 @@ static bool parseWithStrategy (tokenInfo *token,
 			break;
 		}
 	}
+
+	/* The last token is optional and not present - let the caller know */
+	if (!next_token)
+		*tokenUnprocessed = true;
 
 	if (name)
 		deleteToken (name);
@@ -798,16 +829,18 @@ static bool parseEnv (tokenInfo *const token, bool begin, bool *tokenUnprocessed
 
 }
 
-static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
+static bool parseNewcommandFull (tokenInfo *const token, bool *tokenUnprocessed, texKind kind)
 {
 	bool eof = false;
 
-	/* \newcommand {cmd}[args][opt]{def} */
+	/* \newcommand{cmd}[args][opt]{def} */
+	/* \newcommand\cmd[args][opt]{def} */
+	/* \def\cmd{replacement} */
 	struct TexParseStrategy strategy [] = {
 		{
-			.type = '{',
+			.type = '\\',
 			.flags = 0,
-			.kindIndex = TEXTAG_COMMAND,
+			.kindIndex = kind,
 			.roleIndex = ROLE_DEFINITION_INDEX,
 			.name = NULL,
 			.unique = false,
@@ -827,6 +860,97 @@ static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 		{
 			.type = '{',
 			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+		eof = true;
+
+	return eof;
+}
+
+static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	return parseNewcommandFull (token, tokenUnprocessed, TEXTAG_COMMAND);
+}
+
+static bool parseNewEnvironment (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	bool eof = false;
+	/* \newenvironment{nam}[args]{begdef}{enddef} */
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = TEXTAG_ENVIRONMENT,
+			.roleIndex = ROLE_DEFINITION_INDEX,
+			.name = NULL,
+			.unique = false,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+		eof = true;
+
+	return eof;
+}
+
+static bool parseNewTheorem (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	bool eof = false;
+	/*	\newtheorem{name}{title}
+		\newtheorem{name}{title}[numbered_within]
+		\newtheorem{name}[numbered_like]{title} */
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = TEXTAG_THEOREM,
+			.roleIndex = ROLE_DEFINITION_INDEX,
+			.name = NULL,
+			.unique = false,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
 			.kindIndex = KIND_GHOST_INDEX,
 			.name = NULL,
 		},
@@ -844,7 +968,7 @@ static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 {
 	bool eof = false;
-	/* \newccounter {counter}[parentCounter] */
+	/* \newcounter {counter}[parentCounter] */
 	struct TexParseStrategy strategy [] = {
 		{
 			.type = '{',
@@ -856,7 +980,7 @@ static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 		},
 		{
 			.type = '[',
-			.flags = 0,
+			.flags = TEX_NAME_FLAG_OPTIONAL,
 			.kindIndex = KIND_GHOST_INDEX,
 			.name = NULL,
 		},
@@ -870,6 +994,7 @@ static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 
 	return eof;
 }
+
 static void parseTexFile (tokenInfo *const token)
 {
 	bool eof = false;
@@ -934,7 +1059,20 @@ static void parseTexFile (tokenInfo *const token)
 										false, &tokenUnprocessed);
 					break;
 				case KEYWORD_newcommand:
+				case KEYWORD_renewcommand:
+				case KEYWORD_providecommand:
+				case KEYWORD_def:
 					eof = parseNewcommand (token, &tokenUnprocessed);
+					break;
+				case KEYWORD_declaremathoperator:
+					eof = parseNewcommandFull (token, &tokenUnprocessed, TEXTAG_OPERATOR);
+					break;
+				case KEYWORD_newenvironment:
+				case KEYWORD_renewenvironment:
+					eof = parseNewEnvironment (token, &tokenUnprocessed);
+					break;
+				case KEYWORD_newtheorem:
+					eof = parseNewTheorem (token, &tokenUnprocessed);
 					break;
 				case KEYWORD_newcounter:
 					eof = parseNewcounter (token, &tokenUnprocessed);
