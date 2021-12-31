@@ -1,0 +1,3 @@
+--sort=no
+--fields=+ZK
+--fields-ReStructuredText=+{sectionMarker}{overline}

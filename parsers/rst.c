@@ -28,13 +28,17 @@
 #include "entry.h"
 #include "routines.h"
 #include "field.h"
+#include "htable.h"
+#include "debug.h"
 
 /*
 *   DATA DEFINITIONS
 */
 typedef enum {
 	K_EOF = -1,
-	K_CHAPTER = 0,
+	K_TITLE = 0,
+	K_SUBTITLE,
+	K_CHAPTER,
 	K_SECTION,
 	K_SUBSECTION,
 	K_SUBSUBSECTION,
@@ -45,6 +49,8 @@ typedef enum {
 } rstKind;
 
 static kindDefinition RstKinds[] = {
+	{ true, 'H', "title",         "titles"},
+	{ true, 'h', "subtitle",      "sub titles" },
 	{ true, 'c', "chapter",       "chapters"},
 	{ true, 's', "section",       "sections" },
 	{ true, 'S', "subsection",    "subsections" },
@@ -78,6 +84,7 @@ static NestingLevels *nestingLevels = NULL;
 struct sectionTracker {
 	char kindchar;
 	bool overline;
+	int count;
 };
 
 struct olineTracker
@@ -193,10 +200,14 @@ static int get_kind(char c, bool overline, struct sectionTracker tracker[])
 	for (i = 0; i < SECTION_COUNT; i++)
 	{
 		if (tracker[i].kindchar == c && tracker[i].overline == overline)
-			return i;
-
-		if (tracker[i].kindchar == 0)
 		{
+			tracker[i].count++;
+			return i;
+		}
+
+		if (tracker[i].count == 0)
+		{
+			tracker[i].count = 1;
 			tracker[i].kindchar = c;
 			tracker[i].overline = overline;
 			return i;
@@ -316,6 +327,76 @@ static void overline_set(struct olineTracker *ol, char c, size_t len)
 static bool has_overline(struct olineTracker *ol)
 {
 	return (ol->c != 0);
+}
+
+static int getFosterEntry(tagEntryInfo *e, int shift)
+{
+	int r = CORK_NIL;
+
+	while (shift-- > 0)
+	{
+		r = e->extensionFields.scopeIndex;
+		Assert(r != CORK_NIL);
+		e = getEntryInCorkQueue(r);
+		Assert(e);
+	}
+	return r;
+}
+
+static void shiftKinds(int shift, rstKind baseKind)
+{
+	size_t count = countEntryInCorkQueue();
+	hashTable *remapping_table = hashTableNew (count,
+											   hashPtrhash,
+											   hashPtreq, NULL, NULL);
+	hashTableSetValueForUnknownKey(remapping_table, HT_INT_TO_PTR(CORK_NIL), NULL);
+
+	for (int index = 0; index < count; index++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue(index);
+		if (e && (baseKind <= e->kindIndex && e->kindIndex < SECTION_COUNT))
+		{
+			e->kindIndex += shift;
+			if (e->kindIndex >= SECTION_COUNT)
+			{
+				markTagPlaceholder(e, true);
+
+				int foster_parent = getFosterEntry(e, shift);
+				Assert (foster_parent != CORK_NIL);
+				hashTablePutItem(remapping_table, HT_INT_TO_PTR(index),
+								 HT_INT_TO_PTR(foster_parent));
+			}
+		}
+	}
+
+	for (int index = 0; index < count; index++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue(index);
+		if (e && e->extensionFields.scopeIndex != CORK_NIL)
+		{
+			void *remapping_to = hashTableGetItem (remapping_table,
+												   HT_INT_TO_PTR(e->extensionFields.scopeIndex));
+			if (HT_PTR_TO_INT(remapping_to) != CORK_NIL)
+				e->extensionFields.scopeIndex = HT_PTR_TO_INT(remapping_to);
+		}
+	}
+	hashTableDelete(remapping_table);
+}
+
+static void adjustSectionKinds(struct sectionTracker section_tracker[])
+{
+	if (section_tracker[K_TITLE].count > 1)
+	{
+		shiftKinds(2, K_TITLE);
+		return;
+	}
+
+	if (section_tracker[K_TITLE].count == 1
+		&& section_tracker[K_SUBTITLE].count > 1)
+	{
+		shiftKinds(1, K_SUBTITLE);
+		return;
+	}
 }
 
 static void inlineTagScope(tagEntryInfo *e, int parent_index)
@@ -476,6 +557,7 @@ static void findRstTags (void)
 	vStringDelete (name);
 	nestingLevelsFree(nestingLevels);
 
+	adjustSectionKinds(section_tracker);
 	inlineScopes();
 }
 
