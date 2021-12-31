@@ -8,6 +8,9 @@
 *   This module contains functions for generating tags for reStructuredText (reST) files.
 *
 *   This module was ported from geany.
+*
+*   References:
+*      https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html
 */
 
 /*
