@@ -29,6 +29,7 @@
 typedef enum {
 	K_ANCHOR,
 	K_CLASS,
+	K_TITLE,
 	K_HEADING1,
 	K_HEADING2,
 	K_HEADING3,
@@ -66,6 +67,7 @@ static kindDefinition HtmlKinds [] = {
 	{ true, 'a', "anchor",		"named anchors" },
 	{ true, 'c', "class",		"classes",
 	  .referenceOnly = true, ATTACH_ROLES (ClassRoles)},
+	{ true, 't', "title",		"titles" },
 	{ true, 'h', "heading1",	"H1 headings" },
 	{ true, 'i', "heading2",	"H2 headings" },
 	{ true, 'j', "heading3",	"H3 headings" },
@@ -77,9 +79,16 @@ static kindDefinition HtmlKinds [] = {
 };
 
 typedef enum {
+	/* The order starting from "title" to "h3" should
+	 * not be changed.
+	 *
+	 */
+	KEYWORD_heading_start,
+	KEYWORD_title = KEYWORD_heading_start,
 	KEYWORD_h1,
 	KEYWORD_h2,
 	KEYWORD_h3,
+	KEYWORD_heading_end = KEYWORD_h3,
 	KEYWORD_a,
 	KEYWORD_script,
 	KEYWORD_style,
@@ -110,6 +119,7 @@ typedef enum {
 } keywordId;
 
 static const keywordTable HtmlKeywordTable[] = {
+	{"title", KEYWORD_title},
 	{"h1", KEYWORD_h1},
 	{"h2", KEYWORD_h2},
 	{"h3", KEYWORD_h3},
@@ -465,7 +475,7 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 		bool stylesheet_expectation = false;
 
 		startTag = lookupKeyword (vStringValue (token->string), Lang_html);
-		isHeading = (startTag == KEYWORD_h1 || startTag == KEYWORD_h2 || startTag == KEYWORD_h3);
+		isHeading = (KEYWORD_heading_start <= startTag && startTag <= KEYWORD_heading_end);
 		isVoid = (startTag >= KEYWORD_area && startTag <= KEYWORD_wbr);
 		if (text == NULL && isHeading)
 		{
@@ -600,6 +610,8 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 					{
 						htmlKind headingKind;
 
+						if (startTag == KEYWORD_title)
+							headingKind = K_TITLE;
 						if (startTag == KEYWORD_h1)
 							headingKind = K_HEADING1;
 						else if (startTag == KEYWORD_h2)
