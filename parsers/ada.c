@@ -95,7 +95,6 @@
 
 #include <string.h>     /* to declare strxxx() functions */
 #include <ctype.h>      /* to define isxxx() macros */
-#include <setjmp.h>
 
 #include "parse.h"      /* always include */
 #include "read.h"       /* to define file readLineFromInputFile() */
@@ -104,13 +103,8 @@
 #include "debug.h"      /* for Assert */
 #include "xtag.h"
 
-typedef enum eAdaException
-{
-	EXCEPTION_NONE,
-	EXCEPTION_EOF
-} adaException;
 
-static adaException exception;
+static bool eof_reached;
 
 typedef enum eAdaParseMode
 {
@@ -301,13 +295,6 @@ static const char *AdaKeywords[] =
 	"with"
 };
 
-/* a jump buffer for fail-safe error prevention */
-static jmp_buf eofError;
-
-/* a simple var to keep track of how many times we hit EOF... If we hit it
- * say, about 1000 times, we will print an error, jump to the end of the
- * program, and store what tags we have */
-static int eofCount;
 
 /* variables for managing the input string, position as well as input line
  * number and position */
@@ -624,17 +611,8 @@ static void readNewLine (void)
 		if (line == NULL)
 		{
 			lineLen = 0;
-			exception = EXCEPTION_EOF;
-			eofCount++;
-
-			if (eofCount >= 1000)
-			{
-				longjmp (eofError, exception);
-			}
-			else
-			{
-				return;
-			}
+			eof_reached = true;
+			return;
 		}
 
 		lineLen = strlen (line);
@@ -649,7 +627,7 @@ static void readNewLine (void)
 static void movePos (int amount)
 {
 	pos += amount;
-	if (exception != EXCEPTION_EOF && pos >= lineLen)
+	if (!eof_reached && pos >= lineLen)
 	{
 		readNewLine ();
 	}
@@ -709,10 +687,10 @@ static bool adaCmp (const char *match)
 {
 	bool status = false;
 
-	/* first check to see if line is empty, if it is, throw an exception */
+	/* first check to see if line is empty */
 	if (line == NULL)
 	{
-		exception = EXCEPTION_EOF;
+		eof_reached = true;
 		return status;
 	}
 
@@ -735,10 +713,10 @@ static bool adaKeywordCmp (adaKeyword keyword)
 {
 	bool status = false;
 
-	/* first check to see if line is empty, if it is, throw an exception */
+	/* first check to see if line is empty, if it is */
 	if (line == NULL)
 	{
-		exception = EXCEPTION_EOF;
+		eof_reached = true;
 		return status;
 	}
 
@@ -762,7 +740,7 @@ static void skipUntilWhiteSpace (void)
 	 * check to be true immediately */
 	skipComments ();
 
-	while (exception != EXCEPTION_EOF && !isspace (line[pos]))
+	while (!eof_reached && !isspace (line[pos]))
 	{
 		/* don't use movePos () because if we read in a new line with this function
 		 * we need to stop */
@@ -778,7 +756,7 @@ static void skipUntilWhiteSpace (void)
 			if (line == NULL)
 			{
 				lineLen = 0;
-				exception = EXCEPTION_EOF;
+				eof_reached = true;
 				return;
 			}
 
@@ -798,7 +776,7 @@ static void skipWhiteSpace (void)
 	 * check to fail immediately */
 	skipComments ();
 
-	while (exception != EXCEPTION_EOF && isspace (line[pos]))
+	while (!eof_reached && isspace (line[pos]))
 	{
 		movePos (1);
 
@@ -809,7 +787,7 @@ static void skipWhiteSpace (void)
 
 static void skipComments (void)
 {
-	while (exception != EXCEPTION_EOF && isAdaComment (line, pos, lineLen))
+	while (!eof_reached && isAdaComment (line, pos, lineLen))
 	{
 		readNewLine ();
 	}
@@ -819,18 +797,18 @@ static void skipComments (void)
  * Return false if no string literal (nor char literal) is found. */
 static bool skipStringLiteral (void)
 {
-	if (exception != EXCEPTION_EOF && isAdaStringLiteral (line, pos, lineLen))
+	if (!eof_reached && isAdaStringLiteral (line, pos, lineLen))
 	{
 		do {
 			movePos (1);
-		} while (exception != EXCEPTION_EOF && !isAdaStringLiteral (line, pos, lineLen));
+		} while (!eof_reached && !isAdaStringLiteral (line, pos, lineLen));
 
 		/* Go to the next char of " */
 		movePos (1);
 
 		return true;
 	}
-	else if (exception != EXCEPTION_EOF && isAdaCharLiteral (line, pos, lineLen))
+	else if (!eof_reached && isAdaCharLiteral (line, pos, lineLen))
 	{
 		movePos (3);
 		return true;
@@ -855,7 +833,7 @@ static void skipPast (const char *past)
 	skipCommentsAndStringLiteral ();
 
 	/* now look for the keyword */
-	while (exception != EXCEPTION_EOF && !adaCmp (past))
+	while (!eof_reached && !adaCmp (past))
 	{
 		movePos (1);
 
@@ -871,7 +849,7 @@ static void skipPastKeyword (adaKeyword keyword)
 	skipComments ();
 
 	/* now look for the keyword */
-	while (exception != EXCEPTION_EOF && !adaKeywordCmp (keyword))
+	while (!eof_reached && !adaKeywordCmp (keyword))
 	{
 		movePos (1);
 
@@ -888,7 +866,7 @@ static void skipPastWord (void)
 
 	/* now increment until we hit a non-word character... Specifically,
 	 * whitespace, '(', ')', ':', and ';' */
-	while (exception != EXCEPTION_EOF && !isspace (line[pos]) &&
+	while (!eof_reached && !isspace (line[pos]) &&
 		   line[pos] != '(' && line[pos] != ')' && line[pos] != ':' &&
 		   line[pos] != ';')
 	{
@@ -906,7 +884,7 @@ static void skipPastWord (void)
 			if (line == NULL)
 			{
 				lineLen = 0;
-				exception = EXCEPTION_EOF;
+				eof_reached = true;
 				return;
 			}
 
@@ -927,7 +905,7 @@ static void skipPastLambda (skipCompFn cmpfn, void *data)
 	skipCommentsAndStringLiteral ();
 
 	/* now call the predicate */
-	while (exception != EXCEPTION_EOF && !cmpfn (data))
+	while (!eof_reached && !cmpfn (data))
 	{
 		movePos (1);
 
@@ -1019,9 +997,9 @@ static adaTokenInfo *adaParseBlock (adaTokenInfo *parent, adaKind kind)
 	skipWhiteSpace ();
 
 	/* task and protected types are allowed to have discriminants */
-	if (exception != EXCEPTION_EOF && line[pos] == '(')
+	if (!eof_reached && line[pos] == '(')
 	{
-		while (exception != EXCEPTION_EOF && line[pos] != ')')
+		while (!eof_reached && line[pos] != ')')
 		{
 			movePos (1);
 			adaParseVariables (token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -1088,7 +1066,7 @@ static adaTokenInfo *adaParseBlock (adaTokenInfo *parent, adaKind kind)
 			skipUntilWhiteSpace ();
 		}
 
-		if (exception == EXCEPTION_EOF)
+		if (eof_reached)
 		{
 			freeAdaToken (&parent->children, token);
 			token = NULL;
@@ -1123,9 +1101,9 @@ static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 	skipWhiteSpace ();
 
 	/* if we find a '(' grab any parameters */
-	if (exception != EXCEPTION_EOF && line[pos] == '(' && token != NULL)
+	if (!eof_reached && line[pos] == '(' && token != NULL)
 	{
-		while (exception != EXCEPTION_EOF && line[pos] != ')')
+		while (!eof_reached && line[pos] != ')')
 		{
 			movePos (1);
 			tmpToken = adaParseVariables (token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -1141,9 +1119,9 @@ static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 			 * pair */
 			skipWhiteSpace ();
 
-			if (exception != EXCEPTION_EOF && line[pos] == '(')
+			if (!eof_reached && line[pos] == '(')
 			{
-				while (exception != EXCEPTION_EOF && line[pos] != ')')
+				while (!eof_reached && line[pos] != ')')
 				{
 					movePos (1);
 					adaParseVariables (token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -1156,7 +1134,7 @@ static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 	/* loop infinitely until we hit a "is", "do" or ";", this will skip over
 	 * the returns keyword, returned-type for functions as well as any one of a
 	 * myriad of keyword qualifiers */
-	while (exception != EXCEPTION_EOF && token != NULL)
+	while (!eof_reached && token != NULL)
 	{
 		skipWhiteSpace ();
 
@@ -1235,11 +1213,11 @@ static adaTokenInfo *adaParseType (adaTokenInfo *parent, adaKind kind)
 	movePos (i);
 	skipWhiteSpace ();
 
-	if (exception != EXCEPTION_EOF && line[pos] == '(')
+	if (!eof_reached && line[pos] == '(')
 	{
 		/* in this case there is a discriminant to this type, gather the
 		 * variables */
-		while (exception != EXCEPTION_EOF && line[pos] != ')')
+		while (!eof_reached && line[pos] != ')')
 		{
 			movePos (1);
 			adaParseVariables (token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -1254,7 +1232,7 @@ static adaTokenInfo *adaParseType (adaTokenInfo *parent, adaKind kind)
 	{
 		skipWhiteSpace ();
 		/* check to see if this may be a record or an enumeration */
-		if (exception != EXCEPTION_EOF && line[pos] == '(')
+		if (!eof_reached && line[pos] == '(')
 		{
 			movePos (1);
 			adaParseVariables (token, ADA_KIND_ENUM_LITERAL);
@@ -1292,7 +1270,7 @@ static adaTokenInfo *adaParseType (adaTokenInfo *parent, adaKind kind)
 			{
 				/* A and B */
 				/* until we hit "end record" we need to gather type variables */
-				while (exception != EXCEPTION_EOF)
+				while (!eof_reached)
 				{
 					skipWhiteSpace ();
 
@@ -1373,7 +1351,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 	 * bufLen match */
 	buf[bufLen] = '\0';
 
-	while (exception != EXCEPTION_EOF)
+	while (!eof_reached)
 	{
 		/* make sure that we don't count anything in a comment as being valid to
 		 * parse */
@@ -1454,7 +1432,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 
 		/* if we just incremented beyond the length of the current buffer, we need
 		 * to read in a new line */
-		if (exception != EXCEPTION_EOF && bufPos >= bufLen)
+		if (!eof_reached && bufPos >= bufLen)
 		{
 			readNewLine ();
 
@@ -1592,14 +1570,14 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 	initAdaTokenList (&genericParamsRoot.children);
 
 	/* if we hit the end of the file, line will be NULL and our skip and match
-	 * functions will hit this jump buffer with EXCEPTION_EOF */
-	while (exception == EXCEPTION_NONE)
+	 * functions will hit this jump buffer with eof_reached */
+	while (!eof_reached)
 	{
 		/* find the next place to start */
 		skipWhiteSpace ();
 
 		/* check some universal things to check for first */
-		if (exception == EXCEPTION_EOF)
+		if (eof_reached)
 		{
 			break;
 		}
@@ -1655,7 +1633,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				skipWhiteSpace ();
 
 				/* skip over the "(" until we hit the tag */
-				if (exception != EXCEPTION_EOF && line[pos] == '(')
+				if (!eof_reached && line[pos] == '(')
 				{
 					movePos (1);
 					skipWhiteSpace ();
@@ -1782,9 +1760,9 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				movePos (i);
 
 				/* now gather the parameters to this subprogram */
-				if (exception != EXCEPTION_EOF && line[pos] == '(')
+				if (!eof_reached && line[pos] == '(')
 				{
-					while (exception != EXCEPTION_EOF && line[pos] != ')')
+					while (!eof_reached && line[pos] != ')')
 					{
 						movePos (1);
 						adaParseVariables (genericParamsRoot.children.tail,
@@ -2366,11 +2344,10 @@ static void findAdaTags (void)
 	adaTokenInfo *tmp;
 
 	/* init all global data now */
-	exception = EXCEPTION_NONE;
+	eof_reached = false;
 	line = NULL;
 	pos = 0;
 	matchLineNum = 0;
-	eofCount = 0;
 
 	/* cannot just set matchFilePos to 0 because the fpos_t is not a simple
 	 * integer on all systems. */
@@ -2386,12 +2363,11 @@ static void findAdaTags (void)
 
 	/* read in the first line */
 	readNewLine ();
-	if (exception == EXCEPTION_EOF)
+	if (eof_reached)
 		goto out;
 
 	/* tokenize entire file */
-	exception = setjmp (eofError);
-	while (exception != EXCEPTION_EOF && adaParse (ADA_ROOT, &root) != NULL);
+	while (!eof_reached && adaParse (ADA_ROOT, &root) != NULL);
 
 	/* store tags */
 	tmp = root.children.head;
