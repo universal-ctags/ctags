@@ -1,0 +1,7 @@
+/sample/path	input.yaml	/^    \/sample\/path:$/;"	p
+/sample/other/path	input.yaml	/^    \/sample\/other\/path:$/;"	p
+NullableField	input.yaml	/^        NullableField:$/;"	d
+NullableFieldStringEnum	input.yaml	/^        NullableFieldStringEnum:$/;"	d
+CustomHeader	input.yaml	/^        CustomHeader:$/;"	P
+Response1	input.yaml	/^        Response1:$/;"	R
+Response2	input.yaml	/^        Response2:$/;"	R

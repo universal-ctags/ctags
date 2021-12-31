@@ -375,6 +375,8 @@ YAML_HEADS = parsers/yaml.h
 YAML_SRCS = \
 	parsers/yaml.c		\
 	\
+	parsers/openapi.c	\
+	\
 	parsers/ansibleplaybook.c	\
 	\
 	$(NULL)
