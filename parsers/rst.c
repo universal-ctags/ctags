@@ -128,15 +128,8 @@ static int makeTargetRstTag(const vString* const name, rstKind kindex)
 	initTagEntry (&e, vStringValue (name), kindex);
 
 	const NestingLevel *nl = nestingLevelsGetCurrent(nestingLevels);
-	tagEntryInfo *parent = NULL;
 	if (nl)
-		parent = getEntryOfNestingLevel (nl);
-
-	if (parent)
-	{
-		e.extensionFields.scopeKindIndex = parent->kindIndex;
-		e.extensionFields.scopeName = parent->name;
-	}
+		e.extensionFields.scopeIndex = nl->corkIndex;
 
 	return makeTagEntry (&e);
 }
@@ -161,26 +154,7 @@ static void makeSectionRstTag(const vString* const name, const int kind, const M
 
 		parent = getEntryOfNestingLevel (nl);
 		if (parent && (parent->kindIndex < kind))
-		{
-#if 1
-			e.extensionFields.scopeKindIndex = parent->kindIndex;
-			e.extensionFields.scopeName = parent->name;
-#else
-			/* TODO
-
-			   Following code makes the scope information full qualified form.
-			   Do users want the full qualified form?
-			   --- ./Units/rst.simple.d/expected.tags	2015-12-18 01:32:35.574255617 +0900
-			   +++ /home/yamato/var/ctags-github/Units/rst.simple.d/FILTERED.tmp	2016-05-05 03:05:38.165604756 +0900
-			   @@ -5,2 +5,2 @@
-			   -Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Section 1.1
-			   -Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Subsection 1.1.1
-			   +Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Chapter 1.Section 1.1
-			   +Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Chapter 1.Section 1.1.Subsection 1.1.1
-			*/
-			   e.extensionFields.scopeIndex = nl->corkIndex;
-#endif
-		}
+			e.extensionFields.scopeIndex = nl->corkIndex;
 
 		m[0] = marker;
 		attachParserField (&e, false, RstFields [F_SECTION_MARKER].ftype, m);
@@ -344,6 +318,40 @@ static bool has_overline(struct olineTracker *ol)
 	return (ol->c != 0);
 }
 
+static void inlineTagScope(tagEntryInfo *e, int parent_index)
+{
+	tagEntryInfo *parent = getEntryInCorkQueue (parent_index);
+	if (parent)
+	{
+		e->extensionFields.scopeKindIndex = parent->kindIndex;
+		e->extensionFields.scopeName = eStrdup(parent->name);
+		e->extensionFields.scopeIndex = CORK_NIL;
+	}
+}
+
+static void inlineScopes (void)
+{
+	/* TODO
+	   Following code makes the scope information full qualified form.
+	   Do users want the full qualified form?
+	   --- ./Units/rst.simple.d/expected.tags	2015-12-18 01:32:35.574255617 +0900
+	   +++ /home/yamato/var/ctags-github/Units/rst.simple.d/FILTERED.tmp	2016-05-05 03:05:38.165604756 +0900
+	   @@ -5,2 +5,2 @@
+	   -Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Section 1.1
+	   -Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Subsection 1.1.1
+	   +Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Chapter 1.Section 1.1
+	   +Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Chapter 1.Section 1.1.Subsection 1.1.1
+	*/
+	size_t count = countEntryInCorkQueue();
+	for (int index = 0; index < count; index++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue(index);
+
+		if (e && e->extensionFields.scopeIndex != CORK_NIL)
+			inlineTagScope(e, e->extensionFields.scopeIndex);
+	}
+}
+
 static void findRstTags (void)
 {
 	vString *name = vStringNew ();
@@ -467,6 +475,8 @@ static void findRstTags (void)
 	getNestingLevel (K_EOF);
 	vStringDelete (name);
 	nestingLevelsFree(nestingLevels);
+
+	inlineScopes();
 }
 
 extern parserDefinition* RstParser (void)
