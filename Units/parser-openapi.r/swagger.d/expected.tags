@@ -1,0 +1,8 @@
+/sample/other/path	input.yaml	/^    \/sample\/other\/path:$/;"	p
+/sample/path	input.yaml	/^    \/sample\/path:$/;"	p
+Param1	input.yaml	/^    Param1:$/;"	P
+Param2	input.yaml	/^    Param2:$/;"	P
+PolymorphicInteger	input.yaml	/^    PolymorphicInteger:$/;"	d
+PolymorphicString	input.yaml	/^    PolymorphicString:$/;"	d
+Response1	input.yaml	/^    Response1:$/;"	R
+Response2	input.yaml	/^    Response2:$/;"	R
