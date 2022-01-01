@@ -25,8 +25,6 @@
 
 #ifdef DEBUG
 
-# define debug(level)      (level > 0)
-
 extern void debugAssert (const char *assertion, const char *file, unsigned int line, const char *function)
 {
 	fprintf(stderr, "readtags: %s:%u: %s%sAssertion `%s' failed.\n",
@@ -37,17 +35,6 @@ extern void debugAssert (const char *assertion, const char *file, unsigned int l
 	abort();
 }
 
-extern void debugPrintf (
-		const enum eDebugLevels level, const char *const format, ... )
-{
-	va_list ap;
-
-	va_start (ap, format);
-	if (debug (level))
-		vprintf (format, ap);
-	fflush (stdout);
-	va_end (ap);
-}
 #endif
 
 #define selected(var,feature)	(((int)(var) & (int)(feature)) == (int)feature)
