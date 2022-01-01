@@ -1,6 +1,12 @@
 a	input.bas	/^Common a As Integer$/;"	v
 b	input.bas	/^Dim b As Integer$/;"	v
+c	input.bas	/^dim as string c(20), d="a", e$/;"	v
+d	input.bas	/^dim as string c(20), d="a", e$/;"	v
+e	input.bas	/^dim as string c(20), d="a", e$/;"	v
 f	input.bas	/^Function f()$/;"	f
+g	input.bas	/^dim shared as string g$/;"	v
+h	input.bas	/^dim as string ptr h$/;"	v
+i	input.bas	/^dim as string * 4096 i$/;"	v
 one	input.bas	/^Const one = 1$/;"	c
 start	input.bas	/^start:$/;"	l
 str	input.bas	/^DIM AS STRING str$/;"	v

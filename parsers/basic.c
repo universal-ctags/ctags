@@ -52,7 +52,6 @@ static kindDefinition BasicKinds[] = {
 static KeyWord basic_keywords[] = {
 	/* freebasic */
 	{"const", K_CONST, 0},
-	{"dim as", K_VARIABLE, 1},
 	{"dim", K_VARIABLE, 0},
 	{"common", K_VARIABLE, 0},
 	{"function", K_FUNCTION, 0},
@@ -82,6 +81,74 @@ static KeyWord basic_keywords[] = {
 /*
  *   FUNCTION DEFINITIONS
  */
+
+/* Match the name of a dim or const starting at pos. */
+static void extract_dim (char const *pos, BasicKind kind)
+{
+	vString *name = vStringNew ();
+
+	if (strncasecmp (pos, "shared", 6) == 0)
+		pos += 6; /* skip keyword "shared" */
+
+	while (isspace (*pos))
+		pos++;
+
+	/* capture "dim as String str" */
+	if (strncasecmp (pos, "as", 2) == 0)
+	{
+			pos += 2; /* skip keyword "as" */
+
+		while (isspace (*pos))
+			pos++;
+		while (!isspace (*pos) && *pos) /* skip next part which is a type */
+			pos++;
+		while (isspace (*pos))
+			pos++;
+		/* now we are at the name */
+	}
+	/* capture "dim as foo ptr bar" */
+	if (strncasecmp (pos, "ptr", 3) == 0 && isspace(*(pos+3)))
+	{
+		pos += 3; /* skip keyword "ptr" */
+		while (isspace (*pos))
+			pos++;
+	}
+	/*	capture "dim as string * 4096 chunk" */
+	if (strncmp (pos, "*", 1) == 0)
+	{
+		pos += 1; /* skip "*" */
+		while (isspace (*pos) || isdigit(*pos) || ispunct(*pos))
+			pos++;
+	}
+
+	for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ',' && *pos != '='; pos++)
+		vStringPut (name, *pos);
+	makeSimpleTag (name, kind);
+
+	/* if the line contains a ',', we have multiple declarations */
+	while (*pos && strchr (pos, ','))
+	{
+		/* skip all we don't need(e.g. "..., new_array(5), " we skip "(5)") */
+		while (*pos != ',' && *pos != '\'' && *pos)
+			pos++;
+
+		if (*pos == '\'')
+			break; /* break if we are in a comment */
+
+		while (isspace (*pos) || *pos == ',')
+			pos++;
+
+		if (*pos == '\'')
+			break; /* break if we are in a comment */
+
+		vStringClear (name);
+		for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ',' && *pos != '='; pos++)
+			vStringPut (name, *pos);
+		makeSimpleTag (name, kind);
+	}
+
+	vStringDelete (name);
+}
 
 /* Match the name of a tag (function, variable, type, ...) starting at pos. */
 static char const *extract_name (char const *pos, vString * name)
@@ -115,6 +182,12 @@ static int match_keyword (const char *p, KeyWord const *kw)
 	/* create tags only if there is some space between the keyword and the identifier */
 	if (old_p == p)
 		return 0;
+
+	if (kw->kind == K_VARIABLE)
+	{
+		extract_dim (p, kw->kind); /* extract_dim adds the found tag(s) */
+		return 1;
+	}
 
 	name = vStringNew ();
 	for (j = 0; j < 1 + kw->skip; j++)
