@@ -61,6 +61,9 @@ static KeyWord basic_keywords[] = {
 	{"public sub", K_FUNCTION, 0},
 	{"private function", K_FUNCTION, 0},
 	{"public function", K_FUNCTION, 0},
+	{"property", K_FUNCTION, 0},
+	{"constructor", K_FUNCTION, 0},
+	{"destructor", K_FUNCTION, 0},
 	{"type", K_TYPE, 0},
 	{"enum", K_ENUM, 0},
 
