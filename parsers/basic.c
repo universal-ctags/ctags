@@ -89,7 +89,7 @@ static char const *extract_name (char const *pos, vString * name)
 	while (isspace (*pos))
 		pos++;
 	vStringClear (name);
-	for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ','; pos++)
+	for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ',' && *pos != '='; pos++)
 		vStringPut (name, *pos);
 	return pos;
 }
