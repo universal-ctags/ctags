@@ -32,6 +32,7 @@
 #include "xtag_p.h"
 
 #include "optscript.h"
+#include "script_p.h"
 
 #define FIELD_NULL_LETTER_CHAR '-'
 #define FIELD_NULL_LETTER_STRING "-"
