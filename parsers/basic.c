@@ -37,7 +37,6 @@ typedef enum {
 typedef struct {
 	char const *token;
 	BasicKind kind;
-	int skip;
 } KeyWord;
 
 static kindDefinition BasicKinds[] = {
@@ -51,31 +50,31 @@ static kindDefinition BasicKinds[] = {
 
 static KeyWord basic_keywords[] = {
 	/* freebasic */
-	{"const", K_CONST, 0},
-	{"dim", K_VARIABLE, 0},
-	{"common", K_VARIABLE, 0},
-	{"function", K_FUNCTION, 0},
-	{"sub", K_FUNCTION, 0},
-	{"private sub", K_FUNCTION, 0},
-	{"public sub", K_FUNCTION, 0},
-	{"private function", K_FUNCTION, 0},
-	{"public function", K_FUNCTION, 0},
-	{"property", K_FUNCTION, 0},
-	{"constructor", K_FUNCTION, 0},
-	{"destructor", K_FUNCTION, 0},
-	{"type", K_TYPE, 0},
-	{"enum", K_ENUM, 0},
+	{"const", K_CONST},
+	{"dim", K_VARIABLE},
+	{"common", K_VARIABLE},
+	{"function", K_FUNCTION},
+	{"sub", K_FUNCTION},
+	{"private sub", K_FUNCTION},
+	{"public sub", K_FUNCTION},
+	{"private function", K_FUNCTION},
+	{"public function", K_FUNCTION},
+	{"property", K_FUNCTION},
+	{"constructor", K_FUNCTION},
+	{"destructor", K_FUNCTION},
+	{"type", K_TYPE},
+	{"enum", K_ENUM},
 
 	/* blitzbasic, purebasic */
-	{"global", K_VARIABLE, 0},
+	{"global", K_VARIABLE},
 
 	/* purebasic */
-	{"newlist", K_VARIABLE, 0},
-	{"procedure", K_FUNCTION, 0},
-	{"interface", K_TYPE, 0},
-	{"structure", K_TYPE, 0},
+	{"newlist", K_VARIABLE},
+	{"procedure", K_FUNCTION},
+	{"interface", K_TYPE},
+	{"structure", K_TYPE},
 
-	{NULL, 0, 0}
+	{NULL, 0}
 };
 
 /*
@@ -166,7 +165,6 @@ static int match_keyword (const char *p, KeyWord const *kw)
 {
 	vString *name;
 	size_t i;
-	int j;
 	const char *old_p;
 	for (i = 0; i < strlen (kw->token); i++)
 	{
@@ -190,10 +188,7 @@ static int match_keyword (const char *p, KeyWord const *kw)
 	}
 
 	name = vStringNew ();
-	for (j = 0; j < 1 + kw->skip; j++)
-	{
-		p = extract_name (p, name);
-	}
+	extract_name (p, name);
 	makeSimpleTag (name, kw->kind);
 	vStringDelete (name);
 	return 1;
