@@ -187,7 +187,7 @@ static void findBasicTags (void)
 			if (match_keyword (p, kw)) break;
 
 		/* Is it a label? */
-		if (strcmp (extension, "bb") == 0)
+		if (*p == '.')
 			match_dot_label (p);
 		else
 			match_colon_label (p);
