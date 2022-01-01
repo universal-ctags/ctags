@@ -6,6 +6,8 @@
 *   This module contains functions for reading tag files.
 */
 
+#include "general.h"
+
 #include "readtags.h"
 #include "printtags.h"
 #include <string.h>		/* strerror */

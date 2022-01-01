@@ -14,14 +14,44 @@ REPOINFO_OBJS  = $(REPOINFO_SRCS:.c=.$(OBJEXT))
 MIO_HEADS = main/mio.h
 MIO_SRCS  = main/mio.c
 
+UTIL_PUBLIC_HEADS = \
+	main/general.h		\
+	\
+	main/gcc-attr.h		\
+	main/inline.h		\
+	main/routines.h		\
+	main/trashbox.h 	\
+	main/vstring.h		\
+	\
+	$(NULL)
+
+UTIL_PRIVATE_HEADS = \
+	main/routines_p.h	\
+	\
+	$(NULL)
+
+UTIL_HEADS = \
+	$(UTIL_PUBLIC_HEADS)	\
+	$(UTIL_PRIVATE_HEADS)	\
+	\
+	$(NULL)
+
+UTIL_SRCS = \
+	main/routines.c		\
+	main/trashbox.c		\
+	main/vstring.c		\
+	\
+	$(NULL)
+UTIL_OBJS = $(UTIL_SRCS:.c=.$(OBJEXT))
+
 MAIN_PUBLIC_HEADS =		\
+	$(UTIL_PUBLIC_HEADS)	\
+	\
 	main/dependency.h	\
 	main/entry.h		\
 	main/field.h		\
-	main/gcc-attr.h		\
 	main/gvars.h		\
 	main/htable.h		\
-	main/inline.h		\
 	main/keyword.h		\
 	main/kind.h		\
 	main/lregex.h		\
@@ -37,21 +67,20 @@ MAIN_PUBLIC_HEADS =		\
 	main/ptrarray.h		\
 	main/rbtree.h		\
 	main/read.h		\
-	main/routines.h		\
 	main/selectors.h	\
 	main/strlist.h		\
 	main/subparser.h	\
 	main/tokeninfo.h	\
 	main/trace.h		\
-	main/trashbox.h 	\
 	main/types.h		\
 	main/unwindi.h  	\
-	main/vstring.h		\
 	main/xtag.h		\
 	\
 	$(NULL)
 
 LIB_PRIVATE_HEADS =		\
+	$(UTIL_PRIVATE_HEADS)	\
+	\
 	main/args_p.h		\
 	main/colprint_p.h	\
 	main/dependency_p.h	\
@@ -75,7 +104,6 @@ LIB_PRIVATE_HEADS =		\
 	main/promise_p.h	\
 	main/ptag_p.h		\
 	main/read_p.h		\
-	main/routines_p.h	\
 	main/script_p.h		\
 	main/sort_p.h		\
 	main/stats_p.h		\
@@ -88,7 +116,6 @@ LIB_PRIVATE_HEADS =		\
 
 LIB_HEADS =			\
 	main/ctags.h		\
-	main/general.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)	\
 	$(LIB_PRIVATE_HEADS)	\
@@ -98,6 +125,8 @@ LIB_HEADS =			\
 	$(NULL)
 
 LIB_SRCS =			\
+	$(UTIL_SRCS)			\
+	\
 	main/args.c			\
 	main/colprint.c			\
 	main/dependency.c		\
@@ -127,7 +156,6 @@ LIB_SRCS =			\
 	main/ptrarray.c			\
 	main/rbtree.c			\
 	main/read.c			\
-	main/routines.c			\
 	main/script.c			\
 	main/seccomp.c			\
 	main/selectors.c		\
@@ -135,10 +163,8 @@ LIB_SRCS =			\
 	main/stats.c			\
 	main/strlist.c			\
 	main/trace.c			\
-	main/trashbox.c			\
 	main/tokeninfo.c		\
 	main/unwindi.c			\
-	main/vstring.c			\
 	main/writer.c			\
 	main/writer-etags.c		\
 	main/writer-ctags.c		\
@@ -423,11 +449,13 @@ READTAGS_SRCS  = \
 	libreadtags/readtags.c      \
 	extra-cmds/printtags.c  \
 	extra-cmds/readtags-cmd.c  \
+	extra-cmds/readtags-stub.c \
 	\
 	$(NULL)
 READTAGS_HEADS = \
 	libreadtags/readtags.h \
 	extra-cmds/printtags.h  \
+	extra-cmds/readtags-stub.h \
 	\
 	$(NULL)
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
