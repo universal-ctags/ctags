@@ -49,26 +49,8 @@ static kindDefinition BasicKinds[] = {
 	{true, 'g', "enum", "enumerations"}
 };
 
-static KeyWord blitzbasic_keywords[] = {
-	{"const", K_CONST, 0},
-	{"global", K_VARIABLE, 0},
-	{"dim", K_VARIABLE, 0},
-	{"function", K_FUNCTION, 0},
-	{"type", K_TYPE, 0},
-	{NULL, 0, 0}
-};
-
-static KeyWord purebasic_keywords[] = {
-	{"newlist", K_VARIABLE, 0},
-	{"global", K_VARIABLE, 0},
-	{"dim", K_VARIABLE, 0},
-	{"procedure", K_FUNCTION, 0},
-	{"interface", K_TYPE, 0},
-	{"structure", K_TYPE, 0},
-	{NULL, 0, 0}
-};
-
-static KeyWord freebasic_keywords[] = {
+static KeyWord basic_keywords[] = {
+	/* freebasic */
 	{"const", K_CONST, 0},
 	{"dim as", K_VARIABLE, 1},
 	{"dim", K_VARIABLE, 0},
@@ -81,6 +63,16 @@ static KeyWord freebasic_keywords[] = {
 	{"public function", K_FUNCTION, 0},
 	{"type", K_TYPE, 0},
 	{"enum", K_ENUM, 0},
+
+	/* blitzbasic, purebasic */
+	{"global", K_VARIABLE, 0},
+
+	/* purebasic */
+	{"newlist", K_VARIABLE, 0},
+	{"procedure", K_FUNCTION, 0},
+	{"interface", K_TYPE, 0},
+	{"structure", K_TYPE, 0},
+
 	{NULL, 0, 0}
 };
 
@@ -151,15 +143,6 @@ static void match_dot_label (char const *p)
 static void findBasicTags (void)
 {
 	const char *line;
-	const char *extension = fileExtension (getInputFileName ());
-	KeyWord *keywords;
-
-	if (strcmp (extension, "bb") == 0)
-		keywords = blitzbasic_keywords;
-	else if (strcmp (extension, "pb") == 0)
-		keywords = purebasic_keywords;
-	else
-		keywords = freebasic_keywords;
 
 	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
@@ -183,7 +166,7 @@ static void findBasicTags (void)
 			continue;
 
 		/* In Basic, keywords always are at the start of the line. */
-		for (kw = keywords; kw->token; kw++)
+		for (kw = basic_keywords; kw->token; kw++)
 			if (match_keyword (p, kw)) break;
 
 		/* Is it a label? */
