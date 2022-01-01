@@ -100,13 +100,23 @@ static int match_keyword (const char *p, KeyWord const *kw)
 	vString *name;
 	size_t i;
 	int j;
+	const char *old_p;
 	for (i = 0; i < strlen (kw->token); i++)
 	{
 		if (tolower (p[i]) != kw->token[i])
 			return 0;
 	}
-	name = vStringNew ();
 	p += i;
+
+	old_p = p;
+	while (isspace (*p))
+		p++;
+
+	/* create tags only if there is some space between the keyword and the identifier */
+	if (old_p == p)
+		return 0;
+
+	name = vStringNew ();
 	for (j = 0; j < 1 + kw->skip; j++)
 	{
 		p = extract_name (p, name);
