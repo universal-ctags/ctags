@@ -119,8 +119,8 @@ extra-cmds/%.o: extra-cmds/%.c
 libreadtags/%.o: libreadtags/%.c
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Ilibreadtags -o $@ $<
 
-readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(GNULIB_OBJS) $(MINGW_GNULIB_HEADS)
-	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(GNULIB_OBJS) $(LIBS)
+readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(READTAGS_DSL_OBJS) $(READTAGS_DSL_HEADS) $(GNULIB_OBJS) $(MINGW_GNULIB_HEADS)
+	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(READTAGS_DSL_OBJS) $(GNULIB_OBJS) $(LIBS)
 
 optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(LIBS)
