@@ -10,6 +10,8 @@
 
 #include "readtags.h"
 #include "printtags.h"
+#include "routines.h"
+#include "routines_p.h"
 #include <string.h>		/* strerror */
 #include <stdlib.h>		/* exit */
 #include <stdio.h>		/* stderr */
@@ -277,11 +279,82 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 }
 #endif
 
+static int copyFile (FILE *in, FILE *out)
+{
+#define BUFSIZE (4096 * 10)
+	static unsigned char buffer [BUFSIZE];
+
+	while (1)
+	{
+		size_t r, t;
+
+		r = fread (buffer, 1, BUFSIZE, in);
+		if (!r)
+		{
+			if (ferror(in))
+			{
+				fprintf (stderr, "%s: error in reading from stdin\n", ProgramName);
+				return -1;
+			}
+			/* EOF */
+			break;
+		}
+		t = fwrite (buffer, 1, r, out);
+		if (r != t)
+		{
+			fprintf (stderr, "%s error in writing to the temporarily file", ProgramName);
+			return -1;
+		}
+	}
+	return 0;
+}
+
+static void removeTagFile (void)
+{
+	remove (TagFileName);
+	eFree ((char *)TagFileName);
+}
+
+static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
+{
+	if (strcmp (filePath, "-") == 0)
+	{
+		char *tempName = NULL;
+		FILE *tempFP = tempFileFP ("w", &tempName);
+
+		if (tempFP == NULL)
+		{
+			fprintf (stderr, "%s: failed to make a temporarily file for storing data from stdin\n",
+					 ProgramName);
+			exit (1);
+		}
+		TagFileName = tempName;
+		atexit (removeTagFile);
+
+		if (copyFile (stdin, tempFP) < 0)
+		{
+			fclose (tempFP);
+			exit (1);
+		}
+
+		if (fflush (tempFP) < 0)
+		{
+			fprintf (stderr, "%s: failed to flush a temporarily file for storing data from stdin\n",
+					 ProgramName);
+			exit (1);
+		}
+		fclose (tempFP);
+		return tagsOpen (tempName, info);
+	}
+
+	return tagsOpen (filePath, info);
+}
+
 static void findTag (const char *const name, const int options)
 {
 	tagFileInfo info;
 	tagEntry entry;
-	tagFile *const file = tagsOpen (TagFileName, &info);
+	tagFile *const file = openTags (TagFileName, &info);
 	if (file == NULL || !info.status.opened)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
@@ -325,7 +398,7 @@ static void listTags (int pseudoTags)
 {
 	tagFileInfo info;
 	tagEntry entry;
-	tagFile *const file = tagsOpen (TagFileName, &info);
+	tagFile *const file = openTags (TagFileName, &info);
 	if (file == NULL || !info.status.opened)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
@@ -401,6 +474,7 @@ static const char *const Usage =
 	"        Perform prefix matching in the NAME action.\n"
 	"    -t TAGFILE | --tag-file TAGFILE\n"
 	"        Use specified tag file (default: \"tags\").\n"
+	"        \"-\" indicates taking tag file data from standard input.\n"
 	"    -s[0|1|2] | --override-sort-detection METHOD\n"
 	"        Override sort detection of tag file.\n"
 	"        METHOD: unsorted|sorted|foldcase\n"
@@ -472,6 +546,7 @@ extern int main (int argc, char **argv)
 	int ignore_prefix = 0;
 
 	ProgramName = argv [0];
+	setExecutableName (ProgramName);
 	if (argc == 1)
 		printUsage(stderr, 1);
 	for (i = 1  ;  i < argc  ;  ++i)

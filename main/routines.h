@@ -76,4 +76,6 @@ extern bool strToLong(const char *const string, int base, long *value);
 extern const char *baseFilename (const char *const filePath);
 extern const char *fileExtension (const char *const fileName);
 
+extern FILE *tempFileFP (const char *const mode, char **const pName);
+
 #endif  /* CTAGS_MAIN_ROUTINES_H */

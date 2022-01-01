@@ -45,6 +45,9 @@ The behavior of reading tags can be controlled using these options:
 
 ``-t TAGFILE``, ``--tag-file TAGFILE``
 	Use specified tag file (default: "tags").
+	"-" indicates taking tag file data from standard input;
+	readtags stores the data to a temorary file before
+	taking the ACTION.
 
 ``-s[0|1|2]``, ``--override-sort-detection METHOD``
 	Override sort detection of tag file.

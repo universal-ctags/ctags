@@ -1,0 +1,3 @@
+Foo.aq	base.py	/^    def aq ():$/;"	kind:member	line:5	language:Python	scope:class:Foo	access:public	signature:()
+Foo.aw	base.py	/^    def aw ():$/;"	kind:member	line:7	language:Python	scope:class:Foo	access:public	signature:()
+Foo.ae	base.py	/^    def ae ():$/;"	kind:member	line:9	language:Python	scope:class:Foo	access:public	signature:()
