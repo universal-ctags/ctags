@@ -20,7 +20,6 @@
 #include "types.h"
 
 #include "vstring.h"
-#include "optscript.h"
 
 /*
 *   DATA DECLARATIONS
@@ -101,13 +100,13 @@ struct sFieldDefinition {
 	bool (* isValueAvailable) (const tagEntryInfo *const);
 
 	const char * getterValueType;
-	EsObject * (* getValueObject) (const tagEntryInfo *, const fieldDefinition *);
+	struct _EsObject * (* getValueObject) (const tagEntryInfo *, const fieldDefinition *);
 	const char * setterValueType;
 
 	/* Return es_false if passed value is acceptable.
 	   Return an error object is unacceptable. */
-	EsObject * (* checkValueForSetter) (const fieldDefinition *, const EsObject *);
-	EsObject * (* setValueObject) (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+	struct _EsObject * (* checkValueForSetter) (const fieldDefinition *, const struct _EsObject *);
+	struct _EsObject * (* setValueObject) (tagEntryInfo *, const fieldDefinition *, const struct _EsObject *);
 
 	fieldDataType dataType; /* used in json output */
 
