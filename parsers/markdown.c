@@ -193,6 +193,7 @@ static void findMarkdownTags (void)
 	long startSourceLineNumber = 0;
 	long startLineNumber = 0;
 	bool inPreambule = false;
+	bool inComment = false;
 
 	nestingLevels = nestingLevelsNewFull (0, fillEndField);
 
@@ -246,9 +247,23 @@ static void findMarkdownTags (void)
 				lineProcessed = true;
 			}
 		}
+		/* XML comment start */
+		else if (lineLen >= pos + 4 && line[pos] == '<' && line[pos + 1] == '!' &&
+			line[pos + 2] == '-' && line[pos + 3] == '-')
+		{
+			if (strstr ((const char *)(line + pos + 4), "-->") == NULL)
+				inComment = true;
+			lineProcessed = true;
+		}
+		/* XML comment end */
+		else if (inComment && strstr ((const char *)(line + pos), "-->"))
+		{
+			inComment = false;
+			lineProcessed = true;
+		}
 
-		/* code block */
-		if (inCodeChar)
+		/* code block or comment */
+		if (inCodeChar || inComment)
 			lineProcessed = true;
 
 		/* code block using indent */
