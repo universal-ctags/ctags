@@ -24,8 +24,6 @@
 #include "ptrarray.h"
 #include "nestlevel.h"
 
-#include "script_p.h"
-
 /*
 *   MACROS
 */
