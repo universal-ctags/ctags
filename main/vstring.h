@@ -19,7 +19,6 @@
 #include <stdio.h>
 
 #include "inline.h"
-#include "mio.h"
 
 /*
 *   MACROS

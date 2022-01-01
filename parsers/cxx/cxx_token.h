@@ -10,6 +10,7 @@
 */
 
 #include "general.h"
+#include "mio.h"
 #include "vstring.h"
 
 #include "cxx_keyword.h"
