@@ -952,8 +952,6 @@ extern MIO *tempFile (const char *const mode, char **const pName)
 	if (fp == NULL)
 		error (FATAL | PERROR, "cannot open temporary file");
 	mio = mio_new_fp (fp, fclose);
-	DebugStatement (
-		debugPrintf (DEBUG_STATUS, "opened temporary file %s\n", name); )
 	Assert (*pName == NULL);
 	*pName = name;
 	return mio;
