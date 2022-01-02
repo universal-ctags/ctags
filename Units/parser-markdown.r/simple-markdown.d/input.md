@@ -103,3 +103,44 @@ E
 
 F
 ---
+
+ G
+-
+
+  H
+-
+
+   I
+-
+
+    indented
+-
+
+	indented_with_tab
+-
+
+ 	indented_with_space_and_tab
+-
+
+text
+- ignored
+-
+
+# C\#
+
+J
+ -
+
+K
+  -
+
+L
+   -
+
+ignored
+    -
+
+```foo```
+
+> quoted
+---

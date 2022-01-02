@@ -243,9 +243,6 @@
     <ClCompile Include="..\optlib\man.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\optlib\markdown.c">
-      <Filter>Source Files\optlib</Filter>
-    </ClCompile>
     <ClCompile Include="..\optlib\meson.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
@@ -472,6 +469,9 @@
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\make.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\markdown.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\matlab.c">

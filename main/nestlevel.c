@@ -29,7 +29,7 @@
 */
 
 extern NestingLevels *nestingLevelsNewFull(size_t userDataSize,
-										   void (* deleteUserData)(NestingLevel *))
+										   void (* deleteUserData)(NestingLevel *, void *))
 {
 	NestingLevels *nls = xCalloc (1, NestingLevels);
 	nls->userDataSize = userDataSize;
@@ -42,7 +42,7 @@ extern NestingLevels *nestingLevelsNew(size_t userDataSize)
 	return nestingLevelsNewFull (userDataSize, NULL);
 }
 
-extern void nestingLevelsFree(NestingLevels *nls)
+extern void nestingLevelsFreeFull(NestingLevels *nls, void *ctxData)
 {
 	int i;
 	NestingLevel *nl;
@@ -51,7 +51,7 @@ extern void nestingLevelsFree(NestingLevels *nls)
 	{
 		nl = NL_NTH(nls, i);
 		if (nls->deleteUserData)
-			nls->deleteUserData (nl);
+			nls->deleteUserData (nl, ctxData);
 		nl->corkIndex = CORK_NIL;
 	}
 	if (nls->levels) eFree(nls->levels);
@@ -89,13 +89,13 @@ extern NestingLevel *nestingLevelsTruncate(NestingLevels *nls, int depth, int co
 }
 
 
-extern void nestingLevelsPop(NestingLevels *nls)
+extern void nestingLevelsPopFull(NestingLevels *nls, void *ctxData)
 {
 	NestingLevel *nl = nestingLevelsGetCurrent(nls);
 
 	Assert (nl != NULL);
 	if (nls->deleteUserData)
-		nls->deleteUserData (nl);
+		nls->deleteUserData (nl, ctxData);
 	nl->corkIndex = CORK_NIL;
 	nls->n--;
 }

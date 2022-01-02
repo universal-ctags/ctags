@@ -6,6 +6,7 @@ tags: ['code','python']
 menu:
     main:
         parent: 'code'
+layout: default
 ---
 
 # About this input
