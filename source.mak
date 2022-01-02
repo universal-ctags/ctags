@@ -417,7 +417,7 @@ READTAGS_DSL_SRCS = \
 	$(MIO_SRCS) \
 	\
 	$(NULL)
-READTAGS_DSL_OBJS = $(QUALIFIER_SRCS:.c=.$(OBJEXT))
+READTAGS_DSL_OBJS = $(READTAGS_DSL_SRCS:.c=.$(OBJEXT))
 
 READTAGS_SRCS  = \
 	libreadtags/readtags.c      \
