@@ -150,26 +150,24 @@ static void extract_dim (char const *pos, BasicKind kind)
 }
 
 /* Match the name of a tag (function, variable, type, ...) starting at pos. */
-static char const *extract_name (char const *pos, vString * name)
+static void extract_name (char const *pos, BasicKind kind)
 {
-	while (isspace (*pos))
-		pos++;
-	vStringClear (name);
+	vString *name = vStringNew ();
 	for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ',' && *pos != '='; pos++)
 		vStringPut (name, *pos);
-	return pos;
+	makeSimpleTag (name, kind);
+	vStringDelete (name);
 }
 
 /* Match a keyword starting at p (case insensitive). */
-static int match_keyword (const char *p, KeyWord const *kw)
+static bool match_keyword (const char *p, KeyWord const *kw)
 {
-	vString *name;
 	size_t i;
 	const char *old_p;
 	for (i = 0; i < strlen (kw->token); i++)
 	{
 		if (tolower (p[i]) != kw->token[i])
-			return 0;
+			return false;
 	}
 	p += i;
 
@@ -179,19 +177,13 @@ static int match_keyword (const char *p, KeyWord const *kw)
 
 	/* create tags only if there is some space between the keyword and the identifier */
 	if (old_p == p)
-		return 0;
+		return false;
 
 	if (kw->kind == K_VARIABLE)
-	{
 		extract_dim (p, kw->kind); /* extract_dim adds the found tag(s) */
-		return 1;
-	}
-
-	name = vStringNew ();
-	extract_name (p, name);
-	makeSimpleTag (name, kw->kind);
-	vStringDelete (name);
-	return 1;
+	else
+		extract_name (p, kw->kind);
+	return true;
 }
 
 /* Match a "label:" style label. */
@@ -213,12 +205,7 @@ static void match_colon_label (char const *p)
 static void match_dot_label (char const *p)
 {
 	if (*p == '.')
-	{
-		vString *name = vStringNew ();
-		extract_name (p + 1, name);
-		makeSimpleTag (name, K_LABEL);
-		vStringDelete (name);
-	}
+		extract_name (p + 1, K_LABEL);
 }
 
 static void findBasicTags (void)
