@@ -926,7 +926,10 @@ static vString *iFileGetLine (bool chop_newline)
 			vStringPutNewlinAgainUnsafe (File.line);
 
 		File.line->size = File.line->length == 0 ? 2 : File.line->length + 1;
-		File.line->buffer = xRealloc (File.line->buffer, File.line->size, char);
+		char *oldbuf = File.line->buffer;
+		File.line->buffer = xMalloc (File.line->size, char);
+		memcpy(File.line->buffer, oldbuf, File.line->size);
+		eFree(oldbuf);
 
 		return File.line;
 	}
