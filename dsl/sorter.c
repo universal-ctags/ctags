@@ -64,6 +64,8 @@ DECLARE_ALT_VALUE_FN(scope_kind);
 DECLARE_ALT_VALUE_FN(scope_name);
 DECLARE_ALT_VALUE_FN(signature);
 DECLARE_ALT_VALUE_FN(typeref);
+DECLARE_ALT_VALUE_FN(typeref_kind);
+DECLARE_ALT_VALUE_FN(typeref_name);
 DECLARE_ALT_VALUE_FN(roles);
 DECLARE_ALT_VALUE_FN(xpath);
 
@@ -123,6 +125,10 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> #f|<string>" },
 	{ "&typeref",        alt_value_typeref,        NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
+	{ "&typeref-kind",   alt_value_typeref_kind,   NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "&typeref-name",   alt_value_typeref_name,   NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
 	{ "&roles",          alt_value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <list>" },
 	{ "&xpath",         alt_value_xpath,           NULL, DSL_PATTR_MEMORABLE, 0UL,
@@ -154,6 +160,8 @@ DEFINE_ALT_VALUE_FN(scope_kind);
 DEFINE_ALT_VALUE_FN(scope_name);
 DEFINE_ALT_VALUE_FN(signature);
 DEFINE_ALT_VALUE_FN(typeref);
+DEFINE_ALT_VALUE_FN(typeref_kind);
+DEFINE_ALT_VALUE_FN(typeref_name);
 DEFINE_ALT_VALUE_FN(roles);
 DEFINE_ALT_VALUE_FN(xpath);
 

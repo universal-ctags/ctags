@@ -115,6 +115,8 @@ EsObject* dsl_entry_scope_kind (const tagEntry *entry);
 EsObject* dsl_entry_scope_name (const tagEntry *entry);
 EsObject* dsl_entry_signature (const tagEntry *entry);
 EsObject* dsl_entry_typeref (const tagEntry *entry);
+EsObject* dsl_entry_typeref_kind (const tagEntry *entry);
+EsObject* dsl_entry_typeref_name (const tagEntry *entry);
 EsObject* dsl_entry_roles (const tagEntry *entry);
 EsObject* dsl_entry_xpath (const tagEntry *entry);
 

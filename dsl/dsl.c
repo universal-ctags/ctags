@@ -101,6 +101,8 @@ DECLARE_VALUE_FN(scope_kind);
 DECLARE_VALUE_FN(scope_name);
 DECLARE_VALUE_FN(signature);
 DECLARE_VALUE_FN(typeref);
+DECLARE_VALUE_FN(typeref_kind);
+DECLARE_VALUE_FN(typeref_name);
 DECLARE_VALUE_FN(roles);
 DECLARE_VALUE_FN(xpath);
 
@@ -224,6 +226,10 @@ static DSLProcBind pbinds [] = {
 	{ "$signature",      value_signature,      NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>" },
 	{ "$typeref",        value_typeref,        NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "$typeref-kind",   value_typeref_kind,   NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "$typeref-name",   value_typeref_name,   NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
 	{ "$roles",          value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <list>" },
@@ -902,6 +908,8 @@ DEFINE_VALUE_FN(scope_kind)
 DEFINE_VALUE_FN(scope_name)
 DEFINE_VALUE_FN(signature)
 DEFINE_VALUE_FN(typeref)
+DEFINE_VALUE_FN(typeref_kind)
+DEFINE_VALUE_FN(typeref_name)
 DEFINE_VALUE_FN(roles)
 DEFINE_VALUE_FN(xpath)
 
@@ -1086,6 +1094,45 @@ EsObject* dsl_entry_scope_name (const tagEntry *entry)
 		return es_false;
 
 	kind = strchr (scope, ':');
+	if (kind == NULL)
+		return es_false;
+
+	if (*(kind + 1) == '\0')
+		return es_false;
+
+	r = es_object_autounref (es_string_new (kind + 1));
+
+	return r;
+}
+
+EsObject* dsl_entry_typeref_kind (const tagEntry *entry)
+{
+	const char* typeref = entry_xget (entry, "typeref");
+	const char* kind;
+	EsObject *r;
+
+	if (typeref == NULL)
+		return es_false;
+
+	kind = strchr (typeref, ':');
+	if (kind == NULL)
+		return es_false;
+
+	r = es_object_autounref (es_string_newL (typeref,
+											 kind - typeref));
+	return r;
+}
+
+EsObject* dsl_entry_typeref_name (const tagEntry *entry)
+{
+	const char* typeref = entry_xget (entry, "typeref");
+	const char* kind;
+	EsObject *r;
+
+	if (typeref == NULL)
+		return es_false;
+
+	kind = strchr (typeref, ':');
 	if (kind == NULL)
 		return es_false;
 
