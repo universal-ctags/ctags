@@ -925,6 +925,9 @@ static vString *iFileGetLine (bool chop_newline)
 		if (chopped && !chop_newline)
 			vStringPutNewlinAgainUnsafe (File.line);
 
+		File.line->size = File.line->length == 0 ? 2 : File.line->length + 1;
+		File.line->buffer = xRealloc (File.line->buffer, File.line->size, char);
+
 		return File.line;
 	}
 	else
