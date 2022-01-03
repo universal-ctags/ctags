@@ -13,7 +13,7 @@ Find tag file entries matching specified names
 SYNOPSIS
 --------
 |	**readtags** -h | --help
-|	**readtags** (-H | --help-expression) (filter|sorter)
+|	**readtags** (-H | --help-expression) (filter|sorter|formatter)
 |	**readtags** [OPTION]... ACTION
 
 DESCRIPTION
@@ -21,8 +21,8 @@ DESCRIPTION
 The **readtags** program filters, sorts and prints tag entries in a tags file.
 The basic filtering is done using **actions**, by which you can list all
 regular tags, pseudo tags or regular tags matching specific name. Then, further
-filtering and sorting can be done using **post processors**, namely **filter
-expressions** and **sorter expressions**.
+filtering, sorting, and formatting can be done using **post processors**, namely
+**filter expressions**, **sorter expressions**, and **formatter expressions**.
 
 ACTIONS
 -------
@@ -91,15 +91,19 @@ human-readable, but when utilizing readtags output in a script or a client
 tool, ``-E`` option should be used. See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` for more
 discussion on this.
 
-Filtering and Sorting
-~~~~~~~~~~~~~~~~~~~~~
-Further filtering and sorting on the tags listed by actions are performed using:
+Filtering, Sorting, and Formatting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Further filtering, sorting, and formatting on the tags listed by actions
+are performed using:
 
 ``-Q EXP``, ``--filter EXP``
 	Filter the tags listed by ACTION with EXP before printing.
 
 ``-S EXP``, ``--sorter EXP``
 	Sort the tags listed by ACTION with EXP before printing.
+
+``-F EXP``, ``--formatter EXP``
+	Format the tags listed by ACTION with EXP when printing.
 
 These are discussed in the `EXPRESSION`_ section.
 
@@ -131,8 +135,8 @@ Examples
 
 EXPRESSION
 ----------
-Scheme-style expressions are used for the ``-Q`` and ``-S`` options. For those
-who doesn't know Scheme or Lisp, just remember:
+Scheme-style expressions are used for the ``-Q``, ``-S``, and ``-F`` options.
+For those who doesn't know Scheme or Lisp, just remember:
 
 * A function call is wrapped in a pair of parenthesis. The first item in it is
   the function/operator name, the others are arguments.
@@ -333,6 +337,72 @@ sorter would look like:
 A quick read tells us: If $-entry has "file" kind, and &-entry doesn't, the
 sorter becomes ``(<> 1 -1)``, which produces ``1``, so the $-entry is put below
 the &-entry, exactly what we want.
+
+Formatting
+~~~~~~~~~~
+A formatter expression defines how readtags prints tag entries.
+
+A formatter expression may produce a string, a boolean, an integer,
+or a list. Readtags prints the produced string, and integer as is.
+Readtags prints nothing for ``#f``, and a newline for ``#t``.
+
+A list could contain any number of strings, booleans,
+integers, and/or lists. Readtags prints the elements of a list
+sequentially and recursively.
+
+All the operators for filtering are also available in formatter
+expressions. In addition to the operators, ``list`` is available
+in formatter expressions. As the name shows, ``list`` is for
+making a list. ``list`` makes a list containing arguments passed to
+the operator. e.g., the following expression makes a list contains
+``1``, ``#f``, and ``"hello"``:
+
+.. code-block:: lisp
+
+   (list 1 #f "hello")
+
+NOTE: Unlike real-Lisp, backquote constructs are not available.
+
+To show some examples, the following tags file (``output.tags``) is assumed
+as input for readtags:
+
+.. code-block:: tags
+
+   M	input.c	4;"	macro	file:
+   N	input.c	3;"	macro	file:
+   bar	input.c	11;"	f	typeref:typename:void	file:	signature:(char ** argv,int * r)
+   foo	input.c	6;"	f	typeref:typename:int	file:	signature:(int v)
+   main	input.c	16;"	f	typeref:typename:int	signature:(int argc,char ** argv)
+
+An exapmle for printing only function names:
+
+.. code-block:: console
+
+   $ readtags -t output.tags -Q '(eq? $kind "function")' -F '(list $name #t)' -l
+   bar
+   foo
+   main
+
+Doing the same only with a formatter expression:
+
+.. code-block:: console
+
+   $ readtags -t output.tags -F '(if (eq? $kind "function") (list $name #t) #f)' -l
+   bar
+   foo
+   main
+
+Generating declarations for the functions:
+
+.. code-block:: console
+
+   $ readtags -t output.tags -F \
+     '(if (eq? $kind "function")
+         (list (if $file "static " #f) $typeref-name " " $name $signature ";" #t)
+        #f)' -l
+   static void bar(char ** argv,int * r);
+   static int foo(int v);
+   int main(int argc,char ** argv);
 
 Inspecting the Behavior of Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
