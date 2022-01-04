@@ -7,6 +7,9 @@ f	input.bas	/^Function f()$/;"	f
 g	input.bas	/^dim shared as string g$/;"	v
 h	input.bas	/^dim as string ptr h$/;"	v
 i	input.bas	/^dim as string * 4096 i$/;"	v
+j	input.bas	/^dim j as string="Export_GIR_FULL_"+mid(date,7)+","+mid(date,1,2)+""+mid(date,4,2)+".csv"$/;"	v
+k	input.bas	/^dim as string k="Export_GIR_FULL_"+mid(date(),"(")+","+mid(date,1,2)+""+mid(date,4,2)+".csv", l$/;"	v
+l	input.bas	/^dim as string k="Export_GIR_FULL_"+mid(date(),"(")+","+mid(date,1,2)+""+mid(date,4,2)+".csv", l$/;"	v
 one	input.bas	/^Const one = 1$/;"	c
 start	input.bas	/^start:$/;"	l
 str	input.bas	/^DIM AS STRING str$/;"	v

@@ -81,6 +81,41 @@ static KeyWord basic_keywords[] = {
  *   FUNCTION DEFINITIONS
  */
 
+static const char *skipToMatching (char begin, char end, const char *pos)
+{
+	int counter = 1;
+	pos++;
+	while (*pos && counter > 0)
+	{
+		if (*pos == end)
+			counter--;
+		else if (*pos == begin)
+			counter++;
+		else if (*pos == '"')
+			pos = skipToMatching ('"', '"', pos) - 1;
+		pos++;
+	}
+	return pos;
+}
+
+static const char *nextPos (const char *pos)
+{
+	if (*pos == '\0')
+		return pos;
+
+	pos++;
+	switch (*pos)
+	{
+		case '(':
+			pos = skipToMatching ('(', ')', pos);
+			break;
+		case '"':
+			pos = skipToMatching ('"', '"', pos);
+			break;
+	}
+	return pos;
+}
+
 static bool isIdentChar (char c)
 {
 	return c && !isspace (c) && c != '(' && c != ',' && c != '=';
@@ -134,7 +169,7 @@ static void extract_dim (char const *pos, BasicKind kind)
 	{
 		/* skip all we don't need(e.g. "..., new_array(5), " we skip "(5)") */
 		while (*pos != ',' && *pos != '\'' && *pos)
-			pos++;
+			pos = nextPos (pos);
 
 		if (*pos == '\'')
 			break; /* break if we are in a comment */
