@@ -81,6 +81,11 @@ static KeyWord basic_keywords[] = {
  *   FUNCTION DEFINITIONS
  */
 
+static bool isIdentChar (char c)
+{
+	return c && !isspace (c) && c != '(' && c != ',' && c != '=';
+}
+
 /* Match the name of a dim or const starting at pos. */
 static void extract_dim (char const *pos, BasicKind kind)
 {
@@ -120,7 +125,7 @@ static void extract_dim (char const *pos, BasicKind kind)
 			pos++;
 	}
 
-	for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ',' && *pos != '='; pos++)
+	for (; isIdentChar (*pos); pos++)
 		vStringPut (name, *pos);
 	makeSimpleTag (name, kind);
 
@@ -141,7 +146,7 @@ static void extract_dim (char const *pos, BasicKind kind)
 			break; /* break if we are in a comment */
 
 		vStringClear (name);
-		for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ',' && *pos != '='; pos++)
+		for (; isIdentChar (*pos); pos++)
 			vStringPut (name, *pos);
 		makeSimpleTag (name, kind);
 	}
@@ -153,7 +158,7 @@ static void extract_dim (char const *pos, BasicKind kind)
 static void extract_name (char const *pos, BasicKind kind)
 {
 	vString *name = vStringNew ();
-	for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ',' && *pos != '='; pos++)
+	for (; isIdentChar (*pos); pos++)
 		vStringPut (name, *pos);
 	makeSimpleTag (name, kind);
 	vStringDelete (name);
