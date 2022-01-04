@@ -39,8 +39,6 @@ Changes known by devs worth backporting:
 They have these additional language parsers:
 
 * `DocBook <https://en.wikipedia.org/wiki/DocBook>`_
-* `Ferite (c.c) <https://en.wikipedia.org/wiki/Ferite>`_
-* `GLSL (c.c) <https://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
 * `Vala (c.c) <https://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
 
 Software using ctags
