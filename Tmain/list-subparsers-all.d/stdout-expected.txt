@@ -10,7 +10,7 @@ IPythonCell          Python     base => sub {shared}
 ITcl                 Tcl        base <> sub {bidirectional}
 Maven2               XML        base <> sub {bidirectional}
 Moose                Perl       base <> sub {bidirectional}
-OpenApi              Yaml       base <> sub {bidirectional}
+OpenAPI              Yaml       base <> sub {bidirectional}
 PlistXML             XML        base <> sub {bidirectional}
 PythonLoggingConfig  Iniconf    base <> sub {bidirectional}
 QtMoc                C++        base <> sub {bidirectional}

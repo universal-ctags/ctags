@@ -347,7 +347,7 @@ extern parserDefinition* OpenApiParser (void)
 		{ DEPTYPE_SUBPARSER, "Yaml", &openapiSubparser },
 	};
 
-	parserDefinition* const def = parserNew ("OpenApi");
+	parserDefinition* const def = parserNew ("OpenAPI");
 
 
 	def->dependencies = dependencies;
