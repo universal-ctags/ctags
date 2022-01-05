@@ -37,7 +37,6 @@ typedef enum {
 typedef struct {
 	char const *token;
 	BasicKind kind;
-	int skip;
 } KeyWord;
 
 static kindDefinition BasicKinds[] = {
@@ -49,76 +48,182 @@ static kindDefinition BasicKinds[] = {
 	{true, 'g', "enum", "enumerations"}
 };
 
-static KeyWord blitzbasic_keywords[] = {
-	{"const", K_CONST, 0},
-	{"global", K_VARIABLE, 0},
-	{"dim", K_VARIABLE, 0},
-	{"function", K_FUNCTION, 0},
-	{"type", K_TYPE, 0},
-	{NULL, 0, 0}
-};
+static KeyWord basic_keywords[] = {
+	/* freebasic */
+	{"const", K_CONST},
+	{"dim", K_VARIABLE},
+	{"common", K_VARIABLE},
+	{"function", K_FUNCTION},
+	{"sub", K_FUNCTION},
+	{"private sub", K_FUNCTION},
+	{"public sub", K_FUNCTION},
+	{"private function", K_FUNCTION},
+	{"public function", K_FUNCTION},
+	{"property", K_FUNCTION},
+	{"constructor", K_FUNCTION},
+	{"destructor", K_FUNCTION},
+	{"type", K_TYPE},
+	{"enum", K_ENUM},
 
-static KeyWord purebasic_keywords[] = {
-	{"newlist", K_VARIABLE, 0},
-	{"global", K_VARIABLE, 0},
-	{"dim", K_VARIABLE, 0},
-	{"procedure", K_FUNCTION, 0},
-	{"interface", K_TYPE, 0},
-	{"structure", K_TYPE, 0},
-	{NULL, 0, 0}
-};
+	/* blitzbasic, purebasic */
+	{"global", K_VARIABLE},
 
-static KeyWord freebasic_keywords[] = {
-	{"const", K_CONST, 0},
-	{"dim as", K_VARIABLE, 1},
-	{"dim", K_VARIABLE, 0},
-	{"common", K_VARIABLE, 0},
-	{"function", K_FUNCTION, 0},
-	{"sub", K_FUNCTION, 0},
-	{"private sub", K_FUNCTION, 0},
-	{"public sub", K_FUNCTION, 0},
-	{"private function", K_FUNCTION, 0},
-	{"public function", K_FUNCTION, 0},
-	{"type", K_TYPE, 0},
-	{"enum", K_ENUM, 0},
-	{NULL, 0, 0}
+	/* purebasic */
+	{"newlist", K_VARIABLE},
+	{"procedure", K_FUNCTION},
+	{"interface", K_TYPE},
+	{"structure", K_TYPE},
+
+	{NULL, 0}
 };
 
 /*
  *   FUNCTION DEFINITIONS
  */
 
-/* Match the name of a tag (function, variable, type, ...) starting at pos. */
-static char const *extract_name (char const *pos, vString * name)
+static const char *skipToMatching (char begin, char end, const char *pos)
 {
-	while (isspace (*pos))
+	int counter = 1;
+	pos++;
+	while (*pos && counter > 0)
+	{
+		if (*pos == end)
+			counter--;
+		else if (*pos == begin)
+			counter++;
+		else if (*pos == '"')
+			pos = skipToMatching ('"', '"', pos) - 1;
 		pos++;
-	vStringClear (name);
-	for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ','; pos++)
-		vStringPut (name, *pos);
+	}
 	return pos;
 }
 
-/* Match a keyword starting at p (case insensitive). */
-static int match_keyword (const char *p, KeyWord const *kw)
+static const char *nextPos (const char *pos)
 {
-	vString *name;
+	if (*pos == '\0')
+		return pos;
+
+	pos++;
+	switch (*pos)
+	{
+		case '(':
+			pos = skipToMatching ('(', ')', pos);
+			break;
+		case '"':
+			pos = skipToMatching ('"', '"', pos);
+			break;
+	}
+	return pos;
+}
+
+static bool isIdentChar (char c)
+{
+	return c && !isspace (c) && c != '(' && c != ',' && c != '=';
+}
+
+/* Match the name of a dim or const starting at pos. */
+static void extract_dim (char const *pos, BasicKind kind)
+{
+	vString *name = vStringNew ();
+
+	if (strncasecmp (pos, "shared", 6) == 0)
+		pos += 6; /* skip keyword "shared" */
+
+	while (isspace (*pos))
+		pos++;
+
+	/* capture "dim as String str" */
+	if (strncasecmp (pos, "as", 2) == 0)
+	{
+			pos += 2; /* skip keyword "as" */
+
+		while (isspace (*pos))
+			pos++;
+		while (!isspace (*pos) && *pos) /* skip next part which is a type */
+			pos++;
+		while (isspace (*pos))
+			pos++;
+		/* now we are at the name */
+	}
+	/* capture "dim as foo ptr bar" */
+	if (strncasecmp (pos, "ptr", 3) == 0 && isspace(*(pos+3)))
+	{
+		pos += 3; /* skip keyword "ptr" */
+		while (isspace (*pos))
+			pos++;
+	}
+	/*	capture "dim as string * 4096 chunk" */
+	if (strncmp (pos, "*", 1) == 0)
+	{
+		pos += 1; /* skip "*" */
+		while (isspace (*pos) || isdigit(*pos) || ispunct(*pos))
+			pos++;
+	}
+
+	for (; isIdentChar (*pos); pos++)
+		vStringPut (name, *pos);
+	makeSimpleTag (name, kind);
+
+	/* if the line contains a ',', we have multiple declarations */
+	while (*pos && strchr (pos, ','))
+	{
+		/* skip all we don't need(e.g. "..., new_array(5), " we skip "(5)") */
+		while (*pos != ',' && *pos != '\'' && *pos)
+			pos = nextPos (pos);
+
+		if (*pos == '\'')
+			break; /* break if we are in a comment */
+
+		while (isspace (*pos) || *pos == ',')
+			pos++;
+
+		if (*pos == '\'')
+			break; /* break if we are in a comment */
+
+		vStringClear (name);
+		for (; isIdentChar (*pos); pos++)
+			vStringPut (name, *pos);
+		makeSimpleTag (name, kind);
+	}
+
+	vStringDelete (name);
+}
+
+/* Match the name of a tag (function, variable, type, ...) starting at pos. */
+static void extract_name (char const *pos, BasicKind kind)
+{
+	vString *name = vStringNew ();
+	for (; isIdentChar (*pos); pos++)
+		vStringPut (name, *pos);
+	makeSimpleTag (name, kind);
+	vStringDelete (name);
+}
+
+/* Match a keyword starting at p (case insensitive). */
+static bool match_keyword (const char *p, KeyWord const *kw)
+{
 	size_t i;
-	int j;
+	const char *old_p;
 	for (i = 0; i < strlen (kw->token); i++)
 	{
 		if (tolower (p[i]) != kw->token[i])
-			return 0;
+			return false;
 	}
-	name = vStringNew ();
 	p += i;
-	for (j = 0; j < 1 + kw->skip; j++)
-	{
-		p = extract_name (p, name);
-	}
-	makeSimpleTag (name, kw->kind);
-	vStringDelete (name);
-	return 1;
+
+	old_p = p;
+	while (isspace (*p))
+		p++;
+
+	/* create tags only if there is some space between the keyword and the identifier */
+	if (old_p == p)
+		return false;
+
+	if (kw->kind == K_VARIABLE)
+		extract_dim (p, kw->kind); /* extract_dim adds the found tag(s) */
+	else
+		extract_name (p, kw->kind);
+	return true;
 }
 
 /* Match a "label:" style label. */
@@ -140,26 +245,12 @@ static void match_colon_label (char const *p)
 static void match_dot_label (char const *p)
 {
 	if (*p == '.')
-	{
-		vString *name = vStringNew ();
-		extract_name (p + 1, name);
-		makeSimpleTag (name, K_LABEL);
-		vStringDelete (name);
-	}
+		extract_name (p + 1, K_LABEL);
 }
 
 static void findBasicTags (void)
 {
 	const char *line;
-	const char *extension = fileExtension (getInputFileName ());
-	KeyWord *keywords;
-
-	if (strcmp (extension, "bb") == 0)
-		keywords = blitzbasic_keywords;
-	else if (strcmp (extension, "pb") == 0)
-		keywords = purebasic_keywords;
-	else
-		keywords = freebasic_keywords;
 
 	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
@@ -183,11 +274,11 @@ static void findBasicTags (void)
 			continue;
 
 		/* In Basic, keywords always are at the start of the line. */
-		for (kw = keywords; kw->token; kw++)
+		for (kw = basic_keywords; kw->token; kw++)
 			if (match_keyword (p, kw)) break;
 
 		/* Is it a label? */
-		if (strcmp (extension, "bb") == 0)
+		if (*p == '.')
 			match_dot_label (p);
 		else
 			match_colon_label (p);
