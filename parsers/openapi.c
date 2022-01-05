@@ -26,6 +26,11 @@ typedef enum {
 	KIND_PATH,
 	KIND_RESPONSE,
 	KIND_PARAMETER,
+	KIND_INFO,
+	KIND_SERVER,
+	KIND_SECURITY,
+	KIND_TAG,
+	KIND_EXTERNAL_DOCS,
 } openapiKind;
 
 static kindDefinition OpenApiKinds [] = {
@@ -33,16 +38,28 @@ static kindDefinition OpenApiKinds [] = {
 	{ true, 'p', "path", "paths" },
 	{ true, 'R', "response", "responses" },
 	{ true, 'P', "parameter", "parameters" },
+	{ true, 'I', "info", "info"},
+	{ true, 'S', "server", "servers"},
+	{ true, 's', "security", "security"},
+	{ true, 't', "tag", "tags"},
+	{ true, 'D', "doc", "docs"},
 };
 
 enum openapiKeys {
-	KEY_UNKNOWN,
+	KEY_UNKNOWN, // 0
 	KEY_PATHS,
 	KEY_COMPONENTS,
 	KEY_SCHEMAS,
 	KEY_PARAMETERS,
-	KEY_RESPONSES,
+	KEY_RESPONSES, //5
 	KEY_DEFINITIONS,
+	KEY_INFO,
+	KEY_SERVERS,
+	KEY_SECURITY,
+	KEY_TAG, // 10
+	KEY_EXTERNAL_DOCS,
+	KEY_NAME,
+	KEY_URL,
 };
 
 struct yamlBlockTypeStack {
@@ -143,6 +160,20 @@ static enum openapiKeys parseKey(yaml_token_t *token)
 		return KEY_PARAMETERS;
 	else if (scalarNeq(token, 9, "responses"))
 		return KEY_RESPONSES;
+	else if (scalarNeq(token, 4, "info"))
+		return KEY_INFO;
+	else if (scalarNeq(token, 7, "servers"))
+		return KEY_SERVERS;
+	else if (scalarNeq(token, 8, "security"))
+		return KEY_SECURITY;
+	else if (scalarNeq(token, 4, "tags"))
+		return KEY_TAG;
+	else if (scalarNeq(token, 12, "externalDocs"))
+		return KEY_EXTERNAL_DOCS;
+	else if (scalarNeq(token, 3, "url"))
+		return KEY_NAME;
+	else if (scalarNeq(token, 4, "name"))
+		return KEY_NAME;
 	else
 		return KEY_UNKNOWN;
 }
@@ -203,6 +234,33 @@ static const enum openapiKeys definitions2Keys[] = {
 	KEY_DEFINITIONS,
 };
 
+static const enum openapiKeys info3Keys[] = {
+	KEY_UNKNOWN,
+	KEY_INFO,
+};
+
+// TODO
+static const enum openapiKeys server3Keys[] = {
+	KEY_SERVERS,
+};
+
+static const enum openapiKeys security3Keys[] = {
+	KEY_UNKNOWN,
+	KEY_SECURITY,
+};
+
+static const enum openapiKeys tags3Keys[] = {
+	KEY_NAME,
+	KEY_UNKNOWN,
+	KEY_TAG,
+};
+
+// TODO: subdocuments
+static const enum openapiKeys externalDocs3Keys[] = {
+	KEY_URL,
+	KEY_EXTERNAL_DOCS,
+};
+
 const struct tagSource tagSources[] = {
 	{
 		KIND_PATH,
@@ -238,7 +296,32 @@ const struct tagSource tagSources[] = {
 		KIND_SCHEMA,
 		definitions2Keys,
 		ARRAY_SIZE (definitions2Keys),
-	}
+	},
+	{
+		KIND_INFO,
+		info3Keys,
+		ARRAY_SIZE (info3Keys),
+	},
+	{
+		KIND_SECURITY,
+		security3Keys,
+		ARRAY_SIZE (security3Keys),
+	},
+	{
+		KIND_SERVER,
+		server3Keys,
+		ARRAY_SIZE (server3Keys),
+	},
+	{
+		KIND_TAG,
+		tags3Keys,
+		ARRAY_SIZE (tags3Keys),
+	},
+	{
+		KIND_EXTERNAL_DOCS,
+		externalDocs3Keys,
+		ARRAY_SIZE (externalDocs3Keys),
+	},
 };
 
 static void handleKey(struct sOpenApiSubparser *openapi,
@@ -268,7 +351,7 @@ static void handleKey(struct sOpenApiSubparser *openapi,
 static void	openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
 											 yaml_token_t *token)
 {
-	// printStack(openapi->type_stack);
+	printStack(openapi->type_stack);
 
 	switch (token->type)
 	{

@@ -7,6 +7,8 @@ info:
 servers:
   - url: http://example.com
     description: production
+  - url: http://example2.com
+    description: testing
 
 paths:
     /sample/path:
@@ -53,3 +55,15 @@ components:
                     schema:
                         type: object
                         properties: {}
+
+                          # security: TODO
+
+tags:
+  - name: android_handler
+    description: Handler for Android clients
+  - name: ios_handler
+    description: Handler for iOS clients
+
+externalDocs:
+    description: some docs
+    url: http://example.com
