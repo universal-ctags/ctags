@@ -43,6 +43,7 @@ typedef enum {
 	K_FIELD,
 	K_VARIANT,
 	K_METHOD,
+	K_CONST,
 	K_NONE
 } RustKind;
 
@@ -59,6 +60,7 @@ static kindDefinition rustKinds[] = {
 	{true, 'm', "field", "A struct field"},
 	{true, 'e', "enumerator", "An enum variant"},
 	{true, 'P', "method", "A method"},
+	{true, 'C', "constant", "A constant"},
 };
 
 typedef enum {
@@ -725,6 +727,18 @@ static void parseStatic (lexerState *lexer, vString *scope, int parent_kind)
 	addTag(lexer->token_str, NULL, K_STATIC, lexer->line, lexer->pos, scope, parent_kind);
 }
 
+/* Const format:
+ * "const" <ident>
+ */
+static void parseConst (lexerState *lexer, vString *scope, int parent_kind)
+{
+	advanceToken(lexer, true);
+	if (lexer->cur_token != TOKEN_IDENT)
+		return;
+
+	addTag(lexer->token_str, NULL, K_CONST, lexer->line, lexer->pos, scope, parent_kind);
+}
+
 /* Type format:
  * "type" <ident>
  */
@@ -917,6 +931,10 @@ static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 			else if(strcmp(vStringValue(lexer->token_str), "static") == 0)
 			{
 				parseStatic(lexer, scope, kind);
+			}
+			else if(strcmp(vStringValue(lexer->token_str), "const") == 0)
+			{
+				parseConst(lexer, scope, kind);
 			}
 			else if(strcmp(vStringValue(lexer->token_str), "trait") == 0)
 			{

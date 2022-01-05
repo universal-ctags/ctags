@@ -12,6 +12,7 @@ Foo	input.rs	/^impl Foo {$/;"	c
 Foo	input.rs	/^impl Testable for Foo {$/;"	c
 Foo	input.rs	/^struct Foo{foo_field_1:isize}$/;"	s
 Foo2	input.rs	/^struct Foo2 {$/;"	s
+N	input.rs	/^const N: usize = 10;$/;"	C
 ParametrizedTrait	input.rs	/^trait ParametrizedTrait<T> {$/;"	i
 S1	input.rs	/^struct S1 {$/;"	s
 SomeStruct	input.rs	/^	pub struct SomeStruct;$/;"	s	module:test_input2

@@ -63,6 +63,7 @@ fn array_param(arr: [[u32; 3]; 4])
  */
 
 static size: usize = 1;
+const N: usize = 10;
 
 #[cfg(test)]
 struct S1 {
