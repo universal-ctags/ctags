@@ -56,6 +56,54 @@ components:
                         type: object
                         properties: {}
 
+    examples:
+        Example1: {}
+        Example2: {}
+
+    requestBodies:
+        Body1:
+            description: bla bla bla
+            content:
+                application/json:
+                    schema:
+                        type: string
+        Body2:
+            description: bla bla bla
+            content:
+                application/json:
+                    schema:
+                        type: integer
+
+    headers:
+        Header1:
+            schema:
+                type: string
+        Header2:
+            schema:
+                type: string
+
+    securitySchemes:
+        SSchema1:
+            type: http
+            scheme: basic
+        SSchema2:
+            type: http
+            scheme: basic
+
+    links:
+        Link1: {}
+        Link2: {}
+
+    callbacks:
+        Callback1: {}
+        Callback2: {}
+
+    pathItems:
+        PathItem1: {}
+        PathItem2: {}
+
+
+
 security:
   - type: apiKey
     name: api_key
