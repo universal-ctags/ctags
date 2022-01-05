@@ -6,3 +6,6 @@ PolymorphicInteger	input.yaml	/^    PolymorphicInteger:$/;"	d
 PolymorphicString	input.yaml	/^    PolymorphicString:$/;"	d
 Response1	input.yaml	/^    Response1:$/;"	R
 Response2	input.yaml	/^    Response2:$/;"	R
+description	input.yaml	/^    description: test$/;"	I
+title	input.yaml	/^    title: test$/;"	I
+version	input.yaml	/^    version: '1.0'$/;"	I

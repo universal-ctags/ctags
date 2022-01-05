@@ -49,7 +49,7 @@ static kindDefinition OpenApiKinds [] = {
 	{ true, 'S', "server", "servers"},
 	{ true, 's', "security", "security"},
 	{ true, 't', "tag", "tags"},
-	{ true, 'x', "example", "examples"},
+	{ true, 'e', "example", "examples"},
 	{ true, 'D', "doc", "docs"},
 	{ true, 'B', "requestBody", "requestBodies"},
 	{ true, 'h', "header", "headers"},
@@ -462,7 +462,7 @@ static void handleKey(struct sOpenApiSubparser *openapi,
 					ts->countKeys
 			))
 		{
-			printf("match! i=%d, value=%s\n", i, token->data.scalar.value);
+			// printf("match! i=%d, value=%s\n", i, token->data.scalar.value);
 
 			tagEntryInfo tag;
 			initTagEntry (&tag, (char *)token->data.scalar.value, ts->kind);
@@ -489,7 +489,7 @@ static void handleValue(struct sOpenApiSubparser *openapi,
 					ts->countKeys
 			))
 		{
-			printf("match value! i=%d\n", i);
+			// printf("match value! i=%d\n", i);
 
 			tagEntryInfo tag;
 			initTagEntry (&tag, (char *)token->data.scalar.value, ts->kind);
@@ -504,7 +504,7 @@ static void handleValue(struct sOpenApiSubparser *openapi,
 static void	openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
 											 yaml_token_t *token)
 {
-	printStack(openapi->type_stack);
+	// printStack(openapi->type_stack);
 
 	switch (token->type)
 	{
@@ -515,11 +515,11 @@ static void	openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
 		switch (openapi->play_detection_state) {
 			case DSTAT_LAST_KEY:
 				openapi->type_stack->key = parseKey (token);
-				printf ("  key: %s\n", (char*)token->data.scalar.value);
+				// printf ("  key: %s\n", (char*)token->data.scalar.value);
 				handleKey (openapi, token);
 				break;
 			case DSTAT_LAST_VALUE:
-				printf ("  value: %s\n", (char*)token->data.scalar.value);
+				// printf ("  value: %s\n", (char*)token->data.scalar.value);
 				handleValue (openapi, token);
 				break;
 			default:
