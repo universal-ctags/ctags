@@ -60,6 +60,7 @@ enum openapiKeys {
 	KEY_EXTERNAL_DOCS,
 	KEY_NAME,
 	KEY_URL,
+	KEY_TYPE,
 };
 
 struct yamlBlockTypeStack {
@@ -171,9 +172,11 @@ static enum openapiKeys parseKey(yaml_token_t *token)
 	else if (scalarNeq(token, 12, "externalDocs"))
 		return KEY_EXTERNAL_DOCS;
 	else if (scalarNeq(token, 3, "url"))
-		return KEY_NAME;
+		return KEY_URL;
 	else if (scalarNeq(token, 4, "name"))
 		return KEY_NAME;
+	else if (scalarNeq(token, 4, "type"))
+		return KEY_TYPE;
 	else
 		return KEY_UNKNOWN;
 }
@@ -239,12 +242,16 @@ static const enum openapiKeys info3Keys[] = {
 	KEY_INFO,
 };
 
-// TODO
 static const enum openapiKeys server3Keys[] = {
+	KEY_URL,
+	KEY_UNKNOWN,
 	KEY_SERVERS,
 };
 
+// The tag "type" is used as a poor man's tag title.
+// That's because "name" can be set with type=apiKey only :(
 static const enum openapiKeys security3Keys[] = {
+	KEY_TYPE,
 	KEY_UNKNOWN,
 	KEY_SECURITY,
 };
@@ -255,7 +262,6 @@ static const enum openapiKeys tags3Keys[] = {
 	KEY_TAG,
 };
 
-// TODO: subdocuments
 static const enum openapiKeys externalDocs3Keys[] = {
 	KEY_URL,
 	KEY_EXTERNAL_DOCS,
@@ -302,11 +308,9 @@ const struct tagSource tagSources[] = {
 		info3Keys,
 		ARRAY_SIZE (info3Keys),
 	},
-	{
-		KIND_SECURITY,
-		security3Keys,
-		ARRAY_SIZE (security3Keys),
-	},
+};
+
+const struct tagSource tagValueSources[] = {
 	{
 		KIND_SERVER,
 		server3Keys,
@@ -321,6 +325,11 @@ const struct tagSource tagSources[] = {
 		KIND_EXTERNAL_DOCS,
 		externalDocs3Keys,
 		ARRAY_SIZE (externalDocs3Keys),
+	},
+	{
+		KIND_SECURITY,
+		security3Keys,
+		ARRAY_SIZE (security3Keys),
 	},
 };
 
@@ -348,10 +357,35 @@ static void handleKey(struct sOpenApiSubparser *openapi,
 	}
 }
 
+
+static void handleValue(struct sOpenApiSubparser *openapi,
+						yaml_token_t *token)
+{
+	int i;
+	for (i = 0; i < ARRAY_SIZE(tagValueSources); i++)
+	{
+		const struct tagSource* ts = &tagValueSources[i];
+
+		if (stateStackMatch(
+					openapi->type_stack,
+					ts->keys,
+					ts->countKeys
+			))
+		{
+
+			tagEntryInfo tag;
+			initTagEntry (&tag, (char *)token->data.scalar.value, ts->kind);
+			attachYamlPosition (&tag, token, false);
+
+			makeTagEntry (&tag);
+		}
+	}
+}
+
 static void	openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
 											 yaml_token_t *token)
 {
-	printStack(openapi->type_stack);
+	// printStack(openapi->type_stack);
 
 	switch (token->type)
 	{
@@ -361,12 +395,13 @@ static void	openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
 	case YAML_SCALAR_TOKEN:
 		switch (openapi->play_detection_state) {
 			case DSTAT_LAST_KEY:
-				openapi->type_stack->key = parseKey(token);
-				//printf("  key: %s\n", (char*)token->data.scalar.value);
+				openapi->type_stack->key = parseKey (token);
+				// printf ("  key: %s\n", (char*)token->data.scalar.value);
 				handleKey (openapi, token);
 				break;
 			case DSTAT_LAST_VALUE:
-				//printf("  value: %s\n", (char*)token->data.scalar.value);
+				// printf ("  value: %s\n", (char*)token->data.scalar.value);
+				handleValue (openapi, token);
 				break;
 			default:
 				break;

@@ -56,7 +56,12 @@ components:
                         type: object
                         properties: {}
 
-                          # security: TODO
+security:
+  - type: apiKey
+    name: api_key
+    in: header
+  - type: http
+    scheme: basic
 
 tags:
   - name: android_handler
