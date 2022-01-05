@@ -356,6 +356,5 @@ extern parserDefinition* OpenApiParser (void)
 	def->kindTable	= OpenApiKinds;
 	def->kindCount = ARRAY_SIZE (OpenApiKinds);
 	def->parser	= findOpenApiTags;
-	def->useCork = CORK_NIL;
 	return def;
 }
