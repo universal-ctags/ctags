@@ -359,5 +359,3 @@ extern parserDefinition* OpenApiParser (void)
 	def->useCork = CORK_NIL;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */
