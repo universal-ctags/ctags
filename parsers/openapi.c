@@ -131,20 +131,20 @@ static bool scalarNeq (yaml_token_t *token, unsigned int len, const char* val)
 
 static enum openapiKeys parseKey(yaml_token_t *token)
 {
-  if (scalarNeq(token, 10, "components"))
-	  return KEY_COMPONENTS;
-  else if (scalarNeq(token, 7, "schemas"))
-	  return KEY_SCHEMAS;
-  else if (scalarNeq(token, 5, "paths"))
-	  return KEY_PATHS;
-  else if (scalarNeq(token, 11, "definitions"))
-	  return KEY_DEFINITIONS;
-  else if (scalarNeq(token, 10, "parameters"))
-	  return KEY_PARAMETERS;
-  else if (scalarNeq(token, 9, "responses"))
-	  return KEY_RESPONSES;
-  else
-	  return KEY_UNKNOWN;
+	if (scalarNeq(token, 10, "components"))
+		return KEY_COMPONENTS;
+	else if (scalarNeq(token, 7, "schemas"))
+		return KEY_SCHEMAS;
+	else if (scalarNeq(token, 5, "paths"))
+		return KEY_PATHS;
+	else if (scalarNeq(token, 11, "definitions"))
+		return KEY_DEFINITIONS;
+	else if (scalarNeq(token, 10, "parameters"))
+		return KEY_PARAMETERS;
+	else if (scalarNeq(token, 9, "responses"))
+		return KEY_RESPONSES;
+	else
+		return KEY_UNKNOWN;
 }
 
 static void printStack(struct yamlBlockTypeStack* stack)
@@ -245,14 +245,16 @@ static void handleKey(struct sOpenApiSubparser *openapi,
 											 yaml_token_t *token)
 {
 	int i;
-	for (i = 0; i < ARRAY_SIZE(tagSources); i++) {
+	for (i = 0; i < ARRAY_SIZE(tagSources); i++)
+	{
 		const struct tagSource* ts = &tagSources[i];
 
 		if (stateStackMatch(
 					openapi->type_stack,
 					ts->keys,
 					ts->countKeys
-					)) {
+			))
+		{
 
 			tagEntryInfo tag;
 			initTagEntry (&tag, (char *)token->data.scalar.value, ts->kind);
