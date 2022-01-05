@@ -8,6 +8,9 @@
 *   This module contains functions for generating tags for reStructuredText (reST) files.
 *
 *   This module was ported from geany.
+*
+*   References:
+*      https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html
 */
 
 /*
@@ -25,23 +28,29 @@
 #include "entry.h"
 #include "routines.h"
 #include "field.h"
+#include "htable.h"
+#include "debug.h"
 
 /*
 *   DATA DEFINITIONS
 */
 typedef enum {
 	K_EOF = -1,
-	K_CHAPTER = 0,
+	K_TITLE = 0,
+	K_SUBTITLE,
+	K_CHAPTER,
 	K_SECTION,
 	K_SUBSECTION,
 	K_SUBSUBSECTION,
-	K_CITATION,
+	SECTION_COUNT,
+	K_CITATION = SECTION_COUNT,
 	K_TARGET,
 	K_SUBSTDEF,
-	SECTION_COUNT
 } rstKind;
 
 static kindDefinition RstKinds[] = {
+	{ true, 'H', "title",         "titles"},
+	{ true, 'h', "subtitle",      "sub titles" },
 	{ true, 'c', "chapter",       "chapters"},
 	{ true, 's', "section",       "sections" },
 	{ true, 'S', "subsection",    "subsections" },
@@ -53,6 +62,7 @@ static kindDefinition RstKinds[] = {
 
 typedef enum {
 	F_SECTION_MARKER,
+	F_SECTION_OVERLINE,
 } rstField;
 
 static fieldDefinition RstFields [] = {
@@ -61,11 +71,27 @@ static fieldDefinition RstFields [] = {
 		.description = "character used for declaring section",
 		.enabled = false,
 	},
+	{
+		.name = "overline",
+		.description = "whether using overline & underline for declaring section",
+		.enabled = false,
+		.dataType = FIELDTYPE_BOOL
+	},
 };
 
-static char kindchars[SECTION_COUNT];
-
 static NestingLevels *nestingLevels = NULL;
+
+struct sectionTracker {
+	char kindchar;
+	bool overline;
+	int count;
+};
+
+struct olineTracker
+{
+	char c;
+	size_t len;
+};
 
 /*
 *   FUNCTION DEFINITIONS
@@ -109,21 +135,14 @@ static int makeTargetRstTag(const vString* const name, rstKind kindex)
 	initTagEntry (&e, vStringValue (name), kindex);
 
 	const NestingLevel *nl = nestingLevelsGetCurrent(nestingLevels);
-	tagEntryInfo *parent = NULL;
 	if (nl)
-		parent = getEntryOfNestingLevel (nl);
-
-	if (parent)
-	{
-		e.extensionFields.scopeKindIndex = parent->kindIndex;
-		e.extensionFields.scopeName = parent->name;
-	}
+		e.extensionFields.scopeIndex = nl->corkIndex;
 
 	return makeTagEntry (&e);
 }
 
 static void makeSectionRstTag(const vString* const name, const int kind, const MIOPos filepos,
-		       char marker)
+		       char marker, bool overline)
 {
 	const NestingLevel *const nl = getNestingLevel(kind);
 	tagEntryInfo *parent;
@@ -142,29 +161,14 @@ static void makeSectionRstTag(const vString* const name, const int kind, const M
 
 		parent = getEntryOfNestingLevel (nl);
 		if (parent && (parent->kindIndex < kind))
-		{
-#if 1
-			e.extensionFields.scopeKindIndex = parent->kindIndex;
-			e.extensionFields.scopeName = parent->name;
-#else
-			/* TODO
-
-			   Following code makes the scope information full qualified form.
-			   Do users want the full qualified form?
-			   --- ./Units/rst.simple.d/expected.tags	2015-12-18 01:32:35.574255617 +0900
-			   +++ /home/yamato/var/ctags-github/Units/rst.simple.d/FILTERED.tmp	2016-05-05 03:05:38.165604756 +0900
-			   @@ -5,2 +5,2 @@
-			   -Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Section 1.1
-			   -Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Subsection 1.1.1
-			   +Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Chapter 1.Section 1.1
-			   +Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Chapter 1.Section 1.1.Subsection 1.1.1
-			*/
-			   e.extensionFields.scopeIndex = nl->corkIndex;
-#endif
-		}
+			e.extensionFields.scopeIndex = nl->corkIndex;
 
 		m[0] = marker;
 		attachParserField (&e, false, RstFields [F_SECTION_MARKER].ftype, m);
+
+		if (overline)
+			attachParserField (&e, false, RstFields [F_SECTION_OVERLINE].ftype, "");
+
 		r = makeTagEntry (&e);
 	}
 	nestingLevelsPush(nestingLevels, r);
@@ -189,18 +193,23 @@ static bool issame(const char *str)
 }
 
 
-static int get_kind(char c)
+static int get_kind(char c, bool overline, struct sectionTracker tracker[])
 {
 	int i;
 
 	for (i = 0; i < SECTION_COUNT; i++)
 	{
-		if (kindchars[i] == c)
-			return i;
-
-		if (kindchars[i] == 0)
+		if (tracker[i].kindchar == c && tracker[i].overline == overline)
 		{
-			kindchars[i] = c;
+			tracker[i].count++;
+			return i;
+		}
+
+		if (tracker[i].count == 0)
+		{
+			tracker[i].count = 1;
+			tracker[i].kindchar = c;
+			tracker[i].overline = overline;
 			return i;
 		}
 	}
@@ -303,22 +312,146 @@ static int capture_markup (const unsigned char *target_line, char defaultTermina
 	return r;
 }
 
-/* TODO: parse overlining & underlining as distinct sections. */
+static void overline_clear(struct olineTracker *ol)
+{
+	ol->c = 0;
+	ol->len = 0;
+}
+
+static void overline_set(struct olineTracker *ol, char c, size_t len)
+{
+	ol->c = c;
+	ol->len = len;
+}
+
+static bool has_overline(struct olineTracker *ol)
+{
+	return (ol->c != 0);
+}
+
+static int getFosterEntry(tagEntryInfo *e, int shift)
+{
+	int r = CORK_NIL;
+
+	while (shift-- > 0)
+	{
+		r = e->extensionFields.scopeIndex;
+		Assert(r != CORK_NIL);
+		e = getEntryInCorkQueue(r);
+		Assert(e);
+	}
+	return r;
+}
+
+static void shiftKinds(int shift, rstKind baseKind)
+{
+	size_t count = countEntryInCorkQueue();
+	hashTable *remapping_table = hashTableNew (count,
+											   hashPtrhash,
+											   hashPtreq, NULL, NULL);
+	hashTableSetValueForUnknownKey(remapping_table, HT_INT_TO_PTR(CORK_NIL), NULL);
+
+	for (int index = 0; index < count; index++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue(index);
+		if (e && (baseKind <= e->kindIndex && e->kindIndex < SECTION_COUNT))
+		{
+			e->kindIndex += shift;
+			if (e->kindIndex >= SECTION_COUNT)
+			{
+				markTagPlaceholder(e, true);
+
+				int foster_parent = getFosterEntry(e, shift);
+				Assert (foster_parent != CORK_NIL);
+				hashTablePutItem(remapping_table, HT_INT_TO_PTR(index),
+								 HT_INT_TO_PTR(foster_parent));
+			}
+		}
+	}
+
+	for (int index = 0; index < count; index++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue(index);
+		if (e && e->extensionFields.scopeIndex != CORK_NIL)
+		{
+			void *remapping_to = hashTableGetItem (remapping_table,
+												   HT_INT_TO_PTR(e->extensionFields.scopeIndex));
+			if (HT_PTR_TO_INT(remapping_to) != CORK_NIL)
+				e->extensionFields.scopeIndex = HT_PTR_TO_INT(remapping_to);
+		}
+	}
+	hashTableDelete(remapping_table);
+}
+
+static void adjustSectionKinds(struct sectionTracker section_tracker[])
+{
+	if (section_tracker[K_TITLE].count > 1)
+	{
+		shiftKinds(2, K_TITLE);
+		return;
+	}
+
+	if (section_tracker[K_TITLE].count == 1
+		&& section_tracker[K_SUBTITLE].count > 1)
+	{
+		shiftKinds(1, K_SUBTITLE);
+		return;
+	}
+}
+
+static void inlineTagScope(tagEntryInfo *e, int parent_index)
+{
+	tagEntryInfo *parent = getEntryInCorkQueue (parent_index);
+	if (parent)
+	{
+		e->extensionFields.scopeKindIndex = parent->kindIndex;
+		e->extensionFields.scopeName = eStrdup(parent->name);
+		e->extensionFields.scopeIndex = CORK_NIL;
+	}
+}
+
+static void inlineScopes (void)
+{
+	/* TODO
+	   Following code makes the scope information full qualified form.
+	   Do users want the full qualified form?
+	   --- ./Units/rst.simple.d/expected.tags	2015-12-18 01:32:35.574255617 +0900
+	   +++ /home/yamato/var/ctags-github/Units/rst.simple.d/FILTERED.tmp	2016-05-05 03:05:38.165604756 +0900
+	   @@ -5,2 +5,2 @@
+	   -Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Section 1.1
+	   -Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Subsection 1.1.1
+	   +Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Chapter 1.Section 1.1
+	   +Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Chapter 1.Section 1.1.Subsection 1.1.1
+	*/
+	size_t count = countEntryInCorkQueue();
+	for (int index = 0; index < count; index++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue(index);
+
+		if (e && e->extensionFields.scopeIndex != CORK_NIL)
+			inlineTagScope(e, e->extensionFields.scopeIndex);
+	}
+}
+
 static void findRstTags (void)
 {
 	vString *name = vStringNew ();
 	MIOPos filepos;
 	const unsigned char *line;
 	const unsigned char *markup_line;
+	struct sectionTracker section_tracker[SECTION_COUNT];
+	struct olineTracker overline;
 
 	memset(&filepos, 0, sizeof(filepos));
-	memset(kindchars, 0, sizeof kindchars);
+	memset(section_tracker, 0, sizeof section_tracker);
+	overline_clear(&overline);
 	nestingLevels = nestingLevelsNew(0);
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		if ((markup_line = is_markup_line (line, '_')) != NULL)
 		{
+			overline_clear(&overline);
 			/* Handle .. _target:
 			 * http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#hyperlink-targets
 			 */
@@ -330,6 +463,7 @@ static void findRstTags (void)
 		}
 		else if ((markup_line = is_markup_line (line, '[')) != NULL)
 		{
+			overline_clear(&overline);
 			/* Handle .. [citation]
 			 * https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#citations
 			 */
@@ -341,6 +475,7 @@ static void findRstTags (void)
 		}
 		else if ((markup_line = is_markup_line (line, '|')) != NULL)
 		{
+			overline_clear(&overline);
 			/* Hanle .. |substitute definition|
 			 * https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#substitution-definitions
 			 */
@@ -362,23 +497,58 @@ static void findRstTags (void)
 		if (name_len < 0)
 			name_len = name_len_bytes;
 
+		/* overline may come after an empty line (or begging of file). */
+		if (name_len_bytes == 0 && line_len > 0 &&
+			ispunct(line[0]) && issame((const char*) line))
+		{
+			overline_set(&overline, *line, line_len);
+			continue;
+		}
+
 		/* underlines must be the same length or more */
 		if (line_len >= name_len && name_len > 0 &&
 			ispunct(line[0]) && issame((const char*) line))
 		{
 			char c = line[0];
-			int kind = get_kind(c);
+			bool o = (overline.c == c && overline.len == line_len);
+			int kind = get_kind(c, o, section_tracker);
+
+			overline_clear(&overline);
 
 			if (kind >= 0)
 			{
-				makeSectionRstTag(name, kind, filepos, c);
+				makeSectionRstTag(name, kind, filepos, c, o);
+				vStringClear(name);
 				continue;
 			}
 		}
+
+		if (has_overline(&overline))
+		{
+			if (name_len > 0)
+			{
+				/*
+				 * Though we saw an overline and a section title text,
+				 * we cannot find the associated underline.
+				 * In that case, we must reset the state of tracking
+				 * overline.
+				 */
+				overline_clear(&overline);
+			}
+
+			/*
+			 * We san an overline. The line is the candidate
+			 * of a section title text. Skip the prefixed whitespaces.
+			 */
+			while (isspace(*line))
+				line++;
+		}
+
 		vStringClear (name);
 		if (!isspace(*line))
 		{
 			vStringCatS(name, (const char*)line);
+			vStringStripTrailing (name);
 			filepos = getInputFilePosition();
 		}
 	}
@@ -386,6 +556,9 @@ static void findRstTags (void)
 	getNestingLevel (K_EOF);
 	vStringDelete (name);
 	nestingLevelsFree(nestingLevels);
+
+	adjustSectionKinds(section_tracker);
+	inlineScopes();
 }
 
 extern parserDefinition* RstParser (void)

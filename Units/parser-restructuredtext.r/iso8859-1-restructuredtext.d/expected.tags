@@ -1,4 +1,6 @@
-Chàptèr 1	input.rst	/^Chàptèr 1$/;"	c
+Chàptèr 1	input.rst	/^Chàptèr 1$/;"	c	subtitle:Sûbitïtlê
 Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Sùbs
 Séçtiön 1.1	input.rst	/^Séçtiön 1.1$/;"	s	chapter:Chàptèr 1
 Sùbs	input.rst	/^Sùbs$/;"	S	section:Séçtiön 1.1
+Sûbitïtlê	input.rst	/^Sûbitïtlê$/;"	h	title:Tîtlë
+Tîtlë	input.rst	/^Tîtlë$/;"	H

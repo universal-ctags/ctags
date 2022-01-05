@@ -1,2 +1,3 @@
 #LETTER	NAME	ENABLED	LANGUAGE	JSTYPE	FIXED	OP	DESCRIPTION
+-	overline	no	ReStructuredText	--b	no	--	whether using overline & underline for declaring section
 -	sectionMarker	no	ReStructuredText	s--	no	--	character used for declaring section

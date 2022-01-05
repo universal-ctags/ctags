@@ -1,0 +1,30 @@
+TITLE	input.rst	/^TITLE$/;"	title	sectionMarker:=	overline:
+Subtitle	input.rst	/^Subtitle$/;"	subtitle	scope:title:TITLE	sectionMarker:-	overline:
+a	input.rst	/^.. [a] a.rst$/;"	citation	scope:subtitle:Subtitle
+Chapter	input.rst	/^Chapter$/;"	chapter	scope:subtitle:Subtitle	sectionMarker:=
+b	input.rst	/^.. [b] b.rst$/;"	citation	scope:chapter:Chapter
+Section	input.rst	/^Section$/;"	section	scope:chapter:Chapter	sectionMarker:-
+c	input.rst	/^.. [c] c.rst$/;"	citation	scope:section:Section
+Subsection	input.rst	/^Subsection$/;"	subsection	scope:section:Section	sectionMarker:|
+d	input.rst	/^.. [d] d.rst$/;"	citation	scope:subsection:Subsection
+SubSubsection	input.rst	/^SubSubsection$/;"	subsubsection	scope:subsection:Subsection	sectionMarker:.	overline:
+e	input.rst	/^.. [e] e.rst$/;"	citation	scope:subsubsection:SubSubsection
+f	input.rst	/^.. [f] f.rst$/;"	citation	scope:subsubsection:SubSubsection
+g	input.rst	/^.. [g] g.rst$/;"	citation	scope:subsubsection:SubSubsection
+Chapter2	input.rst	/^Chapter2$/;"	chapter	scope:subtitle:Subtitle	sectionMarker:=
+h	input.rst	/^.. [h] g.rst$/;"	citation	scope:chapter:Chapter2
+C0	input-0.rst	/^C0$/;"	chapter	sectionMarker:=	overline:
+S0	input-0.rst	/^S0$/;"	section	scope:chapter:C0	sectionMarker:-	overline:
+s0	input-0.rst	/^s0$/;"	subsection	scope:section:S0	sectionMarker:=
+C1	input-0.rst	/^C1$/;"	chapter	sectionMarker:=	overline:
+S1	input-0.rst	/^S1$/;"	section	scope:chapter:C1	sectionMarker:-	overline:
+s1	input-0.rst	/^s1$/;"	subsection	scope:section:S1	sectionMarker:=
+T0	input-1.rst	/^                     T0$/;"	title	sectionMarker:=	overline:
+xC0	input-1.rst	/^                     xC0$/;"	chapter	scope:title:T0	sectionMarker:-	overline:
+xs0	input-1.rst	/^xs0$/;"	section	scope:chapter:xC0	sectionMarker:=
+xC1	input-1.rst	/^xC1$/;"	chapter	scope:title:T0	sectionMarker:-	overline:
+xs1	input-1.rst	/^xs1$/;"	section	scope:chapter:xC1	sectionMarker:=
+yT0	input-2.rst	/^                   yT0$/;"	title	sectionMarker:=	overline:
+yST0	input-2.rst	/^yST0$/;"	subtitle	scope:title:yT0	sectionMarker:-
+yC0	input-2.rst	/^yC0$/;"	chapter	scope:subtitle:yST0	sectionMarker:=
+yC1	input-2.rst	/^yC1$/;"	chapter	scope:subtitle:yST0	sectionMarker:=

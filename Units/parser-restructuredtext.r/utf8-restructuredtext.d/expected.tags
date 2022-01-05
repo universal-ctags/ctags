@@ -1,4 +1,6 @@
 @Ѐ–𐀀	input.rst	/^@Ѐ–𐀀$/;"	S	section:Šéçtiön 1.1
-Chàptěr 1	input.rst	/^Chàptěr 1$/;"	c
+Chàptěr 1	input.rst	/^Chàptěr 1$/;"	c	subtitle:Șůƀťițƚe
 Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:@Ѐ–𐀀
+Titlə	input.rst	/^Titlə$/;"	H
 Šéçtiön 1.1	input.rst	/^Šéçtiön 1.1$/;"	s	chapter:Chàptěr 1
+Șůƀťițƚe	input.rst	/^Șůƀťițƚe$/;"	h	title:Titlə

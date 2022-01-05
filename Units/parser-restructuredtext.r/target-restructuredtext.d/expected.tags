@@ -1,3 +1,4 @@
+ANOTHER TITLE	input.rst	/^ANOTHER TITLE$/;"	c
 TITLE	input.rst	/^TITLE$/;"	c
 title-target	input.rst	/^.. _title-target:$/;"	T	chapter:TITLE
 section0	input.rst	/^section0$/;"	s	chapter:TITLE
