@@ -218,7 +218,8 @@ static enum openapiKeys parseKey(yaml_token_t *token)
 
 static void printStack(struct yamlBlockTypeStack* stack)
 {
-  if (!stack) {
+  if (!stack)
+  {
 	  puts("");
 	  return;
   }
@@ -501,7 +502,7 @@ static void handleValue(struct sOpenApiSubparser *openapi,
 	}
 }
 
-static void	openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
+static void openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
 											 yaml_token_t *token)
 {
 	// printStack(openapi->type_stack);
@@ -512,7 +513,8 @@ static void	openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
 		openapi->play_detection_state = DSTAT_LAST_KEY;
 		break;
 	case YAML_SCALAR_TOKEN:
-		switch (openapi->play_detection_state) {
+		switch (openapi->play_detection_state)
+		{
 			case DSTAT_LAST_KEY:
 				openapi->type_stack->key = parseKey (token);
 				// printf ("  key: %s\n", (char*)token->data.scalar.value);
