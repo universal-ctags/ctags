@@ -31,7 +31,7 @@ components:
         NullableFieldStringEnum:
             type: object
             properties: {}
-
+    
     parameters:
         CustomHeader:
             in: header
@@ -39,7 +39,7 @@ components:
             required: false
             schema:
                 type: string
-
+    
     responses:
         Response1:
             description: Payment Required
@@ -55,11 +55,14 @@ components:
                     schema:
                         type: object
                         properties: {}
-
     examples:
-        Example1: {}
-        Example2: {}
-
+        Example1:
+            summary: xxx
+            value: yyyyy
+        Example2:
+            b: xxxx
+            summary: xxx
+            value: yyyyy
     requestBodies:
         Body1:
             description: bla bla bla
@@ -73,7 +76,6 @@ components:
                 application/json:
                     schema:
                         type: integer
-
     headers:
         Header1:
             schema:
@@ -81,7 +83,6 @@ components:
         Header2:
             schema:
                 type: string
-
     securitySchemes:
         SSchema1:
             type: http
@@ -89,15 +90,12 @@ components:
         SSchema2:
             type: http
             scheme: basic
-
     links:
         Link1: {}
         Link2: {}
-
     callbacks:
         Callback1: {}
         Callback2: {}
-
     pathItems:
         PathItem1: {}
         PathItem2: {}
