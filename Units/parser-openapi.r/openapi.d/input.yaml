@@ -60,7 +60,6 @@ components:
             summary: xxx
             value: yyyyy
         Example2:
-            b: xxxx
             summary: xxx
             value: yyyyy
     requestBodies:

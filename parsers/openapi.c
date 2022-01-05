@@ -30,7 +30,14 @@ typedef enum {
 	KIND_SERVER,
 	KIND_SECURITY,
 	KIND_TAG,
+	KIND_EXAMPLE,
 	KIND_EXTERNAL_DOCS,
+	KIND_REQUEST_BODY,
+	KIND_HEADER,
+	KIND_SECURITY_SCHEME,
+	KIND_LINK,
+	KIND_CALLBACK,
+	KIND_PATH_ITEM,
 } openapiKind;
 
 static kindDefinition OpenApiKinds [] = {
@@ -42,7 +49,14 @@ static kindDefinition OpenApiKinds [] = {
 	{ true, 'S', "server", "servers"},
 	{ true, 's', "security", "security"},
 	{ true, 't', "tag", "tags"},
+	{ true, 'x', "example", "examples"},
 	{ true, 'D', "doc", "docs"},
+	{ true, 'B', "requestBody", "requestBodies"},
+	{ true, 'h', "header", "headers"},
+	{ true, 'C', "securityScheme", "securitySchemes"},
+	{ true, 'l', "link", "links"},
+	{ true, 'c', "callback", "callbacks"},
+	{ true, 'A', "pathItem", "pathItems"},
 };
 
 enum openapiKeys {
@@ -61,6 +75,13 @@ enum openapiKeys {
 	KEY_NAME,
 	KEY_URL,
 	KEY_TYPE,
+	KEY_EXAMPLES, // 15
+	KEY_REQUEST_BODIES,
+	KEY_HEADERS,
+	KEY_SECURITY_SCHEMES,
+	KEY_LINKS,
+	KEY_CALLBACKS, // 20
+	KEY_PATH_ITEMS,
 };
 
 struct yamlBlockTypeStack {
@@ -177,6 +198,20 @@ static enum openapiKeys parseKey(yaml_token_t *token)
 		return KEY_NAME;
 	else if (scalarNeq(token, 4, "type"))
 		return KEY_TYPE;
+	else if (scalarNeq(token, 8, "examples"))
+		return KEY_EXAMPLES;
+	else if (scalarNeq(token, 13, "requestBodies"))
+		return KEY_REQUEST_BODIES;
+	else if (scalarNeq(token, 5, "links"))
+		return KEY_LINKS;
+	else if (scalarNeq(token, 9, "pathItems"))
+		return KEY_PATH_ITEMS;
+	else if (scalarNeq(token, 9, "callbacks"))
+		return KEY_CALLBACKS;
+	else if (scalarNeq(token, 7, "headers"))
+		return KEY_HEADERS;
+	else if (scalarNeq(token, 15, "securitySchemes"))
+		return KEY_SECURITY_SCHEMES;
 	else
 		return KEY_UNKNOWN;
 }
@@ -237,6 +272,48 @@ static const enum openapiKeys definitions2Keys[] = {
 	KEY_DEFINITIONS,
 };
 
+static const enum openapiKeys links3Keys[] = {
+	KEY_UNKNOWN,
+	KEY_LINKS,
+	KEY_COMPONENTS,
+};
+
+static const enum openapiKeys callbacks3Keys[] = {
+	KEY_UNKNOWN,
+	KEY_CALLBACKS,
+	KEY_COMPONENTS,
+};
+
+static const enum openapiKeys pathItems3Keys[] = {
+	KEY_UNKNOWN,
+	KEY_PATH_ITEMS,
+	KEY_COMPONENTS,
+};
+
+static const enum openapiKeys securitySchemes3Keys[] = {
+	KEY_UNKNOWN,
+	KEY_SECURITY_SCHEMES,
+	KEY_COMPONENTS,
+};
+
+static const enum openapiKeys headers3Keys[] = {
+	KEY_UNKNOWN,
+	KEY_HEADERS,
+	KEY_COMPONENTS,
+};
+
+static const enum openapiKeys requestBodies3Keys[] = {
+	KEY_UNKNOWN,
+	KEY_REQUEST_BODIES,
+	KEY_COMPONENTS,
+};
+
+static const enum openapiKeys examples3Keys[] = {
+	KEY_UNKNOWN,
+	KEY_EXAMPLES,
+	KEY_COMPONENTS,
+};
+
 static const enum openapiKeys info3Keys[] = {
 	KEY_UNKNOWN,
 	KEY_INFO,
@@ -269,6 +346,11 @@ static const enum openapiKeys externalDocs3Keys[] = {
 
 const struct tagSource tagSources[] = {
 	{
+		KIND_INFO,
+		info3Keys,
+		ARRAY_SIZE (info3Keys),
+	},
+	{
 		KIND_PATH,
 		pathKeys,
 		ARRAY_SIZE (pathKeys),
@@ -288,10 +370,16 @@ const struct tagSource tagSources[] = {
 		parameters3Keys,
 		ARRAY_SIZE (parameters3Keys),
 	},
+	// 5:
 	{
 		KIND_PARAMETER,
 		parameters2Keys,
 		ARRAY_SIZE (parameters2Keys),
+	},
+	{
+		KIND_EXAMPLE,
+		examples3Keys,
+		ARRAY_SIZE (examples3Keys),
 	},
 	{
 		KIND_SCHEMA,
@@ -304,10 +392,37 @@ const struct tagSource tagSources[] = {
 		ARRAY_SIZE (definitions2Keys),
 	},
 	{
-		KIND_INFO,
-		info3Keys,
-		ARRAY_SIZE (info3Keys),
+		KIND_REQUEST_BODY,
+		requestBodies3Keys,
+		ARRAY_SIZE (requestBodies3Keys),
 	},
+	// 10:
+	{
+		KIND_HEADER,
+		headers3Keys,
+		ARRAY_SIZE (headers3Keys),
+	},
+	{
+		KIND_PATH_ITEM,
+		pathItems3Keys,
+		ARRAY_SIZE (pathItems3Keys),
+	},
+	{
+		KIND_SECURITY_SCHEME,
+		securitySchemes3Keys,
+		ARRAY_SIZE (securitySchemes3Keys),
+	},
+	{
+		KIND_LINK,
+		links3Keys,
+		ARRAY_SIZE (links3Keys),
+	},
+	{
+		KIND_CALLBACK,
+		callbacks3Keys,
+		ARRAY_SIZE (callbacks3Keys),
+	},
+	// 15:
 };
 
 const struct tagSource tagValueSources[] = {
@@ -347,12 +462,14 @@ static void handleKey(struct sOpenApiSubparser *openapi,
 					ts->countKeys
 			))
 		{
+			printf("match! i=%d, value=%s\n", i, token->data.scalar.value);
 
 			tagEntryInfo tag;
 			initTagEntry (&tag, (char *)token->data.scalar.value, ts->kind);
 			attachYamlPosition (&tag, token, false);
 
 			makeTagEntry (&tag);
+			break;
 		}
 	}
 }
@@ -372,12 +489,14 @@ static void handleValue(struct sOpenApiSubparser *openapi,
 					ts->countKeys
 			))
 		{
+			printf("match value! i=%d\n", i);
 
 			tagEntryInfo tag;
 			initTagEntry (&tag, (char *)token->data.scalar.value, ts->kind);
 			attachYamlPosition (&tag, token, false);
 
 			makeTagEntry (&tag);
+			break;
 		}
 	}
 }
@@ -385,7 +504,7 @@ static void handleValue(struct sOpenApiSubparser *openapi,
 static void	openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
 											 yaml_token_t *token)
 {
-	// printStack(openapi->type_stack);
+	printStack(openapi->type_stack);
 
 	switch (token->type)
 	{
@@ -396,11 +515,11 @@ static void	openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
 		switch (openapi->play_detection_state) {
 			case DSTAT_LAST_KEY:
 				openapi->type_stack->key = parseKey (token);
-				// printf ("  key: %s\n", (char*)token->data.scalar.value);
+				printf ("  key: %s\n", (char*)token->data.scalar.value);
 				handleKey (openapi, token);
 				break;
 			case DSTAT_LAST_VALUE:
-				// printf ("  value: %s\n", (char*)token->data.scalar.value);
+				printf ("  value: %s\n", (char*)token->data.scalar.value);
 				handleValue (openapi, token);
 				break;
 			default:
