@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
     title: test
     description: test
@@ -95,6 +95,7 @@ components:
     callbacks:
         Callback1: {}
         Callback2: {}
+    # pathItems is allowed in 3.1.0
     pathItems:
         PathItem1: {}
         PathItem2: {}
@@ -102,11 +103,10 @@ components:
 
 
 security:
-  - type: apiKey
-    name: api_key
-    in: header
-  - type: http
-    scheme: basic
+  - {}
+  - SomeApiKey:
+     - foo:read
+     - foo:write
 
 tags:
   - name: android_handler

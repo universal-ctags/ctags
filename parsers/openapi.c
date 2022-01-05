@@ -328,7 +328,7 @@ static const enum openapiKeys server3Keys[] = {
 // The tag "type" is used as a poor man's tag title.
 // That's because "name" can be set with type=apiKey only :(
 static const enum openapiKeys security3Keys[] = {
-	KEY_TYPE,
+	KEY_UNKNOWN,
 	KEY_UNKNOWN,
 	KEY_SECURITY,
 };
@@ -423,6 +423,11 @@ const struct tagSource tagSources[] = {
 		ARRAY_SIZE (callbacks3Keys),
 	},
 	// 15:
+	{
+		KIND_SECURITY,
+		security3Keys,
+		ARRAY_SIZE (security3Keys),
+	},
 };
 
 const struct tagSource tagValueSources[] = {
@@ -440,11 +445,6 @@ const struct tagSource tagValueSources[] = {
 		KIND_EXTERNAL_DOCS,
 		externalDocs3Keys,
 		ARRAY_SIZE (externalDocs3Keys),
-	},
-	{
-		KIND_SECURITY,
-		security3Keys,
-		ARRAY_SIZE (security3Keys),
 	},
 };
 
