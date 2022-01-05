@@ -503,7 +503,7 @@ static void handleValue(struct sOpenApiSubparser *openapi,
 }
 
 static void openapiPlayStateMachine (struct sOpenApiSubparser *openapi,
-											 yaml_token_t *token)
+									 yaml_token_t *token)
 {
 	// printStack(openapi->type_stack);
 
