@@ -89,8 +89,7 @@ static void pushBlockType (struct sOpenAPISubparser *openapi, yaml_token_type_t 
 	s->key = KEY_UNKNOWN;
 }
 
-static void popBlockType (struct sOpenAPISubparser *openapi,
-						  yaml_token_t *token)
+static void popBlockType (struct sOpenAPISubparser *openapi)
 {
 	struct yamlBlockTypeStack *s;
 
@@ -102,11 +101,10 @@ static void popBlockType (struct sOpenAPISubparser *openapi,
 	eFree (s);
 }
 
-static void popAllBlockType (struct sOpenAPISubparser *openapi,
-							 yaml_token_t *token)
+static void popAllBlockType (struct sOpenAPISubparser *openapi)
 {
 	while (openapi->type_stack)
-		popBlockType (openapi, token);
+		popBlockType (openapi);
 }
 
 static bool stateStackMatch (struct yamlBlockTypeStack *stack,
@@ -307,9 +305,9 @@ static void newTokenCallback (yamlSubparser *s, yaml_token_t *token)
 	openapiPlayStateMachine ((struct sOpenAPISubparser *)s, token);
 
 	if (token->type == YAML_BLOCK_END_TOKEN)
-		popBlockType ((struct sOpenAPISubparser *)s, token);
+		popBlockType ((struct sOpenAPISubparser *)s);
 	else if (token->type == YAML_STREAM_END_TOKEN)
-		popAllBlockType ((struct sOpenAPISubparser *)s, token);
+		popAllBlockType ((struct sOpenAPISubparser *)s);
 }
 
 static void inputStart(subparser *s)
