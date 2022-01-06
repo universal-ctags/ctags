@@ -45,6 +45,10 @@ The behavior of reading tags can be controlled using these options:
 
 ``-t TAGFILE``, ``--tag-file TAGFILE``
 	Use specified tag file (default: "tags").
+	Giving "-" as TAGFILE indicates reading the tags file content from the
+	standard input. "-" can make the command line simpler. However,
+	it doesn't mean efficient; readtags stores the data to a temorary
+	file and reads that file for taking the ACTION.
 
 ``-s[0|1|2]``, ``--override-sort-detection METHOD``
 	Override sort detection of tag file.
@@ -242,6 +246,30 @@ not reference tags. Here's how to do it:
 
 Notice that ``(not $extras)`` produces ``#t`` when ``$extras`` is missing, so
 the whole ``or`` expression produces ``#t``.
+
+
+The combination of ``ctags -o -`` and ``readtags -t -`` is handy for inspecting
+a source file as far as the source file is enough short.
+
+* List all the large (> 100 lines) functions in a file:
+
+  .. code-block:: console
+
+     $ ctags -o - --fields=+neKz input.c \
+       | ./readtags -t - -en \
+                    -Q '(and (eq? $kind "function") $end $line (> (- $end $line) 100))' \
+                    -l
+
+* List all the tags including line 80 in a file:
+
+  .. code-block:: console
+
+     $ ctags -o - --fields=+neKz input.c \
+       | readtags -t - -ne \
+                  -Q '(and $line
+                           (or (eq? $line 80)
+                               (and $end (< $line 80) (< 80 $end))))' \
+         -l
 
 Run "readtags -H filter" to know about all valid functions and variables.
 
