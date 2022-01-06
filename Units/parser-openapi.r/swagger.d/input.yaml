@@ -1,0 +1,64 @@
+swagger: '2.0'
+info:
+    description: test
+    title: test
+    version: '1.0'
+host: example.com
+
+paths:
+    /sample/path:
+        post:
+            description: test
+            responses:
+              200:
+                description: xxx
+
+    /sample/other/path:
+        get:
+            description: smth
+            responses:
+              200:
+                description: xxx
+
+definitions:
+    PolymorphicString:
+        type: object
+        required:
+          - type
+          - value
+        additionalProperties: false
+        properties:
+            type:
+                type: string
+            value:
+                type: string
+
+    PolymorphicInteger:
+        type: object
+        required:
+          - type
+          - value
+        additionalProperties: false
+        properties:
+            type:
+                type: string
+            value:
+                type: integer
+
+parameters:
+    Param1:
+        name: test1
+        in: query
+        type: boolean
+
+    Param2:
+        name: test2
+        in: query
+        type: boolean
+
+responses:
+    Response1:
+        description: aaa
+
+    Response2:
+        description: bbb
