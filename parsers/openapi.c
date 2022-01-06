@@ -29,6 +29,7 @@ typedef enum {
 	KIND_RESPONSE,
 	KIND_PARAMETER,
 	KIND_TITLE,
+	KIND_SERVER,
 } openapiKind;
 
 static kindDefinition OpenAPIKinds [] = {
@@ -37,6 +38,7 @@ static kindDefinition OpenAPIKinds [] = {
 	{ true, 'R', "response", "responses" },
 	{ true, 'P', "parameter", "parameters" },
 	{ true, 't', "title", "titles" },
+	{ true, 's', "server", "servers (or hosts in swagger)" },
 };
 
 #define KEY_UNKNOWN KEYWORD_NONE
@@ -49,6 +51,9 @@ enum openapiKeys {
 	KEY_DEFINITIONS,
 	KEY_INFO,
 	KEY_TITLE,
+	KEY_SERVERS,
+	KEY_URL,
+	KEY_HOST,
 };
 
 static const keywordTable OpenAPIKeywordTable[] = {
@@ -60,6 +65,9 @@ static const keywordTable OpenAPIKeywordTable[] = {
 	{ "definitions", KEY_DEFINITIONS },
 	{ "info",        KEY_INFO },
 	{ "title",       KEY_TITLE },
+	{ "servers",     KEY_SERVERS },
+	{ "url",         KEY_URL },
+	{ "host",        KEY_HOST },
 };
 
 struct yamlBlockTypeStack {
@@ -206,6 +214,16 @@ static const enum openapiKeys title3Keys[] = {
 	KEY_INFO,
 };
 
+static const enum openapiKeys server3Keys[] = {
+	KEY_URL,
+	KEY_UNKNOWN,
+	KEY_SERVERS,
+};
+
+static const enum openapiKeys host2Keys[] = {
+	KEY_HOST,
+};
+
 const struct tagSource tagSources[] = {
 	{
 		KIND_PATH,
@@ -250,6 +268,16 @@ const struct tagSource tagValueSources[] = {
 		title3Keys,
 		ARRAY_SIZE (title3Keys),
 	},
+	{
+		KIND_SERVER,
+		server3Keys,
+		ARRAY_SIZE (server3Keys),
+	},
+	{
+		KIND_SERVER,
+		host2Keys,
+		ARRAY_SIZE (host2Keys),
+	}
 };
 
 static void handleToken(struct sOpenAPISubparser *openapi, yaml_token_t *token,
