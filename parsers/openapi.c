@@ -30,6 +30,7 @@ typedef enum {
 	KIND_PARAMETER,
 	KIND_TITLE,
 	KIND_SERVER,
+	KIND_TAG,
 } openapiKind;
 
 static kindDefinition OpenAPIKinds [] = {
@@ -39,6 +40,7 @@ static kindDefinition OpenAPIKinds [] = {
 	{ true, 'P', "parameter", "parameters" },
 	{ true, 't', "title", "titles" },
 	{ true, 's', "server", "servers (or hosts in swagger)" },
+	{ true, 'T', "tag", "tags"},
 };
 
 /* - name: "THE NAME" */
@@ -75,6 +77,8 @@ static tagYpathTable ypathTables [] = {
 	  DSTAT_LAST_VALUE, KIND_SERVER,    },
 	{ "host",
 	  DSTAT_LAST_VALUE, KIND_SERVER,    },
+	{ "tags/*/name",
+	  DSTAT_LAST_VALUE, KIND_TAG,       },
 };
 
 static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
