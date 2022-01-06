@@ -1,3 +1,8 @@
+title	input.yaml	/^    title: test$/;"	I
+description	input.yaml	/^    description: test$/;"	I
+version	input.yaml	/^    version: '1.0'$/;"	I
+http://example.com	input.yaml	/^  - url: http:\/\/example.com$/;"	S
+http://example2.com	input.yaml	/^  - url: http:\/\/example2.com$/;"	S
 /sample/path	input.yaml	/^    \/sample\/path:$/;"	p
 /sample/other/path	input.yaml	/^    \/sample\/other\/path:$/;"	p
 NullableField	input.yaml	/^        NullableField:$/;"	d
@@ -5,3 +10,21 @@ NullableFieldStringEnum	input.yaml	/^        NullableFieldStringEnum:$/;"	d
 CustomHeader	input.yaml	/^        CustomHeader:$/;"	P
 Response1	input.yaml	/^        Response1:$/;"	R
 Response2	input.yaml	/^        Response2:$/;"	R
+Example1	input.yaml	/^        Example1:$/;"	e
+Example2	input.yaml	/^        Example2:$/;"	e
+Body1	input.yaml	/^        Body1:$/;"	B
+Body2	input.yaml	/^        Body2:$/;"	B
+Header1	input.yaml	/^        Header1:$/;"	h
+Header2	input.yaml	/^        Header2:$/;"	h
+SSchema1	input.yaml	/^        SSchema1:$/;"	C
+SSchema2	input.yaml	/^        SSchema2:$/;"	C
+Link1	input.yaml	/^        Link1: {}$/;"	l
+Link2	input.yaml	/^        Link2: {}$/;"	l
+Callback1	input.yaml	/^        Callback1: {}$/;"	c
+Callback2	input.yaml	/^        Callback2: {}$/;"	c
+PathItem1	input.yaml	/^        PathItem1: {}$/;"	A
+PathItem2	input.yaml	/^        PathItem2: {}$/;"	A
+SomeApiKey	input.yaml	/^  - SomeApiKey:$/;"	s
+android_handler	input.yaml	/^  - name: android_handler$/;"	t
+ios_handler	input.yaml	/^  - name: ios_handler$/;"	t
+http://example.com	input.yaml	/^    url: http:\/\/example.com$/;"	D

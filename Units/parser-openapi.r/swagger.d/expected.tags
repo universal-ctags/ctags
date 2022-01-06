@@ -1,3 +1,6 @@
+description	input.yaml	/^    description: test$/;"	I
+title	input.yaml	/^    title: test$/;"	I
+version	input.yaml	/^    version: '1.0'$/;"	I
 /sample/path	input.yaml	/^    \/sample\/path:$/;"	p
 /sample/other/path	input.yaml	/^    \/sample\/other\/path:$/;"	p
 PolymorphicString	input.yaml	/^    PolymorphicString:$/;"	d
