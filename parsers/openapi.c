@@ -233,12 +233,12 @@ const struct tagSource tagSources[] = {
 	},
 };
 
-static void handleKey(struct sOpenAPISubparser *openapi,
-					  yaml_token_t *token)
+static void handleToken(struct sOpenAPISubparser *openapi, yaml_token_t *token,
+						const struct tagSource *tss, size_t ts_count)
 {
-	for (int i = 0; i < ARRAY_SIZE(tagSources); i++)
+	for (int i = 0; i < ts_count; i++)
 	{
-		const struct tagSource* ts = &tagSources[i];
+		const struct tagSource* ts = &tss[i];
 
 		if (stateStackMatch(openapi->type_stack,
 							ts->keys, ts->countKeys))
@@ -252,6 +252,12 @@ static void handleKey(struct sOpenAPISubparser *openapi,
 			break;
 		}
 	}
+}
+
+static void handleKey(struct sOpenAPISubparser *openapi,
+					  yaml_token_t *token)
+{
+	handleToken (openapi, token, tagSources, ARRAY_SIZE (tagSources));
 }
 
 static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
