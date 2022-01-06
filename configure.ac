@@ -714,6 +714,16 @@ AS_IF([test "x$enable_pcre2" != "xno"], [
 ])
 AM_CONDITIONAL(HAVE_PCRE2, test "x$have_libpcre2_8" = xyes)
 
+if test "${enable_static}" = "yes"; then
+	if test "${have_libpcre2_8}" = "yes"; then
+		if test "${host_mingw}" = "yes"; then
+			dnl -DPCRE2_STATIC needs to be added manually.
+			PCRE2_CFLAGS="$PCRE2_CFLAGS -DPCRE2_STATIC"
+		fi
+	fi
+fi
+
+
 # Checks for missing prototypes
 # -----------------------------
 AC_MSG_NOTICE(checking for new missing prototypes)
