@@ -249,6 +249,7 @@ static void handleKey(struct sOpenAPISubparser *openapi,
 			attachYamlPosition (&tag, token, false);
 
 			makeTagEntry (&tag);
+			break;
 		}
 	}
 }
