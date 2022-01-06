@@ -1,3 +1,4 @@
+test	input.yaml	/^    title: test$/;"	t
 /sample/path	input.yaml	/^    \/sample\/path:$/;"	p
 /sample/other/path	input.yaml	/^    \/sample\/other\/path:$/;"	p
 PolymorphicString	input.yaml	/^    PolymorphicString:$/;"	d

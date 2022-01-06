@@ -28,6 +28,7 @@ typedef enum {
 	KIND_PATH,
 	KIND_RESPONSE,
 	KIND_PARAMETER,
+	KIND_TITLE,
 } openapiKind;
 
 static kindDefinition OpenAPIKinds [] = {
@@ -35,6 +36,7 @@ static kindDefinition OpenAPIKinds [] = {
 	{ true, 'p', "path", "paths" },
 	{ true, 'R', "response", "responses" },
 	{ true, 'P', "parameter", "parameters" },
+	{ true, 't', "title", "titles" },
 };
 
 #define KEY_UNKNOWN KEYWORD_NONE
@@ -45,6 +47,8 @@ enum openapiKeys {
 	KEY_PARAMETERS,
 	KEY_RESPONSES,
 	KEY_DEFINITIONS,
+	KEY_INFO,
+	KEY_TITLE,
 };
 
 static const keywordTable OpenAPIKeywordTable[] = {
@@ -54,6 +58,8 @@ static const keywordTable OpenAPIKeywordTable[] = {
 	{ "parameters",  KEY_PARAMETERS  },
 	{ "responses",   KEY_RESPONSES   },
 	{ "definitions", KEY_DEFINITIONS },
+	{ "info",        KEY_INFO },
+	{ "title",       KEY_TITLE },
 };
 
 struct yamlBlockTypeStack {
@@ -195,6 +201,11 @@ static const enum openapiKeys definitions2Keys[] = {
 	KEY_DEFINITIONS,
 };
 
+static const enum openapiKeys title3Keys[] = {
+	KEY_TITLE,
+	KEY_INFO,
+};
+
 const struct tagSource tagSources[] = {
 	{
 		KIND_PATH,
@@ -233,6 +244,14 @@ const struct tagSource tagSources[] = {
 	},
 };
 
+const struct tagSource tagValueSources[] = {
+	{
+		KIND_TITLE,
+		title3Keys,
+		ARRAY_SIZE (title3Keys),
+	},
+};
+
 static void handleToken(struct sOpenAPISubparser *openapi, yaml_token_t *token,
 						const struct tagSource *tss, size_t ts_count)
 {
@@ -260,6 +279,12 @@ static void handleKey(struct sOpenAPISubparser *openapi,
 	handleToken (openapi, token, tagSources, ARRAY_SIZE (tagSources));
 }
 
+static void handleValue(struct sOpenAPISubparser *openapi,
+						yaml_token_t *token)
+{
+	handleToken (openapi, token, tagValueSources, ARRAY_SIZE (tagValueSources));
+}
+
 static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
 									 yaml_token_t *token)
 {
@@ -285,6 +310,8 @@ static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
 			break;
 		case DSTAT_LAST_VALUE:
 			TRACE_PRINT("  value: %s", (char*)token->data.scalar.value);
+			if (openapi->type_stack)
+				handleValue (openapi, token);
 			break;
 		default:
 			break;
