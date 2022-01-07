@@ -28,7 +28,6 @@ typedef enum {
 	KIND_PATH,
 	KIND_RESPONSE,
 	KIND_PARAMETER,
-	KIND_INFO,
 	KIND_SERVER,
 	KIND_SECURITY,
 	KIND_TAG,
@@ -47,7 +46,6 @@ static kindDefinition OpenAPIKinds [] = {
 	{ true, 'p', "path", "paths" },
 	{ true, 'R', "response", "responses" },
 	{ true, 'P', "parameter", "parameters" },
-	{ true, 'I', "info", "info"},
         { true, 'S', "server", "servers"},
         { true, 's', "security", "security"},
         { true, 't', "tag", "tags"},
@@ -69,7 +67,6 @@ enum openapiKeys {
 	KEY_PARAMETERS,
 	KEY_RESPONSES,
 	KEY_DEFINITIONS,
-	KEY_INFO,
         KEY_SERVERS,
         KEY_SECURITY,
         KEY_TAG,
@@ -94,7 +91,6 @@ static const keywordTable OpenAPIKeywordTable[] = {
 	{ "parameters",      KEY_PARAMETERS       },
 	{ "responses",       KEY_RESPONSES        },
 	{ "definitions",     KEY_DEFINITIONS      },
-	{ "info",            KEY_INFO             },
 	{ "servers",         KEY_SERVERS          },
 	{ "security",        KEY_SECURITY         },
 	{ "tags",            KEY_TAG              },
@@ -293,11 +289,6 @@ static const enum openapiKeys examples3Keys[] = {
        KEY_COMPONENTS,
 };
 
-static const enum openapiKeys info3Keys[] = {
-       KEY_UNKNOWN,
-       KEY_INFO,
-};
-
 static const enum openapiKeys server3Keys[] = {
        KEY_URL,
        KEY_UNKNOWN,
@@ -324,13 +315,7 @@ static const enum openapiKeys externalDocs3Keys[] = {
 };
 
 
-
 const struct tagSource tagSources[] = {
-        {
-                KIND_INFO,
-                info3Keys,
-                ARRAY_SIZE (info3Keys),
-        },
         {
                 KIND_EXAMPLE,
                 examples3Keys,

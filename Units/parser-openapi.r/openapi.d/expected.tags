@@ -1,6 +1,3 @@
-title	input.yaml	/^    title: test$/;"	I
-description	input.yaml	/^    description: test$/;"	I
-version	input.yaml	/^    version: '1.0'$/;"	I
 http://example.com	input.yaml	/^  - url: http:\/\/example.com$/;"	S
 http://example2.com	input.yaml	/^  - url: http:\/\/example2.com$/;"	S
 /sample/path	input.yaml	/^    \/sample\/path:$/;"	p
