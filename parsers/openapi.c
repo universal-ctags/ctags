@@ -271,9 +271,12 @@ static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
 		switch (openapi->play_detection_state)
 		{
 		case DSTAT_LAST_KEY:
-			openapi->type_stack->key = parseKey(token);
 			TRACE_PRINT("  key: %s\n", (char*)token->data.scalar.value);
-			handleKey (openapi, token);
+			if (openapi->type_stack)
+			{
+				openapi->type_stack->key = parseKey(token);
+				handleKey (openapi, token);
+			}
 			break;
 		case DSTAT_LAST_VALUE:
 			TRACE_PRINT("  value: %s\n", (char*)token->data.scalar.value);

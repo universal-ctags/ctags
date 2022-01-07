@@ -1,0 +1,6 @@
+This is a crash test.
+The code is derived from puppet/spec/fixtures/unit/data_providers/environments/hiera_bad_syntax_yaml/data/bad.yaml.
+
+    REPO=https://github.com/puppetlabs/puppet.git
+    ALIGNMENT=6.2.0
+    LANGUAGES=Ruby,PuppetManifest
