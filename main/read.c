@@ -739,8 +739,7 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		File.filePosition.offset = StartOfLine.offset = mio_tell (File.mio);
 		File.currentLine  = NULL;
 
-		if (File.line != NULL)
-			vStringClear (File.line);
+		File.line = vStringNewOrClear (File.line);
 
 		setInputFileParameters  (vStringNewInit (fileName), language);
 		File.input.lineNumberOrigin = 0L;
@@ -777,8 +776,8 @@ extern void resetInputFile (const langType language)
 	File.filePosition.offset = StartOfLine.offset = mio_tell (File.mio);
 	File.currentLine  = NULL;
 
-	if (File.line != NULL)
-		vStringClear (File.line);
+	Assert (File.line);
+	vStringClear (File.line);
 	if (hasLanguageMultilineRegexPatterns (language))
 		File.allLines = vStringNew ();
 
@@ -899,9 +898,7 @@ static vString *iFileGetLine (bool chop_newline)
 	eolType eol;
 	langType lang = getInputLanguage();
 
-	if (File.line == NULL)
-		File.line = vStringNew ();
-
+	Assert (File.line);
 	eol = readLine (File.line, File.mio);
 
 	if (vStringLength (File.line) > 0)
