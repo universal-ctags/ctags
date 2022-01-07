@@ -510,7 +510,7 @@ case "$host" in
 	AC_DEFINE(MANUAL_GLOBBING)
 	AC_DEFINE(HAVE__FINDFIRST)
 	;;
-  *-cygwin*)
+  *-cygwin | *-msys)
 	gl_cv_have_weak=no
 	;;
 esac
@@ -559,10 +559,6 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 #   Place it further down in the file, typically where you normally check for
 #   header files or functions.
 gl_INIT
-
-AC_DEFINE([GNULIB_REGEX_SINGLE_THREAD], [1],
-  [Define if all programs in this package call functions of the Gnulib
-   'regex' module only from a single thread.])
 
 if test "$REPLACE_FNMATCH" != 0; then
 	AC_DEFINE([USE_GNULIB_FNMATCH])
