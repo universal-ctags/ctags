@@ -740,6 +740,7 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		File.currentLine  = NULL;
 
 		File.line = vStringNewOrClear (File.line);
+		File.ungetchIdx = 0;
 
 		setInputFileParameters  (vStringNewInit (fileName), language);
 		File.input.lineNumberOrigin = 0L;
@@ -778,6 +779,8 @@ extern void resetInputFile (const langType language)
 
 	Assert (File.line);
 	vStringClear (File.line);
+	File.ungetchIdx = 0;
+
 	if (hasLanguageMultilineRegexPatterns (language))
 		File.allLines = vStringNew ();
 
