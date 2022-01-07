@@ -6,8 +6,12 @@
 *   This module contains functions for reading tag files.
 */
 
+#include "general.h"
+
 #include "readtags.h"
 #include "printtags.h"
+#include "routines.h"
+#include "routines_p.h"
 #include <string.h>		/* strerror */
 #include <stdlib.h>		/* exit */
 #include <stdio.h>		/* stderr */
@@ -25,6 +29,8 @@ static int escaping;
 static QCode *Qualifier;
 #include "dsl/sorter.h"
 static SCode *Sorter;
+#include "dsl/formatter.h"
+static FCode *Formatter;
 #endif
 
 static const char* tagsStrerror (int err)
@@ -60,6 +66,13 @@ static void printTag (const tagEntry *entry)
 	};
 	tagsPrint (entry, &opts, NULL, stdout);
 }
+
+#ifdef READTAGS_DSL
+static void printTagWithFormatter (const tagEntry *entry)
+{
+	f_print (entry, Formatter, stdout);
+}
+#endif
 
 static void printPseudoTag (const tagEntry *entry)
 {
@@ -275,11 +288,82 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 }
 #endif
 
+static int copyFile (FILE *in, FILE *out)
+{
+#define BUFSIZE (4096 * 10)
+	static unsigned char buffer [BUFSIZE];
+
+	while (1)
+	{
+		size_t r, t;
+
+		r = fread (buffer, 1, BUFSIZE, in);
+		if (!r)
+		{
+			if (ferror(in))
+			{
+				fprintf (stderr, "%s: error in reading from stdin\n", ProgramName);
+				return -1;
+			}
+			/* EOF */
+			break;
+		}
+		t = fwrite (buffer, 1, r, out);
+		if (r != t)
+		{
+			fprintf (stderr, "%s error in writing to the temporarily file", ProgramName);
+			return -1;
+		}
+	}
+	return 0;
+}
+
+static void removeTagFile (void)
+{
+	remove (TagFileName);
+	eFree ((char *)TagFileName);
+}
+
+static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
+{
+	if (strcmp (filePath, "-") == 0)
+	{
+		char *tempName = NULL;
+		FILE *tempFP = tempFileFP ("w", &tempName);
+
+		if (tempFP == NULL)
+		{
+			fprintf (stderr, "%s: failed to make a temporarily file for storing data from stdin\n",
+					 ProgramName);
+			exit (1);
+		}
+		TagFileName = tempName;
+		atexit (removeTagFile);
+
+		if (copyFile (stdin, tempFP) < 0)
+		{
+			fclose (tempFP);
+			exit (1);
+		}
+
+		if (fflush (tempFP) < 0)
+		{
+			fprintf (stderr, "%s: failed to flush a temporarily file for storing data from stdin\n",
+					 ProgramName);
+			exit (1);
+		}
+		fclose (tempFP);
+		return tagsOpen (tempName, info);
+	}
+
+	return tagsOpen (filePath, info);
+}
+
 static void findTag (const char *const name, const int options)
 {
 	tagFileInfo info;
 	tagEntry entry;
-	tagFile *const file = tagsOpen (TagFileName, &info);
+	tagFile *const file = openTags (TagFileName, &info);
 	if (file == NULL || !info.status.opened)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
@@ -307,7 +391,11 @@ static void findTag (const char *const name, const int options)
 			fprintf (stderr, "%s: searching for \"%s\" in \"%s\"\n",
 					 ProgramName, name, TagFileName);
 		if (tagsFind (file, &entry, name, options) == TagSuccess)
-			walkTags (file, &entry, tagsFindNext, printTag);
+			walkTags (file, &entry, tagsFindNext,
+#ifdef READTAGS_DSL
+					  Formatter? printTagWithFormatter:
+#endif
+					  printTag);
 		else if ((err = tagsGetErrno (file)) != 0)
 		{
 			fprintf (stderr, "%s: error in tagsFind(): %s\n",
@@ -323,7 +411,7 @@ static void listTags (int pseudoTags)
 {
 	tagFileInfo info;
 	tagEntry entry;
-	tagFile *const file = tagsOpen (TagFileName, &info);
+	tagFile *const file = openTags (TagFileName, &info);
 	if (file == NULL || !info.status.opened)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
@@ -352,7 +440,11 @@ static void listTags (int pseudoTags)
 	{
 		int err = 0;
 		if (tagsFirst (file, &entry) == TagSuccess)
-			walkTags (file, &entry, tagsNext, printTag);
+			walkTags (file, &entry, tagsNext,
+#ifdef READTAGS_DSL
+					  Formatter? printTagWithFormatter:
+#endif
+					  printTag);
 		else if ((err = tagsGetErrno (file)) != 0)
 		{
 			fprintf (stderr, "%s: error in tagsFirst(): %s\n",
@@ -372,7 +464,7 @@ static const char *const Usage =
 #ifdef READTAGS_DSL
 	"    %s -H POSTPROCESSOR | --help-expression POSTPROCESSOR\n"
 	"        Print available terms that can be used in POSTPROCESSOR expression.\n"
-	"        POSTPROCESSOR: filter sorter\n"
+	"        POSTPROCESSOR: filter sorter formatter\n"
 #endif
 	"    %s [OPTIONS] ACTION\n"
 	"        Do the specified action.\n"
@@ -399,10 +491,13 @@ static const char *const Usage =
 	"        Perform prefix matching in the NAME action.\n"
 	"    -t TAGFILE | --tag-file TAGFILE\n"
 	"        Use specified tag file (default: \"tags\").\n"
+	"        \"-\" indicates taking tag file data from standard input.\n"
 	"    -s[0|1|2] | --override-sort-detection METHOD\n"
 	"        Override sort detection of tag file.\n"
 	"        METHOD: unsorted|sorted|foldcase\n"
 #ifdef READTAGS_DSL
+	"    -F EXP | --formatter EXP\n"
+	"        Format the tags listed by ACTION with EXP when printing.\n"
 	"    -Q EXP | --filter EXP\n"
 	"        Filter the tags listed by ACTION with EXP before printing.\n"
 	"    -S EXP | --sorter EXP\n"
@@ -432,6 +527,13 @@ static void printSorterExpression (FILE *stream, int exitCode)
 {
 	fprintf (stream, "Sorter expression: \n");
 	s_help (stream);
+	exit (exitCode);
+}
+
+static void printFormatterExpression (FILE *stream, int exitCode)
+{
+	fprintf (stream, "Formatter expression: \n");
+	f_help (stream);
 	exit (exitCode);
 }
 
@@ -470,6 +572,7 @@ extern int main (int argc, char **argv)
 	int ignore_prefix = 0;
 
 	ProgramName = argv [0];
+	setExecutableName (ProgramName);
 	if (argc == 1)
 		printUsage(stderr, 1);
 	for (i = 1  ;  i < argc  ;  ++i)
@@ -504,6 +607,8 @@ extern int main (int argc, char **argv)
 						printFilterExpression (stdout, 0);
 					if (strcmp (exp_klass, "sorter") == 0)
 						printSorterExpression (stdout, 0);
+					if (strcmp (exp_klass, "formatter") == 0)
+						printFormatterExpression (stdout, 0);
 					else
 					{
 						fprintf (stderr, "%s: unknown expression class for --%s option\n",
@@ -597,6 +702,19 @@ extern int main (int argc, char **argv)
 					exit (1);
 				}
 			}
+			else if (strcmp (optname, "formatter") == 0)
+			{
+				if (i + 1 < argc)
+					Sorter = compileExpression (argv[++i],
+												(void * (*)(EsObject *))f_compile,
+												optname);
+				else
+				{
+					fprintf (stderr, "%s: missing formatter expression for --%s option\n",
+							 ProgramName, optname);
+					exit (1);
+				}
+			}
 #endif
 			else
 			{
@@ -625,6 +743,8 @@ extern int main (int argc, char **argv)
 								printFilterExpression (stdout, 0);
 							else if (strcmp (exp_klass, "sorter") == 0)
 								printSorterExpression (stdout, 0);
+							else if (strcmp (exp_klass, "formatter") == 0)
+								printFormatterExpression (stdout, 0);
 							else
 								printUsage(stderr, 1);
 						}
@@ -673,6 +793,13 @@ extern int main (int argc, char **argv)
 													   (void * (*)(EsObject *))s_compile,
 													   "sorter");
 						break;
+					case 'F':
+						if (i + 1 == argc)
+							printUsage(stderr, 1);
+						Formatter = compileExpression (argv[++i],
+													   (void * (*)(EsObject *))f_compile,
+													   "formatter");
+						break;
 #endif
 					default:
 						fprintf (stderr, "%s: unknown option: %c\n",
@@ -695,6 +822,8 @@ extern int main (int argc, char **argv)
 		q_destroy (Qualifier);
 	if (Sorter)
 		s_destroy (Sorter);
+	if (Formatter)
+		f_destroy (Formatter);
 #endif
 	return 0;
 }

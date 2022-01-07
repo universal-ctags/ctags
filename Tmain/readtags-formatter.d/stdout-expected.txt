@@ -1,0 +1,12 @@
+# FQ
+bar
+foo
+main
+# F
+bar
+foo
+main
+# F declarations
+static void bar(char ** argv,int * r);
+static int foo(int v);
+int main(int argc,char ** argv);

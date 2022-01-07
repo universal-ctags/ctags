@@ -18,6 +18,7 @@
 #include "options.h"
 #include "selectors.h"
 #include "vstring.h"
+#include "mio.h"
 
 static const char *TR_UNKNOWN = NULL;
 static const char *TR_PERL5   = "Perl";

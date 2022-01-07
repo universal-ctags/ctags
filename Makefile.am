@@ -56,7 +56,9 @@ maintainer-clean-local:
 	rm -rf .deps misc/packcc/.dirstamp
 
 bin_PROGRAMS = ctags
-noinst_LIBRARIES = libctags.a
+noinst_LIBRARIES =
+noinst_LIBRARIES += libctags.a
+noinst_LIBRARIES += libutil.a
 
 noinst_PROGRAMS =
 
@@ -79,11 +81,16 @@ $(PACKCC): $(srcdir)/$(PACKCC_SRC)
 if USE_READCMD
 bin_PROGRAMS+= readtags
 readtags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/libreadtags
+if ENABLE_DEBUGGING
+readtags_CPPFLAGS+= $(DEBUG_CPPFLAGS)
+endif
 readtags_CFLAGS = $(COVERAGE_CFLAGS) $(WARNING_CFLAGS)
 dist_readtags_SOURCES = $(READTAGS_SRCS) $(READTAGS_HEADS)
 readtags_CPPFLAGS += $(GNULIB_CPPFLAGS)
 readtags_CPPFLAGS += -DREADTAGS_DSL -I$(srcdir)/dsl
-readtags_LDADD = $(GNULIB_LIBS)
+readtags_LDADD  =
+readtags_LDADD += $(GNULIB_LIBS)
+readtags_LDADD += libutil.a
 dist_readtags_SOURCES += $(READTAGS_DSL_SRCS) $(READTAGS_DSL_HEADS)
 endif
 
@@ -108,6 +115,16 @@ PARSER_HEADS += $(YAML_HEADS)
 endif
 
 PARSER_HEADS += $(PEG_EXTRA_HEADS)
+
+libutil_a_CPPFLAGS = -I$(srcdir) -I$(srcdir)/main
+libutil_a_CFLAGS   =
+libutil_a_CFLAGS  += $(EXTRA_CFLAGS)
+libutil_a_CFLAGS  += $(WARNING_CFLAGS)
+libutil_a_CFLAGS  += $(COVERAGE_CFLAGS)
+if ENABLE_DEBUGGING
+libutil_a_CPPFLAGS+= $(DEBUG_CPPFLAGS)
+endif
+dist_libutil_a_SOURCES = $(UTIL_HEADS) $(UTIL_SRCS)
 
 libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/dsl -I$(srcdir)/peg -DHAVE_PACKCC
 if ENABLE_DEBUGGING

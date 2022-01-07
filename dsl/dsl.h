@@ -24,6 +24,7 @@ enum eDSLEngineType {
 	DSL_COMMON,
 	DSL_QUALIFIER,
 	DSL_SORTER,
+	DSL_FORMATTER,
 	DSL_ENGINE_COUNT
 };
 typedef enum eDSLEngineType DSLEngineType;
@@ -115,6 +116,8 @@ EsObject* dsl_entry_scope_kind (const tagEntry *entry);
 EsObject* dsl_entry_scope_name (const tagEntry *entry);
 EsObject* dsl_entry_signature (const tagEntry *entry);
 EsObject* dsl_entry_typeref (const tagEntry *entry);
+EsObject* dsl_entry_typeref_kind (const tagEntry *entry);
+EsObject* dsl_entry_typeref_name (const tagEntry *entry);
 EsObject* dsl_entry_roles (const tagEntry *entry);
 EsObject* dsl_entry_xpath (const tagEntry *entry);
 

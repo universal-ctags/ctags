@@ -13,24 +13,24 @@
 #include "types.h"
 
 const char *
-selectByPickingPerlVersion (MIO *, langType *, unsigned int);
+selectByPickingPerlVersion (struct _MIO *, langType *, unsigned int);
 
 const char *
-selectByObjectiveCAndMatLabKeywords (MIO *, langType *, unsigned int);
+selectByObjectiveCAndMatLabKeywords (struct _MIO *, langType *, unsigned int);
 
 const char *
-selectByObjectiveCKeywords(MIO *, langType *, unsigned int);
+selectByObjectiveCKeywords(struct _MIO *, langType *, unsigned int);
 
 const char *
-selectByArrowOfR (MIO *, langType *, unsigned int);
+selectByArrowOfR (struct _MIO *, langType *, unsigned int);
 
 const char *
-selectByRexxCommentAndDosbatchLabelPrefix (MIO *, langType *, unsigned int);
+selectByRexxCommentAndDosbatchLabelPrefix (struct _MIO *, langType *, unsigned int);
 
 const char *
-selectLispOrLEXByLEXMarker (MIO *, langType *, unsigned int);
+selectLispOrLEXByLEXMarker (struct _MIO *, langType *, unsigned int);
 
 const char *
-selectByXpathFileSpec (MIO *input, langType *candidates, unsigned int nCandidates);
+selectByXpathFileSpec (struct _MIO *input, langType *candidates, unsigned int nCandidates);
 
 #endif
