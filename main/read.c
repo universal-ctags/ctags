@@ -148,7 +148,24 @@ extern unsigned long getInputLineNumber (void)
 extern int getInputLineOffset (void)
 {
 	unsigned char *base = (unsigned char *) vStringValue (File.line);
-	int ret = File.currentLine - base - File.ungetchIdx;
+	int ret;
+
+	if (File.currentLine)
+		ret = File.currentLine - base - File.ungetchIdx;
+	else if (File.input.lineNumber)
+	{
+		/* When EOF is saw, currentLine is set to NULL.
+		 * So the way to calculate the offset at the end of file is tricky.
+		 */
+		ret = (mio_tell (File.mio) - (File.bomFound? 3: 0))
+			- getInputFileOffsetForLine(File.input.lineNumber);
+	}
+	else
+	{
+		/* At the first line of file. */
+		ret = mio_tell (File.mio) - (File.bomFound? 3: 0);
+	}
+
 	return ret >= 0 ? ret : 0;
 }
 
