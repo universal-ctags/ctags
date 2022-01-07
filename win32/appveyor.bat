@@ -142,9 +142,9 @@ if "%normalbuild%"=="no" (
   bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-python3-sphinx && break || sleep 15; done"
 )
 :: Install necessary packages
-bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{jansson,libxml2,libyaml,pcre2} && break || sleep 15; done"
+bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{jansson,libxml2,libyaml,pcre2} autoconf automake && break || sleep 15; done"
 
-bash -lc "./autogen.sh"
+bash -lc "./autogen.sh" || exit 1
 :: Use static link.
 bash -lc "./configure --disable-external-sort --enable-static && make -j2"
 
