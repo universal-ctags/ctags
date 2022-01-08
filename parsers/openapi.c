@@ -28,6 +28,17 @@ typedef enum {
 	KIND_PATH,
 	KIND_RESPONSE,
 	KIND_PARAMETER,
+	KIND_SERVER,
+	KIND_SECURITY,
+	KIND_TAG,
+	KIND_EXAMPLE,
+	KIND_EXTERNAL_DOCS,
+	KIND_REQUEST_BODY,
+	KIND_HEADER,
+	KIND_SECURITY_SCHEME,
+	KIND_LINK,
+	KIND_CALLBACK,
+	KIND_PATH_ITEM,
 } openapiKind;
 
 static kindDefinition OpenAPIKinds [] = {
@@ -35,6 +46,17 @@ static kindDefinition OpenAPIKinds [] = {
 	{ true, 'p', "path", "paths" },
 	{ true, 'R', "response", "responses" },
 	{ true, 'P', "parameter", "parameters" },
+        { true, 'S', "server", "servers"},
+        { true, 's', "security", "security"},
+        { true, 't', "tag", "tags"},
+        { true, 'e', "example", "examples"},
+        { true, 'D', "doc", "docs"},
+        { true, 'B', "requestBody", "requestBodies"},
+        { true, 'h', "header", "headers"},
+        { true, 'C', "securityScheme", "securitySchemes"},
+        { true, 'l', "link", "links"},
+        { true, 'c', "callback", "callbacks"},
+        { true, 'A', "pathItem", "pathItems"},
 };
 
 #define KEY_UNKNOWN KEYWORD_NONE
@@ -45,15 +67,45 @@ enum openapiKeys {
 	KEY_PARAMETERS,
 	KEY_RESPONSES,
 	KEY_DEFINITIONS,
+        KEY_SERVERS,
+        KEY_SECURITY,
+        KEY_TAG,
+        KEY_EXTERNAL_DOCS,
+        KEY_NAME,
+        KEY_URL,
+        KEY_TYPE,
+        KEY_EXAMPLES,
+        KEY_REQUEST_BODIES,
+        KEY_HEADERS,
+        KEY_SECURITY_SCHEMES,
+        KEY_LINKS,
+        KEY_CALLBACKS,
+        KEY_PATH_ITEMS,
+
 };
 
 static const keywordTable OpenAPIKeywordTable[] = {
-	{ "paths",       KEY_PATHS       },
-	{ "components",  KEY_COMPONENTS  },
-	{ "schemas",     KEY_SCHEMAS     },
-	{ "parameters",  KEY_PARAMETERS  },
-	{ "responses",   KEY_RESPONSES   },
-	{ "definitions", KEY_DEFINITIONS },
+	{ "paths",           KEY_PATHS            },
+	{ "components",      KEY_COMPONENTS       },
+	{ "schemas",         KEY_SCHEMAS          },
+	{ "parameters",      KEY_PARAMETERS       },
+	{ "responses",       KEY_RESPONSES        },
+	{ "definitions",     KEY_DEFINITIONS      },
+	{ "servers",         KEY_SERVERS          },
+	{ "security",        KEY_SECURITY         },
+	{ "tags",            KEY_TAG              },
+	{ "externalDocs",    KEY_EXTERNAL_DOCS    },
+	{ "url",             KEY_URL              },
+	{ "name",            KEY_NAME             },
+	{ "type",            KEY_TYPE             },
+	{ "examples",        KEY_EXAMPLES         },
+	{ "requestBodies",   KEY_REQUEST_BODIES   },
+	{ "links",           KEY_LINKS            },
+	{ "pathItems",       KEY_PATH_ITEMS       },
+	{ "callbacks",       KEY_CALLBACKS        },
+	{ "headers",         KEY_HEADERS          },
+	{ "securitySchemes", KEY_SECURITY_SCHEMES },
+
 };
 
 struct yamlBlockTypeStack {
@@ -89,8 +141,7 @@ static void pushBlockType (struct sOpenAPISubparser *openapi, yaml_token_type_t 
 	s->key = KEY_UNKNOWN;
 }
 
-static void popBlockType (struct sOpenAPISubparser *openapi,
-						  yaml_token_t *token)
+static void popBlockType (struct sOpenAPISubparser *openapi)
 {
 	struct yamlBlockTypeStack *s;
 
@@ -102,11 +153,10 @@ static void popBlockType (struct sOpenAPISubparser *openapi,
 	eFree (s);
 }
 
-static void popAllBlockType (struct sOpenAPISubparser *openapi,
-							 yaml_token_t *token)
+static void popAllBlockType (struct sOpenAPISubparser *openapi)
 {
 	while (openapi->type_stack)
-		popBlockType (openapi, token);
+		popBlockType (openapi);
 }
 
 static bool stateStackMatch (struct yamlBlockTypeStack *stack,
@@ -197,7 +247,80 @@ static const enum openapiKeys definitions2Keys[] = {
 	KEY_DEFINITIONS,
 };
 
+static const enum openapiKeys links3Keys[] = {
+       KEY_UNKNOWN,
+       KEY_LINKS,
+       KEY_COMPONENTS,
+};
+
+static const enum openapiKeys callbacks3Keys[] = {
+       KEY_UNKNOWN,
+       KEY_CALLBACKS,
+       KEY_COMPONENTS,
+};
+
+static const enum openapiKeys pathItems3Keys[] = {
+       KEY_UNKNOWN,
+       KEY_PATH_ITEMS,
+       KEY_COMPONENTS,
+};
+
+static const enum openapiKeys securitySchemes3Keys[] = {
+       KEY_UNKNOWN,
+       KEY_SECURITY_SCHEMES,
+       KEY_COMPONENTS,
+};
+
+static const enum openapiKeys headers3Keys[] = {
+       KEY_UNKNOWN,
+       KEY_HEADERS,
+       KEY_COMPONENTS,
+};
+
+static const enum openapiKeys requestBodies3Keys[] = {
+       KEY_UNKNOWN,
+       KEY_REQUEST_BODIES,
+       KEY_COMPONENTS,
+};
+
+static const enum openapiKeys examples3Keys[] = {
+       KEY_UNKNOWN,
+       KEY_EXAMPLES,
+       KEY_COMPONENTS,
+};
+
+static const enum openapiKeys server3Keys[] = {
+       KEY_URL,
+       KEY_UNKNOWN,
+       KEY_SERVERS,
+};
+
+// The tag "type" is used as a poor man's tag title.
+// That's because "name" can be set with type=apiKey only :(
+static const enum openapiKeys security3Keys[] = {
+       KEY_UNKNOWN,
+       KEY_UNKNOWN,
+       KEY_SECURITY,
+};
+
+static const enum openapiKeys tags3Keys[] = {
+       KEY_NAME,
+       KEY_UNKNOWN,
+       KEY_TAG,
+};
+
+static const enum openapiKeys externalDocs3Keys[] = {
+       KEY_URL,
+       KEY_EXTERNAL_DOCS,
+};
+
+
 const struct tagSource tagSources[] = {
+        {
+                KIND_EXAMPLE,
+                examples3Keys,
+                ARRAY_SIZE (examples3Keys),
+        },
 	{
 		KIND_PATH,
 		pathKeys,
@@ -233,14 +356,68 @@ const struct tagSource tagSources[] = {
 		definitions2Keys,
 		ARRAY_SIZE (definitions2Keys),
 	},
+        {
+                KIND_REQUEST_BODY,
+                requestBodies3Keys,
+                ARRAY_SIZE (requestBodies3Keys),
+        },
+        {
+                KIND_HEADER,
+                headers3Keys,
+                ARRAY_SIZE (headers3Keys),
+        },
+        {
+                KIND_PATH_ITEM,
+                pathItems3Keys,
+                ARRAY_SIZE (pathItems3Keys),
+        },
+        {
+                KIND_SECURITY_SCHEME,
+                securitySchemes3Keys,
+                ARRAY_SIZE (securitySchemes3Keys),
+        },
+        {
+                KIND_LINK,
+                links3Keys,
+                ARRAY_SIZE (links3Keys),
+        },
+        {
+                KIND_CALLBACK,
+                callbacks3Keys,
+                ARRAY_SIZE (callbacks3Keys),
+        },
+        {
+                KIND_SECURITY,
+                security3Keys,
+                ARRAY_SIZE (security3Keys),
+        },
 };
 
-static void handleKey(struct sOpenAPISubparser *openapi,
-					  yaml_token_t *token)
+const struct tagSource tagValueSources[] = {
+       {
+               KIND_SERVER,
+               server3Keys,
+               ARRAY_SIZE (server3Keys),
+       },
+       {
+               KIND_TAG,
+               tags3Keys,
+               ARRAY_SIZE (tags3Keys),
+       },
+       {
+               KIND_EXTERNAL_DOCS,
+               externalDocs3Keys,
+               ARRAY_SIZE (externalDocs3Keys),
+       },
+};
+
+
+static void handleToken(struct sOpenAPISubparser *openapi, yaml_token_t *token,
+	const struct tagSource *tss, size_t ts_count)
 {
-	for (int i = 0; i < ARRAY_SIZE(tagSources); i++)
+	for (int i = 0; i < ts_count; i++)
 	{
-		const struct tagSource* ts = &tagSources[i];
+		const struct tagSource* ts = &tss[i];
 
 		if (stateStackMatch(openapi->type_stack,
 							ts->keys, ts->countKeys))
@@ -251,8 +428,21 @@ static void handleKey(struct sOpenAPISubparser *openapi,
 			attachYamlPosition (&tag, token, false);
 
 			makeTagEntry (&tag);
+			break;
 		}
 	}
+}
+
+static void handleKey(struct sOpenAPISubparser *openapi,
+					  yaml_token_t *token)
+{
+	handleToken(openapi, token, tagSources, ARRAY_SIZE(tagSources));
+}
+
+static void handleValue(struct sOpenAPISubparser *openapi,
+					  yaml_token_t *token)
+{
+	handleToken(openapi, token, tagValueSources, ARRAY_SIZE(tagValueSources));
 }
 
 static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
@@ -280,6 +470,7 @@ static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
 			break;
 		case DSTAT_LAST_VALUE:
 			TRACE_PRINT("  value: %s\n", (char*)token->data.scalar.value);
+			handleValue (openapi, token);
 			break;
 		default:
 			break;
@@ -307,9 +498,9 @@ static void newTokenCallback (yamlSubparser *s, yaml_token_t *token)
 	openapiPlayStateMachine ((struct sOpenAPISubparser *)s, token);
 
 	if (token->type == YAML_BLOCK_END_TOKEN)
-		popBlockType ((struct sOpenAPISubparser *)s, token);
+		popBlockType ((struct sOpenAPISubparser *)s);
 	else if (token->type == YAML_STREAM_END_TOKEN)
-		popAllBlockType ((struct sOpenAPISubparser *)s, token);
+		popAllBlockType ((struct sOpenAPISubparser *)s);
 }
 
 static void inputStart(subparser *s)
