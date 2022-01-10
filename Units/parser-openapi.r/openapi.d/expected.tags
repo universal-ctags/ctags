@@ -1,3 +1,5 @@
+test	input.yaml	/^    title: test$/;"	t
+http://example.com	input.yaml	/^  - url: http:\/\/example.com$/;"	s
 /sample/path	input.yaml	/^    \/sample\/path:$/;"	p
 /sample/other/path	input.yaml	/^    \/sample\/other\/path:$/;"	p
 NullableField	input.yaml	/^        NullableField:$/;"	d

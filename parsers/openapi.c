@@ -28,6 +28,8 @@ typedef enum {
 	KIND_PATH,
 	KIND_RESPONSE,
 	KIND_PARAMETER,
+	KIND_TITLE,
+	KIND_SERVER,
 } openapiKind;
 
 static kindDefinition OpenAPIKinds [] = {
@@ -35,6 +37,8 @@ static kindDefinition OpenAPIKinds [] = {
 	{ true, 'p', "path", "paths" },
 	{ true, 'R', "response", "responses" },
 	{ true, 'P', "parameter", "parameters" },
+	{ true, 't', "title", "titles" },
+	{ true, 's', "server", "servers (or hosts in swagger)" },
 };
 
 #define KEY_UNKNOWN KEYWORD_NONE
@@ -45,6 +49,11 @@ enum openapiKeys {
 	KEY_PARAMETERS,
 	KEY_RESPONSES,
 	KEY_DEFINITIONS,
+	KEY_INFO,
+	KEY_TITLE,
+	KEY_SERVERS,
+	KEY_URL,
+	KEY_HOST,
 };
 
 static const keywordTable OpenAPIKeywordTable[] = {
@@ -54,6 +63,11 @@ static const keywordTable OpenAPIKeywordTable[] = {
 	{ "parameters",  KEY_PARAMETERS  },
 	{ "responses",   KEY_RESPONSES   },
 	{ "definitions", KEY_DEFINITIONS },
+	{ "info",        KEY_INFO },
+	{ "title",       KEY_TITLE },
+	{ "servers",     KEY_SERVERS },
+	{ "url",         KEY_URL },
+	{ "host",        KEY_HOST },
 };
 
 struct yamlBlockTypeStack {
@@ -89,8 +103,7 @@ static void pushBlockType (struct sOpenAPISubparser *openapi, yaml_token_type_t 
 	s->key = KEY_UNKNOWN;
 }
 
-static void popBlockType (struct sOpenAPISubparser *openapi,
-						  yaml_token_t *token)
+static void popBlockType (struct sOpenAPISubparser *openapi)
 {
 	struct yamlBlockTypeStack *s;
 
@@ -102,11 +115,10 @@ static void popBlockType (struct sOpenAPISubparser *openapi,
 	eFree (s);
 }
 
-static void popAllBlockType (struct sOpenAPISubparser *openapi,
-							 yaml_token_t *token)
+static void popAllBlockType (struct sOpenAPISubparser *openapi)
 {
 	while (openapi->type_stack)
-		popBlockType (openapi, token);
+		popBlockType (openapi);
 }
 
 static bool stateStackMatch (struct yamlBlockTypeStack *stack,
@@ -197,6 +209,21 @@ static const enum openapiKeys definitions2Keys[] = {
 	KEY_DEFINITIONS,
 };
 
+static const enum openapiKeys title3Keys[] = {
+	KEY_TITLE,
+	KEY_INFO,
+};
+
+static const enum openapiKeys server3Keys[] = {
+	KEY_URL,
+	KEY_UNKNOWN,
+	KEY_SERVERS,
+};
+
+static const enum openapiKeys host2Keys[] = {
+	KEY_HOST,
+};
+
 const struct tagSource tagSources[] = {
 	{
 		KIND_PATH,
@@ -235,12 +262,30 @@ const struct tagSource tagSources[] = {
 	},
 };
 
-static void handleKey(struct sOpenAPISubparser *openapi,
-					  yaml_token_t *token)
-{
-	for (int i = 0; i < ARRAY_SIZE(tagSources); i++)
+const struct tagSource tagValueSources[] = {
 	{
-		const struct tagSource* ts = &tagSources[i];
+		KIND_TITLE,
+		title3Keys,
+		ARRAY_SIZE (title3Keys),
+	},
+	{
+		KIND_SERVER,
+		server3Keys,
+		ARRAY_SIZE (server3Keys),
+	},
+	{
+		KIND_SERVER,
+		host2Keys,
+		ARRAY_SIZE (host2Keys),
+	}
+};
+
+static void handleToken(struct sOpenAPISubparser *openapi, yaml_token_t *token,
+						const struct tagSource *tss, size_t ts_count)
+{
+	for (int i = 0; i < ts_count; i++)
+	{
+		const struct tagSource* ts = &tss[i];
 
 		if (stateStackMatch(openapi->type_stack,
 							ts->keys, ts->countKeys))
@@ -251,8 +296,21 @@ static void handleKey(struct sOpenAPISubparser *openapi,
 			attachYamlPosition (&tag, token, false);
 
 			makeTagEntry (&tag);
+			break;
 		}
 	}
+}
+
+static void handleKey(struct sOpenAPISubparser *openapi,
+					  yaml_token_t *token)
+{
+	handleToken (openapi, token, tagSources, ARRAY_SIZE (tagSources));
+}
+
+static void handleValue(struct sOpenAPISubparser *openapi,
+						yaml_token_t *token)
+{
+	handleToken (openapi, token, tagValueSources, ARRAY_SIZE (tagValueSources));
 }
 
 static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
@@ -271,7 +329,7 @@ static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
 		switch (openapi->play_detection_state)
 		{
 		case DSTAT_LAST_KEY:
-			TRACE_PRINT("  key: %s\n", (char*)token->data.scalar.value);
+			TRACE_PRINT("  key: %s", (char*)token->data.scalar.value);
 			if (openapi->type_stack)
 			{
 				openapi->type_stack->key = parseKey(token);
@@ -279,7 +337,9 @@ static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
 			}
 			break;
 		case DSTAT_LAST_VALUE:
-			TRACE_PRINT("  value: %s\n", (char*)token->data.scalar.value);
+			TRACE_PRINT("  value: %s", (char*)token->data.scalar.value);
+			if (openapi->type_stack)
+				handleValue (openapi, token);
 			break;
 		default:
 			break;
@@ -307,9 +367,9 @@ static void newTokenCallback (yamlSubparser *s, yaml_token_t *token)
 	openapiPlayStateMachine ((struct sOpenAPISubparser *)s, token);
 
 	if (token->type == YAML_BLOCK_END_TOKEN)
-		popBlockType ((struct sOpenAPISubparser *)s, token);
+		popBlockType ((struct sOpenAPISubparser *)s);
 	else if (token->type == YAML_STREAM_END_TOKEN)
-		popAllBlockType ((struct sOpenAPISubparser *)s, token);
+		popAllBlockType ((struct sOpenAPISubparser *)s);
 }
 
 static void inputStart(subparser *s)
