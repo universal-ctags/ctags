@@ -1,0 +1,2 @@
+retry	input.s	/^retry:;loop:$/;"	l
+loop	input.s	/^retry:;loop:$/;"	l

@@ -1,6 +1,7 @@
 # ALL
 #LANGUAGE      NAME              DESCRIPTION
 Asm            commentCharsAtBOL line comment chraracters at the begining of line ([;*@])
+Asm            extraLinesepChars extra characters used as a line separator ([])
 CPreProcessor  _expand           expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
 CPreProcessor  define            define replacement for an identifier (name(params,...)=definition)
 CPreProcessor  if0               examine code within "#if 0" branch (true or [false])
@@ -12,6 +13,7 @@ TclOO          forceUse          enable the parser even when `oo' namespace is n
 # ALL MACHINABLE
 #LANGUAGE	NAME	DESCRIPTION
 Asm	commentCharsAtBOL	line comment chraracters at the begining of line ([;*@])
+Asm	extraLinesepChars	extra characters used as a line separator ([])
 CPreProcessor	_expand	expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
 CPreProcessor	define	define replacement for an identifier (name(params,...)=definition)
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
@@ -22,6 +24,7 @@ TclOO	forceUse	enable the parser even when `oo' namespace is not specified in th
 
 # ALL MACHINABLE NOHEADER
 Asm	commentCharsAtBOL	line comment chraracters at the begining of line ([;*@])
+Asm	extraLinesepChars	extra characters used as a line separator ([])
 CPreProcessor	_expand	expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
 CPreProcessor	define	define replacement for an identifier (name(params,...)=definition)
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])

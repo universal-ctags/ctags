@@ -146,6 +146,10 @@ static const opKind OpKinds [] = {
 static const char defaultCommentCharAtBOL [] = DEFAULT_COMMENT_CHARS_BOL;
 static const char *commentCharsAtBOL = defaultCommentCharAtBOL;
 
+#define DEFAULT_EXTRA_LINESEP_CHARS ""
+static const char defaultExtraLinesepChars [] = DEFAULT_EXTRA_LINESEP_CHARS;
+static const char *extraLinesepChars = defaultExtraLinesepChars;
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -312,15 +316,16 @@ static const unsigned char *asmReadLineFromInputFile (void)
 
 	while ((c = cppGetc()) != EOF)
 	{
-		if (c == '\n')
-			break;
-		else if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
+		if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
 		{
 			/* We cannot store these values to vString
 			 * Store a whitespace as a dummy value for them.
 			 */
 			vStringPut (line, ' ');
 		}
+		else if (c == '\n' || (extraLinesepChars[0] != '\0'
+							   && strchr (extraLinesepChars, c) != NULL))
+			break;
 		else
 			vStringPut (line, c);
 	}
@@ -522,11 +527,28 @@ static void asmSetCommentCharsAtBOL (const langType language CTAGS_ATTR_UNUSED,
 		commentCharsAtBOL = defaultCommentCharAtBOL;
 }
 
+static void asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
+									const char *optname CTAGS_ATTR_UNUSED, const char *arg)
+{
+	if (extraLinesepChars != defaultExtraLinesepChars)
+		eFree ((void *)extraLinesepChars);
+
+	if (arg && (arg[0] != '\0'))
+		extraLinesepChars = eStrdup (arg);
+	else
+		extraLinesepChars = defaultExtraLinesepChars;
+}
+
 static parameterHandlerTable AsmParameterHandlerTable [] = {
 	{
 		.name = "commentCharsAtBOL",
 		.desc = "line comment chraracters at the begining of line ([" DEFAULT_COMMENT_CHARS_BOL "])",
 		.handleParameter = asmSetCommentCharsAtBOL,
+	},
+	{
+		.name = "extraLinesepChars",
+		.desc = "extra characters used as a line separator ([])",
+		.handleParameter = asmSetExtraLinesepChars,
 	},
 };
 
