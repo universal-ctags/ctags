@@ -1342,7 +1342,7 @@ bool cxxParserParseNextToken(void)
 				/* If the macro is overly used, report it here. */
 				CXX_DEBUG_PRINT("Overly uesd macro %s <%p> useCount: %d (> %d)",
 								vStringValue(t->pszWord),
-								pMacro, pMacro? pMacro->useCount: -1,
+								pMacro, pMacro->useCount,
 								CXX_PARSER_MAXIMUM_MACRO_USE_COUNT);
 			}
 #endif
