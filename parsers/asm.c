@@ -146,6 +146,10 @@ static const opKind OpKinds [] = {
 static const char defaultCommentChar [] = DEFAULT_COMMENT_CHARS;
 static const char *commentChars = defaultCommentChar;
 
+#define DEFAULT_EXTRA_LINESEP_CHARS ""
+static const char defaultExtraLinesepChars [] = DEFAULT_EXTRA_LINESEP_CHARS;
+static const char *extraLinesepChars = defaultExtraLinesepChars;
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -312,7 +316,8 @@ static const unsigned char *asmReadLineFromInputFile (void)
 
 	while ((c = cppGetc()) != EOF)
 	{
-		if (c == '\n')
+		if (c == '\n' || (extraLinesepChars[0] != '\0'
+						  && strchr (extraLinesepChars, c) != NULL))
 			break;
 		else if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
 		{
@@ -522,11 +527,28 @@ static void asmSetCommentChars (const langType language CTAGS_ATTR_UNUSED,
 		commentChars = defaultCommentChar;
 }
 
+static void asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
+									const char *optname CTAGS_ATTR_UNUSED, const char *arg)
+{
+	if (extraLinesepChars != defaultExtraLinesepChars)
+		eFree ((void *)extraLinesepChars);
+
+	if (arg && (arg[0] != '\0'))
+		extraLinesepChars = eStrdup (arg);
+	else
+		extraLinesepChars = defaultExtraLinesepChars;
+}
+
 static parameterHandlerTable AsmParameterHandlerTable [] = {
 	{
 		.name = "commentChars",
 		.desc = "characters starting a comment line ([" DEFAULT_COMMENT_CHARS "])",
 		.handleParameter = asmSetCommentChars,
+	},
+	{
+		.name = "extraLinesepChars",
+		.desc = "extra characters used as a line separator ([])",
+		.handleParameter = asmSetExtraLinesepChars,
 	},
 };
 
