@@ -19,6 +19,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "keyword.h"
+#include "param.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -140,6 +141,10 @@ static const opKind OpKinds [] = {
 	{ OP_SET,         K_DEFINE },
 	{ OP_STRUCT,      K_TYPE   }
 };
+
+#define DEFAULT_COMMENT_CHARS ";*@"
+static const char defaultCommentChar [] = DEFAULT_COMMENT_CHARS;
+static const char *commentChars = defaultCommentChar;
 
 /*
 *   FUNCTION DEFINITIONS
@@ -433,7 +438,7 @@ static void findAsmTags (void)
 		bool nameFollows = false;
 		bool directive = false;
 		const bool isComment = (bool)
-				(*cp != '\0' && strchr (";*@", *cp) != NULL);
+				(*cp != '\0' && strchr (commentChars, *cp) != NULL);
 
 		/* skip comments */
 		if (isComment)
@@ -505,6 +510,26 @@ static void initialize (const langType language)
 	Lang_asm = language;
 }
 
+static void asmSetCommentChars (const langType language CTAGS_ATTR_UNUSED,
+								const char *optname CTAGS_ATTR_UNUSED, const char *arg)
+{
+	if (commentChars != defaultCommentChar)
+		eFree ((void *)commentChars);
+
+	if (arg && (arg[0] != '\0'))
+		commentChars = eStrdup (arg);
+	else
+		commentChars = defaultCommentChar;
+}
+
+static parameterHandlerTable AsmParameterHandlerTable [] = {
+	{
+		.name = "commentChars",
+		.desc = "characters starting a comment line ([" DEFAULT_COMMENT_CHARS "])",
+		.handleParameter = asmSetCommentChars,
+	},
+};
+
 extern parserDefinition* AsmParser (void)
 {
 	static const char *const extensions [] = {
@@ -533,5 +558,9 @@ extern parserDefinition* AsmParser (void)
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->fieldTable = AsmFields;
 	def->fieldCount = ARRAY_SIZE (AsmFields);
+
+	def->parameterHandlerTable = AsmParameterHandlerTable;
+	def->parameterHandlerCount = ARRAY_SIZE(AsmParameterHandlerTable);
+
 	return def;
 }
