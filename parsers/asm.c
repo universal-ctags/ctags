@@ -475,7 +475,7 @@ static void findAsmTags (void)
 				labelCandidate = false;
 		}
 
-		if (! isspace ((int) *cp)  &&  *cp != '\0')
+		if (! isspace ((int) *cp)  &&  *cp != '\0' && strchr (commentChars, *cp) == NULL)
 			continue;
 
 		/* skip white space */
