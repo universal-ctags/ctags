@@ -27,6 +27,7 @@ GEN_IN_MAN_FILES = \
 	ctags-client-tools.7 \
 	ctags-faq.7 \
 	\
+	ctags-lang-asm.7 \
 	ctags-lang-gdscript.7 \
 	ctags-lang-iPythonCell.7 \
 	ctags-lang-julia.7 \
