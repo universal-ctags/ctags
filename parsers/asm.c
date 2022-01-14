@@ -146,6 +146,10 @@ static const opKind OpKinds [] = {
 static const char defaultCommentCharAtBOL [] = DEFAULT_COMMENT_CHARS_BOL;
 static const char *commentCharsAtBOL = defaultCommentCharAtBOL;
 
+#define DEFAULT_COMMENT_CHARS_MOL ""
+static const char defaultCommentCharInMOL [] = DEFAULT_COMMENT_CHARS_MOL;
+static const char *commentCharsInMOL = defaultCommentCharInMOL;
+
 #define DEFAULT_EXTRA_LINESEP_CHARS ""
 static const char defaultExtraLinesepChars [] = DEFAULT_EXTRA_LINESEP_CHARS;
 static const char *extraLinesepChars = defaultExtraLinesepChars;
@@ -307,10 +311,11 @@ static const unsigned char *readOperator (
 	return cp;
 }
 
-static const unsigned char *asmReadLineFromInputFile (void)
+static const unsigned char *asmReadLineFromInputFile (const char *commentChars)
 {
 	static vString *line;
 	int c;
+	bool truncation = false;
 
 	line = vStringNewOrClear (line);
 
@@ -321,13 +326,20 @@ static const unsigned char *asmReadLineFromInputFile (void)
 			/* We cannot store these values to vString
 			 * Store a whitespace as a dummy value for them.
 			 */
-			vStringPut (line, ' ');
+			if (!truncation)
+				vStringPut (line, ' ');
 		}
 		else if (c == '\n' || (extraLinesepChars[0] != '\0'
 							   && strchr (extraLinesepChars, c) != NULL))
 			break;
 		else
-			vStringPut (line, c);
+		{
+			if (truncation == false && commentChars[0] && strchr (commentChars, c))
+				truncation = true;
+
+			if (!truncation)
+				vStringPut (line, c);
+		}
 	}
 
 	if ((vStringLength (line) == 0) && (c == EOF))
@@ -436,7 +448,7 @@ static void findAsmTags (void)
 
 	 int scope = CORK_NIL;
 
-	while ((line = asmReadLineFromInputFile ()) != NULL)
+	while ((line = asmReadLineFromInputFile (commentCharsInMOL)) != NULL)
 	{
 		const unsigned char *cp = line;
 		bool labelCandidate = (bool) (! isspace ((int) *cp));
@@ -515,17 +527,21 @@ static void initialize (const langType language)
 	Lang_asm = language;
 }
 
-static void asmSetCommentCharsAtBOL (const langType language CTAGS_ATTR_UNUSED,
-								const char *optname CTAGS_ATTR_UNUSED, const char *arg)
-{
-	if (commentCharsAtBOL != defaultCommentCharAtBOL)
-		eFree ((void *)commentCharsAtBOL);
+#define defineCommentCharSetter(PREPOS, POS)							\
+	static void asmSetCommentChars##PREPOS##POS (const langType language CTAGS_ATTR_UNUSED, \
+												 const char *optname CTAGS_ATTR_UNUSED, const char *arg) \
+	{																	\
+		if (commentChars##PREPOS##POS != defaultCommentChar##PREPOS##POS) \
+			eFree ((void *)commentChars##PREPOS##POS);					\
+																		\
+		if (arg && (arg[0] != '\0'))									\
+			commentChars##PREPOS##POS = eStrdup (arg);					\
+		else															\
+			commentChars##PREPOS##POS = defaultCommentChar##PREPOS##POS; \
+	}
 
-	if (arg && (arg[0] != '\0'))
-		commentCharsAtBOL = eStrdup (arg);
-	else
-		commentCharsAtBOL = defaultCommentCharAtBOL;
-}
+defineCommentCharSetter(At, BOL);
+defineCommentCharSetter(In, MOL);
 
 static void asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
 									const char *optname CTAGS_ATTR_UNUSED, const char *arg)
@@ -544,6 +560,11 @@ static parameterHandlerTable AsmParameterHandlerTable [] = {
 		.name = "commentCharsAtBOL",
 		.desc = "line comment chraracters at the begining of line ([" DEFAULT_COMMENT_CHARS_BOL "])",
 		.handleParameter = asmSetCommentCharsAtBOL,
+	},
+	{
+		.name = "commentCharsInMOL",
+		.desc = "line comment chraracters in the begining of line ([" DEFAULT_COMMENT_CHARS_MOL "])",
+		.handleParameter = asmSetCommentCharsInMOL,
 	},
 	{
 		.name = "extraLinesepChars",
