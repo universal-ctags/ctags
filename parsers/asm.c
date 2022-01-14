@@ -154,6 +154,8 @@ static const char *commentCharsInMOL = defaultCommentCharInMOL;
 static const char defaultExtraLinesepChars [] = DEFAULT_EXTRA_LINESEP_CHARS;
 static const char *extraLinesepChars = defaultExtraLinesepChars;
 
+static bool useCPreProcessor = true;
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -311,7 +313,7 @@ static const unsigned char *readOperator (
 	return cp;
 }
 
-static const unsigned char *asmReadLineFromInputFile (const char *commentChars)
+static const unsigned char *readLineViaCpp (const char *commentChars)
 {
 	static vString *line;
 	int c;
@@ -346,6 +348,42 @@ static const unsigned char *asmReadLineFromInputFile (const char *commentChars)
 		return NULL;
 	else
 		return (unsigned char *)vStringValue (line);
+}
+
+static const unsigned char *readLineNoCpp (const char *commentChars)
+{
+	static vString *line;
+	int c;
+	bool truncation = false;
+
+	line = vStringNewOrClear (line);
+
+	while ((c = getcFromInputFile ()) != EOF)
+	{
+		if (c == '\n' || (extraLinesepChars[0] != '\0'
+						  && strchr (extraLinesepChars, c) != NULL))
+			break;
+		else
+		{
+			if (truncation == false && commentChars[0] && strchr (commentChars, c))
+				truncation = true;
+
+			if (!truncation)
+				vStringPut (line, c);
+		}
+	}
+	if ((vStringLength (line) == 0) && (c == EOF))
+		return NULL;
+	else
+		return (unsigned char *)vStringValue (line);
+}
+
+static const unsigned char *asmReadLineFromInputFile (const char *commentChars, bool useCpp)
+{
+	if (useCpp)
+		return readLineViaCpp (commentChars);
+	else
+		return readLineNoCpp (commentChars);
 }
 
 static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned char *cp)
@@ -436,20 +474,21 @@ static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned cha
 	vStringDelete (name);
 }
 
-static void findAsmTags (void)
+static void findAsmTagsCommon (bool useCpp)
 {
 	vString *name = vStringNew ();
 	vString *operator = vStringNew ();
 	const unsigned char *line;
 
-	cppInit (false, false, false, false,
-			 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
-			 FIELD_UNKNOWN);
+	if (useCpp)
+		cppInit (false, false, false, false,
+				 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
+				 FIELD_UNKNOWN);
 
 	int scope = CORK_NIL;
 
-	while ((line = asmReadLineFromInputFile (commentCharsInMOL)) != NULL)
-	{
+	 while ((line = asmReadLineFromInputFile (commentCharsInMOL, useCpp)) != NULL)
+	 {
 		const unsigned char *cp = line;
 		bool labelCandidate = (bool) (! isspace ((int) *cp));
 		bool nameFollows = false;
@@ -516,10 +555,16 @@ static void findAsmTags (void)
 			readMacroParameters (r, e, cp);
 	}
 
-	cppTerminate ();
+	if (useCpp)
+		cppTerminate ();
 
 	vStringDelete (name);
 	vStringDelete (operator);
+}
+
+static void findAsmTags (void)
+{
+	findAsmTagsCommon (useCPreProcessor);
 }
 
 static void initialize (const langType language)
@@ -555,6 +600,13 @@ static void asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
 		extraLinesepChars = defaultExtraLinesepChars;
 }
 
+static void setUseCPreProcessor(const langType language CTAGS_ATTR_UNUSED,
+								const char *name, const char *arg)
+{
+	useCPreProcessor = paramParserBool (arg, useCPreProcessor,
+										name, "parameter");
+}
+
 static parameterHandlerTable AsmParameterHandlerTable [] = {
 	{
 		.name = "commentCharsAtBOL",
@@ -570,6 +622,11 @@ static parameterHandlerTable AsmParameterHandlerTable [] = {
 		.name = "extraLinesepChars",
 		.desc = "extra characters used as a line separator ([])",
 		.handleParameter = asmSetExtraLinesepChars,
+	},
+	{
+		.name = "useCPreProcessor",
+		.desc = "run CPreProcessor parser for extracting macro definitions ([true] or false)",
+		.handleParameter = setUseCPreProcessor,
 	},
 };
 

@@ -1,0 +1,2 @@
+labelM	input.S	/^#define labelM /;"	d	file:
+labelM	input.S	/^labelM:$/;"	l
