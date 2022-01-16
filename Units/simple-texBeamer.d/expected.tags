@@ -1,9 +1,25 @@
-Concept	input.tex	/^\\begin{frame}{Concept}$/;"	frametitle
-kind	input.tex	/^\\begin{frame}{Concept}{kind}$/;"	framesubtitle	frametitle:Concept
-field	input.tex	/^  \\framesubtitle{field}$/;"	framesubtitle	frametitle:Concept
-extra	input.tex	/^  \\framesubtitle{extra}$/;"	framesubtitle	frametitle:Concept
-pseudo tag	input.tex	/^\\begin{frame}[fragile]{Concept}{pseudo tag}$/;"	framesubtitle	frametitle:Concept
-Options	input.tex	/^\\begin{frame}<1-2>\\frametitle{Options}$/;"	frametitle
-Optlib	input.tex	/^\\begin{frame}<1-2>[fragile]\\frametitle{Optlib}$/;"	frametitle
-Line oriented parser	input.tex	/^\\begin{frame}<1-2>[fragile]\\frametitle{Optlib}\\framesubtitle{Line oriented parser}$/;"	framesubtitle	frametitle:Optlib
-Multiline parser	input.tex	/^\\begin{frame}[<+->][plain]{Optlib}\\framesubtitle{Multiline parser}$/;"	framesubtitle	frametitle:Optlib
+document	input.tex	/^\\begin{document}$/;"	environment	roles:used
+frame	input.tex	/^\\begin{frame}{Concept}$/;"	environment	roles:used
+Concept	input.tex	/^\\begin{frame}{Concept}$/;"	frametitle	roles:def
+frame	input.tex	/^\\begin{frame}{Concept}{kind}$/;"	environment	roles:used
+kind	input.tex	/^\\begin{frame}{Concept}{kind}$/;"	framesubtitle	frametitle:Concept	roles:def
+frame	input.tex	/^\\begin{frame}\\frametitle{Concept}$/;"	environment	roles:used
+field	input.tex	/^  \\framesubtitle{field}$/;"	framesubtitle	frametitle:Concept	roles:def
+frame	input.tex	/^\\begin{frame}{Concept}$/;"	environment	roles:used
+extra	input.tex	/^  \\framesubtitle{extra}$/;"	framesubtitle	frametitle:Concept	roles:def
+frame	input.tex	/^\\begin{frame}[fragile]{Concept}{pseudo tag}$/;"	environment	roles:used
+pseudo tag	input.tex	/^\\begin{frame}[fragile]{Concept}{pseudo tag}$/;"	framesubtitle	frametitle:Concept	roles:def
+frame	input.tex	/^\\begin{frame}<1-2>\\frametitle{Options}$/;"	environment	roles:used
+Options	input.tex	/^\\begin{frame}<1-2>\\frametitle{Options}$/;"	frametitle	roles:def
+itemize	input.tex	/^  \\begin{itemize}$/;"	environment	roles:used
+itemize	input.tex	/^  \\begin{itemize}$/;"	environment	roles:used
+frame	input.tex	/^\\begin{frame}<1-2>[fragile]\\frametitle{Optlib}$/;"	environment	roles:used
+Optlib	input.tex	/^\\begin{frame}<1-2>[fragile]\\frametitle{Optlib}$/;"	frametitle	roles:def
+itemize	input.tex	/^  \\begin{itemize}$/;"	environment	roles:used
+itemize	input.tex	/^  \\begin{itemize}$/;"	environment	roles:used
+frame	input.tex	/^\\begin{frame}<1-2>[fragile]\\frametitle{Optlib}\\framesubtitle{Line oriented parser}$/;"	environment	roles:used
+Line oriented parser	input.tex	/^\\begin{frame}<1-2>[fragile]\\frametitle{Optlib}\\framesubtitle{Line oriented parser}$/;"	framesubtitle	frametitle:Optlib	roles:def
+itemize	input.tex	/^  \\begin{itemize}$/;"	environment	roles:used
+frame	input.tex	/^\\begin{frame}[<+->][plain]{Optlib}\\framesubtitle{Multiline parser}$/;"	environment	roles:used
+Multiline parser	input.tex	/^\\begin{frame}[<+->][plain]{Optlib}\\framesubtitle{Multiline parser}$/;"	framesubtitle	frametitle:Optlib	roles:def
+itemize	input.tex	/^\\begin{itemize}$/;"	environment	roles:used
