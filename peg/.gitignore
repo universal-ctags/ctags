@@ -1,2 +1,3 @@
 varlink.[ch]
 kotlin.[ch]
+thrift.[ch]

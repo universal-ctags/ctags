@@ -49,6 +49,7 @@ depcomp
 gdb-backtrace.txt
 install-sh
 libctags.a
+libutil.a
 Makefile.in
 mini-geany
 mini-geany.exe
