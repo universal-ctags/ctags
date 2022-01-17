@@ -326,6 +326,11 @@ static void findBasicTags (void)
 		else
 			match_colon_label (p);
 	}
+
+	/* if there are still lost pointers after the file has been parsed */
+	for(int i=0;i<namespace_depth;i++)
+		vStringDelete(namespaces[i]);
+	namespace_depth=0;
 }
 
 parserDefinition *BasicParser (void)
