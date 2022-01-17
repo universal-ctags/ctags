@@ -441,6 +441,17 @@ void cxxTokenChainMoveEntryRange(
 }
 #endif
 
+static CXXToken * cxxTokenCreatePlaceholder(CXXToken * pToken)
+{
+	CXXToken * pPlaceholder = cxxTokenCreate();
+
+	pPlaceholder->iLineNumber = pToken->iLineNumber;
+	pPlaceholder->oFilePosition = pToken->oFilePosition;
+	pPlaceholder->eType = CXXTokenTypeUnknown;
+
+	return pPlaceholder;
+}
+
 CXXTokenChain * cxxTokenChainSplitOnComma(CXXTokenChain * tc)
 {
 	if(!tc)
@@ -457,14 +468,31 @@ CXXTokenChain * cxxTokenChainSplitOnComma(CXXTokenChain * tc)
 
 	while(pStart && pToken->pNext)
 	{
-		while(pToken->pNext && (!cxxTokenTypeIs(pToken->pNext,CXXTokenTypeComma)))
-			pToken = pToken->pNext;
+		CXXToken * pNew = NULL;
 
-		CXXToken * pNew = cxxTokenChainExtractRange(pStart,pToken,0);
+		if (cxxTokenTypeIs(pToken,CXXTokenTypeComma))
+		{
+			// If nothing is passed as an argument like
+			//
+			// macro(,b),
+			// macro(a,), or
+			// macro(,)
+			//
+			// , we must inject a dummy token to the chain.
+			pNew = cxxTokenCreatePlaceholder(pToken);
+			// we will not update pToken in this case.
+		}
+		else
+		{
+			while(pToken->pNext && (!cxxTokenTypeIs(pToken->pNext,CXXTokenTypeComma)))
+				pToken = pToken->pNext;
+
+			pNew = cxxTokenChainExtractRange(pStart,pToken,0);
+			pToken = pToken->pNext; // comma or nothing
+		}
 		if(pNew)
 			cxxTokenChainAppend(pRet,pNew);
 
-		pToken = pToken->pNext; // comma or nothing
 		if(pToken)
 			pToken = pToken->pNext; // after comma
 		pStart = pToken;
