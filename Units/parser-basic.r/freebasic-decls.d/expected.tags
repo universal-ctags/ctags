@@ -1,0 +1,21 @@
+curses	input.bas	/^namespace curses 'public use this$/;"	n	roles:def
+win	input.bas	/^		type win as curses.curses_priv._win_st$/;"	t	namespace:curses	roles:def
+_Init	input.bas	/^		declare	function	_Init	alias "initscr" () as win ptr$/;"	f	namespace:curses	roles:decl	extras:reference
+GetMaxX	input.bas	/^		declare	function	GetMaxX alias	"getmaxx" (byval as win ptr) as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+GetMaxY	input.bas	/^		declare	function	GetMaxY alias "getmaxy"	(byval as win ptr) as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+CreateWindow	input.bas	/^		declare	function	CreateWindow alias "newwin" (byval as integer, byval as integer, byval as int/;"	f	namespace:curses	roles:decl	extras:reference
+CreateSubWindow	input.bas	/^		declare	function	CreateSubWindow alias "subwin" (byval as win ptr, byval as integer, byval as /;"	f	namespace:curses	roles:decl	extras:reference
+GetChar	input.bas	/^		declare function	GetChar alias "getch" () as UByte$/;"	f	namespace:curses	roles:decl	extras:reference
+CBreak	input.bas	/^		declare function	CBreak alias "cbreak" () as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+EreaseTerm	input.bas	/^		declare function	EreaseTerm alias "erase" () as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+ClearTerm	input.bas	/^		declare function	ClearTerm alias "clear" () as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+EreaseWindow	input.bas	/^		declare function EreaseWindow alias "werase" (byval as win ptr) as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+ClearWindow	input.bas	/^		declare function ClearWindow alias "wclear" (byval as win ptr) as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+DeleteWindow	input.bas	/^		declare function DeleteWindow alias "delwin" (byval as win ptr) as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+_Exit	input.bas	/^		declare function _Exit alias "endwin" () as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+RefresTerm	input.bas	/^		declare function RefresTerm alias "refresh" () as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+RefreshWindow	input.bas	/^		declare function RefreshWindow alias "wrefresh" (byval as win ptr) as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+PrintTerm	input.bas	/^		declare function PrintTerm  alias "printw" (byval as zstring ptr, ... ) as integer$/;"	f	namespace:curses	roles:decl	extras:reference
+PrintWindow	input.bas	/^		declare function PrintWindow alias "wprintw" (byval as win ptr, byval as zstring ptr, ... ) as/;"	f	namespace:curses	roles:decl	extras:reference
+SetCursorPositionTerm	input.bas	/^		declare function SetCursorPositionTerm alias "move" (byval as integer,byval as integer) as int/;"	f	namespace:curses	roles:decl	extras:reference
+SetCursorPositionWindow	input.bas	/^		declare function SetCursorPositionWindow alias "wmove" (byval as win ptr, byval as integer, by/;"	f	namespace:curses	roles:decl	extras:reference

@@ -41,9 +41,18 @@ typedef enum {
 	K_NAMESPACE,
 } BasicKind;
 
+typedef enum {
+	BASIC_FUNCTION_DECL,
+} basciFunctionRole;
+
+static roleDefinition BasicFunctionRoles [] = {
+	{ true, "decl", "declared" },
+};
+
 static kindDefinition BasicKinds[] = {
 	{true, 'c', "constant", "constants"},
-	{true, 'f', "function", "functions"},
+	{true, 'f', "function", "functions",
+	 .referenceOnly = false, ATTACH_ROLES(BasicFunctionRoles)},
 	{true, 'l', "label", "labels"},
 	{true, 't', "type", "types"},
 	{true, 'v', "variable", "variables"},
@@ -63,6 +72,7 @@ enum eKeywordID {
 	KEYWORD_NAMESPACE,
 	KEYWORD_END,
 	KEYWORD_ACCESS,
+	KEYWORD_DECLARE,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -82,6 +92,7 @@ static const keywordTable BasicKeywordTable[] = {
 	{"enum", KEYWORD_ENUM},
 	{"namespace", KEYWORD_NAMESPACE},
 	{"end", KEYWORD_END},
+	{"declare", KEYWORD_DECLARE},
 
 	/* blitzbasic, purebasic */
 	{"global", KEYWORD_VARIABLE},
@@ -123,11 +134,15 @@ struct BasicKeywordAttr {
 	[KEYWORD_ACCESS] = {
 		.kind = KIND_GHOST_INDEX,
 	},
+	[KEYWORD_DECLARE] = {
+		.kind = KIND_GHOST_INDEX,
+	},
 };
 
 struct matchState {
 	const char *access;
 	bool end;
+	bool declaration;
 };
 
 static int currentScope;
@@ -214,13 +229,18 @@ static bool isIdentChar (char c)
 	return c && !isspace (c) && c != '(' && c != ',' && c != '=';
 }
 
-static int makeBasicTag (vString *name, int kindIndex)
+static int makeBasicRefTag (vString *name, int kindIndex, int roleIndex)
 {
-	int r = makeSimpleTag (name, kindIndex);
+	int r = makeSimpleRefTag (name, kindIndex, roleIndex);
 	tagEntryInfo *e = getEntryInCorkQueue (r);
 	if (e)
 		e->extensionFields.scopeIndex = currentScope;
 	return r;
+}
+
+static int makeBasicTag (vString *name, int kindIndex)
+{
+	return makeBasicRefTag (name, kindIndex, ROLE_DEFINITION_INDEX);
 }
 
 /* Match the name of a dim or const starting at pos. */
@@ -298,7 +318,13 @@ static int extract_name (char const *pos, BasicKind kind, struct matchState *sta
 	vString *name = vStringNew ();
 	for (; isIdentChar (*pos); pos++)
 		vStringPut (name, *pos);
-	r = makeBasicTag (name, kind);
+	if (state && state->declaration)
+	{
+		if (kind == K_FUNCTION)
+			r = makeBasicRefTag (name, kind, BASIC_FUNCTION_DECL);
+	}
+	else
+		r = makeBasicTag (name, kind);
 	vStringDelete (name);
 
 	tagEntryInfo *e = getEntryInCorkQueue (r);
@@ -313,6 +339,7 @@ static void match_state_reset (struct matchState *state)
 {
 	state->access = NULL;
 	state->end = false;
+	state->declaration =false;
 }
 
 static bool match_keyword (const char **cp, vString *buf,
@@ -343,6 +370,12 @@ static bool match_keyword (const char **cp, vString *buf,
 	else if (kw == KEYWORD_END)
 	{
 		state->end = true;
+		*cp = p;
+		return true;
+	}
+	else if (kw == KEYWORD_DECLARE)
+	{
+		state->declaration = true;
 		*cp = p;
 		return true;
 	}
