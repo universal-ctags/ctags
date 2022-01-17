@@ -1,0 +1,1 @@
+_init	input.bas	/^  declare sub _init alias "initscr" ()$/;"	f
