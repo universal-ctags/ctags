@@ -1502,7 +1502,14 @@ void cxxParserAnalyzeOtherStatement(void)
 	const bool bPrototypeParams = cxxTagKindEnabled(CXXTagKindPROTOTYPE) && cxxTagKindEnabled(CXXTagKindPARAMETER);
 check_function_signature:
 
-	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,bPrototypeParams?&oParamInfo:NULL))
+	if(
+		cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,bPrototypeParams?&oParamInfo:NULL)
+		// Even if we saw "();", we cannot say it is a function prototype; a macro expansion can be used to
+		// initialize a top-level variable like:
+		//   #define INIT() 0
+		//   int i = INIT();"
+		&& ! (oInfo.pTypeEnd && cxxTokenTypeIs(oInfo.pTypeEnd,CXXTokenTypeAssignment))
+		)
 	{
 		CXX_DEBUG_PRINT("Found function prototype");
 

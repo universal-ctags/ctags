@@ -1,0 +1,6 @@
+INIT	input.c	/^#define INIT(/;"	d	file:
+i	input.c	/^static const int i = INIT(2);$/;"	v	typeref:typename:const int	file:
+j	input.c	/^int j;$/;"	v	typeref:typename:int
+k	input.c	/^int k = 1;$/;"	v	typeref:typename:int
+f	input.c	/^int f(void)$/;"	f	typeref:typename:int
+l	input.c	/^	int l = INIT(3);$/;"	l	function:f	typeref:typename:int	file:
