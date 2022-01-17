@@ -17,10 +17,12 @@
 
 #include <string.h>
 
+#include "entry.h"
 #include "keyword.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "trace.h"
 #include "vstring.h"
 
 /*
@@ -100,9 +102,36 @@ static BasicKind keywordToKindMap[] = {
 	[KEYWORD_NAMESPACE_END] = KIND_GHOST_INDEX,
 };
 
+static int currentScope;
 /*
  *   FUNCTION DEFINITIONS
  */
+
+static void pushScope (int corkIndex)
+{
+#ifdef DEBUG
+	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+	TRACE_PRINT ("scope push: %s<%d>", e? e->name: "-", corkIndex);
+#endif
+	currentScope = corkIndex;
+}
+
+static void popScope (void)
+{
+	tagEntryInfo *e = getEntryInCorkQueue (currentScope);
+#ifdef DEBUG
+	TRACE_PRINT ("scope pop: %s<%d>", e? e->name: "-", currentScope);
+#endif
+	currentScope = e? e->extensionFields.scopeIndex: CORK_NIL;
+}
+
+static void updateScope (int corkIndex, int kindIndex, int keywordId)
+{
+	if (corkIndex != CORK_NIL && kindIndex == K_NAMESPACE)
+		pushScope (corkIndex);
+	else if (corkIndex == CORK_NIL && keywordId == KEYWORD_NAMESPACE_END)
+		popScope ();
+}
 
 static int keywordToKind (keywordId keywordId)
 {
@@ -151,6 +180,15 @@ static bool isIdentChar (char c)
 	return c && !isspace (c) && c != '(' && c != ',' && c != '=';
 }
 
+static int makeBasicTag (vString *name, int kindIndex)
+{
+	int r = makeSimpleTag (name, kindIndex);
+	tagEntryInfo *e = getEntryInCorkQueue (r);
+	if (e)
+		e->extensionFields.scopeIndex = currentScope;
+	return r;
+}
+
 /* Match the name of a dim or const starting at pos. */
 static void extract_dim (char const *pos, BasicKind kind)
 {
@@ -192,7 +230,7 @@ static void extract_dim (char const *pos, BasicKind kind)
 
 	for (; isIdentChar (*pos); pos++)
 		vStringPut (name, *pos);
-	makeSimpleTag (name, kind);
+	makeBasicTag (name, kind);
 
 	/* if the line contains a ',', we have multiple declarations */
 	while (*pos && strchr (pos, ','))
@@ -213,20 +251,22 @@ static void extract_dim (char const *pos, BasicKind kind)
 		vStringClear (name);
 		for (; isIdentChar (*pos); pos++)
 			vStringPut (name, *pos);
-		makeSimpleTag (name, kind);
+		makeBasicTag (name, kind);
 	}
 
 	vStringDelete (name);
 }
 
 /* Match the name of a tag (function, variable, type, ...) starting at pos. */
-static void extract_name (char const *pos, BasicKind kind)
+static int extract_name (char const *pos, BasicKind kind)
 {
+	int r = CORK_NIL;
 	vString *name = vStringNew ();
 	for (; isIdentChar (*pos); pos++)
 		vStringPut (name, *pos);
-	makeSimpleTag (name, kind);
+	r = makeBasicTag (name, kind);
 	vStringDelete (name);
+	return r;
 }
 
 /* Match a keyword starting at p (case insensitive). */
@@ -245,15 +285,20 @@ static bool match_keyword (const char *p, keywordTable const *kw)
 	while (isspace (*p))
 		p++;
 
+	int kind = keywordToKind (kw->id);
+
 	/* create tags only if there is some space between the keyword and the identifier */
-	if (old_p == p)
+	if (kind != KIND_GHOST_INDEX && old_p == p)
 		return false;
 
-	int kind = keywordToKind (kw->id);
+	int index = CORK_NIL;
 	if (kind == K_VARIABLE)
 		extract_dim (p, kind); /* extract_dim adds the found tag(s) */
 	else if (kind != KIND_GHOST_INDEX)
-		extract_name (p, kind);
+		index = extract_name (p, kind);
+
+	updateScope (index, kind, kw->id);
+
 	return true;
 }
 
@@ -266,7 +311,7 @@ static void match_colon_label (char const *p)
 	if (*end == ':')
 	{
 		vString *name = vStringNewNInit (p, end - p);
-		makeSimpleTag (name, K_LABEL);
+		makeBasicTag (name, K_LABEL);
 		vStringDelete (name);
 	}
 }
@@ -280,6 +325,8 @@ static void match_dot_label (char const *p)
 static void findBasicTags (void)
 {
 	const char *line;
+
+	currentScope = CORK_NIL;
 
 	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
@@ -324,5 +371,6 @@ parserDefinition *BasicParser (void)
 	def->kindCount = ARRAY_SIZE (BasicKinds);
 	def->extensions = extensions;
 	def->parser = findBasicTags;
+	def->useCork = CORK_QUEUE;
 	return def;
 }
