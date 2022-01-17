@@ -31,7 +31,9 @@ typedef enum {
 	K_LABEL,
 	K_TYPE,
 	K_VARIABLE,
-	K_ENUM
+	K_ENUM,
+	K_NAMESPACE,
+	K_NAMESPACE_END
 } BasicKind;
 
 typedef struct {
@@ -45,7 +47,8 @@ static kindDefinition BasicKinds[] = {
 	{true, 'l', "label", "labels"},
 	{true, 't', "type", "types"},
 	{true, 'v', "variable", "variables"},
-	{true, 'g', "enum", "enumerations"}
+	{true, 'g', "enum", "enumerations"},
+  {true, 'n', "namespace", "namespace"}
 };
 
 static KeyWord basic_keywords[] = {
@@ -65,6 +68,12 @@ static KeyWord basic_keywords[] = {
 	{"type", K_TYPE},
 	{"enum", K_ENUM},
 
+	/* freebasic */
+	{"declare sub", K_FUNCTION},
+	{"declare function", K_FUNCTION},
+	{"namespace", K_NAMESPACE},
+	{"end namespace", K_NAMESPACE_END},
+
 	/* blitzbasic, purebasic */
 	{"global", K_VARIABLE},
 
@@ -77,9 +86,28 @@ static KeyWord basic_keywords[] = {
 	{NULL, 0}
 };
 
+#define __max_namespace_depth 512
+static int namespace_depth=0;
+static vString *namespaces[__max_namespace_depth];
+
 /*
  *   FUNCTION DEFINITIONS
  */
+
+void makeSimpleTagWithNamespace(vString *name, BasicKind kind)
+{
+	vString *name_with_namespace = vStringNew();
+	for(int i=0;i<namespace_depth;i++)
+	{
+		vStringCat (name_with_namespace, namespaces[i]);
+		vStringPut (name_with_namespace, '.');
+	};
+
+	vStringCat (name_with_namespace, name);
+
+	makeSimpleTag(name_with_namespace, kind);
+	vStringDelete(name_with_namespace);
+}
 
 static const char *skipToMatching (char begin, char end, const char *pos)
 {
@@ -162,7 +190,7 @@ static void extract_dim (char const *pos, BasicKind kind)
 
 	for (; isIdentChar (*pos); pos++)
 		vStringPut (name, *pos);
-	makeSimpleTag (name, kind);
+	makeSimpleTagWithNamespace (name, kind);
 
 	/* if the line contains a ',', we have multiple declarations */
 	while (*pos && strchr (pos, ','))
@@ -183,7 +211,7 @@ static void extract_dim (char const *pos, BasicKind kind)
 		vStringClear (name);
 		for (; isIdentChar (*pos); pos++)
 			vStringPut (name, *pos);
-		makeSimpleTag (name, kind);
+		makeSimpleTagWithNamespace (name, kind);
 	}
 
 	vStringDelete (name);
@@ -195,8 +223,16 @@ static void extract_name (char const *pos, BasicKind kind)
 	vString *name = vStringNew ();
 	for (; isIdentChar (*pos); pos++)
 		vStringPut (name, *pos);
-	makeSimpleTag (name, kind);
-	vStringDelete (name);
+
+	makeSimpleTagWithNamespace (name, kind);
+
+	if (kind == K_NAMESPACE)
+	{
+		if (namespace_depth<__max_namespace_depth)
+		namespaces[namespace_depth++]=name;
+	}
+	else
+		vStringDelete (name);
 }
 
 /* Match a keyword starting at p (case insensitive). */
@@ -214,6 +250,13 @@ static bool match_keyword (const char *p, KeyWord const *kw)
 	old_p = p;
 	while (isspace (*p))
 		p++;
+
+	if (kw->kind == K_NAMESPACE_END)
+		if(namespace_depth>0)
+		{
+			vStringDelete(namespaces[namespace_depth--]);
+			return false; /* ignore all after only for internal use */
+		}
 
 	/* create tags only if there is some space between the keyword and the identifier */
 	if (old_p == p)

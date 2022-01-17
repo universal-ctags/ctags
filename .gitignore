@@ -117,3 +117,9 @@ gnulib/unistd.h
 gnulib/wchar.h
 gnulib/wctype.h
 gnulib/sys/types.h
+compile_commands.json
+libutil.a
+m6eb
+peg/thrift.c
+peg/thrift.h
+.cache/
