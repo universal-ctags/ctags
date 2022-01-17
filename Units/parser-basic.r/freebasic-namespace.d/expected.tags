@@ -1,0 +1,6 @@
+first	input.bas	/^namespace first 'first defines something'$/;"	n
+first_func	input.bas	/^  sub first_func$/;"	f
+second	input.bas	/^  namespace second 'second defines something'$/;"	n
+first_func	input.bas	/^    sub first_func  'oh a second first_func$/;"	f
+second_func	input.bas	/^    sub second_func$/;"	f
+first_func	input.bas	/^sub first_func 'oh another first_func$/;"	f

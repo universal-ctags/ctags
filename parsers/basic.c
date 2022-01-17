@@ -32,7 +32,8 @@ typedef enum {
 	K_LABEL,
 	K_TYPE,
 	K_VARIABLE,
-	K_ENUM
+	K_ENUM,
+	K_NAMESPACE,
 } BasicKind;
 
 static kindDefinition BasicKinds[] = {
@@ -42,6 +43,7 @@ static kindDefinition BasicKinds[] = {
 	{true, 't', "type", "types"},
 	{true, 'v', "variable", "variables"},
 	{true, 'g', "enum", "enumerations"},
+	{true, 'n', "namespace", "namespace"},
 };
 
 /* To force to trigger bugs, we make the orders of
@@ -53,6 +55,8 @@ enum eKeywordID {
 	KEYWORD_LABEL,
 	KEYWORD_TYPE,
 	KEYWORD_VARIABLE,
+	KEYWORD_NAMESPACE,
+	KEYWORD_NAMESPACE_END,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -72,6 +76,8 @@ static const keywordTable BasicKeywordTable[] = {
 	{"destructor", KEYWORD_FUNCTION},
 	{"type", KEYWORD_TYPE},
 	{"enum", KEYWORD_ENUM},
+	{"namespace", KEYWORD_NAMESPACE},
+	{"end namespace", KEYWORD_NAMESPACE_END},
 
 	/* blitzbasic, purebasic */
 	{"global", KEYWORD_VARIABLE},
@@ -90,6 +96,8 @@ static BasicKind keywordToKindMap[] = {
 	[KEYWORD_LABEL] = K_LABEL,
 	[KEYWORD_TYPE] = K_TYPE,
 	[KEYWORD_VARIABLE] = K_VARIABLE,
+	[KEYWORD_NAMESPACE] = K_NAMESPACE,
+	[KEYWORD_NAMESPACE_END] = KIND_GHOST_INDEX,
 };
 
 /*
