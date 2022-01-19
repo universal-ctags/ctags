@@ -55,6 +55,11 @@ clone the `ctags-snap` repo. Then, follow instructions to build the
 snap package of Universal Ctags. Snapcraft will automatically fetch the source
 code from GitHub.
 
+### Clear Linux
+```
+sudo swupd bundle-add editors
+```
+
 ## How to build and install ##
 
 To build with Autotools (Autoconf, Automake, and Libtool) on GNU/Linux, OSX, or Windows 10 WSL,
