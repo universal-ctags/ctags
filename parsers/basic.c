@@ -257,8 +257,7 @@ static void match_colon_label (char const *p)
 		end--;
 	if (*end == ':')
 	{
-		vString *name = vStringNew ();
-		vStringNCatS (name, p, end - p);
+		vString *name = vStringNewNInit (p, end - p);
 		makeSimpleTag (name, K_LABEL);
 		vStringDelete (name);
 	}
