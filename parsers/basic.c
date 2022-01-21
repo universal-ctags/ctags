@@ -45,7 +45,7 @@ static kindDefinition BasicKinds[] = {
 	{true, 'l', "label", "labels"},
 	{true, 't', "type", "types"},
 	{true, 'v', "variable", "variables"},
-	{true, 'g', "enum", "enumerations"}
+	{true, 'g', "enum", "enumerations"},
 };
 
 static KeyWord basic_keywords[] = {
