@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+#include "keyword.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -34,11 +35,6 @@ typedef enum {
 	K_ENUM
 } BasicKind;
 
-typedef struct {
-	char const *token;
-	BasicKind kind;
-} KeyWord;
-
 static kindDefinition BasicKinds[] = {
 	{true, 'c', "constant", "constants"},
 	{true, 'f', "function", "functions"},
@@ -48,38 +44,64 @@ static kindDefinition BasicKinds[] = {
 	{true, 'g', "enum", "enumerations"},
 };
 
-static KeyWord basic_keywords[] = {
+/* To force to trigger bugs, we make the orders of
+ * enum eKeywordID and BasicKind different. */
+enum eKeywordID {
+	KEYWORD_ENUM,
+	KEYWORD_CONST,
+	KEYWORD_FUNCTION,
+	KEYWORD_LABEL,
+	KEYWORD_TYPE,
+	KEYWORD_VARIABLE,
+};
+typedef int keywordId; /* to allow KEYWORD_NONE */
+
+static const keywordTable BasicKeywordTable[] = {
 	/* freebasic */
-	{"const", K_CONST},
-	{"dim", K_VARIABLE},
-	{"common", K_VARIABLE},
-	{"function", K_FUNCTION},
-	{"sub", K_FUNCTION},
-	{"private sub", K_FUNCTION},
-	{"public sub", K_FUNCTION},
-	{"private function", K_FUNCTION},
-	{"public function", K_FUNCTION},
-	{"property", K_FUNCTION},
-	{"constructor", K_FUNCTION},
-	{"destructor", K_FUNCTION},
-	{"type", K_TYPE},
-	{"enum", K_ENUM},
+	{"const", KEYWORD_CONST},
+	{"dim", KEYWORD_VARIABLE},
+	{"common", KEYWORD_VARIABLE},
+	{"function", KEYWORD_FUNCTION},
+	{"sub", KEYWORD_FUNCTION},
+	{"private sub", KEYWORD_FUNCTION},
+	{"public sub", KEYWORD_FUNCTION},
+	{"private function", KEYWORD_FUNCTION},
+	{"public function", KEYWORD_FUNCTION},
+	{"property", KEYWORD_FUNCTION},
+	{"constructor", KEYWORD_FUNCTION},
+	{"destructor", KEYWORD_FUNCTION},
+	{"type", KEYWORD_TYPE},
+	{"enum", KEYWORD_ENUM},
 
 	/* blitzbasic, purebasic */
-	{"global", K_VARIABLE},
+	{"global", KEYWORD_VARIABLE},
 
 	/* purebasic */
-	{"newlist", K_VARIABLE},
-	{"procedure", K_FUNCTION},
-	{"interface", K_TYPE},
-	{"structure", K_TYPE},
+	{"newlist", KEYWORD_VARIABLE},
+	{"procedure", KEYWORD_FUNCTION},
+	{"interface", KEYWORD_TYPE},
+	{"structure", KEYWORD_TYPE},
+};
 
-	{NULL, 0}
+static BasicKind keywordToKindMap[] = {
+	[KEYWORD_ENUM]  = K_ENUM,
+	[KEYWORD_CONST] = K_CONST,
+	[KEYWORD_FUNCTION] = K_FUNCTION,
+	[KEYWORD_LABEL] = K_LABEL,
+	[KEYWORD_TYPE] = K_TYPE,
+	[KEYWORD_VARIABLE] = K_VARIABLE,
 };
 
 /*
  *   FUNCTION DEFINITIONS
  */
+
+static int keywordToKind (keywordId keywordId)
+{
+	if (keywordId == KEYWORD_NONE)
+		return KIND_GHOST_INDEX;
+	return keywordToKindMap [keywordId];
+}
 
 static const char *skipToMatching (char begin, char end, const char *pos)
 {
@@ -200,13 +222,13 @@ static void extract_name (char const *pos, BasicKind kind)
 }
 
 /* Match a keyword starting at p (case insensitive). */
-static bool match_keyword (const char *p, KeyWord const *kw)
+static bool match_keyword (const char *p, keywordTable const *kw)
 {
 	size_t i;
 	const char *old_p;
-	for (i = 0; i < strlen (kw->token); i++)
+	for (i = 0; i < strlen (kw->name); i++)
 	{
-		if (tolower (p[i]) != kw->token[i])
+		if (tolower (p[i]) != kw->name[i])
 			return false;
 	}
 	p += i;
@@ -219,10 +241,11 @@ static bool match_keyword (const char *p, KeyWord const *kw)
 	if (old_p == p)
 		return false;
 
-	if (kw->kind == K_VARIABLE)
-		extract_dim (p, kw->kind); /* extract_dim adds the found tag(s) */
-	else
-		extract_name (p, kw->kind);
+	int kind = keywordToKind (kw->id);
+	if (kind == K_VARIABLE)
+		extract_dim (p, kind); /* extract_dim adds the found tag(s) */
+	else if (kind != KIND_GHOST_INDEX)
+		extract_name (p, kind);
 	return true;
 }
 
@@ -255,7 +278,6 @@ static void findBasicTags (void)
 	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
 		const char *p = line;
-		KeyWord const *kw;
 
 		while (isspace (*p))
 			p++;
@@ -274,8 +296,11 @@ static void findBasicTags (void)
 			continue;
 
 		/* In Basic, keywords always are at the start of the line. */
-		for (kw = basic_keywords; kw->token; kw++)
+		for (size_t i = 0; i < ARRAY_SIZE(BasicKeywordTable); i++)
+		{
+			keywordTable const *kw = BasicKeywordTable + i;
 			if (match_keyword (p, kw)) break;
+		}
 
 		/* Is it a label? */
 		if (*p == '.')
