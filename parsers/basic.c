@@ -267,8 +267,7 @@ static void match_colon_label (char const *p)
 /* Match a ".label" style label. */
 static void match_dot_label (char const *p)
 {
-	if (*p == '.')
-		extract_name (p + 1, K_LABEL);
+	extract_name (p + 1, K_LABEL);
 }
 
 static void findBasicTags (void)
