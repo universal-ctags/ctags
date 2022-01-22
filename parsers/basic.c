@@ -94,15 +94,33 @@ static const keywordTable BasicKeywordTable[] = {
 	{"structure", KEYWORD_TYPE},
 };
 
-static BasicKind keywordToKindMap[] = {
-	[KEYWORD_ENUM]  = K_ENUM,
-	[KEYWORD_CONST] = K_CONST,
-	[KEYWORD_FUNCTION] = K_FUNCTION,
-	[KEYWORD_LABEL] = K_LABEL,
-	[KEYWORD_TYPE] = K_TYPE,
-	[KEYWORD_VARIABLE] = K_VARIABLE,
-	[KEYWORD_NAMESPACE] = K_NAMESPACE,
-	[KEYWORD_NAMESPACE_END] = KIND_GHOST_INDEX,
+struct BasicKeywordAttr {
+	int kind;
+} keywordAttrs [] = {
+	[KEYWORD_ENUM]  = {
+		.kind = K_ENUM,
+	},
+	[KEYWORD_CONST] = {
+		.kind = K_CONST,
+	},
+	[KEYWORD_FUNCTION] = {
+		.kind = K_FUNCTION,
+	},
+	[KEYWORD_LABEL] = {
+		.kind = K_LABEL,
+	},
+	[KEYWORD_TYPE] = {
+		.kind = K_TYPE,
+	},
+	[KEYWORD_VARIABLE] = {
+		.kind = K_VARIABLE,
+	},
+	[KEYWORD_NAMESPACE] = {
+		.kind = K_NAMESPACE,
+	},
+	[KEYWORD_NAMESPACE_END] = {
+		.kind = KIND_GHOST_INDEX,
+	},
 };
 
 static int currentScope;
@@ -146,7 +164,7 @@ static int keywordToKind (keywordId keywordId)
 {
 	if (keywordId == KEYWORD_NONE)
 		return KIND_GHOST_INDEX;
-	return keywordToKindMap [keywordId];
+	return keywordAttrs [keywordId].kind;
 }
 
 static const char *skipToMatching (char begin, char end, const char *pos)
