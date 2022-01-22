@@ -122,7 +122,13 @@ static void popScope (void)
 #ifdef DEBUG
 	TRACE_PRINT ("scope pop: %s<%d>", e? e->name: "-", currentScope);
 #endif
-	currentScope = e? e->extensionFields.scopeIndex: CORK_NIL;
+	if (e)
+	{
+		e->extensionFields.endLine = getInputLineNumber ();
+		currentScope = e->extensionFields.scopeIndex;
+	}
+	else
+		currentScope = CORK_NIL;
 }
 
 static void updateScope (int corkIndex, int kindIndex, int keywordId)
