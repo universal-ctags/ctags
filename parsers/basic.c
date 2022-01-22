@@ -309,56 +309,51 @@ static int extract_name (char const *pos, BasicKind kind, struct matchState *sta
 }
 
 /* Match a keyword starting at p (case insensitive). */
-enum matchResult {
-	MATCH_RESULT_BREAK,
-	MATCH_RESULT_RESTART,
-	MATCH_RESULT_CONT,
-};
-
 static void match_state_reset (struct matchState *state)
 {
 	state->access = NULL;
 	state->end = false;
 }
 
-static enum matchResult match_keyword (const char **cp, keywordTable const *kw,
-									   struct matchState *state)
+static bool match_keyword (const char **cp, vString *buf,
+						   struct matchState *state)
 {
-	const char *p = *cp;
+	const char *p;
 
-	size_t i;
-	const char *old_p;
-	for (i = 0; i < strlen (kw->name); i++)
+	for (p = *cp; *p != '\0' && !isspace((unsigned char)*p); p++)
 	{
-		if (tolower (p[i]) != kw->name[i])
-			return MATCH_RESULT_CONT;
+		int c = tolower ((unsigned char)*p);
+		vStringPut (buf, c);
 	}
-	p += i;
 
-	old_p = p;
+	int kw = lookupKeyword (vStringValue (buf), getInputLanguage ());
+	if (kw == KEYWORD_NONE)
+		return false;
+
+	const char *old_p = p;
 	while (isspace (*p))
 		p++;
 
-	if (kw->id == KEYWORD_ACCESS)
+	if (kw == KEYWORD_ACCESS)
 	{
-		state->access = ((*cp)[1] == 'r')? "private": "public";
+		state->access = vStringValue(buf)[1] == 'r'? "private": "public";
 		*cp = p;
-		return MATCH_RESULT_RESTART;
+		return true;
 	}
-	else if (kw->id == KEYWORD_END)
+	else if (kw == KEYWORD_END)
 	{
 		state->end = true;
 		*cp = p;
-		return MATCH_RESULT_RESTART;
+		return true;
 	}
 
-	int kind = keywordToKind (kw->id);
+	int kind = keywordToKind (kw);
 	int index = CORK_NIL;
 	if (!state->end)
 	{
 		/* create tags only if there is some space between the keyword and the identifier */
 		if (kind != KIND_GHOST_INDEX && old_p == p)
-			return MATCH_RESULT_CONT;
+			return false;
 
 		if (kind == K_VARIABLE)
 			extract_dim (p, kind); /* extract_dim adds the found tag(s) */
@@ -366,9 +361,9 @@ static enum matchResult match_keyword (const char **cp, keywordTable const *kw,
 			index = extract_name (p, kind, state);
 	}
 
-	updateScope (index, kind, kw->id);
+	updateScope (index, kind, kw);
 
-	return MATCH_RESULT_BREAK;
+	return false;
 }
 
 /* Match a "label:" style label. */
@@ -396,6 +391,7 @@ static void findBasicTags (void)
 	const char *line;
 
 	currentScope = CORK_NIL;
+	vString *buf = vStringNew ();
 
 	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
@@ -420,16 +416,10 @@ static void findBasicTags (void)
 		/* In Basic, keywords always are at the start of the line. */
 		struct matchState state;
 		match_state_reset (&state);
-	restart:
-		for (size_t i = 0; i < ARRAY_SIZE(BasicKeywordTable); i++)
-		{
-			keywordTable const *kw = BasicKeywordTable + i;
-			enum matchResult mr = match_keyword (&p, kw, &state);
-			if (mr == MATCH_RESULT_BREAK)
-				break;
-			else if (mr == MATCH_RESULT_RESTART)
-				goto restart;
-		}
+		do
+			vStringClear (buf);
+		while (match_keyword (&p, buf, &state));
+
 
 		/* Is it a label? */
 		if (*p == '.')
@@ -437,6 +427,7 @@ static void findBasicTags (void)
 		else
 			match_colon_label (p);
 	}
+	vStringDelete (buf);
 }
 
 parserDefinition *BasicParser (void)
@@ -447,6 +438,8 @@ parserDefinition *BasicParser (void)
 	def->kindCount = ARRAY_SIZE (BasicKinds);
 	def->extensions = extensions;
 	def->parser = findBasicTags;
+	def->keywordTable = BasicKeywordTable;
+	def->keywordCount = ARRAY_SIZE (BasicKeywordTable);
 	def->useCork = CORK_QUEUE;
 	return def;
 }
