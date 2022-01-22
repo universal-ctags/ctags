@@ -61,7 +61,7 @@ enum eKeywordID {
 	KEYWORD_TYPE,
 	KEYWORD_VARIABLE,
 	KEYWORD_NAMESPACE,
-	KEYWORD_NAMESPACE_END,
+	KEYWORD_END,
 	KEYWORD_ACCESS,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -81,7 +81,7 @@ static const keywordTable BasicKeywordTable[] = {
 	{"type", KEYWORD_TYPE},
 	{"enum", KEYWORD_ENUM},
 	{"namespace", KEYWORD_NAMESPACE},
-	{"end namespace", KEYWORD_NAMESPACE_END},
+	{"end", KEYWORD_END},
 
 	/* blitzbasic, purebasic */
 	{"global", KEYWORD_VARIABLE},
@@ -117,7 +117,7 @@ struct BasicKeywordAttr {
 	[KEYWORD_NAMESPACE] = {
 		.kind = K_NAMESPACE,
 	},
-	[KEYWORD_NAMESPACE_END] = {
+	[KEYWORD_END] = {
 		.kind = KIND_GHOST_INDEX,
 	},
 	[KEYWORD_ACCESS] = {
@@ -127,6 +127,7 @@ struct BasicKeywordAttr {
 
 struct matchState {
 	const char *access;
+	bool end;
 };
 
 static int currentScope;
@@ -162,7 +163,7 @@ static void updateScope (int corkIndex, int kindIndex, int keywordId)
 {
 	if (corkIndex != CORK_NIL && kindIndex == K_NAMESPACE)
 		pushScope (corkIndex);
-	else if (corkIndex == CORK_NIL && keywordId == KEYWORD_NAMESPACE_END)
+	else if (corkIndex == CORK_NIL && kindIndex == K_NAMESPACE)
 		popScope ();
 }
 
@@ -317,6 +318,7 @@ enum matchResult {
 static void match_state_reset (struct matchState *state)
 {
 	state->access = NULL;
+	state->end = false;
 }
 
 static enum matchResult match_keyword (const char **cp, keywordTable const *kw,
@@ -343,18 +345,26 @@ static enum matchResult match_keyword (const char **cp, keywordTable const *kw,
 		*cp = p;
 		return MATCH_RESULT_RESTART;
 	}
+	else if (kw->id == KEYWORD_END)
+	{
+		state->end = true;
+		*cp = p;
+		return MATCH_RESULT_RESTART;
+	}
 
 	int kind = keywordToKind (kw->id);
-
-	/* create tags only if there is some space between the keyword and the identifier */
-	if (kind != KIND_GHOST_INDEX && old_p == p)
-		return MATCH_RESULT_CONT;
-
 	int index = CORK_NIL;
-	if (kind == K_VARIABLE)
-		extract_dim (p, kind); /* extract_dim adds the found tag(s) */
-	else if (kind != KIND_GHOST_INDEX)
-		index = extract_name (p, kind, state);
+	if (!state->end)
+	{
+		/* create tags only if there is some space between the keyword and the identifier */
+		if (kind != KIND_GHOST_INDEX && old_p == p)
+			return MATCH_RESULT_CONT;
+
+		if (kind == K_VARIABLE)
+			extract_dim (p, kind); /* extract_dim adds the found tag(s) */
+		else
+			index = extract_name (p, kind, state);
+	}
 
 	updateScope (index, kind, kw->id);
 
