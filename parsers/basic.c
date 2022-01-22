@@ -8,6 +8,9 @@
  *   (BlitzMax), PureBasic and FreeBasic language files. For now, this is kept
  *   quite simple - but feel free to ask for more things added any time -
  *   patches are of course most welcome.
+ *
+ *   FreeBasic:
+ *   - https://www.freebasic.net/wiki/DocToc
  */
 
 /*
