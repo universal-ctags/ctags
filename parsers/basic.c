@@ -62,6 +62,7 @@ enum eKeywordID {
 	KEYWORD_VARIABLE,
 	KEYWORD_NAMESPACE,
 	KEYWORD_NAMESPACE_END,
+	KEYWORD_ACCESS,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -72,10 +73,8 @@ static const keywordTable BasicKeywordTable[] = {
 	{"common", KEYWORD_VARIABLE},
 	{"function", KEYWORD_FUNCTION},
 	{"sub", KEYWORD_FUNCTION},
-	{"private sub", KEYWORD_FUNCTION},
-	{"public sub", KEYWORD_FUNCTION},
-	{"private function", KEYWORD_FUNCTION},
-	{"public function", KEYWORD_FUNCTION},
+	{"private", KEYWORD_ACCESS},
+	{"public", KEYWORD_ACCESS},
 	{"property", KEYWORD_FUNCTION},
 	{"constructor", KEYWORD_FUNCTION},
 	{"destructor", KEYWORD_FUNCTION},
@@ -121,6 +120,13 @@ struct BasicKeywordAttr {
 	[KEYWORD_NAMESPACE_END] = {
 		.kind = KIND_GHOST_INDEX,
 	},
+	[KEYWORD_ACCESS] = {
+		.kind = KIND_GHOST_INDEX,
+	},
+};
+
+struct matchState {
+	const char *access;
 };
 
 static int currentScope;
@@ -285,7 +291,7 @@ static void extract_dim (char const *pos, BasicKind kind)
 }
 
 /* Match the name of a tag (function, variable, type, ...) starting at pos. */
-static int extract_name (char const *pos, BasicKind kind)
+static int extract_name (char const *pos, BasicKind kind, struct matchState *state)
 {
 	int r = CORK_NIL;
 	vString *name = vStringNew ();
@@ -293,18 +299,37 @@ static int extract_name (char const *pos, BasicKind kind)
 		vStringPut (name, *pos);
 	r = makeBasicTag (name, kind);
 	vStringDelete (name);
+
+	tagEntryInfo *e = getEntryInCorkQueue (r);
+	if (e && state && state->access)
+		e->extensionFields.access = eStrdup (state->access);
+
 	return r;
 }
 
 /* Match a keyword starting at p (case insensitive). */
-static bool match_keyword (const char *p, keywordTable const *kw)
+enum matchResult {
+	MATCH_RESULT_BREAK,
+	MATCH_RESULT_RESTART,
+	MATCH_RESULT_CONT,
+};
+
+static void match_state_reset (struct matchState *state)
 {
+	state->access = NULL;
+}
+
+static enum matchResult match_keyword (const char **cp, keywordTable const *kw,
+									   struct matchState *state)
+{
+	const char *p = *cp;
+
 	size_t i;
 	const char *old_p;
 	for (i = 0; i < strlen (kw->name); i++)
 	{
 		if (tolower (p[i]) != kw->name[i])
-			return false;
+			return MATCH_RESULT_CONT;
 	}
 	p += i;
 
@@ -312,21 +337,28 @@ static bool match_keyword (const char *p, keywordTable const *kw)
 	while (isspace (*p))
 		p++;
 
+	if (kw->id == KEYWORD_ACCESS)
+	{
+		state->access = ((*cp)[1] == 'r')? "private": "public";
+		*cp = p;
+		return MATCH_RESULT_RESTART;
+	}
+
 	int kind = keywordToKind (kw->id);
 
 	/* create tags only if there is some space between the keyword and the identifier */
 	if (kind != KIND_GHOST_INDEX && old_p == p)
-		return false;
+		return MATCH_RESULT_CONT;
 
 	int index = CORK_NIL;
 	if (kind == K_VARIABLE)
 		extract_dim (p, kind); /* extract_dim adds the found tag(s) */
 	else if (kind != KIND_GHOST_INDEX)
-		index = extract_name (p, kind);
+		index = extract_name (p, kind, state);
 
 	updateScope (index, kind, kw->id);
 
-	return true;
+	return MATCH_RESULT_BREAK;
 }
 
 /* Match a "label:" style label. */
@@ -346,7 +378,7 @@ static void match_colon_label (char const *p)
 /* Match a ".label" style label. */
 static void match_dot_label (char const *p)
 {
-	extract_name (p + 1, K_LABEL);
+	extract_name (p + 1, K_LABEL, NULL);
 }
 
 static void findBasicTags (void)
@@ -376,10 +408,17 @@ static void findBasicTags (void)
 			continue;
 
 		/* In Basic, keywords always are at the start of the line. */
+		struct matchState state;
+		match_state_reset (&state);
+	restart:
 		for (size_t i = 0; i < ARRAY_SIZE(BasicKeywordTable); i++)
 		{
 			keywordTable const *kw = BasicKeywordTable + i;
-			if (match_keyword (p, kw)) break;
+			enum matchResult mr = match_keyword (&p, kw, &state);
+			if (mr == MATCH_RESULT_BREAK)
+				break;
+			else if (mr == MATCH_RESULT_RESTART)
+				goto restart;
 		}
 
 		/* Is it a label? */
