@@ -1,14 +1,26 @@
-CDefClass	input.pyx	/^cdef class CDefClass :$/;"	c
-StdClass	input.pyx	/^class StdClass :$/;"	c
-__init__	input.pyx	/^    def __init__(self) :$/;"	m	class:CDefClass
-c_method	input.pyx	/^    cdef int c_method(self,int i) :$/;"	m	class:CDefClass
-identity	input.pyx	/^def identity(x) :$/;"	f
-int2string	input.pyx	/^cdef object int2string(int i) :$/;"	f
-int_identity	input.pyx	/^cdef int int_identity(int i) : return i  $/;"	f
-int_identity2	input.pyx	/^cdef (int) int_identity2(int i) : return i$/;"	f
-int_identity3	input.pyx	/^cdef inline int int_identity3(int i) : return i$/;"	f
-int_identity4	input.pyx	/^cdef inline (int) int_identity4(int i) : return i$/;"	f
 python_var	input.pyx	/^python_var = 1$/;"	v
-return_me	input.pyx	/^    def return_me(self) :$/;"	m	class:StdClass
-standard_method	input.pyx	/^    def standard_method(self,i) :$/;"	m	class:CDefClass
+int_identity	input.pyx	/^cdef int int_identity(int i) : return i  $/;"	f	signature:(int i)
+i	input.pyx	/^cdef int int_identity(int i) : return i  $/;"	z	function:int_identity	typeref:typename:int	file:
+int_identity2	input.pyx	/^cdef (int) int_identity2(int i) : return i$/;"	f	signature:(int i)
+i	input.pyx	/^cdef (int) int_identity2(int i) : return i$/;"	z	function:int_identity2	typeref:typename:int	file:
+int_identity3	input.pyx	/^cdef inline int int_identity3(int i) : return i$/;"	f	signature:(int i)
+i	input.pyx	/^cdef inline int int_identity3(int i) : return i$/;"	z	function:int_identity3	typeref:typename:int	file:
+int_identity4	input.pyx	/^cdef inline (int) int_identity4(int i) : return i$/;"	f	signature:(int i)
+i	input.pyx	/^cdef inline (int) int_identity4(int i) : return i$/;"	z	function:int_identity4	typeref:typename:int	file:
+int2string	input.pyx	/^cdef object int2string(int i) :$/;"	f	signature:(int i)
+i	input.pyx	/^cdef object int2string(int i) :$/;"	z	function:int2string	typeref:typename:int	file:
+CDefClass	input.pyx	/^cdef class CDefClass :$/;"	c
+__init__	input.pyx	/^    def __init__(self) :$/;"	m	class:CDefClass	signature:(self)
+self	input.pyx	/^    def __init__(self) :$/;"	z	member:CDefClass.__init__	file:
+standard_method	input.pyx	/^    def standard_method(self,i) :$/;"	m	class:CDefClass	signature:(self,i)
+self	input.pyx	/^    def standard_method(self,i) :$/;"	z	member:CDefClass.standard_method	file:
+i	input.pyx	/^    def standard_method(self,i) :$/;"	z	member:CDefClass.standard_method	file:
+c_method	input.pyx	/^    cdef int c_method(self,int i) :$/;"	m	class:CDefClass	signature:(self, int i)
+self	input.pyx	/^    cdef int c_method(self,int i) :$/;"	z	member:CDefClass.c_method	file:
+i	input.pyx	/^    cdef int c_method(self,int i) :$/;"	z	member:CDefClass.c_method	typeref:typename:int	file:
+identity	input.pyx	/^def identity(x) :$/;"	f	signature:(x)
+x	input.pyx	/^def identity(x) :$/;"	z	function:identity	file:
+StdClass	input.pyx	/^class StdClass :$/;"	c
+return_me	input.pyx	/^    def return_me(self) :$/;"	m	class:StdClass	signature:(self)
+self	input.pyx	/^    def return_me(self) :$/;"	z	member:StdClass.return_me	file:
 stdObj	input.pyx	/^stdObj  = StdClass()$/;"	v

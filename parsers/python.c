@@ -23,6 +23,7 @@
 #include "debug.h"
 #include "xtag.h"
 #include "objpool.h"
+#include "ptrarray.h"
 
 #define isIdentifierChar(c) \
 	(isalnum (c) || (c) == '_' || (c) >= 0x80)
@@ -935,15 +936,204 @@ static vString *parseReturnTypeAnnotation (tokenInfo *const token)
 	return NULL;
 }
 
+struct typedParam {
+	tokenInfo *token;
+	vString *type;
+};
+
+static struct typedParam *makeTypedParam (tokenInfo *token, vString *type)
+{
+	struct typedParam *p = xMalloc (1, struct typedParam);
+	p->token = token;
+	p->type = type;
+	return p;
+}
+
+static struct typedParam *makeTypedParamWithCopy (const tokenInfo *token, const vString *type)
+{
+	tokenInfo *token_copied = newToken ();
+	copyToken (token_copied, token);
+
+
+	vString *type_copied = type? vStringNewCopy (type): NULL;
+	return makeTypedParam (token_copied, type_copied);
+}
+
+static void deleteTypedParam (struct typedParam *p)
+{
+	deleteToken (p->token);
+	vStringDelete (p->type);	/* NULL is acceptable. */
+	eFree (p);
+}
+
+static void parseArglist (tokenInfo *const token, const int kind,
+						  vString *const arglist, ptrArray *const parameters)
+{
+	int prevTokenType = token->type;
+	int depth = 1;
+
+	if (kind != K_CLASS)
+		reprCat (arglist, token);
+
+	do
+	{
+		if (token->type != TOKEN_WHITESPACE &&
+			/* for easy `*args` and `**kwargs` support, we also ignore
+			 * `*`, which anyway can't otherwise screw us up */
+			token->type != '*')
+		{
+			prevTokenType = token->type;
+		}
+
+		readTokenFull (token, true);
+		if (kind != K_CLASS || token->type != ')' || depth > 1)
+			reprCat (arglist, token);
+
+		if (token->type == '(' ||
+			token->type == '[' ||
+			token->type == '{')
+			depth ++;
+		else if (token->type == ')' ||
+				 token->type == ']' ||
+				 token->type == '}')
+			depth --;
+		else if (kind != K_CLASS && depth == 1 &&
+				 token->type == TOKEN_IDENTIFIER &&
+				 (prevTokenType == '(' || prevTokenType == ',') &&
+				 PythonKinds[K_PARAMETER].enabled)
+		{
+			tokenInfo *parameterName;
+			vString *parameterType;
+			struct typedParam *parameter;
+
+			parameterName = newToken ();
+			copyToken (parameterName, token);
+			parameterType = parseParamTypeAnnotation (token, arglist);
+
+			parameter = makeTypedParam (parameterName, parameterType);
+			ptrArrayAdd (parameters, parameter);
+		}
+	}
+	while (token->type != TOKEN_EOF && depth > 0);
+}
+
+static void parseCArglist (tokenInfo *const token, const int kind,
+						  vString *const arglist, ptrArray *const parameters)
+{
+	int depth = 1;
+	tokenInfo *pname = newToken ();
+	vString *ptype = vStringNew ();
+	vStringCat (arglist, token->string);	/* '(' */
+
+	while (true)
+	{
+		readToken (token);
+		if (token->type == TOKEN_EOF)
+		{
+			/* Unexpected input. */
+			vStringClear (arglist);
+			ptrArrayClear (parameters);
+			break;
+		}
+
+		if (depth == 1 && (token->type == ',' || token->type == ')'))
+		{
+			if (pname->type == TOKEN_IDENTIFIER)
+			{
+				struct typedParam *p;
+
+				/*
+				 * Clean up the type string.
+				 * The type string includes the parameter name at the end.
+				 * 1. Trim the parameter name at the end.
+				 * 2. Then, trim the white space at the end of the type string.
+				 * 3. If the type string is not empty,
+				 *    3.a append (the type stirng + ' ' + the parameter name) to arglist.
+				 *    3.b else just append the parameter name to arglist.
+				 *
+				 * FIXME:
+				 * This doesn't work well with an array and a function pointer.
+				 *
+				 *   f(..., int seq [dim], ...)
+				 *      in this case, dim is extacted as a parameter.
+				 *
+				 *   f(..., int (*fn)(int), ...)
+				 *      in this case , int is extacted as a parameter.
+				 */
+				Assert (vStringLength (ptype) >= vStringLength (pname->string));
+				size_t ptype_len = vStringLength (ptype) - vStringLength (pname->string);
+				vStringTruncate (ptype, ptype_len);
+
+				if (vStringLength (ptype) > 0)
+				{
+					vStringStripTrailing (ptype);
+					if (vStringLength (ptype) > 0)
+					{
+						vStringCat (arglist, ptype);
+						vStringPut (arglist, ' ');
+					}
+				}
+				vStringCat (arglist, pname->string);
+
+				p = makeTypedParamWithCopy (pname, vStringIsEmpty(ptype)? NULL: ptype);
+				ptrArrayAdd (parameters, p);
+			}
+			if (token->type == ')')
+			{
+				vStringPut (arglist, ')');
+				break;
+			}
+			vStringCatS (arglist, ", ");
+			vStringClear (ptype);
+			pname->type = TOKEN_UNDEFINED;
+			continue;
+		}
+
+		if (token->type == '(' ||
+			token->type == '[' ||
+			token->type == '{')
+		{
+			vStringPut (ptype, token->type);
+			depth ++;
+			continue;
+		}
+
+		if (token->type == ')' ||
+			token->type == ']' ||
+			token->type == '}')
+		{
+			vStringPut (ptype, token->type);
+			depth --;
+			continue;
+		}
+
+		if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_KEYWORD)
+		{
+			if (vStringLength (ptype) > 0
+				&& (isalnum ((unsigned char)vStringLast (ptype))
+					|| vStringLast (ptype) == ','))
+				vStringPut (ptype, ' ');
+			vStringCat (ptype, token->string);
+
+			if (!isdigit ((unsigned char)vStringLast (token->string)))
+				copyToken (pname, token);
+			continue;
+		}
+
+		vStringCat (ptype, token->string);
+	}
+
+	vStringDelete (ptype);
+	deleteToken (pname);
+}
+
 static bool parseClassOrDef (tokenInfo *const token,
                                 const vString *const decorators,
                                 pythonKind kind, bool isCDef)
 {
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
-	tokenInfo *parameterTokens[16] = { NULL };
-	vString   *parameterTypes [ARRAY_SIZE(parameterTokens)] = { NULL };
-	unsigned int parameterCount = 0;
+	ptrArray *parameters = NULL;
 	NestingLevel *lv;
 	int corkIndex;
 
@@ -966,49 +1156,13 @@ static bool parseClassOrDef (tokenInfo *const token,
 	/* collect parameters or inheritance */
 	if (token->type == '(')
 	{
-		int prevTokenType = token->type;
-		int depth = 1;
-
 		arglist = vStringNew ();
-		if (kind != K_CLASS)
-			reprCat (arglist, token);
+		parameters = ptrArrayNew ((ptrArrayDeleteFunc)deleteTypedParam);
 
-		do
-		{
-			if (token->type != TOKEN_WHITESPACE &&
-			    /* for easy `*args` and `**kwargs` support, we also ignore
-			     * `*`, which anyway can't otherwise screw us up */
-			    token->type != '*')
-			{
-				prevTokenType = token->type;
-			}
-
-			readTokenFull (token, true);
-			if (kind != K_CLASS || token->type != ')' || depth > 1)
-				reprCat (arglist, token);
-
-			if (token->type == '(' ||
-			    token->type == '[' ||
-			    token->type == '{')
-				depth ++;
-			else if (token->type == ')' ||
-			         token->type == ']' ||
-			         token->type == '}')
-				depth --;
-			else if (kind != K_CLASS && depth == 1 &&
-			         token->type == TOKEN_IDENTIFIER &&
-			         (prevTokenType == '(' || prevTokenType == ',') &&
-			         parameterCount < ARRAY_SIZE (parameterTokens) &&
-			         PythonKinds[K_PARAMETER].enabled)
-			{
-				tokenInfo *parameterName = newToken ();
-
-				copyToken (parameterName, token);
-				parameterTokens[parameterCount] = parameterName;
-				parameterTypes [parameterCount++] = parseParamTypeAnnotation (token, arglist);
-			}
-		}
-		while (token->type != TOKEN_EOF && depth > 0);
+		if (isCDef && kind != K_CLASS)
+			parseCArglist (token, kind, arglist, parameters);
+		else
+			parseArglist (token, kind, arglist, parameters);
 	}
 
 	if (kind == K_CLASS)
@@ -1022,24 +1176,24 @@ static bool parseClassOrDef (tokenInfo *const token,
 	deleteToken (name);
 	vStringDelete (arglist);
 
-	if (parameterCount > 0)
+	if (parameters && !ptrArrayIsEmpty (parameters))
 	{
 		unsigned int i;
 
-		for (i = 0; i < parameterCount; i++)
+		for (i = 0; i < ptrArrayCount (parameters); i++)
 		{
-			int paramCorkIndex = makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
-			deleteToken (parameterTokens[i]);
+			struct typedParam *parameter = ptrArrayItem (parameters, i);
+			int paramCorkIndex = makeSimplePythonTag (parameter->token, K_PARAMETER);
 			tagEntryInfo *e = getEntryInCorkQueue (paramCorkIndex);
-			if (e && parameterTypes[i])
+			if (e && parameter->type)
 			{
 				e->extensionFields.typeRef [0] = eStrdup ("typename");
-				e->extensionFields.typeRef [1] = vStringDeleteUnwrap (parameterTypes[i]);
-				parameterTypes[i] = NULL;
+				e->extensionFields.typeRef [1] = vStringDeleteUnwrap (parameter->type);
+				parameter->type = NULL;
 			}
-			vStringDelete (parameterTypes[i]); /* NULL is acceptable. */
 		}
 	}
+	ptrArrayDelete (parameters); /* NULL is acceptable. */
 
 	tagEntryInfo *e;
 	vString *t;

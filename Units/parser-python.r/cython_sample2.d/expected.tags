@@ -1,5 +1,6 @@
-my_fun	input.pyx	/^cpdef np.ndarray[dtype=double, ndim=1] my_fun(np.ndarray[dtype=double, ndim=1] x):$/;"	f	signature:(np.ndarray[dtype=double, ndim=1] x)
-np	input.pyx	/^cimport numpy as np$/;"	I	nameref:module:numpy
+numpy	input.pyx	/^import numpy as np$/;"	i
 np	input.pyx	/^import numpy as np$/;"	I	nameref:module:numpy
 numpy	input.pyx	/^cimport numpy as np$/;"	i
-numpy	input.pyx	/^import numpy as np$/;"	i
+np	input.pyx	/^cimport numpy as np$/;"	I	nameref:module:numpy
+my_fun	input.pyx	/^cpdef np.ndarray[dtype=double, ndim=1] my_fun(np.ndarray[dtype=double, ndim=1] x):$/;"	f	signature:(np.ndarray[dtype=double, ndim=1] x)
+x	input.pyx	/^cpdef np.ndarray[dtype=double, ndim=1] my_fun(np.ndarray[dtype=double, ndim=1] x):$/;"	z	function:my_fun	typeref:typename:np.ndarray[dtype=double, ndim=1]
