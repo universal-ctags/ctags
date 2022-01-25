@@ -1,3 +1,4 @@
 --extras=+r
 --fields=+r
 --sort=no
+--roles-all.*=*

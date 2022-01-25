@@ -137,6 +137,10 @@ typedef enum {
 	TEX_XINPUT_BIBLIOGRAPHY,
 } texInputRole;
 
+typedef enum {
+	TEX_ENVIRONMENT_USED,
+} texEnvironmentRole;
+
 static roleDefinition TexInputRoles [] = {
 	{ true, "included",
 	  "external input file specified with \\include" },
@@ -144,6 +148,10 @@ static roleDefinition TexInputRoles [] = {
 	  "external input file specified with \\input" },
 	{ true, "bibliography",
 	  "bibliography (.bib) file" },
+};
+
+static roleDefinition TexEnvironmentRoles [] = {
+	{ false, "used", "environment usage introduced by \\begin{MyEnv}" },
 };
 
 static kindDefinition TexKinds [] = {
@@ -160,7 +168,8 @@ static kindDefinition TexKinds [] = {
 	{ true,  'B', "bibitem",		  "bibliography items" },
 	{ true,  'C', "command",		  "command created with \\newcommand" },
 	{ true,  'o', "operator",		  "math operator created with \\DeclareMathOperator" },
-	{ true,  'e', "environment",	  "environment created with \\newenvironment" },
+	{ true,  'e', "environment",	  "environment created with \\newenvironment",
+	  .referenceOnly = false, ATTACH_ROLES(TexEnvironmentRoles) },
 	{ true,  't', "theorem",		  "theorem created with \\newtheorem" },
 	{ true,  'N', "counter",		  "counter created with \\newcounter" },
 };
@@ -799,7 +808,8 @@ static bool parseEnv (tokenInfo *const token, bool begin, bool *tokenUnprocessed
 		{
 			.type = '{',
 			.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
-			.kindIndex = KIND_GHOST_INDEX,
+			.kindIndex = begin ? TEXTAG_ENVIRONMENT : KIND_GHOST_INDEX,
+			.roleIndex = TEX_ENVIRONMENT_USED,
 			.name = envName,
 		},
 		{

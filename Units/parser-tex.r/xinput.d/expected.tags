@@ -1,3 +1,4 @@
+document	input.tex	/^\\begin{document}$/;"	e	roles:used
 input-1	input.tex	/^\\include{input-1}$/;"	i	roles:included
 input-2	input.tex	/^\\input{input-2}$/;"	i	roles:input
 input-3	input.tex	/^\\bibliography{input-3}$/;"	i	roles:bibliography
