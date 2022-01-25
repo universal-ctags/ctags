@@ -1,0 +1,2 @@
+i_am_private	input.bas	/^Private Sub i_am_private$/;"	f	access:private
+i_am_public	input.bas	/^Public Sub i_am_public$/;"	f	access:public
