@@ -758,11 +758,30 @@ bool cxxParserParseEnum(void)
 			return false;
 		}
 
-		if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeEOF | CXXTokenTypeSemicolon))
+		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 		{
 			// tolerate EOF, treat as forward declaration
 			cxxParserNewStatement();
-			CXX_DEBUG_LEAVE_TEXT("EOF or semicolon before enum block: can't decode this");
+			CXX_DEBUG_LEAVE_TEXT("EOF before enum block: can't decode this");
+			return true;
+		}
+
+		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
+		{
+			bool bMember = (cxxScopeGetVariableKind() == CXXTagKindMEMBER);
+			if (bMember)
+			{
+				// enum type structure member with bit-width:
+				// e.g.
+				//    sturct { enum E m: 2; } v;
+				CXX_DEBUG_PRINT("Found semicolon, member definition with bit-width");
+				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain, 0);
+			}
+			cxxParserNewStatement();
+			if (bMember)
+				CXX_DEBUG_LEAVE_TEXT("Semicolon before enum block: can't decode this");
+			else
+				CXX_DEBUG_LEAVE();
 			return true;
 		}
 
