@@ -16,7 +16,10 @@
 # - Run Lua parser as a subparser
 #
 --langdef=RpmMacros
---map-RpmMacros=+(macros.*)
+
+# This map is too generic.
+# e.g. "macros.h" of C language input matches this pattern.
+# --map-RpmMacros=+(macros.*)
 
 # This one is too general.
 # --map-RpmMacros=+(macros)

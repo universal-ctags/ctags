@@ -63,7 +63,6 @@ extern parserDefinition* RpmMacrosParser (void)
 	};
 
 	static const char *const patterns [] = {
-		"macros.*",
 		NULL
 	};
 
