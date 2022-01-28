@@ -213,6 +213,7 @@ OPTLIB2C_INPUT = \
 	optlib/man.ctags			\
 	optlib/meson.ctags			\
 	optlib/mesonOptions.ctags		\
+	optlib/org.ctags			\
 	optlib/passwd.ctags			\
 	optlib/pod.ctags			\
 	optlib/puppetManifest.ctags		\

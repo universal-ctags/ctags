@@ -1,0 +1,64 @@
+#  org.ctags regex parser for org-mode files
+#  Copyright (c) 2022 Universite Rennes 2
+#  Copyright (c) 2022 Pierre-Andre CORNILLON
+#
+##  Author: Pierre-Andre Cornillon pierre-andre.cornillon@univ-rennes2.fr
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+#  References:
+#  - https://orgmode.org/
+#
+--langdef=Org
+--map-Org=+.org
+# definitions
+--kinddef-Org=d,definition,definitions
+--kinddef-Org=p,part,parts
+--kinddef-Org=c,chapter,chapters
+--kinddef-Org=s,section,sections
+--kinddef-Org=u,subsection,subsections
+--kinddef-Org=b,subsubsection,subsubsections
+--kinddef-Org=P,paragraph,paragraphs
+--kinddef-Org=G,subparagraph,subparagraphs
+# definition of levels
+--_tabledef-Org=toplevel
+--_tabledef-Org=srcblock
+################################
+# beginning of toplevel
+################################
+# if encounter a src block do language identify languge and defer
+--_mtable-regex-Org=toplevel/[:blank:]*#\+begin_src[ ]+([a-zA-Z0-9][-#+a-zA-Z0-9]*)//{tenter=srcblock}{_guest=\1,0end,}
+# sections stuff
+--_mtable-regex-Org=toplevel/\*\*\*\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/G/
+--_mtable-regex-Org=toplevel/\*\*\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/P/
+--_mtable-regex-Org=toplevel/\*\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/b/
+--_mtable-regex-Org=toplevel/\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/u/
+--_mtable-regex-Org=toplevel/\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/s/
+--_mtable-regex-Org=toplevel/\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/c/
+--_mtable-regex-Org=toplevel/\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/p/
+# labels
+--_mtable-regex-Org=toplevel/<<([^>]+)>>/\1/d/
+--_mtable-regex-Org=toplevel/#\+(NAME|name):[[:blank:]]+([[:graph:][:blank:]]+)([\n])?/\2/d/
+## else do nothing (end of toplevel)
+--_mtable-regex-Org=toplevel/.//
+
+################################
+# beginning of src block
+################################
+# if end of src block exit
+--_mtable-regex-Org=srcblock/[:blank:]*#\+end_src//{tleave}{_guest=,,0end}
+# else do nothing
+--_mtable-regex-Org=srcblock/.//
