@@ -1,0 +1,20 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/pac/ZONE/PKG/TAGS/UNIVERSAL_CTAGS/TEST/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20220109.0/
+R bloc1	input.org	/^#+name: R bloc1$/;"	d
+my section 1	input.org	/^* my section 1$/;"	p
+my section 2	input.org	/^* my section 2$/;"	p
+myf	input.org	/^def myf(x):$/;"	f
+myf	input.org	/^myf <- function(x) {$/;"	f
+myff	input.org	/^def myff(x):$/;"	f
+python  !	input.org	/^** python  !$/;"	c
+python bloc2	input.org	/^#+name: python bloc2$/;"	d
+python ou Python	input.org	/^** python ou Python$/;"	c

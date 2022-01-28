@@ -123,6 +123,7 @@
 	OldCppParser, \
 	OldCParser, \
 	OcamlParser, \
+	OrgParser, \
 	PasswdParser, \
 	PascalParser, \
 	PerlParser, \
