@@ -242,7 +242,6 @@
     <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\optlib\meson.c" />
     <ClCompile Include="..\optlib\mesonOptions.c" />
-    <ClCompile Include="..\optlib\org.c" />
     <ClCompile Include="..\optlib\passwd.c" />
     <ClCompile Include="..\optlib\pod.c" />
     <ClCompile Include="..\optlib\puppetManifest.c" />
