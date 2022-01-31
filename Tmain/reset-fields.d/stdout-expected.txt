@@ -1,0 +1,18 @@
+# 1: 2:
+point	input.h	1;"	kind:struct	end:1
+# 1:--output-format=u-ctags 2:
+point	input.h	1;"	kind:struct	end:1
+# 1:--output-format=etags 2:
+
+input.h,40
+struct point { double x, y };point1,0
+# 1:--output-format=xref 2:
+point            struct        1 input.h          struct point { double x, y };
+# 1: 2:--output-format=u-ctags
+point	input.h	1;"	kind:struct	end:1
+# 1: 2:--output-format=etags
+
+input.h,40
+struct point { double x, y };point1,0
+# 1: 2:--output-format=xref
+point            struct        1 input.h          struct point { double x, y };
