@@ -162,10 +162,10 @@ jobs:
              ulimit -c 0
              make distcheck
 
-   centos_make:
+   ubi8_make:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/centos:latest
+       - image: registry.access.redhat.com/ubi8:latest
      steps:
        - run:
            name: Install Git
@@ -175,7 +175,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-              yum -y --enablerepo=powertools install python3 gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
+              yum -y --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos --enablerepo=ubi-8-codeready-builder install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
        - run:
            name: Build
            command: |
@@ -187,10 +187,10 @@ jobs:
            command: |
              make check
 
-   centos_make_roundtrip:
+   ubi8_make_roundtrip:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/centos:latest
+       - image: registry.access.redhat.com/ubi8:latest
      steps:
        - run:
            name: Install Git
@@ -200,7 +200,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-              yum -y --enablerepo=powertools install python3 gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
+              yum -y --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos --enablerepo=ubi-8-codeready-builder install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
        - run:
            name: Build
            command: |
@@ -371,12 +371,12 @@ workflows:
       - ubuntu20_32bit
       - fedora30_bmake
       - fedora34_distcheck
-      - centos_make
+      - ubi8_make
       - fedora34_gmake
       - fedora33_cross_aarch64
       - centos7_make
       - ubuntu20_mingw
-      - centos_make_roundtrip
+      - ubi8_make_roundtrip
       - fedora30_bmake_roundtrip
       - fedora34_gmake_roundtrip
       - centos7_make_roundtrip
