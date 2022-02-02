@@ -1,0 +1,55 @@
+DEF:S0
+
+BEGIN:lisp
+(defun f0 () (list))
+END
+
+DEF:E0
+
+
+DEF:S1
+
+BEGIN
+(defun f1 () (list))
+END:lisp
+
+DEF:E1
+
+DEF:S2
+
+BEGIN_FILE:foo.cl
+(defun f2 () (list))
+END_FILE
+
+DEF:E2
+
+DEF:S3
+
+BEGIN_FILE
+(defun f3 () (list))
+END_FILE:foo.cl
+
+DEF:E3
+
+DEF:S4
+
+BEGIN_C
+int f4 (void)
+{
+	return 0;
+}
+END_C
+
+DEF:E4
+
+DEF:S5
+BEGIN:lisp<(defun f5 () (list))>END
+DEF:E5
+
+DEF:S6
+BEGIN_FILE:bar.cl<(defun f6 () (list))>END_FILE
+DEF:E6
+
+DEF:S7
+BEGIN_C<int f7 (void) { return 0; }>END_C
+DEF:E7
