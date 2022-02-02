@@ -1366,8 +1366,6 @@ static void processFieldsOption (
 
 	longName = vStringNewOrClearWithAutoRelease (longName);
 
-	Option.fieldsReset = false;
-
 	if (*p == '*')
 	{
 		resetFieldsOption (LANG_IGNORE, true);
