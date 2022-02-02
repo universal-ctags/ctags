@@ -28,3 +28,4 @@ g1	input-1.single	/^int g1 (void) { return 0; }$/;"	f	line:6	language:C	typeref:
 g2	input-1.single	/^function g2$/;"	f	line:10	language:Sh
 EOF	input-1.single	/^	cat > foo.rst <<EOF$/;"	h	line:12	language:Sh
 G2 on g2	input-1.single	/^G2 on g2$/;"	H	line:14	language:ReStructuredText
+f	input-2.single	/^f()$/;"	f	line:4	language:Sh

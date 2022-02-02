@@ -1537,7 +1537,8 @@ For *<PARSER>*, you can specify one of the following items:
 a name of a parser
 
 	If you know the guest parser you want to run before parsing
-	the input file, specify the name of the parser.
+	the input file, specify the name of the parser. Aliases of parsers
+	are also considered when finding a parser for the name.
 
 	An example of running C parser as a guest parser::
 
@@ -1548,7 +1549,8 @@ the group number of a regex pattern started from '``\``' (backslash)
 	If a parser name appears in an input file, write a regex pattern
 	to capture the name.  Specify the group number where the name is
 	stored to the parser.  In such case, use '``\``' as the prefix for
-	the number.
+	the number. Aliases of parsers are also considered when finding
+	a parser for the name.
 
 	Let's see an example. Git Flavor Markdown (GFM) is a language for
 	documentation. It provides a notation for quoting a snippet of
