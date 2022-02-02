@@ -29,7 +29,7 @@
 --langdef=SystemTap
 --map-SystemTap=+.stp
 --map-SystemTap=+.stpm
---alias-SystemTap=+.stap
+--alias-SystemTap=+stap
 
 --kinddef-SystemTap=p,probe,probe aliases
 --kinddef-SystemTap=f,function,functions

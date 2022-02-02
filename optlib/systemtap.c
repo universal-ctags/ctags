@@ -395,7 +395,7 @@ extern parserDefinition* SystemTapParser (void)
 	};
 
 	static const char *const aliases [] = {
-		".stap",
+		"stap",
 		NULL
 	};
 
