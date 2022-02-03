@@ -224,7 +224,7 @@ static const enum openapiKeys host2Keys[] = {
 	KEY_HOST,
 };
 
-const struct tagSource tagSources[] = {
+static const struct tagSource tagSources[] = {
 	{
 		KIND_PATH,
 		pathKeys,
@@ -262,7 +262,7 @@ const struct tagSource tagSources[] = {
 	},
 };
 
-const struct tagSource tagValueSources[] = {
+static const struct tagSource tagValueSources[] = {
 	{
 		KIND_TITLE,
 		title3Keys,
