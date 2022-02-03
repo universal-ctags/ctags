@@ -391,6 +391,7 @@ findOpenAPITags (void)
 
 extern parserDefinition* OpenAPIParser (void)
 {
+	static const char *const patterns [] = { "openapi.yaml", NULL };
 	static struct sOpenAPISubparser openapiSubparser = {
 		.yaml = {
 			.subparser = {
@@ -406,6 +407,8 @@ extern parserDefinition* OpenAPIParser (void)
 	};
 
 	parserDefinition* const def = parserNew ("OpenAPI");
+
+	def->patterns   = patterns;
 
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
