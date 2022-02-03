@@ -383,8 +383,7 @@ static void inputEnd(subparser *s)
 	Assert (((struct sOpenAPISubparser*)s)->type_stack == NULL);
 }
 
-static void
-findOpenAPITags (void)
+static void findOpenAPITags (void)
 {
 	scheduleRunningBaseparser (0);
 }
