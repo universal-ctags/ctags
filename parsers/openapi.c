@@ -224,7 +224,7 @@ static const enum openapiKeys host2Keys[] = {
 	KEY_HOST,
 };
 
-const struct tagSource tagSources[] = {
+static const struct tagSource tagSources[] = {
 	{
 		KIND_PATH,
 		pathKeys,
@@ -262,7 +262,7 @@ const struct tagSource tagSources[] = {
 	},
 };
 
-const struct tagSource tagValueSources[] = {
+static const struct tagSource tagValueSources[] = {
 	{
 		KIND_TITLE,
 		title3Keys,
@@ -383,14 +383,14 @@ static void inputEnd(subparser *s)
 	Assert (((struct sOpenAPISubparser*)s)->type_stack == NULL);
 }
 
-static void
-findOpenAPITags (void)
+static void findOpenAPITags (void)
 {
 	scheduleRunningBaseparser (0);
 }
 
 extern parserDefinition* OpenAPIParser (void)
 {
+	static const char *const patterns [] = { "openapi.yaml", NULL };
 	static struct sOpenAPISubparser openapiSubparser = {
 		.yaml = {
 			.subparser = {
@@ -406,6 +406,8 @@ extern parserDefinition* OpenAPIParser (void)
 	};
 
 	parserDefinition* const def = parserNew ("OpenAPI");
+
+	def->patterns   = patterns;
 
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
