@@ -22,7 +22,7 @@
 #  References:
 #  - https://orgmode.org/
 #
---langdef=org
+--langdef=Org
 --map-org=+.org
 # definitions
 --kinddef-org=d,definition,definitions

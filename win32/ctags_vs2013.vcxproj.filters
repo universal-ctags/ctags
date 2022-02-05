@@ -249,9 +249,6 @@
     <ClCompile Include="..\optlib\mesonOptions.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\optlib\org.c">
-      <Filter>Source Files\optlib</Filter>
-    </ClCompile>
     <ClCompile Include="..\optlib\passwd.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
