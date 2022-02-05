@@ -22,9 +22,10 @@ f4	input.single	/^int f4 (void)$/;"	f	line:37	language:C	typeref:typename:int
 f5	input.single	/(defun f5 () (list))/;"	f	line:46	language:Lisp
 f6	input.single	/(defun f6 () (list))/;"	f	line:50	language:Lisp
 f7	input.single	/int f7 (void) { return 0; }/;"	f	line:54	language:C	typeref:typename:int
-v0	input-0.single	/(defvar v0 0/;"	f	line:1	language:Lisp
+v0	input-0.single	/(defvar v0 0/;"	v	line:1	language:Lisp
 g0	input-1.single	/^(defun g0 () (list))$/;"	f	line:2	language:Lisp
 g1	input-1.single	/^int g1 (void) { return 0; }$/;"	f	line:6	language:C	typeref:typename:int
 g2	input-1.single	/^function g2$/;"	f	line:10	language:Sh
 EOF	input-1.single	/^	cat > foo.rst <<EOF$/;"	h	line:12	language:Sh
-G2 on g2	input-1.single	/^G2 on g2$/;"	c	line:14	language:ReStructuredText
+G2 on g2	input-1.single	/^G2 on g2$/;"	H	line:14	language:ReStructuredText
+f	input-2.single	/^f()$/;"	f	line:4	language:Sh

@@ -839,7 +839,7 @@ static void pre_ptrn_flag_guest_long (const char* const s, const char* const v, 
 	}
 	else
 	{
-		guest->lang.spec.lang = getNamedLanguage (v, (tmp - v));
+		guest->lang.spec.lang = getNamedLanguageOrAlias (v, (tmp - v));
 		if (guest->lang.spec.lang == LANG_IGNORE)
 		{
 			error (WARNING, "no parser found for the guest spec: %s", v);
@@ -1810,7 +1810,7 @@ static bool fillGuestRequest (const char *start,
 			- pmatch [guest_spec->lang.spec.patternGroup].rm_so;
 		if (size > 0)
 		{
-			guest_req->lang = getNamedLanguage (name, size);
+			guest_req->lang = getNamedLanguageOrAlias (name, size);
 			guest_req->lang_set = true;
 		}
 	}
