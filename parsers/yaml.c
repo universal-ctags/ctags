@@ -1,6 +1,7 @@
 /*
 *   Copyright (c) 2016, Masatake YAMATO
 *   Copyright (c) 2016, Red Hat, Inc.
+*   Copyright (c) 2022, Vasily Kulikov
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
@@ -23,6 +24,9 @@
 #include "types.h"
 #include "yaml.h"
 
+#include "numarray.h"
+#include "keyword.h"
+#include "trashbox.h"
 
 
 #define entry(X) [X] = #X
@@ -182,3 +186,172 @@ extern parserDefinition* YamlParser (void)
 
 	return def;
 }
+
+/*
+ * Experimental Ypath code
+ */
+struct ypathTypeStack {
+	yaml_token_type_t type;
+	int key;
+	struct ypathTypeStack *next;
+};
+
+extern int ypathCompileTable (langType language, tagYpathTable *table, int keywordId)
+{
+	vString *tmpkey = vStringNew();
+	intArray *code = intArrayNew ();
+
+	for (const char *ypath = table->ypath; true; ypath++)
+	{
+		if (*ypath == '/' || *ypath == '\0')
+		{
+			if (!vStringIsEmpty (tmpkey))
+			{
+				int k;
+				if (vStringLength (tmpkey) == 1 && (vStringValue (tmpkey)[0] == '*'))
+					k = KEYWORD_NONE;
+				else
+				{
+					k = lookupKeyword (vStringValue (tmpkey), language);
+					if (k == KEYWORD_NONE)
+					{
+						char *keyword = DEFAULT_TRASH_BOX(vStringStrdup (tmpkey), eFree);
+						k = keywordId++;
+						addKeyword (keyword, language, k);
+					}
+				}
+				intArrayAdd (code, k);
+				vStringClear (tmpkey);
+			}
+			if (*ypath == '\0')
+				break;
+		}
+		else
+			vStringPut (tmpkey, *ypath);
+	}
+
+	intArrayReverse (code);
+	table->code = code;
+
+	vStringDelete (tmpkey);
+	return keywordId;
+}
+
+extern void ypathCompileTables (langType language, tagYpathTable tables[], size_t count, int keywordId)
+{
+	for (size_t i = 0; i < count; i++)
+		keywordId = ypathCompileTable (language, tables + i, keywordId);
+}
+
+extern void ypathCompiledCodeDelete (tagYpathTable tables[], size_t count)
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		intArrayDelete (tables[i].code);
+		tables[i].code = NULL;
+	}
+}
+
+extern void ypathPushType (yamlSubparser *yaml, yaml_token_t *token)
+{
+	struct ypathTypeStack *s;
+
+	s = xMalloc (1, struct ypathTypeStack);
+
+	s->next = yaml->ypathTypeStack;
+	yaml->ypathTypeStack = s;
+
+	s->type = token->type;
+	s->key = KEYWORD_NONE;
+}
+
+extern void ypathPopType (yamlSubparser *yaml)
+{
+	struct ypathTypeStack *s;
+
+	s = yaml->ypathTypeStack;
+	yaml->ypathTypeStack = s->next;
+
+	s->next = NULL;
+
+	eFree (s);
+}
+
+extern void ypathPopAllTypes (yamlSubparser *yaml)
+{
+	while (yaml->ypathTypeStack)
+		ypathPopType (yaml);
+}
+
+extern void ypathFillKeywordOfTokenMaybe (yamlSubparser *yaml, yaml_token_t *token, langType lang)
+{
+	if (!yaml->ypathTypeStack)
+		return;
+
+	int k = lookupKeyword ((char *)token->data.scalar.value, lang);
+	yaml->ypathTypeStack->key = k;
+}
+
+static bool ypathStateStackMatch (struct ypathTypeStack *stack,
+								  intArray *code, size_t offset)
+{
+	if (intArrayCount (code) - offset == 0)
+	{
+		if (stack == NULL)
+			return true;
+		else
+			return false;
+	}
+
+	if (stack == NULL)
+		return false;
+
+	if (stack->key == intArrayItem (code, offset))
+		return ypathStateStackMatch (stack->next, code, offset + 1);
+	else
+		return false;
+}
+
+extern void ypathHandleToken (yamlSubparser *yaml, yaml_token_t *token, int state,
+							  tagYpathTable tables[], size_t count)
+{
+	if (!yaml->ypathTypeStack)
+		return;
+
+	for (size_t i = 0; i < count; i++)
+	{
+		if (tables[i].expected_state != state)
+			continue;
+
+		if (ypathStateStackMatch(yaml->ypathTypeStack, tables[i].code, 0))
+		{
+			tagEntryInfo tag;
+			initTagEntry (&tag, (char *)token->data.scalar.value, tables[i].kind);
+			attachYamlPosition (&tag, token, false);
+
+			makeTagEntry (&tag);
+			break;
+		}
+	}
+}
+
+#ifdef DO_TRACING
+extern void ypathPrintTypeStack0(struct ypathTypeStack *stack)
+{
+	if (!stack)
+	{
+		TRACE_PRINT_NEWLINE();
+		return;
+	}
+
+	tracePrintFmt("[%d] - ", stack->key);
+	ypathPrintTypeStack0 (stack->next);
+}
+
+extern void ypathPrintTypeStack(yamlSubparser *yaml)
+{
+	ypathPrintTypeStack0 (yaml->ypathTypeStack);
+}
+#else
+extern void ypathPrintTypeStack(yamlSubparser *yaml) {}
+#endif
