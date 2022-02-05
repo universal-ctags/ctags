@@ -1,0 +1,19 @@
+* my section 1
+#+name: R bloc1
+#+begin_src R :results none :session :exports code :comments org
+myf <- function(x) {
+return(x*x)
+    }
+#+end_src
+* my section 2
+** python  !
+#+begin_src Python :results none :session :exports code :comments org
+def myf(x):
+    return x
+#+end_src
+** python ou Python
+#+NAME: python bloc2
+#+begin_src python :results none :session :exports code :comments org
+def myff(x):
+    return(x*x)
+#+end_src

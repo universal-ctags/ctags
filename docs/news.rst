@@ -439,6 +439,7 @@ The following parsers have been added:
 * M4
 * NSIS
 * ObjectiveC
+* Org *optlib*
 * OpenAPI (3.x.x / Swagger 2.0) *Yaml based subparser*
 * Passwd *optlib*
 * PuppetManifest *optlib*

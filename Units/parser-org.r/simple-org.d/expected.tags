@@ -1,0 +1,9 @@
+my section 1	input.org	/^* my section 1$/;"	p	language:Org
+R bloc1	input.org	/^#+name: R bloc1$/;"	d	language:Org
+my section 2	input.org	/^* my section 2$/;"	p	language:Org
+python  !	input.org	/^** python  !$/;"	c	language:Org
+python ou Python	input.org	/^** python ou Python$/;"	c	language:Org
+python bloc2	input.org	/^#+NAME: python bloc2$/;"	d	language:Org
+myf	input.org	/^myf <- function(x) {$/;"	f	language:R
+myf	input.org	/^def myf(x):$/;"	f	language:Python
+myff	input.org	/^def myff(x):$/;"	f	language:Python
