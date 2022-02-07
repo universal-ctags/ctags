@@ -121,7 +121,6 @@ static void handlYamlToken (yaml_token_t *token)
 		attachYamlPosition (&tag, token, false);
 		makeTagEntry (&tag);
 	}
-
 }
 
 static void findYamlTags (void)
@@ -178,10 +177,10 @@ extern parserDefinition* YamlParser (void)
 
 	def->kindTable = YamlKinds;
 	def->extensions = extensions;
-	def->parser     = findYamlTags;
-	def->useCork    = CORK_QUEUE;
-	def->kindTable         = YamlKinds;
-	def->kindCount     = ARRAY_SIZE (YamlKinds);
+	def->parser = findYamlTags;
+	def->useCork = CORK_QUEUE;
+	def->kindTable = YamlKinds;
+	def->kindCount = ARRAY_SIZE (YamlKinds);
 	def->useMemoryStreamInput = true;
 
 	return def;
