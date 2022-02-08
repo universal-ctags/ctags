@@ -336,6 +336,7 @@ static void findTag (const char *const name, const int options)
 {
 	tagFileInfo info;
 	tagEntry entry;
+	int err = 0;
 	tagFile *const file = openTags (TagFileName, &info);
 	if (file == NULL || !info.status.opened)
 	{
@@ -345,45 +346,43 @@ static void findTag (const char *const name, const int options)
 			tagsClose (file);
 		exit (1);
 	}
-	else
+
+	if (SortOverride)
 	{
-		int err = 0;
-		if (SortOverride)
+		if (tagsSetSortType (file, SortMethod) != TagSuccess)
 		{
-			if (tagsSetSortType (file, SortMethod) != TagSuccess)
-			{
-				err = tagsGetErrno (file);
-				fprintf (stderr, "%s: cannot set sort type to %d: %s\n",
-						 ProgramName,
-						 SortMethod,
-						 tagsStrerror (err));
-				exit (1);
-			}
-		}
-		if (debugMode)
-			fprintf (stderr, "%s: searching for \"%s\" in \"%s\"\n",
-					 ProgramName, name, TagFileName);
-		if (tagsFind (file, &entry, name, options) == TagSuccess)
-			walkTags (file, &entry, tagsFindNext,
-#ifdef READTAGS_DSL
-					  Formatter? printTagWithFormatter:
-#endif
-					  printTag);
-		else if ((err = tagsGetErrno (file)) != 0)
-		{
-			fprintf (stderr, "%s: error in tagsFind(): %s\n",
+			err = tagsGetErrno (file);
+			fprintf (stderr, "%s: cannot set sort type to %d: %s\n",
 					 ProgramName,
+					 SortMethod,
 					 tagsStrerror (err));
 			exit (1);
 		}
-		tagsClose (file);
 	}
+	if (debugMode)
+		fprintf (stderr, "%s: searching for \"%s\" in \"%s\"\n",
+					 ProgramName, name, TagFileName);
+	if (tagsFind (file, &entry, name, options) == TagSuccess)
+		walkTags (file, &entry, tagsFindNext,
+#ifdef READTAGS_DSL
+				  Formatter? printTagWithFormatter:
+#endif
+				  printTag);
+	else if ((err = tagsGetErrno (file)) != 0)
+	{
+		fprintf (stderr, "%s: error in tagsFind(): %s\n",
+				 ProgramName,
+				 tagsStrerror (err));
+		exit (1);
+	}
+	tagsClose (file);
 }
 
 static void listTags (int pseudoTags)
 {
 	tagFileInfo info;
 	tagEntry entry;
+	int err = 0;
 	tagFile *const file = openTags (TagFileName, &info);
 	if (file == NULL || !info.status.opened)
 	{
@@ -395,9 +394,9 @@ static void listTags (int pseudoTags)
 			tagsClose (file);
 		exit (1);
 	}
-	else if (pseudoTags)
+
+	if (pseudoTags)
 	{
-		int err = 0;
 		if (tagsFirstPseudoTag (file, &entry) == TagSuccess)
 			walkTags (file, &entry, tagsNextPseudoTag, printPseudoTag);
 		else if ((err = tagsGetErrno (file)) != 0)
@@ -407,11 +406,9 @@ static void listTags (int pseudoTags)
 					 tagsStrerror (err));
 			exit (1);
 		}
-		tagsClose (file);
 	}
 	else
 	{
-		int err = 0;
 		if (tagsFirst (file, &entry) == TagSuccess)
 			walkTags (file, &entry, tagsNext,
 #ifdef READTAGS_DSL
@@ -425,8 +422,8 @@ static void listTags (int pseudoTags)
 					 tagsStrerror (err));
 			exit (1);
 		}
-		tagsClose (file);
 	}
+	tagsClose (file);
 }
 
 static const char *const Usage =
