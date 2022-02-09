@@ -1,0 +1,34 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/tmp/abc/../././abc/../abc/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/e08db39a3/
+a_fn	xyz/a.c	/^static void a_fn(void) {}$/;"	f	typeref:typename:void	file:
+b_fn	b.c	/^static void b_fn(void) {}$/;"	f	typeref:typename:void	file:
+c_fn	./c.c	/^static void c_fn(void) {}$/;"	f	typeref:typename:void	file:
+d_fn	./../d.c	/^static void d_fn(void) {}$/;"	f	typeref:typename:void	file:
+e_fn	../e.c	/^static void e_fn(void) {}$/;"	f	typeref:typename:void	file:
+f_fn	../../f.c	/^static void f_fn(void) {}$/;"	f	typeref:typename:void	file:
+g_fn	../../../g.c	/^static void g_fn(void) {}$/;"	f	typeref:typename:void	file:
+h_fn	../../../../h.c	/^static void h_fn(void) {}$/;"	f	typeref:typename:void	file:
+i_fn	.././../../../i.c	/^static void i_fn(void) {}$/;"	f	typeref:typename:void	file:
+j_fn	.././../j.c	/^static void j_fn(void) {}$/;"	f	typeref:typename:void	file:
+k_fn	.././.././././k.c	/^static void k_fn(void) {}$/;"	f	typeref:typename:void	file:
+l_fn	././././././l.c	/^static void l_fn(void) {}$/;"	f	typeref:typename:void	file:
+m_fn	./././../abc/./m.c	/^static void m_fn(void) {}$/;"	f	typeref:typename:void	file:
+n_fn	./././../abc/X/.././n.c	/^static void n_fn(void) {}$/;"	f	typeref:typename:void	file:
+o_fn	.////.///////./////..//abc//X//..///.///o.c	/^static void o_fn(void) {}$/;"	f	typeref:typename:void	file:
+p_fn	./../xyz/p.c	/^static void p_fn(void) {}$/;"	f	typeref:typename:void	file:
+q_fn	./../xyz/../././xyz/q.c	/^static void q_fn(void) {}$/;"	f	typeref:typename:void	file:
+r_fn	/r.c	/^static void r_fn(void) {}$/;"	f	typeref:typename:void	file:
+s_fn	/../s.c	/^static void s_fn(void) {}$/;"	f	typeref:typename:void	file:
+t_fn	/../././t.c	/^static void t_fn(void) {}$/;"	f	typeref:typename:void	file:
+u_fn	/../././tmp/./u.c	/^static void u_fn(void) {}$/;"	f	typeref:typename:void	file:
+v_fn	/../././tmp/./../tmp/abc/./v.c	/^static void v_fn(void) {}$/;"	f	typeref:typename:void	file:
+w_fn	/../././tmp/./../tmp/../abc/./w.c	/^static void w_fn(void) {}$/;"	f	typeref:typename:void	file:

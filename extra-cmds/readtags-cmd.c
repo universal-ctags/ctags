@@ -13,6 +13,11 @@
 #include "printtags.h"
 #include "routines.h"
 #include "routines_p.h"
+
+#include "vstring.h"
+#include "htable.h"
+#include "fname.h"
+
 #include <string.h>		/* strerror */
 #include <stdlib.h>		/* exit */
 #include <stdio.h>		/* stderr */
@@ -23,6 +28,10 @@ typedef struct sReadOption {
 	/* options passed to libreadtags API functions.*/
 	int matchOpts;
 } readOptions;
+
+struct canonWorkArea {
+	struct canonFnameCacheTable *cacheTable;
+};
 
 static const char *TagFileName = "tags";
 static const char *ProgramName;
@@ -187,7 +196,8 @@ static int compareTagEntry (const void *a, const void *b)
 
 static void walkTags (tagFile *const file, tagEntry *first_entry,
 					  tagResult (* nextfn) (tagFile *const, tagEntry *),
-					  void (* actionfn) (const tagEntry *, void *), void *data)
+					  void (* actionfn) (const tagEntry *, void *), void *data,
+					  struct canonWorkArea *canon)
 {
 	struct tagEntryArray *a = NULL;
 
@@ -196,9 +206,19 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 
 	do
 	{
+		tagEntry *shadow = first_entry;
+		tagEntry  shadowRec;
+		if (canon)
+		{
+			shadowRec = *first_entry;
+			shadow = &shadowRec;
+			shadow->file = canonicalizeRelativeFileName (canon->cacheTable,
+														 first_entry->file);
+		}
+
 		if (Qualifier)
 		{
-			int i = q_is_acceptable (Qualifier, first_entry);
+			int i = q_is_acceptable (Qualifier, shadow);
 			switch (i)
 			{
 			case Q_REJECT:
@@ -210,11 +230,11 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 
 		if (a)
 		{
-			tagEntry *e = copyTag (first_entry);
+			tagEntry *e = copyTag (shadow);
 			tagEntryArrayPush (a, e);
 		}
 		else
-			(* actionfn) (first_entry, data);
+			(* actionfn) (shadow, data);
 	} while ( (*nextfn) (file, first_entry) == TagSuccess);
 
 	int err = tagsGetErrno (file);
@@ -237,10 +257,23 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 #else
 static void walkTags (tagFile *const file, tagEntry *first_entry,
 					  tagResult (* nextfn) (tagFile *const, tagEntry *),
-					  void (* actionfn) (const tagEntry *, void *), void *data)
+					  void (* actionfn) (const tagEntry *, void *), void *data,
+					  struct canonWorkArea *canon)
 {
 	do
-		(* actionfn) (first_entry, data);
+	{
+		tagEntry *shadow = first_entry;
+		tagEntry  shadowRec;
+		if (canon)
+		{
+			shadow = &shadowRec;
+			shadowRec = *first_entry;
+			shadow->file = canonicalizeFileName (canon->cacheTable,
+												 first_entry->file);
+		}
+
+		(* actionfn) (shadow, data);
+	}
 	while ( (*nextfn) (file, first_entry) == TagSuccess);
 
 	int err = tagsGetErrno (file);
@@ -290,6 +323,42 @@ static void removeTagFile (void)
 	eFree ((char *)TagFileName);
 }
 
+static const char *loadCtagsCWD (tagFile *const file, tagEntry *pentry)
+{
+	if (tagsFindPseudoTag (file, pentry, "!_TAG_PROC_CWD",
+						   TAG_FULLMATCH) != TagSuccess)
+	{
+		int err = tagsGetErrno (file);
+		if (!err)
+		{
+			fprintf (stderr, "%s: no !_TAG_PROC_CWD in %s\n",
+					 ProgramName, TagFileName);
+			exit (1);
+		}
+
+		fprintf (stderr, "%s: cannot find !_TAG_PROC_CWD in %s: %s\n",
+				 ProgramName, TagFileName, tagsStrerror (err));
+		exit (1);
+	}
+
+	if (pentry->file[0] != '/')
+	{
+		fputs ("!_TAG_PROC_CWD must start with '/': ", stderr);
+		tagsPrintValue (pentry->file, 1, NULL, stderr);
+		fputc ('\n', stderr);
+		exit (1);
+	}
+
+	return pentry->file;
+}
+
+static struct canonFnameCacheTable *makeCanonFnameCacheTable (tagFile *const file)
+{
+	tagEntry pentry;
+	const char *cwd = loadCtagsCWD (file, &pentry);
+	return canonFnameCacheTableNew (cwd);
+}
+
 static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
 {
 	if (strcmp (filePath, "-") == 0)
@@ -336,7 +405,7 @@ static int hasPsuedoTag (tagFile *const file,
 }
 
 static void findTag (const char *const name, readOptions *readOpts,
-					 tagPrintOptions *printOpts)
+					 tagPrintOptions *printOpts, struct canonWorkArea *canon)
 {
 	tagFileInfo info;
 	tagEntry entry;
@@ -350,6 +419,9 @@ static void findTag (const char *const name, readOptions *readOpts,
 			tagsClose (file);
 		exit (1);
 	}
+
+	if (canon && canon->cacheTable == NULL)
+		canon->cacheTable = makeCanonFnameCacheTable (file);
 
 	if (printOpts->escaping)
 	{
@@ -379,7 +451,8 @@ static void findTag (const char *const name, readOptions *readOpts,
 #ifdef READTAGS_DSL
 				  Formatter? printTagWithFormatter:
 #endif
-				  printTag, printOpts);
+				  printTag, printOpts,
+				  canon);
 	else if ((err = tagsGetErrno (file)) != 0)
 	{
 		fprintf (stderr, "%s: error in tagsFind(): %s\n",
@@ -390,7 +463,8 @@ static void findTag (const char *const name, readOptions *readOpts,
 	tagsClose (file);
 }
 
-static void listTags (int pseudoTags, tagPrintOptions *printOpts)
+static void listTags (int pseudoTags, tagPrintOptions *printOpts,
+					  struct canonWorkArea *canon)
 {
 	tagFileInfo info;
 	tagEntry entry;
@@ -407,6 +481,9 @@ static void listTags (int pseudoTags, tagPrintOptions *printOpts)
 		exit (1);
 	}
 
+	if (pseudoTags == 0 && canon && canon->cacheTable == NULL)
+		canon->cacheTable = makeCanonFnameCacheTable (file);
+
 	if (printOpts->escaping)
 	{
 		printOpts->escapingInputField = 0;
@@ -418,8 +495,8 @@ static void listTags (int pseudoTags, tagPrintOptions *printOpts)
 	if (pseudoTags)
 	{
 		if (tagsFirstPseudoTag (file, &entry) == TagSuccess)
-			walkTags (file, &entry, tagsNextPseudoTag, printPseudoTag,
-					  printOpts);
+			walkTags (file, &entry, tagsNextPseudoTag, printPseudoTag, printOpts,
+					  canon);
 		else if ((err = tagsGetErrno (file)) != 0)
 		{
 			fprintf (stderr, "%s: error in tagsFirstPseudoTag(): %s\n",
@@ -435,7 +512,8 @@ static void listTags (int pseudoTags, tagPrintOptions *printOpts)
 #ifdef READTAGS_DSL
 					  Formatter? printTagWithFormatter:
 #endif
-					  printTag, printOpts);
+					  printTag, printOpts,
+					  canon);
 		else if ((err = tagsGetErrno (file)) != 0)
 		{
 			fprintf (stderr, "%s: error in tagsFirst(): %s\n",
@@ -488,6 +566,8 @@ static const char *const Usage =
 	"    -s[0|1|2] | --override-sort-detection METHOD\n"
 	"        Override sort detection of tag file.\n"
 	"        METHOD: unsorted|sorted|foldcase\n"
+	"    -C | --canonicalize-input\n"
+	"        Reduct '..' and '.' in input fields.\n"
 #ifdef READTAGS_DSL
 	"    -F EXP | --formatter EXP\n"
 	"        Format the tags listed by ACTION with EXP when printing.\n"
@@ -571,11 +651,18 @@ extern int main (int argc, char **argv)
 	int actionSupplied = 0;
 	int i;
 	int ignore_prefix = 0;
+
 	tagPrintOptions printOpts;
 	readOptions readOpts;
 
 	memset (&printOpts, 0, sizeof (printOpts));
 	memset (&readOpts, 0, sizeof (readOpts));
+
+	struct canonWorkArea canonWorkArea = {
+		.cacheTable = NULL,
+	};
+	struct canonWorkArea *canon = NULL;
+
 
 	ProgramName = argv [0];
 	setExecutableName (ProgramName);
@@ -586,7 +673,7 @@ extern int main (int argc, char **argv)
 		const char *const arg = argv [i];
 		if (ignore_prefix || arg [0] != '-')
 		{
-			findTag (arg, &readOpts, &printOpts);
+			findTag (arg, &readOpts, &printOpts, canon);
 			actionSupplied = 1;
 		}
 		else if (arg [0] == '-' && arg [1] == '\0')
@@ -598,7 +685,7 @@ extern int main (int argc, char **argv)
 				debugMode++;
 			else if (strcmp (optname, "list-pseudo-tags") == 0)
 			{
-				listTags (1, &printOpts);
+				listTags (1, &printOpts, NULL);
 				actionSupplied = 1;
 			}
 			else if (strcmp (optname, "help") == 0)
@@ -643,7 +730,7 @@ extern int main (int argc, char **argv)
 				readOpts.matchOpts |= TAG_PARTIALMATCH;
 			else if (strcmp (optname, "list") == 0)
 			{
-				listTags (0, &printOpts);
+				listTags (0, &printOpts, canon);
 				actionSupplied = 1;
 			}
 			else if (strcmp (optname, "line-number") == 0)
@@ -683,6 +770,8 @@ extern int main (int argc, char **argv)
 					exit (1);
 				}
 			}
+			else if (strcmp (optname, "canonicalize-input") == 0)
+				canon = &canonWorkArea;
 #ifdef READTAGS_DSL
 			else if (strcmp (optname, "filter") == 0)
 			{
@@ -740,7 +829,7 @@ extern int main (int argc, char **argv)
 				switch (arg [j])
 				{
 					case 'd': debugMode++; break;
-					case 'D': listTags (1, &printOpts); actionSupplied = 1; break;
+					case 'D': listTags (1, &printOpts, NULL); actionSupplied = 1; break;
 					case 'h': printUsage (stdout, 0); break;
 #ifdef READTAGS_DSL
 					case 'H':
@@ -764,7 +853,7 @@ extern int main (int argc, char **argv)
 					case 'e': printOpts.extensionFields = 1; break;
 					case 'i': readOpts.matchOpts |= TAG_IGNORECASE;   break;
 					case 'p': readOpts.matchOpts |= TAG_PARTIALMATCH; break;
-					case 'l': listTags (0, &printOpts); actionSupplied = 1; break;
+					case 'l': listTags (0, &printOpts, canon); actionSupplied = 1; break;
 					case 'n': printOpts.lineNumber = 1; break;
 					case 't':
 						if (arg [j+1] != '\0')
@@ -786,6 +875,9 @@ extern int main (int argc, char **argv)
 							readOpts.sortMethod = (sortType) (arg[j] - '0');
 						else
 							printUsage(stderr, 1);
+						break;
+					case 'C':
+						canon = &canonWorkArea;
 						break;
 #ifdef READTAGS_DSL
 					case 'Q':
@@ -834,5 +926,11 @@ extern int main (int argc, char **argv)
 	if (Formatter)
 		f_destroy (Formatter);
 #endif
+
+	if (canon)
+	{
+		if (canon->cacheTable)
+			canonFnameCacheTableDelete (canon->cacheTable);
+	}
 	return 0;
 }
