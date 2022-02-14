@@ -4,10 +4,10 @@ Maybe	input.elm	/^import Maybe exposing (withDefault)$/;"	m	roles:imported
 Je	input.elm	/^import Json.Encode as Je$/;"	n	roles:def
 Thing	input.elm	/^type Thing$/;"	t	roles:def
 One	input.elm	/^    = One$/;"	c	type:Thing	roles:def
-Two Int	input.elm	/^    | Two Int$/;"	c	type:Thing	roles:def
-Param a	input.elm	/^type Param a$/;"	t	roles:def
-Cons a	input.elm	/^    = Cons a$/;"	c	type:Param a	roles:def
-Other a	input.elm	/^    | Other a$/;"	c	type:Param a	roles:def
+Two	input.elm	/^    | Two Int$/;"	c	type:Thing	roles:def
+Param	input.elm	/^type Param a$/;"	t	roles:def
+Cons	input.elm	/^    = Cons a$/;"	c	type:Param	roles:def
+Other	input.elm	/^    | Other a$/;"	c	type:Param	roles:def
 Num	input.elm	/^type alias Num =$/;"	a	roles:def
 outward	input.elm	/^port outward : String -> Cmd a$/;"	p	roles:def
 inward	input.elm	/^port inward : (b -> a) -> Sub a$/;"	p	roles:def
