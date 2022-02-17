@@ -53,3 +53,9 @@ components:
                     schema:
                         type: object
                         properties: {}
+
+tags:
+  - name: android_handler
+    description: Handler for Android clients
+  - name: ios_handler
+    description: Handler for iOS clients

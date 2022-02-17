@@ -7,3 +7,5 @@ NullableFieldStringEnum	input.yaml	/^        NullableFieldStringEnum:$/;"	d
 CustomHeader	input.yaml	/^        CustomHeader:$/;"	P
 Response1	input.yaml	/^        Response1:$/;"	R
 Response2	input.yaml	/^        Response2:$/;"	R
+android_handler	input.yaml	/^  - name: android_handler$/;"	T
+ios_handler	input.yaml	/^  - name: ios_handler$/;"	T
