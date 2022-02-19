@@ -1,0 +1,12 @@
+funcA	input.elm	/^funcA =$/;"	f	roles:def
+a1	input.elm	/^        a1 = 1$/;"	f	function:funcA	roles:def
+a2	input.elm	/^        a2 x y = x + y$/;"	f	function:funcA	roles:def
+funcB	input.elm	/^funcB b =$/;"	f	roles:def
+b1	input.elm	/^        b1 =$/;"	f	function:funcB	roles:def
+b2	input.elm	/^                b2 x y =$/;"	f	function:funcB	roles:def
+b3	input.elm	/^                    b3 x y =$/;"	f	function:funcB	roles:def
+b4	input.elm	/^                    b4 v w =$/;"	f	function:funcB	roles:def
+b5	input.elm	/^        b5 i j = i + j$/;"	f	function:funcB	roles:def
+funcC	input.elm	/^funcC =$/;"	f	roles:def
+c1	input.elm	/^        c1 = 1$/;"	f	function:funcC	roles:def
+c2	input.elm	/^        c2 x y = x + y$/;"	f	function:funcC	roles:def

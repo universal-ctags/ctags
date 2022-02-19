@@ -410,7 +410,7 @@ The following parsers have been added:
 * DTD
 * DTS
 * Elixir *optlib*
-* Elm *optlib*
+* Elm *peg/packcc*
 * Falcon
 * FunctionParameters *perl based subparser*
 * Gdbinit script *optlib*

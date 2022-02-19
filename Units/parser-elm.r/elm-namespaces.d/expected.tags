@@ -1,0 +1,5 @@
+A1Mod	input.elm	/^module A1Mod exposing (..)$/;"	m	roles:def
+A1NameSpace	input.elm	/^import A1Import as A1NameSpace exposing (a1ImpFunc)$/;"	n	module:A1Mod	roles:def	moduleName:A1Import
+A1Import	input.elm	/^import A1Import as A1NameSpace exposing (a1ImpFunc)$/;"	m	roles:imported
+a1ImpFunc	input.elm	/^import A1Import as A1NameSpace exposing (a1ImpFunc)$/;"	f	module:A1Import	roles:imported
+func	input.elm	/^func a1 =$/;"	f	module:A1Mod	roles:def

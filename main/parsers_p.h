@@ -39,7 +39,8 @@
 #define PEG_PARSER_LIST						\
 	VarlinkParser, \
 	KotlinParser,  \
-	ThriftParser
+	ThriftParser,  \
+	ElmParser
 #else
 #define PEG_PARSER_LIST
 #endif
@@ -79,7 +80,6 @@
 	DosBatchParser, \
 	EiffelParser, \
 	ElixirParser, \
-	ElmParser, \
 	EmacsLispParser, \
 	ErlangParser, \
 	FalconParser, \

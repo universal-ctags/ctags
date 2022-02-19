@@ -1,0 +1,20 @@
+A	input.elm	/^type A = ACons { x : Float, y : Float }$/;"	t	roles:def
+ACons	input.elm	/^type A = ACons { x : Float, y : Float }$/;"	c	type:A	roles:def
+B	input.elm	/^type B$/;"	t	roles:def
+B3Cons	input.elm	/^    | B3Cons$/;"	c	type:B	roles:def
+B2Cons	input.elm	/^    | B2Cons String Integer$/;"	c	type:B	roles:def
+B1Cons	input.elm	/^    = B1Cons$/;"	c	type:B	roles:def
+C	input.elm	/^type C=CCons{x:Float,y:Float}$/;"	t	roles:def
+CCons	input.elm	/^type C=CCons{x:Float,y:Float}$/;"	c	type:C	roles:def
+D	input.elm	/^type D = DCons (String, Float, {x:String, y:Float})$/;"	t	roles:def
+DCons	input.elm	/^type D = DCons (String, Float, {x:String, y:Float})$/;"	c	type:D	roles:def
+E	input.elm	/^type E$/;"	t	roles:def
+E2Cons	input.elm	/^    | E2Cons ()$/;"	c	type:E	roles:def
+E1Cons	input.elm	/^    = E1Cons {}$/;"	c	type:E	roles:def
+F	input.elm	/^type F$/;"	t	roles:def
+F3Cons	input.elm	/^    | F3Cons$/;"	c	type:F	roles:def
+F2Cons	input.elm	/^    | F2Cons (Float -> String -> (String -> {x:Float, y:Float}))$/;"	c	type:F	roles:def
+F1Cons	input.elm	/^    = F1Cons (String -> Int)$/;"	c	type:F	roles:def
+G	input.elm	/^type G a$/;"	t	roles:def
+G2Cons	input.elm	/^    | G2Cons { a | name : String}$/;"	c	type:G	roles:def
+G1Cons	input.elm	/^    = G1Cons a Int$/;"	c	type:G	roles:def

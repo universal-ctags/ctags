@@ -233,7 +233,6 @@
     <ClCompile Include="..\optlib\cmake.c" />
     <ClCompile Include="..\optlib\ctags-optlib.c" />
     <ClCompile Include="..\optlib\elixir.c" />
-    <ClCompile Include="..\optlib\elm.c" />
     <ClCompile Include="..\optlib\gdbinit.c" />
     <ClCompile Include="..\optlib\iPythonCell.c" />
     <ClCompile Include="..\optlib\inko.c" />

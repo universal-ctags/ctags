@@ -1,0 +1,6 @@
+funcA	input.elm	/^funcA a1 a2 =$/;"	f	roles:def
+funcB	input.elm	/^funcB b1 =$/;"	f	roles:def
+funcC	input.elm	/^funcC c1 c2 =$/;"	f	roles:def
+c2	input.elm	/^                c2 = 2$/;"	f	function:funcC	roles:def
+c3	input.elm	/^                c3 = 3$/;"	f	function:funcC	roles:def
+funcD	input.elm	/^funcD str =$/;"	f	roles:def

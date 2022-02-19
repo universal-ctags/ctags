@@ -37,6 +37,7 @@ GEN_IN_MAN_FILES = \
 	ctags-lang-r.7 \
 	ctags-lang-rmarkdown.7 \
 	ctags-lang-sql.7 \
+	ctags-lang-elm.7 \
 	\
 	readtags.1 \
 	tags.5 \

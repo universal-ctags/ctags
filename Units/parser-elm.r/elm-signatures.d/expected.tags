@@ -1,0 +1,9 @@
+funcA	input.elm	/^funcA a = 1$/;"	f	signature:Int -> Float -> Float	roles:def
+funcB	input.elm	/^funcB b =$/;"	f	signature:String -> Float	roles:def
+funcC	input.elm	/^funcC c = 3$/;"	f	signature:Int -> {c: String}	roles:def
+funcD	input.elm	/^funcD = 4$/;"	f	signature:(Int, Int) -> String	roles:def
+funcE	input.elm	/^funcE = 5$/;"	f	signature:Float -> (Int -> Int -> Int -> String)	roles:def
+funcF	input.elm	/^funcF = 6$/;"	f	signature:String -> {- Old ->-} Int	roles:def
+funcG	input.elm	/^funcG = 7$/;"	f	signature:G.Int -> G.Other	roles:def
+funcH	input.elm	/^funcH h =$/;"	f	signature:Int -> Int	roles:def
+h2	input.elm	/^        h2 = 34$/;"	f	function:funcH	roles:def
