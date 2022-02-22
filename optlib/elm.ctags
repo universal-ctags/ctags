@@ -38,8 +38,8 @@
 --regex-Elm=/^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing/\1/m/{scope=clear}{exclusive}{_role=imported}
 --regex-Elm=/^import[[:blank:]]+([[:alnum:]_.]+)/\1/m/{scope=clear}{exclusive}{_role=imported}
 --regex-Elm=/^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*/\1/p/{scope=clear}{exclusive}
---regex-Elm=/^type +([[:upper:]][[:alnum:]_]*.*)/\1/t/{scope=set}{exclusive}
---regex-Elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$/\1/c/{scope=ref}{exclusive}
+--regex-Elm=/^type +([[:upper:]][[:alnum:]_]*).*/\1/t/{scope=set}{exclusive}
+--regex-Elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*).*$/\1/c/{scope=ref}{exclusive}
 --regex-Elm=/^type[[:blank:]]+alias[[:blank:]]+([[:upper:]][[:alnum:]_]*[[:blank:][:alnum:]_]*)/\1/a/{scope=set}{exclusive}
 --regex-Elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=set}
 --regex-Elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=ref}
