@@ -87,6 +87,8 @@ extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *ke
 
 extern unsigned int hashTableCountItem   (hashTable *htable);
 
+extern void hashTablePrintStatistics(hashTable *htable);
+
 #define HT_PTR_TO_INT(P) ((int)(intptr_t)(P))
 #define HT_INT_TO_PTR(P) ((void*)(intptr_t)(P))
 #define HT_PTR_TO_UINT(P) ((unsigned int)(uintptr_t)(P))

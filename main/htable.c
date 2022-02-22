@@ -383,6 +383,42 @@ extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *ke
 	return true;
 }
 
+extern void hashTablePrintStatistics(hashTable *htable)
+{
+	if (htable->size == 0 || htable->count == 0)
+		fprintf(stderr, "size: %u, count: %u, average: 0\n",
+				htable->size, htable->count);
+
+	double sum = 0.0;
+	for (size_t i = 0; i < htable->size; i++)
+	{
+		hentry *e = htable->table[i];
+		while (e)
+		{
+			sum += 1.0;
+			e = e->next;
+		}
+	}
+	double average = sum / (double)htable->size;
+
+	double variance = 0.0;
+	for (size_t i = 0; i < htable->size; i++)
+	{
+		double sum0 = 0;
+		hentry *e = htable->table[i];
+		while (e)
+		{
+			sum0 += 1.0;
+			e = e->next;
+		}
+		double d = sum0 - average;
+		variance += (d * d);
+	}
+	variance = variance / (double)htable->size;
+	fprintf(stderr, "size: %u, count: %u, average: %lf, s.d.: sqrt(%lf)\n",
+			htable->size, htable->count, average, variance);
+}
+
 extern unsigned int hashTableCountItem   (hashTable *htable)
 {
 	return htable->count;
