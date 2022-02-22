@@ -106,13 +106,34 @@ static void  entry_reclaim (hentry* entry,
 		entry = entry_destroy (entry, keyfreefn, valfreefn);
 }
 
-static void *entry_find (hentry* entry, const void* const key, hashTableEqualFunc equalfn,
+/* Looking for an entry having KEY as its key in the chain:
+ * entry, entry->next, entry->next->next,...
+ *
+ * We have a chance to optimize for the case when a same key is
+ * used repeatedly. By moving the entry found in the last time to
+ * the head of the chain, we can avoid taking time for tracking
+ * down the ->next-> chain.
+ * The cost for the optimization is very small.
+ */
+static void *entry_find (hentry** root_entry, const void* const key, hashTableEqualFunc equalfn,
 						 void *valForNotUnknownKey)
 {
+	hentry *entry = *root_entry;
+	hentry *last = NULL;
 	while (entry)
 	{
 		if (equalfn( key, entry->key))
+		{
+			if (last)
+			{
+				last->next = entry->next;
+				entry->next = *root_entry;
+				*root_entry = entry;
+			}
 			return entry->value;
+		}
+
+		last = entry;
 		entry = entry->next;
 	}
 	return valForNotUnknownKey;
@@ -308,7 +329,7 @@ extern void*      hashTableGetItem   (hashTable *htable, const void * key)
 
 	h = htable->hashfn (key);
 	i = h % htable->size;
-	return entry_find(htable->table[i], key, htable->equalfn, htable->valForNotUnknownKey);
+	return entry_find(& (htable->table[i]), key, htable->equalfn, htable->valForNotUnknownKey);
 }
 
 extern bool     hashTableDeleteItem (hashTable *htable, const void *key)
