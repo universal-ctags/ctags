@@ -78,7 +78,7 @@ BEGIN
             VALUE "FileDescription", "Universal Ctags"
             VALUE "FileVersion", "5.9.0.0"
             VALUE "InternalName", "ctags.exe"
-            VALUE "LegalCopyright", "Copyright \251 2015 Universal Ctags Team"
+            VALUE "LegalCopyright", "Copyright \251 2015-2022 Universal Ctags Team"
             VALUE "OriginalFilename", "ctags.exe"
             VALUE "ProductName", "Universal Ctags"
             VALUE "ProductVersion", "5.9.0.0"

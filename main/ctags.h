@@ -21,7 +21,7 @@
 #endif
 #define PROGRAM_NAME      "Universal Ctags"
 #define PROGRAM_URL       "https://ctags.io/"
-#define PROGRAM_COPYRIGHT "Copyright (C) 2015"
+#define PROGRAM_COPYRIGHT "Copyright (C) 2015-2022"
 #define AUTHOR_NAME       "Universal Ctags Team"
 
 /*
