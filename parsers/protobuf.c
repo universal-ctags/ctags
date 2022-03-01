@@ -68,7 +68,7 @@ typedef enum {
 	SYNTAX_PROTO2,
 	SYNTAX_PROTO3,
 } protobufSyntax;
-static protobufSyntax syntax = SYNTAX_UNKNOWN;;
+static protobufSyntax syntax = SYNTAX_UNKNOWN;
 
 typedef enum {
 	PK_PACKAGE,
