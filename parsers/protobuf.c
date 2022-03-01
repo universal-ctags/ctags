@@ -661,6 +661,8 @@ static void findProtobufTags (void)
 			 FIELD_UNKNOWN);
 	token.value = vStringNew ();
 
+	syntax = SYNTAX_UNKNOWN;
+
 	nextToken ();
 	findProtobufTags0 (false, CORK_NIL);
 
