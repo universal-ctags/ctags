@@ -3333,6 +3333,55 @@ static EsObject* lrop_make_reftag (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject* lrop_assign_role_common (OptVM *vm, EsObject *name, bool assign)
+{
+	EsObject *tag = opt_vm_ostack_peek (vm, 1);
+	tagEntryInfo *e;
+	if (es_integer_p (tag))
+	{
+		int n = es_integer_get (tag);
+		if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
+			return OPT_ERR_RANGECHECK;
+		e = getEntryInCorkQueue (n);
+	}
+	else if (es_object_get_type (tag) == OPT_TYPE_TAG)
+		e = es_pointer_get (tag);
+	else
+		return OPT_ERR_TYPECHECK;
+
+	if (e == NULL)
+		return OPTSCRIPT_ERR_NOTAGENTRY;
+
+	langType lang = e->langType;
+	int kind_index = e->kindIndex;
+	EsObject *role = opt_vm_ostack_top (vm);
+	if (es_object_get_type (role) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+	EsObject *role_sym = es_pointer_get (role);
+	const char *role_str = es_symbol_get (role_sym);
+	roleDefinition* role_def = getLanguageRoleForName (lang, kind_index, role_str);
+	if (!role_def)
+		return OPTSCRIPT_ERR_UNKNOWNROLE;
+	int role_index = role_def->id;
+
+	(assign? assignRole: unassignRole) (e, role_index);
+
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_pop (vm);
+
+	return es_false;
+}
+
+static EsObject* lrop_assign_role (OptVM *vm, EsObject *name)
+{
+	return lrop_assign_role_common (vm, name, true);
+}
+
+static EsObject* lrop_unassign_role (OptVM *vm, EsObject *name)
+{
+	return lrop_assign_role_common (vm, name, false);
+}
+
 /* tag COMMIT int */
 static EsObject* lrop_commit_tag (OptVM *vm, EsObject *name)
 {
@@ -4210,6 +4259,18 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = 1,
 		.help_str = "param:name _PARAM value:string true%"
 		"param:name _PARAM false",
+	},
+	{
+		.name     = "_assignrole",
+		.fn       = lrop_assign_role,
+		.arity    = 2,
+		.help_str = "tag:int|tag:tag role:name _ASSIGNROLE -",
+	},
+	{
+		.name     = "_unassignrole",
+		.fn       = lrop_unassign_role,
+		.arity    = 2,
+		.help_str = "tag:int|tag:tag role:name _UNASSIGNROLE -",
 	},
 };
 
