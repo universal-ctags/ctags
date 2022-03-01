@@ -1,0 +1,4 @@
+input.proto	input.proto	1;"	F
+Data	input-0.proto	/^message Data {$/;"	m
+MaxNodeID	input-0.proto	/^	required uint64 MaxNodeID = 7;$/;"	f	message:Data	typeref:typename:uint64
+input-0.proto	input-0.proto	1;"	F
