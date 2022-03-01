@@ -2085,6 +2085,11 @@ extern void assignRole(tagEntryInfo *const e, int roleIndex)
 	assignRoleFull(e, roleIndex, true);
 }
 
+extern void unassignRole(tagEntryInfo *const e, int roleIndex)
+{
+	assignRoleFull(e, roleIndex, false);
+}
+
 extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex)
 {
 	if (roleIndex == ROLE_DEFINITION_INDEX)

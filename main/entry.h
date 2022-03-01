@@ -156,6 +156,7 @@ extern void initForeignRefTagEntry (tagEntryInfo *const e, const char *const nam
 									int kindIndex, int roleIndex);
 extern void assignRole(tagEntryInfo *const e, int roleIndex);
 #define clearRoles(E) assignRole((E), ROLE_DEFINITION_INDEX)
+extern void unassignRole(tagEntryInfo *const e, int roleIndex);
 extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex);
 
 extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
