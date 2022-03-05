@@ -1,0 +1,7 @@
+#!/bin/sh
+e=/bin/echo
+
+$e -ne '\xef'
+$e -ne '\xbb'
+$e -ne '\xbf'
+cat $1

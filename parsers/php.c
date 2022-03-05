@@ -25,6 +25,7 @@
 #include "routines.h"
 #include "debug.h"
 #include "objpool.h"
+#include "promise.h"
 
 #define isIdentChar(c) (isalnum (c) || (c) == '_' || (c) >= 0x80)
 #define newToken() (objPoolGet (TokenPool))
@@ -901,9 +902,21 @@ getNextChar:
 
 	if (! InPhp)
 	{
+		unsigned long startSourceLineNumber = getSourceLineNumber ();
+		unsigned long startLineNumber = startSourceLineNumber;
+		int startLineOffset = getInputLineOffset ();
+
 		c = findPhpStart ();
 		if (c != EOF)
 			InPhp = true;
+
+		unsigned long endLineNumber = getInputLineNumber ();
+		int endLineOffset = getInputLineOffset ();
+
+		if ((startLineNumber != endLineNumber)
+			|| (startLineOffset != endLineOffset))
+			makePromise ("HTML", startLineNumber, startLineOffset,
+						 endLineNumber, endLineOffset, startSourceLineNumber);
 	}
 	else
 		c = getcFromInputFile ();

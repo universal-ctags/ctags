@@ -148,7 +148,24 @@ extern unsigned long getInputLineNumber (void)
 extern int getInputLineOffset (void)
 {
 	unsigned char *base = (unsigned char *) vStringValue (File.line);
-	int ret = File.currentLine - base - File.ungetchIdx;
+	int ret;
+
+	if (File.currentLine)
+		ret = File.currentLine - base - File.ungetchIdx;
+	else if (File.input.lineNumber)
+	{
+		/* When EOF is saw, currentLine is set to NULL.
+		 * So the way to calculate the offset at the end of file is tricky.
+		 */
+		ret = (mio_tell (File.mio) - (File.bomFound? 3: 0))
+			- getInputFileOffsetForLine(File.input.lineNumber);
+	}
+	else
+	{
+		/* At the first line of file. */
+		ret = mio_tell (File.mio) - (File.bomFound? 3: 0);
+	}
+
 	return ret >= 0 ? ret : 0;
 }
 
@@ -739,8 +756,8 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		File.filePosition.offset = StartOfLine.offset = mio_tell (File.mio);
 		File.currentLine  = NULL;
 
-		if (File.line != NULL)
-			vStringClear (File.line);
+		File.line = vStringNewOrClear (File.line);
+		File.ungetchIdx = 0;
 
 		setInputFileParameters  (vStringNewInit (fileName), language);
 		File.input.lineNumberOrigin = 0L;
@@ -777,8 +794,10 @@ extern void resetInputFile (const langType language)
 	File.filePosition.offset = StartOfLine.offset = mio_tell (File.mio);
 	File.currentLine  = NULL;
 
-	if (File.line != NULL)
-		vStringClear (File.line);
+	Assert (File.line);
+	vStringClear (File.line);
+	File.ungetchIdx = 0;
+
 	if (hasLanguageMultilineRegexPatterns (language))
 		File.allLines = vStringNew ();
 
@@ -899,9 +918,7 @@ static vString *iFileGetLine (bool chop_newline)
 	eolType eol;
 	langType lang = getInputLanguage();
 
-	if (File.line == NULL)
-		File.line = vStringNew ();
-
+	Assert (File.line);
 	eol = readLine (File.line, File.mio);
 
 	if (vStringLength (File.line) > 0)
