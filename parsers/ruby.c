@@ -159,9 +159,9 @@ static bool isIdentChar (int c)
 	return (isalnum (c) || c == '_');
 }
 
-static bool notIdentChar (int c)
+static bool notIdentCharButColon (int c)
 {
-	return ! isIdentChar (c);
+	return ! (isIdentChar (c) || c == ':');
 }
 
 static bool isOperatorChar (int c)
@@ -213,7 +213,12 @@ static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
 #define canMatchKeyword rubyCanMatchKeyword
 extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal)
 {
-	return canMatch (s, literal, notIdentChar);
+	/* Using notIdentCharButColon() here.
+	 *
+	 * A hash can be defined like {for: nil, foo: 0}.
+	 *"for" in the above example is not a keyword.
+	 */
+	return canMatch (s, literal, notIdentCharButColon);
 }
 
 /*
