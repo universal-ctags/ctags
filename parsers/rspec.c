@@ -192,12 +192,19 @@ static void findRSpecTags (void)
 	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
 
+static void inputStart (subparser *s)
+{
+	struct sRSpecSubparser *rspec = (struct sRSpecSubparser *)s;
+	rspec->scope = CORK_NIL;
+}
+
 extern parserDefinition* RSpecParser (void)
 {
 	static struct sRSpecSubparser rspecSubparser = {
 		.ruby = {
 			.subparser = {
 				.direction = SUBPARSER_BASE_RUNS_SUB,
+				.inputStart = inputStart,
 			},
 			.lineNotify = lineNotify,
 			.enterBlockNotify = enterBlockNotify,
