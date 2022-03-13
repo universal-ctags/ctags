@@ -783,7 +783,17 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 			lang = scope->langType;
 			root_scope = scope;
 		}
-		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
+		int scopeIndex = scope->extensionFields.scopeIndex;
+		scope =  getEntryInCorkQueue (scopeIndex);
+
+		if (scope && scope->extensionFields.scopeIndex == scopeIndex)
+		{
+			error (WARNING,
+				   "interanl error: scope information made a loop structure: %s in %s:%lu",
+				   scope->name, scope->inputFileName, scope->lineNumber);
+			/* Force break this while-loop. */
+			scope = NULL;
+		}
 	}
 
 	n = vStringNew ();
