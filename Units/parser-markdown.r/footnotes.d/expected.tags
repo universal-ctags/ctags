@@ -1,0 +1,2 @@
+1	input.md	/^[^1]: This is the first footnote.$/;"	footnote	line:4
+bignote	input.md	/^[^bignote]: Here's one with multiple paragraphs and code.$/;"	footnote	line:6

@@ -10,6 +10,9 @@
  * This module contains functions for generating tags for markdown files.
  *
  * This parser was based on the asciidoc parser.
+ *
+ * Extended syntax like footnotes is described in
+ * https://www.markdownguide.org/extended-syntax/
  */
 
 /*
@@ -41,6 +44,7 @@ typedef enum {
 	K_LEVEL4SECTION,
 	K_LEVEL5SECTION,
 	K_SECTION_COUNT,
+	K_FOOTNOTE = K_SECTION_COUNT,
 } markdownKind;
 
 static kindDefinition MarkdownKinds[] = {
@@ -50,6 +54,7 @@ static kindDefinition MarkdownKinds[] = {
 	{ true, 't', "subsubsection", "level 3 sections" },
 	{ true, 'T', "l4subsection",  "level 4 sections" },
 	{ true, 'u', "l5subsection",  "level 5 sections" },
+	{ true, 'n', "footnote",      "footnotes" },
 };
 
 static fieldDefinition MarkdownFields [] = {
@@ -183,6 +188,27 @@ static void fillEndField (NestingLevel *nl, void *ctxData)
 	}
 }
 
+static void getFootnoteMaybe (const char *line)
+{
+	const char *start = strstr (line, "[^");
+	const char *end = start? strstr(start + 2, "]:"): NULL;
+
+	if (! (start && end))
+		return;
+	if (! (end > (start + 2)))
+		return;
+
+	vString * footnote = vStringNewNInit (start + 2, end - (start + 2));
+	const NestingLevel *const nl = nestingLevelsGetCurrent (nestingLevels);
+	tagEntryInfo e;
+
+	initTagEntry (&e, vStringValue (footnote), K_FOOTNOTE);
+	if (nl)
+		e.extensionFields.scopeIndex = nl->corkIndex;
+	makeTagEntry (&e);
+
+	vStringDelete (footnote);
+}
 
 static void findMarkdownTags (void)
 {
@@ -315,7 +341,10 @@ static void findMarkdownTags (void)
 
 		vStringClear (prevLine);
 		if (!lineProcessed)
+		{
+			getFootnoteMaybe ((const char *)line);
 			vStringCatS (prevLine, (const char*) line);
+		}
 	}
 	vStringDelete (prevLine);
 	vStringDelete (codeLang);
