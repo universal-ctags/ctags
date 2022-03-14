@@ -261,6 +261,7 @@ PARSER_HEADS = \
 	parsers/iniconf.h \
 	parsers/m4.h \
 	parsers/make.h \
+	parsers/markdown.h \
 	parsers/perl.h \
 	parsers/r.h \
 	parsers/ruby.h \
@@ -356,6 +357,7 @@ PARSER_SRCS =				\
 	parsers/r-s4class.c		\
 	parsers/r.c			\
 	parsers/rexx.c			\
+	parsers/rmarkdown.c		\
 	parsers/robot.c			\
 	parsers/rpmspec.c		\
 	parsers/rspec.c			\

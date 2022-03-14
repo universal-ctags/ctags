@@ -33,6 +33,8 @@
 #include "promise.h"
 #include "htable.h"
 
+#include "markdown.h"
+
 /*
  *   DATA DEFINITIONS
  */
@@ -210,6 +212,26 @@ static void getFootnoteMaybe (const char *line)
 	vStringDelete (footnote);
 }
 
+static bool extractLanguageForCodeBlock (const char *langMarker,
+										 vString *codeLang)
+{
+	subparser *s;
+	bool r = false;
+
+	foreachSubparser (s, false)
+	{
+		markdownSubparser *m = (markdownSubparser *)s;
+		enterSubparser(s);
+		if (m->extractLanguageForCodeBlock)
+			r = m->extractLanguageForCodeBlock (m, langMarker, codeLang);
+		leaveSubparser();
+		if (r)
+			break;
+	}
+
+	return r;
+}
+
 static void findMarkdownTags (void)
 {
 	vString *prevLine = vStringNew ();
@@ -220,6 +242,10 @@ static void findMarkdownTags (void)
 	long startLineNumber = 0;
 	bool inPreambule = false;
 	bool inComment = false;
+
+	subparser *sub = getSubparserRunningBaseparser();
+	if (sub)
+		chooseExclusiveSubparser (sub, NULL);
 
 	nestingLevels = nestingLevelsNewFull (0, fillEndField);
 
@@ -255,10 +281,16 @@ static void findMarkdownTags (void)
 					inCodeChar = 0;
 				else if (inCodeChar)
 				{
+					const char *langMarker = (const char *)(line + pos + nSame);
 					startLineNumber = startSourceLineNumber = lineNum + 1;
-					vStringCopyS (codeLang, (const char *)(line + pos + nSame));
-					vStringStripLeading (codeLang);
-					vStringStripTrailing (codeLang);
+
+					vStringClear (codeLang);
+					if (! extractLanguageForCodeBlock (langMarker, codeLang))
+					{
+						vStringCopyS (codeLang, langMarker);
+						vStringStripLeading (codeLang);
+						vStringStripTrailing (codeLang);
+					}
 				}
 				else
 				{
