@@ -231,15 +231,14 @@ static void findMarkdownTags (void)
 				{
 					startSourceLineNumber = getSourceLineNumber ();
 					startLineNumber = getInputLineNumber ();
-					vStringClear (codeLang);
-					vStringCatS (codeLang, (const char *)(line + pos + nSame));
+					vStringCopyS (codeLang, (const char *)(line + pos + nSame));
 					vStringStripLeading (codeLang);
 					vStringStripTrailing (codeLang);
 				}
 				else
 				{
 					long endLineNumber = getInputLineNumber () - 1;
-					if (codeLang->size > 0)
+					if (vStringLength (codeLang) > 0)
 						makePromise (vStringValue (codeLang), startLineNumber, 0,
 							endLineNumber, 0, startSourceLineNumber);
 				}
