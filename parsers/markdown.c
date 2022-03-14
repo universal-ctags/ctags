@@ -229,7 +229,7 @@ static void findMarkdownTags (void)
 		bool lineProcessed = false;
 		bool indented;
 		int pos = getFirstCharPos (line, lineLen, &indented);
-		int lineNum = getInputLineNumber ();
+		const int lineNum = getInputLineNumber ();
 
 		if (lineNum == 1 || inPreambule)
 		{
@@ -255,16 +255,16 @@ static void findMarkdownTags (void)
 					inCodeChar = 0;
 				else if (inCodeChar)
 				{
-					startSourceLineNumber = getSourceLineNumber ();
-					startLineNumber = getInputLineNumber ();
+					startLineNumber = startSourceLineNumber = lineNum + 1;
 					vStringCopyS (codeLang, (const char *)(line + pos + nSame));
 					vStringStripLeading (codeLang);
 					vStringStripTrailing (codeLang);
 				}
 				else
 				{
-					long endLineNumber = getInputLineNumber () - 1;
-					if (vStringLength (codeLang) > 0)
+					long endLineNumber = lineNum;
+					if (vStringLength (codeLang) > 0
+						&& startLineNumber < endLineNumber)
 						makePromise (vStringValue (codeLang), startLineNumber, 0,
 							endLineNumber, 0, startSourceLineNumber);
 				}
