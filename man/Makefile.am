@@ -35,6 +35,7 @@ GEN_IN_MAN_FILES = \
 	ctags-lang-verilog.7 \
 	ctags-lang-inko.7 \
 	ctags-lang-r.7 \
+	ctags-lang-rmarkdown.7 \
 	ctags-lang-sql.7 \
 	\
 	readtags.1 \
