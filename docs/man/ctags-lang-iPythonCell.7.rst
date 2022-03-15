@@ -12,20 +12,20 @@ The man page of the iPythonCell parser for Universal Ctags
 
 SYNOPSIS
 --------
-|	**ctags** ... --extras={subparser} --languages=+iPythonCell,Python \\
+|	**ctags** ... --extras=+{subparser} --languages=+iPythonCell,Python \\
 |                     [--extras-IPythonCell=+{doubleSharps}] \\
 |                     [--regex-IPythonCell=/<PATTERN>/\\n/c/] ...
 
 DESCRIPTION
 -----------
-iPythonCell is a subparser stacked on top of the Python parser.
+iPythonCell parser is a subparser stacked on top of the Python parser.
 It works when:
 
-* The Python parser is enabled,
+* the Python parser is enabled,
 * the ``subparser`` extra is enabled, and
 * the iPythonCell parser itself is enabled.
 
-iPythonCell extracts cells explained as in vim-ipython-cell
+The iPythonCell parser extracts cells explained as in vim-ipython-cell
 (https://github.com/hanschen/vim-ipython-cell/blob/master/README.md).
 
 KIND(S)
