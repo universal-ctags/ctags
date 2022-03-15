@@ -137,6 +137,7 @@
 	PythonLoggingConfigParser, \
 	QemuHXParser, \
 	QtMocParser, \
+	RMarkdownParser, \
 	RParser, \
 	R6ClassParser, \
 	RSpecParser, \

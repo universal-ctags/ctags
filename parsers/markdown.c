@@ -10,6 +10,9 @@
  * This module contains functions for generating tags for markdown files.
  *
  * This parser was based on the asciidoc parser.
+ *
+ * Extended syntax like footnotes is described in
+ * https://www.markdownguide.org/extended-syntax/
  */
 
 /*
@@ -30,6 +33,8 @@
 #include "promise.h"
 #include "htable.h"
 
+#include "markdown.h"
+
 /*
  *   DATA DEFINITIONS
  */
@@ -41,6 +46,7 @@ typedef enum {
 	K_LEVEL4SECTION,
 	K_LEVEL5SECTION,
 	K_SECTION_COUNT,
+	K_FOOTNOTE = K_SECTION_COUNT,
 } markdownKind;
 
 static kindDefinition MarkdownKinds[] = {
@@ -50,6 +56,7 @@ static kindDefinition MarkdownKinds[] = {
 	{ true, 't', "subsubsection", "level 3 sections" },
 	{ true, 'T', "l4subsection",  "level 4 sections" },
 	{ true, 'u', "l5subsection",  "level 5 sections" },
+	{ true, 'n', "footnote",      "footnotes" },
 };
 
 static fieldDefinition MarkdownFields [] = {
@@ -183,6 +190,47 @@ static void fillEndField (NestingLevel *nl, void *ctxData)
 	}
 }
 
+static void getFootnoteMaybe (const char *line)
+{
+	const char *start = strstr (line, "[^");
+	const char *end = start? strstr(start + 2, "]:"): NULL;
+
+	if (! (start && end))
+		return;
+	if (! (end > (start + 2)))
+		return;
+
+	vString * footnote = vStringNewNInit (start + 2, end - (start + 2));
+	const NestingLevel *const nl = nestingLevelsGetCurrent (nestingLevels);
+	tagEntryInfo e;
+
+	initTagEntry (&e, vStringValue (footnote), K_FOOTNOTE);
+	if (nl)
+		e.extensionFields.scopeIndex = nl->corkIndex;
+	makeTagEntry (&e);
+
+	vStringDelete (footnote);
+}
+
+static bool extractLanguageForCodeBlock (const char *langMarker,
+										 vString *codeLang)
+{
+	subparser *s;
+	bool r = false;
+
+	foreachSubparser (s, false)
+	{
+		markdownSubparser *m = (markdownSubparser *)s;
+		enterSubparser(s);
+		if (m->extractLanguageForCodeBlock)
+			r = m->extractLanguageForCodeBlock (m, langMarker, codeLang);
+		leaveSubparser();
+		if (r)
+			break;
+	}
+
+	return r;
+}
 
 static void findMarkdownTags (void)
 {
@@ -195,6 +243,10 @@ static void findMarkdownTags (void)
 	bool inPreambule = false;
 	bool inComment = false;
 
+	subparser *sub = getSubparserRunningBaseparser();
+	if (sub)
+		chooseExclusiveSubparser (sub, NULL);
+
 	nestingLevels = nestingLevelsNewFull (0, fillEndField);
 
 	while ((line = readLineFromInputFile ()) != NULL)
@@ -203,7 +255,7 @@ static void findMarkdownTags (void)
 		bool lineProcessed = false;
 		bool indented;
 		int pos = getFirstCharPos (line, lineLen, &indented);
-		int lineNum = getInputLineNumber ();
+		const int lineNum = getInputLineNumber ();
 
 		if (lineNum == 1 || inPreambule)
 		{
@@ -229,17 +281,22 @@ static void findMarkdownTags (void)
 					inCodeChar = 0;
 				else if (inCodeChar)
 				{
-					startSourceLineNumber = getSourceLineNumber ();
-					startLineNumber = getInputLineNumber ();
+					const char *langMarker = (const char *)(line + pos + nSame);
+					startLineNumber = startSourceLineNumber = lineNum + 1;
+
 					vStringClear (codeLang);
-					vStringCatS (codeLang, (const char *)(line + pos + nSame));
-					vStringStripLeading (codeLang);
-					vStringStripTrailing (codeLang);
+					if (! extractLanguageForCodeBlock (langMarker, codeLang))
+					{
+						vStringCopyS (codeLang, langMarker);
+						vStringStripLeading (codeLang);
+						vStringStripTrailing (codeLang);
+					}
 				}
 				else
 				{
-					long endLineNumber = getInputLineNumber () - 1;
-					if (codeLang->size > 0)
+					long endLineNumber = lineNum;
+					if (vStringLength (codeLang) > 0
+						&& startLineNumber < endLineNumber)
 						makePromise (vStringValue (codeLang), startLineNumber, 0,
 							endLineNumber, 0, startSourceLineNumber);
 				}
@@ -316,7 +373,10 @@ static void findMarkdownTags (void)
 
 		vStringClear (prevLine);
 		if (!lineProcessed)
+		{
+			getFootnoteMaybe ((const char *)line);
 			vStringCatS (prevLine, (const char*) line);
+		}
 	}
 	vStringDelete (prevLine);
 	vStringDelete (codeLang);

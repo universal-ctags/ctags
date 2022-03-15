@@ -455,6 +455,7 @@ The following parsers have been added:
 * R6Class *R based subparser*
 * RelaxNG *libxml*
 * ReStructuredText
+* RMarkdown *Markdown based subparser*
 * Robot
 * RpmMacros *optlib*
 * RpmSpec

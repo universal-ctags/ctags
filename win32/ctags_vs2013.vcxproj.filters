@@ -534,6 +534,9 @@
     <ClCompile Include="..\parsers\rexx.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\rmarkdown.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\robot.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
@@ -861,6 +864,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\make.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parsers\markdown.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\perl.h">

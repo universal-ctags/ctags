@@ -1,0 +1,27 @@
+# S1
+
+```{r xyX}
+
+x <- 1
+foo <- function () {
+    y <- 2
+    return(y)
+}
+
+X <- func()
+
+```
+
+# S2
+
+```{r, cache = TRUE, dependson = "xyX"}
+mean(X)
+```
+
+```{python}
+def f():
+   g()
+   return 3
+```
+# S3
+

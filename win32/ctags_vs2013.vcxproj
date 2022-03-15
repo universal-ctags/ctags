@@ -337,6 +337,7 @@
     <ClCompile Include="..\parsers\r-s4class.c" />
     <ClCompile Include="..\parsers\r.c" />
     <ClCompile Include="..\parsers\rexx.c" />
+    <ClCompile Include="..\parsers\rmarkdown.c" />
     <ClCompile Include="..\parsers\robot.c" />
     <ClCompile Include="..\parsers\rpmspec.c" />
     <ClCompile Include="..\parsers\rspec.c" />
@@ -448,6 +449,7 @@
     <ClInclude Include="..\parsers\iniconf.h" />
     <ClInclude Include="..\parsers\m4.h" />
     <ClInclude Include="..\parsers\make.h" />
+    <ClInclude Include="..\parsers\markdown.h" />
     <ClInclude Include="..\parsers\perl.h" />
     <ClInclude Include="..\parsers\r.h" />
     <ClInclude Include="..\parsers\ruby.h" />
