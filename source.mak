@@ -258,6 +258,7 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h \
 	\
+	parsers/frontmatter.h \
 	parsers/iniconf.h \
 	parsers/m4.h \
 	parsers/make.h \
@@ -319,6 +320,7 @@ PARSER_SRCS =				\
 	parsers/falcon.c		\
 	parsers/flex.c			\
 	parsers/fortran.c		\
+	parsers/frontmatter.c		\
 	parsers/fypp.c			\
 	parsers/gdscript.c		\
 	parsers/gemspec.c		\
@@ -407,6 +409,8 @@ YAML_SRCS = \
 	parsers/openapi.c	\
 	\
 	parsers/ansibleplaybook.c	\
+	\
+	parsers/yamlfrontmatter.c	\
 	\
 	$(NULL)
 

@@ -30,7 +30,8 @@
 #define YAML_PARSER_LIST						\
 	YamlParser,									\
 	AnsiblePlaybookParser, \
-	OpenAPIParser
+	OpenAPIParser, \
+	YamlFrontMatter
 #else
 #define YAML_PARSER_LIST
 #endif
@@ -85,6 +86,7 @@
 	FalconParser, \
 	FlexParser, \
 	FortranParser, \
+	FrontMatterParser, \
 	FunctionParametersParser, \
 	FyppParser,	   \
 	GdbinitParser, \

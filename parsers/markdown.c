@@ -260,7 +260,18 @@ static void findMarkdownTags (void)
 		if (lineNum == 1 || inPreambule)
 		{
 			if (line[pos] == '-' && line[pos + 1] == '-' && line[pos + 2] == '-')
+			{
+				if (inPreambule)
+				{
+					long endLineNumber = lineNum;
+					if (startLineNumber < endLineNumber)
+						makePromise ("FrontMatter", startLineNumber, 0,
+									 endLineNumber, 0, startSourceLineNumber);
+				}
+				else
+					startSourceLineNumber = startLineNumber = lineNum;
 				inPreambule = !inPreambule;
+			}
 		}
 
 		if (inPreambule)
@@ -400,6 +411,20 @@ extern parserDefinition* MarkdownParser (void)
 	def->fieldCount = ARRAY_SIZE (MarkdownFields);
 	def->defaultScopeSeparator = "\"\"";
 	def->parser = findMarkdownTags;
+
+	/*
+	 * This setting (useMemoryStreamInput) is for running
+	 * Yaml parser from YamlFrontMatter as subparser.
+	 * YamlFrontMatter is run from FrontMatter as a gust parser.
+	 * FrontMatter is run from Markdown as a guest parser.
+	 * This stacked structure hits the limitation of the main
+	 * part: subparser's requirement for memory based input stream
+	 * is not propagated to the main part.
+	 *
+	 * TODO: instead of setting useMemoryStreamInput here, we
+	 * should remove the limitation.
+	 */
+	def->useMemoryStreamInput = true;
 
 	return def;
 }
