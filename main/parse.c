@@ -3964,6 +3964,7 @@ extern bool runParserInNarrowedInputStream (const langType language,
 			 endLine, endCharOffset);
 
 	pushNarrowedInputStream (
+				 doesParserRequireMemoryStream (language),
 				 startLine, startCharOffset,
 				 endLine, endCharOffset,
 				 sourceLineOffset,

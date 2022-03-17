@@ -1093,6 +1093,7 @@ extern char *readLineFromBypass (
 }
 
 extern void   pushNarrowedInputStream (
+				       bool useMemoryStreamInput,
 				       unsigned long startLine, long startCharOffset,
 				       unsigned long endLine, long endCharOffset,
 				       unsigned long sourceLineOffset,
@@ -1107,9 +1108,17 @@ extern void   pushNarrowedInputStream (
 						  endLine, endCharOffset,
 						  sourceLineOffset))
 	{
-		File.thinDepth++;
-		verbose ("push thin stream (%d)\n", File.thinDepth);
-		return;
+		if ((!useMemoryStreamInput
+			 || mio_memory_get_data (File.mio, NULL)))
+		{
+			File.thinDepth++;
+			verbose ("push thin stream (%d)\n", File.thinDepth);
+			return;
+		}
+		error(WARNING, "INTERNAL ERROR: though pushing thin MEMORY stream, "
+			  "underlying input stream is a FILE stream: %s@%s",
+			  vStringValue (File.input.name), vStringValue (File.input.tagPath));
+		AssertNotReached ();
 	}
 	Assert (File.thinDepth == 0);
 
