@@ -1867,6 +1867,13 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 	initForeignRefTagEntry (e, name, getInputLanguage (), kindIndex, roleIndex);
 }
 
+extern void initForeignTagEntry (tagEntryInfo *const e, const char *const name,
+								 langType type,
+								 int kindIndex)
+{
+	initForeignRefTagEntry (e, name, type, kindIndex, ROLE_DEFINITION_INDEX);
+}
+
 extern void initForeignRefTagEntry (tagEntryInfo *const e, const char *const name,
 									langType langType,
 									int kindIndex, int roleIndex)
