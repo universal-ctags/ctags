@@ -160,7 +160,7 @@ customType <-
     'type' _1_ <upperStartIdentifier> (_0_ typeParameterList)? _0_ '=' _0_ {
         makeElmTagSettingScope(auxil, $1, $1s, K_TYPE, ROLE_DEFINITION_INDEX);
     } constructorList EOS {
-        POP_KIND(auxil, true);
+        POP_SCOPE(auxil);
     }
 
 typeParameterList <- lowerStartIdentifier (_1_ lowerStartIdentifier)*
