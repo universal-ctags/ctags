@@ -6,6 +6,7 @@
  *   GNU General Public License version 2 or (at your option) any later version.
  *
  *   This module contains functions to generate tags for Elm.
+ *   See https://elm-lang.org/docs/syntax for language reference.
  */
 
 /*

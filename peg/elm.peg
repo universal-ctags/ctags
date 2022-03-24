@@ -3,7 +3,10 @@
 # This source code is released for free distribution under the terms of the
 # GNU General Public License version 2 or later.
 #
-# This Elm parser will tag items reliably at the top level. Functions
+# This parser generates tags for Elm. See https://elm-lang.org/docs/syntax
+# for language reference.
+#
+# The parser will tag items reliably at the top level. Functions
 # defined in let/in blocks are also tagged, but with limitations. See below.
 #
 # Kinds
