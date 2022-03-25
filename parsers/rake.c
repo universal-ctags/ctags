@@ -136,8 +136,6 @@ static int parseTask (rubySubparser *s, int kind, const unsigned char **cp)
 
 static int lineNotify (rubySubparser *s, const unsigned char **cp)
 {
-	int r = CORK_NIL;;
-
 	struct taskType {
 		const char *keyword;
 		rakeKind    kind;
@@ -152,11 +150,7 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 	for (int i = 0; i < ARRAY_SIZE(taskTypes); i++)
 	{
 		if (rubyCanMatchKeywordWithAssign (cp, taskTypes[i].keyword))
-		{
-			r = parseTask (s, taskTypes[i].kind, cp);
-			if (r != CORK_NIL)
-				return r;
-		}
+			return parseTask (s, taskTypes[i].kind, cp);
 	}
 
 #if 0
@@ -179,7 +173,7 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 	}
 #endif
 
-	return r;
+	return CORK_NIL;
 }
 
 static void inputStart (subparser *s)
