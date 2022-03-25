@@ -454,6 +454,7 @@ The following parsers have been added:
 * QtMoc
 * R
 * R6Class *R based subparser*
+* Rake *Ruby based subparser*
 * RelaxNG *libxml*
 * ReStructuredText
 * RMarkdown *Markdown based subparser*
