@@ -1,0 +1,2 @@
+__anonfe5966820100	input.rb	/^Class.new do$/;"	c
+foo	input.rb	/^  def foo() end$/;"	S	class:__anonfe5966820100
