@@ -143,7 +143,7 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 		rakeKind    kind;
 	} taskTypes [] = {
 		{ "task",       K_TASK      },
-		{ "namespace", K_NAMESPACE },
+		{ "namespace",  K_NAMESPACE },
 		{ "file",       K_FILE      },
 		{ "directory",  K_DIRECTORY },
 		{ "multitask",  K_MULTITASK },
