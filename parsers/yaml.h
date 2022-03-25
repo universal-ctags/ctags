@@ -40,8 +40,13 @@ extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asE
 typedef struct sTagYpathTable {
 	const char * ypath;
 	int expected_state;
+	/* If INITTAGENTRY filed is non-NULL, call it for initializing
+	 * a tagEntry. If it is NULL, initializing the tagEntry in usual way:
+	 * call initTagEntry() defined in the main part with KIND. */
 	int kind;
-	void *code;
+	bool (* initTagEntry) (tagEntryInfo *, char *, void *);
+	void *data;
+	void *code;					/* YAML base parser private */
 } tagYpathTable;
 
 extern int ypathCompileTable (langType language, tagYpathTable *table, int keywordId);

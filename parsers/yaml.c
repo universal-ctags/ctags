@@ -325,10 +325,18 @@ extern void ypathHandleToken (yamlSubparser *yaml, yaml_token_t *token, int stat
 		if (ypathStateStackMatch(yaml->ypathTypeStack, tables[i].code, 0))
 		{
 			tagEntryInfo tag;
-			initTagEntry (&tag, (char *)token->data.scalar.value, tables[i].kind);
-			attachYamlPosition (&tag, token, false);
+			bool r = true;
+			if (tables[i].initTagEntry)
+				r = (* tables[i].initTagEntry) (&tag, (char *)token->data.scalar.value,
+												tables[i].data);
+			else
+				initTagEntry (&tag, (char *)token->data.scalar.value, tables[i].kind);
 
-			makeTagEntry (&tag);
+			if (r)
+			{
+				attachYamlPosition (&tag, token, false);
+				makeTagEntry (&tag);
+			}
 			break;
 		}
 	}

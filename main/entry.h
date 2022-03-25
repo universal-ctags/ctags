@@ -146,6 +146,9 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
  * When making a tag for a foreign with this function, you must declare the
  * language X in the parser of Y with DEPTYPE_FOREIGNER dependency.
  */
+extern void initForeignTagEntry (tagEntryInfo *const e, const char *const name,
+								 langType type,
+								 int kindIndex);
 extern void initForeignRefTagEntry (tagEntryInfo *const e, const char *const name,
 									langType type,
 									int kindIndex, int roleIndex);

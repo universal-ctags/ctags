@@ -420,6 +420,9 @@
     <ClCompile Include="..\parsers\fortran.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\frontmatter.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\fypp.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
@@ -855,6 +858,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\cxx\cxx_token_chain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parsers\frontmatter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\iniconf.h">

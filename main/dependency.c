@@ -324,6 +324,9 @@ extern void subparserColprintAddSubparsers (struct colprintTable *table,
 		if (tmp->type != DEPTYPE_SUBPARSER)
 			continue;
 
+		if (!isLanguageVisible (tmp->id))
+			continue;
+
 		struct colprintLine *line = colprintTableGetNewLine(table);
 
 		colprintLineAppendColumnCString (line, getLanguageName (tmp->id));

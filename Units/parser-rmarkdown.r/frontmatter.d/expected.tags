@@ -1,0 +1,12 @@
+S1	input.rmd	/^# S1$/;"	chapter	line:4	language:Markdown	end:17
+xyX	input.rmd	/^```{r xyX}$/;"	chunklabel	line:6	language:RMarkdown	extras:subparser
+S2	input.rmd	/^# S2$/;"	chapter	line:18	language:Markdown	end:28
+__anon9d4e183a0100	input.rmd	/^```{r, cache = TRUE, dependson = "xyX"}$/;"	chunklabel	line:20	language:RMarkdown	extras:subparser,anonymous
+__anon9d4e183a0200	input.rmd	/^```{python}$/;"	chunklabel	line:24	language:RMarkdown	extras:subparser,anonymous
+S3	input.rmd	/^# S3$/;"	chapter	line:29	language:Markdown	end:30
+x	input.rmd	/^x <- 1$/;"	globalVar	line:8	language:R	extras:guest	end:8
+foo	input.rmd	/^foo <- function () {$/;"	function	line:9	language:R	extras:guest	end:12
+y	input.rmd	/^    y <- 2$/;"	functionVar	line:10	language:R	function:foo	extras:guest	end:10
+X	input.rmd	/^X <- func()$/;"	globalVar	line:14	language:R	extras:guest	end:14
+f	input.rmd	/^def f():$/;"	function	line:25	language:Python	extras:guest	end:27
+example for u-ctags	input.rmd	/^title: example for u-ctags$/;"	title	line:2	language:FrontMatter	extras:subparser

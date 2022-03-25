@@ -299,6 +299,7 @@
     <ClCompile Include="..\parsers\falcon.c" />
     <ClCompile Include="..\parsers\flex.c" />
     <ClCompile Include="..\parsers\fortran.c" />
+    <ClCompile Include="..\parsers\frontmatter.c" />
     <ClCompile Include="..\parsers\fypp.c" />
     <ClCompile Include="..\parsers\gdscript.c" />
     <ClCompile Include="..\parsers\gemspec.c" />
@@ -446,6 +447,7 @@
     <ClInclude Include="..\parsers\cxx\cxx_tag.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token_chain.h" />
+    <ClInclude Include="..\parsers\frontmatter.h" />
     <ClInclude Include="..\parsers\iniconf.h" />
     <ClInclude Include="..\parsers\m4.h" />
     <ClInclude Include="..\parsers\make.h" />

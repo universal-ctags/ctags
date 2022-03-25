@@ -1,4 +1,5 @@
 #NAME                BASEPARSER DIRECTIONS
+AnsiblePlaybook      Yaml       base <> sub {bidirectional}
 Ant                  XML        base <> sub {bidirectional}
 Autoconf             M4         base <> sub {bidirectional}
 Automake             Make       base <= sub {dedicated}

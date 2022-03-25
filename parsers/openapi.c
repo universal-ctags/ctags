@@ -44,7 +44,7 @@ static kindDefinition OpenAPIKinds [] = {
 };
 
 /* - name: "THE NAME" */
-enum openapiPlayDetectingState {
+enum openapiDetectingState {
 	DSTAT_LAST_KEY,
 	DSTAT_LAST_VALUE,
 	DSTAT_INITIAL,
@@ -53,7 +53,7 @@ enum openapiPlayDetectingState {
 
 struct sOpenAPISubparser {
 	yamlSubparser yaml;
-	enum openapiPlayDetectingState play_detection_state;
+	enum openapiDetectingState detection_state;
 };
 
 static tagYpathTable ypathTables [] = {
@@ -81,8 +81,8 @@ static tagYpathTable ypathTables [] = {
 	  DSTAT_LAST_VALUE, KIND_TAG,       },
 };
 
-static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
-									 yaml_token_t *token)
+static void	openapiStateMachine (struct sOpenAPISubparser *openapi,
+								 yaml_token_t *token)
 {
 #ifdef DO_TRACING
 	ypathPrintTypeStack (YAML(openapi));
@@ -91,34 +91,34 @@ static void	openapiPlayStateMachine (struct sOpenAPISubparser *openapi,
 	switch (token->type)
 	{
 	case YAML_KEY_TOKEN:
-		openapi->play_detection_state = DSTAT_LAST_KEY;
+		openapi->detection_state = DSTAT_LAST_KEY;
 		break;
 	case YAML_SCALAR_TOKEN:
-		switch (openapi->play_detection_state)
+		switch (openapi->detection_state)
 		{
 		case DSTAT_LAST_KEY:
 			ypathFillKeywordOfTokenMaybe (YAML(openapi), token, getInputLanguage ());
 			/* FALL THROUGH */
 		case DSTAT_LAST_VALUE:
 			TRACE_PRINT("token-callback: %s: %s",
-						(openapi->play_detection_state == DSTAT_LAST_KEY)? "key": "value",
+						(openapi->detection_state == DSTAT_LAST_KEY)? "key": "value",
 						(char*)token->data.scalar.value);
-			ypathHandleToken (YAML(openapi), token, openapi->play_detection_state,
+			ypathHandleToken (YAML(openapi), token, openapi->detection_state,
 							  ypathTables, ARRAY_SIZE (ypathTables));
 			break;
 		default:
 			break;
 		}
 
-		openapi->play_detection_state = DSTAT_INITIAL;
+		openapi->detection_state = DSTAT_INITIAL;
 
 		break;
 	case YAML_VALUE_TOKEN:
-		openapi->play_detection_state = DSTAT_LAST_VALUE;
+		openapi->detection_state = DSTAT_LAST_VALUE;
 		break;
 
 	default:
-		openapi->play_detection_state = DSTAT_INITIAL;
+		openapi->detection_state = DSTAT_INITIAL;
 		break;
 	}
 }
@@ -129,7 +129,7 @@ static void newTokenCallback (yamlSubparser *s, yaml_token_t *token)
 		|| token->type == YAML_BLOCK_MAPPING_START_TOKEN)
 		ypathPushType (s, token);
 
-	openapiPlayStateMachine ((struct sOpenAPISubparser *)s, token);
+	openapiStateMachine ((struct sOpenAPISubparser *)s, token);
 
 	if (token->type == YAML_BLOCK_END_TOKEN)
 		ypathPopType (s);
@@ -139,7 +139,7 @@ static void newTokenCallback (yamlSubparser *s, yaml_token_t *token)
 
 static void inputStart(subparser *s)
 {
-	((struct sOpenAPISubparser*)s)->play_detection_state = DSTAT_INITIAL;
+	((struct sOpenAPISubparser*)s)->detection_state = DSTAT_INITIAL;
 	((yamlSubparser*)s)->ypathTypeStack = NULL;
 }
 
