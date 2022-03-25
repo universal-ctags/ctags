@@ -137,6 +137,11 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 	{
 		kindObject *kind = kcb->kind + i;
 		kind->def = parser->kindTable + i;
+
+		Assert (kind->def->letter != KIND_FILE_DEFAULT_LETTER);
+		Assert (kind->def->name == NULL /* SELF (RUNTIME) TEST NEEDS THIS. */
+				|| strcmp(kind->def->name, KIND_FILE_DEFAULT_NAME));
+
 		kind->free = NULL;
 		kind->def->id = i;
 		kind->rcb = allocRoleControlBlock (kind);
