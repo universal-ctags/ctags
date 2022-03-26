@@ -8,11 +8,46 @@
 #include "xtag.h"
 
 
+typedef enum {
+	K_CHAPTER,
+	K_SECTION,
+	K_SUBSECTION,
+	K_SUBSUBSECTION,
+} PodKind;
+
+
 static void initializePodParser (const langType language CTAGS_ATTR_UNUSED)
 {
 	addLanguageOptscriptToHook (language, SCRIPT_HOOK_PRELUDE,
-		"{{	/kindTable\n"
-		"	[ /chapter /section /subsection /subsubsection ] def\n"
+		"{{	/kindTable [\n"
+		"        /chapter /section /subsection /subsubsection\n"
+		"    ] def\n"
+		"\n"
+		"    % numstr:str TOLEVEL int\n"
+		"    /tolevel {\n"
+		"        0 get ?1 sub\n"
+		"    } def\n"
+		"\n"
+		"    /depthForCork {\n"
+		"        :kind kindTable exch _aindex pop\n"
+		"    } def\n"
+		"\n"
+		"    % goal:int scopePopUpTo -\n"
+		"    /scopePopUpTo\n"
+		"    {\n"
+		"        {\n"
+		"            _scopetop {\n"
+		"                depthForCork 1 index ge {\n"
+		"                    _scopepop\n"
+		"                } {\n"
+		"                    exit\n"
+		"                } ifelse\n"
+		"            } {\n"
+		"                exit\n"
+		"            } ifelse\n"
+		"        } loop\n"
+		"        pop\n"
+		"    } def\n"
 		"}}");
 }
 
@@ -50,9 +85,15 @@ extern parserDefinition* PodParser (void)
 		"", ""
 		"{{\n"
 		"	\\2\n"
-		"	kindTable \\1 0 get ?1 sub get\n"
+		"	kindTable \\1 tolevel get\n"
 		"	2 /start _matchloc\n"
-		"	_tag _commit pop\n"
+		"	_tag _commit\n"
+		"    \\1 tolevel scopePopUpTo\n"
+		"    _scopetop {\n"
+		"        1 index exch scope: _scopepush\n"
+		"    } {\n"
+		"        _scopepush\n"
+		"    } ifelse\n"
 		"}}", NULL, false},
 	};
 
@@ -69,6 +110,7 @@ extern parserDefinition* PodParser (void)
 	def->kindCount     = ARRAY_SIZE(PodKindTable);
 	def->tagRegexTable = PodTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(PodTagRegexTable);
+	def->defaultScopeSeparator = "\"\"";
 	def->initialize    = initializePodParser;
 
 	return def;

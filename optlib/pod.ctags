@@ -29,14 +29,51 @@
 --kinddef-Pod=S,subsection,subsections
 --kinddef-Pod=t,subsubsection,subsubsections
 
+# Separator definitions must come after kind definitions.
+# This is the limitation of optlib2c.
+--_scopesep-Pod=*/*:""
+
 --_prelude-Pod={{
-	/kindTable
-	[ /chapter /section /subsection /subsubsection ] def
+	/kindTable [
+        /chapter /section /subsection /subsubsection
+    ] def
+
+    % numstr:str TOLEVEL int
+    /tolevel {
+        0 get ?1 sub
+    } def
+
+    /depthForCork {
+        :kind kindTable exch _aindex pop
+    } def
+
+    % goal:int scopePopUpTo -
+    /scopePopUpTo
+    {
+        {
+            _scopetop {
+                depthForCork 1 index ge {
+                    _scopepop
+                } {
+                    exit
+                } ifelse
+            } {
+                exit
+            } ifelse
+        } loop
+        pop
+    } def
 }}
 
 --regex-Pod=/^=head([1-4])[ \t]+(.+)//{{
 	\2
-	kindTable \1 0 get ?1 sub get
+	kindTable \1 tolevel get
 	2 /start _matchloc
-	_tag _commit pop
+	_tag _commit
+    \1 tolevel scopePopUpTo
+    _scopetop {
+        1 index exch scope: _scopepush
+    } {
+        _scopepush
+    } ifelse
 }}
