@@ -1,0 +1,31 @@
+Markup	input.rb	/^class RDoc::Markup$/;"	class	line:737	language:Ruby	module:RDoc	end:867
+attribute_manager	input.rb	/^  attr_reader :attribute_manager$/;"	accessor	line:742	language:Ruby	class:Markup
+parse	input.rb	/^  def self.parse str$/;"	singletonMethod	line:747	language:Ruby	class:Markup	end:770
+initialize	input.rb	/^  def initialize attribute_manager = nil$/;"	method	line:777	language:Ruby	class:Markup	end:780
+add_word_pair	input.rb	/^  def add_word_pair(start, stop, name)$/;"	method	line:787	language:Ruby	class:Markup	end:789
+add_html	input.rb	/^  def add_html(tag, name)$/;"	method	line:794	language:Ruby	class:Markup	end:796
+add_regexp_handling	input.rb	/^  def add_regexp_handling(pattern, name)$/;"	method	line:806	language:Ruby	class:Markup	end:808
+convert	input.rb	/^  def convert input, formatter$/;"	method	line:814	language:Ruby	class:Markup	end:823
+Supported Formats	input.rb	/^# = Supported Formats$/;"	L1Header	line:13	language:RDoc	end:43
+RDoc::Markup	input.rb	/^# = RDoc::Markup$/;"	L1Header	line:44	language:RDoc	end:97
+Synopsis	input.rb	/^# == Synopsis$/;"	L2Header	line:55	language:RDoc	L1Header:RDoc::Markup	end:91
+Encoding	input.rb	/^# == Encoding$/;"	L2Header	line:92	language:RDoc	L1Header:RDoc::Markup	end:97
+\\RDoc Markup Reference	input.rb	/^# = \\RDoc Markup Reference$/;"	L1Header	line:98	language:RDoc	end:868
+Block Markup	input.rb	/^# == Block Markup$/;"	L2Header	line:100	language:RDoc	L1Header:\\RDoc Markup Reference	end:297
+Paragraphs and Verbatim	input.rb	/^# === Paragraphs and Verbatim$/;"	L3Header	line:102	language:RDoc	L2Header:\\RDoc Markup Reference""Block Markup	end:133
+Headers	input.rb	/^# === Headers$/;"	L3Header	line:134	language:RDoc	L2Header:\\RDoc Markup Reference""Block Markup	end:170
+Rules	input.rb	/^# === Rules$/;"	L3Header	line:171	language:RDoc	L2Header:\\RDoc Markup Reference""Block Markup	end:181
+Simple Lists	input.rb	/^# === Simple Lists$/;"	L3Header	line:182	language:RDoc	L2Header:\\RDoc Markup Reference""Block Markup	end:216
+Labeled Lists	input.rb	/^# === Labeled Lists$/;"	L3Header	line:217	language:RDoc	L2Header:\\RDoc Markup Reference""Block Markup	end:269
+Lists and Verbatim	input.rb	/^# === Lists and Verbatim$/;"	L3Header	line:270	language:RDoc	L2Header:\\RDoc Markup Reference""Block Markup	end:297
+Text Markup	input.rb	/^# == Text Markup$/;"	L2Header	line:298	language:RDoc	L1Header:\\RDoc Markup Reference	end:440
+Bold, Italic, Typewriter Text	input.rb	/^# === Bold, Italic, Typewriter Text$/;"	L3Header	line:300	language:RDoc	L2Header:\\RDoc Markup Reference""Text Markup	end:325
+Links	input.rb	/^# === Links$/;"	L3Header	line:326	language:RDoc	L2Header:\\RDoc Markup Reference""Text Markup	end:383
+Escaping Text Markup	input.rb	/^# === Escaping Text Markup$/;"	L3Header	line:384	language:RDoc	L2Header:\\RDoc Markup Reference""Text Markup	end:414
+Conversion of characters	input.rb	/^# === Conversion of characters$/;"	L3Header	line:415	language:RDoc	L2Header:\\RDoc Markup Reference""Text Markup	end:440
+Documenting Source Code	input.rb	/^# == Documenting Source Code$/;"	L2Header	line:441	language:RDoc	L1Header:\\RDoc Markup Reference	end:514
+Directives	input.rb	/^# == Directives$/;"	L2Header	line:515	language:RDoc	L1Header:\\RDoc Markup Reference	end:868
+Controlling what is documented	input.rb	/^# === Controlling what is documented$/;"	L3Header	line:519	language:RDoc	L2Header:\\RDoc Markup Reference""Directives	end:570
+Method arguments	input.rb	/^# === Method arguments$/;"	L3Header	line:571	language:RDoc	L2Header:\\RDoc Markup Reference""Directives	end:609
+Sections	input.rb	/^# === Sections$/;"	L3Header	line:610	language:RDoc	L2Header:\\RDoc Markup Reference""Directives	end:678
+Other directives	input.rb	/^# === Other directives$/;"	L3Header	line:679	language:RDoc	L2Header:\\RDoc Markup Reference""Directives	end:868
