@@ -158,3 +158,22 @@
     } forall
     pop
 } __bddef
+
+(array key _AINDEX nth:int true
+ array key _AINDEX false)
+/_aindex {
+    0 3 1 roll
+    % idx array key
+    exch {
+        % idx key elt
+        1 index
+        eq {
+            % idx key
+            pop true exit
+        } {
+            % idx key
+            exch 1 add exch
+        } ifelse
+    } forall
+    dup true ne { pop pop false } if
+} __bddef

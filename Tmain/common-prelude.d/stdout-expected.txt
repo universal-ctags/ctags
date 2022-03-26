@@ -1,3 +1,4 @@
+aindex.ps...0
 amember.ps...0
 buildstring.ps...0
 dedup.ps...0
