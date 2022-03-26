@@ -37,6 +37,7 @@ typedef enum {
 	K_FILE,
 	K_DIRECTORY,
 	K_MULTITASK,
+	K_XTASK,
 } rakeKind;
 
 /*
@@ -57,6 +58,8 @@ static kindDefinition RakeKinds [] = {
 	{ true, 'd', "directory", "directory tasks",
 	  ATTACH_SEPARATORS(RakeGenericSeparators)},
 	{ true, 'm', "multitask", "multi tasks",
+	  ATTACH_SEPARATORS(RakeGenericSeparators)},
+	{ true, 'x', "xtask", "tasks defined with special constructor",
 	  ATTACH_SEPARATORS(RakeGenericSeparators)},
 };
 
@@ -120,6 +123,11 @@ static int makeSimpleRakeTag (vString *vstr, int kindIndex, rubySubparser *subpa
 	return r;
 }
 
+struct taskType {
+	const char *keyword;
+	rakeKind    kind;
+};
+
 static int parseTask (rubySubparser *s, int kind, const unsigned char **cp)
 {
 	vString *vstr = NULL;
@@ -134,16 +142,33 @@ static int parseTask (rubySubparser *s, int kind, const unsigned char **cp)
 	return CORK_NIL;
 }
 
+static int parseXTask (rubySubparser *s, struct taskType *xtask, const unsigned char **cp)
+{
+	rubySkipWhitespace (cp);
+	if (**cp == '(')
+	{
+		vString *vstr = NULL;
+		++*cp;
+		rubySkipWhitespace (cp);
+		vstr = readTask (cp);
+		if (vstr)
+		{
+			int r = makeSimpleRakeTag (vstr, xtask->kind, s);
+			vStringDelete (vstr);
+			tagEntryInfo *e = getEntryInCorkQueue (r);
+			e->extensionFields.typeRef [0] = eStrdup ("typename");
+			e->extensionFields.typeRef [1] = eStrdup (xtask->keyword);
+			return r;
+		}
+	}
+	return CORK_NIL;
+}
+
 static int lineNotify (rubySubparser *s, const unsigned char **cp)
 {
-	int r = CORK_NIL;;
-
-	struct taskType {
-		const char *keyword;
-		rakeKind    kind;
-	} taskTypes [] = {
+	struct taskType taskTypes [] = {
 		{ "task",       K_TASK      },
-		{ "namespace", K_NAMESPACE },
+		{ "namespace",  K_NAMESPACE },
 		{ "file",       K_FILE      },
 		{ "directory",  K_DIRECTORY },
 		{ "multitask",  K_MULTITASK },
@@ -152,34 +177,24 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 	for (int i = 0; i < ARRAY_SIZE(taskTypes); i++)
 	{
 		if (rubyCanMatchKeywordWithAssign (cp, taskTypes[i].keyword))
-		{
-			r = parseTask (s, taskTypes[i].kind, cp);
-			if (r != CORK_NIL)
-				return r;
-		}
+			return parseTask (s, taskTypes[i].kind, cp);
 	}
 
-#if 0
-	if (rubyCanMatchKeywordWithAssign (cp, "Rake::TestTask.new"))
+	struct taskType xtaskTypes [] = {
+		{ "RSpec::Core::RakeTask.new", K_XTASK },
+		{ "Cucumber::Rake::Task.new",  K_XTASK },
+		{ "Rake::TestTask.new",        K_XTASK },
+		{ "Rake::PackageTask.new",     K_XTASK },
+		/* ... */
+	};
+
+	for (int i = 0; i < ARRAY_SIZE(xtaskTypes); i++)
 	{
-		rubySkipWhitespace (cp);
-		if (**cp == '(')
-		{
-			vString *vstr = NULL;
-			++*cp;
-			rubySkipWhitespace (cp);
-			vstr = readTask (cp);
-			if (vstr)
-			{
-				int r = makeSimpleTag (vstr, K_TARGET);
-				vStringDelete (vstr);
-				return r;
-			}
-		}
+		if (rubyCanMatchKeywordWithAssign (cp, xtaskTypes[i].keyword))
+			return parseXTask (s, xtaskTypes + i, cp);;
 	}
-#endif
 
-	return r;
+	return CORK_NIL;
 }
 
 static void inputStart (subparser *s)
