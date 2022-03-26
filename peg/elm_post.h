@@ -68,11 +68,7 @@ static void addElmSignature(int scope_index, const char *sig)
 	if (e)
 	{
 		vString *vsig = collapseWhitespace (sig);
-		const char *sig2 = vStringValue (vsig);
-
-		e->extensionFields.signature = eStrdup (sig2);
-
-		vStringDelete (vsig);
+		e->extensionFields.signature = vStringDeleteUnwrap (vsig);
 	}
 }
 
