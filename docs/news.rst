@@ -455,6 +455,7 @@ The following parsers have been added:
 * R
 * R6Class *R based subparser*
 * Rake *Ruby based subparser*
+* RDoc *optlib pcre2*
 * RelaxNG *libxml*
 * ReStructuredText
 * RMarkdown *Markdown based subparser*
@@ -485,6 +486,7 @@ The following parsers have been added:
 See :ref:`optlib` for details on *optlib*.
 Libxml2 is required to use the parser(s) marked with *libxml*.
 Libyaml is required to use the parser(s) marked with *libyaml*.
+pcre2 is required to use the parser(s) marked with *pcre2*.
 
 TIPS: you can list newly introduced parsers if you also have
 Exuberant Ctags installed with following command line:

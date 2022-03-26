@@ -1,0 +1,88 @@
+#
+#  Copyright (c) 2022, Red Hat, Inc.
+#  Copyright (c) 2022, Masatake YAMATO
+#
+#  Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+# This parser extracts headers written in the RDoc Markup explained in
+# https://ruby.github.io/rdoc/RDoc/Markup.html#class-RDoc::Markup-label-RDoc+Markup+Reference
+#
+--langdef=RDoc
+--map-RDoc=+.rdoc
+
+--kinddef-RDoc=h,L1Header, Level 1 headers
+--kinddef-RDoc=i,L2Header, Level 2 headers
+--kinddef-RDoc=j,L3Header, Level 3 headers
+--kinddef-RDoc=k,L4Header, Level 4 headers
+--kinddef-RDoc=l,L5Header, Level 5 headers
+--kinddef-RDoc=m,L6Header, Level 6 headers
+
+# Separator definitions must come after kind definitions.
+# This is the limitation of optlib2c.
+--_scopesep-RDoc=*/*:""
+
+--_prelude-RDoc={{
+    /kindTable [
+        /L1Header /L2Header /L3Header /L4Header /L5Header /L6Header
+    ] def
+
+    /depthForCork {
+        :kind kindTable exch _aindex pop
+    } def
+    /depthForStr {
+        length 1 sub
+    } def
+
+    % endline:int goal:int scopePopUpTo -
+    /scopePopUpTo
+    {
+        {
+            _scopetop {
+                dup
+                % endline goal scope scope
+                depthForCork 2 index depthForStr ge {
+                    % endline goal scope
+                    2 index end:
+                    _scopepop
+                } {
+                    pop
+                    exit
+                } ifelse
+            } {
+                exit
+            } ifelse
+        } loop
+        pop
+        pop
+    } def
+}}
+
+--regex-RDoc=/^(?:#[ \t])*(={1,6})[ \t]*([^=].*)[ \t]*$//{pcre2}{{
+    \1 length kindTable length le {
+        \2
+        kindTable \1 length 1 sub get
+        2 /start _matchloc
+        _tag _commit
+        dup :line 1 sub \1 scopePopUpTo
+        _scopetop {
+            1 index exch scope: _scopepush
+        } {
+            _scopepush
+        } ifelse
+    } if
+}}

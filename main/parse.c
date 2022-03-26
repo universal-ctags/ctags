@@ -146,6 +146,10 @@ static parserDefinitionFunc* BuiltInParsers[] = {
 #ifdef HAVE_PACKCC
        ,
 #endif
+	   OPTLIB2C_PCRE2_PARSER_LIST
+#ifdef HAVE_PCRE2
+      ,
+#endif
 #endif	/* EXTERNAL_PARSER_LIST */
 };
 static parserObject* LanguageTable = NULL;

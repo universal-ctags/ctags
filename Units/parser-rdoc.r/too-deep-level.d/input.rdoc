@@ -1,0 +1,25 @@
+= level1
+== level2
+=== level3
+==== level4
+===== level5
+====== level6
+======= level7
+======== level8
+= level1'
+== level2'
+=== level3'
+==== level4'
+===== level5'
+====== level6'
+======= level7'
+======== level8'
+======== level8''
+======= level7''
+====== level6''
+===== level5''
+==== level4''
+=== level3''
+== level2''
+= level1''
+

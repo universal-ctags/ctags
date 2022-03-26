@@ -200,6 +200,12 @@ OPTSCRIPT_SRCS = \
 	$(NULL)
 OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.$(OBJEXT))
 
+OPTLIB2C_PCRE2_INPUT =       \
+   optlib/rdoc.ctags         \
+   \
+   $(NULL)
+OPTLIB2C_PCRE2_SRCS = $(OPTLIB2C_PCRE2_INPUT:.ctags=.c)
+
 OPTLIB2C_INPUT = \
 	optlib/cmake.ctags			\
 	optlib/ctags-optlib.ctags		\
