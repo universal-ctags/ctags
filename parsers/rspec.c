@@ -61,11 +61,13 @@ struct sRSpecSubparser {
 typedef enum {
 	K_DESCRIBE,
 	K_CONTEXT,
+	K_IT,
 } rspecKind;
 
 static kindDefinition RSpecKinds [] = {
 	{ true, 'd', "describe", "describes" },
 	{ true, 'c', "context", "contexts" },
+	{ true, 'i', "it", "things described with \"it\"" },
 };
 
 /*
@@ -152,6 +154,7 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 		{ "describe", K_DESCRIBE },
 		{ "RSpec.describe", K_DESCRIBE },
 		{ "context", K_CONTEXT },
+		{ "it", K_IT },
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(caseTypes); i++)
