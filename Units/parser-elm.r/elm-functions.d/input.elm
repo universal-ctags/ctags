@@ -11,7 +11,7 @@ funcB b =
 
 funcC = 2 + 1
 
--- Function with whitespace - ideally this will be stripped in the signature
+-- Function with whitespace - ideally this will be stripped in the type description
 
 funcD   d1
     d2   = d1 + d2

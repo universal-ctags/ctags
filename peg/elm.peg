@@ -26,7 +26,8 @@
 # - function:<f>    This function is in the scope of function <f>, which
 #                   may be dotted. Eg Main.myFunc.
 # - module:<m>      This is in the scope of module <m>.
-# - signature:<s>   This function, constructor or port has signature <s>.
+# - typeref:description:<t>   This function, constructor or port
+#                   has type <t>.
 # - moduleName:<m>  This namespace has original module name <m>.
 #
 # Functions defined in let/in blocks may be tagged, with these limitations:
@@ -42,7 +43,8 @@
 # Maybe do:
 # - let/in blocks
 #   - Allow tuples on the LHS. Eg '(val1, val2) = valFunc'.
-#   - Inner functions' type annotations are used in the function's signature.
+#   - Inner functions' type annotations are used in the function's
+#     type description.
 #   - Inner functions can have more complex parameters.
 # - Functions
 #   - Allow non-Latin upper and lower case. Use
@@ -176,7 +178,7 @@ typeParameterList <- lowerStartIdentifier (_1_ lowerStartIdentifier)*
 
 constructorList <- <upperStartIdentifier> _0_ <constructorTypes>? _0_ ('|' _0_ constructorList)? {
         int r = makeElmTag(auxil, $1, $1s, K_CONSTRUCTOR, ROLE_DEFINITION_INDEX);
-        addElmSignature(r, $2);
+        addElmTypeRef(r, $2);
 }
 
 constructorTypes <- singleTypeSpec (_0_ constructorTypes)*
@@ -212,7 +214,7 @@ functionTypeSpec <-
 portDeclaration <-
     'port' _1_ <lowerStartIdentifier> _0_ ':' _0_ <typeAnnotation> EOS {
         int r = makeElmTag(auxil, $1, $1s, K_PORT, ROLE_DEFINITION_INDEX);
-        addElmSignature(r, $2);
+        addElmTypeRef(r, $2);
     }
 
 # Import statement
@@ -287,7 +289,7 @@ functionWithTypeAnnotation <-
     <lowerStartIdentifier> _0_ ':' _0_ <typeAnnotation> TLSS
     <$1> _1_ {
         int r = makeElmTagSettingScope(auxil, $3, $3s, K_FUNCTION, ROLE_DEFINITION_INDEX);
-        addElmSignature(r, $2);
+        addElmTypeRef(r, $2);
     }
     functionParameterList? _0_ '=' _0_ expression EOS {
         POP_SCOPE(auxil);

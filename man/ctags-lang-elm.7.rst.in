@@ -80,10 +80,10 @@ with "--sort=no --extras=+r --fields=+r"
 	MyImport	input.elm	/^import MyImport as NSpace exposing (impFunc)$/;"	m	roles:imported
 	impFunc	input.elm	/^import MyImport as NSpace exposing (impFunc)$/;"	f	module:MyImport	roles:imported
 
-Signatures
+Type descriptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Constructors will have signatures. So will any top level function
+Constructors will have type descriptions. So will any top level function
 that has a type annotation.
 
 .. code-block:: Elm
@@ -100,15 +100,15 @@ that has a type annotation.
 	    | B3Cons
 
 "output.tags"
-with "--sort=no --extras=+r --fields=+rS"
+with "--sort=no --extras=+r --fields=+r"
 
 .. code-block:: tags
 
-	funcA	input.elm	/^funcA a = a + 1$/;"	f	signature:Int -> Int	roles:def
+	funcA	input.elm	/^funcA a = a + 1$/;"	f	typeref:description:Int -> Int	roles:def
 	B	input.elm	/^type B$/;"	t	roles:def
-	B3Cons	input.elm	/^    | B3Cons$/;"	c	type:B	signature:	roles:def
-	B2Cons	input.elm	/^    | B2Cons String Integer$/;"	c	type:B	signature:String Integer	roles:def
-	B1Cons	input.elm	/^    = B1Cons$/;"	c	type:B	signature:{ x : Float , y : Float }	roles:def
+	B3Cons	input.elm	/^    | B3Cons$/;"	c	type:B	typeref:description:	roles:def
+	B2Cons	input.elm	/^    | B2Cons String Integer$/;"	c	type:B	typeref:description:String Integer	roles:def
+	B1Cons	input.elm	/^    = B1Cons$/;"	c	type:B	typeref:description:{ x : Float , y : Float }	roles:def
 
 KNOWN LIMITATIONS
 -----------------
@@ -122,7 +122,7 @@ Sometimes functions in let/in blocks will be omitted.
 Functions in let/in blocks will be marked as being in the scope of their
 outer function, regardless of how deeply nested the let/in block is.
 
-Functions in let/in blocks won't have signatures.
+Functions in let/in blocks won't have type descriptions.
 
 SEE ALSO
 --------
