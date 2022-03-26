@@ -181,6 +181,7 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 extern void addLanguageOptscriptToHook (langType language, enum scriptHook hook, const char *const src);
 
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
+extern void anonConcat   (vString *buffer, int kind);
 extern vString *anonGenerateNew (const char *prefix, int kind);
 extern void anonHashString (const char *filename, char buf[9]);
 

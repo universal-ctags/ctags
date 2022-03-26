@@ -4828,6 +4828,11 @@ extern void anonHashString (const char *filename, char buf[9])
 }
 
 
+extern void anonConcat (vString *buffer, int kind)
+{
+	anonGenerate (buffer, NULL, kind);
+}
+
 extern void anonGenerate (vString *buffer, const char *prefix, int kind)
 {
 	parserObject* parser = LanguageTable + getInputLanguage ();
@@ -4836,7 +4841,8 @@ extern void anonGenerate (vString *buffer, const char *prefix, int kind)
 	char szNum[32];
 	char buf [9];
 
-	vStringCopyS(buffer, prefix);
+	if (prefix)
+		vStringCopyS(buffer, prefix);
 
 	anonHashString (getInputFileName(), buf);
 	sprintf(szNum,"%s%02x%02x",buf,parser -> anonymousIdentiferId, kind);
