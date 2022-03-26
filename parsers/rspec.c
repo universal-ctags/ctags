@@ -141,33 +141,35 @@ static vString *readRest (const unsigned char **cp)
 	return vstr;
 }
 
+struct caseType {
+	const char *keyword;
+	rspecKind    kind;
+};
+
 static int lineNotify (rubySubparser *s, const unsigned char **cp)
 {
-	if (rubyCanMatchKeywordWithAssign (cp, "describe")
-		|| rubyCanMatchKeywordWithAssign (cp, "RSpec.describe"))
+	struct caseType caseTypes [] = {
+		{ "describe", K_DESCRIBE },
+		{ "RSpec.describe", K_DESCRIBE },
+		{ "context", K_CONTEXT },
+	};
+
+	for (int i = 0; i < ARRAY_SIZE(caseTypes); i++)
 	{
-		vString *vstr = NULL;
-		rubySkipWhitespace (cp);
-		vstr = readRest (cp);
-		if (vstr)
+		if (rubyCanMatchKeywordWithAssign(cp, caseTypes[i].keyword))
 		{
-			int r = makeSimpleRSpecTag (vstr, K_DESCRIBE, s);
-			vStringDelete (vstr);
-			return r;
+			vString *vstr = NULL;
+			rubySkipWhitespace (cp);
+			vstr = readRest (cp);
+			if (vstr)
+			{
+				int r = makeSimpleRSpecTag (vstr, caseTypes[i].kind, s);
+				vStringDelete (vstr);
+				return r;
+			}
 		}
 	}
-	else if (rubyCanMatchKeywordWithAssign (cp, "context"))
-	{
-		vString *vstr = NULL;
-		rubySkipWhitespace (cp);
-		vstr = readRest (cp);
-		if (vstr)
-		{
-			int r = makeSimpleRSpecTag (vstr, K_CONTEXT, s);
-			vStringDelete (vstr);
-			return r;
-		}
-	}
+
 	return CORK_NIL;
 }
 
