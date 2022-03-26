@@ -307,6 +307,13 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 	const char *unqualified_name;
 	const char *qualified_name;
 	int r;
+	bool anonymous = false;
+
+	if (!name)
+	{
+		name = anonGenerateNew ("__anon", K_CLASS);
+		anonymous = true;
+	}
 
         if (!RubyKinds[kind].enabled) {
             return CORK_NIL;
@@ -348,6 +355,10 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 		tag.extensionFields.scopeKindIndex = parent_kind;
 		tag.extensionFields.scopeName = vStringValue (scope);
 	}
+
+	if (anonymous)
+		markTagExtraBit (&tag, XTAG_ANONYMOUS);
+
 	r = makeTagEntry (&tag);
 
 	if (pushLevel)
@@ -355,6 +366,10 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 
 	if (clearName)
 		vStringClear (name);
+
+	if (anonymous)
+		vStringDelete (name);
+
 	vStringDelete (scope);
 
 	return r;
@@ -1013,9 +1028,17 @@ static void findRubyTags (void)
 		{
 			readAndEmitTag (&cp, K_MODULE);
 		}
-		else if (canMatchKeywordWithAssign (&cp, "class"))
+		else if (canMatchKeywordWithAssign (&cp, "class")
+				 || (canMatchKeywordWithAssign (&cp, "Class.new")))
+
 		{
-			int r = readAndEmitTag (&cp, K_CLASS);
+
+			int r;
+			if (*(cp - 1) != 's')
+				r = emitRubyTagFull(NULL, K_CLASS, true, false);
+			else
+				r = readAndEmitTag (&cp, K_CLASS); /* "class" */
+
 			tagEntryInfo *e = getEntryInCorkQueue (r);
 
 			if (e)
