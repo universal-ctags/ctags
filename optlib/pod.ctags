@@ -47,20 +47,26 @@
         :kind kindTable exch _aindex pop
     } def
 
-    % goal:int scopePopUpTo -
+    % endline:int goal:int scopePopUpTo -
     /scopePopUpTo
     {
         {
             _scopetop {
-                depthForCork 1 index ge {
+                dup
+                % endline goal scope scope
+                depthForCork 2 index ge {
+                    % endline goal scope
+                    2 index end:
                     _scopepop
                 } {
+                    pop
                     exit
                 } ifelse
             } {
                 exit
             } ifelse
         } loop
+        pop
         pop
     } def
 }}
@@ -70,7 +76,7 @@
 	kindTable \1 tolevel get
 	2 /start _matchloc
 	_tag _commit
-    \1 tolevel scopePopUpTo
+    dup :line 1 sub \1 tolevel scopePopUpTo
     _scopetop {
         1 index exch scope: _scopepush
     } {

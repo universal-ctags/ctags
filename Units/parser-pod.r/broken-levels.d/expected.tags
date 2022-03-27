@@ -1,5 +1,5 @@
-L1	input.pod	/^=head1 L1$/;"	c
-L3	input.pod	/^=head3 L3$/;"	S	chapter:L1
-L4	input.pod	/^=head4 L4$/;"	t	subsection:L1""L3
-L2	input.pod	/^=head2 L2$/;"	s	chapter:L1
-L3'	input.pod	/^=head3 L3'$/;"	S	section:L1""L2
+L1	input.pod	/^=head1 L1$/;"	c	line:1	end:6
+L3	input.pod	/^=head3 L3$/;"	S	line:2	chapter:L1	end:3
+L4	input.pod	/^=head4 L4$/;"	t	line:3	subsection:L1""L3	end:3
+L2	input.pod	/^=head2 L2$/;"	s	line:4	chapter:L1	end:6
+L3'	input.pod	/^=head3 L3'$/;"	S	line:5	section:L1""L2	end:6
