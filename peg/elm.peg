@@ -160,28 +160,64 @@ typeAlias <-
 # Custom type
 #
 # Includes type parameters, such as 'x' in 'type MyType x = Wrap x'.
+#
+# In a definition such as 'type MyType = Cons1 String Int' we
+# capture 'MyType', and then for each type in each constructor
+# subtype (here, 'String' and 'Int') we append a '->' and finally
+# concatentate them all to get the constructor's type description,
+# such as 'String -> Int -> MyType'
 
 customType <-
     'type' _1_ <upperStartIdentifier> (_0_ typeParameterList)? _0_ '=' _0_ {
+        initElmConstructorFields(auxil, $1);
         makeElmTagSettingScope(auxil, $1, $1s, K_TYPE, ROLE_DEFINITION_INDEX);
     } constructorList EOS {
         POP_SCOPE(auxil);
+        tidyElmConstructorFields(auxil);
     }
 
 typeParameterList <- lowerStartIdentifier (_1_ lowerStartIdentifier)*
 
 # A type could be defined as a constructor list:
 #     type A = Cons1 String | Cons2 Float Float | ...
-# The 'String' and the 'Float Float' etc are the constructor types.
+# The 'String' and the 'Float Float' etc are the constructor subtypes.
 # Each 'String', 'Float', etc is a single type spec.
 # But a single type spec could also be a record, a tuple or a function spec.
+#
+# Subtypes in constructors need to be parsed differently from types in
+# type annotations and record fields. Consider these:
+#     type A1Type a b = A1Cons a b              -- Line 1
+#     type A2Type a b = A2Cons String a b       -- Line 2
+#     type BType a b = BCons { x : A2Type a b}  -- Line 3
+#     cFunc : A1Type String Int -> String       -- Line 4
+# In line 1, 'a b' must be parsed as two individual types (parameterised).
+# In line 2, 'String a b' must be parsed as three individual types.
+# In line 3, 'A2Type a b' must be parsed as one type, even though it's
+# lexically equivalent to 'String a b' on line 2.
+# In line 4, 'A1Type String Int' must also be parsed one type.
+# This means we have to have slightly different rules for parsing a
+# constructor's subtypes as from other cases. The first case is handled
+# by constructorSubtypeList and singleConstructorSubtypeSpec. The second
+# case is handled by singleTypeSpec.
 
-constructorList <- <upperStartIdentifier> _0_ <constructorTypes>? _0_ ('|' _0_ constructorList)? {
+constructorList <- <upperStartIdentifier> {
+        initElmConstructorSubtypeFields(auxil);
+    } _0_ <constructorSubtypeList>? {
         int r = makeElmTag(auxil, $1, $1s, K_CONSTRUCTOR, ROLE_DEFINITION_INDEX);
-        addElmTypeRef(r, $2);
-}
+        addElmConstructorTypeRef(auxil, r);
+    } _0_ ('|' _0_ constructorList)?
 
-constructorTypes <- singleTypeSpec (_0_ constructorTypes)*
+constructorSubtypeList <- singleConstructorSubtypeSpec (_0_ singleConstructorSubtypeSpec)*
+
+singleConstructorSubtypeSpec <-
+    < recordTypeSpec
+      / tupleTypeSpec
+      / functionTypeSpec
+      / dottedIdentifier
+    >
+    {
+        addElmConstructorSubtype(auxil, $1);
+    }
 
 singleTypeSpec <-
     recordTypeSpec

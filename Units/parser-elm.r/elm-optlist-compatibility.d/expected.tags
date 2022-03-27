@@ -5,11 +5,11 @@ withDefault	input.elm	/^import Maybe exposing (withDefault)$/;"	f	module:Maybe	r
 Je	input.elm	/^import Json.Encode as Je$/;"	n	module:Main	roles:def	moduleName:Json.Encode
 Json.Encode	input.elm	/^import Json.Encode as Je$/;"	m	roles:imported
 Thing	input.elm	/^type Thing$/;"	t	module:Main	roles:def
-Two	input.elm	/^    | Two Int$/;"	c	type:Main.Thing	roles:def
 One	input.elm	/^    = One$/;"	c	type:Main.Thing	roles:def
+Two	input.elm	/^    | Two Int$/;"	c	type:Main.Thing	roles:def
 Param	input.elm	/^type Param a$/;"	t	module:Main	roles:def
-Other	input.elm	/^    | Other a$/;"	c	type:Main.Param	roles:def
 Cons	input.elm	/^    = Cons a$/;"	c	type:Main.Param	roles:def
+Other	input.elm	/^    | Other a$/;"	c	type:Main.Param	roles:def
 Num	input.elm	/^type alias Num =$/;"	a	module:Main	roles:def
 outward	input.elm	/^port outward : String -> Cmd a$/;"	p	module:Main	roles:def
 inward	input.elm	/^port inward : (b -> a) -> Sub a$/;"	p	module:Main	roles:def

@@ -90,6 +90,8 @@ static kindDefinition ElmKinds [COUNT_KINDS] = {
 
 struct parserCtx {
 	struct parserBaseCtx base;
+	vString *customType;
+	vString *consSubtype;
 };
 
 /*
@@ -99,4 +101,9 @@ struct parserCtx {
 static int makeElmTag (struct parserCtx *auxil, const char *name, long offset, int kind, int role);
 static int makeElmTagSettingScope (struct parserCtx *auxil, const char *name, long offset, int kind, int role);
 static void addElmTypeRef(int scope_index, const char *str);
+static void initElmConstructorFields (struct parserCtx *auxil, const char *name);
+static void initElmConstructorSubtypeFields (struct parserCtx *auxil);
+static void addElmConstructorSubtype (struct parserCtx *auxil, const char *name);
+static void addElmConstructorTypeRef (struct parserCtx *auxil, int tag_index);
+static void tidyElmConstructorFields (struct parserCtx *auxil);
 static vString *collapseWhitespace (const char *sig);

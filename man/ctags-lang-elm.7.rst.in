@@ -107,8 +107,8 @@ with "--sort=no --extras=+r --fields=+r"
 	funcA	input.elm	/^funcA a = a + 1$/;"	f	typeref:description:Int -> Int	roles:def
 	B	input.elm	/^type B$/;"	t	roles:def
 	B3Cons	input.elm	/^    | B3Cons$/;"	c	type:B	typeref:description:	roles:def
-	B2Cons	input.elm	/^    | B2Cons String Integer$/;"	c	type:B	typeref:description:String Integer	roles:def
-	B1Cons	input.elm	/^    = B1Cons$/;"	c	type:B	typeref:description:{ x : Float , y : Float }	roles:def
+	B2Cons	input.elm	/^    | B2Cons String Integer$/;"	c	type:B	typeref:description:String -> Integer -> B	roles:def
+	B1Cons	input.elm	/^    = B1Cons$/;"	c	type:B	typeref:description:{ x : Float , y : Float } -> B	roles:def
 
 KNOWN LIMITATIONS
 -----------------

@@ -74,6 +74,43 @@ static void addElmTypeRef(int scope_index, const char *sig)
 	}
 }
 
+/* There are several steps to making the type of constructors within
+ * a custom type:
+ *   1. Initialise the fields when we encounter the custom type declaration.
+ *   2. Initialise the subtype field (do this for each new constructor).
+ *   3. Add each subtype as we find it.
+ *   4. Make the typeref field.
+ *   5. Tidy up
+ */
+static void initElmConstructorFields (struct parserCtx *auxil, const char *name)
+{
+	auxil->customType = vStringNewInit (name);
+	auxil->consSubtype = vStringNew ();
+}
+
+static void initElmConstructorSubtypeFields (struct parserCtx *auxil)
+{
+	vStringClear (auxil->consSubtype);
+}
+
+static void addElmConstructorSubtype (struct parserCtx *auxil, const char *name)
+{
+	vStringCatS (auxil->consSubtype, name);
+	vStringCatS (auxil->consSubtype, " -> ");
+}
+
+static void addElmConstructorTypeRef (struct parserCtx *auxil, int tag_index)
+{
+	vStringCat (auxil->consSubtype, auxil->customType);
+	addElmTypeRef (tag_index, vStringValue (auxil->consSubtype));
+}
+
+static void tidyElmConstructorFields (struct parserCtx *auxil)
+{
+	vStringDelete (auxil->consSubtype);
+	vStringDelete (auxil->customType);
+}
+
 /* For a signature such as "a1   b2  c3" we want to transform it
  * to "a1 b2 c3" for the signature field.
  */
