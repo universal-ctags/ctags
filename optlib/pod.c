@@ -19,7 +19,7 @@ typedef enum {
 static void initializePodParser (const langType language CTAGS_ATTR_UNUSED)
 {
 	addLanguageOptscriptToHook (language, SCRIPT_HOOK_PRELUDE,
-		"{{	/kindTable [\n"
+		"{{    /kindTable [\n"
 		"        /chapter /section /subsection /subsubsection\n"
 		"    ] def\n"
 		"\n"
@@ -90,10 +90,10 @@ extern parserDefinition* PodParser (void)
 		{"^=head([1-4])[ \t]+(.+)", "",
 		"", ""
 		"{{\n"
-		"	\\2\n"
-		"	kindTable \\1 tolevel get\n"
-		"	2 /start _matchloc\n"
-		"	_tag _commit\n"
+		"    \\2\n"
+		"    kindTable \\1 tolevel get\n"
+		"    2 /start _matchloc\n"
+		"    _tag _commit\n"
 		"    dup :line 1 sub \\1 tolevel scopePopUpTo\n"
 		"    _scopetop {\n"
 		"        1 index exch scope: _scopepush\n"

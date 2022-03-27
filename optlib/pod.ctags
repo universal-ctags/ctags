@@ -34,7 +34,7 @@
 --_scopesep-Pod=*/*:""
 
 --_prelude-Pod={{
-	/kindTable [
+    /kindTable [
         /chapter /section /subsection /subsubsection
     ] def
 
@@ -72,10 +72,10 @@
 }}
 
 --regex-Pod=/^=head([1-4])[ \t]+(.+)//{{
-	\2
-	kindTable \1 tolevel get
-	2 /start _matchloc
-	_tag _commit
+    \2
+    kindTable \1 tolevel get
+    2 /start _matchloc
+    _tag _commit
     dup :line 1 sub \1 tolevel scopePopUpTo
     _scopetop {
         1 index exch scope: _scopepush
