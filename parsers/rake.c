@@ -23,6 +23,8 @@
 
 #include "ruby.h"
 
+#include <string.h>
+
 /*
 * DATA STRUCTURES
 */
@@ -71,10 +73,11 @@ static void findRakeTags (void)
 	scheduleRunningBaseparser (0);
 }
 
-static vString *readTask (const unsigned char **cp)
+static vString *readTask (const unsigned char **cp, bool *variable)
 {
 	vString *vstr = NULL;
 	unsigned char b;
+	const unsigned char *start;
 
 	switch (**cp)
 	{
@@ -100,18 +103,35 @@ static vString *readTask (const unsigned char **cp)
 		break;
 	default:
 		vstr = vStringNew ();
+		start = *cp;
 		if (!rubyParseMethodName (cp, vstr))
 		{
 			vStringDelete (vstr);
 			vstr = NULL;
+		}
+		{
+			const char *end = strstr((const char *)start, vStringValue (vstr));
+			if (end)
+			{
+				end += vStringLength (vstr);
+				if (*end != ':')
+					*variable = true;
+			}
 		}
 		break;
 	}
 	return vstr;
 }
 
-static int makeSimpleRakeTag (vString *vstr, int kindIndex, rubySubparser *subparser)
+static int makeSimpleRakeTag (vString *vstr, int kindIndex, rubySubparser *subparser,
+							  bool anonymous)
 {
+	if (anonymous)
+	{
+		vStringPut (vstr, '_');
+		anonConcat (vstr, kindIndex);
+	}
+
 	int r = makeSimpleTag (vstr, kindIndex);
 	tagEntryInfo *e = getEntryInCorkQueue (r);
 	if (e)
@@ -119,6 +139,8 @@ static int makeSimpleRakeTag (vString *vstr, int kindIndex, rubySubparser *subpa
 		struct sRakeSubparser *rake = (struct sRakeSubparser *)subparser;
 		if (!intArrayIsEmpty (rake->namespaces))
 			e->extensionFields.scopeIndex = intArrayLast(rake->namespaces);
+		if (anonymous)
+			markTagExtraBit (e, XTAG_ANONYMOUS);
 	}
 	return r;
 }
@@ -131,11 +153,12 @@ struct taskType {
 static int parseTask (rubySubparser *s, int kind, const unsigned char **cp)
 {
 	vString *vstr = NULL;
+	bool variable = false;
 	rubySkipWhitespace (cp);
-	vstr = readTask (cp);
+	vstr = readTask (cp, &variable);
 	if (vstr)
 	{
-		int r = makeSimpleRakeTag (vstr, kind, s);
+		int r = makeSimpleRakeTag (vstr, kind, s, variable);
 		vStringDelete (vstr);
 		return r;
 	}
@@ -148,12 +171,13 @@ static int parseXTask (rubySubparser *s, struct taskType *xtask, const unsigned 
 	if (**cp == '(')
 	{
 		vString *vstr = NULL;
+		bool variable = false;
 		++*cp;
 		rubySkipWhitespace (cp);
-		vstr = readTask (cp);
+		vstr = readTask (cp, &variable);
 		if (vstr)
 		{
-			int r = makeSimpleRakeTag (vstr, xtask->kind, s);
+			int r = makeSimpleRakeTag (vstr, xtask->kind, s, variable);
 			vStringDelete (vstr);
 			tagEntryInfo *e = getEntryInCorkQueue (r);
 			e->extensionFields.typeRef [0] = eStrdup ("typename");

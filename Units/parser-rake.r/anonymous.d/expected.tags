@@ -1,0 +1,6 @@
+benchmark	input.rake	/^namespace :benchmark do$/;"	n	extras:subparser
+generate_scenario_tasks	input.rake	/^  def generate_scenario_tasks(location, name)$/;"	f
+name_f22764bb0100	input.rake	/^    task name => "#{name}:run"$/;"	t	namespace:benchmark	extras:subparser,anonymous
+name_f22764bb0201	input.rake	/^    namespace name do$/;"	n	namespace:benchmark	extras:subparser,anonymous
+setup	input.rake	/^      task :setup do$/;"	t	namespace:benchmark:name_f22764bb0201	extras:subparser
+generate	input.rake	/^      task :generate => :setup do$/;"	t	namespace:benchmark:name_f22764bb0201	extras:subparser
