@@ -110,8 +110,31 @@ with "--sort=no --extras=+r --fields=+r"
 	B2Cons	input.elm	/^    | B2Cons String Integer$/;"	c	type:B	typeref:description:String -> Integer -> B	roles:def
 	B1Cons	input.elm	/^    = B1Cons$/;"	c	type:B	typeref:description:{ x : Float , y : Float } -> B	roles:def
 
+Function parameter lists
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Function parameter lists can be extracted into the tags file
+signature field. They are not really function signatures, but
+it's the closest concept available in ctags.
+Use "--fields=+S".
+
+.. code-block:: Elm
+
+    funcA a1 a2 =
+        a1 + a2
+
+"output.tags"
+with "--sort=no --extras=+r --fields=+rS"
+
+.. code-block:: tags
+
+    funcA	input.elm	/^funcA a1 a2 =$/;"	f	signature:a1 a2	roles:def
+
 KNOWN LIMITATIONS
 -----------------
+The ctags signature field is used for function parameter lists, even
+though it's not an idea field. See above.
+
 Elm requires all statements at the same logical level to have the
 same indentation. If there is additional indentation that line is part
 of the previous one. Therefore without over-complicating the

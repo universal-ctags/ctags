@@ -61,6 +61,18 @@ static int makeElmTagSettingScope (struct parserCtx *auxil, const char *name, lo
 	return scope_index;
 }
 
+static void addElmSignature(int scope_index, const char *sig)
+{
+	tagEntryInfo *e = getEntryInCorkQueue (scope_index);
+
+	if (e)
+	{
+		vString *vsig = collapseWhitespace (sig);
+
+		e->extensionFields.signature = vStringDeleteUnwrap (vsig);
+	}
+}
+
 static void addElmTypeRef(int scope_index, const char *sig)
 {
 	tagEntryInfo *e = getEntryInCorkQueue (scope_index);

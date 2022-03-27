@@ -323,11 +323,11 @@ importedTypeConstructor <-
 
 functionWithTypeAnnotation <-
     <lowerStartIdentifier> _0_ ':' _0_ <typeAnnotation> TLSS
-    <$1> _1_ {
+    <$1> _1_ <functionParameterList>? {
         int r = makeElmTagSettingScope(auxil, $3, $3s, K_FUNCTION, ROLE_DEFINITION_INDEX);
         addElmTypeRef(r, $2);
-    }
-    functionParameterList? _0_ '=' _0_ expression EOS {
+        addElmSignature(r, $4);
+    } _0_ '=' _0_ expression EOS {
         POP_SCOPE(auxil);
     }
 
@@ -337,10 +337,10 @@ typeAnnotation <-
 # Function without a type annotation
 
 functionDefinition <-
-    <nonKeywordIdentifier> _0_ {
-        makeElmTagSettingScope(auxil, $1, $1s, K_FUNCTION, ROLE_DEFINITION_INDEX);
-    }
-    functionParameterList? _0_ '=' _0_ expression EOS {
+    <nonKeywordIdentifier> _0_ <functionParameterList>? {
+        int r = makeElmTagSettingScope(auxil, $1, $1s, K_FUNCTION, ROLE_DEFINITION_INDEX);
+        addElmSignature(r, $2);
+    } _0_ '=' _0_ expression EOS {
         POP_SCOPE(auxil);
     }
 
@@ -435,9 +435,13 @@ letInLine <-
     / letInFunctionBody
 
 letInFunctionDefinition <-
-    <nonKeywordIdentifier> (WS+ nonKeywordIdentifier)* WS* '=' Non_NL* {
-        makeElmTag(auxil, $1, $1s, K_FUNCTION, ROLE_DEFINITION_INDEX);
+    <nonKeywordIdentifier> WS* <letInFunctionParameters>? WS* '=' Non_NL* {
+        int r = makeElmTag(auxil, $1, $1s, K_FUNCTION, ROLE_DEFINITION_INDEX);
+        addElmSignature(r, $2);
     }
+
+letInFunctionParameters <-
+    nonKeywordIdentifier (WS+ nonKeywordIdentifier)*
 
 letInFunctionBody <-
     !('let' / 'in') Non_NL+

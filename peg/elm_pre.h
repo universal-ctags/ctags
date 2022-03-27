@@ -100,6 +100,7 @@ struct parserCtx {
 #define USE_KIND_STACK KIND_GHOST_INDEX
 static int makeElmTag (struct parserCtx *auxil, const char *name, long offset, int kind, int role);
 static int makeElmTagSettingScope (struct parserCtx *auxil, const char *name, long offset, int kind, int role);
+static void addElmSignature(int scope_index, const char *sig);
 static void addElmTypeRef(int scope_index, const char *str);
 static void initElmConstructorFields (struct parserCtx *auxil, const char *name);
 static void initElmConstructorSubtypeFields (struct parserCtx *auxil);
