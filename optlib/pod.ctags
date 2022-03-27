@@ -20,6 +20,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 # USA.
 #
+# This module extracts headers of Pod file.
+#
+# References:
+# - https://perldoc.perl.org/perlpod
+# - https://perldoc.perl.org/perlpodspec
 #
 --langdef=Pod
 --map-Pod=+.pod
