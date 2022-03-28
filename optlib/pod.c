@@ -8,11 +8,52 @@
 #include "xtag.h"
 
 
+typedef enum {
+	K_CHAPTER,
+	K_SECTION,
+	K_SUBSECTION,
+	K_SUBSUBSECTION,
+} PodKind;
+
+
 static void initializePodParser (const langType language CTAGS_ATTR_UNUSED)
 {
 	addLanguageOptscriptToHook (language, SCRIPT_HOOK_PRELUDE,
-		"{{	/kindTable\n"
-		"	[ /chapter /section /subsection /subsubsection ] def\n"
+		"{{    /kindTable [\n"
+		"        /chapter /section /subsection /subsubsection\n"
+		"    ] def\n"
+		"\n"
+		"    % numstr:str TOLEVEL int\n"
+		"    /tolevel {\n"
+		"        0 get ?1 sub\n"
+		"    } def\n"
+		"\n"
+		"    /depthForCork {\n"
+		"        :kind kindTable exch _aindex pop\n"
+		"    } def\n"
+		"\n"
+		"    % endline:int goal:int scopePopUpTo -\n"
+		"    /scopePopUpTo\n"
+		"    {\n"
+		"        {\n"
+		"            _scopetop {\n"
+		"                dup\n"
+		"                % endline goal scope scope\n"
+		"                depthForCork 2 index ge {\n"
+		"                    % endline goal scope\n"
+		"                    2 index end:\n"
+		"                    _scopepop\n"
+		"                } {\n"
+		"                    pop\n"
+		"                    exit\n"
+		"                } ifelse\n"
+		"            } {\n"
+		"                exit\n"
+		"            } ifelse\n"
+		"        } loop\n"
+		"        pop\n"
+		"        pop\n"
+		"    } def\n"
 		"}}");
 }
 
@@ -49,10 +90,16 @@ extern parserDefinition* PodParser (void)
 		{"^=head([1-4])[ \t]+(.+)", "",
 		"", ""
 		"{{\n"
-		"	\\2\n"
-		"	kindTable \\1 0 get ?1 sub get\n"
-		"	2 /start _matchloc\n"
-		"	_tag _commit pop\n"
+		"    \\2\n"
+		"    kindTable \\1 tolevel get\n"
+		"    2 /start _matchloc\n"
+		"    _tag _commit\n"
+		"    dup :line 1 sub \\1 tolevel scopePopUpTo\n"
+		"    _scopetop {\n"
+		"        1 index exch scope: _scopepush\n"
+		"    } {\n"
+		"        _scopepush\n"
+		"    } ifelse\n"
 		"}}", NULL, false},
 	};
 
@@ -69,6 +116,7 @@ extern parserDefinition* PodParser (void)
 	def->kindCount     = ARRAY_SIZE(PodKindTable);
 	def->tagRegexTable = PodTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(PodTagRegexTable);
+	def->defaultScopeSeparator = "\"\"";
 	def->initialize    = initializePodParser;
 
 	return def;

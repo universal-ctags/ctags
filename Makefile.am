@@ -36,7 +36,7 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/Makefile \
 	       win32/gen-repoinfo.bat \
 	       misc/txt2cstr \
-	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(TXT2CSTR_INPUT) \
+	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(OPTLIB2C_PCRE2_INPUT) $(TXT2CSTR_INPUT) \
 	       docs Tmain Units m4/gnulib-cache.m4
 
 CLEANFILES =
@@ -46,7 +46,7 @@ MAINTAINERCLEANFILES = autom4te.cache
 # for distcheck
 clean-local:
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
-		rm -rf $(OPTLIB2C_SRCS); \
+		rm -rf $(OPTLIB2C_SRCS) $(OPTLIB2C_PCRE2_SRCS); \
 		rm -rf $(TXT2CSTR_SRCS); \
 	else \
 		$(MAKE) -C docs clean; \
@@ -95,7 +95,7 @@ dist_readtags_SOURCES += $(READTAGS_DSL_SRCS) $(READTAGS_DSL_HEADS)
 endif
 
 if HAVE_PCRE2
-PARSER_SRCS += $(PCRE2_SRCS)
+PARSER_SRCS += $(PCRE2_SRCS) $(OPTLIB2C_PCRE2_SRCS)
 PARSER_HEADS += $(PCRE2_HEADS)
 endif
 
@@ -177,6 +177,9 @@ SUFFIXES += .ctags
 .ctags.c:
 	$(optlib2c_verbose)$(OPTLIB2C) $< > $@
 $(OPTLIB2C_SRCS): $(OPTLIB2C) Makefile
+if HAVE_PCRE2
+$(OPTLIB2C_PCRE2_SRCS): $(OPTLIB2C) Makefile
+endif
 endif
 
 if RUN_TXT2CSTR

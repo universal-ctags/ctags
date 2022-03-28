@@ -58,6 +58,9 @@ extern parserDefinitionFunc YAML_PARSER_LIST;
 #ifdef HAVE_PACKCC
 extern parserDefinitionFunc PEG_PARSER_LIST;
 #endif
+#ifdef HAVE_PCRE2
+extern parserDefinitionFunc OPTLIB2C_PCRE2_PARSER_LIST;
+#endif
 #endif /* EXTERNAL_PARSER_LIST */
 
 extern bool doesLanguageAllowNullTag (const langType language);

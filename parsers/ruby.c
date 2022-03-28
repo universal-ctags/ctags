@@ -21,6 +21,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "parse.h"
+#include "promise.h"
 #include "nestlevel.h"
 #include "read.h"
 #include "routines.h"
@@ -960,6 +961,7 @@ static void findRubyTags (void)
 	const unsigned char *line;
 	bool inMultiLineComment = false;
 	vString *constant = vStringNew ();
+	bool found_rdoc = false;
 
 	nesting = nestingLevelsNewFull (sizeof (struct blockData), deleteBlockData);
 
@@ -980,6 +982,12 @@ static void findRubyTags (void)
 		/* if we expect a separator after a while, for, or until statement
 		 * separators are "do", ";" or newline */
 		bool expect_separator = false;
+
+		if (found_rdoc == false && strncmp ((const char*)cp, "# =", 3) == 0)
+		{
+			found_rdoc = true;
+			makePromise ("RDoc", 0, 0, 0, 0, 0);
+		}
 
 		if (canMatch (&cp, "=begin", isWhitespace))
 		{

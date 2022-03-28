@@ -1,0 +1,8 @@
+a	input.rdoc	/^= a$/;"	h	line:1	end:14
+b	input.rdoc	/^== b$/;"	i	line:3	L1Header:a	end:8
+c	input.rdoc	/^=== c$/;"	j	line:5	L2Header:a""b	end:6
+d	input.rdoc	/^=== d$/;"	j	line:7	L2Header:a""b	end:8
+e	input.rdoc	/^== e$/;"	i	line:9	L1Header:a	end:14
+X	input.rdoc	/^==== X$/;"	k	line:11	L2Header:a""e	end:14
+Y	input.rdoc	/^===== Y$/;"	l	line:13	L4Header:a""e""X	end:14
+f	input.rdoc	/^= f$/;"	h	line:15	end:15

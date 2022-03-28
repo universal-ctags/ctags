@@ -45,6 +45,13 @@
 #define PEG_PARSER_LIST
 #endif
 
+#ifdef HAVE_PCRE2
+#define OPTLIB2C_PCRE2_PARSER_LIST             \
+   RDocParser
+#else
+#define OPTLIB2C_PCRE2_PARSER_LIST
+#endif
+
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
 	AbaqusParser, \
