@@ -1,3 +1,4 @@
 A	a.rb	/^RSpec.describe "A" do$/;"	d	end:12
 B	b.rb	/^RSpec.describe "B" do$/;"	d	end:2
 a	a.rb	/^  describe "a" do$/;"	d	describe:A	end:11
+hangs	a.rb	/^    it "hangs" do$/;"	i	describe:A.a	end:10
