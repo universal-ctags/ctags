@@ -3,6 +3,13 @@
 # This source code is released for free distribution under the terms of the
 # GNU General Public License version 2 or later.
 #
+# Thanks to:
+# - Mark Skipper, for the original Elm optlib parser, which inspired this;
+# - Samuel Stauffer, for the Thrift PEG parser, which showed me how to
+#   write a PEG parser;
+# - Jan Dolinár, for the Kotlin PEG parser, which also provided insight;
+# - Masatake YAMATO, for patience and guidance in code reviews.
+#
 # This parser generates tags for Elm. See https://elm-lang.org/docs/syntax
 # for language reference.
 #
@@ -50,9 +57,6 @@
 #   - Allow non-Latin upper and lower case. Use
 #     https://util.unicode.org/UnicodeJsps/properties.html
 #     combined with \p{Lu}, \p{Ll} and \p{L}.
-# - If there's no --field=+r then an imported module (say) is still tagged,
-#   but there's no roles:imported, so it looks like it has been defined.
-#   Not sure if this is a bug. The Thrift parser has this same behaviour.
 #
 # Won't do:
 # - Handle Elm's indentation properly.

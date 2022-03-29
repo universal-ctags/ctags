@@ -35,10 +35,12 @@ Imported items are tagged, but their role is "imported", not "def".
 Imported items are marked as being in the scope of their own module,
 not the module that's doing the importing.
 
+"input.elm"
+
 .. code-block:: Elm
 
 	module SomeMod exposing (..)
-	
+
 	import MyMod exposing
 	  ( map
 	  , Maybe
@@ -47,7 +49,7 @@ not the module that's doing the importing.
 	  )
 
 "output.tags"
-with "--sort=no --extras=+r --fields=+r"
+with "--options=NONE -o - --sort=no --extras=+r --fields=+r input.elm"
 
 .. code-block:: tags
 
@@ -64,14 +66,16 @@ Namespaces
 
 Namespaces are tagged and their role is "def".
 
+"input.elm"
+
 .. code-block:: Elm
 
 	module AMod exposing (..)
-	
+
 	import MyImport as NSpace exposing (impFunc)
 
 "output.tags"
-with "--sort=no --extras=+r --fields=+r"
+with "--options=NONE -o - --sort=no --extras=+r --fields=+r input.elm"
 
 .. code-block:: tags
 
@@ -80,17 +84,18 @@ with "--sort=no --extras=+r --fields=+r"
 	MyImport	input.elm	/^import MyImport as NSpace exposing (impFunc)$/;"	m	roles:imported
 	impFunc	input.elm	/^import MyImport as NSpace exposing (impFunc)$/;"	f	module:MyImport	roles:imported
 
-Type descriptions
+Type names
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Constructors will have type descriptions. So will any top level function
-that has a type annotation.
+Constructors top level functions will have type names.
+
+"input.elm"
 
 .. code-block:: Elm
 
 	funcA : Int -> Int
 	funcA a = a + 1
-	
+
 	type B
 	    = B1Cons
 	      { x : Float
@@ -100,15 +105,15 @@ that has a type annotation.
 	    | B3Cons
 
 "output.tags"
-with "--sort=no --extras=+r --fields=+r"
+with "--options=NONE -o - --sort=no --extras=+r --fields=+r input.elm"
 
 .. code-block:: tags
 
-	funcA	input.elm	/^funcA a = a + 1$/;"	f	typeref:description:Int -> Int	roles:def
+	funcA	input.elm	/^funcA a = a + 1$/;"	f	typeref:typename:Int -> Int	roles:def
 	B	input.elm	/^type B$/;"	t	roles:def
-	B3Cons	input.elm	/^    | B3Cons$/;"	c	type:B	typeref:description:	roles:def
-	B2Cons	input.elm	/^    | B2Cons String Integer$/;"	c	type:B	typeref:description:String -> Integer -> B	roles:def
-	B1Cons	input.elm	/^    = B1Cons$/;"	c	type:B	typeref:description:{ x : Float , y : Float } -> B	roles:def
+	B1Cons	input.elm	/^    = B1Cons$/;"	c	type:B	typeref:typename:{ x : Float , y : Float } -> B	roles:def
+	B2Cons	input.elm	/^    | B2Cons String Integer$/;"	c	type:B	typeref:typename:String -> Integer -> B	roles:def
+	B3Cons	input.elm	/^    | B3Cons$/;"	c	type:B	typeref:typename:B	roles:def
 
 Function parameter lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,7 +150,7 @@ Sometimes functions in let/in blocks will be omitted.
 Functions in let/in blocks will be marked as being in the scope of their
 outer function, regardless of how deeply nested the let/in block is.
 
-Functions in let/in blocks won't have type descriptions.
+Functions in let/in blocks won't have type names.
 
 SEE ALSO
 --------

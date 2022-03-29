@@ -81,7 +81,7 @@ static void addElmTypeRef(int scope_index, const char *sig)
 	{
 		vString *vsig = collapseWhitespace (sig);
 
-		e->extensionFields.typeRef [0] = eStrdup ("description");
+		e->extensionFields.typeRef [0] = eStrdup ("typename");
 		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (vsig);
 	}
 }
@@ -139,7 +139,7 @@ static vString *collapseWhitespace (const char *sig)
 		// The character, in case we need to change it
 		c2 = *c;
 
-		if (c2 == ' ' || c2 == '\t' || c2 == '\r' || c2 == '\n' || c2 == '\f')
+		if (isspace ((unsigned char) c2))
 		{
 			// It's whitespace. Make it plain space
 			c2 = ' ';
