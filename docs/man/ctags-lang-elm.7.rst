@@ -123,13 +123,15 @@ signature field. They are not really function signatures, but
 it's the closest concept available in ctags.
 Use "--fields=+S".
 
+"input.elm"
+
 .. code-block:: Elm
 
     funcA a1 a2 =
         a1 + a2
 
 "output.tags"
-with "--sort=no --extras=+r --fields=+rS"
+with "--options=NONE -o - --sort=no --extras=+r --fields=+rS input.elm"
 
 .. code-block:: tags
 
