@@ -1,0 +1,13 @@
+funcA	input.elm	/^funcA =$/;"	f	roles:def
+funcB	input.elm	/^funcB = (\\b1 b2 b3 -> 42)$/;"	f	roles:def
+funcC	input.elm	/^funcC =$/;"	f	roles:def
+funcD	input.elm	/^funcD =$/;"	f	roles:def
+funcE	input.elm	/^funcE e1 e2 =$/;"	f	roles:def
+funcF	input.elm	/^funcF = []$/;"	f	roles:def
+funcG	input.elm	/^funcG =$/;"	f	roles:def
+funcH	input.elm	/^funcH h =$/;"	f	roles:def
+funcI	input.elm	/^funcI i1 i2 =$/;"	f	roles:def
+funcJ1	input.elm	/^funcJ1 =$/;"	f	roles:def
+funcJ2	input.elm	/^funcJ2 =$/;"	f	roles:def
+funcJ3	input.elm	/^funcJ3 =$/;"	f	roles:def
+funcJ4	input.elm	/^funcJ4 =$/;"	f	roles:def

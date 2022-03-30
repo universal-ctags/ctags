@@ -1,0 +1,7 @@
+funcA	input.elm	/^funcA a1 a2 =$/;"	f	signature:a1 a2	roles:def
+funcB	input.elm	/^funcB b1$/;"	f	typeref:typename:Int -> Int -> Int	signature:b1 b2	roles:def
+funcC	input.elm	/^funcC (c1, c2) {c3} (C4Cons c4 c5) =$/;"	f	signature:(c1, c2) {c3} (C4Cons c4 c5)	roles:def
+funcD	input.elm	/^funcD = 4$/;"	f	signature:	roles:def
+funcE	input.elm	/^funcE=5$/;"	f	signature:	roles:def
+funcF1	input.elm	/^funcF1 =$/;"	f	signature:	roles:def
+funcF2	input.elm	/^        funcF2 f1 f2 = 6$/;"	f	function:funcF1	signature:f1 f2	roles:def

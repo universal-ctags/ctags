@@ -101,6 +101,7 @@ main\repoinfo.obj: main\repoinfo.c main\repoinfo.h
 peg\varlink.c peg\varlink.h: peg\varlink.peg $(PACKCC)
 peg\kotlin.c peg\kotlin.h: peg\kotlin.peg $(PACKCC)
 peg\thrift.c peg\thrift.h: peg\thrift.peg $(PACKCC)
+peg\elm.c peg\elm.h: peg\elm.peg $(PACKCC)
 
 $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 	$(RC) /nologo /l 0x409 /Fo$@ $*.rc

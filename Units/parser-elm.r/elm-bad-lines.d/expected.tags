@@ -1,0 +1,8 @@
+Input	input.elm	/^import Input exposing (..)$/;"	m	roles:imported
+input1a	input-1.elm	/^input1a = 1$/;"	f	roles:def
+input1b	input-1.elm	/^input1b = 2$/;"	f	typeref:typename:Int	roles:def
+input2b	input-2.elm	/^input2b = 1$/;"	f	roles:def
+input2c	input-2.elm	/^input2c = 3$/;"	f	roles:def
+module2d	input-2.elm	/^module2d = 4$/;"	f	roles:def
+input3b	input-3.elm	/^input3b = 1$/;"	f	roles:def
+input3d	input-3.elm	/^input3d = 1$/;"	f	roles:def

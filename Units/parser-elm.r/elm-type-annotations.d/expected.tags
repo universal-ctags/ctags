@@ -1,0 +1,9 @@
+funcA	input.elm	/^funcA a = 1$/;"	f	typeref:typename:Int -> Float -> Float	roles:def
+funcB	input.elm	/^funcB b =$/;"	f	typeref:typename:String -> Float	roles:def
+funcC	input.elm	/^funcC c = 3$/;"	f	typeref:typename:Int -> {c: String}	roles:def
+funcD	input.elm	/^funcD = 4$/;"	f	typeref:typename:(Int, Int) -> String	roles:def
+funcE	input.elm	/^funcE = 5$/;"	f	typeref:typename:Float -> (Int -> Int -> Int -> String)	roles:def
+funcF	input.elm	/^funcF = 6$/;"	f	typeref:typename:String -> {- Old ->-} Int	roles:def
+funcG	input.elm	/^funcG = 7$/;"	f	typeref:typename:G.Int -> G.Other	roles:def
+funcH	input.elm	/^funcH h =$/;"	f	typeref:typename:Int -> Int	roles:def
+h2	input.elm	/^        h2 = 34$/;"	f	function:funcH	roles:def

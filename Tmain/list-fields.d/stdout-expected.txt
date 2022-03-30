@@ -37,6 +37,7 @@ z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field outpu
 -	macrodef	no	CPreProcessor	s--	no	--	macro definition
 -	macrodef	no	CUDA	s--	no	--	macro definition
 -	properties	no	CUDA	s--	no	--	properties (static, inline, mutable,...)
+-	moduleName	yes	Elm	s--	no	--	actual name of renamed module
 -	annotations	yes	GDScript	s--	no	--	annotations on functions and variables
 -	howImported	no	Go	s--	no	--	how the package is imported ("inline" for `.' or "init" for `_')
 -	package	yes	Go	s--	no	--	the real package specified by the package name

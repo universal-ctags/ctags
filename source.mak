@@ -210,7 +210,6 @@ OPTLIB2C_INPUT = \
 	optlib/cmake.ctags			\
 	optlib/ctags-optlib.ctags		\
 	optlib/elixir.ctags			\
-	optlib/elm.ctags			\
 	optlib/gdbinit.ctags			\
 	optlib/inko.ctags			\
 	optlib/iPythonCell.ctags		\
@@ -242,6 +241,7 @@ PEG_INPUT = \
        peg/varlink.peg				\
        peg/kotlin.peg				\
        peg/thrift.peg				\
+       peg/elm.peg					\
        \
        $(NULL)
 PEG_SRCS = $(PEG_INPUT:.peg=.c)

@@ -1,0 +1,20 @@
+Apple	input.elm	/^type Apple = Cox | Braeburn$/;"	t	roles:def
+Cox	input.elm	/^type Apple = Cox | Braeburn$/;"	c	type:Apple	roles:def
+Braeburn	input.elm	/^type Apple = Cox | Braeburn$/;"	c	type:Apple	roles:def
+Box	input.elm	/^type Box a = Cardboard a | Wooden$/;"	t	roles:def
+Cardboard	input.elm	/^type Box a = Cardboard a | Wooden$/;"	c	type:Box	roles:def
+Wooden	input.elm	/^type Box a = Cardboard a | Wooden$/;"	c	type:Box	roles:def
+Clog	input.elm	/^type Clog a b = Dutch | English$/;"	t	roles:def
+Dutch	input.elm	/^type Clog a b = Dutch | English$/;"	c	type:Clog	roles:def
+English	input.elm	/^type Clog a b = Dutch | English$/;"	c	type:Clog	roles:def
+DType	input.elm	/^type DType$/;"	t	roles:def
+D1Cons	input.elm	/^    = D1Cons { x : String, y:Maybe Int}$/;"	c	type:DType	roles:def
+D2Cons	input.elm	/^    | D2Cons Float Float Clog$/;"	c	type:DType	roles:def
+TypesTwo	input-1.elm	/^module TypesTwo exposing (..)$/;"	m	roles:def
+T2a	input-1.elm	/^type T2a = T2a_1 | T2a_2$/;"	t	module:TypesTwo	roles:def
+T2a_1	input-1.elm	/^type T2a = T2a_1 | T2a_2$/;"	c	type:TypesTwo.T2a	roles:def
+T2a_2	input-1.elm	/^type T2a = T2a_1 | T2a_2$/;"	c	type:TypesTwo.T2a	roles:def
+funcT2	input-1.elm	/^funcT2 = "T2"$/;"	f	module:TypesTwo	roles:def
+T2b	input-1.elm	/^type T2b = T2b_1 | T2b_2$/;"	t	module:TypesTwo	roles:def
+T2b_1	input-1.elm	/^type T2b = T2b_1 | T2b_2$/;"	c	type:TypesTwo.T2b	roles:def
+T2b_2	input-1.elm	/^type T2b = T2b_1 | T2b_2$/;"	c	type:TypesTwo.T2b	roles:def

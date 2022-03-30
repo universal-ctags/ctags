@@ -1,0 +1,3 @@
+MyAlias1	input.elm	/^type alias MyAlias1 = String$/;"	a	roles:def
+MyAlias2	input.elm	/^type alias MyAlias2 =$/;"	a	roles:def
+MyAlias3	input.elm	/^    MyAlias3$/;"	a	roles:def

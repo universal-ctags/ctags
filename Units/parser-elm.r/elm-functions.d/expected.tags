@@ -1,0 +1,5 @@
+funcA	input.elm	/^funcA a1 a2 = a1 + a2$/;"	f	roles:def
+funcB	input.elm	/^funcB b =$/;"	f	roles:def
+funcC	input.elm	/^funcC = 2 + 1$/;"	f	roles:def
+funcD	input.elm	/^funcD   d1$/;"	f	roles:def
+funcE	input.elm	/^funcE=2$/;"	f	roles:def

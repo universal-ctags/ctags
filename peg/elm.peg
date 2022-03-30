@@ -1,0 +1,671 @@
+# Copyright (c) 2022 Nik Silver
+#
+# This source code is released for free distribution under the terms of the
+# GNU General Public License version 2 or later.
+#
+# Thanks to:
+# - Mark Skipper, for the original Elm optlib parser, which inspired this;
+# - Samuel Stauffer, for the Thrift PEG parser, which showed me how to
+#   write a PEG parser;
+# - Jan Dolinár, for the Kotlin PEG parser, which also provided insight;
+# - Masatake YAMATO, for patience and guidance in code reviews.
+#
+# This parser generates tags for Elm. See https://elm-lang.org/docs/syntax
+# for language reference.
+#
+# The parser will tag items reliably at the top level. Functions
+# defined in let/in blocks are also tagged, but with limitations. See below.
+#
+# Kinds
+# - m module
+# - n namespace (ie a module that's renamed)
+# - t type
+# - c constructor (within a type)
+# - a alias
+# - p port
+# - f function
+#
+# Key/value pairs
+# - roles:def       This is defined here.
+# - roles:imported  This is imported here.
+# - type:<t>        This constructor is in the scope of type <t>, which
+#                   may be dotted. Eg Main.myType.
+# - function:<f>    This function is in the scope of function <f>, which
+#                   may be dotted. Eg Main.myFunc.
+# - module:<m>      This is in the scope of module <m>.
+# - typeref:description:<t>   This function, constructor or port
+#                   has type <t>.
+# - moduleName:<m>  This namespace has original module name <m>.
+#
+# Functions defined in let/in blocks may be tagged, with these limitations:
+# - the LHS (up to and including the '=') need to be on a single line;
+# - the LHS can only have simple parameters;
+# - their scope is only marked as being in the top-most function;
+# - any type annotation is ignored.
+# This should be good for 90% of inner functions. To make it totally robust
+# is much more complicated due to (a) Elm's clever indentation-sensitivity
+# and (b) limitations of the PEG parser used here.
+#
+# To do:
+# Maybe do:
+# - let/in blocks
+#   - Allow tuples on the LHS. Eg '(val1, val2) = valFunc'.
+#   - Inner functions' type annotations are used in the function's
+#     type description.
+#   - Inner functions can have more complex parameters.
+# - Functions
+#   - Allow non-Latin upper and lower case. Use
+#     https://util.unicode.org/UnicodeJsps/properties.html
+#     combined with \p{Lu}, \p{Ll} and \p{L}.
+#
+# Won't do:
+# - Handle Elm's indentation properly.
+
+
+%prefix "pelm"
+
+%auxil	"struct parserCtx *"
+
+%earlysource {
+    #include "general.h"
+}
+
+%header {
+	struct parserCtx;
+}
+
+%source {
+#include "elm_pre.h"
+#include "routines.h"
+
+/*
+ * Include these lines to debug the parsing.
+ * From https://github.com/arithy/packcc#macros
+ * This will output parsing info to STDERR.tmp in the vent of a failed test.
+ */
+
+/*
+static const char *dbg_str[] = { "Evaluating rule", "Matched rule", "Abandoning rule" };
+
+#define PCC_DEBUG(auxil, event, rule, level, pos, buffer, length) \
+    fprintf(stderr, "%*s%s %s @%zu [%.*s]\n", \
+        (int)((level) * 2), "", dbg_str[event], rule, pos, (int)(length), buffer)
+ */
+}
+
+# Top level elements -----------------------------------------------------
+
+# We separate the file into the module section and the main section
+# so that we only consider and tag one module declaration
+
+file <-
+    {
+        ELM_INIT_MODULE_SCOPE;
+    }
+    TLSS?
+    moduleDeclaration?
+    TLSS?
+    mainTopLevelStatements?
+    TLSS?
+    EOF
+
+mainTopLevelStatements <-
+    topLevelStatement (TLSS topLevelStatement)*
+
+topLevelStatement <-
+    importStatement
+    / typeAlias
+    / customType
+    / portDeclaration
+    / functionWithTypeAnnotation
+    / functionDefinition
+    / ignoreRestOfStatement
+
+# Main Elm grammar -------------------------------------------------------
+
+# Module declaration
+#
+# We can be a bit relaxed about distinguishing functions, types and
+# constructors listed in a module declaration, because we're not going
+# to tag them.
+
+moduleDeclaration <-
+    ('port' _1_)? 'module' _1_ <dottedIdentifier> _1_ 'exposing' _0_ '(' exposedList ')' EOS {
+        elm_module_scope_index = makeElmTagSettingScope(auxil, $1, $1s, K_MODULE, ROLE_DEFINITION_INDEX);
+    }
+
+exposedList <- _0_ exposedItem _0_ (',' _0_ exposedList )*
+
+exposedItem <-
+    exposedFieldOrType
+    / exposedFunction
+    / exposedItemIgnored
+
+exposedFieldOrType <-
+    <upperStartIdentifier> (_0_ '(' _0_ exposedTypeConstructorList _0_ ')')?
+
+exposedFunction <-
+    lowerStartIdentifier
+
+exposedItemIgnored <- '.'+
+
+exposedTypeConstructorList <-
+    (upperStartIdentifier / exposedItemIgnored) _0_ (',' _0_ exposedTypeConstructorList)*
+
+# Type alias
+#
+# We don't care what the actual alias is
+
+typeAlias <-
+    'type' _1_ 'alias' _1_ <upperStartIdentifier> _0_ '=' _0_ ignoreRestOfStatement {
+        makeElmTag(auxil, $1, $1s, K_ALIAS, ROLE_DEFINITION_INDEX);
+    }
+
+# Custom type
+#
+# Includes type parameters, such as 'x' in 'type MyType x = Wrap x'.
+#
+# In a definition such as 'type MyType = Cons1 String Int' we
+# capture 'MyType', and then for each type in each constructor
+# subtype (here, 'String' and 'Int') we append a '->' and finally
+# concatentate them all to get the constructor's type description,
+# such as 'String -> Int -> MyType'
+
+customType <-
+    'type' _1_ <upperStartIdentifier> (_0_ typeParameterList)? _0_ '=' _0_ {
+        initElmConstructorFields(auxil, $1);
+        makeElmTagSettingScope(auxil, $1, $1s, K_TYPE, ROLE_DEFINITION_INDEX);
+    } constructorList EOS {
+        POP_SCOPE(auxil);
+        tidyElmConstructorFields(auxil);
+    }
+
+typeParameterList <- lowerStartIdentifier (_1_ lowerStartIdentifier)*
+
+# A type could be defined as a constructor list:
+#     type A = Cons1 String | Cons2 Float Float | ...
+# The 'String' and the 'Float Float' etc are the constructor subtypes.
+# Each 'String', 'Float', etc is a single type spec.
+# But a single type spec could also be a record, a tuple or a function spec.
+#
+# Subtypes in constructors need to be parsed differently from types in
+# type annotations and record fields. Consider these:
+#     type A1Type a b = A1Cons a b              -- Line 1
+#     type A2Type a b = A2Cons String a b       -- Line 2
+#     type BType a b = BCons { x : A2Type a b}  -- Line 3
+#     cFunc : A1Type String Int -> String       -- Line 4
+# In line 1, 'a b' must be parsed as two individual types (parameterised).
+# In line 2, 'String a b' must be parsed as three individual types.
+# In line 3, 'A2Type a b' must be parsed as one type, even though it's
+# lexically equivalent to 'String a b' on line 2.
+# In line 4, 'A1Type String Int' must also be parsed one type.
+# This means we have to have slightly different rules for parsing a
+# constructor's subtypes as from other cases. The first case is handled
+# by constructorSubtypeList and singleConstructorSubtypeSpec. The second
+# case is handled by singleTypeSpec.
+
+constructorList <- <upperStartIdentifier> {
+        initElmConstructorSubtypeFields(auxil);
+    } _0_ <constructorSubtypeList>? {
+        int r = makeElmTag(auxil, $1, $1s, K_CONSTRUCTOR, ROLE_DEFINITION_INDEX);
+        addElmConstructorTypeRef(auxil, r);
+    } _0_ ('|' _0_ constructorList)?
+
+constructorSubtypeList <- singleConstructorSubtypeSpec (_0_ singleConstructorSubtypeSpec)*
+
+singleConstructorSubtypeSpec <-
+    < recordTypeSpec
+      / tupleTypeSpec
+      / functionTypeSpec
+      / dottedIdentifier
+    >
+    {
+        addElmConstructorSubtype(auxil, $1);
+    }
+
+singleTypeSpec <-
+    recordTypeSpec
+    / tupleTypeSpec
+    / functionTypeSpec
+    / parameterisedTypeSpec
+
+recordTypeSpec <-
+    '{' (_0_ recordRestrictionPrefix)? _0_ fieldSpec (_0_ ',' _0_ fieldSpec)* _0_ '}'
+    / '{' (_0_ recordRestrictionPrefix)? _0_ '}'
+
+recordRestrictionPrefix <-
+    lowerStartIdentifier _0_ '|'
+
+fieldSpec <-
+    lowerStartIdentifier _0_ ':' _0_ singleTypeSpec
+
+tupleTypeSpec <-
+    '(' _0_ singleTypeSpec (_0_ ',' _0_ singleTypeSpec)* _0_ ')'
+    / '(' _0_ ')'
+
+parameterisedTypeSpec <-
+    dottedIdentifier (_1_ (singleTypeSpec / lowerStartIdentifier))*
+
+functionTypeSpec <-
+    singleTypeSpec (_0_ '->' _0_ singleTypeSpec)+
+
+# Port declaration
+
+portDeclaration <-
+    'port' _1_ <lowerStartIdentifier> _0_ ':' _0_ <typeAnnotation> EOS {
+        int r = makeElmTag(auxil, $1, $1s, K_PORT, ROLE_DEFINITION_INDEX);
+        addElmTypeRef(r, $2);
+    }
+
+# Import statement
+#
+# For the import statement we don't want the imported items to appear in the
+# scope of the current module (ie this file), otherwise they'll be named
+# wrongly. So we # want to save the module scope, make the imported tags,
+# then restore the module scope. We do this in two separate C code blocks,
+# because the module scope needs to be saved before any of the imported tags
+# are made.
+#
+# Also, if we create a namespace then that *does* live in the scope of the
+# current module, so we'll make that tag (if needed) before saving the
+# module scope.
+
+importStatement <-
+    'import' _1_ <dottedIdentifier> (_1_ 'as' _1_ <upperStartIdentifier>)? {
+        // Make the namespace tag first, as it's in the file module's scope
+        if ($2s > 0) {
+            int r = makeElmTag(auxil, $2, $2s, K_NAMESPACE, ROLE_DEFINITION_INDEX);
+            attachParserFieldToCorkEntry (r, ElmFields[F_MODULENAME].ftype, $1);
+        }
+
+        // Now make the tag for the imported module, as it lives outside
+        // the scope of the file module
+        ELM_SAVE_MODULE_SCOPE;
+        makeElmTagSettingScope(auxil, $1, $1s, K_MODULE, ELM_ROLE_IMPORTED);
+    } (_1_ 'exposing' _0_ '(' _0_ importedList _0_ ')')? EOS {
+        ELM_RESTORE_MODULE_SCOPE;
+    }
+
+importedList <- importedItem _0_ (',' _0_ importedList)*
+
+importedItem <-
+    importedFunction
+    / importedType
+    / importedItemIgnored
+
+importedFunction <- <lowerStartIdentifier> {
+        makeElmTag(auxil, $1, $1s, K_FUNCTION, ELM_ROLE_IMPORTED);
+    }
+
+# When importing a type and constructors we want the constructors
+# to be in the scope of the type. So we have to set the scope as the
+# type first, before parsing (and making the tags for) the constructors.
+# That's why the code here uses two separate C code blocks.
+
+importedType <-
+    <upperStartIdentifier> {
+        makeElmTagSettingScope(auxil, $1, $1s, K_TYPE, ELM_ROLE_IMPORTED);
+    } (_0_ '(' _0_ importedTypeConstructorList _0_ ')')? {
+        // We're done with the type and its constructors, so we can pop it
+        POP_SCOPE(auxil);
+    }
+
+importedItemIgnored <- '.'+
+
+importedTypeConstructorList <-
+    (importedTypeConstructor / importedItemIgnored) _0_ (',' _0_ importedTypeConstructorList)*
+
+importedTypeConstructor <-
+    <upperStartIdentifier> {
+        makeElmTag(auxil, $1, $1s, K_CONSTRUCTOR, ELM_ROLE_IMPORTED);
+    }
+
+# Function with a type annotation.
+#
+# The type is on one line, and the function must follow immediately as
+# the next top level statement
+
+functionWithTypeAnnotation <-
+    <lowerStartIdentifier> _0_ ':' _0_ <typeAnnotation> TLSS
+    <$1> _1_ <functionParameterList>? {
+        int r = makeElmTagSettingScope(auxil, $3, $3s, K_FUNCTION, ROLE_DEFINITION_INDEX);
+        addElmTypeRef(r, $2);
+        addElmSignature(r, $4);
+    } _0_ '=' _0_ expression EOS {
+        POP_SCOPE(auxil);
+    }
+
+typeAnnotation <-
+    singleTypeSpec (_0_ '->' _0_ singleTypeSpec)*
+
+# Function without a type annotation
+
+functionDefinition <-
+    <nonKeywordIdentifier> _0_ <functionParameterList>? {
+        int r = makeElmTagSettingScope(auxil, $1, $1s, K_FUNCTION, ROLE_DEFINITION_INDEX);
+        addElmSignature(r, $2);
+    } _0_ '=' _0_ expression EOS {
+        POP_SCOPE(auxil);
+    }
+
+# A function parameter list is what we define a function with. It's the
+# x y z in 'fn x y z'. But of course they can be more complex, such as
+# 'fn (Cons a b) ({ thing } as otherThing))' etc.
+
+functionParameterList <- functionParameter (_0_ functionParameter)*
+
+functionParameter <-
+    plainFunctionParameter
+    / tupleFunctionParameter
+    / recordFunctionParameter
+    / constructorFunctionParameter
+
+plainFunctionParameter <-
+    lowerStartIdentifier (_0_ asClause)?
+
+tupleFunctionParameter <-
+    '(' _0_ functionParameter (_0_ ',' _0_ functionParameter)* _0_ ')' (_0_ asClause)?
+
+recordFunctionParameter <-
+    '{' _0_ lowerStartIdentifier (_0_ ',' _0_ lowerStartIdentifier)* _0_ '}' (_0_ asClause)?
+
+constructorFunctionParameter <-
+    upperStartIdentifier (_0_ functionParameter)* (_0_ asClause)?
+
+asClause <-
+    'as' _1_ lowerStartIdentifier
+
+# Expressions
+
+expression <-
+    (letInBlock _NL_IND_)? simpleExpression (_0_ binaryOperator _0_ expression)*
+
+simpleExpression <-
+    hexNumber
+    / decimal
+    / multilineString
+    / characterLiteral
+    / oneLineString
+    / tupleExpression
+    / listExpression
+    / recordExpression
+    / caseStatement
+    / ifThenElseStatement
+    / anonymousFunction
+    / functionCall
+
+tupleExpression <-
+    '(' _0_ expression (_0_ ',' _0_ expression)* _0_ ')'
+    / '(' _0_ ')'
+
+listExpression <-
+    '[' _0_ expression (_0_ ',' _0_ expression)* _0_ ']'
+    / '[' _0_ ']'
+
+recordExpression <-
+    '{' _0_
+    (lowerStartIdentifier _0_ '|' _0_)?
+    recordExpressionAssignment (_0_ ',' _0_ recordExpressionAssignment)* _0_
+    '}'
+    / '{' _0_ '}'
+
+recordExpressionAssignment <-
+    lowerStartIdentifier _0_ '=' _0_ expression
+
+anonymousFunction <-
+    '\\' _0_ functionParameterList _0_ '->' _0_ expression
+
+functionCall <-
+    ( dottedIdentifier
+      / '.' lowerStartIdentifier
+      / '(' binaryOperator ')'
+    ) (_1_ expression)*
+
+# Let/in block
+#
+# We'll treat let/in blocks very simply - we'll consider each line
+# and expect the whole line either to be the start of a function
+# definition (perhaps with some of its body) or its body. So something
+# like 'f x y =' will have to be on one line.
+
+letInBlock <-
+    'let' _NL_IND_
+    letInLine (_NL_IND_ letInLine)* _NL_IND_
+    'in'
+
+letInLine <-
+    letInFunctionDefinition
+    / letInBlock
+    / letInFunctionBody
+
+letInFunctionDefinition <-
+    <nonKeywordIdentifier> WS* <letInFunctionParameters>? WS* '=' Non_NL* {
+        int r = makeElmTag(auxil, $1, $1s, K_FUNCTION, ROLE_DEFINITION_INDEX);
+        addElmSignature(r, $2);
+    }
+
+letInFunctionParameters <-
+    nonKeywordIdentifier (WS+ nonKeywordIdentifier)*
+
+letInFunctionBody <-
+    !('let' / 'in') Non_NL+
+
+# Case statements
+#
+# We're going to be pretty loose with case statements, otherwise we'd
+# have to follow Elm's indentation rules. So we'll just say
+# the body of a case statement is a series of patterns like this:
+# <something> -> <expression>. The <expression> might well swallow
+# up a bit of the next case pattern (because to do otherwise requires
+# following Elm's indentation rules), so that's why we just specify
+# <something>.
+
+caseStatement <-
+    'case' _1_ expression _0_ 'of' _1_
+    caseClauseList
+
+caseClauseList <-
+    caseClause (_1_ caseClause)*
+
+caseClause <-
+    roughCasePatternChar* '->' _0_ expression
+
+roughCasePatternChar <-
+    !('->' / TLSS / lineComment / delimitedComment / NL) .
+
+# If/then/else statements
+
+ifThenElseStatement <-
+    'if' _1_ expression _1_
+    'then' _1_ expression _1_
+    'else' _1_ expression
+
+# Binary operators
+
+binaryOperator <-
+    '>>' / '<<' / '|>' / '<|'
+    / '//' / '++' / '::'
+    / '==' / '/='
+    / '&&' / '||'
+    / '<=' / '>='
+    / '<' / '>'
+    / '+' / '-' / '*' / '/' / '^'
+
+# Sometimes we just need to ignore the rest of the (top level) statement
+
+ignoreRestOfStatement <-
+    (multilineString / Non_WS_or_NL+) (_1_ ignoreRestOfStatement)*
+
+multilineString <-
+    '"""' (!'"""' .)* '"""'
+
+# Low level tokens -------------------------------------------------------
+
+# Identifiers
+
+naiveIdentifier <- [A-Za-z_] alphanumeric*
+
+upperStartIdentifier <- [A-Z] alphanumeric*
+
+lowerStartIdentifier <- !keyword [a-z_] alphanumeric*
+
+alphanumeric <- [A-Za-z0-9_]
+
+nonKeywordIdentifier <-
+    !keyword naiveIdentifier
+
+keyword <-
+    'type' !alphanumeric
+    / 'module' !alphanumeric
+    / 'port' !alphanumeric
+    / 'alias' !alphanumeric
+    / 'as' !alphanumeric
+    / 'exposing' !alphanumeric
+    / 'import' !alphanumeric
+    / 'let' !alphanumeric
+    / 'in' !alphanumeric
+    / 'case' !alphanumeric
+    / 'of' !alphanumeric
+    / 'if' !alphanumeric
+    / 'then' !alphanumeric
+    / 'else' !alphanumeric
+
+dottedIdentifier <- nonKeywordIdentifier ('.' nonKeywordIdentifier)*
+
+# Numbers
+
+decimal <-
+    exponentialDecimal
+    / simpleDecimal
+
+exponentialDecimal <-
+    simpleDecimal 'e' simpleInteger
+
+simpleDecimal <-
+    simpleInteger ('.' digits)?
+    / '.' digits+
+
+simpleInteger <- [-+]? digits
+
+digits <- [0-9]+
+
+hexNumber <- '0x' [0-9A-Fa-f]+
+
+# One line strings and characters
+
+oneLineString <- '"' inStringChar* '"'
+
+characterLiteral <- "'" inStringChar "'"
+
+inStringChar <-
+    !('"' / NL)
+    ( inStringUnicodeChar / inStringEscapedChar / inStringPlainChar )
+
+inStringPlainChar <-
+    !('"' / '\\' / NL) .
+
+inStringEscapedChar <-
+    '\\' !('u' / NL) .
+
+inStringUnicodeChar <-
+    '\\u{' [0-9A-Fa-f]+ '}'
+
+# Ignorable things -------------------------------------------------------
+
+# Simple things...
+
+WS <- [ \t]+
+NL <- '\n' / '\f' / '\r' '\n'?
+Non_NL <- [^\n\r\f]
+Non_WS_or_NL <- [^ \t\n\r\f]
+EOF <- !.
+
+# A delimited comment is effectively "nothing", even if it spans several
+# lines. But it does separate two tokens.
+#
+# A line comment can only come at the end of a line. Notice here it doesn't
+# include the actual newline.
+
+delimitedComment <- '{-' (delimitedComment / !'-}' .)* '-}'
+
+lineComment <- '--' Non_NL*
+
+# Elm whitespacing is a bit special...
+# - Two statements are at the same level (eg at the top level, or statements
+#   in the same let...in block) only if they begin with the same indentation.
+# - One line has more indentation than the previous line then it is a
+#   continuation of that previous line.
+# - But sometimes several statements can appear on the same line if tokens
+#   make it obvious. Eg this is okay:
+#   Eg: 'myFunc = let f x y = x + y in f 3 4'
+#
+# We'll only worry about top level statements for this part. But we still
+# need to know
+# - when a top level statement begins; and
+# - when two sequential tokens are part of the same top level statement.
+#   They may be separated by a combination of whitespace, comments, and
+#   newlines, but if there is a newline then that will always be followed
+#   by an indent.
+#
+# When considering how one token relates to the next in top level statements
+# we should only need three kinds of "join"s:
+# - Where we need whitespace, such as 'import MyModule', but that space
+#   may occur over multiple lines. If it's over multiple lines, the
+#   second token needs to be somewhat in from the first column of text.
+#   We'll call this _1_ - ie at least one space.
+# - Where we don't need whitespace, such as 'f = 3', but that space
+#   may occur over multiple lines. If it's over multiple lines then again
+#   the second token needs to be somewhat in from the first column of text.
+#   We'll call this _0_ - ie possibly zero space.
+# - When we've got an end of statement, and the next token is some
+#   meaningful code (not a comment) and starts in the first column of text.
+#   Then that next token is the start of the next top level statement.
+#   We'll call this TLSS, for top level statement separator.
+#
+# We can define _1_ as
+# - The longest possible sequence of whitespace, delimited comments,
+#   newlines, and line comments, as long as it ends with a whitespace
+#   or a delimited comment, because then it won't be in the first column.
+#
+# We can define _0_ as
+# - _1_ or the empty string.
+#
+# We can define TLSS as
+# - The longest possible sequence of whitespace, delimited comments,
+#   newlines, and line comments, as long as it ends with a newline or EOF
+#   (and there's no more ignorable characters after that).
+#
+# PEG parsing tip: If we want to define a sequence like 'the longest
+# sequence of As, Bs and Cs, as long as it ends with C' we define a short
+# sequence like 'the longest sequence of As and Bs, then a C' and then
+# define 'the longest sequence of those'.
+
+_1_short <-
+    (lineComment / NL)* (WS / delimitedComment)
+
+_1_ <- _1_short+
+
+
+_0_ <- _1_ / ''
+
+TLSS_short <-
+    (WS / lineComment / delimitedComment)* (NL / EOF)
+
+TLSS <-
+    TLSS_short+
+    !(WS / lineComment / delimitedComment)
+
+# An end of statement marks the end of a top level statement, but
+# doesn't consume anything
+
+EOS <- &( TLSS / EOF )
+
+# When considering lines in a let/in block we'll want to look for
+# a newline and an indent. There may be some delimited comments etc
+# in between.
+
+_NL_IND_ <-
+    TLSS_short+ WS+
+
+%%
+#include "elm_post.h"

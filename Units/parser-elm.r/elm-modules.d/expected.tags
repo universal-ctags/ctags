@@ -1,0 +1,11 @@
+Amodule	input.elm	/^module Amodule exposing (expo)$/;"	m	roles:def
+someFunc	input.elm	/^someFunc a =$/;"	f	module:Amodule	roles:def
+A1module	input-1.elm	/^module A1module exposing (expo)$/;"	m	roles:def
+someFunc1	input-1.elm	/^someFunc1 a =$/;"	f	module:A1module	roles:def
+expo	input-1.elm	/^expo a =$/;"	f	module:A1module	roles:def
+A2_1	input-2.elm	/^module A2_1 exposing (expo)$/;"	m	roles:def
+func2_1	input-2.elm	/^func2_1 a =$/;"	f	module:A2_1	roles:def
+func2_2	input-2.elm	/^func2_2 a =$/;"	f	module:A2_1	roles:def
+A3Module	input-3.elm	/^module A3Module exposing$/;"	m	roles:def
+a4Module	input-4.elm	/^module a4Module exposing (..)$/;"	m	roles:def
+a5.Module.Deep	input-5.elm	/^module a5.Module.Deep exposing (..)$/;"	m	roles:def

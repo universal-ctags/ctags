@@ -1,0 +1,2 @@
+f	input.elm	/^f = 6 {- another comment -}$/;"	f	roles:def
+h	input.elm	/^h = 9$/;"	f	roles:def

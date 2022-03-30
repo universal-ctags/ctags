@@ -1,0 +1,7 @@
+funcA	input.elm	/^funcA (a1, _, a2) =$/;"	f	roles:def
+funcB	input.elm	/^funcB (b1, b2) (b3, b4) =$/;"	f	roles:def
+funcC	input.elm	/^funcC {c1} {c2, c3} =$/;"	f	roles:def
+funcD	input.elm	/^funcD (D1Cons a b) (D2Cons a b, D3Cons a b) =$/;"	f	roles:def
+funcE	input.elm	/^funcE (D1Cons {a, b} c) d =$/;"	f	roles:def
+funcF	input.elm	/^funcF (D1Cons ({a, b} as ab) c) (d as d2) =$/;"	f	roles:def
+funcG	input.elm	/^funcG =$/;"	f	roles:def

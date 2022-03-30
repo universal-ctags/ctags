@@ -1,0 +1,4 @@
+B	input.elm	/^type B$/;"	t	roles:def
+B1Cons	input.elm	/^    = B1Cons$/;"	c	type:B	typeref:typename:{ x : Float , y : Float } -> B	roles:def
+B2Cons	input.elm	/^    | B2Cons String Integer$/;"	c	type:B	typeref:typename:String -> Integer -> B	roles:def
+B3Cons	input.elm	/^    | B3Cons$/;"	c	type:B	typeref:typename:B	roles:def
