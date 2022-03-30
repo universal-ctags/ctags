@@ -137,6 +137,25 @@ with "--options=NONE -o - --sort=no --extras=+r --fields=+rS input.elm"
 
     funcA	input.elm	/^funcA a1 a2 =$/;"	f	signature:a1 a2	roles:def
 
+Module where ports are defined
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If a module is modified with "port", the parser fills the ``access``
+field of the tag for the module with "port".
+
+"input.elm"
+
+.. code-block:: Elm
+
+    port module Main exposing (..)
+
+"output.tags"
+with "--options=NONE -o - --sort=no --fields=+a input.elm"
+
+.. code-block:: tags
+
+    Main	input.elm	/^port module Main exposing (..)$/;"	m	access:port
+
 KNOWN LIMITATIONS
 -----------------
 The ctags signature field is used for function parameter lists, even
