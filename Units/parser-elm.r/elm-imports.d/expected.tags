@@ -1,22 +1,22 @@
 SomeMod	input.elm	/^module SomeMod exposing (..)$/;"	m	roles:def
 PlainImport	input.elm	/^import PlainImport$/;"	m	roles:imported
 MyMod	input.elm	/^import MyMod exposing$/;"	m	roles:imported
-map	input.elm	/^    ( map, foldl$/;"	f	module:MyMod	roles:imported
-foldl	input.elm	/^    ( map, foldl$/;"	f	module:MyMod	roles:imported
-Maybe	input.elm	/^    , Maybe, Possibly$/;"	t	module:MyMod	roles:imported
-Possibly	input.elm	/^    , Maybe, Possibly$/;"	t	module:MyMod	roles:imported
-Result	input.elm	/^    , Result(..)$/;"	t	module:MyMod	roles:imported
-MyList	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	t	module:MyMod	roles:imported
-Empty	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	c	type:MyMod.MyList	roles:imported
-Tree	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	t	module:MyMod	roles:imported
-Node	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	c	type:MyMod.Tree	roles:imported
-Value	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	c	type:MyMod.Tree	roles:imported
-Special	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	c	type:MyMod.Tree	roles:imported
+map	input.elm	/^    ( map, foldl$/;"	f	module:MyMod	roles:exposed
+foldl	input.elm	/^    ( map, foldl$/;"	f	module:MyMod	roles:exposed
+Maybe	input.elm	/^    , Maybe, Possibly$/;"	t	module:MyMod	roles:exposed
+Possibly	input.elm	/^    , Maybe, Possibly$/;"	t	module:MyMod	roles:exposed
+Result	input.elm	/^    , Result(..)$/;"	t	module:MyMod	roles:exposed
+MyList	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	t	module:MyMod	roles:exposed
+Empty	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	c	type:MyMod.MyList	roles:exposed
+Tree	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	t	module:MyMod	roles:exposed
+Node	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	c	type:MyMod.Tree	roles:exposed
+Value	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	c	type:MyMod.Tree	roles:exposed
+Special	input.elm	/^    , MyList(Empty), Tree(Node, Value, Special) )$/;"	c	type:MyMod.Tree	roles:exposed
 otherMod	input.elm	/^import otherMod exposing (Coin)$/;"	m	roles:imported
-Coin	input.elm	/^import otherMod exposing (Coin)$/;"	t	module:otherMod	roles:imported
+Coin	input.elm	/^import otherMod exposing (Coin)$/;"	t	module:otherMod	roles:exposed
 Dotted.name.Here	input.elm	/^import Dotted.name.Here exposing (Dot(Cons))$/;"	m	roles:imported
-Dot	input.elm	/^import Dotted.name.Here exposing (Dot(Cons))$/;"	t	module:Dotted.name.Here	roles:imported
-Cons	input.elm	/^import Dotted.name.Here exposing (Dot(Cons))$/;"	c	type:Dotted.name.Here.Dot	roles:imported
+Dot	input.elm	/^import Dotted.name.Here exposing (Dot(Cons))$/;"	t	module:Dotted.name.Here	roles:exposed
+Cons	input.elm	/^import Dotted.name.Here exposing (Dot(Cons))$/;"	c	type:Dotted.name.Here.Dot	roles:exposed
 func	input.elm	/^func x =$/;"	f	module:SomeMod	roles:def
 String	input-1.elm	/^import String$/;"	m	roles:imported
 A	input-1.elm	/^type A = B$/;"	t	roles:def
