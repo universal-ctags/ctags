@@ -53,11 +53,13 @@ typedef enum {
 /* We only define roles which aren't def(ined)
  */
 typedef enum {
-	ELM_ROLE_IMPORTED
+	ELM_ROLE_IMPORTED,
+	ELM_ROLE_EXPOSED,
 } elmRoles;
 
 static roleDefinition ElmRoles [] = {
-	{ true, "imported", "item imported" },
+	{ true, "imported", "module imported" },
+	{ true, "exposed", "item exposed from a module" },
 };
 
 typedef enum {

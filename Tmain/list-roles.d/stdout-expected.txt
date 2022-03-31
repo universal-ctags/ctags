@@ -40,10 +40,14 @@ DTD            e/element         attOwner           on      attributes owner
 DTD            p/parameterEntity condition          on      conditions
 DTD            p/parameterEntity elementName        on      element names
 DTD            p/parameterEntity partOfAttDef       on      part of attribute definition
-Elm            c/constructor     imported           on      item imported
-Elm            f/function        imported           on      item imported
-Elm            m/module          imported           on      item imported
-Elm            t/type            imported           on      item imported
+Elm            c/constructor     exposed            on      item exposed from a module
+Elm            c/constructor     imported           on      module imported
+Elm            f/function        exposed            on      item exposed from a module
+Elm            f/function        imported           on      module imported
+Elm            m/module          exposed            on      item exposed from a module
+Elm            m/module          imported           on      module imported
+Elm            t/type            exposed            on      item exposed from a module
+Elm            t/type            imported           on      module imported
 Flex           I/import          import             on      imports
 GDScript       c/class           extended           on      used as a base class for extending
 GemSpec        g/gem             develDep           on      specifying development dependency
@@ -148,10 +152,14 @@ DTD            e/element         attOwner           on      attributes owner
 DTD            p/parameterEntity condition          on      conditions
 DTD            p/parameterEntity elementName        on      element names
 DTD            p/parameterEntity partOfAttDef       on      part of attribute definition
-Elm            c/constructor     imported           on      item imported
-Elm            f/function        imported           on      item imported
-Elm            m/module          imported           on      item imported
-Elm            t/type            imported           on      item imported
+Elm            c/constructor     exposed            on      item exposed from a module
+Elm            c/constructor     imported           on      module imported
+Elm            f/function        exposed            on      item exposed from a module
+Elm            f/function        imported           on      module imported
+Elm            m/module          exposed            on      item exposed from a module
+Elm            m/module          imported           on      module imported
+Elm            t/type            exposed            on      item exposed from a module
+Elm            t/type            imported           on      module imported
 Flex           I/import          import             on      imports
 GDScript       c/class           extended           on      used as a base class for extending
 GemSpec        g/gem             develDep           on      specifying development dependency

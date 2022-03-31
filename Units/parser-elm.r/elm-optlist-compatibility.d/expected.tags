@@ -1,7 +1,7 @@
 Main	input.elm	/^port module Main exposing (..)$/;"	m	roles:def
 List	input.elm	/^import List$/;"	m	roles:imported
 Maybe	input.elm	/^import Maybe exposing (withDefault)$/;"	m	roles:imported
-withDefault	input.elm	/^import Maybe exposing (withDefault)$/;"	f	module:Maybe	roles:imported
+withDefault	input.elm	/^import Maybe exposing (withDefault)$/;"	f	module:Maybe	roles:exposed
 Je	input.elm	/^import Json.Encode as Je$/;"	n	module:Main	roles:def	moduleName:Json.Encode
 Json.Encode	input.elm	/^import Json.Encode as Je$/;"	m	roles:imported
 Thing	input.elm	/^type Thing$/;"	t	module:Main	roles:def

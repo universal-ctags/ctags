@@ -30,9 +30,11 @@ EXAMPLES
 Imports
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Imported items are tagged, but their role is "imported", not "def".
+Imported modules are tagged, and their role is "imported", not "def".
+Types, functions, etc which are exposed via imported module have their
+role as "exposed".
 
-Imported items are marked as being in the scope of their own module,
+Exposed items are marked as being in the scope of their own module,
 not the module that's doing the importing.
 
 "input.elm"
@@ -55,11 +57,11 @@ with "--options=NONE -o - --sort=no --extras=+r --fields=+r input.elm"
 
 	SomeMod	input.elm	/^module SomeMod exposing (..)$/;"	m	roles:def
 	MyMod	input.elm	/^import MyMod exposing$/;"	m	roles:imported
-	map	input.elm	/^  ( map$/;"	f	module:MyMod	roles:imported
-	Maybe	input.elm	/^  , Maybe$/;"	t	module:MyMod	roles:imported
-	Result	input.elm	/^  , Result(..)$/;"	t	module:MyMod	roles:imported
-	MyList	input.elm	/^  , MyList(Empty)$/;"	t	module:MyMod	roles:imported
-	Empty	input.elm	/^  , MyList(Empty)$/;"	c	type:MyMod.MyList	roles:imported
+	map	input.elm	/^  ( map$/;"	f	module:MyMod	roles:exposed
+	Maybe	input.elm	/^  , Maybe$/;"	t	module:MyMod	roles:exposed
+	Result	input.elm	/^  , Result(..)$/;"	t	module:MyMod	roles:exposed
+	MyList	input.elm	/^  , MyList(Empty)$/;"	t	module:MyMod	roles:exposed
+	Empty	input.elm	/^  , MyList(Empty)$/;"	c	type:MyMod.MyList	roles:exposed
 
 Namespaces
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -82,7 +84,7 @@ with "--options=NONE -o - --sort=no --extras=+r --fields=+r input.elm"
 	AMod	input.elm	/^module AMod exposing (..)$/;"	m	roles:def
 	NSpace	input.elm	/^import MyImport as NSpace exposing (impFunc)$/;"	n	module:AMod	roles:def	moduleName:MyImport
 	MyImport	input.elm	/^import MyImport as NSpace exposing (impFunc)$/;"	m	roles:imported
-	impFunc	input.elm	/^import MyImport as NSpace exposing (impFunc)$/;"	f	module:MyImport	roles:imported
+	impFunc	input.elm	/^import MyImport as NSpace exposing (impFunc)$/;"	f	module:MyImport	roles:exposed
 
 Type names
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
