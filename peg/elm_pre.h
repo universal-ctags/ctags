@@ -53,14 +53,23 @@ typedef enum {
 /* We only define roles which aren't def(ined)
  */
 typedef enum {
-	ELM_ROLE_IMPORTED,
-	ELM_ROLE_EXPOSED,
-} elmRoles;
+	ELM_MODULE_IMPORTED,
+} elmModuleRoles;
 
-static roleDefinition ElmRoles [] = {
+static roleDefinition ElmModuleRoles [] = {
 	{ true, "imported", "module imported" },
-	{ true, "exposed", "item exposed from a module" },
 };
+
+#define define_elm_role(NAME,Name)							\
+	typedef enum {											\
+		ELM_##NAME##_EXPOSED,								\
+	} elm##Name##Roleds;									\
+	static roleDefinition Elm##Name##Roles [] = {			\
+		{ true, "exposed", "item exposed from a module" },	\
+	}
+define_elm_role(TYPE,Type);
+define_elm_role(CONSTRUCTOR,Constructor);
+define_elm_role(FUNCTION,Function);
 
 typedef enum {
 	F_MODULENAME,
@@ -78,16 +87,16 @@ static fieldDefinition ElmFields [COUNT_FIELDS] = {
  */
 static kindDefinition ElmKinds [COUNT_KINDS] = {
 	{ true, 'm', "module", "modules",
-	  .referenceOnly = false, ATTACH_ROLES (ElmRoles) },
+	  .referenceOnly = false, ATTACH_ROLES (ElmModuleRoles) },
 	{ true, 'n', "namespace", "modules renamed", },
 	{ true, 't', "type", "types",
-	  .referenceOnly = false, ATTACH_ROLES (ElmRoles) },
+	  .referenceOnly = false, ATTACH_ROLES (ElmTypeRoles) },
 	{ true, 'c', "constructor", "constructors",
-	  .referenceOnly = false, ATTACH_ROLES (ElmRoles) },
+	  .referenceOnly = false, ATTACH_ROLES (ElmConstructorRoles) },
 	{ true, 'a', "alias", "aliases", },
 	{ true, 'p', "port", "ports", },
 	{ true, 'f', "function", "functions",
-	  .referenceOnly = false, ATTACH_ROLES (ElmRoles) },
+	  .referenceOnly = false, ATTACH_ROLES (ElmFunctionRoles) },
 };
 
 struct parserCtx {

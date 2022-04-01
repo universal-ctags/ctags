@@ -281,7 +281,7 @@ importStatement <-
         // Now make the tag for the imported module, as it lives outside
         // the scope of the file module
         ELM_SAVE_MODULE_SCOPE;
-        makeElmTagSettingScope(auxil, $1, $1s, K_MODULE, ELM_ROLE_IMPORTED);
+        makeElmTagSettingScope(auxil, $1, $1s, K_MODULE, ELM_MODULE_IMPORTED);
     } (_1_ 'exposing' _0_ '(' _0_ importedList _0_ ')')? EOS {
         ELM_RESTORE_MODULE_SCOPE;
     }
@@ -294,7 +294,7 @@ importedItem <-
     / importedItemIgnored
 
 importedFunction <- <lowerStartIdentifier> {
-        makeElmTag(auxil, $1, $1s, K_FUNCTION, ELM_ROLE_EXPOSED);
+        makeElmTag(auxil, $1, $1s, K_FUNCTION, ELM_FUNCTION_EXPOSED);
     }
 
 # When importing a type and constructors we want the constructors
@@ -304,7 +304,7 @@ importedFunction <- <lowerStartIdentifier> {
 
 importedType <-
     <upperStartIdentifier> {
-        makeElmTagSettingScope(auxil, $1, $1s, K_TYPE, ELM_ROLE_EXPOSED);
+        makeElmTagSettingScope(auxil, $1, $1s, K_TYPE, ELM_TYPE_EXPOSED);
     } (_0_ '(' _0_ importedTypeConstructorList _0_ ')')? {
         // We're done with the type and its constructors, so we can pop it
         POP_SCOPE(auxil);
@@ -317,7 +317,7 @@ importedTypeConstructorList <-
 
 importedTypeConstructor <-
     <upperStartIdentifier> {
-        makeElmTag(auxil, $1, $1s, K_CONSTRUCTOR, ELM_ROLE_EXPOSED);
+        makeElmTag(auxil, $1, $1s, K_CONSTRUCTOR, ELM_CONSTRUCTOR_EXPOSED);
     }
 
 # Function with a type annotation.
