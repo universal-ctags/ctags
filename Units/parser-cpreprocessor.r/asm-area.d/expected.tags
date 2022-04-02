@@ -1,0 +1,15 @@
+DO_NOTHING_	input.c	/^	.macro	DO_NOTHING_$/;"	m	language:Asm	extras:guest
+DO_NOTHING_0	input-0.c	/^	.macro	DO_NOTHING_0$/;"	m	language:Asm	extras:guest
+do_nothing_1	input-1.c	/^inline void do_nothing_1(void) {}$/;"	f	language:C	typeref:typename:void
+do_nothing_2	input-2.c	/^	inline void do_nothing_2 (void) {}$/;"	f	language:C	typeref:typename:void
+DO_NOTHING_2	input-2.c	/^	.macro	DO_NOTHING_2$/;"	m	language:Asm	extras:guest
+do_nothing_3a	input-3.c	/^	inline void do_nothing_3a (void) {}$/;"	f	language:C	typeref:typename:void
+do_nothing_3b	input-3.c	/^	inline void do_nothing_3b (void) {}$/;"	f	language:C	typeref:typename:void
+DO_NOTHING_3	input-3.c	/^	.macro	DO_NOTHING_3$/;"	m	language:Asm	extras:guest
+do_nothing_4a	input-4.c	/^	inline void do_nothing_4a (void) {}$/;"	f	language:C	typeref:typename:void
+do_nothing_4b	input-4.c	/^	inline void do_nothing_4b (void) {}$/;"	f	language:C	typeref:typename:void
+DO_NOTHING_4	input-4.c	/^	.macro	DO_NOTHING_4$/;"	m	language:Asm	extras:guest
+do_nothing_5	input-5.c	/^inline void do_nothing_5(void) {}$/;"	f	language:C	typeref:typename:void
+DO_NOTHING_5	input-5.c	/^	.macro	DO_NOTHING_5$/;"	m	language:Asm	extras:guest
+do_nothing_6	input-6.c	/^inline void do_nothing_6(void) {}$/;"	f	language:C	typeref:typename:void
+DO_NOTHING_7_NO_GUEST	input-7.asm	/^.macro	DO_NOTHING_7_NO_GUEST$/;"	m	language:Asm
