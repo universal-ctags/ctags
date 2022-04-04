@@ -25,6 +25,7 @@
 #include "vstring.h"
 #include "param.h"
 #include "parse.h"
+#include "promise.h"
 #include "xtag.h"
 
 #include "cxx/cxx_debug.h"
@@ -45,6 +46,21 @@ enum eCppLimits {
 	MaxDirectiveName = 10
 };
 
+/* For tracking __ASSEMBLER__ area. */
+enum eIfSubstate {
+	IF_IF,
+	IF_IFDEF,
+	IF_IFNDEF,
+	IF_ELSE,
+	IF_ELIF,
+	IF_ENDIF,
+};
+
+struct asmAreaInfo {
+	enum eIfSubstate ifSubstate;
+	unsigned long line;
+};
+
 /*  Defines the one nesting level of a preprocessor conditional.
  */
 typedef struct sConditionalInfo {
@@ -53,6 +69,9 @@ typedef struct sConditionalInfo {
 	bool branchChosen;       /* branch already selected */
 	bool ignoring;           /* current ignore state */
 	int enterExternalParserBlockNestLevel;          /* the parser state when entering this conditional: used only by cxx */
+
+	/* tracking __ASSEMBLER__ area */
+	struct asmAreaInfo asmArea;
 } conditionalInfo;
 
 enum eState {
@@ -103,6 +122,8 @@ typedef struct sCppState {
 
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
+		enum eIfSubstate ifsubstate; /* For tracking __ASSEMBLER__.
+									  * assigned only when state == DICTV_IF */
 		bool	accept;          /* is a directive syntactically permitted? */
 		vString * name;          /* macro name */
 		unsigned int nestLevel;  /* level 0 is not used */
@@ -726,6 +747,7 @@ static bool pushConditional (const bool firstBranchChosen)
 				! firstBranchChosen  &&  ! BraceFormat  &&
 				(ifdef->singleBranch || !doesExaminCodeWithInIf0Branch)));
 		ifdef->enterExternalParserBlockNestLevel = externalParserBlockNestLevel;
+		ifdef->asmArea.line = 0;
 		ignoreBranch = ifdef->ignoring;
 	}
 	return ignoreBranch;
@@ -1006,10 +1028,62 @@ static void directivePragma (int c)
 	Cpp.directive.state = DRCTV_NONE;
 }
 
-static bool directiveIf (const int c)
+/*
+ * __ASSEMBLER__ ("3.7.1 Standard Predefined Macros" in GNU cpp info),
+ * __ASSEMBLY__	 (Used in Linux kernel)
+ */
+static bool isAssemblerBlock (int c)
 {
+	if (c != '_')
+		return false;
+
+	bool r = false;
+	vString *cond = vStringNew ();
+	readIdentifier (c, cond);
+	if (strcmp (vStringValue (cond), "__ASSEMBLER__") == 0
+		|| strcmp (vStringValue (cond), "__ASSEMBLY__") == 0)
+		r = true;
+
+	CXX_DEBUG_PRINT("ASSEMBLER[%s]: %s", r? "true": "false", vStringValue(cond));
+
+	size_t len = vStringLength (cond);
+	/* Pushing back to the stream.
+	 * The first character is not read in this function.
+	 * So don't touch the character here. */
+	for (size_t i = len; i > 1; i--)
+	{
+		c = vStringChar (cond, i - 1);
+		cppUngetc (c);
+	}
+
+	vStringDelete (cond);
+	return r;
+}
+
+static bool directiveIf (const int c, enum eIfSubstate if_substate)
+{
+	static langType asmLang = LANG_IGNORE;
+	if (asmLang == LANG_IGNORE)
+		asmLang = getNamedLanguage ("Asm", 0);
+
 	DebugStatement ( const bool ignore0 = isIgnore (); )
-	const bool ignore = pushConditional ((bool) (c != '0'));
+	bool firstBranchChosen = (bool) (c != '0');
+	bool assemblerBlock = false;
+	if (Cpp.clientLang != asmLang && firstBranchChosen)
+	{
+		assemblerBlock = isAssemblerBlock(c);
+		if (assemblerBlock && if_substate != IF_IFNDEF)
+			firstBranchChosen = false;
+	}
+
+	CXX_DEBUG_PRINT("firstBranchChosen: %d", firstBranchChosen);
+	const bool ignore = pushConditional (firstBranchChosen);
+	if (assemblerBlock)
+	{
+		conditionalInfo *ifdef = currentConditional ();
+		ifdef->asmArea.ifSubstate = if_substate;
+		ifdef->asmArea.line = getInputLineNumber();
+	}
 
 	Cpp.directive.state = DRCTV_NONE;
 	DebugStatement ( debugCppNest (true, Cpp.directive.nestLevel);
@@ -1035,6 +1109,36 @@ static void directiveInclude (const int c)
 	Cpp.directive.state = DRCTV_NONE;
 }
 
+static void promiseOrPrepareAsm (conditionalInfo *ifdef, enum eIfSubstate currentState)
+{
+	if (!ifdef->asmArea.line)
+		return;
+
+	if (((ifdef->asmArea.ifSubstate == IF_IF || ifdef->asmArea.ifSubstate == IF_IFDEF)
+		 && (currentState == IF_ELSE || currentState == IF_ELIF || currentState == IF_ENDIF))
+		|| ((ifdef->asmArea.ifSubstate == IF_ELSE)
+			&& (currentState == IF_ENDIF)))
+	{
+		unsigned long start = ifdef->asmArea.line + 1;
+		unsigned long end = getInputLineNumber ();
+
+		if (start < end)
+			makePromise ("Asm", start, 0, end, 0, start);
+
+		ifdef->asmArea.line = 0;
+	}
+	else if (ifdef->asmArea.ifSubstate == IF_IFNDEF)
+	{
+		if (currentState == IF_ELIF)
+			ifdef->asmArea.line = 0;
+		else if (currentState == IF_ELSE)
+		{
+			ifdef->asmArea.ifSubstate = IF_ELSE;
+			ifdef->asmArea.line = getInputLineNumber ();
+		}
+	}
+}
+
 static bool directiveHash (const int c)
 {
 	bool ignore = false;
@@ -1049,19 +1153,33 @@ static bool directiveHash (const int c)
 	else if (stringMatch (directive, "undef"))
 		Cpp.directive.state = DRCTV_UNDEF;
 	else if (strncmp (directive, "if", (size_t) 2) == 0)
+	{
 		Cpp.directive.state = DRCTV_IF;
+		Cpp.directive.ifsubstate = IF_IF;
+		if (directive[2] == 'd')
+			Cpp.directive.ifsubstate = IF_IFDEF;
+		else if (directive[2] == 'n')
+			Cpp.directive.ifsubstate = IF_IFNDEF;
+	}
 	else if (stringMatch (directive, "elif")  ||
 			stringMatch (directive, "else"))
 	{
+		enum eIfSubstate s = (directive[2] == 's')? IF_ELSE: IF_ELIF;
+		conditionalInfo *ifdef = currentConditional ();
+		promiseOrPrepareAsm (ifdef, s);
+
 		ignore = setIgnore (isIgnoreBranch ());
 		CXX_DEBUG_PRINT("Found #elif or #else: ignore is %d",ignore);
-		if (! ignore  &&  stringMatch (directive, "else"))
+		if (! ignore  &&  s == IF_ELSE)
 			chooseBranch ();
-		Cpp.directive.state = (directive[2] == 'i')? DRCTV_ELIF: DRCTV_NONE;
+		Cpp.directive.state = (s == IF_ELIF)? DRCTV_ELIF: DRCTV_NONE;
 		DebugStatement ( if (ignore != ignore0) debugCppIgnore (ignore); )
 	}
 	else if (stringMatch (directive, "endif"))
 	{
+		conditionalInfo *ifdef = currentConditional ();
+		promiseOrPrepareAsm (ifdef, IF_ENDIF);
+
 		DebugStatement ( debugCppNest (false, Cpp.directive.nestLevel); )
 		ignore = popConditional ();
 		Cpp.directive.state = DRCTV_NONE;
@@ -1089,7 +1207,7 @@ static bool handleDirective (const int c, int *macroCorkIndex, bool *inspect_con
 			break;
 		case DRCTV_HASH:    ignore = directiveHash (c);  break;
 		case DRCTV_IF:
-			ignore = directiveIf (c);
+			ignore = directiveIf (c, Cpp.directive.ifsubstate);
 			*inspect_conidtion = true;
 			break;
 		case DRCTV_ELIF:
