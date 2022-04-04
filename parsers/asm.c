@@ -219,8 +219,9 @@ static int makeAsmTag (
 
 	if (vStringLength (name) > 0)
 	{
-		bool found;
-		const AsmKind kind = operatorKind (operator, &found);
+		bool found = false;
+		AsmKind kind = directive? K_NONE: operatorKind (operator, &found);
+
 		if (found)
 		{
 			if (kind > K_NONE)
