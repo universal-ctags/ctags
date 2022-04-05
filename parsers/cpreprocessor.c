@@ -1925,7 +1925,7 @@ static bool buildMacroInfoFromTagEntry (int corkIndex,
 {
 	cppMacroInfo **info = data;
 
-	if (entry->langType == Cpp.clientLang
+	if ((entry->langType == Cpp.clientLang || entry->langType == Cpp.lang)
 		&& entry->kindIndex == Cpp.defineMacroKindIndex
 		&& isRoleAssigned (entry, ROLE_DEFINITION_INDEX))
 	{
