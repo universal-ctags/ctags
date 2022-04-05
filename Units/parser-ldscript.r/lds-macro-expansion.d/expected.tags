@@ -1,0 +1,10 @@
+MEM_DISCARD	input.lds.S	/^#define MEM_DISCARD(/;"	d	file:	signature:(sec)	roles:def	macrodef:*(.mem##sec)
+INIT_TEXT	input.lds.S	/^#define INIT_TEXT(/;"	d	file:	signature:(X,A)	roles:def	macrodef:*A *X MEM_DISCARD(init.text*)
+INIT_TEXT_SECTION	input.lds.S	/^#define INIT_TEXT_SECTION(/;"	d	file:	signature:(inittext_align,Y,B)	roles:def	macrodef:. = ALIGN(inittext_align); .init.text : AT(ADDR(.init.text) - LOAD_OFFSET) { _sinittext = .; INIT_TEXT(Y,B) _einittext = .; }
+.init.text	input.lds.S	/^	INIT_TEXT_SECTION(PAGE_SIZE,(.text.startup),(.init.text .init.text.*))$/;"	S	roles:def
+_sinittext	input.lds.S	/^	INIT_TEXT_SECTION(PAGE_SIZE,(.text.startup),(.init.text .init.text.*))$/;"	s	section:.init.text	roles:def
+.init.text	input.lds.S	/^	INIT_TEXT_SECTION(PAGE_SIZE,(.text.startup),(.init.text .init.text.*))$/;"	i	section:.init.text	roles:mapped
+.init.text.	input.lds.S	/^	INIT_TEXT_SECTION(PAGE_SIZE,(.text.startup),(.init.text .init.text.*))$/;"	i	section:.init.text	roles:mapped
+.text.startup	input.lds.S	/^	INIT_TEXT_SECTION(PAGE_SIZE,(.text.startup),(.init.text .init.text.*))$/;"	i	section:.init.text	roles:mapped
+.meminit.text	input.lds.S	/^	INIT_TEXT_SECTION(PAGE_SIZE,(.text.startup),(.init.text .init.text.*))$/;"	i	section:.init.text	roles:mapped
+_einittext	input.lds.S	/^	INIT_TEXT_SECTION(PAGE_SIZE,(.text.startup),(.init.text .init.text.*))$/;"	s	section:.init.text	roles:def
