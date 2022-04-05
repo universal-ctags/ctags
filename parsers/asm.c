@@ -24,6 +24,7 @@
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
+#include "trace.h"
 #include "vstring.h"
 
 /*
@@ -314,6 +315,137 @@ static const unsigned char *readOperator (
 	return cp;
 }
 
+// We stop applying macro replacements if the unget buffer gets too big
+// as it is a sign of recursive macro expansion
+#define ASM_SCRIPT_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
+
+// We stop applying macro replacements if a macro is used so many
+// times in a recursive macro expansion.
+#define ASM_SCRIPT_PARSER_MAXIMUM_MACRO_USE_COUNT 8
+
+static bool collectCppMacroArguments (ptrArray *args)
+{
+	vString *s = vStringNew ();
+	int c;
+	int depth = 1;
+
+	do
+	{
+		c = cppGetc ();
+		if (c == EOF || c == '\n')
+			break;
+		else if (c == ')')
+		{
+			depth--;
+			if (depth == 0)
+			{
+				char *cstr = vStringDeleteUnwrap (s);
+				ptrArrayAdd (args, cstr);
+				s = NULL;
+			}
+			else
+				vStringPut (s, c);
+		}
+		else if (c == '(')
+		{
+			depth++;
+			vStringPut (s, c);
+		}
+		else if (c == ',')
+		{
+			char *cstr = vStringDeleteUnwrap (s);
+			ptrArrayAdd (args, cstr);
+			s = vStringNew ();
+		}
+		else if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
+			vStringPut (s, ' ');
+		else
+			vStringPut (s, c);
+	}
+	while (depth > 0);
+
+	vStringDelete (s);			/* NULL is acceptable. */
+
+	if (depth > 0)
+		TRACE_PRINT("unbalanced argument list");
+
+	return (depth > 0)? false: true;
+}
+
+static bool expandCppMacro (cppMacroInfo *macroInfo)
+{
+	ptrArray *args = NULL;
+
+	if (macroInfo->hasParameterList)
+	{
+		int c;
+
+		while (1)
+		{
+			c = cppGetc ();
+			if (c == STRING_SYMBOL || c == CHAR_SYMBOL || !isspace (c))
+				break;
+		}
+
+		if (c != '(')
+		{
+			cppUngetc (c);
+			return false;
+		}
+
+		args = ptrArrayNew (eFree);
+		if (!collectCppMacroArguments (args))
+		{
+			/* The input stream is already corrupted.
+			 * It is hard to recover. */
+			ptrArrayDelete (args);
+			return false;
+		}
+	}
+
+	cppBuildMacroReplacementWithPtrArrayAndUngetResult(macroInfo, args);
+
+	ptrArrayDelete (args);		/* NULL is acceptable. */
+	return true;
+}
+
+static void truncateLastIdetifier (vString *line, vString *identifier)
+{
+	Assert (vStringLength (line) >= vStringLength (identifier));
+	size_t len = vStringLength (line) - vStringLength (identifier);
+	Assert (strcmp (vStringValue (line) + len,
+					vStringValue (identifier)) == 0);
+	vStringTruncate (line, len);
+}
+
+static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
+{
+	TRACE_ENTER();
+
+	bool r = false;
+	cppMacroInfo *macroInfo = cppFindMacro (vStringValue (identifier));
+
+	if (!macroInfo)
+		goto out;
+
+	if (lastChar != EOF)
+		cppUngetc (lastChar);
+
+	TRACE_PRINT("Macro expansion: %s<%p>%s", macroInfo->name,
+				macroInfo, macroInfo->hasParameterList? "(...)": "");
+
+	r = expandCppMacro (macroInfo);
+
+ out:
+	if (r)
+		truncateLastIdetifier (line, identifier);
+
+	vStringClear (identifier);
+
+	TRACE_LEAVE();
+	return r;
+}
+
 static const unsigned char *readLineViaCpp (const char *commentChars)
 {
 	static vString *line;
@@ -322,10 +454,17 @@ static const unsigned char *readLineViaCpp (const char *commentChars)
 
 	line = vStringNewOrClear (line);
 
+	vString *identifier = vStringNew ();
+
+ cont:
 	while ((c = cppGetc()) != EOF)
 	{
 		if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
 		{
+			if (!vStringIsEmpty (identifier)
+				&& processCppMacroX (identifier, ' ', line))
+				continue;
+
 			/* We cannot store these values to vString
 			 * Store a whitespace as a dummy value for them.
 			 */
@@ -334,9 +473,25 @@ static const unsigned char *readLineViaCpp (const char *commentChars)
 		}
 		else if (c == '\n' || (extraLinesepChars[0] != '\0'
 							   && strchr (extraLinesepChars, c) != NULL))
+		{
+			if (!vStringIsEmpty (identifier)
+				&& processCppMacroX (identifier, c, line))
+				continue;
 			break;
+		}
+		else if ((vStringIsEmpty (identifier) && (isalpha (c) || c == '_'))
+				|| (!vStringIsEmpty (identifier) && (isalnum (c) || c == '_')))
+		{
+			vStringPut (identifier, c);
+			if (!truncation)
+				vStringPut (line, c);
+		}
 		else
 		{
+			if (!vStringIsEmpty (identifier)
+				&& processCppMacroX (identifier, c, line))
+				continue;
+
 			if (truncation == false && commentChars[0] && strchr (commentChars, c))
 				truncation = true;
 
@@ -344,6 +499,15 @@ static const unsigned char *readLineViaCpp (const char *commentChars)
 				vStringPut (line, c);
 		}
 	}
+
+	if (c == EOF
+		&& !vStringIsEmpty(identifier)
+		&& processCppMacroX (identifier, EOF, line))
+		goto cont;
+
+	vStringDelete (identifier);
+
+	TRACE_PRINT("line: %s\n", vStringValue (line));
 
 	if ((vStringLength (line) == 0) && (c == EOF))
 		return NULL;
