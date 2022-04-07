@@ -86,7 +86,7 @@ enum eKeywordId {
 	KEYWORD_M_BAD_STATE, KEYWORD_M_BAD_TRANS, KEYWORD_M_STATE, KEYWORD_M_TRANS,
 	KEYWORD_MUTABLE,
 	KEYWORD_NAMESPACE, KEYWORD_NEW, KEYWORD_NEWCOV, KEYWORD_NATIVE,
-	KEYWORD_NHOLD, KEYWORD_NOEXCEPT, KEYWORD_NSAMPLE,
+	KEYWORD_NHOLD, KEYWORD_NSAMPLE,
 	KEYWORD_OPERATOR, KEYWORD_OUTPUT, KEYWORD_OVERLOAD, KEYWORD_OVERRIDE,
 	KEYWORD_PACKED, KEYWORD_PORT, KEYWORD_PACKAGE, KEYWORD_PHOLD, KEYWORD_PRIVATE,
 	KEYWORD_PROGRAM, KEYWORD_PROTECTED, KEYWORD_PSAMPLE, KEYWORD_PUBLIC,
@@ -530,7 +530,6 @@ static const keywordDesc KeywordTable [] = {
      { "new",             KEYWORD_NEW,             { 1, 1, 1, 0 } },
      { "newcov",          KEYWORD_NEWCOV,          { 0, 0, 0, 1 } },
      { "NHOLD",           KEYWORD_NHOLD,           { 0, 0, 0, 1 } },
-     { "noexcept",        KEYWORD_NOEXCEPT,        { 0, 0, 0, 0 } },
      { "NSAMPLE",         KEYWORD_NSAMPLE,         { 0, 0, 0, 1 } },
      { "null",            KEYWORD_NULL,            { 0, 1, 0, 0 } },
      { "operator",        KEYWORD_OPERATOR,        { 1, 1, 0, 0 } },
@@ -2288,7 +2287,6 @@ static bool skipPostArgumentStuff (
 				case KEYWORD_THROW:     skipParens ();  break;
 				case KEYWORD_IF:        if (isInputLanguage (Lang_d)) skipParens ();  break;
 				case KEYWORD_TRY:                       break;
-				case KEYWORD_NOEXCEPT:                  break;
 
 				case KEYWORD_CONST:
 				case KEYWORD_VOLATILE:
