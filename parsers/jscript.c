@@ -2267,7 +2267,6 @@ nextVar:
 					makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
 					if ( vStringLength(secondary_name->string) > 0 )
 						makeFunctionTag (secondary_name, signature, is_generator);
-					parseBlock (token, name->string);
 				}
 				else
 				{
@@ -2290,6 +2289,7 @@ nextVar:
 					if ( vStringLength(secondary_name->string) > 0 )
 						makeFunctionTag (secondary_name, signature, is_generator);
 				}
+				parseBlock (token, name->string);
 			}
 
 			vStringDelete (signature);
