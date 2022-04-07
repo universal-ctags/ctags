@@ -1,0 +1,15 @@
+* \\color{red}Use of Color	input.tex	/^\\section{\\color{red}Use of Color}$/;"	section	roles:def
+* \\label{morefig}Subfigures	input.tex	/^\\section{\\label{morefig}Subfigures}$/;"	section	roles:def
+
+These two are questionable.
+
+Ideally the first one should be:
+
+* Use of Color	input.tex	/^\\section{\\color{red}Use of Color}$/;"	section	roles:def
+
+If we should consider only \color, skipping it is nor hard.
+
+The second one sohuld be:
+
+* morefig	input.tex	/^\\section{\\label{morefig}Subfigures}$/;"	label	roles;def
+* Subfigures	input.tex	/^\\section{\\label{morefig}Subfigures}$/;"	section	roles:def
