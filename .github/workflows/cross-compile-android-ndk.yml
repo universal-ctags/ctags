@@ -24,6 +24,12 @@ jobs:
 
       - name: Run ./configure ...
         run: |
+          # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md#environment-variables-3
+          [ -n "$ANDROID_NDK_LATEST_HOME" ] && {
+            export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME"
+            export ANDROID_NDK_ROOT="$ANDROID_NDK_LATEST_HOME"
+          }
+
           BUILD_MACHINE_OS_TYPE=$(uname | tr A-Z a-z)
           BUILD_MACHINE_OS_ARCH=$(uname -m)
 
@@ -32,8 +38,8 @@ jobs:
           SYSROOT=$TOOLCHAIN_BASE_DIR/sysroot
           
           export CC=$TOOLCHAIN_BIN_DIR/armv7a-linux-androideabi21-clang
-          export AR=$TOOLCHAIN_BIN_DIR/arm-linux-androideabi-ar
-          export RANLIB=$TOOLCHAIN_BIN_DIR/arm-linux-androideabi-ranlib
+          export AR=$TOOLCHAIN_BIN_DIR/llvm-ar
+          export RANLIB=$TOOLCHAIN_BIN_DIR/llvm-ranlib
 
           export CFLAGS="--sysroot $SYSROOT -Qunused-arguments -Os -fpic"
           export CPPFLAGS="--sysroot $SYSROOT -Qunused-arguments"
@@ -70,4 +76,4 @@ jobs:
       
       - run: make V=1
       
-      - run: file ctags | grep 'ELF 32-bit LSB shared object, ARM, EABI5'
+      - run: file ctags | grep 'ELF 32-bit LSB pie executable, ARM, EABI5'
