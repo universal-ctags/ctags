@@ -3274,76 +3274,10 @@ static void buildKeywordHash (const langType language, unsigned int idx)
 	}
 }
 
-static void initializeCsharpParser (const langType language)
-{
-	Lang_csharp = language;
-	buildKeywordHash (language, 0);
-}
-
-static void initializeDParser (const langType language)
-{
-	Lang_d = language;
-	buildKeywordHash (language, 1);
-}
-
-
-static void initializeJavaParser (const langType language)
-{
-	Lang_java = language;
-	buildKeywordHash (language, 2);
-}
-
 static void initializeVeraParser (const langType language)
 {
 	Lang_vera = language;
 	buildKeywordHash (language, 3);
-}
-
-extern parserDefinition* DParser (void)
-{
-	static const char *const extensions [] = { "d", "di", NULL };
-	parserDefinition* def = parserNew ("D");
-	def->kindTable      = DKinds;
-	def->kindCount  = ARRAY_SIZE (DKinds);
-	def->extensions = extensions;
-	def->parser2    = findCTags;
-	def->initialize = initializeDParser;
-	// end: field is not tested.
-
-	/* cpreprocessor wants corkQueue. */
-	def->useCork    = CORK_QUEUE;
-	return def;
-}
-
-extern parserDefinition* CsharpParser (void)
-{
-	static const char *const extensions [] = { "cs", NULL };
-	static const char *const aliases [] = { "csharp", NULL };
-	parserDefinition* def = parserNew ("C#");
-	def->kindTable      = CsharpKinds;
-	def->kindCount  = ARRAY_SIZE (CsharpKinds);
-	def->extensions = extensions;
-	def->aliases    = aliases;
-	def->parser2    = findCTags;
-	def->initialize = initializeCsharpParser;
-	// end: field is not tested.
-
-	/* cpreprocessor wants corkQueue. */
-	def->useCork    = CORK_QUEUE;
-	return def;
-}
-
-extern parserDefinition* JavaParser (void)
-{
-	static const char *const extensions [] = { "java", NULL };
-	parserDefinition* def = parserNew ("Java");
-	def->kindTable      = JavaKinds;
-	def->kindCount  = ARRAY_SIZE (JavaKinds);
-	def->extensions = extensions;
-	def->parser2    = findCTags;
-	def->initialize = initializeJavaParser;
-	def->useCork    = CORK_QUEUE;
-	return def;
 }
 
 extern parserDefinition* VeraParser (void)

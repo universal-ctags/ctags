@@ -39,8 +39,6 @@
                             (bool) ((st)->parent->declaration == DECL_ENUM))
 #define insideAnnotationBody(st)  ((st)->parent == NULL ? false : \
 								  (bool) ((st)->parent->declaration == DECL_ANNOTATION))
-#define insideInterfaceBody(st) ((st)->parent == NULL ? false : \
-                            (bool) ((st)->parent->declaration == DECL_INTERFACE))
 #define isSignalDirection(token) (bool)(( (token)->keyword == KEYWORD_INPUT  ) ||\
 					   ( (token)->keyword == KEYWORD_OUTPUT ) ||\
 					   ( (token)->keyword == KEYWORD_INOUT  )  )
@@ -92,7 +90,7 @@ enum eKeywordId {
 	KEYWORD_SHADOW, KEYWORD_STATE,
 	KEYWORD_SHORT, KEYWORD_SIGNED, KEYWORD_STATIC, KEYWORD_STRING,
 	KEYWORD_STRUCT, KEYWORD_SWITCH, KEYWORD_SYNCHRONIZED,
-	KEYWORD_TASK, KEYWORD_TEMPLATE, KEYWORD_THIS, KEYWORD_THROW,
+	KEYWORD_TEMPLATE, KEYWORD_THIS, KEYWORD_THROW,
 	KEYWORD_THROWS, KEYWORD_TRANSIENT, KEYWORD_TRANS, KEYWORD_TRANSITION,
 	KEYWORD_TRY, KEYWORD_TYPEDEF, KEYWORD_TYPENAME,
 	KEYWORD_UINT, KEYWORD_ULONG, KEYWORD_UNION, KEYWORD_UNSIGNED, KEYWORD_USHORT,
@@ -172,7 +170,6 @@ typedef enum eDeclaration {
 	DECL_PROTECTED,
 	DECL_PUBLIC,
 	DECL_STRUCT,
-	DECL_TASK,           /* Vera task */
 	DECL_TEMPLATE,       /* D-only */
 	DECL_UNION,
 	DECL_USING,
@@ -260,7 +257,6 @@ typedef enum eTagType {
 	TAG_PROTOTYPE,   /* function prototype or declaration */
 	TAG_SIGNAL,	 /* VERA signal name */
 	TAG_STRUCT,      /* structure name */
-	TAG_TASK,        /* task name */
 	TAG_TYPEDEF,     /* typedef name / D alias name */
 	TAG_TEMPLATE,    /* D template name */
 	TAG_UNION,       /* union name */
@@ -290,7 +286,6 @@ static jmp_buf Exception;
 static langType Lang_csharp;
 static langType Lang_d;
 static langType Lang_java;
-static langType Lang_vera;
 static vString *Signature;
 static bool CollectingSignature;
 
@@ -381,214 +376,161 @@ static kindDefinition JavaKinds [] = {
 	  .referenceOnly = false, ATTACH_ROLES(JavaPackageRoles)},
 };
 
-/* Used to index into the VeraKinds table. */
-typedef enum {
-	VR_MACRO_UNDEF,
-	VR_MACRO_CONDITION,
-} veraMacroRole;
-
-static roleDefinition VeraMacroRoles [] = {
-	RoleTemplateUndef,
-	RoleTemplateCondition,
-};
-
-
-typedef enum {
-	VR_HEADER_SYSTEM,
-	VR_HEADER_LOCAL,
-} veraHeaderRole;
-
-static roleDefinition VeraHeaderRoles [] = {
-	RoleTemplateSystem,
-	RoleTemplateLocal,
-};
-
-typedef enum {
-	VK_UNDEFINED = COMMONK_UNDEFINED,
-	VK_CLASS, VK_DEFINE, VK_ENUMERATOR, VK_FUNCTION,
-	VK_ENUMERATION, VK_INTERFACE, VK_LOCAL, VK_MEMBER, VK_PROGRAM, VK_PROTOTYPE,
-	VK_SIGNAL, VK_TASK, VK_TYPEDEF, VK_VARIABLE,
-	VK_EXTERN_VARIABLE, VK_HEADER, VK_MACRO_PARAM,
-} veraKind;
-
-static kindDefinition VeraKinds [] = {
-	{ true,  'c', "class",      "classes"},
-	{ true,  'd', "macro",      "macro definitions",
-	  .referenceOnly = false, ATTACH_ROLES(VeraMacroRoles)},
-	{ true,  'e', "enumerator", "enumerators (values inside an enumeration)"},
-	{ true,  'f', "function",   "function definitions"},
-	{ true,  'g', "enum",       "enumeration names"},
-	{ true,  'i', "interface",  "interfaces"},
-	{ false, 'l', "local",      "local variables"},
-	{ true,  'm', "member",     "class, struct, and union members"},
-	{ true,  'p', "program",    "programs"},
-	{ false, 'P', "prototype",  "function prototypes"},
-	{ true,  's', "signal",     "signals"},
-	{ true,  't', "task",       "tasks"},
-	{ true,  'T', "typedef",    "typedefs"},
-	{ true,  'v', "variable",   "variable definitions"},
-	{ false, 'x', "externvar",  "external variable declarations"},
-	{ true,  'h', "header",     "included header files",
-	  .referenceOnly = true, ATTACH_ROLES(VeraHeaderRoles)},
-	{ false, 'D', "macroParameter", "cpp macro parameters"},
-};
-
 static const keywordDesc KeywordTable [] = {
-     /*                                                 D          */
-     /*                                              C# | Java     */
-     /*                                              |  |  |  Vera */
-     /* keyword           keyword ID                 |  |  |  |    */
-     { "__attribute__",   KEYWORD_ATTRIBUTE,       { 1, 1, 0, 0 } },
-     { "abstract",        KEYWORD_ABSTRACT,        { 1, 1, 1, 0 } },
-     { "alias",           KEYWORD_ALIAS,           { 0, 1, 0, 0 } },
-     { "align",           KEYWORD_ALIGN,           { 0, 1, 0, 0 } },
-     { "asm",             KEYWORD_ASM,             { 0, 1, 0, 0 } },
-     { "assert",          KEYWORD_ASSERT,          { 0, 1, 0, 0 } },
-     { "auto",            KEYWORD_AUTO,            { 0, 1, 0, 0 } },
-     { "bad_state",       KEYWORD_BAD_STATE,       { 0, 0, 0, 1 } },
-     { "bad_trans",       KEYWORD_BAD_TRANS,       { 0, 0, 0, 1 } },
-     { "bind",            KEYWORD_BIND,            { 0, 0, 0, 1 } },
-     { "bind_var",        KEYWORD_BIND_VAR,        { 0, 0, 0, 1 } },
-     { "bit",             KEYWORD_BIT,             { 0, 0, 0, 1 } },
-     { "body",            KEYWORD_BODY,            { 0, 1, 0, 0 } },
-     { "bool",            KEYWORD_BOOL,            { 0, 1, 0, 0 } },
-     { "boolean",         KEYWORD_BOOLEAN,         { 0, 0, 1, 0 } },
-     { "break",           KEYWORD_BREAK,           { 0, 1, 0, 0 } },
-     { "byte",            KEYWORD_BYTE,            { 0, 1, 1, 0 } },
-     { "case",            KEYWORD_CASE,            { 1, 1, 1, 0 } },
-     { "cast",            KEYWORD_CAST,            { 0, 1, 0, 0 } },
-     { "catch",           KEYWORD_CATCH,           { 1, 1, 1, 0 } },
-     { "cdouble",         KEYWORD_CDOUBLE,         { 0, 1, 0, 0 } },
-     { "cent",            KEYWORD_CENT,            { 0, 1, 0, 0 } },
-     { "cfloat",          KEYWORD_CFLOAT,          { 0, 1, 0, 0 } },
-     { "char",            KEYWORD_CHAR,            { 1, 1, 1, 0 } },
-     { "class",           KEYWORD_CLASS,           { 1, 1, 1, 1 } },
-     { "CLOCK",           KEYWORD_CLOCK,           { 0, 0, 0, 1 } },
-     { "const",           KEYWORD_CONST,           { 1, 1, 1, 0 } },
-     { "constraint",      KEYWORD_CONSTRAINT,      { 0, 0, 0, 1 } },
-     { "continue",        KEYWORD_CONTINUE,        { 0, 1, 0, 0 } },
-     { "coverage_block",  KEYWORD_COVERAGE_BLOCK,  { 0, 0, 0, 1 } },
-     { "coverage_def",    KEYWORD_COVERAGE_DEF,    { 0, 0, 0, 1 } },
-     { "creal",           KEYWORD_CREAL,           { 0, 1, 0, 0 } },
-     { "dchar",           KEYWORD_DCHAR,           { 0, 1, 0, 0 } },
-     { "debug",           KEYWORD_DEBUG,           { 0, 1, 0, 0 } },
-     { "default",         KEYWORD_DEFAULT,         { 1, 1, 1, 0 } },
-     { "delegate",        KEYWORD_DELEGATE,        { 1, 1, 0, 0 } },
-     { "delete",          KEYWORD_DELETE,          { 0, 1, 0, 0 } },
-     { "deprecated",      KEYWORD_DEPRECATED,      { 0, 1, 0, 0 } },
-     { "do",              KEYWORD_DO,              { 1, 1, 1, 0 } },
-     { "double",          KEYWORD_DOUBLE,          { 1, 1, 1, 0 } },
-     { "else",            KEYWORD_ELSE,            { 1, 1, 1, 0 } },
-     { "enum",            KEYWORD_ENUM,            { 1, 1, 1, 1 } },
-     { "event",           KEYWORD_EVENT,           { 1, 0, 0, 1 } },
-     { "explicit",        KEYWORD_EXPLICIT,        { 1, 1, 0, 0 } },
-     { "export",          KEYWORD_EXPORT,          { 0, 1, 0, 0 } },
-     { "extends",         KEYWORD_EXTENDS,         { 0, 0, 1, 1 } },
-     { "extern",          KEYWORD_EXTERN,          { 1, 1, 0, 1 } },
-     { "false",           KEYWORD_FALSE,           { 0, 1, 0, 0 } },
-     { "final",           KEYWORD_FINAL,           { 0, 1, 1, 0 } },
-     { "finally",         KEYWORD_FINALLY,         { 0, 1, 0, 0 } },
-     { "float",           KEYWORD_FLOAT,           { 1, 1, 1, 0 } },
-     { "for",             KEYWORD_FOR,             { 1, 1, 1, 0 } },
-     { "foreach",         KEYWORD_FOREACH,         { 1, 1, 0, 0 } },
-     { "foreach_reverse", KEYWORD_FOREACH_REVERSE, { 0, 1, 0, 0 } },
-     { "friend",          KEYWORD_FRIEND,          { 0, 1, 0, 0 } },
-     { "function",        KEYWORD_FUNCTION,        { 0, 1, 0, 1 } },
-     { "goto",            KEYWORD_GOTO,            { 1, 1, 1, 0 } },
-     { "hdl_node",        KEYWORD_HDL_NODE,        { 0, 0, 0, 1 } },
-     { "idouble",         KEYWORD_IDOUBLE,         { 0, 1, 0, 0 } },
-     { "if",              KEYWORD_IF,              { 1, 1, 1, 0 } },
-     { "ifloat",          KEYWORD_IFLOAT,          { 0, 1, 0, 0 } },
-     { "implements",      KEYWORD_IMPLEMENTS,      { 0, 0, 1, 0 } },
-     { "import",          KEYWORD_IMPORT,          { 0, 1, 1, 0 } },
-     { "in",              KEYWORD_IN,              { 0, 1, 0, 0 } },
-     { "inline",          KEYWORD_INLINE,          { 0, 1, 0, 0 } },
-     { "inout",           KEYWORD_INOUT,           { 0, 1, 0, 1 } },
-     { "input",           KEYWORD_INPUT,           { 0, 0, 0, 1 } },
-     { "int",             KEYWORD_INT,             { 1, 1, 1, 0 } },
-     { "integer",         KEYWORD_INTEGER,         { 0, 0, 0, 1 } },
-     { "interface",       KEYWORD_INTERFACE,       { 1, 1, 1, 1 } },
-     { "internal",        KEYWORD_INTERNAL,        { 1, 0, 0, 0 } },
-     { "invariant",       KEYWORD_INVARIANT,       { 0, 1, 0, 0 } },
-     { "ireal",           KEYWORD_IREAL,           { 0, 1, 0, 0 } },
-     { "is",              KEYWORD_IS,              { 0, 1, 0, 0 } },
-     { "lazy",            KEYWORD_LAZY,            { 0, 1, 0, 0 } },
-     { "local",           KEYWORD_LOCAL,           { 0, 0, 0, 1 } },
-     { "long",            KEYWORD_LONG,            { 1, 1, 1, 0 } },
-     { "m_bad_state",     KEYWORD_M_BAD_STATE,     { 0, 0, 0, 1 } },
-     { "m_bad_trans",     KEYWORD_M_BAD_TRANS,     { 0, 0, 0, 1 } },
-     { "m_state",         KEYWORD_M_STATE,         { 0, 0, 0, 1 } },
-     { "m_trans",         KEYWORD_M_TRANS,         { 0, 0, 0, 1 } },
-     { "mixin",           KEYWORD_MIXIN,           { 0, 1, 0, 0 } },
-     { "module",          KEYWORD_MODULE,          { 0, 1, 0, 0 } },
-     { "mutable",         KEYWORD_MUTABLE,         { 0, 1, 0, 0 } },
-     { "namespace",       KEYWORD_NAMESPACE,       { 1, 1, 0, 0 } },
-     { "native",          KEYWORD_NATIVE,          { 0, 0, 1, 0 } },
-     { "new",             KEYWORD_NEW,             { 1, 1, 1, 0 } },
-     { "newcov",          KEYWORD_NEWCOV,          { 0, 0, 0, 1 } },
-     { "NHOLD",           KEYWORD_NHOLD,           { 0, 0, 0, 1 } },
-     { "NSAMPLE",         KEYWORD_NSAMPLE,         { 0, 0, 0, 1 } },
-     { "null",            KEYWORD_NULL,            { 0, 1, 0, 0 } },
-     { "operator",        KEYWORD_OPERATOR,        { 1, 1, 0, 0 } },
-     { "out",             KEYWORD_OUT,             { 0, 1, 0, 0 } },
-     { "output",          KEYWORD_OUTPUT,          { 0, 0, 0, 1 } },
-     { "overload",        KEYWORD_OVERLOAD,        { 0, 1, 0, 0 } },
-     { "override",        KEYWORD_OVERRIDE,        { 1, 1, 0, 0 } },
-     { "package",         KEYWORD_PACKAGE,         { 0, 1, 1, 0 } },
-     { "packed",          KEYWORD_PACKED,          { 0, 0, 0, 1 } },
-     { "PHOLD",           KEYWORD_PHOLD,           { 0, 0, 0, 1 } },
-     { "port",            KEYWORD_PORT,            { 0, 0, 0, 1 } },
-     { "pragma",          KEYWORD_PRAGMA,          { 0, 1, 0, 0 } },
-     { "private",         KEYWORD_PRIVATE,         { 1, 1, 1, 0 } },
-     { "program",         KEYWORD_PROGRAM,         { 0, 0, 0, 1 } },
-     { "protected",       KEYWORD_PROTECTED,       { 1, 1, 1, 1 } },
-     { "PSAMPLE",         KEYWORD_PSAMPLE,         { 0, 0, 0, 1 } },
-     { "public",          KEYWORD_PUBLIC,          { 1, 1, 1, 1 } },
-     { "real",            KEYWORD_REAL,            { 0, 1, 0, 0 } },
-     { "register",        KEYWORD_REGISTER,        { 0, 1, 0, 0 } },
-     { "return",          KEYWORD_RETURN,          { 1, 1, 1, 0 } },
-     { "scope",           KEYWORD_SCOPE,           { 0, 1, 0, 0 } },
-     { "shadow",          KEYWORD_SHADOW,          { 0, 0, 0, 1 } },
-     { "short",           KEYWORD_SHORT,           { 1, 1, 1, 0 } },
-     { "signed",          KEYWORD_SIGNED,          { 0, 1, 0, 0 } },
-     { "state",           KEYWORD_STATE,           { 0, 0, 0, 1 } },
-     { "static",          KEYWORD_STATIC,          { 1, 1, 1, 1 } },
-     { "string",          KEYWORD_STRING,          { 1, 0, 0, 1 } },
-     { "struct",          KEYWORD_STRUCT,          { 1, 1, 0, 0 } },
-     { "super",           KEYWORD_SUPER,           { 0, 1, 0, 0 } },
-     { "switch",          KEYWORD_SWITCH,          { 1, 1, 1, 0 } },
-     { "synchronized",    KEYWORD_SYNCHRONIZED,    { 0, 1, 1, 0 } },
-     { "task",            KEYWORD_TASK,            { 0, 0, 0, 1 } },
-     { "template",        KEYWORD_TEMPLATE,        { 0, 1, 0, 0 } },
-     { "this",            KEYWORD_THIS,            { 1, 0, 1, 0 } },
-     { "throw",           KEYWORD_THROW,           { 1, 1, 1, 0 } },
-     { "throws",          KEYWORD_THROWS,          { 0, 0, 1, 0 } },
-     { "trans",           KEYWORD_TRANS,           { 0, 0, 0, 1 } },
-     { "transient",       KEYWORD_TRANSIENT,       { 0, 0, 1, 0 } },
-     { "transition",      KEYWORD_TRANSITION,      { 0, 0, 0, 1 } },
-     { "true",            KEYWORD_TRUE,            { 0, 1, 0, 0 } },
-     { "try",             KEYWORD_TRY,             { 1, 1, 0, 0 } },
-     { "typedef",         KEYWORD_TYPEDEF,         { 1, 1, 0, 1 } },
-     { "typeid",          KEYWORD_TYPEID,          { 0, 1, 0, 0 } },
-     { "typename",        KEYWORD_TYPENAME,        { 0, 1, 0, 0 } },
-     { "typeof",          KEYWORD_TYPEOF,          { 0, 1, 0, 0 } },
-     { "ubyte",           KEYWORD_UBYTE,           { 0, 1, 0, 0 } },
-     { "ucent",           KEYWORD_UCENT,           { 0, 1, 0, 0 } },
-     { "uint",            KEYWORD_UINT,            { 1, 1, 0, 0 } },
-     { "ulong",           KEYWORD_ULONG,           { 1, 1, 0, 0 } },
-     { "union",           KEYWORD_UNION,           { 0, 1, 0, 0 } },
-     { "unittest",        KEYWORD_UNITTEST,        { 0, 1, 0, 0 } },
-     { "unsigned",        KEYWORD_UNSIGNED,        { 1, 1, 0, 0 } },
-     { "ushort",          KEYWORD_USHORT,          { 1, 1, 0, 0 } },
-     { "using",           KEYWORD_USING,           { 1, 1, 0, 0 } },
-     { "version",         KEYWORD_VERSION,         { 0, 1, 0, 0 } },
-     { "virtual",         KEYWORD_VIRTUAL,         { 1, 1, 0, 1 } },
-     { "void",            KEYWORD_VOID,            { 1, 1, 1, 1 } },
-     { "volatile",        KEYWORD_VOLATILE,        { 1, 1, 1, 0 } },
-     { "wchar",           KEYWORD_WCHAR,           { 0, 1, 0, 0 } },
-     { "wchar_t",         KEYWORD_WCHAR_T,         { 1, 0, 0, 0 } },
-     { "while",           KEYWORD_WHILE,           { 1, 1, 1, 0 } },
-     { "with",            KEYWORD_WITH,            { 0, 1, 0, 0 } },
+     /*                                                 D       */
+     /*                                              C# | Java  */
+     /*                                              |  |   |   */
+     /* keyword           keyword ID                 |  |       */
+     { "__attribute__",   KEYWORD_ATTRIBUTE,       { 1, 1, 0 } },
+     { "abstract",        KEYWORD_ABSTRACT,        { 1, 1, 1 } },
+     { "alias",           KEYWORD_ALIAS,           { 0, 1, 0 } },
+     { "align",           KEYWORD_ALIGN,           { 0, 1, 0 } },
+     { "asm",             KEYWORD_ASM,             { 0, 1, 0 } },
+     { "assert",          KEYWORD_ASSERT,          { 0, 1, 0 } },
+     { "auto",            KEYWORD_AUTO,            { 0, 1, 0 } },
+     { "bad_state",       KEYWORD_BAD_STATE,       { 0, 0, 0 } },
+     { "bad_trans",       KEYWORD_BAD_TRANS,       { 0, 0, 0 } },
+     { "bind",            KEYWORD_BIND,            { 0, 0, 0 } },
+     { "bind_var",        KEYWORD_BIND_VAR,        { 0, 0, 0 } },
+     { "bit",             KEYWORD_BIT,             { 0, 0, 0 } },
+     { "body",            KEYWORD_BODY,            { 0, 1, 0 } },
+     { "bool",            KEYWORD_BOOL,            { 0, 1, 0 } },
+     { "boolean",         KEYWORD_BOOLEAN,         { 0, 0, 1 } },
+     { "break",           KEYWORD_BREAK,           { 0, 1, 0 } },
+     { "byte",            KEYWORD_BYTE,            { 0, 1, 1 } },
+     { "case",            KEYWORD_CASE,            { 1, 1, 1 } },
+     { "cast",            KEYWORD_CAST,            { 0, 1, 0 } },
+     { "catch",           KEYWORD_CATCH,           { 1, 1, 1 } },
+     { "cdouble",         KEYWORD_CDOUBLE,         { 0, 1, 0 } },
+     { "cent",            KEYWORD_CENT,            { 0, 1, 0 } },
+     { "cfloat",          KEYWORD_CFLOAT,          { 0, 1, 0 } },
+     { "char",            KEYWORD_CHAR,            { 1, 1, 1 } },
+     { "class",           KEYWORD_CLASS,           { 1, 1, 1 } },
+     { "CLOCK",           KEYWORD_CLOCK,           { 0, 0, 0 } },
+     { "const",           KEYWORD_CONST,           { 1, 1, 1 } },
+     { "constraint",      KEYWORD_CONSTRAINT,      { 0, 0, 0 } },
+     { "continue",        KEYWORD_CONTINUE,        { 0, 1, 0 } },
+     { "coverage_block",  KEYWORD_COVERAGE_BLOCK,  { 0, 0, 0 } },
+     { "coverage_def",    KEYWORD_COVERAGE_DEF,    { 0, 0, 0 } },
+     { "creal",           KEYWORD_CREAL,           { 0, 1, 0 } },
+     { "dchar",           KEYWORD_DCHAR,           { 0, 1, 0 } },
+     { "debug",           KEYWORD_DEBUG,           { 0, 1, 0 } },
+     { "default",         KEYWORD_DEFAULT,         { 1, 1, 1 } },
+     { "delegate",        KEYWORD_DELEGATE,        { 1, 1, 0 } },
+     { "delete",          KEYWORD_DELETE,          { 0, 1, 0 } },
+     { "deprecated",      KEYWORD_DEPRECATED,      { 0, 1, 0 } },
+     { "do",              KEYWORD_DO,              { 1, 1, 1 } },
+     { "double",          KEYWORD_DOUBLE,          { 1, 1, 1 } },
+     { "else",            KEYWORD_ELSE,            { 1, 1, 1 } },
+     { "enum",            KEYWORD_ENUM,            { 1, 1, 1 } },
+     { "event",           KEYWORD_EVENT,           { 1, 0, 0 } },
+     { "explicit",        KEYWORD_EXPLICIT,        { 1, 1, 0 } },
+     { "export",          KEYWORD_EXPORT,          { 0, 1, 0 } },
+     { "extends",         KEYWORD_EXTENDS,         { 0, 0, 1 } },
+     { "extern",          KEYWORD_EXTERN,          { 1, 1, 0 } },
+     { "false",           KEYWORD_FALSE,           { 0, 1, 0 } },
+     { "final",           KEYWORD_FINAL,           { 0, 1, 1 } },
+     { "finally",         KEYWORD_FINALLY,         { 0, 1, 0 } },
+     { "float",           KEYWORD_FLOAT,           { 1, 1, 1 } },
+     { "for",             KEYWORD_FOR,             { 1, 1, 1 } },
+     { "foreach",         KEYWORD_FOREACH,         { 1, 1, 0 } },
+     { "foreach_reverse", KEYWORD_FOREACH_REVERSE, { 0, 1, 0 } },
+     { "friend",          KEYWORD_FRIEND,          { 0, 1, 0 } },
+     { "function",        KEYWORD_FUNCTION,        { 0, 1, 0 } },
+     { "goto",            KEYWORD_GOTO,            { 1, 1, 1 } },
+     { "hdl_node",        KEYWORD_HDL_NODE,        { 0, 0, 0 } },
+     { "idouble",         KEYWORD_IDOUBLE,         { 0, 1, 0 } },
+     { "if",              KEYWORD_IF,              { 1, 1, 1 } },
+     { "ifloat",          KEYWORD_IFLOAT,          { 0, 1, 0 } },
+     { "implements",      KEYWORD_IMPLEMENTS,      { 0, 0, 1 } },
+     { "import",          KEYWORD_IMPORT,          { 0, 1, 1 } },
+     { "in",              KEYWORD_IN,              { 0, 1, 0 } },
+     { "inline",          KEYWORD_INLINE,          { 0, 1, 0 } },
+     { "inout",           KEYWORD_INOUT,           { 0, 1, 0 } },
+     { "input",           KEYWORD_INPUT,           { 0, 0, 0 } },
+     { "int",             KEYWORD_INT,             { 1, 1, 1 } },
+     { "integer",         KEYWORD_INTEGER,         { 0, 0, 0 } },
+     { "interface",       KEYWORD_INTERFACE,       { 1, 1, 1 } },
+     { "internal",        KEYWORD_INTERNAL,        { 1, 0, 0 } },
+     { "invariant",       KEYWORD_INVARIANT,       { 0, 1, 0 } },
+     { "ireal",           KEYWORD_IREAL,           { 0, 1, 0 } },
+     { "is",              KEYWORD_IS,              { 0, 1, 0 } },
+     { "lazy",            KEYWORD_LAZY,            { 0, 1, 0 } },
+     { "local",           KEYWORD_LOCAL,           { 0, 0, 0 } },
+     { "long",            KEYWORD_LONG,            { 1, 1, 1 } },
+     { "m_bad_state",     KEYWORD_M_BAD_STATE,     { 0, 0, 0 } },
+     { "m_bad_trans",     KEYWORD_M_BAD_TRANS,     { 0, 0, 0 } },
+     { "m_state",         KEYWORD_M_STATE,         { 0, 0, 0 } },
+     { "m_trans",         KEYWORD_M_TRANS,         { 0, 0, 0 } },
+     { "mixin",           KEYWORD_MIXIN,           { 0, 1, 0 } },
+     { "module",          KEYWORD_MODULE,          { 0, 1, 0 } },
+     { "mutable",         KEYWORD_MUTABLE,         { 0, 1, 0 } },
+     { "namespace",       KEYWORD_NAMESPACE,       { 1, 1, 0 } },
+     { "native",          KEYWORD_NATIVE,          { 0, 0, 1 } },
+     { "new",             KEYWORD_NEW,             { 1, 1, 1 } },
+     { "newcov",          KEYWORD_NEWCOV,          { 0, 0, 0 } },
+     { "NHOLD",           KEYWORD_NHOLD,           { 0, 0, 0 } },
+     { "NSAMPLE",         KEYWORD_NSAMPLE,         { 0, 0, 0 } },
+     { "null",            KEYWORD_NULL,            { 0, 1, 0 } },
+     { "operator",        KEYWORD_OPERATOR,        { 1, 1, 0 } },
+     { "out",             KEYWORD_OUT,             { 0, 1, 0 } },
+     { "output",          KEYWORD_OUTPUT,          { 0, 0, 0 } },
+     { "overload",        KEYWORD_OVERLOAD,        { 0, 1, 0 } },
+     { "override",        KEYWORD_OVERRIDE,        { 1, 1, 0 } },
+     { "package",         KEYWORD_PACKAGE,         { 0, 1, 1 } },
+     { "packed",          KEYWORD_PACKED,          { 0, 0, 0 } },
+     { "PHOLD",           KEYWORD_PHOLD,           { 0, 0, 0 } },
+     { "port",            KEYWORD_PORT,            { 0, 0, 0 } },
+     { "pragma",          KEYWORD_PRAGMA,          { 0, 1, 0 } },
+     { "private",         KEYWORD_PRIVATE,         { 1, 1, 1 } },
+     { "program",         KEYWORD_PROGRAM,         { 0, 0, 0 } },
+     { "protected",       KEYWORD_PROTECTED,       { 1, 1, 1 } },
+     { "PSAMPLE",         KEYWORD_PSAMPLE,         { 0, 0, 0 } },
+     { "public",          KEYWORD_PUBLIC,          { 1, 1, 1 } },
+     { "real",            KEYWORD_REAL,            { 0, 1, 0 } },
+     { "register",        KEYWORD_REGISTER,        { 0, 1, 0 } },
+     { "return",          KEYWORD_RETURN,          { 1, 1, 1 } },
+     { "scope",           KEYWORD_SCOPE,           { 0, 1, 0 } },
+     { "shadow",          KEYWORD_SHADOW,          { 0, 0, 0 } },
+     { "short",           KEYWORD_SHORT,           { 1, 1, 1 } },
+     { "signed",          KEYWORD_SIGNED,          { 0, 1, 0 } },
+     { "state",           KEYWORD_STATE,           { 0, 0, 0 } },
+     { "static",          KEYWORD_STATIC,          { 1, 1, 1 } },
+     { "string",          KEYWORD_STRING,          { 1, 0, 0 } },
+     { "struct",          KEYWORD_STRUCT,          { 1, 1, 0 } },
+     { "super",           KEYWORD_SUPER,           { 0, 1, 0 } },
+     { "switch",          KEYWORD_SWITCH,          { 1, 1, 1 } },
+     { "synchronized",    KEYWORD_SYNCHRONIZED,    { 0, 1, 1 } },
+     { "template",        KEYWORD_TEMPLATE,        { 0, 1, 0 } },
+     { "this",            KEYWORD_THIS,            { 1, 0, 1 } },
+     { "throw",           KEYWORD_THROW,           { 1, 1, 1 } },
+     { "throws",          KEYWORD_THROWS,          { 0, 0, 1 } },
+     { "trans",           KEYWORD_TRANS,           { 0, 0, 0 } },
+     { "transient",       KEYWORD_TRANSIENT,       { 0, 0, 1 } },
+     { "transition",      KEYWORD_TRANSITION,      { 0, 0, 0 } },
+     { "true",            KEYWORD_TRUE,            { 0, 1, 0 } },
+     { "try",             KEYWORD_TRY,             { 1, 1, 0 } },
+     { "typedef",         KEYWORD_TYPEDEF,         { 1, 1, 0 } },
+     { "typeid",          KEYWORD_TYPEID,          { 0, 1, 0 } },
+     { "typename",        KEYWORD_TYPENAME,        { 0, 1, 0 } },
+     { "typeof",          KEYWORD_TYPEOF,          { 0, 1, 0 } },
+     { "ubyte",           KEYWORD_UBYTE,           { 0, 1, 0 } },
+     { "ucent",           KEYWORD_UCENT,           { 0, 1, 0 } },
+     { "uint",            KEYWORD_UINT,            { 1, 1, 0 } },
+     { "ulong",           KEYWORD_ULONG,           { 1, 1, 0 } },
+     { "union",           KEYWORD_UNION,           { 0, 1, 0 } },
+     { "unittest",        KEYWORD_UNITTEST,        { 0, 1, 0 } },
+     { "unsigned",        KEYWORD_UNSIGNED,        { 1, 1, 0 } },
+     { "ushort",          KEYWORD_USHORT,          { 1, 1, 0 } },
+     { "using",           KEYWORD_USING,           { 1, 1, 0 } },
+     { "version",         KEYWORD_VERSION,         { 0, 1, 0 } },
+     { "virtual",         KEYWORD_VIRTUAL,         { 1, 1, 0 } },
+     { "void",            KEYWORD_VOID,            { 1, 1, 1 } },
+     { "volatile",        KEYWORD_VOLATILE,        { 1, 1, 1 } },
+     { "wchar",           KEYWORD_WCHAR,           { 0, 1, 0 } },
+     { "wchar_t",         KEYWORD_WCHAR_T,         { 1, 0, 0 } },
+     { "while",           KEYWORD_WHILE,           { 1, 1, 1 } },
+     { "with",            KEYWORD_WITH,            { 0, 1, 0 } },
 };
 
 /*
@@ -719,7 +661,7 @@ static const char *declString (const declType declaration)
 	static const char *const names [] = {
 		"?", "base", "class", "enum", "event", "function", "function template",
 		"ignore", "interface", "mixin", "namespace", "package", "package ref",
-		"private", "program", "protected", "public", "struct", "task", "template",
+		"private", "program", "protected", "public", "struct", "template",
 		"union", "using", "version", "annotation"
 	};
 	Assert (ARRAY_SIZE (names) == DECL_COUNT);
@@ -1022,32 +964,6 @@ static dKind dTagKindFull (const tagType type, bool with_assert)
 	return result;
 }
 
-#define veraTagKind(type) veraTagKindFull(type, true)
-#define veraTagKindNoAssert(type) veraTagKindFull(type, false)
-static veraKind veraTagKindFull (const tagType type, bool with_assert) {
-	veraKind result = VK_UNDEFINED;
-	switch (type)
-	{
-		case TAG_CLASS:      result = VK_CLASS;           break;
-		case TAG_ENUM:       result = VK_ENUMERATION;     break;
-		case TAG_ENUMERATOR: result = VK_ENUMERATOR;      break;
-		case TAG_FUNCTION:   result = VK_FUNCTION;        break;
-		case TAG_INTERFACE:  result = VK_INTERFACE;       break;
-		case TAG_LOCAL:      result = VK_LOCAL;           break;
-		case TAG_MEMBER:     result = VK_MEMBER;          break;
-		case TAG_PROGRAM:    result = VK_PROGRAM;         break;
-		case TAG_PROTOTYPE:  result = VK_PROTOTYPE;       break;
-		case TAG_SIGNAL:     result = VK_SIGNAL;          break;
-		case TAG_TASK:       result = VK_TASK;            break;
-		case TAG_TYPEDEF:    result = VK_TYPEDEF;         break;
-		case TAG_VARIABLE:   result = VK_VARIABLE;        break;
-		case TAG_EXTERN_VAR: result = VK_EXTERN_VARIABLE; break;
-
-		default: if (with_assert) Assert ("Bad Vera tag type" == NULL); break;
-	}
-	return result;
-}
-
 static int kindIndexForType (const tagType type)
 {
 	int result = 0;
@@ -1057,8 +973,6 @@ static int kindIndexForType (const tagType type)
 		result = javaTagKind (type);
 	else if (isInputLanguage (Lang_d))
 		result = dTagKind (type);
-	else if (isInputLanguage (Lang_vera))
-		result = veraTagKind (type);
 	return result;
 }
 
@@ -1085,8 +999,6 @@ static const char *tagName (const tagType type)
 		result = JavaKinds [javaTagKind (type)].name;
 	else if (isInputLanguage (Lang_d))
 		result = DKinds [dTagKind (type)].name;
-	else if (isInputLanguage (Lang_vera))
-		result = VeraKinds [veraTagKind (type)].name;
 	return result;
 }
 
@@ -1103,8 +1015,6 @@ static bool includeTag (const tagType type, const bool isFileScope)
 		k = javaTagKindNoAssert (type);
 	else if (isInputLanguage (Lang_d))
 		k = dTagKindNoAssert (type);
-	else if (isInputLanguage (Lang_vera))
-		k = veraTagKindNoAssert (type);
 
 	if (k == COMMONK_UNDEFINED)
 		result = false;
@@ -1131,7 +1041,6 @@ static tagType declToTagType (const declType declaration)
 		case DECL_PRIVATE:      type = TAG_CLASS;       break;
 		case DECL_PROTECTED:    type = TAG_CLASS;       break;
 		case DECL_PUBLIC:       type = TAG_CLASS;       break;
-		case DECL_TASK:         type = TAG_TASK;        break;
 		case DECL_TEMPLATE: 	type = TAG_TEMPLATE; 	break;
 		case DECL_STRUCT:       type = TAG_STRUCT;      break;
 		case DECL_UNION:        type = TAG_UNION;       break;
@@ -1185,7 +1094,6 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 		case TAG_PROPERTY:
 		case TAG_SIGNAL:
 		case TAG_STRUCT:
-		case TAG_TASK:
 		case TAG_TYPEDEF:
 		case TAG_UNION:
 		case TAG_ANNOTATION:
@@ -1446,8 +1354,6 @@ static int qualifyFunctionTag (const statementInfo *const st,
 						(!isMember (st)  &&  st->scope == SCOPE_STATIC));
 		if (isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp))
 			type = TAG_METHOD;
-		else if (isInputLanguage (Lang_vera)  &&  st->declaration == DECL_TASK)
-			type = TAG_TASK;
 		else
 			type = TAG_FUNCTION;
 		corkIndex = makeTag (nameToken, st, isFileScope, type);
@@ -1479,8 +1385,7 @@ static int qualifyCompoundTag (const statementInfo *const st,
 		const tagType type = declToTagType (st->declaration);
 		const bool fileScoped = (bool)
 				(!(isInputLanguage (Lang_java) ||
-				   isInputLanguage (Lang_csharp) ||
-				   isInputLanguage (Lang_vera)));
+				   isInputLanguage (Lang_csharp)));
 
 		if (type != TAG_UNDEFINED)
 			corkIndex = makeTag (nameToken, st, fileScoped, type);
@@ -2098,7 +2003,6 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_SIGNED:    st->declaration = DECL_BASE;            break;
 		case KEYWORD_STRING:    st->declaration = DECL_BASE;            break;
 		case KEYWORD_STRUCT:    checkIsClassEnum (st, DECL_STRUCT);     break;
-		case KEYWORD_TASK:      st->declaration = DECL_TASK;            break;
 		case KEYWORD_THROWS:    discardTypeList (token);                break;
 		case KEYWORD_UNION:     st->declaration = DECL_UNION;           break;
 		case KEYWORD_UNSIGNED:  st->declaration = DECL_BASE;            break;
@@ -2994,7 +2898,6 @@ static void nest (statementInfo *const st, const unsigned int nestLevel)
 			break;
 
 		case DECL_FUNCTION:
-		case DECL_TASK:
 			st->inFunction = true;
 			/* fall through */
 		default:
@@ -3022,47 +2925,6 @@ static int tagCheck (statementInfo *const st)
 				corkIndex = qualifyEnumeratorTag (st, token);
 			if (st->declaration == DECL_MIXIN)
 				corkIndex = makeTag (token, st, false, TAG_MIXIN);
-			if (isInputLanguage (Lang_vera) && insideInterfaceBody (st))
-			{
-				/* Quoted from
-				   http://www.asic-world.com/vera/hdl1.html#Interface_Declaration
-				   ------------------------------------------------
-				   interface interface_name
-				   {
-				   signal_direction [signal_width] signal_name signal_type
-				   [skew] [depth value][vca q_value][force][hdl_node "hdl_path"];
-				   }
-				   Where
-				   signal_direction : This can be one of the following
-				        input : ...
-				        output : ...
-				        inout : ...
-				   signal_width : The signal_width is a range specifying the width of
-				                  a vector signal. It must be in the form [msb:lsb].
-						  Interface signals can have any integer lsb value,
-						  even a negative value. The default width is 1.
-				   signal_name : The signal_name identifies the signal being defined.
-				                 It is the Vera name for the HDL signal being connected.
-				   signal_type : There are many signals types, most commonly used one are
-					NHOLD : ...
-					PHOLD : ...
-					PHOLD NHOLD : ...
-					NSAMPLE : ...
-					PSAMPLE : ...
-					PSAMPLE NSAMPLE : ...
-					CLOCK : ...
-					PSAMPLE PHOLD : ...
-					NSAMPLE NHOLD : ...
-					PSAMPLE PHOLD NSAMPLE NHOLD : ...
-				   ------------------------------------------------
-				   We want to capture "signal_name" here.
-				*/
-				if (( isType (prev, TOKEN_KEYWORD)
-				      && isSignalDirection(prev) ) ||
-				    ( isType (prev2, TOKEN_KEYWORD)
-				      && isSignalDirection(prev) ))
-					corkIndex = makeTag (token, st, false, TAG_SIGNAL);
-			}
 			break;
 #if 0
 		case TOKEN_PACKAGE:
@@ -3090,8 +2952,7 @@ static int tagCheck (statementInfo *const st)
 						corkIndex = qualifyBlockTag (st, prev2);
 					else
 					{
-						if (! isInputLanguage (Lang_vera))
-							st->declaration = DECL_FUNCTION;
+						st->declaration = DECL_FUNCTION;
 						corkIndex = qualifyFunctionTag (st, prev2);
 					}
 				}
@@ -3224,19 +3085,8 @@ static rescanReason findCTags (const unsigned int passCount)
 
 	AnonymousID = 0;
 
-	if (isInputLanguage (Lang_vera))
-	{
-		kind_for_define = VK_DEFINE;
-		kind_for_header = VK_HEADER;
-		kind_for_param  = VK_MACRO_PARAM,
-		role_for_macro_undef = VR_MACRO_UNDEF;
-		role_for_macro_condition = VR_MACRO_CONDITION;
-		role_for_header_system = VR_HEADER_SYSTEM;
-		role_for_header_local = VR_HEADER_LOCAL;
-	}
-
 	cppInit ((bool) (passCount > 1), isInputLanguage (Lang_csharp), false,
-		 isInputLanguage(Lang_vera),
+		 false,
 		 kind_for_define, role_for_macro_undef, role_for_macro_condition, kind_for_param,
 		 kind_for_header, role_for_header_system, role_for_header_local,
 		 FIELD_UNKNOWN);
@@ -3293,12 +3143,6 @@ static void initializeJavaParser (const langType language)
 	buildKeywordHash (language, 2);
 }
 
-static void initializeVeraParser (const langType language)
-{
-	Lang_vera = language;
-	buildKeywordHash (language, 3);
-}
-
 extern parserDefinition* DParser (void)
 {
 	static const char *const extensions [] = { "d", "di", NULL };
@@ -3343,22 +3187,5 @@ extern parserDefinition* JavaParser (void)
 	def->parser2    = findCTags;
 	def->initialize = initializeJavaParser;
 	def->useCork    = CORK_QUEUE;
-	return def;
-}
-
-extern parserDefinition* VeraParser (void)
-{
-	static const char *const extensions [] = { "vr", "vri", "vrh", NULL };
-	parserDefinition* def = parserNew ("Vera");
-	def->kindTable      = VeraKinds;
-	def->kindCount  = ARRAY_SIZE (VeraKinds);
-	def->extensions = extensions;
-	def->parser2    = findCTags;
-	def->initialize = initializeVeraParser;
-	// end: field is not tested.
-
-	/* cpreprocessor wants corkQueue. */
-	def->useCork    = CORK_QUEUE;
-
 	return def;
 }
