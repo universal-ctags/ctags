@@ -264,6 +264,7 @@
     <ClCompile Include="..\parsers\basic.c" />
     <ClCompile Include="..\parsers\beta.c" />
     <ClCompile Include="..\parsers\bibtex.c" />
+    <ClCompile Include="..\parsers\c-based.c" />
     <ClCompile Include="..\parsers\c.c" />
     <ClCompile Include="..\parsers\clojure.c" />
     <ClCompile Include="..\parsers\cobol.c" />

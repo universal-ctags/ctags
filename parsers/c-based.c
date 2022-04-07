@@ -3542,17 +3542,6 @@ static void buildKeywordHash (const langType language, unsigned int idx)
 	}
 }
 
-static void initializeCParser (const langType language)
-{
-	Lang_c = language;
-	buildKeywordHash (language, 0);
-}
-static void initializeCppParser (const langType language)
-{
-	Lang_cpp = language;
-	buildKeywordHash (language, 1);
-}
-
 static void initializeCsharpParser (const langType language)
 {
 	Lang_csharp = language;
@@ -3578,22 +3567,6 @@ static void initializeVeraParser (const langType language)
 	buildKeywordHash (language, 5);
 }
 
-extern parserDefinition* OldCParser (void)
-{
-	static const char *const extensions [] = { "c", NULL };
-	parserDefinition* def = parserNew ("OldC");
-	def->kindTable      = CKinds;
-	def->kindCount  = ARRAY_SIZE (CKinds);
-	def->extensions = extensions;
-	def->parser2    = findCTags;
-	def->initialize = initializeCParser;
-	def->enabled = 0;
-
-	/* cpreprocessor wants corkQueue. */
-	def->useCork    = CORK_QUEUE;
-	return def;
-}
-
 extern parserDefinition* DParser (void)
 {
 	static const char *const extensions [] = { "d", "di", NULL };
@@ -3604,33 +3577,6 @@ extern parserDefinition* DParser (void)
 	def->parser2    = findCTags;
 	def->initialize = initializeDParser;
 	// end: field is not tested.
-
-	/* cpreprocessor wants corkQueue. */
-	def->useCork    = CORK_QUEUE;
-	return def;
-}
-
-extern parserDefinition* OldCppParser (void)
-{
-	static const char *const extensions [] = {
-		"c++", "cc", "cp", "cpp", "cxx",
-		"h", "h++", "hh", "hp", "hpp", "hxx", "inl",
-#ifndef CASE_INSENSITIVE_FILENAMES
-		"C", "H",
-#endif
-		NULL
-	};
-	static selectLanguage selectors[] = { selectByObjectiveCKeywords,
-					      NULL };
-
-	parserDefinition* def = parserNew ("OldC++");
-	def->kindTable      = CKinds;
-	def->kindCount  = ARRAY_SIZE (CKinds);
-	def->extensions = extensions;
-	def->parser2    = findCTags;
-	def->initialize = initializeCppParser;
-	def->selectLanguage = selectors;
-	def->enabled = 0;
 
 	/* cpreprocessor wants corkQueue. */
 	def->useCork    = CORK_QUEUE;
