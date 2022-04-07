@@ -1,0 +1,18 @@
+chapter text	input.tex	/^\\chapter{chapter text}$/;"	chapter	roles:def
+chapter1-intro.inc	input.tex	/^\\include{chapter1-intro.inc}$/;"	xinput	roles:included
+section1 text	input.tex	/^\\section{section1 text}$/;"	section	chapter:chapter text	roles:def
+Introduction	input.tex	/^\\section{Introduction}$/;"	section	chapter:chapter text	roles:def
+Part1	input.tex	/^\\part{Part1}$/;"	part	roles:def
+subsection2	input.tex	/^\\subsection{subsection2}$/;"	subsection	part:Part1	roles:def
+subsubsection3 with extra text	input.tex	/^\\subsubsection{subsubsection3 with extra text}$/;"	subsubsection	subsection:Part1""subsection2	roles:def
+short section4	input.tex	/^\\section[short section4]{section4 text}$/;"	section	part:Part1	roles:def
+short para1	input.tex	/^\\paragraph[short para1]{long paragraph1}$/;"	paragraph	section:Part1""short section4	roles:def
+long paragraph2	input.tex	/^\\paragraph{long paragraph2}$/;"	paragraph	section:Part1""short section4	roles:def
+Part2	input.tex	/^\\part{Part2}$/;"	part	roles:def
+shorter intro2	input.tex	/^\\section[shorter intro2]*{Introduction2longtitle}$/;"	section	part:Part2	roles:def
+subsec5 text	input.tex	/^\\subsection[subsec5 text]*{subsection5}$/;"	subsection	section:Part2""shorter intro2	roles:def
+short subpara1	input.tex	/^\\subparagraph[short subpara1]{long subparagraph1}$/;"	subparagraph	subsection:Part2""shorter intro2""subsec5 text	roles:def
+long subparagraph2	input.tex	/^\\subparagraph{long subparagraph2}$/;"	subparagraph	subsection:Part2""shorter intro2""subsec5 text	roles:def
+subsubsection6 with extra text	input.tex	/^\\subsubsection{subsubsection6 with extra text}$/;"	subsubsection	subsection:Part2""shorter intro2""subsec5 text	roles:def
+chapter2	input.tex	/^\\chapter{chapter2}$/;"	chapter	part:Part2	roles:def
+chapter2-intro.inc	input.tex	/^\\include{chapter2-intro.inc}$/;"	xinput	roles:included
