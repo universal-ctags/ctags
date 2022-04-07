@@ -44,8 +44,6 @@
 #define isSignalDirection(token) (bool)(( (token)->keyword == KEYWORD_INPUT  ) ||\
 					   ( (token)->keyword == KEYWORD_OUTPUT ) ||\
 					   ( (token)->keyword == KEYWORD_INOUT  )  )
-#define isExternCDecl(st,c) (bool) ((c) == STRING_SYMBOL  && \
-                    ! (st)->haveQualifyingName  && (st)->scope == SCOPE_EXTERN)
 
 #define isOneOf(c,s)        (bool) (strchr ((s), (c)) != NULL)
 
@@ -167,7 +165,6 @@ typedef enum eDeclaration {
 	DECL_INTERFACE,
 	DECL_MIXIN,
 	DECL_NAMESPACE,
-	DECL_NOMANGLE,       /* C++ name demangling block */
 	DECL_PACKAGE,
 	DECL_PACKAGEREF,
 	DECL_PRIVATE,
@@ -721,7 +718,7 @@ static const char *declString (const declType declaration)
 {
 	static const char *const names [] = {
 		"?", "base", "class", "enum", "event", "function", "function template",
-		"ignore", "interface", "mixin", "namespace", "no mangle", "package", "package ref",
+		"ignore", "interface", "mixin", "namespace", "package", "package ref",
 		"private", "program", "protected", "public", "struct", "task", "template",
 		"union", "using", "version", "annotation"
 	};
@@ -2863,11 +2860,7 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 	{
 		parseJavaAnnotation (st);
 	}
-	else if (isExternCDecl (st, c))
-	{
-		st->declaration = DECL_NOMANGLE;
-		st->scope = SCOPE_GLOBAL;
-	} else if (c == STRING_SYMBOL) {
+	else if (c == STRING_SYMBOL) {
 		setToken(st, TOKEN_NONE);
 	}
 }
@@ -3000,7 +2993,6 @@ static void nest (statementInfo *const st, const unsigned int nestLevel)
 		case DECL_ENUM:
 		case DECL_INTERFACE:
 		case DECL_NAMESPACE:
-		case DECL_NOMANGLE:
 		case DECL_PRIVATE:
 		case DECL_PROTECTED:
 		case DECL_PUBLIC:
