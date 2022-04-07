@@ -1,0 +1,8 @@
+This one is inherited from e-ctags source tree.
+
+The input looks too large. Therefore it is hard to evaluate the impact
+of code change; a small improvement on the parser needs huge updates
+of expected.tags.
+
+The test case is kept as is. However, if you will work on improving
+VHDL parser, you may rearrange this test input as you need.
