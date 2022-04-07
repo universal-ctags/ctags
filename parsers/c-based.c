@@ -4,7 +4,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains functions for parsing and scanning C, C++, C#, D and Java
+*   This module contains functions for parsing and scanning C#, D and Java
 *   source files.
 */
 
@@ -1792,7 +1792,7 @@ static void readPackageOrNamespace (statementInfo *const st, const declType decl
 
 	if (declaration == DECL_NAMESPACE && !isInputLanguage (Lang_csharp))
 	{
-		/* In C++ a namespace is specified one level at a time. */
+		/* Namespace is specified one level at a time. */
 		return;
 	}
 	else
@@ -2222,20 +2222,11 @@ static void skipMacro (statementInfo *const st)
 	skipToMatch ("()");
 }
 
-/*  Skips over characters following the parameter list. This will be either
- *  non-ANSI style function declarations or C++ stuff. Our choices:
+/*  Skips over characters following the parameter list.
+ *  Originally written for C++, may contain unnecessary stuff.
  *
- *  C (K&R):
- *    int func ();
- *    int func (one, two) int one; float two; {...}
- *  C (ANSI):
- *    int func (int one, float two);
- *    int func (int one, float two) {...}
- *  C++:
- *    int foo (...) [const|volatile] [throw (...)];
- *    int foo (...) [const|volatile] [throw (...)] [ctor-initializer] {...}
- *    int foo (...) [const|volatile] [throw (...)] try [ctor-initializer] {...}
- *        catch (...) {...}
+ *  C#:
+ *    public C(double x) : base(x) {}
  */
 static bool skipPostArgumentStuff (
 		statementInfo *const st, parenInfo *const info)
@@ -2948,8 +2939,8 @@ static bool isStatementEnd (const statementInfo *const st)
 	if (isType (token, TOKEN_SEMICOLON))
 		isEnd = true;
 	else if (isType (token, TOKEN_BRACE_CLOSE))
-		/* Java and C# do not require semicolons to end a block. Neither do C++
-		 * namespaces. All other blocks require a semicolon to terminate them.
+		/* Java and C# do not require semicolons to end a block.
+		 * All other blocks require a semicolon to terminate them.
 		 */
 		isEnd = (bool) (isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp) ||
 				 isInputLanguage (Lang_d) || ! isContextualStatement (st));
