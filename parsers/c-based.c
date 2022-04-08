@@ -538,15 +538,6 @@ static void setToken (statementInfo *const st, const tokenType type)
 	token->type = type;
 }
 
-static void retardToken (statementInfo *const st)
-{
-	if (st->tokenIndex == 0)
-		st->tokenIndex = (unsigned int) NumTokens - 1;
-	else
-		--st->tokenIndex;
-	setToken (st, TOKEN_NONE);
-}
-
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -2026,15 +2017,6 @@ static void skipMemIntializerList (tokenInfo *const token)
 	cppUngetc (c);
 }
 
-static void skipMacro (statementInfo *const st)
-{
-	tokenInfo *const prev2 = prevToken (st, 2);
-
-	if (isType (prev2, TOKEN_NAME))
-		retardToken (st);
-	skipToMatch ("()");
-}
-
 /*  Skips over characters following the parameter list.
  *  Originally written for C++, may contain unnecessary stuff.
  *
@@ -2313,7 +2295,6 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 				if (firstChar)
 				{
 					info->isParamList = false;
-					skipMacro (st);
 					depth = 0;
 				}
 				break;
@@ -2338,7 +2319,6 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 					info->isNameCandidate = false;
 					cppUngetc (c);
 					vStringClear (Signature);
-					skipMacro (st);
 					depth = 0;
 					vStringChop (Signature);
 				}
