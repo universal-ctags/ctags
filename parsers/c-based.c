@@ -1018,8 +1018,7 @@ static const char* accessField (const statementInfo *const st)
 
 static void addContextSeparator (vString *const scope)
 {
-	if (isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp) || isInputLanguage(Lang_d))
-		vStringPut (scope, '.');
+	vStringPut (scope, '.');
 }
 
 static void addOtherFields (tagEntryInfo* const tag, const tagType type,
@@ -1076,9 +1075,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 				tag->extensionFields.inheritance =
 						vStringValue (st->parentClasses);
 			}
-			if (st->implementation != IMP_DEFAULT &&
-				(isInputLanguage (Lang_csharp) ||
-				 isInputLanguage (Lang_d) || isInputLanguage (Lang_java)))
+			if (st->implementation != IMP_DEFAULT)
 			{
 				tag->extensionFields.implementation =
 						implementationString (st->implementation);
@@ -2521,9 +2518,7 @@ static void addContext (statementInfo *const st, const tokenInfo* const token)
 	{
 		if (vStringLength (st->context->name) > 0)
 		{
-			if (isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp) ||
-				isInputLanguage (Lang_d))
-				vStringPut (st->context->name, '.');
+			vStringPut (st->context->name, '.');
 		}
 		vStringCat (st->context->name, token->name);
 		st->context->type = TOKEN_NAME;
@@ -2790,11 +2785,9 @@ static bool isStatementEnd (const statementInfo *const st)
 	if (isType (token, TOKEN_SEMICOLON))
 		isEnd = true;
 	else if (isType (token, TOKEN_BRACE_CLOSE))
-		/* Java and C# do not require semicolons to end a block.
-		 * All other blocks require a semicolon to terminate them.
+		/* Java, C# and D do not require semicolons to end a block.
 		 */
-		isEnd = (bool) (isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp) ||
-				 isInputLanguage (Lang_d) || ! isContextualStatement (st));
+		isEnd = true;
 	else
 		isEnd = false;
 
