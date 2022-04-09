@@ -4,7 +4,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains functions for parsing and scanning C#, D and Java
+*   This module contains functions for parsing and scanning Vera
 *   source files.
 */
 
@@ -37,8 +37,6 @@
 #define isType(token,t)     (bool) ((token)->type == (t))
 #define insideEnumBody(st)  ((st)->parent == NULL ? false : \
                             (bool) ((st)->parent->declaration == DECL_ENUM))
-#define insideAnnotationBody(st)  ((st)->parent == NULL ? false : \
-								  (bool) ((st)->parent->declaration == DECL_ANNOTATION))
 #define insideInterfaceBody(st) ((st)->parent == NULL ? false : \
                             (bool) ((st)->parent->declaration == DECL_INTERFACE))
 #define isSignalDirection(token) (bool)(( (token)->keyword == KEYWORD_INPUT  ) ||\
@@ -47,8 +45,6 @@
 
 #define isOneOf(c,s)        (bool) (strchr ((s), (c)) != NULL)
 
-#define isHighChar(c)       ((c) != EOF && (unsigned int)(c) >= 0xc0 && \
-							               (unsigned int)(c) <= 0xff)
 
 /*
 *   DATA DECLARATIONS
@@ -110,10 +106,8 @@ typedef enum eTokenType {
 	TOKEN_DOUBLE_COLON,  /* double colon indicates nested-name-specifier */
 	TOKEN_KEYWORD,
 	TOKEN_NAME,          /* an unknown name */
-	TOKEN_PACKAGE,       /* a Java package name */
 	TOKEN_PAREN_NAME,    /* a single name in parentheses */
 	TOKEN_SEMICOLON,     /* the semicolon character */
-	TOKEN_SPEC,          /* a storage class specifier, qualifier, type, etc. */
 	TOKEN_COUNT
 } tokenType;
 
@@ -123,7 +117,6 @@ typedef enum eTagScope {
 	SCOPE_GLOBAL,        /* no storage class specified */
 	SCOPE_STATIC,        /* static storage class */
 	SCOPE_EXTERN,        /* external storage class */
-	SCOPE_FRIEND,        /* declares access only */
 	SCOPE_TYPEDEF,       /* scoping depends upon context */
 	SCOPE_COUNT
 } tagScope;
@@ -135,24 +128,9 @@ typedef enum eDeclaration {
 	DECL_ENUM,
 	DECL_EVENT,
 	DECL_FUNCTION,
-	DECL_FUNCTION_TEMPLATE, /* D-only */
-	DECL_IGNORE,         /* non-taggable "declaration" */
 	DECL_INTERFACE,
-	DECL_MIXIN,
-	DECL_NAMESPACE,
-	DECL_PACKAGE,
-	DECL_PACKAGEREF,
-	DECL_PRIVATE,
-	DECL_PROGRAM,        /* Vera program */
-	DECL_PROTECTED,
-	DECL_PUBLIC,
-	DECL_STRUCT,
-	DECL_TASK,           /* Vera task */
-	DECL_TEMPLATE,       /* D-only */
-	DECL_UNION,
-	DECL_USING,
-	DECL_VERSION,        /* D conditional compile */
-	DECL_ANNOTATION,     /* Java annotation */
+	DECL_PROGRAM,
+	DECL_TASK,
 	DECL_COUNT
 } declType;
 
@@ -471,7 +449,7 @@ static const char *tokenString (const tokenType type)
 {
 	static const char *const names [] = {
 		"none", "args", "}", "{", "colon", "comma", "double colon", "keyword",
-		"name", "package", "paren-name", "semicolon", "specifier"
+		"name", "paren-name", "semicolon"
 	};
 	Assert (ARRAY_SIZE (names) == TOKEN_COUNT);
 	Assert ((int) type < TOKEN_COUNT);
@@ -481,7 +459,7 @@ static const char *tokenString (const tokenType type)
 static const char *scopeString (const tagScope scope)
 {
 	static const char *const names [] = {
-		"global", "static", "extern", "friend", "typedef"
+		"global", "static", "extern", "typedef"
 	};
 	Assert (ARRAY_SIZE (names) == SCOPE_COUNT);
 	Assert ((int) scope < SCOPE_COUNT);
@@ -491,10 +469,9 @@ static const char *scopeString (const tagScope scope)
 static const char *declString (const declType declaration)
 {
 	static const char *const names [] = {
-		"?", "base", "class", "enum", "event", "function", "function template",
-		"ignore", "interface", "mixin", "namespace", "package", "package ref",
-		"private", "program", "protected", "public", "struct", "task", "template",
-		"union", "using", "version", "annotation"
+		"?", "base", "class", "enum", "event", "function",
+		"interface",
+		"program", "task"
 	};
 	Assert (ARRAY_SIZE (names) == DECL_COUNT);
 	Assert ((int) declaration < DECL_COUNT);
@@ -587,14 +564,6 @@ static bool isContextualStatement (const statementInfo *const st)
 		case DECL_CLASS:
 		case DECL_ENUM:
 		case DECL_INTERFACE:
-		case DECL_NAMESPACE:
-		case DECL_PRIVATE:
-		case DECL_PROTECTED:
-		case DECL_PUBLIC:
-		case DECL_STRUCT:
-		case DECL_UNION:
-		case DECL_TEMPLATE:
-		case DECL_ANNOTATION:
 			result = true;
 			break;
 
@@ -619,19 +588,7 @@ static void initMemberInfo (statementInfo *const st)
 	accessType accessDefault = ACCESS_UNDEFINED;
 	if (st->parent != NULL) switch (st->parent->declaration)
 	{
-		case DECL_PRIVATE:
-			accessDefault = ACCESS_PRIVATE;
-			break;
-		case DECL_PROTECTED:
-			accessDefault = ACCESS_PROTECTED;
-			break;
-		case DECL_PUBLIC:
-			accessDefault = ACCESS_PUBLIC;
-			break;
 		case DECL_ENUM:
-			accessDefault = ACCESS_UNDEFINED;
-			break;
-		case DECL_NAMESPACE:
 			accessDefault = ACCESS_UNDEFINED;
 			break;
 
@@ -640,9 +597,6 @@ static void initMemberInfo (statementInfo *const st)
 			break;
 
 		case DECL_INTERFACE:
-		case DECL_STRUCT:
-		case DECL_UNION:
-		case DECL_ANNOTATION:
 			accessDefault = ACCESS_PUBLIC;
 			break;
 
@@ -775,19 +729,9 @@ static tagType declToTagType (const declType declaration)
 		case DECL_ENUM:         type = TAG_ENUM;        break;
 		case DECL_EVENT:        type = TAG_EVENT;       break;
 		case DECL_FUNCTION:     type = TAG_FUNCTION;    break;
-		case DECL_FUNCTION_TEMPLATE: type = TAG_FUNCTION; break;
 		case DECL_INTERFACE:    type = TAG_INTERFACE;   break;
-		case DECL_NAMESPACE:    type = TAG_NAMESPACE;   break;
 		case DECL_PROGRAM:      type = TAG_PROGRAM;     break;
-		case DECL_PRIVATE:      type = TAG_CLASS;       break;
-		case DECL_PROTECTED:    type = TAG_CLASS;       break;
-		case DECL_PUBLIC:       type = TAG_CLASS;       break;
 		case DECL_TASK:         type = TAG_TASK;        break;
-		case DECL_TEMPLATE: 	type = TAG_TEMPLATE; 	break;
-		case DECL_STRUCT:       type = TAG_STRUCT;      break;
-		case DECL_UNION:        type = TAG_UNION;       break;
-		case DECL_VERSION: 		type = TAG_VERSION; 	break;
-		case DECL_ANNOTATION:   type = TAG_ANNOTATION;  break;
 
 		default: Assert ("Unexpected declaration" == NULL); break;
 	}
@@ -834,8 +778,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 		case TAG_TYPEDEF:
 		case TAG_UNION:
 		case TAG_ANNOTATION:
-			if (vStringLength (scope) > 0  &&
-				(isMember (st) || st->parent->declaration == DECL_NAMESPACE))
+			if (vStringLength (scope) > 0  &&  isMember (st))
 			{
 				tagType ptype;
 
@@ -915,15 +858,8 @@ static bool findScopeHierarchy (vString *const string, const statementInfo *cons
 		for (s = st->parent  ;  s != NULL  ;  s = s->parent)
 		{
 			if (isContextualStatement (s) ||
-				s->declaration == DECL_NAMESPACE ||
 				s->declaration == DECL_PROGRAM)
 			{
-				if (s->declaration == DECL_PRIVATE ||
-					s->declaration == DECL_PROTECTED ||
-					s->declaration == DECL_PUBLIC) {
-					continue;
-				}
-
 				found = true;
 				vStringCopy (temp, string);
 				vStringClear (string);
@@ -1045,9 +981,6 @@ static bool isValidTypeSpecifier (const declType declaration)
 		case DECL_CLASS:
 		case DECL_ENUM:
 		case DECL_EVENT:
-		case DECL_STRUCT:
-		case DECL_UNION:
-		case DECL_ANNOTATION:
 			result = true;
 			break;
 
@@ -1123,13 +1056,7 @@ static int qualifyBlockTag (statementInfo *const st,
 		case DECL_CLASS:
 		case DECL_ENUM:
 		case DECL_INTERFACE:
-		case DECL_NAMESPACE:
 		case DECL_PROGRAM:
-		case DECL_STRUCT:
-		case DECL_UNION:
-		case DECL_TEMPLATE:
-		case DECL_VERSION:
-		case DECL_ANNOTATION:
 			corkIndex = qualifyCompoundTag (st, nameToken);
 			break;
 		default: break;
@@ -1152,12 +1079,6 @@ static int qualifyVariableTag (const statementInfo *const st,
 	else if (st->declaration == DECL_EVENT)
 		corkIndex = makeTag (nameToken, st, (bool) (st->member.access == ACCESS_PRIVATE),
 							 TAG_EVENT);
-	else if (st->declaration == DECL_PACKAGE)
-		corkIndex = makeTag (nameToken, st, false, TAG_PACKAGE);
-	else if (st->declaration == DECL_PACKAGEREF)
-		corkIndex = makeTag (nameToken, st, false, TAG_PACKAGEREF);
-	else if (st->declaration == DECL_USING && st->assignment)
-		corkIndex = makeTag (nameToken, st, true, TAG_TYPEDEF);
 	else if (isValidTypeSpecifier (st->declaration))
 	{
 		if (st->notVariable)
@@ -1186,14 +1107,6 @@ static int qualifyVariableTag (const statementInfo *const st,
 *   Parsing functions
 */
 
-static int skipToOneOf (const char *const chars)
-{
-	int c;
-	do
-		c = cppGetc ();
-	while (c != EOF  &&  c != '\0'  &&  strchr (chars, c) == NULL);
-	return c;
-}
 
 /*  Skip to the next non-white character.
  */
@@ -1920,23 +1833,12 @@ static void processColon (statementInfo *const st)
 	}
 	else
 	{
+		const tokenInfo *const prev  = prevToken (st, 1);
 		cppUngetc (c);
-		if (parentDecl (st) == DECL_STRUCT)
+		if (st->parent != NULL)
 		{
-			c = skipToOneOf (",;");
-			if (c == ',')
-				setToken (st, TOKEN_COMMA);
-			else if (c == ';')
-				setToken (st, TOKEN_SEMICOLON);
-		}
-		else
-		{
-			const tokenInfo *const prev  = prevToken (st, 1);
-			if (st->parent != NULL)
-			{
-				makeTag (prev, st, false, TAG_LABEL);
-				reinitStatement (st, false);
-			}
+			makeTag (prev, st, false, TAG_LABEL);
+			reinitStatement (st, false);
 		}
 	}
 }
@@ -2173,19 +2075,9 @@ static void nest (statementInfo *const st, const unsigned int nestLevel)
 {
 	switch (st->declaration)
 	{
-		case DECL_TEMPLATE:
-		case DECL_VERSION:
-			st->inFunction = false;
 		case DECL_CLASS:
 		case DECL_ENUM:
 		case DECL_INTERFACE:
-		case DECL_NAMESPACE:
-		case DECL_PRIVATE:
-		case DECL_PROTECTED:
-		case DECL_PUBLIC:
-		case DECL_STRUCT:
-		case DECL_UNION:
-		case DECL_ANNOTATION:
 			createTags (nestLevel, st);
 			break;
 
@@ -2216,8 +2108,6 @@ static int tagCheck (statementInfo *const st)
 		case TOKEN_NAME:
 			if (insideEnumBody (st))
 				corkIndex = qualifyEnumeratorTag (st, token);
-			if (st->declaration == DECL_MIXIN)
-				corkIndex = makeTag (token, st, false, TAG_MIXIN);
 			if (insideInterfaceBody (st))
 			{
 				/* Quoted from
@@ -2260,21 +2150,10 @@ static int tagCheck (statementInfo *const st)
 					corkIndex = makeTag (token, st, false, TAG_SIGNAL);
 			}
 			break;
-#if 0
-		case TOKEN_PACKAGE:
-			if (st->haveQualifyingName)
-				corkIndex = makeTag (token, st, false, TAG_PACKAGE);
-			break;
-#endif
 		case TOKEN_BRACE_OPEN:
 			if (isType (prev, TOKEN_ARGS))
 			{
-				if (st->declaration == DECL_TEMPLATE)
-					corkIndex = qualifyBlockTag (st, prev2);
-				else if (st->declaration == DECL_FUNCTION_TEMPLATE) {
-					corkIndex = qualifyFunctionTag (st, st->blockName);
-				}
-				else if (st->haveQualifyingName)
+				if (st->haveQualifyingName)
 				{
 					if (isType (prev2, TOKEN_NAME))
 						copyToken (st->blockName, prev2);
@@ -2283,7 +2162,6 @@ static int tagCheck (statementInfo *const st)
 				}
 			}
 			else if (isContextualStatement (st) ||
-					st->declaration == DECL_VERSION ||
 					st->declaration == DECL_PROGRAM)
 			{
 				const tokenInfo *name_token = prev;
