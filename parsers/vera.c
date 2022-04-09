@@ -64,53 +64,28 @@ typedef enum eException {
 /*  Used to specify type of keyword.
  */
 enum eKeywordId {
-	KEYWORD_ALIAS, KEYWORD_ATTRIBUTE, KEYWORD_ABSTRACT,
-	KEYWORD_BOOLEAN, KEYWORD_BYTE, KEYWORD_BAD_STATE, KEYWORD_BAD_TRANS,
+	KEYWORD_BAD_STATE, KEYWORD_BAD_TRANS,
 	KEYWORD_BIND, KEYWORD_BIND_VAR, KEYWORD_BIT,
-	KEYWORD_CASE, KEYWORD_CATCH, KEYWORD_CHAR, KEYWORD_CLASS, KEYWORD_CLOCK, KEYWORD_CONST,
+	KEYWORD_CLASS, KEYWORD_CLOCK,
 	KEYWORD_CONSTRAINT, KEYWORD_COVERAGE_BLOCK, KEYWORD_COVERAGE_DEF,
-	KEYWORD_DEFAULT, KEYWORD_DELEGATE, KEYWORD_DELETE, KEYWORD_DO,
-	KEYWORD_DOUBLE,
-	KEYWORD_ELSE, KEYWORD_ENUM, KEYWORD_EXPLICIT, KEYWORD_EXTERN,
+	KEYWORD_ENUM, KEYWORD_EXTERN,
 	KEYWORD_EXTENDS, KEYWORD_EVENT,
-	KEYWORD_FINAL, KEYWORD_FLOAT, KEYWORD_FOR, KEYWORD_FOREACH,
-	KEYWORD_FRIEND, KEYWORD_FUNCTION,
-	KEYWORD_GOTO,
+	KEYWORD_FUNCTION,
 	KEYWORD_HDL_NODE,
-	KEYWORD_IF, KEYWORD_IMPLEMENTS, KEYWORD_IMPORT, KEYWORD_INLINE, KEYWORD_INT,
 	KEYWORD_INOUT, KEYWORD_INPUT, KEYWORD_INTEGER, KEYWORD_INTERFACE,
-	KEYWORD_INTERNAL,
-	KEYWORD_LOCAL, KEYWORD_LONG,
+	KEYWORD_LOCAL,
 	KEYWORD_M_BAD_STATE, KEYWORD_M_BAD_TRANS, KEYWORD_M_STATE, KEYWORD_M_TRANS,
-	KEYWORD_MUTABLE,
-	KEYWORD_NAMESPACE, KEYWORD_NEW, KEYWORD_NEWCOV, KEYWORD_NATIVE,
+	KEYWORD_NEWCOV,
 	KEYWORD_NHOLD, KEYWORD_NSAMPLE,
-	KEYWORD_OPERATOR, KEYWORD_OUTPUT, KEYWORD_OVERLOAD, KEYWORD_OVERRIDE,
-	KEYWORD_PACKED, KEYWORD_PORT, KEYWORD_PACKAGE, KEYWORD_PHOLD, KEYWORD_PRIVATE,
+	KEYWORD_OUTPUT,
+	KEYWORD_PACKED, KEYWORD_PORT, KEYWORD_PHOLD,
 	KEYWORD_PROGRAM, KEYWORD_PROTECTED, KEYWORD_PSAMPLE, KEYWORD_PUBLIC,
-	KEYWORD_REGISTER, KEYWORD_RETURN,
 	KEYWORD_SHADOW, KEYWORD_STATE,
-	KEYWORD_SHORT, KEYWORD_SIGNED, KEYWORD_STATIC, KEYWORD_STRING,
-	KEYWORD_STRUCT, KEYWORD_SWITCH, KEYWORD_SYNCHRONIZED,
-	KEYWORD_TASK, KEYWORD_TEMPLATE, KEYWORD_THIS, KEYWORD_THROW,
-	KEYWORD_THROWS, KEYWORD_TRANSIENT, KEYWORD_TRANS, KEYWORD_TRANSITION,
-	KEYWORD_TRY, KEYWORD_TYPEDEF, KEYWORD_TYPENAME,
-	KEYWORD_UINT, KEYWORD_ULONG, KEYWORD_UNION, KEYWORD_UNSIGNED, KEYWORD_USHORT,
-	KEYWORD_USING,
-	KEYWORD_VIRTUAL, KEYWORD_VOID, KEYWORD_VOLATILE,
-	KEYWORD_WCHAR_T, KEYWORD_WHILE,
-	KEYWORD_ALIGN, KEYWORD_ASM, KEYWORD_ASSERT, KEYWORD_AUTO,
-	KEYWORD_BODY, KEYWORD_BOOL, KEYWORD_BREAK, KEYWORD_CAST,
-	KEYWORD_CDOUBLE, KEYWORD_CENT, KEYWORD_CFLOAT, KEYWORD_CONTINUE,
-	KEYWORD_CREAL, KEYWORD_DCHAR, KEYWORD_DEBUG,
-	KEYWORD_DEPRECATED, KEYWORD_EXPORT, KEYWORD_FALSE, KEYWORD_FINALLY,
-	KEYWORD_FOREACH_REVERSE, KEYWORD_IDOUBLE, KEYWORD_IFLOAT,
-	KEYWORD_IN, KEYWORD_INVARIANT, KEYWORD_IREAL, KEYWORD_IS,
-	KEYWORD_LAZY, KEYWORD_MIXIN, KEYWORD_MODULE, KEYWORD_NULL,
-	KEYWORD_OUT, KEYWORD_PRAGMA, KEYWORD_REAL, KEYWORD_SCOPE,
-	KEYWORD_SUPER, KEYWORD_TRUE, KEYWORD_TYPEID, KEYWORD_TYPEOF,
-	KEYWORD_UBYTE, KEYWORD_UCENT, KEYWORD_UNITTEST, KEYWORD_VERSION,
-	KEYWORD_WCHAR, KEYWORD_WITH
+	KEYWORD_STATIC, KEYWORD_STRING,
+	KEYWORD_TASK,
+	KEYWORD_TRANS, KEYWORD_TRANSITION,
+	KEYWORD_TYPEDEF,
+	KEYWORD_VIRTUAL, KEYWORD_VOID
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -351,157 +326,53 @@ static kindDefinition VeraKinds [] = {
 
 static const keywordDesc KeywordTable [] = {
      /* keyword           keyword ID                      */
-     { "__attribute__",   KEYWORD_ATTRIBUTE,       { 0 } },
-     { "abstract",        KEYWORD_ABSTRACT,        { 0 } },
-     { "alias",           KEYWORD_ALIAS,           { 0 } },
-     { "align",           KEYWORD_ALIGN,           { 0 } },
-     { "asm",             KEYWORD_ASM,             { 0 } },
-     { "assert",          KEYWORD_ASSERT,          { 0 } },
-     { "auto",            KEYWORD_AUTO,            { 0 } },
+
      { "bad_state",       KEYWORD_BAD_STATE,       { 1 } },
      { "bad_trans",       KEYWORD_BAD_TRANS,       { 1 } },
      { "bind",            KEYWORD_BIND,            { 1 } },
      { "bind_var",        KEYWORD_BIND_VAR,        { 1 } },
      { "bit",             KEYWORD_BIT,             { 1 } },
-     { "body",            KEYWORD_BODY,            { 0 } },
-     { "bool",            KEYWORD_BOOL,            { 0 } },
-     { "boolean",         KEYWORD_BOOLEAN,         { 0 } },
-     { "break",           KEYWORD_BREAK,           { 0 } },
-     { "byte",            KEYWORD_BYTE,            { 0 } },
-     { "case",            KEYWORD_CASE,            { 0 } },
-     { "cast",            KEYWORD_CAST,            { 0 } },
-     { "catch",           KEYWORD_CATCH,           { 0 } },
-     { "cdouble",         KEYWORD_CDOUBLE,         { 0 } },
-     { "cent",            KEYWORD_CENT,            { 0 } },
-     { "cfloat",          KEYWORD_CFLOAT,          { 0 } },
-     { "char",            KEYWORD_CHAR,            { 0 } },
      { "class",           KEYWORD_CLASS,           { 1 } },
      { "CLOCK",           KEYWORD_CLOCK,           { 1 } },
-     { "const",           KEYWORD_CONST,           { 0 } },
      { "constraint",      KEYWORD_CONSTRAINT,      { 1 } },
-     { "continue",        KEYWORD_CONTINUE,        { 0 } },
      { "coverage_block",  KEYWORD_COVERAGE_BLOCK,  { 1 } },
      { "coverage_def",    KEYWORD_COVERAGE_DEF,    { 1 } },
-     { "creal",           KEYWORD_CREAL,           { 0 } },
-     { "dchar",           KEYWORD_DCHAR,           { 0 } },
-     { "debug",           KEYWORD_DEBUG,           { 0 } },
-     { "default",         KEYWORD_DEFAULT,         { 0 } },
-     { "delegate",        KEYWORD_DELEGATE,        { 0 } },
-     { "delete",          KEYWORD_DELETE,          { 0 } },
-     { "deprecated",      KEYWORD_DEPRECATED,      { 0 } },
-     { "do",              KEYWORD_DO,              { 0 } },
-     { "double",          KEYWORD_DOUBLE,          { 0 } },
-     { "else",            KEYWORD_ELSE,            { 0 } },
      { "enum",            KEYWORD_ENUM,            { 1 } },
      { "event",           KEYWORD_EVENT,           { 1 } },
-     { "explicit",        KEYWORD_EXPLICIT,        { 0 } },
-     { "export",          KEYWORD_EXPORT,          { 0 } },
      { "extends",         KEYWORD_EXTENDS,         { 1 } },
      { "extern",          KEYWORD_EXTERN,          { 1 } },
-     { "false",           KEYWORD_FALSE,           { 0 } },
-     { "final",           KEYWORD_FINAL,           { 0 } },
-     { "finally",         KEYWORD_FINALLY,         { 0 } },
-     { "float",           KEYWORD_FLOAT,           { 0 } },
-     { "for",             KEYWORD_FOR,             { 0 } },
-     { "foreach",         KEYWORD_FOREACH,         { 0 } },
-     { "foreach_reverse", KEYWORD_FOREACH_REVERSE, { 0 } },
-     { "friend",          KEYWORD_FRIEND,          { 0 } },
      { "function",        KEYWORD_FUNCTION,        { 1 } },
-     { "goto",            KEYWORD_GOTO,            { 0 } },
      { "hdl_node",        KEYWORD_HDL_NODE,        { 1 } },
-     { "idouble",         KEYWORD_IDOUBLE,         { 0 } },
-     { "if",              KEYWORD_IF,              { 0 } },
-     { "ifloat",          KEYWORD_IFLOAT,          { 0 } },
-     { "implements",      KEYWORD_IMPLEMENTS,      { 0 } },
-     { "import",          KEYWORD_IMPORT,          { 0 } },
-     { "in",              KEYWORD_IN,              { 0 } },
-     { "inline",          KEYWORD_INLINE,          { 0 } },
      { "inout",           KEYWORD_INOUT,           { 1 } },
      { "input",           KEYWORD_INPUT,           { 1 } },
-     { "int",             KEYWORD_INT,             { 0 } },
      { "integer",         KEYWORD_INTEGER,         { 1 } },
      { "interface",       KEYWORD_INTERFACE,       { 1 } },
-     { "internal",        KEYWORD_INTERNAL,        { 0 } },
-     { "invariant",       KEYWORD_INVARIANT,       { 0 } },
-     { "ireal",           KEYWORD_IREAL,           { 0 } },
-     { "is",              KEYWORD_IS,              { 0 } },
-     { "lazy",            KEYWORD_LAZY,            { 0 } },
      { "local",           KEYWORD_LOCAL,           { 1 } },
-     { "long",            KEYWORD_LONG,            { 0 } },
      { "m_bad_state",     KEYWORD_M_BAD_STATE,     { 1 } },
      { "m_bad_trans",     KEYWORD_M_BAD_TRANS,     { 1 } },
      { "m_state",         KEYWORD_M_STATE,         { 1 } },
      { "m_trans",         KEYWORD_M_TRANS,         { 1 } },
-     { "mixin",           KEYWORD_MIXIN,           { 0 } },
-     { "module",          KEYWORD_MODULE,          { 0 } },
-     { "mutable",         KEYWORD_MUTABLE,         { 0 } },
-     { "namespace",       KEYWORD_NAMESPACE,       { 0 } },
-     { "native",          KEYWORD_NATIVE,          { 0 } },
-     { "new",             KEYWORD_NEW,             { 0 } },
      { "newcov",          KEYWORD_NEWCOV,          { 1 } },
      { "NHOLD",           KEYWORD_NHOLD,           { 1 } },
      { "NSAMPLE",         KEYWORD_NSAMPLE,         { 1 } },
-     { "null",            KEYWORD_NULL,            { 0 } },
-     { "operator",        KEYWORD_OPERATOR,        { 0 } },
-     { "out",             KEYWORD_OUT,             { 0 } },
      { "output",          KEYWORD_OUTPUT,          { 1 } },
-     { "overload",        KEYWORD_OVERLOAD,        { 0 } },
-     { "override",        KEYWORD_OVERRIDE,        { 0 } },
-     { "package",         KEYWORD_PACKAGE,         { 0 } },
      { "packed",          KEYWORD_PACKED,          { 1 } },
      { "PHOLD",           KEYWORD_PHOLD,           { 1 } },
      { "port",            KEYWORD_PORT,            { 1 } },
-     { "pragma",          KEYWORD_PRAGMA,          { 0 } },
-     { "private",         KEYWORD_PRIVATE,         { 0 } },
      { "program",         KEYWORD_PROGRAM,         { 1 } },
      { "protected",       KEYWORD_PROTECTED,       { 1 } },
      { "PSAMPLE",         KEYWORD_PSAMPLE,         { 1 } },
      { "public",          KEYWORD_PUBLIC,          { 1 } },
-     { "real",            KEYWORD_REAL,            { 0 } },
-     { "register",        KEYWORD_REGISTER,        { 0 } },
-     { "return",          KEYWORD_RETURN,          { 0 } },
-     { "scope",           KEYWORD_SCOPE,           { 0 } },
      { "shadow",          KEYWORD_SHADOW,          { 1 } },
-     { "short",           KEYWORD_SHORT,           { 0 } },
-     { "signed",          KEYWORD_SIGNED,          { 0 } },
      { "state",           KEYWORD_STATE,           { 1 } },
      { "static",          KEYWORD_STATIC,          { 1 } },
      { "string",          KEYWORD_STRING,          { 1 } },
-     { "struct",          KEYWORD_STRUCT,          { 0 } },
-     { "super",           KEYWORD_SUPER,           { 0 } },
-     { "switch",          KEYWORD_SWITCH,          { 0 } },
-     { "synchronized",    KEYWORD_SYNCHRONIZED,    { 0 } },
      { "task",            KEYWORD_TASK,            { 1 } },
-     { "template",        KEYWORD_TEMPLATE,        { 0 } },
-     { "this",            KEYWORD_THIS,            { 0 } },
-     { "throw",           KEYWORD_THROW,           { 0 } },
-     { "throws",          KEYWORD_THROWS,          { 0 } },
      { "trans",           KEYWORD_TRANS,           { 1 } },
-     { "transient",       KEYWORD_TRANSIENT,       { 0 } },
      { "transition",      KEYWORD_TRANSITION,      { 1 } },
-     { "true",            KEYWORD_TRUE,            { 0 } },
-     { "try",             KEYWORD_TRY,             { 0 } },
      { "typedef",         KEYWORD_TYPEDEF,         { 1 } },
-     { "typeid",          KEYWORD_TYPEID,          { 0 } },
-     { "typename",        KEYWORD_TYPENAME,        { 0 } },
-     { "typeof",          KEYWORD_TYPEOF,          { 0 } },
-     { "ubyte",           KEYWORD_UBYTE,           { 0 } },
-     { "ucent",           KEYWORD_UCENT,           { 0 } },
-     { "uint",            KEYWORD_UINT,            { 0 } },
-     { "ulong",           KEYWORD_ULONG,           { 0 } },
-     { "union",           KEYWORD_UNION,           { 0 } },
-     { "unittest",        KEYWORD_UNITTEST,        { 0 } },
-     { "unsigned",        KEYWORD_UNSIGNED,        { 0 } },
-     { "ushort",          KEYWORD_USHORT,          { 0 } },
-     { "using",           KEYWORD_USING,           { 0 } },
-     { "version",         KEYWORD_VERSION,         { 0 } },
      { "virtual",         KEYWORD_VIRTUAL,         { 1 } },
      { "void",            KEYWORD_VOID,            { 1 } },
-     { "volatile",        KEYWORD_VOLATILE,        { 0 } },
-     { "wchar",           KEYWORD_WCHAR,           { 0 } },
-     { "wchar_t",         KEYWORD_WCHAR_T,         { 0 } },
-     { "while",           KEYWORD_WHILE,           { 0 } },
-     { "with",            KEYWORD_WITH,            { 0 } },
 };
 
 /*
@@ -700,11 +571,6 @@ static bool isContextualKeyword (const tokenInfo *const token)
 		case KEYWORD_CLASS:
 		case KEYWORD_ENUM:
 		case KEYWORD_INTERFACE:
-		case KEYWORD_NAMESPACE:
-		case KEYWORD_STRUCT:
-		case KEYWORD_UNION:
-		case KEYWORD_VERSION:
-		case KEYWORD_TEMPLATE:
 			result = true;
 			break;
 
@@ -1423,26 +1289,6 @@ static void skipToMatch (const char *const pair)
 	}
 }
 
-static void skipParens (void)
-{
-	const int c = skipToNonWhite ();
-
-	if (c == '(')
-		skipToMatch ("()");
-	else
-		cppUngetc (c);
-}
-
-static void skipBraces (void)
-{
-	const int c = skipToNonWhite ();
-
-	if (c == '{')
-		skipToMatch ("{}");
-	else
-		cppUngetc (c);
-}
-
 static keywordId analyzeKeyword (const char *const name)
 {
 	const keywordId id = (keywordId) lookupKeyword (name, getInputLanguage ());
@@ -1524,69 +1370,6 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 	analyzeIdentifier (token);
 }
 
-static void readPackageName (tokenInfo *const token, const int firstChar, bool allowWildCard)
-{
-	vString *const name = token->name;
-	int c = firstChar;
-
-	initToken (token);
-
-	while (cppIsident (c)  || (allowWildCard && (c == '*')) ||  c == '.')
-	{
-		vStringPut (name, c);
-		c = cppGetc ();
-	}
-	cppUngetc (c);        /* unget non-package character */
-}
-
-static void readPackageOrNamespace (statementInfo *const st, const declType declaration, bool allowWildCard)
-{
-	st->declaration = declaration;
-
-	if (declaration == DECL_NAMESPACE)
-	{
-		/* Namespace is specified one level at a time. */
-		return;
-	}
-	else
-	{
-		/* In C#, a namespace can also be specified like a Java package name. */
-		tokenInfo *const token = activeToken (st);
-		Assert (isType (token, TOKEN_KEYWORD));
-		readPackageName (token, skipToNonWhite (), allowWildCard);
-		token->type = TOKEN_NAME;
-		st->gotName = true;
-		st->haveQualifyingName = true;
-	}
-}
-
-static void readVersionName (tokenInfo *const token, const int firstChar)
-{
-	vString *const name = token->name;
-	int c = firstChar;
-
-	initToken (token);
-
-	while (cppIsident (c))
-	{
-		vStringPut (name, c);
-		c = cppGetc ();
-	}
-    cppGetc ();
-}
-
-static void readVersion (statementInfo *const st)
-{
-    tokenInfo *const token = activeToken (st);
-	Assert (isType (token, TOKEN_KEYWORD));
-    skipToNonWhite ();
-	readVersionName (token, cppGetc ());
-	token->type = TOKEN_NAME;
-	st->declaration = DECL_VERSION;
-	st->gotName = true;
-	st->haveQualifyingName = true;
-}
-
 static void processName (statementInfo *const st)
 {
 	Assert (isType (activeToken (st), TOKEN_NAME));
@@ -1594,75 +1377,6 @@ static void processName (statementInfo *const st)
 		st->declaration = DECL_BASE;
 	st->gotName = true;
 	st->haveQualifyingName = true;
-}
-
-static void readOperator (statementInfo *const st)
-{
-	const char *const acceptable = "+-*/%^&|~!=<>,[]";
-	const tokenInfo* const prev = prevToken (st,1);
-	tokenInfo *const token = activeToken (st);
-	vString *const name = token->name;
-	int c = skipToNonWhite ();
-
-	/*  When we arrive here, we have the keyword "operator" in 'name'.
-	 */
-	if (isType (prev, TOKEN_KEYWORD) && (prev->keyword == KEYWORD_ENUM ||
-		 prev->keyword == KEYWORD_STRUCT || prev->keyword == KEYWORD_UNION))
-		;        /* ignore "operator" keyword if preceded by these keywords */
-	else if (c == '(')
-	{
-		/*  Verify whether this is a valid function call (i.e. "()") operator.
-		 */
-		if (cppGetc () == ')')
-		{
-			vStringPut (name, ' ');  /* always separate operator from keyword */
-			c = skipToNonWhite ();
-			if (c == '(')
-				vStringCatS (name, "()");
-		}
-		else
-		{
-			skipToMatch ("()");
-			c = cppGetc ();
-		}
-	}
-	else if (cppIsident1 (c))
-	{
-		/*  Handle "new" and "delete" operators, and conversion functions
-		 *  (per 13.3.1.1.2 [2] of the C++ spec).
-		 */
-		bool whiteSpace = true;  /* default causes insertion of space */
-		do
-		{
-			if (cppIsspace (c))
-				whiteSpace = true;
-			else
-			{
-				if (whiteSpace)
-				{
-					vStringPut (name, ' ');
-					whiteSpace = false;
-				}
-				vStringPut (name, c);
-			}
-			c = cppGetc ();
-		} while (! isOneOf (c, "(;")  &&  c != EOF);
-	}
-	else if (isOneOf (c, acceptable))
-	{
-		vStringPut (name, ' ');  /* always separate operator from keyword */
-		do
-		{
-			vStringPut (name, c);
-			c = cppGetc ();
-		} while (isOneOf (c, acceptable));
-	}
-
-	cppUngetc (c);
-
-	token->type	= TOKEN_NAME;
-	token->keyword = KEYWORD_NONE;
-	processName (st);
 }
 
 static void copyToken (tokenInfo *const dest, const tokenInfo *const src)
@@ -1680,19 +1394,6 @@ static void setAccess (statementInfo *const st, const accessType access)
 	{
 		st->member.access = access;
 	}
-}
-
-static void discardTypeList (tokenInfo *const token)
-{
-	int c = skipToNonWhite ();
-	while (cppIsident1 (c))
-	{
-		readIdentifier (token, c);
-		c = skipToNonWhite ();
-		if (c == '.'  ||  c == ',')
-			c = skipToNonWhite ();
-	}
-	cppUngetc (c);
 }
 
 static void addParentClass (statementInfo *const st, tokenInfo *const token)
@@ -1740,12 +1441,6 @@ static void readParents (statementInfo *const st, const int qualifier)
 	deleteToken (token);
 }
 
-static void skipStatement (statementInfo *const st)
-{
-	st->declaration = DECL_IGNORE;
-	skipToOneOf (";");
-}
-
 static void processInterface (statementInfo *const st)
 {
 	st->declaration = DECL_INTERFACE;
@@ -1763,63 +1458,27 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		default: break;
 
 		case KEYWORD_NONE:      processName (st);                       break;
-		case KEYWORD_ABSTRACT:  st->implementation = IMP_ABSTRACT;      break;
-		case KEYWORD_ATTRIBUTE: skipParens (); initToken (token);       break;
 		case KEYWORD_BIND:      st->declaration = DECL_BASE;            break;
 		case KEYWORD_BIT:       st->declaration = DECL_BASE;            break;
-		case KEYWORD_CATCH:     skipParens (); skipBraces ();           break;
-		case KEYWORD_CHAR:      st->declaration = DECL_BASE;            break;
 		case KEYWORD_CLASS:     checkIsClassEnum (st, DECL_CLASS);      break;
-		case KEYWORD_CONST:     st->declaration = DECL_BASE;            break;
-		case KEYWORD_DOUBLE:    st->declaration = DECL_BASE;            break;
 		case KEYWORD_ENUM:      st->declaration = DECL_ENUM;            break;
 		case KEYWORD_EXTENDS:   readParents (st, '.');
 		                        setToken (st, TOKEN_NONE);              break;
-		case KEYWORD_FLOAT:     st->declaration = DECL_BASE;            break;
 		case KEYWORD_FUNCTION:  st->declaration = DECL_BASE;            break;
-		case KEYWORD_FRIEND:    st->scope       = SCOPE_FRIEND;         break;
-		case KEYWORD_GOTO:      skipStatement (st);                     break;
-		case KEYWORD_IMPLEMENTS:readParents (st, '.');
-		                        setToken (st, TOKEN_NONE);              break;
-		case KEYWORD_IMPORT:
-			skipStatement (st);
-			break;
-		case KEYWORD_INT:       st->declaration = DECL_BASE;            break;
 		case KEYWORD_INTEGER:   st->declaration = DECL_BASE;            break;
 		case KEYWORD_INTERFACE: processInterface (st);                  break;
 		case KEYWORD_LOCAL:     setAccess (st, ACCESS_LOCAL);           break;
-		case KEYWORD_LONG:      st->declaration = DECL_BASE;            break;
-		case KEYWORD_OPERATOR:  readOperator (st);                      break;
-		case KEYWORD_MIXIN:     st->declaration = DECL_MIXIN;           break;
-		case KEYWORD_PRIVATE:   setAccess (st, ACCESS_PRIVATE);         break;
 		case KEYWORD_PROGRAM:   st->declaration = DECL_PROGRAM;         break;
 		case KEYWORD_PROTECTED: setAccess (st, ACCESS_PROTECTED);       break;
 		case KEYWORD_PUBLIC:    setAccess (st, ACCESS_PUBLIC);          break;
-		case KEYWORD_RETURN:    skipStatement (st);                     break;
-		case KEYWORD_SHORT:     st->declaration = DECL_BASE;            break;
-		case KEYWORD_SIGNED:    st->declaration = DECL_BASE;            break;
 		case KEYWORD_STRING:    st->declaration = DECL_BASE;            break;
-		case KEYWORD_STRUCT:    checkIsClassEnum (st, DECL_STRUCT);     break;
 		case KEYWORD_TASK:      st->declaration = DECL_TASK;            break;
-		case KEYWORD_THROWS:    discardTypeList (token);                break;
-		case KEYWORD_UNION:     st->declaration = DECL_UNION;           break;
-		case KEYWORD_UNSIGNED:  st->declaration = DECL_BASE;            break;
-		case KEYWORD_USING:     st->declaration = DECL_USING;           break;
 		case KEYWORD_VOID:      st->declaration = DECL_BASE;            break;
-		case KEYWORD_VOLATILE:  st->declaration = DECL_BASE;            break;
-		case KEYWORD_VERSION:   readVersion(st);                        break;
 		case KEYWORD_VIRTUAL:   st->implementation = IMP_VIRTUAL;       break;
-		case KEYWORD_WCHAR_T:   st->declaration = DECL_BASE;            break;
-		case KEYWORD_TEMPLATE:
-			break;
-		case KEYWORD_NAMESPACE: readPackageOrNamespace (st, DECL_NAMESPACE, false); break;
-		case KEYWORD_MODULE:
-		case KEYWORD_PACKAGE:   readPackageOrNamespace (st, DECL_PACKAGE, false);   break;
 
 		case KEYWORD_EVENT:
 			break;
 
-		case KEYWORD_ALIAS:
 		case KEYWORD_TYPEDEF:
 			reinitStatement (st, false);
 			st->scope = SCOPE_TYPEDEF;
@@ -1836,18 +1495,6 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 			st->scope = SCOPE_STATIC;
 			st->declaration = DECL_BASE;
 			break;
-
-		case KEYWORD_FOR:
-		case KEYWORD_FOREACH:
-		case KEYWORD_IF:
-		case KEYWORD_SWITCH:
-		case KEYWORD_WHILE:
-		{
-			int c = skipToNonWhite ();
-			if (c == '(')
-				skipToMatch ("()");
-			break;
-		}
 	}
 }
 
@@ -1963,40 +1610,13 @@ static bool skipPostArgumentStuff (
 				readIdentifier (token, c);
 				switch (token->keyword)
 				{
-				case KEYWORD_ATTRIBUTE: skipParens ();  break;
-				case KEYWORD_THROW:     skipParens ();  break;
-				case KEYWORD_IF:                        break;
-				case KEYWORD_TRY:                       break;
-
-				case KEYWORD_CONST:
-				case KEYWORD_VOLATILE:
-					if (vStringLength (Signature) > 0)
-					{
-						vStringPut (Signature, ' ');
-						vStringCat (Signature, token->name);
-					}
-					break;
-				case KEYWORD_ALIAS:
-				case KEYWORD_CATCH:
 				case KEYWORD_CLASS:
-				case KEYWORD_EXPLICIT:
 				case KEYWORD_EXTERN:
-				case KEYWORD_FRIEND:
-				case KEYWORD_INLINE:
-				case KEYWORD_MUTABLE:
-				case KEYWORD_NAMESPACE:
-				case KEYWORD_NEW:
 				case KEYWORD_NEWCOV:
-				case KEYWORD_OPERATOR:
-				case KEYWORD_OVERLOAD:
-				case KEYWORD_PRIVATE:
 				case KEYWORD_PROTECTED:
 				case KEYWORD_PUBLIC:
 				case KEYWORD_STATIC:
-				case KEYWORD_TEMPLATE:
 				case KEYWORD_TYPEDEF:
-				case KEYWORD_TYPENAME:
-				case KEYWORD_USING:
 				case KEYWORD_VIRTUAL:
 					/* Never allowed within parameter declarations. */
 					restart = true;
@@ -2189,11 +1809,7 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 						token->type = TOKEN_PAREN_NAME;
 					else if (isType (token, TOKEN_KEYWORD))
 					{
-						if (token->keyword != KEYWORD_CONST &&
-							token->keyword != KEYWORD_VOLATILE)
-						{
-							info->isNameCandidate = false;
-						}
+						info->isNameCandidate = false;
 					}
 				}
 				else
@@ -2316,16 +1932,9 @@ static void processColon (statementInfo *const st)
 		else
 		{
 			const tokenInfo *const prev  = prevToken (st, 1);
-			const tokenInfo *const prev2 = prevToken (st, 2);
-			if (prev->keyword == KEYWORD_DEFAULT ||
-				prev2->keyword == KEYWORD_CASE)
+			if (st->parent != NULL)
 			{
-				reinitStatement (st, false);
-			}
-			else if (st->parent != NULL)
-			{
-				if (prevToken (st->parent, 1)->keyword != KEYWORD_SWITCH)
-					makeTag (prev, st, false, TAG_LABEL);
+				makeTag (prev, st, false, TAG_LABEL);
 				reinitStatement (st, false);
 			}
 		}
@@ -2697,10 +2306,6 @@ static int tagCheck (statementInfo *const st)
 			break;
 
 		case TOKEN_KEYWORD:
-
-			if (token->keyword == KEYWORD_DEFAULT && isType(prev, TOKEN_ARGS) && insideAnnotationBody(st)) {
-				corkIndex = qualifyFunctionDeclTag(st, prev2);
-			}
 			break;
 
 		case TOKEN_SEMICOLON:
