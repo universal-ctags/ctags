@@ -140,7 +140,6 @@ typedef enum eVisibilityType {
 	ACCESS_PRIVATE,
 	ACCESS_PROTECTED,
 	ACCESS_PUBLIC,
-	ACCESS_DEFAULT,      /* Java-specific */
 	ACCESS_COUNT
 } accessType;
 
@@ -161,7 +160,6 @@ typedef struct sTokenInfo {
 
 typedef enum eImplementation {
 	IMP_DEFAULT,
-	IMP_ABSTRACT,
 	IMP_VIRTUAL,
 	IMP_PURE_VIRTUAL,
 	IMP_COUNT
@@ -198,30 +196,18 @@ typedef enum eTagType {
 	TAG_ENUM,        /* enumeration name */
 	TAG_ENUMERATOR,  /* enumerator (enumeration value) */
 	TAG_EVENT,       /* event */
-	TAG_FIELD,       /* field (Java) */
 	TAG_FUNCTION,    /* function definition */
 	TAG_INTERFACE,   /* interface declaration */
 	TAG_LOCAL,       /* local variable definition */
 	TAG_MEMBER,      /* structure, class or interface member */
-	TAG_METHOD,      /* method declaration */
-	TAG_MIXIN, 		 /* D mixin */
-	TAG_NAMESPACE,   /* namespace name */
-	TAG_PACKAGE,     /* package name / D module name */
-	TAG_PACKAGEREF,	 /* referenced package name */
 	TAG_PROGRAM,     /* program name */
-	TAG_PROPERTY,    /* property name */
 	TAG_PROTOTYPE,   /* function prototype or declaration */
-	TAG_SIGNAL,	 /* VERA signal name */
-	TAG_STRUCT,      /* structure name */
+	TAG_SIGNAL,      /* signal name */
 	TAG_TASK,        /* task name */
 	TAG_TYPEDEF,     /* typedef name / D alias name */
-	TAG_TEMPLATE,    /* D template name */
-	TAG_UNION,       /* union name */
 	TAG_VARIABLE,    /* variable definition */
 	TAG_EXTERN_VAR,  /* external variable declaration */
-	TAG_VERSION, 	 /* conditional template compilation */
-	TAG_LABEL,	 /* goto label */
-	TAG_ANNOTATION,  /* Java annotation definition */
+	TAG_LABEL,       /* goto label */
 	TAG_COUNT        /* must be last */
 } tagType;
 
@@ -430,7 +416,7 @@ static void deleteToken (tokenInfo *const token)
 static const char *accessString (const accessType access)
 {
 	static const char *const names [] = {
-		"?", "local", "private", "protected", "public", "default"
+		"?", "local", "private", "protected", "public"
 	};
 	Assert (ARRAY_SIZE (names) == ACCESS_COUNT);
 	Assert ((int) access < ACCESS_COUNT);
@@ -758,8 +744,6 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 		default: break;
 
 		case TAG_FUNCTION:
-		case TAG_TEMPLATE:
-		case TAG_METHOD:
 		case TAG_PROTOTYPE:
 			if (vStringLength (Signature) > 0)
 				tag->extensionFields.signature = vStringValue (Signature);
@@ -767,17 +751,11 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 		case TAG_ENUM:
 		case TAG_ENUMERATOR:
 		case TAG_EVENT:
-		case TAG_FIELD:
 		case TAG_INTERFACE:
 		case TAG_MEMBER:
-		case TAG_NAMESPACE:
-		case TAG_PROPERTY:
 		case TAG_SIGNAL:
-		case TAG_STRUCT:
 		case TAG_TASK:
 		case TAG_TYPEDEF:
-		case TAG_UNION:
-		case TAG_ANNOTATION:
 			if (vStringLength (scope) > 0  &&  isMember (st))
 			{
 				tagType ptype;
@@ -794,8 +772,8 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 			}
-			if ((type == TAG_CLASS  ||  type == TAG_INTERFACE  ||
-				 type == TAG_STRUCT || type == TAG_ANNOTATION) && vStringLength (st->parentClasses) > 0)
+			if ((type == TAG_CLASS  ||  type == TAG_INTERFACE) &&
+				 vStringLength (st->parentClasses) > 0)
 			{
 
 				tag->extensionFields.inheritance =
