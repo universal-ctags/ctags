@@ -109,6 +109,7 @@ static vString *readTask (const unsigned char **cp, bool *variable)
 			vStringDelete (vstr);
 			vstr = NULL;
 		}
+		else
 		{
 			const char *end = strstr((const char *)start, vStringValue (vstr));
 			if (end)
