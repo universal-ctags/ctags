@@ -675,11 +675,6 @@ static int kindIndexForType (const tagType type)
 	return veraTagKind (type);
 }
 
-static int roleForType (const tagType type)
-{
-	return ROLE_DEFINITION_INDEX;
-}
-
 static const char *tagName (const tagType type)
 {
 	return VeraKinds [veraTagKind (type)].name;
@@ -914,20 +909,12 @@ static int makeTag (const tokenInfo *const token,
 		 */
 		tagEntryInfo e;
 		int kind;
-		int role;
-
-		role = roleForType (type);
-		if (! (role == ROLE_DEFINITION_INDEX || isXtagEnabled (XTAG_REFERENCE_TAGS)))
-			return CORK_NIL;
 
 		scope  = vStringNew ();
 		typeRef = vStringNew ();
 
 		kind  = kindIndexForType(type);
-		if (role == ROLE_DEFINITION_INDEX)
-			initTagEntry (&e, vStringValue (token->name), kind);
-		else
-			initRefTagEntry (&e, vStringValue (token->name), kind, role);
+		initTagEntry (&e, vStringValue (token->name), kind);
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
