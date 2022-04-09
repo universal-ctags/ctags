@@ -91,7 +91,6 @@ typedef int keywordId; /* to allow KEYWORD_NONE */
 typedef struct sKeywordDesc {
 	const char *name;
 	keywordId id;
-	short isValid [6]; /* indicates languages for which kw is valid */
 } keywordDesc;
 
 /*  Used for reporting the type of object parsed by nextToken ().
@@ -289,54 +288,52 @@ static kindDefinition VeraKinds [] = {
 };
 
 static const keywordDesc KeywordTable [] = {
-     /* keyword           keyword ID                      */
-
-     { "bad_state",       KEYWORD_BAD_STATE,       { 1 } },
-     { "bad_trans",       KEYWORD_BAD_TRANS,       { 1 } },
-     { "bind",            KEYWORD_BIND,            { 1 } },
-     { "bind_var",        KEYWORD_BIND_VAR,        { 1 } },
-     { "bit",             KEYWORD_BIT,             { 1 } },
-     { "class",           KEYWORD_CLASS,           { 1 } },
-     { "CLOCK",           KEYWORD_CLOCK,           { 1 } },
-     { "constraint",      KEYWORD_CONSTRAINT,      { 1 } },
-     { "coverage_block",  KEYWORD_COVERAGE_BLOCK,  { 1 } },
-     { "coverage_def",    KEYWORD_COVERAGE_DEF,    { 1 } },
-     { "enum",            KEYWORD_ENUM,            { 1 } },
-     { "event",           KEYWORD_EVENT,           { 1 } },
-     { "extends",         KEYWORD_EXTENDS,         { 1 } },
-     { "extern",          KEYWORD_EXTERN,          { 1 } },
-     { "function",        KEYWORD_FUNCTION,        { 1 } },
-     { "hdl_node",        KEYWORD_HDL_NODE,        { 1 } },
-     { "inout",           KEYWORD_INOUT,           { 1 } },
-     { "input",           KEYWORD_INPUT,           { 1 } },
-     { "integer",         KEYWORD_INTEGER,         { 1 } },
-     { "interface",       KEYWORD_INTERFACE,       { 1 } },
-     { "local",           KEYWORD_LOCAL,           { 1 } },
-     { "m_bad_state",     KEYWORD_M_BAD_STATE,     { 1 } },
-     { "m_bad_trans",     KEYWORD_M_BAD_TRANS,     { 1 } },
-     { "m_state",         KEYWORD_M_STATE,         { 1 } },
-     { "m_trans",         KEYWORD_M_TRANS,         { 1 } },
-     { "newcov",          KEYWORD_NEWCOV,          { 1 } },
-     { "NHOLD",           KEYWORD_NHOLD,           { 1 } },
-     { "NSAMPLE",         KEYWORD_NSAMPLE,         { 1 } },
-     { "output",          KEYWORD_OUTPUT,          { 1 } },
-     { "packed",          KEYWORD_PACKED,          { 1 } },
-     { "PHOLD",           KEYWORD_PHOLD,           { 1 } },
-     { "port",            KEYWORD_PORT,            { 1 } },
-     { "program",         KEYWORD_PROGRAM,         { 1 } },
-     { "protected",       KEYWORD_PROTECTED,       { 1 } },
-     { "PSAMPLE",         KEYWORD_PSAMPLE,         { 1 } },
-     { "public",          KEYWORD_PUBLIC,          { 1 } },
-     { "shadow",          KEYWORD_SHADOW,          { 1 } },
-     { "state",           KEYWORD_STATE,           { 1 } },
-     { "static",          KEYWORD_STATIC,          { 1 } },
-     { "string",          KEYWORD_STRING,          { 1 } },
-     { "task",            KEYWORD_TASK,            { 1 } },
-     { "trans",           KEYWORD_TRANS,           { 1 } },
-     { "transition",      KEYWORD_TRANSITION,      { 1 } },
-     { "typedef",         KEYWORD_TYPEDEF,         { 1 } },
-     { "virtual",         KEYWORD_VIRTUAL,         { 1 } },
-     { "void",            KEYWORD_VOID,            { 1 } },
+     { "bad_state",       KEYWORD_BAD_STATE,      },
+     { "bad_trans",       KEYWORD_BAD_TRANS,      },
+     { "bind",            KEYWORD_BIND,           },
+     { "bind_var",        KEYWORD_BIND_VAR,       },
+     { "bit",             KEYWORD_BIT,            },
+     { "class",           KEYWORD_CLASS,          },
+     { "CLOCK",           KEYWORD_CLOCK,          },
+     { "constraint",      KEYWORD_CONSTRAINT,     },
+     { "coverage_block",  KEYWORD_COVERAGE_BLOCK, },
+     { "coverage_def",    KEYWORD_COVERAGE_DEF,   },
+     { "enum",            KEYWORD_ENUM,           },
+     { "event",           KEYWORD_EVENT,          },
+     { "extends",         KEYWORD_EXTENDS,        },
+     { "extern",          KEYWORD_EXTERN,         },
+     { "function",        KEYWORD_FUNCTION,       },
+     { "hdl_node",        KEYWORD_HDL_NODE,       },
+     { "inout",           KEYWORD_INOUT,          },
+     { "input",           KEYWORD_INPUT,          },
+     { "integer",         KEYWORD_INTEGER,        },
+     { "interface",       KEYWORD_INTERFACE,      },
+     { "local",           KEYWORD_LOCAL,          },
+     { "m_bad_state",     KEYWORD_M_BAD_STATE,    },
+     { "m_bad_trans",     KEYWORD_M_BAD_TRANS,    },
+     { "m_state",         KEYWORD_M_STATE,        },
+     { "m_trans",         KEYWORD_M_TRANS,        },
+     { "newcov",          KEYWORD_NEWCOV,         },
+     { "NHOLD",           KEYWORD_NHOLD,          },
+     { "NSAMPLE",         KEYWORD_NSAMPLE,        },
+     { "output",          KEYWORD_OUTPUT,         },
+     { "packed",          KEYWORD_PACKED,         },
+     { "PHOLD",           KEYWORD_PHOLD,          },
+     { "port",            KEYWORD_PORT,           },
+     { "program",         KEYWORD_PROGRAM,        },
+     { "protected",       KEYWORD_PROTECTED,      },
+     { "PSAMPLE",         KEYWORD_PSAMPLE,        },
+     { "public",          KEYWORD_PUBLIC,         },
+     { "shadow",          KEYWORD_SHADOW,         },
+     { "state",           KEYWORD_STATE,          },
+     { "static",          KEYWORD_STATIC,         },
+     { "string",          KEYWORD_STRING,         },
+     { "task",            KEYWORD_TASK,           },
+     { "trans",           KEYWORD_TRANS,          },
+     { "transition",      KEYWORD_TRANSITION,     },
+     { "typedef",         KEYWORD_TYPEDEF,        },
+     { "virtual",         KEYWORD_VIRTUAL,        },
+     { "void",            KEYWORD_VOID,           },
 };
 
 /*
@@ -2287,8 +2284,7 @@ static void buildKeywordHash (const langType language, unsigned int idx)
 	for (i = 0  ;  i < count  ;  ++i)
 	{
 		const keywordDesc* const p = &KeywordTable [i];
-		if (p->isValid [idx])
-			addKeyword (p->name, language, (int) p->id);
+		addKeyword (p->name, language, (int) p->id);
 	}
 }
 
