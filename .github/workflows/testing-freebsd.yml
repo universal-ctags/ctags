@@ -9,19 +9,22 @@ on:
 jobs:
   testing:
     runs-on: macos-10.15
-    
+
+    strategy:
+      fail-fast: false
+      matrix:
+        freebsd-version: [12,13]
+
     steps:
     - uses: actions/checkout@v2
 
-    - name: run in FreeBSD vm
-      uses: vmactions/freebsd-vm@v0.1.5
+    # https://app.vagrantup.com/boxes/search?utf8=%E2%9C%93&sort=downloads&provider=&q=freebsd
+    # https://github.com/leleliu008/github-actions-vagrant
+    - uses: leleliu008/github-actions-vagrant@v1
       with:
-        usesh: true
+        mem: 2048
+        box: generic/freebsd${{ matrix.freebsd-version }}
         run: |
-          run() {
-            printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
-            $@
-          }
           run pkg install -y automake pkgconf gmake
           run freebsd-version
           run cc --version
