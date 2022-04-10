@@ -1,0 +1,10 @@
+sample_if	input.vr	/^interface sample_if {$/;"	interface	end:14
+clock	input.vr	/^  input clock          CLOCK;$/;"	signal	interface:sample_if	end:5
+reset	input.vr	/^  output reset         PHOLD#1;$/;"	signal	interface:sample_if	end:6
+enable	input.vr	/^  output enable        PHOLD#1;$/;"	signal	interface:sample_if	end:7
+cout	input.vr	/^  input [7:0] cout     PSAMPLE #-1;$/;"	signal	interface:sample_if	end:8
+data	input.vr	/^  inout data           PSAMPLE PHOLD NSAMPLE#-1 NHOLD #1;$/;"	signal	interface:sample_if	end:9
+ddr_data_in	input.vr	/^  input ddr_data_in    PSAMPLE NSAMPLE;$/;"	signal	interface:sample_if	end:10
+data_in	input.vr	/^  input data_in        PSAMPLE #-1 hdl_node "sample_if_verilog.data";$/;"	signal	interface:sample_if	end:11
+count	input.vr	/^  input [7:0] count    PSAMPLE #-1 hdl_node "sample_if_verilog.counter";$/;"	signal	interface:sample_if	end:12
+nenable	input.vr	/^  output  nenable      PHOLD   #1 hdl_node "sample_if_verilog.counter_en";$/;"	signal	interface:sample_if	end:13
