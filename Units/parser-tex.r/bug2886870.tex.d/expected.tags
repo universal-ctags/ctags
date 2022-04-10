@@ -1,0 +1,26 @@
+Introduction	input.tex	/^\\section{Introduction}$/;"	s
+Equations	input.tex	/^\\section{Equations}$/;"	s
+eq:ising	input.tex	/^\\label{eq:ising}$/;"	l
+\\lb	input.tex	/^ \\newcommand{\\lb}{{\\langle}}$/;"	C
+\\rb	input.tex	/^ \\newcommand{\\rb}{{\\rangle}}$/;"	C
+\\lb	input.tex	/^\\newcommand{\\lb}{{\\langle}}$/;"	C
+\\rb	input.tex	/^\\newcommand{\\rb}{{\\rangle}}$/;"	C
+eq:fine	input.tex	/^I = \\! \\int_{-\\infty}^\\infty f(x)\\,dx \\label{eq:fine}.$/;"	l
+eq:mdiv	input.tex	/^\\label{eq:mdiv}$/;"	l
+\\rv	input.tex	/^\\newcommand{\\rv}{\\textbf{r}}$/;"	C
+Tables	input.tex	/^\\section{Tables}$/;"	s
+tab:5/tc	input.tex	/^\\caption{\\label{tab:5\/tc}Comparison of the mean-field predictions$/;"	l
+Lists	input.tex	/^\\section{Lists}$/;"	s
+Figures	input.tex	/^\\section{Figures}$/;"	s
+fig:typical	input.tex	/^\\caption{\\label{fig:typical}Show me a sine.}$/;"	l
+fig:lj	input.tex	/^\\caption{\\label{fig:lj}Plot of the$/;"	l
+Literal text	input.tex	/^\\section{Literal text}$/;"	s
+Special Symbols	input.tex	/^\\section{Special Symbols}$/;"	s
+Common Greek letters	input.tex	/^\\subsection{Common Greek letters}$/;"	u	section:Special Symbols
+Test for ctags	input.tex	/^\\subsubsection{Test for ctags}$/;"	b	subsection:Special Symbols""Common Greek letters
+Special symbols	input.tex	/^\\subsection{Special symbols}$/;"	u	section:Special Symbols
+\\color{red}Use of Color	input.tex	/^\\section{\\color{red}Use of Color}$/;"	s
+\\label{morefig}Subfigures	input.tex	/^\\section{\\label{morefig}Subfigures}$/;"	s
+fig:qm/complexfunctions	input.tex	/^\\caption{\\label{fig:qm\/complexfunctions} Two representations of complex$/;"	l
+latex	input.tex	/^\\bibitem{latex}Helmut Kopka and Patrick W. Daly, \\textsl{A Guide to$/;"	B
+website	input.tex	/^\\bibitem{website}Some useful links are$/;"	B
