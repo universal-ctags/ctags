@@ -1,0 +1,8 @@
+This one is inherited from e-ctags source tree.
+The input looks broken;
+
+- the "end" sohuld be "end Pow2", and
+- the code in loop "Result * N" should be "Result * i".
+
+The test case is kept as is. However, if you will work on improving
+VHDL parser, you may update this test case as you need.
