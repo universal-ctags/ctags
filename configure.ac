@@ -41,6 +41,11 @@ case $host in
             printf "\n%s\n" "macOS not support --enable-static." >&6
             exit 1
         fi
+        ;;
+    *freebsd*|*openbsd*)
+        # https://github.com/universal-ctags/ctags/issues/3338
+        export LDFLAGS="$LDFLAGS -L/usr/local/lib"
+        ;;
 esac
 
 AH_TEMPLATE([PACKAGE], [Package name.])
