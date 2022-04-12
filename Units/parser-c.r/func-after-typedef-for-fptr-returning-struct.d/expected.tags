@@ -1,0 +1,3 @@
+s	input.c	/^struct s {};$/;"	s	file:
+g	input.c	/^typedef struct s (*g)(void);$/;"	t	typeref:struct:s (*)(void)	file:
+f	input.c	/^void f(void){}$/;"	f	typeref:typename:void	signature:(void)

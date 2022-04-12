@@ -1,0 +1,4 @@
+s	input.c	/^enum s { E };$/;"	g	file:
+E	input.c	/^enum s { E };$/;"	e	enum:s	file:
+g	input.c	/^typedef enum s (*g)(void);$/;"	t	typeref:enum:s (*)(void)	file:
+f	input.c	/^void f(void){}$/;"	f	typeref:typename:void	signature:(void)
