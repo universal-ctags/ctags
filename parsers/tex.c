@@ -1132,6 +1132,12 @@ static void findTexTags (void)
 {
 	tokenInfo *const token = newToken ();
 
+	vStringClear(lastPart);
+	vStringClear(lastChapter);
+	vStringClear(lastSection);
+	vStringClear(lastSubS);
+	vStringClear(lastSubSubS);
+
 	parseTexFile (token);
 
 	deleteToken (token);
