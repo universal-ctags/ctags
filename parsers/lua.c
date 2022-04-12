@@ -74,7 +74,8 @@ static bool is_a_code_line (const unsigned char *line)
 
 static bool isLuaIdentifier (char c)
 {
-	return (bool) !(isspace(c)  || c == '(' || c == ')' || c == '=' || c == '.' || c == ':');
+	return (bool) !(isspace(c)  || c == '(' || c == ')' || c == '=' || c == '.' || c == ':'
+					|| c == '{' || c == '}');
 }
 
 static void set_scope (int child, int parent)
