@@ -1,0 +1,1 @@
+__index	input.lua	/^setmetatable(t, {__index=function(self,k) return k end})$/;"	f
