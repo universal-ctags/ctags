@@ -1,0 +1,5 @@
+PartA	input.tex	/^\\part{PartA}$/;"	p
+SectionA	input.tex	/^\\section{SectionA}$/;"	s	part:PartA
+SubsectionA	input.tex	/^\\subsection{SubsectionA}$/;"	u	section:PartA""SectionA
+SectionB	input-0.tex	/^\\section{SectionB}$/;"	s
+SubsectionB	input-0.tex	/^\\subsection{SubsectionB}$/;"	u	section:SectionB
