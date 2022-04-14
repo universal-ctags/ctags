@@ -20,6 +20,8 @@ jobs:
     steps:
       - run: apk add libc-dev gcc make automake autoconf pkgconf python3 file diffutils git
 
+      - run: git config --global --add safe.directory /__w/ctags/ctags
+
       - uses: actions/checkout@v2
 
       - run: cc --version
