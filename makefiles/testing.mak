@@ -318,12 +318,12 @@ check-genfile:
 	fi
 if HAVE_RST2MAN
 # man/*.in : committed for man pages to be genrated without rst2man
-#   make clean-docs remove both man/*.rst and docs/man/*.rst
+#   make clean-docs remove both man/*.in and docs/man/*.rst
 	$(chkgen_verbose)$(MAKE) -C man clean-docs
-	$(chkgen_verbose)$(MAKE) -C man
+	$(chkgen_verbose)$(MAKE) -C man man-in
 	$(chkgen_verbose)if ! git diff --exit-code -- man; then \
 		echo "Files under man/ are not up to date." ; \
-		echo "Please execute 'make -C man' and commit them." ; \
+		echo "Please execute 'make -C man man-in' and commit them." ; \
 		exit 1 ; \
 	else \
 		echo "Files under man are up to date." ; \
