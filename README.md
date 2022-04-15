@@ -67,6 +67,8 @@ To build with Autotools (Autoconf and Automake) on GNU/Linux, OSX, or Windows 10
     $ make install # may require extra privileges depending on where to install
 ```
 
+GNU make is assumed as the `make` command.
+
 See
 [`docs/autotools.rst`](https://github.com/universal-ctags/ctags/blob/master/docs/autotools.rst)
 for more information.
