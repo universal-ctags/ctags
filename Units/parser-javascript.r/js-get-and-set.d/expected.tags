@@ -1,0 +1,6 @@
+get	input.js	/^  get() {$/;"	method	class:obj
+log	input.js	/^  log: ['a', 'b', 'c'],$/;"	property	class:obj
+log	input.js	/^  log: []$/;"	property	class:o
+o	input.js	/^var o = {$/;"	class
+obj	input.js	/^var obj = {$/;"	class
+set	input.js	/^  set(str) {$/;"	method	class:o

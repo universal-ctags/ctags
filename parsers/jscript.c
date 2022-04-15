@@ -1618,6 +1618,8 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
      *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
 	 *     get prop() {}
 	 *     set prop(val) {}
+	 *     get(...) {}
+	 *     set(...) {}
      *
      * ES6 methods:
      *     property(...) {}
@@ -1653,15 +1655,30 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 
 		if (isKeyword (token, KEYWORD_async))
 			readToken (token);
-		else if (isType(token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_get))
+		else if (isType (token, TOKEN_KEYWORD) &&
+				 (isKeyword (token, KEYWORD_get) || isKeyword (token, KEYWORD_set)))
 		{
-			is_getter = true;
+			tokenInfo *savedToken = newToken ();
+			copyToken (savedToken, token, true);
 			readToken (token);
-		}
-		else if (isType(token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_set))
-		{
-			is_setter = true;
-			readToken (token);
+			if (isType(token, TOKEN_OPEN_PAREN))
+			{
+				Assert (NextToken == NULL);
+				NextToken = newToken ();
+				copyToken (NextToken, token, false);	/* save token for next read */
+				copyToken (token, savedToken, true);	/* restore token to process */
+				token->type = TOKEN_IDENTIFIER;			/* process as identifier */
+				token->keyword = KEYWORD_NONE;
+			}
+			else if (isKeyword (savedToken, KEYWORD_get))
+			{
+				is_getter = true;
+			}
+			else
+			{
+				is_setter = true;
+			}
+			deleteToken (savedToken);
 		}
 
 		if (! isType (token, TOKEN_KEYWORD) &&
