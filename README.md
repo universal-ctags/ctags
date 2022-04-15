@@ -57,15 +57,42 @@ code from GitHub.
 
 ## How to build and install ##
 
-To build with Autotools (Autoconf, Automake, and Libtool) on GNU/Linux, OSX, or Windows 10 WSL,
-```
-    $ git clone https://github.com/universal-ctags/ctags.git
-    $ cd ctags
-    $ ./autogen.sh
-    $ ./configure --prefix=/where/you/want # defaults to /usr/local
-    $ make
-    $ make install # may require extra privileges depending on where to install
-```
+To build with Autotools (Autoconf, Automake, and Libtool) on GNU/Linux, OSX, or Windows 10 WSL:
+
+1. Clone the repository and run `./autogen.sh`:
+
+   ```
+       $ git clone https://github.com/universal-ctags/ctags.git
+       $ cd ctags
+       $ ./autogen.sh
+   ```
+2. Install development headers for the following **[prerequisite|useful|delete as appropriate]** libraries. These
+   provide **[essential|useful|delete as appropriate]** functionality for Universal Ctags as follows:
+
+   - [Libxml2][libxml]: This allows Universal Ctags to **[fill in appropriate functionality]**.
+   - [Jansson][jansson]: This allows Universal Ctags to **[fill in appropriate functionality]**.
+   - [LibYAML][libyaml]: This allows Universal Ctags to **[fill in appropriate functionality]**.
+   - [PCRE2][pcre2]: This allows Universal Ctags to **[fill in appropriate functionality]**.
+
+   On Debian-based Linux distributions, these can be installed with
+
+   ```
+       $ sudo apt-get install libxml2-dev libpcre2-dev libyaml-dev libjansson-dev
+   ```
+
+
+[libxml]: http://xmlsoft.org
+[jansson]: https://github.com/akheron/jansson
+[libyaml]: https://github.com/yaml/libyaml
+[pcre2]: https://www.pcre.org
+
+3. Configure, build and install the Universal Ctags executable:
+
+   ```
+       $ ./configure --prefix=/where/you/want # defaults to /usr/local
+       $ make
+       $ make install # may require extra privileges depending on where to install
+   ```
 
 See
 [`docs/autotools.rst`](https://github.com/universal-ctags/ctags/blob/master/docs/autotools.rst)
@@ -121,3 +148,4 @@ The most significant incompatible changes:
   is appreciated.
 
 Pull-requests are welcome!
+
