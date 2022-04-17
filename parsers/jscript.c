@@ -373,28 +373,24 @@ static void makeJsTag (const tokenInfo *const token, const jsKind kind,
 static void makeClassTagCommon (tokenInfo *const token, vString *const signature,
                           vString *const inheritance, bool anonymous)
 {
-
-
+	vString *	fulltag = vStringNew ();
+	if (vStringLength (token->scope) > 0)
 	{
-		vString *	fulltag = vStringNew ();
-		if (vStringLength (token->scope) > 0)
-		{
-			vStringCopy(fulltag, token->scope);
-			vStringPut (fulltag, '.');
-			vStringCat (fulltag, token->string);
-		}
-		else
-		{
-			vStringCopy(fulltag, token->string);
-		}
-		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
-		{
-			stringListAdd (ClassNames, vStringNewCopy (fulltag));
-			makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance,
-							 anonymous);
-		}
-		vStringDelete (fulltag);
+		vStringCopy(fulltag, token->scope);
+		vStringPut (fulltag, '.');
+		vStringCat (fulltag, token->string);
 	}
+	else
+	{
+		vStringCopy(fulltag, token->string);
+	}
+	if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
+	{
+		stringListAdd (ClassNames, vStringNewCopy (fulltag));
+		makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance,
+						 anonymous);
+	}
+	vStringDelete (fulltag);
 }
 
 static void makeClassTag (tokenInfo *const token, vString *const signature,
@@ -406,26 +402,24 @@ static void makeClassTag (tokenInfo *const token, vString *const signature,
 static void makeFunctionTagCommon (tokenInfo *const token, vString *const signature, bool generator,
 								   bool anonymous)
 {
+	vString *	fulltag = vStringNew ();
+	if (vStringLength (token->scope) > 0)
 	{
-		vString *	fulltag = vStringNew ();
-		if (vStringLength (token->scope) > 0)
-		{
-			vStringCopy(fulltag, token->scope);
-			vStringPut (fulltag, '.');
-			vStringCat (fulltag, token->string);
-		}
-		else
-		{
-			vStringCopy(fulltag, token->string);
-		}
-		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
-		{
-			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
-			makeJsTagCommon (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL,
-							 anonymous);
-		}
-		vStringDelete (fulltag);
+		vStringCopy(fulltag, token->scope);
+		vStringPut (fulltag, '.');
+		vStringCat (fulltag, token->string);
 	}
+	else
+	{
+		vStringCopy(fulltag, token->string);
+	}
+	if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
+	{
+		stringListAdd (FunctionNames, vStringNewCopy (fulltag));
+		makeJsTagCommon (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL,
+						 anonymous);
+	}
+	vStringDelete (fulltag);
 }
 
 static void makeFunctionTag (tokenInfo *const token, vString *const signature, bool generator)
