@@ -1796,38 +1796,38 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				}
 				else if (! is_es6_class)
 				{
-						bool has_child_methods = false;
+					bool has_child_methods = false;
 
-						/* skip whatever is the value */
-						while (! isType (token, TOKEN_COMMA) &&
-						       ! isType (token, TOKEN_CLOSE_CURLY) &&
-						       ! isType (token, TOKEN_EOF))
+					/* skip whatever is the value */
+					while (! isType (token, TOKEN_COMMA) &&
+					       ! isType (token, TOKEN_CLOSE_CURLY) &&
+					       ! isType (token, TOKEN_EOF))
+					{
+						if (isType (token, TOKEN_OPEN_CURLY))
 						{
-							if (isType (token, TOKEN_OPEN_CURLY))
-							{
-								/* Recurse to find child properties/methods */
-								has_child_methods = parseMethods (token, name, false);
-								readToken (token);
-							}
-							else if (isType (token, TOKEN_OPEN_PAREN))
-							{
-								skipArgumentList (token, false, NULL);
-							}
-							else if (isType (token, TOKEN_OPEN_SQUARE))
-							{
-								skipArrayList (token, false);
-							}
-							else
-							{
-								readToken (token);
-							}
+							/* Recurse to find child properties/methods */
+							has_child_methods = parseMethods (token, name, false);
+							readToken (token);
 						}
-
-						has_methods = true;
-						if (has_child_methods)
-							makeJsTag (name, JSTAG_CLASS, NULL, NULL);
+						else if (isType (token, TOKEN_OPEN_PAREN))
+						{
+							skipArgumentList (token, false, NULL);
+						}
+						else if (isType (token, TOKEN_OPEN_SQUARE))
+						{
+							skipArrayList (token, false);
+						}
 						else
-							makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
+						{
+							readToken (token);
+						}
+					}
+
+					has_methods = true;
+					if (has_child_methods)
+						makeJsTag (name, JSTAG_CLASS, NULL, NULL);
+					else
+						makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 				}
 				else if (can_be_field)
 				{
