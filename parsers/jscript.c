@@ -129,7 +129,8 @@ typedef enum eTokenType {
 	/* To handle Babel's decorators.
 	 * Used only in readTokenFull or lower functions. */
 	TOKEN_ATMARK,
-	TOKEN_BINARY_OPERATOR
+	TOKEN_BINARY_OPERATOR,
+	TOKEN_ARROW
 } tokenType;
 
 typedef struct sTokenInfo {
@@ -226,6 +227,7 @@ static void readTokenFull (tokenInfo *const token, bool include_newlines, vStrin
 static void skipArgumentList (tokenInfo *const token, bool include_newlines, vString *const repr);
 static void parseFunction (tokenInfo *const token);
 static bool parseBlock (tokenInfo *const token, const vString *const parentScope);
+static bool parseMethods (tokenInfo *const token, const tokenInfo *const class, const bool is_es6_class);
 static bool parseLine (tokenInfo *const token, bool is_inside_class);
 static void parseUI5 (tokenInfo *const token);
 
@@ -851,9 +853,21 @@ getNextChar:
 		case ':': token->type = TOKEN_COLON;				break;
 		case '{': token->type = TOKEN_OPEN_CURLY;			break;
 		case '}': token->type = TOKEN_CLOSE_CURLY;			break;
-		case '=': token->type = TOKEN_EQUAL_SIGN;			break;
 		case '[': token->type = TOKEN_OPEN_SQUARE;			break;
 		case ']': token->type = TOKEN_CLOSE_SQUARE;			break;
+
+		case '=':
+			{
+				int d = getcFromInputFile ();
+				if (d == '>')
+					token->type = TOKEN_ARROW;
+				else
+				{
+					ungetcToInputFile (d);
+					token->type = TOKEN_EQUAL_SIGN;
+				}
+				break;
+			}
 
 		case '+':
 		case '-':
@@ -1018,6 +1032,7 @@ getNextChar:
 		                              (t) == TOKEN_OPEN_CURLY)
 		/* these cannot be the start or end of a statement */
 		#define IS_BINARY_OPERATOR(t) ((t) == TOKEN_EQUAL_SIGN      || \
+		                               (t) == TOKEN_ARROW           || \
 		                               (t) == TOKEN_COLON           || \
 		                               (t) == TOKEN_PERIOD          || \
 		                               (t) == TOKEN_STAR            || \
@@ -1129,15 +1144,30 @@ static void readToken (tokenInfo *const token)
  *	 Token parsing functions
  */
 
+static void parseMethodsInAnonymousClass (tokenInfo *const token)
+{
+	tokenInfo *const anon_class = newToken ();
+	copyToken (anon_class, token, true);
+	anonGenerate (anon_class->string, "AnonymousClass", JSTAG_CLASS);
+	anon_class->type = TOKEN_IDENTIFIER;
+
+	bool has_methods = parseMethods (token, anon_class, false);
+
+	if (has_methods)
+		makeJsTagCommon (anon_class, JSTAG_CLASS, NULL, NULL, true);
+
+	deleteToken (anon_class);
+}
+
 static void skipArgumentList (tokenInfo *const token, bool include_newlines, vString *const repr)
 {
-	int nest_level = 0;
-
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
 	{
-		nest_level++;
+		int nest_level = 1;
 		if (repr)
 			vStringPut (repr, '(');
+
+		tokenType prev_token_type = token->type;
 		while (nest_level > 0 && ! isType (token, TOKEN_EOF))
 		{
 			readTokenFull (token, false, repr);
@@ -1145,8 +1175,17 @@ static void skipArgumentList (tokenInfo *const token, bool include_newlines, vSt
 				nest_level++;
 			else if (isType (token, TOKEN_CLOSE_PAREN))
 				nest_level--;
+			else if (isType (token, TOKEN_OPEN_CURLY))
+			{
+				if (prev_token_type == TOKEN_ARROW)
+					parseBlock (token, NULL);
+				else
+					parseMethodsInAnonymousClass (token);
+			}
 			else if (isKeyword (token, KEYWORD_function))
 				parseFunction (token);
+
+			prev_token_type = token->type;
 		}
 		readTokenFull (token, include_newlines, NULL);
 	}
@@ -1154,8 +1193,6 @@ static void skipArgumentList (tokenInfo *const token, bool include_newlines, vSt
 
 static void skipArrayList (tokenInfo *const token, bool include_newlines)
 {
-	int nest_level = 0;
-
 	/*
 	 * Handle square brackets
 	 *	 var name[1]
@@ -1164,7 +1201,8 @@ static void skipArrayList (tokenInfo *const token, bool include_newlines)
 
 	if (isType (token, TOKEN_OPEN_SQUARE))	/* arguments? */
 	{
-		nest_level++;
+		int nest_level = 1;
+		tokenType prev_token_type = token->type;
 		while (nest_level > 0 && ! isType (token, TOKEN_EOF))
 		{
 			readToken (token);
@@ -1172,6 +1210,15 @@ static void skipArrayList (tokenInfo *const token, bool include_newlines)
 				nest_level++;
 			else if (isType (token, TOKEN_CLOSE_SQUARE))
 				nest_level--;
+			else if (isType (token, TOKEN_OPEN_CURLY))
+			{
+				if (prev_token_type == TOKEN_ARROW)
+					parseBlock (token, NULL);
+				else
+					parseMethodsInAnonymousClass (token);
+			}
+
+			prev_token_type = token->type;
 		}
 		readTokenFull (token, include_newlines, NULL);
 	}
@@ -1594,7 +1641,8 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 {
 	TRACE_ENTER_TEXT("token is '%s' of type %s in classToken '%s' of type %s (es6: %s)",
 					 vStringValue(token->string), tokenTypeName (token->type),
-					 vStringValue(class->string), tokenTypeName (class->type),
+					 class == NULL ? "none" : vStringValue(class->string),
+					 class == NULL ? "none" : tokenTypeName (class->type),
 					 is_es6_class? "yes": "no");
 
 	tokenInfo *const name = newToken ();
@@ -1602,7 +1650,8 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 	vString *saveScope = vStringNew ();
 
 	vStringCopy (saveScope, token->scope);
-	addToScope (token, class->string);
+	if (class != NULL)
+		addToScope (token, class->string);
 
 	/*
 	 * This deals with these formats
@@ -1741,10 +1790,11 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 					if (isKeyword (token, KEYWORD_async))
 						readToken (token);
 				}
+
+				vString * signature = vStringNew ();
 				if ( is_shorthand || isKeyword (token, KEYWORD_function) )
 				{
 					TRACE_PRINT("Seems to be a function or shorthand");
-					vString *const signature = vStringNew ();
 
 					if (! is_shorthand)
 					{
@@ -1761,6 +1811,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						skipArgumentList(token, false, signature);
 					}
 
+function:
 					if (isType (token, TOKEN_OPEN_CURLY))
 					{
 						has_methods = true;
@@ -1785,12 +1836,11 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						if (! is_es6_class)
 							readToken (token);
 					}
-
-					vStringDelete (signature);
 				}
 				else if (! is_es6_class)
 				{
 					bool has_child_methods = false;
+					tokenInfo *saved_token = newToken ();
 
 					/* skip whatever is the value */
 					while (! isType (token, TOKEN_COMMA) &&
@@ -1805,17 +1855,34 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						}
 						else if (isType (token, TOKEN_OPEN_PAREN))
 						{
-							skipArgumentList (token, false, NULL);
+							vStringClear (signature);
+							skipArgumentList (token, false, signature);
 						}
 						else if (isType (token, TOKEN_OPEN_SQUARE))
 						{
 							skipArrayList (token, false);
 						}
+						else if (isType (token, TOKEN_ARROW))
+						{
+							TRACE_PRINT("Seems to be an anonymous function");
+							if (vStringIsEmpty (signature) &&
+								isType (saved_token, TOKEN_IDENTIFIER))
+							{
+								vStringPut (signature, '(');
+								vStringCat (signature, saved_token->string);
+								vStringPut (signature, ')');
+							}
+							readToken (token);
+							deleteToken (saved_token);
+							goto function;
+						}
 						else
 						{
+							copyToken (saved_token, token, true);
 							readToken (token);
 						}
 					}
+					deleteToken (saved_token);
 
 					has_methods = true;
 					if (has_child_methods)
@@ -1828,6 +1895,8 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 					makeJsTag (name, JSTAG_FIELD, NULL, NULL);
 					parseLine (token, true);
 				}
+
+				vStringDelete (signature);
 			}
 			else
 			{

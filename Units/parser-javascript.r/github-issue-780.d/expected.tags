@@ -1,0 +1,3 @@
+AnonymousClass6b70cce50101	input.js	/^const Bar = Foo.create({$/;"	c
+Bar	input.js	/^const Bar = Foo.create({$/;"	C
+jump	input.js	/^  jump() {$/;"	m	class:AnonymousClass6b70cce50101
