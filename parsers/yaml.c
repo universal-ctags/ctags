@@ -174,6 +174,14 @@ static void findYamlTags (void)
 
 		yaml_token_delete (&token);
 	}
+
+	foreachSubparser(sub, false)
+	{
+		enterSubparser (sub);
+		ypathPopAllTypes ((yamlSubparser*)sub);
+		leaveSubparser ();
+	}
+
 	yamlFini (&yaml);
 }
 
