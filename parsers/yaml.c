@@ -134,6 +134,13 @@ static void findYamlTags (void)
 
 	findRegexTags ();
 
+	foreachSubparser(sub, false)
+	{
+		enterSubparser (sub);
+		((yamlSubparser*)sub)->ypathTypeStack = NULL;
+		leaveSubparser ();
+	}
+
 	sub = getSubparserRunningBaseparser();
 	if (sub)
 		chooseExclusiveSubparser (sub, NULL);

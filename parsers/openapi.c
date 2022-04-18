@@ -140,7 +140,6 @@ static void newTokenCallback (yamlSubparser *s, yaml_token_t *token)
 static void inputStart(subparser *s)
 {
 	((struct sOpenAPISubparser*)s)->detection_state = DSTAT_INITIAL;
-	((yamlSubparser*)s)->ypathTypeStack = NULL;
 }
 
 static void inputEnd(subparser *s)
