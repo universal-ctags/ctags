@@ -1652,19 +1652,19 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 		else if (isType (token, TOKEN_KEYWORD) &&
 				 (isKeyword (token, KEYWORD_get) || isKeyword (token, KEYWORD_set)))
 		{
-			tokenInfo *savedToken = newToken ();
-			copyToken (savedToken, token, true);
+			tokenInfo *saved_token = newToken ();
+			copyToken (saved_token, token, true);
 			readToken (token);
 			if (isType(token, TOKEN_OPEN_PAREN))
 			{
 				Assert (NextToken == NULL);
 				NextToken = newToken ();
 				copyToken (NextToken, token, false);	/* save token for next read */
-				copyToken (token, savedToken, true);	/* restore token to process */
+				copyToken (token, saved_token, true);	/* restore token to process */
 				token->type = TOKEN_IDENTIFIER;			/* process as identifier */
 				token->keyword = KEYWORD_NONE;
 			}
-			else if (isKeyword (savedToken, KEYWORD_get))
+			else if (isKeyword (saved_token, KEYWORD_get))
 			{
 				is_getter = true;
 			}
@@ -1672,7 +1672,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 			{
 				is_setter = true;
 			}
-			deleteToken (savedToken);
+			deleteToken (saved_token);
 		}
 
 		if (! isType (token, TOKEN_KEYWORD) &&
