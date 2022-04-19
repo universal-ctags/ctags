@@ -47,6 +47,7 @@ dctags
 dctags.exe
 depcomp
 gdb-backtrace.txt
+GNUmakefile.in
 install-sh
 libctags.a
 libutil.a
@@ -78,13 +79,13 @@ win32/*.user
 win32/[Dd]ebug/
 win32/[Rr]elease/
 _build
-man/Makefile
 man/ctags.1
 man/ctags.1.html
 man/ctags.1.rst
 man/ctags-*.7
 man/ctags-*.7.rst
 man/ctags-*.7.html
+man/GNUmakefile
 man/readtags.1
 man/readtags.1.rst
 man/readtags.1.html

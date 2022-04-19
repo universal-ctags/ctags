@@ -835,7 +835,7 @@ fi
 
 AC_CHECK_FUNCS(mblen)
 
-AC_CONFIG_FILES([Makefile gnulib/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile gnulib/Makefile man/GNUmakefile])
 
 AC_OUTPUT
 
