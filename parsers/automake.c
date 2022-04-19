@@ -335,7 +335,7 @@ static void findAutomakeTags (void)
 extern parserDefinition* AutomakeParser (void)
 {
 	static const char *const extensions [] = { "am", NULL };
-	static const char *const patterns [] = { "Makefile.am", NULL };
+	static const char *const patterns [] = { "Makefile.am", "GNUmakefile.am", NULL };
 	static struct sAutomakeSubparser automakeSubparser = {
 		.make = {
 			.subparser = {
