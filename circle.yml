@@ -160,7 +160,15 @@ jobs:
            name: Test
            command: |
              ulimit -c 0
-             make distcheck
+             # Let's trick git.
+             #
+             # "git" running in "make distcheck" may refer $(pwd)/.git of THIS context.
+             # On the other hand, we want to run the test cases in an environment separated
+             # from our git repo.
+             #
+             mkdir __NO_GIT__
+             make distcheck GIT_DIR=__NO_GIT__
+             rmdir __NO_GIT__
 
    ubi8_make:
      working_directory: ~/universal-ctags
