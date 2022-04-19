@@ -27,16 +27,16 @@ jobs:
             sudo ln -s /usr/local/lib/libiconv.so.* /usr/local/lib/libiconv.so
           fi
               
-          run sudo pkg_add automake-1.16.3
+          run sudo pkg_add automake-1.16.3 gmake
 
           run cc --version
             
           run ./autogen.sh
           run ./configure --prefix=/usr
-          run make
-          run sudo make install
+          run gmake
+          run sudo gmake install
           run file /usr/bin/ctags
           run ctags --version
           # bugs to fix
           #run make check
-          run make roundtrip
+          run gmake roundtrip
