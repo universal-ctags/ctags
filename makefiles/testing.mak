@@ -296,6 +296,7 @@ chkgen_verbose = $(chkgen_verbose_@AM_V@)
 chkgen_verbose_ = $(chkgen_verbose_@AM_DEFAULT_V@)
 chkgen_verbose_0 = @echo CHKGEN "    $@";
 check-genfile:
+if BUILD_IN_GIT_REPO
 # OPTLIB2C_SRCS : committed for win32 build
 	$(chkgen_verbose)rm -f $(OPTLIB2C_SRCS)
 	$(chkgen_verbose)$(MAKE) $(OPTLIB2C_SRCS)
@@ -351,3 +352,4 @@ endif
 	else \
 		echo "Files under win32 are up to date." ; \
 	fi
+endif
