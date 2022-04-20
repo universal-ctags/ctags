@@ -38,5 +38,5 @@ jobs:
           run file /usr/bin/ctags
           run ctags --version
           # bugs to fix
-          #run make check
-          run gmake roundtrip
+          #run make check CI=gha+vagrant+openbsd
+          run gmake roundtrip CI=gha+vagrant+openbsd

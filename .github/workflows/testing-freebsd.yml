@@ -34,5 +34,5 @@ jobs:
           run gmake install
           run file ctags
           run ctags --version
-          run gmake check
-          run gmake roundtrip
+          run gmake check CI=gha+vagrant+freebsd
+          run gmake roundtrip CI=gha+vagrant+freebsd
