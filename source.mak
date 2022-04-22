@@ -292,6 +292,7 @@ PARSER_SRCS =				\
 	parsers/basic.c			\
 	parsers/beta.c			\
 	parsers/bibtex.c		\
+	parsers/c-based.c		\
 	parsers/c.c			\
 	parsers/clojure.c		\
 	parsers/css.c			\
@@ -386,6 +387,7 @@ PARSER_SRCS =				\
 	parsers/ttcn.c			\
 	parsers/txt2tags.c		\
 	parsers/typescript.c		\
+	parsers/vera.c			\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\
 	parsers/vim.c			\

@@ -264,6 +264,7 @@
     <ClCompile Include="..\parsers\basic.c" />
     <ClCompile Include="..\parsers\beta.c" />
     <ClCompile Include="..\parsers\bibtex.c" />
+    <ClCompile Include="..\parsers\c-based.c" />
     <ClCompile Include="..\parsers\c.c" />
     <ClCompile Include="..\parsers\clojure.c" />
     <ClCompile Include="..\parsers\cobol.c" />
@@ -358,6 +359,7 @@
     <ClCompile Include="..\parsers\ttcn.c" />
     <ClCompile Include="..\parsers\txt2tags.c" />
     <ClCompile Include="..\parsers\typescript.c" />
+    <ClCompile Include="..\parsers\vera.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />
     <ClCompile Include="..\parsers\vim.c" />
