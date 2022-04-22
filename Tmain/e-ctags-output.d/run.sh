@@ -16,9 +16,13 @@ run()
 	echo '#'
 
 	cp input_file.cc $BUILDDIR/"${tmp}"
-	if ! direq $BUILDDIR .; then
-		cp input_*.rst $BUILDDIR
-		copied=yes
+	if ! direq_maybe $BUILDDIR .; then
+		for f in input_*.rst; do
+			if ! [ -e $BUILDDIR/$f ]; then
+				cp $f $BUILDDIR
+				copied=yes
+			fi
+		done
 	fi
 	(
 		cd $BUILDDIR

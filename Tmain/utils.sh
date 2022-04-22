@@ -130,7 +130,7 @@ echo2()
 	/bin/echo "$@" 1>&2
 }
 
-direq ()
+direq_maybe ()
 {
     [ "$(cd ${1} && pwd)" = "$(cd ${2} && pwd)" ]
     return $?

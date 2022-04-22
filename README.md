@@ -57,7 +57,7 @@ code from GitHub.
 
 ## How to build and install ##
 
-To build with Autotools (Autoconf, Automake, and Libtool) on GNU/Linux, OSX, or Windows 10 WSL,
+To build with Autotools (Autoconf and Automake) on GNU/Linux, OSX, or Windows 10 WSL,
 ```
     $ git clone https://github.com/universal-ctags/ctags.git
     $ cd ctags
@@ -66,6 +66,8 @@ To build with Autotools (Autoconf, Automake, and Libtool) on GNU/Linux, OSX, or 
     $ make
     $ make install # may require extra privileges depending on where to install
 ```
+
+GNU make is assumed as the `make` command.
 
 See
 [`docs/autotools.rst`](https://github.com/universal-ctags/ctags/blob/master/docs/autotools.rst)

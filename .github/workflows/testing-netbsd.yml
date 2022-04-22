@@ -18,7 +18,7 @@ jobs:
         mem: 2048
         box: generic/netbsd9
         run: |
-          run sudo pkgin -y install mozilla-rootcerts automake autoconf pkg-config
+          run sudo pkgin -y install mozilla-rootcerts automake autoconf pkg-config gmake
 
           run sudo mozilla-rootcerts install
 
@@ -26,10 +26,10 @@ jobs:
 
           run ./autogen.sh
           run ./configure --prefix=/usr
-          run make
-          run sudo make install
+          run gmake
+          run sudo gmake install
           run file /usr/bin/ctags
           run ctags --version
           # bugs to fix
-          #run make check
-          run make roundtrip
+          #run make check CI=gha+vagrant+netbsd
+          run gmake roundtrip CI=gha+vagrant+netbsd

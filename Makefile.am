@@ -33,7 +33,7 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/ctags_vs2013.sln \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/ctags_vs2013.vcxproj.in win32/ctags_vs2013.vcxproj.filters.in \
-	       win32/Makefile \
+	       win32/GNUmakefile \
 	       win32/gen-repoinfo.bat \
 	       misc/txt2cstr \
 	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(OPTLIB2C_PCRE2_INPUT) $(TXT2CSTR_INPUT) \

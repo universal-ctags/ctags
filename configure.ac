@@ -835,8 +835,14 @@ fi
 
 AC_CHECK_FUNCS(mblen)
 
-AC_CONFIG_FILES([Makefile gnulib/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile gnulib/Makefile man/GNUmakefile])
 
 AC_OUTPUT
+
+AC_MSG_RESULT([
+##########################################################################
+Now you can run make or gmake, when you run as make, besure it is GNU make.
+##########################################################################
+])
 
 # vim:ts=4:sw=4:
