@@ -12,7 +12,7 @@ for x in no yes default; do
     touch $BUILDDIR/${x}-$O
 done
 
-if ! direq $BUILDDIR .; then
+if ! direq_maybe $BUILDDIR .; then
 	cp -r indirect $BUILDDIR
 	copied=yes
 fi
