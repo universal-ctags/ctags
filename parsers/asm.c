@@ -320,7 +320,7 @@ static const unsigned char *asmReadLineFromInputFile (void)
 			vStringPut (line, c);
 	}
 
-	if ((vStringLength (line) == 0)&& (c == EOF))
+	if ((vStringLength (line) == 0) && (c == EOF))
 		return NULL;
 	else
 		return (unsigned char *)vStringValue (line);
