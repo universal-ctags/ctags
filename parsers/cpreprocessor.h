@@ -115,6 +115,7 @@ typedef struct sCppMacroReplacementPartInfo {
 } cppMacroReplacementPartInfo;
 
 typedef struct sCppMacroInfo {
+	char *name;			/* the name of macro. Useful for debugging. */
 	bool hasParameterList; /* true if the macro has a trailing () */
 	cppMacroReplacementPartInfo * replacements;
 	int useCount;

@@ -2093,8 +2093,8 @@ static void saveIgnoreToken(const char * ignoreToken)
 	}
 	info->useCount = 0;
 	info->next = NULL;
-
-	hashTablePutItem(cmdlineMacroTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
+	info->name = eStrndup(tokenBegin,tokenEnd - tokenBegin);
+	hashTablePutItem(cmdlineMacroTable,info->name,info);
 
 	verbose ("    ignore token: %s\n", ignoreToken);
 }
@@ -2389,7 +2389,8 @@ static cppMacroInfo * saveMacro(hashTable *table, const char * macro)
 			ADD_CONSTANT_REPLACEMENT(begin,c - begin);
 	}
 
-	hashTablePutItem(table,eStrndup(identifierBegin,identifierEnd - identifierBegin),info);
+	info->name = eStrndup(identifierBegin,identifierEnd - identifierBegin);
+	hashTablePutItem(table,info->name,info);
 	CXX_DEBUG_LEAVE();
 
 	return info;
@@ -2408,6 +2409,7 @@ static void freeMacroInfo(cppMacroInfo * info)
 		pPart = pPart->next;
 		eFree(pPartToDelete);
 	}
+	eFree(info->name);
 	eFree(info);
 }
 
@@ -2417,7 +2419,7 @@ static hashTable *makeMacroTable (void)
 		1024,
 		hashCstrhash,
 		hashCstreq,
-		eFree,
+		NULL,					/* Keys refers values' name fields. */
 		(void (*)(void *))freeMacroInfo
 		);
 }
