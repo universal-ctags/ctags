@@ -1350,7 +1350,7 @@ bool cxxParserParseNextToken(void)
 			if(pMacro && (pMacro->useCount < CXX_PARSER_MAXIMUM_MACRO_USE_COUNT))
 			{
 				CXX_DEBUG_PRINT("Macro %s <%p> useCount: %d", vStringValue(t->pszWord),
-								pMacro, pMacro? pMacro->useCount: -1);
+								pMacro, pMacro->useCount);
 
 				cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
