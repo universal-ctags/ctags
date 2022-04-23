@@ -1,4 +1,16 @@
+AnonymousClassecad86450101	input.js	/^  { a: "hello", b: 42 },$/;"	c
+AnonymousClassecad86450201	input.js	/^  { a: "hi", b: 41 }$/;"	c
+AnonymousClassecad86450301	input.js	/^    { a: {}, b: {} },$/;"	c	class:class
+AnonymousClassecad86450401	input.js	/^    { a: {}, b: {} }$/;"	c	class:class
+a	input.js	/^    { a: {}, b: {} }$/;"	p	class:class.AnonymousClassecad86450401
+a	input.js	/^    { a: {}, b: {} },$/;"	p	class:class.AnonymousClassecad86450301
+a	input.js	/^  { a: "hello", b: 42 },$/;"	p	class:AnonymousClassecad86450101
+a	input.js	/^  { a: "hi", b: 41 }$/;"	p	class:AnonymousClassecad86450201
 a	input.js	/^var a = [];$/;"	v
+b	input.js	/^    { a: {}, b: {} }$/;"	p	class:class.AnonymousClassecad86450401
+b	input.js	/^    { a: {}, b: {} },$/;"	p	class:class.AnonymousClassecad86450301
+b	input.js	/^  { a: "hello", b: 42 },$/;"	p	class:AnonymousClassecad86450101
+b	input.js	/^  { a: "hi", b: 41 }$/;"	p	class:AnonymousClassecad86450201
 b	input.js	/^var b = [1, 2, 3];$/;"	v
 bar	input.js	/^    bar: [ 4, 5, 9]$/;"	p	class:class.test1
 c	input.js	/^var c = [$/;"	v
