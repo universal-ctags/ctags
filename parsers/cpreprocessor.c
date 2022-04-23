@@ -2031,6 +2031,54 @@ extern vString * cppBuildMacroReplacement(
 	return ret;
 }
 
+// We stop applying macro replacements if the unget buffer gets too big
+// as it is a sign of recursive macro expansion
+#define CPP_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
+
+extern void cppBuildMacroReplacementWithPtrArrayAndUngetResult(
+		cppMacroInfo * macro,
+		const ptrArray * args)
+{
+	vString * replacement = NULL;
+
+	// Detect other cases of nasty macro expansion that cause
+	// the unget buffer to grow fast (but the token chain to grow slowly)
+	//    -D'p=a' -D'a=p+p'
+	if ((cppUngetBufferSize() < CPP_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
+		&& macro->replacements)
+	{
+		int argc = 0;
+		const char ** argv = NULL;
+
+		if (args)
+		{
+			argc = ptrArrayCount (args);
+			argv = (const char **)eMalloc (sizeof(char *) * argc);
+			for (int i = 0; i < argc; i++)
+			{
+				TRACE_PRINT("Arg[%d] for %s<%p>: %s",
+							i, macro->name, macro, ptrArrayItem (args, i));
+				argv[i] = ptrArrayItem (args, i);
+			}
+		}
+
+		replacement = cppBuildMacroReplacement(macro, argv, argc);
+
+		if (argv)
+			eFree ((void *)argv);
+	}
+
+	if (replacement)
+	{
+		cppUngetStringBuiltByMacro(vStringValue(replacement), vStringLength(replacement),
+								   macro);
+		TRACE_PRINT("Replacement for %s<%p>: %s", macro->name, macro, vStringValue (replacement));
+		vStringDelete (replacement);
+	}
+	else
+		TRACE_PRINT("Replacement for %s<%p>: ", macro->name, macro);
+
+}
 
 static void saveIgnoreToken(const char * ignoreToken)
 {
