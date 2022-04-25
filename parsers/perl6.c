@@ -325,7 +325,8 @@ findPerl6Tags (void)
 parserDefinition *
 Perl6Parser (void)
 {
-    static const char *const extensions[] = { "p6", "pm6", "pm", "pl6", NULL };
+    static const char *const extensions[] = { "p6", "pm6", "pm", "pl6",
+		"t6", "raku", "rakumod", "rakutest", NULL };
     static selectLanguage selectors [] = { selectByPickingPerlVersion,
 					   NULL };
     parserDefinition* def = parserNew("Perl6");
