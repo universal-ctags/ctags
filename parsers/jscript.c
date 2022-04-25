@@ -303,70 +303,67 @@ static void makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 							 vString *const signature, vString *const inheritance,
 							 bool anonymous)
 {
-	if (JsKinds [kind].enabled )
+	const char *name = vStringValue (token->string);
+	vString *fullscope = vStringNewCopy (token->scope);
+	const char *p;
+	tagEntryInfo e;
+
+	if (!token->dynamicProp && kind != JSTAG_PROPERTY &&  (p = strrchr (name, '.')) != NULL )
 	{
-		const char *name = vStringValue (token->string);
-		vString *fullscope = vStringNewCopy (token->scope);
-		const char *p;
-		tagEntryInfo e;
-
-		if (!token->dynamicProp && kind != JSTAG_PROPERTY &&  (p = strrchr (name, '.')) != NULL )
-		{
-			if (vStringLength (fullscope) > 0)
-				vStringPut (fullscope, '.');
-			vStringNCatS (fullscope, name, (size_t) (p - name));
-			name = p + 1;
-		}
-
-		initTagEntry (&e, name, kind);
-
-		TRACE_PRINT("Emitting tag for symbol '%s' of kind %02x with scope '%s'",name,kind,vStringValue(fullscope));
-
-		e.lineNumber   = token->lineNumber;
-		e.filePosition = token->filePosition;
-
-		if ( vStringLength(fullscope) > 0 )
-		{
-			/* FIXME: proper parent type */
-			jsKind parent_kind = JSTAG_CLASS;
-
-			/*
-			 * If we're creating a function (and not a method),
-			 * guess we're inside another function
-			 */
-			if (kind == JSTAG_FUNCTION)
-				parent_kind = JSTAG_FUNCTION;
-
-			e.extensionFields.scopeKindIndex = parent_kind;
-			e.extensionFields.scopeName = vStringValue (fullscope);
-		}
-
-		if (signature && vStringLength(signature))
-		{
-			size_t i;
-			/* sanitize signature by replacing all control characters with a
-			 * space (because it's simple).
-			 * there should never be any junk in a valid signature, but who
-			 * knows what the user wrote and CTags doesn't cope well with weird
-			 * characters. */
-			for (i = 0; i < signature->length; i++)
-			{
-				unsigned char c = (unsigned char) vStringChar (signature, i);
-				if (c < 0x20 /* below space */ || c == 0x7F /* DEL */)
-					vStringChar (signature, i) = ' ';
-			}
-			e.extensionFields.signature = vStringValue(signature);
-		}
-
-		if (inheritance)
-			e.extensionFields.inheritance = vStringValue(inheritance);
-
-		if (anonymous)
-			markTagExtraBit (&e, XTAG_ANONYMOUS);
-
-		makeTagEntry (&e);
-		vStringDelete (fullscope);
+		if (vStringLength (fullscope) > 0)
+			vStringPut (fullscope, '.');
+		vStringNCatS (fullscope, name, (size_t) (p - name));
+		name = p + 1;
 	}
+
+	initTagEntry (&e, name, kind);
+
+	TRACE_PRINT("Emitting tag for symbol '%s' of kind %02x with scope '%s'",name,kind,vStringValue(fullscope));
+
+	e.lineNumber   = token->lineNumber;
+	e.filePosition = token->filePosition;
+
+	if ( vStringLength(fullscope) > 0 )
+	{
+		/* FIXME: proper parent type */
+		jsKind parent_kind = JSTAG_CLASS;
+
+		/*
+		 * If we're creating a function (and not a method),
+		 * guess we're inside another function
+		 */
+		if (kind == JSTAG_FUNCTION)
+			parent_kind = JSTAG_FUNCTION;
+
+		e.extensionFields.scopeKindIndex = parent_kind;
+		e.extensionFields.scopeName = vStringValue (fullscope);
+	}
+
+	if (signature && vStringLength(signature))
+	{
+		size_t i;
+		/* sanitize signature by replacing all control characters with a
+		 * space (because it's simple).
+		 * there should never be any junk in a valid signature, but who
+		 * knows what the user wrote and CTags doesn't cope well with weird
+		 * characters. */
+		for (i = 0; i < signature->length; i++)
+		{
+			unsigned char c = (unsigned char) vStringChar (signature, i);
+			if (c < 0x20 /* below space */ || c == 0x7F /* DEL */)
+				vStringChar (signature, i) = ' ';
+		}
+		e.extensionFields.signature = vStringValue(signature);
+	}
+
+	if (inheritance)
+		e.extensionFields.inheritance = vStringValue(inheritance);
+
+	if (anonymous)
+		markTagExtraBit (&e, XTAG_ANONYMOUS);
+
+	makeTagEntry (&e);
+	vStringDelete (fullscope);
 }
 
 static void makeJsTag (const tokenInfo *const token, const jsKind kind,
