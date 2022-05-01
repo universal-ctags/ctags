@@ -1889,6 +1889,8 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 
 		if(pTypeName)
 		{
+			if (pInfo->uAnonymous & (0x1u << i))
+				PARSER_TRASH_BOX_TAKE_BACK (pInfo->aIdentifiers[i]);
 			cxxTokenDestroy(pInfo->aIdentifiers[i]);
 			cxxTokenDestroy(pTypeName);
 		}
@@ -2180,6 +2182,7 @@ try_again:
 						pIdentifier->iLineNumber = t->pPrev->iLineNumber;
 						pIdentifier->oFilePosition = t->pPrev->oFilePosition;
 						pParamInfo->uAnonymous |= (0x1u << pParamInfo->uCount);
+						PARSER_TRASH_BOX (pIdentifier, cxxTokenDestroy);
 					}
 					pParamInfo->aIdentifiers[pParamInfo->uCount] = pIdentifier;
 					pParamInfo->uCount++;
@@ -2233,7 +2236,7 @@ try_again:
 			pParamInfo->uCount++;
 
 			PARSER_TRASH_BOX (pFakeStart, cxxTokenDestroy);
-			/* pFakeId may be destroyed via pParamInfo->aIdentifiers[i]. */
+			PARSER_TRASH_BOX (pFakeId, cxxTokenDestroy);
 		}
 
 		if(cxxTokenTypeIs(t,CXXTokenTypeClosingParenthesis))
