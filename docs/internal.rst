@@ -290,6 +290,17 @@ the child tag filling ``scopeIndex``:
 If ``scopeIndex`` of ``child`` is ``CORK_NIL``, the ``child`` is stores
 to the *toplevel scope*.
 
+``unregisterEntry`` is for clearing (and updating) the reverse mapping
+of a child. Consider the case you want to change the scope of ``child``
+from ``newParent``.
+
+.. code-block:: c
+
+	unregisterEntry (child);                         /* delete the reverse mapping. */
+	tagEntryInfo *e_child = getEntryInCorkQueue (child);
+	e_child->extensionFields.scopeIndex = newParent; /* update the forward mapping. */
+	registerEntry (child);                           /* set the new reverse mapping. */
+
 ``foreachEntriesInScope`` is the function for traversing all child
 tags stored to the parent tag specified with ``corkIndex``.
 If the ``corkIndex`` is ``CORK_NIL``, the children defined (and/or

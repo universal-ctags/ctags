@@ -1235,6 +1235,12 @@ static void corkSymtabPut (tagEntryInfoX *scope, const char* name, tagEntryInfoX
 	rb_insert_color(&item->symnode, root);
 }
 
+static void corkSymtabUnlink (tagEntryInfoX *scope, tagEntryInfoX *item)
+{
+	struct rb_root *root = &scope->symtab;
+	rb_erase (&item->symnode, root);
+}
+
 extern bool foreachEntriesInScope (int corkIndex,
 								   const char *name,
 								   entryForeachFunc func,
@@ -1433,6 +1439,19 @@ extern void registerEntry (int corkIndex)
 		tagEntryInfoX *scope = ptrArrayItem (TagFile.corkQueue, e->slot.extensionFields.scopeIndex);
 		corkSymtabPut (scope, e->slot.name, e);
 	}
+}
+
+extern void unregisterEntry(int corkIndex)
+{
+	Assert (TagFile.corkFlags & CORK_SYMTAB);
+	Assert (corkIndex != CORK_NIL);
+
+	tagEntryInfoX *e = ptrArrayItem (TagFile.corkQueue, corkIndex);
+	{
+		tagEntryInfoX *scope = ptrArrayItem (TagFile.corkQueue, e->slot.extensionFields.scopeIndex);
+		corkSymtabUnlink (scope, e);
+	}
+
 }
 
 static int queueTagEntry(const tagEntryInfo *const tag)

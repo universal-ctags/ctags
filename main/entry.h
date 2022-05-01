@@ -172,6 +172,7 @@ size_t        countEntryInCorkQueue (void);
  * specified in the scopeIndex field of the tag specified with CORKINDEX.
  */
 void          registerEntry (int corkIndex);
+void        unregisterEntry (int corkIndex);
 
 /* foreachEntriesInScope is for traversing the symbol table for a table
  * specified with CORKINDEX. If CORK_NIL is given, this function traverses
