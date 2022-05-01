@@ -1970,7 +1970,7 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 					"Token '%s' is something that is not a identifier, keyword, :: or ...",
 					vStringValue(t->pszWord)
 				);
-			return false;
+			goto unexpected_input;
 		}
 
 #define TOKENS_THAT_SHOULD_NOT_APPEAR_IN_SIGNATURE_BEFORE_ASSIGNMENT \
@@ -2037,7 +2037,7 @@ try_again:
 			CXX_DEBUG_LEAVE_TEXT(
 					"Found a parenthesis chain that doesn't belong to a function parameters list"
 				);
-			return false;
+			goto unexpected_input;
 		}
 
 		if(cxxTokenTypeIs(t,CXXTokenTypeSmallerThanSign))
@@ -2052,7 +2052,7 @@ try_again:
 						"Either not a function declaration or unbalanced " \
 							"template angle brackets"
 					);
-				return false;
+				goto unexpected_input;
 			}
 
 			goto try_again;
@@ -2061,7 +2061,7 @@ try_again:
 		if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Unbalanced > (a < should have been found before)");
-			return false;
+			goto unexpected_input;
 		}
 
 		if(cxxTokenTypeIsOneOf(
@@ -2074,7 +2074,7 @@ try_again:
 						"parameter list",
 					vStringValue(t->pszWord)
 				);
-			return false;
+			goto unexpected_input;
 		}
 
 		// closing parenthesis, assignment or comma
@@ -2233,7 +2233,10 @@ try_again:
 			pParamInfo->uCount++;
 
 			PARSER_TRASH_BOX (pFakeStart, cxxTokenDestroy);
-			/* pFakeId may be destroyed via pParamInfo->aIdentifiers[i]. */
+			/* pFakeId may be destroyed via pParamInfo->aIdentifiers[i] if this function
+			 * returns true. If this function returns false, pFakeId must be freed in
+			 * this function. See unexpected_input label at the end of function.
+			 */
 		}
 
 		if(cxxTokenTypeIs(t,CXXTokenTypeClosingParenthesis))
@@ -2256,7 +2259,7 @@ try_again:
 			CXX_DEBUG_LEAVE_TEXT(
 					"Found assignment, this doesn't look like valid C function parameter list"
 				);
-			return false;
+			goto unexpected_input;
 		}
 
 		CXX_DEBUG_PRINT("Found assignment");
@@ -2278,4 +2281,15 @@ try_again:
 	// not reached
 	CXX_DEBUG_LEAVE();
 	return true;
+
+ unexpected_input:
+	/* If this function returns false, pParamInfo passed to this function is not
+	 * used in the caller side. */
+	if (pParamInfo && isXtagEnabled(XTAG_ANONYMOUS)) {
+		for (unsigned int i = 0; i < pParamInfo->uCount; i++) {
+			if (pParamInfo->uAnonymous & (0x1u << i))
+				cxxTokenDestroy(pParamInfo->aIdentifiers[i]);
+		}
+	}
+	return false;
 }
