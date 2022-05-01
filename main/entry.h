@@ -178,7 +178,8 @@ void          registerEntry (int corkIndex);
  * top-level entries. If name is NULL, this function traverses all entries
  * under the scope.
  *
- * If FUNC returns false, this function returns false.
+ * If FUNC returns false, this function returns false immediately
+ * even if more entires in the scope.
  * If FUNC never returns false, this function returns true.
  * If FUNC is not called because no node for NAME in the symbol table,
  * this function returns true.
