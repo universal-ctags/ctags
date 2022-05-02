@@ -1316,7 +1316,7 @@ extern bool foreachEntriesInScope (int corkIndex,
 	do
 	{
 		tagEntryInfoX *entry = container_of(cursor, tagEntryInfoX, symnode);
-		if (!revisited_rep || !name || strcmp(name, entry->slot.name))
+		if (!revisited_rep || !name || !strcmp(name, entry->slot.name))
 		{
 			verbose ("symtbl[< ] %s->%p\n", name, &entry->slot);
 			if (!func (entry->corkIndex, &entry->slot, data))
