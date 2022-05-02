@@ -1063,7 +1063,7 @@ bool cxxParserLookForFunctionSignature(
 							pParamInfo
 						)
 					)
-						goto next_token;
+					goto next_token;
 
 			}
 
