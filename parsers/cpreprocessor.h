@@ -13,6 +13,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "ptrarray.h"
 #include "types.h"
 #include "vstring.h"
 
@@ -115,6 +116,7 @@ typedef struct sCppMacroReplacementPartInfo {
 } cppMacroReplacementPartInfo;
 
 typedef struct sCppMacroInfo {
+	char *name;			/* the name of macro. Useful for debugging. */
 	bool hasParameterList; /* true if the macro has a trailing () */
 	cppMacroReplacementPartInfo * replacements;
 	int useCount;
@@ -135,5 +137,11 @@ extern vString * cppBuildMacroReplacement(
 		const char ** parameters, /* may be NULL */
 		int parameterCount
 	);
+
+/* Do the same as cppBuildMacroReplacement with ptrArray<const char*>,
+ * and unget the result of expansion to input cpp stream. */
+extern void cppBuildMacroReplacementWithPtrArrayAndUngetResult(
+		cppMacroInfo * macro,
+		const ptrArray * args);
 
 #endif  /* CTAGS_MAIN_GET_H */

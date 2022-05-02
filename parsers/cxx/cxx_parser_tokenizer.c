@@ -1341,7 +1341,7 @@ bool cxxParserParseNextToken(void)
 			{
 				/* If the macro is overly used, report it here. */
 				CXX_DEBUG_PRINT("Overly uesd macro %s <%p> useCount: %d (> %d)",
-								vStringValue(t->pszWord),
+								pMacro->name,
 								pMacro, pMacro->useCount,
 								CXX_PARSER_MAXIMUM_MACRO_USE_COUNT);
 			}
@@ -1349,8 +1349,8 @@ bool cxxParserParseNextToken(void)
 
 			if(pMacro && (pMacro->useCount < CXX_PARSER_MAXIMUM_MACRO_USE_COUNT))
 			{
-				CXX_DEBUG_PRINT("Macro %s <%p> useCount: %d", vStringValue(t->pszWord),
-								pMacro, pMacro? pMacro->useCount: -1);
+				CXX_DEBUG_PRINT("Macro %s <%p> useCount: %d", pMacro->name,
+								pMacro, pMacro->useCount);
 
 				cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 

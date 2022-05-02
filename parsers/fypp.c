@@ -450,9 +450,10 @@ static void fyppSetGuestParser (const langType language CTAGS_ATTR_UNUSED,
 }
 
 static parameterHandlerTable FyppParameterHandlerTable [] = {
-	{ .name = "guest",
-	  .desc = "parser run after Fypp parser parses the original input (\"NONE\" or a parser name [Fortran])" ,
-	  .handleParameter = fyppSetGuestParser,
+	{
+		.name = "guest",
+		.desc = "parser run after Fypp parser parses the original input (\"NONE\" or a parser name [Fortran])" ,
+		.handleParameter = fyppSetGuestParser,
 	},
 };
 

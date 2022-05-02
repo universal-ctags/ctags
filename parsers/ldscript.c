@@ -16,7 +16,9 @@
 #include "cpreprocessor.h"
 #include "keyword.h"
 #include "parse.h"
+#include "ptrarray.h"
 #include "read.h"
+#include "trace.h"
 #include "xtag.h"
 
 #include <string.h>
@@ -122,6 +124,7 @@ typedef struct sLdScriptToken {
 	tokenInfo base;
 	int scopeIndex;
 	tokenKeyword assignment;
+	bool whitespacePrefixed;
 } ldScriptToken;
 
 #define LDSCRIPT(TOKEN) ((ldScriptToken *)TOKEN)
@@ -178,6 +181,8 @@ static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UN
 		LDSCRIPT (src)->scopeIndex;
 	LDSCRIPT (dest)->assignment =
 		LDSCRIPT (src)->assignment;
+	LDSCRIPT (dest)->whitespacePrefixed =
+		LDSCRIPT (src)->whitespacePrefixed;
 }
 
 static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
@@ -253,6 +258,104 @@ static int readPrefixedToken (tokenInfo *const token, int type)
 	return n;
 }
 
+// We stop applying macro replacements if a macro is used so many
+// times in a recursive macro expansion.
+#define LD_SCRIPT_PARSER_MAXIMUM_MACRO_USE_COUNT 8
+
+static bool collectMacroArguments (ptrArray *args)
+{
+	vString *s = vStringNew ();
+	tokenInfo *const t = newLdScriptToken ();
+	int depth = 1;
+
+	do
+	{
+		tokenRead (t);
+
+		if (tokenIsType (t, EOF))
+			break;
+		else if (tokenIsTypeVal (t, ')'))
+		{
+			depth--;
+			if (depth == 0)
+			{
+				char *cstr = vStringDeleteUnwrap (s);
+				ptrArrayAdd (args, cstr);
+				s = NULL;
+			}
+			else
+				vStringCat (s, t->string);
+		}
+		else if (tokenIsTypeVal (t, '('))
+		{
+			depth++;
+			vStringCat (s, t->string);
+		}
+		else if (tokenIsTypeVal (t, ','))
+		{
+			char *cstr = vStringDeleteUnwrap (s);
+			ptrArrayAdd (args, cstr);
+			s = vStringNew ();
+		}
+		else
+		{
+			if (LDSCRIPT(t)->whitespacePrefixed)
+				vStringPut(s, ' ');
+			vStringCat (s, t->string);
+		}
+	}
+	while (depth > 0);
+
+	vStringDelete (s);			/* NULL is acceptable. */
+
+	tokenDelete (t);
+
+	if (depth > 0)
+		TRACE_PRINT("unbalanced argument list");
+
+	return (depth > 0)? false: true;
+}
+
+static bool expandCppMacro (cppMacroInfo *macroInfo)
+{
+	ptrArray *args = NULL;
+
+	if (macroInfo->hasParameterList)
+	{
+		tokenInfo *const t = newLdScriptToken ();
+
+		/* Though macro arguments are expected, they are not found. */
+		tokenRead (t);
+		if (!tokenIsTypeVal (t, '('))
+		{
+			tokenUnread (t);
+			tokenDelete (t);
+			TRACE_PRINT("no argument for the %s<%p>", macroInfo->name, macroInfo);
+			return false;
+		}
+
+		args = ptrArrayNew (eFree);
+		if (!collectMacroArguments (args))
+		{
+			ptrArrayDelete (args);
+			tokenUnread (t);
+			tokenDelete (t);
+			return false;
+		}
+		tokenDelete (t);
+	}
+
+#ifdef DO_TRACING
+	for (int i = 0; i < ptrArrayCount(args); i++)
+		TRACE_PRINT("[%d] %s", i, (const char *)ptrArrayItem (args, i));
+#endif
+
+	cppBuildMacroReplacementWithPtrArrayAndUngetResult (macroInfo, args);
+
+	ptrArrayDelete (args);		/* NULL is acceptable. */
+	return true;
+}
+
 static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 {
 	int c, c0, c1;
@@ -261,8 +364,13 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	token->keyword	= KEYWORD_NONE;
 	vStringClear (token->string);
 
+	int prefix_count = -1;
+	LDSCRIPT (token)->whitespacePrefixed = false;
 	do {
 		c = cppGetc();
+		prefix_count++;
+		if (prefix_count > 0)
+			LDSCRIPT (token)->whitespacePrefixed = true;
 	} while (c == ' ' || c== '\t' || c == '\f' || c == '\r' || c == '\n'
 			 || c == STRING_SYMBOL || c == CHAR_SYMBOL);
 
@@ -281,6 +389,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	case '}':
 	case '[':
 	case ']':
+		tokenPutc(token, c);
 		token->type = c;
 		break;
 	case '~':
@@ -453,12 +562,30 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 			}
 			token->keyword = lookupKeyword (vStringValue (token->string), Lang_ldscript);
 			if (token->keyword == KEYWORD_NONE)
+			{
 				token->type = TOKEN_IDENTIFIER;
+
+				cppMacroInfo *macroInfo = cppFindMacro (vStringValue (token->string));
+				if (macroInfo)
+				{
+					TRACE_PRINT("Macro expansion: %s<%p>%s", vStringValue (token->string),
+								macroInfo, macroInfo->hasParameterList? "(...)": "");
+					if (!(macroInfo->useCount < LD_SCRIPT_PARSER_MAXIMUM_MACRO_USE_COUNT))
+						TRACE_PRINT ("Overly uesd macro %s<%p> useCount: %d (> %d)",
+									 vStringValue (token->string), macroInfo, macroInfo->useCount,
+									 LD_SCRIPT_PARSER_MAXIMUM_MACRO_USE_COUNT);
+					else if (expandCppMacro (macroInfo))
+						readToken (token, NULL);
+				}
+			}
 			else
 				token->type = TOKEN_KEYWORD;
 		}
 		else
+		{
+			tokenPutc(token, c);
 			token->type = c;
+		}
 		break;
 	}
 }
@@ -763,7 +890,7 @@ extern parserDefinition* LdScriptParser (void)
 	def->fieldTable = LdScriptFields;
 	def->fieldCount = ARRAY_SIZE (LdScriptFields);
 
-	def->useCork    = CORK_QUEUE;
+	def->useCork    = CORK_QUEUE|CORK_SYMTAB;
 
 	return def;
 }
