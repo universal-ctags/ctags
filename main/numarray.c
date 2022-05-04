@@ -146,7 +146,7 @@
 	extern void prefix##ArrayDeleteItem (prefix##Array* const current, unsigned int indx) \
 	{																	\
 		memmove (current->array + indx, current->array + indx + 1,		\
-				 (current->count - indx) * sizeof (*current->array));	\
+				 (current->count - indx - 1) * sizeof (*current->array)); \
 		--current->count;												\
 	}																	\
 	static int prefix##GreaterThan(const void *a, const void *b)		\

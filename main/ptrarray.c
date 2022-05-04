@@ -199,7 +199,7 @@ extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx)
 		current->deleteFunc (ptr);
 
 	memmove (current->array + indx, current->array + indx + 1,
-			(current->count - indx) * sizeof (*current->array));
+			(current->count - indx - 1) * sizeof (*current->array));
 	--current->count;
 }
 
@@ -208,7 +208,7 @@ extern void*ptrArrayRemoveItem (ptrArray* const current, unsigned int indx)
 	void *ptr = current->array[indx];
 
 	memmove (current->array + indx, current->array + indx + 1,
-			(current->count - indx) * sizeof (*current->array));
+			(current->count - indx - 1) * sizeof (*current->array));
 	--current->count;
 
 	return ptr;
