@@ -905,7 +905,8 @@ static void parseArchitecture (tokenInfo * const token)
 											   VHDLTAG_ENTITY, VHDL_ENTITY_DESIGNED);
 			int entity_index = anyKindEntryInScope (CORK_NIL,
 													vStringValue (token->string),
-													VHDLTAG_ENTITY);
+													VHDLTAG_ENTITY,
+													false);
 			tagEntryInfo *e = getEntryInCorkQueue (index);
 			if (e)
 			{

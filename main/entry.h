@@ -196,18 +196,22 @@ bool          foreachEntriesInScope (int corkIndex,
  * for NAME.
  */
 int           anyEntryInScope       (int corkIndex,
-									 const char *name);
+									 const char *name,
+									 bool onlyDefinitionTag);
 
 int           anyKindEntryInScope (int corkIndex,
-								   const char *name, int kind);
+								   const char *name, int kind,
+								   bool onlyDefinitionTag);
 
 int           anyKindsEntryInScope (int corkIndex,
 									const char *name,
-									const int * kinds, int count);
+									const int * kinds, int count,
+									bool onlyDefinitionTag);
 
 int           anyKindsEntryInScopeRecursive (int corkIndex,
 											 const char *name,
-											 const int * kinds, int count);
+											 const int * kinds, int count,
+											 bool onlyDefinitionTag);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern void    unmarkTagExtraBit   (tagEntryInfo *const tag, xtagType extra);

@@ -316,7 +316,8 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 										   (int[]){K_FUNCTION,
 												   K_GLOBALVAR,
 												   K_FUNCVAR,
-												   K_PARAM}, 4) != CORK_NIL)
+												   K_PARAM}, 4,
+										   false) != CORK_NIL)
 			return CORK_NIL;
 
 		parent = CORK_NIL;
@@ -330,7 +331,7 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 	if (pe && ((pe->langType == Lang_R && pe->kindIndex == K_FUNCTION)
 			   || (pe->langType != Lang_R && askSubparserTagHasFunctionAlikeKind (pe))))
 	{
-		cousin = anyEntryInScope (parent, tokenString (token));
+		cousin = anyEntryInScope (parent, tokenString (token), false);
 		if (kind == K_GLOBALVAR)
 			kind = K_FUNCVAR;
 	}
@@ -340,10 +341,10 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 		parent = searchScopeOtherThan (pe->extensionFields.scopeIndex,
 									   (int[]){K_VECTOR, K_LIST, K_DATAFRAME}, 3);
 		if (parent == CORK_NIL)
-			cousin = anyKindEntryInScope (parent, tokenString (token), K_GLOBALVAR);
+			cousin = anyKindEntryInScope (parent, tokenString (token), K_GLOBALVAR, false);
 		else
 		{
-			cousin = anyKindEntryInScope (parent, tokenString (token), K_FUNCVAR);
+			cousin = anyKindEntryInScope (parent, tokenString (token), K_FUNCVAR, false);
 			kind = K_FUNCVAR;
 		}
 	}
@@ -352,7 +353,7 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 		/* The condition for tagging is a bit relaxed here.
 		   Even if the same name tag is created in the scope, a name
 		   is tagged if kinds are different. */
-		cousin = anyKindEntryInScope (parent, tokenString (token), kind);
+		cousin = anyKindEntryInScope (parent, tokenString (token), kind, false);
 	}
 	if (cousin != CORK_NIL)
 		return CORK_NIL;

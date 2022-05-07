@@ -1338,20 +1338,31 @@ extern bool foreachEntriesInScope (int corkIndex,
 	return true;
 }
 
-static bool findName (int corkIndex, tagEntryInfo *entry, void *data)
-{
-	int *index = data;
+struct anyEntryInScopeData {
+	int index;
+	bool onlyDefinitionTag;
+};
 
-	*index =  corkIndex;
+static bool findName (int corkIndex, tagEntryInfo *entry, void *cbData)
+{
+	struct anyEntryInScopeData *data = cbData;
+
+	if (data->onlyDefinitionTag && !isRoleAssigned (entry, ROLE_DEFINITION_INDEX))
+		return true;
+
+	data->index = corkIndex;
 	return false;
 }
 
-int anyEntryInScope (int corkIndex, const char *name)
+int anyEntryInScope (int corkIndex, const char *name, bool onlyDefinitionTag)
 {
-	int index = CORK_NIL;
+	struct anyEntryInScopeData data = {
+		.index = CORK_NIL,
+		.onlyDefinitionTag = onlyDefinitionTag,
+	};
 
-	if (foreachEntriesInScope (corkIndex, name, findName, &index) == false)
-		return index;
+	if (foreachEntriesInScope (corkIndex, name, findName, &data) == false)
+		return data.index;
 
 	return CORK_NIL;
 }
@@ -1360,6 +1371,7 @@ struct anyKindsEntryInScopeData {
 	int  index;
 	const int *kinds;
 	int  count;
+	bool onlyDefinitionTag;
 };
 
 static bool findNameOfKinds (int corkIndex, tagEntryInfo *entry, void *data)
@@ -1369,7 +1381,9 @@ static bool findNameOfKinds (int corkIndex, tagEntryInfo *entry, void *data)
 	for (int i = 0; i < kdata->count; i++)
 	{
 		int k = kdata->kinds [i];
-		if (entry->kindIndex == k)
+		if (entry->kindIndex == k
+			&& ((!kdata->onlyDefinitionTag)
+				|| isRoleAssigned (entry, ROLE_DEFINITION_INDEX)))
 		{
 			kdata->index = corkIndex;
 			return false;
@@ -1379,19 +1393,22 @@ static bool findNameOfKinds (int corkIndex, tagEntryInfo *entry, void *data)
 }
 
 int anyKindEntryInScope (int corkIndex,
-						 const char *name, int kind)
+						 const char *name, int kind,
+						 bool onlyDefinitionTag)
 {
-	return anyKindsEntryInScope (corkIndex, name, &kind, 1);
+	return anyKindsEntryInScope (corkIndex, name, &kind, 1, onlyDefinitionTag);
 }
 
 int anyKindsEntryInScope (int corkIndex,
 						  const char *name,
-						  const int *kinds, int count)
+						  const int *kinds, int count,
+						  bool onlyDefinitionTag)
 {
 	struct anyKindsEntryInScopeData data = {
 		.index = CORK_NIL,
 		.kinds = kinds,
 		.count = count,
+		.onlyDefinitionTag = onlyDefinitionTag,
 	};
 
 	if (foreachEntriesInScope (corkIndex, name, findNameOfKinds, &data) == false)
@@ -1402,12 +1419,14 @@ int anyKindsEntryInScope (int corkIndex,
 
 int anyKindsEntryInScopeRecursive (int corkIndex,
 								   const char *name,
-								   const int *kinds, int count)
+								   const int *kinds, int count,
+								   bool onlyDefinitionTag)
 {
 	struct anyKindsEntryInScopeData data = {
 		.index = CORK_NIL,
 		.kinds = kinds,
 		.count = count,
+		.onlyDefinitionTag = onlyDefinitionTag,
 	};
 
 	tagEntryInfo *e;

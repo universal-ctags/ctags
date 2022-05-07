@@ -330,7 +330,8 @@ is not ``NULL``.
 .. code-block:: c
 
 	int           anyEntryInScope       (int corkIndex,
-										 const char *name);
+										 const char *name,
+										 bool onlyDefinitionTag);
 
 
 .. _tokeninfo:
