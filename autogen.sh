@@ -12,6 +12,12 @@ for t in autoreconf aclocal pkg-config autoconf automake; do
 	echo '##################################################################'
 done
 
+if [ -e ./aclocal.m4 ]; then
+	echo '#             Renaming aclocal.m4 to last-aclocal.m4             #'
+	mv ./aclocal.m4 ./last-aclocal.m4
+	echo '##################################################################'
+fi
+
 echo '#                        Generating files                        #'
 echo '##################################################################'
 

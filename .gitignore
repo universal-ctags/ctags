@@ -49,6 +49,7 @@ depcomp
 gdb-backtrace.txt
 GNUmakefile.in
 install-sh
+last-aclocal.m4
 libctags.a
 libutil.a
 Makefile.in
