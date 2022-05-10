@@ -112,7 +112,7 @@ copy_gnulib_heads:
 	copy win32\gnulib_h\fnmatch.h gnulib
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnulib\*.obj misc\packcc\*.obj peg\*.obj extra-cmds\*.obj libreadtags\*.obj dsl/*.o win32\mkstemp\*.obj win32\*.res main\repoinfo.h
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnulib\*.obj misc\packcc\*.obj peg\*.obj extra-cmds\*.obj libreadtags\*.obj dsl\*.obj win32\mkstemp\*.obj win32\*.res main\repoinfo.h
 	- del ctags.exe readtags.exe optscript.exe $(PACKCC)
 	- del tags
 	- del config.h gnulib\langinfo.h gnulib\fnmatch.h gnulib\*.obj gnulib\malloc\*.obj
