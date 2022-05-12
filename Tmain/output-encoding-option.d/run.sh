@@ -8,6 +8,9 @@ BUILDDIR=$2
 . ../utils.sh
 
 if ${CTAGS} --quiet --options=NONE --list-features | grep -q iconv; then
+  check_encoding shift_jis
+  check_encoding utf-8
+  check_encoding euc-jp
   if ${CTAGS}  --quiet --options=NONE \
 	       --pseudo-tags=-TAG_PROC_CWD \
 	       --output-encoding=shift_jis --input-encoding=utf-8 --input-encoding-javascript=euc-jp \

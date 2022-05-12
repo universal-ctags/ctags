@@ -8,6 +8,7 @@ BUILDDIR=$2
 . ../utils.sh
 
 if ${CTAGS} --quiet --options=NONE --list-features | grep -q iconv; then
+  check_encoding utf-8
   ${CTAGS} --quiet --options=NONE --output-encoding=utf-8 -o $BUILDDIR/tags input.js input.java
   exit $?
 else
