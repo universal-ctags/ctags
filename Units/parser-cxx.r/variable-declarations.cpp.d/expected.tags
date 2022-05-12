@@ -1,3 +1,5 @@
+MY_API	input.cpp	/^#define MY_API /;"	d	file:	macrodef:__declspec(dllexport)
+SIZE	input.cpp	/^#define SIZE /;"	d	file:	macrodef:25
 l01	input.cpp	/^	unsigned short int l01;$/;"	l	function:main	typeref:typename:unsigned short int	file:
 l02	input.cpp	/^	unsigned long long int * const l02 = NULL, * l03 = NULL;$/;"	l	function:main	typeref:typename:unsigned long long int * const	file:
 l03	input.cpp	/^	unsigned long long int * const l02 = NULL, * l03 = NULL;$/;"	l	function:main	typeref:typename:unsigned long long int * const *	file:
@@ -17,9 +19,9 @@ l16	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref
 l17	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref:struct:Struct1	file:
 l18	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref:struct:Struct1[10]	file:
 l19	input.cpp	/^	Struct1 l19 = {};$/;"	l	function:main	typeref:typename:Struct1	file:
-l20	input.cpp	/^	std::string ** l20[SIZE];$/;"	l	function:main	typeref:typename:std::string ** []	file:
+l20	input.cpp	/^	std::string ** l20[SIZE];$/;"	l	function:main	typeref:typename:std::string ** [25]	file:
 l21	input.cpp	/^	std::string l21[1 << 2];$/;"	l	function:main	typeref:typename:std::string[]	file:
-l22	input.cpp	/^	std::string * l22[SIZE][SIZE];$/;"	l	function:main	typeref:typename:std::string * [][]	file:
+l22	input.cpp	/^	std::string * l22[SIZE][SIZE];$/;"	l	function:main	typeref:typename:std::string * [25][25]	file:
 l23	input.cpp	/^	std::string l23[5][2];$/;"	l	function:main	typeref:typename:std::string[5][2]	file:
 l24	input.cpp	/^	std::string * const l24 = 0;$/;"	l	function:main	typeref:typename:std::string * const	file:
 l25	input.cpp	/^	wchar_t l25[] = { L"кошка" };$/;"	l	function:main	typeref:typename:wchar_t[]	file:
@@ -30,6 +32,8 @@ l29	input.cpp	/^	bool l29 { false };$/;"	l	function:main	typeref:typename:bool	f
 l30	input.cpp	/^	std::string * l30{ new std::string("test") };$/;"	l	function:main	typeref:typename:std::string *	file:
 l31	input.cpp	/^	std::string * l31(new std::string("test"));$/;"	l	function:main	typeref:typename:std::string *	file:
 l32	input.cpp	/^	auto l32 = new std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> >;$/;"	l	function:main	typeref:typename:auto	file:
+l32_33_0	input.cpp	/^class MY_API n06 l32_33_0;$/;"	v	typeref:class:n06
+l32_33_1	input.cpp	/^class __declspec(dllexport) n07 l32_33_1;$/;"	v	typeref:class:n07
 l33	input.cpp	/^	void (Struct1::*l33)() = NULL;$/;"	l	function:anotherFunc	typeref:typename:void (Struct1::*)()	file:
 l34	input.cpp	/^	void (Struct1::*l34)(int) = NULL;$/;"	l	function:anotherFunc	typeref:typename:void (Struct1::*)(int)	file:
 l35	input.cpp	/^	decltype(l36) l35;$/;"	l	function:anotherFunc	typeref:typename:decltype(l36)	file:

@@ -1,1 +1,7 @@
 --kinds-c++=lvm
+
+# for testing that the parser can skip __declspec
+--kinds-c++=+d
+--param-CPreProcessor._expand=true
+--fields=+{signature}
+--fields-c++=+{macrodef}

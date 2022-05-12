@@ -77,13 +77,16 @@ typedef struct X n01;
 typedef unsigned short int n02;
 typedef enum Enum1 n03;
 
-// This would be nice: handle #defines as ignore tokens.
-//#define MY_API __declspec(dllexport)
-//class MY_API n04;
+#define MY_API __declspec(dllexport)
+class MY_API n04;
 
-#ifdef _MSVC
+// This would be nice: parse inside a block surrounded by ifdef/endif.
+// #ifdef _MSVC
 	class __declspec(dllexport) n05;
-#endif
+// #endif
+
+class MY_API n06 l32_33_0;
+class __declspec(dllexport) n07 l32_33_1;
 
 // Note that function parameters are NOT extracted in this test.
 
