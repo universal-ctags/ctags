@@ -912,8 +912,9 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 	CXX_DEBUG_ENTER();
 
 	CXX_DEBUG_ASSERT(
-			cxxTokenIsKeyword(g_cxx.pToken,CXXKeyword__ATTRIBUTE__),
-			"This function should be called only after we have parsed __attribute__"
+			cxxTokenIsKeyword(g_cxx.pToken,CXXKeyword__ATTRIBUTE__)
+			|| cxxTokenIsKeyword(g_cxx.pToken,CXXKeyword__DECLSPEC),
+			"This function should be called only after we have parsed __attribute__ or __declspec"
 		);
 
 	// Kill it
@@ -1326,9 +1327,10 @@ bool cxxParserParseNextToken(void)
 				t->eType = CXXTokenTypeKeyword;
 				t->eKeyword = (CXXKeyword)iCXXKeyword;
 
-				if(iCXXKeyword == CXXKeyword__ATTRIBUTE__)
+				if(iCXXKeyword == CXXKeyword__ATTRIBUTE__
+					|| iCXXKeyword == CXXKeyword__DECLSPEC)
 				{
-					// special handling for __attribute__
+					// special handling for __attribute__ and __declspec
 					return cxxParserParseNextTokenCondenseAttribute();
 				}
 			}
