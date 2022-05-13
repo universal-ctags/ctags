@@ -8,6 +8,7 @@ CTAGS=$1
 . ../utils.sh
 
 if ${CTAGS} --quiet --options=NONE --list-features | grep -q iconv; then
+  check_encoding euc-jp
   ${CTAGS} --quiet --options=NONE --input-encoding-java=invalid	--input-encoding-javascript=euc-jp -o - input.js input.java
   exit $?
 else
