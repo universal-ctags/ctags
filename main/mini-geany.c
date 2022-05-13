@@ -204,6 +204,7 @@ typedef struct {
 	bool isFileScope;
 	unsigned long lineNumber;
 	int lang;
+	bool isAnon;
 } Tag;
 
 
@@ -228,6 +229,7 @@ static Tag *createTag(const tagEntryInfo *info)
 	tag->isFileScope = info->isFileScope;
 	tag->lineNumber = info->lineNumber;
 	tag->lang = info->langType;
+	tag->isAnon = isTagExtraBitMarked(info, XTAG_ANONYMOUS);
 	return tag;
 }
 
