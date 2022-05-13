@@ -61,8 +61,20 @@ static bool nofatalErrorPrinter (const errorSelection selection,
 }
 
 
-/* we need to be able to enable all kinds for all languages (some are disabled by default) */
-static void enableAllLangKinds()
+static void enableRoles(unsigned int lang, unsigned int kind)
+{
+	unsigned int c = countLanguageRoles(lang, kind);
+
+	for (unsigned int i = 0; i < c; i++)
+	{
+		roleDefinition* rdef = getLanguageRole(lang, kind, (int)i);
+		enableRole(rdef, true);
+	}
+}
+
+
+/* we need to be able to enable all kinds and roles for all languages (some are disabled by default) */
+static void enableKindsAndRoles()
 {
 	unsigned int lang;
 
@@ -75,6 +87,7 @@ static void enableAllLangKinds()
 		{
 			kindDefinition *def = getLanguageKind(lang, kind);
 			enableKind(def, true);
+			enableRoles(lang, kind);
 		}
 	}
 }
@@ -103,8 +116,8 @@ static void ctagsInit(void)
 	enableXtag(XTAG_TAGS_GENERATED_BY_GUEST_PARSERS, true);
 	enableXtag(XTAG_REFERENCE_TAGS, true);
 
-	/* some kinds we are interested in are disabled by default */
-	enableAllLangKinds();
+	/* some kinds and roles we are interested in are disabled by default */
+	enableKindsAndRoles();
 }
 
 
