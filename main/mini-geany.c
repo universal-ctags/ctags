@@ -21,6 +21,7 @@
 #include "field_p.h"
 #include "xtag_p.h"
 #include "entry_p.h"
+#include "param_p.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -179,6 +180,13 @@ static unsigned int ctagsGetLangCount(void)
 	return countParsers();
 }
 
+
+void addIgnoreSymbol(const char *value)
+{
+	langType lang = getNamedLanguage ("CPreProcessor", 0);
+	applyParameter (lang, "ignore", value);
+}
+
 /*******************************************************************************
  * So let's just use what we have for our great client...
  ******************************************************************************/
@@ -319,10 +327,17 @@ extern int main (int argc, char **argv)
 			"are provided\n\n");
 	if (argc == 1)  /* parsing contents of a buffer */
 	{
-		char *program = "int foo() {}\n\n int bar() {}\n\n int main() {}\n";
+		char *program = "FOO int foo() {}\n\n int bar() {}\n\n int main() {}\n";
 		int lang = ctagsGetNamedLang("C");
 		const char *kinds = ctagsGetLangKinds(lang);
 		int i;
+
+		/* we need to be able to set and clear ignore symbols */
+		addIgnoreSymbol("int");
+		/* clear */
+		addIgnoreSymbol(NULL);
+		/* set to something else */
+		addIgnoreSymbol("FOO");
 
 		printf("Number of all parsers is: %d\n", ctagsGetLangCount());
 		printf("We are parsing %s which provides the following kinds:\n",
