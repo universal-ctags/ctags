@@ -183,7 +183,7 @@ the object after calling.
 
 .. code-block:: c
 
-		static int parent = CORK_NIL;
+		int parent = CORK_NIL;
 		...
 		parent = makeTagEntry (&e);
 
