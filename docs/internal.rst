@@ -231,6 +231,97 @@ Setting ``requestAutomaticFQTag`` to ``TRUE`` implies setting
 
 .. NOT REVIEWED YET
 
+.. _symtabAPI:
+
+symbol table API
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*symbol table* API is an extension to the cork API. The cork API was
+introduced to provide the simple way to represent mapping (*forward
+mapping*) from a language object (*child object*) to its upper scope
+(*parent object*). *symbol table* API is for representing the mapping
+(*reverse mapping*) opposite direction; you can look up (or traverse)
+child tags defined (or used) in a given tag.
+
+To use this API, a parser must set ``CORK_SYMTAB`` to ``useCork`` member
+of ``parserDefinition`` in addition to setting ``CORK_QUEUE`` as preparation.
+
+An example taken from R parser:
+
+.. code-block:: c
+
+	extern parserDefinition *RParser (void)
+	{
+		static const char *const extensions[] = { "r", "R", "s", "q", NULL };
+		parserDefinition *const def = parserNew ("R");
+
+		...
+
+		def->useCork = CORK_QUEUE | CORK_SYMTAB;
+
+		...
+
+		return def;
+	}
+
+
+To install a reverse mapping between a parent and its child tags,
+call ``registerEntry`` with the cork index for a child after making
+the child tag filling ``scopeIndex``:
+
+.. code-block:: c
+
+	int parent = CORK_NIL;
+	...
+	parent = makeTagEntry (&e_parent);
+
+	...
+
+	tagEntryInfo e_child;
+	...
+	initTagEntry (&e_child, ...);
+	e_child.extensionFields.scopeIndex = parent;    /* setting up forward mapping */
+	...
+	int child = makeTagEntry (&e_child);
+
+	registerEntry (child);                          /* setting up reverse mapping */
+
+``registerEntry`` stores ``child`` to the symbol table of ``parent``.
+If ``scopeIndex`` of ``child`` is ``CORK_NIL``, the ``child`` is stores
+to the *toplevel scope*.
+
+``foreachEntriesInScope`` is the function for traversing all child
+tags stored to the parent tag specified with ``corkIndex``.
+If the ``corkIndex`` is ``CORK_NIL``, the children defined (and/or
+used) in *toplevel scope*  are traversed.
+
+.. code-block:: c
+
+	typedef bool (* entryForeachFunc) (int corkIndex,
+									   tagEntryInfo * entry,
+									   void * data);
+	bool          foreachEntriesInScope (int corkIndex,
+										 const char *name, /* or NULL */
+										 entryForeachFunc func,
+										 void *data);
+
+``foreachEntriesInScope``  takes a ``foreachEntriesInScope`` typed
+callback function.  ``foreachEntriesInScope`` passes the cork
+index and a pointer for ``tagEntryInfo`` object of children.
+
+`anyEntryInScope` is a function for finding a child tag stored
+to the parent tag specified with ``corkIndex``. It returns
+the cork index for the child tag. If ``corkIndex`` is ``CORK_NIL``,
+`anyEntryInScope` finds a tag stored to the toplevel scope.
+The returned child tag has ``name`` as its name as far as ``name``
+is not ``NULL``.
+
+.. code-block:: c
+
+	int           anyEntryInScope       (int corkIndex,
+										 const char *name);
+
+
 .. _tokeninfo:
 
 tokenInfo API
