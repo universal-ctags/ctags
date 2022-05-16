@@ -172,13 +172,15 @@ size_t        countEntryInCorkQueue (void);
  * specified in the scopeIndex field of the tag specified with CORKINDEX.
  */
 void          registerEntry (int corkIndex);
+void        unregisterEntry (int corkIndex);
 
 /* foreachEntriesInScope is for traversing the symbol table for a table
  * specified with CORKINDEX. If CORK_NIL is given, this function traverses
  * top-level entries. If name is NULL, this function traverses all entries
  * under the scope.
  *
- * If FUNC returns false, this function returns false.
+ * If FUNC returns false, this function returns false immediately
+ * even if more entires in the scope.
  * If FUNC never returns false, this function returns true.
  * If FUNC is not called because no node for NAME in the symbol table,
  * this function returns true.
@@ -194,18 +196,22 @@ bool          foreachEntriesInScope (int corkIndex,
  * for NAME.
  */
 int           anyEntryInScope       (int corkIndex,
-									 const char *name);
+									 const char *name,
+									 bool onlyDefinitionTag);
 
 int           anyKindEntryInScope (int corkIndex,
-								   const char *name, int kind);
+								   const char *name, int kind,
+								   bool onlyDefinitionTag);
 
 int           anyKindsEntryInScope (int corkIndex,
 									const char *name,
-									const int * kinds, int count);
+									const int * kinds, int count,
+									bool onlyDefinitionTag);
 
 int           anyKindsEntryInScopeRecursive (int corkIndex,
 											 const char *name,
-											 const int * kinds, int count);
+											 const int * kinds, int count,
+											 bool onlyDefinitionTag);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern void    unmarkTagExtraBit   (tagEntryInfo *const tag, xtagType extra);

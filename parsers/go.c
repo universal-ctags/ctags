@@ -814,7 +814,7 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		collectorTruncate (&collector, false);
 		if (receiver_type_token)
 		{
-			func_scope = anyEntryInScope (scope, vStringValue (receiver_type_token->string));
+			func_scope = anyEntryInScope (scope, vStringValue (receiver_type_token->string), false);
 			if (func_scope == CORK_NIL)
 				func_scope = makeTagFull(receiver_type_token, GOTAG_UNKNOWN,
 										 scope, NULL, NULL,
@@ -872,7 +872,7 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 static void attachTypeRefField (int scope, intArray *corks, const char *const type)
 {
-	int type_cork = anyEntryInScope (scope, type);
+	int type_cork = anyEntryInScope (scope, type, false);
 	tagEntryInfo *type_e = getEntryInCorkQueue (type_cork);
 
 	for (unsigned int i = 0; i < intArrayCount (corks); i++)

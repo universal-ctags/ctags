@@ -716,7 +716,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 
 static bool isCCFlag(const char *str)
 {
-	return (anyKindEntryInScope(CORK_NIL, str, SQLTAG_PLSQL_CCFLAGS) != 0);
+	return (anyKindEntryInScope(CORK_NIL, str, SQLTAG_PLSQL_CCFLAGS, false) != 0);
 }
 
 /* Parse a PostgreSQL: dollar-quoted string

@@ -461,7 +461,7 @@ static void findAsmTags (void)
 			}
 			else if (anyKindEntryInScope (CORK_NIL,
 										  vStringValue (name),
-										  K_MACRO))
+										  K_MACRO, true))
 				labelCandidate = false;
 		}
 
