@@ -421,7 +421,7 @@
 
 
 /* Define to 1 if the compiler supports the keyword '__inline'. */
-/* !!!#define HAVE___INLINE 1 */
+#define HAVE___INLINE 1
 
 /* Define this value if the platform uses "lib" as prefix for iconv functions.
    */
