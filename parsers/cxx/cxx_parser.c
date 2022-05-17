@@ -551,7 +551,7 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 	{
 		CXX_DEBUG_PRINT("Found opening bracket: possibly a function declaration?");
-		if(!cxxParserParseBlockHandleOpeningBracket())
+		if(!cxxParserParseBlockHandleOpeningBracket(false))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to handle the opening bracket");
 			return false;
@@ -955,7 +955,8 @@ bool cxxParserParseEnum(void)
 static bool cxxParserParseClassStructOrUnionInternal(
 		CXXKeyword eKeyword,
 		unsigned int uTagKind,
-		unsigned int uScopeType
+		unsigned int uScopeType,
+		bool bGotTemplateUpper
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -1287,9 +1288,9 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	int iCorkQueueIndex = CORK_NIL;
 	int iCorkQueueIndexFQ = CORK_NIL;
 
-	bool bGotTemplate = g_cxx.pTemplateTokenChain &&
+	bool bGotTemplate = bGotTemplateUpper || (g_cxx.pTemplateTokenChain &&
 			(g_cxx.pTemplateTokenChain->iCount > 0) &&
-			cxxParserCurrentLanguageIsCPP();
+			cxxParserCurrentLanguageIsCPP());
 
 	if(tag)
 	{
@@ -1359,7 +1360,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 	vString * pScopeName = cxxScopeGetFullNameAsString();
 
-	if(!cxxParserParseBlock(true))
+	if(!cxxParserParseBlock(true,bGotTemplate))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse scope");
 		if(pScopeName)
@@ -1398,7 +1399,8 @@ static bool cxxParserParseClassStructOrUnionInternal(
 bool cxxParserParseClassStructOrUnion(
 		CXXKeyword eKeyword,
 		unsigned int uTagKind,
-		unsigned int uScopeType
+		unsigned int uScopeType,
+		bool bGotTemplate
 	)
 {
 	// Trick for "smart" handling of public/protected/private keywords in .h files parsed as C++.
@@ -1407,7 +1409,7 @@ bool cxxParserParseClassStructOrUnion(
 	// Enable public/protected/private keywords and save the previous state
 	bool bEnablePublicProtectedPrivateKeywords = cxxKeywordEnablePublicProtectedPrivate(true);
 
-	bool bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,uTagKind,uScopeType);
+	bool bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,uTagKind,uScopeType,bGotTemplate);
 
 	// If parsing succeeded, we're in C++ mode and the keyword is "class" then
 	// we're fairly certain that the source code is *really* C++.
@@ -1522,7 +1524,7 @@ void cxxParserAnalyzeOtherStatement(void)
 check_function_signature:
 
 	if(
-		cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,bPrototypeParams?&oParamInfo:NULL)
+		cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,bPrototypeParams?&oParamInfo:NULL,false)
 		// Even if we saw "();", we cannot say it is a function prototype; a macro expansion can be used to
 		// initialize a top-level variable like:
 		//   #define INIT() 0
@@ -1911,7 +1913,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 
 	g_cxx.iNestingLevels = 0;
 
-	bool bRet = cxxParserParseBlock(false);
+	bool bRet = cxxParserParseBlock(false,false);
 
 	cppTerminate ();
 

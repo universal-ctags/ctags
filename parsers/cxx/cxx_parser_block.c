@@ -27,7 +27,7 @@
 
 #include <string.h>
 
-bool cxxParserParseBlockHandleOpeningBracket(void)
+bool cxxParserParseBlockHandleOpeningBracket(bool bGotTemplateUpper)
 {
 	CXX_DEBUG_ENTER();
 
@@ -149,7 +149,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	{
 		// very likely a function definition
 		// (but may be also a toplevel block, like "extern "C" { ... }")
-		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket(&oInfo,&iCorkQueueIndex,&iCorkQueueIndexFQ);
+		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket(&oInfo,&iCorkQueueIndex,&iCorkQueueIndexFQ,bGotTemplateUpper);
 
 		// FIXME: Handle syntax (5) of list initialization:
 		//        Class::Class() : member { arg1, arg2, ... } {...
@@ -164,7 +164,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 
 	cxxParserNewStatement();
 
-	if(!cxxParserParseBlock(true))
+	if(!cxxParserParseBlock(true,bGotTemplateUpper))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
 		return false;
@@ -230,7 +230,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 				break; // (would be a syntax error!)
 			}
 
-			if(!cxxParserParseBlock(true))
+			if(!cxxParserParseBlock(true,false))
 				return false;
 
  			uEndPosition = getInputLineNumber();
@@ -253,13 +253,16 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	return true;
 }
 
-static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
+static bool cxxParserParseBlockInternal(bool bExpectClosingBracket, bool bGotTemplateUpper)
 {
 	CXX_DEBUG_ENTER();
 
 	//char * szScopeName = cxxScopeGetFullName();
 	//CXX_DEBUG_PRINT("Scope name is '%s'",szScopeName ? szScopeName : "");
 
+	bool bGotTemplate = bGotTemplateUpper || (g_cxx.pTemplateTokenChain &&
+			(g_cxx.pTemplateTokenChain->iCount > 0) &&
+			 cxxParserCurrentLanguageIsCPP());
 	cxxParserNewStatement();
 
 	if(bExpectClosingBracket)
@@ -405,7 +408,7 @@ process_token:
 							(!cxxTokenTypeIsOneOf(g_cxx.pToken->pPrev,CXXTokenTypeSmallerThanSign | CXXTokenTypeComma))
 						)
 						{
-							if(!cxxParserParseClassStructOrUnion(CXXKeywordCLASS,CXXTagCPPKindCLASS,CXXScopeTypeClass))
+							if(!cxxParserParseClassStructOrUnion(CXXKeywordCLASS,CXXTagCPPKindCLASS,CXXScopeTypeClass,bGotTemplate))
 							{
 								CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 								return false;
@@ -419,7 +422,7 @@ process_token:
 							(!cxxTokenTypeIsOneOf(g_cxx.pToken->pPrev,CXXTokenTypeSmallerThanSign | CXXTokenTypeComma))
 						)
 						{
-							if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT,CXXScopeTypeStruct))
+							if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT,CXXScopeTypeStruct,bGotTemplate))
 							{
 								CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 								return false;
@@ -433,7 +436,7 @@ process_token:
 							(!cxxTokenTypeIsOneOf(g_cxx.pToken->pPrev,CXXTokenTypeSmallerThanSign | CXXTokenTypeComma))
 						)
 						{
-							if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION,CXXScopeTypeUnion))
+							if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION,CXXScopeTypeUnion,bGotTemplate))
 							{
 								CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 								return false;
@@ -714,7 +717,7 @@ process_token:
 			}
 			break;
 			case CXXTokenTypeOpeningBracket:
-				if(!cxxParserParseBlockHandleOpeningBracket())
+				if(!cxxParserParseBlockHandleOpeningBracket(bGotTemplateUpper))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to handle opening bracket");
 					return false;
@@ -790,12 +793,12 @@ process_token:
 // When the statement ends without finding any characteristic token the chain
 // is passed to an analysis routine which does a second scan pass.
 //
-bool cxxParserParseBlock(bool bExpectClosingBracket)
+bool cxxParserParseBlock(bool bExpectClosingBracket, bool bGotTemplateUpper)
 {
 	cxxSubparserNotifyEnterBlock ();
 
 	cppPushExternalParserBlock();
-	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket);
+	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket,bGotTemplateUpper);
 	cppPopExternalParserBlock();
 
 	cxxSubparserNotifyLeaveBlock ();

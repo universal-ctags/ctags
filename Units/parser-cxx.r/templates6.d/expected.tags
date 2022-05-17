@@ -1,0 +1,6 @@
+Stack	input.cc	/^class Stack$/;"	c	file:
+size	input.cc	/^  std::size_t size;$/;"	m	class:Stack	typeref:typename:std::size_t	file:
+stack	input.cc	/^  std::vector<T> stack;$/;"	m	class:Stack	typeref:typename:std::vector<T>	file:
+~Stack	input.cc	/^  ~Stack(){};$/;"	f	class:Stack	file:
+Stack	input.cc	/^  Stack<T>(std::size_t n) {$/;"	f	class:Stack	file:
+main	input.cc	/^int main() {$/;"	f	typeref:typename:int

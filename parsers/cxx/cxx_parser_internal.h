@@ -42,8 +42,8 @@ CXXToken * cxxParserOpeningBracketIsLambda(void);
 bool cxxParserHandleLambda(CXXToken * pParenthesis);
 
 // cxx_parser_block.c
-bool cxxParserParseBlock(bool bExpectClosingBracket);
-bool cxxParserParseBlockHandleOpeningBracket(void);
+bool cxxParserParseBlock(bool bExpectClosingBracket, bool bGotTemplateUpper);
+bool cxxParserParseBlockHandleOpeningBracket(bool bGotTemplateUpper);
 
 enum CXXExtractVariableDeclarationsFlags
 {
@@ -158,7 +158,8 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void);
 int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 		CXXFunctionSignatureInfo * pInfo,
 		int * piCorkQueueIndex,
-		int * piCorkQueueIndexFQ
+		int * piCorkQueueIndexFQ,
+		bool bGotTemplateUpper
 	);
 
 /* This must be smaller than (sizeof(unsigned int) * 8).
@@ -189,7 +190,8 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 bool cxxParserLookForFunctionSignature(
 		CXXTokenChain * pChain,
 		CXXFunctionSignatureInfo * pInfo,
-		CXXTypedVariableSet * pParamInfo
+		CXXTypedVariableSet * pParamInfo,
+		bool bGotTemplateUpper
 	);
 
 enum CXXEmitFunctionTagsOptions
@@ -227,7 +229,8 @@ bool cxxParserParseEnum(void);
 bool cxxParserParseClassStructOrUnion(
 		CXXKeyword eKeyword,
 		unsigned int uTagKind,
-		unsigned int uScopeType
+		unsigned int uScopeType,
+		bool bGotTemplate
 	);
 bool cxxParserParseAndCondenseCurrentSubchain(
 		unsigned int uInitialSubchainMarkerTypes,

@@ -342,7 +342,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 
 	cxxParserNewStatement();
 
-	if(!cxxParserParseBlock(true))
+	if(!cxxParserParseBlock(true,false))
 	{
 		CXX_DEBUG_PRINT("Failed to parse K&R function block");
 		return -1;
@@ -656,7 +656,8 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 bool cxxParserLookForFunctionSignature(
 		CXXTokenChain * pChain,
 		CXXFunctionSignatureInfo * pInfo,
-		CXXTypedVariableSet * pParamInfo
+		CXXTypedVariableSet * pParamInfo,
+		bool bGotTemplateUpper
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -1024,7 +1025,7 @@ bool cxxParserLookForFunctionSignature(
 				cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeGreaterThanSign) &&
 				// We extracted an initial template<*> token chain
 				// (which has been removed from the currently examined chain)
-				g_cxx.pTemplateTokenChain &&
+				(bGotTemplateUpper || g_cxx.pTemplateTokenChain) &&
 				// We skipped an additional <...> block in *this* chain
 				bSkippedAngleBrackets
 			)
@@ -1210,7 +1211,7 @@ next_token:
 						break; // nope
 					if(!cxxTokenTypeIs(pSmallerThan->pPrev,CXXTokenTypeIdentifier))
 						break; // nope
-					// hmm.. probably a template specialisation
+					// hmm.. probably a template specialization
 					pAux = pSmallerThan->pPrev;
 					pInfo->uFlags |= CXXFunctionSignatureInfoScopeTemplateSpecialization;
 				} else if(pAux->eType == CXXTokenTypeAngleBracketChain)
@@ -1774,7 +1775,8 @@ int cxxParserEmitFunctionTags(
 int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 		CXXFunctionSignatureInfo * pInfo,
 		int * piCorkQueueIndex,
-		int * piCorkQueueIndexFQ
+		int * piCorkQueueIndexFQ,
+		bool bGotTemplateUpper
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -1801,7 +1803,7 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 	CXXTypedVariableSet oParamInfo;
 	bool bParams = cxxTagKindEnabled(CXXTagKindPARAMETER);
 
-	if(!cxxParserLookForFunctionSignature(g_cxx.pTokenChain,pInfo,bParams?&oParamInfo:NULL))
+	if(!cxxParserLookForFunctionSignature(g_cxx.pTokenChain,pInfo,bParams?&oParamInfo:NULL,bGotTemplateUpper))
 	{
 		CXX_DEBUG_LEAVE_TEXT("No parenthesis found: no function");
 		return 0;

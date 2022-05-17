@@ -320,7 +320,7 @@ bool cxxParserParseNamespace(void)
 
 	// Here we certainly got an opening bracket: namespace block
 
-	if(!cxxParserParseBlock(true))
+	if(!cxxParserParseBlock(true,false))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse namespace block");
 		return false;

@@ -295,7 +295,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 			cxxParserEmitFunctionParameterTags(&oParamInfo);
 	}
 
-	bool bRet = cxxParserParseBlock(true);
+	bool bRet = cxxParserParseBlock(true,false);
 
 	if(iCorkQueueIndex > CORK_NIL)
 	{
