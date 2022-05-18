@@ -35,11 +35,8 @@ tab_width = 8
 [misc/optlib2c]
 trim_trailing_whitespace = true
 
-[win32/*]
+[win32/*.{bat,sln,vcxproj,vcxproj.filters}]
 end_of_line = crlf
-
-[win32/*.vcxproj*.in]
-end_of_line = lf
 
 [win32/*.vcxproj*]
 insert_final_newline = false
