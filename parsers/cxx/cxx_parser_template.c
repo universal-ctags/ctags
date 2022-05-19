@@ -51,12 +51,11 @@ static bool cxxTemplateTokenCheckIsNonTypeAndCompareWord(const CXXToken *t,void 
 	// {
   	// return A();
 	// }
+	// (here the parser is at A, before f(void))
 	// here the greater-than sign (>) is not a comparison, but just closes the
 	// template. We know it is a template, because the keyword of the second
 	// template parameter is "typename"
 	// This addresses issue #3388
-	CXX_DEBUG_PRINT("HERE %s ",vStringValue(t->pszWord));
-	CXX_DEBUG_PRINT("t->pPrev->pPrev->pPrev- %s ",vStringValue(t->pPrev->pPrev->pPrev->pszWord));
 	const CXXToken * tmp = t->pPrev;
 	while(tmp){
 		if (tmp->eKeyword  == CXXKeywordTYPENAME)
@@ -66,15 +65,7 @@ static bool cxxTemplateTokenCheckIsNonTypeAndCompareWord(const CXXToken *t,void 
 			break;
 		tmp = tmp->pPrev;
 	}
-	/*
-	if(
-		t->pPrev != NULL &&
-		t->pPrev->pPrev != NULL &&
-		t->pPrev->pPrev->pPrev != NULL &&
-		t->pPrev->pPrev->pPrev->eKeyword == CXXKeywordTYPENAME
-	)
-		return false;
-	*/
+
 	if(cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
 	{
 		if(cxxKeywordIsTypeRefMarker(t->pPrev->eKeyword))
