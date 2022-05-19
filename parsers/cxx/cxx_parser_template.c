@@ -45,6 +45,21 @@ static bool cxxTemplateTokenCheckIsNonTypeAndCompareWord(const CXXToken *t,void 
 	// To be non type the token must NOT be preceded by class/struct/union
 	if(!t->pPrev)
 		return false;
+	// This catches the case where we have a structure like this:
+	// template<typename A, typename B>
+	// A f(void)
+	// {
+  	// return A();
+	// }
+	// here the greater-than sign (>) is not a comparison, but just closes the
+	// template. We know it is a template, because the keyword of the second
+	// template parameter is "typename"
+	// This addresses issue #3388
+
+	if(
+		t->pPrev->pPrev->pPrev->eKeyword == CXXKeywordTYPENAME
+	)
+		return false;
 	if(cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
 	{
 		if(cxxKeywordIsTypeRefMarker(t->pPrev->eKeyword))
