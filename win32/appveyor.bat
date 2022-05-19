@@ -241,7 +241,7 @@ goto :eof
 :: Using Cygwin, iconv enabled
 @echo on
 appveyor DownloadFile http://cygwin.com/setup-x86_64.exe -FileName c:\cygwin64\setup-x86_64.exe
-c:\cygwin64\setup-x86_64.exe -qnNdO -P dos2unix,libiconv-devel,libjansson-devel,libxml2-devel,libyaml-devel,pcre2,perl
+c:\cygwin64\setup-x86_64.exe -qnNdOg -P dos2unix,libiconv-devel,libjansson-devel,libxml2-devel,libyaml-devel,pcre2,perl
 PATH c:\cygwin64\bin;%PATH%
 set CHERE_INVOKING=yes
 bash -lc "./autogen.sh"
