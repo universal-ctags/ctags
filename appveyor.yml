@@ -19,7 +19,7 @@ environment:
     #- compiler: msvc
     #  ARCH: x86
     - compiler: mingw
-    - compiler: cygwin
+    #- compiler: cygwin
 
 build_script:
   - '%APPVEYOR_BUILD_FOLDER%\win32\appveyor.bat build'
