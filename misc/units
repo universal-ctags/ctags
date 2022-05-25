@@ -2798,7 +2798,8 @@ validate_dir ()
 	     done | sort)
 
     for f in $inputs; do
-	t=${f#input}; t=${t%.*}
+	t=$(basename $f)
+	t=${t#input}; t=${t%.*}
 	v=$(resolve_validator "${base_dir}"/validator"$t" \
 			     "$default_validator" \
 			     "$has_expected_tags" \
