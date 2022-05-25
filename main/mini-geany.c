@@ -21,6 +21,7 @@
 #include "field_p.h"
 #include "xtag_p.h"
 #include "entry_p.h"
+#include "param_p.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -61,8 +62,20 @@ static bool nofatalErrorPrinter (const errorSelection selection,
 }
 
 
-/* we need to be able to enable all kinds for all languages (some are disabled by default) */
-static void enableAllLangKinds()
+static void enableRoles(unsigned int lang, unsigned int kind)
+{
+	unsigned int c = countLanguageRoles(lang, kind);
+
+	for (unsigned int i = 0; i < c; i++)
+	{
+		roleDefinition* rdef = getLanguageRole(lang, kind, (int)i);
+		enableRole(rdef, true);
+	}
+}
+
+
+/* we need to be able to enable all kinds and roles for all languages (some are disabled by default) */
+static void enableKindsAndRoles()
 {
 	unsigned int lang;
 
@@ -75,6 +88,7 @@ static void enableAllLangKinds()
 		{
 			kindDefinition *def = getLanguageKind(lang, kind);
 			enableKind(def, true);
+			enableRoles(lang, kind);
 		}
 	}
 }
@@ -103,8 +117,8 @@ static void ctagsInit(void)
 	enableXtag(XTAG_TAGS_GENERATED_BY_GUEST_PARSERS, true);
 	enableXtag(XTAG_REFERENCE_TAGS, true);
 
-	/* some kinds we are interested in are disabled by default */
-	enableAllLangKinds();
+	/* some kinds and roles we are interested in are disabled by default */
+	enableKindsAndRoles();
 }
 
 
@@ -166,6 +180,13 @@ static unsigned int ctagsGetLangCount(void)
 	return countParsers();
 }
 
+
+void addIgnoreSymbol(const char *value)
+{
+	langType lang = getNamedLanguage ("CPreProcessor", 0);
+	applyParameter (lang, "ignore", value);
+}
+
 /*******************************************************************************
  * So let's just use what we have for our great client...
  ******************************************************************************/
@@ -183,6 +204,7 @@ typedef struct {
 	bool isFileScope;
 	unsigned long lineNumber;
 	int lang;
+	bool isAnon;
 } Tag;
 
 
@@ -207,6 +229,7 @@ static Tag *createTag(const tagEntryInfo *info)
 	tag->isFileScope = info->isFileScope;
 	tag->lineNumber = info->lineNumber;
 	tag->lang = info->langType;
+	tag->isAnon = isTagExtraBitMarked(info, XTAG_ANONYMOUS);
 	return tag;
 }
 
@@ -306,10 +329,17 @@ extern int main (int argc, char **argv)
 			"are provided\n\n");
 	if (argc == 1)  /* parsing contents of a buffer */
 	{
-		char *program = "int foo() {}\n\n int bar() {}\n\n int main() {}\n";
+		char *program = "FOO int foo() {}\n\n int bar() {}\n\n int main() {}\n";
 		int lang = ctagsGetNamedLang("C");
 		const char *kinds = ctagsGetLangKinds(lang);
 		int i;
+
+		/* we need to be able to set and clear ignore symbols */
+		addIgnoreSymbol("int");
+		/* clear */
+		addIgnoreSymbol(NULL);
+		/* set to something else */
+		addIgnoreSymbol("FOO");
 
 		printf("Number of all parsers is: %d\n", ctagsGetLangCount());
 		printf("We are parsing %s which provides the following kinds:\n",
