@@ -15,50 +15,54 @@ template<typename T,int I,int J = I < V> K funcC(T t)
 	return 0;
 }
 
-// This stuff is allowed by C++03
-template<typename T,int I,int J = I >> 2> K funcD(T t)
+// The original comment: This stuff is allowed by C++03
+//    template<typename T,int I,int J = (I >> 2)> K funcD(T t)
+// However, the above input is rejected with:
+//    error: default template arguments may not be used in function templates
+//           without `-std=c++11' or `-std=gnu++11'
+template<typename T,int I,int J = (I >> 2)> K funcD(T t)
 {
 	return 0;
 }
 
-template<typename T,int I,int J = 1 >> I> K funcE(T t)
+template<typename T,int I,int J = (1 >> I)> K funcE(T t)
 {
 	return 0;
 }
 
-template<typename T,int I,int L,int J = I >> L> K funcF(T t)
+template<typename T,int I,int L,int J = (I >> L)> K funcF(T t)
 {
 	return 0;
 }
 
-template<typename T,int I,int J = 1 >> V> K funcG(T t)
+template<typename T,int I,int J = (1 >> V)> K funcG(T t)
 {
 	return 0;
 }
 
-template<typename T,int I,int J = I >> V> K funcH(T t)
+template<typename T,int I,int J = (I >> V)> K funcH(T t)
 {
 	return 0;
 }
 
-template<typename T,int I,int J = 1 >> (1+2)> K funcI(T t)
+template<typename T,int I,int J = (1 >> (1+2))> K funcI(T t)
 {
 	return 0;
 }
 
 
 
-template<typename T,int I,int J = I > 2> K funcJ(T t)
+template<typename T,int I,int J = (I > 2)> K funcJ(T t)
 {
 	return 0;
 }
 
-template<typename T,int I,int J = 1 > I> K funcK(T t)
+template<typename T,int I,int J = (1 > I)> K funcK(T t)
 {
 	return 0;
 }
 
-template<typename T,int I,int L,int J = I > L> K funcL(T t)
+template<typename T,int I,int L,int J = (I > L)> K funcL(T t)
 {
 	return 0;
 }
@@ -78,7 +82,7 @@ template<typename T,int I,unsigned long int J = I > V> K funcN(T t)
 }
 */
 
-template<typename T,int I,unsigned int J = 1 > (1+2)> K funcO(T t)
+template<typename T,int I,unsigned int J = (1 > (1+2))> K funcO(T t)
 {
 	return 0;
 }
