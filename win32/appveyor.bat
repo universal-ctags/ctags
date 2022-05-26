@@ -212,9 +212,12 @@ goto :eof
 
 :mingw_build
 :: ----------------------------------------------------------------------
-:: Using MinGW without autotools, iconv disabled
+:: Using MinGW-w64 without autotools, iconv disabled
 @echo on
-path C:\MinGW\bin;C:\MinGW\msys\1.0\bin;%path%
+set MSYS2_ARCH=x86_64
+set MSYS2_DIR=msys64
+set MSYSTEM=MINGW64
+PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
 make -f mk_mingw.mak -j2
 
 @echo off
