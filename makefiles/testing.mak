@@ -303,6 +303,9 @@ if BUILD_IN_GIT_REPO
 	$(chkgen_verbose)if ! git diff --exit-code $(OPTLIB2C_DIR); then \
 		echo "Files under $(OPTLIB2C_DIR) are not up to date." ; \
 		echo "If you change $(OPTLIB2C_DIR)/foo.ctags, don't forget to add $(OPTLIB2C_DIR)/foo.c to your commit." ; \
+		if ! test x$(CI) = x; then \
+			git --no-pager diff -- $(OPTLIB2C_DIR); \
+		fi; \
 		exit 1 ; \
 	else \
 		echo "Files under $(OPTLIB2C_DIR) are up to date." ; \
@@ -313,6 +316,9 @@ if BUILD_IN_GIT_REPO
 	$(chkgen_verbose)if ! git diff --exit-code $(TXT2CSTR_DIR); then \
 		echo "Files under $(TXT2CSTR_DIR) are not up to date." ; \
 		echo "If you change $(TXT2CSTR_DIR)/foo.ps, don't forget to add $(TXT2CSTR_DIR)/foo.c to your commit." ; \
+		if ! test x$(CI) = x; then \
+			git --no-pager diff -- $(TXT2CSTR_DIR); \
+		fi; \
 		exit 1 ; \
 	else \
 		echo "Files under $(TXT2CSTR_DIR) are up to date." ; \
@@ -325,6 +331,9 @@ if HAVE_RST2MAN
 	$(chkgen_verbose)if ! git diff --exit-code -- man; then \
 		echo "Files under man/ are not up to date." ; \
 		echo "Please execute 'make -C man man-in' and commit them." ; \
+		if ! test x$(CI) = x; then \
+			git --no-pager diff -- man; \
+		fi; \
 		exit 1 ; \
 	else \
 		echo "Files under man are up to date." ; \
@@ -334,6 +343,9 @@ if HAVE_RST2MAN
 	$(chkgen_verbose)if ! git diff --exit-code -- docs/man; then \
 		echo "Files under docs/man/ are not up to date." ; \
 		echo "Please execute 'make -C man update-docs' and commit them." ; \
+		if ! test x$(CI) = x; then \
+			git --no-pager diff -- docs/man; \
+		fi; \
 		exit 1 ; \
 	else \
 		echo "Files under docs/man are up to date." ; \
@@ -348,6 +360,9 @@ endif
 	$(chkgen_verbose)if ! git diff --exit-code -- win32; then \
 		echo "Files under win32/ are not up to date." ; \
 		echo "Please execute 'make -BC win32' and commit them." ; \
+		if ! test x$(CI) = x; then \
+			git --no-pager diff -- win32; \
+		fi; \
 		exit 1 ; \
 	else \
 		echo "Files under win32 are up to date." ; \
