@@ -28,13 +28,17 @@ Note that ctags cannot be built with Visual Studio older than 2013 anymore. Ther
 GCC
 .............................................................................
 
-There are three flavors of GCC for Windows:
+You can use `MinGW-w64 <https://www.mingw-w64.org/>`_ to build ctags. There are several ways to install MinGW-w64 in Windows.
 
-- MinGW http://www.mingw.org
-- MinGW-w64 http://mingw-w64.sourceforge.net
-- TDM-GCC http://tdm-gcc.tdragon.net
+- MSYS2 https://www.msys2.org/
+- MinGW-w64 - for 32 and 64 bit Windows https://sourceforge.net/projects/mingw-w64/
+- TDM-GCC https://jmeubank.github.io/tdm-gcc/
 
-MinGW started it all, but development stalled for a while and no x64 was available. Then the MinGW-w64 fork emerged. It started as a 64-bit compiler, but soon they included both a 32-bit and a 64-bit compiler. But the name remained, a bit confusing. Another fork of MinGW is TDM-GCC. It also provides both 32-bit and 64-bit compilers. All have at least GCC 4.8. MinGW-w64 appears to be the most used flavor of MinGW at this moment. Many well known programs that originate from GNU/Linux use MinGW-w64 to compile their Windows port.
+If you want to build a full-featured version, use MSYS2 (with Autotools). Otherwise, you can also use the other two distributions.
+
+**History**
+
+MinGW started it all, but development stalled for a while and no x64 was available. Then the MinGW-w64 fork emerged. It started as a 64-bit compiler, but soon they included both a 32-bit and a 64-bit compiler. But the name remained, a bit confusing. MinGW-w64 appears to be the most used flavor of MinGW at this moment. Many well known programs that originate from GNU/Linux use MinGW-w64 to compile their Windows port.
 
 Building ctags from the command line
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,17 +84,13 @@ If you want to build a debug version, you must specify ``DEBUG=1`` like below::
 
         make -f mk_mingw.mak DEBUG=1
 
-**MSYS / MSYS2**
+**MSYS2**
 
-From their site: MSYS is a collection of GNU utilities such as bash, make, gawk and grep to allow building of applications and programs which depend on traditional UNIX tools to be present. It is intended to supplement MinGW and the deficiencies of the cmd shell.
-
-MSYS comes in two flavors; the original from MinGW and MSYS2.
-See https://www.msys2.org/ about MSYS2.
-
-MSYS is old but still works. You can build ctags with it using ``make -f mk_mingw.mak``. The Autotools are too old on MSYS so you cannot use them.
+From mingw.org: MSYS is a collection of GNU utilities such as bash, make, gawk and grep to allow building of applications and programs which depend on traditional UNIX tools to be present. It is intended to supplement MinGW and the deficiencies of the cmd shell.
 
 MSYS2 is a more maintained version of MSYS, but specially geared towards MinGW-w64. You can also use Autotools to build ctags.
 If you use Autotools you can enable parsers which require jansson, libxml2 or libyaml, and can also do the Units testing with ``make units``.
+If you don't need such features, you can still build ctags without using Autotools: ``make -f mk_mingw.mak``.
 
 The following packages are needed to build a full-featured version:
 
