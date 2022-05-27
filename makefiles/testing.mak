@@ -346,9 +346,14 @@ endif
 		$(MAKE) -BC win32 ; \
 	fi
 	$(chkgen_verbose)if ! git diff --exit-code -- win32; then \
-		echo "Files under win32/ are not up to date." ; \
-		echo "Please execute 'make -BC win32' and commit them." ; \
-		exit 1 ; \
+		if test "$(SKIP_CHECKGEN_WIN32)" = "yes"; then \
+			echo "Skip checking the files under win32." ; \
+			exit 0 ; \
+		else \
+			echo "Files under win32/ are not up to date." ; \
+			echo "Please execute 'make -BC win32' and commit them." ; \
+			exit 1 ; \
+		fi \
 	else \
 		echo "Files under win32 are up to date." ; \
 	fi

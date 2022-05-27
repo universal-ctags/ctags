@@ -245,7 +245,7 @@ jobs:
        - run:
            name: Test
            command: |
-             make check
+             make check SKIP_CHECKGEN_WIN32=yes
 
    centos7_make_roundtrip:
      working_directory: ~/universal-ctags
