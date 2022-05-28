@@ -1,0 +1,38 @@
+name: run units target on a big endian architecture
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  s390x_job:
+    runs-on: ubuntu-18.04
+    name: Build on ubuntu-18.04 s390x
+    steps:
+      - uses: actions/checkout@v2.1.0
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        id: runcmd
+        with:
+          arch: s390x
+          distro: fedora_latest
+          #
+          # We don't install libseccomp-devel because sandbox related test cases fail.
+          #
+          # Adjust safe.directory because we got following messages when running make check-genfile:
+          #
+          #     fatal: unsafe repository ('/home/runner/work/ctags/ctags' is owned by someone else)
+          #     To add an exception for this directory, call:
+          #     git config --global --add safe.directory /home/runner/work/ctags/ctags
+          #
+          install: |
+            dnf -y install git gdb procps-ng gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
+          run: |
+            bash ./autogen.sh
+            ./configure --enable-debugging
+            make -j 2
+            readelf -h ctags
+            git config --global --add safe.directory $(pwd)
+            make check
