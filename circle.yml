@@ -94,7 +94,7 @@ jobs:
            name: Install build tools
            command: |
              dnf -y install gcc automake autoconf pkgconfig bmake libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils sudo
-             dnf -y install jq puppet
+             dnf -y install g++ jq puppet
        - run:
            name: Build
            command: |
