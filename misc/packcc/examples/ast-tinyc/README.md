@@ -46,19 +46,19 @@ You must have [Build Tools for Visual Studio](https://visualstudio.microsoft.com
 You can get the executable by executing the following commands using 'Developer Command Prompt for VS 2019' or 'Developer PowerShell for VS 2019':
 
 ```
-cd /path/to/this_directory
+cd \path\to\this_directory
 mkdir build
 cd build
-cmake -DPACKCC=/path/to/packcc ..
+cmake -DPACKCC=\path\to\packcc ..
 MSBuild ALL_BUILD.vcxproj
 ```
 
-Here, `/path/to/this_directory` represents the path name of this directory,
-and `/path/to/packcc` represents the path name of `packcc` command.
+Here, `\path\to\this_directory` represents the path name of this directory,
+and `\path\to\packcc` represents the path name of `packcc` command.
 If `packcc` command is installed in one of the directories specified in the environment variable `PATH`,
-the option `-DPACKCC=/path/to/packcc` is not necessary.
+the option `-DPACKCC=\path\to\packcc` is not necessary.
 
-The executable `ast.exe` will be created in the directory `build`.
+The executable `ast.exe` will be created in the directory `build\Debug`.
 
 #### Using MinGW-w64 ####
 

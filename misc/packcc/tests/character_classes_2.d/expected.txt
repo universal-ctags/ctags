@@ -1,0 +1,8 @@
+CLASS0: 'a-'
+CLASS1: 'bb'
+CLASS2: 'c+'
+CLASS2: 'c-'
+CLASS3: 'd+'
+CLASS3: 'd-'
+CLASS4: 'ee'
+CLASS5: 'ff'
