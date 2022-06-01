@@ -9,6 +9,7 @@ TESTS = \
 	\
 	test-fix-unescaping \
 	test-fix-null-deref \
+	test-fix-large-tags \
 	\
 	$(NULL)
 
@@ -23,6 +24,7 @@ check_PROGRAMS = \
 	\
 	test-fix-unescaping \
 	test-fix-null-deref \
+	test-fix-large-tags \
 	\
 	$(NULL)
 
@@ -80,3 +82,6 @@ EXTRA_DIST += unescaping.tags
 test_fix_null_deref = test-fix-null-deref.c
 test_fix_null_deref_DEPENDENCIES = $(DEPS)
 EXTRA_DIST += null-deref.tags
+
+test_fix_large_tags = test-fix-large-tags.c
+test_fix_large_tags_DEPENDENCIES = $(DEPS)

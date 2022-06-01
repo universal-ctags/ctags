@@ -24,8 +24,11 @@ AC_PROG_LIBTOOL
 # 1:0:0
 #    introduced tagsGetErrno() and tagErrno.
 #    rename sortType to tagSortType.
-
-AC_SUBST(LT_VERSION, [1:0:0])
+#
+# 2:0:1
+#    introduced TagErrnoFileMayTooBig.
+#
+AC_SUBST(LT_VERSION, [2:0:1])
 
 AC_ARG_ENABLE([gcov],
 	[AS_HELP_STRING([--enable-gcov],
