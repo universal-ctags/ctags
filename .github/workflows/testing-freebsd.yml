@@ -18,6 +18,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    # to resolve The requested URL returned error: 429
+    # I do not known why, but it works indeed.
+    - run: rm -rf ~/.vagrant.d
+
     # https://app.vagrantup.com/boxes/search?utf8=%E2%9C%93&sort=downloads&provider=&q=freebsd
     # https://github.com/leleliu008/github-actions-vagrant
     - uses: leleliu008/github-actions-vagrant@v1
