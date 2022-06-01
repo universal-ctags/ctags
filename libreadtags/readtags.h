@@ -59,6 +59,7 @@ typedef enum {
 										  * (Zero or a positive integer is expected.) */
 	TagErrnoInvalidArgument        = -4, /* Unexpected argument passed to the API
 										  * function */
+	TagErrnoFileMaybeTooBig        = -5, /* Maybe the tags file is too big */
 } tagErrno;
 
 struct sTagFile;
@@ -258,7 +259,7 @@ extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry);
 
 /*
 *  Does the same as tagsFirst(), but is specialized to pseudo tags.
-*  If tagFileInfo doesn't contain pseudo tags you are interested, read
+*  If tagFileInfo doesn't contain pseudo tags you are interested in, read
 *  them sequentially with this function and tagsNextPseudoTag().
 */
 extern tagResult tagsFirstPseudoTag (tagFile *const file, tagEntry *const entry);
