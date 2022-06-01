@@ -441,6 +441,9 @@ EOF <- !.
 %%
 
 int main(int argc, char **argv) {
+    if (argc > 1) {
+        freopen(argv[1], "r", stdin);
+    }
     int ret;
     pcc_context_t *ctx = pcc_create(NULL);
     while (pcc_parse(ctx, &ret));
