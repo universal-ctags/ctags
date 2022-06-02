@@ -9,18 +9,15 @@ on:
 jobs:
   testing:
     runs-on: macos-10.15
-    
+
     steps:
     - uses: actions/checkout@v2
 
-    # to resolve The requested URL returned error: 429
-    # I do not known why, but it works indeed.
-    - run: rm -rf ~/.vagrant.d
-
-    - uses: leleliu008/github-actions-vagrant@v1
+    - uses: leleliu008/github-actions-vagrant@v2
       with:
         mem: 2048
         box: generic/openbsd6
+        log: debug
         run: |
           export AUTOCONF_VERSION=2.69
           export AUTOMAKE_VERSION=1.16
