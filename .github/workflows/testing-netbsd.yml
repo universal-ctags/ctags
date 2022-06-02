@@ -13,14 +13,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # to resolve The requested URL returned error: 429
-    # I do not known why, but it works indeed.
-    - run: rm -rf ~/.vagrant.d
-
-    - uses: leleliu008/github-actions-vagrant@v1
+    - uses: leleliu008/github-actions-vagrant@v2
       with:
         mem: 2048
         box: generic/netbsd9
+        log: debug
         run: |
           run sudo pkgin -y install mozilla-rootcerts automake autoconf pkg-config gmake
 
