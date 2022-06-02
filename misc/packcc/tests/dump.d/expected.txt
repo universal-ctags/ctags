@@ -5,7 +5,7 @@ Rule(name:'statement', ref:0, vars.len:1, capts.len:0, codes.len:2) {
       Reference(var:'e', index:0, name:'expression', rule:'expression')
       Reference(var:'(null)', index:void, name:'_', rule:'_')
       Reference(var:'(null)', index:void, name:'EOL', rule:'EOL')
-      Action(index:0, value:{ printf(\"answer=%d\\n\", e); }, vars:
+      Action(index:0, code:{ printf(\"answer=%d\\n\", e); }, vars:
         'e'
       )
     }
@@ -19,14 +19,14 @@ Rule(name:'statement', ref:0, vars.len:1, capts.len:0, codes.len:2) {
         }
       }
       Reference(var:'(null)', index:void, name:'EOL', rule:'EOL')
-      Action(index:1, value:{ printf(\"error\\n\"); }, vars:none)
+      Action(index:1, code:{ printf(\"error\\n\"); }, vars:none)
     }
   }
 }
 Rule(name:'expression', ref:2, vars.len:1, capts.len:0, codes.len:1) {
   Sequence(max:2, len:2) {
     Reference(var:'e', index:0, name:'term', rule:'term')
-    Action(index:0, value:{ __ = e; }, vars:
+    Action(index:0, code:{ __ = e; }, vars:
       'e'
     )
   }
@@ -39,7 +39,7 @@ Rule(name:'term', ref:3, vars.len:3, capts.len:0, codes.len:3) {
       String(value:'+')
       Reference(var:'(null)', index:void, name:'_', rule:'_')
       Reference(var:'r', index:1, name:'factor', rule:'factor')
-      Action(index:0, value:{ __ = l + r; }, vars:
+      Action(index:0, code:{ __ = l + r; }, vars:
         'l'
         'r'
       )
@@ -50,14 +50,14 @@ Rule(name:'term', ref:3, vars.len:3, capts.len:0, codes.len:3) {
       String(value:'-')
       Reference(var:'(null)', index:void, name:'_', rule:'_')
       Reference(var:'r', index:1, name:'factor', rule:'factor')
-      Action(index:1, value:{ __ = l - r; }, vars:
+      Action(index:1, code:{ __ = l - r; }, vars:
         'l'
         'r'
       )
     }
     Sequence(max:2, len:2) {
       Reference(var:'e', index:2, name:'factor', rule:'factor')
-      Action(index:2, value:{ __ = e; }, vars:
+      Action(index:2, code:{ __ = e; }, vars:
         'e'
       )
     }
@@ -71,7 +71,7 @@ Rule(name:'factor', ref:5, vars.len:3, capts.len:0, codes.len:3) {
       String(value:'*')
       Reference(var:'(null)', index:void, name:'_', rule:'_')
       Reference(var:'r', index:1, name:'unary', rule:'unary')
-      Action(index:0, value:{ __ = l * r; }, vars:
+      Action(index:0, code:{ __ = l * r; }, vars:
         'l'
         'r'
       )
@@ -82,14 +82,14 @@ Rule(name:'factor', ref:5, vars.len:3, capts.len:0, codes.len:3) {
       String(value:'/')
       Reference(var:'(null)', index:void, name:'_', rule:'_')
       Reference(var:'r', index:1, name:'unary', rule:'unary')
-      Action(index:1, value:{ __ = l / r; }, vars:
+      Action(index:1, code:{ __ = l / r; }, vars:
         'l'
         'r'
       )
     }
     Sequence(max:2, len:2) {
       Reference(var:'e', index:2, name:'unary', rule:'unary')
-      Action(index:2, value:{ __ = e; }, vars:
+      Action(index:2, code:{ __ = e; }, vars:
         'e'
       )
     }
@@ -101,7 +101,7 @@ Rule(name:'unary', ref:5, vars.len:1, capts.len:0, codes.len:3) {
       String(value:'+')
       Reference(var:'(null)', index:void, name:'_', rule:'_')
       Reference(var:'e', index:0, name:'unary', rule:'unary')
-      Action(index:0, value:{ __ = +e; }, vars:
+      Action(index:0, code:{ __ = +e; }, vars:
         'e'
       )
     }
@@ -109,13 +109,13 @@ Rule(name:'unary', ref:5, vars.len:1, capts.len:0, codes.len:3) {
       String(value:'-')
       Reference(var:'(null)', index:void, name:'_', rule:'_')
       Reference(var:'e', index:0, name:'unary', rule:'unary')
-      Action(index:1, value:{ __ = -e; }, vars:
+      Action(index:1, code:{ __ = -e; }, vars:
         'e'
       )
     }
     Sequence(max:2, len:2) {
       Reference(var:'e', index:0, name:'primary', rule:'primary')
-      Action(index:2, value:{ __ = e; }, vars:
+      Action(index:2, code:{ __ = e; }, vars:
         'e'
       )
     }
@@ -129,7 +129,7 @@ Rule(name:'primary', ref:1, vars.len:1, capts.len:1, codes.len:2) {
           Charclass(value:'0-9')
         }
       }
-      Action(index:0, value:{ __ = atoi(_1); }, vars:
+      Action(index:0, code:{ __ = atoi(_1); }, vars:
         $1
       )
     }
@@ -139,7 +139,7 @@ Rule(name:'primary', ref:1, vars.len:1, capts.len:1, codes.len:2) {
       Reference(var:'e', index:0, name:'expression', rule:'expression')
       Reference(var:'(null)', index:void, name:'_', rule:'_')
       String(value:')')
-      Action(index:1, value:{ __ = e; }, vars:
+      Action(index:1, code:{ __ = e; }, vars:
         'e'
       )
     }

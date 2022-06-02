@@ -1,0 +1,33 @@
+%header { /* :HEADER: */ }
+
+%source {
+    /* :SOURCE: */
+}
+
+%common {
+    /* :COMMON: */
+}
+
+%earlyheader { /* :EARLYHEADER: */ }
+
+%earlysource { /* :EARLYSOURCE: */ }
+
+%earlycommon {
+    /* :EARLYCOMMON: */
+}
+
+FILE
+   <- RULE1
+    {
+        /* :RULE1: */
+    }
+    / RULE2
+    { /* :RULE2: */ }
+    / RULE3 { /* :RULE3: */ }
+
+RULE1 <- '1'
+RULE2 <- '2'
+RULE3 <- '3'
+
+%%
+/* :CODE: */

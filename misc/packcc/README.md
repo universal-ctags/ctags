@@ -133,7 +133,10 @@ packcc -o parser example.peg
 
 By running this, the parser source `parser.h` and `parser.c` are generated.
 
-If you want to disable UTF-8 support, specify the command line option `-a` (version 1.4.0 or later).
+If you want to disable UTF-8 support, specify the command line option `-a` or `--ascii` (version 1.4.0 or later).
+
+If you want to insert `#line` directives in the generated source and header files, specify the command line option `-l` or `--lines` (version 1.7.0 or later).
+It is helpful to trace compilation errors of the generated source and header files back to the codes written in the PEG source file.
 
 If you want to confirm the version of the `packcc` command, execute the below.
 
@@ -300,6 +303,7 @@ This matches `[[`...`]]`, `[=[`...`]=]`, `[==[`...`]==]`, etc.
 Curly braces surround an action.
 The action is arbitrary C source code to be executed at the end of matching.
 Any braces within the action must be properly nested.
+Note that braces in directive lines and in comments (`/*`...`*/` and `//`...) are appropriately ignored.
 One or more actions can be inserted in any places between elements in the pattern.
 Actions are not executed where matching fails.
 
@@ -323,6 +327,7 @@ In the action, the C source code can use the predefined variables below.
     The default data type is `void *`.
 - _variable_
     The result of another rule that has already been evaluated.
+    If the rule has not been evaluated, it is ensured that the value is zero-cleared (version 1.7.1 or later).
     The data type is the one specified by `%value`.
     The default data type is `int`.
 - **`$`**_n_
@@ -368,6 +373,7 @@ The data type is `size_t` (before version 1.4.0, it was `int`).
 Curly braces following tilde (`~`) surround an error action.
 The error action is arbitrary C source code to be executed at the end of matching only if the preceding _element_ matching fails.
 Any braces within the error action must be properly nested.
+Note that braces in directive lines and in comments (`/*`...`*/` and `//`...) are appropriately ignored.
 One or more error actions can be inserted in any places after elements in the pattern.
 The operator tilde (`~`) binds less tightly than any other operator except alternation (`/`) and sequencing.
 The error action is intended to make error handling and recovery code easier to write.
@@ -382,15 +388,21 @@ rule2 <- (e1 e2 e3) ~{ error("one of e[123] has failed"); }
 **`%header` `{` _c source code_ `}`**
 
 The specified C source code is copied verbatim to the C header file before the generated parser API function declarations.
+Any braces in the C source code must be properly nested.
+Note that braces in directive lines and in comments (`/*`...`*/` and `//`...) are appropriately ignored.
 
 **`%source` `{` _c source code_ `}`**
 
 The specified C source code is copied verbatim to the C source file before the generated parser implementation code.
+Any braces in the C source code must be properly nested.
+Note that braces in directive lines and in comments (`/*`...`*/` and `//`...) are appropriately ignored.
 
 **`%common` `{` _c source code_ `}`**
 
 The specified C source code is copied verbatim to both of the C header file and the C source file
 before the generated parser API function declarations and the implementation code respectively.
+Any braces in the C source code must be properly nested.
+Note that braces in directive lines and in comments (`/*`...`*/` and `//`...) are appropriately ignored.
 
 **`%earlyheader` `{` _c source code_ `}`**
 
@@ -641,7 +653,7 @@ while (pcc_parse(ctx, &ret));
 pcc_destroy(ctx);
 ```
 
-## Example ##
+## Examples ##
 
 ### Desktop calculator ###
 

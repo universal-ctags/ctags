@@ -99,7 +99,7 @@ load "$TESTDIR/utils.sh"
     INCLUDE=$(get_line '#include "parser.h"' parser.c)
     SOURCE=$(get_line "custom_function" parser.c)
     COMMON=$(get_line "HEADER AND SOURCE" parser.c)
-    GENERATED_START=$(get_line "#define PCC_BUFFERSIZE" parser.c)
+    GENERATED_START=$(get_line "#define PCC_BUFFER_MIN_SIZE" parser.c)
     GENERATED_END=$(get_line "my_destroy" parser.c)
     POST_SOURCE=$(get_line "SOURCE AFTER GENERATED CODE" parser.c)
 

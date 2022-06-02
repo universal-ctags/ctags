@@ -37,5 +37,6 @@ tests/test-api-tagsFirst
 tests/test-api-tagsFirstPseudoTag
 tests/test-api-tagsOpen
 tests/test-api-tagsSetSortType
+tests/test-fix-large-tags
 tests/test-fix-null-deref
 tests/test-fix-unescaping

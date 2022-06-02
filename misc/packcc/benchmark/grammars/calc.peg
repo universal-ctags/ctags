@@ -29,7 +29,10 @@ _      <- [ \t]*
 EOL    <- '\n' / '\r\n' / '\r' / ';'
 
 %%
-int main() {
+int main(int argc, char **argv) {
+    if (argc > 1) {
+        freopen(argv[1], "r", stdin);
+    }
     calc_context_t *ctx = calc_create(NULL);
     while (calc_parse(ctx, NULL));
     calc_destroy(ctx);

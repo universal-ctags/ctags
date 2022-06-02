@@ -12,7 +12,10 @@ null <- 'null'
 _  <- [ \n\r\t]*
 
 %%
-int main() {
+int main(int argc, char **argv) {
+    if (argc > 1) {
+        freopen(argv[1], "r", stdin);
+    }
     json_context_t *ctx = json_create(NULL);
     while (json_parse(ctx, NULL));
     json_destroy(ctx);
