@@ -22,6 +22,7 @@ jobs:
     # I do not known why, but it works indeed.
     - run: rm -rf ~/.vagrant.d
 
+    - run: curl -I https://vagrantcloud.com/generic/boxes/freebsd13/versions/4.0.0/providers/virtualbox.box
     # https://app.vagrantup.com/boxes/search?utf8=%E2%9C%93&sort=downloads&provider=&q=freebsd
     # https://github.com/leleliu008/github-actions-vagrant
     - uses: leleliu008/github-actions-vagrant@v1
