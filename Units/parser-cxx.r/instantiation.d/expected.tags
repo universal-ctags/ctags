@@ -1,0 +1,12 @@
+X	input.hpp	/^template <class T> struct X { };$/;"	s
+Y	input.hpp	/^template <int N> struct Y { };$/;"	s
+M	input.hpp	/^#define M /;"	d
+S	input.hpp	/^struct S {$/;"	s
+i	input.hpp	/^	int i;$/;"	m	struct:S	typeref:typename:int
+y	input.hpp	/^	Y<0> y;$/;"	m	struct:S	typeref:typename:Y<0>
+x0	input.hpp	/^	X< Y< 1 > > x0;$/;"	m	struct:S	typeref:typename:X<Y<1>>
+x1	input.hpp	/^	X< Y< 1 + 2 > > x1;$/;"	m	struct:S	typeref:typename:X<Y<1+2>>
+x2	input.hpp	/^	X< Y< 1 << 2 > > x2;$/;"	m	struct:S	typeref:typename:X<Y<1<<2>>
+x3	input.hpp	/^	X< Y< M << 2 > > x3;$/;"	m	struct:S	typeref:typename:X<Y<M<<2>>
+x4	input.hpp	/^	X< Y< M << M > > x4;$/;"	m	struct:S	typeref:typename:X<Y<M<<M>>
+d	input.hpp	/^	double d;$/;"	m	struct:S	typeref:typename:double
