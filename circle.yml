@@ -91,10 +91,10 @@ jobs:
              dnf -y install git gdb
        - checkout
        - run:
-           name: Install build tools
+           name: Install packages for building ctags and validating test input files
            command: |
              dnf -y install gcc automake autoconf pkgconfig bmake libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils sudo
-             dnf -y install jq puppet
+             dnf -y install g++ jq puppet
        - run:
            name: Build
            command: |

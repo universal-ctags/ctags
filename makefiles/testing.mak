@@ -153,9 +153,6 @@ clean-units:
 validate-input:
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
-	if test x$(VG) = x1; then		\
-		VALGRIND=--with-valgrind;	\
-	fi;					\
 	if test -n "$(VALIDATORS)"; then	\
 		VALIDATORS="--validators=$(VALIDATORS)"; \
 	fi; \
