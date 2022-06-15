@@ -71,13 +71,13 @@ static void initializeSCSSParser (const langType language)
 	                               "^\\$([A-Za-z0-9_-]+)[ \t]*:[^\n]*\n?",
 	                               "\\1", "v", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^([.][A-Za-z0-9_:-]+)",
+	                               "^[.]([A-Za-z0-9_-]+)",
 	                               "\\1", "c", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^(%[A-Za-z0-9_:-]+)",
+	                               "^%([A-Za-z0-9_-]+)",
 	                               "\\1", "P", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^#([A-Za-z0-9_:-]+)",
+	                               "^#([A-Za-z0-9_-]+)",
 	                               "\\1", "i", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^.",
