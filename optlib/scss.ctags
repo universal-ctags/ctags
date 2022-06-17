@@ -59,9 +59,9 @@
 --_mtable-regex-SCSS=toplevel/:[^\n{]+[;{]\n?//
 --_mtable-regex-SCSS=toplevel/\$([A-Za-z0-9_-]+)[ \t]*:[ \t]*\(/\1/v/{tenter=map}
 --_mtable-regex-SCSS=toplevel/\$([A-Za-z0-9_-]+)[ \t]*:[^\n]*\n?/\1/v/
---_mtable-regex-SCSS=toplevel/([.][A-Za-z0-9_:-]+)/\1/c/
---_mtable-regex-SCSS=toplevel/(%[A-Za-z0-9_:-]+)/\1/P/
---_mtable-regex-SCSS=toplevel/#([A-Za-z0-9_:-]+)/\1/i/
+--_mtable-regex-SCSS=toplevel/[.]([A-Za-z0-9_-]+)/\1/c/
+--_mtable-regex-SCSS=toplevel/%([A-Za-z0-9_-]+)/\1/P/
+--_mtable-regex-SCSS=toplevel/#([A-Za-z0-9_-]+)/\1/i/
 --_mtable-regex-SCSS=toplevel/.//
 --_mtable-regex-SCSS=comment/\*\///{tleave}
 --_mtable-regex-SCSS=comment/.//
