@@ -1,0 +1,8 @@
+root	input.xml	/^<!DOCTYPE root [$/;"	r
+deftest	input.xml	/^<!ENTITY % deftest '&#60;!ELEMENT test (#PCDATA) >' >$/;"	p
+defmiddle	input.xml	/^<!ENTITY % defmiddle '&#60;!ELEMENT middle (test) >' >$/;"	p
+defroot	input.xml	/^<!ENTITY % defroot '&#60;!ELEMENT root (middle) >' >$/;"	p
+root	input-0.xml	/^<!DOCTYPE root [$/;"	r
+deftest	input-0.xml	/^<!ENTITY % deftest '&#60;!ELEMENT test (#PCDATA) >' >$/;"	p
+defmiddle	input-0.xml	/^<!ENTITY % defmiddle '&#60;!ELEMENT middle (test) >' >$/;"	p
+defroot	input-0.xml	/^<!ENTITY % defroot '&#60;!ELEMENT root (middle) >' >$/;"	p

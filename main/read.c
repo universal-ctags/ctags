@@ -208,7 +208,9 @@ extern MIOPos getInputFilePositionForLine (unsigned int line)
 extern long getInputFileOffsetForLine (unsigned int line)
 {
 	compoundPos *cpos = getInputFileCompoundPosForLine (line);
-	return cpos->offset - (File.bomFound? 3: 0);
+	long r = cpos->offset - (File.bomFound? 3: 0) - cpos->crAdjustment;
+	Assert (r >= 0);
+	return r;
 }
 
 extern langType getInputLanguage (void)

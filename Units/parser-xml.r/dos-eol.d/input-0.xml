@@ -1,0 +1,11 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE root [
+<!ENTITY % deftest '&#60;!ELEMENT test (#PCDATA) >' >
+<!ENTITY % defmiddle '&#60;!ELEMENT middle (test) >' >
+<!ENTITY % defroot '&#60;!ELEMENT root (middle) >' >
+%defroot;%defmiddle;%deftest;
+]>
+<root><middle><test>sample</test></middle></root>
+<!-- Derrived from test/valid/t9a.xml in
+     https://gitlab.gnome.org/GNOME/libxml2/-/releases/v2.9.13
+     UTF-8 BOM is prepended .-->
