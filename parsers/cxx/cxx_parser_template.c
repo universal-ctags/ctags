@@ -354,7 +354,10 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 					// ... 1 < whatever ...
 					cxxTokenTypeIs(pSmallerThan->pPrev,CXXTokenTypeNumber) ||
 					// ... nonTypeParam < whatever ...
-					cxxTokenIsPresentInTemplateParametersAsNonType(pSmallerThan->pPrev)
+					(
+						cxxTokenTypeIsOneOf(pSmallerThan->pPrev,CXXTokenTypeIdentifier) &&
+						cxxTokenIsPresentInTemplateParametersAsNonType(pSmallerThan->pPrev)
+					)
 				)
 				{
 					CXX_DEBUG_PRINT("Treating < as less-than operator");
