@@ -661,8 +661,12 @@ bool cxxParserParseEnum(void)
 	{
 		if(uInitialKeywordState & CXXParserKeywordStateSeenTypedef)
 		{
+			bool bR;
+			g_cxx.uKeywordState &= ~CXXParserKeywordStateSeenTypedef;
 			CXX_DEBUG_LEAVE_TEXT("Found parenthesis after typedef: parsing as generic typedef");
-			return cxxParserParseGenericTypedef();
+			bR = cxxParserParseGenericTypedef();
+			cxxParserNewStatement();
+			return bR;
 		}
 		// probably a function declaration/prototype
 		// something like enum x func()....
@@ -1066,8 +1070,12 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	{
 		if(uInitialKeywordState & CXXParserKeywordStateSeenTypedef)
 		{
+			bool bR;
+			g_cxx.uKeywordState &= ~CXXParserKeywordStateSeenTypedef;
 			CXX_DEBUG_LEAVE_TEXT("Found parenthesis after typedef: parsing as generic typedef");
-			return cxxParserParseGenericTypedef();
+			bR = cxxParserParseGenericTypedef();
+			cxxParserNewStatement();
+			return bR;
 		}
 
 		// probably a function declaration/prototype
