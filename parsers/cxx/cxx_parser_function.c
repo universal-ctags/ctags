@@ -638,6 +638,39 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 	return false;
 }
 
+// If pInfo->pIdentifierStart has the same name as the name of
+// class|enum|union|struct scope, we consider pInfo->pIdentifierStart
+// points a constructor.
+static bool cxxParserisConstructor(const char *szFuncname)
+{
+	if (cxxScopeIsGlobal())
+		return false;
+
+	switch (cxxScopeGetType())
+	{
+	case CXXScopeTypeClass:
+	case CXXScopeTypeEnum:
+	case CXXScopeTypeUnion:
+	case CXXScopeTypeStruct:
+		break;
+	default:
+		return false;
+	}
+
+	const char *szScope = cxxScopeGetName();
+	const char *szTmp = strrstr (szScope, szFuncname);
+
+	/* szFuncname == "C", szScope == "C" */
+	if (szTmp == szScope)
+		return true;
+
+	/* szFuncname == "C", szScope == "X::C" */
+	if (szTmp[-1] == ':')
+		return true;
+
+	return false;
+}
+
 //
 // Look for a function signature in the specified chain.
 //
@@ -1022,9 +1055,6 @@ bool cxxParserLookForFunctionSignature(
 		if(
 				// The previous token is >
 				cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeGreaterThanSign) &&
-				// We extracted an initial template<*> token chain
-				// (which has been removed from the currently examined chain)
-				g_cxx.pTemplateTokenChain &&
 				// We skipped an additional <...> block in *this* chain
 				bSkippedAngleBrackets
 			)
@@ -1039,7 +1069,17 @@ bool cxxParserLookForFunctionSignature(
 			if(
 					pSpecBegin &&
 					pSpecBegin->pPrev &&
-					cxxTokenTypeIs(pSpecBegin->pPrev,CXXTokenTypeIdentifier)
+					cxxTokenTypeIs(pSpecBegin->pPrev,CXXTokenTypeIdentifier) &&
+					(
+						// We extracted an initial template<*> token chain
+						// (which has been removed from the currently examined chain)
+						g_cxx.pTemplateTokenChain ||
+						// g_cxx.pTemplateTokenChain is set to null if "{" after "class" keyword
+						// is found. As a result, a constructor with <*> defined in a template
+						// class could not be tagged. The next additional condition is for
+						// tagging the condition in this situation.
+						cxxParserisConstructor(vStringValue(pSpecBegin->pPrev->pszWord))
+					)
 				)
 			{
 				// template specialisation

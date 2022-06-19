@@ -1,0 +1,11 @@
+X	input.hpp	/^namespace X {$/;"	n
+C	input.hpp	/^template<typename T> class X::C$/;"	c	class:X
+C	input.hpp	/^  C<T>(void) {$/;"	f	class:X::C
+D	input.hpp	/^template<typename T> class D$/;"	c
+D	input.hpp	/^  D<T>(void) {$/;"	f	class:D
+Stack	input-0.cpp	/^class Stack$/;"	c	file:
+size	input-0.cpp	/^  std::size_t size;$/;"	m	class:Stack	typeref:typename:std::size_t	file:
+stack	input-0.cpp	/^  std::vector<T> stack;$/;"	m	class:Stack	typeref:typename:std::vector<T>	file:
+~Stack	input-0.cpp	/^  ~Stack(){};$/;"	f	class:Stack	file:
+Stack	input-0.cpp	/^  Stack<T>(std::size_t n) {$/;"	f	class:Stack	file:
+main	input-0.cpp	/^int main() {$/;"	f	typeref:typename:int
