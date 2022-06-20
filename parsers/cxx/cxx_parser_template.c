@@ -45,26 +45,6 @@ static bool cxxTemplateTokenCheckIsNonTypeAndCompareWord(const CXXToken *t,void 
 	// To be non type the token must NOT be preceded by class/struct/union
 	if(!t->pPrev)
 		return false;
-	// This catches the case where we have a structure like this:
-	// template<typename A, typename B>
-	// A f(void)
-	// {
-  	// return A();
-	// }
-	// (here the parser is at A, before f(void))
-	// here the greater-than sign (>) is not a comparison, but just closes the
-	// template. We know it is a template, because the keyword of the second
-	// template parameter is "typename"
-	// This addresses issue #3388
-	const CXXToken * tmp = t->pPrev;
-	while(tmp){
-		if (tmp->eKeyword  == CXXKeywordTYPENAME)
-			return false;
-		// should we reach template we went too far back
-		if (tmp->eKeyword  == CXXKeywordTEMPLATE)
-			break;
-		tmp = tmp->pPrev;
-	}
 
 	if(cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
 	{
@@ -438,36 +418,6 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 				}
 
 				CXX_DEBUG_PRINT("Found %d greater-than signs",iGreaterThanCount);
-
-				// check greater than operator: very narrow conditions
-				if(
-					(iGreaterThanCount == 1) &&
-					(
-						// whatever op 2 [C++03 allows this without parens]
-						// whatever op (...) [C++03 allows this without parens]
-						cxxTokenTypeIsOneOf(
-								g_cxx.pToken,
-								CXXTokenTypeNumber | CXXTokenTypeOpeningParenthesis
-							) ||
-						// whatever op nonTypeParameter [C++03 allows this without parens]
-						(
-							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier) &&
-							cxxTokenIsPresentInTemplateParametersAsNonType(g_cxx.pToken)
-						)
-						// WARNING: don't be tempted to add a loose condition that has
-						// (!cxxTokenIsPresentInTemplateParametersAsType()) on the right.
-						// It's unsafe.
-					)
-				)
-				{
-					CXX_DEBUG_PRINT("Treating as greater-than sign");
-
-					if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeOpeningParenthesis))
-						cxxParserUngetCurrentToken(); // needs to be condensed
-
-					continue;
-				}
-
 
 				// check right shift operator: a bit broader conditions
 				if(
