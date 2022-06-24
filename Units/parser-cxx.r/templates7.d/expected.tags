@@ -1,0 +1,8 @@
+foo	input.hpp	/^A foo()$/;"	f	typeref:typename:A	template:<typename A,typename B>
+A	input.hpp	/^template<typename A, typename B>$/;"	Z	function:foo	typeref:meta:typename
+B	input.hpp	/^template<typename A, typename B>$/;"	Z	function:foo	typeref:meta:typename
+bar	input.hpp	/^A& bar(A& a, const B& b)$/;"	f	typeref:typename:A &	template:<typename A,typename B>
+A	input.hpp	/^template<typename A, typename B>$/;"	Z	function:bar	typeref:meta:typename
+B	input.hpp	/^template<typename A, typename B>$/;"	Z	function:bar	typeref:meta:typename
+a	input.hpp	/^A& bar(A& a, const B& b)$/;"	z	function:bar	typeref:typename:A &	file:
+b	input.hpp	/^A& bar(A& a, const B& b)$/;"	z	function:bar	typeref:typename:const B &	file:
