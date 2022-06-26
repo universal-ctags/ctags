@@ -138,7 +138,7 @@ direq_maybe ()
 
 check_encoding()
 {
-    if iconv -l | grep -qi "$1"; then
+    if iconv -l 2> /dev/null | grep -qi "$1"; then
 		return 0
 	fi
 	skip "iconv doesn't know about the encoding: $1"
