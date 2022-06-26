@@ -16,7 +16,7 @@ template<typename T,int I,int J = I < V> K funcC(T t)
 }
 
 // The original comment: This stuff is allowed by C++03
-//    template<typename T,int I,int J = (I >> 2)> K funcD(T t)
+//    template<typename T,int I,int J = I >> 2> K funcD(T t)
 // However, the above input is rejected with:
 //    error: default template arguments may not be used in function templates
 //           without `-std=c++11' or `-std=gnu++11'
