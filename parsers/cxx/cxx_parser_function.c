@@ -660,6 +660,9 @@ static bool cxxParserisConstructor(const char *szFuncname)
 	const char *szScope = cxxScopeGetName();
 	const char *szTmp = strrstr (szScope, szFuncname);
 
+	if (szTmp == NULL)
+		return false;
+
 	/* szFuncname == "C", szScope == "C" */
 	if (szTmp == szScope)
 		return true;
