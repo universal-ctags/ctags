@@ -8,8 +8,8 @@ f1	input.js	/^function f1(y) {$/;"	f
 f2	input.js	/^function f2() {$/;"	f
 f2i1	input.js	/^  return function f2i1() {$/;"	f	function:f2
 f2i1i1	input.js	/^    function f2i1i1() {$/;"	f	function:f2.f2i1
-fi1	input.js	/^    function fi1(x) {$/;"	f	function:C1.m2
-gi1	input.js	/^    function gi1(x) {$/;"	f	function:K1.l2
+fi1	input.js	/^    function fi1(x) {$/;"	f	method:C1.m2
+gi1	input.js	/^    function gi1(x) {$/;"	f	method:K1.l2
 l1	input.js	/^  l1() {$/;"	m	class:K1
 l2	input.js	/^  l2(n) {$/;"	m	class:K1
 m1	input.js	/^  m1: function() {$/;"	m	class:C1

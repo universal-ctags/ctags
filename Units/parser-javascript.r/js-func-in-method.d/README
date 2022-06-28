@@ -1,2 +1,2 @@
 a tag for a function defined in a method should have scope:method:...
-However, it has scope:function.
+However, it had scope:function.

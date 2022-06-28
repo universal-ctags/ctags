@@ -1,4 +1,4 @@
 container	input.js	/^var container = {};$/;"	v
 method1	input.js	/^container.object.method1 = function() {}$/;"	f	function:container.object
 method2	input.js	/^container.object.method2 = function() {}$/;"	f	function:container.object
-object	input.js	/^container.object = function() {}$/;"	f	function:container
+object	input.js	/^container.object = function() {}$/;"	f	variable:container

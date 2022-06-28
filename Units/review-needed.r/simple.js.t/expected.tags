@@ -11,7 +11,7 @@ my_global_var1	input.js	/^var my_global_var1 = 33;$/;"	v
 my_global_var2	input.js	/^var my_global_var2 = "Something";$/;"	v
 my_global_var3	input.js	/^var my_global_var3;$/;"	v
 my_global_var4	input.js	/^var my_global_var4 = document.getElementsByTagName("input");$/;"	v
-onchange	input.js	/^    my_global_var4[i].onchange = function () {$/;"	f	function:my_global_var4
+onchange	input.js	/^    my_global_var4[i].onchange = function () {$/;"	f	variable:my_global_var4
 originalvalue	input.js	/^    var originalvalue = my_global_var4[i].value;$/;"	v
 validFunctionFive	input.js	/^testlib.validFunctionFive = function(a,b) {}$/;"	f	function:testlib
 validFunctionFour	input.js	/^function extra.validFunctionFour(a,b) {}$/;"	f	function:extra

@@ -1,3 +1,4 @@
+app.my_form	input.js	/^sap.ui.controller("app.my_form", {$/;"	c
 onInit	input.js	/^    onInit : function () {$/;"	m	class:app.my_form
 refreshForm	input.js	/^    refreshForm : function (AUFNR) {$/;"	m	class:app.my_form
 refreshSettlements	input.js	/^    refreshSettlements : function (AUFNR) {$/;"	m	class:app.my_form

@@ -20,7 +20,7 @@ DT9	input.js	/^function DT9(name, salary)$/;"	c
 PT1	input.js	/^function PT1()$/;"	f
 PT2	input.js	/^function PT2(name, color)$/;"	c
 PT3	input.js	/^function PT3(name, salary)$/;"	c
-add	input.js	/^myObject.add=function(a,b){return a+b};  $/;"	f	function:myObject
+add	input.js	/^myObject.add=function(a,b){return a+b};  $/;"	f	class:myObject
 addSalary	input.js	/^PT3.prototype.addSalary=function addSalaryFunction(addition)$/;"	m	class:PT3
 addSalaryFunction	input.js	/^function addSalaryFunction(addition)$/;"	c
 addSalaryFunctionDT9	input.js	/^function addSalaryFunctionDT9(addition)$/;"	c
