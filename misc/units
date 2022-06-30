@@ -2536,7 +2536,7 @@ is_validator_runnable ()
     local d=$2
     shift 2
 
-    "$d/"validator-"$v" is_runnable
+    "$d/"validator-"$v" is_runnable unused $d
 }
 
 update_validator_list ()
@@ -2719,7 +2719,7 @@ validate_file ()
     local validators_dir=$3
     shift 3
 
-    ${validators_dir}/validator-${validator} validate $input
+    ${validators_dir}/validator-${validator} validate $input ${validators_dir}
     return $?
 }
 
