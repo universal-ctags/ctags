@@ -117,13 +117,13 @@ Following code is taken from ``clojure.c`` (with some modifications).
 
 		if (vStringLength (parent) > 0)
 		{
-			current.extensionFields.scope[0] = ClojureKinds[K_NAMESPACE].name;
-			current.extensionFields.scope[1] = vStringValue (parent);
+			current.extensionFields.scopeKind = ClojureKinds[K_NAMESPACE].name;
+			current.extensionFields.scopeName = vStringValue (parent);
 		}
 
 		makeTagEntry (&current);
 
-``parent``, ``scope [0]`` and ``scope [1]`` are vStrings. The parser must manage
+``parent``, ``scopeKind`` and ``scopeName`` are vStrings. The parser must manage
 their life cycles; the parser cannot free them till the tag referring them via
 its scope fields are emitted, and must free them after emitting.
 
@@ -198,9 +198,9 @@ When passing ``current`` to ``makeTagEntry``, the ``scopeIndex`` is
 referred for emitting the scope information of ``current``.
 
 ``scopeIndex`` must be set to ``CORK_NIL`` if a tag is not in any scope.
-When using ``scopeIndex`` of ``current``, ``NULL`` must be assigned to both
-``current.extensionFields.scope[0]`` and
-``current.extensionFields.scope[1]``.  ``initTagEntry`` function does this
+When using ``scopeIndex`` of ``current``, ``KIND_GHOST_INDEX`` must be assigned
+to ``current.extensionFields.scopeKindIndex`` and  ``NULL`` must be assigned to
+``current.extensionFields.scopeName``.  ``initTagEntry`` function does this
 initialization internally, so you generally you don't have to write
 the initialization explicitly.
 
