@@ -444,7 +444,7 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 	 *   if (LEAF_KIND == FUNCTION)
 	 *       c  kind:function	scope:class:b	roles:chainElt
 	 *   else
-	 *       c  kind:function	scope:class:b	roles:chainElt
+	 *       c  kind:class	scope:class:b	roles:chainElt
 	 */
 
 	const char *name = name_chain;
@@ -484,7 +484,7 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 
 static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 							vString *const signature, vString *const inheritance,
-							bool anonymous, bool redefineIfKindIsDifferent)
+							bool anonymous)
 {
 	int index = CORK_NIL;
 	const char *name = vStringValue (token->string);
@@ -564,15 +564,13 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 static int makeJsTag (const tokenInfo *const token, const jsKind kind,
 					   vString *const signature, vString *const inheritance)
 {
-	return makeJsTagCommon (token, kind, signature, inheritance, false, true);
+	return makeJsTagCommon (token, kind, signature, inheritance, false);
 }
 
 static int makeClassTagCommon (tokenInfo *const token, vString *const signature,
                           vString *const inheritance, bool anonymous)
 {
-	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance,
-							anonymous, false);
-
+	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance, anonymous);
 }
 
 static int makeClassTag (tokenInfo *const token, vString *const signature,
@@ -585,7 +583,7 @@ static int makeFunctionTagCommon (tokenInfo *const token, vString *const signatu
 								   bool anonymous)
 {
 	return makeJsTagCommon (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL,
-							anonymous, true);
+							anonymous);
 }
 
 static int makeFunctionTag (tokenInfo *const token, vString *const signature, bool generator)
@@ -1331,7 +1329,7 @@ static int parseMethodsInAnonymousObject (tokenInfo *const token)
 	anonGenerate (anon_object->string, "anonymousObject", JSTAG_VARIABLE);
 	anon_object->type = TOKEN_IDENTIFIER;
 
-	index = makeJsTagCommon (anon_object, JSTAG_VARIABLE, NULL, NULL, true, true);
+	index = makeJsTagCommon (anon_object, JSTAG_VARIABLE, NULL, NULL, true);
 	if (! parseMethods (token, index, false))
 	{
 		/* If no method is found, the anonymous object
@@ -1435,11 +1433,6 @@ static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 	vStringCat (parent->string, child->string);
 }
 
-static void addToScope (tokenInfo* const token, int parentIndex)
-{
-	token->scope = parentIndex;
-}
-
 /*
  *	 Scanning functions
  */
@@ -1463,17 +1456,11 @@ static bool findCmdTerm (tokenInfo *const token, bool include_newlines,
 			readTokenFull (token, include_newlines, NULL);
 		}
 		else if ( isType (token, TOKEN_OPEN_PAREN) )
-		{
 			skipArgumentList(token, include_newlines, NULL);
-		}
 		else if ( isType (token, TOKEN_OPEN_SQUARE) )
-		{
 			skipArrayList(token, include_newlines);
-		}
 		else
-		{
 			readTokenFull (token, include_newlines, NULL);
-		}
 	}
 
 	return isType (token, TOKEN_SEMICOLON);
@@ -1536,31 +1523,21 @@ static bool parseLoop (tokenInfo *const token)
 		readToken(token);
 
 		if (isType (token, TOKEN_OPEN_PAREN))
-		{
 			skipArgumentList(token, false, NULL);
-		}
 
 		if (isType (token, TOKEN_OPEN_CURLY))
-		{
 			parseBlock (token, CORK_NIL);
-		}
 		else
-		{
 			is_terminated = parseLine(token, false);
-		}
 	}
 	else if (isKeyword (token, KEYWORD_do))
 	{
 		readToken(token);
 
 		if (isType (token, TOKEN_OPEN_CURLY))
-		{
 			parseBlock (token, CORK_NIL);
-		}
 		else
-		{
 			is_terminated = parseLine(token, false);
-		}
 
 		if (is_terminated)
 			readToken(token);
@@ -1570,9 +1547,8 @@ static bool parseLoop (tokenInfo *const token)
 			readToken(token);
 
 			if (isType (token, TOKEN_OPEN_PAREN))
-			{
 				skipArgumentList(token, true, NULL);
-			}
+
 			if (! isType (token, TOKEN_SEMICOLON))
 			{
 				/* oddly enough, `do {} while (0) var foo = 42` is perfectly
@@ -1641,14 +1617,10 @@ static bool parseIf (tokenInfo *const token)
 	}
 
 	if (isType (token, TOKEN_OPEN_PAREN))
-	{
 		skipArgumentList(token, false, NULL);
-	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))
-	{
 		parseBlock (token, CORK_NIL);
-	}
 	else
 	{
 		/* The next token should only be read if this statement had its own
@@ -1909,7 +1881,7 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 	int saveScope = token->scope;
 
 	if (classIndex != CORK_NIL)
-		addToScope (token, classIndex);
+		token->scope = classIndex;
 
 	/*
 	 * This deals with these formats
@@ -1972,13 +1944,10 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 				token->keyword = KEYWORD_NONE;
 			}
 			else if (isKeyword (saved_token, KEYWORD_get))
-			{
 				is_getter = true;
-			}
 			else
-			{
 				is_setter = true;
-			}
+
 			deleteToken (saved_token);
 		}
 
@@ -2230,7 +2199,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 	TRACE_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
 
 	int r = makeJsTagCommon (targetName, JSTAG_CLASS, NULL, inheritance,
-							 (is_anonymous && (targetName == className)), true);
+							 (is_anonymous && (targetName == className)));
 
 	if (! is_anonymous && targetName != className)
 	{
@@ -2370,9 +2339,7 @@ nextVar:
 				if (! isType(token, TOKEN_KEYWORD))
 				{
 					if ( is_class )
-					{
-						addToScope(token, indexForName);
-					}
+						token->scope = indexForName;
 					else
 					{
 						addContext (name, token);
@@ -2433,7 +2400,7 @@ nextVar:
 						{
 							vString *const signature = vStringNew ();
 
-							addToScope(token, indexForName);
+							token->scope = indexForName;
 
 							copyToken (method_body_token, token, true);
 							readToken (method_body_token);
@@ -2663,35 +2630,31 @@ nextVar:
 			if (has_methods)
 			{
 				jsKind kind = strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
-				indexForName = makeJsTagCommon (name, kind, NULL, NULL, anonObject, true);
+				indexForName = makeJsTagCommon (name, kind, NULL, NULL, anonObject);
 				moveChildren (p, indexForName);
 			}
-			else
+			else if ( token->nestLevel == 0 && is_global )
 			{
 				/*
 				 * Only create variables for global scope
+				 *
+				 * A pointer can be created to the function.
+				 * If we recognize the function/class name ignore the variable.
+				 * This format looks identical to a variable definition.
+				 * A variable defined outside of a block is considered
+				 * a global variable:
+				 *	   var g_var1 = 1;
+				 *	   var g_var2;
+				 * This is not a global variable:
+				 *	   var g_var = function;
+				 * This is a global variable:
+				 *	   var g_var = different_var_name;
 				 */
-				if ( token->nestLevel == 0 && is_global )
-				{
-					/*
-					 * A pointer can be created to the function.
-					 * If we recognize the function/class name ignore the variable.
-					 * This format looks identical to a variable definition.
-					 * A variable defined outside of a block is considered
-					 * a global variable:
-					 *	   var g_var1 = 1;
-					 *	   var g_var2;
-					 * This is not a global variable:
-					 *	   var g_var = function;
-					 * This is a global variable:
-					 *	   var g_var = different_var_name;
-					 */
-					indexForName = anyKindsEntryInScope (token->scope, vStringValue (token->string),
-														 (int[]){JSTAG_FUNCTION, JSTAG_CLASS}, 2, true);
+				indexForName = anyKindsEntryInScope (token->scope, vStringValue (token->string),
+													 (int[]){JSTAG_FUNCTION, JSTAG_CLASS}, 2, true);
 
-					if (indexForName == CORK_NIL)
-						indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
-				}
+				if (indexForName == CORK_NIL)
+					indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 			}
 			/* Here we should be at the end of the block, on the close curly.
 			 * If so, read the next token not to confuse that close curly with
@@ -2721,57 +2684,47 @@ nextVar:
 				if ( isType (token, TOKEN_OPEN_PAREN) )
 					skipArgumentList(token, true, NULL);
 
-				if (isType (token, TOKEN_SEMICOLON))
+				if (isType (token, TOKEN_SEMICOLON) && token->nestLevel == 0)
 				{
-					if ( token->nestLevel == 0 )
+					if ( is_var )
+						indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+					else if ( is_class )
+						indexForName = makeClassTag (name, NULL, NULL);
+					else
 					{
-						if ( is_var )
-						{
-							indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
-						}
-						else if ( is_class )
-						{
-							indexForName = makeClassTag (name, NULL, NULL);
-						}
-						else
-						{
-							/* FIXME: we cannot really get a meaningful
-							 * signature from a `new Function()` call,
-							 * so for now just don't set any */
-							indexForName = makeFunctionTag (name, NULL, false);
-						}
+						/* FIXME: we cannot really get a meaningful
+						 * signature from a `new Function()` call,
+						 * so for now just don't set any */
+						indexForName = makeFunctionTag (name, NULL, false);
 					}
 				}
 				else if (isType (token, TOKEN_CLOSE_CURLY))
 					is_terminated = false;
 			}
 		}
-		else if (! isType (token, TOKEN_KEYWORD))
+		else if (! isType (token, TOKEN_KEYWORD) &&
+				 token->nestLevel == 0 && is_global )
 		{
 			/*
 			 * Only create variables for global scope
+			 *
+			 * A pointer can be created to the function.
+			 * If we recognize the function/class name ignore the variable.
+			 * This format looks identical to a variable definition.
+			 * A variable defined outside of a block is considered
+			 * a global variable:
+			 *	   var g_var1 = 1;
+			 *	   var g_var2;
+			 * This is not a global variable:
+			 *	   var g_var = function;
+			 * This is a global variable:
+			 *	   var g_var = different_var_name;
 			 */
-			if ( token->nestLevel == 0 && is_global )
-			{
-				/*
-				 * A pointer can be created to the function.
-				 * If we recognize the function/class name ignore the variable.
-				 * This format looks identical to a variable definition.
-				 * A variable defined outside of a block is considered
-				 * a global variable:
-				 *	   var g_var1 = 1;
-				 *	   var g_var2;
-				 * This is not a global variable:
-				 *	   var g_var = function;
-				 * This is a global variable:
-				 *	   var g_var = different_var_name;
-				 */
-				indexForName = anyKindsEntryInScope (token->scope, vStringValue (token->string),
-													 (int[]){JSTAG_FUNCTION, JSTAG_CLASS}, 2, true);
+			indexForName = anyKindsEntryInScope (token->scope, vStringValue (token->string),
+												 (int[]){JSTAG_FUNCTION, JSTAG_CLASS}, 2, true);
 
-				if (indexForName == CORK_NIL)
-					indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
-			}
+			if (indexForName == CORK_NIL)
+				indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 		}
 
 		if (parenDepth > 0)
