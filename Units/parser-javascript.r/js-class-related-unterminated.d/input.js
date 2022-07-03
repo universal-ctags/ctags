@@ -1,6 +1,5 @@
 
 var Cls = {
-  // add a member just so Cls is recognized as a class from the start
   A: {}
 }
 

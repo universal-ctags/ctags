@@ -1,4 +1,4 @@
-RE	input.js	/^var RE={"bar":\/foo\\"\/};$/;"	c
-bar	input.js	/^var RE={"bar":\/foo\\"\/};$/;"	p	class:RE
+RE	input.js	/^var RE={"bar":\/foo\\"\/};$/;"	v
+bar	input.js	/^var RE={"bar":\/foo\\"\/};$/;"	p	variable:RE
 foo	input.js	/^var foo="foo \\" some other stuff";$/;"	v
 my_function	input.js	/^function my_function() {$/;"	f

@@ -1,7 +1,7 @@
 a	input.js	/^let a = 1;$/;"	v
 b	input.js	/^let b = 0;$/;"	v
 func	input.js	/^let func = function(){}$/;"	f
-group	input.js	/^let group = {$/;"	c
-x	input.js	/^  x:1,$/;"	p	class:group
-y	input.js	/^  y:1,$/;"	p	class:group
-z	input.js	/^  z:1,$/;"	p	class:group
+group	input.js	/^let group = {$/;"	v
+x	input.js	/^  x:1,$/;"	p	variable:group
+y	input.js	/^  y:1,$/;"	p	variable:group
+z	input.js	/^  z:1,$/;"	p	variable:group

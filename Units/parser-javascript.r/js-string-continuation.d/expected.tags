@@ -1,5 +1,5 @@
-first	input.js	/^  "first": function(){},$/;"	m	class:o
-fourth	input.js	/^  "fourth": function(){},$/;"	m	class:o
-o	input.js	/^var o = {$/;"	c
-second	input.js	/^ond": function(){},$/;"	m	class:o
-third	input.js	/^": function(){},$/;"	m	class:o
+first	input.js	/^  "first": function(){},$/;"	m	variable:o
+fourth	input.js	/^  "fourth": function(){},$/;"	m	variable:o
+o	input.js	/^var o = {$/;"	v
+second	input.js	/^ond": function(){},$/;"	m	variable:o
+third	input.js	/^": function(){},$/;"	m	variable:o

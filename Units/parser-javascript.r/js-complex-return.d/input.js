@@ -7,7 +7,7 @@ function func2() {
   return 42;
 }
 
-var class1 = function() {
+var Class1 = function() {
   this.method1 = function() {
     return 42;
   };
@@ -22,7 +22,7 @@ var class1 = function() {
   };
 };
 
-var class2 = function() {
+var Class2 = function() {
   this.c2m1 = function() {
     c2m3(function() {
       return { 'test': {} };
@@ -36,7 +36,7 @@ var class2 = function() {
   };
 };
 
-var class3 = function() {
+var Class3 = function() {
   this.c3m1 = function() {
     return function(n) {
       if (n == 42) {
@@ -51,7 +51,7 @@ var class3 = function() {
   };
 }
 
-var class4 = function() {
+var Class4 = function() {
   this.method1 = function() {
     return [{a:1, b:2}, {a:3, b:4}, {a:5, b:6}];
   };

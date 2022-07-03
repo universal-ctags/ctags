@@ -1,4 +1,4 @@
-AnonymousClass80ca49fb0101	input.js	/^var Namespace = Ember.Namespace = Ember.Object.extend=({$/;"	c
 Namespace	input.js	/^var Namespace = Ember.Namespace = Ember.Object.extend=({$/;"	v
-init	input.js	/^  init: function() {$/;"	m	class:AnonymousClass80ca49fb0101
-isNamespace	input.js	/^  isNamespace: true,$/;"	p	class:AnonymousClass80ca49fb0101
+anonymousObject80ca49fb0105	input.js	/^var Namespace = Ember.Namespace = Ember.Object.extend=({$/;"	v
+init	input.js	/^  init: function() {$/;"	m	variable:anonymousObject80ca49fb0105
+isNamespace	input.js	/^  isNamespace: true,$/;"	p	variable:anonymousObject80ca49fb0105
