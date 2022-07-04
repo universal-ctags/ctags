@@ -80,8 +80,8 @@ struct sTagEntryInfo {
 		const char* scopeName;
 		int         scopeIndex;   /* cork queue entry for upper scope tag.
 					     This field is meaningful if the value
-					     is not CORK_NIL and scope[0]  and scope[1] are
-					     NULL. */
+					     is not CORK_NIL, scopeKindIndex is KIND_GHOST_INDEX,
+					     and scopeName is NULL. */
 
 		const char* signature;
 
