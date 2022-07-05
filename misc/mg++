@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+# mg++ - testing whether g++ accepts an input with multiple C++ standards
+#
+# Copyright (C) 2014 Masatake YAMATO
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+help()
+{
+    echo Usage: "$0" "input.cpp" 1>&2
+    exit $1
+}
+
+if [ $# = 0 ]; then
+    help 1 1>&2
+elif [ $1 = "-h" ] || [ $1 = "--help" ]; then
+    help 0
+fi
+
+if ! type g++ > /dev/null; then
+    echo "No g++ found" 1>&2
+    exit 1
+fi
+
+if ! [ -f $1 ]; then
+    echo "No such file: $1" 1>&2
+    exit 1
+fi
+
+STDS="
+c++03
+gnu++03
+c++11
+gnu++11
+c++14
+gnu++14
+c++17
+gnu++17
+c++20
+gnu++20
+c++23
+gnu++23
+"
+
+dummy=/tmp/input-$$.cpp
+cat > $dummy <<EOF
+// dummy input for mg++
+int main (void)
+{
+  return 0;
+}
+EOF
+
+for s in $STDS; do
+    if ! g++ -fsyntax-only -c --std=$s -c $dummy; then
+	echo "*** this g++ doesn't support --std=$s option"
+	continue
+    fi
+
+    printf "%s..." "*** compile with --std=$s"
+    LOG=$(g++ -fsyntax-only -c --std=$s $1 2>&1)
+    if [ $? = 0 ]; then
+	echo ok
+    else
+	echo error
+	echo "$LOG"
+	echo -----------------------------------
+    fi
+done
+
+rm -f $dummy

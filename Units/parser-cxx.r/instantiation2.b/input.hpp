@@ -1,5 +1,5 @@
 // Based on an example in https://cpplover.blogspot.com/2013/12/c03c11_3905.html (in Japanese)
-// A C++03 compiler may accepts this input but a C++11 compiler may not.
+// A C++03 compiler accept this input but a C++11 compiler does not.
 template <class T> struct X { };
 template <int N> struct Y { };
 #define M 2

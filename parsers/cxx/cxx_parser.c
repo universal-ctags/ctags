@@ -494,10 +494,13 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 
 	MIOPos oFilePosition = getInputFilePosition();
 	int iFileLine = getInputLineNumber();
+	int eMaybeTokenTypeOpeningBracket = (g_cxx.bConfirmedCPPLanguage
+										 ? 0
+										 : CXXTokenTypeOpeningBracket);
 
 	if(!cxxParserParseUpToOneOf(
 			CXXTokenTypeEOF | CXXTokenTypeSemicolon |
-				CXXTokenTypeOpeningBracket | CXXTokenTypeAssignment,
+				eMaybeTokenTypeOpeningBracket | CXXTokenTypeAssignment,
 			false
 		))
 	{

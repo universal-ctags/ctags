@@ -571,10 +571,14 @@ runs the command in two ways.
     *is_runnable* method of *validator-jq* command should exit with
     non-zero value.
 
+    The second argument is dummy. Don't use it. The third argument
+    is the directory (*misc/validators*) where the command is.
+
 *validate* method
 
-    The make target runs the command with "validate* and an input
-    file name for validating the input file.  The command exits
+    The make target runs the command with "validate", an input
+    file name for validating the input file, and the directory
+    (*misc/validators*) where the command is. The command exits
     non-zero if the input file contains invalid syntax. This method
     will never run if *is_runnable* method of the command exits with
     non-zero.
