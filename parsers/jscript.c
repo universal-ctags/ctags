@@ -474,7 +474,11 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 		e.extensionFields.scopeIndex = scope;
 
 		index = makeTagEntry (&e);
-		registerEntry (index);
+		/* We shold remove This condition. We should fix the callers passing
+		 * an empty name instead. makeTagEntry() returns CORK_NIL if the tag
+		 * name is empty. */
+		if (index != CORK_NIL)
+			registerEntry (index);
 	}
 
 	return next
@@ -556,7 +560,11 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 		markTagExtraBit (&e, XTAG_ANONYMOUS);
 
 	index = makeTagEntry (&e);
-	registerEntry (index);
+	/* We shold remove This condition. We should fix the callers passing
+	 * an empty name instead. makeTagEntry() returns CORK_NIL if the tag
+	 * name is empty. */
+	if (index != CORK_NIL)
+		registerEntry (index);
 
 	return index;
 }
