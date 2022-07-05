@@ -1,6 +1,6 @@
-MyClass	input.js	/^MyClass = {$/;"	c
-MyClass_sub1	input.js	/^    MyClass_sub1: function(x){$/;"	m	class:MyClass
-MyClass_sub2	input.js	/^    MyClass_sub2: function(x){$/;"	m	class:MyClass
+MyClass	input.js	/^MyClass = {$/;"	v
+MyClass_sub1	input.js	/^    MyClass_sub1: function(x){$/;"	m	variable:MyClass
+MyClass_sub2	input.js	/^    MyClass_sub2: function(x){$/;"	m	variable:MyClass
 a	input.js	/^function a(flag){$/;"	f
 aa	input.js	/^function aa(){$/;"	f
 aa_sub1	input.js	/^    function aa_sub1(){$/;"	f	function:aa

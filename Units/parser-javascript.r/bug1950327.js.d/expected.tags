@@ -1,13 +1,13 @@
-*	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	class:container.dirtyTab
+*	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	property:container.dirtyTab
 Different	input.js	/^Different.prototype = {$/;"	c
 TabChrome	input.js	/^TabChrome.prototype = {$/;"	c
+container.dirtyTab	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p
 createTabTile	input.js	/^	createTabTile: function(browser) $/;"	m	class:Different
 createTabTile	input.js	/^	createTabTile: function(browser) $/;"	m	class:TabChrome
 destroyTabTile	input.js	/^	destroyTabTile: function(tile)$/;"	m	class:Different
 destroyTabTile	input.js	/^	destroyTabTile: function(tile)$/;"	m	class:TabChrome
-dirtyTab	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	c	class:container
 init	input.js	/^	init: function() $/;"	m	class:Different
 init	input.js	/^	init: function() $/;"	m	class:TabChrome
-snapshot	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	class:container.dirtyTab
-title	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	class:container.dirtyTab
-url	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	class:container.dirtyTab
+snapshot	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	property:container.dirtyTab
+title	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	property:container.dirtyTab
+url	input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	property:container.dirtyTab

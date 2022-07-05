@@ -1,2 +1,2 @@
-.	input.js	/^X = {'.': 1};$/;"	p	class:X
-X	input.js	/^X = {'.': 1};$/;"	c
+.	input.js	/^X = {'.': 1};$/;"	p	variable:X
+X	input.js	/^X = {'.': 1};$/;"	v

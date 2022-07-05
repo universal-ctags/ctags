@@ -1,21 +1,21 @@
-AnonymousClassecad86450101	input.js	/^  { a: "hello", b: 42 },$/;"	c
-AnonymousClassecad86450201	input.js	/^  { a: "hi", b: 41 }$/;"	c
-AnonymousClassecad86450301	input.js	/^    { a: {}, b: {} },$/;"	c	class:class
-AnonymousClassecad86450401	input.js	/^    { a: {}, b: {} }$/;"	c	class:class
-a	input.js	/^    { a: {}, b: {} }$/;"	p	class:class.AnonymousClassecad86450401
-a	input.js	/^    { a: {}, b: {} },$/;"	p	class:class.AnonymousClassecad86450301
-a	input.js	/^  { a: "hello", b: 42 },$/;"	p	class:AnonymousClassecad86450101
-a	input.js	/^  { a: "hi", b: 41 }$/;"	p	class:AnonymousClassecad86450201
+a	input.js	/^    { a: {}, b: {} }$/;"	p	variable:class.anonymousObjectecad86450405
+a	input.js	/^    { a: {}, b: {} },$/;"	p	variable:class.anonymousObjectecad86450305
+a	input.js	/^  { a: "hello", b: 42 },$/;"	p	variable:anonymousObjectecad86450105
+a	input.js	/^  { a: "hi", b: 41 }$/;"	p	variable:anonymousObjectecad86450205
 a	input.js	/^var a = [];$/;"	v
-b	input.js	/^    { a: {}, b: {} }$/;"	p	class:class.AnonymousClassecad86450401
-b	input.js	/^    { a: {}, b: {} },$/;"	p	class:class.AnonymousClassecad86450301
-b	input.js	/^  { a: "hello", b: 42 },$/;"	p	class:AnonymousClassecad86450101
-b	input.js	/^  { a: "hi", b: 41 }$/;"	p	class:AnonymousClassecad86450201
+anonymousObjectecad86450105	input.js	/^  { a: "hello", b: 42 },$/;"	v
+anonymousObjectecad86450205	input.js	/^  { a: "hi", b: 41 }$/;"	v
+anonymousObjectecad86450305	input.js	/^    { a: {}, b: {} },$/;"	v	function:class
+anonymousObjectecad86450405	input.js	/^    { a: {}, b: {} }$/;"	v	function:class
+b	input.js	/^    { a: {}, b: {} }$/;"	p	variable:class.anonymousObjectecad86450405
+b	input.js	/^    { a: {}, b: {} },$/;"	p	variable:class.anonymousObjectecad86450305
+b	input.js	/^  { a: "hello", b: 42 },$/;"	p	variable:anonymousObjectecad86450105
+b	input.js	/^  { a: "hi", b: 41 }$/;"	p	variable:anonymousObjectecad86450205
 b	input.js	/^var b = [1, 2, 3];$/;"	v
-bar	input.js	/^    bar: [ 4, 5, 9]$/;"	p	class:class.test1
+bar	input.js	/^    bar: [ 4, 5, 9]$/;"	p	variable:class.test1
 c	input.js	/^var c = [$/;"	v
-class	input.js	/^var class = function() {$/;"	c
+class	input.js	/^var class = function() {$/;"	f
 d	input.js	/^var d = [$/;"	v
-foo	input.js	/^    foo: [ 1, 2, 3],$/;"	p	class:class.test1
-test1	input.js	/^  this.test1 = {$/;"	c	class:class
-test3	input.js	/^  this.test3 = function() {}$/;"	m	class:class
+foo	input.js	/^    foo: [ 1, 2, 3],$/;"	p	variable:class.test1
+test1	input.js	/^  this.test1 = {$/;"	v	function:class
+test3	input.js	/^  this.test3 = function() {}$/;"	m	function:class

@@ -1,19 +1,19 @@
-AnonymousFunctiona815156f0100	input.js	/^    c2m3(function() {$/;"	f	method:class2.c2m1
-AnonymousFunctiona815156f0200	input.js	/^    return function(n) {$/;"	f	method:class3.c3m1
-c2m1	input.js	/^  this.c2m1 = function() {$/;"	m	class:class2
-c2m2	input.js	/^  this.c2m2 = function(f) {$/;"	m	class:class2
-c2m3	input.js	/^  this.c2m3 = function(f) {$/;"	m	class:class2
-c3m1	input.js	/^  this.c3m1 = function() {$/;"	m	class:class3
-c3m2	input.js	/^  this.c3m2 = function() {$/;"	m	class:class3
-class1	input.js	/^var class1 = function() {$/;"	c
-class2	input.js	/^var class2 = function() {$/;"	c
-class3	input.js	/^var class3 = function() {$/;"	c
-class4	input.js	/^var class4 = function() {$/;"	c
+Class1	input.js	/^var Class1 = function() {$/;"	c
+Class2	input.js	/^var Class2 = function() {$/;"	c
+Class3	input.js	/^var Class3 = function() {$/;"	c
+Class4	input.js	/^var Class4 = function() {$/;"	c
+anonymousFunctiona815156f0100	input.js	/^    c2m3(function() {$/;"	f	method:Class2.c2m1
+anonymousFunctiona815156f0200	input.js	/^    return function(n) {$/;"	f	method:Class3.c3m1
+c2m1	input.js	/^  this.c2m1 = function() {$/;"	m	class:Class2
+c2m2	input.js	/^  this.c2m2 = function(f) {$/;"	m	class:Class2
+c2m3	input.js	/^  this.c2m3 = function(f) {$/;"	m	class:Class2
+c3m1	input.js	/^  this.c3m1 = function() {$/;"	m	class:Class3
+c3m2	input.js	/^  this.c3m2 = function() {$/;"	m	class:Class3
 func1	input.js	/^function func1() {$/;"	f
 func2	input.js	/^function func2() {$/;"	f
-method1	input.js	/^  this.method1 = function() {$/;"	m	class:class1
-method1	input.js	/^  this.method1 = function() {$/;"	m	class:class4
-method2	input.js	/^  this.method2 = function() {$/;"	m	class:class1
-method2	input.js	/^  this.method2 = function() {$/;"	m	class:class4
-method3	input.js	/^  this.method3 = function() {$/;"	m	class:class1
-method4	input.js	/^  this.method4 = function() {$/;"	m	class:class1
+method1	input.js	/^  this.method1 = function() {$/;"	m	class:Class1
+method1	input.js	/^  this.method1 = function() {$/;"	m	class:Class4
+method2	input.js	/^  this.method2 = function() {$/;"	m	class:Class1
+method2	input.js	/^  this.method2 = function() {$/;"	m	class:Class4
+method3	input.js	/^  this.method3 = function() {$/;"	m	class:Class1
+method4	input.js	/^  this.method4 = function() {$/;"	m	class:Class1

@@ -1,4 +1,4 @@
-var class2 = function() {
+var Class2 = function() {
   this.c2m1 = function() {
     c2m3(function() {
       return { 'test': {} };
@@ -6,7 +6,7 @@ var class2 = function() {
   };
 };
 
-var class3 = function() {
+var Class3 = function() {
   this.c3m1 = function() {
     return function(n) {
       if (n == 42) {

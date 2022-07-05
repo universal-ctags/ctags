@@ -1,7 +1,7 @@
-A	input.js	/^  A: {}$/;"	p	class:Cls
-B	input.js	/^Cls.B = function(a, b) {$/;"	c	class:Cls
-C	input.js	/^Cls.C = function () {$/;"	c	class:Cls
-Cls	input.js	/^var Cls = {$/;"	c
+A	input.js	/^  A: {}$/;"	p	variable:Cls
+B	input.js	/^Cls.B = function(a, b) {$/;"	c	variable:Cls
+C	input.js	/^Cls.C = function () {$/;"	c	variable:Cls
+Cls	input.js	/^var Cls = {$/;"	v
 Sub	input.js	/^Cls.B.Sub = function() {$/;"	c	class:Cls.B
 dyn1	input.js	/^  Cls.B.Sub.prototype.dyn1 = this.m4$/;"	m	class:Cls.B.Sub
 m1	input.js	/^Cls.B.prototype.m1 = function(a) {$/;"	m	class:Cls.B

@@ -1,5 +1,4 @@
-MyClass	input.js	/^MyClass.prototype.method2 = function() {$/;"	c
-MyClass	input.js	/^function MyClass() {$/;"	f
+MyClass	input.js	/^function MyClass() {$/;"	c
 function1	input.js	/^function function1() {$/;"	f
 function2	input.js	/^function2 = function() {$/;"	f
 method2	input.js	/^MyClass.prototype.method2 = function() {$/;"	m	class:MyClass

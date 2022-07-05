@@ -1,4 +1,4 @@
-func1	input.js	/^  func1: () => {$/;"	m	class:testobj	signature:()
-func2	input.js	/^  func2: () => {$/;"	m	class:testobj	signature:()
-func3	input.js	/^  func3: x => {$/;"	m	class:testobj	signature:(x)
-testobj	input.js	/^testobj = {$/;"	c
+func1	input.js	/^  func1: () => {$/;"	m	variable:testobj	signature:()
+func2	input.js	/^  func2: () => {$/;"	m	variable:testobj	signature:()
+func3	input.js	/^  func3: x => {$/;"	m	variable:testobj	signature:(x)
+testobj	input.js	/^testobj = {$/;"	v

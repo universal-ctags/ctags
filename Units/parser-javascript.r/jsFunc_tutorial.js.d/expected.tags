@@ -1,15 +1,15 @@
-Ball1	input.js	/^function Ball1()       \/\/ it may seem odd, but this declaration$/;"	f
-Ball3	input.js	/^function Ball3()       \/\/ it may seem odd, but declaration$/;"	f
-D1	input.js	/^function D1(a, b) $/;"	f
-D2	input.js	/^var D2=function(a, b) $/;"	f
-D2A	input.js	/^var D2A=function theAdd(a, b) $/;"	f
-D3	input.js	/^var D3=new Function("a", "b", "return a+b;");$/;"	f
-D4	input.js	/^var D4=new Function("a", "b", $/;"	f
-D5	input.js	/^function D5(myOperator)$/;"	f
-DT1	input.js	/^function DT1()$/;"	f
-DT2	input.js	/^function DT2(message)$/;"	f
-DT2A	input.js	/^function DT2A(message)$/;"	f
-DT3	input.js	/^function DT3()$/;"	f
+Ball1	input.js	/^function Ball1()       \/\/ it may seem odd, but this declaration$/;"	c
+Ball3	input.js	/^function Ball3()       \/\/ it may seem odd, but declaration$/;"	c
+D1	input.js	/^function D1(a, b) $/;"	c
+D2	input.js	/^var D2=function(a, b) $/;"	c
+D2A	input.js	/^var D2A=function theAdd(a, b) $/;"	c
+D3	input.js	/^var D3=new Function("a", "b", "return a+b;");$/;"	c
+D4	input.js	/^var D4=new Function("a", "b", $/;"	c
+D5	input.js	/^function D5(myOperator)$/;"	c
+DT1	input.js	/^function DT1()$/;"	c
+DT2	input.js	/^function DT2(message)$/;"	c
+DT2A	input.js	/^function DT2A(message)$/;"	c
+DT3	input.js	/^function DT3()$/;"	c
 DT4	input.js	/^function DT4(message, specifiedName)$/;"	c
 DT5	input.js	/^function DT5(color, specifiedName, owner, weight)$/;"	c
 DT6	input.js	/^function DT6(name, salary, mySupervisor)$/;"	c
@@ -17,16 +17,16 @@ DT7	input.js	/^function DT7(name, salary)$/;"	c
 DT7A	input.js	/^function DT7A(name, salary)$/;"	c
 DT8	input.js	/^function DT8(name, salary)$/;"	c
 DT9	input.js	/^function DT9(name, salary)$/;"	c
-PT1	input.js	/^function PT1()$/;"	f
+PT1	input.js	/^function PT1()$/;"	c
 PT2	input.js	/^function PT2(name, color)$/;"	c
 PT3	input.js	/^function PT3(name, salary)$/;"	c
-add	input.js	/^myObject.add=function(a,b){return a+b};  $/;"	f	class:myObject
+add	input.js	/^myObject.add=function(a,b){return a+b};  $/;"	f	variable:myObject
 addSalary	input.js	/^PT3.prototype.addSalary=function addSalaryFunction(addition)$/;"	m	class:PT3
-addSalaryFunction	input.js	/^function addSalaryFunction(addition)$/;"	c
-addSalaryFunctionDT9	input.js	/^function addSalaryFunctionDT9(addition)$/;"	c
+addSalaryFunction	input.js	/^function addSalaryFunction(addition)$/;"	f
+addSalaryFunctionDT9	input.js	/^function addSalaryFunctionDT9(addition)$/;"	f
 ball0	input.js	/^var ball0=new DT1(); \/\/ ball0 now points to a new object$/;"	v
 ball1	input.js	/^var ball1=new DT2("creating new Ball");  \/\/ creates object & $/;"	v
-ball2	input.js	/^var ball2=new Object();$/;"	c
+ball2	input.js	/^var ball2=new Object();$/;"	v
 ball3	input.js	/^var ball3=new DT3(); \/\/ ball0 now points to a new instance of type Ball$/;"	v
 ball4	input.js	/^var ball4=new DT3();$/;"	v
 ball5	input.js	/^var ball5=new DT3();$/;"	v
@@ -61,11 +61,11 @@ myFunction6A	input.js	/^function myFunction6A() $/;"	f
 myFunction6AE	input.js	/^myFunction6AE=function()$/;"	f
 myFunction6B	input.js	/^function myFunction6B() $/;"	f
 myFunction6E	input.js	/^myFunction6E=function()$/;"	f
-myObject	input.js	/^var myObject=new Object();$/;"	c
+myObject	input.js	/^var myObject=new Object();$/;"	v
 my_global_var1	input.js	/^var my_global_var1 = 'global';$/;"	v
-object1	input.js	/^var object1=new Object();      \/\/ creates 3 objects$/;"	c
-object2	input.js	/^var object2=new Object();$/;"	c
-object3	input.js	/^var object3=new Object();$/;"	c
+object1	input.js	/^var object1=new Object();      \/\/ creates 3 objects$/;"	v
+object2	input.js	/^var object2=new Object();$/;"	v
+object3	input.js	/^var object3=new Object();$/;"	v
 price	input.js	/^PT2.prototype.price=20;$/;"	m	class:PT2
 savedFunc6B	input.js	/^savedFunc6B=function()$/;"	f
 sayName4A	input.js	/^function sayName4A(name) $/;"	f
