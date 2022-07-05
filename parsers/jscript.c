@@ -2999,7 +2999,7 @@ getKindStringForCorkIndex(int index)
 
 static const char *kindName(jsKind kind)
 {
-	return kind >= 0 ? JsKinds[kind].name : "none";
+	return ((int)kind) >= 0 ? JsKinds[kind].name : "none";
 }
 
 static const char *tokenTypeName(enum eTokenType e)
