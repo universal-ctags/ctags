@@ -1938,7 +1938,7 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 			tokenInfo *saved_token = newToken ();
 			copyToken (saved_token, token, true);
 			readToken (token);
-			if (isType(token, TOKEN_OPEN_PAREN))
+			if (isType(token, TOKEN_OPEN_PAREN) || isType(token, TOKEN_COLON))
 			{
 				Assert (NextToken == NULL);
 				NextToken = newToken ();
