@@ -1,0 +1,4 @@
+log	input.js	/^  log: ['a', 'b', 'c'],$/;"	property	variable:obj
+obj.log	input.js	/^  log: ['a', 'b', 'c'],$/;"	property	variable:obj
+obj	input.js	/^var obj = {$/;"	variable
+o	input.js	/^var o = {$/;"	variable

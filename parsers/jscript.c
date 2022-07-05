@@ -3130,6 +3130,7 @@ extern parserDefinition* JavaScriptParser (void)
 	def->keywordTable = JsKeywordTable;
 	def->keywordCount = ARRAY_SIZE (JsKeywordTable);
 	def->useCork	= CORK_QUEUE|CORK_SYMTAB;
+	def->requestAutomaticFQTag = true;
 
 	return def;
 }
