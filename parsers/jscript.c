@@ -2249,6 +2249,7 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	bool is_terminated = true;
 	bool is_global = false;
 	bool has_methods = false;
+	bool found_this = false;
 
 	/*
 	 * Functions can be named or unnamed.
@@ -2300,9 +2301,11 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	}
 
 nextVar:
+	found_this = false;
 	if ( isKeyword(token, KEYWORD_this) )
 	{
 		TRACE_PRINT("found 'this' keyword");
+		found_this = true;
 
 		readToken(token);
 		if (isType (token, TOKEN_PERIOD))
@@ -2633,7 +2636,7 @@ nextVar:
 			has_methods = parseMethods(token, p, false);
 			if (has_methods)
 			{
-				jsKind kind = strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
+				jsKind kind = found_this || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
 				indexForName = makeJsTagCommon (name, kind, NULL, NULL, anonObject);
 				moveChildren (p, indexForName);
 			}
@@ -2669,6 +2672,21 @@ nextVar:
 				is_terminated = isType (token, TOKEN_SEMICOLON);
 			}
 		}
+		else if (isType (token, TOKEN_OPEN_SQUARE) && !vStringIsEmpty (name->string))
+		{
+			/*
+			 * Creates tag for an array
+			 */
+			skipArrayList(token, true);
+			jsKind kind = found_this || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
+			/*
+			 * Only create variables for global scope or class/object properties
+			 */
+			if ( ( token->nestLevel == 0 && is_global ) || kind == JSTAG_PROPERTY )
+			{
+				indexForName = makeJsTagCommon (name, kind, NULL, NULL, false);
+			}
+		}
 		else if (isKeyword (token, KEYWORD_new))
 		{
 			readToken (token);
@@ -2691,7 +2709,7 @@ nextVar:
 				if (isType (token, TOKEN_SEMICOLON) && token->nestLevel == 0)
 				{
 					if ( is_var )
-						indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+						indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : found_this ? JSTAG_PROPERTY : JSTAG_VARIABLE, NULL, NULL);
 					else if ( is_class )
 						indexForName = makeClassTag (name, NULL, NULL);
 					else
