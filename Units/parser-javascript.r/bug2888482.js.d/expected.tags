@@ -1,2 +1,2 @@
-onsubmit	input.js	/^		editFormEl.onsubmit = function() {$/;"	f	function:editFormEl
+onsubmit	input.js	/^		editFormEl.onsubmit = function() {$/;"	f	variable:editFormEl
 scrollEditBox	input.js	/^function scrollEditBox() {$/;"	f

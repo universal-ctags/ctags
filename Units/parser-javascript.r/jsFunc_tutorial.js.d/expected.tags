@@ -21,6 +21,7 @@ PT1	input.js	/^function PT1()$/;"	c
 PT2	input.js	/^function PT2(name, color)$/;"	c
 PT3	input.js	/^function PT3(name, salary)$/;"	c
 add	input.js	/^myObject.add=function(a,b){return a+b};  $/;"	f	variable:myObject
+add	input.js	/^var add=D5("+");                \/\/ creates "add" function$/;"	v
 addSalary	input.js	/^PT3.prototype.addSalary=function addSalaryFunction(addition)$/;"	m	class:PT3
 addSalaryFunction	input.js	/^function addSalaryFunction(addition)$/;"	f
 addSalaryFunctionDT9	input.js	/^function addSalaryFunctionDT9(addition)$/;"	f
@@ -54,6 +55,7 @@ getSalary	input.js	/^PT3.prototype.getSalary=function getSalaryFunction()$/;"	m	
 getSalaryFunctionDT9	input.js	/^function getSalaryFunctionDT9()$/;"	f
 livesIn	input.js	/^PT2.prototype.livesIn="water";$/;"	m	class:PT2
 manager	input.js	/^var manager=new DT6("Joan", 50, boss);  $/;"	v
+multiply	input.js	/^var multiply=D5("*");           \/\/ created "multiply" function$/;"	v
 myFunction4	input.js	/^function myFunction4(message) $/;"	f
 myFunction5	input.js	/^function myFunction5() $/;"	f
 myFunction6	input.js	/^function myFunction6() $/;"	f
@@ -67,7 +69,14 @@ object1	input.js	/^var object1=new Object();      \/\/ creates 3 objects$/;"	v
 object2	input.js	/^var object2=new Object();$/;"	v
 object3	input.js	/^var object3=new Object();$/;"	v
 price	input.js	/^PT2.prototype.price=20;$/;"	m	class:PT2
+ptr	input.js	/^var ptr=myFunction4;  \/\/ ptr points to myFunction$/;"	v
+ptr1	input.js	/^var ptr1=myFunction5;                 \/\/ ptr1 points to myFunction$/;"	v
+ptr2	input.js	/^var ptr2=myFunction5;                 \/\/ ptr2 also points to myFunction$/;"	v
+resultString	input.js	/^var resultString=getHalfOf7(10,20,30);$/;"	v
+savedFunc	input.js	/^var savedFunc=myFunction6B;$/;"	v
 savedFunc6B	input.js	/^savedFunc6B=function()$/;"	f
+savedFunction	input.js	/^var savedFunction=myFunction6A;$/;"	v
 sayName4A	input.js	/^function sayName4A(name) $/;"	f
+subtract	input.js	/^var subtract=D5("-");           \/\/ creates "subtract" function$/;"	v
 teamLeader	input.js	/^var teamLeader=new DT6("Rose", 50, boss);  $/;"	v
 theAdd	input.js	/^var D2A=function theAdd(a, b) $/;"	f

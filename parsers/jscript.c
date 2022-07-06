@@ -251,14 +251,14 @@ typedef enum {
  */
 
 typedef enum {
-	JS_FUNCITON_CHAINELT,
-} jsFunctionRole;
+	JS_VARIABLE_CHAINELT,
+} jsVariableRole;
 
 typedef enum {
 	JS_CLASS_CHAINELT,
 } jsClassRole;
 
-static roleDefinition JsFunctionRoles [] = {
+static roleDefinition JsVariableRoles [] = {
 	{ false, "chainElt", "(EXPERIMENTAL)used as an element in a name chain like a.b.c" },
 };
 
@@ -267,14 +267,14 @@ static roleDefinition JsClassRoles [] = {
 };
 
 static kindDefinition JsKinds [] = {
-	{ true,  'f', "function",	  "functions",
-	  .referenceOnly = false, ATTACH_ROLES(JsFunctionRoles) },
+	{ true,  'f', "function",	  "functions"        },
 	{ true,  'c', "class",		  "classes",
 	  .referenceOnly = false, ATTACH_ROLES(JsClassRoles)    },
 	{ true,  'm', "method",		  "methods"          },
 	{ true,  'p', "property",	  "properties"       },
 	{ true,  'C', "constant",	  "constants"        },
-	{ true,  'v', "variable",	  "global variables" },
+	{ true,  'v', "variable",	  "global variables",
+	  .referenceOnly = false, ATTACH_ROLES(JsVariableRoles) },
 	{ true,  'g', "generator",	  "generators"       },
 	{ true,  'G', "getter",		  "getters"          },
 	{ true,  'S', "setter",		  "setters"          },
@@ -461,10 +461,10 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 		{
 			/*
 			 * If we're creating a function (and not a method),
-			 * guess we're inside another function
+			 * assume the parent is a plain variable.
 			 */
-			kind = JSTAG_FUNCTION;
-			role = JS_FUNCITON_CHAINELT;
+			kind = JSTAG_VARIABLE;
+			role = JS_VARIABLE_CHAINELT;
 		}
 
 		initRefTagEntry (&e, name, kind, role);
@@ -2657,8 +2657,8 @@ nextVar:
 				 * This is a global variable:
 				 *	   var g_var = different_var_name;
 				 */
-				indexForName = anyKindsEntryInScope (token->scope, vStringValue (token->string),
-													 (int[]){JSTAG_FUNCTION, JSTAG_CLASS}, 2, true);
+				indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
+													 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
 
 				if (indexForName == CORK_NIL)
 					indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
@@ -2742,8 +2742,8 @@ nextVar:
 			 * This is a global variable:
 			 *	   var g_var = different_var_name;
 			 */
-			indexForName = anyKindsEntryInScope (token->scope, vStringValue (token->string),
-												 (int[]){JSTAG_FUNCTION, JSTAG_CLASS}, 2, true);
+			indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
+												 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
 
 			if (indexForName == CORK_NIL)
 				indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);

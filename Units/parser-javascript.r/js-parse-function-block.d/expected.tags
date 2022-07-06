@@ -1,3 +1,3 @@
 anonymousFunctionf0f039f00100	input.js	/^A.add('X', function(Y) {$/;"	function
-c	input.js	/^B.c = function(type, field)$/;"	function	function:B
-d	input.js	/^B.d = function(id)$/;"	function	function:B
+c	input.js	/^B.c = function(type, field)$/;"	function	variable:B
+d	input.js	/^B.d = function(id)$/;"	function	variable:B
