@@ -17,7 +17,6 @@ var class = function() {
     foo: [ 1, 2, 3],
     bar: [ 4, 5, 9]
   };
-  // FIXME: no tag is generated for test2
   this.test2 = [
     { a: {}, b: {} },
     { a: {}, b: {} }

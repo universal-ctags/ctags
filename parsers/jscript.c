@@ -251,14 +251,14 @@ typedef enum {
  */
 
 typedef enum {
-	JS_FUNCITON_CHAINELT,
-} jsFunctionRole;
+	JS_VARIABLE_CHAINELT,
+} jsVariableRole;
 
 typedef enum {
 	JS_CLASS_CHAINELT,
 } jsClassRole;
 
-static roleDefinition JsFunctionRoles [] = {
+static roleDefinition JsVariableRoles [] = {
 	{ false, "chainElt", "(EXPERIMENTAL)used as an element in a name chain like a.b.c" },
 };
 
@@ -267,14 +267,14 @@ static roleDefinition JsClassRoles [] = {
 };
 
 static kindDefinition JsKinds [] = {
-	{ true,  'f', "function",	  "functions",
-	  .referenceOnly = false, ATTACH_ROLES(JsFunctionRoles) },
+	{ true,  'f', "function",	  "functions"        },
 	{ true,  'c', "class",		  "classes",
 	  .referenceOnly = false, ATTACH_ROLES(JsClassRoles)    },
 	{ true,  'm', "method",		  "methods"          },
 	{ true,  'p', "property",	  "properties"       },
 	{ true,  'C', "constant",	  "constants"        },
-	{ true,  'v', "variable",	  "global variables" },
+	{ true,  'v', "variable",	  "global variables",
+	  .referenceOnly = false, ATTACH_ROLES(JsVariableRoles) },
 	{ true,  'g', "generator",	  "generators"       },
 	{ true,  'G', "getter",		  "getters"          },
 	{ true,  'S', "setter",		  "setters"          },
@@ -334,7 +334,6 @@ static const char *kindName(jsKind kind);
 // #define DO_TRACING_USE_DUMP_TOKEN
 #ifdef DO_TRACING_USE_DUMP_TOKEN
 static void dumpToken (const tokenInfo *const token);
-static const char *keywordName(enum eKeywordId e);
 #endif
 #endif
 
@@ -462,10 +461,10 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 		{
 			/*
 			 * If we're creating a function (and not a method),
-			 * guess we're inside another function
+			 * assume the parent is a plain variable.
 			 */
-			kind = JSTAG_FUNCTION;
-			role = JS_FUNCITON_CHAINELT;
+			kind = JSTAG_VARIABLE;
+			role = JS_VARIABLE_CHAINELT;
 		}
 
 		initRefTagEntry (&e, name, kind, role);
@@ -1306,15 +1305,12 @@ static void readTokenFull (tokenInfo *const token, bool include_newlines, vStrin
 	}
 }
 
-#ifdef JSCRIPT_DO_DEBUGGING
+#ifdef DO_TRACING_USE_DUMP_TOKEN
 /* trace readTokenFull() */
 static void readTokenFullDebug (tokenInfo *const token, bool include_newlines, vString *const repr)
 {
 	readTokenFull (token, include_newlines, repr);
-
-	const char *scopeStr = getNameStringForCorkIndex (token->scope);
-	const char *scopeKindStr = getKindStringForCorkIndex (token->scope);
-	TRACE_PRINT("token '%s' of type %s with scope '%s' of kind %s", vStringValue(token->string), tokenTypeName(token->type), scopeStr, scopeKindStr);
+	dumpToken (token);
 }
 # define readTokenFull readTokenFullDebug
 #endif
@@ -1942,7 +1938,7 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 			tokenInfo *saved_token = newToken ();
 			copyToken (saved_token, token, true);
 			readToken (token);
-			if (isType(token, TOKEN_OPEN_PAREN))
+			if (isType(token, TOKEN_OPEN_PAREN) || isType(token, TOKEN_COLON))
 			{
 				Assert (NextToken == NULL);
 				NextToken = newToken ();
@@ -2253,6 +2249,7 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	bool is_terminated = true;
 	bool is_global = false;
 	bool has_methods = false;
+	bool found_this = false;
 
 	/*
 	 * Functions can be named or unnamed.
@@ -2304,9 +2301,11 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	}
 
 nextVar:
+	found_this = false;
 	if ( isKeyword(token, KEYWORD_this) )
 	{
 		TRACE_PRINT("found 'this' keyword");
+		found_this = true;
 
 		readToken(token);
 		if (isType (token, TOKEN_PERIOD))
@@ -2637,7 +2636,7 @@ nextVar:
 			has_methods = parseMethods(token, p, false);
 			if (has_methods)
 			{
-				jsKind kind = strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
+				jsKind kind = found_this || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
 				indexForName = makeJsTagCommon (name, kind, NULL, NULL, anonObject);
 				moveChildren (p, indexForName);
 			}
@@ -2658,8 +2657,8 @@ nextVar:
 				 * This is a global variable:
 				 *	   var g_var = different_var_name;
 				 */
-				indexForName = anyKindsEntryInScope (token->scope, vStringValue (token->string),
-													 (int[]){JSTAG_FUNCTION, JSTAG_CLASS}, 2, true);
+				indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
+													 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
 
 				if (indexForName == CORK_NIL)
 					indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
@@ -2671,6 +2670,21 @@ nextVar:
 			{
 				readTokenFull(token, true, NULL);
 				is_terminated = isType (token, TOKEN_SEMICOLON);
+			}
+		}
+		else if (isType (token, TOKEN_OPEN_SQUARE) && !vStringIsEmpty (name->string))
+		{
+			/*
+			 * Creates tag for an array
+			 */
+			skipArrayList(token, true);
+			jsKind kind = found_this || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
+			/*
+			 * Only create variables for global scope or class/object properties
+			 */
+			if ( ( token->nestLevel == 0 && is_global ) || kind == JSTAG_PROPERTY )
+			{
+				indexForName = makeJsTagCommon (name, kind, NULL, NULL, false);
 			}
 		}
 		else if (isKeyword (token, KEYWORD_new))
@@ -2695,7 +2709,7 @@ nextVar:
 				if (isType (token, TOKEN_SEMICOLON) && token->nestLevel == 0)
 				{
 					if ( is_var )
-						indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+						indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : found_this ? JSTAG_PROPERTY : JSTAG_VARIABLE, NULL, NULL);
 					else if ( is_class )
 						indexForName = makeClassTag (name, NULL, NULL);
 					else
@@ -2728,8 +2742,8 @@ nextVar:
 			 * This is a global variable:
 			 *	   var g_var = different_var_name;
 			 */
-			indexForName = anyKindsEntryInScope (token->scope, vStringValue (token->string),
-												 (int[]){JSTAG_FUNCTION, JSTAG_CLASS}, 2, true);
+			indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
+												 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
 
 			if (indexForName == CORK_NIL)
 				indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
@@ -2946,15 +2960,25 @@ static void parseJsFile (tokenInfo *const token)
 }
 
 #ifdef DO_TRACING
-#if DO_TRACING_USE_DUMP_TOKEN
+#ifdef DO_TRACING_USE_DUMP_TOKEN
 static void dumpToken (const tokenInfo *const token)
 {
-	fprintf(stderr, "Token <%p>: %s: %s\n",
-			token,
+	const char *scopeStr = getNameStringForCorkIndex (token->scope);
+	const char *scopeKindStr = getKindStringForCorkIndex (token->scope);
+
+	if (strcmp(scopeStr, "placeholder") == 0)
+	{
+		TRACE_PRINT("%s: %s",
 			tokenTypeName (token->type),
-			(token->type == TOKEN_KEYWORD   ? keywordName (token->keyword):
-			 token->type == TOKEN_IDENTIFIER? vStringValue (token->string):
-			 ""));
+			vStringValue (token->string));
+	}
+	else
+	{
+		TRACE_PRINT("%s: %s (scope '%s' of kind %s)",
+			tokenTypeName (token->type),
+			vStringValue (token->string),
+			scopeStr, scopeKindStr);
+	}
 }
 #endif
 
@@ -2993,7 +3017,7 @@ getKindStringForCorkIndex(int index)
 
 static const char *kindName(jsKind kind)
 {
-	return kind >= 0 ? JsKinds[kind].name : "none";
+	return ((int)kind) >= 0 ? JsKinds[kind].name : "none";
 }
 
 static const char *tokenTypeName(enum eTokenType e)
@@ -3025,44 +3049,6 @@ static const char *tokenTypeName(enum eTokenType e)
 		default: return "UNKNOWN";
 	}
 }
-
-#if DO_TRACING_USE_DUMP_TOKEN
-static const char *keywordName(enum eKeywordId e)
-{ /* Generated by misc/enumstr.sh with cmdline "parsers/jscript.c" "eKeywordId" "keywordName" */
-	switch (e)
-	{
-		case            KEYWORD_async: return "KEYWORD_async";
-		case KEYWORD_capital_function: return "KEYWORD_capital_function";
-		case   KEYWORD_capital_object: return "KEYWORD_capital_object";
-		case            KEYWORD_catch: return "KEYWORD_catch";
-		case            KEYWORD_class: return "KEYWORD_class";
-		case            KEYWORD_const: return "KEYWORD_const";
-		case          KEYWORD_default: return "KEYWORD_default";
-		case               KEYWORD_do: return "KEYWORD_do";
-		case             KEYWORD_else: return "KEYWORD_else";
-		case           KEYWORD_export: return "KEYWORD_export";
-		case          KEYWORD_extends: return "KEYWORD_extends";
-		case          KEYWORD_finally: return "KEYWORD_finally";
-		case              KEYWORD_for: return "KEYWORD_for";
-		case         KEYWORD_function: return "KEYWORD_function";
-		case              KEYWORD_get: return "KEYWORD_get";
-		case               KEYWORD_if: return "KEYWORD_if";
-		case              KEYWORD_let: return "KEYWORD_let";
-		case              KEYWORD_new: return "KEYWORD_new";
-		case        KEYWORD_prototype: return "KEYWORD_prototype";
-		case           KEYWORD_return: return "KEYWORD_return";
-		case              KEYWORD_sap: return "KEYWORD_sap";
-		case              KEYWORD_set: return "KEYWORD_set";
-		case           KEYWORD_static: return "KEYWORD_static";
-		case           KEYWORD_switch: return "KEYWORD_switch";
-		case             KEYWORD_this: return "KEYWORD_this";
-		case              KEYWORD_try: return "KEYWORD_try";
-		case              KEYWORD_var: return "KEYWORD_var";
-		case            KEYWORD_while: return "KEYWORD_while";
-		default: return "UNKNOWN";
-	}
-}
-#endif
 #endif
 
 static void initialize (const langType language)
@@ -3130,6 +3116,7 @@ extern parserDefinition* JavaScriptParser (void)
 	def->keywordTable = JsKeywordTable;
 	def->keywordCount = ARRAY_SIZE (JsKeywordTable);
 	def->useCork	= CORK_QUEUE|CORK_SYMTAB;
+	def->requestAutomaticFQTag = true;
 
 	return def;
 }

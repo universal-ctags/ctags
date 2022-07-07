@@ -1,0 +1,10 @@
+log	input.js	/^  log: ['a', 'b', 'c'],$/;"	property	variable:obj
+obj.log	input.js	/^  log: ['a', 'b', 'c'],$/;"	property	variable:obj
+get	input.js	/^  get: function() {$/;"	method	variable:obj
+obj.get	input.js	/^  get: function() {$/;"	method	variable:obj
+obj	input.js	/^var obj = {$/;"	variable
+set	input.js	/^  set: function(str) {$/;"	method	variable:o
+o.set	input.js	/^  set: function(str) {$/;"	method	variable:o
+log	input.js	/^  log: []$/;"	property	variable:o
+o.log	input.js	/^  log: []$/;"	property	variable:o
+o	input.js	/^var o = {$/;"	variable
