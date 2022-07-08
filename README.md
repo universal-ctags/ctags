@@ -87,7 +87,7 @@ Users should first consult the
 [ctags(1)](https://docs.ctags.io/en/latest/man/ctags.1.html), and [other man
 pages](https://docs.ctags.io/en/latest/man-pages.html) if necessary.
 
-[Universal Ctags Hacking Guide](https://docs.ctags.io), which also includes the
+[Universal Ctags Hacking Guide](https://docs.ctags.io/en/latest/), which also includes the
 man pages, is primarily for developers and provides additional information to
 the man pages, including experimental features.
 
