@@ -2258,6 +2258,42 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 	return true;
 }
 
+static void convertToFunction (int index, const char *signature)
+{
+	tagEntryInfo *e = getEntryInCorkQueue(index);
+	if (e && e->kindIndex != JSTAG_FUNCTION
+		&& ( signature == NULL || e->extensionFields.signature == NULL))
+	{
+		e->kindIndex = JSTAG_FUNCTION;
+		if (signature)
+			e->extensionFields.signature = eStrdup (signature);
+	}
+}
+
+static vString *trimGarbageInSignature (vString *sig)
+{
+	/* Drop "=>" at the end. */
+	const char *sigstr = vStringValue (sig);
+	char *last = strrchr (sigstr, ')');
+	Assert (last);
+	vStringTruncate (sig, last - sigstr + 1);
+	return sig;
+}
+
+static vString *makeVStringForSignature (tokenInfo *const token)
+{
+	vString * sig = vStringNewInit ("(");
+
+	if (isType (token, TOKEN_IDENTIFIER))
+		vStringCat (sig, token->string);
+	else if (isType (token, TOKEN_CLOSE_PAREN))
+		vStringPut (sig, ')');
+	else if (isType (token, TOKEN_DOTS))
+		vStringCatS (sig, "...");
+
+	return sig;
+}
+
 static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 {
 	TRACE_ENTER_TEXT("is_inside_class: %s", is_inside_class? "yes": "no");
@@ -2556,6 +2592,7 @@ nextVar:
 	if ( isType (token, TOKEN_EQUAL_SIGN) )
 	{
 		int parenDepth = 0;
+		bool canbe_arrowfun = false;
 
 		readToken (token);
 
@@ -2778,21 +2815,46 @@ nextVar:
 												 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
 
 			if (indexForName == CORK_NIL)
+			{
 				indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+				if (isType (token, TOKEN_IDENTIFIER))
+					canbe_arrowfun = true;
+			}
+		}
+
+		if (parenDepth == 0 && canbe_arrowfun)
+		{
+			/* var v = a => { ... } */
+			vString *sig = vStringNewInit ("(");
+			vStringCat (sig, token->string);
+			vStringPut (sig, ')');
+			readTokenFull (token, true, NULL);
+			if (isType (token, TOKEN_ARROW))
+				convertToFunction (indexForName, vStringValue (sig));
+			vStringDelete (sig);
 		}
 
 		if (parenDepth > 0)
 		{
+			/* Collect parameters for arrow function. */
+			vString *sig = (parenDepth == 1)? makeVStringForSignature (token): NULL;
+
 			while (parenDepth > 0 && ! isType (token, TOKEN_EOF))
 			{
 				if (isType (token, TOKEN_OPEN_PAREN))
 					parenDepth++;
 				else if (isType (token, TOKEN_CLOSE_PAREN))
 					parenDepth--;
-				readTokenFull (token, true, NULL);
+				readTokenFull (token, true, sig);
 			}
 			if (isType (token, TOKEN_CLOSE_CURLY))
 				is_terminated = false;
+
+			/* var f = (a, b) => { ... } */
+			if (isType (token, TOKEN_ARROW) && sig)
+				convertToFunction (indexForName,
+								   vStringValue (trimGarbageInSignature (sig)));
+			vStringDelete (sig); /* NULL is acceptable. */
 		}
 	}
 	/* if we aren't already at the cmd end, advance to it and check whether
