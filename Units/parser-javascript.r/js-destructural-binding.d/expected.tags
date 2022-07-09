@@ -1,0 +1,59 @@
+x	input.js	/^const [x] = [1];$/;"	C
+y	input.js	/^const [y, z] = [1, 2, 3, 4, 5];$/;"	C
+z	input.js	/^const [y, z] = [1, 2, 3, 4, 5];$/;"	C
+a	input.js	/^let [a=5, b=7] = [1];$/;"	v
+b	input.js	/^let [a=5, b=7] = [1];$/;"	v
+c	input.js	/^let [c, , d] = [1, 2, 3];$/;"	v
+d	input.js	/^let [c, , d] = [1, 2, 3];$/;"	v
+e	input.js	/^let [e, f = 0, , g] = [1, 2, 3, 4];$/;"	v
+f	input.js	/^let [e, f = 0, , g] = [1, 2, 3, 4];$/;"	v
+g	input.js	/^let [e, f = 0, , g] = [1, 2, 3, 4];$/;"	v
+h	input.js	/^const [h, i, ...[j, k]] = [1, 2, 3, 4];$/;"	C
+i	input.js	/^const [h, i, ...[j, k]] = [1, 2, 3, 4];$/;"	C
+j	input.js	/^const [h, i, ...[j, k]] = [1, 2, 3, 4];$/;"	C
+k	input.js	/^const [h, i, ...[j, k]] = [1, 2, 3, 4];$/;"	C
+l	input.js	/^const [l, m, ...[n, o, ...[p, q]]] = [1, 2, 3, 4, 5, 6];$/;"	C
+m	input.js	/^const [l, m, ...[n, o, ...[p, q]]] = [1, 2, 3, 4, 5, 6];$/;"	C
+n	input.js	/^const [l, m, ...[n, o, ...[p, q]]] = [1, 2, 3, 4, 5, 6];$/;"	C
+o	input.js	/^const [l, m, ...[n, o, ...[p, q]]] = [1, 2, 3, 4, 5, 6];$/;"	C
+p	input.js	/^const [l, m, ...[n, o, ...[p, q]]] = [1, 2, 3, 4, 5, 6];$/;"	C
+q	input.js	/^const [l, m, ...[n, o, ...[p, q]]] = [1, 2, 3, 4, 5, 6];$/;"	C
+A	input.js	/^const [A, B, ...{ C, D }] = []$/;"	C
+B	input.js	/^const [A, B, ...{ C, D }] = []$/;"	C
+C	input.js	/^const [A, B, ...{ C, D }] = []$/;"	C
+D	input.js	/^const [A, B, ...{ C, D }] = []$/;"	C
+E	input.js	/^    E: 42,$/;"	p	variable:user
+F	input.js	/^    F: true$/;"	p	variable:user
+user	input.js	/^const user = {$/;"	v
+E	input.js	/^const {E, F} = user;$/;"	C
+F	input.js	/^const {E, F} = user;$/;"	C
+G	input.js	/^const {E: G, F: H} = user;$/;"	C
+H	input.js	/^const {E: G, F: H} = user;$/;"	C
+I	input.js	/^const {I = 10, J = 5} = {I: 3};$/;"	C
+J	input.js	/^const {I = 10, J = 5} = {I: 3};$/;"	C
+I	input.js	/^const {I = 10, J = 5} = {I: 3};$/;"	p	variable:anonymousObject785a93f40105
+anonymousObject785a93f40105	input.js	/^const {I = 10, J = 5} = {I: 3};$/;"	v
+K	input.js	/^let {a: K = 10, b: L = 5} = {a: 3};$/;"	v
+L	input.js	/^let {a: K = 10, b: L = 5} = {a: 3};$/;"	v
+a	input.js	/^let {a: K = 10, b: L = 5} = {a: 3};$/;"	p	variable:anonymousObject785a93f40205
+anonymousObject785a93f40205	input.js	/^let {a: K = 10, b: L = 5} = {a: 3};$/;"	v
+M	input.js	/^let {M, N, ...O} = {M: 10, N: 20, c: 30, d: 40}$/;"	v
+N	input.js	/^let {M, N, ...O} = {M: 10, N: 20, c: 30, d: 40}$/;"	v
+O	input.js	/^let {M, N, ...O} = {M: 10, N: 20, c: 30, d: 40}$/;"	v
+M	input.js	/^let {M, N, ...O} = {M: 10, N: 20, c: 30, d: 40}$/;"	p	variable:anonymousObject785a93f40305
+N	input.js	/^let {M, N, ...O} = {M: 10, N: 20, c: 30, d: 40}$/;"	p	variable:anonymousObject785a93f40305
+c	input.js	/^let {M, N, ...O} = {M: 10, N: 20, c: 30, d: 40}$/;"	p	variable:anonymousObject785a93f40305
+d	input.js	/^let {M, N, ...O} = {M: 10, N: 20, c: 30, d: 40}$/;"	p	variable:anonymousObject785a93f40305
+anonymousObject785a93f40305	input.js	/^let {M, N, ...O} = {M: 10, N: 20, c: 30, d: 40}$/;"	v
+title	input.js	/^  title: 'Scratchpad',$/;"	p	variable:metadata
+anonymousObject785a93f40405	input.js	/^    {$/;"	v	variable:metadata
+locale	input.js	/^      locale: 'de',$/;"	p	variable:metadata.anonymousObject785a93f40405
+localization_tags	input.js	/^      localization_tags: [],$/;"	p	variable:metadata.anonymousObject785a93f40405
+last_edit	input.js	/^      last_edit: '2014-04-14T08:43:37',$/;"	p	variable:metadata.anonymousObject785a93f40405
+url	input.js	/^      url: '\/de\/docs\/Tools\/Scratchpad',$/;"	p	variable:metadata.anonymousObject785a93f40405
+title	input.js	/^      title: 'JavaScript-Umgebung'$/;"	p	variable:metadata.anonymousObject785a93f40405
+translations	input.js	/^  translations: [$/;"	p	variable:metadata
+url	input.js	/^  url: '\/en-US\/docs\/Tools\/Scratchpad'$/;"	p	variable:metadata
+metadata	input.js	/^const metadata = {$/;"	v
+englishTitle	input.js	/^  title: englishTitle, \/\/ rename$/;"	v
+localeTitle	input.js	/^       title: localeTitle, \/\/ rename$/;"	v
