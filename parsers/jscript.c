@@ -2726,7 +2726,8 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 
 		if (state->indexForName == CORK_NIL)
 		{
-			state->indexForName = makeJsTag (name, state->isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+			if (!vStringIsEmpty (name->string))
+				state->indexForName = makeJsTag (name, state->isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 			if (isType (token, TOKEN_IDENTIFIER))
 				canbe_arrowfun = true;
 		}
@@ -2793,6 +2794,143 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 
 	TRACE_LEAVE();
 	return true;
+}
+
+static bool parseObjectDestructuring (tokenInfo *const token, bool is_const);
+static bool parseArrayDestructuring (tokenInfo *const token, bool is_const)
+{
+	int nest_level = 1;
+	bool in_left_side = true;
+	bool found = false;
+
+	while (nest_level > 0 && ! isType (token, TOKEN_EOF))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_OPEN_SQUARE))
+		{
+			in_left_side = true;
+			nest_level++;
+		}
+		else if (isType (token, TOKEN_CLOSE_SQUARE))
+		{
+			in_left_side = false;
+			nest_level--;
+		}
+		else if (isType (token, TOKEN_OPEN_CURLY))
+		{
+			in_left_side = false;
+			if (parseObjectDestructuring (token, is_const))
+				found = true;
+		}
+		else if (isType (token, TOKEN_COMMA)
+			 || isType (token, TOKEN_DOTS))
+			in_left_side = true;
+		else if (in_left_side && isType (token, TOKEN_IDENTIFIER))
+		{
+			in_left_side = false;
+			makeJsTag (token,
+				   is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE,
+				   NULL, NULL);
+			found = true;
+		}
+		else if (isType (token, TOKEN_EQUAL_SIGN))
+		{
+			in_left_side = false;
+			/* TODO: SKIP */
+		}
+		else
+			in_left_side = false;
+	}
+
+	return found;
+}
+
+static bool parseObjectDestructuring (tokenInfo *const token, bool is_const)
+{
+	tokenInfo *const name = newToken ();
+	bool found = false;
+
+	/*
+	 * let { k0: v0, k1: v1 = 0, v3 };
+	 *     |	  |  ||	  |  |	  |
+	 *     ^...|..|^...|..|....^.....: start
+	 *     ....^..|....^..|..........: colon
+	 *     .......^.......^..........: emitted (made a tag for an id after colon)
+	 */
+	enum objDestructuringState {
+		OBJ_DESTRUCTURING_START,
+		OBJ_DESTRUCTURING_COLON,
+		OBJ_DESTRUCTURING_EMITTED,
+	} state = OBJ_DESTRUCTURING_START;
+
+	while (! isType (token, TOKEN_EOF))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_OPEN_CURLY))
+		{
+			if (parseObjectDestructuring (token, is_const))
+				found = true;
+			if (state == OBJ_DESTRUCTURING_COLON)
+				state = OBJ_DESTRUCTURING_EMITTED;
+		}
+		else if (isType (token, TOKEN_CLOSE_CURLY))
+		{
+			if (!vStringIsEmpty(name->string))
+			{
+				makeJsTag (name,
+					   is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE,
+					   NULL, NULL);
+				found = true;
+			}
+			break;
+		}
+		else if (isType (token, TOKEN_OPEN_SQUARE))
+		{
+			if (parseArrayDestructuring (token, is_const))
+				found = true;
+			if (state == OBJ_DESTRUCTURING_COLON)
+				state = OBJ_DESTRUCTURING_EMITTED;
+		}
+		else if (isType (token, TOKEN_IDENTIFIER))
+		{
+			if (state == OBJ_DESTRUCTURING_COLON)
+			{
+				makeJsTag (token,
+					   is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE,
+					   NULL, NULL);
+				found = true;
+				state = OBJ_DESTRUCTURING_EMITTED;
+			}
+			else if (state == OBJ_DESTRUCTURING_START
+				 && vStringIsEmpty(name->string))
+				copyToken(name, token, true);
+		}
+		else if (isType (token, TOKEN_COMMA))
+		{
+			if (!vStringIsEmpty(name->string))
+			{
+				makeJsTag (name,
+					   is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE,
+					   NULL, NULL);
+				found = true;
+				vStringClear (name->string);
+			}
+			state = OBJ_DESTRUCTURING_START;
+		}
+		else if (isType (token, TOKEN_COLON))
+		{
+			vStringClear (name->string);
+			state = OBJ_DESTRUCTURING_COLON;
+		}
+		else
+		{
+			if (state == OBJ_DESTRUCTURING_COLON)
+				state = OBJ_DESTRUCTURING_EMITTED;
+		}
+	}
+
+	deleteToken (name);
+	return found;
 }
 
 static bool parseStatement (tokenInfo *const token, bool is_inside_class)
@@ -2862,6 +3000,22 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 			state.isGlobal = true;
 		}
 		readToken(token);
+
+		if (state.isGlobal)
+		{
+			bool found = false;
+			if (isType (token, TOKEN_OPEN_CURLY))
+				found = parseObjectDestructuring (token, state.isConst);
+			else if (isType (token, TOKEN_OPEN_SQUARE))
+				found = parseArrayDestructuring (token, state.isConst);
+
+			if (found)
+			{
+				/* Adjust the context to the code for non-destructing. */
+				found_lhs = true;
+				readToken(token);
+			}
+		}
 	}
 
 nextVar:
@@ -2952,7 +3106,8 @@ nextVar:
 			 * Handles this syntax:
 			 *     var g_var2;
 			 */
-			state.indexForName = makeJsTag (name, state.isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+			if (!vStringIsEmpty (name->string))
+				state.indexForName = makeJsTag (name, state.isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 		}
 		/*
 		 * Statement has ended.
