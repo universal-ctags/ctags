@@ -124,7 +124,7 @@ typedef enum eTokenType {
 	 * Used only in readTokenFull or lower functions. */
 	TOKEN_ATMARK,
 	TOKEN_BINARY_OPERATOR,
-	TOKEN_ARROW
+	TOKEN_ARROW,
 } tokenType;
 
 typedef struct sTokenInfo {
