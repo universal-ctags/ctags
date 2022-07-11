@@ -125,6 +125,7 @@ typedef enum eTokenType {
 	TOKEN_ATMARK,
 	TOKEN_BINARY_OPERATOR,
 	TOKEN_ARROW,
+	TOKEN_DOTS,					/* ... */
 } tokenType;
 
 typedef struct sTokenInfo {
@@ -1029,7 +1030,36 @@ getNextChar:
 		case ')': token->type = TOKEN_CLOSE_PAREN;			break;
 		case ';': token->type = TOKEN_SEMICOLON;			break;
 		case ',': token->type = TOKEN_COMMA;				break;
-		case '.': token->type = TOKEN_PERIOD;				break;
+		case '.':
+			{
+				token->type = TOKEN_PERIOD;
+
+				int d = getcFromInputFile ();
+				if (d != '.')
+				{
+					ungetcToInputFile (d);
+					break;
+				}
+
+				d = getcFromInputFile ();
+				if (d != '.')
+				{
+					ungetcToInputFile (d);
+					ungetcToInputFile ('.');
+					break;
+				}
+
+				token->type = TOKEN_DOTS;
+				if (repr)
+				{
+					/* Adding two dots is enough here.
+					 * The first one is already added with
+					 * vStringPut (repr, c).
+					 */
+					vStringCatS (repr, "..");
+				}
+				break;
+			}
 		case ':': token->type = TOKEN_COLON;				break;
 		case '{': token->type = TOKEN_OPEN_CURLY;			break;
 		case '}': token->type = TOKEN_CLOSE_CURLY;			break;
@@ -2598,7 +2628,7 @@ nextVar:
 					}
 
 					indexForName = isClassName (name) ?
-						makeClassTag (name, signature, NULL): 
+						makeClassTag (name, signature, NULL):
 						makeFunctionTag (name, signature, is_generator);
 
 					parseBlock (token, indexForName);

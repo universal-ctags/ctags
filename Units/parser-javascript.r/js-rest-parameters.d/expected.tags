@@ -1,0 +1,4 @@
+rf0	input.js	/^function rf0(a,  b, ...manyMoreArgs0) {$/;"	f	signature:(a, b, ...manyMoreArgs0)
+rf1	input.js	/^function rf1(...manyMoreArgs1) {$/;"	f	signature:(...manyMoreArgs1)
+rf2	input.js	/^function rf2(a,  b, ...$/;"	f	signature:(a, b, ... manyMoreArgs0)
+rf3	input.js	/^function rf3(...$/;"	f	signature:(... manyMoreArgs1)
