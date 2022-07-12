@@ -2357,6 +2357,8 @@ nextVar:
 	{
 		if (isType (token, TOKEN_OPEN_CURLY))
 			parseBlock (token, CORK_NIL);
+		else if (isKeyword (token, KEYWORD_function))
+			parseFunction (token);
 
 		/* Potentially the name of the function */
 		if (isType (token, TOKEN_PERIOD))

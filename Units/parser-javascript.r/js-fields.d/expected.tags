@@ -17,6 +17,8 @@ field13	input.js	/^    ['field13'];$/;"	M	class:Class0
 ['field1' + '4']	input.js	/^    ['field1' + '4']$/;"	M	class:Class0
 field15	input.js	/^    field15 = 1$/;"	M	class:Class0
 field16	input.js	/^    field16 = [ function() {return}, function() {return} ]$/;"	M	class:Class0
+anonymousFunction391993410100	input.js	/^    field16 = [ function() {return}, function() {return} ]$/;"	f	class:Class0
+anonymousFunction391993410200	input.js	/^    field16 = [ function() {return}, function() {return} ]$/;"	f	class:Class0
 method2	input.js	/^    method2() {$/;"	m	class:Class0
 method3	input.js	/^    method3() {$/;"	m	class:Class0
 Class1	input.js	/^class Class1 {$/;"	c
