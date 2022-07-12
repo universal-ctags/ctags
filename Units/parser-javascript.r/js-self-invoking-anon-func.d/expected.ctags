@@ -1,0 +1,10 @@
+anonymousFunction204aa80e0100	input.js	/^(function(x) {$/;"	f
+a	input.js	/^    var a = function (o) { return o; };$/;"	f	function:anonymousFunction204aa80e0100
+anonymousFunction204aa80e0200	input.js	/^(function(y) {$/;"	f
+b	input.js	/^    const b = function (p) { return p; };$/;"	f	function:anonymousFunction204aa80e0200
+anonymousFunction204aa80e0300	input.js	/^!function(z) {$/;"	f
+c	input.js	/^    const c = function (r) { return r; };$/;"	f	function:anonymousFunction204aa80e0300
+anonymousFunction204aa80e0400	input.js	/^console.log("a" + (function (A) {$/;"	f
+anonymousFunction204aa80e0500	input.js	/^}((function (B) {$/;"	f
+anonymousFunction204aa80e0600	input.js	/^}(!function(C) {$/;"	f
+f	input.js	/^    var f = function (t) {$/;"	f	function:anonymousFunction204aa80e0600
