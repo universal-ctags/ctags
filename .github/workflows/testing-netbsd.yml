@@ -17,7 +17,7 @@ jobs:
       with:
         mem: 2048
         box: generic/netbsd9
-        log: debug
+        log: warn
         run: |
           run sudo pkgin -y install mozilla-rootcerts automake autoconf pkg-config gmake
 

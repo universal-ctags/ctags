@@ -24,7 +24,7 @@ jobs:
       with:
         mem: 2048
         box: generic/freebsd${{ matrix.freebsd-version }}
-        log: debug
+        log: warn
         run: |
           run pkg install -y automake pkgconf gmake
           run freebsd-version
