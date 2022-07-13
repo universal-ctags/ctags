@@ -21,8 +21,6 @@ jobs:
         run: |
           run sudo pkgin -y install mozilla-rootcerts automake autoconf pkg-config gmake
 
-          run sudo mozilla-rootcerts install
-
           run cc --version
 
           run ./autogen.sh
