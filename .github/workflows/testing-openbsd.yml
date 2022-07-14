@@ -17,7 +17,7 @@ jobs:
       with:
         mem: 2048
         box: generic/openbsd6
-        log: debug
+        log: warn
         run: |
           export AUTOCONF_VERSION=2.69
           export AUTOMAKE_VERSION=1.16
