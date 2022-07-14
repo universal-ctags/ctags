@@ -10,3 +10,6 @@ mocha	input.gemspec	/^  s.add_development_dependency "mocha",        "~> 0.13.0"
 rr	input.gemspec	/^  s.add_development_dependency "rr",           "~> 1.0.4"$/;"	g	roles:develDep
 flexmock	input.gemspec	/^  s.add_development_dependency "flexmock",     "~> 0.9.0"$/;"	g	roles:develDep
 thread_order	input.gemspec	/^  s.add_development_dependency "thread_order", "~> 1.1.0"$/;"	g	roles:develDep
+katello/version	input-0.gemspec	/^require "katello\/version"$/;"	L	roles:required
+katello	input-0.gemspec	/^  gem.name        = "katello"$/;"	g	roles:def
+rails	input-0.gemspec	/^  gem.add_dependency "rails"$/;"	g	roles:runtimeDep
