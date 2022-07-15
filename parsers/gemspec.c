@@ -93,6 +93,12 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 
 		if (strncmp ((const char *)p, "name", 4) == 0)
 			p += 4;
+		else if (strncmp ((const char *)p, "add_dependency", 14) == 0)
+		{
+			p += 14;
+			role = R_GEM_RUNTIME_DEP;
+			is_attr = false;
+		}
 		else if (strncmp ((const char *)p, "add_runtime_dependency", 22) == 0)
 		{
 			p += 22;
