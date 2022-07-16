@@ -26,7 +26,7 @@ jobs:
         box: generic/freebsd${{ matrix.freebsd-version }}
         log: warn
         run: |
-          run pkg install -y automake pkgconf gmake
+          run pkg install -y automake pkgconf gmake python3
           run freebsd-version
           run cc --version
           run ./autogen.sh
