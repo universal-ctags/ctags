@@ -26,9 +26,9 @@ It works when:
 * the RMarkdown parser itself is enabled.
 
 The RMarkdown parser extends the way of detecting **codeblocks** from the
-Markdown parser for running guest parsers on **code chunks**.
+Markdown parser. This extension is for running guest parsers on **code chunks**.
 
-The Markdown parser expects the following syntax for codeblocks
+The Markdown parser expects the following syntax represents codeblocks:
 
 .. code-block::
 
@@ -44,8 +44,7 @@ For an example
 		...
 	```
 
-The RMarkdown parser accepts the following syntax for code chunks
-as the markdown parser accepts codeblocks
+The RMarkdown parser accepts the following syntax for code chunks:
 
 .. code-block::
 
@@ -62,10 +61,12 @@ For an example
 	```
 
 Give `--extras=+{guest}` for enabling ``guest`` to command line if you
-want to run proper parsers on inside code chunks.
+want to run proper parsers on lines inside code chunks.
 
-The parser extrats chunk labels coming after `language-name` as
-`chunklabel` kind objcts. The kind is enabled by default.
+The parser extracts chunk labels coming after `language-name` as
+`chunklabel` kind objcts. In the exapmle, the RMarkdown parser
+extracts `precalc` as a `chunklabel` kind object.
+The `chunklabel` kind is enabled by default.
 
 EXAMPLES
 --------
@@ -95,4 +96,5 @@ with "--options=NONE --extras=+{guest} --fields=+KZln -o - input.rmd"
 
 SEE ALSO
 --------
-:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`, `R Markdown: The Definitive Guide <https://bookdown.org/yihui/rmarkdown/>`_
+:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`, :ref:`ctags-lang-r(7) <ctags-lang-r(7)>`,
+`R Markdown: The Definitive Guide <https://bookdown.org/yihui/rmarkdown/>`_
