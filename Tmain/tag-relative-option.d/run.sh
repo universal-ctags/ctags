@@ -5,6 +5,11 @@ CTAGS=$1
 O="--quiet --options=NONE -o - -x "
 P=$(pwd)
 
+if type realpath > /dev/null 2>&1; then
+   P=$(realpath "$P")
+   cd "$P"
+fi
+
 . ../utils.sh
 
 if ! ${CTAGS} $O --help | grep -e --tag-relative | grep --quiet -e always; then
