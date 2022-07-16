@@ -25,3 +25,19 @@ let f5 = (x,...y) => {
 let f6 = (x,y,...z) => {
     console.log('hello');
 }
+
+a.f7 = x => {
+    console.log('hello');
+}
+
+a.f8 = async () => {
+    console.log('hello');
+}
+
+b.f9 = (async () => {
+    console.log('hello');
+})
+
+b.f10 = (async x => {
+    console.log('hello');
+})
