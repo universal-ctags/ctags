@@ -1,0 +1,7 @@
+f0	input.js	/^var f0 = (x) => {$/;"	function	signature:(x)
+f1	input.js	/^var f1 = (x, y) => {$/;"	function	signature:(x, y)
+f2	input.js	/^const f2 = x => {$/;"	function	signature:(x)
+f3	input.js	/^let f3 = () => {$/;"	function	signature:()
+f4	input.js	/^let f4 = (...x) => {$/;"	function	signature:(...x)
+f5	input.js	/^let f5 = (x,...y) => {$/;"	function	signature:(x,...y)
+f6	input.js	/^let f6 = (x,y,...z) => {$/;"	function	signature:(x,y,...z)
