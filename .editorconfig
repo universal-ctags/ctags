@@ -45,3 +45,6 @@ end_of_line = crlf
 
 [win32/*.vcxproj*]
 insert_final_newline = false
+
+[.github/workflows/*.yml]
+trim_trailing_whitespace = true
