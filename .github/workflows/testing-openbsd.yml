@@ -21,17 +21,17 @@ jobs:
         run: |
           export AUTOCONF_VERSION=2.69
           export AUTOMAKE_VERSION=1.16
-              
+
           export CFLAGS='-I/usr/local/include -L/usr/local/lib'
-              
+
           if [ ! -f /usr/local/lib/libiconv.so ] ; then
             sudo ln -s /usr/local/lib/libiconv.so.* /usr/local/lib/libiconv.so
           fi
-              
+
           run sudo pkg_add automake-1.16.3 gmake
 
           run cc --version
-            
+
           run ./autogen.sh
           run ./configure --prefix=/usr
           run gmake

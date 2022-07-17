@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  testing:  
+  testing:
     runs-on: windows-latest
 
     defaults:
@@ -17,12 +17,12 @@ jobs:
     steps:
     - run: choco install -y --source cygwin gcc-g++ make automake autoconf pkg-config dos2unix libiconv-devel libjansson-devel libxml2-devel libyaml-devel
       shell: pwsh
-    
+
     - run: git config --global core.autocrlf input
       shell: bash
 
     - uses: actions/checkout@v2
-    
+
     - run: printf 'cd %s' "$(cygpath '${{ github.workspace }}')" >> ~/.bashrc
 
     - run: ./autogen.sh
