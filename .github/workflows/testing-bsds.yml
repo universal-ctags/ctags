@@ -1,0 +1,102 @@
+name: run units target on FreeBSD OpenBSD NetBSD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  freebsd:
+    runs-on: macos-10.15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        freebsd-version: [12,13]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # https://app.vagrantup.com/boxes/search?utf8=%E2%9C%93&sort=downloads&provider=&q=freebsd
+    # https://github.com/leleliu008/github-actions-vagrant
+    - uses: leleliu008/github-actions-vagrant@v2
+      with:
+        mem: 2048
+        box: generic/freebsd${{ matrix.freebsd-version }}
+        log: warn
+        run: |
+          run pkg install -y automake pkgconf gmake python3
+          run freebsd-version
+          run cc --version
+          run ./autogen.sh
+          run ./configure --prefix=/usr
+          run gmake
+          run gmake install
+          run file ctags
+          run ctags --version
+          run gmake check CI=gha+vagrant+freebsd
+          run gmake roundtrip CI=gha+vagrant+freebsd
+
+  openbsd:
+    needs: freebsd
+    runs-on: macos-10.15
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: leleliu008/github-actions-vagrant@v2
+      with:
+        mem: 2048
+        box: generic/openbsd6
+        log: warn
+        run: |
+          export AUTOCONF_VERSION=2.69
+          export AUTOMAKE_VERSION=1.16
+              
+          export CFLAGS='-I/usr/local/include -L/usr/local/lib'
+              
+          if [ ! -f /usr/local/lib/libiconv.so ] ; then
+            sudo ln -s /usr/local/lib/libiconv.so.* /usr/local/lib/libiconv.so
+          fi
+              
+          run sudo pkg_add automake-1.16.3 gmake
+
+          run cc --version
+            
+          run ./autogen.sh
+          run ./configure --prefix=/usr
+          run gmake
+          run sudo gmake install
+          run file /usr/bin/ctags
+          run ctags --version
+          # bugs to fix
+          #run make check CI=gha+vagrant+openbsd
+          run gmake roundtrip CI=gha+vagrant+openbsd
+
+  netbsd:
+    needs: openbsd
+    runs-on: macos-10.15
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: leleliu008/github-actions-vagrant@v2
+      with:
+        mem: 2048
+        box: generic/netbsd9
+        log: warn
+        run: |
+          run sudo pkgin -y install mozilla-rootcerts automake autoconf pkg-config gmake
+
+          run cc --version
+
+          run ./autogen.sh
+          run ./configure --prefix=/usr
+          run gmake
+          run sudo gmake install
+          run file /usr/bin/ctags
+          run ctags --version
+          # bugs to fix
+          #run make check CI=gha+vagrant+netbsd
+          run gmake roundtrip CI=gha+vagrant+netbsd
