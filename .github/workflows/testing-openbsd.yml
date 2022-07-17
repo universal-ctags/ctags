@@ -1,10 +1,11 @@
 name: run units target on OpenBSD
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  # For avoiding the burst access to vagrant-cloud.
+  workflow_run:
+    workflows: ["run units target on FreeBSD"]
+    types:
+      - completed
 
 jobs:
   testing:
