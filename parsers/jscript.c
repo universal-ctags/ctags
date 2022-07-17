@@ -2592,6 +2592,7 @@ nextVar:
 	if ( isType (token, TOKEN_EQUAL_SIGN) )
 	{
 		int parenDepth = 0;
+		int arrowfun_paren_depth = 0;
 		bool canbe_arrowfun = false;
 
 		readToken (token);
@@ -2600,11 +2601,23 @@ nextVar:
 		while (isType (token, TOKEN_OPEN_PAREN))
 		{
 			parenDepth++;
+			arrowfun_paren_depth++;
 			readToken (token);
 		}
 
 		if (isKeyword (token, KEYWORD_async))
+		{
+			arrowfun_paren_depth = 0;
 			readToken (token);
+
+			/* check for function signature */
+			while (isType (token, TOKEN_OPEN_PAREN))
+			{
+				parenDepth++;
+				arrowfun_paren_depth++;
+				readToken (token);
+			}
+		}
 
 		if ( isKeyword (token, KEYWORD_function) )
 		{
@@ -2821,8 +2834,12 @@ nextVar:
 					canbe_arrowfun = true;
 			}
 		}
+		else if ( isType (token, TOKEN_IDENTIFIER) )
+		{
+			canbe_arrowfun = true;
+		}
 
-		if (parenDepth == 0 && canbe_arrowfun)
+		if (arrowfun_paren_depth == 0 && canbe_arrowfun)
 		{
 			/* var v = a => { ... } */
 			vString *sig = vStringNewInit ("(");
@@ -2830,30 +2847,50 @@ nextVar:
 			vStringPut (sig, ')');
 			readTokenFull (token, true, NULL);
 			if (isType (token, TOKEN_ARROW))
-				convertToFunction (indexForName, vStringValue (sig));
+			{
+				if (indexForName == CORK_NIL)	// was not a global variable
+					indexForName = makeFunctionTag (name, sig, false);
+				else
+					convertToFunction (indexForName, vStringValue (sig));
+			}
 			vStringDelete (sig);
 		}
 
 		if (parenDepth > 0)
 		{
 			/* Collect parameters for arrow function. */
-			vString *sig = (parenDepth == 1)? makeVStringForSignature (token): NULL;
+			vString *sig = (arrowfun_paren_depth == 1)? makeVStringForSignature (token): NULL;
 
 			while (parenDepth > 0 && ! isType (token, TOKEN_EOF))
 			{
 				if (isType (token, TOKEN_OPEN_PAREN))
+				{
 					parenDepth++;
+					arrowfun_paren_depth++;
+				}
 				else if (isType (token, TOKEN_CLOSE_PAREN))
+				{
 					parenDepth--;
+					arrowfun_paren_depth--;
+				}
 				readTokenFull (token, true, sig);
+
+				/* var f = (a, b) => { ... } */
+				if (arrowfun_paren_depth == 0 && isType (token, TOKEN_ARROW) && sig)
+				{
+					if (indexForName == CORK_NIL)	// was not a global variable
+						indexForName = makeFunctionTag (name, trimGarbageInSignature (sig), false);
+					else
+						convertToFunction (indexForName,
+										   vStringValue (trimGarbageInSignature (sig)));
+
+					vStringDelete (sig);
+					sig = NULL;
+				}
 			}
 			if (isType (token, TOKEN_CLOSE_CURLY))
 				is_terminated = false;
 
-			/* var f = (a, b) => { ... } */
-			if (isType (token, TOKEN_ARROW) && sig)
-				convertToFunction (indexForName,
-								   vStringValue (trimGarbageInSignature (sig)));
 			vStringDelete (sig); /* NULL is acceptable. */
 		}
 	}
