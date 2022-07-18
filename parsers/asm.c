@@ -446,7 +446,7 @@ static void findAsmTags (void)
 			 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
 			 FIELD_UNKNOWN);
 
-	 int scope = CORK_NIL;
+	int scope = CORK_NIL;
 
 	while ((line = asmReadLineFromInputFile (commentCharsInMOL)) != NULL)
 	{
@@ -585,8 +585,7 @@ extern parserDefinition* AsmParser (void)
 		"*.[xX][68][68]",
 		NULL
 	};
-	static selectLanguage selectors[] = { selectByArrowOfR,
-					      NULL };
+	static selectLanguage selectors[] = { selectByArrowOfR, NULL };
 
 	parserDefinition* def = parserNew ("Asm");
 	def->kindTable      = AsmKinds;
