@@ -461,6 +461,11 @@ static const unsigned char *readLineViaCpp (const char *commentChars)
 	{
 		if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
 		{
+			/* c == CHAR_SYMBOL is subtle condition.
+			 * If the last char of IDENTIFIER is [0-9a-f],
+			 * cppGetc() never returns CHAR_SYMBOL to
+			 * Handle c++14 digit separator.
+			 */
 			if (!vStringIsEmpty (identifier)
 				&& processCppMacroX (identifier, ' ', line))
 				continue;

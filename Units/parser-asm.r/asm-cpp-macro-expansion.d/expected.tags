@@ -24,3 +24,5 @@ label5	input-4.S	/^ENTRY5$/;"	l
 MAC5	input-5.S	/^#define MAC5 /;"	d	file:	macrodef:maclabel5:; nop;maclabel50:; nop
 maclabel5	input-5.S	/^MAC5/;"	l
 maclabel50	input-5.S	/^MAC5/;"	l
+ENTRYZ	input-6.S	/^#define ENTRYZ /;"	d	file:	macrodef:label6:; nop;.section .entry.text, 
+label6	input-6.S	/^	ENTRYZ'z'$/;"	l
