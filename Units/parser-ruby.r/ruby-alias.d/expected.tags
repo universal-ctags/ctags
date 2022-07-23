@@ -8,3 +8,10 @@ my_alias_method1	input.rb	/^  alias_method "my_alias_method1", :my_method$/;"	a	
 my_alias_method2	input.rb	/^  alias_method(:my_alias_method2, :my_method)$/;"	a	module:MyModule
 my_alias_method3	input.rb	/^  alias_method("my_alias_method3", :my_method)$/;"	a	module:MyModule
 my_alias_method4	input.rb	/^  alias_method('my_alias_method4', :my_method)$/;"	a	module:MyModule
+M	input-0.rb	/^module M$/;"	m
+get	input-0.rb	/^  def get(); end$/;"	f	module:M
+set	input-0.rb	/^  def set(); end$/;"	f	module:M
+[]	input-0.rb	/^  alias :"[]" :get$/;"	a	module:M
+[]=	input-0.rb	/^  alias :"[]=" :set$/;"	a	module:M
+set	input-0.rb	/^  alias :set :"[]="$/;"	a	module:M
+z	input-0.rb	/^def z(); end$/;"	f

@@ -397,6 +397,27 @@ extern void rubySkipWhitespace (const unsigned char** cp)
 	}
 }
 
+static void parseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
+{
+	while (**cp != 0 && **cp != boundary)
+	{
+		if (vstr)
+			vStringPut (vstr, **cp);
+		++*cp;
+	}
+
+	/* skip the last found '"' */
+	if (**cp == boundary)
+		++*cp;
+}
+
+extern bool rubyParseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
+{
+	const unsigned char *p = *cp;
+	parseString (cp, boundary, vstr);
+	return (p != *cp);
+}
+
 /*
 * Copies the characters forming an identifier from *cp into
 * name, leaving *cp pointing to the character after the identifier.
@@ -442,6 +463,20 @@ static rubyKind parseIdentifier (
 	}
 
 	/* Copy the identifier into 'name'. */
+	if (**cp == ':' && (*((*cp) + 1) == '"' || *((*cp) + 1) == '\''))
+	{
+		/* The symbol is defined with string literal like:
+		   ----
+		   :"[]"
+		   :"[]="
+		   ----
+		*/
+		unsigned char b = *(++*cp);
+		++*cp;
+		parseString (cp, b, name);
+		return kind;
+	}
+
 	while (**cp != 0 && (**cp == ':' || isIdentChar (**cp) || charIsIn (**cp, also_ok)))
 	{
 		char last_char = **cp;
@@ -489,27 +524,6 @@ extern bool rubyParseMethodName (const unsigned char **cp, vString* vstr)
 extern bool rubyParseModuleName (const unsigned char **cp, vString* vstr)
 {
 	return (parseIdentifier (cp, vstr, K_MODULE) == K_MODULE);
-}
-
-static void parseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
-{
-	while (**cp != 0 && **cp != boundary)
-	{
-		if (vstr)
-			vStringPut (vstr, **cp);
-		++*cp;
-	}
-
-	/* skip the last found '"' */
-	if (**cp == boundary)
-		++*cp;
-}
-
-extern bool rubyParseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
-{
-	const unsigned char *p = *cp;
-	parseString (cp, boundary, vstr);
-	return (p != *cp);
 }
 
 static void parseSignature (const unsigned char** cp, vString* vstr)
