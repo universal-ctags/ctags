@@ -26,3 +26,4 @@ maclabel5	input-5.S	/^MAC5/;"	l
 maclabel50	input-5.S	/^MAC5/;"	l
 ENTRYZ	input-6.S	/^#define ENTRYZ /;"	d	file:	macrodef:label6:; nop;.section .entry.text, 
 label6	input-6.S	/^	ENTRYZ'z'$/;"	l
+X	input-7.S	/^#define X(/;"	d	file:	signature:()	macrodef:mylabel:; nop;
