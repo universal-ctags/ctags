@@ -169,12 +169,15 @@ static int parseTask (rubySubparser *s, int kind, const unsigned char **cp)
 static int parseXTask (rubySubparser *s, struct taskType *xtask, const unsigned char **cp)
 {
 	rubySkipWhitespace (cp);
-	if (**cp == '(')
+	if (**cp == '(' || **cp == '"' || **cp == '\'')
 	{
 		vString *vstr = NULL;
 		bool variable = false;
-		++*cp;
-		rubySkipWhitespace (cp);
+		if (**cp == '(')
+		{
+			++*cp;
+			rubySkipWhitespace (cp);
+		}
 		vstr = readTask (cp, &variable);
 		if (vstr)
 		{

@@ -13,3 +13,5 @@ relish_staging	input.rake	/^task :relish_staging do$/;"	task
 default	input.rake	/^task :default => [:spec, :cucumber, :rubocop]$/;"	task
 verify_private_key_present	input.rake	/^task :verify_private_key_present do$/;"	task
 build	input.rake	/^task :build => :verify_private_key_present$/;"	task
+default	input-0.rake	/^task :default => :test$/;"	task
+test	input-0.rake	/^Rake::TestTask.new 'test' do |t|$/;"	xtask	typeref:typename:Rake::TestTask.new
