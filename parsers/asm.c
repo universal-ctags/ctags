@@ -19,10 +19,12 @@
 #include "debug.h"
 #include "entry.h"
 #include "keyword.h"
+#include "param.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
+#include "trace.h"
 #include "vstring.h"
 
 /*
@@ -141,6 +143,20 @@ static const opKind OpKinds [] = {
 	{ OP_STRUCT,      K_TYPE   }
 };
 
+#define DEFAULT_COMMENT_CHARS_BOL ";*@"
+static const char defaultCommentCharAtBOL [] = DEFAULT_COMMENT_CHARS_BOL;
+static const char *commentCharsAtBOL = defaultCommentCharAtBOL;
+
+#define DEFAULT_COMMENT_CHARS_MOL ""
+static const char defaultCommentCharInMOL [] = DEFAULT_COMMENT_CHARS_MOL;
+static const char *commentCharsInMOL = defaultCommentCharInMOL;
+
+#define DEFAULT_EXTRA_LINESEP_CHARS ""
+static const char defaultExtraLinesepChars [] = DEFAULT_EXTRA_LINESEP_CHARS;
+static const char *extraLinesepChars = defaultExtraLinesepChars;
+
+static bool useCPreProcessor = true;
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -208,8 +224,9 @@ static int makeAsmTag (
 
 	if (vStringLength (name) > 0)
 	{
-		bool found;
-		const AsmKind kind = operatorKind (operator, &found);
+		bool found = false;
+		AsmKind kind = directive? K_NONE: operatorKind (operator, &found);
+
 		if (found)
 		{
 			if (kind > K_NONE)
@@ -298,32 +315,245 @@ static const unsigned char *readOperator (
 	return cp;
 }
 
-static const unsigned char *asmReadLineFromInputFile (void)
+// We stop applying macro replacements if the unget buffer gets too big
+// as it is a sign of recursive macro expansion
+#define ASM_SCRIPT_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
+
+// We stop applying macro replacements if a macro is used so many
+// times in a recursive macro expansion.
+#define ASM_SCRIPT_PARSER_MAXIMUM_MACRO_USE_COUNT 8
+
+static bool collectCppMacroArguments (ptrArray *args)
+{
+	vString *s = vStringNew ();
+	int c;
+	int depth = 1;
+
+	do
+	{
+		c = cppGetc ();
+		if (c == EOF || c == '\n')
+			break;
+		else if (c == ')')
+		{
+			depth--;
+			if (depth == 0)
+			{
+				char *cstr = vStringDeleteUnwrap (s);
+				ptrArrayAdd (args, cstr);
+				s = NULL;
+			}
+			else
+				vStringPut (s, c);
+		}
+		else if (c == '(')
+		{
+			depth++;
+			vStringPut (s, c);
+		}
+		else if (c == ',')
+		{
+			char *cstr = vStringDeleteUnwrap (s);
+			ptrArrayAdd (args, cstr);
+			s = vStringNew ();
+		}
+		else if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
+			vStringPut (s, ' ');
+		else
+			vStringPut (s, c);
+	}
+	while (depth > 0);
+
+	vStringDelete (s);			/* NULL is acceptable. */
+
+	if (depth > 0)
+		TRACE_PRINT("unbalanced argument list");
+
+	return (depth > 0)? false: true;
+}
+
+static bool expandCppMacro (cppMacroInfo *macroInfo)
+{
+	ptrArray *args = NULL;
+
+	if (macroInfo->hasParameterList)
+	{
+		int c;
+
+		while (1)
+		{
+			c = cppGetc ();
+			if (c == STRING_SYMBOL || c == CHAR_SYMBOL || !isspace (c))
+				break;
+		}
+
+		if (c != '(')
+		{
+			cppUngetc (c);
+			return false;
+		}
+
+		args = ptrArrayNew (eFree);
+		if (!collectCppMacroArguments (args))
+		{
+			/* The input stream is already corrupted.
+			 * It is hard to recover. */
+			ptrArrayDelete (args);
+			return false;
+		}
+	}
+
+	cppBuildMacroReplacementWithPtrArrayAndUngetResult(macroInfo, args);
+
+	ptrArrayDelete (args);		/* NULL is acceptable. */
+	return true;
+}
+
+static void truncateLastIdetifier (vString *line, vString *identifier)
+{
+	Assert (vStringLength (line) >= vStringLength (identifier));
+	size_t len = vStringLength (line) - vStringLength (identifier);
+	Assert (strcmp (vStringValue (line) + len,
+					vStringValue (identifier)) == 0);
+	vStringTruncate (line, len);
+}
+
+static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
+{
+	TRACE_ENTER();
+
+	bool r = false;
+	cppMacroInfo *macroInfo = cppFindMacro (vStringValue (identifier));
+
+	if (!macroInfo)
+		goto out;
+
+	if (lastChar != EOF)
+		cppUngetc (lastChar);
+
+	TRACE_PRINT("Macro expansion: %s<%p>%s", macroInfo->name,
+				macroInfo, macroInfo->hasParameterList? "(...)": "");
+
+	r = expandCppMacro (macroInfo);
+
+ out:
+	if (r)
+		truncateLastIdetifier (line, identifier);
+
+	vStringClear (identifier);
+
+	TRACE_LEAVE();
+	return r;
+}
+
+static const unsigned char *readLineViaCpp (const char *commentChars)
 {
 	static vString *line;
 	int c;
+	bool truncation = false;
 
 	line = vStringNewOrClear (line);
 
+	vString *identifier = vStringNew ();
+
+ cont:
 	while ((c = cppGetc()) != EOF)
 	{
-		if (c == '\n')
-			break;
-		else if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
+		if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
 		{
+			/* c == CHAR_SYMBOL is subtle condition.
+			 * If the last char of IDENTIFIER is [0-9a-f],
+			 * cppGetc() never returns CHAR_SYMBOL to
+			 * Handle c++14 digit separator.
+			 */
+			if (!vStringIsEmpty (identifier)
+				&& processCppMacroX (identifier, ' ', line))
+				continue;
+
 			/* We cannot store these values to vString
 			 * Store a whitespace as a dummy value for them.
 			 */
-			vStringPut (line, ' ');
+			if (!truncation)
+				vStringPut (line, ' ');
+		}
+		else if (c == '\n' || (extraLinesepChars[0] != '\0'
+							   && strchr (extraLinesepChars, c) != NULL))
+		{
+			if (!vStringIsEmpty (identifier)
+				&& processCppMacroX (identifier, c, line))
+				continue;
+			break;
+		}
+		else if ((vStringIsEmpty (identifier) && (isalpha (c) || c == '_'))
+				|| (!vStringIsEmpty (identifier) && (isalnum (c) || c == '_')))
+		{
+			vStringPut (identifier, c);
+			if (!truncation)
+				vStringPut (line, c);
 		}
 		else
-			vStringPut (line, c);
+		{
+			if (!vStringIsEmpty (identifier)
+				&& processCppMacroX (identifier, c, line))
+				continue;
+
+			if (truncation == false && commentChars[0] && strchr (commentChars, c))
+				truncation = true;
+
+			if (!truncation)
+				vStringPut (line, c);
+		}
 	}
 
-	if ((vStringLength (line) == 0)&& (c == EOF))
+	if (c == EOF
+		&& !vStringIsEmpty(identifier)
+		&& processCppMacroX (identifier, EOF, line))
+		goto cont;
+
+	vStringDelete (identifier);
+
+	TRACE_PRINT("line: %s\n", vStringValue (line));
+
+	if ((vStringLength (line) == 0) && (c == EOF))
 		return NULL;
 	else
 		return (unsigned char *)vStringValue (line);
+}
+
+static const unsigned char *readLineNoCpp (const char *commentChars)
+{
+	static vString *line;
+	int c;
+	bool truncation = false;
+
+	line = vStringNewOrClear (line);
+
+	while ((c = getcFromInputFile ()) != EOF)
+	{
+		if (c == '\n' || (extraLinesepChars[0] != '\0'
+						  && strchr (extraLinesepChars, c) != NULL))
+			break;
+		else
+		{
+			if (truncation == false && commentChars[0] && strchr (commentChars, c))
+				truncation = true;
+
+			if (!truncation)
+				vStringPut (line, c);
+		}
+	}
+	if ((vStringLength (line) == 0) && (c == EOF))
+		return NULL;
+	else
+		return (unsigned char *)vStringValue (line);
+}
+
+static const unsigned char *asmReadLineFromInputFile (const char *commentChars, bool useCpp)
+{
+	if (useCpp)
+		return readLineViaCpp (commentChars);
+	else
+		return readLineNoCpp (commentChars);
 }
 
 static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned char *cp)
@@ -414,26 +644,27 @@ static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned cha
 	vStringDelete (name);
 }
 
-static void findAsmTags (void)
+static void findAsmTagsCommon (bool useCpp)
 {
 	vString *name = vStringNew ();
 	vString *operator = vStringNew ();
 	const unsigned char *line;
 
-	cppInit (false, false, false, false,
-			 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
-			 FIELD_UNKNOWN);
+	if (useCpp)
+		cppInit (false, false, false, false,
+				 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
+				 FIELD_UNKNOWN);
 
-	 int scope = CORK_NIL;
+	int scope = CORK_NIL;
 
-	while ((line = asmReadLineFromInputFile ()) != NULL)
-	{
+	 while ((line = asmReadLineFromInputFile (commentCharsInMOL, useCpp)) != NULL)
+	 {
 		const unsigned char *cp = line;
 		bool labelCandidate = (bool) (! isspace ((int) *cp));
 		bool nameFollows = false;
 		bool directive = false;
 		const bool isComment = (bool)
-				(*cp != '\0' && strchr (";*@", *cp) != NULL);
+				(*cp != '\0' && strchr (commentCharsAtBOL, *cp) != NULL);
 
 		/* skip comments */
 		if (isComment)
@@ -494,16 +725,80 @@ static void findAsmTags (void)
 			readMacroParameters (r, e, cp);
 	}
 
-	cppTerminate ();
+	if (useCpp)
+		cppTerminate ();
 
 	vStringDelete (name);
 	vStringDelete (operator);
+}
+
+static void findAsmTags (void)
+{
+	findAsmTagsCommon (useCPreProcessor);
 }
 
 static void initialize (const langType language)
 {
 	Lang_asm = language;
 }
+
+#define defineCommentCharSetter(PREPOS, POS)							\
+	static void asmSetCommentChars##PREPOS##POS (const langType language CTAGS_ATTR_UNUSED, \
+												 const char *optname CTAGS_ATTR_UNUSED, const char *arg) \
+	{																	\
+		if (commentChars##PREPOS##POS != defaultCommentChar##PREPOS##POS) \
+			eFree ((void *)commentChars##PREPOS##POS);					\
+																		\
+		if (arg && (arg[0] != '\0'))									\
+			commentChars##PREPOS##POS = eStrdup (arg);					\
+		else															\
+			commentChars##PREPOS##POS = defaultCommentChar##PREPOS##POS; \
+	}
+
+defineCommentCharSetter(At, BOL);
+defineCommentCharSetter(In, MOL);
+
+static void asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
+									const char *optname CTAGS_ATTR_UNUSED, const char *arg)
+{
+	if (extraLinesepChars != defaultExtraLinesepChars)
+		eFree ((void *)extraLinesepChars);
+
+	if (arg && (arg[0] != '\0'))
+		extraLinesepChars = eStrdup (arg);
+	else
+		extraLinesepChars = defaultExtraLinesepChars;
+}
+
+static void setUseCPreProcessor(const langType language CTAGS_ATTR_UNUSED,
+								const char *name, const char *arg)
+{
+	useCPreProcessor = paramParserBool (arg, useCPreProcessor,
+										name, "parameter");
+}
+
+static parameterHandlerTable AsmParameterHandlerTable [] = {
+	{
+		.name = "commentCharsAtBOL",
+		.desc = "line comment chraracters at the begining of line ([" DEFAULT_COMMENT_CHARS_BOL "])",
+		.handleParameter = asmSetCommentCharsAtBOL,
+	},
+	{
+		.name = "commentCharsInMOL",
+		.desc = "line comment chraracters in the begining of line ([" DEFAULT_COMMENT_CHARS_MOL "])",
+		.handleParameter = asmSetCommentCharsInMOL,
+	},
+	{
+		.name = "extraLinesepChars",
+		.desc = "extra characters used as a line separator ([])",
+		.handleParameter = asmSetExtraLinesepChars,
+	},
+	{
+		.name = "useCPreProcessor",
+		.desc = "run CPreProcessor parser for extracting macro definitions ([true] or false)",
+		.handleParameter = setUseCPreProcessor,
+	},
+};
 
 extern parserDefinition* AsmParser (void)
 {
@@ -517,8 +812,7 @@ extern parserDefinition* AsmParser (void)
 		"*.[xX][68][68]",
 		NULL
 	};
-	static selectLanguage selectors[] = { selectByArrowOfR,
-					      NULL };
+	static selectLanguage selectors[] = { selectByArrowOfR, NULL };
 
 	parserDefinition* def = parserNew ("Asm");
 	def->kindTable      = AsmKinds;
@@ -533,5 +827,9 @@ extern parserDefinition* AsmParser (void)
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->fieldTable = AsmFields;
 	def->fieldCount = ARRAY_SIZE (AsmFields);
+
+	def->parameterHandlerTable = AsmParameterHandlerTable;
+	def->parameterHandlerCount = ARRAY_SIZE(AsmParameterHandlerTable);
+
 	return def;
 }

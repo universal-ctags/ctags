@@ -1,0 +1,3 @@
+X	input.s	/^#define X /;"	d	file:
+retry	input.s	/^retry:;loop:$/;"	l
+loop	input.s	/^retry:;loop:$/;"	l

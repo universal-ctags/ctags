@@ -1,15 +1,23 @@
 # ALL
-#LANGUAGE      NAME     DESCRIPTION
-CPreProcessor  _expand  expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
-CPreProcessor  define   define replacement for an identifier (name(params,...)=definition)
-CPreProcessor  if0      examine code within "#if 0" branch (true or [false])
-CPreProcessor  ignore   a token to be specially handled
-Fypp           guest    parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
-ITcl           forceUse enable the parser even when `itcl' namespace is not specified in the input (true or [false])
-TclOO          forceUse enable the parser even when `oo' namespace is not specified in the input (true or [false])
+#LANGUAGE      NAME              DESCRIPTION
+Asm            commentCharsAtBOL line comment chraracters at the begining of line ([;*@])
+Asm            commentCharsInMOL line comment chraracters in the begining of line ([])
+Asm            extraLinesepChars extra characters used as a line separator ([])
+Asm            useCPreProcessor  run CPreProcessor parser for extracting macro definitions ([true] or false)
+CPreProcessor  _expand           expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
+CPreProcessor  define            define replacement for an identifier (name(params,...)=definition)
+CPreProcessor  if0               examine code within "#if 0" branch (true or [false])
+CPreProcessor  ignore            a token to be specially handled
+Fypp           guest             parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+ITcl           forceUse          enable the parser even when `itcl' namespace is not specified in the input (true or [false])
+TclOO          forceUse          enable the parser even when `oo' namespace is not specified in the input (true or [false])
 
 # ALL MACHINABLE
 #LANGUAGE	NAME	DESCRIPTION
+Asm	commentCharsAtBOL	line comment chraracters at the begining of line ([;*@])
+Asm	commentCharsInMOL	line comment chraracters in the begining of line ([])
+Asm	extraLinesepChars	extra characters used as a line separator ([])
+Asm	useCPreProcessor	run CPreProcessor parser for extracting macro definitions ([true] or false)
 CPreProcessor	_expand	expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
 CPreProcessor	define	define replacement for an identifier (name(params,...)=definition)
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
@@ -19,6 +27,10 @@ ITcl	forceUse	enable the parser even when `itcl' namespace is not specified in t
 TclOO	forceUse	enable the parser even when `oo' namespace is not specified in the input (true or [false])
 
 # ALL MACHINABLE NOHEADER
+Asm	commentCharsAtBOL	line comment chraracters at the begining of line ([;*@])
+Asm	commentCharsInMOL	line comment chraracters in the begining of line ([])
+Asm	extraLinesepChars	extra characters used as a line separator ([])
+Asm	useCPreProcessor	run CPreProcessor parser for extracting macro definitions ([true] or false)
 CPreProcessor	_expand	expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
 CPreProcessor	define	define replacement for an identifier (name(params,...)=definition)
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])

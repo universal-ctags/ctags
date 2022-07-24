@@ -1,0 +1,8 @@
+--sort=no
+--param-Asm.useCPreProcessor=1
+--param-CPreProcessor._expand=1
+--fields=+{signature}
+--fields-CPreProcessor=+{macrodef}
+--param-Asm.extraLinesepChars=;
+-DGENTRY(LABEL)=.global LABEL; LABEL:
+-DLENTRY(LABEL)=LABEL; LABEL:

@@ -1,0 +1,29 @@
+ENTRY	input.S	/^#define ENTRY(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
+main	input.S	/^ENTRY(main):$/;"	l
+ENTRY2	input.S	/^#define ENTRY2(/;"	d	file:	signature:(LABEL,UNUSED)	macrodef:.global LABEL ;LABEL
+loop0	input.S	/^ENTRY2(loop0, "STRING"):$/;"	l
+loop1	input.S	/^ENTRY2(loop1, 'c'):$/;"	l
+loop2	input.S	/^ENTRY2(loop2, ('c')):$/;"	l
+ASM_NL	input.S	/^#define ASM_NL	/;"	d	file:	macrodef:;
+SYM_ENTRY	input.S	/^#define SYM_ENTRY(/;"	d	file:	signature:(name,linkage,align...)	macrodef:linkage(name) ASM_NL align ASM_NL name:
+SYM_START	input.S	/^#define SYM_START(/;"	d	file:	signature:(name,linkage,align...)	macrodef:SYM_ENTRY(name, linkage, align)
+SYM_CODE_START	input.S	/^#define SYM_CODE_START(/;"	d	file:	signature:(name)	macrodef:SYM_START(name, SYM_L_GLOBAL, SYM_A_ALIGN)
+asm_exc_nmi	input.S	/^SYM_CODE_START(asm_exc_nmi)$/;"	l
+ENTRY0	input-0.S	/^#define ENTRY0(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
+exit0	input-0.S	/^exit0:$/;"	l
+ENTRY1	input-1.S	/^#define ENTRY1(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
+exit1	input-1.S	/^ENTRY1(exit1):$/;"	l
+ENTRY2	input-2.S	/^#define ENTRY2(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
+exit2	input-2.S	/^ENTRY2(exit2):$/;"	l
+ENTRY3	input-3.S	/^#define ENTRY3 /;"	d	file:	macrodef:label3:; nop;.section .entry.text, 
+label3	input-3.S	/^	ENTRY3"a"$/;"	l
+ENTRY4	input-4.S	/^#define ENTRY4 /;"	d	file:	macrodef:label4:
+ENTRY5	input-4.S	/^#define ENTRY5 /;"	d	file:	macrodef:label5:
+label4	input-4.S	/^ENTRY4;	nop$/;"	l
+label5	input-4.S	/^ENTRY5$/;"	l
+MAC5	input-5.S	/^#define MAC5 /;"	d	file:	macrodef:maclabel5:; nop;maclabel50:; nop
+maclabel5	input-5.S	/^MAC5/;"	l
+maclabel50	input-5.S	/^MAC5/;"	l
+ENTRYZ	input-6.S	/^#define ENTRYZ /;"	d	file:	macrodef:label6:; nop;.section .entry.text, 
+label6	input-6.S	/^	ENTRYZ'z'$/;"	l
+X	input-7.S	/^#define X(/;"	d	file:	signature:()	macrodef:mylabel:; nop;

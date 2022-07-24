@@ -1,0 +1,6 @@
+--sort=no
+--param-Asm.extraLinesepChars=,
+# To increse the test coverage, overwrite the parameter
+# that set from the command line once.
+--param-Asm.extraLinesepChars=;
+--param-Asm.useCPreProcessor=true

@@ -15,6 +15,7 @@ Man pages
 	ctags-incompatibilities(7) <man/ctags-incompatibilities.7.rst>
 	ctags-faq(7) <man/ctags-faq.7.rst>
 
+	ctags-lang-asm(7) <man/ctags-lang-asm.7.rst>
 	ctags-lang-elm(7) <man/ctags-lang-elm.7.rst>
 	ctags-lang-gdscript(7) <man/ctags-lang-gdscript.7.rst>
 	ctags-lang-inko(7) <man/ctags-lang-inko.7.rst>
