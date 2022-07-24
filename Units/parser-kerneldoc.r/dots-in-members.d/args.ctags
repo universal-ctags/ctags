@@ -1,0 +1,7 @@
+--sort=no
+--languages=+KernelDoc
+--fields=+Kl
+--extras=+g
+--kinds-KernelDoc=*
+--kinds-C=
+--kinds-CPreProcessor=

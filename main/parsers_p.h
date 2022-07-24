@@ -115,6 +115,7 @@
 	JsonParser, \
 	JuliaParser, \
 	KconfigParser, \
+	KernelDocParser, \
 	LdScriptParser, \
 	LEXParser, \
 	LispParser, \

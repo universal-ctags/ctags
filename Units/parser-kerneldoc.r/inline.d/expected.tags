@@ -1,0 +1,8 @@
+in-line	input.c	/^ * DOC: in-line$/;"	doc	language:KernelDoc
+foo	input.c	/^ * struct foo - Brief description.$/;"	struct	language:KernelDoc	doc:in-line
+foo	input.c	/^ * @foo: The Foo member.$/;"	member	language:KernelDoc	struct:in-line""foo
+bar	input.c	/^       * @bar: The Bar member.$/;"	member	language:KernelDoc	struct:in-line""foo
+baz	input.c	/^       * @baz: The Baz member.$/;"	member	language:KernelDoc	struct:in-line""foo
+foobar	input.c	/^              \/** @foobar: Single line description. *\/$/;"	member	language:KernelDoc	struct:in-line""foo
+bar2	input.c	/^      \/** @bar2: Description for struct @bar2 inside @foo *\/$/;"	member	language:KernelDoc	struct:in-line""foo
+bar2.barbar	input.c	/^               * @bar2.barbar: Description for @barbar inside @foo.bar2$/;"	member	language:KernelDoc	struct:in-line""foo

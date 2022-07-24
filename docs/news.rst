@@ -429,6 +429,7 @@ The following parsers have been added:
 * JSON
 * Julia
 * Kconfig *optlib*
+* KernelDoc *CPreProcessor based subparser"
 * Kotlin *peg/packcc*
 * GNU linker script(LdScript)
 * LEX *optlib*

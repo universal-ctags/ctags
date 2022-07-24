@@ -1,0 +1,4 @@
+Typedefs with function prototypes	input.c	/^ * DOC: Typedefs with function prototypes$/;"	doc	language:KernelDoc
+type_name	input.c	/^ * typedef type_name - Brief description.$/;"	typedef	language:KernelDoc	doc:Typedefs with function prototypes
+arg1	input.c	/^ * @arg1: description of arg1$/;"	parameter	language:KernelDoc	typedef:Typedefs with function prototypes""type_name
+arg2	input.c	/^ * @arg2: description of arg2$/;"	parameter	language:KernelDoc	typedef:Typedefs with function prototypes""type_name
