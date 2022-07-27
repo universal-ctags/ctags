@@ -231,6 +231,7 @@ typedef enum eAdaKeywords
 	ADA_KEYWORD_OR,
 	ADA_KEYWORD_OVERRIDING,		/* Ada 2005 */
 	ADA_KEYWORD_PACKAGE,
+	ADA_KEYWORD_PARALLEL,		/* Ada 2022 */
 	ADA_KEYWORD_PRAGMA,
 	ADA_KEYWORD_PRIVATE,
 	ADA_KEYWORD_PROCEDURE,
@@ -239,6 +240,7 @@ typedef enum eAdaKeywords
 	ADA_KEYWORD_RENAMES,
 	ADA_KEYWORD_SELECT,
 	ADA_KEYWORD_SEPARATE,
+	ADA_KEY_WORD_SOME,		/* Ada 2012 */
 	ADA_KEYWORD_SUBTYPE,
 	ADA_KEYWORD_TASK,
 	ADA_KEYWORD_THEN,
@@ -276,6 +278,7 @@ static const char *AdaKeywords[] =
 	"or",
 	"overriding",
 	"package",
+	"parallel",
 	"pragma",
 	"private",
 	"procedure",
@@ -284,6 +287,7 @@ static const char *AdaKeywords[] =
 	"renames",
 	"select",
 	"separate",
+	"some",
 	"subtype",
 	"task",
 	"then",
