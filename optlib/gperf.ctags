@@ -1,0 +1,122 @@
+#
+# lex.ctags --- multitable regex parser for gperf input
+#
+# Copyright (c) 2022, Red Hat, Inc.
+# Copyright (c) 2022, Masatake YAMATO
+#
+# Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+# Reference:
+#
+# - https://www.gnu.org/software/gperf/manual/gperf.html
+#
+
+--langdef=GPerf
+
+#
+# Map definitions
+#
+--map-GPerf=+.perf
+--map-GPerf=+.gperf
+
+#
+# Kind definitions
+#
+--kinddef-GPerf=k,keyword,keywords
+--kinddef-GPerf=h,hfunc,hash function names
+--kinddef-GPerf=l,lfunc,lookup function names
+--kinddef-GPerf=c,class,class names
+--kinddef-GPerf=s,strpool,string pool names
+
+#
+# Table declarations
+#
+--_tabledef-GPerf=main
+--_tabledef-GPerf=comment
+--_tabledef-GPerf=codeinc
+--_tabledef-GPerf=keywordsec
+--_tabledef-GPerf=functions
+--_tabledef-GPerf=structdec
+
+#
+# Table definitions
+#
+--_mtable-regex-GPerf=comment/[^*]+//
+--_mtable-regex-GPerf=comment/\*\///{tleave}
+--_mtable-regex-GPerf=comment/.//
+
+#
+# codeinc:
+# - run the C parser on the area %{ ... %}
+#
+--_mtable-regex-GPerf=codeinc/[^%]+//
+--_mtable-regex-GPerf=codeinc/%\}//{tjump=structdec}{_guest=,,0start}
+--_mtable-regex-GPerf=codeinc/.//
+
+#
+# structdec:
+# - run the C parser on the area %} struct ...; %%
+# - extract %define ... used in the area %} ...; %%
+#
+--_tabledef-GPerf=struct
+--_tabledef-GPerf=structbody
+
+--_mtable-regex-GPerf=structdec/struct[ \t]//{_guest=C,0start,}{tenter=struct}
+--_mtable-regex-GPerf=structdec/%%//{tjump=keywordsec}
+--_mtable-regex-GPerf=structdec/%define[ \t]+(hash-function-name|lookup-function-name|class-name|string-pool-name)[ \t]+([_a-zA-Z:][_a-zA-Z:0-9]*)[^\n]*\n//{{
+  \2
+  << (hash-function-name)   /hfunc
+     (lookup-function-name) /lfunc
+     (class-name)           /class
+     (string-pool-name)     /strpool >> \1 get
+  2 /start _matchloc
+  _tag _commit pop
+}}
+--_mtable-regex-GPerf=structdec/[^\n]*\n//
+
+--_mtable-regex-GPerf=struct/\{//{tenter=structbody}
+--_mtable-regex-GPerf=struct/\/\*//{tenter=comment}
+--_mtable-regex-GPerf=struct/;//{tleave}{_guest=,,0end}
+--_mtable-regex-GPerf=struct/%//{tleave}{_guest=,,0end}{_advanceTo=0start}
+--_mtable-regex-GPerf=struct/.//
+
+--_mtable-regex-GPerf=structbody/\}//{tleave}
+--_mtable-regex-GPerf=structbody/\{//{tenter=structbody}
+--_mtable-regex-GPerf=structbody/\/\*//{tenter=comment}
+--_mtable-regex-GPerf=structbody/.//
+
+#
+# keywordsec:
+# - extrac keywords defined in %% ... %%
+#
+--_mtable-regex-GPerf=keywordsec/%%//{tjump=functions}{_guest=C,0end,}
+--_mtable-regex-GPerf=keywordsec/([^\n,]+)[^\n]*\n?/\1/k/
+--_mtable-regex-GPerf=keywordsec/[^\n]*\n//
+
+#
+# functions:
+# - run the C parser on the area %% ... EOF
+#
+--_mtable-regex-GPerf=functions/.+//{_guest=,,0end}
+
+#
+# main:
+#
+--_mtable-regex-GPerf=main/\/\*//{tenter=comment}
+--_mtable-regex-GPerf=main/%\{//{tjump=codeinc}{_guest=C,0end,}
+--_mtable-extend-GPerf=main+structdec

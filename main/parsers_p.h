@@ -100,6 +100,7 @@
 	GDScriptParser, \
 	GemSpecParser, \
 	GoParser, \
+	GPerfParser, \
 	HaskellParser, \
 	HaxeParser, \
 	HtmlParser, \

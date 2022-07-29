@@ -1,0 +1,87 @@
+resolved_gperf_hash	input.perf	/^%define hash-function-name resolved_gperf_hash$/;"	h
+resolved_gperf_lookup	input.perf	/^%define lookup-function-name resolved_gperf_lookup$/;"	l
+MyNameSpace::MyClass	input.perf	/^%define class-name MyNameSpace::MyClass$/;"	c
+HUP	input.perf	/^HUP, 1$/;"	k
+INT	input.perf	/^INT, 2$/;"	k
+QUIT	input.perf	/^QUIT, 3$/;"	k
+ILL	input.perf	/^ILL, 4$/;"	k
+TRAP	input.perf	/^TRAP, 5$/;"	k
+ABRT	input.perf	/^ABRT, 6$/;"	k
+BUS	input.perf	/^BUS, 7$/;"	k
+FPE	input.perf	/^FPE, 8$/;"	k
+KILL	input.perf	/^KILL, 9$/;"	k
+USR1	input.perf	/^USR1, 10$/;"	k
+SEGV	input.perf	/^SEGV, 11$/;"	k
+USR2	input.perf	/^USR2, 12$/;"	k
+PIPE	input.perf	/^PIPE, 13$/;"	k
+ALRM	input.perf	/^ALRM, 14$/;"	k
+TERM	input.perf	/^TERM, 15$/;"	k
+STKFLT	input.perf	/^STKFLT, 16$/;"	k
+CHLD	input.perf	/^CHLD, 17$/;"	k
+CONT	input.perf	/^CONT, 18$/;"	k
+STOP	input.perf	/^STOP, 19$/;"	k
+TSTP	input.perf	/^TSTP, 20$/;"	k
+TTIN	input.perf	/^TTIN, 21$/;"	k
+TTOU	input.perf	/^TTOU, 22$/;"	k
+URG	input.perf	/^URG, 23$/;"	k
+XCPU	input.perf	/^XCPU, 24$/;"	k
+XFSZ	input.perf	/^XFSZ, 25$/;"	k
+VTALRM	input.perf	/^VTALRM, 26$/;"	k
+PROF	input.perf	/^PROF, 27$/;"	k
+WINCH	input.perf	/^WINCH, 28$/;"	k
+IO	input.perf	/^IO, 29$/;"	k
+PWR	input.perf	/^PWR, 30$/;"	k
+SYS	input.perf	/^SYS, 31$/;"	k
+RTMIN	input.perf	/^RTMIN, 34$/;"	k
+RTMIN+1	input.perf	/^RTMIN+1, 35$/;"	k
+RTMIN+2	input.perf	/^RTMIN+2, 36$/;"	k
+RTMIN+3	input.perf	/^RTMIN+3, 37$/;"	k
+RTMIN+4	input.perf	/^RTMIN+4, 38$/;"	k
+RTMIN+5	input.perf	/^RTMIN+5, 39$/;"	k
+RTMIN+6	input.perf	/^RTMIN+6, 40$/;"	k
+RTMIN+7	input.perf	/^RTMIN+7, 41$/;"	k
+RTMIN+8	input.perf	/^RTMIN+8, 42$/;"	k
+RTMIN+9	input.perf	/^RTMIN+9, 43$/;"	k
+RTMIN+10	input.perf	/^RTMIN+10, 44$/;"	k
+RTMIN+11	input.perf	/^RTMIN+11, 45$/;"	k
+RTMIN+12	input.perf	/^RTMIN+12, 46$/;"	k
+RTMIN+13	input.perf	/^RTMIN+13, 47$/;"	k
+RTMIN+14	input.perf	/^RTMIN+14, 48$/;"	k
+RTMIN+15	input.perf	/^RTMIN+15, 49$/;"	k
+RTMAX-14	input.perf	/^RTMAX-14, 50$/;"	k
+RTMAX-13	input.perf	/^RTMAX-13, 51$/;"	k
+RTMAX-12	input.perf	/^RTMAX-12, 52$/;"	k
+RTMAX-11	input.perf	/^RTMAX-11, 53$/;"	k
+RTMAX-10	input.perf	/^RTMAX-10, 54$/;"	k
+RTMAX-9	input.perf	/^RTMAX-9, 55$/;"	k
+RTMAX-8	input.perf	/^RTMAX-8, 56$/;"	k
+RTMAX-7	input.perf	/^RTMAX-7, 57$/;"	k
+RTMAX-6	input.perf	/^RTMAX-6, 58$/;"	k
+RTMAX-5	input.perf	/^RTMAX-5, 59$/;"	k
+RTMAX-4	input.perf	/^RTMAX-4, 60$/;"	k
+RTMAX-3	input.perf	/^RTMAX-3, 61$/;"	k
+RTMAX-2	input.perf	/^RTMAX-2, 62$/;"	k
+RTMAX-1	input.perf	/^RTMAX-1, 63$/;"	k
+RTMAX	input.perf	/^RTMAX, 64$/;"	k
+_GNU_SOURCE	input.perf	/^#define _GNU_SOURCE$/;"	d	file:
+config.h	input.perf	/^#include <config.h>/;"	h
+stddef.h	input.perf	/^#include <stddef.h>/;"	h
+stdlib.h	input.perf	/^#include <stdlib.h>/;"	h
+utils.h	input.perf	/^#include "utils.h"/;"	h
+signal_s	input.perf	/^struct signal_s$/;"	s	file:
+name	input.perf	/^  int name;$/;"	m	struct:signal_s	typeref:typename:int	file:
+value	input.perf	/^  int value;$/;"	m	struct:signal_s	typeref:typename:int	file:
+sender_s	input.perf	/^  struct sender_s {$/;"	s	struct:signal_s	file:
+pid	input.perf	/^     pid_t pid; \/*$/;"	m	struct:signal_s::sender_s	typeref:typename:pid_t	file:
+comm	input.perf	/^     char comm[16];$/;"	m	struct:signal_s::sender_s	typeref:typename:char[16]	file:
+sender	input.perf	/^  } sender;$/;"	m	struct:signal_s	typeref:struct:signal_s::sender_s	file:
+str2sig	input.perf	/^str2sig (const char *name)$/;"	f	typeref:typename:int
+kconf_id_hash	input-0.gperf	/^%define hash-function-name kconf_id_hash$/;"	h
+kconf_id_lookup	input-0.gperf	/^%define lookup-function-name kconf_id_lookup$/;"	l
+kconf_id_strings	input-0.gperf	/^%define string-pool-name kconf_id_strings$/;"	s
+mainmenu	input-0.gperf	/^mainmenu,	T_MAINMENU,	TF_COMMAND$/;"	k
+menu	input-0.gperf	/^menu,		T_MENU,		TF_COMMAND$/;"	k
+EXPORT_SYMBOL	input-1.perf	/^EXPORT_SYMBOL, EXPORT_SYMBOL_KEYW$/;"	k
+resword	input-1.perf	/^struct resword { const char *name; int token; }$/;"	s	file:
+name	input-1.perf	/^struct resword { const char *name; int token; }$/;"	m	struct:resword	typeref:typename:const char *	file:
+token	input-1.perf	/^struct resword { const char *name; int token; }$/;"	m	struct:resword	typeref:typename:int	file:

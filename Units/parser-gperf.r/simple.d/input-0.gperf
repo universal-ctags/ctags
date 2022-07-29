@@ -1,0 +1,16 @@
+/* Taken from
+   https://kernel.googlesource.com/pub/scm/linux/kernel/git/konrad/xen/+/stable/for-linus-3.10-rc5-tag/scripts/kconfig/zconf.gperf */
+%language=ANSI-C
+%define hash-function-name kconf_id_hash
+%define lookup-function-name kconf_id_lookup
+%define string-pool-name kconf_id_strings
+%compare-strncmp
+%enum
+%pic
+%struct-type
+struct kconf_id;
+static const struct kconf_id *kconf_id_lookup(register const char *str, register unsigned int len);
+%%
+mainmenu,	T_MAINMENU,	TF_COMMAND
+menu,		T_MENU,		TF_COMMAND
+%%

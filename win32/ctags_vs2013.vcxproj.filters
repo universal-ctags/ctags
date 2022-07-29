@@ -225,6 +225,9 @@
     <ClCompile Include="..\optlib\gdbinit.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\gperf.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\iPythonCell.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
