@@ -211,6 +211,7 @@ OPTLIB2C_INPUT = \
 	optlib/ctags-optlib.ctags		\
 	optlib/elixir.ctags			\
 	optlib/gdbinit.ctags			\
+	optlib/gperf.ctags			\
 	optlib/inko.ctags			\
 	optlib/iPythonCell.ctags		\
 	optlib/kconfig.ctags			\

@@ -71,8 +71,8 @@ and C parsers. You may want to run C parser for the areas from YACC
 parser.
 
 Here YACC parser is a host parser. C parser is a guest parser.
-See "`parsers/yacc.c
-<https://github.com/universal-ctags/ctags/blob/master/parsers/yacc.c>`_".
+See "`optlib/yacc.ctags
+<https://github.com/universal-ctags/ctags/blob/master/optlib/yacc.ctags>`_".
 
 
 Pod/Perl parser combination

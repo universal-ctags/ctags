@@ -1,0 +1,138 @@
+/* Derrived FROM crun-1.4.4/src/libcrun/signals.perf
+   and systemd/src/resolve/resolved-gperf.gperf */
+/*
+ * crun - OCI runtime written in C
+ *
+ * Copyright (C) 2017, 2018, 2019 Giuseppe Scrivano <giuseppe@scrivano.org>
+ * crun is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * crun is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with crun.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+%{
+#define _GNU_SOURCE
+
+#include <config.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include "utils.h"
+%}
+struct signal_s
+{
+  int name;
+  int value;
+  struct sender_s {
+     pid_t pid; /*
+}
+%%
+*/
+     char comm[16];
+  } sender;
+};
+%null_strings
+%language=ANSI-C
+%define slot-name section_and_lvalue
+%define hash-function-name resolved_gperf_hash
+%define lookup-function-name resolved_gperf_lookup
+%define class-name MyNameSpace::MyClass
+%readonly-tables
+%omit-struct-type
+%struct-type
+%includes
+%%
+HUP, 1
+INT, 2
+QUIT, 3
+ILL, 4
+TRAP, 5
+ABRT, 6
+BUS, 7
+FPE, 8
+KILL, 9
+USR1, 10
+SEGV, 11
+USR2, 12
+PIPE, 13
+ALRM, 14
+TERM, 15
+STKFLT, 16
+CHLD, 17
+CONT, 18
+STOP, 19
+TSTP, 20
+TTIN, 21
+TTOU, 22
+URG, 23
+XCPU, 24
+XFSZ, 25
+VTALRM, 26
+PROF, 27
+WINCH, 28
+IO, 29
+PWR, 30
+SYS, 31
+RTMIN, 34
+RTMIN+1, 35
+RTMIN+2, 36
+RTMIN+3, 37
+RTMIN+4, 38
+RTMIN+5, 39
+RTMIN+6, 40
+RTMIN+7, 41
+RTMIN+8, 42
+RTMIN+9, 43
+RTMIN+10, 44
+RTMIN+11, 45
+RTMIN+12, 46
+RTMIN+13, 47
+RTMIN+14, 48
+RTMIN+15, 49
+RTMAX-14, 50
+RTMAX-13, 51
+RTMAX-12, 52
+RTMAX-11, 53
+RTMAX-10, 54
+RTMAX-9, 55
+RTMAX-8, 56
+RTMAX-7, 57
+RTMAX-6, 58
+RTMAX-5, 59
+RTMAX-4, 60
+RTMAX-3, 61
+RTMAX-2, 62
+RTMAX-1, 63
+RTMAX, 64
+%%
+int
+str2sig (const char *name)
+{
+  const struct signal_s *s;
+
+  if (has_prefix (name, "SIG"))
+    name += 3;
+
+  s = libcrun_signal_in_word_set (name, strlen (name));
+  if (s == NULL)
+    {
+      long int value;
+
+      errno = 0;
+      value = strtol (name, NULL, 10);
+      if (errno == 0)
+        return value;
+
+      errno = ENOENT;
+      return -1;
+    }
+
+  return s->value;
+}

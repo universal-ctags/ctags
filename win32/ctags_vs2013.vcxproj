@@ -234,6 +234,7 @@
     <ClCompile Include="..\optlib\ctags-optlib.c" />
     <ClCompile Include="..\optlib\elixir.c" />
     <ClCompile Include="..\optlib\gdbinit.c" />
+    <ClCompile Include="..\optlib\gperf.c" />
     <ClCompile Include="..\optlib\iPythonCell.c" />
     <ClCompile Include="..\optlib\inko.c" />
     <ClCompile Include="..\optlib\kconfig.c" />

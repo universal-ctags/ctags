@@ -1,0 +1,7 @@
+/* Derrived from
+   https://kernel.googlesource.com/pub/scm/linux/kernel/git/dhowells/linux-asm_system/+/refs/tags/v2.6.15-rc7/scripts/genksyms/keywords.gperf */
+%{
+%}
+struct resword { const char *name; int token; }
+%%
+EXPORT_SYMBOL, EXPORT_SYMBOL_KEYW

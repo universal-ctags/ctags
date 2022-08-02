@@ -419,6 +419,7 @@ The following parsers have been added:
 * GDScript
 * Glade *libxml*
 * Go
+* GPerf *optlib*
 * Haskell
 * Haxe
 * iPythonCell *optlib*, *pthon based subparser*
