@@ -11,8 +11,8 @@ jobs:
 
     strategy:
       matrix:
-        # os: [ubuntu-18.04, ubuntu-20.04]
-        os: [ubuntu-18.04, ubuntu-20.04]
+        # os: [ubuntu-22.04, ubuntu-20.04]
+        os: [ubuntu-22.04, ubuntu-20.04]
         compiler: [gcc, clang]
 
     runs-on: ${{ matrix.os }}
@@ -33,7 +33,14 @@ jobs:
     - name: update package information
       run: sudo apt-get -y -o APT::Immediate-Configure=false update
     - name: install tools and libraries
-      run: sudo apt-get -y -o APT::Immediate-Configure=false install valgrind pkg-config automake bash libjansson-dev libyaml-dev libseccomp-dev libxml2-dev gdb python3-docutils libpcre2-dev
+      run: sudo apt-get -y -o APT::Immediate-Configure=false install pkg-config automake bash libjansson-dev libyaml-dev libseccomp-dev libxml2-dev gdb python3-docutils libpcre2-dev
+    - name: install valgrind
+      if: matrix.compiler == 'clang' && matrix.os == 'ubuntu-22.04'
+      # valgrind doesn't work well with an executable built with clang 14.
+      # https://forum.manjaro.org/t/valgrind-fails-possibly-corrupted-debuginfo-file/118156
+      run: |
+        type clang > /dev/null && clang --version | head -1 | grep -q 14 \
+        || sudo apt-get -y -o APT::Immediate-Configure=false install valgrind
     - name: install rubygems and lcov
       if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-20.04'
       #run: sudo apt-get -y -o APT::Immediate-Configure=false install rubygems lcov
