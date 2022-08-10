@@ -625,6 +625,21 @@ static int matchExprOperator (void)
 	return 0;
 }
 
+/* Check if next token is one of "(omit)", "(value)", "(present)".
+ * ETSI ES 201 873-1 V4.14.1
+ * A.1.6.7 471. TemplateRestriction ::= "(" (OmitKeyword | ValueKeyword | PresentKeyword) ")"
+ * A.1.6.6 461. OmitKeyword ::= "omit"
+ * A.1.6.4.2 346. ValueKeyword ::= "value"
+ * A.1.6.1.3 145.PresentKeyword ::= "present"
+ */
+static int matchTemplateRestriction (void)
+{
+	/* Simplistic: do not verify the actual "omit"/"value"/"present" keyword, just skip the entire brackets when
+	 * present. This also is tolerant to typos in the keyword. Drawback: would also accept any amount of unrelated
+	 * tokens and punctuation in the braces. */
+	return matchBrackets(BR_PAR);
+}
+
 static int parseExprOperand (void)
 {
 	ttcnToken_t * pTok;
@@ -950,7 +965,8 @@ static void parseTTCN (void)
 				parseTypeDefBody();
 				break;
 			case T_TEMPLATE:
-				/* A.1.6.1.3 TemplateDef ::= "template" (Type | Signature) ID ... */
+				/* A.1.6.1.3 TemplateDef ::= "template" [TemplateRestriction] (Type | Signature) ID ... */
+				matchTemplateRestriction();
 				if (parseType() || parseSignature())
 					parseID(K_TEMPLATE);
 				break;
