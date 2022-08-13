@@ -753,7 +753,7 @@ static int skipExpression (int c)
 static int skipToNewLine (int c)
 {
 	bool escape = false;
-	for ( ; (c != '\n' || escape) &&  c != EOF; c = vGetc ())
+	for ( ; (c != '\n' || escape) &&  c != EOF; c = getcFromInputFile ())
 		escape = (c == '\\');
 
 	return c;	// '\n' or EOF
