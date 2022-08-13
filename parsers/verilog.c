@@ -1855,7 +1855,7 @@ static int findTag (tokenInfo *const token, int c)
 
 				if (c == ':')
 					; /* label */
-				else if (c == ',' || c == '{')	// "foo, ..." or "coverpoint foo { ... }"
+				else if (c == ',' || c == '.' || c == '{')	// "foo, ...", "foo.bar,...", or "coverpoint foo { ... }"
 					c = skipWhite (vGetc ());
 				else if (c == '(')	// task, function, or method call
 					c = skipPastMatch ("()");
