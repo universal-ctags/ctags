@@ -752,11 +752,14 @@ static int skipExpression (int c)
 // Should be used after readWordTokenNoSkip() for compiler directives
 static int skipToNewLine (int c)
 {
-	bool escape = false;
-	for ( ; (c != '\n' || escape) &&  c != EOF; c = getcFromInputFile ())
-		escape = (c == '\\');
-
-	return c;	// '\n' or EOF
+	int prev = EOF; // The previous char of 'c' never be a EOF.
+	while (!((prev != '\\') && (c == '\n')) && (c != EOF)) {
+		prev = c;
+		// Getc() does not work for a comment in multi-line macro
+		c = getcFromInputFile ();
+	}
+	Assert(c == '\n' || c == EOF);
+	return c;
 }
 
 static int skipMacro (int c, tokenInfo *token)
