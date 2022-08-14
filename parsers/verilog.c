@@ -42,6 +42,18 @@
 #define IDX_SYSTEMVERILOG   0
 #define IDX_VERILOG         1
 
+#ifndef DEBUG
+#define VERBOSE(...) do { \
+		verbose("%s:%ld:%s:%d:Internal Error:", getInputFileName(), getInputLineNumber(), __FILE__, __LINE__); \
+		verbose(__VA_ARGS__); \
+	} while (0)
+#else
+#define VERBOSE(...) do { \
+		fprintf(stderr, "%s:%ld:%s:%d:Internal Error:", getInputFileName(), getInputLineNumber(), __FILE__, __LINE__); \
+		fprintf(stderr, __VA_ARGS__); \
+	} while (0)
+#endif
+
 /*
  *   DATA DECLARATIONS
  */
@@ -915,7 +927,7 @@ static int dropEndContext (tokenInfo *const token, int c)
 		vStringDelete (endTokenName);
 	}
 	else
-		verbose ("Unexpected current context %s\n", vStringValue (currentContext->name));
+		VERBOSE ("Unexpected current context %s\n", vStringValue (currentContext->name));
 	return c;
 }
 
@@ -1064,7 +1076,7 @@ static int processPortList (tokenInfo *token, int c, bool mayPortDecl)
 		if (c == ')')	// sanity check
 			c = skipWhite (vGetc ());
 		else
-			verbose ("Unexpected input: %c\n", c);
+			VERBOSE ("Unexpected input: %c\n", c);
 	}
 	return c;
 }
@@ -1296,7 +1308,7 @@ static int processClass (tokenInfo *const token, int c, verilogKind kind)
 
 	if (token->kind != K_IDENTIFIER)
 	{
-		verbose ("Unexpected input: class name is expected.\n");
+		VERBOSE ("Unexpected input: class name is expected.\n");
 		return c;
 	}
 
@@ -1418,7 +1430,7 @@ static int processDesignElementL (tokenInfo *const token, int c)
 		}
 		else
 		{
-			verbose ("Unexpected input\n");
+			VERBOSE ("Unexpected input\n");
 			return c;
 		}
 	}
@@ -1520,7 +1532,7 @@ static int pushEnumNames (tokenInfo* token, int c)
 		{
 			if (!isWordToken (c))
 			{
-				verbose ("Unexpected input: %c\n", c);
+				VERBOSE ("Unexpected input: %c\n", c);
 				return c;
 			}
 			c = readWordToken (token, c);
@@ -1558,7 +1570,7 @@ static int pushMembers (tokenInfo* token, int c)
 			bool not_used;
 			if (!isWordToken (c))
 			{
-				verbose ("Unexpected input: %c\n", c);
+				VERBOSE ("Unexpected input: %c\n", c);
 				return c;
 			}
 			c = readWordToken (token, c);
@@ -1585,7 +1597,7 @@ static int pushMembers (tokenInfo* token, int c)
 					c = readWordToken (token, c);
 				else
 				{
-					verbose ("Unexpected input.\n");
+					VERBOSE ("Unexpected input.\n");
 					break;
 				}
 			}
@@ -1657,7 +1669,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 			}
 			else
 			{
-				verbose ("Unexpected input\n");	// FIXME: x dist {}, with
+				VERBOSE ("Unexpected input\n");	// FIXME: x dist {}, with
 				break;
 			}
 		}
@@ -1691,7 +1703,7 @@ static int skipClassType (tokenInfo* token, int c)
 			c = skipWhite (vGetc ());
 			if (c != ':')
 			{
-				verbose ("Unexpected input.\n");
+				VERBOSE ("Unexpected input.\n");
 				vUngetc (c);
 				return ':';
 			}
@@ -1925,7 +1937,7 @@ static int findTag (tokenInfo *const token, int c)
 		case K_IGNORE:
 			break;
 		default:
-			verbose ("Unexpected kind->token %d\n", token->kind);
+			VERBOSE ("Unexpected kind->token %d\n", token->kind);
 	}
 	return c;
 }
