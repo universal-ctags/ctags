@@ -1,0 +1,14 @@
+A	input.sv	/^class A;$/;"	C
+A0	input.sv	/^  covergroup A0;$/;"	V	class:A
+A1	input.sv	/^  covergroup A1;$/;"	V	class:A
+A2	input.sv	/^  covergroup A2;$/;"	V	class:A
+A3	input.sv	/^  covergroup A3;$/;"	V	class:A
+A4	input.sv	/^  covergroup A4;$/;"	V	class:A
+A5	input.sv	/^  covergroup A5;$/;"	V	class:A
+B	input.sv	/^class B;$/;"	C
+one	input.sv	/^  int one, two;$/;"	r	class:B
+two	input.sv	/^  int one, two;$/;"	r	class:B
+new	input.sv	/^  function new();$/;"	f	class:B
+E	input.sv	/^typedef enum { FOO, BAR } E;/;"	T
+FOO	input.sv	/^typedef enum { FOO, BAR } E;/;"	c	typedef:E
+BAR	input.sv	/^typedef enum { FOO, BAR } E;/;"	c	typedef:E
