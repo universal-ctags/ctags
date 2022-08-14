@@ -8,7 +8,7 @@ on:
 
 jobs:
   freebsd:
-    runs-on: macos-10.15
+    runs-on: macos-12
 
     strategy:
       fail-fast: false
@@ -40,7 +40,7 @@ jobs:
 
   openbsd:
     needs: freebsd
-    runs-on: macos-10.15
+    runs-on: macos-12
 
     steps:
     - uses: actions/checkout@v2
@@ -76,7 +76,7 @@ jobs:
 
   netbsd:
     needs: openbsd
-    runs-on: macos-10.15
+    runs-on: macos-12
 
     steps:
     - uses: actions/checkout@v2
