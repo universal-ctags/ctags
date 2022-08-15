@@ -416,8 +416,8 @@ static int readWordTokenNoSkip (tokenInfo *const token, int c);
 static int skipBlockName (tokenInfo *const token, int c);
 static int skipClockEvent (tokenInfo* token, int c);
 static int skipDelay (tokenInfo* token, int c);
-static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl);
-static int tagNameList (tokenInfo* token, int c, verilogKind kind);
+static int tagIdsInPort (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl);
+static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind);
 
 /*
  *   FUNCTION DEFINITIONS
@@ -1089,7 +1089,7 @@ static int processPortList (tokenInfo *token, int c, bool mayPortDecl)
 	if (c == '(')
 	{
 		c = skipWhite (vGetc ());	// skip '('
-		c = tagIdentifierList (token, c, K_PORT, mayPortDecl);
+		c = tagIdsInPort (token, c, K_PORT, mayPortDecl);
 		if (c == ')')	// sanity check
 			c = skipWhite (vGetc ());
 		else
@@ -1165,7 +1165,7 @@ static int processEnum (tokenInfo *const token, int c)
 
 	/* Following identifiers are tag names */
 	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (enumToken->name), enumToken->kind);
-	c = tagNameList (enumToken, c, enumToken->kind);
+	c = tagIdsInDataDecl (enumToken, c, enumToken->kind);
 	deleteToken (enumToken);
 
 	// Clean up the tag content list at the end of the declaration to support multiple variables
@@ -1191,7 +1191,7 @@ static int processStruct (tokenInfo *const token, int c)
 
 	/* Following identifiers are tag names */
 	verbose ("Find struct|union tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
-	c = tagNameList (token, c, kind);
+	c = tagIdsInDataDecl (token, c, kind);
 	ptrArrayClear (tagContents);
 	return c;
 }
@@ -1749,7 +1749,7 @@ static int skipClassType (tokenInfo* token, int c)
 	return c;
 }
 
-// Tag a list of identifiers
+// Tag a list of identifiers in a port list
 // data_type :: =
 //   ...
 //   | virtual [ interface ] identifier [ # ( [ ... ] ) ]  [ . identifier ]
@@ -1758,7 +1758,7 @@ static int skipClassType (tokenInfo* token, int c)
 //   | ...
 //
 //   mayPortDecl: may be a ANSI port declaration.  true for module, interface, or program.
-static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl)
+static int tagIdsInPort (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl)
 {
 	bool first_port = true;
 	bool enableTag = true;
@@ -1821,7 +1821,8 @@ static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, b
 	return c;
 }
 
-static int tagNameList (tokenInfo* token, int c, verilogKind kind)
+// Tag a list of identifiers in a data declaration
+static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 {
 	c = skipClassType (token, c);
 	if (c == ';')
@@ -1886,7 +1887,7 @@ static int findTag (tokenInfo *const token, int c)
 			if (token->kind == K_PORT && currentContext->kind == K_CLOCKING)
 				c = skipToSemiColon (c); // clocking items are not port definitions
 			else
-				c = tagNameList (token, c, token->kind);
+				c = tagIdsInDataDecl (token, c, token->kind);
 			break;
 		case K_IDENTIFIER:
 			{
@@ -1902,7 +1903,7 @@ static int findTag (tokenInfo *const token, int c)
 				else if (c == '=')	// assignment
 					c = skipExpression (skipWhite (vGetc ()));
 				else
-					c = tagNameList (token, c, token->kind); /* user defined type */
+					c = tagIdsInDataDecl (token, c, token->kind); /* user defined type */
 			}
 			break;
 		case K_CLASS:
