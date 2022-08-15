@@ -692,6 +692,20 @@ static bool isIdentifierCharacter (const int c)
 	return (isalnum (c) || c == '_' || c == '`' || c == '$');
 }
 
+// check if double colon.
+static bool isDoubleColon (int c)
+{
+	if (c != ':')
+		return false;
+	c = vGetc ();
+	if (c == ':') {
+		return true;
+	} else {
+		vUngetc (c);
+		return false;
+	}
+}
+
 static int skipWhite (int c)
 {
 	while (isspace (c))
@@ -1981,7 +1995,8 @@ static void findVerilogTags (void)
 			case ':':
 				/* Store current block name whenever a : is found
 				 * This is used later by any tag type that requires this information */
-				vStringCopy (currentContext->blockName, token->name);
+				if (!isDoubleColon(c))
+					vStringCopy (currentContext->blockName, token->name);
 				c = skipWhite (vGetc ());
 				break;
 			case ';':
