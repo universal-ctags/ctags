@@ -1824,7 +1824,7 @@ static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, b
 static int tagNameList (tokenInfo* token, int c, verilogKind kind)
 {
 	c = skipClassType (token, c);
-	if (c == ':' || c == ';')	// ## (cycle delay) or unexpected input
+	if (c == ';')
 		return c;
 
 	// skip drive|charge strength or type_reference, dimensions, and delay for net
@@ -1833,7 +1833,7 @@ static int tagNameList (tokenInfo* token, int c, verilogKind kind)
 	c = skipDimension (c);
 	if (c == '.')
 		return c;	// foo[...].bar = ..;
-	c = skipDelay (token, c);
+	c = skipDelay (token, c);	// ## (cycle delay)
 
 	while (c != EOF)
 	{
