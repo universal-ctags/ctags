@@ -1399,6 +1399,25 @@ static int processAssertion (tokenInfo *const token, int c)
 	return c;
 }
 
+// data_declaration ::=
+//   ...
+//   import < package_identifier :: identifier | package_identifier :: * > ; 
+// dpi_import_export ::=
+//   import ( "DPI-C" | "DPI" ) [ context | pure ] [ c_identifier = ] function data_type_or_void function_identifier [ ( [ tf_port_list ] ) ] ;
+// | import ( "DPI-C" | "DPI" ) [ context ]        [ c_identifier = ] task task_identifier [ ( [ tf_port_list ] ) ] ;
+// | export ( "DPI-C" | "DPI" ) [ c_identifier = ] function function_identifier ;
+// | export ( "DPI-C" | "DPI" ) [ c_identifier = ] task     task_identifier ;
+static int processImport (tokenInfo *const token, int c)
+{
+	if (c == '"') {	// dpi_import: we don't care about export.
+		currentContext->prototype = true;
+	} else {
+		c = skipToSemiColon (c);
+		c = skipWhite (vGetc ());	// skip semicolon
+	}
+	return c;
+}
+
 // non-ANSI type
 // ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] ( port { , port } ) ;
 // ANSI type
@@ -1893,8 +1912,10 @@ static int findTag (tokenInfo *const token, int c)
 		case K_STRUCT:
 			c = processStruct (token, c);
 			break;
-		case K_PROTOTYPE:
 		case K_IMPORT:
+			c = processImport (token, c);
+			break;
+		case K_PROTOTYPE:
 		case K_WITH:
 			currentContext->prototype = true;
 			break;
