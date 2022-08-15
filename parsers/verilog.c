@@ -1131,17 +1131,11 @@ static int processFunction (tokenInfo *const token, int c)
 		c = skipParameterAssignment (c);
 
 		/* Identify class type prefixes and create respective context*/
-		if (isInputLanguage (Lang_systemverilog) && c == ':')
+		if (isInputLanguage (Lang_systemverilog) && isDoubleColon(c))
 		{
-			c = vGetc ();
-			if (c == ':')
-			{
-				verbose ("Found function declaration with class type %s\n", vStringValue (token->name));
-				createContext (K_CLASS, token->name);
-				currentContext->classScope = true;
-			}
-			else
-				vUngetc (c);
+			verbose ("Found function declaration with class type %s\n", vStringValue (token->name));
+			createContext (K_CLASS, token->name);
+			currentContext->classScope = true;
 		}
 	}
 	verbose ("Found function: %s\n", vStringValue (token->name));
@@ -1736,12 +1730,10 @@ static int skipClassType (tokenInfo* token, int c)
 		}
 		else if (c == ':')
 		{
-			c = skipWhite (vGetc ());
-			if (c != ':')
+			if (!isDoubleColon(c))
 			{
 				VERBOSE ("Unexpected input.\n");
-				vUngetc (c);
-				return ':';
+				return c;
 			}
 			c = skipWhite (vGetc ());
 			if (isWordToken (c))
