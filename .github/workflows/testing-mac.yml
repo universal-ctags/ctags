@@ -26,7 +26,7 @@ jobs:
       run: brew update
     - name: install tools and libraries
       run: |
-        brew upgrade python@3.9 || brew link --overwrite python@3.9
+        brew upgrade python@3.9 || brew link --overwrite python@3.9 || :
         brew install automake pkg-config bash libxml2 jansson libyaml gdb docutils pcre2
     - name: autogen.sh
       run: ./autogen.sh
