@@ -1,22 +1,22 @@
 /*
- *	 Copyright (c) 2003, Darren Hiebert
+ * Copyright (c) 2003, Darren Hiebert
  *
- *	 This source code is released for free distribution under the terms of the
- *	 GNU General Public License version 2 or (at your option) any later version.
+ * This source code is released for free distribution under the terms of the
+ * GNU General Public License version 2 or (at your option) any later version.
  *
- *	 This module contains functions for generating tags for JavaScript language
- *	 files.
+ * This module contains functions for generating tags for JavaScript language
+ * files.
  *
- *	 Reference: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+ * Reference: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
  *
- *	 This is a good reference for different forms of the function statement:
- *		 http://www.permadi.com/tutorial/jsFunc/
- *   Another good reference:
- *       http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Guide
+ * This is a good reference for different forms of the function statement:
+ *     http://www.permadi.com/tutorial/jsFunc/
+ * Another good reference:
+ *     http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Guide
  */
 
 /*
- *	 INCLUDE FILES
+ * INCLUDE FILES
  */
 #include "general.h"	/* must always come first */
 #include <ctype.h>	/* to define isalpha () */
@@ -49,7 +49,7 @@
 #include "trace.h"
 
 /*
- *	 MACROS
+ * MACROS
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
@@ -61,10 +61,10 @@
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
 /*
- *	 DATA DECLARATIONS
+ * DATA DECLARATIONS
  */
 
-/*	Used to specify type of keyword.
+/* Used to specify type of keyword.
 */
 enum eKeywordId {
 	KEYWORD_function,
@@ -133,14 +133,14 @@ typedef struct sTokenInfo {
 	keywordId		keyword;
 	vString *		string;
 	int				scope;
-	unsigned long 	lineNumber;
-	MIOPos 			filePosition;
+	unsigned long	lineNumber;
+	MIOPos			filePosition;
 	int				nestLevel;
 	bool			dynamicProp;
 } tokenInfo;
 
 /*
- *	DATA DEFINITIONS
+ * DATA DEFINITIONS
  */
 
 static tokenType LastTokenType;
@@ -232,8 +232,8 @@ typedef enum {
  *
  * With these trick and technique, the scope field for `g' is filled:
  +---+ tags for input-1.js ---------------------------------------------
- | 1 | A	input-1.js	/^A.g = function(x) {$/;"	f	roles:chainElt	extras:reference
- | 2 | g	input-1.js	/^A.g = function(x) {$/;"	f	scope:function:A	signature:(x)	roles:def
+ | 1 | A  input-1.js  /^A.g = function(x) {$/;"  f  roles:chainElt  extras:reference
+ | 2 | g  input-1.js  /^A.g = function(x) {$/;"  f  scope:function:A  signature:(x)  roles:def
  +---+------------------------------------------------------------------
  *
  * By default, reference tags are not emitted. So non-ctags-expert users may
@@ -302,7 +302,7 @@ static const keywordTable JsKeywordTable [] = {
 	{ "try",		KEYWORD_try					},
 	{ "catch",		KEYWORD_catch				},
 	{ "finally",	KEYWORD_finally				},
-	{ "sap",	    KEYWORD_sap    				},
+	{ "sap",	    KEYWORD_sap					},
 	{ "return",		KEYWORD_return				},
 	{ "class",		KEYWORD_class				},
 	{ "extends",	KEYWORD_extends				},
@@ -315,7 +315,7 @@ static const keywordTable JsKeywordTable [] = {
 };
 
 /*
- *	 FUNCTION DEFINITIONS
+ * FUNCTION DEFINITIONS
  */
 
 /* Recursive functions */
@@ -359,7 +359,7 @@ static void clearPoolToken (void *data)
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	vStringClear (token->string);
-	token->scope 		= CORK_NIL;
+	token->scope		= CORK_NIL;
 }
 
 static void deletePoolToken (void *data)
@@ -393,7 +393,7 @@ static void injectDynamicName (tokenInfo *const token, vString *newName)
 }
 
 /*
- *	 Tag generation functions
+ * Tag generation functions
  */
 
 struct  bestJSEntryInScopeData {
@@ -436,15 +436,15 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 	 * "c" must be tagged if the cork API is used.
 	 * ----------------------------------------------------------
 	 * How the fields for "a", "b", and "c" are filled.
-	 *   a  kind:class	scope:<given by SCOPE> roles:chainElt
-	 *   b  kind:class	scope:class:a	roles:chainElt
+	 *   a  kind:class  scope:<given by SCOPE>  roles:chainElt
+	 *   b  kind:class  scope:class:a  roles:chainElt
 	 *
 	 *   The fields of c depends on LEAF_KIND that is passed to this functions.
 	 *
 	 *   if (LEAF_KIND == FUNCTION)
-	 *       c  kind:function	scope:class:b	roles:chainElt
+	 *       c  kind:function  scope:class:b  roles:chainElt
 	 *   else
-	 *       c  kind:class	scope:class:b	roles:chainElt
+	 *       c  kind:class  scope:class:b  roles:chainElt
 	 */
 
 	const char *name = name_chain;
@@ -611,7 +611,7 @@ static bool isClassName (tokenInfo *const name)
 }
 
 /*
- *	 Parsing functions
+ * Parsing functions
  */
 
 /* given @p point, returns the first byte of the encoded output sequence, and
@@ -916,8 +916,8 @@ static void parseRegExp (void)
 	} while (c != EOF);
 }
 
-/*	Read a C identifier beginning with "firstChar" and places it into
- *	"name".
+/* Read a C identifier beginning with "firstChar" and places it into
+ * "name".
  */
 static void parseIdentifier (vString *const string, const int firstChar)
 {
@@ -1351,7 +1351,7 @@ static void readToken (tokenInfo *const token)
 }
 
 /*
- *	 Token parsing functions
+ * Token parsing functions
  */
 
 static int parseMethodsInAnonymousObject (tokenInfo *const token)
@@ -1416,7 +1416,7 @@ static void skipArrayList (tokenInfo *const token, bool include_newlines)
 {
 	/*
 	 * Handle square brackets
-	 *	 var name[1]
+	 *   var name[1]
 	 * So we must check for nested open and closing square brackets
 	 */
 
@@ -1468,7 +1468,7 @@ static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 }
 
 /*
- *	 Scanning functions
+ * Scanning functions
  */
 
 static bool findCmdTerm (tokenInfo *const token, bool include_newlines,
@@ -1505,11 +1505,11 @@ static void parseSwitch (tokenInfo *const token)
 	/*
 	 * switch (expression) {
 	 * case value1:
-	 *	   statement;
-	 *	   break;
+	 *     statement;
+	 *     break;
 	 * case value2:
-	 *	   statement;
-	 *	   break;
+	 *     statement;
+	 *     break;
 	 * default : statement;
 	 * }
 	 */
@@ -1531,24 +1531,24 @@ static bool parseLoop (tokenInfo *const token)
 {
 	/*
 	 * Handles these statements
-	 *	   for (x=0; x<3; x++)
-	 *		   document.write("This text is repeated three times<br>");
+	 *     for (x=0; x<3; x++)
+	 *         document.write("This text is repeated three times<br>");
 	 *
-	 *	   for (x=0; x<3; x++)
-	 *	   {
-	 *		   document.write("This text is repeated three times<br>");
-	 *	   }
+	 *     for (x=0; x<3; x++)
+	 *     {
+	 *         document.write("This text is repeated three times<br>");
+	 *     }
 	 *
-	 *	   while (number<5){
-	 *		   document.write(number+"<br>");
-	 *		   number++;
-	 *	   }
+	 *     while (number<5){
+	 *         document.write(number+"<br>");
+	 *         number++;
+	 *     }
 	 *
-	 *	   do{
-	 *		   document.write(number+"<br>");
-	 *		   number++;
-	 *	   }
-	 *	   while (number<5);
+	 *     do{
+	 *         document.write(number+"<br>");
+	 *         number++;
+	 *     }
+	 *     while (number<5);
 	 */
 	bool is_terminated = true;
 
@@ -1602,23 +1602,23 @@ static bool parseIf (tokenInfo *const token)
 	bool read_next_token = true;
 	/*
 	 * If statements have two forms
-	 *	   if ( ... )
-	 *		   one line;
+	 *     if ( ... )
+	 *         one line;
 	 *
-	 *	   if ( ... )
-	 *		  statement;
-	 *	   else
-	 *		  statement
+	 *     if ( ... )
+	 *         statement;
+	 *     else
+	 *         statement
 	 *
-	 *	   if ( ... ) {
-	 *		  multiple;
-	 *		  statements;
-	 *	   }
+	 *     if ( ... ) {
+	 *         multiple;
+	 *         statements;
+	 *     }
 	 *
 	 *
-	 *	   if ( ... ) {
-	 *		  return elem
-	 *	   }
+	 *     if ( ... ) {
+	 *         return elem
+	 *     }
 	 *
 	 *     This example if correctly written, but the
 	 *     else contains only 1 statement without a terminator
@@ -1632,11 +1632,11 @@ static bool parseIf (tokenInfo *const token)
 	 *     }
 	 *
 	 * TODO:  Deal with statements that can optional end
-	 *		  without a semi-colon.  Currently this messes up
-	 *		  the parsing of blocks.
-	 *		  Need to somehow detect this has happened, and either
-	 *		  backup a token, or skip reading the next token if
-	 *		  that is possible from all code locations.
+	 *        without a semi-colon.  Currently this messes up
+	 *        the parsing of blocks.
+	 *        Need to somehow detect this has happened, and either
+	 *        backup a token, or skip reading the next token if
+	 *        that is possible from all code locations.
 	 *
 	 */
 
@@ -1745,8 +1745,8 @@ static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, co
 	int index_for_name = CORK_NIL;
 	/*
 	 * This deals with these formats
-	 *	   function validFunctionTwo(a,b) {}
-	 *	   function * generator(a,b) {}
+	 *     function validFunctionTwo(a,b) {}
+	 *     function * generator(a,b) {}
 	 */
 
 	copyToken (name, token, true);
@@ -1900,7 +1900,6 @@ static bool parseBlock (tokenInfo *const token, int parentScope)
 		token->nestLevel--;
 
 	TRACE_LEAVE();
-
 	return is_class;
 }
 
@@ -1929,9 +1928,9 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 
 	/*
 	 * This deals with these formats
-	 *	   validProperty  : 2,
-	 *	   validMethod    : function(a,b) {}
-	 *	   'validMethod2' : function(a,b) {}
+	 *     validProperty  : 2,
+	 *     validMethod    : function(a,b) {}
+	 *     'validMethod2' : function(a,b) {}
 	 *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
 	 *     get prop() {}
 	 *     set prop(val) {}
@@ -2190,7 +2189,6 @@ cleanUp:
 	deleteToken (name);
 
 	TRACE_LEAVE_TEXT("found method(s): %s", has_methods? "yes": "no");
-
 	return has_methods;
 }
 
@@ -2250,7 +2248,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 		/* FIXME: what to do with the secondary name?  It's local to the
 		 *        class itself, so not very useful... let's hope people
 		 *        don't give it another name than the target in case of
-		 *        	var MyClass = class MyClassSecondaryName { ... }
+		 *          var MyClass = class MyClassSecondaryName { ... }
 		 *        I guess it could be an alias to MyClass, or duplicate it
 		 *        altogether, not sure. */
 		makeJsTag (className, JSTAG_CLASS, NULL, inheritance);
@@ -2328,7 +2326,7 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 	 * CASE 1
 	 * Specified function name: "build"
 	 *     BindAgent.prototype.build = function( mode ) {
-	 *     	  maybe parse nested functions
+	 *         maybe parse nested functions
 	 *     }
 	 *
 	 * CASE 2
@@ -2430,7 +2428,6 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 	}
 
 	TRACE_LEAVE_TEXT("done: not found");
-
 	return true;
 }
 
@@ -2466,7 +2463,6 @@ static bool parseStatementLHS (tokenInfo *const name, tokenInfo *const token, st
 	} while (isType (token, TOKEN_PERIOD));
 
 	TRACE_LEAVE();
-
 	return true;
 }
 
@@ -2544,12 +2540,12 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 			 * This format looks identical to a variable definition.
 			 * A variable defined outside of a block is considered
 			 * a global variable:
-			 *	   var g_var1 = 1;
-			 *	   var g_var2;
+			 *     var g_var1 = 1;
+			 *     var g_var2;
 			 * This is not a global variable:
-			 *	   var g_var = function;
+			 *     var g_var = function;
 			 * This is a global variable:
-			 *	   var g_var = different_var_name;
+			 *     var g_var = different_var_name;
 			 */
 			state->indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
 														 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
@@ -2629,12 +2625,12 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		 * This format looks identical to a variable definition.
 		 * A variable defined outside of a block is considered
 		 * a global variable:
-		 *	   var g_var1 = 1;
-		 *	   var g_var2;
+		 *     var g_var1 = 1;
+		 *     var g_var2;
 		 * This is not a global variable:
-		 *	   var g_var = function;
+		 *     var g_var = function;
 		 * This is a global variable:
-		 *	   var g_var = different_var_name;
+		 *     var g_var = different_var_name;
 		 */
 		state->indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
 													 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
@@ -2707,7 +2703,6 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 	}
 
 	TRACE_LEAVE();
-
 	return true;
 }
 
@@ -2737,28 +2732,28 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	 * Functions can be named or unnamed.
 	 * This deals with these formats:
 	 * Function
-	 *	   validFunctionOne = function(a,b) {}
-	 *	   testlib.validFunctionFive = function(a,b) {}
-	 *	   var innerThree = function(a,b) {}
-	 *	   var innerFour = (a,b) {}
-	 *	   var D2 = secondary_fcn_name(a,b) {}
-	 *	   var D3 = new Function("a", "b", "return a+b;");
+	 *     validFunctionOne = function(a,b) {}
+	 *     testlib.validFunctionFive = function(a,b) {}
+	 *     var innerThree = function(a,b) {}
+	 *     var innerFour = (a,b) {}
+	 *     var D2 = secondary_fcn_name(a,b) {}
+	 *     var D3 = new Function("a", "b", "return a+b;");
 	 * Class
-	 *	   testlib.extras.ValidClassOne = function(a,b) {
-	 *		   this.a = a;
-	 *	   }
+	 *     testlib.extras.ValidClassOne = function(a,b) {
+	 *         this.a = a;
+	 *     }
 	 * Class Methods
-	 *	   testlib.extras.ValidClassOne.prototype = {
-	 *		   'validMethodOne' : function(a,b) {},
-	 *		   'validMethodTwo' : function(a,b) {}
-	 *	   }
+	 *     testlib.extras.ValidClassOne.prototype = {
+	 *         'validMethodOne' : function(a,b) {},
+	 *         'validMethodTwo' : function(a,b) {}
+	 *     }
 	 *     ValidClassTwo = function ()
 	 *     {
 	 *         this.validMethodThree = function() {}
 	 *         // unnamed method
 	 *         this.validMethodFour = () {}
 	 *     }
-	 *	   Database.prototype.validMethodThree = Database_getTodaysDate;
+	 *     Database.prototype.validMethodThree = Database_getTodaysDate;
 	 */
 
 	/*
@@ -2863,7 +2858,7 @@ nextVar:
 		{
 			/*
 			 * Handles this syntax:
-			 *	   var g_var2;
+			 *     var g_var2;
 			 */
 			state.indexForName = makeJsTag (name, state.isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 		}
@@ -2897,10 +2892,10 @@ nextVar:
 			 * document.write line below:
 			 *
 			 * function checkForUpdate() {
-			 *	   if( 1==1 ) {
-			 *		   document.write("hello from checkForUpdate<br>")
-			 *	   }
-			 *	   return 1;
+			 *     if( 1==1 ) {
+			 *         document.write("hello from checkForUpdate<br>")
+			 *     }
+			 *     return 1;
 			 * }
 			 */
 			state.isTerminated = findCmdTerm (token, true, true);
@@ -2920,7 +2915,6 @@ cleanUp:
 	deleteToken (name);
 
 	TRACE_LEAVE_TEXT("is terminated: %d", (int) state.isTerminated);
-
 	return state.isTerminated;
 }
 
@@ -3059,7 +3053,6 @@ static bool parseLine (tokenInfo *const token, bool is_inside_class)
 	}
 
 	TRACE_LEAVE();
-
 	return is_terminated;
 }
 
