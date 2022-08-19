@@ -370,7 +370,7 @@ static void deletePoolToken (void *data)
 }
 
 static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
-                       bool const include_non_read_info)
+					   bool const include_non_read_info)
 {
 	dest->lineNumber = src->lineNumber;
 	dest->filePosition = src->filePosition;
@@ -576,7 +576,7 @@ static int makeJsTag (const tokenInfo *const token, const jsKind kind,
 }
 
 static int makeClassTagCommon (tokenInfo *const token, vString *const signature,
-                          vString *const inheritance, bool anonymous)
+						  vString *const inheritance, bool anonymous)
 {
 	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance, anonymous);
 }
@@ -705,7 +705,7 @@ static int handleUnicodeCodePoint (uint32_t point)
  * @param isUTF16 Location to store whether @param value is an UTF-16 word.
  * @returns Whether a valid sequence was read. */
 static bool readUnicodeEscapeSequenceValue (uint32_t *const value,
-                                            bool *const isUTF16)
+											bool *const isUTF16)
 {
 	bool valid = false;
 	int d = getcFromInputFile ();
@@ -1237,24 +1237,24 @@ getNextChar:
 
 		/* these already end a statement, so no need to duplicate it */
 		#define IS_STMT_SEPARATOR(t) ((t) == TOKEN_SEMICOLON    || \
-		                              (t) == TOKEN_EOF          || \
-		                              (t) == TOKEN_COMMA        || \
-		                              (t) == TOKEN_OPEN_CURLY)
+									  (t) == TOKEN_EOF          || \
+									  (t) == TOKEN_COMMA        || \
+									  (t) == TOKEN_OPEN_CURLY)
 		/* these cannot be the start or end of a statement */
 		#define IS_BINARY_OPERATOR(t) ((t) == TOKEN_EQUAL_SIGN      || \
-		                               (t) == TOKEN_ARROW           || \
-		                               (t) == TOKEN_COLON           || \
-		                               (t) == TOKEN_PERIOD          || \
-		                               (t) == TOKEN_STAR            || \
-		                               (t) == TOKEN_BINARY_OPERATOR)
+									   (t) == TOKEN_ARROW           || \
+									   (t) == TOKEN_COLON           || \
+									   (t) == TOKEN_PERIOD          || \
+									   (t) == TOKEN_STAR            || \
+									   (t) == TOKEN_BINARY_OPERATOR)
 
 		if (! IS_STMT_SEPARATOR(LastTokenType) &&
-		    ! IS_STMT_SEPARATOR(token->type) &&
-		    ! IS_BINARY_OPERATOR(LastTokenType) &&
-		    ! IS_BINARY_OPERATOR(token->type) &&
-		    /* these cannot be followed by a semicolon */
-		    ! (LastTokenType == TOKEN_OPEN_PAREN ||
-		       LastTokenType == TOKEN_OPEN_SQUARE))
+			! IS_STMT_SEPARATOR(token->type) &&
+			! IS_BINARY_OPERATOR(LastTokenType) &&
+			! IS_BINARY_OPERATOR(token->type) &&
+			/* these cannot be followed by a semicolon */
+			! (LastTokenType == TOKEN_OPEN_PAREN ||
+			   LastTokenType == TOKEN_OPEN_SQUARE))
 		{
 			/* hold the token... */
 			Assert (NextToken == NULL);
@@ -1472,7 +1472,7 @@ static void addContext (tokenInfo* const parent, const tokenInfo* const child)
  */
 
 static bool findCmdTerm (tokenInfo *const token, bool include_newlines,
-                            bool include_commas)
+							bool include_commas)
 {
 	/*
 	 * Read until we find either a semicolon or closing brace.
@@ -1624,12 +1624,12 @@ static bool parseIf (tokenInfo *const token)
 	 *     else contains only 1 statement without a terminator
 	 *     since the function finishes with the closing brace.
 	 *
-     *     function a(flag){
-     *         if(flag)
-     *             test(1);
-     *         else
-     *             test(2)
-     *     }
+	 *     function a(flag){
+	 *         if(flag)
+	 *             test(1);
+	 *         else
+	 *             test(2)
+	 *     }
 	 *
 	 * TODO:  Deal with statements that can optional end
 	 *		  without a semi-colon.  Currently this messes up
@@ -1905,7 +1905,7 @@ static bool parseBlock (tokenInfo *const token, int parentScope)
 }
 
 static bool parseMethods (tokenInfo *const token, int classIndex,
-                          const bool is_es6_class)
+						  const bool is_es6_class)
 {
 	TRACE_ENTER_TEXT("token is '%s' of type %s in parentToken '%s' of kind %s (es6: %s)",
 					 vStringValue(token->string), tokenTypeName (token->type),
@@ -1932,21 +1932,21 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 	 *	   validProperty  : 2,
 	 *	   validMethod    : function(a,b) {}
 	 *	   'validMethod2' : function(a,b) {}
-     *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
+	 *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
 	 *     get prop() {}
 	 *     set prop(val) {}
 	 *     get(...) {}
 	 *     set(...) {}
-     *
-     * ES6 methods:
-     *     property(...) {}
-     *     *generator() {}
-     *
-     * ES6 computed name:
-     *     [property]() {}
-     *     get [property]() {}
-     *     set [property]() {}
-     *     *[generator]() {}
+	 *
+	 * ES6 methods:
+	 *     property(...) {}
+	 *     *generator() {}
+	 *
+	 * ES6 computed name:
+	 *     [property]() {}
+	 *     get [property]() {}
+	 *     set [property]() {}
+	 *     *[generator]() {}
 	 *
 	 * tc39/proposal-class-fields
 	 *     field0 = function(a,b) {}
@@ -1996,7 +1996,7 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 		}
 
 		if (! isType (token, TOKEN_KEYWORD) &&
-		    ! isType (token, TOKEN_SEMICOLON))
+			! isType (token, TOKEN_SEMICOLON))
 		{
 			bool is_generator = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
@@ -2117,8 +2117,8 @@ function:
 
 					/* skip whatever is the value */
 					while (! isType (token, TOKEN_COMMA) &&
-					       ! isType (token, TOKEN_CLOSE_CURLY) &&
-					       ! isType (token, TOKEN_EOF))
+						   ! isType (token, TOKEN_CLOSE_CURLY) &&
+						   ! isType (token, TOKEN_EOF))
 					{
 						if (isType (token, TOKEN_OPEN_CURLY))
 						{
@@ -2179,7 +2179,7 @@ function:
 			}
 		}
 	} while ( isType(token, TOKEN_COMMA) ||
-	          ( is_es6_class && ! isType(token, TOKEN_EOF) ) );
+			  ( is_es6_class && ! isType(token, TOKEN_EOF) ) );
 
 	TRACE_PRINT("Finished parsing methods");
 
@@ -2227,13 +2227,13 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 
 	/* skip inheritance info */
 	while (! isType (token, TOKEN_OPEN_CURLY) &&
-	       ! isType (token, TOKEN_EOF) &&
-	       ! isType (token, TOKEN_SEMICOLON))
+		   ! isType (token, TOKEN_EOF) &&
+		   ! isType (token, TOKEN_SEMICOLON))
 		readTokenFull (token, false, inheritance);
 
 	/* remove the last added token (here we assume it's one char, "{" or ";" */
 	if (inheritance && vStringLength (inheritance) > 0 &&
-	    ! isType (token, TOKEN_EOF))
+		! isType (token, TOKEN_EOF))
 	{
 		vStringChop (inheritance);
 		vStringStripTrailing (inheritance);
@@ -2377,9 +2377,9 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 			readToken (method_body_token);
 
 			while (! isType (method_body_token, TOKEN_SEMICOLON) &&
-			       ! isType (method_body_token, TOKEN_CLOSE_CURLY) &&
-			       ! isType (method_body_token, TOKEN_OPEN_CURLY) &&
-			       ! isType (method_body_token, TOKEN_EOF))
+				   ! isType (method_body_token, TOKEN_CLOSE_CURLY) &&
+				   ! isType (method_body_token, TOKEN_OPEN_CURLY) &&
+				   ! isType (method_body_token, TOKEN_EOF))
 			{
 				if ( isType (method_body_token, TOKEN_OPEN_PAREN) )
 					skipArgumentList(method_body_token, false,
@@ -2752,12 +2752,12 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	 *		   'validMethodOne' : function(a,b) {},
 	 *		   'validMethodTwo' : function(a,b) {}
 	 *	   }
-     *     ValidClassTwo = function ()
-     *     {
-     *         this.validMethodThree = function() {}
-     *         // unnamed method
-     *         this.validMethodFour = () {}
-     *     }
+	 *     ValidClassTwo = function ()
+	 *     {
+	 *         this.validMethodThree = function() {}
+	 *         // unnamed method
+	 *         this.validMethodFour = () {}
+	 *     }
 	 *	   Database.prototype.validMethodThree = Database_getTodaysDate;
 	 */
 
@@ -2801,10 +2801,10 @@ nextVar:
 				vStringValue(token->string), tokenTypeName (token->type));
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
-	       ! isType (token, TOKEN_SEMICOLON)   &&
-	       ! isType (token, TOKEN_EQUAL_SIGN)  &&
-	       ! isType (token, TOKEN_COMMA)       &&
-	       ! isType (token, TOKEN_EOF))
+		   ! isType (token, TOKEN_SEMICOLON)   &&
+		   ! isType (token, TOKEN_EQUAL_SIGN)  &&
+		   ! isType (token, TOKEN_COMMA)       &&
+		   ! isType (token, TOKEN_EOF))
 	{
 		found_lhs = true;
 		if (isType (token, TOKEN_OPEN_CURLY))
@@ -2889,7 +2889,7 @@ nextVar:
 		 * the statement was terminated */
 		if (ok &&
 			! isType (token, TOKEN_CLOSE_CURLY) &&
-		    ! isType (token, TOKEN_SEMICOLON))
+			! isType (token, TOKEN_SEMICOLON))
 		{
 			/*
 			 * Statements can be optionally terminated in the case of
@@ -3074,7 +3074,7 @@ static void parseJsFile (tokenInfo *const token)
 		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
 		else if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_export ||
-		                                           token->keyword == KEYWORD_default))
+												   token->keyword == KEYWORD_default))
 			/* skip those at top-level */;
 		else
 			parseLine (token, false);
@@ -3146,7 +3146,7 @@ static const char *kindName(jsKind kind)
 
 static const char *tokenTypeName(enum eTokenType e)
 { /* Generated by misc/enumstr.sh with cmdline:
-     parsers/jscript.c eTokenType tokenTypeName */
+	 parsers/jscript.c eTokenType tokenTypeName */
 	switch (e)
 	{
 		case      TOKEN_UNDEFINED: return "TOKEN_UNDEFINED";
@@ -3208,7 +3208,7 @@ static void findJsTags (void)
 
 #ifdef HAVE_ICONV
 	if (JSUnicodeConverter != (iconv_t) -2 && /* not created */
-	    JSUnicodeConverter != (iconv_t) -1 /* creation failed */)
+		JSUnicodeConverter != (iconv_t) -1 /* creation failed */)
 	{
 		iconv_close (JSUnicodeConverter);
 		JSUnicodeConverter = (iconv_t) -2;
@@ -3225,7 +3225,7 @@ extern parserDefinition* JavaScriptParser (void)
 	// which have JS function definitions, so we just use the JS parser
 	static const char *const extensions [] = { "js", "jsx", "mjs", NULL };
 	static const char *const aliases [] = { "js", "node", "nodejs",
-	                                        "seed", "gjs",
+											"seed", "gjs",
 											/* Used in PostgreSQL
 											 * https://github.com/plv8/plv8 */
 											"v8",
