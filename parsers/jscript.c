@@ -1767,16 +1767,6 @@ static void parseFunction (tokenInfo *const token)
 	else
 		readToken (token);
 
-	while (isType (token, TOKEN_PERIOD))
-	{
-		readToken (token);
-		if (! isType(token, TOKEN_KEYWORD))
-		{
-			addContext (name, token);
-			readToken (token);
-		}
-	}
-
 	if ( isType (token, TOKEN_OPEN_PAREN) )
 		skipArgumentList(token, false, signature);
 

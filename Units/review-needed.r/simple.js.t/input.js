@@ -3,7 +3,6 @@
  * ctags -f - simple.js
  *
  * functions
- *   extra.validFunctionFour
  *   getHalfOf
  *   getHalfOf.calculate
  *   testlib.core.validFunctionSix
@@ -39,8 +38,6 @@ function validFunctionThree(a,b) {
 }
 
 var my_global_var1 = 33;
-
-function extra.validFunctionFour(a,b) {}
 
 //pseudo-module setup
 testlib = {}
