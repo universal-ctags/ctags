@@ -2,8 +2,8 @@ Class1	input.js	/^var Class1 = function() {$/;"	c
 Class2	input.js	/^var Class2 = function() {$/;"	c
 Class3	input.js	/^var Class3 = function() {$/;"	c
 Class4	input.js	/^var Class4 = function() {$/;"	c
-anonymousFunctiona815156f0100	input.js	/^    c2m3(function() {$/;"	f	method:Class2.c2m1
-anonymousFunctiona815156f0200	input.js	/^    return function(n) {$/;"	f	method:Class3.c3m1
+anonymousFunctiona815156f0800	input.js	/^    c2m3(function() {$/;"	f	method:Class2.c2m1
+anonymousFunctiona815156f0d00	input.js	/^    return function(n) {$/;"	f	method:Class3.c3m1
 c2m1	input.js	/^  this.c2m1 = function() {$/;"	m	class:Class2
 c2m2	input.js	/^  this.c2m2 = function(f) {$/;"	m	class:Class2
 c2m3	input.js	/^  this.c2m3 = function(f) {$/;"	m	class:Class2

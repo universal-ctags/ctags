@@ -321,7 +321,7 @@ static const keywordTable JsKeywordTable [] = {
 /* Recursive functions */
 static void readTokenFull (tokenInfo *const token, bool include_newlines, vString *const repr);
 static void skipArgumentList (tokenInfo *const token, bool include_newlines, vString *const repr);
-static void parseFunction (tokenInfo *const token);
+static bool parseFunction (tokenInfo *const token, tokenInfo *const name, const bool is_inside_class);
 static bool parseBlock (tokenInfo *const token, int parentScope);
 static bool parseMethods (tokenInfo *const token, int classIndex, const bool is_es6_class);
 static bool parseLine (tokenInfo *const token, bool is_inside_class);
@@ -1404,7 +1404,7 @@ static void skipArgumentList (tokenInfo *const token, bool include_newlines, vSt
 					parseMethodsInAnonymousObject (token);
 			}
 			else if (isKeyword (token, KEYWORD_function))
-				parseFunction (token);
+				parseFunction (token, NULL, false);
 
 			prev_token_type = token->type;
 		}
@@ -1728,7 +1728,7 @@ static void moveChildren (int oldParent, int newParent)
 	intArrayDelete (children);
 }
 
-static void parseFunction (tokenInfo *const token)
+static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, const bool is_inside_class)
 {
 #ifdef DO_TRACING
 	{
@@ -1742,6 +1742,7 @@ static void parseFunction (tokenInfo *const token)
 	vString *const signature = vStringNew ();
 	bool is_generator = false;
 	bool is_anonymous = false;
+	int index_for_name = CORK_NIL;
 	/*
 	 * This deals with these formats
 	 *	   function validFunctionTwo(a,b) {}
@@ -1772,20 +1773,39 @@ static void parseFunction (tokenInfo *const token)
 
 	if ( isType (token, TOKEN_OPEN_CURLY) )
 	{
-		const int p = isClassName (name) ?
-			makeClassTagCommon (name, signature, NULL, is_anonymous) :
-			makeFunctionTagCommon (name, signature, is_generator, is_anonymous);
+		if ( lhs_name != NULL && is_inside_class )
+		{
+			index_for_name = makeJsTag (lhs_name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
+		}
+		else if ( lhs_name != NULL )
+		{
+			index_for_name = isClassName (lhs_name) ?
+				makeClassTag (lhs_name, signature, NULL):
+				makeFunctionTag (lhs_name, signature, is_generator);
+		}
 
-		parseBlock (token, p);
+		int f = index_for_name,
+			p = CORK_NIL;
+		if ( f == CORK_NIL || !is_anonymous )
+			p = isClassName (name) ?
+				makeClassTagCommon (name, signature, NULL, is_anonymous) :
+				makeFunctionTagCommon (name, signature, is_generator, is_anonymous);
+
+		if (f == CORK_NIL)
+			f = p;
+
+		parseBlock (token, f);
 	}
 
-	findCmdTerm (token, false, false);
+	if ( lhs_name == NULL )
+		findCmdTerm (token, false, false);
 
  cleanUp:
 	vStringDelete (signature);
 	deleteToken (name);
 
 	TRACE_LEAVE();
+	return index_for_name;
 }
 
 /* Parses a block surrounded by curly braces.
@@ -2284,6 +2304,413 @@ static vString *makeVStringForSignature (tokenInfo *const token)
 	return sig;
 }
 
+typedef struct sStatementState {
+	int  indexForName;
+	bool isClass;
+	bool isConst;
+	bool isTerminated;
+	bool isGlobal;
+	bool foundThis;
+} statementState;
+
+static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, statementState *const state)
+{
+	TRACE_ENTER();
+
+	/*
+	 * When we reach the "prototype" tag, we infer:
+	 *     "BindAgent" is a class
+	 *     "build"     is a method
+	 *
+	 * function BindAgent( repeatableIdName, newParentIdName ) {
+	 * }
+	 *
+	 * CASE 1
+	 * Specified function name: "build"
+	 *     BindAgent.prototype.build = function( mode ) {
+	 *     	  maybe parse nested functions
+	 *     }
+	 *
+	 * CASE 2
+	 * Prototype listing
+	 *     ValidClassOne.prototype = {
+	 *         'validMethodOne' : function(a,b) {},
+	 *         'validMethodTwo' : function(a,b) {}
+	 *     }
+	 *
+	 */
+	if (! ( isType (name, TOKEN_IDENTIFIER)
+		|| isType (name, TOKEN_STRING) ) )
+		/*
+		 * Unexpected input. Try to reset the parsing.
+		 *
+		 * TOKEN_STRING is acceptable. e.g.:
+		 * -----------------------------------
+		 * "a".prototype = function( mode ) {}
+		 */
+	{
+		TRACE_LEAVE_TEXT("bad input");
+		return false;
+	}
+
+	state->indexForName = makeClassTag (name, NULL, NULL);
+	state->isClass = true;
+
+	/*
+	 * There should a ".function_name" next.
+	 */
+	readToken (token);
+	if (isType (token, TOKEN_PERIOD))
+	{
+		/*
+		 * Handle CASE 1
+		 */
+		readToken (token);
+		if (! isType(token, TOKEN_KEYWORD))
+		{
+			vString *const signature = vStringNew ();
+
+			token->scope = state->indexForName;
+
+			tokenInfo *const method_body_token = newToken ();
+			copyToken (method_body_token, token, true);
+			readToken (method_body_token);
+
+			while (! isType (method_body_token, TOKEN_SEMICOLON) &&
+			       ! isType (method_body_token, TOKEN_CLOSE_CURLY) &&
+			       ! isType (method_body_token, TOKEN_OPEN_CURLY) &&
+			       ! isType (method_body_token, TOKEN_EOF))
+			{
+				if ( isType (method_body_token, TOKEN_OPEN_PAREN) )
+					skipArgumentList(method_body_token, false,
+									 vStringLength (signature) == 0 ? signature : NULL);
+				else
+					readToken (method_body_token);
+			}
+
+			int index = makeJsTag (token, JSTAG_METHOD, signature, NULL);
+			vStringDelete (signature);
+
+			if ( isType (method_body_token, TOKEN_OPEN_CURLY))
+			{
+				parseBlock (method_body_token, index);
+				state->isTerminated = true;
+			}
+			else
+				state->isTerminated = isType (method_body_token, TOKEN_SEMICOLON);
+
+			deleteToken (method_body_token);
+			TRACE_LEAVE_TEXT("done: single");
+			return false;
+		}
+	}
+	else if (isType (token, TOKEN_EQUAL_SIGN))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_OPEN_CURLY))
+		{
+			/*
+			 * Handle CASE 2
+			 *
+			 * Creates tags for each of these class methods
+			 *     ValidClassOne.prototype = {
+			 *         'validMethodOne' : function(a,b) {},
+			 *         'validMethodTwo' : function(a,b) {}
+			 *     }
+			 */
+			parseMethods(token, state->indexForName, false);
+			/*
+			 * Find to the end of the statement
+			 */
+			findCmdTerm (token, false, false);
+			state->isTerminated = true;
+			TRACE_LEAVE_TEXT("done: multiple");
+			return false;
+		}
+	}
+
+	TRACE_LEAVE_TEXT("done: not found");
+
+	return true;
+}
+
+static bool parseStatementLHS (tokenInfo *const name, tokenInfo *const token, statementState *const state)
+{
+	TRACE_ENTER();
+
+	do
+	{
+		readToken (token);
+		if (! isType(token, TOKEN_KEYWORD))
+		{
+			if ( state->isClass )
+				token->scope = state->indexForName;
+			else
+			{
+				addContext (name, token);
+				state->indexForName = CORK_NIL;
+			}
+
+			readToken (token);
+		}
+		else if ( isKeyword(token, KEYWORD_prototype) )
+		{
+			if (! parsePrototype (name, token, state) )
+			{
+				TRACE_LEAVE_TEXT("done: prototype");
+				return false;
+			}
+		}
+		else
+			readToken (token);
+	} while (isType (token, TOKEN_PERIOD));
+
+	TRACE_LEAVE();
+
+	return true;
+}
+
+static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, statementState *const state, bool is_inside_class)
+{
+	TRACE_ENTER();
+
+	int paren_depth = 0;
+	int arrowfun_paren_depth = 0;
+	bool canbe_arrowfun = false;
+
+	readToken (token);
+
+	/* rvalue might be surrounded with parentheses */
+	while (isType (token, TOKEN_OPEN_PAREN))
+	{
+		paren_depth++;
+		arrowfun_paren_depth++;
+		readToken (token);
+	}
+
+	if (isKeyword (token, KEYWORD_async))
+	{
+		arrowfun_paren_depth = 0;
+		readToken (token);
+
+		/* check for function signature */
+		while (isType (token, TOKEN_OPEN_PAREN))
+		{
+			paren_depth++;
+			arrowfun_paren_depth++;
+			readToken (token);
+		}
+	}
+
+	if ( isKeyword (token, KEYWORD_function) )
+	{
+		state->indexForName = parseFunction (token, name, is_inside_class);
+	}
+	else if (isKeyword (token, KEYWORD_class))
+	{
+		state->isTerminated = parseES6Class (token, name);
+	}
+	else if (isType (token, TOKEN_OPEN_CURLY))
+	{
+		/*
+		 * Creates tags for each of these class methods
+		 *     objectOne = {
+		 *         'validMethodOne' : function(a,b) {},
+		 *         'validMethodTwo' : function(a,b) {}
+		 *     }
+		 * Or checks if this is a hash variable.
+		 *     var z = {};
+		 */
+		bool anonObject = vStringIsEmpty (name->string);
+		if (anonObject)
+		{
+			anonGenerate (name->string, "anonymousObject", JSTAG_VARIABLE);
+			state->indexForName = CORK_NIL;
+		}
+		int p = makeSimplePlaceholder (name->string);
+		if ( parseMethods(token, p, false) )
+		{
+			jsKind kind = state->foundThis || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
+			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, anonObject);
+			moveChildren (p, state->indexForName);
+		}
+		else if ( token->nestLevel == 0 && state->isGlobal )
+		{
+			/*
+			 * Only create variables for global scope
+			 *
+			 * A pointer can be created to the function.
+			 * If we recognize the function/class name ignore the variable.
+			 * This format looks identical to a variable definition.
+			 * A variable defined outside of a block is considered
+			 * a global variable:
+			 *	   var g_var1 = 1;
+			 *	   var g_var2;
+			 * This is not a global variable:
+			 *	   var g_var = function;
+			 * This is a global variable:
+			 *	   var g_var = different_var_name;
+			 */
+			state->indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
+														 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
+
+			if (state->indexForName == CORK_NIL)
+				state->indexForName = makeJsTag (name, state->isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+		}
+		/* Here we should be at the end of the block, on the close curly.
+		 * If so, read the next token not to confuse that close curly with
+		 * the end of the current statement. */
+		if (isType (token, TOKEN_CLOSE_CURLY))
+		{
+			readTokenFull(token, true, NULL);
+			state->isTerminated = isType (token, TOKEN_SEMICOLON);
+		}
+	}
+	else if (isType (token, TOKEN_OPEN_SQUARE) && !vStringIsEmpty (name->string))
+	{
+		/*
+		 * Creates tag for an array
+		 */
+		skipArrayList(token, true);
+		jsKind kind = state->foundThis || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
+		/*
+		 * Only create variables for global scope or class/object properties
+		 */
+		if ( ( token->nestLevel == 0 && state->isGlobal ) || kind == JSTAG_PROPERTY )
+		{
+			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, false);
+		}
+	}
+	else if (isKeyword (token, KEYWORD_new))
+	{
+		readToken (token);
+		bool is_var = isType (token, TOKEN_IDENTIFIER) || isKeyword (token, KEYWORD_capital_object);
+		if ( isKeyword (token, KEYWORD_function) ||
+				isKeyword (token, KEYWORD_capital_function) ||
+				is_var )
+		{
+			if ( isKeyword (token, KEYWORD_capital_function) && isClassName (name) )
+				state->isClass = true;
+
+			if ( isType (token, TOKEN_IDENTIFIER) )
+				skipQualifiedIdentifier (token);
+			else
+				readToken (token);
+
+			if ( isType (token, TOKEN_OPEN_PAREN) )
+				skipArgumentList(token, true, NULL);
+
+			if (isType (token, TOKEN_SEMICOLON) && token->nestLevel == 0)
+			{
+				if ( is_var )
+					state->indexForName = makeJsTag (name, state->isConst ? JSTAG_CONSTANT : state->foundThis ? JSTAG_PROPERTY : JSTAG_VARIABLE, NULL, NULL);
+				else if ( state->isClass )
+					state->indexForName = makeClassTag (name, NULL, NULL);
+				else
+				{
+					/* FIXME: we cannot really get a meaningful
+					 * signature from a `new Function()` call,
+					 * so for now just don't set any */
+					state->indexForName = makeFunctionTag (name, NULL, false);
+				}
+			}
+			else if (isType (token, TOKEN_CLOSE_CURLY))
+				state->isTerminated = false;
+		}
+	}
+	else if (! isType (token, TOKEN_KEYWORD) &&
+			 token->nestLevel == 0 && state->isGlobal )
+	{
+		/*
+		 * Only create variables for global scope
+		 *
+		 * A pointer can be created to the function.
+		 * If we recognize the function/class name ignore the variable.
+		 * This format looks identical to a variable definition.
+		 * A variable defined outside of a block is considered
+		 * a global variable:
+		 *	   var g_var1 = 1;
+		 *	   var g_var2;
+		 * This is not a global variable:
+		 *	   var g_var = function;
+		 * This is a global variable:
+		 *	   var g_var = different_var_name;
+		 */
+		state->indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
+													 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
+
+		if (state->indexForName == CORK_NIL)
+		{
+			state->indexForName = makeJsTag (name, state->isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+			if (isType (token, TOKEN_IDENTIFIER))
+				canbe_arrowfun = true;
+		}
+	}
+	else if ( isType (token, TOKEN_IDENTIFIER) )
+	{
+		canbe_arrowfun = true;
+	}
+
+	if (arrowfun_paren_depth == 0 && canbe_arrowfun)
+	{
+		/* var v = a => { ... } */
+		vString *sig = vStringNewInit ("(");
+		vStringCat (sig, token->string);
+		vStringPut (sig, ')');
+		readTokenFull (token, true, NULL);
+		if (isType (token, TOKEN_ARROW))
+		{
+			if (state->indexForName == CORK_NIL)	// was not a global variable
+				state->indexForName = makeFunctionTag (name, sig, false);
+			else
+				convertToFunction (state->indexForName, vStringValue (sig));
+		}
+		vStringDelete (sig);
+	}
+
+	if (paren_depth > 0)
+	{
+		/* Collect parameters for arrow function. */
+		vString *sig = (arrowfun_paren_depth == 1)? makeVStringForSignature (token): NULL;
+
+		while (paren_depth > 0 && ! isType (token, TOKEN_EOF))
+		{
+			if (isType (token, TOKEN_OPEN_PAREN))
+			{
+				paren_depth++;
+				arrowfun_paren_depth++;
+			}
+			else if (isType (token, TOKEN_CLOSE_PAREN))
+			{
+				paren_depth--;
+				arrowfun_paren_depth--;
+			}
+			readTokenFull (token, true, sig);
+
+			/* var f = (a, b) => { ... } */
+			if (arrowfun_paren_depth == 0 && isType (token, TOKEN_ARROW) && sig)
+			{
+				if (state->indexForName == CORK_NIL)	// was not a global variable
+					state->indexForName = makeFunctionTag (name, trimGarbageInSignature (sig), false);
+				else
+					convertToFunction (state->indexForName,
+									   vStringValue (trimGarbageInSignature (sig)));
+
+				vStringDelete (sig);
+				sig = NULL;
+			}
+		}
+		if (isType (token, TOKEN_CLOSE_CURLY))
+			state->isTerminated = false;
+
+		vStringDelete (sig); /* NULL is acceptable. */
+	}
+
+	TRACE_LEAVE();
+
+	return true;
+}
+
 static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 {
 	TRACE_ENTER_TEXT("is_inside_class: %s", is_inside_class? "yes": "no");
@@ -2295,17 +2722,16 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	 * is changed, `indexForName' is reset to CORK_NIL.
 	 */
 	tokenInfo *const name = newToken ();
-	int indexForName = CORK_NIL;
-	tokenInfo *const secondary_name = newToken ();
-	tokenInfo *const method_body_token = newToken ();
 	int saveScope = token->scope;
-	bool is_class = false;
-	bool is_var = false;
-	bool is_const = false;
-	bool is_terminated = true;
-	bool is_global = false;
-	bool has_methods = false;
-	bool found_this = false;
+	bool found_lhs = false;
+	statementState state = {
+		.indexForName = CORK_NIL,
+		.isClass = is_inside_class,
+		.isConst = false,
+		.isTerminated = true,
+		.isGlobal = false,
+		.foundThis = false
+	};
 
 	/*
 	 * Functions can be named or unnamed.
@@ -2335,8 +2761,6 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	 *	   Database.prototype.validMethodThree = Database_getTodaysDate;
 	 */
 
-	if ( is_inside_class )
-		is_class = true;
 	/*
 	 * var can precede an inner function
 	 */
@@ -2345,23 +2769,25 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 		 isKeyword(token, KEYWORD_const) )
 	{
 		TRACE_PRINT("var/let/const case");
-		is_const = isKeyword(token, KEYWORD_const);
+		state.isConst = isKeyword(token, KEYWORD_const);
 		/*
 		 * Only create variables for global scope
 		 */
 		if ( token->nestLevel == 0 )
 		{
-			is_global = true;
+			state.isGlobal = true;
 		}
 		readToken(token);
 	}
 
 nextVar:
-	found_this = false;
+	state.indexForName = CORK_NIL;
+	state.isClass = false;
+	state.foundThis = false;
 	if ( isKeyword(token, KEYWORD_this) )
 	{
 		TRACE_PRINT("found 'this' keyword");
-		found_this = true;
+		state.foundThis = true;
 
 		readToken(token);
 		if (isType (token, TOKEN_PERIOD))
@@ -2371,7 +2797,6 @@ nextVar:
 	}
 
 	copyToken(name, token, true);
-	indexForName = CORK_NIL;
 	TRACE_PRINT("name becomes '%s' of type %s",
 				vStringValue(token->string), tokenTypeName (token->type));
 
@@ -2381,147 +2806,32 @@ nextVar:
 	       ! isType (token, TOKEN_COMMA)       &&
 	       ! isType (token, TOKEN_EOF))
 	{
+		found_lhs = true;
 		if (isType (token, TOKEN_OPEN_CURLY))
+		{
 			parseBlock (token, CORK_NIL);
+			readTokenFull (token, true, NULL);
+		}
 		else if (isKeyword (token, KEYWORD_function))
-			parseFunction (token);
+		{
+			parseFunction (token, NULL, false);
+			readTokenFull (token, true, NULL);
+		}
 
 		/* Potentially the name of the function */
-		if (isType (token, TOKEN_PERIOD))
+		else if (isType (token, TOKEN_PERIOD))
 		{
 			/*
 			 * Cannot be a global variable is it has dot references in the name
 			 */
-			is_global = false;
+			state.isGlobal = false;
 			/* Assume it's an assignment to a global name (e.g. a class) using
 			 * its fully qualified name, so strip the scope.
 			 * FIXME: resolve the scope so we can make more than an assumption. */
 			token->scope = CORK_NIL;
 			name->scope = CORK_NIL;
-			do
-			{
-				readToken (token);
-				if (! isType(token, TOKEN_KEYWORD))
-				{
-					if ( is_class )
-						token->scope = indexForName;
-					else
-					{
-						addContext (name, token);
-						indexForName = CORK_NIL;
-					}
-
-					readToken (token);
-				}
-				else if ( isKeyword(token, KEYWORD_prototype) )
-				{
-					/*
-					 * When we reach the "prototype" tag, we infer:
-					 *     "BindAgent" is a class
-					 *     "build"     is a method
-					 *
-					 * function BindAgent( repeatableIdName, newParentIdName ) {
-					 * }
-					 *
-					 * CASE 1
-					 * Specified function name: "build"
-					 *     BindAgent.prototype.build = function( mode ) {
-					 *     	  maybe parse nested functions
-					 *     }
-					 *
-					 * CASE 2
-					 * Prototype listing
-					 *     ValidClassOne.prototype = {
-					 *         'validMethodOne' : function(a,b) {},
-					 *         'validMethodTwo' : function(a,b) {}
-					 *     }
-					 *
-					 */
-					if (! ( isType (name, TOKEN_IDENTIFIER)
-						|| isType (name, TOKEN_STRING) ) )
-						/*
-						 * Unexpected input. Try to reset the parsing.
-						 *
-						 * TOKEN_STRING is acceptable. e.g.:
-						 * -----------------------------------
-						 * "a".prototype = function( mode ) {}
-						 */
-						goto cleanUp;
-
-					indexForName = makeClassTag (name, NULL, NULL);
-					is_class = true;
-
-					/*
-					 * There should a ".function_name" next.
-					 */
-					readToken (token);
-					if (isType (token, TOKEN_PERIOD))
-					{
-						/*
-						 * Handle CASE 1
-						 */
-						readToken (token);
-						if (! isType(token, TOKEN_KEYWORD))
-						{
-							vString *const signature = vStringNew ();
-
-							token->scope = indexForName;
-
-							copyToken (method_body_token, token, true);
-							readToken (method_body_token);
-
-							while (! isType (method_body_token, TOKEN_SEMICOLON) &&
-							       ! isType (method_body_token, TOKEN_CLOSE_CURLY) &&
-							       ! isType (method_body_token, TOKEN_OPEN_CURLY) &&
-							       ! isType (method_body_token, TOKEN_EOF))
-							{
-								if ( isType (method_body_token, TOKEN_OPEN_PAREN) )
-									skipArgumentList(method_body_token, false,
-													 vStringLength (signature) == 0 ? signature : NULL);
-								else
-									readToken (method_body_token);
-							}
-
-							int index = makeJsTag (token, JSTAG_METHOD, signature, NULL);
-							vStringDelete (signature);
-
-							if ( isType (method_body_token, TOKEN_OPEN_CURLY))
-							{
-								parseBlock (method_body_token, index);
-								is_terminated = true;
-							}
-							else
-								is_terminated = isType (method_body_token, TOKEN_SEMICOLON);
-							goto cleanUp;
-						}
-					}
-					else if (isType (token, TOKEN_EQUAL_SIGN))
-					{
-						readToken (token);
-						if (isType (token, TOKEN_OPEN_CURLY))
-						{
-							/*
-							 * Handle CASE 2
-							 *
-							 * Creates tags for each of these class methods
-							 *     ValidClassOne.prototype = {
-							 *         'validMethodOne' : function(a,b) {},
-							 *         'validMethodTwo' : function(a,b) {}
-							 *     }
-							 */
-							parseMethods(token, indexForName, false);
-							/*
-							 * Find to the end of the statement
-							 */
-							findCmdTerm (token, false, false);
-							is_terminated = true;
-							goto cleanUp;
-						}
-					}
-				}
-				else
-					readToken (token);
-			} while (isType (token, TOKEN_PERIOD));
+			if ( ! parseStatementLHS (name, token, &state) )
+				goto cleanUp;
 		}
 		else
 			readTokenFull (token, true, NULL);
@@ -2531,13 +2841,6 @@ nextVar:
 
 		if ( isType (token, TOKEN_OPEN_SQUARE) )
 			skipArrayList(token, false);
-
-		/*
-		if ( isType (token, TOKEN_OPEN_CURLY) )
-		{
-			is_class = parseBlock (token, name->string);
-		}
-		*/
 	}
 
 	if ( isType (token, TOKEN_CLOSE_CURLY) )
@@ -2547,24 +2850,22 @@ nextVar:
 		 * processed an open curly brace indicates
 		 * the statement is most likely not terminated.
 		 */
-		is_terminated = false;
-		goto cleanUp;
+		state.isTerminated = false;
 	}
-
-	if ( isType (token, TOKEN_SEMICOLON) ||
-	     isType (token, TOKEN_EOF) ||
-	     isType (token, TOKEN_COMMA) )
+	else if ( isType (token, TOKEN_SEMICOLON) ||
+			  isType (token, TOKEN_EOF) ||
+			  isType (token, TOKEN_COMMA) )
 	{
 		/*
 		 * Only create variables for global scope
 		 */
-		if ( token->nestLevel == 0 && is_global )
+		if ( token->nestLevel == 0 && state.isGlobal )
 		{
 			/*
 			 * Handles this syntax:
 			 *	   var g_var2;
 			 */
-			indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+			state.indexForName = makeJsTag (name, state.isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 		}
 		/*
 		 * Statement has ended.
@@ -2576,349 +2877,51 @@ nextVar:
 			readToken (token);
 			goto nextVar;
 		}
-		goto cleanUp;
 	}
-
-	if ( isType (token, TOKEN_EQUAL_SIGN) )
+	else
 	{
-		int parenDepth = 0;
-		int arrowfun_paren_depth = 0;
-		bool canbe_arrowfun = false;
-
-		readToken (token);
-
-		/* rvalue might be surrounded with parentheses */
-		while (isType (token, TOKEN_OPEN_PAREN))
+		bool ok = found_lhs;
+		if ( ok && isType (token, TOKEN_EQUAL_SIGN) )
 		{
-			parenDepth++;
-			arrowfun_paren_depth++;
-			readToken (token);
+			ok = parseStatementRHS (name, token, &state, is_inside_class);
 		}
-
-		if (isKeyword (token, KEYWORD_async))
-		{
-			arrowfun_paren_depth = 0;
-			readToken (token);
-
-			/* check for function signature */
-			while (isType (token, TOKEN_OPEN_PAREN))
-			{
-				parenDepth++;
-				arrowfun_paren_depth++;
-				readToken (token);
-			}
-		}
-
-		if ( isKeyword (token, KEYWORD_function) )
-		{
-			vString *const signature = vStringNew ();
-			bool is_generator = false;
-
-			readToken (token);
-			if (isType (token, TOKEN_STAR))
-			{
-				is_generator = true;
-				readToken (token);
-			}
-
-			if (! isType (token, TOKEN_KEYWORD) &&
-			    ! isType (token, TOKEN_OPEN_PAREN))
-			{
-				/*
-				 * Functions of this format:
-				 *	   var D2A = function theAdd(a, b)
-				 *	   {
-				 *		  return a+b;
-				 *	   }
-				 * Are really two separate defined functions and
-				 * can be referenced in two ways:
-				 *	   alert( D2A(1,2) );			  // produces 3
-				 *	   alert( theAdd(1,2) );		  // also produces 3
-				 * So it must have two tags:
-				 *	   D2A
-				 *	   theAdd
-				 * Save the reference to the name for later use, once
-				 * we have established this is a valid function we will
-				 * create the secondary reference to it.
-				 */
-				copyToken(secondary_name, token, true);
-				readToken (token);
-			}
-
-			if ( isType (token, TOKEN_OPEN_PAREN) )
-				skipArgumentList(token, false, signature);
-
-			if (isType (token, TOKEN_OPEN_CURLY))
-			{
-				// This will be either a function or a class.
-				if ( is_inside_class )
-				{
-					indexForName = makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
-					if ( vStringLength(secondary_name->string) > 0 )
-						makeFunctionTag (secondary_name, signature, is_generator);
-				}
-				else
-				{
-					if (! ( isType (name, TOKEN_IDENTIFIER)
-					     || isType (name, TOKEN_STRING)
-					     || isType (name, TOKEN_KEYWORD) ) )
-					{
-						/* Unexpected input. Try to reset the parsing. */
-						TRACE_PRINT("Unexpected input, trying to reset");
-						vStringDelete (signature);
-						goto cleanUp;
-					}
-
-					indexForName = isClassName (name) ?
-						makeClassTag (name, signature, NULL):
-						makeFunctionTag (name, signature, is_generator);
-
-					parseBlock (token, indexForName);
-
-					if ( vStringLength(secondary_name->string) > 0 )
-						makeFunctionTag (secondary_name, signature, is_generator);
-				}
-				parseBlock (token, indexForName);
-			}
-
-			vStringDelete (signature);
-		}
-		else if (isKeyword (token, KEYWORD_class))
-		{
-			is_terminated = parseES6Class (token, name);
-		}
-		else if (isType (token, TOKEN_OPEN_CURLY))
+		/* if we aren't already at the cmd end, advance to it and check whether
+		 * the statement was terminated */
+		if (ok &&
+			! isType (token, TOKEN_CLOSE_CURLY) &&
+		    ! isType (token, TOKEN_SEMICOLON))
 		{
 			/*
-			 * Creates tags for each of these class methods
-			 *     objectOne = {
-			 *         'validMethodOne' : function(a,b) {},
-			 *         'validMethodTwo' : function(a,b) {}
-			 *     }
-			 * Or checks if this is a hash variable.
-			 *     var z = {};
-			 */
-			bool anonObject = vStringIsEmpty (name->string);
-			if (anonObject)
-			{
-				anonGenerate (name->string, "anonymousObject", JSTAG_VARIABLE);
-				indexForName = CORK_NIL;
-			}
-			int p = makeSimplePlaceholder (name->string);
-			has_methods = parseMethods(token, p, false);
-			if (has_methods)
-			{
-				jsKind kind = found_this || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
-				indexForName = makeJsTagCommon (name, kind, NULL, NULL, anonObject);
-				moveChildren (p, indexForName);
-			}
-			else if ( token->nestLevel == 0 && is_global )
-			{
-				/*
-				 * Only create variables for global scope
-				 *
-				 * A pointer can be created to the function.
-				 * If we recognize the function/class name ignore the variable.
-				 * This format looks identical to a variable definition.
-				 * A variable defined outside of a block is considered
-				 * a global variable:
-				 *	   var g_var1 = 1;
-				 *	   var g_var2;
-				 * This is not a global variable:
-				 *	   var g_var = function;
-				 * This is a global variable:
-				 *	   var g_var = different_var_name;
-				 */
-				indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
-													 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
-
-				if (indexForName == CORK_NIL)
-					indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
-			}
-			/* Here we should be at the end of the block, on the close curly.
-			 * If so, read the next token not to confuse that close curly with
-			 * the end of the current statement. */
-			if (isType (token, TOKEN_CLOSE_CURLY))
-			{
-				readTokenFull(token, true, NULL);
-				is_terminated = isType (token, TOKEN_SEMICOLON);
-			}
-		}
-		else if (isType (token, TOKEN_OPEN_SQUARE) && !vStringIsEmpty (name->string))
-		{
-			/*
-			 * Creates tag for an array
-			 */
-			skipArrayList(token, true);
-			jsKind kind = found_this || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
-			/*
-			 * Only create variables for global scope or class/object properties
-			 */
-			if ( ( token->nestLevel == 0 && is_global ) || kind == JSTAG_PROPERTY )
-			{
-				indexForName = makeJsTagCommon (name, kind, NULL, NULL, false);
-			}
-		}
-		else if (isKeyword (token, KEYWORD_new))
-		{
-			readToken (token);
-			is_var = isType (token, TOKEN_IDENTIFIER) || isKeyword (token, KEYWORD_capital_object);
-			if ( isKeyword (token, KEYWORD_function) ||
-					isKeyword (token, KEYWORD_capital_function) ||
-					is_var )
-			{
-				if ( isKeyword (token, KEYWORD_capital_function) && isClassName (name) )
-					is_class = true;
-
-				if ( isType (token, TOKEN_IDENTIFIER) )
-					skipQualifiedIdentifier (token);
-				else
-					readToken (token);
-
-				if ( isType (token, TOKEN_OPEN_PAREN) )
-					skipArgumentList(token, true, NULL);
-
-				if (isType (token, TOKEN_SEMICOLON) && token->nestLevel == 0)
-				{
-					if ( is_var )
-						indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : found_this ? JSTAG_PROPERTY : JSTAG_VARIABLE, NULL, NULL);
-					else if ( is_class )
-						indexForName = makeClassTag (name, NULL, NULL);
-					else
-					{
-						/* FIXME: we cannot really get a meaningful
-						 * signature from a `new Function()` call,
-						 * so for now just don't set any */
-						indexForName = makeFunctionTag (name, NULL, false);
-					}
-				}
-				else if (isType (token, TOKEN_CLOSE_CURLY))
-					is_terminated = false;
-			}
-		}
-		else if (! isType (token, TOKEN_KEYWORD) &&
-				 token->nestLevel == 0 && is_global )
-		{
-			/*
-			 * Only create variables for global scope
+			 * Statements can be optionally terminated in the case of
+			 * statement prior to a close curly brace as in the
+			 * document.write line below:
 			 *
-			 * A pointer can be created to the function.
-			 * If we recognize the function/class name ignore the variable.
-			 * This format looks identical to a variable definition.
-			 * A variable defined outside of a block is considered
-			 * a global variable:
-			 *	   var g_var1 = 1;
-			 *	   var g_var2;
-			 * This is not a global variable:
-			 *	   var g_var = function;
-			 * This is a global variable:
-			 *	   var g_var = different_var_name;
+			 * function checkForUpdate() {
+			 *	   if( 1==1 ) {
+			 *		   document.write("hello from checkForUpdate<br>")
+			 *	   }
+			 *	   return 1;
+			 * }
 			 */
-			indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
-												 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
-
-			if (indexForName == CORK_NIL)
+			state.isTerminated = findCmdTerm (token, true, true);
+			/* if we're at a comma, try and read a second var */
+			if (isType (token, TOKEN_COMMA))
 			{
-				indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
-				if (isType (token, TOKEN_IDENTIFIER))
-					canbe_arrowfun = true;
+				readToken (token);
+				goto nextVar;
 			}
 		}
-		else if ( isType (token, TOKEN_IDENTIFIER) )
-		{
-			canbe_arrowfun = true;
-		}
-
-		if (arrowfun_paren_depth == 0 && canbe_arrowfun)
-		{
-			/* var v = a => { ... } */
-			vString *sig = vStringNewInit ("(");
-			vStringCat (sig, token->string);
-			vStringPut (sig, ')');
-			readTokenFull (token, true, NULL);
-			if (isType (token, TOKEN_ARROW))
-			{
-				if (indexForName == CORK_NIL)	// was not a global variable
-					indexForName = makeFunctionTag (name, sig, false);
-				else
-					convertToFunction (indexForName, vStringValue (sig));
-			}
-			vStringDelete (sig);
-		}
-
-		if (parenDepth > 0)
-		{
-			/* Collect parameters for arrow function. */
-			vString *sig = (arrowfun_paren_depth == 1)? makeVStringForSignature (token): NULL;
-
-			while (parenDepth > 0 && ! isType (token, TOKEN_EOF))
-			{
-				if (isType (token, TOKEN_OPEN_PAREN))
-				{
-					parenDepth++;
-					arrowfun_paren_depth++;
-				}
-				else if (isType (token, TOKEN_CLOSE_PAREN))
-				{
-					parenDepth--;
-					arrowfun_paren_depth--;
-				}
-				readTokenFull (token, true, sig);
-
-				/* var f = (a, b) => { ... } */
-				if (arrowfun_paren_depth == 0 && isType (token, TOKEN_ARROW) && sig)
-				{
-					if (indexForName == CORK_NIL)	// was not a global variable
-						indexForName = makeFunctionTag (name, trimGarbageInSignature (sig), false);
-					else
-						convertToFunction (indexForName,
-										   vStringValue (trimGarbageInSignature (sig)));
-
-					vStringDelete (sig);
-					sig = NULL;
-				}
-			}
-			if (isType (token, TOKEN_CLOSE_CURLY))
-				is_terminated = false;
-
-			vStringDelete (sig); /* NULL is acceptable. */
-		}
-	}
-	/* if we aren't already at the cmd end, advance to it and check whether
-	 * the statement was terminated */
-	if (! isType (token, TOKEN_CLOSE_CURLY) &&
-	    ! isType (token, TOKEN_SEMICOLON))
-	{
-		/*
-		 * Statements can be optionally terminated in the case of
-		 * statement prior to a close curly brace as in the
-		 * document.write line below:
-		 *
-		 * function checkForUpdate() {
-		 *	   if( 1==1 ) {
-		 *		   document.write("hello from checkForUpdate<br>")
-		 *	   }
-		 *	   return 1;
-		 * }
-		 */
-		is_terminated = findCmdTerm (token, true, true);
-		/* if we're at a comma, try and read a second var */
-		if (isType (token, TOKEN_COMMA))
-		{
-			readToken (token);
-			goto nextVar;
-		}
+		else if (ok && isType (token, TOKEN_SEMICOLON))
+			state.isTerminated = true;
 	}
 
 cleanUp:
 	token->scope = saveScope;
 	deleteToken (name);
-	deleteToken (secondary_name);
-	deleteToken (method_body_token);
 
-	TRACE_LEAVE();
+	TRACE_LEAVE_TEXT("is terminated: %d", (int) state.isTerminated);
 
-	return is_terminated;
+	return state.isTerminated;
 }
 
 static void parseUI5 (tokenInfo *const token)
@@ -3035,7 +3038,7 @@ static bool parseLine (tokenInfo *const token, bool is_inside_class)
 				is_terminated = parseLine (token, is_inside_class);
 				break;
 			case KEYWORD_function:
-				parseFunction (token);
+				parseFunction (token, NULL, false);
 				break;
 			case KEYWORD_class:
 				is_terminated = parseES6Class (token, NULL);

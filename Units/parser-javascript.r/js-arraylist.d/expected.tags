@@ -1,14 +1,14 @@
-a	input.js	/^    { a: {}, b: {} }$/;"	p	variable:class.anonymousObjectecad86450405
-a	input.js	/^    { a: {}, b: {} },$/;"	p	variable:class.anonymousObjectecad86450305
+a	input.js	/^    { a: {}, b: {} }$/;"	p	variable:class.anonymousObjectecad86450505
+a	input.js	/^    { a: {}, b: {} },$/;"	p	variable:class.anonymousObjectecad86450405
 a	input.js	/^  { a: "hello", b: 42 },$/;"	p	variable:anonymousObjectecad86450105
 a	input.js	/^  { a: "hi", b: 41 }$/;"	p	variable:anonymousObjectecad86450205
 a	input.js	/^var a = [];$/;"	v
 anonymousObjectecad86450105	input.js	/^  { a: "hello", b: 42 },$/;"	v
 anonymousObjectecad86450205	input.js	/^  { a: "hi", b: 41 }$/;"	v
-anonymousObjectecad86450305	input.js	/^    { a: {}, b: {} },$/;"	v	function:class
-anonymousObjectecad86450405	input.js	/^    { a: {}, b: {} }$/;"	v	function:class
-b	input.js	/^    { a: {}, b: {} }$/;"	p	variable:class.anonymousObjectecad86450405
-b	input.js	/^    { a: {}, b: {} },$/;"	p	variable:class.anonymousObjectecad86450305
+anonymousObjectecad86450405	input.js	/^    { a: {}, b: {} },$/;"	v	function:class
+anonymousObjectecad86450505	input.js	/^    { a: {}, b: {} }$/;"	v	function:class
+b	input.js	/^    { a: {}, b: {} }$/;"	p	variable:class.anonymousObjectecad86450505
+b	input.js	/^    { a: {}, b: {} },$/;"	p	variable:class.anonymousObjectecad86450405
 b	input.js	/^  { a: "hello", b: 42 },$/;"	p	variable:anonymousObjectecad86450105
 b	input.js	/^  { a: "hi", b: 41 }$/;"	p	variable:anonymousObjectecad86450205
 b	input.js	/^var b = [1, 2, 3];$/;"	v
