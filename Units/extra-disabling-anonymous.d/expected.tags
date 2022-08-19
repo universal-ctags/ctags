@@ -7,5 +7,5 @@ Class3	input-0.js	/^var Class3 = function() {$/;"	c
 c3m1	input-0.js	/^  this.c3m1 = function() {$/;"	m	class:Class3
 f1	input-0.js	/^function f1(y) {$/;"	f
 Mixin	input-0.js	/^function Mixin(superclass) {$/;"	c
-hello	input-0.js	/^    hello() {$/;"	m	class:Mixin.AnonymousClass2503d9910401
-method8	input-0.js	/^	method8(n) { return n * n; }$/;"	m	class:AnonymousClass2503d9910501
+hello	input-0.js	/^    hello() {$/;"	m	class:Mixin.AnonymousClass2503d9910801
+method8	input-0.js	/^	method8(n) { return n * n; }$/;"	m	class:AnonymousClass2503d9910901
