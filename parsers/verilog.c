@@ -416,8 +416,8 @@ static int readWordTokenNoSkip (tokenInfo *const token, int c);
 static int skipBlockName (tokenInfo *const token, int c);
 static int skipClockEvent (tokenInfo* token, int c);
 static int skipDelay (tokenInfo* token, int c);
-static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl);
-static int tagNameList (tokenInfo* token, int c, verilogKind kind);
+static int tagIdsInPort (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl);
+static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind);
 
 /*
  *   FUNCTION DEFINITIONS
@@ -690,6 +690,20 @@ static bool isWordToken (const int c)
 static bool isIdentifierCharacter (const int c)
 {
 	return (isalnum (c) || c == '_' || c == '`' || c == '$');
+}
+
+// check if double colon.
+static bool isDoubleColon (int c)
+{
+	if (c != ':')
+		return false;
+	c = vGetc ();
+	if (c == ':') {
+		return true;
+	} else {
+		vUngetc (c);
+		return false;
+	}
 }
 
 static int skipWhite (int c)
@@ -1075,7 +1089,7 @@ static int processPortList (tokenInfo *token, int c, bool mayPortDecl)
 	if (c == '(')
 	{
 		c = skipWhite (vGetc ());	// skip '('
-		c = tagIdentifierList (token, c, K_PORT, mayPortDecl);
+		c = tagIdsInPort (token, c, K_PORT, mayPortDecl);
 		if (c == ')')	// sanity check
 			c = skipWhite (vGetc ());
 		else
@@ -1117,17 +1131,11 @@ static int processFunction (tokenInfo *const token, int c)
 		c = skipParameterAssignment (c);
 
 		/* Identify class type prefixes and create respective context*/
-		if (isInputLanguage (Lang_systemverilog) && c == ':')
+		if (isInputLanguage (Lang_systemverilog) && isDoubleColon(c))
 		{
-			c = vGetc ();
-			if (c == ':')
-			{
-				verbose ("Found function declaration with class type %s\n", vStringValue (token->name));
-				createContext (K_CLASS, token->name);
-				currentContext->classScope = true;
-			}
-			else
-				vUngetc (c);
+			verbose ("Found function declaration with class type %s\n", vStringValue (token->name));
+			createContext (K_CLASS, token->name);
+			currentContext->classScope = true;
 		}
 	}
 	verbose ("Found function: %s\n", vStringValue (token->name));
@@ -1157,7 +1165,7 @@ static int processEnum (tokenInfo *const token, int c)
 
 	/* Following identifiers are tag names */
 	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (enumToken->name), enumToken->kind);
-	c = tagNameList (enumToken, c, enumToken->kind);
+	c = tagIdsInDataDecl (enumToken, c, enumToken->kind);
 	deleteToken (enumToken);
 
 	// Clean up the tag content list at the end of the declaration to support multiple variables
@@ -1183,7 +1191,7 @@ static int processStruct (tokenInfo *const token, int c)
 
 	/* Following identifiers are tag names */
 	verbose ("Find struct|union tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
-	c = tagNameList (token, c, kind);
+	c = tagIdsInDataDecl (token, c, kind);
 	ptrArrayClear (tagContents);
 	return c;
 }
@@ -1396,6 +1404,25 @@ static int processAssertion (tokenInfo *const token, int c)
 	// skip ( ... )
 	if (c == '(')
 		c = skipPastMatch ("()");
+	return c;
+}
+
+// data_declaration ::=
+//   ...
+//   import < package_identifier :: identifier | package_identifier :: * > ; 
+// dpi_import_export ::=
+//   import ( "DPI-C" | "DPI" ) [ context | pure ] [ c_identifier = ] function data_type_or_void function_identifier [ ( [ tf_port_list ] ) ] ;
+// | import ( "DPI-C" | "DPI" ) [ context ]        [ c_identifier = ] task task_identifier [ ( [ tf_port_list ] ) ] ;
+// | export ( "DPI-C" | "DPI" ) [ c_identifier = ] function function_identifier ;
+// | export ( "DPI-C" | "DPI" ) [ c_identifier = ] task     task_identifier ;
+static int processImport (tokenInfo *const token, int c)
+{
+	if (c == '"') {	// dpi_import: we don't care about export.
+		currentContext->prototype = true;
+	} else {
+		c = skipToSemiColon (c);
+		c = skipWhite (vGetc ());	// skip semicolon
+	}
 	return c;
 }
 
@@ -1703,12 +1730,10 @@ static int skipClassType (tokenInfo* token, int c)
 		}
 		else if (c == ':')
 		{
-			c = skipWhite (vGetc ());
-			if (c != ':')
+			if (!isDoubleColon(c))
 			{
 				VERBOSE ("Unexpected input.\n");
-				vUngetc (c);
-				return ':';
+				return c;
 			}
 			c = skipWhite (vGetc ());
 			if (isWordToken (c))
@@ -1724,7 +1749,7 @@ static int skipClassType (tokenInfo* token, int c)
 	return c;
 }
 
-// Tag a list of identifiers
+// Tag a list of identifiers in a port list
 // data_type :: =
 //   ...
 //   | virtual [ interface ] identifier [ # ( [ ... ] ) ]  [ . identifier ]
@@ -1733,7 +1758,7 @@ static int skipClassType (tokenInfo* token, int c)
 //   | ...
 //
 //   mayPortDecl: may be a ANSI port declaration.  true for module, interface, or program.
-static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl)
+static int tagIdsInPort (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl)
 {
 	bool first_port = true;
 	bool enableTag = true;
@@ -1796,10 +1821,11 @@ static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, b
 	return c;
 }
 
-static int tagNameList (tokenInfo* token, int c, verilogKind kind)
+// Tag a list of identifiers in a data declaration
+static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 {
 	c = skipClassType (token, c);
-	if (c == ':' || c == ';')	// ## (cycle delay) or unexpected input
+	if (c == ';')
 		return c;
 
 	// skip drive|charge strength or type_reference, dimensions, and delay for net
@@ -1808,7 +1834,7 @@ static int tagNameList (tokenInfo* token, int c, verilogKind kind)
 	c = skipDimension (c);
 	if (c == '.')
 		return c;	// foo[...].bar = ..;
-	c = skipDelay (token, c);
+	c = skipDelay (token, c);	// ## (cycle delay)
 
 	while (c != EOF)
 	{
@@ -1861,7 +1887,7 @@ static int findTag (tokenInfo *const token, int c)
 			if (token->kind == K_PORT && currentContext->kind == K_CLOCKING)
 				c = skipToSemiColon (c); // clocking items are not port definitions
 			else
-				c = tagNameList (token, c, token->kind);
+				c = tagIdsInDataDecl (token, c, token->kind);
 			break;
 		case K_IDENTIFIER:
 			{
@@ -1877,7 +1903,7 @@ static int findTag (tokenInfo *const token, int c)
 				else if (c == '=')	// assignment
 					c = skipExpression (skipWhite (vGetc ()));
 				else
-					c = tagNameList (token, c, token->kind); /* user defined type */
+					c = tagIdsInDataDecl (token, c, token->kind); /* user defined type */
 			}
 			break;
 		case K_CLASS:
@@ -1893,8 +1919,10 @@ static int findTag (tokenInfo *const token, int c)
 		case K_STRUCT:
 			c = processStruct (token, c);
 			break;
-		case K_PROTOTYPE:
 		case K_IMPORT:
+			c = processImport (token, c);
+			break;
+		case K_PROTOTYPE:
 		case K_WITH:
 			currentContext->prototype = true;
 			break;
@@ -1960,7 +1988,8 @@ static void findVerilogTags (void)
 			case ':':
 				/* Store current block name whenever a : is found
 				 * This is used later by any tag type that requires this information */
-				vStringCopy (currentContext->blockName, token->name);
+				if (!isDoubleColon(c))
+					vStringCopy (currentContext->blockName, token->name);
 				c = skipWhite (vGetc ());
 				break;
 			case ';':
