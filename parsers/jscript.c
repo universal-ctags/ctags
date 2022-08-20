@@ -1,22 +1,22 @@
 /*
- *	 Copyright (c) 2003, Darren Hiebert
+ * Copyright (c) 2003, Darren Hiebert
  *
- *	 This source code is released for free distribution under the terms of the
- *	 GNU General Public License version 2 or (at your option) any later version.
+ * This source code is released for free distribution under the terms of the
+ * GNU General Public License version 2 or (at your option) any later version.
  *
- *	 This module contains functions for generating tags for JavaScript language
- *	 files.
+ * This module contains functions for generating tags for JavaScript language
+ * files.
  *
- *	 Reference: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+ * Reference: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
  *
- *	 This is a good reference for different forms of the function statement:
- *		 http://www.permadi.com/tutorial/jsFunc/
- *   Another good reference:
- *       http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Guide
+ * This is a good reference for different forms of the function statement:
+ *     http://www.permadi.com/tutorial/jsFunc/
+ * Another good reference:
+ *     http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Guide
  */
 
 /*
- *	 INCLUDE FILES
+ * INCLUDE FILES
  */
 #include "general.h"	/* must always come first */
 #include <ctype.h>	/* to define isalpha () */
@@ -49,7 +49,7 @@
 #include "trace.h"
 
 /*
- *	 MACROS
+ * MACROS
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
@@ -61,10 +61,10 @@
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
 /*
- *	 DATA DECLARATIONS
+ * DATA DECLARATIONS
  */
 
-/*	Used to specify type of keyword.
+/* Used to specify type of keyword.
 */
 enum eKeywordId {
 	KEYWORD_function,
@@ -133,14 +133,14 @@ typedef struct sTokenInfo {
 	keywordId		keyword;
 	vString *		string;
 	int				scope;
-	unsigned long 	lineNumber;
-	MIOPos 			filePosition;
+	unsigned long	lineNumber;
+	MIOPos			filePosition;
 	int				nestLevel;
 	bool			dynamicProp;
 } tokenInfo;
 
 /*
- *	DATA DEFINITIONS
+ * DATA DEFINITIONS
  */
 
 static tokenType LastTokenType;
@@ -232,8 +232,8 @@ typedef enum {
  *
  * With these trick and technique, the scope field for `g' is filled:
  +---+ tags for input-1.js ---------------------------------------------
- | 1 | A	input-1.js	/^A.g = function(x) {$/;"	f	roles:chainElt	extras:reference
- | 2 | g	input-1.js	/^A.g = function(x) {$/;"	f	scope:function:A	signature:(x)	roles:def
+ | 1 | A  input-1.js  /^A.g = function(x) {$/;"  f  roles:chainElt  extras:reference
+ | 2 | g  input-1.js  /^A.g = function(x) {$/;"  f  scope:function:A  signature:(x)  roles:def
  +---+------------------------------------------------------------------
  *
  * By default, reference tags are not emitted. So non-ctags-expert users may
@@ -302,7 +302,7 @@ static const keywordTable JsKeywordTable [] = {
 	{ "try",		KEYWORD_try					},
 	{ "catch",		KEYWORD_catch				},
 	{ "finally",	KEYWORD_finally				},
-	{ "sap",	    KEYWORD_sap    				},
+	{ "sap",	    KEYWORD_sap					},
 	{ "return",		KEYWORD_return				},
 	{ "class",		KEYWORD_class				},
 	{ "extends",	KEYWORD_extends				},
@@ -315,15 +315,15 @@ static const keywordTable JsKeywordTable [] = {
 };
 
 /*
- *	 FUNCTION DEFINITIONS
+ * FUNCTION DEFINITIONS
  */
 
 /* Recursive functions */
 static void readTokenFull (tokenInfo *const token, bool include_newlines, vString *const repr);
 static void skipArgumentList (tokenInfo *const token, bool include_newlines, vString *const repr);
 static bool parseFunction (tokenInfo *const token, tokenInfo *const name, const bool is_inside_class);
-static bool parseBlock (tokenInfo *const token, int parentScope);
-static bool parseMethods (tokenInfo *const token, int classIndex, const bool is_es6_class);
+static bool parseBlock (tokenInfo *const token, int parent_scope);
+static bool parseMethods (tokenInfo *const token, int class_index, const bool is_es6_class);
 static bool parseLine (tokenInfo *const token, bool is_inside_class);
 static void parseUI5 (tokenInfo *const token);
 
@@ -342,8 +342,8 @@ static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
 	tokenInfo *token = xMalloc (1, tokenInfo);
 
-	token->string		= vStringNew ();
-	token->scope		= CORK_NIL;
+	token->string = vStringNew ();
+	token->scope = CORK_NIL;
 
 	return token;
 }
@@ -352,14 +352,14 @@ static void clearPoolToken (void *data)
 {
 	tokenInfo *token = data;
 
-	token->type			= TOKEN_UNDEFINED;
-	token->keyword		= KEYWORD_NONE;
-	token->nestLevel	= 0;
-	token->dynamicProp  = false;
-	token->lineNumber   = getInputLineNumber ();
+	token->type = TOKEN_UNDEFINED;
+	token->keyword = KEYWORD_NONE;
+	token->nestLevel = 0;
+	token->dynamicProp = false;
+	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	vStringClear (token->string);
-	token->scope 		= CORK_NIL;
+	token->scope = CORK_NIL;
 }
 
 static void deletePoolToken (void *data)
@@ -370,7 +370,7 @@ static void deletePoolToken (void *data)
 }
 
 static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
-                       bool const include_non_read_info)
+					   bool const include_non_read_info)
 {
 	dest->lineNumber = src->lineNumber;
 	dest->filePosition = src->filePosition;
@@ -393,16 +393,16 @@ static void injectDynamicName (tokenInfo *const token, vString *newName)
 }
 
 /*
- *	 Tag generation functions
+ * Tag generation functions
  */
 
 struct  bestJSEntryInScopeData {
 	int index;
 };
 
-static bool findBestJSEntry (int corkIndex, tagEntryInfo *entry, void *cbData)
+static bool findBestJSEntry (int corkIndex, tagEntryInfo *entry, void *cb_data)
 {
-	struct  bestJSEntryInScopeData *data = cbData;
+	struct  bestJSEntryInScopeData *data = cb_data;
 
 	if (isRoleAssigned (entry, ROLE_DEFINITION_INDEX))
 	{
@@ -412,6 +412,7 @@ static bool findBestJSEntry (int corkIndex, tagEntryInfo *entry, void *cbData)
 
 	if (data->index == CORK_NIL || data->index > corkIndex)
 		data->index = corkIndex;
+
 	return true;
 }
 
@@ -436,15 +437,15 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 	 * "c" must be tagged if the cork API is used.
 	 * ----------------------------------------------------------
 	 * How the fields for "a", "b", and "c" are filled.
-	 *   a  kind:class	scope:<given by SCOPE> roles:chainElt
-	 *   b  kind:class	scope:class:a	roles:chainElt
+	 *   a  kind:class  scope:<given by SCOPE>  roles:chainElt
+	 *   b  kind:class  scope:class:a  roles:chainElt
 	 *
 	 *   The fields of c depends on LEAF_KIND that is passed to this functions.
 	 *
 	 *   if (LEAF_KIND == FUNCTION)
-	 *       c  kind:function	scope:class:b	roles:chainElt
+	 *       c  kind:function  scope:class:b  roles:chainElt
 	 *   else
-	 *       c  kind:class	scope:class:b	roles:chainElt
+	 *       c  kind:class  scope:class:b  roles:chainElt
 	 */
 
 	const char *name = name_chain;
@@ -530,9 +531,9 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 
 #ifdef DO_TRACING
 	{
-		const char *scopeStr = getNameStringForCorkIndex (scope);
-		const char *scopeKindStr = getKindStringForCorkIndex (scope);
-		TRACE_PRINT("Emitting tag for symbol '%s' of kind %s with scope '%s:%s'", name, kindName(kind), scopeKindStr, scopeStr);
+		const char *scope_str = getNameStringForCorkIndex (scope);
+		const char *scope_kind_str = getKindStringForCorkIndex (scope);
+		TRACE_PRINT("Emitting tag for symbol '%s' of kind %s with scope '%s:%s'", name, kindName(kind), scope_kind_str, scope_str);
 	}
 #endif
 
@@ -576,7 +577,7 @@ static int makeJsTag (const tokenInfo *const token, const jsKind kind,
 }
 
 static int makeClassTagCommon (tokenInfo *const token, vString *const signature,
-                          vString *const inheritance, bool anonymous)
+						  vString *const inheritance, bool anonymous)
 {
 	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance, anonymous);
 }
@@ -587,8 +588,8 @@ static int makeClassTag (tokenInfo *const token, vString *const signature,
 	return makeClassTagCommon (token, signature, inheritance, false);
 }
 
-static int makeFunctionTagCommon (tokenInfo *const token, vString *const signature, bool generator,
-								   bool anonymous)
+static int makeFunctionTagCommon (tokenInfo *const token, vString *const signature,
+								  bool generator, bool anonymous)
 {
 	return makeJsTagCommon (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL,
 							anonymous);
@@ -611,7 +612,7 @@ static bool isClassName (tokenInfo *const name)
 }
 
 /*
- *	 Parsing functions
+ * Parsing functions
  */
 
 /* given @p point, returns the first byte of the encoded output sequence, and
@@ -705,7 +706,7 @@ static int handleUnicodeCodePoint (uint32_t point)
  * @param isUTF16 Location to store whether @param value is an UTF-16 word.
  * @returns Whether a valid sequence was read. */
 static bool readUnicodeEscapeSequenceValue (uint32_t *const value,
-                                            bool *const isUTF16)
+											bool *const isUTF16)
 {
 	bool valid = false;
 	int d = getcFromInputFile ();
@@ -916,12 +917,12 @@ static void parseRegExp (void)
 	} while (c != EOF);
 }
 
-/*	Read a C identifier beginning with "firstChar" and places it into
- *	"name".
+/* Read a C identifier beginning with "first_char" and places it into
+ * "name".
  */
-static void parseIdentifier (vString *const string, const int firstChar)
+static void parseIdentifier (vString *const string, const int first_char)
 {
-	int c = firstChar;
+	int c = first_char;
 	Assert (isIdentChar (c));
 	do
 	{
@@ -1025,73 +1026,73 @@ getNextChar:
 
 	switch (c)
 	{
-		case EOF: token->type = TOKEN_EOF;					break;
-		case '(': token->type = TOKEN_OPEN_PAREN;			break;
-		case ')': token->type = TOKEN_CLOSE_PAREN;			break;
-		case ';': token->type = TOKEN_SEMICOLON;			break;
-		case ',': token->type = TOKEN_COMMA;				break;
+		case EOF: token->type = TOKEN_EOF;			break;
+		case '(': token->type = TOKEN_OPEN_PAREN;	break;
+		case ')': token->type = TOKEN_CLOSE_PAREN;	break;
+		case ';': token->type = TOKEN_SEMICOLON;	break;
+		case ',': token->type = TOKEN_COMMA;		break;
 		case '.':
+		{
+			token->type = TOKEN_PERIOD;
+
+			int d = getcFromInputFile ();
+			if (d != '.')
 			{
-				token->type = TOKEN_PERIOD;
-
-				int d = getcFromInputFile ();
-				if (d != '.')
-				{
-					ungetcToInputFile (d);
-					break;
-				}
-
-				d = getcFromInputFile ();
-				if (d != '.')
-				{
-					ungetcToInputFile (d);
-					ungetcToInputFile ('.');
-					break;
-				}
-
-				token->type = TOKEN_DOTS;
-				if (repr)
-				{
-					/* Adding two dots is enough here.
-					 * The first one is already added with
-					 * vStringPut (repr, c).
-					 */
-					vStringCatS (repr, "..");
-				}
+				ungetcToInputFile (d);
 				break;
 			}
-		case ':': token->type = TOKEN_COLON;				break;
-		case '{': token->type = TOKEN_OPEN_CURLY;			break;
-		case '}': token->type = TOKEN_CLOSE_CURLY;			break;
-		case '[': token->type = TOKEN_OPEN_SQUARE;			break;
-		case ']': token->type = TOKEN_CLOSE_SQUARE;			break;
+
+			d = getcFromInputFile ();
+			if (d != '.')
+			{
+				ungetcToInputFile (d);
+				ungetcToInputFile ('.');
+				break;
+			}
+
+			token->type = TOKEN_DOTS;
+			if (repr)
+			{
+				/* Adding two dots is enough here.
+				 * The first one is already added with
+				 * vStringPut (repr, c).
+				 */
+				vStringCatS (repr, "..");
+			}
+			break;
+		}
+		case ':': token->type = TOKEN_COLON;		break;
+		case '{': token->type = TOKEN_OPEN_CURLY;	break;
+		case '}': token->type = TOKEN_CLOSE_CURLY;	break;
+		case '[': token->type = TOKEN_OPEN_SQUARE;	break;
+		case ']': token->type = TOKEN_CLOSE_SQUARE;	break;
 
 		case '=':
+		{
+			int d = getcFromInputFile ();
+			if (d == '>')
+				token->type = TOKEN_ARROW;
+			else
 			{
-				int d = getcFromInputFile ();
-				if (d == '>')
-					token->type = TOKEN_ARROW;
-				else
-				{
-					ungetcToInputFile (d);
-					token->type = TOKEN_EQUAL_SIGN;
-				}
-				break;
+				ungetcToInputFile (d);
+				token->type = TOKEN_EQUAL_SIGN;
 			}
+			break;
+		}
 
 		case '+':
 		case '-':
+		{
+			int d = getcFromInputFile ();
+			if (d == c) /* ++ or -- */
+				token->type = TOKEN_POSTFIX_OPERATOR;
+			else
 			{
-				int d = getcFromInputFile ();
-				if (d == c) /* ++ or -- */
-					token->type = TOKEN_POSTFIX_OPERATOR;
-				else
-				{
-					ungetcToInputFile (d);
-					token->type = TOKEN_BINARY_OPERATOR;
-				}
-				break;
+				ungetcToInputFile (d);
+				token->type = TOKEN_BINARY_OPERATOR;
 			}
+			break;
+		}
 
 		case '*':
 			token->type = TOKEN_STAR;
@@ -1108,117 +1109,117 @@ getNextChar:
 
 		case '\'':
 		case '"':
-				  token->type = TOKEN_STRING;
-				  parseString (token->string, c);
-				  token->lineNumber = getInputLineNumber ();
-				  token->filePosition = getInputFilePosition ();
-				  if (repr)
-				  {
-					  vStringCat (repr, token->string);
-					  vStringPut (repr, c);
-				  }
-				  break;
+			token->type = TOKEN_STRING;
+			parseString (token->string, c);
+			token->lineNumber = getInputLineNumber ();
+			token->filePosition = getInputFilePosition ();
+			if (repr)
+			{
+				vStringCat (repr, token->string);
+				vStringPut (repr, c);
+			}
+			break;
 
 		case '`':
-				  token->type = TOKEN_TEMPLATE_STRING;
-				  parseTemplateString (token->string);
-				  token->lineNumber = getInputLineNumber ();
-				  token->filePosition = getInputFilePosition ();
-				  if (repr)
-				  {
-					  vStringCat (repr, token->string);
-					  vStringPut (repr, c);
-				  }
-				  break;
+			token->type = TOKEN_TEMPLATE_STRING;
+			parseTemplateString (token->string);
+			token->lineNumber = getInputLineNumber ();
+			token->filePosition = getInputFilePosition ();
+			if (repr)
+			{
+				vStringCat (repr, token->string);
+				vStringPut (repr, c);
+			}
+			break;
 
 		case '/':
-				  {
-					  int d = getcFromInputFile ();
-					  if ( (d != '*') &&		/* is this the start of a comment? */
-							  (d != '/') )		/* is a one line comment? */
-					  {
-						  ungetcToInputFile (d);
-						  switch (LastTokenType)
-						  {
-							  case TOKEN_CHARACTER:
-							  case TOKEN_IDENTIFIER:
-							  case TOKEN_STRING:
-							  case TOKEN_TEMPLATE_STRING:
-							  case TOKEN_CLOSE_CURLY:
-							  case TOKEN_CLOSE_PAREN:
-							  case TOKEN_CLOSE_SQUARE:
-								  token->type = TOKEN_BINARY_OPERATOR;
-								  break;
+		{
+			int d = getcFromInputFile ();
+			if ( (d != '*') &&		/* is this the start of a comment? */
+					(d != '/') )		/* is a one line comment? */
+			{
+				ungetcToInputFile (d);
+				switch (LastTokenType)
+				{
+					case TOKEN_CHARACTER:
+					case TOKEN_IDENTIFIER:
+					case TOKEN_STRING:
+					case TOKEN_TEMPLATE_STRING:
+					case TOKEN_CLOSE_CURLY:
+					case TOKEN_CLOSE_PAREN:
+					case TOKEN_CLOSE_SQUARE:
+						token->type = TOKEN_BINARY_OPERATOR;
+						break;
 
-							  default:
-								  token->type = TOKEN_REGEXP;
-								  parseRegExp ();
-								  token->lineNumber = getInputLineNumber ();
-								  token->filePosition = getInputFilePosition ();
-								  break;
-						  }
-					  }
-					  else
-					  {
-						  if (repr) /* remove the / we added */
-							  vStringChop(repr);
-						  if (d == '*')
-						  {
-							  skipToCharacterInInputFile2('*', '/');
-							  goto getNextChar;
-						  }
-						  else if (d == '/')	/* is this the start of a comment?  */
-						  {
-							  skipToCharacterInInputFile ('\n');
-							  /* if we care about newlines, put it back so it is seen */
-							  if (include_newlines)
-								  ungetcToInputFile ('\n');
-							  goto getNextChar;
-						  }
-					  }
-					  break;
-				  }
+					default:
+						token->type = TOKEN_REGEXP;
+						parseRegExp ();
+						token->lineNumber = getInputLineNumber ();
+						token->filePosition = getInputFilePosition ();
+						break;
+				}
+			}
+			else
+			{
+				if (repr) /* remove the / we added */
+					vStringChop(repr);
+				if (d == '*')
+				{
+					skipToCharacterInInputFile2('*', '/');
+					goto getNextChar;
+				}
+				else if (d == '/')	/* is this the start of a comment?  */
+				{
+					skipToCharacterInInputFile ('\n');
+					/* if we care about newlines, put it back so it is seen */
+					if (include_newlines)
+						ungetcToInputFile ('\n');
+					goto getNextChar;
+				}
+			}
+			break;
+		}
 
 		case '#':
-				  /* skip shebang in case of e.g. Node.js scripts */
-				  if (token->lineNumber > 1)
-					  token->type = TOKEN_UNDEFINED;
-				  else if ((c = getcFromInputFile ()) != '!')
-				  {
-					  ungetcToInputFile (c);
-					  token->type = TOKEN_UNDEFINED;
-				  }
-				  else
-				  {
-					  skipToCharacterInInputFile ('\n');
-					  goto getNextChar;
-				  }
-				  break;
+			/* skip shebang in case of e.g. Node.js scripts */
+			if (token->lineNumber > 1)
+				token->type = TOKEN_UNDEFINED;
+			else if ((c = getcFromInputFile ()) != '!')
+			{
+				ungetcToInputFile (c);
+				token->type = TOKEN_UNDEFINED;
+			}
+			else
+			{
+				skipToCharacterInInputFile ('\n');
+				goto getNextChar;
+			}
+			break;
 
 		case '@':
-				  token->type = TOKEN_ATMARK;
-				  break;
+			token->type = TOKEN_ATMARK;
+			break;
 
 		case '\\':
-				  c = readUnicodeEscapeSequence (c);
-				  /* fallthrough */
+			c = readUnicodeEscapeSequence (c);
+			/* fallthrough */
 		default:
-				  if (! isIdentChar (c))
-					  token->type = TOKEN_UNDEFINED;
-				  else
-				  {
-					  parseIdentifier (token->string, c);
-					  token->lineNumber = getInputLineNumber ();
-					  token->filePosition = getInputFilePosition ();
-					  token->keyword = lookupKeyword (vStringValue (token->string), Lang_js);
-					  if (isKeyword (token, KEYWORD_NONE))
-						  token->type = TOKEN_IDENTIFIER;
-					  else
-						  token->type = TOKEN_KEYWORD;
-					  if (repr && vStringLength (token->string) > 1)
-						  vStringCatS (repr, vStringValue (token->string) + 1);
-				  }
-				  break;
+			if (! isIdentChar (c))
+				token->type = TOKEN_UNDEFINED;
+			else
+			{
+				parseIdentifier (token->string, c);
+				token->lineNumber = getInputLineNumber ();
+				token->filePosition = getInputFilePosition ();
+				token->keyword = lookupKeyword (vStringValue (token->string), Lang_js);
+				if (isKeyword (token, KEYWORD_NONE))
+					token->type = TOKEN_IDENTIFIER;
+				else
+					token->type = TOKEN_KEYWORD;
+				if (repr && vStringLength (token->string) > 1)
+					vStringCatS (repr, vStringValue (token->string) + 1);
+			}
+			break;
 	}
 
 	if (include_newlines && newline_encountered)
@@ -1237,24 +1238,24 @@ getNextChar:
 
 		/* these already end a statement, so no need to duplicate it */
 		#define IS_STMT_SEPARATOR(t) ((t) == TOKEN_SEMICOLON    || \
-		                              (t) == TOKEN_EOF          || \
-		                              (t) == TOKEN_COMMA        || \
-		                              (t) == TOKEN_OPEN_CURLY)
+									  (t) == TOKEN_EOF          || \
+									  (t) == TOKEN_COMMA        || \
+									  (t) == TOKEN_OPEN_CURLY)
 		/* these cannot be the start or end of a statement */
 		#define IS_BINARY_OPERATOR(t) ((t) == TOKEN_EQUAL_SIGN      || \
-		                               (t) == TOKEN_ARROW           || \
-		                               (t) == TOKEN_COLON           || \
-		                               (t) == TOKEN_PERIOD          || \
-		                               (t) == TOKEN_STAR            || \
-		                               (t) == TOKEN_BINARY_OPERATOR)
+									   (t) == TOKEN_ARROW           || \
+									   (t) == TOKEN_COLON           || \
+									   (t) == TOKEN_PERIOD          || \
+									   (t) == TOKEN_STAR            || \
+									   (t) == TOKEN_BINARY_OPERATOR)
 
 		if (! IS_STMT_SEPARATOR(LastTokenType) &&
-		    ! IS_STMT_SEPARATOR(token->type) &&
-		    ! IS_BINARY_OPERATOR(LastTokenType) &&
-		    ! IS_BINARY_OPERATOR(token->type) &&
-		    /* these cannot be followed by a semicolon */
-		    ! (LastTokenType == TOKEN_OPEN_PAREN ||
-		       LastTokenType == TOKEN_OPEN_SQUARE))
+			! IS_STMT_SEPARATOR(token->type) &&
+			! IS_BINARY_OPERATOR(LastTokenType) &&
+			! IS_BINARY_OPERATOR(token->type) &&
+			/* these cannot be followed by a semicolon */
+			! (LastTokenType == TOKEN_OPEN_PAREN ||
+			   LastTokenType == TOKEN_OPEN_SQUARE))
 		{
 			/* hold the token... */
 			Assert (NextToken == NULL);
@@ -1262,8 +1263,8 @@ getNextChar:
 			copyToken (NextToken, token, false);
 
 			/* ...and emit a semicolon instead */
-			token->type		= TOKEN_SEMICOLON;
-			token->keyword	= KEYWORD_NONE;
+			token->type = TOKEN_SEMICOLON;
+			token->keyword = KEYWORD_NONE;
 			vStringClear (token->string);
 			if (repr)
 				vStringPut (token->string, '\n');
@@ -1351,7 +1352,7 @@ static void readToken (tokenInfo *const token)
 }
 
 /*
- *	 Token parsing functions
+ * Token parsing functions
  */
 
 static int parseMethodsInAnonymousObject (tokenInfo *const token)
@@ -1416,7 +1417,7 @@ static void skipArrayList (tokenInfo *const token, bool include_newlines)
 {
 	/*
 	 * Handle square brackets
-	 *	 var name[1]
+	 *   var name[1]
 	 * So we must check for nested open and closing square brackets
 	 */
 
@@ -1468,11 +1469,10 @@ static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 }
 
 /*
- *	 Scanning functions
+ * Scanning functions
  */
 
-static bool findCmdTerm (tokenInfo *const token, bool include_newlines,
-                            bool include_commas)
+static bool findCmdTerm (tokenInfo *const token, bool include_newlines, bool include_commas)
 {
 	/*
 	 * Read until we find either a semicolon or closing brace.
@@ -1505,11 +1505,11 @@ static void parseSwitch (tokenInfo *const token)
 	/*
 	 * switch (expression) {
 	 * case value1:
-	 *	   statement;
-	 *	   break;
+	 *     statement;
+	 *     break;
 	 * case value2:
-	 *	   statement;
-	 *	   break;
+	 *     statement;
+	 *     break;
 	 * default : statement;
 	 * }
 	 */
@@ -1531,24 +1531,24 @@ static bool parseLoop (tokenInfo *const token)
 {
 	/*
 	 * Handles these statements
-	 *	   for (x=0; x<3; x++)
-	 *		   document.write("This text is repeated three times<br>");
+	 *     for (x=0; x<3; x++)
+	 *         document.write("This text is repeated three times<br>");
 	 *
-	 *	   for (x=0; x<3; x++)
-	 *	   {
-	 *		   document.write("This text is repeated three times<br>");
-	 *	   }
+	 *     for (x=0; x<3; x++)
+	 *     {
+	 *         document.write("This text is repeated three times<br>");
+	 *     }
 	 *
-	 *	   while (number<5){
-	 *		   document.write(number+"<br>");
-	 *		   number++;
-	 *	   }
+	 *     while (number<5){
+	 *         document.write(number+"<br>");
+	 *         number++;
+	 *     }
 	 *
-	 *	   do{
-	 *		   document.write(number+"<br>");
-	 *		   number++;
-	 *	   }
-	 *	   while (number<5);
+	 *     do{
+	 *         document.write(number+"<br>");
+	 *         number++;
+	 *     }
+	 *     while (number<5);
 	 */
 	bool is_terminated = true;
 
@@ -1602,41 +1602,41 @@ static bool parseIf (tokenInfo *const token)
 	bool read_next_token = true;
 	/*
 	 * If statements have two forms
-	 *	   if ( ... )
-	 *		   one line;
+	 *     if ( ... )
+	 *         one line;
 	 *
-	 *	   if ( ... )
-	 *		  statement;
-	 *	   else
-	 *		  statement
+	 *     if ( ... )
+	 *         statement;
+	 *     else
+	 *         statement
 	 *
-	 *	   if ( ... ) {
-	 *		  multiple;
-	 *		  statements;
-	 *	   }
+	 *     if ( ... ) {
+	 *         multiple;
+	 *         statements;
+	 *     }
 	 *
 	 *
-	 *	   if ( ... ) {
-	 *		  return elem
-	 *	   }
+	 *     if ( ... ) {
+	 *         return elem
+	 *     }
 	 *
 	 *     This example if correctly written, but the
 	 *     else contains only 1 statement without a terminator
 	 *     since the function finishes with the closing brace.
 	 *
-     *     function a(flag){
-     *         if(flag)
-     *             test(1);
-     *         else
-     *             test(2)
-     *     }
+	 *     function a(flag){
+	 *         if(flag)
+	 *             test(1);
+	 *         else
+	 *             test(2)
+	 *     }
 	 *
 	 * TODO:  Deal with statements that can optional end
-	 *		  without a semi-colon.  Currently this messes up
-	 *		  the parsing of blocks.
-	 *		  Need to somehow detect this has happened, and either
-	 *		  backup a token, or skip reading the next token if
-	 *		  that is possible from all code locations.
+	 *        without a semi-colon.  Currently this messes up
+	 *        the parsing of blocks.
+	 *        Need to somehow detect this has happened, and either
+	 *        backup a token, or skip reading the next token if
+	 *        that is possible from all code locations.
 	 *
 	 */
 
@@ -1711,10 +1711,10 @@ static bool collectChildren (int corkIndex, tagEntryInfo *entry, void *data)
  *         moveChildren (dummyIndex, trueIdex);
  *
  */
-static void moveChildren (int oldParent, int newParent)
+static void moveChildren (int old_parent, int new_parent)
 {
 	intArray *children = intArrayNew ();
-	foreachEntriesInScope (oldParent, NULL, collectChildren, children);
+	foreachEntriesInScope (old_parent, NULL, collectChildren, children);
 	for (unsigned int i = 0; i < intArrayCount (children); i++)
 	{
 		int c = intArrayItem (children, i);
@@ -1722,7 +1722,7 @@ static void moveChildren (int oldParent, int newParent)
 		unregisterEntry (c);
 		tagEntryInfo *e = getEntryInCorkQueue (c);
 		Assert (e);
-		e->extensionFields.scopeIndex = newParent;
+		e->extensionFields.scopeIndex = new_parent;
 		registerEntry (c);
 	}
 	intArrayDelete (children);
@@ -1732,9 +1732,9 @@ static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, co
 {
 #ifdef DO_TRACING
 	{
-		const char *scopeStr = getNameStringForCorkIndex (token->scope);
-		const char *scopeKindStr = getKindStringForCorkIndex (token->scope);
-		TRACE_ENTER_TEXT("token has scope '%s' of kind %s", scopeStr, scopeKindStr);
+		const char *scope_str = getNameStringForCorkIndex (token->scope);
+		const char *scope_kind_str = getKindStringForCorkIndex (token->scope);
+		TRACE_ENTER_TEXT("token has scope '%s' of kind %s", scope_str, scope_kind_str);
 	}
 #endif
 
@@ -1745,8 +1745,8 @@ static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, co
 	int index_for_name = CORK_NIL;
 	/*
 	 * This deals with these formats
-	 *	   function validFunctionTwo(a,b) {}
-	 *	   function * generator(a,b) {}
+	 *     function validFunctionTwo(a,b) {}
+	 *     function * generator(a,b) {}
 	 */
 
 	copyToken (name, token, true);
@@ -1809,18 +1809,18 @@ static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, co
 }
 
 /* Parses a block surrounded by curly braces.
- * @p parentScope is the scope name for this block, or NULL for unnamed scopes */
-static bool parseBlock (tokenInfo *const token, int parentScope)
+ * @p parent_scope is the scope name for this block, or NULL for unnamed scopes */
+static bool parseBlock (tokenInfo *const token, int parent_scope)
 {
 	TRACE_ENTER();
 
 	bool is_class = false;
 	bool read_next_token = true;
-	int saveScope = token->scope;
+	int save_scope = token->scope;
 
-	if (parentScope != CORK_NIL)
+	if (parent_scope != CORK_NIL)
 	{
-		token->scope = parentScope;
+		token->scope = parent_scope;
 		token->nestLevel++;
 	}
 
@@ -1895,22 +1895,21 @@ static bool parseBlock (tokenInfo *const token, int parentScope)
 				 ! isType (token, TOKEN_CLOSE_CURLY) && read_next_token);
 	}
 
-	token->scope = saveScope;
-	if (parentScope != CORK_NIL)
+	token->scope = save_scope;
+	if (parent_scope != CORK_NIL)
 		token->nestLevel--;
 
 	TRACE_LEAVE();
-
 	return is_class;
 }
 
-static bool parseMethods (tokenInfo *const token, int classIndex,
-                          const bool is_es6_class)
+static bool parseMethods (tokenInfo *const token, int class_index,
+						  const bool is_es6_class)
 {
 	TRACE_ENTER_TEXT("token is '%s' of type %s in parentToken '%s' of kind %s (es6: %s)",
 					 vStringValue(token->string), tokenTypeName (token->type),
-					 classIndex == CORK_NIL ? "none" : getNameStringForCorkIndex (classIndex),
-					 classIndex == CORK_NIL ? "none" : getKindStringForCorkIndex (classIndex),
+					 class_index == CORK_NIL ? "none" : getNameStringForCorkIndex (class_index),
+					 class_index == CORK_NIL ? "none" : getKindStringForCorkIndex (class_index),
 					 is_es6_class? "yes": "no");
 
 	/*
@@ -1920,33 +1919,33 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 	 * is changed, `indexForName' is reset to CORK_NIL.
 	 */
 	tokenInfo *const name = newToken ();
-	int indexForName = CORK_NIL;
+	int index_for_name = CORK_NIL;
 	bool has_methods = false;
-	int saveScope = token->scope;
+	int save_scope = token->scope;
 
-	if (classIndex != CORK_NIL)
-		token->scope = classIndex;
+	if (class_index != CORK_NIL)
+		token->scope = class_index;
 
 	/*
 	 * This deals with these formats
-	 *	   validProperty  : 2,
-	 *	   validMethod    : function(a,b) {}
-	 *	   'validMethod2' : function(a,b) {}
-     *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
+	 *     validProperty  : 2,
+	 *     validMethod    : function(a,b) {}
+	 *     'validMethod2' : function(a,b) {}
+	 *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
 	 *     get prop() {}
 	 *     set prop(val) {}
 	 *     get(...) {}
 	 *     set(...) {}
-     *
-     * ES6 methods:
-     *     property(...) {}
-     *     *generator() {}
-     *
-     * ES6 computed name:
-     *     [property]() {}
-     *     get [property]() {}
-     *     set [property]() {}
-     *     *[generator]() {}
+	 *
+	 * ES6 methods:
+	 *     property(...) {}
+	 *     *generator() {}
+	 *
+	 * ES6 computed name:
+	 *     [property]() {}
+	 *     get [property]() {}
+	 *     set [property]() {}
+	 *     *[generator]() {}
 	 *
 	 * tc39/proposal-class-fields
 	 *     field0 = function(a,b) {}
@@ -1996,7 +1995,7 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 		}
 
 		if (! isType (token, TOKEN_KEYWORD) &&
-		    ! isType (token, TOKEN_SEMICOLON))
+			! isType (token, TOKEN_SEMICOLON))
 		{
 			bool is_generator = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
@@ -2021,7 +2020,7 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 			}
 
 			copyToken(name, token, true);
-			indexForName = CORK_NIL;
+			index_for_name = CORK_NIL;
 			if (is_computed_name && ! isType (token, TOKEN_STRING))
 				is_dynamic_prop = true;
 
@@ -2047,7 +2046,7 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 			if (is_dynamic_prop)
 			{
 				injectDynamicName (name, dprop);
-				indexForName = CORK_NIL;
+				index_for_name = CORK_NIL;
 				dprop = NULL;
 			}
 			else
@@ -2097,8 +2096,8 @@ function:
 						else if (is_setter)
 							kind = JSTAG_SETTER;
 
-						indexForName = makeJsTag (name, kind, signature, NULL);
-						parseBlock (token, indexForName);
+						index_for_name = makeJsTag (name, kind, signature, NULL);
+						parseBlock (token, index_for_name);
 
 						/*
 						 * If we aren't parsing an ES6 class (for which there
@@ -2117,8 +2116,8 @@ function:
 
 					/* skip whatever is the value */
 					while (! isType (token, TOKEN_COMMA) &&
-					       ! isType (token, TOKEN_CLOSE_CURLY) &&
-					       ! isType (token, TOKEN_EOF))
+						   ! isType (token, TOKEN_CLOSE_CURLY) &&
+						   ! isType (token, TOKEN_EOF))
 					{
 						if (isType (token, TOKEN_OPEN_CURLY))
 						{
@@ -2159,9 +2158,9 @@ function:
 					deleteToken (saved_token);
 
 					has_methods = true;
-					indexForName = makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
+					index_for_name = makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 					if (p != CORK_NIL)
-						moveChildren (p, indexForName);
+						moveChildren (p, index_for_name);
 				}
 				else if (can_be_field)
 				{
@@ -2179,81 +2178,80 @@ function:
 			}
 		}
 	} while ( isType(token, TOKEN_COMMA) ||
-	          ( is_es6_class && ! isType(token, TOKEN_EOF) ) );
+			  ( is_es6_class && ! isType(token, TOKEN_EOF) ) );
 
 	TRACE_PRINT("Finished parsing methods");
 
 	findCmdTerm (token, false, false);
 
 cleanUp:
-	token->scope = saveScope;
+	token->scope = save_scope;
 	deleteToken (name);
 
 	TRACE_LEAVE_TEXT("found method(s): %s", has_methods? "yes": "no");
-
 	return has_methods;
 }
 
-static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
+static bool parseES6Class (tokenInfo *const token, const tokenInfo *target_name)
 {
 	TRACE_ENTER();
 
-	tokenInfo * className = newToken ();
+	tokenInfo * class_name = newToken ();
 	vString *inheritance = NULL;
 	bool is_anonymous = true;
 
-	copyToken (className, token, true);
-	readToken (className);
+	copyToken (class_name, token, true);
+	readToken (class_name);
 
 	/* optional name */
-	if (isType (className, TOKEN_IDENTIFIER))
+	if (isType (class_name, TOKEN_IDENTIFIER))
 	{
 		readToken (token);
 		is_anonymous = false;
 	}
 	else
 	{
-		copyToken (token, className, true);
+		copyToken (token, class_name, true);
 		/* We create a fake name so we have a scope for the members */
-		if (! targetName)
-			anonGenerate (className->string, "AnonymousClass", JSTAG_CLASS);
+		if (! target_name)
+			anonGenerate (class_name->string, "AnonymousClass", JSTAG_CLASS);
 	}
 
-	if (! targetName)
-		targetName = className;
+	if (! target_name)
+		target_name = class_name;
 
 	if (isKeyword (token, KEYWORD_extends))
 		inheritance = vStringNew ();
 
 	/* skip inheritance info */
 	while (! isType (token, TOKEN_OPEN_CURLY) &&
-	       ! isType (token, TOKEN_EOF) &&
-	       ! isType (token, TOKEN_SEMICOLON))
+		   ! isType (token, TOKEN_EOF) &&
+		   ! isType (token, TOKEN_SEMICOLON))
 		readTokenFull (token, false, inheritance);
 
 	/* remove the last added token (here we assume it's one char, "{" or ";" */
 	if (inheritance && vStringLength (inheritance) > 0 &&
-	    ! isType (token, TOKEN_EOF))
+		! isType (token, TOKEN_EOF))
 	{
 		vStringChop (inheritance);
 		vStringStripTrailing (inheritance);
 		vStringStripLeading (inheritance);
 	}
 
-	TRACE_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
+	TRACE_PRINT("Emitting tag for class '%s'", vStringValue(target_name->string));
 
-	int r = makeJsTagCommon (targetName, JSTAG_CLASS, NULL, inheritance,
-							 (is_anonymous && (targetName == className)));
+	int r = makeJsTagCommon (target_name, JSTAG_CLASS, NULL, inheritance,
+							 (is_anonymous && (target_name == class_name)));
 
-	if (! is_anonymous && targetName != className)
+	if (! is_anonymous && target_name != class_name)
 	{
 		/* FIXME: what to do with the secondary name?  It's local to the
 		 *        class itself, so not very useful... let's hope people
 		 *        don't give it another name than the target in case of
-		 *        	var MyClass = class MyClassSecondaryName { ... }
+		 *          var MyClass = class MyClassSecondaryName { ... }
 		 *        I guess it could be an alias to MyClass, or duplicate it
 		 *        altogether, not sure. */
-		makeJsTag (className, JSTAG_CLASS, NULL, inheritance);
+		makeJsTag (class_name, JSTAG_CLASS, NULL, inheritance);
 	}
 
 	if (inheritance)
@@ -2262,7 +2260,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 	if (isType (token, TOKEN_OPEN_CURLY))
 		parseMethods (token, r, true);
 
-	deleteToken (className);
+	deleteToken (class_name);
 
 	TRACE_LEAVE();
 	return true;
@@ -2328,7 +2326,7 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 	 * CASE 1
 	 * Specified function name: "build"
 	 *     BindAgent.prototype.build = function( mode ) {
-	 *     	  maybe parse nested functions
+	 *         maybe parse nested functions
 	 *     }
 	 *
 	 * CASE 2
@@ -2377,9 +2375,9 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 			readToken (method_body_token);
 
 			while (! isType (method_body_token, TOKEN_SEMICOLON) &&
-			       ! isType (method_body_token, TOKEN_CLOSE_CURLY) &&
-			       ! isType (method_body_token, TOKEN_OPEN_CURLY) &&
-			       ! isType (method_body_token, TOKEN_EOF))
+				   ! isType (method_body_token, TOKEN_CLOSE_CURLY) &&
+				   ! isType (method_body_token, TOKEN_OPEN_CURLY) &&
+				   ! isType (method_body_token, TOKEN_EOF))
 			{
 				if ( isType (method_body_token, TOKEN_OPEN_PAREN) )
 					skipArgumentList(method_body_token, false,
@@ -2430,7 +2428,6 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 	}
 
 	TRACE_LEAVE_TEXT("done: not found");
-
 	return true;
 }
 
@@ -2466,7 +2463,6 @@ static bool parseStatementLHS (tokenInfo *const name, tokenInfo *const token, st
 	} while (isType (token, TOKEN_PERIOD));
 
 	TRACE_LEAVE();
-
 	return true;
 }
 
@@ -2521,8 +2517,8 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		 * Or checks if this is a hash variable.
 		 *     var z = {};
 		 */
-		bool anonObject = vStringIsEmpty (name->string);
-		if (anonObject)
+		bool anon_object = vStringIsEmpty (name->string);
+		if (anon_object)
 		{
 			anonGenerate (name->string, "anonymousObject", JSTAG_VARIABLE);
 			state->indexForName = CORK_NIL;
@@ -2531,7 +2527,7 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		if ( parseMethods(token, p, false) )
 		{
 			jsKind kind = state->foundThis || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
-			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, anonObject);
+			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, anon_object);
 			moveChildren (p, state->indexForName);
 		}
 		else if ( token->nestLevel == 0 && state->isGlobal )
@@ -2544,12 +2540,12 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 			 * This format looks identical to a variable definition.
 			 * A variable defined outside of a block is considered
 			 * a global variable:
-			 *	   var g_var1 = 1;
-			 *	   var g_var2;
+			 *     var g_var1 = 1;
+			 *     var g_var2;
 			 * This is not a global variable:
-			 *	   var g_var = function;
+			 *     var g_var = function;
 			 * This is a global variable:
-			 *	   var g_var = different_var_name;
+			 *     var g_var = different_var_name;
 			 */
 			state->indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
 														 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
@@ -2586,8 +2582,8 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		readToken (token);
 		bool is_var = isType (token, TOKEN_IDENTIFIER) || isKeyword (token, KEYWORD_capital_object);
 		if ( isKeyword (token, KEYWORD_function) ||
-				isKeyword (token, KEYWORD_capital_function) ||
-				is_var )
+			 isKeyword (token, KEYWORD_capital_function) ||
+			 is_var )
 		{
 			if ( isKeyword (token, KEYWORD_capital_function) && isClassName (name) )
 				state->isClass = true;
@@ -2629,12 +2625,12 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		 * This format looks identical to a variable definition.
 		 * A variable defined outside of a block is considered
 		 * a global variable:
-		 *	   var g_var1 = 1;
-		 *	   var g_var2;
+		 *     var g_var1 = 1;
+		 *     var g_var2;
 		 * This is not a global variable:
-		 *	   var g_var = function;
+		 *     var g_var = function;
 		 * This is a global variable:
-		 *	   var g_var = different_var_name;
+		 *     var g_var = different_var_name;
 		 */
 		state->indexForName = anyKindsEntryInScope (name->scope, vStringValue (name->string),
 													 (int[]){JSTAG_VARIABLE, JSTAG_FUNCTION, JSTAG_CLASS}, 3, true);
@@ -2707,7 +2703,6 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 	}
 
 	TRACE_LEAVE();
-
 	return true;
 }
 
@@ -2722,7 +2717,7 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	 * is changed, `indexForName' is reset to CORK_NIL.
 	 */
 	tokenInfo *const name = newToken ();
-	int saveScope = token->scope;
+	int save_scope = token->scope;
 	bool found_lhs = false;
 	statementState state = {
 		.indexForName = CORK_NIL,
@@ -2737,28 +2732,28 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	 * Functions can be named or unnamed.
 	 * This deals with these formats:
 	 * Function
-	 *	   validFunctionOne = function(a,b) {}
-	 *	   testlib.validFunctionFive = function(a,b) {}
-	 *	   var innerThree = function(a,b) {}
-	 *	   var innerFour = (a,b) {}
-	 *	   var D2 = secondary_fcn_name(a,b) {}
-	 *	   var D3 = new Function("a", "b", "return a+b;");
+	 *     validFunctionOne = function(a,b) {}
+	 *     testlib.validFunctionFive = function(a,b) {}
+	 *     var innerThree = function(a,b) {}
+	 *     var innerFour = (a,b) {}
+	 *     var D2 = secondary_fcn_name(a,b) {}
+	 *     var D3 = new Function("a", "b", "return a+b;");
 	 * Class
-	 *	   testlib.extras.ValidClassOne = function(a,b) {
-	 *		   this.a = a;
-	 *	   }
+	 *     testlib.extras.ValidClassOne = function(a,b) {
+	 *         this.a = a;
+	 *     }
 	 * Class Methods
-	 *	   testlib.extras.ValidClassOne.prototype = {
-	 *		   'validMethodOne' : function(a,b) {},
-	 *		   'validMethodTwo' : function(a,b) {}
-	 *	   }
-     *     ValidClassTwo = function ()
-     *     {
-     *         this.validMethodThree = function() {}
-     *         // unnamed method
-     *         this.validMethodFour = () {}
-     *     }
-	 *	   Database.prototype.validMethodThree = Database_getTodaysDate;
+	 *     testlib.extras.ValidClassOne.prototype = {
+	 *         'validMethodOne' : function(a,b) {},
+	 *         'validMethodTwo' : function(a,b) {}
+	 *     }
+	 *     ValidClassTwo = function ()
+	 *     {
+	 *         this.validMethodThree = function() {}
+	 *         // unnamed method
+	 *         this.validMethodFour = () {}
+	 *     }
+	 *     Database.prototype.validMethodThree = Database_getTodaysDate;
 	 */
 
 	/*
@@ -2801,10 +2796,10 @@ nextVar:
 				vStringValue(token->string), tokenTypeName (token->type));
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
-	       ! isType (token, TOKEN_SEMICOLON)   &&
-	       ! isType (token, TOKEN_EQUAL_SIGN)  &&
-	       ! isType (token, TOKEN_COMMA)       &&
-	       ! isType (token, TOKEN_EOF))
+		   ! isType (token, TOKEN_SEMICOLON)   &&
+		   ! isType (token, TOKEN_EQUAL_SIGN)  &&
+		   ! isType (token, TOKEN_COMMA)       &&
+		   ! isType (token, TOKEN_EOF))
 	{
 		found_lhs = true;
 		if (isType (token, TOKEN_OPEN_CURLY))
@@ -2863,7 +2858,7 @@ nextVar:
 		{
 			/*
 			 * Handles this syntax:
-			 *	   var g_var2;
+			 *     var g_var2;
 			 */
 			state.indexForName = makeJsTag (name, state.isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 		}
@@ -2889,7 +2884,7 @@ nextVar:
 		 * the statement was terminated */
 		if (ok &&
 			! isType (token, TOKEN_CLOSE_CURLY) &&
-		    ! isType (token, TOKEN_SEMICOLON))
+			! isType (token, TOKEN_SEMICOLON))
 		{
 			/*
 			 * Statements can be optionally terminated in the case of
@@ -2897,10 +2892,10 @@ nextVar:
 			 * document.write line below:
 			 *
 			 * function checkForUpdate() {
-			 *	   if( 1==1 ) {
-			 *		   document.write("hello from checkForUpdate<br>")
-			 *	   }
-			 *	   return 1;
+			 *     if( 1==1 ) {
+			 *         document.write("hello from checkForUpdate<br>")
+			 *     }
+			 *     return 1;
 			 * }
 			 */
 			state.isTerminated = findCmdTerm (token, true, true);
@@ -2916,11 +2911,10 @@ nextVar:
 	}
 
 cleanUp:
-	token->scope = saveScope;
+	token->scope = save_scope;
 	deleteToken (name);
 
 	TRACE_LEAVE_TEXT("is terminated: %d", (int) state.isTerminated);
-
 	return state.isTerminated;
 }
 
@@ -3059,7 +3053,6 @@ static bool parseLine (tokenInfo *const token, bool is_inside_class)
 	}
 
 	TRACE_LEAVE();
-
 	return is_terminated;
 }
 
@@ -3074,7 +3067,7 @@ static void parseJsFile (tokenInfo *const token)
 		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
 		else if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_export ||
-		                                           token->keyword == KEYWORD_default))
+												   token->keyword == KEYWORD_default))
 			/* skip those at top-level */;
 		else
 			parseLine (token, false);
@@ -3087,10 +3080,10 @@ static void parseJsFile (tokenInfo *const token)
 #ifdef DO_TRACING_USE_DUMP_TOKEN
 static void dumpToken (const tokenInfo *const token)
 {
-	const char *scopeStr = getNameStringForCorkIndex (token->scope);
-	const char *scopeKindStr = getKindStringForCorkIndex (token->scope);
+	const char *scope_str = getNameStringForCorkIndex (token->scope);
+	const char *scope_kind_str = getKindStringForCorkIndex (token->scope);
 
-	if (strcmp(scopeStr, "placeholder") == 0)
+	if (strcmp(scope_str, "placeholder") == 0)
 	{
 		TRACE_PRINT("%s: %s",
 			tokenTypeName (token->type),
@@ -3101,7 +3094,7 @@ static void dumpToken (const tokenInfo *const token)
 		TRACE_PRINT("%s: %s (scope '%s' of kind %s)",
 			tokenTypeName (token->type),
 			vStringValue (token->string),
-			scopeStr, scopeKindStr);
+			scope_str, scope_kind_str);
 	}
 }
 #endif
@@ -3146,7 +3139,7 @@ static const char *kindName(jsKind kind)
 
 static const char *tokenTypeName(enum eTokenType e)
 { /* Generated by misc/enumstr.sh with cmdline:
-     parsers/jscript.c eTokenType tokenTypeName */
+	 parsers/jscript.c eTokenType tokenTypeName */
 	switch (e)
 	{
 		case      TOKEN_UNDEFINED: return "TOKEN_UNDEFINED";
@@ -3208,7 +3201,7 @@ static void findJsTags (void)
 
 #ifdef HAVE_ICONV
 	if (JSUnicodeConverter != (iconv_t) -2 && /* not created */
-	    JSUnicodeConverter != (iconv_t) -1 /* creation failed */)
+		JSUnicodeConverter != (iconv_t) -1 /* creation failed */)
 	{
 		iconv_close (JSUnicodeConverter);
 		JSUnicodeConverter = (iconv_t) -2;
@@ -3225,7 +3218,7 @@ extern parserDefinition* JavaScriptParser (void)
 	// which have JS function definitions, so we just use the JS parser
 	static const char *const extensions [] = { "js", "jsx", "mjs", NULL };
 	static const char *const aliases [] = { "js", "node", "nodejs",
-	                                        "seed", "gjs",
+											"seed", "gjs",
 											/* Used in PostgreSQL
 											 * https://github.com/plv8/plv8 */
 											"v8",
