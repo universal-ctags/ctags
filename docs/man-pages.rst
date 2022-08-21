@@ -20,6 +20,7 @@ Man pages
 	ctags-lang-gdscript(7) <man/ctags-lang-gdscript.7.rst>
 	ctags-lang-inko(7) <man/ctags-lang-inko.7.rst>
 	ctags-lang-iPythonCell(7) <man/ctags-lang-iPythonCell.7.rst>
+	ctags-lang-javascript(7) <man/ctags-lang-javascript.7.rst>
 	ctags-lang-julia(7) <man/ctags-lang-julia.7.rst>
 	ctags-lang-python(7) <man/ctags-lang-python.7.rst>
 	ctags-lang-r(7) <man/ctags-lang-r.7.rst>
