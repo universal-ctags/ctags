@@ -1,0 +1,32 @@
+import from CoffeeTypes all
+import from CoffeeConstants all
+
+module CoffeeTemplates
+{
+
+template (present) Coffee AnyCoffee
+{
+    id := ?,
+    description := ?
+}
+
+template (value) Coffee SomeCoffee(integer id, charstring description := "")
+{
+    id := id,
+   description := description
+}
+
+template (omit) Coffee Espresso()
+{
+    id := c_espressoId,
+    description := c_espresso
+}
+
+template (TYPO IN RESTRICTION) Coffee Latte()
+{
+    id := c_latteId,
+    description := c_latte
+}
+
+}
+

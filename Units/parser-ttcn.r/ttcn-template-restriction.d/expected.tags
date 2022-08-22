@@ -1,0 +1,5 @@
+CoffeeTemplates	input.ttcn	/^module CoffeeTemplates$/;"	M
+AnyCoffee	input.ttcn	/^template (present) Coffee AnyCoffee$/;"	d
+SomeCoffee	input.ttcn	/^template (value) Coffee SomeCoffee(integer id, charstring description := "")$/;"	d
+Espresso	input.ttcn	/^template (omit) Coffee Espresso()$/;"	d
+Latte	input.ttcn	/^template (TYPO IN RESTRICTION) Coffee Latte()$/;"	d
