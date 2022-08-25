@@ -1,0 +1,10 @@
+test	input.v	/^module test (\/*AUTOARG*\/);$/;"	m	roles:def
+i_a	input.v	/^   input i_a, i_b;$/;"	p	module:test	roles:def
+i_b	input.v	/^   input i_a, i_b;$/;"	p	module:test	roles:def
+o_c	input.v	/^   output o_c;$/;"	p	module:test	roles:def
+int1	input.v	/^   ref1 int1 ();$/;"	i	module:test	typeref:module:ref1	roles:def
+ref1	input.v	/^   ref1 int1 ();$/;"	m	module:test	roles:decl
+int2	input.v	/^   ref1 int2 ();$/;"	i	module:test	typeref:module:ref1	roles:def
+ref1	input.v	/^   ref1 int2 ();$/;"	m	module:test	roles:decl
+int3	input.v	/^   int3 ();$/;"	i	module:test	typeref:module:ref3	roles:def
+ref3	input.v	/^   ref3 # (.A (aaa),$/;"	m	module:test	roles:decl

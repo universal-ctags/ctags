@@ -108,6 +108,10 @@ typedef enum {
 	K_NETTYPE,
 } verilogKind;
 
+typedef enum {
+       R_MODULE_DECL,
+} verilogModuleRole;
+
 typedef struct {
 	const char *keyword;
 	verilogKind kind;
@@ -141,11 +145,20 @@ static int Ungetc;
 static int Lang_verilog;
 static int Lang_systemverilog;
 
+static roleDefinition VerilogModuleRoles [] = {
+ { true, "decl", "declaring instances" },
+};
+
+static roleDefinition SystemVerilogModuleRoles [] = {
+ { true, "decl", "declaring instances" },
+};
+
 static kindDefinition VerilogKinds [] = {
  { true, 'c', "constant",  "constants (define, parameter, specparam)" },
  { true, 'e', "event",     "events" },
  { true, 'f', "function",  "functions" },
- { true, 'm', "module",    "modules" },
+ { true, 'm', "module",    "modules",
+   .referenceOnly = false, ATTACH_ROLES(VerilogModuleRoles) },
  { true, 'n', "net",       "net data types" },
  { true, 'p', "port",      "ports" },
  { true, 'r', "register",  "variable data types" },
@@ -158,7 +171,8 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'c', "constant",  "constants (define, parameter, specparam, enum values)" },
  { true, 'e', "event",     "events" },
  { true, 'f', "function",  "functions" },
- { true, 'm', "module",    "modules" },
+ { true, 'm', "module",    "modules",
+   .referenceOnly = false, ATTACH_ROLES(SystemVerilogModuleRoles) },
  { true, 'n', "net",       "net data types" },
  { true, 'p', "port",      "ports" },
  { true, 'r', "register",  "variable data types" },
@@ -949,7 +963,7 @@ static int dropEndContext (tokenInfo *const token, int c)
 }
 
 
-static void createTagWithTypeRef (tokenInfo *const token, verilogKind kind, tokenInfo *const typeref)
+static void createTagFull (tokenInfo *const token, verilogKind kind, int role, tokenInfo *const typeref)
 {
 	tagEntryInfo tag;
 
@@ -981,7 +995,10 @@ static void createTagWithTypeRef (tokenInfo *const token, verilogKind kind, toke
 	}
 
 	/* Create tag */
-	initTagEntry (&tag, vStringValue (token->name), kind);
+	if (role == ROLE_DEFINITION_INDEX)
+		initTagEntry (&tag, vStringValue (token->name), kind);
+	else
+		initRefTagEntry (&tag, vStringValue (token->name), kind, role);
 	tag.lineNumber = token->lineNumber;
 	tag.filePosition = token->filePosition;
 
@@ -1011,7 +1028,8 @@ static void createTagWithTypeRef (tokenInfo *const token, verilogKind kind, toke
 
 	makeTagEntry (&tag);
 
-	if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && currentContext->kind != K_UNDEFINED)
+	if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && currentContext->kind != K_UNDEFINED
+		&& role == ROLE_DEFINITION_INDEX)
 	{
 		vString *const scopedName = vStringNew ();
 
@@ -1027,7 +1045,7 @@ static void createTagWithTypeRef (tokenInfo *const token, verilogKind kind, toke
 	}
 
 	/* Push token as context if it is a container */
-	if (container)
+	if (container && role == ROLE_DEFINITION_INDEX)
 	{
 		createContext (kind, token->name);
 
@@ -1037,7 +1055,7 @@ static void createTagWithTypeRef (tokenInfo *const token, verilogKind kind, toke
 		for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
 		{
 			tokenInfo *content = ptrArrayItem (tagContents, i);
-			createTagWithTypeRef (content, content->kind, NULL);
+			createTagFull (content, content->kind, ROLE_DEFINITION_INDEX, NULL);
 		}
 
 		/* Drop temporary contexts */
@@ -1049,9 +1067,19 @@ static void createTagWithTypeRef (tokenInfo *const token, verilogKind kind, toke
 	vStringClear (token->inheritance);
 }
 
+static void createTagWithTypeRef (tokenInfo *const token, verilogKind kind, tokenInfo *const typeref)
+{
+	createTagFull (token, kind, ROLE_DEFINITION_INDEX, typeref);
+}
+
 static void createTag (tokenInfo *const token, verilogKind kind)
 {
 	createTagWithTypeRef (token, kind, NULL);
+}
+
+static void createRefTag (tokenInfo *const token, verilogKind kind, int role)
+{
+	createTagFull (token, kind, role, NULL);
 }
 
 static int skipBlockName (tokenInfo *const token, int c)
@@ -1873,6 +1901,7 @@ static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 				tokenSaved->kind = K_MODULE;   // for typeRef field
 				verbose ("find instance: %s with kind %s\n", vStringValue (token->name), getNameForKind (K_INSTANCE));
 				createTagWithTypeRef (token, K_INSTANCE, tokenSaved);
+				createRefTag (tokenSaved, K_MODULE, R_MODULE_DECL);
 			}
 		}
 		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (before comma)
