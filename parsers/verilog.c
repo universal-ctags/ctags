@@ -108,6 +108,10 @@ typedef enum {
 	K_NETTYPE,
 } verilogKind;
 
+typedef enum {
+	R_MODULE_DEFINSTANCE,
+} verilogModuleRole;
+
 typedef struct {
 	const char *keyword;
 	verilogKind kind;
@@ -141,11 +145,16 @@ static int Ungetc;
 static int Lang_verilog;
 static int Lang_systemverilog;
 
+static roleDefinition VerilogModuleRoles [] = {
+ { true, "defInstance", "defining instances" },
+};
+
 static kindDefinition VerilogKinds [] = {
  { true, 'c', "constant",  "constants (define, parameter, specparam)" },
  { true, 'e', "event",     "events" },
  { true, 'f', "function",  "functions" },
- { true, 'm', "module",    "modules" },
+ { true, 'm', "module",    "modules",
+   .referenceOnly = false, ATTACH_ROLES(VerilogModuleRoles)},
  { true, 'n', "net",       "net data types" },
  { true, 'p', "port",      "ports" },
  { true, 'r', "register",  "variable data types" },
@@ -406,6 +415,7 @@ static fieldDefinition SystemVerilogFields[] = {
  *   PROTOTYPE DEFINITIONS
  */
 
+static void createTagFull (tokenInfo *const token, verilogKind kind, int role, tokenInfo *const typeref);
 static bool isIdentifier (tokenInfo* token);
 static int processDefine (tokenInfo *const token, int c);
 static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with);
@@ -951,6 +961,11 @@ static int dropEndContext (tokenInfo *const token, int c)
 
 static void createTag (tokenInfo *const token, verilogKind kind)
 {
+	createTagFull (token, kind, ROLE_DEFINITION_INDEX, NULL);
+}
+
+static void createTagFull (tokenInfo *const token, verilogKind kind, int role, tokenInfo *const typeref)
+{
 	tagEntryInfo tag;
 
 	if (kind == K_LOCALPARAM)
@@ -981,7 +996,10 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 	}
 
 	/* Create tag */
-	initTagEntry (&tag, vStringValue (token->name), kind);
+	if (role == ROLE_DEFINITION_INDEX)
+		initTagEntry (&tag, vStringValue (token->name), kind);
+	else
+		initRefTagEntry (&tag, vStringValue (token->name), kind, role);
 	tag.lineNumber = token->lineNumber;
 	tag.filePosition = token->filePosition;
 
@@ -1000,12 +1018,19 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		verbose ("Class %s extends %s\n", vStringValue (token->name), tag.extensionFields.inheritance);
 	}
 
+	if (typeref)
+	{
+		tag.extensionFields.typeRef [0] = getNameForKind (typeref->kind);
+		tag.extensionFields.typeRef [1] = vStringValue (typeref->name);
+	}
+
 	if (token->parameter)
 		attachParserField (&tag, false, fieldTable [F_PARAMETER].ftype, "");
 
 	makeTagEntry (&tag);
 
-	if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && currentContext->kind != K_UNDEFINED)
+	if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && currentContext->kind != K_UNDEFINED
+		&& role == ROLE_DEFINITION_INDEX)
 	{
 		vString *const scopedName = vStringNew ();
 
@@ -1021,7 +1046,7 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 	}
 
 	/* Push token as context if it is a container */
-	if (container)
+	if (container && role == ROLE_DEFINITION_INDEX)
 	{
 		createContext (kind, token->name);
 
@@ -1409,7 +1434,7 @@ static int processAssertion (tokenInfo *const token, int c)
 
 // data_declaration ::=
 //   ...
-//   import < package_identifier :: identifier | package_identifier :: * > ; 
+//   import < package_identifier :: identifier | package_identifier :: * > ;
 // dpi_import_export ::=
 //   import ( "DPI-C" | "DPI" ) [ context | pure ] [ c_identifier = ] function data_type_or_void function_identifier [ ( [ tf_port_list ] ) ] ;
 // | import ( "DPI-C" | "DPI" ) [ context ]        [ c_identifier = ] task task_identifier [ ( [ tf_port_list ] ) ] ;
@@ -1824,16 +1849,19 @@ static int tagIdsInPort (tokenInfo *const token, int c, verilogKind kind, bool m
 // Tag a list of identifiers in a data declaration
 static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 {
+	tokenInfo *module = dupToken(token);
+	module->kind = K_MODULE;
+
 	c = skipClassType (token, c);
 	if (c == ';')
-		return c;
+		goto out;
 
 	// skip drive|charge strength or type_reference, dimensions, and delay for net
 	if (c == '(')
 		c = skipPastMatch ("()");
 	c = skipDimension (c);
 	if (c == '.')
-		return c;	// foo[...].bar = ..;
+		goto out;	// foo[...].bar = ..;
 	c = skipDelay (token, c);	// ## (cycle delay)
 
 	while (c != EOF)
@@ -1859,7 +1887,8 @@ static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 			if (c == ';' || c == ',')
 			{
 				verbose ("find instance: %s with kind %s\n", vStringValue (token->name), getNameForKind (K_INSTANCE));
-				createTag (token, K_INSTANCE);
+				createTagFull (module, module->kind, R_MODULE_DEFINSTANCE, NULL);
+				createTagFull (token, K_INSTANCE, ROLE_DEFINITION_INDEX, module);
 			}
 		}
 		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (before comma)
@@ -1868,6 +1897,8 @@ static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 		c = skipWhite (vGetc ());	// skip ','
 		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (after comma)
 	}
+ out:
+	deleteToken (module);
 	return c;
 }
 
