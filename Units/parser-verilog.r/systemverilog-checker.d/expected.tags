@@ -38,7 +38,7 @@ bus	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	p	module:m
 clk	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	p	module:m
 res	input.sv	/^    logic res, scan;$/;"	r	module:m
 scan	input.sv	/^    logic res, scan;$/;"	r	module:m
-check_bus	input.sv	/^    mutex check_bus(bus, posedge clk, res);$/;"	i	module:m
+check_bus	input.sv	/^    mutex check_bus(bus, posedge clk, res);$/;"	i	module:m	typeref:module:mutex
 c1	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	H
 clk	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	p	checker:c1
 a	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	p	checker:c1
@@ -55,10 +55,10 @@ en	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	
 in1	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	p	module:m
 in2	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	p	module:m
 in_array	input.sv	/^         in_array [20:0]);$/;"	p	module:m
-check_outside	input.sv	/^    c1 check_outside(posedge clk, in1, in2);$/;"	i	module:m
+check_outside	input.sv	/^    c1 check_outside(posedge clk, in1, in2);$/;"	i	module:m	typeref:module:c1
 v1	input.sv	/^        automatic logic [7:0] v1=0;$/;"	r	module:m
-check_inside	input.sv	/^            c1 check_inside(posedge clk, in1, v1);$/;"	i	module:m
-check_loop	input.sv	/^                c1 check_loop(posedge clk, in1, in_array[v1]);$/;"	i	module:m
+check_inside	input.sv	/^            c1 check_inside(posedge clk, in1, v1);$/;"	i	module:m	typeref:module:c1
+check_loop	input.sv	/^                c1 check_loop(posedge clk, in1, in_array[v1]);$/;"	i	module:m	typeref:module:c1
 counter_model	input.sv	/^checker counter_model(logic flag);$/;"	H
 flag	input.sv	/^checker counter_model(logic flag);$/;"	p	checker:counter_model
 counter	input.sv	/^    bit [2:0] counter = '0;$/;"	r	checker:counter_model

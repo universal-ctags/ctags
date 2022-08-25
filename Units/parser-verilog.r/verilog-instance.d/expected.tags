@@ -14,22 +14,22 @@ b	input.v	/^   input                b;                      \/\/ To uut3 of foo.
 top.b	input.v	/^   input                b;                      \/\/ To uut3 of foo.v$/;"	p	module:top
 unused_pin	input.v	/^   wire unused_pin;$/;"	n	module:top
 top.unused_pin	input.v	/^   wire unused_pin;$/;"	n	module:top
-uut1	input.v	/^   foo uut1 ($/;"	i	module:top
-top.uut1	input.v	/^   foo uut1 ($/;"	i	module:top
-uut2	input.v	/^     uut2 ($/;"	i	module:top
-top.uut2	input.v	/^     uut2 ($/;"	i	module:top
-uut3	input.v	/^   foo uut3 (\/*AUTOINST*\/$/;"	i	module:top
-top.uut3	input.v	/^   foo uut3 (\/*AUTOINST*\/$/;"	i	module:top
-uut4	input.v	/^   uut4 (\/*AUTOINST*\/$/;"	i	module:top
-top.uut4	input.v	/^   uut4 (\/*AUTOINST*\/$/;"	i	module:top
-uut5	input.v	/^   uut5 (\/*AUTOINST*\/$/;"	i	module:top
-top.uut5	input.v	/^   uut5 (\/*AUTOINST*\/$/;"	i	module:top
-uut6	input.v	/^   foo uut6 [10:0]();$/;"	i	module:top
-top.uut6	input.v	/^   foo uut6 [10:0]();$/;"	i	module:top
-uut7	input.v	/^   foo uut7 [1:0][10:0]();$/;"	i	module:top
-top.uut7	input.v	/^   foo uut7 [1:0][10:0]();$/;"	i	module:top
-uut8	input.v	/^   foo uut8 () ;$/;"	i	module:top
-top.uut8	input.v	/^   foo uut8 () ;$/;"	i	module:top
+uut1	input.v	/^   foo uut1 ($/;"	i	module:top	typeref:module:foo
+top.uut1	input.v	/^   foo uut1 ($/;"	i	module:top	typeref:module:foo
+uut2	input.v	/^     uut2 ($/;"	i	module:top	typeref:module:foo
+top.uut2	input.v	/^     uut2 ($/;"	i	module:top	typeref:module:foo
+uut3	input.v	/^   foo uut3 (\/*AUTOINST*\/$/;"	i	module:top	typeref:module:foo
+top.uut3	input.v	/^   foo uut3 (\/*AUTOINST*\/$/;"	i	module:top	typeref:module:foo
+uut4	input.v	/^   uut4 (\/*AUTOINST*\/$/;"	i	module:top	typeref:module:foo
+top.uut4	input.v	/^   uut4 (\/*AUTOINST*\/$/;"	i	module:top	typeref:module:foo
+uut5	input.v	/^   uut5 (\/*AUTOINST*\/$/;"	i	module:top	typeref:module:foo
+top.uut5	input.v	/^   uut5 (\/*AUTOINST*\/$/;"	i	module:top	typeref:module:foo
+uut6	input.v	/^   foo uut6 [10:0]();$/;"	i	module:top	typeref:module:foo
+top.uut6	input.v	/^   foo uut6 [10:0]();$/;"	i	module:top	typeref:module:foo
+uut7	input.v	/^   foo uut7 [1:0][10:0]();$/;"	i	module:top	typeref:module:foo
+top.uut7	input.v	/^   foo uut7 [1:0][10:0]();$/;"	i	module:top	typeref:module:foo
+uut8	input.v	/^   foo uut8 () ;$/;"	i	module:top	typeref:module:foo
+top.uut8	input.v	/^   foo uut8 () ;$/;"	i	module:top	typeref:module:foo
 func_foo	input.v	/^   function void func_foo(int a);$/;"	f	module:top
 top.func_foo	input.v	/^   function void func_foo(int a);$/;"	f	module:top
 a	input.v	/^   function void func_foo(int a);$/;"	p	function:top.func_foo
