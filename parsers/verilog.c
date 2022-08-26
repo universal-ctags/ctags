@@ -1409,7 +1409,7 @@ static int processAssertion (tokenInfo *const token, int c)
 
 // data_declaration ::=
 //   ...
-//   import < package_identifier :: identifier | package_identifier :: * > ; 
+//   import < package_identifier :: identifier | package_identifier :: * > ;
 // dpi_import_export ::=
 //   import ( "DPI-C" | "DPI" ) [ context | pure ] [ c_identifier = ] function data_type_or_void function_identifier [ ( [ tf_port_list ] ) ] ;
 // | import ( "DPI-C" | "DPI" ) [ context ]        [ c_identifier = ] task task_identifier [ ( [ tf_port_list ] ) ] ;
