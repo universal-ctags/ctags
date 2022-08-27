@@ -1849,7 +1849,7 @@ static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 			if (c == '=')
 				c = skipExpression (c);
 		}
-		else if (c == '(' || c == '[')	// should be instance
+		else if (c == '(' || c == '[')	// should be an instance
 		{
 			c = skipDimension (c); // name_of_instance {unpacked_dimension}
 			c = skipPastMatch ("()"); // list_of_port_connections
