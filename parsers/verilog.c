@@ -949,7 +949,7 @@ static int dropEndContext (tokenInfo *const token, int c)
 }
 
 
-static void createTag (tokenInfo *const token, verilogKind kind)
+static void createTagWithTypeRef (tokenInfo *const token, verilogKind kind, tokenInfo *const typeref)
 {
 	tagEntryInfo tag;
 
@@ -1000,6 +1000,12 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		verbose ("Class %s extends %s\n", vStringValue (token->name), tag.extensionFields.inheritance);
 	}
 
+	if (typeref)
+	{
+		tag.extensionFields.typeRef [0] = getNameForKind (typeref->kind);
+		tag.extensionFields.typeRef [1] = vStringValue (typeref->name);
+	}
+
 	if (token->parameter)
 		attachParserField (&tag, false, fieldTable [F_PARAMETER].ftype, "");
 
@@ -1031,7 +1037,7 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
 		{
 			tokenInfo *content = ptrArrayItem (tagContents, i);
-			createTag (content, content->kind);
+			createTagWithTypeRef (content, content->kind, NULL);
 		}
 
 		/* Drop temporary contexts */
@@ -1041,6 +1047,11 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 
 	/* Clear no longer required inheritance information */
 	vStringClear (token->inheritance);
+}
+
+static void createTag (tokenInfo *const token, verilogKind kind)
+{
+	createTagWithTypeRef (token, kind, NULL);
 }
 
 static int skipBlockName (tokenInfo *const token, int c)
@@ -1409,7 +1420,7 @@ static int processAssertion (tokenInfo *const token, int c)
 
 // data_declaration ::=
 //   ...
-//   import < package_identifier :: identifier | package_identifier :: * > ; 
+//   import < package_identifier :: identifier | package_identifier :: * > ;
 // dpi_import_export ::=
 //   import ( "DPI-C" | "DPI" ) [ context | pure ] [ c_identifier = ] function data_type_or_void function_identifier [ ( [ tf_port_list ] ) ] ;
 // | import ( "DPI-C" | "DPI" ) [ context ]        [ c_identifier = ] task task_identifier [ ( [ tf_port_list ] ) ] ;
@@ -1836,6 +1847,7 @@ static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 		return c;	// foo[...].bar = ..;
 	c = skipDelay (token, c);	// ## (cycle delay)
 
+	tokenInfo *tokenSaved = dupToken(token); // maybe a module_identifier
 	while (c != EOF)
 	{
 		bool with = false;
@@ -1849,7 +1861,7 @@ static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 			if (c == '=')
 				c = skipExpression (c);
 		}
-		else if (c == '(' || c == '[')	// should be instance
+		else if (c == '(' || c == '[')	// should be an instance
 		{
 			c = skipDimension (c); // name_of_instance {unpacked_dimension}
 			c = skipPastMatch ("()"); // list_of_port_connections
@@ -1858,8 +1870,9 @@ static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 			// var `add_t(foo) = '0;
 			if (c == ';' || c == ',')
 			{
+				tokenSaved->kind = K_MODULE;   // for typeRef field
 				verbose ("find instance: %s with kind %s\n", vStringValue (token->name), getNameForKind (K_INSTANCE));
-				createTag (token, K_INSTANCE);
+				createTagWithTypeRef (token, K_INSTANCE, tokenSaved);
 			}
 		}
 		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (before comma)
@@ -1868,6 +1881,7 @@ static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 		c = skipWhite (vGetc ());	// skip ','
 		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (after comma)
 	}
+	deleteToken (tokenSaved);
 	return c;
 }
 
