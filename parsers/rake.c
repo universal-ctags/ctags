@@ -93,7 +93,6 @@ static vString *readTask (const unsigned char **cp, bool *variable)
 		}
 		break;
 	case ':':
-		++*cp;
 		vstr = vStringNew ();
 		if (!rubyParseMethodName (cp, vstr))
 		{
