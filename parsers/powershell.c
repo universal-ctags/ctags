@@ -521,8 +521,7 @@ static bool parseFunction (tokenInfo *const token)
 	else
 		readNext = false;
 
-	if (nameFree)
-		deleteToken (nameFree);
+	deleteToken (nameFree);
 
 	return readNext;
 }
@@ -558,8 +557,7 @@ static bool parseClass (tokenInfo *const token)
 	else
 		readNext = false;
 
-	if (nameFree)
-		deleteToken (nameFree);
+	deleteToken (nameFree);
 
 	return readNext;
 }
