@@ -93,7 +93,6 @@ static vString *readTask (const unsigned char **cp, bool *variable)
 		}
 		break;
 	case ':':
-		++*cp;
 		vstr = vStringNew ();
 		if (!rubyParseMethodName (cp, vstr))
 		{
@@ -184,8 +183,11 @@ static int parseXTask (rubySubparser *s, struct taskType *xtask, const unsigned 
 			int r = makeSimpleRakeTag (vstr, xtask->kind, s, variable);
 			vStringDelete (vstr);
 			tagEntryInfo *e = getEntryInCorkQueue (r);
-			e->extensionFields.typeRef [0] = eStrdup ("typename");
-			e->extensionFields.typeRef [1] = eStrdup (xtask->keyword);
+			if (e)
+			{
+				e->extensionFields.typeRef [0] = eStrdup ("typename");
+				e->extensionFields.typeRef [1] = eStrdup (xtask->keyword);
+			}
 			return r;
 		}
 	}

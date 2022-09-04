@@ -15,3 +15,5 @@ verify_private_key_present	input.rake	/^task :verify_private_key_present do$/;"	
 build	input.rake	/^task :build => :verify_private_key_present$/;"	task
 default	input-0.rake	/^task :default => :test$/;"	task
 test	input-0.rake	/^Rake::TestTask.new 'test' do |t|$/;"	xtask	typeref:typename:Rake::TestTask.new
+spec:rcovSingle	input-1.rake	/^RSpec::Core::RakeTask.new(:'spec:rcovSingle') do |t|$/;"	xtask	typeref:typename:RSpec::Core::RakeTask.new
+spec:rcovDouble	input-1.rake	/^RSpec::Core::RakeTask.new(:"spec:rcovDouble") do |t|$/;"	xtask	typeref:typename:RSpec::Core::RakeTask.new

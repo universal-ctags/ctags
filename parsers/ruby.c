@@ -463,18 +463,23 @@ static rubyKind parseIdentifier (
 	}
 
 	/* Copy the identifier into 'name'. */
-	if (**cp == ':' && (*((*cp) + 1) == '"' || *((*cp) + 1) == '\''))
+	if (**cp == ':')
 	{
-		/* The symbol is defined with string literal like:
-		   ----
-		   :"[]"
-		   :"[]="
-		   ----
-		*/
-		unsigned char b = *(++*cp);
+		if (*((*cp) + 1) == '"' || *((*cp) + 1) == '\'')
+		{
+			/* The symbol is defined with string literal like:
+			   ----
+			   :"[]"
+			   :"[]="
+			   ----
+			*/
+			unsigned char b = *(++*cp);
+			++*cp;
+			parseString (cp, b, name);
+			return kind;
+		}
+		/* May be symbol like :name. Skip the first character. */
 		++*cp;
-		parseString (cp, b, name);
-		return kind;
 	}
 
 	while (**cp != 0 && (**cp == ':' || isIdentChar (**cp) || charIsIn (**cp, also_ok)))
@@ -810,7 +815,6 @@ static void readAttrsAndEmitTags (const unsigned char **cp, bool reader, bool wr
 		skipWhitespace (cp);
 		if (**cp == ':')
 		{
-			++*cp;
 			if (K_METHOD == parseIdentifier (cp, a, K_METHOD))
 			{
 				emitRubyAccessorTags (a, reader, writer);
@@ -854,7 +858,6 @@ static int readAliasMethodAndEmitTags (const unsigned char **cp)
 	skipWhitespace (cp);
 	if (**cp == ':')
 	{
-		++*cp;
 		if (K_METHOD != parseIdentifier (cp, a, K_METHOD))
 			vStringClear (a);
 	}
