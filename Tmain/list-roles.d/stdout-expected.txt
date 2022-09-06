@@ -92,6 +92,7 @@ Ruby           L/library         required           on      loaded by "require" 
 Ruby           L/library         requiredRel        on      loaded by "require_relative" method
 Sh             h/heredoc         endmarker          on      end marker
 Sh             s/script          loaded             on      loaded
+SystemVerilog  m/module          decl               on      declaring instances
 SystemdUnit    u/unit            After              on      referred in After key
 SystemdUnit    u/unit            Before             on      referred in Before key
 SystemdUnit    u/unit            RequiredBy         on      referred in RequiredBy key
@@ -108,6 +109,7 @@ Vera           d/macro           condition          off     used in part of #if/
 Vera           d/macro           undef              on      undefined
 Vera           h/header          local              on      local header
 Vera           h/header          system             on      system header
+Verilog        m/module          decl               on      declaring instances
 
 #
 # all.*
@@ -202,6 +204,7 @@ Ruby           L/library         required           on      loaded by "require" 
 Ruby           L/library         requiredRel        on      loaded by "require_relative" method
 Sh             h/heredoc         endmarker          on      end marker
 Sh             s/script          loaded             on      loaded
+SystemVerilog  m/module          decl               on      declaring instances
 SystemdUnit    u/unit            After              on      referred in After key
 SystemdUnit    u/unit            Before             on      referred in Before key
 SystemdUnit    u/unit            RequiredBy         on      referred in RequiredBy key
@@ -218,6 +221,7 @@ Vera           d/macro           condition          off     used in part of #if/
 Vera           d/macro           undef              on      undefined
 Vera           h/header          local              on      local header
 Vera           h/header          system             on      system header
+Verilog        m/module          decl               on      declaring instances
 
 #
 # C.*

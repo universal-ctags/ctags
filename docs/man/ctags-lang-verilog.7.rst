@@ -162,6 +162,28 @@ because they cannot be overridden.
 	P3	input.sv	/^	parameter  P3 = "parameter";$/;"	c	module:no_parameter_port_list	parameter:
 	L7	input.sv	/^	localparam L7 = "localparam";$/;"	c	module:no_parameter_port_list
 
+Supported Roles
+~~~~~~~~~~~~~~~
+
+.. code-block:: console
+
+	$ ./ctags --list-roles=SystemVerilog
+	#KIND(L/N) NAME ENABLED DESCRIPTION
+	m/module   decl on      declaring instances
+
+	$ ./ctags --list-roles=Verilog
+	#KIND(L/N) NAME ENABLED DESCRIPTION
+	m/module   decl on      declaring instances
+
+The parser extracts names of modules used in instance declarations as
+reference tags. ``decl`` is the role for the tags. See "TAG ENTRIES"
+section of :ref:`ctags(1) <ctags(1)>` about reference tags and roles.
+
+.. warning::
+
+   The support for references in Universal Ctags is still
+   experimental; the names of the roles may be changed in the future.
+
 TIPS
 ~~~~
 
