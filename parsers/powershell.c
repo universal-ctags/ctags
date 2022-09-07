@@ -534,7 +534,6 @@ static bool parseClass (tokenInfo *const token)
 {
 	bool readNext = true;
 	tokenInfo *nameFree = NULL;
-	const char *access;
 
 	readToken (token);
 
