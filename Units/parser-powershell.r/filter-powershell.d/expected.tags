@@ -1,0 +1,4 @@
+f1	input.ps1	/^filter f1 {$/;"	i
+f2	input.ps1	/^filter f2() {$/;"	i	signature:()
+f3	input.ps1	/^filter f3([switch]$Message) {$/;"	i	signature:([switch] $Message)
+f4	input.ps1	/^filter f4 {$/;"	i
