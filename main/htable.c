@@ -11,6 +11,7 @@
 
 #include "general.h"
 #include "htable.h"
+#include "debug.h"
 
 #ifndef MAIN
 #include <stdio.h>
@@ -35,12 +36,14 @@ typedef struct sHashEntry hentry;
 struct sHashEntry {
 	void *key;
 	void *value;
+	unsigned int hash;
 	hentry *next;
 };
 
 struct sHashTable {
 	hentry** table;
 	unsigned int size;
+	unsigned int count;
 	hashTableHashFunc hashfn;
 	hashTableEqualFunc equalfn;
 	hashTableDeleteFunc keyfreefn;
@@ -56,13 +59,14 @@ struct chainTracker {
 	hashTableEqualFunc equalfn;
 };
 
-static hentry* entry_new (void *key, void *value, hentry* next)
+static hentry* entry_new (void *key, void *value, unsigned int hash, hentry* next)
 {
 	hentry* entry = xMalloc (1, hentry);
 
 	entry->key = key;
 	entry->value = value;
 	entry->next = next;
+	entry->hash = hash;
 
 	return entry;
 }
@@ -164,7 +168,14 @@ extern hashTable *hashTableNew    (unsigned int size,
 	hashTable *htable;
 
 	htable = xMalloc (1, hashTable);
+
+	if (size < 3)
+		size = 3;
+	if ((size % 2) == 0)
+		size++;
+
 	htable->size = size;
+	htable->count = 0;
 	htable->table = xCalloc (size, hentry*);
 
 	htable->hashfn = hashfn;
@@ -217,40 +228,114 @@ extern void       hashTableClear (hashTable *htable)
 	}
 }
 
+static void       hashTablePutItem00    (hashTable *htable, void *key, void *value, unsigned int h)
+{
+	unsigned int i = h % htable->size;
+	htable->table[i] = entry_new(key, value, h, htable->table[i]);
+	htable->count++;
+}
+
+/* TODO: A pre-calculated array can be used instead of
+ * finding a new one at runtume. */
+static unsigned int
+prime_double(unsigned int i)
+{
+	Assert (i > 2);
+	Assert (i % 2);
+
+	for (unsigned int c = 2 * i + 1; ; c += 2)
+	{
+		for (unsigned int i0 = 3; i0 < i; i0 += 2)
+		{
+			if ((c % i0) == 0)
+				goto next;
+		}
+		return c;
+	next:;
+	}
+
+	return i;
+}
+
+static void       hashTableGrow        (hashTable *htable)
+{
+	unsigned int current_size = htable->size;
+	unsigned int new_size = prime_double (current_size);
+
+	if (new_size <= current_size)
+		return;
+
+	hentry** new_table = xCalloc (new_size, hentry*);
+	for (unsigned int i = 0; i < current_size; i++)
+	{
+		hentry *entry;
+		while ((entry = htable->table[i]))
+		{
+			unsigned int hash = entry->hash;
+			unsigned int j = hash % new_size;
+			htable->table[i] = entry->next;
+			entry->next = new_table[j];
+			new_table[j] = entry;
+		}
+	}
+
+	hentry** old_table = htable->table;
+	htable->table = new_table;
+	htable->size = new_size;
+	eFree (old_table);
+}
+
+static void       hashTablePutItem0    (hashTable *htable, void *key, void *value, unsigned int h)
+{
+	if (((double)htable->count / (double)htable->size) < 0.8)
+	{
+		hashTablePutItem00 (htable, key, value,  h);
+		return;
+	}
+
+	hashTableGrow (htable);
+	hashTablePutItem00 (htable, key, value, h);
+}
+
 extern void       hashTablePutItem    (hashTable *htable, void *key, void *value)
 {
-	unsigned int i;
-
-	i = htable->hashfn (key) % htable->size;
-	htable->table[i] = entry_new(key, value, htable->table[i]);
+	hashTablePutItem0 (htable, key, value, htable->hashfn (key));
 }
 
 extern void*      hashTableGetItem   (hashTable *htable, const void * key)
 {
-	unsigned int i;
+	unsigned int h, i;
 
-	i = htable->hashfn (key) % htable->size;
+	h = htable->hashfn (key);
+	i = h % htable->size;
 	return entry_find(htable->table[i], key, htable->equalfn, htable->valForNotUnknownKey);
 }
 
 extern bool     hashTableDeleteItem (hashTable *htable, const void *key)
 {
+	unsigned int h;
 	unsigned int i;
+	h = htable->hashfn (key);
+	i = h % htable->size;
 
-	i = htable->hashfn (key) % htable->size;
-	return entry_delete(&htable->table[i], key,
+	bool r = entry_delete(&htable->table[i], key,
 			    htable->equalfn, htable->keyfreefn, htable->valfreefn);
+	if (r)
+		htable->count--;
+	return r;
 }
 
 extern bool    hashTableUpdateItem (hashTable *htable, void *key, void *value)
 {
-	unsigned int i;
+	unsigned int h, i;
 
-	i = htable->hashfn (key) % htable->size;
+	h = htable->hashfn (key);
+	i = h % htable->size;
 	bool r = entry_update(htable->table[i], key, value,
 						  htable->equalfn, htable->keyfreefn, htable->valfreefn);
 	if (!r)
-		htable->table[i] = entry_new(key, value, htable->table[i]);
+		hashTablePutItem0(htable, key, value, h);
+
 	return r;
 }
 
@@ -283,7 +368,7 @@ static bool track_chain (const void *const key, void *value, void *chain_data)
 
 extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *key, hashTableForeachFunc proc, void *user_data)
 {
-	unsigned int i;
+	unsigned int h, i;
 	struct chainTracker chain_tracker = {
 		.target_key = key,
 		.user_proc = proc,
@@ -291,24 +376,16 @@ extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *ke
 		.equalfn   = htable->equalfn,
 	};
 
-	i = htable->hashfn (key) % htable->size;
+	h = htable->hashfn (key);
+	i = h % htable->size;
 	if (!entry_foreach(htable->table[i], track_chain, &chain_tracker))
 		return false;
 	return true;
 }
 
-static bool count (const void *const key CTAGS_ATTR_UNUSED, void *value CTAGS_ATTR_UNUSED, void *data)
-{
-	int *c = data;
-	++*c;
-	return true;
-}
-
 extern unsigned int hashTableCountItem   (hashTable *htable)
 {
-	int c = 0;
-	hashTableForeachItem (htable, count, &c);
-	return c;
+	return htable->count;
 }
 
 unsigned int hashPtrhash (const void * const x)

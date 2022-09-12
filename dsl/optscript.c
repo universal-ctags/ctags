@@ -2464,7 +2464,14 @@ op__make_dict (OptVM *vm, EsObject *name)
 			return OPT_ERR_TYPECHECK;
 	}
 
-	EsObject *d = dict_new (n > 0? (n / 2): 1, ATTR_READABLE|ATTR_WRITABLE);
+	/* A hashtable grows automatically when its filling rate is
+	 * grater than 80%. If we put elements between `<<' and `>>' to a dictionary
+	 * initialized with the size equal to the number of elements, the dictionary
+	 * grows once during putting them. Making a 1/0.8 times larger dictionary can
+	 * avoid the predictable growing. */
+	int size = (10 * (n > 0? (n / 2): 1)) / 8;
+
+	EsObject *d = dict_new (size, ATTR_READABLE|ATTR_WRITABLE);
 	for (int i = 0; i < (n / 2); i++)
 	{
 		EsObject *val = ptrArrayLast (vm->ostack);
