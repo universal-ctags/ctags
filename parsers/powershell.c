@@ -95,7 +95,7 @@ typedef struct {
 	vString *		scope;
 	unsigned long	lineNumber;
 	MIOPos			filePosition;
-	int 			parentKind; /* KIND_GHOST_INDEX if none */
+	int				parentKind; /* KIND_GHOST_INDEX if none */
 } tokenInfo;
 
 
