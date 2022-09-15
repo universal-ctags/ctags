@@ -186,7 +186,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-              yum -y --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos --enablerepo=ubi-8-codeready-builder install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
+              yum -y --enablerepo=ubi-8-appstream-rpms --enablerepo=ubi-8-baseos-rpms --enablerepo=ubi-8-codeready-builder-rpms install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
        - run:
            name: Build
            command: |
@@ -211,7 +211,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-              yum -y --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos --enablerepo=ubi-8-codeready-builder install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
+              yum -y --enablerepo=ubi-8-appstream-rpms --enablerepo=ubi-8-baseos-rpms --enablerepo=ubi-8-codeready-builder-rpms install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
        - run:
            name: Build
            command: |
