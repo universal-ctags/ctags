@@ -3029,8 +3029,10 @@ op_dict (OptVM *vm, EsObject *name)
 		return OPT_ERR_TYPECHECK;
 
 	int n = es_integer_get (nobj);
-	if (n < 1)
+	if (n < 0)
 		return OPT_ERR_RANGECHECK;
+	else if (n == 0)
+		n = 1;
 
 	ptrArrayDeleteLast (vm->ostack);
 
