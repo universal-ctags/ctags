@@ -2464,7 +2464,7 @@ op__make_dict (OptVM *vm, EsObject *name)
 			return OPT_ERR_TYPECHECK;
 	}
 
-	EsObject *d = dict_new (n % 2 + 1, ATTR_READABLE|ATTR_WRITABLE); /* FIXME: + 1 */
+	EsObject *d = dict_new (n > 0? (n / 2): 1, ATTR_READABLE|ATTR_WRITABLE);
 	for (int i = 0; i < (n / 2); i++)
 	{
 		EsObject *val = ptrArrayLast (vm->ostack);
