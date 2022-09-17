@@ -475,8 +475,8 @@ opt_init (void)
 
 	defOP (opt_system_dict, op_mark,           "<<",  0,  "- << mark");
 	defOP (opt_system_dict, op_mark,           "[",   0,  "- [ mark");
-	defOP (opt_system_dict, op__make_array,    "]",   1,  "[ any1 ... anyn ] array");
-	defOP (opt_system_dict, op__make_dict ,    ">>",  1, "<< key1 value1 ... keyn valuen >> dict");
+	defOP (opt_system_dict, op__make_array,    "]",   0,  "[ any1 ... anyn ] array");
+	defOP (opt_system_dict, op__make_dict ,    ">>",  0, "<< key1 value1 ... keyn valuen >> dict");
 
 	defop (opt_system_dict, _help,  0, "- _HELP -");
 	defop (opt_system_dict, pstack, 0, "|- any1 ... anyn PSTACK |- any1 ... anyn");
