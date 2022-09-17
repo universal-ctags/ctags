@@ -1,0 +1,38 @@
+0 dict == clear
+0 dict dup /x 1 put == clear
+1 dict ==
+1 dict dup /y 2 put == clear
+2 dict ==
+2 dict dup /z 2 put == clear
+
+{
+    { -1 dict } stopped {
+        _errorname =
+        stop
+    } if
+} stopped pop
+_errorname =
+
+<< >> == clear
+<<>> dup /x 0 put == clear
+
+<< /x 0 >> ==
+<</x 0>> dup /y 1 put == clear
+
+<< /x 0 /y 1 >> ==
+<< /x 0 /y 1 >> dup /z 2 put == clear
+
+{
+    { >> } stopped {
+               _errorname =
+               stop
+           } if
+}  stopped pop
+
+{
+    { << /a >> } stopped {
+        _errorname =
+        stop
+    } if
+} stopped pop
+_errorname =

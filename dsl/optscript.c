@@ -475,8 +475,8 @@ opt_init (void)
 
 	defOP (opt_system_dict, op_mark,           "<<",  0,  "- << mark");
 	defOP (opt_system_dict, op_mark,           "[",   0,  "- [ mark");
-	defOP (opt_system_dict, op__make_array,    "]",   1,  "[ any1 ... anyn ] array");
-	defOP (opt_system_dict, op__make_dict ,    ">>",  1, "<< key1 value1 ... keyn valuen >> dict");
+	defOP (opt_system_dict, op__make_array,    "]",   0,  "[ any1 ... anyn ] array");
+	defOP (opt_system_dict, op__make_dict ,    ">>",  0, "<< key1 value1 ... keyn valuen >> dict");
 
 	defop (opt_system_dict, _help,  0, "- _HELP -");
 	defop (opt_system_dict, pstack, 0, "|- any1 ... anyn PSTACK |- any1 ... anyn");
@@ -2464,7 +2464,14 @@ op__make_dict (OptVM *vm, EsObject *name)
 			return OPT_ERR_TYPECHECK;
 	}
 
-	EsObject *d = dict_new (n > 0? (n / 2): 1, ATTR_READABLE|ATTR_WRITABLE);
+	/* A hashtable grows automatically when its filling rate is
+	 * grater than 80%. If we put elements between `<<' and `>>' to a dictionary
+	 * initialized with the size equal to the number of elements, the dictionary
+	 * grows once during putting them. Making a 1/0.8 times larger dictionary can
+	 * avoid the predictable growing. */
+	int size = (10 * (n > 0? (n / 2): 1)) / 8;
+
+	EsObject *d = dict_new (size, ATTR_READABLE|ATTR_WRITABLE);
 	for (int i = 0; i < (n / 2); i++)
 	{
 		EsObject *val = ptrArrayLast (vm->ostack);
@@ -3029,8 +3036,10 @@ op_dict (OptVM *vm, EsObject *name)
 		return OPT_ERR_TYPECHECK;
 
 	int n = es_integer_get (nobj);
-	if (n < 1)
+	if (n < 0)
 		return OPT_ERR_RANGECHECK;
+	else if (n == 0)
+		n = 1;
 
 	ptrArrayDeleteLast (vm->ostack);
 

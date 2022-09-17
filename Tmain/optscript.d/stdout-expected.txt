@@ -1,8 +1,10 @@
 arithmetic.ps...0
 array.ps...0
+arrayx.ps...0
 compound.ps...0
 control.ps...0
 dict.ps...0
+dictx.ps...0
 error-undefined-if-if.ps...1
 error-undefined-if.ps...1
 misc.ps...0
