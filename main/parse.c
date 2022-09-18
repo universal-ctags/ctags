@@ -3578,7 +3578,7 @@ static void aliasColprintAddLanguage (struct colprintTable * table,
 		for (unsigned int i = 0; i < count; i++)
 		{
 			struct colprintLine * line = colprintTableGetNewLine (table);
-			vString *alias = stringListItem (parser->currentAliases, i);;
+			vString *alias = stringListItem (parser->currentAliases, i);
 
 			colprintLineAppendColumnCString (line, parser->def->name);
 			colprintLineAppendColumnVString (line, alias);

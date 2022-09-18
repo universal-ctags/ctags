@@ -244,7 +244,7 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 	char sep [] = {';', '"', '\0'};
 	int length = 0;
 
-	const char *str = NULL;;
+	const char *str = NULL;
 	kindDefinition *kdef = getLanguageKind(tag->langType, tag->kindIndex);
 	const char kind_letter_str[2] = {kdef->letter, '\0'};
 
