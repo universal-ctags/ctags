@@ -48,7 +48,7 @@ jobs:
     - uses: leleliu008/github-actions-vagrant@v2
       with:
         mem: 2048
-        box: generic/openbsd6
+        box: generic/openbsd7
         log: warn
         run: |
           export AUTOCONF_VERSION=2.69
