@@ -923,7 +923,7 @@ static vString* determineVimFileType (const char *const modeline)
 	return filetype;
 }
 
-static vString* extractVimFileType(MIO* input)
+static vString* extractVimFileTypeCommon(MIO* input, bool eof)
 {
 	/* http://vimdoc.sourceforge.net/htmldoc/options.html#modeline
 
@@ -951,7 +951,14 @@ static vString* extractVimFileType(MIO* input)
 	i = 0;
 	while ((readLineRaw (ring[i++], input)) != NULL)
 		if (i == RING_SIZE)
+		{
 			i = 0;
+			if (!eof)
+			{
+				i++;
+				break;
+			}
+		}
 
 	j = i;
 	do
@@ -986,6 +993,16 @@ static vString* extractVimFileType(MIO* input)
 
 	/* TODO:
 	   [text]{white}{vi:|vim:|ex:}[white]{options} */
+}
+
+static vString* extractVimFileTypeAtBOF(MIO* input)
+{
+	return extractVimFileTypeCommon (input, false);
+}
+
+static vString* extractVimFileTypeAtEOF(MIO* input)
+{
+	return extractVimFileTypeCommon (input, true);
 }
 
 static vString* extractMarkGeneric (MIO* input,
@@ -1100,8 +1117,12 @@ static const struct taster {
 		.msg    = "emacs mode at the EOF",
 	},
 	{
-		.taste  = extractVimFileType,
-		.msg    = "vim modeline",
+		.taste  = extractVimFileTypeAtBOF,
+		.msg    = "vim modeline at the BOF",
+	},
+	{
+		.taste  = extractVimFileTypeAtEOF,
+		.msg    = "vim modeline at the EOF",
 	},
 	{
 		.taste  = extractPHPMark,

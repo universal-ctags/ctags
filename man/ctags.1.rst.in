@@ -1521,7 +1521,7 @@ template file name testing
 "vim modeline" testing
 	Like the modeline of the Emacs editor, Vim editor has the same concept.
 	@CTAGS_NAME_EXECUTABLE@ treats ``TYPE`` as a name of interpreter and applies the same
-	rule of "interpreter" heuristic testing if the last 5 lines of the file
+	rule of "interpreter" heuristic testing if the first or last 5 lines of the file
 	have one of the following patterns::
 
 		filetype=TYPE
