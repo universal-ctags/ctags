@@ -1081,32 +1081,32 @@ struct getLangCtx {
 
 static const struct taster {
 	vString* (* taste) (MIO *);
-        const char     *msg;
+	const char     *msg;
 } eager_tasters[] = {
-        {
+	{
 		.taste  = extractInterpreter,
 		.msg    = "interpreter",
-        },
+	},
 	{
 		.taste  = extractZshAutoloadTag,
 		.msg    = "zsh autoload tag",
 	},
-        {
+	{
 		.taste  = extractEmacsModeAtFirstLine,
 		.msg    = "emacs mode at the first line",
-        },
-        {
+	},
+	{
 		.taste  = extractEmacsModeLanguageAtEOF,
 		.msg    = "emacs mode at the EOF",
-        },
-        {
+	},
+	{
 		.taste  = extractVimFileType,
 		.msg    = "vim modeline",
-        },
-		{
+	},
+	{
 		.taste  = extractPHPMark,
 		.msg    = "PHP marker",
-		}
+	}
 };
 static langType tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters,
 			      langType *fallback);
