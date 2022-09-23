@@ -1,0 +1,9 @@
+
+
+
+// vim: noet ft=first ft=c.qt
+int
+main(void)
+{
+	return 0;
+}
