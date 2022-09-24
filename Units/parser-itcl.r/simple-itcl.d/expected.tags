@@ -30,3 +30,9 @@ commonProtected	input.tcl	/^    protected proc commonProtected "b"$/;"	kind:proc
 SmartToaster::commonProtected	input.tcl	/^    protected proc commonProtected "b"$/;"	kind:procedure	line:48	language:ITcl	scope:class:SmartToaster	access:protected	roles:def	extras:qualified,subparser	end:48
 commonPrivate	input.tcl	/^    private proc commonPrivate "c"$/;"	kind:procedure	line:49	language:ITcl	scope:class:SmartToaster	access:private	roles:def	extras:subparser	end:49
 SmartToaster::commonPrivate	input.tcl	/^    private proc commonPrivate "c"$/;"	kind:procedure	line:49	language:ITcl	scope:class:SmartToaster	access:private	roles:def	extras:qualified,subparser	end:49
+X	input.tcl	/^itcl::class X {$/;"	kind:class	line:51	language:ITcl	roles:def	extras:subparser
+x	input.tcl	/^    variable x 0$/;"	kind:variable	line:52	language:ITcl	scope:class:X	roles:def	extras:subparser	end:52
+X::x	input.tcl	/^    variable x 0$/;"	kind:variable	line:52	language:ITcl	scope:class:X	roles:def	extras:qualified,subparser	end:52
+Y	input.tcl	/^itcl::class Y {$/;"	kind:class	line:54	language:ITcl	roles:def	extras:subparser
+y	input.tcl	/^    variable y 0$/;"	kind:variable	line:55	language:ITcl	scope:class:Y	roles:def	extras:subparser	end:55
+Y::y	input.tcl	/^    variable y 0$/;"	kind:variable	line:55	language:ITcl	scope:class:Y	roles:def	extras:qualified,subparser	end:55
