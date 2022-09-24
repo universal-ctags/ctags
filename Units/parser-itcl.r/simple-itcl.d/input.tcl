@@ -48,6 +48,12 @@ itcl::class SmartToaster {
     protected proc commonProtected "b"
     private proc commonPrivate "c"
 }
+itcl::class X {
+    variable x 0
+}
+itcl::class Y {
+    variable y 0
+}
 
 set toaster [SmartToaster #auto]
 $toaster toast 2

@@ -1,0 +1,6 @@
+S	input.tcl	/^oo::class create S {$/;"	c	language:TclOO
+sx	input.tcl	/^    method sx {} {$/;"	m	language:TclOO	class:S
+M	input.tcl	/^oo::class create M {$/;"	c	language:TclOO
+mx	input.tcl	/^    method mx {} {$/;"	m	language:TclOO	class:M
+C	input.tcl	/^oo::class create C {$/;"	c	language:TclOO	inherits:S
+cx	input.tcl	/^    method cx {} {$/;"	m	language:TclOO	class:C

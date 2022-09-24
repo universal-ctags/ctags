@@ -632,8 +632,9 @@ static void parseNamespace (tokenInfo *const token,
 			parseProc (token, index);
 		else if (tokenIsType (token, TCL_IDENTIFIER))
 		{
-			notifyCommand (token, index);
-			skipToEndOfCmdline(token); /* ??? */
+			int r = notifyCommand (token, index);
+			if (r == CORK_NIL)
+				skipToEndOfCmdline(token);
 		}
 		else if (token->type == '}')
 		{
@@ -682,8 +683,9 @@ static void findTclTags (void)
 			parsePackage (token);
 		else if (tokenIsType (token, TCL_IDENTIFIER))
 		{
-			notifyCommand (token, CORK_NIL);
-			skipToEndOfCmdline(token); /* ??? */
+			int r = notifyCommand (token, CORK_NIL);
+			if (r == CORK_NIL)
+				skipToEndOfCmdline(token);
 		}
 		else
 			skipToEndOfCmdline(token);
