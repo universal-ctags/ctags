@@ -452,7 +452,7 @@ static void findShTags (void)
 			if (found_kind != K_NOTHING)
 			{
 				if (found_kind == K_SOURCE)
-						makeSimpleRefTag (name, K_SOURCE, R_SCRIPT_LOADED);
+					makeSimpleRefTag (name, K_SOURCE, R_SCRIPT_LOADED);
 				else
 					makeSimpleTag (name, found_kind);
 				found_kind = K_NOTHING;
