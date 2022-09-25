@@ -24,10 +24,13 @@
 #include "vstring.h"
 #include "xtag.h"
 
+#include "sh.h"
+
 /*
 *   DATA DEFINITIONS
 */
 typedef enum {
+	K_SUBPARSER = -2,
 	K_NOTHING = -1,		/* place holder. Never appears on tags file. */
 	K_ALIAS,
 	K_FUNCTION,
@@ -59,6 +62,15 @@ static kindDefinition ShKinds [] = {
 	{ true, 'h', "heredoc", "label for here document",
 	  .referenceOnly = false, ATTACH_ROLES (ShHeredocRoles) },
 };
+
+/*
+* FUNCTION DECLARATIONS
+*/
+static subparser *notifyLineToSubparsers (const unsigned char *cp,
+										  int *n);
+static int extractNameToSubparser (subparser *sub, const unsigned char *cp,
+								   vString *name);
+static int makeTagInSubparser (subparser *sub, vString *name);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -307,6 +319,9 @@ static void findShTags (void)
 		hdocStateClear (&hstate);
 		while (*cp != '\0')
 		{
+			subparser *sub = NULL;
+			int sub_n = 0;
+
 			/* jump over whitespace */
 			while (isspace ((int)*cp))
 				cp++;
@@ -409,28 +424,43 @@ static void findShTags (void)
 				cp += 6;
 				check_char = isFileChar;
 			}
+			else if ((sub = notifyLineToSubparsers (cp, &sub_n)))
+			{
+				found_kind = K_SUBPARSER;
+				cp += sub_n;
+			}
 
 			if (found_kind != K_NOTHING)
 				while (isspace ((int) *cp))
 					++cp;
 
-			// Get the name of the function, alias or file to be read by source
-			if (! check_char ((int) *cp))
+			if (found_kind == K_SUBPARSER)
 			{
-				found_kind = K_NOTHING;
-
-				int d = hdocStateReadDestfileName (&hstate, cp,
-												   hereDocDelimiter);
-				if (d > 0)
-					cp += d;
-				else if (*cp != '\0')
-					++cp;
-				continue;
+				sub_n = extractNameToSubparser (sub, cp, name);
+				if (!vStringIsEmpty (name))
+					cp += sub_n;
 			}
-			while (check_char ((int) *cp))
+			else
 			{
-				vStringPut (name, (int) *cp);
-				++cp;
+				// Get the name of the function, alias or file to be read by source
+				if (! check_char ((int) *cp))
+				{
+					found_kind = K_NOTHING;
+
+					int d = hdocStateReadDestfileName (&hstate, cp,
+													   hereDocDelimiter);
+					if (d > 0)
+						cp += d;
+					else if (*cp != '\0')
+						++cp;
+					continue;
+				}
+
+				while (check_char ((int) *cp))
+				{
+					vStringPut (name, (int) *cp);
+					++cp;
+				}
 			}
 
 			while (isspace ((int) *cp))
@@ -453,6 +483,11 @@ static void findShTags (void)
 			{
 				if (found_kind == K_SOURCE)
 					makeSimpleRefTag (name, K_SOURCE, R_SCRIPT_LOADED);
+				else if (found_kind == K_SUBPARSER)
+				{
+					if (!vStringIsEmpty (name))
+						makeTagInSubparser (sub, name);
+				}
 				else
 					makeSimpleTag (name, found_kind);
 				found_kind = K_NOTHING;
@@ -466,6 +501,59 @@ static void findShTags (void)
 	vStringDelete (name);
 	if (hereDocDelimiter)
 		vStringDelete (hereDocDelimiter);
+}
+
+static subparser *notifyLineToSubparsers (const unsigned char *cp,
+										  int *n)
+{
+	int r = 0;
+	subparser *sub;
+
+	foreachSubparser (sub, false)
+	{
+		shSubparser *shsub = (shSubparser *)sub;
+
+		if(shsub->lineNotify)
+		{
+			enterSubparser(sub);
+			r = shsub->lineNotify (shsub, cp);
+			leaveSubparser();
+			if (r > 0)
+				break;
+		}
+	}
+
+	if (r > 0)
+	{
+		*n = r;
+		return sub;
+	}
+	return NULL;
+}
+
+static int extractNameToSubparser(subparser *sub, const unsigned char *cp,
+								  vString *name)
+{
+	int n;
+	shSubparser *shsub = (shSubparser *)sub;
+
+	enterSubparser(sub);
+	n = shsub->extractName(shsub, cp, name);
+	leaveSubparser();
+
+	return n;
+}
+
+static int makeTagInSubparser (subparser *sub, vString *name)
+{
+	int r;
+	shSubparser *shsub = (shSubparser *)sub;
+
+	enterSubparser(sub);
+	r = shsub->makeTag(shsub, name);
+	leaveSubparser();
+
+	return r;
 }
 
 extern parserDefinition* ShParser (void)

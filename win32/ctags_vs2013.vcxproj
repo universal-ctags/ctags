@@ -263,6 +263,7 @@
     <ClCompile Include="..\parsers\automake.c" />
     <ClCompile Include="..\parsers\awk.c" />
     <ClCompile Include="..\parsers\basic.c" />
+    <ClCompile Include="..\parsers\bats.c" />
     <ClCompile Include="..\parsers\beta.c" />
     <ClCompile Include="..\parsers\bibtex.c" />
     <ClCompile Include="..\parsers\c-based.c" />
@@ -458,6 +459,7 @@
     <ClInclude Include="..\parsers\perl.h" />
     <ClInclude Include="..\parsers\r.h" />
     <ClInclude Include="..\parsers\ruby.h" />
+    <ClInclude Include="..\parsers\sh.h" />
     <ClInclude Include="..\parsers\tcl.h" />
     <ClInclude Include="..\parsers\tex.h" />
     <ClInclude Include="resource.h" />

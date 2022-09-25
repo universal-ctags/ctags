@@ -1,0 +1,11 @@
+Zeroth test	input.bats	/^@test "Zeroth test" {$/;"	t	language:Bats	roles:def
+First test	input.bats	/^@test "First test" {$/;"	t	language:Bats	roles:def
+Second test	input.bats	/^@test "Second test" {$/;"	t	language:Bats	roles:def
+Loading	input.bats	/^@test "Loading" {$/;"	t	language:Bats	roles:def
+ABC	input.bats	/^      load "ABC"$/;"	S	language:Bats	roles:loaded
+a"b	input.bats	/^      load "a\\"b"$/;"	S	language:Bats	roles:loaded
+c\\d	input.bats	/^      load "c\\\\d"$/;"	S	language:Bats	roles:loaded
+EFG	input.bats	/^      load EFG$/;"	S	language:Bats	roles:loaded
+HIJ	input.bats	/^      load 'HIJ'$/;"	S	language:Bats	roles:loaded
+h\\ij	input.bats	/^      load 'h\\ij'$/;"	S	language:Bats	roles:loaded
+K L;M	input.bats	/^      load K\\ L\\;M$/;"	S	language:Bats	roles:loaded
