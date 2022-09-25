@@ -474,7 +474,7 @@ extern parserDefinition* ShParser (void)
 		"sh", "SH", "bsh", "bash", "ksh", "zsh", "ash", NULL
 	};
 	static const char *const aliases [] = {
-		"sh", "bash", "ksh", "zsh", "ash",
+		"sh", "bash", "ksh", "zsh", "ash", "dash",
 		/* major mode name in emacs */
 		"shell-script",
 		NULL
