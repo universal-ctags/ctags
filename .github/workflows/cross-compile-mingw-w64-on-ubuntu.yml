@@ -1,4 +1,4 @@
-name: cross compile with mingw-w64
+name: cross compile with mingw-w64 on ubuntu
 
 on:
   push:
@@ -11,15 +11,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build-machine-os: [ubuntu-22.04, ubuntu-20.04, macos-12, macos-11]
+        build-machine-os: [ubuntu-22.04, ubuntu-20.04]
         target: [i686-w64-mingw32,x86_64-w64-mingw32]
 
     runs-on: ${{ matrix.build-machine-os }}
 
     steps:
       - uses: actions/checkout@v2
-      
-      - run: brew install mingw-w64 gcc make automake autoconf file
+
+      - run: sudo apt-get -y -o APT::Immediate-Configure=false update
+      - run: sudo apt-get -y -o APT::Immediate-Configure=false install mingw-w64 gcc make automake autoconf file
 
       - run: ./autogen.sh
 
@@ -37,7 +38,7 @@ jobs:
               AR=${{ matrix.target }}-ar \
               RANLIB=${{ matrix.target }}-ranlib \
               WINDRES=${{ matrix.target }}-windres
-      
+
       - run: make V=1
-      
+
       - run: file ctags.exe | grep PE32
