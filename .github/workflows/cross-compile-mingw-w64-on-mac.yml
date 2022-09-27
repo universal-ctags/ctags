@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
+
       - run: brew install mingw-w64 gcc make automake autoconf file
 
       - run: ./autogen.sh
@@ -37,7 +37,7 @@ jobs:
               AR=${{ matrix.target }}-ar \
               RANLIB=${{ matrix.target }}-ranlib \
               WINDRES=${{ matrix.target }}-windres
-      
+
       - run: make V=1
-      
+
       - run: file ctags.exe | grep PE32
