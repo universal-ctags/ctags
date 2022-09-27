@@ -77,4 +77,5 @@ jobs:
 
       - run: make V=1
 
-      - run: file ctags | grep "ELF 32-bit LSB pie executable, ARM, EABI5"
+      # pie executable or shared object
+      - run: file ctags | grep 'ELF 32-bit LSB .*, ARM, EABI5'
