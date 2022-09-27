@@ -26,6 +26,7 @@
 #include "debug.h"
 #include "objpool.h"
 #include "promise.h"
+#include "trace.h"
 
 #define isIdentChar(c) (isalnum (c) || (c) == '_' || (c) >= 0x80)
 #define newToken() (objPoolGet (TokenPool))
@@ -237,6 +238,35 @@ typedef enum eTokenType {
 	TOKEN_BACKSLASH,
 	TOKEN_QMARK,
 } tokenType;
+
+#ifdef DEBUG
+static const char *tokenTypes[] = {
+#define E(X) [TOKEN_##X] = #X
+	E(UNDEFINED),
+	E(EOF),
+	E(CHARACTER),
+	E(CLOSE_PAREN),
+	E(SEMICOLON),
+	E(COLON),
+	E(COMMA),
+	E(KEYWORD),
+	E(OPEN_PAREN),
+	E(OPERATOR),
+	E(IDENTIFIER),
+	E(STRING),
+	E(PERIOD),
+	E(OPEN_CURLY),
+	E(CLOSE_CURLY),
+	E(EQUAL_SIGN),
+	E(OPEN_SQUARE),
+	E(CLOSE_SQUARE),
+	E(VARIABLE),
+	E(AMPERSAND),
+	E(BACKSLASH),
+	E(QMARK),
+#undef E
+};
+#endif
 
 typedef struct {
 	tokenType		type;
@@ -1128,6 +1158,8 @@ getNextChar:
 	}
 
 	MayBeKeyword = nextMayBeKeyword;
+
+	TRACE_PRINT("token: %s (%s)", tokenTypes[token->type], vStringValue (token->string));
 }
 
 static void readQualifiedName (tokenInfo *const token, vString *name,
@@ -1712,6 +1744,8 @@ static void enterScope (tokenInfo *const parentToken,
 						const vString *const extraScope,
 						const int parentKind)
 {
+	TRACE_ENTER();
+
 	tokenInfo *token = newToken ();
 	vString *typeName = vStringNew ();
 	int origParentKind = parentToken->parentKind;
@@ -1811,10 +1845,14 @@ static void enterScope (tokenInfo *const parentToken,
 	parentToken->parentKind = origParentKind;
 	vStringDelete (typeName);
 	deleteToken (token);
+
+	TRACE_LEAVE();
 }
 
 static void findTags (bool startsInPhpMode)
 {
+	TRACE_ENTER();
+
 	tokenInfo *const token = newToken ();
 
 	InPhp = startsInPhpMode;
@@ -1834,16 +1872,22 @@ static void findTags (bool startsInPhpMode)
 	vStringDelete (FullScope);
 	vStringDelete (CurrentNamesapce);
 	deleteToken (token);
+
+	TRACE_LEAVE();
 }
 
 static void findPhpTags (void)
 {
+	TRACE_ENTER();
 	findTags (false);
+	TRACE_LEAVE();
 }
 
 static void findZephirTags (void)
 {
+	TRACE_ENTER();
 	findTags (true);
+	TRACE_LEAVE();
 }
 
 static void initializePool (void)
