@@ -158,8 +158,8 @@ typedef enum {
 	TOKEN_NAME,			/* tag and attribute names */
 	TOKEN_STRING,		/* single- or double-quoted attribute value */
 	TOKEN_TEXT,
-	TOKEN_TAG_START,	/* <  */
-	TOKEN_TAG_START2,	/* </ */
+	TOKEN_OPEN_TAG_START,	/* <  */
+	TOKEN_CLOSE_TAG_START,	/* </ */
 	TOKEN_TAG_END,		/* >  */
 	TOKEN_TAG_END2,		/* /> */
 	TOKEN_EQUAL,
@@ -289,11 +289,11 @@ getNextChar:
 			else if (d == '?')
 				token->type = TOKEN_OTHER;
 			else if (d == '/')
-				token->type = TOKEN_TAG_START2;
+				token->type = TOKEN_CLOSE_TAG_START;
 			else
 			{
 				ungetcToInputFile (d);
-				token->type = TOKEN_TAG_START;
+				token->type = TOKEN_OPEN_TAG_START;
 			}
 			break;
 		}
@@ -378,19 +378,19 @@ static bool readTagContent (tokenInfo *token, vString *text, long *line, long *l
 		*lineOffset = getInputLineOffset ();
 		readToken (token, false);
 		type = token->type;
-		if (type == TOKEN_TAG_START)
+		if (type == TOKEN_OPEN_TAG_START)
 			readTag (token, text, depth + 1);
-		if (type == TOKEN_COMMENT || type == TOKEN_TAG_START)
+		if (type == TOKEN_COMMENT || type == TOKEN_OPEN_TAG_START)
 		{
 			readTokenText (token, text != NULL);
 			appendText (text, token->string);
 		}
 	}
-	while (type == TOKEN_COMMENT || type == TOKEN_TAG_START);
+	while (type == TOKEN_COMMENT || type == TOKEN_OPEN_TAG_START);
 
 	TRACE_LEAVE_TEXT("is_close_tag? %d", type == TOKEN_CLOSE_TAG_START);
 
-	return type == TOKEN_TAG_START2;
+	return type == TOKEN_CLOSE_TAG_START;
 }
 
 static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
@@ -413,7 +413,7 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 		readToken (token, false);
 		type = token->type;
 
-		if (type == TOKEN_TAG_START2)
+		if (type == TOKEN_CLOSE_TAG_START)
 		{
 			found_start = true;
 			line_tmp[1] = line_tmp[0];
@@ -657,7 +657,7 @@ static void findHtmlTags (void)
 	do
 	{
 		readToken (&token, true);
-		if (token.type == TOKEN_TAG_START)
+		if (token.type == TOKEN_OPEN_TAG_START)
 			readTag (&token, NULL, 0);
 	}
 	while (token.type != TOKEN_EOF);
