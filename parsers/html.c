@@ -174,8 +174,8 @@ static const char *tokenTypes[] = {
 	E(NAME),
 	E(STRING),
 	E(TEXT),
-	E(TAG_START),
-	E(TAG_START2),
+	E(OPEN_TAG_START),
+	E(CLOSE_TAG_START),
 	E(TAG_END),
 	E(TAG_END2),
 	E(EQUAL),
@@ -195,6 +195,8 @@ static int Lang_html;
 
 
 static void readTag (tokenInfo *token, vString *text, int depth);
+
+static void skipOtherScriptContent (const int delimiter);
 
 static void readTokenText (tokenInfo *const token, bool collectText)
 {
@@ -255,7 +257,6 @@ getNextChar:
 		case '<':
 		{
 			int d = getcFromInputFile ();
-
 			if (d == '!')
 			{
 				d = getcFromInputFile ();
@@ -286,8 +287,11 @@ getNextChar:
 				ungetcToInputFile (d);
 				token->type = TOKEN_OTHER;
 			}
-			else if (d == '?')
-				token->type = TOKEN_OTHER;
+			else if (d == '?' || d == '%')
+			{
+				skipOtherScriptContent(d);
+				goto getNextChar;
+			}
 			else if (d == '/')
 				token->type = TOKEN_CLOSE_TAG_START;
 			else
@@ -435,6 +439,53 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 	TRACE_LEAVE_TEXT("found_script? %d", found_script);
 
 	return found_script;
+}
+
+static void skipOtherScriptContent (const int delimiter)
+{
+	TRACE_ENTER();
+
+	const long startSourceLineNumber = getSourceLineNumber ();
+	const long startLineNumber = getInputLineNumber ();
+	const long startLineOffset = getInputLineOffset () - 2;
+
+	vString *script_name = vStringNew ();
+	bool reading_script_name = true;
+	while (1)
+	{
+		int c = getcFromInputFile ();
+		if (c == EOF)
+		{
+			break;
+		}
+		else if (reading_script_name && !isspace(c))
+		{
+			vStringPut (script_name, c);
+		}
+		else if (reading_script_name)
+		{
+			reading_script_name = false;
+		}
+		else if (c == delimiter)
+		{
+			c = getcFromInputFile ();
+			if (c == '>')
+			{
+				break;
+			}
+			ungetcToInputFile (c);
+		}
+	}
+
+	if (strcasecmp ("php", vStringValue (script_name)) == 0
+		|| strcmp ("=", vStringValue (script_name)) == 0)
+		makePromise ("PHP", startLineNumber, startLineOffset,
+					 getInputLineNumber (), getInputLineOffset (),
+					 startSourceLineNumber);
+
+	vStringDelete (script_name);
+
+	TRACE_LEAVE();
 }
 
 static void makeClassRefTags (const char *classes)

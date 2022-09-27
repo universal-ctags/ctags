@@ -933,7 +933,7 @@ getNextChar:
 	if (! InPhp)
 	{
 		unsigned long startSourceLineNumber = getSourceLineNumber ();
-		unsigned long startLineNumber = startSourceLineNumber;
+		unsigned long startLineNumber = getInputLineNumber ();
 		int startLineOffset = getInputLineOffset ();
 
 		c = findPhpStart ();

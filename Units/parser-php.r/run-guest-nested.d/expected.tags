@@ -1,0 +1,9 @@
+.blarg	input.php	/^.blarg {$/;"	c	line:31	language:CSS	roles:def
+My Home Page	input.php	/^    <title>My Home Page<\/title>$/;"	j	line:8	language:HTML	roles:def
+X	input.php	/^<html><head><title>X<\/title>$/;"	j	line:1	language:HTML	roles:def
+css/general.css	input.php	/^    <link rel="stylesheet" href="css\/general.css" type="text\/css">$/;"	C	line:9	language:HTML	roles:extFile
+draw	input.php	/^  function draw($x) {$/;"	f	line:3	language:PHP	roles:def
+f1	input.php	/^    var f1 = function (n) {$/;"	f	line:21	language:JavaScript	roles:def
+f2	input.php	/^    var f2 = function (m) {$/;"	f	line:26	language:JavaScript	roles:def
+nothing	input.php	/^  function nothing($x) {$/;"	f	line:36	language:PHP	roles:def
+stuff	input.php	/^    <h1>stuff<\/h1>$/;"	h	line:13	language:HTML	roles:def
