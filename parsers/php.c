@@ -913,10 +913,8 @@ getNextChar:
 		unsigned long endLineNumber = getInputLineNumber ();
 		int endLineOffset = getInputLineOffset ();
 
-		if ((startLineNumber != endLineNumber)
-			|| (startLineOffset != endLineOffset))
-			makePromise ("HTML", startLineNumber, startLineOffset,
-						 endLineNumber, endLineOffset, startSourceLineNumber);
+		makePromise ("HTML", startLineNumber, startLineOffset,
+					 endLineNumber, endLineOffset, startSourceLineNumber);
 	}
 	else
 		c = getcFromInputFile ();

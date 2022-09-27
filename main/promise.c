@@ -71,15 +71,21 @@ int  makePromise   (const char *parser,
 	int r;
 	langType lang = LANG_IGNORE;
 
+	const bool is_thin_stream_spec =
+		isThinStreamSpec(startLine, startCharOffset,
+						 endLine, endCharOffset,
+						 sourceLineOffset);
+
+	if (!is_thin_stream_spec
+		&& (startLine > endLine
+			|| (startLine == endLine && startCharOffset >= endCharOffset)))
+		return -1;
+
 	verbose("makePromise: %s start(line: %lu, offset: %ld, srcline: %lu), end(line: %lu, offset: %ld)\n",
 			parser? parser: "*", startLine, startCharOffset, sourceLineOffset,
 			endLine, endCharOffset);
 
-	if ((!isThinStreamSpec(startLine,
-						   startCharOffset,
-						   endLine,
-						   endCharOffset,
-						   sourceLineOffset))
+	if ((!is_thin_stream_spec)
 		&& ( !isXtagEnabled (XTAG_GUEST)))
 		return -1;
 
