@@ -227,22 +227,23 @@ static void line_filler (unsigned char *input, size_t size,
 						 void *data)
 {
 	const ulongArray *lines = data;
+	const size_t count = ulongArrayCount (lines);
 	unsigned int start_index, end_index;
 	unsigned int i;
 
-	for (i = 0; i < ulongArrayCount (lines); i++)
+	for (i = 0; i < count; i++)
 	{
 		unsigned long line = ulongArrayItem (lines, i);
 		if (line >= startLine)
 			break;
 	}
-	if (i == ulongArrayCount (lines))
+	if (i == count)
 		return;
 	if (i > endLine)
 		return;
 	start_index = i;
 
-	for (; i < ulongArrayCount (lines); i++)
+	for (; i < count; i++)
 	{
 		unsigned long line = ulongArrayItem (lines, i);
 		if (line > endLine)
