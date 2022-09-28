@@ -226,7 +226,7 @@ static void line_filler (unsigned char *input, size_t size,
 						 unsigned long endLine, long endCharOffset,
 						 void *data)
 {
-	ulongArray *lines = data;
+	const ulongArray *lines = data;
 	unsigned int start_index, end_index;
 	unsigned int i;
 
