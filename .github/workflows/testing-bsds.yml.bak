@@ -18,6 +18,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - uses: actions/cache@v2
+      with:
+        path: ~/.vagrant.d/boxes
+        key: vagrant-generic-freebsd-${{ matrix.freebsd-version }}
+        restore-keys: |
+          vagrant-generic-freebsd-${{ matrix.freebsd-version }}
+
     # https://app.vagrantup.com/boxes/search?utf8=%E2%9C%93&sort=downloads&provider=&q=freebsd
     # https://github.com/leleliu008/github-actions-vagrant
     - uses: leleliu008/github-actions-vagrant@v2
@@ -44,6 +51,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.vagrant.d/boxes
+        key: vagrant-generic-openbsd-7
+        restore-keys: |
+          vagrant-generic-openbsd-7
 
     - uses: leleliu008/github-actions-vagrant@v2
       with:
@@ -80,6 +94,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.vagrant.d/boxes
+        key: vagrant-generic-netbsd-9
+        restore-keys: |
+          vagrant-generic-netbsd-9
 
     - uses: leleliu008/github-actions-vagrant@v2
       with:

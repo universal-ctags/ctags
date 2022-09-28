@@ -13,10 +13,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - uses: actions/cache@v2
+      with:
+        path: ~/.vagrant.d/boxes
+        key: vagrant-generic-openbsd-7
+        restore-keys: |
+          vagrant-generic-openbsd-7
+
     - uses: leleliu008/github-actions-vagrant@v2
       with:
         mem: 2048
-        box: generic/openbsd6
+        box: generic/openbsd7
         log: warn
         run: |
           export AUTOCONF_VERSION=2.69

@@ -13,6 +13,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - uses: actions/cache@v2
+      with:
+        path: ~/.vagrant.d/boxes
+        key: vagrant-generic-netbsd-9
+        restore-keys: |
+          vagrant-generic-netbsd-9
+
     - uses: leleliu008/github-actions-vagrant@v2
       with:
         mem: 2048
