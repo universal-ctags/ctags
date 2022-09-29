@@ -17,6 +17,7 @@ Automake       d/directory       man                on      directory for MANS p
 Automake       d/directory       program            on      directory for PROGRAMS primary
 Automake       d/directory       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
+Bats           S/script          loaded             on      script loaed with "load" command
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C              d/macro           undef              on      undefined
 C              h/header          local              on      local header
@@ -129,6 +130,7 @@ Automake       d/directory       man                on      directory for MANS p
 Automake       d/directory       program            on      directory for PROGRAMS primary
 Automake       d/directory       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
+Bats           S/script          loaded             on      script loaed with "load" command
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C              d/macro           undef              on      undefined
 C              h/header          local              on      local header

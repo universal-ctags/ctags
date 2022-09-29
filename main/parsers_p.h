@@ -67,6 +67,7 @@
 	AutomakeParser, \
 	AwkParser, \
 	BasicParser, \
+	BatsParser, \
 	BetaParser, \
   	BibtexParser, \
 	ClojureParser, \

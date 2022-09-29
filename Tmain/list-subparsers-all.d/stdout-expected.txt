@@ -3,6 +3,7 @@ AnsiblePlaybook      Yaml       base <> sub {bidirectional}
 Ant                  XML        base <> sub {bidirectional}
 Autoconf             M4         base <> sub {bidirectional}
 Automake             Make       base <= sub {dedicated}
+Bats                 Sh         base <= sub {dedicated}
 DBusIntrospect       XML        base <> sub {bidirectional}
 FunctionParameters   Perl       base <> sub {bidirectional}
 GemSpec              Ruby       base <= sub {dedicated}

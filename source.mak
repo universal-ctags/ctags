@@ -273,6 +273,7 @@ PARSER_HEADS = \
 	parsers/perl.h \
 	parsers/r.h \
 	parsers/ruby.h \
+	parsers/sh.h \
 	parsers/tcl.h \
 	parsers/tex.h \
 	\
@@ -291,6 +292,7 @@ PARSER_SRCS =				\
 	parsers/automake.c		\
 	parsers/awk.c			\
 	parsers/basic.c			\
+	parsers/bats.c			\
 	parsers/beta.c			\
 	parsers/bibtex.c		\
 	parsers/c-based.c		\

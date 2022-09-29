@@ -407,6 +407,7 @@ The following parsers have been added:
 * D
 * DBusIntrospect *libxml*
 * Diff
+* Dots *Sh based subparser*
 * DTD
 * DTS
 * Elixir *optlib*
