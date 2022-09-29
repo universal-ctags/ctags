@@ -71,7 +71,7 @@ int  makePromise   (const char *parser,
 	int r;
 	langType lang = LANG_IGNORE;
 
-	verbose("makePromise: %s start(line: %lu, offset: %lu, srcline: %lu), end(line: %lu, offset: %lu)\n",
+	verbose("makePromise: %s start(line: %lu, offset: %ld, srcline: %lu), end(line: %lu, offset: %ld)\n",
 			parser? parser: "*", startLine, startCharOffset, sourceLineOffset,
 			endLine, endCharOffset);
 
