@@ -197,7 +197,7 @@ int getLastPromise (void)
 	return promise_count - 1;
 }
 
-static unsigned char* fill_or_skip (unsigned char *input, unsigned char *input_end, bool filling)
+static unsigned char* fill_or_skip (unsigned char *input, const unsigned char *const input_end, bool filling)
 {
 	if ( !(input < input_end))
 		return NULL;
@@ -254,6 +254,7 @@ static void line_filler (unsigned char *input, size_t size,
 	end_index = i;
 
 	unsigned long input_line = startLine;
+	const unsigned char *const input_end = input + size;
 	for (i = start_index; i < end_index; i++)
 	{
 		unsigned long line = ulongArrayItem (lines, i);
@@ -262,13 +263,13 @@ static void line_filler (unsigned char *input, size_t size,
 		{
 			if (input_line == line)
 			{
-				input = fill_or_skip (input, input + size, true);
+				input = fill_or_skip (input, input_end, true);
 				input_line++;
 				break;
 			}
 			else
 			{
-				input = fill_or_skip (input, input + size, false);
+				input = fill_or_skip (input, input_end, false);
 				input_line++;
 			}
 		}
