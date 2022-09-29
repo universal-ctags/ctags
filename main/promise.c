@@ -272,6 +272,8 @@ static void line_filler (unsigned char *input, size_t size,
 				input = fill_or_skip (input, input_end, false);
 				input_line++;
 			}
+			if (input == NULL)
+				return;
 		}
 	}
 }
