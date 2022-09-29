@@ -238,9 +238,7 @@ static void line_filler (unsigned char *input, size_t size,
 			break;
 	}
 	if (i == count)
-		return;
-	if (i > endLine)
-		return;
+		return;					/* Not over-wrapping */
 	start_index = i;
 
 	for (; i < count; i++)
