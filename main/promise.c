@@ -197,7 +197,7 @@ int getLastPromise (void)
 	return promise_count - 1;
 }
 
-static unsigned char* fill_or_skip (unsigned char *input, const unsigned char *const input_end, bool filling)
+static unsigned char* fill_or_skip (unsigned char *input, const unsigned char *const input_end, const bool filling)
 {
 	if ( !(input < input_end))
 		return NULL;
@@ -221,9 +221,9 @@ static unsigned char* fill_or_skip (unsigned char *input, const unsigned char *c
 	}
 }
 
-static void line_filler (unsigned char *input, size_t size,
-						 unsigned long startLine, long startCharOffset,
-						 unsigned long endLine, long endCharOffset,
+static void line_filler (unsigned char *input, size_t const size,
+						 unsigned long const startLine, long const startCharOffset,
+						 unsigned long const endLine, long const endCharOffset,
 						 void *data)
 {
 	const ulongArray *lines = data;
@@ -233,7 +233,7 @@ static void line_filler (unsigned char *input, size_t size,
 
 	for (i = 0; i < count; i++)
 	{
-		unsigned long line = ulongArrayItem (lines, i);
+		const unsigned long line = ulongArrayItem (lines, i);
 		if (line >= startLine)
 		{
 			if (line > endLine)
@@ -247,7 +247,7 @@ static void line_filler (unsigned char *input, size_t size,
 
 	for (; i < count; i++)
 	{
-		unsigned long line = ulongArrayItem (lines, i);
+		const unsigned long line = ulongArrayItem (lines, i);
 		if (line > endLine)
 			break;
 	}
@@ -257,7 +257,7 @@ static void line_filler (unsigned char *input, size_t size,
 	const unsigned char *const input_end = input + size;
 	for (i = start_index; i < end_index; i++)
 	{
-		unsigned long line = ulongArrayItem (lines, i);
+		const unsigned long line = ulongArrayItem (lines, i);
 
 		while (1)
 		{
