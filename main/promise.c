@@ -235,7 +235,11 @@ static void line_filler (unsigned char *input, size_t size,
 	{
 		unsigned long line = ulongArrayItem (lines, i);
 		if (line >= startLine)
+		{
+			if (line > endLine)
+				return;			/* Not over-wrapping */
 			break;
+		}
 	}
 	if (i == count)
 		return;					/* Not over-wrapping */
