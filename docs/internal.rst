@@ -498,6 +498,11 @@ the line in which case the two offsets have to be provided. Compilers reading
 the input character by character can obtain the current offset by calling
 ``getInputLineOffset()``.
 
+In some cases, you may want to specifying the offset of the end of
+line (EOL).  A macro ``EOL_CHAR_OFFSET`` defined in ``main/promise.h``
+can be used for specying EOL in abstracted way; you don't have to find
+the real offset for the EOL.
+
 Internal design
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
