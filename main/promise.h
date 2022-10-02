@@ -17,6 +17,8 @@
 #include "parse.h"
 #include "numarray.h"
 
+#define EOL_CHAR_OFFSET -1
+
 /* parser can be NULL; give a name with promiseUpdateLanguage()
  * when the name can be determined. */
 int  makePromise   (const char *parser,

@@ -494,9 +494,14 @@ Available parser names can be listed by running ctags with
 the 3rd and 5th argument. They are byte offsets of the start and the end of the
 C language area from the beginning of the line which is 0 in this case. In
 general, the guest language's section does not have to start at the beginning of
-the line in which case the two offsets have to be provided. Compilers reading
+the line in which case the two offsets have to be provided. Parsers reading
 the input character by character can obtain the current offset by calling
 ``getInputLineOffset()``.
+
+In some cases, you may want to specifying the offset of the end of
+line (EOL).  A macro ``EOL_CHAR_OFFSET`` defined in ``main/promise.h``
+can be used for specying EOL in abstracted way; you don't have to find
+the real offset for the EOL.
 
 Internal design
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

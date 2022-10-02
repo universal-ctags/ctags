@@ -7,7 +7,7 @@ F	input.fy	/^	F(1), \/\/ should be 'e', not missing$/;"	e	enum:e	file:	end:22
 debug_code	input.fy	/^#:def debug_code(code)$/;"	m	end:8
 e	input.fy	/^        e() {}$/;"	m	class:e	end:32
 e	input.fy	/^        e(int x) {}$/;"	m	class:e	end:31
-e	input.fy	/^public enum e {$/;"	g
+e	input.fy	/^public enum e {$/;"	g	end:51
 getShape	input.fy	/^	public final Shape getShape() {$/;"	m	class:e	end:46
 getString	input.fy	/^	public String getString() {$/;"	m	class:e	end:41
 repeat_code	input.fy	/^#:def repeat_code(code, repeat)$/;"	m	end:29

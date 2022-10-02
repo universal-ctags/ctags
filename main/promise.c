@@ -71,7 +71,7 @@ int  makePromise   (const char *parser,
 	int r;
 	langType lang = LANG_IGNORE;
 
-	verbose("makePromise: %s start(line: %lu, offset: %lu, srcline: %lu), end(line: %lu, offset: %lu)\n",
+	verbose("makePromise: %s start(line: %lu, offset: %ld, srcline: %lu), end(line: %lu, offset: %ld)\n",
 			parser? parser: "*", startLine, startCharOffset, sourceLineOffset,
 			endLine, endCharOffset);
 
@@ -197,7 +197,7 @@ int getLastPromise (void)
 	return promise_count - 1;
 }
 
-static unsigned char* fill_or_skip (unsigned char *input, unsigned char *input_end, bool filling)
+static unsigned char* fill_or_skip (unsigned char *input, const unsigned char *const input_end, const bool filling)
 {
 	if ( !(input < input_end))
 		return NULL;
@@ -221,53 +221,59 @@ static unsigned char* fill_or_skip (unsigned char *input, unsigned char *input_e
 	}
 }
 
-static void line_filler (unsigned char *input, size_t size,
-						 unsigned long startLine, long startCharOffset,
-						 unsigned long endLine, long endCharOffset,
+static void line_filler (unsigned char *input, size_t const size,
+						 unsigned long const startLine, long const startCharOffset,
+						 unsigned long const endLine, long const endCharOffset,
 						 void *data)
 {
-	ulongArray *lines = data;
+	const ulongArray *lines = data;
+	const size_t count = ulongArrayCount (lines);
 	unsigned int start_index, end_index;
 	unsigned int i;
 
-	for (i = 0; i < ulongArrayCount (lines); i++)
+	for (i = 0; i < count; i++)
 	{
-		unsigned long line = ulongArrayItem (lines, i);
+		const unsigned long line = ulongArrayItem (lines, i);
 		if (line >= startLine)
+		{
+			if (line > endLine)
+				return;			/* Not over-wrapping */
 			break;
+		}
 	}
-	if (i == ulongArrayCount (lines))
-		return;
-	if (i > endLine)
-		return;
+	if (i == count)
+		return;					/* Not over-wrapping */
 	start_index = i;
 
-	for (; i < ulongArrayCount (lines); i++)
+	for (; i < count; i++)
 	{
-		unsigned long line = ulongArrayItem (lines, i);
+		const unsigned long line = ulongArrayItem (lines, i);
 		if (line > endLine)
 			break;
 	}
 	end_index = i;
 
 	unsigned long input_line = startLine;
+	const unsigned char *const input_end = input + size;
 	for (i = start_index; i < end_index; i++)
 	{
-		unsigned long line = ulongArrayItem (lines, i);
+		const unsigned long line = ulongArrayItem (lines, i);
 
 		while (1)
 		{
 			if (input_line == line)
 			{
-				input = fill_or_skip (input, input + size, true);
+				input = fill_or_skip (input, input_end, true);
 				input_line++;
 				break;
 			}
 			else
 			{
-				input = fill_or_skip (input, input + size, false);
+				input = fill_or_skip (input, input_end, false);
 				input_line++;
 			}
+			if (input == NULL)
+				return;
 		}
 	}
 }

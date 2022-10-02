@@ -26,6 +26,7 @@
 #include "routines_p.h"
 #include "options_p.h"
 #include "parse_p.h"
+#include "promise.h"
 #include "promise_p.h"
 #include "stats_p.h"
 #include "trace.h"
@@ -1133,7 +1134,17 @@ extern void   pushNarrowedInputStream (
 
 	tmp = getInputFilePositionForLine (endLine);
 	mio_setpos (File.mio, &tmp);
-	mio_seek (File.mio, endCharOffset, SEEK_CUR);
+	if (endCharOffset == EOL_CHAR_OFFSET)
+	{
+		long line_start = mio_tell (File.mio);
+		vString *tmpstr = vStringNew ();
+		readLine (tmpstr, File.mio);
+		endCharOffset = mio_tell (File.mio) - line_start;
+		vStringDelete (tmpstr);
+		Assert (endCharOffset >= 0);
+	}
+	else
+		mio_seek (File.mio, endCharOffset, SEEK_CUR);
 	q = mio_tell (File.mio);
 
 	mio_setpos (File.mio, &original);
