@@ -363,9 +363,20 @@ AM_CONDITIONAL([RUN_TXT2CSTR], [test "${perl_found}" = "yes"])
 # 	can be installed using pip ("pip install docutils"). On some
 #	systems, rst2man and rst2html are actually installed as rst2man.py
 #	and rst2html.py - create a symlink of that's the case.
-AC_PATH_PROGS(RST2MAN, [rst2man rst2man.py rst2man-3 rst2man-3.6 rst2man-3.7 rst2man-3.8 rst2man-3.9], [no])
+#	Also, allow to define path as "--with-rst2man" and "--with-rst2html".
+AC_ARG_WITH([rst2man],
+  AS_HELP_STRING([--with-rst2man=PATH], [Location of rst2man (auto)]),
+  [RST2MAN="$withval"],
+  [AC_PATH_PROGS(RST2MAN,
+    [rst2man rst2man.py rst2man-3 rst2man-3.6 rst2man-3.7 rst2man-3.8 rst2man-3.9, rst2man-3.10],
+    [no])])
 AM_CONDITIONAL([HAVE_RST2MAN], [test "x$RST2MAN" != "xno"])
-AC_PATH_PROGS(RST2HTML, [rst2html rst2html.py rst2html-3 rst2html-3.6 rst2html-3.7 rst2html-3.8 rst2html-3.9], [no])
+AC_ARG_WITH([rst2html],
+  AS_HELP_STRING([--with-rst2html=PATH], [Location of rst2html (auto)]),
+  [RST2HTML="$withval"],
+  [AC_PATH_PROGS(RST2HTML,
+    [rst2html rst2html.py rst2html-3 rst2html-3.6 rst2html-3.7 rst2html-3.8 rst2html-3.9, rst2html-3.10],
+    [no])])
 AM_CONDITIONAL([HAVE_RST2HTML], [test "x$RST2HTML" != "xno"])
 
 # rst2pdf is a separate tool and can also be installed via pip (e.g.,
