@@ -15,7 +15,9 @@
 
 #include <string.h>
 
+#include "debug.h"
 #include "entry.h"
+#include "keyword.h"
 #include "kind.h"
 #include "parse.h"
 #include "read.h"
@@ -42,25 +44,46 @@ typedef enum {
 	R_SCRIPT_LOADED,
 } shScriptRole;
 
+#define SH_SCRIPT_ROLES_COMMON 	{ true, "loaded", "loaded" }
 static roleDefinition ShScriptRoles [] = {
-	{ true, "loaded", "loaded" },
+	SH_SCRIPT_ROLES_COMMON,
 };
 
 typedef enum {
 	R_HEREDOC_ENDMARKER,
 } shHeredocRole;
 
+#define SH_HEREDOC_ROLES_COMMON { true, "endmarker", "end marker" }
 static roleDefinition ShHeredocRoles [] = {
-	{ true, "endmarker", "end marker" },
+	SH_HEREDOC_ROLES_COMMON,
 };
 
+#define SH_KINDS_COMMON(SCRIPT_ROLES,HEREDOC_ROLES)				\
+	{ true, 'a', "alias", "aliases"},							\
+	{ true, 'f', "function", "functions"},						\
+	{ true, 's', "script", "script files",						\
+	  .referenceOnly = true, ATTACH_ROLES (SCRIPT_ROLES) },		\
+	{ true, 'h', "heredoc", "label for here document",			\
+	  .referenceOnly = false, ATTACH_ROLES (HEREDOC_ROLES) }
+
 static kindDefinition ShKinds [] = {
-	{ true, 'a', "alias", "aliases"},
-	{ true, 'f', "function", "functions"},
-	{ true, 's', "script", "script files",
-	  .referenceOnly = true, ATTACH_ROLES (ShScriptRoles) },
-	{ true, 'h', "heredoc", "label for here document",
-	  .referenceOnly = false, ATTACH_ROLES (ShHeredocRoles) },
+	SH_KINDS_COMMON(ShScriptRoles, ShHeredocRoles),
+};
+
+enum eShKeywordId {
+	KEYWORD_function,
+	KEYWORD_alias,
+	KEYWORD_source,
+};
+
+const char *dialectMap [] = {
+	"Sh",
+};
+
+static const struct dialectalKeyword KeywordTable [] = {
+	{ "function",  KEYWORD_function, { 1 } },
+	{ "alias",     KEYWORD_alias,    { 1 } },
+	{ "source",    KEYWORD_source,   { 1 } },
 };
 
 /*
@@ -84,6 +107,11 @@ static bool isFileChar  (int c)
 		|| c == '+' || c == '^'
 		|| c == '%' || c == '@'
 		|| c == '~');
+}
+
+static bool isIdentChar0 (int c)
+{
+	return (isalpha (c) || c == '_' || c == '-');
 }
 
 static bool isIdentChar (int c)
@@ -278,13 +306,53 @@ static void hdocStateUpdateTag (struct hereDocParsingState *hstate, unsigned lon
 	}
 }
 
-static void findShTags (void)
+static size_t handleShKeyword (int keyword,
+							   vString *token,
+							   int *kind,
+							   bool (** check_char)(int))
+{
+	switch (keyword)
+	{
+	case KEYWORD_function:
+		*kind = K_FUNCTION;
+		break;
+	case KEYWORD_alias:
+		*kind = K_ALIAS;
+		*check_char = isIdentChar;
+		break;
+	case KEYWORD_source:
+		*kind = K_SCRIPT;
+		*check_char = isFileChar;
+		break;
+	default:
+		AssertNotReached();
+		break;
+	}
+
+	return vStringLength(token);
+}
+
+static int makeShTag (vString *name, const unsigned char ** cp CTAGS_ATTR_UNUSED, int found_kind)
+{
+	if (found_kind == K_SCRIPT)
+		return makeSimpleRefTag (name, K_SCRIPT, R_SCRIPT_LOADED);
+	else
+		return makeSimpleTag (name, found_kind);
+}
+
+typedef bool (* checkCharFunc) (int);
+static void findShTagsCommon (size_t (* keyword_handler) (int,
+														  vString *,
+														  int *,
+														  checkCharFunc *check_char),
+							  int (* make_tag_handler) (vString *, const unsigned char **, int))
+
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
 	vString *hereDocDelimiter = NULL;
 	bool hereDocIndented = false;
-	bool (* check_char)(int);
+	checkCharFunc check_char;
 
 	struct hereDocParsingState hstate;
 	hdocStateInit (&hstate);
@@ -397,37 +465,35 @@ static void findShTags (void)
 
 			check_char = isBashFunctionChar;
 
-			if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
-				isspace ((int) cp [8]))
-			{
-				found_kind = K_FUNCTION;
-				cp += 8;
-			}
-			else if (strncmp ((const char*) cp, "alias", (size_t) 5) == 0  &&
-				isspace ((int) cp [5]))
-			{
-				check_char = isIdentChar;
-				found_kind = K_ALIAS;
-				cp += 5;
-			}
-			else if (cp [0] == '.'
+			if (cp [0] == '.'
 				    && isspace((int) cp [1]))
 			{
 				found_kind = K_SCRIPT;
 				++cp;
 				check_char = isFileChar;
 			}
-			else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
-					 && isspace((int) cp [6]))
-			{
-				found_kind = K_SCRIPT;
-				cp += 6;
-				check_char = isFileChar;
-			}
 			else if ((sub = notifyLineToSubparsers (cp, &sub_n)))
 			{
 				found_kind = K_SUBPARSER;
 				cp += sub_n;
+			}
+			else
+			{
+				vString *token = vStringNew ();
+				const unsigned char *tmp = cp;
+				while (*tmp && (tmp == cp
+								? (isIdentChar0 (*tmp))
+								: (isIdentChar (*tmp))))
+				{
+					vStringPut (token, *tmp);
+					tmp++;
+				}
+
+				int keyword = lookupKeyword (vStringValue (token),
+											 getInputLanguage ());
+				if (keyword != KEYWORD_NONE)
+					cp += (* keyword_handler) (keyword, token, &found_kind, &check_char);
+				vStringDelete (token);
 			}
 
 			if (found_kind != K_NOTHING)
@@ -489,7 +555,7 @@ static void findShTags (void)
 						makeTagInSubparser (sub, name);
 				}
 				else
-					makeSimpleTag (name, found_kind);
+					make_tag_handler (name, &cp, found_kind);
 				found_kind = K_NOTHING;
 			}
 			else if (!hereDocDelimiter)
@@ -501,6 +567,11 @@ static void findShTags (void)
 	vStringDelete (name);
 	if (hereDocDelimiter)
 		vStringDelete (hereDocDelimiter);
+}
+
+static void findShTags (void)
+{
+	findShTagsCommon (handleShKeyword, makeShTag);
 }
 
 static subparser *notifyLineToSubparsers (const unsigned char *cp,
@@ -556,6 +627,13 @@ static int makeTagInSubparser (subparser *sub, vString *name)
 	return r;
 }
 
+static void initializeSh (const langType language)
+{
+	addDialectalKeywords (KeywordTable, ARRAY_SIZE (KeywordTable),
+						  language,
+						  dialectMap, ARRAY_SIZE (dialectMap));
+}
+
 extern parserDefinition* ShParser (void)
 {
 	static const char *const extensions [] = {
@@ -573,6 +651,7 @@ extern parserDefinition* ShParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findShTags;
+	def->initialize = initializeSh;
 	def->useCork    = CORK_QUEUE;
 	return def;
 }
