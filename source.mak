@@ -17,6 +17,7 @@ MIO_SRCS  = main/mio.c
 UTIL_PUBLIC_HEADS = \
 	main/general.h		\
 	\
+	main/fname.h		\
 	main/gcc-attr.h		\
 	main/htable.h		\
 	main/inline.h		\
@@ -39,6 +40,7 @@ UTIL_HEADS = \
 	$(NULL)
 
 UTIL_SRCS = \
+	main/fname.c		\
 	main/htable.c		\
 	main/ptrarray.c		\
 	main/routines.c		\
