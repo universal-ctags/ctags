@@ -17,6 +17,9 @@
   used fseek and ftell. In this version, they are replaced with _fseeki64 and
   _ftelli64.
 
+- add a new API function (tagsFindPseudoTag) for finding a pseudo tag for
+  given name.
+
 # Version 0.1.0
 
 - propagate internal errors to caller

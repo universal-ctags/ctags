@@ -1334,6 +1334,39 @@ extern tagResult tagsNextPseudoTag (tagFile *const file, tagEntry *const entry)
 	return findPseudoTag (file, 0, entry);
 }
 
+extern tagResult tagsFindPseudoTag (tagFile *const file, tagEntry *const entry,
+									const char *const name, const int match)
+{
+	size_t len;
+	tagEntry entry0;
+	tagEntry *entryp = entry? entry: &entry0;
+
+	tagResult r = tagsFirstPseudoTag (file, entryp);
+	if (r != TagSuccess)
+		return r;
+
+	if (match & TAG_PARTIALMATCH)
+		len = strlen (name);
+
+	do
+	{
+		if (match & TAG_PARTIALMATCH)
+		{
+			if (strncmp (entryp->name, name, len) == 0)
+				return TagSuccess;
+		}
+		else
+		{
+			if (strcmp (entryp->name, name) == 0)
+				return TagSuccess;
+		}
+		r = tagsNextPseudoTag (file, entryp);
+	}
+	while (r == TagSuccess);
+
+	return r;
+}
+
 extern tagResult tagsClose (tagFile *const file)
 {
 	tagResult result = TagFailure;

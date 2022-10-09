@@ -2,6 +2,7 @@ TESTS = \
 	\
 	test-api-tagsOpen \
 	test-api-tagsFind \
+	test-api-tagsFindPseudoTag \
 	test-api-tagsFirstPseudoTag \
 	test-api-tagsFirst \
 	test-api-tagsClose \
@@ -17,6 +18,7 @@ check_PROGRAMS = \
 	\
 	test-api-tagsOpen \
 	test-api-tagsFind \
+	test-api-tagsFindPseudoTag \
 	test-api-tagsFirstPseudoTag \
 	test-api-tagsFirst \
 	test-api-tagsClose \
@@ -56,6 +58,9 @@ EXTRA_DIST += duplicated-names--sorted-yes.tags
 EXTRA_DIST += duplicated-names--sorted-no.tags
 EXTRA_DIST += duplicated-names--sorted-foldcase.tags
 EXTRA_DIST += broken-line-field-in-middle.tags
+
+test_api_tagsFindPseudoTag = test-api-tagsFindPseudoTag.c
+test_api_tagsFindPseudoTag_DEPENDENCIES = $(DEPS)
 
 test_api_tagsFirstPseudoTag = test-api-tagsFirstPseudoTag.c
 test_api_tagsFirstPseudoTag_DEPENDENCIES = $(DEPS)

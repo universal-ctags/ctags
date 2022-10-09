@@ -39,7 +39,7 @@ typedef enum {
 #define sortType tagSortType
 #endif
 
-/* Options for tagsFind() */
+/* Options for tagsFind() and tagsFindPseudoTag() */
 #define TAG_FULLMATCH     0x0
 #define TAG_PARTIALMATCH  0x1
 
@@ -269,6 +269,21 @@ extern tagResult tagsFirstPseudoTag (tagFile *const file, tagEntry *const entry)
 *  tagsFirstPseudoTag().
 */
 extern tagResult tagsNextPseudoTag (tagFile *const file, tagEntry *const entry);
+
+/*
+* Does the same as tagsFind(), but is specialized to pseudo tags.
+* The available values for `match' are:
+*
+*    TAG_PARTIALMATCH
+*        Tags whose leading characters match `name' will qualify.
+*
+*    TAG_FULLMATCH
+*        Only tags whose full lengths match `name' will qualify.
+*
+* NOTE: unlike tagsFind(), this function uses liner-searching even if
+* the tags file is sorted.
+*/
+extern tagResult tagsFindPseudoTag (tagFile *const file, tagEntry *const entry, const char *const name, const int match);
 
 /*
 *  Call tagsClose() at completion of reading the tag file, which will
