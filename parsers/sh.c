@@ -34,7 +34,7 @@ typedef enum {
 	K_NOTHING = -1,		/* place holder. Never appears on tags file. */
 	K_ALIAS,
 	K_FUNCTION,
-	K_SOURCE,
+	K_SCRIPT,
 	K_HEREDOCLABEL,
 } shKind;
 
@@ -413,14 +413,14 @@ static void findShTags (void)
 			else if (cp [0] == '.'
 				    && isspace((int) cp [1]))
 			{
-				found_kind = K_SOURCE;
+				found_kind = K_SCRIPT;
 				++cp;
 				check_char = isFileChar;
 			}
 			else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
 					 && isspace((int) cp [6]))
 			{
-				found_kind = K_SOURCE;
+				found_kind = K_SCRIPT;
 				cp += 6;
 				check_char = isFileChar;
 			}
@@ -466,7 +466,7 @@ static void findShTags (void)
 			while (isspace ((int) *cp))
 				++cp;
 
-			if ((found_kind != K_SOURCE)
+			if ((found_kind != K_SCRIPT)
 			    && *cp == '(')
 			{
 				++cp;
@@ -481,8 +481,8 @@ static void findShTags (void)
 
 			if (found_kind != K_NOTHING)
 			{
-				if (found_kind == K_SOURCE)
-					makeSimpleRefTag (name, K_SOURCE, R_SCRIPT_LOADED);
+				if (found_kind == K_SCRIPT)
+					makeSimpleRefTag (name, K_SCRIPT, R_SCRIPT_LOADED);
 				else if (found_kind == K_SUBPARSER)
 				{
 					if (!vStringIsEmpty (name))
