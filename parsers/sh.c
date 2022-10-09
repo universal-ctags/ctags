@@ -42,11 +42,21 @@ typedef enum {
 
 typedef enum {
 	R_SCRIPT_LOADED,
+	LAST_R_SCRIPT,
 } shScriptRole;
+
+typedef enum {
+	R_ZSH_SCRIPT_AUTOLOADED = LAST_R_SCRIPT,
+} zshScriptRole;
 
 #define SH_SCRIPT_ROLES_COMMON 	{ true, "loaded", "loaded" }
 static roleDefinition ShScriptRoles [] = {
 	SH_SCRIPT_ROLES_COMMON,
+};
+
+static roleDefinition ZshScriptRoles [] = {
+	SH_SCRIPT_ROLES_COMMON,
+	{ true, "autoloaded", "autoloaded" },
 };
 
 typedef enum {
@@ -58,32 +68,52 @@ static roleDefinition ShHeredocRoles [] = {
 	SH_HEREDOC_ROLES_COMMON,
 };
 
-#define SH_KINDS_COMMON(SCRIPT_ROLES,HEREDOC_ROLES)				\
+static roleDefinition ZshHeredocRoles [] = {
+	SH_HEREDOC_ROLES_COMMON,
+};
+
+typedef enum {
+	R_ZSH_FUNCTION_AUTOLOADED,
+} zshFunctionRole;
+
+static roleDefinition ZshFunctionRoles [] = {
+	{ true, "autoloaded", "function name passed to autoload built-in command" },
+};
+
+#define SH_KINDS_COMMON(SCRIPT_ROLES,HEREDOC_ROLES, FUNCTION_ROLES_SPEC) \
 	{ true, 'a', "alias", "aliases"},							\
-	{ true, 'f', "function", "functions"},						\
+	{ true, 'f', "function", "functions",						\
+	  .referenceOnly = false, FUNCTION_ROLES_SPEC },			\
 	{ true, 's', "script", "script files",						\
 	  .referenceOnly = true, ATTACH_ROLES (SCRIPT_ROLES) },		\
 	{ true, 'h', "heredoc", "label for here document",			\
 	  .referenceOnly = false, ATTACH_ROLES (HEREDOC_ROLES) }
 
 static kindDefinition ShKinds [] = {
-	SH_KINDS_COMMON(ShScriptRoles, ShHeredocRoles),
+	SH_KINDS_COMMON(ShScriptRoles, ShHeredocRoles,),
+};
+
+static kindDefinition ZshKinds [] = {
+	SH_KINDS_COMMON(ZshScriptRoles, ZshHeredocRoles,
+					ATTACH_ROLES(ZshFunctionRoles)),
 };
 
 enum eShKeywordId {
 	KEYWORD_function,
 	KEYWORD_alias,
 	KEYWORD_source,
+	KEYWORD_autoload,
 };
 
 const char *dialectMap [] = {
-	"Sh",
+	"Sh", "Zsh",
 };
 
 static const struct dialectalKeyword KeywordTable [] = {
-	{ "function",  KEYWORD_function, { 1 } },
-	{ "alias",     KEYWORD_alias,    { 1 } },
-	{ "source",    KEYWORD_source,   { 1 } },
+	{ "function",  KEYWORD_function, { 1, 1 } },
+	{ "alias",     KEYWORD_alias,    { 1, 1 } },
+	{ "source",    KEYWORD_source,   { 1, 1 } },
+	{ "autoload",  KEYWORD_autoload, { 0, 1 } },
 };
 
 /*
@@ -340,6 +370,92 @@ static int makeShTag (vString *name, const unsigned char ** cp CTAGS_ATTR_UNUSED
 	return makeSimpleRefTag (name, found_kind, found_role);
 }
 
+static int makeZshAutoloadTag(vString *name, const unsigned char ** cp)
+{
+	const unsigned char *p = *cp;
+
+	int r = CORK_NIL;
+	do
+	{
+		if (vStringChar(name, 0) != '-' && vStringChar(name, 0) != '+')
+		{
+			do
+			{
+				r = makeSimpleRefTag (name, K_SCRIPT, R_ZSH_SCRIPT_AUTOLOADED);
+
+				tagEntryInfo e;
+				const char *func = strrchr(vStringValue (name), '/');
+				func = func? func + 1: vStringValue (name);
+				if (*func != '\0')
+				{
+					initRefTagEntry (&e, func, K_FUNCTION, R_ZSH_FUNCTION_AUTOLOADED);
+					r = makeTagEntry(&e);
+				}
+
+				while (isspace (*p))
+					p++;
+
+				if (*p == '\0')
+					break;
+
+				vStringClear (name);
+				while (*p != '\0' && !isspace (*p))
+					vStringPut (name, *p++);
+			}
+			while (1);
+			break;
+		}
+
+		if (*p == '\0')
+			break;
+
+		vStringClear(name);
+		while (*p != '\0' && !isspace(*p))
+			vStringPut (name, *p++);
+
+		while (isspace (*p))
+			++p;
+	}
+	while (1);
+
+	*cp = p;
+	return r;
+}
+
+static int makeZshTag (vString *name, const unsigned char ** cp,
+					  int found_kind, int found_role)
+{
+	const unsigned char *p = *cp;
+
+	if (found_kind == K_SCRIPT && found_role == R_ZSH_SCRIPT_AUTOLOADED)
+	{
+		int r = makeZshAutoloadTag(name, &p);
+		*cp = p;
+		return r;
+	}
+
+	return makeShTag (name, cp, found_kind, found_role);
+}
+
+static size_t handleZshKeyword (int keyword,
+								vString *token,
+								int *kind,
+								int *role,
+								bool (** check_char)(int))
+{
+	switch (keyword)
+	{
+	case KEYWORD_autoload:
+		*kind = K_SCRIPT;
+		*role = R_ZSH_SCRIPT_AUTOLOADED;
+		break;
+	default:
+		return handleShKeyword (keyword, token, kind, role, check_char);
+	}
+
+	return vStringLength(token);
+}
+
 typedef bool (* checkCharFunc) (int);
 static void findShTagsCommon (size_t (* keyword_handler) (int,
 														  vString *,
@@ -578,6 +694,11 @@ static void findShTags (void)
 	findShTagsCommon (handleShKeyword, makeShTag);
 }
 
+static void findZshTags (void)
+{
+	findShTagsCommon (handleZshKeyword, makeZshTag);
+}
+
 static subparser *notifyLineToSubparsers (const unsigned char *cp,
 										  int *n)
 {
@@ -641,10 +762,10 @@ static void initializeSh (const langType language)
 extern parserDefinition* ShParser (void)
 {
 	static const char *const extensions [] = {
-		"sh", "SH", "bsh", "bash", "ksh", "zsh", "ash", NULL
+		"sh", "SH", "bsh", "bash", "ksh", "ash", NULL
 	};
 	static const char *const aliases [] = {
-		"sh", "bash", "ksh", "zsh", "ash", "dash",
+		"sh", "bash", "ksh", "ash", "dash",
 		/* major mode name in emacs */
 		"shell-script",
 		NULL
@@ -655,6 +776,25 @@ extern parserDefinition* ShParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findShTags;
+	def->initialize = initializeSh;
+	def->useCork    = CORK_QUEUE;
+	return def;
+}
+
+extern parserDefinition* ZshParser (void)
+{
+	static const char *const extensions [] = {
+		"zsh", NULL
+	};
+	static const char *const aliases [] = {
+		"zsh", NULL,
+	};
+	parserDefinition* def = parserNew ("Zsh");
+	def->kindTable      = ZshKinds;
+	def->kindCount  = ARRAY_SIZE (ZshKinds);
+	def->extensions = extensions;
+	def->aliases = aliases;
+	def->parser     = findZshTags;
 	def->initialize = initializeSh;
 	def->useCork    = CORK_QUEUE;
 	return def;

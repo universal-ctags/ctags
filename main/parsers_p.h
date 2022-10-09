@@ -184,6 +184,7 @@
 	WindResParser, \
 	YACCParser, \
 	YumRepoParser, \
-	ZephirParser
+	ZephirParser, \
+	ZshParser
 
 #endif  /* CTAGS_MAIN_PARSERS_H */

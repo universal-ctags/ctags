@@ -484,6 +484,7 @@ The following parsers have been added:
 * Yaml *libyaml*
 * YumRepo
 * Zephir
+* Zsh
 
 See :ref:`optlib` for details on *optlib*.
 Libxml2 is required to use the parser(s) marked with *libxml*.
