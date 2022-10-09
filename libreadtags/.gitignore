@@ -34,6 +34,7 @@ tests/*.trs
 tests/test-api-tagsClose
 tests/test-api-tagsFind
 tests/test-api-tagsFirst
+tests/test-api-tagsFindPseudoTag
 tests/test-api-tagsFirstPseudoTag
 tests/test-api-tagsOpen
 tests/test-api-tagsSetSortType
