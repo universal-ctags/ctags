@@ -4,3 +4,6 @@ input-firstline2.unknown: Sh
 input-firstline3.unknown: Sh
 input-firstline4.unknown: Sh
 input-firstline5.unknown: Sh
+input-lastlist0.unknown: Zsh
+input-lastlist1.unknown: Sh
+input-lastlist2.unknown: Sh

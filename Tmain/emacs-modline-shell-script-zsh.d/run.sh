@@ -9,6 +9,9 @@ for f in input-firstline0.unknown \
 			 input-firstline3.unknown \
 			 input-firstline4.unknown \
 			 input-firstline5.unknown \
+			 input-lastlist0.unknown  \
+			 input-lastlist1.unknown  \
+			 input-lastlist2.unknown  \
 		 ; do
 	$CTAGS --quiet --options=NONE -G --print-language $f
 done

@@ -875,6 +875,7 @@ static vString* determineEmacsModeAtEOF (MIO* const fp)
 	bool headerFound = false;
 	const char* p;
 	vString* mode = vStringNew ();
+	bool is_shell_mode = false;
 
 	while ((line = readLineRaw (vLine, fp)) != NULL)
 	{
@@ -888,11 +889,22 @@ static vString* determineEmacsModeAtEOF (MIO* const fp)
 				;  /* no-op */
 			for ( ;  *p != '\0'  &&  isLanguageNameChar ((int) *p)  ;  ++p)
 				vStringPut (mode, (int) *p);
+
+			is_shell_mode = ((strcasecmp (vStringValue (mode), "sh") == 0
+								 || strcasecmp (vStringValue (mode), "shell-script") == 0));
 		}
 		else if (headerFound && (p = strstr(line, "End:")))
 			headerFound = false;
 		else if (strstr (line, "Local Variables:"))
 			headerFound = true;
+		else if (is_shell_mode && (p = strstr (line, "sh-set-shell")))
+		{
+			p += strlen("sh-set-shell");
+			while (isspace ((int) *p))
+				p++;
+			if (strncmp (p, "\"zsh\"", 5) == 0)
+				vStringCopyS (mode, "Zsh");
+		}
 	}
 	vStringDelete (vLine);
 	return mode;
