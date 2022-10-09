@@ -1,0 +1,6 @@
+input-firstline0.unknown: Zsh
+input-firstline1.unknown: Zsh
+input-firstline2.unknown: Sh
+input-firstline3.unknown: Sh
+input-firstline4.unknown: Sh
+input-firstline5.unknown: Sh

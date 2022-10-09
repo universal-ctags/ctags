@@ -783,6 +783,24 @@ static vString* extractInterpreter (MIO* input)
 	return interpreter;
 }
 
+static bool isShellZsh (const char *p)
+{
+	p = strstr (p, "sh-set-shell");
+	if (!p)
+		return false;
+	p += strlen("sh-set-shell");
+
+	if (*p == ':')
+		p++;
+	while (isspace ((int) *p))
+		p++;
+
+	if (strncmp (p, "\"zsh\"", 5) == 0
+		|| strncmp (p, "zsh", 3) == 0)
+		return true;
+	return false;
+}
+
 static vString* determineEmacsModeAtFirstLine (const char* const line)
 {
 	vString* mode = vStringNew ();
@@ -803,6 +821,11 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 			;  /* no-op */
 		for ( ;  *p != '\0'  &&  isLanguageNameChar ((int) *p)  ;  ++p)
 			vStringPut (mode, (int) *p);
+
+		if ((strcmp(vStringValue (mode), "sh") == 0
+			 || strcmp(vStringValue (mode), "shell-script") == 0)
+			&& isShellZsh (p))
+			vStringCopyS (mode, "Zsh");
 	}
 	else
 	{
