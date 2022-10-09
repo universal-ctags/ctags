@@ -309,6 +309,7 @@ static void hdocStateUpdateTag (struct hereDocParsingState *hstate, unsigned lon
 static size_t handleShKeyword (int keyword,
 							   vString *token,
 							   int *kind,
+							   int *role,
 							   bool (** check_char)(int))
 {
 	switch (keyword)
@@ -322,6 +323,7 @@ static size_t handleShKeyword (int keyword,
 		break;
 	case KEYWORD_source:
 		*kind = K_SCRIPT;
+		*role = R_SCRIPT_LOADED;
 		*check_char = isFileChar;
 		break;
 	default:
@@ -332,20 +334,19 @@ static size_t handleShKeyword (int keyword,
 	return vStringLength(token);
 }
 
-static int makeShTag (vString *name, const unsigned char ** cp CTAGS_ATTR_UNUSED, int found_kind)
+static int makeShTag (vString *name, const unsigned char ** cp CTAGS_ATTR_UNUSED,
+					  int found_kind, int found_role)
 {
-	if (found_kind == K_SCRIPT)
-		return makeSimpleRefTag (name, K_SCRIPT, R_SCRIPT_LOADED);
-	else
-		return makeSimpleTag (name, found_kind);
+	return makeSimpleRefTag (name, found_kind, found_role);
 }
 
 typedef bool (* checkCharFunc) (int);
 static void findShTagsCommon (size_t (* keyword_handler) (int,
 														  vString *,
 														  int *,
+														  int *,
 														  checkCharFunc *check_char),
-							  int (* make_tag_handler) (vString *, const unsigned char **, int))
+							  int (* make_tag_handler) (vString *, const unsigned char **, int, int))
 
 {
 	vString *name = vStringNew ();
@@ -360,7 +361,8 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char* cp = line;
-		shKind found_kind = K_NOTHING;
+		int found_kind = K_NOTHING;
+		int found_role = ROLE_DEFINITION_INDEX;
 
 		if (hereDocDelimiter)
 		{
@@ -469,6 +471,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 				    && isspace((int) cp [1]))
 			{
 				found_kind = K_SCRIPT;
+				found_role = R_SCRIPT_LOADED;
 				++cp;
 				check_char = isFileChar;
 			}
@@ -492,7 +495,8 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 				int keyword = lookupKeyword (vStringValue (token),
 											 getInputLanguage ());
 				if (keyword != KEYWORD_NONE)
-					cp += (* keyword_handler) (keyword, token, &found_kind, &check_char);
+					cp += (* keyword_handler) (keyword, token,
+											   &found_kind, &found_role, &check_char);
 				vStringDelete (token);
 			}
 
@@ -512,6 +516,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 				if (! check_char ((int) *cp))
 				{
 					found_kind = K_NOTHING;
+					found_role = ROLE_DEFINITION_INDEX;
 
 					int d = hdocStateReadDestfileName (&hstate, cp,
 													   hereDocDelimiter);
@@ -547,16 +552,15 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 
 			if (found_kind != K_NOTHING)
 			{
-				if (found_kind == K_SCRIPT)
-					makeSimpleRefTag (name, K_SCRIPT, R_SCRIPT_LOADED);
-				else if (found_kind == K_SUBPARSER)
+				if (found_kind == K_SUBPARSER)
 				{
 					if (!vStringIsEmpty (name))
 						makeTagInSubparser (sub, name);
 				}
 				else
-					make_tag_handler (name, &cp, found_kind);
+					make_tag_handler (name, &cp, found_kind, found_role);
 				found_kind = K_NOTHING;
+				found_role = ROLE_DEFINITION_INDEX;
 			}
 			else if (!hereDocDelimiter)
 				hdocStateUpdateArgs (&hstate, name);
