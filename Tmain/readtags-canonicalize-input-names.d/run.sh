@@ -24,11 +24,12 @@ echo2()
 run_test()
 {
 	echo2 "# $@"
-	"${READTAGS}" -F '(list $name "\t" $input "\n")' $2 -t $1 -l
+	"${READTAGS}" -F '(list $name "\t" $input "\n")' $2 -t $1 $3
 }
 
-run_test good0.tags -C &&
-run_test good1.tags --canonicalize-input &&
-run_test good2.tags -C &&
-! run_test drive-letter0.tags --canonicalize-input &&
-! run_test drive-letter1.tags -C
+run_test good0.tags -C -l &&
+run_test good1.tags --canonicalize-input -l &&
+run_test good2.tags -C -l &&
+! run_test drive-letter0.tags --canonicalize-input -l &&
+! run_test drive-letter1.tags -C -l &&
+run_test good-ptags.tags -C -D

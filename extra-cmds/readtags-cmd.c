@@ -31,6 +31,7 @@ typedef struct sReadOption {
 
 struct canonWorkArea {
 	struct canonFnameCacheTable *cacheTable;
+	int ptags;
 };
 
 static const char *TagFileName = "tags";
@@ -208,7 +209,9 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 	{
 		tagEntry *shadow = first_entry;
 		tagEntry  shadowRec;
-		if (canon)
+		if (canon
+			&& (canon->ptags == 0
+				|| strcmp (first_entry->name, "!_TAG_PROC_CWD") == 0))
 		{
 			shadowRec = *first_entry;
 			shadow = &shadowRec;
@@ -264,7 +267,9 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 	{
 		tagEntry *shadow = first_entry;
 		tagEntry  shadowRec;
-		if (canon)
+		if (canon
+			&& (canon->ptags == 0
+				|| strcmp (first_entry->name, "!_TAG_PROC_CWD") == 0))
 		{
 			shadow = &shadowRec;
 			shadowRec = *first_entry;
@@ -481,7 +486,7 @@ static void listTags (int pseudoTags, tagPrintOptions *printOpts,
 		exit (1);
 	}
 
-	if (pseudoTags == 0 && canon && canon->cacheTable == NULL)
+	if (canon && canon->cacheTable == NULL)
 		canon->cacheTable = makeCanonFnameCacheTable (file);
 
 	if (printOpts->escaping)
@@ -660,6 +665,7 @@ extern int main (int argc, char **argv)
 
 	struct canonWorkArea canonWorkArea = {
 		.cacheTable = NULL,
+		.ptags = 0,
 	};
 	struct canonWorkArea *canon = NULL;
 
@@ -673,6 +679,8 @@ extern int main (int argc, char **argv)
 		const char *const arg = argv [i];
 		if (ignore_prefix || arg [0] != '-')
 		{
+			if (canon)
+				canon->ptags = 0;
 			findTag (arg, &readOpts, &printOpts, canon);
 			actionSupplied = 1;
 		}
@@ -685,6 +693,8 @@ extern int main (int argc, char **argv)
 				debugMode++;
 			else if (strcmp (optname, "list-pseudo-tags") == 0)
 			{
+				if (canon)
+					canon->ptags = 1;
 				listTags (1, &printOpts, NULL);
 				actionSupplied = 1;
 			}
@@ -730,6 +740,8 @@ extern int main (int argc, char **argv)
 				readOpts.matchOpts |= TAG_PARTIALMATCH;
 			else if (strcmp (optname, "list") == 0)
 			{
+				if (canon)
+					canon->ptags = 0;
 				listTags (0, &printOpts, canon);
 				actionSupplied = 1;
 			}
@@ -829,7 +841,12 @@ extern int main (int argc, char **argv)
 				switch (arg [j])
 				{
 					case 'd': debugMode++; break;
-					case 'D': listTags (1, &printOpts, NULL); actionSupplied = 1; break;
+					case 'D':
+						if (canon)
+							canon->ptags = 1;
+						listTags (1, &printOpts, canon);
+						actionSupplied = 1;
+						break;
 					case 'h': printUsage (stdout, 0); break;
 #ifdef READTAGS_DSL
 					case 'H':
@@ -853,7 +870,12 @@ extern int main (int argc, char **argv)
 					case 'e': printOpts.extensionFields = 1; break;
 					case 'i': readOpts.matchOpts |= TAG_IGNORECASE;   break;
 					case 'p': readOpts.matchOpts |= TAG_PARTIALMATCH; break;
-					case 'l': listTags (0, &printOpts, canon); actionSupplied = 1; break;
+					case 'l':
+						if (canon)
+							canon->ptags = 0;
+						listTags (0, &printOpts, canon);
+						actionSupplied = 1;
+						break;
 					case 'n': printOpts.lineNumber = 1; break;
 					case 't':
 						if (arg [j+1] != '\0')
