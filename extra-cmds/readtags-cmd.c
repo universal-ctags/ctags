@@ -163,8 +163,10 @@ void tagEntryArrayPush (struct tagEntryArray *a, tagEntry *e)
 {
 	if (a->count + 1 == a->length)
 	{
-		if (a->length * 2 < a->length)
-			perror("Too large array allocation");
+		if (a->length * 2 < a->length) {
+			fprintf(stderr, "too large array allocation");
+			exit(1);
+		}
 
 		struct tagEntryHolder *tmp = eRealloc (a->a, sizeof (a->a[0]) * (a->length * 2));
 		a->a = tmp;
