@@ -73,6 +73,15 @@ Controlling the Output
 By default, the output of readtags contains only the name, input and pattern
 field. The Output can be tweaked using these options:
 
+``-C``, ``--canonicalize-input``
+	Reduct '..' and '.' in input fields of regular tags.
+	This option works only with tags files having ``!_TAG_PROC_CWD`` pseudo
+	tag.
+
+	NOTE: The current implementation accepts only ``!_TAG_PROC_CWD``
+	starting with ``/``; a Windows directory name starting with a
+	drive letter like ``C:\Somewhere`` is not acceptable.
+
 ``-d``, ``--debug``
 	Turn on debugging output.
 
