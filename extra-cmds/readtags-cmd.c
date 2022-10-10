@@ -107,35 +107,20 @@ static tagEntry *copyTag (tagEntry *o)
 {
 	tagEntry *n;
 
-	n = calloc (1, sizeof  (*o));
-	if (!n)
-		perror (__FUNCTION__);
+	n = eCalloc (1, sizeof  (*o));
 
-	n->name = strdup (o->name);
-
-	if (!n->name)
-		perror (__FUNCTION__);
+	n->name = eStrdup (o->name);
 
 	if (o->file)
-		n->file = strdup (o->file);
-	if (o->file && !n->file)
-		perror (__FUNCTION__);
+		n->file = eStrdup (o->file);
 
 	if (o->address.pattern)
-	{
-		n->address.pattern = strdup (o->address.pattern);
-		if (!n->address.pattern)
-			perror (__FUNCTION__);
-	}
+		n->address.pattern = eStrdup (o->address.pattern);
 
 	n->address.lineNumber = o->address.lineNumber;
 
 	if (o->kind)
-	{
-		n->kind = strdup (o->kind);
-		if (!n->kind)
-			perror (__FUNCTION__);
-	}
+		n->kind = eStrdup (o->kind);
 
 	n->fileScope = o->fileScope;
 	n->fields.count = o->fields.count;
@@ -143,19 +128,12 @@ static tagEntry *copyTag (tagEntry *o)
 	if (o->fields.count == 0)
 		return n;
 
-	n->fields.list = malloc (o->fields.count *sizeof (*o->fields.list));
-	if (!n->fields.list)
-		perror (__FUNCTION__);
+	n->fields.list = eMalloc (o->fields.count * sizeof (*o->fields.list));
 
 	for (unsigned short c = 0; c < o->fields.count; c++)
 	{
-		n->fields.list[c].key = strdup (o->fields.list[c].key);
-		if (!n->fields.list[c].key)
-			perror (__FUNCTION__);
-
-		n->fields.list[c].value = strdup (o->fields.list[c].value);
-		if (!n->fields.list[c].value)
-			perror (__FUNCTION__);
+		n->fields.list[c].key = eStrdup (o->fields.list[c].key);
+		n->fields.list[c].value = eStrdup (o->fields.list[c].value);
 	}
 
 	return n;
@@ -172,15 +150,11 @@ struct tagEntryArray {
 
 struct tagEntryArray *tagEntryArrayNew (void)
 {
-	struct tagEntryArray * a = malloc (sizeof (struct tagEntryArray));
-	if (!a)
-		perror(__FUNCTION__);
+	struct tagEntryArray * a = eMalloc (sizeof (struct tagEntryArray));
 
 	a->count = 0;
 	a->length = 1024;
-	a->a = malloc(a->length * sizeof (a->a[0]));
-	if (!a->a)
-		perror(__FUNCTION__);
+	a->a = eMalloc(a->length * sizeof (a->a[0]));
 
 	return a;
 }
@@ -192,10 +166,7 @@ void tagEntryArrayPush (struct tagEntryArray *a, tagEntry *e)
 		if (a->length * 2 < a->length)
 			perror("Too large array allocation");
 
-		struct tagEntryHolder *tmp = realloc (a->a, sizeof (a->a[0]) * (a->length * 2));
-		if (!tmp)
-			perror(__FUNCTION__);
-
+		struct tagEntryHolder *tmp = eRealloc (a->a, sizeof (a->a[0]) * (a->length * 2));
 		a->a = tmp;
 		a->length *= 2;
 	}
