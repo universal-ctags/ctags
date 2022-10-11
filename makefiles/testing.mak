@@ -16,6 +16,18 @@ READTAGS_TEST = ./readtags$(EXEEXT)
 MINI_GEANY_TEST = ./mini-geany$(EXEEXT)
 OPTSCRIPT_TEST = ./optscript$(EXEEXT)
 
+# Make these macros empty from make's command line
+# if you don't want to (re)build these executables
+# before testing.
+# e.g.
+#
+#    $ make units CTAGS_DEP=
+#
+CTAGS_DEP = $(CTAGS_TEST)
+READTAGS_DEP = $(READTAGS_TEST)
+MINI_GEANY_DEP = $(MINI_GEANY_TEST)
+OPTSCRIPT_DEP = $(OPTSCRIPT_TEST)
+
 if HAVE_TIMEOUT
 TIMEOUT = 1
 else
@@ -40,7 +52,7 @@ V_RUN_0 = @echo "  RUN      $@";
 #
 # SHELL must be dash or bash.
 #
-fuzz: $(CTAGS_TEST)
+fuzz: $(CTAGS_DEP)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
@@ -56,7 +68,7 @@ fuzz: $(CTAGS_TEST)
 #
 # NOISE Target
 #
-noise: $(CTAGS_TEST)
+noise: $(CTAGS_DEP)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
@@ -72,7 +84,7 @@ noise: $(CTAGS_TEST)
 #
 # CHOP Target
 #
-chop: $(CTAGS_TEST)
+chop: $(CTAGS_DEP)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
@@ -84,7 +96,7 @@ chop: $(CTAGS_TEST)
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
-slap: $(CTAGS_TEST)
+slap: $(CTAGS_DEP)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
@@ -100,7 +112,7 @@ slap: $(CTAGS_TEST)
 #
 # UNITS Target
 #
-units: $(CTAGS_TEST)
+units: $(CTAGS_DEP)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
@@ -161,7 +173,7 @@ validate-input:
 #
 # Test main part, not parsers
 #
-tmain: $(CTAGS_TEST) $(READTAGS_TEST) $(OPTSCRIPT_TEST)
+tmain: $(CTAGS_DEP) $(READTAGS_DEP) $(OPTSCRIPT_DEP)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
@@ -204,7 +216,7 @@ clean-tmain:
 		$(SHELL) $(srcdir)/misc/units clean-tmain $$(pwd)/Tmain; \
 	fi
 
-tlib: $(MINI_GEANY_TEST)
+tlib: $(MINI_GEANY_DEP)
 	$(V_RUN) \
 	builddir=$$(pwd); \
 	mkdir -p $${builddir}/misc; \
@@ -238,7 +250,7 @@ tinst:
 # Test readtags
 #
 if USE_READCMD
-roundtrip: $(READTAGS_TEST)
+roundtrip: $(READTAGS_DEP)
 	$(V_RUN) \
 	if ! test x$(CI) = x; then	\
 		ROUNDTRIP_FLAGS=--minitrip;			\
@@ -252,7 +264,7 @@ endif
 #
 # Checking code in ctags own rules
 #
-codecheck: $(CTAGS_TEST)
+codecheck: $(CTAGS_DEP)
 	$(V_RUN) $(SHELL) misc/src-check
 
 #
@@ -280,7 +292,7 @@ cppcheck:
 #
 # Testing examples in per-language man pages
 #
-man-test: $(CTAGS_TEST)
+man-test: $(CTAGS_DEP)
 	$(V_RUN) \
 	$(PYTHON) $(srcdir)/misc/man-test.py $(MAN_TEST_TMPDIR) $(CTAGS_TEST) $(srcdir)/man/ctags-lang-*.7.rst.in
 
