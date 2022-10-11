@@ -1,5 +1,10 @@
 #!/bin/sh
 #
+###################################################################
+# Use units.py instead of this shell script.
+# Only minor parts of this script are still used.
+###################################################################
+#
 # units - Units test harness for ctags
 #
 # Copyright (C) 2014 Masatake YAMATO
