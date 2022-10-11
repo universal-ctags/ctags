@@ -1118,6 +1118,8 @@ action_run ()
 	ERROR 1 "No such directory(build_dir): ${build_dir}"
     fi
 
+    [ -z "$CTAGS" ] && CTAGS=./ctags
+
     if ! [ -f "${CTAGS}" ]; then
 	ERROR 1 "no such file: ${CTAGS}"
     elif ! [ -e "${CTAGS}" ]; then
@@ -1667,6 +1669,8 @@ action_fuzz_common ()
     if ! [ -d "$units_dir" ]; then
 	ERROR 0 "No such directory: ${units_dir}"
     fi
+
+    [ -z "$CTAGS" ] && CTAGS=./ctags
 
     if ! [ -f "${CTAGS}" ]; then
 	ERROR 1 "no such file: ${CTAGS}"
@@ -2243,6 +2247,8 @@ action_tmain ()
     if ! [ -d "$build_dir" ]; then
 	ERROR 1 "No such directory(build_dir): ${build_dir}"
     fi
+
+    [ -z "$CTAGS" ] && CTAGS=./ctags
 
     if ! [ -f "${CTAGS}" ]; then
 	ERROR 1 "no such file: ${CTAGS}"
