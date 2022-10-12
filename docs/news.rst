@@ -474,6 +474,7 @@ The following parsers have been added:
 * SVG *libxml*
 * TclOO (see :ref:`The new Tcl parser <tcl>`)
 * Thrift *peg/packcc*
+* TOML *peg/packcc*
 * TTCN
 * Txt2tags
 * TypeScript

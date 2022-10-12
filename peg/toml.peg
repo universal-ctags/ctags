@@ -1,0 +1,273 @@
+#
+# This file is derived from
+#
+# https://github.com/naoina/toml/blob/master/parse.peg ( e401e4e )
+#
+########################################################################
+#
+# Copyright (c) 2014 Naoya Inada <naoina@kuune.org>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+##########################################################################
+#
+# Masatake YAMATO adapted the origina peg file to ctags.
+#
+##########################################################################
+%prefix "ptoml"
+
+%auxil	"struct parserCtx *"
+
+%earlysource {
+    #include "general.h"
+}
+
+%header {
+	struct parserCtx;
+}
+
+%source {
+#include "toml_pre.h"
+}
+
+TOML <- Expression (newline Expression)* newline* !. { ; }
+
+Expression <- (
+   <ws table ws comment? (ws newlineRequired wsnl keyval ws comment?)*> { ; }
+  / ws keyval ws comment?
+  / ws comment?
+  / ws
+)
+
+val <- (
+    <datetime>    { ; }
+  / <float>       { ; }
+  / <integer>     { ; }
+  / <string>      { ; }
+  / <boolean>     { ; }
+  / <array>       { ; }
+  / <inlineTable> { ; }
+)
+
+ws <- [ \t]*
+wsnl <- ([ \t] / newline)*
+
+comment <- '#' (badControl / [\t -\u10FFFF])* { ; }
+
+newline <- ('\r\n' / '\n') { ; }
+
+newlineRequired <- (
+    !newline { ; }
+  / newline
+)
+
+badControl <- <[\u007F\u000B\u000C\u0000-\u0008\u000E-\u001F]> {
+    ;
+}
+
+# -------------------------------------------------------------------------
+# -- Tables
+
+table <- stdTable / arrayTable
+
+stdTable <- '[' ws { tableKeyStart(auxil, false, $0s); } tableKey { tableKeyEnd(auxil); } ws ']'
+
+arrayTable <- '[[' ws { tableKeyStart(auxil, true, $0s); } tableKey { tableKeyEnd(auxil); } ws ']]'
+
+keyval <- { keyvalStart(auxil, $0s); } tableKey { keyvalKeyEnd(auxil); } ws '=' ws val { keyvalValEnd(auxil); }
+
+key <- bareKey / quotedKey
+
+bareKey <- <bareKeyChar+> { ; }
+
+bareKeyChar <- badControl / [0-9A-Za-z\-_]
+
+quotedKey <- < '"' basicChar* '"' > { ; }
+
+tableKey <- tableKeyComp (tableKeySep tableKeyComp)*
+
+tableKeyComp <- <key> { queueKey (auxil, $1); }
+
+tableKeySep <- ws '.' ws
+
+# -------------------------------------------------------------------------
+# -- Inline Tables
+
+inlineTable <- (
+    '{' { ; }
+    ws inlineTableKeyValues? ws
+    '}' { ; }
+)
+
+inlineTableKeyValues <- (
+  keyval
+  (
+      ws inlineTableCommaRequired ws
+      keyval
+  )*
+  ws inlineTableCommaForbidden
+)
+
+inlineTableCommaForbidden <- (
+    !','
+  / ',' { ; }
+)
+
+inlineTableCommaRequired <- (
+    !',' { ; }
+  / ','
+)
+
+# -------------------------------------------------------------------------
+# -- Booleans
+
+boolean <- 'true' / 'false'
+
+# -------------------------------------------------------------------------
+# -- Numbers
+
+integer <- hexInt / octalInt / binaryInt / decimalInt / ([+\-] decimalInt)
+
+decimalInt <- [1-9] (decimalDigit / '_' decimalDigit)+ / decimalDigit
+decimalDigit <- [0-9]
+
+hexInt <- '0x' hexDigit (hexDigit / '_' hexDigit)*
+hexDigit <- [0-9A-Fa-f]
+
+octalInt <- '0o' octalDigit (octalDigit / '_' octalDigit)*
+octalDigit <- [0-7]
+
+binaryInt <- '0b' binaryDigit (binaryDigit / '_' octalDigit)*
+binaryDigit <- [01]
+
+float <- [+\-]? ('nan' / 'inf' / floatDigits)
+floatDigits <- decimalInt (floatFrac floatExp? / floatFrac? floatExp)
+floatFrac <- '.' decimalDigit (decimalDigit / '_' decimalDigit)*
+floatExp <- [eE] [\-+]? decimalDigit (decimalDigit / '_' decimalDigit)*
+
+# -------------------------------------------------------------------------
+# -- Escape Sequences
+
+escaped <- escape ([btnfr"/\\] / 'u' hexQuad / 'U' hexQuad hexQuad)
+escape <- '\\'
+
+hexQuad <- hexDigit hexDigit hexDigit hexDigit
+
+# -------------------------------------------------------------------------
+# -- Strings
+
+string <- (
+    mlLiteralString
+  / literalString
+  / mlBasicString
+  / basicString
+)
+
+basicString <- <'"' basicChar* '"'> { ; }
+
+basicChar <- badControl / basicUnescaped / escaped
+
+# This is basically the full printable range, excluding " and \
+basicUnescaped <- [\t -!#-\[\]-\u10FFFF]
+
+mlBasicString <- '"""' mlBasicBody '"""' { ; }
+
+mlBasicBody <- (
+    mlBasicBodyChar*
+    mlBasicBodyEndQuotes?                # needed for strings like """str"""""
+)
+
+mlBasicBodyChar <- (
+    !'"""' '"' { ; }
+  / <basicChar / newline> { ; }
+  / escape newline wsnl
+)
+mlBasicBodyEndQuotes <- (
+    ('""' &'"""') { ; }
+  / ('"' &'"""')  { ; }
+)
+
+literalString <- "'" <literalChar*> "'" { ; }
+
+literalChar <- badControl / [\t -&(-\u10FFFF]
+
+mlLiteralString <- (
+    "'''"
+    <mlLiteralBody> { ; }
+    "'''"
+)
+
+mlLiteralBody <- (
+    (!"'''" (mlLiteralChar / newline))*
+    mlLiteralBodyEndQuotes?               # needed for '''str'''''
+)
+
+mlLiteralChar <- badControl / [\t -\u10FFFF]
+mlLiteralBodyEndQuotes <- ("''" &"'''") / ("'" &"'''")
+
+# -------------------------------------------------------------------------
+# -- Datetimes
+
+datetime <- (fullDate ([tT ] fullTime)?) / partialTime
+
+partialTime <- timeHour ':' timeMinute ':' timeSecond timeSecfrac?
+
+fullDate <- dateFullYear '-' dateMonth '-' dateMDay
+fullTime <- partialTime timeOffset?
+
+dateFullYear <- digitQuad
+dateMonth <- digitDual
+dateMDay <- digitDual
+timeHour <- digitDual
+timeMinute <- digitDual
+timeSecond <- digitDual
+timeSecfrac <- '.' decimalDigit+
+timeNumoffset <- [\-+] timeHour ':' timeMinute
+timeOffset <- [zZ] / timeNumoffset
+
+digitDual <- decimalDigit decimalDigit
+digitQuad <- digitDual digitDual
+
+# -------------------------------------------------------------------------
+# -- Arrays
+
+array <- (
+    '[' { ; }
+    wsnl arrayValues? wsnl
+    ']'
+)
+
+arrayValues <- (
+    (wsnl comment)* wsnl
+    val { ; }
+    (
+        (wsnl comment)* wsnl
+        arraySep
+        (wsnl comment)* wsnl
+        val { ; }
+    )*
+    (wsnl comment)* wsnl
+    arraySep?
+    (wsnl comment)*
+)
+
+arraySep <- ','
+
+%%
+#include "toml_post.h"
