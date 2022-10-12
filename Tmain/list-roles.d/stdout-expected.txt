@@ -121,6 +121,7 @@ SystemdUnit    u/unit            RequiredBy         on      referred in Required
 SystemdUnit    u/unit            Requires           on      referred in Requires key
 SystemdUnit    u/unit            WantedBy           on      referred in WantedBy key
 SystemdUnit    u/unit            Wants              on      referred in Wants key
+TOML           k/key             chainElt           off     (EXPERIMENTAL)used as an element in a key name chain like a.b.c
 Terraform      v/variable        assigned           on      assigned in Variable Definitions (.tfvars) files
 Tex            e/environment     used               off     environment usage introduced by \begin{MyEnv}
 Tex            i/xinput          bibliography       on      bibliography (.bib) file
@@ -264,6 +265,7 @@ SystemdUnit    u/unit            RequiredBy         on      referred in Required
 SystemdUnit    u/unit            Requires           on      referred in Requires key
 SystemdUnit    u/unit            WantedBy           on      referred in WantedBy key
 SystemdUnit    u/unit            Wants              on      referred in Wants key
+TOML           k/key             chainElt           off     (EXPERIMENTAL)used as an element in a key name chain like a.b.c
 Terraform      v/variable        assigned           on      assigned in Variable Definitions (.tfvars) files
 Tex            e/environment     used               off     environment usage introduced by \begin{MyEnv}
 Tex            i/xinput          bibliography       on      bibliography (.bib) file
