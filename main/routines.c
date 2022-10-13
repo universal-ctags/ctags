@@ -300,19 +300,6 @@ extern int strnuppercmp (const char *s1, const char *s2, size_t n)
 	return result;
 }
 
-#ifndef HAVE_STRSTR
-extern char* strstr (const char *str, const char *substr)
-{
-	const size_t length = strlen (substr);
-	const char *p;
-
-	for (p = str  ;  *p != '\0'  ;  ++p)
-		if (strncmp (p, substr, length) == 0)
-			return (char*) p;
-	return NULL;
-}
-#endif
-
 extern char* strrstr (const char *str, const char *substr)
 {
 	const size_t length = strlen (substr);
