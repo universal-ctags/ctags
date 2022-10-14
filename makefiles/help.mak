@@ -16,6 +16,7 @@ help:
 	@echo "make units                        - Run parser unit test cases"
 	@echo "make tmain                        - Run ctags main functionality test cases"
 	@echo "make tlib                         - Run mini-geany test cases"
+	@echo "make tutil                        - Run utiltest test cases"
 	@echo "make man-test                     - Run testing examples in per-language man pages"
 	@echo "make check-genfile                - Run testing generated files are committed"
 	@echo "make check                        - Run all tests above"

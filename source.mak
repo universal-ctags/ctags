@@ -50,6 +50,21 @@ UTIL_SRCS = \
 	$(NULL)
 UTIL_OBJS = $(UTIL_SRCS:.c=.$(OBJEXT))
 
+UTILTEST_HEADS = \
+	extra-cmds/acutest.h \
+	\
+	$(MIO_HEADS) \
+	\
+	$(NULL)
+UTILTEST_SRCS  = \
+	extra-cmds/utiltest.c \
+	extra-cmds/readtags-stub.c \
+	\
+	$(MIO_SRCS) \
+	\
+	$(NULL)
+UTILTEST_OBJS = $(UTILTEST_SRCS:.c=.$(OBJEXT))
+
 MAIN_PUBLIC_HEADS =		\
 	$(UTIL_PUBLIC_HEADS)	\
 	\

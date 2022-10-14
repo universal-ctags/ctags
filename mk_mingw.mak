@@ -98,7 +98,7 @@ V_WINDRES_1 =
 peg/%.c peg/%.h: peg/%.peg $(PACKCC)
 	$(V_PACKCC) $(PACKCC) $<
 
-all: copy_gnulib_heads $(PACKCC) ctags.exe readtags.exe optscript.exe
+all: copy_gnulib_heads $(PACKCC) ctags.exe readtags.exe optscript.exe utiltest.exe
 
 ctags: ctags.exe
 
@@ -124,6 +124,9 @@ readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(UTIL_OBJS) $(UTIL_HEADS) $(RE
 
 optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(LIBS)
+
+utiltest.exe: $(UTIL_OBJS) $(UTIL_HEAD) $(UTILTEST_OBJS) $(UTILTEST_HEADS)
+	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) -o $@ $(UTIL_OBJS) $(UTILTEST_OBJS)
 
 copy_gnulib_heads:
 	cp win32/config_mingw.h config.h
