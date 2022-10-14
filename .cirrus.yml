@@ -1,0 +1,31 @@
+freebsd13_task:
+  freebsd_instance:
+    image_family: freebsd-13-1
+  timeout_in: 120m
+  install_script: pkg install -y automake pkgconf gmake python3
+  script:
+    - freebsd-version
+    - cc --version
+    - ./autogen.sh
+    - ./configure --prefix=/usr
+    - gmake
+    - gmake install
+    - file ctags
+    - ctags --version
+    - gmake check CI=cirrus+freebsd
+
+freebsd12_task:
+  freebsd_instance:
+    image_family: freebsd-12-3
+  timeout_in: 120m
+  install_script: pkg install -y automake pkgconf gmake python3
+  script:
+    - freebsd-version
+    - cc --version
+    - ./autogen.sh
+    - ./configure --prefix=/usr
+    - gmake
+    - gmake install
+    - file ctags
+    - ctags --version
+    - gmake check CI=cirrus+freebsd
