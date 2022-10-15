@@ -17,8 +17,11 @@ MIO_SRCS  = main/mio.c
 UTIL_PUBLIC_HEADS = \
 	main/general.h		\
 	\
+	main/fname.h		\
 	main/gcc-attr.h		\
+	main/htable.h		\
 	main/inline.h		\
+	main/ptrarray.h		\
 	main/routines.h		\
 	main/trashbox.h 	\
 	main/vstring.h		\
@@ -37,12 +40,30 @@ UTIL_HEADS = \
 	$(NULL)
 
 UTIL_SRCS = \
+	main/fname.c		\
+	main/htable.c		\
+	main/ptrarray.c		\
 	main/routines.c		\
 	main/trashbox.c		\
 	main/vstring.c		\
 	\
 	$(NULL)
 UTIL_OBJS = $(UTIL_SRCS:.c=.$(OBJEXT))
+
+UTILTEST_HEADS = \
+	extra-cmds/acutest.h \
+	\
+	$(MIO_HEADS) \
+	\
+	$(NULL)
+UTILTEST_SRCS  = \
+	extra-cmds/utiltest.c \
+	extra-cmds/readtags-stub.c \
+	\
+	$(MIO_SRCS) \
+	\
+	$(NULL)
+UTILTEST_OBJS = $(UTILTEST_SRCS:.c=.$(OBJEXT))
 
 MAIN_PUBLIC_HEADS =		\
 	$(UTIL_PUBLIC_HEADS)	\
@@ -51,7 +72,6 @@ MAIN_PUBLIC_HEADS =		\
 	main/entry.h		\
 	main/field.h		\
 	main/gvars.h		\
-	main/htable.h		\
 	main/keyword.h		\
 	main/kind.h		\
 	main/lregex.h		\
@@ -64,7 +84,6 @@ MAIN_PUBLIC_HEADS =		\
 	main/param.h		\
 	main/parse.h		\
 	main/promise.h		\
-	main/ptrarray.h		\
 	main/rbtree.h		\
 	main/read.h		\
 	main/selectors.h	\
@@ -136,7 +155,6 @@ LIB_SRCS =			\
 	main/field.c			\
 	main/flags.c			\
 	main/fmt.c			\
-	main/htable.c			\
 	main/keyword.c			\
 	main/kind.c			\
 	main/lregex.c			\
@@ -153,7 +171,6 @@ LIB_SRCS =			\
 	main/portable-scandir.c		\
 	main/promise.c			\
 	main/ptag.c			\
-	main/ptrarray.c			\
 	main/rbtree.c			\
 	main/read.c			\
 	main/script.c			\

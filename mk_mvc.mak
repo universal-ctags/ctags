@@ -27,6 +27,7 @@ READTAGS_OBJS = $(READTAGS_SRCS:.c=.obj)
 UTIL_OBJS = $(UTIL_SRCS:.c=.obj)
 READTAGS_DSL_OBJS = $(READTAGS_DSL_SRCS:.c=.obj)
 OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.obj)
+UTILTEST_OBJS = $(UTILTEST_SRCS:.c=.obj)
 
 !if "$(WITH_ICONV)" == "yes"
 DEFINES = $(DEFINES) -DHAVE_ICONV
@@ -77,7 +78,7 @@ PDBFLAG =
 {gnulib\malloc}.c{gnulib\malloc}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fognulib\malloc\ /c $<
 
-all: copy_gnulib_heads $(PACKCC) ctags.exe readtags.exe optscript.exe
+all: copy_gnulib_heads $(PACKCC) ctags.exe readtags.exe optscript.exe utiltest.exe
 
 ctags: ctags.exe
 
@@ -89,6 +90,9 @@ readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(UTIL_OBJS) $(UTIL_HEADS) $(RE
 
 optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) /link setargv.obj $(LIBS)
+
+utiltest.exe: $(UTIL_OBJS) $(UTIL_HEADS) $(UTILTEST_OBJS) $(UTILTEST_HEADS) $(WIN32_HEADS)
+	$(CC) $(OPT) /Fe$@ $(UTIL_OBJS) $(UTILTEST_OBJS) $(WIN32_OBJS) /link setargv.obj
 
 $(PACKCC_OBJ): $(PACKCC_SRC)
 	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(COMMON_DEFINES) $(PACKCC_SRC)

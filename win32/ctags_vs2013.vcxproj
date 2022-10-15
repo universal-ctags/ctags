@@ -193,6 +193,7 @@
     <ClCompile Include="..\main\field.c" />
     <ClCompile Include="..\main\flags.c" />
     <ClCompile Include="..\main\fmt.c" />
+    <ClCompile Include="..\main\fname.c" />
     <ClCompile Include="..\main\htable.c" />
     <ClCompile Include="..\main\keyword.c" />
     <ClCompile Include="..\main\kind.c" />
@@ -388,6 +389,7 @@
     <ClInclude Include="..\main\field_p.h" />
     <ClInclude Include="..\main\flags_p.h" />
     <ClInclude Include="..\main\fmt_p.h" />
+    <ClInclude Include="..\main\fname.h" />
     <ClInclude Include="..\main\gcc-attr.h" />
     <ClInclude Include="..\main\general.h" />
     <ClInclude Include="..\main\gvars.h" />

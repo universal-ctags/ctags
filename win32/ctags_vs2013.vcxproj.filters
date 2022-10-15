@@ -102,6 +102,9 @@
     <ClCompile Include="..\main\fmt.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\fname.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\htable.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
@@ -681,6 +684,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\fmt_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\fname.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\gcc-attr.h">

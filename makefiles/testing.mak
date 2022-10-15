@@ -1,11 +1,11 @@
 # -*- makefile -*-
-.PHONY: check units fuzz noise tmain tinst tlib man-test clean-units clean-tlib clean-tmain clean-gcov clean-man-test run-gcov codecheck cppcheck dicts validate-input check-genfile
+.PHONY: check units fuzz noise tmain tinst tlib man-test clean-units clean-tlib clean-tmain clean-gcov clean-man-test run-gcov codecheck cppcheck dicts validate-input check-genfile tutil
 
 EXTRA_DIST += misc/units misc/units.py misc/man-test.py
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
 MAN_TEST_TMPDIR = ManTest
 
-check: tmain units tlib man-test check-genfile
+check: tmain units tlib man-test check-genfile tutil
 
 # We may use CLEANFILES, DISTCLEANFILES, or etc.
 # clean-tlib and clean-gcov are not included
@@ -15,6 +15,7 @@ CTAGS_TEST = ./ctags$(EXEEXT)
 READTAGS_TEST = ./readtags$(EXEEXT)
 MINI_GEANY_TEST = ./mini-geany$(EXEEXT)
 OPTSCRIPT_TEST = ./optscript$(EXEEXT)
+UTILTEST_TEST = ./utiltest$(EXEEXT)
 
 # Make these macros empty from make's command line
 # if you don't want to (re)build these executables
@@ -27,6 +28,7 @@ CTAGS_DEP = $(CTAGS_TEST)
 READTAGS_DEP = $(READTAGS_TEST)
 MINI_GEANY_DEP = $(MINI_GEANY_TEST)
 OPTSCRIPT_DEP = $(OPTSCRIPT_TEST)
+UTILTEST_DEP = $(UTILTEST_TEST)
 
 if HAVE_TIMEOUT
 TIMEOUT = 1
@@ -367,3 +369,19 @@ endif
 		echo "Files under win32 are up to date." ; \
 	fi
 endif
+
+#
+# Test installation
+#
+tutil: $(UTILTEST_DEP)
+# See _VALGRIND_EXIT in misc/uints.py about 56.
+	$(V_RUN) vg=; \
+	if test x$(VG) = x1; then \
+		vg="valgrind "; \
+		vg="$$vg --leak-check=full"; \
+		vg="$$vg --track-origins=yes"; \
+		vg="$$vg --error-exitcode=56"; \
+	fi; \
+	\
+	builddir=$$(pwd); \
+	$$vg $$builddir/$(UTILTEST_TEST)
