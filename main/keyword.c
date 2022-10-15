@@ -274,3 +274,32 @@ extern void addKeywordGroup (const struct keywordGroup *const groupdef,
 		addKeyword (groupdef->keywords[i], language, groupdef->value);
 	}
 }
+
+extern void addDialectalKeywords (const struct dialectalKeyword *const dkeywords,
+								  size_t nDkeyword,
+								  langType language,
+								  const char **dialectMap,
+								  size_t nMap)
+{
+	int dialect = -1;
+	const char *name = getLanguageName (language);
+
+	Assert(name);
+
+	for (size_t i = 0; i < nMap; i++)
+	{
+		if (strcmp(dialectMap[i], name) == 0)
+		{
+			dialect = i;
+			break;
+		}
+	}
+	Assert (dialect != -1);
+
+	for (size_t i = 0; i < nDkeyword; i++)
+	{
+		const struct dialectalKeyword *p = dkeywords + i;
+		if (p->isValid[dialect])
+			addKeyword (p->keyword, language, p->value);
+	}
+}

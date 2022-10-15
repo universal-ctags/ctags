@@ -1,0 +1,25 @@
+func	input.zsh	/^autoload func$/;"	script	roles:autoloaded
+func	input.zsh	/^autoload func$/;"	function	roles:autoloaded
+kfun	input.zsh	/^autoload -z kfun$/;"	script	roles:autoloaded
+kfun	input.zsh	/^autoload -z kfun$/;"	function	roles:autoloaded
+zfun	input.zsh	/^autoload -k zfun$/;"	script	roles:autoloaded
+zfun	input.zsh	/^autoload -k zfun$/;"	function	roles:autoloaded
+f0	input.zsh	/^autoload f0 f1 f2$/;"	script	roles:autoloaded
+f0	input.zsh	/^autoload f0 f1 f2$/;"	function	roles:autoloaded
+f1	input.zsh	/^autoload f0 f1 f2$/;"	script	roles:autoloaded
+f1	input.zsh	/^autoload f0 f1 f2$/;"	function	roles:autoloaded
+f2	input.zsh	/^autoload f0 f1 f2$/;"	script	roles:autoloaded
+f2	input.zsh	/^autoload f0 f1 f2$/;"	function	roles:autoloaded
+/path0/A/pf0	input.zsh	/^autoload \/path0\/A\/pf0 \/path1\/B\/pf1$/;"	script	roles:autoloaded
+pf0	input.zsh	/^autoload \/path0\/A\/pf0 \/path1\/B\/pf1$/;"	function	roles:autoloaded
+/path1/B/pf1	input.zsh	/^autoload \/path0\/A\/pf0 \/path1\/B\/pf1$/;"	script	roles:autoloaded
+pf1	input.zsh	/^autoload \/path0\/A\/pf0 \/path1\/B\/pf1$/;"	function	roles:autoloaded
+/path3/pf3	input.zsh	/^autoload \/path3\/pf3 f3$/;"	script	roles:autoloaded
+pf3	input.zsh	/^autoload \/path3\/pf3 f3$/;"	function	roles:autoloaded
+f3	input.zsh	/^autoload \/path3\/pf3 f3$/;"	script	roles:autoloaded
+f3	input.zsh	/^autoload \/path3\/pf3 f3$/;"	function	roles:autoloaded
+foo	input.zsh	/^foo()$/;"	function	roles:def
+g0	input.zsh	/^autoload +x g0 g1$/;"	script	roles:autoloaded
+g0	input.zsh	/^autoload +x g0 g1$/;"	function	roles:autoloaded
+g1	input.zsh	/^autoload +x g0 g1$/;"	script	roles:autoloaded
+g1	input.zsh	/^autoload +x g0 g1$/;"	function	roles:autoloaded

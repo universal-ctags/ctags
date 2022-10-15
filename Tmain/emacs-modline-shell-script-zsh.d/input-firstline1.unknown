@@ -1,0 +1,3 @@
+# -*- mode: shell-script; sh-set-shell: zsh -*-
+# Emacs doesn't understand this notation but I found one in
+# https://github.com/neumachen/dotfiles/blob/3e2b04249f852dbdf7dee1e33e518de61031eb04/private_dot_config/exact_zsh/dot_zprofile

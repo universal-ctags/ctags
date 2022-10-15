@@ -38,4 +38,24 @@ struct keywordGroup {
 
 extern void addKeywordGroup (const struct keywordGroup *const groupdef,
 							 langType language);
+
+/*
+* DIALECTAL KEYWROD API
+*/
+#define MAX_DIALECTS 10
+struct dialectalKeyword {
+	const char *keyword;
+	int value;
+
+	/* If this keyword is valid for Nth dialect,
+	   isValid[N] should be 1; else 0. */
+	bool isValid [MAX_DIALECTS];
+};
+
+extern void addDialectalKeywords (const struct dialectalKeyword *const dkeywords,
+								  size_t nDkeyword,
+								  langType language,
+								  const char **dialectMap,
+								  size_t nMap);
+
 #endif  /* CTAGS_MAIN_KEYWORD_H */
