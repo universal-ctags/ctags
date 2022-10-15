@@ -81,7 +81,9 @@ static void entry_reset  (hentry* entry,
 		keyfreefn (entry->key);
 	if (valfreefn)
 		valfreefn (entry->value);
-	entry->key = newkey;
+
+	if (keyfreefn)
+		entry->key = newkey;
 	entry->value = newval;
 }
 
@@ -346,14 +348,25 @@ extern bool     hashTableDeleteItem (hashTable *htable, const void *key)
 	return r;
 }
 
-extern bool    hashTableUpdateItem (hashTable *htable, void *key, void *value)
+extern bool    hashTableUpdateItem (hashTable *htable, const void *key, void *value)
+{
+	unsigned int h, i;
+
+	h = htable->hashfn (key);
+	i = h % htable->size;
+	bool r = entry_update(htable->table[i], (void *)key, value,
+						  htable->equalfn, NULL, htable->valfreefn);
+	return r;
+}
+
+extern bool    hashTableUpdateOrPutItem (hashTable *htable, void *key, void *value)
 {
 	unsigned int h, i;
 
 	h = htable->hashfn (key);
 	i = h % htable->size;
 	bool r = entry_update(htable->table[i], key, value,
-						  htable->equalfn, htable->keyfreefn, htable->valfreefn);
+						  htable->equalfn, NULL, htable->valfreefn);
 	if (!r)
 		hashTablePutItem0(htable, key, value, h);
 
