@@ -70,7 +70,19 @@ extern void       hashTablePutItem     (hashTable *htable, void *key, void *valu
 extern void*      hashTableGetItem     (hashTable *htable, const void * key);
 extern bool    hashTableHasItem     (hashTable * htable, const void * key);
 extern bool    hashTableDeleteItem  (hashTable *htable, const void *key);
-extern bool       hashTableUpdateItem  (hashTable *htable, void *key, void *value);
+
+/* If KEY is found, this function updates the value for KEY and returns true.
+ * If KEY is not found, this function just returns false.
+ *
+ * KEY is just referred. The HTABLE takes the ownership of VALUE when KEY is found. */
+extern bool       hashTableUpdateItem  (hashTable *htable, const void *key, void *value);
+
+/* If KEY is found, this function updates the value for KEY and returns true.
+ * If KEY is not found, this function adds KEY and VALUE and returns false.
+ *
+ * The HTABLE takes the ownership of KEY only if KEY is not found.
+ * The HTABLE takes the ownership of VALUE either when KEY is found or not. */
+extern bool       hashTableUpdateOrPutItem  (hashTable *htable, void *key, void *value);
 
 /* Return true if proc never returns false; proc returns true for all
  * the items, or htable holds no item.

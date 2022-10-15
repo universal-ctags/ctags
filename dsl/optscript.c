@@ -2129,7 +2129,11 @@ dict_op_def (EsObject* dict, EsObject *key, EsObject *val)
 	key = es_object_ref (key);
 	val = es_object_ref (val);
 
-	hashTableUpdateItem (t, key, val);
+	if (hashTableUpdateOrPutItem (t, key, val))
+	{
+		/* A key in the hashtable is reused. */
+		es_object_unref (key);
+	}
 }
 
 static bool
