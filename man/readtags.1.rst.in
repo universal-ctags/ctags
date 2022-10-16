@@ -74,7 +74,8 @@ By default, the output of readtags contains only the name, input and pattern
 field. The Output can be tweaked using these options:
 
 ``-C``, ``--canonicalize-input``
-	Reduct '..' and '.' in input fields of regular tags.
+	Resolve '..' and '.' in input fields of regular tags.
+	This produces a unique representation of the input path.
 	This option works only with tags files having ``!_TAG_PROC_CWD`` pseudo
 	tag.
 
