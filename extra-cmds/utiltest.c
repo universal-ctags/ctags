@@ -8,9 +8,45 @@
 #include "general.h"
 
 #include "acutest.h"
+#include "fname.h"
 #include "htable.h"
 #include "routines.h"
 #include <string.h>
+
+static void test_fname_absolute(void)
+{
+	char *str;
+	char *in;
+
+#define T(INPUT,OUTPUT) \
+	TEST_CHECK((in = eStrdup (INPUT), \
+				strcmp((str = canonicalizeAbsoluteFileName (in)), OUTPUT) == 0)); \
+	eFree (in); \
+	eFree (str)
+
+	T("/abc/efg/..", "/abc");
+	T("/abc/efg/hij/..", "/abc/efg");
+	T("/abc/efg/../", "/abc");
+	T("/abc/efg/./", "/abc/efg");
+	T("/abc/efg/./../.", "/abc");
+	T("/abc/..", "/");
+
+	T("..", "/");
+	T(".", "/");
+	T("a", "/a");
+	T("abc", "/abc");
+	T("", "/");
+
+	T("../a", "/a");
+	T("../abc", "/abc");
+	T("./a", "/a");
+	T("./abc", "/abc");
+	T("a/../b", "/b");
+	T("abc/../efg", "/efg");
+
+	T("..//////a", "/a");
+	T("..//..//..//a", "/a");
+}
 
 static void test_htable_update(void)
 {
@@ -34,6 +70,7 @@ static void test_routines_strrstr(void)
 }
 
 TEST_LIST = {
+   { "fname/absolute",   test_fname_absolute   },
    { "htable/update",    test_htable_update    },
    { "routines/strrstr", test_routines_strrstr },
    { NULL, NULL }     /* zeroed record marking the end of the list */
