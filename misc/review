@@ -184,15 +184,18 @@ units_inspect_show_input ()
     inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/input.*) pygmentize_or_cat
 }
 
+# See https://stackoverflow.com/questions/65533232/bash-extglob-pattern-matching-breaks-when-enclosed-in-a-function
+shopt -s extglob
 units_inspect_show_expected_tags ()
 {
     local tcase=$1
 
     (
 	shopt -s extglob
-	inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/expected.tags?(-*)) "cat" "-n"
+	inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/expected.tags?\(-*\)) "cat" "-n"
     )
 }
+shopt -u extglob
 
 inspect_cmd_quit ()
 {
