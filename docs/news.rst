@@ -413,7 +413,7 @@ The following parsers have been added:
 * Elixir *optlib*
 * Elm *peg/packcc*
 * Falcon
-* FrontMatter *only YAML syntax, running as a guest  on R?Markdown*
+* FrontMatter *only YAML syntax, running as a guest on R?Markdown*
 * FunctionParameters *perl based subparser*
 * Gdbinit script *optlib*
 * GemSpec *Ruby based subparser*
