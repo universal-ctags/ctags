@@ -581,7 +581,6 @@ if test "$REPLACE_FNMATCH" != 0; then
 fi
 
 AC_CHECK_FUNCS(asprintf)
-AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
 AC_CHECK_FUNCS(strncasecmp strnicmp, break)
 
