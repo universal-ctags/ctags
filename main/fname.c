@@ -134,12 +134,10 @@ extern char *canonicalizeAbsoluteFileName (char *fname)
 			fname [1] = '\0';
 			return strdup (fname);
 		}
-		{
-			char *r = xMalloc (strlen (fname) + 2, char);
-			r[0] = '/';
-			strcpy (r + 1, fname);
-			return r;
-		}
+		char *r = xMalloc (strlen (fname) + 2, char);
+		r[0] = '/';
+		strcpy (r + 1, fname);
+		return r;
 	}
 
 	*next = '\0';
