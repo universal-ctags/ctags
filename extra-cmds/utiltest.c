@@ -12,7 +12,7 @@
 #include "routines.h"
 #include <string.h>
 
-void test_htable_update(void)
+static void test_htable_update(void)
 {
 	hashTable *htable = hashTableNew (3, hashCstrhash, hashCstreq,
 									  eFree, NULL);
@@ -28,7 +28,7 @@ void test_htable_update(void)
 	hashTableDelete(htable);
 }
 
-void test_routines_strrstr(void)
+static void test_routines_strrstr(void)
 {
 	TEST_CHECK(strcmp(strrstr("abcdcdb", "cd"), "cdb") == 0);
 }
