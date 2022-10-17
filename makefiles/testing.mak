@@ -384,4 +384,4 @@ tutil: $(UTILTEST_DEP)
 	fi; \
 	\
 	builddir=$$(pwd); \
-	$$vg $$builddir/$(UTILTEST_TEST)
+	$$vg $$builddir/$(UTILTEST_TEST) -v
