@@ -20,7 +20,6 @@
 #define HAVE_DIRECT_H 1
 #define HAVE_STRICMP 1
 #define HAVE_STRNICMP 1
-#define HAVE_STRSTR 1
 #define HAVE_STRERROR 1
 #define HAVE__FINDFIRST 1
 #define HAVE_FINDNEXT 1
