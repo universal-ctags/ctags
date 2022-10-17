@@ -19,6 +19,7 @@
 #include "routines.h"
 #include "keyword.h"
 #include "promise.h"
+#include "trace.h"
 
 /* The max. number of nested elements - prevents further recursion if the limit
  * is exceeded and avoids stack overflow for invalid input containing too many
@@ -157,8 +158,8 @@ typedef enum {
 	TOKEN_NAME,			/* tag and attribute names */
 	TOKEN_STRING,		/* single- or double-quoted attribute value */
 	TOKEN_TEXT,
-	TOKEN_TAG_START,	/* <  */
-	TOKEN_TAG_START2,	/* </ */
+	TOKEN_OPEN_TAG_START,	/* <  */
+	TOKEN_CLOSE_TAG_START,	/* </ */
 	TOKEN_TAG_END,		/* >  */
 	TOKEN_TAG_END2,		/* /> */
 	TOKEN_EQUAL,
@@ -167,14 +168,14 @@ typedef enum {
 } tokenType;
 
 #ifdef DEBUG
-const char *tokenTypes[] = {
+static const char *tokenTypes[] = {
 #define E(X) [TOKEN_##X] = #X
 	E(EOF),
 	E(NAME),
 	E(STRING),
 	E(TEXT),
-	E(TAG_START),
-	E(TAG_START2),
+	E(OPEN_TAG_START),
+	E(CLOSE_TAG_START),
 	E(TAG_END),
 	E(TAG_END2),
 	E(EQUAL),
@@ -195,16 +196,7 @@ static int Lang_html;
 
 static void readTag (tokenInfo *token, vString *text, int depth);
 
-#ifdef DEBUG
-#if 0
-static void dumpToken (tokenInfo *token, const char *context, const char* extra_context)
-{
-	fprintf (stderr, "[%7s] %-20s@%s.%s\n",
-			 tokenTypes[token->type], vStringValue(token->string),
-			 context, extra_context? extra_context: "_");
-}
-#endif
-#endif
+static void skipOtherScriptContent (const int delimiter);
 
 static void readTokenText (tokenInfo *const token, bool collectText)
 {
@@ -265,7 +257,6 @@ getNextChar:
 		case '<':
 		{
 			int d = getcFromInputFile ();
-
 			if (d == '!')
 			{
 				d = getcFromInputFile ();
@@ -296,14 +287,17 @@ getNextChar:
 				ungetcToInputFile (d);
 				token->type = TOKEN_OTHER;
 			}
-			else if (d == '?')
-				token->type = TOKEN_OTHER;
+			else if (d == '?' || d == '%')
+			{
+				skipOtherScriptContent(d);
+				goto getNextChar;
+			}
 			else if (d == '/')
-				token->type = TOKEN_TAG_START2;
+				token->type = TOKEN_CLOSE_TAG_START;
 			else
 			{
 				ungetcToInputFile (d);
-				token->type = TOKEN_TAG_START;
+				token->type = TOKEN_OPEN_TAG_START;
 			}
 			break;
 		}
@@ -356,6 +350,8 @@ getNextChar:
 			break;
 		}
 	}
+
+	TRACE_PRINT("token: %s (%s)", tokenTypes[token->type], vStringValue (token->string));
 }
 
 static void appendText (vString *text, vString *appendedText)
@@ -373,6 +369,8 @@ static void appendText (vString *text, vString *appendedText)
 
 static bool readTagContent (tokenInfo *token, vString *text, long *line, long *lineOffset, int depth)
 {
+	TRACE_ENTER();
+
 	tokenType type;
 
 	readTokenText (token, text != NULL);
@@ -384,21 +382,25 @@ static bool readTagContent (tokenInfo *token, vString *text, long *line, long *l
 		*lineOffset = getInputLineOffset ();
 		readToken (token, false);
 		type = token->type;
-		if (type == TOKEN_TAG_START)
+		if (type == TOKEN_OPEN_TAG_START)
 			readTag (token, text, depth + 1);
-		if (type == TOKEN_COMMENT || type == TOKEN_TAG_START)
+		if (type == TOKEN_COMMENT || type == TOKEN_OPEN_TAG_START)
 		{
 			readTokenText (token, text != NULL);
 			appendText (text, token->string);
 		}
 	}
-	while (type == TOKEN_COMMENT || type == TOKEN_TAG_START);
+	while (type == TOKEN_COMMENT || type == TOKEN_OPEN_TAG_START);
 
-	return type == TOKEN_TAG_START2;
+	TRACE_LEAVE_TEXT("is_close_tag? %d", type == TOKEN_CLOSE_TAG_START);
+
+	return type == TOKEN_CLOSE_TAG_START;
 }
 
 static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 {
+	TRACE_ENTER();
+
 	bool found_start = false;
 	bool found_script = false;
 
@@ -415,7 +417,7 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 		readToken (token, false);
 		type = token->type;
 
-		if (type == TOKEN_TAG_START2)
+		if (type == TOKEN_CLOSE_TAG_START)
 		{
 			found_start = true;
 			line_tmp[1] = line_tmp[0];
@@ -434,7 +436,56 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 	}
 	while ((type != TOKEN_EOF) && (!found_script));
 
+	TRACE_LEAVE_TEXT("found_script? %d", found_script);
+
 	return found_script;
+}
+
+static void skipOtherScriptContent (const int delimiter)
+{
+	TRACE_ENTER();
+
+	const long startSourceLineNumber = getSourceLineNumber ();
+	const long startLineNumber = getInputLineNumber ();
+	const long startLineOffset = getInputLineOffset () - 2;
+
+	vString *script_name = vStringNew ();
+	bool reading_script_name = true;
+	while (1)
+	{
+		int c = getcFromInputFile ();
+		if (c == EOF)
+		{
+			break;
+		}
+		else if (reading_script_name && !isspace(c))
+		{
+			vStringPut (script_name, c);
+		}
+		else if (reading_script_name)
+		{
+			reading_script_name = false;
+		}
+		else if (c == delimiter)
+		{
+			c = getcFromInputFile ();
+			if (c == '>')
+			{
+				break;
+			}
+			ungetcToInputFile (c);
+		}
+	}
+
+	if (strcasecmp ("php", vStringValue (script_name)) == 0
+		|| strcmp ("=", vStringValue (script_name)) == 0)
+		makePromise ("PHP", startLineNumber, startLineOffset,
+					 getInputLineNumber (), getInputLineOffset (),
+					 startSourceLineNumber);
+
+	vStringDelete (script_name);
+
+	TRACE_LEAVE();
 }
 
 static void makeClassRefTags (const char *classes)
@@ -463,6 +514,8 @@ static void makeClassRefTags (const char *classes)
 
 static void readTag (tokenInfo *token, vString *text, int depth)
 {
+	TRACE_ENTER();
+
 	bool textCreated = false;
 
 	readToken (token, true);
@@ -640,10 +693,14 @@ static void readTag (tokenInfo *token, vString *text, int depth)
  out:
 	if (textCreated)
 		vStringDelete (text);
+
+	TRACE_LEAVE();
 }
 
 static void findHtmlTags (void)
 {
+	TRACE_ENTER();
+
 	tokenInfo token;
 
 	token.string = vStringNew ();
@@ -651,12 +708,14 @@ static void findHtmlTags (void)
 	do
 	{
 		readToken (&token, true);
-		if (token.type == TOKEN_TAG_START)
+		if (token.type == TOKEN_OPEN_TAG_START)
 			readTag (&token, NULL, 0);
 	}
 	while (token.type != TOKEN_EOF);
 
 	vStringDelete (token.string);
+
+	TRACE_LEAVE();
 }
 
 static void initialize (const langType language)
