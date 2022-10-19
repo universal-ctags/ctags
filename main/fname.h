@@ -20,7 +20,9 @@ extern hashTable  *canonFnameCacheTableNew (void);
 extern const char *canonicalizeRelativeFileName(const char *cwd, size_t cwd_len, const char *input,
 												hashTable* cache_table);
 
-/* eFree() is for freeing the cstring returned from this function. */
+/* eFree() is for freeing the cstring returned from this function.
+ * This function may modify FNAME[].
+ */
 extern char *canonicalizeAbsoluteFileName (char *fname);
 
 #endif	/* CTAGS_MAIN_FNAME_UTIL_H */
