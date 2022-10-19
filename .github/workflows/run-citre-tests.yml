@@ -45,6 +45,6 @@ jobs:
         with:
           repository: 'universal-ctags/citre'
           path: 'citre'
-      - name: run Citre unit tests for ctags backend
+      - name: run Citre unit tests for tags backend
         working-directory: 'citre'
-        run: make test-ctags
+        run: make test-tags
