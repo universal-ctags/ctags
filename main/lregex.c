@@ -1926,7 +1926,6 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 {
 	const char *start;
 	const char *current;
-	off_t offset = 0;
 	regexPattern* patbuf = entry->pattern;
 	struct mGroupSpec *mgroup = &patbuf->mgroup;
 	struct guestSpec  *guest = &patbuf->guest;
@@ -1958,9 +1957,6 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 		if (hasMessage(patbuf))
 			printMessage(lcb->owner, patbuf, (current + pmatch[0].rm_so) - start, current, pmatch);
 
-		offset = (current + pmatch [mgroup->forLineNumberDetermination].rm_so)
-				 - start;
-
 		entry->statistics.match++;
 		scriptWindow window = {
 			.line = current,
@@ -1983,6 +1979,8 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 
 		if (patbuf->type == PTRN_TAG)
 		{
+			off_t offset = (current + pmatch [mgroup->forLineNumberDetermination].rm_so)
+				- start;
 			matchTagPattern (lcb, current, patbuf, pmatch, offset,
 							 (patbuf->optscript && hasNameSlot (patbuf))? &window: NULL);
 			result = true;
@@ -2757,9 +2755,6 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		if (match == 0)
 		{
 			entry->statistics.match++;
-			off_t offset_for_tag = (current
-									+ pmatch [ptrn->mgroup.forLineNumberDetermination].rm_so)
-				- cstart;
 			scriptWindow window = {
 				.line = current,
 				.start = cstart,
@@ -2782,6 +2777,9 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 
 			if (ptrn->type == PTRN_TAG)
 			{
+				off_t offset_for_tag = (current
+										+ pmatch [ptrn->mgroup.forLineNumberDetermination].rm_so)
+					- cstart;
 				matchTagPattern (lcb, current, ptrn, pmatch, offset_for_tag,
 								 (ptrn->optscript && hasNameSlot (ptrn))? &window: NULL);
 
