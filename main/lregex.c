@@ -1979,6 +1979,7 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 
 		if (patbuf->type == PTRN_TAG)
 		{
+			Assert (mgroup->forLineNumberDetermination != NO_MULTILINE);
 			off_t offset = (current + pmatch [mgroup->forLineNumberDetermination].rm_so)
 				- start;
 			matchTagPattern (lcb, current, patbuf, pmatch, offset,
@@ -2777,6 +2778,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 
 			if (ptrn->type == PTRN_TAG)
 			{
+				Assert (ptrn->mgroup.forLineNumberDetermination != NO_MULTILINE);
 				off_t offset_for_tag = (current
 										+ pmatch [ptrn->mgroup.forLineNumberDetermination].rm_so)
 					- cstart;
