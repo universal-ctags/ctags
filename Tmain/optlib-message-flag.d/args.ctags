@@ -12,7 +12,7 @@
 
 --mline-regex-FOO=/namespace ([a-zA-Z]+) /\1/m,mlineNamespace/{mgroup=1}{warning="got namespace"}
 --mline-regex-FOO=/var ([a-zA-Z]+) ([a-zA-Z]+);/\2/V,mlineVariable/{warning="got variable '\2' of type \1"}{mgroup=2}
---mline-regex-FOO=/bad multi-line ([a-zA-Z-]+)/\1/x,bad/{fatal="bad='\1'"}
+--mline-regex-FOO=/bad multi-line ([a-zA-Z-]+)/\1/x,bad/{fatal="bad='\1'"}{mgroup=1}
 
 
 --_tabledef-FOO=main

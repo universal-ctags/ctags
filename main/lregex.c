@@ -2290,8 +2290,16 @@ extern void addTagMultiLineRegex (struct lregexControlBlock *lcb, const char* co
 								  const char* const name, const char* const kinds, const char* const flags,
 								  bool *disabled)
 {
-	addTagRegexInternal (lcb, TABLE_INDEX_UNUSED,
-						 REG_PARSER_MULTI_LINE, regex, name, kinds, flags, disabled);
+	regexPattern *ptrn = addTagRegexInternal (lcb, TABLE_INDEX_UNUSED,
+											  REG_PARSER_MULTI_LINE, regex, name, kinds, flags, disabled);
+	if (ptrn->mgroup.forLineNumberDetermination == NO_MULTILINE)
+	{
+		if (hasNameSlot(ptrn))
+			error (WARNING, "%s: no {mgroup=N} flag given in --mline-regex-<LANG>=/%s/... (%s)",
+				   regex,
+				   getLanguageName (lcb->owner), ASSERT_FUNCTION);
+		ptrn->mgroup.forLineNumberDetermination = 0;
+	}
 }
 
 extern void addTagMultiTableRegex(struct lregexControlBlock *lcb,
@@ -2383,8 +2391,19 @@ static void addTagRegexOption (struct lregexControlBlock *lcb,
 		regex_pat = eStrdup (pattern);
 
 	if (parseTagRegex (regptype, regex_pat, &name, &kinds, &flags))
-		addTagRegexInternal (lcb, table_index, regptype, regex_pat, name, kinds, flags,
-							 NULL);
+	{
+		regexPattern *ptrn = addTagRegexInternal (lcb, table_index, regptype, regex_pat, name, kinds, flags,
+												  NULL);
+		if (regptype == REG_PARSER_MULTI_LINE
+			&& ptrn->mgroup.forLineNumberDetermination == NO_MULTILINE)
+		{
+			if (hasNameSlot(ptrn))
+				error (WARNING, "%s: no {mgroup=N} flag given in --mline-regex-<LANG>=%s... (%s)",
+					   getLanguageName (lcb->owner),
+					   pattern, ASSERT_FUNCTION);
+			ptrn->mgroup.forLineNumberDetermination = 0;
+		}
+	}
 
 	eFree (regex_pat);
 }
