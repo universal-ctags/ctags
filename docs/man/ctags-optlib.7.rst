@@ -34,7 +34,7 @@ Following options are for defining (or customizing) a parser:
 * ``--map-<LANG>=[+|-]<extension>|<pattern>``
 * ``--kinddef-<LANG>=<letter>,<name>,<description>``
 * ``--regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
-* ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
+* ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/{mgroup=<N>}[<flags>]``
 
 Following options are for controlling loading parser definition:
 
@@ -117,7 +117,7 @@ Overview for defining a parser
 
    Use ``--regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
    option for a single-line regular expression. You can also use
-   ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
+   ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/{mgroup=<N>}[<flags>]``
    option for a multi-line regular expression.
 
    As *<kind-spec>*, you can use the one-letter flag defined with
@@ -271,11 +271,14 @@ OPTIONS
 ``--list-mline-regex-flags``
 	Lists the flags that can be used in ``--mline-regex-<LANG>`` option.
 
-``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
+``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/{mgroup=<N>}[<flags>]``
 	Define a multi-line regular expression.
 
 	This option is similar to ``--regex-<LANG>`` option except the pattern is
 	applied to the whole file’s contents, not line by line.
+
+	See "`FLAGS FOR ``--mline-regex-<LANG>`` OPTION`_" about ``{mgroup=<N>}``.
+	``{mgroup=<N>}`` flag is a must.
 
 ``--_echo=<message>``
 	Print *<message>* to the standard error stream.  This is helpful to
@@ -404,6 +407,20 @@ representation. ``--list-regex-flags`` lists all the flags.
 
 ``fatal=<message>``
 	print the given *<message>* and exit
+
+FLAGS FOR ``--mline-regex-<LANG>`` OPTION
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``mgroup=<N>``
+
+	decide the location of the tag extracted with
+	``--mline-regex-<LANG>`` option.
+
+	*<N>* is the number of a capture group in the pattern, which is
+	used to record the line number location of the tag. ``mgroup=<N>``
+	flag is not an optional. You **must** add an ``mgroup=<N>`` flag,
+	even if the *<N>* is ``0`` (meaning the start position of the
+	whole regex pattern).
 
 EXAMPLES
 -------------

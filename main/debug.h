@@ -24,6 +24,15 @@
 *   Macros
 */
 
+#if defined _MSC_VER
+/* See https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros */
+# define ASSERT_FUNCTION __FUNCTION__
+#elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+# define ASSERT_FUNCTION __func__
+#else
+# define ASSERT_FUNCTION ((const char*)0)
+#endif
+
 #ifdef DEBUG
 # define debug(level)      ((ctags_debugLevel & (long)(level)) != 0)
 # define DebugStatement(x) x
@@ -33,11 +42,6 @@
 #  define AssertNotReached() do {} while(0)
 # else
    /* We expect cc supports c99 standard. */
-#  if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
-#   define ASSERT_FUNCTION __func__
-#  else
-#   define ASSERT_FUNCTION ((const char*)0)
-#  endif
 #  define Assert(c) ((c) ? ((void)0) : debugAssert(#c, __FILE__, __LINE__, ASSERT_FUNCTION))
 #  define AssertNotReached() Assert(!"The control reaches unexpected place")
 # endif

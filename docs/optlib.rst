@@ -917,7 +917,7 @@ Multiline pattern flags
 
 .. TODO: Q: isn't the above restriction really a bug? I think it is. I should fix it.
    Q to @masatake-san: Do you mean that {mgroup=0} can be omitted? -> #2918 is opened
-
+   A. as proposed in #3514, I made {mgroup=N} be a must flag.
 
 ``{_advanceTo=N[start|end]}``
 

@@ -1,3 +1,4 @@
 ctags: Notice: No options will be read from files or environment
+ctags: Warning: FOO: no {mgroup=N} flag given in --mline-regex-<LANG>=/(.)/\1/{_advanceTo=1start}... (addTagRegexOption)
 ctags: Warning: a multi line regex pattern doesn't advance the input cursor: (.)
 ctags: Warning: Language: FOO, input file: ./input.foo, pos: 0
