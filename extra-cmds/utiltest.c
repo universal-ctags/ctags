@@ -46,6 +46,7 @@ static void test_fname_absolute(void)
 
 	T("..//////a", "/a");
 	T("..//..//..//a", "/a");
+#undef T
 }
 
 static void test_htable_update(void)
