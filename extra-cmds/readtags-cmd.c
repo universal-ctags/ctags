@@ -243,7 +243,7 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 	int err = tagsGetErrno (file);
 	if (err != 0)
 	{
-		fprintf (stderr, "%s: error in walktTags(): %s\n",
+		fprintf (stderr, "%s: error in walkTags(): %s\n",
 				 ProgramName,
 				 tagsStrerror (err));
 		exit (1);
@@ -284,7 +284,7 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 	int err = tagsGetErrno (file);
 	if (err != 0)
 	{
-		fprintf (stderr, "%s: error in walktTags(): %s\n",
+		fprintf (stderr, "%s: error in walkTags(): %s\n",
 				 ProgramName,
 				 tagsStrerror (err));
 		exit (1);
