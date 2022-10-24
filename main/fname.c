@@ -24,22 +24,31 @@ struct comp {
 
 struct canonFnameCacheTable {
 	hashTable *table;
+	const char *cwd;
+	size_t cwd_len;
 	char *input_last;
 	char *return_last;
 };
 
-extern struct canonFnameCacheTable *canonFnameCacheTableNew (void)
+extern struct canonFnameCacheTable *canonFnameCacheTableNew (const char *cwd)
 {
 	struct canonFnameCacheTable *r = xMalloc (1, struct canonFnameCacheTable);
 	r->table = hashTableNew (7, hashCstrhash, hashCstreq,
 				 eFree, eFree);
 	r->input_last = NULL;
 	r->return_last = NULL;
+
+	char *cwd_tmp = eStrdup (cwd);
+	r->cwd = canonicalizeAbsoluteFileName (cwd_tmp);
+	eFree (cwd_tmp);
+	r->cwd_len = strlen (r->cwd);
+
 	return r;
 }
 
 extern void canonFnameCacheTableDelete (struct canonFnameCacheTable *cache_table)
 {
+	eFree ((void *)cache_table->cwd);
 	hashTableDelete (cache_table->table);
 	eFree (cache_table);
 }
@@ -220,8 +229,8 @@ static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *re
 	return r;
 }
 
-extern const char *canonicalizeRelativeFileName (const char *cwd, size_t cwd_len, const char *input,
-						 struct canonFnameCacheTable *cache_table)
+extern const char *canonicalizeRelativeFileName (struct canonFnameCacheTable *cache_table,
+												 const char *input)
 {
 	if (cache_table->input_last)
 	{
@@ -234,7 +243,7 @@ extern const char *canonicalizeRelativeFileName (const char *cwd, size_t cwd_len
 	if (r)
 		return r;
 
-	r = canonicalizePathNew (cwd, cwd_len, input);
+	r = canonicalizePathNew (cache_table->cwd, cache_table->cwd_len, input);
 
 	cache_table->input_last = eStrdup (input);
 	cache_table->return_last = r;

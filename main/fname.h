@@ -12,14 +12,14 @@
 #include "htable.h"
 
 struct canonFnameCacheTable;
-extern struct canonFnameCacheTable *canonFnameCacheTableNew (void);
+extern struct canonFnameCacheTable *canonFnameCacheTableNew (const char *cwd);
 extern void canonFnameCacheTableDelete (struct canonFnameCacheTable *cache_table);
 
 /* Don't free the cstring returned from this function directly.
  * This function stores the cstring to the cache.
  */
-extern const char *canonicalizeRelativeFileName(const char *cwd, size_t cwd_len, const char *input,
-						struct canonFnameCacheTable *cache_table);
+extern const char *canonicalizeRelativeFileName(struct canonFnameCacheTable *cache_table,
+												const char *input);
 
 /*
  * Resolve '.', '..', and '//' in FNAME as if the current working
