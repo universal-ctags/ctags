@@ -161,12 +161,12 @@ static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *re
 	vString *buf = vStringNew ();
 
 	if (rela == NULL)
-		vStringCopyS (buf, dir);
+		vStringNCopyS (buf, dir, dir_len);
 	else if (rela[0] == '/')
 		vStringCopyS (buf, rela);
 	else
 	{
-		vStringCopyS (buf, dir);
+		vStringNCopyS (buf, dir, dir_len);
 		vStringPut (buf, '/');
 		vStringCatS (buf, rela);
 		relative = true;
