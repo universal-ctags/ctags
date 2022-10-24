@@ -11,14 +11,15 @@
 
 #include "htable.h"
 
-/* hashTableDelete() is for freeing the cache returned from this function. */
-extern hashTable  *canonFnameCacheTableNew (void);
+struct canonFnameCacheTable;
+extern struct canonFnameCacheTable *canonFnameCacheTableNew (void);
+extern void canonFnameCacheTableDelete (struct canonFnameCacheTable *cache_table);
 
 /* Don't free the cstring returned from this function directly.
  * This function stores the cstring to the cache.
  */
 extern const char *canonicalizeRelativeFileName(const char *cwd, size_t cwd_len, const char *input,
-												hashTable* cache_table);
+						struct canonFnameCacheTable *cache_table);
 
 /*
  * Resolve '.', '..', and '//' in FNAME as if the current working

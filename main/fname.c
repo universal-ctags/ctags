@@ -22,10 +22,26 @@ struct comp {
 };
 
 
-extern hashTable *canonFnameCacheTableNew (void)
+struct canonFnameCacheTable {
+	hashTable *table;
+	char *input_last;
+	char *return_last;
+};
+
+extern struct canonFnameCacheTable *canonFnameCacheTableNew (void)
 {
-	return hashTableNew (7, hashCstrhash, hashCstreq,
-						 eFree, eFree);
+	struct canonFnameCacheTable *r = xMalloc (1, struct canonFnameCacheTable);
+	r->table = hashTableNew (7, hashCstrhash, hashCstreq,
+				 eFree, eFree);
+	r->input_last = NULL;
+	r->return_last = NULL;
+	return r;
+}
+
+extern void canonFnameCacheTableDelete (struct canonFnameCacheTable *cache_table)
+{
+	hashTableDelete (cache_table->table);
+	eFree (cache_table);
 }
 
 static void strcpy_comps (char *buf, struct comp *comp)
@@ -205,26 +221,23 @@ static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *re
 }
 
 extern const char *canonicalizeRelativeFileName (const char *cwd, size_t cwd_len, const char *input,
-												 hashTable* cache_table)
+						 struct canonFnameCacheTable *cache_table)
 {
-	static char *input_last;
-	static char *return_last;
-
-	if (input_last)
+	if (cache_table->input_last)
 	{
-		if (strcmp (input, input_last) == 0)
-			return return_last;
-		input_last = NULL;
+		if (strcmp (input, cache_table->input_last) == 0)
+			return cache_table->return_last;
+		cache_table->input_last = NULL;
 	}
 
-	char *r = hashTableGetItem (cache_table, input);
+	char *r = hashTableGetItem (cache_table->table, input);
 	if (r)
 		return r;
 
 	r = canonicalizePathNew (cwd, cwd_len, input);
 
-	input_last = eStrdup (input);
-	return_last = r;
-	hashTablePutItem (cache_table, input_last, return_last);
-	return return_last;
+	cache_table->input_last = eStrdup (input);
+	cache_table->return_last = r;
+	hashTablePutItem (cache_table->table, cache_table->input_last, cache_table->return_last);
+	return cache_table->return_last;
 }
