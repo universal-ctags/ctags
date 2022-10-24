@@ -49,6 +49,80 @@ static void test_fname_absolute(void)
 #undef T
 }
 
+static void test_fname_relative(void)
+{
+	struct canonFnameCacheTable *ct;
+
+#define T(INPUT,OUTPUT) \
+	if (!TEST_CHECK(strcmp(canonicalizeRelativeFileName (ct, INPUT), \
+			       OUTPUT) == 0))				\
+		fprintf(stderr, "	ACTUAL: %s\n", canonicalizeRelativeFileName (ct, INPUT))
+
+
+	ct = canonFnameCacheTableNew ("/abc");
+	T("/abc/input", "/abc/input");
+	T("/abc/../input", "/input");
+	T("/abc/../../input", "/input");
+	T("/abc/.././../input", "/input");
+	T("/abc/./input", "/abc/input");
+	T("/abc/.//input", "/abc/input");
+	T("/abc/.//.//input", "/abc/input");
+	T("/input", "/input");
+	T("/./input", "/input");
+	T("/../z/../input", "/input");
+	T("/../z/../..input", "/..input");
+
+	T("input", "input");
+	T("./input", "input");
+	T("../input", "/input");
+	T("..//input", "/input");
+	T(".././input", "/input");
+	T("..//.//input", "/input");
+	T("../d/input", "/d/input");
+	T("../d/../input", "/input");
+	T("../d/..//input", "/input");
+	T("../d/..///./input", "/input");
+	canonFnameCacheTableDelete (ct);
+
+	ct = canonFnameCacheTableNew ("/abc/efg");
+	T("input", "input");
+	T("../input", "/abc/input");
+	T("..//input", "/abc/input");
+	T(".././input", "/abc/input");
+	T("..//.//input", "/abc/input");
+	T("../d/input", "/abc/d/input");
+	T("../d/../input", "/abc/input");
+	T("../d/..//input", "/abc/input");
+	T("../d/..///./input", "/abc/input");
+	T("../d/..///./input/.././input", "/abc/input");
+	T("", ".");
+	T(".", ".");
+	T("./", ".");
+	T("./..", "/abc");
+	T("./.", ".");
+	T("././//", ".");
+	T("././//.", ".");
+	T("././../efg/.", ".");
+	T("..", "/abc");
+	T("../..", "/");
+	T("../../", "/");
+	T("../..", "/");
+	T("../../..", "/");
+	T("../../../..", "/");
+	T("../././..", "/");
+	T("./././..", "/abc");
+	T("...", "...");
+	T(".../", "...");
+	T("...//", "...");
+	T("..././", "...");
+	T("...//./", "...");
+	T("...//.//", "...");
+	T("..././/", "...");
+	T("..././.../", ".../...");
+	canonFnameCacheTableDelete (ct);
+#undef T
+}
+
 static void test_htable_update(void)
 {
 	hashTable *htable = hashTableNew (3, hashCstrhash, hashCstreq,
@@ -72,6 +146,7 @@ static void test_routines_strrstr(void)
 
 TEST_LIST = {
    { "fname/absolute",   test_fname_absolute   },
+   { "fname/relative",   test_fname_relative   },
    { "htable/update",    test_htable_update    },
    { "routines/strrstr", test_routines_strrstr },
    { NULL, NULL }     /* zeroed record marking the end of the list */
