@@ -3808,6 +3808,39 @@ extern void readOptionConfiguration (void)
 		parseConfigurationFileOptions ();
 }
 
+static stringList* optlibPathListNew(struct preloadPathElt *pathList)
+{
+	stringList * appended = stringListNew ();
+
+	for (size_t i = 0; pathList[i].path != NULL || pathList[i].makePath != NULL; ++i)
+	{
+		struct preloadPathElt *elt = pathList + i;
+		preloadMakePathFunc maker = elt->makePath;
+		const char *path = elt->path;
+
+		if (!elt->isDirectory)
+			continue;
+
+		if (elt->stage == OptionLoadingStageCurrentDir)
+			continue;
+
+		if (maker)
+			path = maker(elt->path, elt->extra);
+
+		if (path == NULL)
+			continue;
+
+		vString *vpath;
+		if (path == elt->path)
+			vpath = vStringNewInit (path);
+		else
+			vpath = vStringNewOwn ((char *)path);
+		stringListAdd(appended, vpath);
+	}
+
+	return appended;
+}
+
 /*
 *   Option initialization
 */
@@ -3815,7 +3848,7 @@ extern void readOptionConfiguration (void)
 extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
-	OptlibPathList = stringListNew ();
+	OptlibPathList = optlibPathListNew (preload_path_list);
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();

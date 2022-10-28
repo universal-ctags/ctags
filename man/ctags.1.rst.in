@@ -830,7 +830,7 @@ Option File Options
 
 ``--optlib-dir=[+]<directory>``
 	Add an optlib *<directory>* to or reset the optlib path list.
-	By default, the optlib path list is empty.
+	See "`Default optlib path list`_" about the default elements for optlib path list.
 
 optlib Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2203,6 +2203,19 @@ Preloading option files
 
 	``*.ctags`` files in a directory are loaded in alphabetical order.
 
+Default optlib path list
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``$XDG_CONFIG_HOME/ctags``, or ``$HOME/.config/ctags`` if
+``$XDG_CONFIG_HOME`` is not defined
+(on other than MS Windows)
+
+``$HOME/.ctags.d``
+
+``$HOMEDRIVE$HOMEPATH/ctags.d`` (on MS Windows only)
+
+	These directories are parts of the optlib path list by default.
+	See "`Option File Options`_" about the optlib path list.
 
 SEE ALSO
 --------
