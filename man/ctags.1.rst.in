@@ -2217,6 +2217,22 @@ Default optlib path list
 	These directories are parts of the optlib path list by default.
 	See "`Option File Options`_" about the optlib path list.
 
+	If you have a set of options that you want to enable
+	conditionally, make a directory in the path in the optlib path
+	list, and put the options to the files having .ctags as extensions
+	under the directory. ``--options=<the-directory-name>`` is for
+	enabling the options.
+
+	For example, consider you have some options you want to enable
+	only when tagging the Linux kernel source tree.  In that case,
+	make ``$HOME/.ctags.d/linux`` directory, put the options to
+	``$HOME/.ctags.d/linux/my.ctags``. If you have many options, you
+	can split them into multiple files like
+	``$HOME/.ctags.d/linux/device-driver.ctags`` and
+	``$HOME/.ctags.d/linux/network-stack.ctags``. Either way, you can
+	enable the options in the .ctags file(s) under the directory by
+	adding ``--options=linux`` to your ctags command line.
+
 SEE ALSO
 --------
 
