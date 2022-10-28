@@ -2153,11 +2153,17 @@ ENVIRONMENT VARIABLES
 FILES
 -----
 
+Output files
+~~~~~~~~~~~~
+
 ``tags``
 	The default tag file created by @CTAGS_NAME_EXECUTABLE@.
 
 ``TAGS``
 	The default tag file created by @ETAGS_NAME_EXECUTABLE@.
+
+Preloading option files
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ``$XDG_CONFIG_HOME/ctags/*.ctags``, or ``$HOME/.config/ctags/*.ctags`` if
 ``$XDG_CONFIG_HOME`` is not defined
