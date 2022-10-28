@@ -194,8 +194,8 @@ typedef enum eOptionLoadingStage {
 	OptionLoadingStageNone,
 	OptionLoadingStageCustom,
 	OptionLoadingStageXdg,
-	OptionLoadingStageHomeRecursive,
-	OptionLoadingStageCurrentRecursive,
+	OptionLoadingStageHomeDir,
+	OptionLoadingStageCurrentDir,
 	OptionLoadingStageEnvVar,
 	OptionLoadingStageCmdline,
 } OptionLoadingStage;
@@ -613,8 +613,8 @@ static const char *const StageDescription [] = {
 	[OptionLoadingStageNone]   = "not initialized",
 	[OptionLoadingStageCustom] = "custom file",
 	[OptionLoadingStageXdg] = "file(s) under $XDG_CONFIG_HOME and $HOME/.config",
-	[OptionLoadingStageHomeRecursive] = "file(s) under $HOME",
-	[OptionLoadingStageCurrentRecursive] = "file(s) under the current directory",
+	[OptionLoadingStageHomeDir] = "file(s) under $HOME",
+	[OptionLoadingStageCurrentDir] = "file(s) under the current directory",
 	[OptionLoadingStageCmdline] = "command line",
 };
 
@@ -3768,7 +3768,7 @@ static struct preloadPathElt preload_path_list [] = {
 		.isDirectory = true,
 		.makePath = prependEnvvar,
 		.extra = "HOME",
-		.stage = OptionLoadingStageHomeRecursive,
+		.stage = OptionLoadingStageHomeDir,
 	},
 #ifdef WIN32
 	{
@@ -3776,20 +3776,20 @@ static struct preloadPathElt preload_path_list [] = {
 		.isDirectory = true,
 		.makePath = getConfigAtHomeOnWindows,
 		.extra = NULL,
-		.stage = OptionLoadingStageHomeRecursive,
+		.stage = OptionLoadingStageHomeDir,
 	},
 #endif
 	{
 		.path = ".ctags.d",
 		.isDirectory = true,
 		.makePath = NULL,
-		.stage = OptionLoadingStageCurrentRecursive,
+		.stage = OptionLoadingStageCurrentDir,
 	},
 	{
 		.path = "ctags.d",
 		.isDirectory = true,
 		.makePath = NULL,
-		.stage = OptionLoadingStageCurrentRecursive,
+		.stage = OptionLoadingStageCurrentDir,
 	},
 	{
 		.path = NULL,
