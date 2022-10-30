@@ -1,0 +1,4 @@
+func	input.bash	/^func() {$/;"	f
+func1=	input.bash	/^function func1=$/;"	f
+func2=	input.bash	/^function func2= {$/;"	f
+func3=	input.bash	/^func3=() {$/;"	f
