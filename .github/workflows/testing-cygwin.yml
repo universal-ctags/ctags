@@ -15,13 +15,17 @@ jobs:
         shell: C:\tools\cygwin\bin\bash.exe -l -i {0}
 
     steps:
-    - run: choco install -y --source cygwin gcc-g++ make automake autoconf pkg-config dos2unix libiconv-devel libjansson-devel libxml2-devel libyaml-devel
+    # https://www.cygwin.com/faq/faq.html#faq.setup.cli
+    - run: Invoke-WebRequest -OutFile setup-x86_64.exe "http://cygwin.com/setup-x86_64.exe"
       shell: pwsh
-    
+
+    - run: .\setup-x86_64.exe --quiet-mode --no-desktop --no-shortcuts --no-startmenu --only-site --site http://mirrors.kernel.org/sourceware/cygwin/ --root C:\tools\cygwin --local-package-dir C:\tools\cygwin\packages --packages gcc-g++,make,automake,autoconf,pkg-config,dos2unix,libiconv-devel,libjansson-devel,libxml2-devel,libyaml-devel | Out-Default
+      shell: pwsh
+
     - run: git config --global core.autocrlf input
       shell: bash
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     
     - run: printf 'cd %s' "$(cygpath '${{ github.workspace }}')" >> ~/.bashrc
 
