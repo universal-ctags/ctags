@@ -661,7 +661,22 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 					++cp;
 				if (*cp == ')')
 				{
-					found_kind = K_FUNCTION;
+					/* A function definiton can look like an array initialization:
+					 *
+					 *   ... f=()
+					 *
+					 * We use followng heuristics to distinguish a function definition
+					 * from an array initialization:
+					 *
+					 *   preceding "function" keyword: function f=()
+					 *   followed by '{': f=() {
+					 *
+					 */
+					if (! ((vStringLast(name) == '=')
+						   /* Have we found "function" yet? */
+						   && (found_kind != K_FUNCTION)
+						   && (strchr ((char *)(cp + 1), '{') == NULL)))
+						found_kind = K_FUNCTION;
 					++cp;
 				}
 			}
