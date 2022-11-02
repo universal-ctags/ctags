@@ -26,6 +26,12 @@
 --kinddef-Meson=t,test,tests
 --kinddef-Meson=b,benchmark,benchmark targets
 --kinddef-Meson=r,run,run targets
+--kinddef-Meson=m,module,modules
+
+#
+# Role definitions
+#
+--_roledef-Meson.{module}=imported,imported
 
 #
 # Tables declaration
@@ -61,6 +67,7 @@
 --_mtable-regex-Meson=common/custom_target[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/c/{tenter=skipToArgEnd}
 --_mtable-regex-Meson=common/(alias|run)_target[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\2/r/{tenter=skipToArgEnd}
 --_mtable-regex-Meson=common/bench_mark[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/b/{tenter=skipToArgEnd}
+--_mtable-regex-Meson=common/import[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/m/{tenter=skipToArgEnd}{_role=imported}
 
 --_mtable-extend-Meson=skipPair+common
 --_mtable-regex-Meson=skipPair/[])}]//{tleave}

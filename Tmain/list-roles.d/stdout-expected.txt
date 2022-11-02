@@ -72,6 +72,7 @@ M4             I/macrofile       sincluded          on      silently included ma
 M4             d/macro           undef              on      undefined
 Make           I/makefile        included           on      included
 Make           I/makefile        optional           on      optionally included
+Meson          m/module          imported           on      imported
 NSIS           i/script          included           on      included with !include
 Perl           M/module          unused             on      specified in `no' built-in function
 Perl           M/module          used               on      specified in `use' built-in function
@@ -189,6 +190,7 @@ M4             I/macrofile       sincluded          on      silently included ma
 M4             d/macro           undef              on      undefined
 Make           I/makefile        included           on      included
 Make           I/makefile        optional           on      optionally included
+Meson          m/module          imported           on      imported
 NSIS           i/script          included           on      included with !include
 Perl           M/module          unused             on      specified in `no' built-in function
 Perl           M/module          used               on      specified in `use' built-in function

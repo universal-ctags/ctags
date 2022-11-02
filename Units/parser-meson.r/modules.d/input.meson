@@ -1,0 +1,7 @@
+if meson.version().version_compare('>=0.56.0')
+  keyval = import('keyval')
+else
+  keyval = import('unstable-keyval')
+endif
+ss = import('sourceset')
+fs = import('fs')
