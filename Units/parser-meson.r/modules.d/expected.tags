@@ -1,0 +1,8 @@
+keyval	input.meson	/^  keyval = import('keyval')$/;"	variable	roles:def
+keyval	input.meson	/^  keyval = import('keyval')$/;"	module	roles:imported
+keyval	input.meson	/^  keyval = import('unstable-keyval')$/;"	variable	roles:def
+unstable-keyval	input.meson	/^  keyval = import('unstable-keyval')$/;"	module	roles:imported
+ss	input.meson	/^ss = import('sourceset')$/;"	variable	roles:def
+sourceset	input.meson	/^ss = import('sourceset')$/;"	module	roles:imported
+fs	input.meson	/^fs = import('fs')$/;"	variable	roles:def
+fs	input.meson	/^fs = import('fs')$/;"	module	roles:imported

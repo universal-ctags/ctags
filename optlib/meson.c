@@ -47,6 +47,9 @@ static void initializeMesonParser (const langType language)
 	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "b", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
+	                               "^import[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
+	                               "\\1", "m", "{tenter=skipToArgEnd}{_role=imported}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
 	                               "^project[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "P", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
@@ -113,6 +116,9 @@ static void initializeMesonParser (const langType language)
 	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "b", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
+	                               "^import[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
+	                               "\\1", "m", "{tenter=skipToArgEnd}{_role=imported}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipPair",
 	                               "^[])}]",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
@@ -145,6 +151,9 @@ static void initializeMesonParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "common",
 	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "b", "{tenter=skipToArgEnd}", NULL);
+	addLanguageTagMultiTableRegex (language, "common",
+	                               "^import[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
+	                               "\\1", "m", "{tenter=skipToArgEnd}{_role=imported}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
 	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
@@ -173,6 +182,9 @@ static void initializeMesonParser (const langType language)
 	                               "^bench_mark[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "b", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
+	                               "^import[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
+	                               "\\1", "m", "{tenter=skipToArgEnd}{_role=imported}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
 	                               "^[])}]",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
@@ -195,6 +207,9 @@ extern parserDefinition* MesonParser (void)
 		NULL
 	};
 
+	static roleDefinition MesonModuleRoleTable [] = {
+		{ true, "imported", "imported" },
+	};
 	static kindDefinition MesonKindTable [] = {
 		{
 		  true, 'P', "project", "projects",
@@ -219,6 +234,10 @@ extern parserDefinition* MesonParser (void)
 		},
 		{
 		  true, 'r', "run", "run targets",
+		},
+		{
+		  true, 'm', "module", "modules",
+		  ATTACH_ROLES(MesonModuleRoleTable),
 		},
 	};
 
