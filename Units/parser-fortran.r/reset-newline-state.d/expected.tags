@@ -1,0 +1,4 @@
+mod1	input-1.f90	/^  MODULE mod1$/;"	m
+var1	input-1.f90	/^     integer :: var1$/;"	v	module:mod1
+mod2	input-2.f90	/^  MODULE mod2$/;"	m
+var2	input-2.f90	/^     integer :: var2$/;"	v	module:mod2
