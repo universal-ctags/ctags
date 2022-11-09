@@ -25,7 +25,10 @@ jobs:
     - name: update package information
       run: brew update
     - name: install tools and libraries
-      run: brew install automake pkg-config bash libxml2 jansson libyaml gdb docutils pcre2
+      run: |
+        # python@3.11 symlink 2to3-3.11 to /usr/local/bin/2to3-3.11, but it already exists. so we need use --overwrite option when installing python@3.11, python@3.11 is depended by gdb.
+        brew install --overwrite python@3.11
+        brew install automake pkg-config bash libxml2 jansson libyaml gdb docutils pcre2
     - name: autogen.sh
       run: ./autogen.sh
     - name: report the version of cc
