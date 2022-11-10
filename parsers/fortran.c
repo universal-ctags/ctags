@@ -224,6 +224,7 @@ static unsigned int Column;
 static bool FreeSourceForm;
 static bool FreeSourceFormFound = false;
 static bool ParsingString;
+static bool Newline;
 
 /* indexed by tagType */
 static kindDefinition FortranKinds [] = {
@@ -781,7 +782,6 @@ static int skipToNextLine (void)
 
 static int getFreeFormChar (void)
 {
-	static bool newline = true;
 	bool advanceLine = false;
 	int c = getcFromInputFile ();
 
@@ -796,7 +796,7 @@ static int getFreeFormChar (void)
 		while (isspace (c)  &&  c != '\n');
 		if (c == '\n')
 		{
-			newline = true;
+			Newline = true;
 			advanceLine = true;
 		}
 		else if (c == '!')
@@ -807,16 +807,16 @@ static int getFreeFormChar (void)
 			c = '&';
 		}
 	}
-	else if (newline && (c == '!' || c == '#'))
+	else if (Newline && (c == '!' || c == '#'))
 		advanceLine = true;
 	while (advanceLine)
 	{
 		while (isspace (c))
 			c = getcFromInputFile ();
-		if (c == '!' || (newline && c == '#'))
+		if (c == '!' || (Newline && c == '#'))
 		{
 			c = skipToNextLine ();
-			newline = true;
+			Newline = true;
 			continue;
 		}
 		if (c == '&')
@@ -824,7 +824,7 @@ static int getFreeFormChar (void)
 		else
 			advanceLine = false;
 	}
-	newline = (bool) (c == '\n');
+	Newline = (bool) (c == '\n');
 	return c;
 }
 
@@ -2653,6 +2653,7 @@ static rescanReason findFortranTags (const unsigned int passCount)
 	token = newToken ();
 
 	FreeSourceForm = (bool) (passCount > 1);
+	Newline = (passCount == 1)? true: Newline;
 	Column = 0;
 	parseProgramUnit (token);
 	if (FreeSourceFormFound  &&  ! FreeSourceForm)
