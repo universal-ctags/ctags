@@ -4,6 +4,12 @@ class MyException : Exception {
     }
 }
 
+class Derived : Base {
+}
+
+class Derived2: Base {
+}
+
 class Foo {
     $Property1
     $Property2 = 20
