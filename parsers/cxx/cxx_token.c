@@ -117,7 +117,7 @@ CXXToken * cxxTokenCopy(CXXToken * pToken)
 	pRetToken->oFilePosition = pToken->oFilePosition;
 	pRetToken->eType = pToken->eType;
 	pRetToken->eKeyword = pToken->eKeyword;
-	pToken->bFollowedBySpace = pToken->bFollowedBySpace;
+	pRetToken->bFollowedBySpace = pToken->bFollowedBySpace;
 	vStringCat(pRetToken->pszWord,pToken->pszWord);
 
 	return pRetToken;
