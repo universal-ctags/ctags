@@ -1,4 +1,6 @@
 MyException	input.ps1	/^class MyException : Exception {$/;"	c
+Derived	input.ps1	/^class Derived : Base {$/;"	c
+Derived2	input.ps1	/^class Derived2: Base {$/;"	c
 Foo	input.ps1	/^class Foo {$/;"	c
 GetBar	input.ps1	/^function GetBar {$/;"	f
 GetBaz	input.ps1	/^function GetBaz() {$/;"	f	signature:()

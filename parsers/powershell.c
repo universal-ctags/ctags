@@ -218,7 +218,12 @@ static void addToScope (tokenInfo *const token, const vString *const extra)
 
 static bool isIdentChar (const int c)
 {
-	return (isalnum (c) || c == ':' || c == '_' || c == '-' || c >= 0x80);
+	return (isalnum (c) || c == '_' || c == '-' || c >= 0x80);
+}
+
+static bool isScopeIdentifierChar (const int c)
+{
+	return (isIdentChar (c) || c == ':');
 }
 
 static void parseString (vString *const string, const int delimiter)
@@ -228,20 +233,40 @@ static void parseString (vString *const string, const int delimiter)
 		int c = getcFromInputFile ();
 
 		if (c == '\\' && (c = getcFromInputFile ()) != EOF)
-			vStringPut (string, (char) c);
+			vStringPut (string, c);
 		else if (c == EOF || c == delimiter)
 			break;
 		else
-			vStringPut (string, (char) c);
+			vStringPut (string, c);
 	}
 }
 
+/* parse a identifier that may contain scopes, such as function names and
+ * variable names.
+ *
+ * 	VariableName
+ * 	FunctionName
+ * 	local:VariableName
+ * 	private:FunctionName
+ */
+static void parseScopeIdentifier (vString *const string, const int firstChar)
+{
+	int c = firstChar;
+	do
+	{
+		vStringPut (string, c);
+		c = getcFromInputFile ();
+	} while (isScopeIdentifierChar (c));
+	ungetcToInputFile (c);
+}
+
+/* parse a identifier that do not contain scope, such as class names. */
 static void parseIdentifier (vString *const string, const int firstChar)
 {
 	int c = firstChar;
 	do
 	{
-		vStringPut (string, (char) c);
+		vStringPut (string, c);
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	ungetcToInputFile (c);
@@ -365,14 +390,14 @@ getNextChar:
 		case '$': /* variable start */
 		{
 			int d = getcFromInputFile ();
-			if (! isIdentChar (d))
+			if (! isScopeIdentifierChar (d))
 			{
 				ungetcToInputFile (d);
 				token->type = TOKEN_UNDEFINED;
 			}
 			else
 			{
-				parseIdentifier (token->string, d);
+				parseScopeIdentifier (token->string, d);
 				token->type = TOKEN_VARIABLE;
 			}
 			break;
@@ -383,7 +408,11 @@ getNextChar:
 				token->type = TOKEN_UNDEFINED;
 			else
 			{
-				parseIdentifier (token->string, c);
+				if (token->keyword == KEYWORD_function ||
+						token->keyword == KEYWORD_filter)
+					parseScopeIdentifier (token->string, c);
+				else
+					parseIdentifier (token->string, c);
 				token->keyword = lookupCaseKeyword (
 						vStringValue (token->string), getInputLanguage ());
 				if (token->keyword == KEYWORD_NONE)
@@ -536,6 +565,7 @@ static bool parseFunction (tokenInfo *const token, int kind)
 /* parse a class
  *
  * 	class MyClass {}
+ * 	class Derived : Base {}
  */
 static bool parseClass (tokenInfo *const token)
 {
