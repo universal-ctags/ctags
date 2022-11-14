@@ -228,11 +228,11 @@ static void parseString (vString *const string, const int delimiter)
 		int c = getcFromInputFile ();
 
 		if (c == '\\' && (c = getcFromInputFile ()) != EOF)
-			vStringPut (string, (char) c);
+			vStringPut (string, c);
 		else if (c == EOF || c == delimiter)
 			break;
 		else
-			vStringPut (string, (char) c);
+			vStringPut (string, c);
 	}
 }
 
@@ -241,7 +241,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	int c = firstChar;
 	do
 	{
-		vStringPut (string, (char) c);
+		vStringPut (string, c);
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	ungetcToInputFile (c);
