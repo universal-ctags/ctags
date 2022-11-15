@@ -18,10 +18,12 @@ Automake       d/directory       program            on      directory for PROGRA
 Automake       d/directory       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
+C              Y/unknown         ref                off     referenced anyhow
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C              d/macro           undef              on      undefined
 C              h/header          local              on      local header
 C              h/header          system             on      system header
+C++            Y/unknown         ref                off     referenced anyhow
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
@@ -30,6 +32,7 @@ CPreProcessor  d/macro           condition          off     used in part of #if/
 CPreProcessor  d/macro           undef              on      undefined
 CPreProcessor  h/header          local              on      local header
 CPreProcessor  h/header          system             on      system header
+CUDA           Y/unknown         ref                off     referenced anyhow
 CUDA           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 CUDA           d/macro           undef              on      undefined
 CUDA           h/header          local              on      local header
@@ -138,10 +141,12 @@ Automake       d/directory       program            on      directory for PROGRA
 Automake       d/directory       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
+C              Y/unknown         ref                off     referenced anyhow
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C              d/macro           undef              on      undefined
 C              h/header          local              on      local header
 C              h/header          system             on      system header
+C++            Y/unknown         ref                off     referenced anyhow
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
@@ -150,6 +155,7 @@ CPreProcessor  d/macro           condition          off     used in part of #if/
 CPreProcessor  d/macro           undef              on      undefined
 CPreProcessor  h/header          local              on      local header
 CPreProcessor  h/header          system             on      system header
+CUDA           Y/unknown         ref                off     referenced anyhow
 CUDA           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 CUDA           d/macro           undef              on      undefined
 CUDA           h/header          local              on      local header
@@ -243,6 +249,7 @@ Zsh            s/script          loaded             on      loaded
 # C.*
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -280,6 +287,7 @@ s/script   loaded on      loaded
 # C.* with disabling all roles of all languages
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     off     local header
@@ -289,6 +297,7 @@ h/header   system    off     system header
 # C.* with disabling all roles of all kinds of all languages
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     off     local header
@@ -299,6 +308,7 @@ h/header   system    off     system header
 # after disabling system role of header kind of C language
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       on      referenced anyhow
 d/macro    condition on      used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -309,6 +319,7 @@ h/header   system    on      system header
 # after disabling system role of header kind of C language
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       on      referenced anyhow
 d/macro    condition on      used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -318,6 +329,7 @@ h/header   system    on      system header
 # C.* with disabling all roles in C language
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     off     local header
@@ -334,6 +346,7 @@ s/script   loaded    on      loaded
 # C.* with disabling all roles of all kinds in C language
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     off     local header
@@ -351,6 +364,7 @@ s/script   loaded    on      loaded
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       on      referenced anyhow
 d/macro    condition on      used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -369,6 +383,7 @@ s/script   loaded    off     loaded
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       on      referenced anyhow
 d/macro    condition on      used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -386,6 +401,7 @@ s/script   loaded    off     loaded
 # C.* with disabling all roles of {header} kind in C language
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     off     local header
@@ -402,6 +418,7 @@ s/script   loaded    on      loaded
 # C.* with disabling all roles of h kind in C language
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     off     local header
@@ -419,6 +436,7 @@ s/script   loaded    on      loaded
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     on      local header
@@ -437,6 +455,7 @@ s/script   loaded    off     loaded
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     on      local header
@@ -454,6 +473,7 @@ s/script   loaded    off     loaded
 # C.* with disabling system role of h kind
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -463,6 +483,7 @@ h/header   system    off     system header
 # C.* with disabling system role of {header} kind
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -472,6 +493,7 @@ h/header   system    off     system header
 # C.* with enabling system role of h kind after disabling the role
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -481,6 +503,7 @@ h/header   system    on      system header
 # C.* with enabling system role of {header} kind after disabling the role
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -490,6 +513,7 @@ h/header   system    on      system header
 # C.* with disabling system and local roles of h kind
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     off     local header
@@ -499,6 +523,7 @@ h/header   system    off     system header
 # C.* with disabling system and local roles of {header} kind
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     off     local header
@@ -509,6 +534,7 @@ h/header   system    off     system header
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     on      local header
@@ -519,6 +545,7 @@ h/header   system    on      system header
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     on      local header
@@ -528,6 +555,7 @@ h/header   system    on      system header
 # C.* with disabling local role of h kind and undef role of d kind
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     off     local header
@@ -537,6 +565,7 @@ h/header   system    on      system header
 # C.* with enabling all roles of header kinds after disabling all roles of the kind
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     on      undefined
 h/header   local     on      local header
@@ -546,6 +575,7 @@ h/header   system    on      system header
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     on      local header
@@ -555,6 +585,7 @@ h/header   system    on      system header
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language (short notation)
 #
 #KIND(L/N) NAME      ENABLED DESCRIPTION
+Y/unknown  ref       off     referenced anyhow
 d/macro    condition off     used in part of #if/#ifdef/#elif conditions
 d/macro    undef     off     undefined
 h/header   local     on      local header

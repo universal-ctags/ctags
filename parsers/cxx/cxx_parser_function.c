@@ -1543,6 +1543,7 @@ int cxxParserEmitFunctionTags(
 			0
 		);
 
+	cxxTagUseTokensInRangeAsPartOfDefTags(CORK_NIL,pInfo->pIdentifierStart,pInfo->pIdentifierEnd);
 	cxxTokenChainDestroyRange(pInfo->pIdentifierChain,pInfo->pIdentifierStart,pInfo->pIdentifierEnd);
 
 	CXX_DEBUG_ASSERT(
@@ -1694,6 +1695,7 @@ int cxxParserEmitFunctionTags(
 						pInfo->pTemplateSpecializationEnd,
 						0
 					);
+				/* TODO */
 
 				// Tricky. We append it to the specialization chain which will
 				// be then used by cxxTagHandleTemplateFileds()

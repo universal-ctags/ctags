@@ -665,6 +665,7 @@ got_identifier:
 					);
 
 				CXXToken * pScopeId = cxxTokenChainExtractRange(pScopeStart,pPartEnd->pPrev,0);
+				/* TODO */
 				cxxScopePush(
 						pScopeId,
 						CXXScopeTypeClass,

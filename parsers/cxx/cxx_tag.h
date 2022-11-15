@@ -35,8 +35,14 @@ enum CXXTagCommonKind
 	CXXTagKindPARAMETER,
 	CXXTagKindLABEL,
 	CXXTagKindMACROPARAM,
+	CXXTagKindUNKNOWN,
 
 	CXXTagCommonKindCount
+};
+
+enum CXXTagUnknownRole
+{
+	CXXTagUnknownRoleREFERENCED,
 };
 
 // Tags specific to the CPP language.
@@ -212,6 +218,8 @@ typedef enum {
 void cxxTagInitForLanguage(langType eLangType);
 
 // Functions for filling iCorkIndex field of tokens.
+// With specifying CORK_NIL, you can use these functions
+// just for preventing emitting reference tags associated with the token(s).
 void cxxTagUseTokensInRangeAsPartOfDefTags(int iCorkIndex, CXXToken * pFrom, CXXToken * pTo);
 void cxxTagUseTokenAsPartOfDefTag(int iCorkIndex, CXXToken * pToken);
 #endif //!_cxxTag_h_

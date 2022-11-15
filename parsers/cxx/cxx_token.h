@@ -74,6 +74,7 @@ typedef struct _CXXToken
 	CXXKeyword eKeyword;
 	CXXTokenChain * pChain; // this is NOT the parent chain!
 	unsigned int bFollowedBySpace: 1;
+	unsigned int bCorkIndexForReftag: 1; // iCorkIndex specifies a reference tag?
 
 	int iLineNumber;
 	MIOPos oFilePosition;
@@ -88,6 +89,13 @@ typedef struct _CXXToken
 	unsigned char uInternalScopeType;
 	unsigned char uInternalScopeAccess;
 
+	// When reading an identifier, the parser makes a reference tag
+	// for it. The cork index for the tag is set to this member.
+	// When the parser recognizes the identifier is part of a definition,
+	// the parser invalidate the reference tag with
+	// cxxTagUseTokensInRangeAsPartOfDefTags() or
+	// cxxTagUseTokenAsPartOfDefTag(). These two functions may
+	// set the index for definition tag.
 	int iCorkIndex;
 } CXXToken;
 

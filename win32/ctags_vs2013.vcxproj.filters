@@ -393,6 +393,9 @@
     <ClCompile Include="..\parsers\cxx\cxx_qtmoc.c">
       <Filter>Source Files\parsers\cxx</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_reftag.c">
+      <Filter>Source Files\parsers\cxx</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\cxx\cxx_scope.c">
       <Filter>Source Files\parsers\cxx</Filter>
     </ClCompile>
@@ -867,6 +870,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\cxx\cxx_parser_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parsers\cxx\cxx_reftag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\cxx\cxx_scope.h">

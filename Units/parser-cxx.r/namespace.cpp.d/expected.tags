@@ -1,15 +1,15 @@
-__anon396601200111	input.cpp	/^namespace {$/;"	n	file:	end:8
-anon_f	input.cpp	/^	void anon_f() { };$/;"	f	namespace:__anon396601200111	typeref:typename:void	end:3
-__anon396601200211	input.cpp	/^	namespace {$/;"	n	namespace:__anon396601200111	file:	end:7
-anon_anon_f	input.cpp	/^		void anon_anon_f() { };$/;"	f	namespace:__anon396601200111::__anon396601200211	typeref:typename:void	end:6
+__anon396601200112	input.cpp	/^namespace {$/;"	n	file:	end:8
+anon_f	input.cpp	/^	void anon_f() { };$/;"	f	namespace:__anon396601200112	typeref:typename:void	end:3
+__anon396601200212	input.cpp	/^	namespace {$/;"	n	namespace:__anon396601200112	file:	end:7
+anon_anon_f	input.cpp	/^		void anon_anon_f() { };$/;"	f	namespace:__anon396601200112::__anon396601200212	typeref:typename:void	end:6
 a1	input.cpp	/^namespace a1 {$/;"	n	file:	end:24
 a1_f	input.cpp	/^	void a1_f() { }$/;"	f	namespace:a1	typeref:typename:void	end:11
 a2	input.cpp	/^	namespace a2 {$/;"	n	namespace:a1	file:	end:19
 a1_a2_f	input.cpp	/^		void a1_a2_f() { }$/;"	f	namespace:a1::a2	typeref:typename:void	end:14
 a3	input.cpp	/^		namespace a3 {$/;"	n	namespace:a1::a2	file:	end:18
 a1_a2_a3_f	input.cpp	/^			void a1_a2_a3_f() { };$/;"	f	namespace:a1::a2::a3	typeref:typename:void	end:17
-__anon396601200311	input.cpp	/^	namespace {$/;"	n	namespace:a1	file:	end:23
-a1_anon_f	input.cpp	/^		void a1_anon_f() { };$/;"	f	namespace:a1::__anon396601200311	typeref:typename:void	end:22
+__anon396601200312	input.cpp	/^	namespace {$/;"	n	namespace:a1	file:	end:23
+a1_anon_f	input.cpp	/^		void a1_anon_f() { };$/;"	f	namespace:a1::__anon396601200312	typeref:typename:void	end:22
 b1	input.cpp	/^namespace b1::b2 {$/;"	n	file:	end:32
 b2	input.cpp	/^namespace b1::b2 {$/;"	n	namespace:b1	file:	end:32
 b1_b2_f	input.cpp	/^	void b1_b2_f() { };$/;"	f	namespace:b1::b2	typeref:typename:void	end:27

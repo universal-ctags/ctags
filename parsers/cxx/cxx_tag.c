@@ -19,6 +19,15 @@
 #include "trashbox.h"
 #include "xtag.h"
 
+#define CXX_COMMON_UNKNOWN_ROLES(__langPrefix) \
+	static roleDefinition __langPrefix##UnknownRoles [] = { \
+		{ false, "ref", "referenced anyhow" }, \
+	}
+
+CXX_COMMON_UNKNOWN_ROLES(C);
+CXX_COMMON_UNKNOWN_ROLES(CXX);
+CXX_COMMON_UNKNOWN_ROLES(CUDA);
+
 #define CXX_COMMON_MACRO_ROLES(__langPrefix) \
 	static roleDefinition __langPrefix##MacroRoles [] = { \
 		RoleTemplateUndef, \
@@ -60,7 +69,10 @@ CXX_COMMON_HEADER_ROLES(CUDA);
 	{ false, 'x', "externvar",  "external and forward variable declarations", .syncWith = _syncWith }, \
 	{ false, 'z', "parameter",  "function parameters inside function or prototype definitions", .syncWith = _syncWith }, \
 	{ false, 'L', "label",      "goto labels", .syncWith = _syncWith }, \
-	{ false, 'D', "macroparam", "parameters inside macro definitions", .syncWith = _syncWith }
+	{ false, 'D', "macroparam", "parameters inside macro definitions", .syncWith = _syncWith }, \
+	{ false, 'Y', "unknown",    "unknown identifier", \
+			.referenceOnly = true, ATTACH_ROLES(_langPrefix##UnknownRoles), .syncWith = _syncWith \
+	}
 
 static kindDefinition g_aCXXCKinds [] = {
 	/* All other than LANG_AUTO are ignored.
@@ -261,7 +273,12 @@ static tagEntryInfo g_oCXXTag;
 
 void cxxTagUseTokenAsPartOfDefTag(int iCorkIndex, CXXToken * pToken)
 {
-	Assert (pToken->iCorkIndex == CORK_NIL);
+	if (pToken->iCorkIndex != CORK_NIL)
+	{
+		Assert(pToken->bCorkIndexForReftag);
+		pToken->bCorkIndexForReftag = false;
+		markCorkEntryAsPlaceholder(pToken->iCorkIndex, true);
+	}
 	pToken->iCorkIndex = iCorkIndex;
 }
 
@@ -309,6 +326,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 		return NULL;
 	}
 
+	cxxTagUseTokenAsPartOfDefTag(CORK_NIL, pToken);
 	initTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
@@ -577,6 +595,7 @@ CXXToken * cxxTagCheckAndSetTypeField(
 
 	cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
 	CXXToken * pTypeName = cxxTokenChainExtractRangeFilterTypeName(pTypeStart,pTypeEnd);
+	/* TODO */
 
 	if(!pTypeName)
 	{

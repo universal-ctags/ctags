@@ -1,0 +1,6 @@
+--sort=no
+--kinds-C++=+p
+--fields=+lK
+--extras=+r
+--kinds-C++=+{unknown}
+--roles-C++.{unknown}=+{ref}

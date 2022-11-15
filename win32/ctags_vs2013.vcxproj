@@ -290,6 +290,7 @@
     <ClCompile Include="..\parsers\cxx\cxx_parser_using.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_variable.c" />
     <ClCompile Include="..\parsers\cxx\cxx_qtmoc.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_reftag.c" />
     <ClCompile Include="..\parsers\cxx\cxx_scope.c" />
     <ClCompile Include="..\parsers\cxx\cxx_subparser.c" />
     <ClCompile Include="..\parsers\cxx\cxx_tag.c" />
@@ -450,6 +451,7 @@
     <ClInclude Include="..\parsers\cxx\cxx_keyword.h" />
     <ClInclude Include="..\parsers\cxx\cxx_parser.h" />
     <ClInclude Include="..\parsers\cxx\cxx_parser_internal.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_reftag.h" />
     <ClInclude Include="..\parsers\cxx\cxx_scope.h" />
     <ClInclude Include="..\parsers\cxx\cxx_subparser.h" />
     <ClInclude Include="..\parsers\cxx\cxx_subparser_internal.h" />
