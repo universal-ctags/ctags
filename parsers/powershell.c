@@ -303,7 +303,7 @@ static int skipSingleComment (void)
 	return c;
 }
 
-static void readToken (tokenInfo *const token)
+static void readTokenFull (tokenInfo *const token, bool includingScope)
 {
 	int c;
 
@@ -408,8 +408,7 @@ getNextChar:
 				token->type = TOKEN_UNDEFINED;
 			else
 			{
-				if (token->keyword == KEYWORD_function ||
-						token->keyword == KEYWORD_filter)
+				if (includingScope)
 					parseScopeIdentifier (token->string, c);
 				else
 					parseIdentifier (token->string, c);
@@ -422,6 +421,11 @@ getNextChar:
 			}
 			break;
 	}
+}
+
+static void readToken (tokenInfo *const token)
+{
+	readTokenFull (token, false);
 }
 
 static void enterScope (tokenInfo *const parentToken,
@@ -470,7 +474,7 @@ static bool parseFunction (tokenInfo *const token, int kind)
 	tokenInfo *nameFree = NULL;
 	const char *access;
 
-	readToken (token);
+	readTokenFull (token, true);
 
 	if (token->type != TOKEN_IDENTIFIER)
 		return false;
