@@ -227,12 +227,12 @@ tlib: $(MINI_GEANY_DEP)
 			$(srcdir)/misc/mini-geany.expected \
 			$${builddir}/misc/mini-geany.actual \
 			$(VG); then \
-			echo 'mini-geany: OK'; \
+			echo 'mini-geany: OK'; true; \
 		else \
-			echo 'mini-geany: FAILED'; \
+			echo 'mini-geany: FAILED'; false; \
 		fi; \
 	else \
-		echo 'mini-geany: SKIP'; \
+		echo 'mini-geany: SKIP'; true; \
 	fi
 clean-tlib:
 	$(SILENT) echo Cleaning libctags part tests
