@@ -1,0 +1,4 @@
+--sort=no
+--kinds-c++=*
+--fields=+x
+--fields-c++=+{properties}

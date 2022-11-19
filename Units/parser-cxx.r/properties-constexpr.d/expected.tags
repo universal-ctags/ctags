@@ -1,0 +1,27 @@
+factorial	input.cc	/^constexpr int factorial(int n)$/;"	f	typeref:typename:int	properties:constexpr
+n	input.cc	/^constexpr int factorial(int n)$/;"	z	function:factorial	typeref:typename:int	file:
+factorial_cxx14	input.cc	/^constexpr int factorial_cxx14(int n)$/;"	f	typeref:typename:int	properties:constexpr
+n	input.cc	/^constexpr int factorial_cxx14(int n)$/;"	z	function:factorial_cxx14	typeref:typename:int	file:
+res	input.cc	/^    int res = 1;$/;"	l	function:factorial_cxx14	typeref:typename:int	file:
+conststr	input.cc	/^class conststr$/;"	c	file:
+p	input.cc	/^    const char* p;$/;"	m	class:conststr	typeref:typename:const char *	file:
+sz	input.cc	/^    std::size_t sz;$/;"	m	class:conststr	typeref:typename:std::size_t	file:
+conststr	input.cc	/^    constexpr conststr(const char(&a)[N]): p(a), sz(N - 1) {}$/;"	f	class:conststr	file:	properties:constexpr
+a	input.cc	/^    constexpr conststr(const char(&a)[N]): p(a), sz(N - 1) {}$/;"	z	function:conststr::conststr	typeref:typename:const char (&)[N]	file:
+operator []	input.cc	/^    constexpr char operator[](std::size_t n) const$/;"	f	class:conststr	typeref:typename:char	file:	properties:const,constexpr
+n	input.cc	/^    constexpr char operator[](std::size_t n) const$/;"	z	function:conststr::operator []	typeref:typename:std::size_t	file:
+size	input.cc	/^    constexpr std::size_t size() const { return sz; }$/;"	f	class:conststr	typeref:typename:std::size_t	file:	properties:const,constexpr
+countlower	input.cc	/^constexpr std::size_t countlower(conststr s, std::size_t n = 0,$/;"	f	typeref:typename:std::size_t	properties:constexpr
+s	input.cc	/^constexpr std::size_t countlower(conststr s, std::size_t n = 0,$/;"	z	function:countlower	typeref:typename:conststr	file:
+n	input.cc	/^constexpr std::size_t countlower(conststr s, std::size_t n = 0,$/;"	z	function:countlower	typeref:typename:std::size_t	file:
+c	input.cc	/^					     std::size_t c = 0)$/;"	z	function:countlower	typeref:typename:std::size_t	file:
+constN	input.cc	/^struct constN$/;"	s	file:
+n	input.cc	/^template<int n>$/;"	Z	struct:constN	typeref:typename:int
+constN	input.cc	/^    constN() { std::cout << n << '\\n'; }$/;"	f	struct:constN	file:
+main	input.cc	/^int main()$/;"	f	typeref:typename:int
+out1	input.cc	/^    constN<factorial(4)> out1; \/\/ computed at compile time$/;"	l	function:main	typeref:typename:constN<factorial (4)>	file:
+k	input.cc	/^    volatile int k = 8; \/\/ disallow optimization using volatile$/;"	l	function:main	typeref:typename:volatile int	file:
+out2	input.cc	/^    constN<countlower("Hello, world!")> out2; \/\/ implicitly converted to conststr$/;"	l	function:main	typeref:typename:constN<countlower ("Hello, world!")>	file:
+a	input.cc	/^    constexpr int a[12] = {0, 1, 2, 3, 4, 5, 6, 7, 8};$/;"	l	function:main	typeref:typename:int[12]	file:	properties:constexpr
+length_a	input.cc	/^    constexpr int length_a = sizeof(a)\/sizeof(int); \/\/ std::size(a) in C++17,$/;"	l	function:main	typeref:typename:int	file:	properties:constexpr
+i	input.cc	/^    for (int i = 0; i < length_a; ++i)$/;"	l	function:main	typeref:typename:int	file:

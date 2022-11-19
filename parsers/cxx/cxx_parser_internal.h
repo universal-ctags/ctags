@@ -284,6 +284,8 @@ typedef enum _CXXParserKeywordState
 	CXXParserKeywordStateSeenAttributeDeprecated = (1 << 11),
 	// "friend" has been seen at block level
 	CXXParserKeywordStateSeenFriend = (1 << 12),
+	// "constexpr" has been seen
+	CXXParserKeywordStateSeenConstexpr = (1 << 13),
 } CXXParserKeywordState;
 
 #define CXX_PARSER_MAXIMUM_NESTING_LEVELS 1024

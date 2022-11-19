@@ -334,6 +334,8 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		ADD_PROPERTY("scopedenum");
 	if(uProperties & CXXTagPropertyFunctionTryBlock)
 		ADD_PROPERTY("fntryblock");
+	if (uProperties & CXXTagPropertyConstexpr)
+		ADD_PROPERTY("constexpr");
 
 	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties),false);
 
