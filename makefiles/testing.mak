@@ -8,8 +8,7 @@ MAN_TEST_TMPDIR = ManTest
 check: tmain units tlib man-test check-genfile tutil
 
 # We may use CLEANFILES, DISTCLEANFILES, or etc.
-# clean-tlib and clean-gcov are not included
-clean-local: clean-units clean-tmain clean-man-test
+clean-local: clean-units clean-tmain clean-man-test clean-tlib clean-gcov
 
 CTAGS_TEST = ./ctags$(EXEEXT)
 READTAGS_TEST = ./readtags$(EXEEXT)
