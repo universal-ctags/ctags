@@ -1,6 +1,7 @@
 primes	input.py	/^primes: List[int] = []$/;"	v	typeref:typename:List[int]
 some_list	input.py	/^some_list: List[int] = []  # variable with initial value$/;"	v	typeref:typename:List[int]
 sane_world	input.py	/^    sane_world = True$/;"	v
+sane_world	input.py	/^    sane_world = False$/;"	v
 t	input.py	/^t: Tuple[int, ...] = (1, 2, 3)$/;"	v	typeref:typename:Tuple[int, ...]
 header	input.py	/^header, kind, body = message$/;"	v
 kind	input.py	/^header, kind, body = message$/;"	v
