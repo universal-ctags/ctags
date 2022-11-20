@@ -1,0 +1,22 @@
+a.b	input.py	/^import a.b$/;"	i	roles:imported
+object	input.py	/^class X(object):$/;"	Y	roles:ref
+X	input.py	/^class X(object):$/;"	c	roles:def
+__init__	input.py	/^    def __init__(self, n):$/;"	m	class:X	roles:def
+self	input.py	/^    def __init__(self, n):$/;"	z	member:X.__init__	file:	roles:def
+n	input.py	/^    def __init__(self, n):$/;"	z	member:X.__init__	file:	roles:def
+self	input.py	/^        self.n = n$/;"	Y	member:X.__init__	roles:ref
+n	input.py	/^        self.n = n$/;"	Y	member:X.__init__	roles:ref
+n	input.py	/^        self.n = n$/;"	Y	member:X.__init__	roles:ref
+val	input.py	/^    def val(self):$/;"	m	class:X	roles:def
+self	input.py	/^    def val(self):$/;"	z	member:X.val	file:	roles:def
+self	input.py	/^        return self.n$/;"	Y	member:X.val	roles:ref
+n	input.py	/^        return self.n$/;"	Y	member:X.val	roles:ref
+one	input.py	/^def one():$/;"	f	roles:def
+X	input.py	/^    return X(1)$/;"	Y	function:one	roles:ref
+two	input.py	/^def two():$/;"	f	roles:def
+X	input.py	/^    return X(2)$/;"	Y	function:two	roles:ref
+print	input.py	/^print (one().val() + two().val())$/;"	Y	roles:ref
+one	input.py	/^print (one().val() + two().val())$/;"	Y	roles:ref
+val	input.py	/^print (one().val() + two().val())$/;"	Y	roles:ref
+two	input.py	/^print (one().val() + two().val())$/;"	Y	roles:ref
+val	input.py	/^print (one().val() + two().val())$/;"	Y	roles:ref
