@@ -1743,6 +1743,13 @@ extern void markTagPlaceholder (tagEntryInfo *e, bool placeholder)
 	e->placeholder = placeholder;
 }
 
+extern void markCorkEntryPlaceholder (int index, bool placeholder)
+{
+	tagEntryInfo *e = getEntryInCorkQueue(index);
+	if (e)
+		markTagPlaceholder(e, placeholder);
+}
+
 extern int makePlaceholder (const char *const name)
 {
 	tagEntryInfo e;

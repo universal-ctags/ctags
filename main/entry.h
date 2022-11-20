@@ -287,6 +287,7 @@ extern const char* getParserFieldValueForType (tagEntryInfo *const tag, fieldTyp
 
 extern int makePlaceholder (const char *const name);
 extern void markTagPlaceholder (tagEntryInfo *e, bool placeholder);
+extern void markCorkEntryPlaceholder (int index, bool placeholder);
 
 /* Marking all tag entries entries under the scope specified
  * with index recursively.
