@@ -2160,7 +2160,7 @@ extern const char* getTagFileDirectory (void)
 
 static bool markAsPlaceholderRecursively  (int index, tagEntryInfo *e, void *data CTAGS_ATTR_UNUSED)
 {
-	e->placeholder = 1;
+	markTagAsPlaceholder (e, true);
 	markAllEntriesInScopeAsPlaceholder (index);
 	return true;
 }
