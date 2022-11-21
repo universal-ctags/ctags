@@ -1738,16 +1738,16 @@ extern size_t        countEntryInCorkQueue (void)
 	return ptrArrayCount (TagFile.corkQueue);
 }
 
-extern void markTagPlaceholder (tagEntryInfo *e, bool placeholder)
+extern void markTagAsPlaceholder (tagEntryInfo *e, bool placeholder)
 {
 	e->placeholder = placeholder;
 }
 
-extern void markCorkEntryPlaceholder (int index, bool placeholder)
+extern void markCorkEntryAsPlaceholder (int index, bool placeholder)
 {
 	tagEntryInfo *e = getEntryInCorkQueue(index);
 	if (e)
-		markTagPlaceholder(e, placeholder);
+		markTagAsPlaceholder(e, placeholder);
 }
 
 extern int makePlaceholder (const char *const name)
@@ -1755,7 +1755,7 @@ extern int makePlaceholder (const char *const name)
 	tagEntryInfo e;
 
 	initTagEntry (&e, name, KIND_GHOST_INDEX);
-	markTagPlaceholder(&e, true);
+	markTagAsPlaceholder(&e, true);
 
 	/*
 	 * makePlaceholder may be called even before reading any bytes
@@ -2158,7 +2158,7 @@ extern const char* getTagFileDirectory (void)
 	return TagFile.directory;
 }
 
-static bool markAsPlaceholder  (int index, tagEntryInfo *e, void *data CTAGS_ATTR_UNUSED)
+static bool markAsPlaceholderRecursively  (int index, tagEntryInfo *e, void *data CTAGS_ATTR_UNUSED)
 {
 	e->placeholder = 1;
 	markAllEntriesInScopeAsPlaceholder (index);
@@ -2167,5 +2167,5 @@ static bool markAsPlaceholder  (int index, tagEntryInfo *e, void *data CTAGS_ATT
 
 extern void markAllEntriesInScopeAsPlaceholder (int index)
 {
-	foreachEntriesInScope (index, NULL, markAsPlaceholder, NULL);
+	foreachEntriesInScope (index, NULL, markAsPlaceholderRecursively, NULL);
 }

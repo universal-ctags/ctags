@@ -359,7 +359,7 @@ static void shiftKinds(int shift, rstKind baseKind)
 			e->kindIndex += shift;
 			if (e->kindIndex >= SECTION_COUNT)
 			{
-				markTagPlaceholder(e, true);
+				markTagAsPlaceholder(e, true);
 
 				int foster_parent = getFosterEntry(e, shift);
 				Assert (foster_parent != CORK_NIL);

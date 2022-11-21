@@ -3947,7 +3947,7 @@ static EsObject *lrop_markplaceholder (OptVM *vm, EsObject *name)
 	if (e == NULL)
 		return OPTSCRIPT_ERR_NOTAGENTRY;
 
-	markTagPlaceholder (e, true);
+	markTagAsPlaceholder (e, true);
 
 	opt_vm_ostack_pop (vm);
 	return es_false;
