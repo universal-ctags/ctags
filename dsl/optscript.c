@@ -3744,7 +3744,7 @@ op_repeat (OptVM *vm, EsObject *name)
 	ptrArrayDeleteLast (vm->ostack);
 	ptrArrayDeleteLast (vm->ostack);
 
-	EsObject *e = es_false;;
+	EsObject *e = es_false;
 	for (int i = 0; i < n; i++)
 	{
 		e = vm_call_proc (vm, proc);
@@ -4231,7 +4231,7 @@ static EsObject*
 op__forall_dict (OptVM *vm, EsObject *name,
 				 EsObject *proc, EsObject *obj)
 {
-	EsObject *r = es_false;;
+	EsObject *r = es_false;
 	hashTable *ht = es_pointer_get (obj);
 	struct dictForallData data = {
 		.vm   = vm,

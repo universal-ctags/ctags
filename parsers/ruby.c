@@ -940,7 +940,7 @@ static int readAndEmitDef (const unsigned char **cp)
 		else
 			vStringPut (signature, ')');
 		e->extensionFields.signature = vStringDeleteUnwrap (signature);
-		signature = NULL;;
+		signature = NULL;
 		vStringDelete (signature);
 	}
 	return corkIndex;

@@ -221,7 +221,7 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 	for (int i = 0; i < ARRAY_SIZE(xtaskTypes); i++)
 	{
 		if (rubyCanMatchKeywordWithAssign (cp, xtaskTypes[i].keyword))
-			return parseXTask (s, xtaskTypes + i, cp);;
+			return parseXTask (s, xtaskTypes + i, cp);
 	}
 
 	return CORK_NIL;

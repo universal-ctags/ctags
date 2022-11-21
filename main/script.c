@@ -82,7 +82,7 @@ static EsObject* lrop_get_field_value (OptVM *vm, EsObject *name)
 	int n = es_integer_get (nobj);
 	tagEntryInfo *e = getEntryInCorkQueue (n);
 	if (e == NULL)
-		return OPTSCRIPT_ERR_NOTAGENTRY;;
+		return OPTSCRIPT_ERR_NOTAGENTRY;
 
 	void * data = es_symbol_get_data (name);
 	fieldType ftype = HT_PTR_TO_INT (data);
@@ -119,7 +119,7 @@ static EsObject* lrop_set_field_value (OptVM *vm, EsObject *name)
 	int n = es_integer_get (indexobj);
 	tagEntryInfo *e = getEntryInCorkQueue (n);
 	if (e == NULL)
-		return OPTSCRIPT_ERR_NOTAGENTRY;;
+		return OPTSCRIPT_ERR_NOTAGENTRY;
 
 	void * data = es_symbol_get_data (name);
 	fieldType ftype = HT_PTR_TO_INT (data);
@@ -349,7 +349,7 @@ extern EsObject* optscriptEval (OptVM *vm, EsObject *code)
 	}
 	es_object_unref (o);
 
-	EsObject *r = opt_vm_eval (vm, exec);;
+	EsObject *r = opt_vm_eval (vm, exec);
 	if (es_error_p (r))
 		opt_vm_report_error (vm, r, NULL);
 	return r;

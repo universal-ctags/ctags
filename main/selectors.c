@@ -460,7 +460,7 @@ selectParserForXmlDoc (xmlDocPtr doc,
 {
 
 	unsigned int lang_index;
-	bool xml_parser_is_in_candidate = false;;
+	bool xml_parser_is_in_candidate = false;
 
 	verbose ("		Xml[rootElementName]: %s\n",
 			 (doc->children && doc->children->name)

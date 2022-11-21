@@ -2046,10 +2046,10 @@ static void findVerilogTags (void)
 				c = skipWhite (vGetc ());
 				break;
 			case '(':	// ignore locally declared variables in a for-loop (LRM 12.7.1)
-				c = skipPastMatch ("()");;
+				c = skipPastMatch ("()");
 				break;
 			case '{':
-				c = skipPastMatch ("{}");;
+				c = skipPastMatch ("{}");
 				break;
 			case '#':
 				c = skipDelay (token, c);
