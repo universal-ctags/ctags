@@ -232,8 +232,8 @@ static unsigned int Column;
 static fortranPass currentPass;
 #define inFreeSourceForm  ((currentPass) == PASS_FREE_FORM)
 #define inFixedSourceForm ((currentPass) == PASS_FIXED_FORM)
-static bool FreeSourceFormFound = false;
 static bool Newline;
+static bool FreeSourceFormFound; /* Used only in FixedSourceForm pass */
 
 /* indexed by tagType */
 static kindDefinition FortranKinds [] = {
@@ -689,7 +689,7 @@ static lineType getLineType (void)
 	return type;
 }
 
-static int getFixedFormChar (bool parsingString)
+static int getFixedFormChar (bool parsingString, bool *freeSourceFormFound)
 {
 	bool newline = false;
 	lineType type;
@@ -723,7 +723,7 @@ static int getFixedFormChar (bool parsingString)
 		{
 			const int c2 = getcFromInputFile ();
 			if (c2 == '\n')
-				FreeSourceFormFound = true;
+				*freeSourceFormFound = true;
 			else
 				ungetcToInputFile (c2);
 		}
@@ -735,7 +735,7 @@ static int getFixedFormChar (bool parsingString)
 		{
 			case LTYPE_UNDETERMINED:
 			case LTYPE_INVALID:
-				FreeSourceFormFound = true;
+				*freeSourceFormFound = true;
 				if (inFixedSourceForm)
 				    return EOF;
 
@@ -837,7 +837,7 @@ static int getFreeFormChar (void)
 	return c;
 }
 
-static int getCharFull (bool parsingString)
+static int getCharFull (bool parsingString, bool *freeSourceFormFound)
 {
 	int c;
 
@@ -849,13 +849,14 @@ static int getCharFull (bool parsingString)
 	else if (inFreeSourceForm)
 		c = getFreeFormChar ();
 	else
-		c = getFixedFormChar (parsingString);
+		c = getFixedFormChar (parsingString,
+							  freeSourceFormFound);
 	return c;
 }
 
 static int getChar (void)
 {
-	return getCharFull (false);
+	return getCharFull (false, &FreeSourceFormFound);
 }
 
 static void ungetChar (const int c)
@@ -923,12 +924,12 @@ static vString *parseNumeric (int c)
 static void parseString (vString *const string, const int delimiter)
 {
 	const unsigned long inputLineNumber = getInputLineNumber ();
-	int c = getCharFull (true);
+	int c = getCharFull (true, &FreeSourceFormFound);
 
 	while (c != delimiter  &&  c != '\n'  &&  c != EOF)
 	{
 		vStringPut (string, c);
-		c = getCharFull (true);
+		c = getCharFull (true, &FreeSourceFormFound);
 	}
 	if (c == '\n'  ||  c == EOF)
 	{
@@ -2667,8 +2668,11 @@ static rescanReason findFortranTags (const unsigned int passCount)
 	currentPass = (fortranPass)passCount;
 	Newline = (passCount == INIT_PASS)? true: Newline;
 	Column = 0;
+	if (inFixedSourceForm)
+		FreeSourceFormFound = false;
+
 	parseProgramUnit (token);
-	if (FreeSourceFormFound  && inFixedSourceForm)
+	if (inFixedSourceForm && FreeSourceFormFound)
 	{
 		verbose ("%s: not fixed source form; retry as free source form\n",
 				getInputFileName ());
