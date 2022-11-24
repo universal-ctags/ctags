@@ -106,6 +106,7 @@ enum eShKeywordId {
 	KEYWORD_alias,
 	KEYWORD_source,
 	KEYWORD_autoload,
+	KEYWORD_declare,			/* declare, typeset, local, export, readonly, float(zsh), integer */
 };
 
 const char *dialectMap [] = {
@@ -117,6 +118,13 @@ static const struct dialectalKeyword KeywordTable [] = {
 	{ "alias",     KEYWORD_alias,    { 1, 1 } },
 	{ "source",    KEYWORD_source,   { 1, 1 } },
 	{ "autoload",  KEYWORD_autoload, { 0, 1 } },
+	{ "declare",   KEYWORD_declare,  { 1, 1 } },
+	{ "typset",    KEYWORD_declare,  { 1, 1 } },
+	{ "local",     KEYWORD_declare,  { 1, 1 } },
+	{ "export",    KEYWORD_declare,  { 1, 1 } },
+	{ "readonly",  KEYWORD_declare,  { 1, 1 } },
+	{ "float",     KEYWORD_declare,  { 0, 1 } },
+	{ "integer",   KEYWORD_declare,  { 0, 1 } },
 };
 
 /*
@@ -355,6 +363,10 @@ static size_t handleShKeyword (int keyword,
 		*role = R_SCRIPT_LOADED;
 		*check_char = isFileChar;
 		break;
+	case KEYWORD_declare:
+		*kind = K_VARIABLE;
+		*check_char = isIdentChar;
+		break;
 	default:
 		AssertNotReached();
 		break;
@@ -523,7 +535,8 @@ static bool doesLineCotinue(const unsigned char *start, const unsigned char *cp)
 
 	while (start < cp)
 	{
-		if (*cp == ';' || *cp == '|' || *cp == '&')
+		if (*cp == ';' || *cp == '|' || *cp == '&'
+			|| *cp == '(' || *cp == '{')
 			return false;
 		else if (isspace(*cp))
 			cp--;
@@ -540,7 +553,7 @@ static bool handleVariableAssignment (vString *input)
 
 	while (*cp != '\0')
 	{
-		if (*cp == '=')
+		if (*cp == '=' || (*cp == '+' && *(cp + 1) == '='))
 		{
 			size_t len = cp - base;
 			if (len > 0)
