@@ -2666,6 +2666,8 @@ static rescanReason findFortranTags (const unsigned int passCount)
 	token = newToken ();
 
 	currentPass = (fortranPass)passCount;
+	if (currentPass == INIT_PASS)
+		Ungetc = '\0';
 	if (inFreeSourceForm)
 		Newline = true;
 	if (inFixedSourceForm)
