@@ -233,7 +233,6 @@ static fortranPass currentPass;
 #define inFreeSourceForm  ((currentPass) == PASS_FREE_FORM)
 #define inFixedSourceForm ((currentPass) == PASS_FIXED_FORM)
 static bool FreeSourceFormFound = false;
-static bool ParsingString;
 static bool Newline;
 
 /* indexed by tagType */
@@ -690,7 +689,7 @@ static lineType getLineType (void)
 	return type;
 }
 
-static int getFixedFormChar (void)
+static int getFixedFormChar (bool parsingString)
 {
 	bool newline = false;
 	lineType type;
@@ -714,7 +713,7 @@ static int getFixedFormChar (void)
 			newline = true;  /* need to check for continuation line */
 			Column = 0;
 		}
-		else if (c == '!'  &&  ! ParsingString)
+		else if (c == '!'  &&  ! parsingString)
 		{
 			c = skipLine ();
 			newline = true;  /* need to check for continuation line */
@@ -838,7 +837,7 @@ static int getFreeFormChar (void)
 	return c;
 }
 
-static int getChar (void)
+static int getCharFull (bool parsingString)
 {
 	int c;
 
@@ -850,8 +849,13 @@ static int getChar (void)
 	else if (inFreeSourceForm)
 		c = getFreeFormChar ();
 	else
-		c = getFixedFormChar ();
+		c = getFixedFormChar (parsingString);
 	return c;
+}
+
+static int getChar (void)
+{
+	return getCharFull (false);
 }
 
 static void ungetChar (const int c)
@@ -919,13 +923,12 @@ static vString *parseNumeric (int c)
 static void parseString (vString *const string, const int delimiter)
 {
 	const unsigned long inputLineNumber = getInputLineNumber ();
-	int c;
-	ParsingString = true;
-	c = getChar ();
+	int c = getCharFull (true);
+
 	while (c != delimiter  &&  c != '\n'  &&  c != EOF)
 	{
 		vStringPut (string, c);
-		c = getChar ();
+		c = getCharFull (true);
 	}
 	if (c == '\n'  ||  c == EOF)
 	{
@@ -934,7 +937,6 @@ static void parseString (vString *const string, const int delimiter)
 		if (c != EOF && inFixedSourceForm)
 			FreeSourceFormFound = true;
 	}
-	ParsingString = false;
 }
 
 /*  Read a C identifier beginning with "firstChar" and places it into "name".
