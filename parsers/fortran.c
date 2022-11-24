@@ -229,7 +229,9 @@ typedef struct sTokenInfo {
 static langType Lang_fortran;
 static int Ungetc;
 static unsigned int Column;
-static bool FreeSourceForm;
+static fortranPass currentPass;
+#define inFreeSourceForm  ((currentPass) == PASS_FREE_FORM)
+#define inFixedSourceForm ((currentPass) == PASS_FIXED_FORM)
 static bool FreeSourceFormFound = false;
 static bool ParsingString;
 static bool Newline;
@@ -735,7 +737,7 @@ static int getFixedFormChar (void)
 			case LTYPE_UNDETERMINED:
 			case LTYPE_INVALID:
 				FreeSourceFormFound = true;
-				if (! FreeSourceForm)
+				if (inFixedSourceForm)
 				    return EOF;
 
 			case LTYPE_SHORT: break;
@@ -845,7 +847,7 @@ static int getChar (void)
 		c = Ungetc;
 		Ungetc = '\0';
 	}
-	else if (FreeSourceForm)
+	else if (inFreeSourceForm)
 		c = getFreeFormChar ();
 	else
 		c = getFixedFormChar ();
@@ -929,7 +931,7 @@ static void parseString (vString *const string, const int delimiter)
 	{
 		verbose ("%s: unterminated character string at line %lu\n",
 				getInputFileName (), inputLineNumber);
-		if (c != EOF && ! FreeSourceForm)
+		if (c != EOF && inFixedSourceForm)
 			FreeSourceFormFound = true;
 	}
 	ParsingString = false;
@@ -1057,7 +1059,7 @@ getNextChar:
 		}
 
 		case '!':
-			if (FreeSourceForm)
+			if (inFreeSourceForm)
 			{
 				do
 				   c = getChar ();
@@ -1071,7 +1073,7 @@ getNextChar:
 			/* fall through to newline case */
 		case '\n':
 			token->type = TOKEN_STATEMENT_END;
-			if (FreeSourceForm)
+			if (inFreeSourceForm)
 				checkForLabel ();
 			break;
 
@@ -2660,11 +2662,11 @@ static rescanReason findFortranTags (const unsigned int passCount)
 	Assert (passCount <= MAX_PASS);
 	token = newToken ();
 
-	FreeSourceForm = (passCount == PASS_FREE_FORM);
+	currentPass = (fortranPass)passCount;
 	Newline = (passCount == INIT_PASS)? true: Newline;
 	Column = 0;
 	parseProgramUnit (token);
-	if (FreeSourceFormFound  &&  ! FreeSourceForm)
+	if (FreeSourceFormFound  && inFixedSourceForm)
 	{
 		verbose ("%s: not fixed source form; retry as free source form\n",
 				getInputFileName ());
