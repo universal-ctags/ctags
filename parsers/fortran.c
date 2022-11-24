@@ -232,7 +232,7 @@ static unsigned int Column;		/* Use only in FixedSourceForm pass */
 static fortranPass currentPass;
 #define inFreeSourceForm  ((currentPass) == PASS_FREE_FORM)
 #define inFixedSourceForm ((currentPass) == PASS_FIXED_FORM)
-static bool Newline;
+static bool Newline;			/* Use only in FreeSourceForm pass */
 static bool FreeSourceFormFound; /* Used only in FixedSourceForm pass */
 
 /* indexed by tagType */
@@ -2666,7 +2666,8 @@ static rescanReason findFortranTags (const unsigned int passCount)
 	token = newToken ();
 
 	currentPass = (fortranPass)passCount;
-	Newline = (passCount == INIT_PASS)? true: Newline;
+	if (inFreeSourceForm)
+		Newline = true;
 	if (inFixedSourceForm)
 	{
 		Column = 0;
