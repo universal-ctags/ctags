@@ -228,7 +228,7 @@ typedef struct sTokenInfo {
 
 static langType Lang_fortran;
 static int Ungetc;
-static unsigned int Column;
+static unsigned int Column;		/* Use only in FixedSourceForm pass */
 static fortranPass currentPass;
 #define inFreeSourceForm  ((currentPass) == PASS_FREE_FORM)
 #define inFixedSourceForm ((currentPass) == PASS_FIXED_FORM)
@@ -2667,9 +2667,11 @@ static rescanReason findFortranTags (const unsigned int passCount)
 
 	currentPass = (fortranPass)passCount;
 	Newline = (passCount == INIT_PASS)? true: Newline;
-	Column = 0;
 	if (inFixedSourceForm)
+	{
+		Column = 0;
 		FreeSourceFormFound = false;
+	}
 
 	parseProgramUnit (token);
 	if (inFixedSourceForm && FreeSourceFormFound)
