@@ -40,6 +40,14 @@
 /*
 *   DATA DECLARATIONS
 */
+
+typedef enum eFortranPass {
+	INIT_PASS = 1,
+	PASS_FIXED_FORM = INIT_PASS,
+	PASS_FREE_FORM,
+	MAX_PASS = PASS_FREE_FORM
+} fortranPass;
+
 /*  Used to designate type of line read in fixed source form.
  */
 typedef enum eFortranLineType {
@@ -2649,11 +2657,11 @@ static rescanReason findFortranTags (const unsigned int passCount)
 	tokenInfo *token;
 	rescanReason rescan;
 
-	Assert (passCount < 3);
+	Assert (passCount <= MAX_PASS);
 	token = newToken ();
 
-	FreeSourceForm = (bool) (passCount > 1);
-	Newline = (passCount == 1)? true: Newline;
+	FreeSourceForm = (bool) (passCount == PASS_FREE_FORM);
+	Newline = (passCount == INIT_PASS)? true: Newline;
 	Column = 0;
 	parseProgramUnit (token);
 	if (FreeSourceFormFound  &&  ! FreeSourceForm)
