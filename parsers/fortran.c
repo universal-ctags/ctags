@@ -2660,7 +2660,7 @@ static rescanReason findFortranTags (const unsigned int passCount)
 	Assert (passCount <= MAX_PASS);
 	token = newToken ();
 
-	FreeSourceForm = (bool) (passCount == PASS_FREE_FORM);
+	FreeSourceForm = (passCount == PASS_FREE_FORM);
 	Newline = (passCount == INIT_PASS)? true: Newline;
 	Column = 0;
 	parseProgramUnit (token);
