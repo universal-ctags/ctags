@@ -228,12 +228,21 @@ typedef struct sTokenInfo {
 
 static langType Lang_fortran;
 static int Ungetc;
-static unsigned int Column;		/* Use only in FixedSourceForm pass */
+
 static fortranPass currentPass;
 #define inFreeSourceForm  ((currentPass) == PASS_FREE_FORM)
 #define inFixedSourceForm ((currentPass) == PASS_FIXED_FORM)
-static bool Newline;			/* Use only in FreeSourceForm pass */
-static bool FreeSourceFormFound; /* Used only in FixedSourceForm pass */
+
+/* State used only in FixedSourceForm pass */
+static struct {
+	unsigned int column;
+	bool freeSourceFormFound;
+} Fixed;
+
+/* State used only in FreeSourceForm pass */
+static struct {
+	bool newline;
+} Free;
 
 /* indexed by tagType */
 static kindDefinition FortranKinds [] = {
@@ -695,29 +704,29 @@ static int getFixedFormChar (bool parsingString, bool *freeSourceFormFound)
 	lineType type;
 	int c = '\0';
 
-	if (Column > 0)
+	if (Fixed.column > 0)
 	{
 #ifdef STRICT_FIXED_FORM
 		/*  EXCEPTION! Some compilers permit more than 72 characters per line.
 		 */
-		if (Column > 71)
+		if (Fixed.column > 71)
 			c = skipLine ();
 		else
 #endif
 		{
 			c = getcFromInputFile ();
-			++Column;
+			++Fixed.column;
 		}
 		if (c == '\n')
 		{
 			newline = true;  /* need to check for continuation line */
-			Column = 0;
+			Fixed.column = 0;
 		}
 		else if (c == '!'  &&  ! parsingString)
 		{
 			c = skipLine ();
 			newline = true;  /* need to check for continuation line */
-			Column = 0;
+			Fixed.column = 0;
 		}
 		else if (c == '&')  /* check for free source form */
 		{
@@ -728,7 +737,7 @@ static int getFixedFormChar (bool parsingString, bool *freeSourceFormFound)
 				ungetcToInputFile (c2);
 		}
 	}
-	while (Column == 0)
+	while (Fixed.column == 0)
 	{
 		type = getLineType ();
 		switch (type)
@@ -743,7 +752,7 @@ static int getFixedFormChar (bool parsingString, bool *freeSourceFormFound)
 			case LTYPE_COMMENT: skipLine (); break;
 
 			case LTYPE_EOF:
-				Column = 6;
+				Fixed.column = 6;
 				if (newline)
 					c = '\n';
 				else
@@ -754,20 +763,20 @@ static int getFixedFormChar (bool parsingString, bool *freeSourceFormFound)
 				if (newline)
 				{
 					c = '\n';
-					Column = 6;
+					Fixed.column = 6;
 					break;
 				}
 				/* fall through to next case */
 			case LTYPE_CONTINUATION:
-				Column = 5;
+				Fixed.column = 5;
 				do
 				{
 					c = getcFromInputFile ();
-					++Column;
+					++Fixed.column;
 				} while (isBlank (c));
 				if (c == '\n')
-					Column = 0;
-				else if (Column > 6)
+					Fixed.column = 0;
+				else if (Fixed.column > 6)
 				{
 					ungetcToInputFile (c);
 					c = ' ';
@@ -805,7 +814,7 @@ static int getFreeFormChar (void)
 		while (isspace (c)  &&  c != '\n');
 		if (c == '\n')
 		{
-			Newline = true;
+			Free.newline = true;
 			advanceLine = true;
 		}
 		else if (c == '!')
@@ -816,16 +825,16 @@ static int getFreeFormChar (void)
 			c = '&';
 		}
 	}
-	else if (Newline && (c == '!' || c == '#'))
+	else if (Free.newline && (c == '!' || c == '#'))
 		advanceLine = true;
 	while (advanceLine)
 	{
 		while (isspace (c))
 			c = getcFromInputFile ();
-		if (c == '!' || (Newline && c == '#'))
+		if (c == '!' || (Free.newline && c == '#'))
 		{
 			c = skipToNextLine ();
-			Newline = true;
+			Free.newline = true;
 			continue;
 		}
 		if (c == '&')
@@ -833,7 +842,7 @@ static int getFreeFormChar (void)
 		else
 			advanceLine = false;
 	}
-	Newline = (bool) (c == '\n');
+	Free.newline = (bool) (c == '\n');
 	return c;
 }
 
@@ -856,7 +865,7 @@ static int getCharFull (bool parsingString, bool *freeSourceFormFound)
 
 static int getChar (void)
 {
-	return getCharFull (false, &FreeSourceFormFound);
+	return getCharFull (false, &Fixed.freeSourceFormFound);
 }
 
 static void ungetChar (const int c)
@@ -924,19 +933,19 @@ static vString *parseNumeric (int c)
 static void parseString (vString *const string, const int delimiter)
 {
 	const unsigned long inputLineNumber = getInputLineNumber ();
-	int c = getCharFull (true, &FreeSourceFormFound);
+	int c = getCharFull (true, &Fixed.freeSourceFormFound);
 
 	while (c != delimiter  &&  c != '\n'  &&  c != EOF)
 	{
 		vStringPut (string, c);
-		c = getCharFull (true, &FreeSourceFormFound);
+		c = getCharFull (true, &Fixed.freeSourceFormFound);
 	}
 	if (c == '\n'  ||  c == EOF)
 	{
 		verbose ("%s: unterminated character string at line %lu\n",
 				getInputFileName (), inputLineNumber);
 		if (c != EOF && inFixedSourceForm)
-			FreeSourceFormFound = true;
+			Fixed.freeSourceFormFound = true;
 	}
 }
 
@@ -1071,7 +1080,7 @@ getNextChar:
 			else
 			{
 				skipLine ();
-				Column = 0;
+				Fixed.column = 0;
 			}
 			/* fall through to newline case */
 		case '\n':
@@ -2669,15 +2678,15 @@ static rescanReason findFortranTags (const unsigned int passCount)
 	if (currentPass == INIT_PASS)
 		Ungetc = '\0';
 	if (inFreeSourceForm)
-		Newline = true;
+		Free.newline = true;
 	if (inFixedSourceForm)
 	{
-		Column = 0;
-		FreeSourceFormFound = false;
+		Fixed.column = 0;
+		Fixed.freeSourceFormFound = false;
 	}
 
 	parseProgramUnit (token);
-	if (inFixedSourceForm && FreeSourceFormFound)
+	if (inFixedSourceForm && Fixed.freeSourceFormFound)
 	{
 		verbose ("%s: not fixed source form; retry as free source form\n",
 				getInputFileName ());
