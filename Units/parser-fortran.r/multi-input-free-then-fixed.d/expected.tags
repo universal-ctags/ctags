@@ -1,0 +1,4 @@
+s1	input.f90	/^subroutine s1$/;"	s
+p1	input-0.f	/^      program p1$/;"	p
+s	input-0.f	/^      character*5  s$/;"	v	program:p1
+r	input-0.f	/^      chara/;"	v	program:p1
