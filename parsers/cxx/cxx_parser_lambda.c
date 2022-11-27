@@ -268,6 +268,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 
 		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
+		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pIdentifier);
 
 		if(pTypeName)
 			cxxTokenDestroy(pTypeName);
