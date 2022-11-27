@@ -1338,6 +1338,43 @@ extern bool foreachEntriesInScope (int corkIndex,
 	return true;
 }
 
+struct countData {
+	bool onlyDefinitionTag;
+	unsigned int count;
+	entryForeachFunc func;
+	void *cbData;
+};
+
+static bool countEntryMaybe (int corkIndex, tagEntryInfo *entry, void *cbData)
+{
+	struct countData *data = cbData;
+	if (data->onlyDefinitionTag
+		&& !isRoleAssigned (entry, ROLE_DEFINITION_INDEX))
+		return true;
+
+	if (data->func == NULL
+		|| data->func (corkIndex, entry, data->cbData))
+		data->count++;
+	return true;
+}
+
+unsigned int countEntriesInScope (int corkIndex, bool onlyDefinitionTag,
+								  entryForeachFunc func, void *cbData)
+{
+	struct countData data = {
+		.onlyDefinitionTag = onlyDefinitionTag,
+		.count = 0,
+		.func = func,
+		.cbData = cbData,
+	};
+
+	foreachEntriesInScope (corkIndex, NULL,
+						   &countEntryMaybe,
+						   &data);
+
+	return data.count;
+}
+
 struct anyEntryInScopeData {
 	int index;
 	bool onlyDefinitionTag;

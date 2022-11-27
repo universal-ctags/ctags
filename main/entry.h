@@ -192,6 +192,9 @@ bool          foreachEntriesInScope (int corkIndex,
 									 entryForeachFunc func,
 									 void *data);
 
+unsigned int countEntriesInScope    (int corkIndex, bool onlyDefinitionTag,
+									 entryForeachFunc func, void *data);
+
 /* Return the cork index for NAME in the scope specified with CORKINDEX.
  * Even if more than one entries for NAME are in the scope, this function
  * just returns one of them. Returning CORK_NIL means there is no entry
