@@ -143,7 +143,7 @@ int cxxScopeGetSize(void)
 const char * cxxScopeGetFullName(void)
 {
 	if(!g_bScopeNameDirty)
-		return g_szScopeName ? g_szScopeName->buffer : NULL;
+		return g_szScopeName ? vStringValue(g_szScopeName): NULL;
 
 	if(g_pScope->iCount < 1)
 	{
@@ -161,7 +161,7 @@ const char * cxxScopeGetFullName(void)
 		);
 
 	g_bScopeNameDirty = false;
-	return g_szScopeName->buffer;
+	return vStringValue(g_szScopeName);
 }
 
 vString * cxxScopeGetFullNameAsString(void)
