@@ -244,6 +244,21 @@ bool cxxTagFieldEnabled(unsigned int uField)
 
 static tagEntryInfo g_oCXXTag;
 
+void cxxTagUseTokenAsPartOfDefTag(int iCorkIndex, CXXToken * pToken)
+{
+	Assert (pToken->iCorkIndex == CORK_NIL);
+	pToken->iCorkIndex = iCorkIndex;
+}
+
+void cxxTagUseTokensInRangeAsPartOfDefTags(int iCorkIndex, CXXToken * pFrom, CXXToken * pTo)
+{
+	cxxTagUseTokenAsPartOfDefTag(iCorkIndex, pFrom);
+	while (pFrom != pTo)
+	{
+		pFrom = pFrom->pNext;
+		cxxTagUseTokenAsPartOfDefTag(iCorkIndex, pFrom);
+	}
+}
 
 tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 {

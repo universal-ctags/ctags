@@ -31,6 +31,7 @@ static CXXToken *createToken(void *createArg CTAGS_ATTR_UNUSED)
 	// we almost always want a string, and since this token
 	// is being reused..well.. we always want it
 	t->pszWord = vStringNew();
+	t->iCorkIndex = CORK_NIL;
 	return t;
 }
 
@@ -53,6 +54,8 @@ static void clearToken(CXXToken *t)
 	t->pChain = NULL;
 	t->pNext = NULL;
 	t->pPrev = NULL;
+
+	t->iCorkIndex = CORK_NIL;
 }
 
 void cxxTokenAPIInit(void)
@@ -119,6 +122,7 @@ CXXToken * cxxTokenCopy(CXXToken * pToken)
 	pRetToken->eKeyword = pToken->eKeyword;
 	pRetToken->bFollowedBySpace = pToken->bFollowedBySpace;
 	vStringCat(pRetToken->pszWord,pToken->pszWord);
+	pRetToken->iCorkIndex = pToken->iCorkIndex;
 
 	return pRetToken;
 }
