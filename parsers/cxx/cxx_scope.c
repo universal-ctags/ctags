@@ -151,10 +151,7 @@ const char * cxxScopeGetFullName(void)
 		return NULL;
 	}
 
-	if(g_szScopeName)
-		vStringClear(g_szScopeName);
-	else
-		g_szScopeName = vStringNew();
+	g_szScopeName = vStringNewOrClear(g_szScopeName);
 
 	cxxTokenChainJoinInString(
 			g_pScope,
@@ -182,10 +179,7 @@ vString * cxxScopeGetFullNameAsString(void)
 	if(g_pScope->iCount < 1)
 		return NULL;
 
-	if(g_szScopeName)
-		vStringClear(g_szScopeName);
-	else
-		g_szScopeName = vStringNew();
+	g_szScopeName = vStringNewOrClear(g_szScopeName);
 
 	cxxTokenChainJoinInString(
 			g_pScope,
