@@ -1,6 +1,6 @@
 +	input.f90	/^    generic :: operator(+)/;"	M	type:atype
-=	input.f90	/^    generic :: assignment(=)/;"	M	type:atype
-add	input.f90	/^    generic :: add /;"	M	type:atype
+=	input.f90	/^    generic :: assignment(=) =>/;"	M	type:atype
+add	input.f90	/^    generic :: add => add_/;"	M	type:atype
 add_1d	input.f90	/^    procedure, deferred :: add_1d,/;"	M	type:atype	implementation:deferred
 add_2d	input.f90	/^    procedure, deferred :: add_1d, add_2d,/;"	M	type:atype	implementation:deferred
 add_3d	input.f90	/^    procedure, deferred :: add_1d, add_2d, add_3d$/;"	M	type:atype	implementation:deferred

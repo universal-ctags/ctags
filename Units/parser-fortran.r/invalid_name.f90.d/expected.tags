@@ -4,4 +4,4 @@ DR_Lun	input.f90	/^      Integer :: DR_Lun$/;"	v	module:TR_DetectionRecording
 Detection_Record	input.f90	/^      Type Detection_Record$/;"	t	module:TR_DetectionRecording
 Face	input.f90	/^         Integer(2) :: Face$/;"	k	type:Detection_Record
 TR_DetectionRecording	input.f90	/^      Module TR_DetectionRecording$/;"	m
-Type	input.f90	/^         Integer(2) :: Type /;"	k	type:Detection_Record
+Type	input.f90	/^         Integer(2) :: Type           ! "Type"/;"	k	type:Detection_Record

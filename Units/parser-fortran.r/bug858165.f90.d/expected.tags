@@ -1,5 +1,5 @@
-a	input.f90	/^integer :: a,/;"	v	program:test
-b	input.f90	/^           b,/;"	v	program:test
-c	input.f90	/^           c,/;"	v	program:test
-d	input.f90	/^           d /;"	v	program:test
+a	input.f90	/^integer :: a, &   !comment on variable a$/;"	v	program:test
+b	input.f90	/^           b, &   !comment on variable b$/;"	v	program:test
+c	input.f90	/^           c, &   !comment on variable c$/;"	v	program:test
+d	input.f90	/^           d      !comment on variable d$/;"	v	program:test
 test	input.f90	/^program test$/;"	p
