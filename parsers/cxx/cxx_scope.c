@@ -135,6 +135,13 @@ const char * cxxScopeGetName(void)
 	return vStringValue(g_pScope->pTail->pszWord);
 }
 
+int cxxScopeGetDefTag(void)
+{
+	if(g_pScope->iCount < 1)
+		return CORK_NIL;
+	return g_pScope->pTail->iCorkIndex;
+}
+
 int cxxScopeGetSize(void)
 {
 	return g_pScope->iCount;

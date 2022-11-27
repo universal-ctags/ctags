@@ -282,8 +282,12 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 
 	if(!cxxScopeIsGlobal())
 	{
+		// scopeKindIndex and scopeName are used for printing the scope field
+		// in a tags file.
 		g_oCXXTag.extensionFields.scopeKindIndex = cxxScopeGetKind();
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
+		// scopeIndex is used in the parser internally.
+		g_oCXXTag.extensionFields.scopeIndex = cxxScopeGetDefTag();
 	}
 
 	// FIXME: meaning of "is file scope" is quite debatable...

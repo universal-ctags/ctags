@@ -81,7 +81,9 @@ struct sTagEntryInfo {
 		int         scopeIndex;   /* cork queue entry for upper scope tag.
 					     This field is meaningful if the value
 					     is not CORK_NIL, scopeKindIndex is KIND_GHOST_INDEX,
-					     and scopeName is NULL. */
+					     and scopeName is NULL.
+					     CXX parser violates this rule; see the comment inside
+					     cxxTagBegin(). */
 
 		const char* signature;
 
