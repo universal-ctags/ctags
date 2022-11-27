@@ -97,6 +97,7 @@ EsObject *dsl_compile_and_eval (EsObject *expr, DSLEnv *env);
 
 
 EsObject* dsl_entry_xget_string (const tagEntry *entry, const char* name);
+EsObject* dsl_entry_xget_integer (const tagEntry *entry, const char* name);
 
 EsObject* dsl_entry_name (const tagEntry *entry);
 EsObject* dsl_entry_input (const tagEntry *entry);

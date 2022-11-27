@@ -937,6 +937,23 @@ EsObject* dsl_entry_xget_string (const tagEntry *entry, const char* name)
 		return es_false;
 }
 
+EsObject* dsl_entry_xget_integer (const tagEntry *entry, const char* name)
+{
+	const char *end_str = entry_xget(entry, name);
+	EsObject *o;
+
+	if (end_str)
+	{
+		o = es_read_from_string (end_str, NULL);
+		if (es_integer_p (o))
+			return es_object_autounref (o);
+		else
+			return es_false;
+	}
+	else
+		return es_false;
+}
+
 /*
  * Accessesors for tagEntry
  */
@@ -1005,19 +1022,7 @@ EsObject* dsl_entry_extras (const tagEntry *entry)
 
 EsObject* dsl_entry_end (const tagEntry *entry)
 {
-	const char *end_str = entry_xget(entry, "end");
-	EsObject *o;
-
-	if (end_str)
-	{
-		o = es_read_from_string (end_str, NULL);
-		if (es_integer_p (o))
-			return es_object_autounref (o);
-		else
-			return es_false;
-	}
-	else
-		return es_false;
+	return dsl_entry_xget_integer(entry, "end");
 }
 
 EsObject* dsl_entry_kind (const tagEntry *entry)
