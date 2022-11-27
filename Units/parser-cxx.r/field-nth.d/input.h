@@ -3,3 +3,12 @@ inline void f(int x, int y) {}
 
 template<class T1, class T2, int I>
 class C {};
+
+class D {
+	int i, j;
+	char c;
+};
+
+enum color {
+	red, green, blue,
+};

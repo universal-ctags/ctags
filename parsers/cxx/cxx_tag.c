@@ -260,6 +260,14 @@ void cxxTagUseTokensInRangeAsPartOfDefTags(int iCorkIndex, CXXToken * pFrom, CXX
 	}
 }
 
+static bool countSameKindEntry(int corkIndex,
+							   tagEntryInfo * entry,
+							   void * data)
+{
+	unsigned int *uKind = data;
+	return (entry->kindIndex == *uKind);
+}
+
 tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 {
 	kindDefinition * pKindDefinitions = g_cxx.pKindDefinitions;
@@ -288,6 +296,14 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 		// scopeIndex is used in the parser internally.
 		g_oCXXTag.extensionFields.scopeIndex = cxxScopeGetDefTag();
+		if (g_oCXXTag.extensionFields.scopeIndex != CORK_NIL)
+		{
+			if (uKind == CXXTagKindMEMBER || uKind == CXXTagKindENUMERATOR)
+				g_oCXXTag.extensionFields.nth =
+					(short) countEntriesInScope(g_oCXXTag.extensionFields.scopeIndex,
+												true,
+												countSameKindEntry, &uKind);
+		}
 	}
 
 	// FIXME: meaning of "is file scope" is quite debatable...
@@ -654,6 +670,8 @@ int cxxTagCommit(int *piCorkQueueIndexFQ)
 #endif
 
 	int iCorkQueueIndex = makeTagEntry(&g_oCXXTag);
+	if (iCorkQueueIndex != CORK_NIL)
+		registerEntry(iCorkQueueIndex);
 
 	// Handle --extra=+q
 	if(!isXtagEnabled(XTAG_QUALIFIED_TAGS))
