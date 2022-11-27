@@ -112,6 +112,7 @@ EsObject* dsl_entry_inherits (const tagEntry *entry);
 EsObject* dsl_entry_implementation (const tagEntry *entry);
 EsObject* dsl_entry_kind (const tagEntry *entry);
 EsObject* dsl_entry_language (const tagEntry *entry);
+EsObject* dsl_entry_nth (const tagEntry *entry);
 EsObject* dsl_entry_scope (const tagEntry *entry);
 EsObject* dsl_entry_scope_kind (const tagEntry *entry);
 EsObject* dsl_entry_scope_name (const tagEntry *entry);

@@ -96,6 +96,7 @@ DECLARE_VALUE_FN(inherits);
 DECLARE_VALUE_FN(implementation);
 DECLARE_VALUE_FN(kind);
 DECLARE_VALUE_FN(language);
+DECLARE_VALUE_FN(nth);
 DECLARE_VALUE_FN(scope);
 DECLARE_VALUE_FN(scope_kind);
 DECLARE_VALUE_FN(scope_name);
@@ -213,6 +214,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> <list>" },
 	{ "$implementation", value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>" },
+	{ "$nth",            value_nth,            NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<integer>"},
 	{ "$kind",           value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
 	{ "$language",       value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL,
@@ -903,6 +906,7 @@ DEFINE_VALUE_FN(inherits)
 DEFINE_VALUE_FN(implementation)
 DEFINE_VALUE_FN(kind)
 DEFINE_VALUE_FN(language)
+DEFINE_VALUE_FN(nth)
 DEFINE_VALUE_FN(scope)
 DEFINE_VALUE_FN(scope_kind)
 DEFINE_VALUE_FN(scope_name)
@@ -993,6 +997,11 @@ EsObject* dsl_entry_file (const tagEntry *entry)
 EsObject* dsl_entry_language (const tagEntry *entry)
 {
 	return dsl_entry_xget_string (entry, "language");
+}
+
+EsObject* dsl_entry_nth (const tagEntry *entry)
+{
+	return dsl_entry_xget_integer(entry, "nth");
 }
 
 EsObject* dsl_entry_implementation (const tagEntry *entry)
