@@ -92,11 +92,11 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 	PE_CONST char *const sortOrder1 = "LC_COLLATE=C";
 	PE_CONST char *const sortOrder2 = "LC_ALL=C";
 # endif
-	vString *cmd = vStringNew ();
 	int ret = -1;
 
-	if (cmd != NULL)
 	{
+		vString *cmd = vStringNew ();
+
 		/*  Ensure ASCII value sort order.
 		 */
 #if defined (HAVE_SETENV) || defined (HAVE_PUTENV)
