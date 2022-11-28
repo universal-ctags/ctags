@@ -96,6 +96,7 @@ DECLARE_VALUE_FN(inherits);
 DECLARE_VALUE_FN(implementation);
 DECLARE_VALUE_FN(kind);
 DECLARE_VALUE_FN(language);
+DECLARE_VALUE_FN(nth);
 DECLARE_VALUE_FN(scope);
 DECLARE_VALUE_FN(scope_kind);
 DECLARE_VALUE_FN(scope_name);
@@ -213,6 +214,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> <list>" },
 	{ "$implementation", value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>" },
+	{ "$nth",            value_nth,            NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<integer>"},
 	{ "$kind",           value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
 	{ "$language",       value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL,
@@ -903,6 +906,7 @@ DEFINE_VALUE_FN(inherits)
 DEFINE_VALUE_FN(implementation)
 DEFINE_VALUE_FN(kind)
 DEFINE_VALUE_FN(language)
+DEFINE_VALUE_FN(nth)
 DEFINE_VALUE_FN(scope)
 DEFINE_VALUE_FN(scope_kind)
 DEFINE_VALUE_FN(scope_name)
@@ -933,6 +937,23 @@ EsObject* dsl_entry_xget_string (const tagEntry *entry, const char* name)
 	const char* value = entry_xget (entry, name);
 	if (value)
 		return es_object_autounref (es_string_new (value));
+	else
+		return es_false;
+}
+
+EsObject* dsl_entry_xget_integer (const tagEntry *entry, const char* name)
+{
+	const char *end_str = entry_xget(entry, name);
+	EsObject *o;
+
+	if (end_str)
+	{
+		o = es_read_from_string (end_str, NULL);
+		if (es_integer_p (o))
+			return es_object_autounref (o);
+		else
+			return es_false;
+	}
 	else
 		return es_false;
 }
@@ -978,6 +999,11 @@ EsObject* dsl_entry_language (const tagEntry *entry)
 	return dsl_entry_xget_string (entry, "language");
 }
 
+EsObject* dsl_entry_nth (const tagEntry *entry)
+{
+	return dsl_entry_xget_integer(entry, "nth");
+}
+
 EsObject* dsl_entry_implementation (const tagEntry *entry)
 {
 	return dsl_entry_xget_string (entry, "implementation");
@@ -1005,19 +1031,7 @@ EsObject* dsl_entry_extras (const tagEntry *entry)
 
 EsObject* dsl_entry_end (const tagEntry *entry)
 {
-	const char *end_str = entry_xget(entry, "end");
-	EsObject *o;
-
-	if (end_str)
-	{
-		o = es_read_from_string (end_str, NULL);
-		if (es_integer_p (o))
-			return es_object_autounref (o);
-		else
-			return es_false;
-	}
-	else
-		return es_false;
+	return dsl_entry_xget_integer(entry, "end");
 }
 
 EsObject* dsl_entry_kind (const tagEntry *entry)

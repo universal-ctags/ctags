@@ -59,6 +59,7 @@ DECLARE_ALT_VALUE_FN(inherits);
 DECLARE_ALT_VALUE_FN(implementation);
 DECLARE_ALT_VALUE_FN(kind);
 DECLARE_ALT_VALUE_FN(language);
+DECLARE_ALT_VALUE_FN(nth);
 DECLARE_ALT_VALUE_FN(scope);
 DECLARE_ALT_VALUE_FN(scope_kind);
 DECLARE_ALT_VALUE_FN(scope_name);
@@ -115,6 +116,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> #f|<string>"},
 	{ "&language",       alt_value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>" },
+	{ "&nth",            alt_value_nth,            NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<integer>"},
 	{ "&scope",          alt_value_scope,          NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>; $scope-kind:$scope-name"},
 	{ "&scope-kind",     alt_value_scope_kind,     NULL, DSL_PATTR_MEMORABLE, 0UL,
@@ -155,6 +158,7 @@ DEFINE_ALT_VALUE_FN(inherits);
 DEFINE_ALT_VALUE_FN(implementation);
 DEFINE_ALT_VALUE_FN(kind);
 DEFINE_ALT_VALUE_FN(language);
+DEFINE_ALT_VALUE_FN(nth);
 DEFINE_ALT_VALUE_FN(scope);
 DEFINE_ALT_VALUE_FN(scope_kind);
 DEFINE_ALT_VALUE_FN(scope_name);
