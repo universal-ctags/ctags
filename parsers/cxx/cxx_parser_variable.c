@@ -757,6 +757,8 @@ got_identifier:
 				// Volatile is part of the type, so we don't mark it as a property
 				//if(g_cxx.uKeywordState & CXXParserKeywordStateSeenVolatile)
 				//	uProperties |= CXXTagPropertyVolatile;
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenConstexpr)
+					uProperties |= CXXTagPropertyConstexpr;
 
 				pszProperties = cxxTagSetProperties(uProperties);
 			}

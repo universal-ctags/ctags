@@ -150,7 +150,9 @@ typedef enum _CXXTagProperty
 	// scoped enum (C++11)
 	CXXTagPropertyScopedEnum = (1 << 16),
 	// function-try-block: int f() try { ... } catch { ... }
-	CXXTagPropertyFunctionTryBlock = (1 << 17)
+	CXXTagPropertyFunctionTryBlock = (1 << 17),
+	// constexpr has been seen.
+	CXXTagPropertyConstexpr = (1 << 18),
 } CXXTagProperty;
 
 // Set the modifiers field of the tag.
