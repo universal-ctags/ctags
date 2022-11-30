@@ -202,4 +202,7 @@ typedef enum {
 // Must be called before attempting to access the kind options.
 void cxxTagInitForLanguage(langType eLangType);
 
+// Functions for filling iCorkIndex field of tokens.
+void cxxTagUseTokensInRangeAsPartOfDefTags(int iCorkIndex, CXXToken * pFrom, CXXToken * pTo);
+void cxxTagUseTokenAsPartOfDefTag(int iCorkIndex, CXXToken * pToken);
 #endif //!_cxxTag_h_

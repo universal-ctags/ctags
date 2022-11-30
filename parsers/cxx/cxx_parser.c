@@ -880,6 +880,7 @@ bool cxxParserParseEnum(void)
 			pszProperties = cxxTagSetProperties(CXXTagPropertyScopedEnum);
 
 		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
+		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pEnumName);
 
 		if (pszProperties)
 			vStringDelete (pszProperties);
@@ -1352,6 +1353,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		tag->isFileScope = !isInputHeaderFile();
 
 		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
+		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pClassName);
 
 	}
 

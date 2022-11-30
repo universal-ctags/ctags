@@ -767,6 +767,7 @@ got_identifier:
 				cxxTagHandleTemplateFields();
 
 			iCorkIndex = cxxTagCommit(&iCorkIndexFQ);
+			cxxTagUseTokenAsPartOfDefTag(iCorkIndexFQ, pIdentifier);
 
 			if(pTypeToken)
 				cxxTokenDestroy(pTypeToken);

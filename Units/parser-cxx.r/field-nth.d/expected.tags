@@ -8,3 +8,11 @@ C	input.h	/^class C {};$/;"	c	template:<class T1,class T2,int I>
 T1	input.h	/^template<class T1, class T2, int I>$/;"	Z	class:C	typeref:meta:class	nth:0
 T2	input.h	/^template<class T1, class T2, int I>$/;"	Z	class:C	typeref:meta:class	nth:1
 I	input.h	/^template<class T1, class T2, int I>$/;"	Z	class:C	typeref:typename:int	nth:2
+D	input.h	/^class D {$/;"	c
+i	input.h	/^	int i, j;$/;"	m	class:D	typeref:typename:int	nth:0
+j	input.h	/^	int i, j;$/;"	m	class:D	typeref:typename:int	nth:1
+c	input.h	/^	char c;$/;"	m	class:D	typeref:typename:char	nth:2
+color	input.h	/^enum color {$/;"	g
+red	input.h	/^	red, green, blue,$/;"	e	enum:color	nth:0
+green	input.h	/^	red, green, blue,$/;"	e	enum:color	nth:1
+blue	input.h	/^	red, green, blue,$/;"	e	enum:color	nth:2

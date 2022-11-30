@@ -135,6 +135,13 @@ const char * cxxScopeGetName(void)
 	return vStringValue(g_pScope->pTail->pszWord);
 }
 
+int cxxScopeGetDefTag(void)
+{
+	if(g_pScope->iCount < 1)
+		return CORK_NIL;
+	return g_pScope->pTail->iCorkIndex;
+}
+
 int cxxScopeGetSize(void)
 {
 	return g_pScope->iCount;
@@ -143,7 +150,7 @@ int cxxScopeGetSize(void)
 const char * cxxScopeGetFullName(void)
 {
 	if(!g_bScopeNameDirty)
-		return g_szScopeName ? g_szScopeName->buffer : NULL;
+		return g_szScopeName ? vStringValue(g_szScopeName): NULL;
 
 	if(g_pScope->iCount < 1)
 	{
@@ -151,10 +158,7 @@ const char * cxxScopeGetFullName(void)
 		return NULL;
 	}
 
-	if(g_szScopeName)
-		vStringClear(g_szScopeName);
-	else
-		g_szScopeName = vStringNew();
+	g_szScopeName = vStringNewOrClear(g_szScopeName);
 
 	cxxTokenChainJoinInString(
 			g_pScope,
@@ -164,7 +168,7 @@ const char * cxxScopeGetFullName(void)
 		);
 
 	g_bScopeNameDirty = false;
-	return g_szScopeName->buffer;
+	return vStringValue(g_szScopeName);
 }
 
 vString * cxxScopeGetFullNameAsString(void)
@@ -182,10 +186,7 @@ vString * cxxScopeGetFullNameAsString(void)
 	if(g_pScope->iCount < 1)
 		return NULL;
 
-	if(g_szScopeName)
-		vStringClear(g_szScopeName);
-	else
-		g_szScopeName = vStringNew();
+	g_szScopeName = vStringNewOrClear(g_szScopeName);
 
 	cxxTokenChainJoinInString(
 			g_pScope,

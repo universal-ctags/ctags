@@ -442,7 +442,8 @@ skip_to_comma_or_end:
 			if(bGotTemplate)
 				cxxTagHandleTemplateFields();
 
-			cxxTagCommit(NULL);
+			int iCorkQueueIndex = cxxTagCommit(NULL);
+			cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, t);
 
 			if (
 					bGotTemplate &&

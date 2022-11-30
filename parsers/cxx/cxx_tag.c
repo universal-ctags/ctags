@@ -244,6 +244,29 @@ bool cxxTagFieldEnabled(unsigned int uField)
 
 static tagEntryInfo g_oCXXTag;
 
+void cxxTagUseTokenAsPartOfDefTag(int iCorkIndex, CXXToken * pToken)
+{
+	Assert (pToken->iCorkIndex == CORK_NIL);
+	pToken->iCorkIndex = iCorkIndex;
+}
+
+void cxxTagUseTokensInRangeAsPartOfDefTags(int iCorkIndex, CXXToken * pFrom, CXXToken * pTo)
+{
+	cxxTagUseTokenAsPartOfDefTag(iCorkIndex, pFrom);
+	while (pFrom != pTo)
+	{
+		pFrom = pFrom->pNext;
+		cxxTagUseTokenAsPartOfDefTag(iCorkIndex, pFrom);
+	}
+}
+
+static bool countSameKindEntry(int corkIndex,
+							   tagEntryInfo * entry,
+							   void * data)
+{
+	unsigned int *uKind = data;
+	return (entry->kindIndex == *uKind);
+}
 
 tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 {
@@ -267,8 +290,21 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 
 	if(!cxxScopeIsGlobal())
 	{
+		// scopeKindIndex and scopeName are used for printing the scope field
+		// in a tags file.
 		g_oCXXTag.extensionFields.scopeKindIndex = cxxScopeGetKind();
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
+		// scopeIndex is used in the parser internally.
+		g_oCXXTag.extensionFields.scopeIndex = cxxScopeGetDefTag();
+		if (g_oCXXTag.extensionFields.scopeIndex != CORK_NIL)
+		{
+			if (uKind == CXXTagKindMEMBER || uKind == CXXTagKindENUMERATOR
+				|| uKind == CXXTagKindPARAMETER || CXXTagCPPKindTEMPLATEPARAM)
+				g_oCXXTag.extensionFields.nth =
+					(short) countEntriesInScope(g_oCXXTag.extensionFields.scopeIndex,
+												true,
+												countSameKindEntry, &uKind);
+		}
 	}
 
 	// FIXME: meaning of "is file scope" is quite debatable...
@@ -635,6 +671,8 @@ int cxxTagCommit(int *piCorkQueueIndexFQ)
 #endif
 
 	int iCorkQueueIndex = makeTagEntry(&g_oCXXTag);
+	if (iCorkQueueIndex != CORK_NIL)
+		registerEntry(iCorkQueueIndex);
 
 	// Handle --extra=+q
 	if(!isXtagEnabled(XTAG_QUALIFIED_TAGS))

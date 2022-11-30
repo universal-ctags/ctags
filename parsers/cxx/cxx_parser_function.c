@@ -304,6 +304,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 
 		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
+		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pIdentifier);
 
 		if(pszSignature)
 			vStringDelete(pszSignature);
@@ -1757,6 +1758,7 @@ int cxxParserEmitFunctionTags(
 		}
 
 		int iCorkQueueIndex = cxxTagCommit(piCorkQueueIndexFQ);
+		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pIdentifier);
 
 		if(piCorkQueueIndex)
 			*piCorkQueueIndex = iCorkQueueIndex;
@@ -1923,7 +1925,6 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 		} else {
 			pTypeName = NULL;
 		}
-		tag->extensionFields.nth = i;
 
 		tag->isFileScope = true;
 

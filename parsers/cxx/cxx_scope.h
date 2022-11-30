@@ -48,6 +48,10 @@ const char * cxxScopeGetFullName(void);
 // it is always a single identifier.
 const char * cxxScopeGetName(void);
 
+// Return the corkIndex of the token representing currently scope.
+// This can be CORK_NIL.
+int cxxScopeGetDefTag(void);
+
 // Return the number of components of the scope name.
 int cxxScopeGetSize(void);
 

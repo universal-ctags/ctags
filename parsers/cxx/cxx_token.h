@@ -87,6 +87,8 @@ typedef struct _CXXToken
 	// uninitialized and must be treated as undefined.
 	unsigned char uInternalScopeType;
 	unsigned char uInternalScopeAccess;
+
+	int iCorkIndex;
 } CXXToken;
 
 CXXToken * cxxTokenCreate(void);
