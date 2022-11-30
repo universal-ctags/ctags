@@ -9,7 +9,7 @@ Named6	input.f90	/^  enum*8 :: Named6$/;"	E	module:Constants
 Named7	input.f90	/^  enum, bind(c) :: Named7$/;"	E	module:Constants
 __anoncfbded350103	input.f90	/^  enum, bind(c) ! unnamed 1$/;"	E	module:Constants
 __anoncfbded350203	input.f90	/^  enum ! unnamed 2$/;"	E	module:Constants
-a	input.f90	/^    enumerat/;"	N	enum:__anoncfbded350203
+a	input.f90	/^    enumerator :: a,/;"	N	enum:__anoncfbded350203
 b	input.f90	/^    enumerator :: a, b,/;"	N	enum:__anoncfbded350203
 black	input.f90	/^    enumerator :: red =1, blue, black /;"	N	enum:__anoncfbded350103
 blue	input.f90	/^    enumerator :: red =1, blue,/;"	N	enum:__anoncfbded350103

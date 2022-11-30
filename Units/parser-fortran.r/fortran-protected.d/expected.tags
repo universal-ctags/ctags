@@ -1,2 +1,2 @@
-i	input.f90	/^  in/;"	v	module:test_implementation
+i	input.f90	/^  integer, public, protected :: i$/;"	v	module:test_implementation
 test_implementation	input.f90	/^module test_implementation$/;"	m

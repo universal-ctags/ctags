@@ -10,20 +10,20 @@
 D02CJW	input.f	/^      DOUBLE PRECISION D02CJW,/;"	v
 FCN	input.f	/^      STDCALL SUBROUTINE FCN(/;"	s
 G	input.f	/^      DOUBLE PRECISION D02CJW, G,/;"	v
-G	input.f	/^      STDCALL DOUBLE PRECISION FUNCTION G(/;"	f
+G	input.f	/^      STDCALL DOUBLE PRECISION FUNCTION G(T,Y)                          !CHANGE/;"	f
 H	input.f	/^      DOUBLE PRECISION H,/;"	v
-I	input.f	/^      IN/;"	v
+I	input.f	/^      INTEGER          I, IFAIL/;"	v
 IFAIL	input.f	/^      INTEGER          I, IFAIL,/;"	v
 IW	input.f	/^      INTEGER          N, IW$/;"	v
 J	input.f	/^      INTEGER          I, IFAIL, J$/;"	v
 K	input.f	/^      INTEGER          K$/;"	v
-N	input.f	/^      INT/;"	v
+N	input.f	/^      INTEGER          N,/;"	v
 NOUT	input.f	/^      INTEGER          NOUT$/;"	v
-OUT	input.f	/^      STDCALL SUBROUTI/;"	s
+OUT	input.f	/^      STDCALL SUBROUTINE OUT(/;"	s
 PI	input.f	/^      DOUBLE PRECISION PI,/;"	v
 RELABS	input.f	/^      CHARACTER        RELABS*/;"	v
 TOL	input.f	/^      DOUBLE PRECISION PI, TOL,/;"	v
-W	input.f	/^      DOUBLE PRECISION W(/;"	v
+W	input.f	/^      DOUBLE PRECISION W(IW)/;"	v
 X	input.f	/^      DOUBLE PRECISION PI, TOL, X$/;"	v
 X01AAF	input.f	/^      DOUBLE PRECISION D02CJW, G, X01AAF$/;"	v
 XEND	input.f	/^      DOUBLE PRECISION H, XEND$/;"	v

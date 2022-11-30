@@ -16,5 +16,5 @@ T	input-0.c	/^#define T /;"	d	file:	macrodef:int
 mytype0	input-0.c	/^typedef T mytype0;$/;"	t	typeref:typename:int	file:
 S	input-0.c	/^#define S /;"	d	file:	macrodef:int
 mytype1	input-0.c	/^typedef S mytype1;$/;"	t	typeref:typename:float	file:
-IO7__POX_ERRSUM__UPE_ERROR	input-1.c	/^#define IO7__POX_ERRSUM__UPE_ERROR /;"	d	file:	macrodef:GEN_MASK(IO7__POX_ERRSUM__UPE_ERROR)
+IO7__POX_ERRSUM__UPE_ERROR	input-1.c	/^#define IO7__POX_ERRSUM__UPE_ERROR        GEN_MASK(IO7__POX_ERRSUM__UPE_ERROR)/;"	d	file:	macrodef:GEN_MASK(IO7__POX_ERRSUM__UPE_ERROR)
 f	input-1.c	/^f(int err_sum)$/;"	f	typeref:typename:int	signature:(int err_sum)

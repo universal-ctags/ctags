@@ -4,7 +4,7 @@ D	input.c	/^??=define D /;"	d	file:
 E	input.c	/^??=define E /;"	d	file:
 F	input.c	/^??=define F /;"	d	file:
 M3_INIT	input.c	/^??=define M3_INIT(/;"	d	file:
-STRINGIFY	input.c	/^??=define STRINGIFY(/;"	d	file:
+STRINGIFY	input.c	/^??=define STRINGIFY(x) STRINGIFY_/;"	d	file:
 STRINGIFY_INTERN	input.c	/^??=define STRINGIFY_INTERN(/;"	d	file:
 buf	input.c	/^  char *buf;$/;"	m	struct:str	typeref:typename:char *	file:
 len	input.c	/^  unsigned int len, size;$/;"	m	struct:str	typeref:typename:unsigned int	file:

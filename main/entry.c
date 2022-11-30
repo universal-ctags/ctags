@@ -739,7 +739,7 @@ extern size_t truncateTagLineAfterTag (
 		char *const line, const char *const token, const bool discardNewline)
 {
 	size_t len = 0;
-	char *p = strstr (line, token);
+	char *p = strrstr (line, token);
 
 	if (p != NULL)
 	{

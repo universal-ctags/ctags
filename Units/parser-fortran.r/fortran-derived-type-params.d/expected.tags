@@ -1,9 +1,9 @@
 Members	input.f90	/^module Members$/;"	m
 MySubroutine	input.f90	/^  subroutine MySubroutine(/;"	s	module:Members
 coordinates	input.f90	/^    REAL :: coordinates(/;"	k	type:general_point
-d	input.f90	/^    INTEGER(selected_/;"	k	type:humongous_matrix
+d	input.f90	/^    INTEGER(selected_int_kind(12)), LEN :: d$/;"	k	type:humongous_matrix
 dim	input.f90	/^    INTEGER, KIND :: dim$/;"	k	type:general_point
 element	input.f90	/^    REAL(k) :: element(/;"	k	type:humongous_matrix
 general_point	input.f90	/^  TYPE general_point(/;"	t	module:Members
 humongous_matrix	input.f90	/^  TYPE humongous_matrix(/;"	t	module:Members
-k	input.f90	/^    INTEGER, KIND :: k /;"	k	type:humongous_matrix
+k	input.f90	/^    INTEGER, KIND :: k = ki/;"	k	type:humongous_matrix

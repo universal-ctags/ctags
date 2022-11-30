@@ -1,7 +1,7 @@
 A	input.f	/^	BYTE A,/;"	v	program:byte_test
 A1	input.f	/^	BYTE A1,/;"	v	program:byte_test
 A2	input.f	/^	BYTE A2 /;"	v	program:byte_test
-B	input.f	/^	BY/;"	v	program:byte_test
+B	input.f	/^	BYTE A, B,/;"	v	program:byte_test
 B1	input.f	/^	BYTE A1, B1,/;"	v	program:byte_test
 B2	input.f	/^	BYTE A2 \/'x'\/, B2 /;"	v	program:byte_test
 C	input.f	/^	BYTE A, B, C /;"	v	program:byte_test

@@ -1,7 +1,7 @@
 align_second_16	input.f90	/^	integer(2) :: align_second_16$/;"	k	type:my_struct
 base_type	input.f90	/^	integer base_type$/;"	v	program:testalloc
 first_byte	input.f90	/^	integer(1) :: first_byte$/;"	k	type:my_struct
-i	input.f90	/^	in/;"	v	program:testalloc
+i	input.f90	/^	integer i,/;"	v	program:testalloc
 i2	input.f90	/^	integer i2$/;"	v	program:testalloc
 i3	input.f90	/^	integer i3$/;"	v	program:testalloc
 i4	input.f90	/^	integer i4$/;"	v	program:testalloc
