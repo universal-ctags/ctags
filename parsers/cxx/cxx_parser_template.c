@@ -823,8 +823,6 @@ void cxxParserEmitTemplateParameterTags(void)
 		if(!tag)
 			continue;
 
-		tag->extensionFields.nth = (short)i;
-
 		CXXToken * pTypeToken = cxxTagCheckAndSetTypeField(
 				g_cxx.oTemplateParameters.aTypeStarts[i],
 				g_cxx.oTemplateParameters.aTypeEnds[i]
