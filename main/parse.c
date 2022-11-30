@@ -162,6 +162,8 @@ static kindDefinition defaultFileKind = {
 	.description = KIND_FILE_DEFAULT_NAME,
 };
 
+static langType ctagsSelfTestLang;
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -4719,6 +4721,13 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 			continue;
 
 		kind = getKind (kcb, i);
+		if (language == ctagsSelfTestLang
+			&& (kind == NULL || kind->name == NULL))
+		{
+			/* The Self test parser may have broken kinds.
+			 * Let's skip it. */
+			continue;
+		}
 		makeKindDescriptionPseudoTag (kind, &data);
 	}
 
@@ -5588,6 +5597,11 @@ static void printStatsCTST (langType lang CTAGS_ATTR_UNUSED)
 			 CTST_num_handled_char);
 }
 
+static void initCTST (langType language)
+{
+	ctagsSelfTestLang = language;
+}
+
 static parserDefinition *CTagsSelfTestParser (void)
 {
 	static const char *const extensions[] = { NULL };
@@ -5596,6 +5610,7 @@ static parserDefinition *CTagsSelfTestParser (void)
 	def->kindTable = CTST_Kinds;
 	def->kindCount = KIND_COUNT;
 	def->parser = createCTSTTags;
+	def->initialize = initCTST;
 	def->invisible = true;
 	def->useMemoryStreamInput = true;
 	def->useCork = CORK_QUEUE;
