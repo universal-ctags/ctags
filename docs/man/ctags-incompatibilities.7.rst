@@ -34,6 +34,11 @@ Environment variables for arranging command lines
 Universal Ctags doesn't read ``CTAGS`` and/or ``ETAGS`` environment
 variables.
 
+Behavior when ``--excmd=mixed`` is given
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Exuberant Ctags uses line numbers as addresses for C preprocessor
+macro definition tags. Universal Ctags uses patterns for the tags.
+
 Incompatibilities in command line interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
