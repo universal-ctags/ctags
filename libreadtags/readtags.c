@@ -832,7 +832,7 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 		result->fields.max, sizeof (tagExtensionField));
 	if (result->fields.list == NULL)
 		goto mem_error;
-	result->fp = fopen (filePath, "rb");
+	result->fp = fopen (filePath, "rbm");
 	if (result->fp == NULL)
 	{
 		info->status.error_number = errno;
