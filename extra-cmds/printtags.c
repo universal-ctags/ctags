@@ -123,7 +123,8 @@ static void tagsPrintTag (const tagEntry *entry,
 		|| entry->address.pattern == NULL)
 		return;
 	if (pseudoTag)
-		print_str (entry->name, outfp);
+		printValue (entry->name, printingWithEscaping,
+					print_str, print_char, outfp);
 	else if (*entry->name == '!' && printingWithEscaping)
 	{
 		print_str ("\\x21", outfp);
