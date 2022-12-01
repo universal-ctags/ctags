@@ -1,65 +1,65 @@
 QFrame	input.h	/^class ColumnPreferencesFrame : public QFrame$/;"	unknown	language:C++
 ColumnPreferencesFrame	input.h	/^class ColumnPreferencesFrame : public QFrame$/;"	class	language:C++
-Q_OBJECT	input.h	/^    Q_OBJECT$/;"	unknown	language:C++
+Q_OBJECT	input.h	/^    Q_OBJECT$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 method0	input.h	/^    void method0(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
-slots	input.h	/^private slots:$/;"	unknown	language:C++
+slots	input.h	/^private slots:$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 slot0	input.h	/^    void slot0(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot0	input.h	/^    void slot0(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 slot1	input.h	/^    void slot1(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot1	input.h	/^    void slot1(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
-slots	input.h	/^public slots:$/;"	unknown	language:C++
+slots	input.h	/^public slots:$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 slot2	input.h	/^    void slot2(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot2	input.h	/^    void slot2(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 slot3	input.h	/^    void slot3(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot3	input.h	/^    void slot3(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
-Q_SLOTS	input.h	/^Q_SLOTS:$/;"	unknown	language:C++
+Q_SLOTS	input.h	/^Q_SLOTS:$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 slot4	input.h	/^    void slot4(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot4	input.h	/^    void slot4(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 slot5	input.h	/^    void slot5(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot5	input.h	/^    void slot5(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 field0	input.h	/^  int field0;$/;"	member	language:C++	class:ColumnPreferencesFrame	typeref:typename:int
 method1	input.h	/^  virtual void method1(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
-Q_SLOTS	input.h	/^private Q_SLOTS:$/;"	unknown	language:C++
+Q_SLOTS	input.h	/^private Q_SLOTS:$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 slot6	input.h	/^  void slot6(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot6	input.h	/^  void slot6(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 slot7	input.h	/^  void slot7(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot7	input.h	/^  void slot7(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
-Q_SLOTS	input.h	/^public Q_SLOTS:$/;"	unknown	language:C++
+Q_SLOTS	input.h	/^public Q_SLOTS:$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 slot8	input.h	/^  void slot8(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot8	input.h	/^  void slot8(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 slot9	input.h	/^  void slot9(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot9	input.h	/^  void slot9(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
-slots	input.h	/^slots:$/;"	unknown	language:C++
+slots	input.h	/^slots:$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 slot10	input.h	/^  void slot10(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot10	input.h	/^  void slot10(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 slot11	input.h	/^  void slot11(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 slot11	input.h	/^  void slot11(void);$/;"	slot	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 field1	input.h	/^  int field1;$/;"	member	language:C++	class:ColumnPreferencesFrame	typeref:typename:int
-signals	input.h	/^signals:$/;"	unknown	language:C++
+signals	input.h	/^signals:$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 signal0	input.h	/^  void signal0(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 signal0	input.h	/^  void signal0(void);$/;"	signal	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 signal1	input.h	/^  void signal1(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 signal1	input.h	/^  void signal1(void);$/;"	signal	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 field2	input.h	/^  int field2;$/;"	member	language:C++	class:ColumnPreferencesFrame	typeref:typename:int
 method2	input.h	/^  virtual void method2(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
-Q_SIGNALS	input.h	/^Q_SIGNALS:$/;"	unknown	language:C++
+Q_SIGNALS	input.h	/^Q_SIGNALS:$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 signal2	input.h	/^  void signal2(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 signal2	input.h	/^  void signal2(void);$/;"	signal	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 signal3	input.h	/^  void signal3(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
 signal3	input.h	/^  void signal3(void);$/;"	signal	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:void
 field3	input.h	/^  int field3;$/;"	member	language:C++	class:ColumnPreferencesFrame	typeref:typename:int
 method3	input.h	/^  virtual void method3(void);$/;"	prototype	language:C++	class:ColumnPreferencesFrame	typeref:typename:void
-Q_PROPERTY	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++
-QString	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++
+Q_PROPERTY	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++	class:ColumnPreferencesFrame
+QString	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 text	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	property	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:QString
-MEMBER	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++
-m_text	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++
-NOTIFY	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++
-textChanged	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++
-Q_PROPERTY	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++
+MEMBER	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++	class:ColumnPreferencesFrame
+m_text	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++	class:ColumnPreferencesFrame
+NOTIFY	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++	class:ColumnPreferencesFrame
+textChanged	input.h	/^  Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged)$/;"	unknown	language:C++	class:ColumnPreferencesFrame
+Q_PROPERTY	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 ShowNonprinting	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	property	language:QtMoc	class:ColumnPreferencesFrame	typeref:typename:bool
-READ	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++
-showsNonprinting	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++
-WRITE	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++
-setShowsNonprinting	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++
+READ	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++	class:ColumnPreferencesFrame
+showsNonprinting	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++	class:ColumnPreferencesFrame
+WRITE	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++	class:ColumnPreferencesFrame
+setShowsNonprinting	input.h	/^  Q_PROPERTY( bool ShowNonprinting READ showsNonprinting WRITE setShowsNonprinting )$/;"	unknown	language:C++	class:ColumnPreferencesFrame
 field4	input.h	/^  int field4;$/;"	member	language:C++	class:ColumnPreferencesFrame	typeref:typename:int

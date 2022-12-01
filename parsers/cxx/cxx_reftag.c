@@ -11,6 +11,7 @@
 
 #include "cxx_token.h"
 #include "cxx_parser_internal.h"
+#include "cxx_scope.h"
 #include "read.h"
 
 
@@ -29,9 +30,11 @@ void cxxReftagEvalNewToken(void)
 		if (in_subparser)
 			pushLanguage(g_cxx.eLangType);
 
-		g_cxx.pToken->iCorkIndex = makeSimpleRefTag(g_cxx.pToken->pszWord,
-													CXXTagKindUNKNOWN,
-													CXXTagUnknownRoleREFERENCED);
+		tagEntryInfo oEntry;
+		initRefTagEntry(&oEntry, vStringValue(g_cxx.pToken->pszWord),
+						CXXTagKindUNKNOWN, CXXTagUnknownRoleREFERENCED);
+		oEntry.extensionFields.scopeIndex = cxxScopeGetDefTag();
+		g_cxx.pToken->iCorkIndex = makeTagEntry(&oEntry);
 		g_cxx.pToken->bCorkIndexForReftag = true;
 
 		if (in_subparser)
