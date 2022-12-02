@@ -2092,6 +2092,19 @@ identical.
 
 This can be avoided by use of the ``--excmd=n`` option.
 
+INCOMPATIBLE CHANGES
+--------------------
+See ctags-incompatibilities(7) about incompatibilities between Universal
+Ctags and Exuberant Ctags.
+
+This section describes major incompatibilities within versions of Universal
+Ctags.
+
+Unifying the kind Letter for ``unknown`` kinds
+	Some parsers used different kind letters for ``unknown`` kinds.
+	EmacsLisp used ``u``. Go used ``u``. Julian used ``x``. Lisp used ``u``.
+	Lua used ``X``. and Python used ``x``. They were unified to ``Y`` in
+	the during development of version 5.9.x.
 
 BUGS
 ----

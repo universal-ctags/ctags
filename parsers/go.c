@@ -146,7 +146,7 @@ static kindDefinition GoKinds[] = {
 	{true, 'm', "member", "struct members"},
 	{true, 'M', "anonMember", "struct anonymous members"},
 	{true, 'n', "methodSpec", "interface method specification"},
-	{true, 'u', "unknown", "unknown",
+	{true, 'Y', "unknown", "unknown",
 	 .referenceOnly = true, ATTACH_ROLES (GoUnknownRoles)},
 	{true, 'P', "packageName", "name for specifying imported package"},
 	{true, 'a', "talias", "type aliases"},

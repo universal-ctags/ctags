@@ -41,7 +41,7 @@ static kindDefinition LuaKinds [] = {
 	{ true, 'f', "function", "functions" },
 
 	/* `unknown' is a kind just for making FQ tag for functions. */
-	{ false, 'X', "unknown",  "unknown language object",
+	{ false, 'Y', "unknown",  "unknown language object",
 	  .referenceOnly = true, ATTACH_ROLES(LuaUnknownRoles) },
 };
 

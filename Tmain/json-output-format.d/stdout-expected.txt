@@ -60,6 +60,7 @@
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "C", "path": "v,variable", "pattern": "variable definitions"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "M,anonMember", "pattern": "struct anonymous members"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "P,packageName", "pattern": "name for specifying imported package"}
+{"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "Y,unknown", "pattern": "unknown"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "a,talias", "pattern": "type aliases"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "c,const", "pattern": "constants"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "f,func", "pattern": "functions"}
@@ -69,18 +70,17 @@
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "p,package", "pattern": "packages"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "s,struct", "pattern": "structs"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "t,type", "pattern": "types"}
-{"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "u,unknown", "pattern": "unknown"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Go", "path": "v,var", "pattern": "variables"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Man", "path": "S,subsection", "pattern": "sub sections"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Man", "path": "s,section", "pattern": "sections"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Man", "path": "t,title", "pattern": "titles"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "I,namespace", "pattern": "name referring a module defined in other file"}
+{"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "Y,unknown", "pattern": "name referring a class\\/variable\\/function\\/module defined in other module"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "c,class", "pattern": "classes"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "f,function", "pattern": "functions"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "i,module", "pattern": "modules"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "m,member", "pattern": "class members"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "v,variable", "pattern": "variables"}
-{"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "x,unknown", "pattern": "name referring a class\\/variable\\/function\\/module defined in other module"}
 {"_type": "ptag", "name": "TAG_OUTPUT_EXCMD", "path": "mixed", "pattern": "number, pattern, mixed, or combineV2"}
 {"_type": "ptag", "name": "TAG_PATTERN_LENGTH_LIMIT", "path": "96", "pattern": "0 for no limit"}
 {"_type": "ptag", "name": "TAG_PROGRAM_AUTHOR", "path": "Universal Ctags Team", "pattern": ""}

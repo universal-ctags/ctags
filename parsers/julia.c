@@ -92,7 +92,7 @@ static kindDefinition JuliaKinds [] = {
       ATTACH_ROLES(JuliaModuleRoles) },
     { true, 's', "struct",   "Structures"   },
     { true, 't', "type",     "Types"        },
-    { true, 'x', "unknown", "name defined in other modules",
+    { true, 'Y', "unknown", "name defined in other modules",
       .referenceOnly = true, ATTACH_ROLES(JuliaUnknownRoles) },
 };
 
