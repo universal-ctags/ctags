@@ -8,7 +8,6 @@
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
-!_TAG_PROGRAM_VERSION	5.9.0	//
 x	input.c	/^int z(int y, int x)$/;"	z	function:z	typeref:typename:int	file:	nth:1
 y	input.c	/^int z(int y, int x)$/;"	z	function:z	typeref:typename:int	file:	nth:0
 z	input.c	/^int z(int y, int x)$/;"	f	typeref:typename:int

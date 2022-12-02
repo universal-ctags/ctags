@@ -8,7 +8,6 @@
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
-!_TAG_PROGRAM_VERSION	5.9.0	/b0d456fb4/
 abc	input.c	/^typedef struct abc {$/;"	s	file:
 def	input.c	/^	int def;$/;"	m	struct:abc	typeref:typename:int	file:
 ghi	input.c	/^	int ghi;$/;"	m	struct:abc	typeref:typename:int	file:

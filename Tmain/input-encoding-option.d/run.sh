@@ -14,6 +14,7 @@ if ${CTAGS} --quiet --options=NONE --list-features | grep -q iconv; then
   check_encoding utf-8
   if ${CTAGS} --quiet --options=NONE \
 			  --pseudo-tags=-TAG_PROC_CWD \
+			  --pseudo-tags=-TAG_PROGRAM_VERSION \
 	      --pseudo-tags=-TAG_KIND_DESCRIPTION \
 	      --pseudo-tags=-TAG_EXTRA_DESCRIPTION \
 	      --pseudo-tags=-TAG_FIELD_DESCRIPTION \

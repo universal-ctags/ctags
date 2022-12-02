@@ -4,4 +4,4 @@
 --languages=X
 --kinddef-X=a,anything,something anythings
 --regex-X=/^(.*)$/\1/a/
-
+--pseudo-tags=-TAG_PROGRAM_VERSION

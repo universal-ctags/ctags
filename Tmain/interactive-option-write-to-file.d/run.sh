@@ -16,6 +16,7 @@ s()
 
 O=/tmp/ctags-tmain-$$.txt
 
-echo '{"command":"generate-tags", "filename":"test.rb"}' | ${CTAGS} --quiet --options=NONE --_interactive -o ${O} |s
+echo '{"command":"generate-tags", "filename":"test.rb"}' | ${CTAGS} --quiet --options=NONE --_interactive -o ${O} \
+																	--pseudo-tags=-TAG_PROGRAM_VERSION |s
 
 rm -f ${O}

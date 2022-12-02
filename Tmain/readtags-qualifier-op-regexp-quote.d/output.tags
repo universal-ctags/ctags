@@ -8,6 +8,5 @@
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
-!_TAG_PROGRAM_VERSION	5.9.0	/d1206890/
 [{.*+]}^$()|?\\	input.x	/^[{.*+]}^$()|?\\$/;"	a
 abc	input.x	/^abc$/;"	a

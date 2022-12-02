@@ -8,7 +8,6 @@
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
-!_TAG_PROGRAM_VERSION	5.9.0	//
 M	input.c	4;"	macro	file:
 N	input.c	3;"	macro	file:
 bar	input.c	11;"	function	typeref:typename:void	file:	signature:(char ** argv,int * r)

@@ -12,6 +12,8 @@ s()
 }
 
 if is_feature_available ${CTAGS} json; then
-	echo '{"command":"generate-tags", "filename":"input.cst"}' | $CTAGS --options=NONE --map-CTagsSelfTest=.cst --_interactive |s
-	echo '{"command":"generate-tags", "filename":"input.cst"}' | $CTAGS --quiet --options=NONE --map-CTagsSelfTest=.cst --_interactive |s
+	echo '{"command":"generate-tags", "filename":"input.cst"}' | $CTAGS --options=NONE --pseudo-tags=-TAG_PROGRAM_VERSION \
+																		--map-CTagsSelfTest=.cst --_interactive |s
+	echo '{"command":"generate-tags", "filename":"input.cst"}' | $CTAGS --quiet --options=NONE --pseudo-tags=-TAG_PROGRAM_VERSION \
+																		--map-CTagsSelfTest=.cst --_interactive |s
 fi

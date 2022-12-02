@@ -1,4 +1,4 @@
-/* ctags -o output.tags --fields=+St -n input.c */
+/* ctags -o output.tags --fields=+St -n --pseudo-tags=-TAG_PROGRAM_VERSION input.c */
 
 #define N 1
 #define M 3

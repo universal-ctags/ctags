@@ -74,5 +74,6 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	testing-readtags.rst
 	reporting.rst
 	contributions.rst
+	releasing.rst
 	other-projects.rst
 	developers.rst

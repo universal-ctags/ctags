@@ -1,0 +1,3 @@
+{"_type": "program", "name": "Universal Ctags", "version": "5.9.0"}
+{"_type": "program", "version": "5.9.0"}
+{"_type": "program", "name": "Universal Ctags"}
