@@ -832,7 +832,16 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 		result->fields.max, sizeof (tagExtensionField));
 	if (result->fields.list == NULL)
 		goto mem_error;
-	result->fp = fopen (filePath, "rb");
+
+#if defined(__GLIBC__) && (__GLIBC__ >= 2) \
+	&& defined(__GLIBC_MINOR__) && (__GLIBC_MINOR__ >= 3)
+	result->fp = fopen (filePath, "rbm");
+#endif
+	if (result->fp == NULL)
+	{
+		errno = 0;
+		result->fp = fopen (filePath, "rb");
+	}
 	if (result->fp == NULL)
 	{
 		info->status.error_number = errno;

@@ -1681,7 +1681,7 @@ static void dump_node(context_t *ctx, const node_t *node, const int indent) {
         fprintf(stdout, "')\n");
         break;
     case NODE_QUANTITY:
-        fprintf(stdout, "%*sQuantity(min:%d, max%d) {\n", indent, "", node->data.quantity.min, node->data.quantity.max);
+        fprintf(stdout, "%*sQuantity(min:%d, max:%d) {\n", indent, "", node->data.quantity.min, node->data.quantity.max);
         dump_node(ctx, node->data.quantity.expr, indent + 2);
         fprintf(stdout, "%*s}\n", indent, "");
         break;
