@@ -10,7 +10,7 @@ Rule(name:'statement', ref:0, vars.len:1, capts.len:0, codes.len:2) {
       )
     }
     Sequence(max:4, len:3) {
-      Quantity(min:0, max-1) {
+      Quantity(min:0, max:-1) {
         Sequence(max:2, len:2) {
           Predicate(neg:1) {
             Reference(var:'(null)', index:void, name:'EOL', rule:'EOL')
@@ -125,7 +125,7 @@ Rule(name:'primary', ref:1, vars.len:1, capts.len:1, codes.len:2) {
   Alternate(max:2, len:2) {
     Sequence(max:2, len:2) {
       Capture(index:0) {
-        Quantity(min:1, max-1) {
+        Quantity(min:1, max:-1) {
           Charclass(value:'0-9')
         }
       }
@@ -146,7 +146,7 @@ Rule(name:'primary', ref:1, vars.len:1, capts.len:1, codes.len:2) {
   }
 }
 Rule(name:'_', ref:14, vars.len:0, capts.len:0, codes.len:0) {
-  Quantity(min:0, max-1) {
+  Quantity(min:0, max:-1) {
     Charclass(value:' \t')
   }
 }
