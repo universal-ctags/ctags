@@ -1,5 +1,5 @@
 np	input.py	/^import numpy as np$/;"	I	language:Python	nameref:module:numpy
-plt	input.py	/^from matplotlib import pyplot as plt$/;"	x	language:Python	nameref:unknown:pyplot
+plt	input.py	/^from matplotlib import pyplot as plt$/;"	Y	language:Python	nameref:unknown:pyplot
 generate sound	input.py	/^# %% generate sound$/;"	c	language:IPythonCell
 f	input.py	/^f = 12000$/;"	v	language:Python
 fs	input.py	/^fs = 44100$/;"	v	language:Python

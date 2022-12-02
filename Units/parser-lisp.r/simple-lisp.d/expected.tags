@@ -6,4 +6,4 @@ c0	input.l	/^(defconstant c0 5)$/;"	c
 C1	input.l	/^(DEFCONSTANT C1 6)$/;"	c
 defunknown0	input.l	/^(defmacro defunknown0 (s)$/;"	m
 DEFUNKNOWN1	input.l	/^(DEFMACRO DEFUNKNOWN1 (s)$/;"	m
-unknown	input.l	/^(defunknown1 unknown)$/;"	u
+unknown	input.l	/^(defunknown1 unknown)$/;"	Y

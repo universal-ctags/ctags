@@ -32,7 +32,7 @@ typedef enum {
 } lispKind;
 
 static kindDefinition LispKinds [] = {
-	{ true, 'u', "unknown", "unknown type of definitions" },
+	{ true, 'Y', "unknown", "unknown type of definitions" },
 	{ true, 'f', "function", "functions" },
 	{ true, 'v', "variable", "variables" },
 	{ true, 'm', "macro", "macros" },
@@ -67,7 +67,7 @@ typedef enum {
  * defvar-mode-local   (=> cadr)
  */
 static kindDefinition EmacsLispKinds [] = {
-	{ true, 'u', "unknown", "unknown type of definitions" },
+	{ true, 'Y', "unknown", "unknown type of definitions" },
 	{ true, 'f', "function", "functions" },
 	{ true, 'v', "variable", "variables" },
 	{ true, 'c', "const", "constants" },

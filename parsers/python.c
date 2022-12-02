@@ -141,7 +141,7 @@ static kindDefinition PythonKinds[COUNT_KIND] = {
 	{true, 'I', "namespace", "name referring a module defined in other file"},
 	{true, 'i', "module",    "modules",
 	 .referenceOnly = true,  ATTACH_ROLES(PythonModuleRoles)},
-	{true, 'x', "unknown",   "name referring a class/variable/function/module defined in other module",
+	{true, 'Y', "unknown",   "name referring a class/variable/function/module defined in other module",
 	 .referenceOnly = false, ATTACH_ROLES(PythonUnknownRoles)},
 	{false, 'z', "parameter", "function parameters" },
 	{false, 'l', "local",    "local variables" },
