@@ -14,6 +14,7 @@ is_feature_available ${CTAGS} '!' gcov
     echo '{"command":"generate-tags", "filename":"input.c", "size": -1}'
     echo '{"command":"generate-tags", "filename":"input.el", "size": 16}'
     echo '(defun foo () 0)'
-} | $CTAGS --quiet --options=NONE  --_interactive=sandbox
+} | $CTAGS --quiet --options=NONE  --_interactive=sandbox \
+		   --pseudo-tags=-TAG_PROGRAM_VERSION
 
 exit $?

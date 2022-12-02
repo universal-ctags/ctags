@@ -13,6 +13,7 @@ is_feature_available ${CTAGS} '!' gcov
 {
     echo '{"command":"generate-tags", "filename":"input.c", "size": 28}'
     echo 'int main(void) { return 0; }'
-} | $CTAGS --quiet --options=NONE  --_interactive=sandbox
+} | $CTAGS --quiet --options=NONE  --_interactive=sandbox \
+		   --pseudo-tags=-TAG_PROGRAM_VERSION
 
 exit $?

@@ -14,6 +14,7 @@ is_feature_available ${CTAGS} '!' gcov
 {
     echo '{"command":"generate-tags", "filename":"input.ctst", "size": 1}'
     echo 'P'
-} | $CTAGS --quiet --options=NONE  --language-force=CTagsSelfTest --_interactive=sandbox
+} | $CTAGS --quiet --options=NONE  --language-force=CTagsSelfTest --_interactive=sandbox \
+		   --pseudo-tags=-TAG_PROGRAM_VERSION
 
 exit $?
