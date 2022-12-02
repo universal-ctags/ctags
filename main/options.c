@@ -194,8 +194,8 @@ typedef enum eOptionLoadingStage {
 	OptionLoadingStageNone,
 	OptionLoadingStageCustom,
 	OptionLoadingStageXdg,
-	OptionLoadingStageHomeRecursive,
-	OptionLoadingStageCurrentRecursive,
+	OptionLoadingStageHomeDir,
+	OptionLoadingStageCurrentDir,
 	OptionLoadingStageEnvVar,
 	OptionLoadingStageCmdline,
 } OptionLoadingStage;
@@ -613,8 +613,8 @@ static const char *const StageDescription [] = {
 	[OptionLoadingStageNone]   = "not initialized",
 	[OptionLoadingStageCustom] = "custom file",
 	[OptionLoadingStageXdg] = "file(s) under $XDG_CONFIG_HOME and $HOME/.config",
-	[OptionLoadingStageHomeRecursive] = "file(s) under $HOME",
-	[OptionLoadingStageCurrentRecursive] = "file(s) under the current directory",
+	[OptionLoadingStageHomeDir] = "file(s) under $HOME",
+	[OptionLoadingStageCurrentDir] = "file(s) under the current directory",
 	[OptionLoadingStageCmdline] = "command line",
 };
 
@@ -3768,7 +3768,7 @@ static struct preloadPathElt preload_path_list [] = {
 		.isDirectory = true,
 		.makePath = prependEnvvar,
 		.extra = "HOME",
-		.stage = OptionLoadingStageHomeRecursive,
+		.stage = OptionLoadingStageHomeDir,
 	},
 #ifdef WIN32
 	{
@@ -3776,20 +3776,20 @@ static struct preloadPathElt preload_path_list [] = {
 		.isDirectory = true,
 		.makePath = getConfigAtHomeOnWindows,
 		.extra = NULL,
-		.stage = OptionLoadingStageHomeRecursive,
+		.stage = OptionLoadingStageHomeDir,
 	},
 #endif
 	{
 		.path = ".ctags.d",
 		.isDirectory = true,
 		.makePath = NULL,
-		.stage = OptionLoadingStageCurrentRecursive,
+		.stage = OptionLoadingStageCurrentDir,
 	},
 	{
 		.path = "ctags.d",
 		.isDirectory = true,
 		.makePath = NULL,
-		.stage = OptionLoadingStageCurrentRecursive,
+		.stage = OptionLoadingStageCurrentDir,
 	},
 	{
 		.path = NULL,
@@ -3808,6 +3808,39 @@ extern void readOptionConfiguration (void)
 		parseConfigurationFileOptions ();
 }
 
+static stringList* optlibPathListNew(struct preloadPathElt *pathList)
+{
+	stringList * appended = stringListNew ();
+
+	for (size_t i = 0; pathList[i].path != NULL || pathList[i].makePath != NULL; ++i)
+	{
+		struct preloadPathElt *elt = pathList + i;
+		preloadMakePathFunc maker = elt->makePath;
+		const char *path = elt->path;
+
+		if (!elt->isDirectory)
+			continue;
+
+		if (elt->stage == OptionLoadingStageCurrentDir)
+			continue;
+
+		if (maker)
+			path = maker(elt->path, elt->extra);
+
+		if (path == NULL)
+			continue;
+
+		vString *vpath;
+		if (path == elt->path)
+			vpath = vStringNewInit (path);
+		else
+			vpath = vStringNewOwn ((char *)path);
+		stringListAdd(appended, vpath);
+	}
+
+	return appended;
+}
+
 /*
 *   Option initialization
 */
@@ -3815,7 +3848,7 @@ extern void readOptionConfiguration (void)
 extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
-	OptlibPathList = stringListNew ();
+	OptlibPathList = optlibPathListNew (preload_path_list);
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
