@@ -50,3 +50,5 @@ jobs:
     - run: make check V=1
     - run: cat tests/test-suite.log
       if: failure()
+    - run: for x in tests/*.log; do echo '#' $x; cat $x; done
+      if: failure()

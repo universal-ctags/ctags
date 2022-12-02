@@ -1,4 +1,12 @@
-# Version ???
+# Version 0.2.1
+
+- use "m" mode flag of fopen only when compiling with glibc 2.3 or higher.
+
+- LT_VERSION 2:1:1
+
+	- no change in public interface
+
+# Version 0.2.0
 
 - delete debug output automatically printed when DEBUG is defiend in
   build-time.
@@ -19,6 +27,15 @@
 
 - add a new API function (tagsFindPseudoTag) for finding a pseudo tag for
   given name.
+
+- Use mmap(2) when opening a tags file if fopen() supports "m" mode flag.
+
+- LT_VERSION 2:0:1
+
+	- extend the API
+
+		- add a constant: TagErrnoFileMaybeTooBig
+		- add a function: tagsFindPseudoTag
 
 # Version 0.1.0
 
