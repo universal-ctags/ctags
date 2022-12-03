@@ -41,3 +41,23 @@ void cxxReftagEvalNewToken(void)
 			popLanguage();
 	}
 }
+
+void cxxReftagReset(int iCorkIndex, int iScopeCorkIndex,
+					int iKindIndex, int iRoleIndex, bool bUpdateScope)
+{
+	tagEntryInfo *pEntry = getEntryInCorkQueue(iCorkIndex);
+	if(pEntry == NULL)
+		return;
+	if (pEntry->placeholder)
+		return;
+
+	clearRoles(pEntry);
+	if(bUpdateScope && pEntry->extensionFields.scopeIndex != CORK_NIL)
+		unregisterEntry(iCorkIndex);
+	if (bUpdateScope)
+		pEntry->extensionFields.scopeIndex = iScopeCorkIndex;
+	pEntry->kindIndex = iKindIndex;
+	assignRole(pEntry, iRoleIndex);
+	if (bUpdateScope)
+		registerEntry(iCorkIndex);
+}
