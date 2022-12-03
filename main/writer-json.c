@@ -25,6 +25,9 @@
 #ifdef HAVE_JANSSON
 #include <jansson.h>
 
+#define JSON_WRITER_MAJOR 0
+#define JSON_WRITER_MINOR 0
+
 #ifndef json_boolean /* compat with jansson < 2.4 */
 #define json_boolean(val)      ((val) ? json_true() : json_false())
 #endif
@@ -270,7 +273,7 @@ extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, langType language CTAGS_A
 									   const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
-			       "0.0",
+			       STRINGIFY(JSON_WRITER_MAJOR) "." STRINGIFY(JSON_WRITER_MINOR),
 			       "in development",
 			       NULL);
 }
