@@ -44,6 +44,7 @@ enum CXXTagUnknownRole
 {
 	CXXTagUnknownRoleREFERENCED,
 	CXXTagUnknownRoleVALUE,
+	CXXTagUnknownRoleDEFVAR,
 };
 
 enum CXXTagMemberRole
@@ -123,7 +124,8 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken);
 // be destroyed after cxxTagCommit() has been called.
 CXXToken * cxxTagCheckAndSetTypeField(
 		CXXToken * pTypeStart,
-		CXXToken * pTypeEnd
+		CXXToken * pTypeEnd,
+		bool       bVardef
 	);
 
 typedef enum _CXXTagProperty

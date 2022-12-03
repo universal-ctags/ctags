@@ -828,7 +828,7 @@ got_identifier:
 			}
 
 			// anything that remains is part of type
-			CXXToken * pTypeToken = cxxTagCheckAndSetTypeField(cxxTokenChainFirst(pChain),t->pPrev);
+			CXXToken * pTypeToken = cxxTagCheckAndSetTypeField(cxxTokenChainFirst(pChain),t->pPrev, true);
 
 			tag->isFileScope = bKnRStyleParameters ?
 					true :

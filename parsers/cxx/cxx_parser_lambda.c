@@ -239,7 +239,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 		markTagExtraBit (tag, XTAG_ANONYMOUS);
 
 		if(pTypeStart)
-			pTypeName = cxxTagCheckAndSetTypeField(pTypeStart,pTypeEnd);
+			pTypeName = cxxTagCheckAndSetTypeField(pTypeStart,pTypeEnd, false);
 		else
 			pTypeName = NULL;
 

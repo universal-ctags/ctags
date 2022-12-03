@@ -12,6 +12,7 @@
 #include "cxx_debug.h"
 #include "cxx_token_chain.h"
 #include "cxx_parser_internal.h"
+#include "cxx_reftag.h"
 
 #include "entry.h"
 #include "../cpreprocessor.h"
@@ -23,6 +24,7 @@
 	static roleDefinition __langPrefix##UnknownRoles [] = { \
 		{ false, "ref", "referenced anyhow" }, \
 		{ true,  "value", "used as right side value" }, \
+		{ true,  "defvar", "(maybe type) used for defining variables" }, \
 	}
 
 CXX_COMMON_UNKNOWN_ROLES(C);
@@ -535,7 +537,8 @@ static bool cxxTagCheckTypeField(
 
 CXXToken * cxxTagCheckAndSetTypeField(
 		CXXToken * pTypeStart,
-		CXXToken * pTypeEnd
+		CXXToken * pTypeEnd,
+		bool       bVardef
 	)
 {
 	CXX_DEBUG_ASSERT(pTypeStart,"Non null type start is expected here");
@@ -607,12 +610,32 @@ CXXToken * cxxTagCheckAndSetTypeField(
 
 	cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
 	CXXToken * pTypeName = cxxTokenChainExtractRangeFilterTypeName(pTypeStart,pTypeEnd);
-	/* TODO */
 
 	if(!pTypeName)
 	{
 		CXX_DEBUG_PRINT("Can't extract type name");
 		return NULL;
+	}
+
+	if (bVardef && pTypeEnd && cxxTokenTypeIs(pTypeEnd, CXXTokenTypeIdentifier) &&
+		cxxTagRoleEnabled(CXXTagKindUNKNOWN, CXXTagUnknownRoleDEFVAR))
+	{
+		CXXToken *t = pTypeEnd;
+		if(t->iCorkIndex != CORK_NIL && t->bCorkIndexForReftag)
+			cxxReftagReset(t->iCorkIndex, CORK_NIL,
+						   CXXTagKindUNKNOWN, CXXTagUnknownRoleDEFVAR, false);
+		else if(t->iCorkIndex == CORK_NIL)
+		{
+			tagEntryInfo oEntry;
+			initRefTagEntry(&oEntry, vStringValue(t->pszWord),
+							CXXTagKindUNKNOWN, CXXTagUnknownRoleDEFVAR);
+			oEntry.lineNumber = t->iLineNumber;
+			oEntry.filePosition = t->oFilePosition;
+			oEntry.isFileScope = false;
+			// TODO: Other scope field must be filled.
+			t->iCorkIndex = makeTagEntry(&oEntry);
+			t->bCorkIndexForReftag = 1;
+		}
 	}
 
 	CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));
