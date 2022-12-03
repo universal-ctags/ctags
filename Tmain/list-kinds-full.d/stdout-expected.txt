@@ -1,7 +1,7 @@
 #LETTER	NAME	ENABLED	REFONLY	NROLES	MASTER	DESCRIPTION
 D	macroparam	no	no	0	C	parameters inside macro definitions
 L	label	no	no	0	C	goto labels
-Y	unknown	no	yes	1	C	unknown identifier
+Y	unknown	no	yes	2	C	unknown identifier
 d	macro	yes	no	2	C	macro definitions
 e	enumerator	yes	no	0	C	enumerators (values inside an enumeration)
 f	function	yes	no	0	C	function definitions
@@ -22,7 +22,7 @@ D	macroparam	no	no	0	C	parameters inside macro definitions
 L	label	no	no	0	C	goto labels
 N	name	no	no	0	NONE	names imported via using scope::symbol
 U	using	no	no	0	NONE	using namespace statements
-Y	unknown	no	yes	1	C	unknown identifier
+Y	unknown	no	yes	2	C	unknown identifier
 Z	tparam	no	no	0	NONE	template parameters
 c	class	yes	no	0	NONE	classes
 d	macro	yes	no	2	C	macro definitions

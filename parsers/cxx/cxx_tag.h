@@ -43,6 +43,7 @@ enum CXXTagCommonKind
 enum CXXTagUnknownRole
 {
 	CXXTagUnknownRoleREFERENCED,
+	CXXTagUnknownRoleVALUE,
 };
 
 enum CXXTagMemberRole

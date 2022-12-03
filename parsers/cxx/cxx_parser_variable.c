@@ -119,6 +119,45 @@ static void cxxParserExtractMembersInitialization(CXXTokenChain * pChain, int iS
 			}
 			// Point t to the assignment.
 			t = t->pNext->pNext->pNext;
+
+			// Looking for the pattern:
+			//
+			//     = unknown,
+			//
+			// or
+			//
+			//     = unknown}
+			//
+			if(t->pNext &&
+			   cxxTokenTypeIs(t->pNext, CXXTokenTypeIdentifier) &&
+			   t->pNext->pNext &&
+			   cxxTokenTypeIsOneOf(t->pNext->pNext,
+								   CXXTokenTypeComma|CXXTokenTypeClosingBracket))
+
+			{
+				CXXToken *pIdentifier = t->pNext;
+				if(pIdentifier->iCorkIndex != CORK_NIL && pIdentifier->bCorkIndexForReftag)
+				{
+					cxxReftagReset(pIdentifier->iCorkIndex, iScopeCorkIndex,
+								   CXXTagKindUNKNOWN, CXXTagUnknownRoleVALUE,
+								   true);
+				}
+				else if(pIdentifier->iCorkIndex == CORK_NIL)
+				{
+					tagEntryInfo oEntry;
+					initRefTagEntry(&oEntry, vStringValue(pIdentifier->pszWord),
+									CXXTagKindUNKNOWN, CXXTagUnknownRoleVALUE);
+					oEntry.lineNumber = pIdentifier->iLineNumber;
+					oEntry.filePosition = pIdentifier->oFilePosition;
+					oEntry.isFileScope = false;
+					// TODO: Other scope field must be filled.
+					oEntry.extensionFields.scopeIndex = iScopeCorkIndex;
+					pIdentifier->iCorkIndex = makeTagEntry(&oEntry);
+					registerEntry(pIdentifier->iCorkIndex);
+					pIdentifier->bCorkIndexForReftag = 1;
+				}
+				t = t->pNext;
+			}
 		}
 	}
 	return;

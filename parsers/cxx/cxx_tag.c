@@ -22,6 +22,7 @@
 #define CXX_COMMON_UNKNOWN_ROLES(__langPrefix) \
 	static roleDefinition __langPrefix##UnknownRoles [] = { \
 		{ false, "ref", "referenced anyhow" }, \
+		{ true,  "value", "used as right side value" }, \
 	}
 
 CXX_COMMON_UNKNOWN_ROLES(C);
