@@ -92,6 +92,9 @@ int cxxTagGetCPPKindDefinitionCount(void);
 // Returns true if the specified tag kind is enabled in the current language
 bool cxxTagKindEnabled(unsigned int uTagKind);
 
+// Returns true if the specified tag role is enabled in the current language
+bool cxxTagRoleEnabled(unsigned int uTagKind, int iTagRole);
+
 // Begin composing a tag. The tag kind must correspond to the current language.
 // Returns NULL if the tag should *not* be included in the output
 // or the tag entry info that can be filled up with extension fields.
