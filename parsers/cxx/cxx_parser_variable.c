@@ -14,6 +14,7 @@
 #include "cxx_token.h"
 #include "cxx_token_chain.h"
 #include "cxx_scope.h"
+#include "cxx_reftag.h"
 
 #include "vstring.h"
 #include "read.h"
@@ -65,6 +66,62 @@ CXXToken * cxxParserFindFirstPossiblyNestedAndQualifiedIdentifier(
 	// baz::foo::something <--
 
 	return cxxTokenChainNextTokenOfType(pId,CXXTokenTypeIdentifier);
+}
+
+static void cxxParserExtractMembersInitialization(CXXTokenChain * pChain, int iScopeCorkIndex)
+{
+	tagEntryInfo *pTag = getEntryInCorkQueue(iScopeCorkIndex);
+	if(!pTag || pTag->kindIndex != CXXTagKindVARIABLE)
+		return;
+
+	// Looking for the pattern:
+	//
+	//     { .member = ...
+	//
+	// or
+	//
+	//     ; .member = ...
+	//
+	for (CXXToken *t = cxxTokenChainFirst(pChain); t && t != pChain->pTail; t = t->pNext)
+	{
+		if(
+			(cxxTokenTypeIs(t, CXXTokenTypeOpeningBracket)
+			 || cxxTokenTypeIs(t, CXXTokenTypeComma)) &&
+			(t->pNext
+			 && cxxTokenTypeIs(t->pNext, CXXTokenTypeDotOperator)) &&
+			(t->pNext->pNext
+			 && cxxTokenTypeIs(t->pNext->pNext, CXXTokenTypeIdentifier)) &&
+			(t->pNext->pNext->pNext
+			 && cxxTokenTypeIs(t->pNext->pNext->pNext, CXXTokenTypeAssignment))
+			)
+		{
+			CXXToken *pIdentifier = t->pNext->pNext;
+			if(pIdentifier->iCorkIndex != CORK_NIL && pIdentifier->bCorkIndexForReftag)
+			{
+				// Tagged with "unknown" kind already. Reset it.
+				cxxReftagReset(pIdentifier->iCorkIndex, iScopeCorkIndex,
+							   CXXTagKindMEMBER, CXXTagMemberRoleINITIALIZED, true);
+			}
+			else if(pIdentifier->iCorkIndex == CORK_NIL)
+			{
+				tagEntryInfo oEntry;
+				initRefTagEntry(&oEntry, vStringValue(pIdentifier->pszWord),
+								CXXTagKindMEMBER, CXXTagMemberRoleINITIALIZED);
+				oEntry.lineNumber = pIdentifier->iLineNumber;
+				oEntry.filePosition = pIdentifier->oFilePosition;
+				oEntry.isFileScope = false;
+				// TODO: Other scope field must be filled.
+				oEntry.extensionFields.scopeIndex = iScopeCorkIndex;
+				pIdentifier->iCorkIndex = makeTagEntry(&oEntry);
+				registerEntry(pIdentifier->iCorkIndex);
+				pIdentifier->bCorkIndexForReftag = 1;
+
+			}
+			// Point t to the assignment.
+			t = t->pNext->pNext->pNext;
+		}
+	}
+	return;
 }
 
 //
@@ -817,11 +874,18 @@ got_identifier:
 			return bGotVariable;
 		}
 
+		// pointing {} of ... = {}
+		CXXToken * pTokenBracketChain = NULL;
 		if(!cxxTokenTypeIsOneOf(
 				t,
 				CXXTokenTypeComma | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket
 			))
 		{
+			if(iCorkIndex != CORK_NIL &&
+			   cxxTokenTypeIs(t, CXXTokenTypeAssignment) &&
+			   t->pNext && cxxTokenTypeIs(t->pNext, CXXTokenTypeBracketChain) &&
+			   t->pNext->pChain)
+				pTokenBracketChain = t->pNext;
 			// look for it, but also check for "<" signs: these usually indicate an uncondensed
 			// template. We give up on them as they are too complicated in this context.
 			// It's rather unlikely to have multiple declarations with templates after the first one
@@ -846,6 +910,9 @@ got_identifier:
 		{
 			if (iCorkIndex != CORK_NIL)
 			{
+				if(pTokenBracketChain)
+					cxxParserExtractMembersInitialization(pTokenBracketChain->pChain,
+														  iCorkIndex);
 				cxxParserSetEndLineForTagInCorkQueue (iCorkIndex, t->iLineNumber);
 				iCorkIndex = CORK_NIL;
 				if(iCorkIndexFQ != CORK_NIL)
@@ -861,6 +928,9 @@ got_identifier:
 		// Comma. Might have other declarations here.
 		if (iCorkIndex != CORK_NIL)
 		{
+			if(pTokenBracketChain)
+				cxxParserExtractMembersInitialization(pTokenBracketChain->pChain,
+													  iCorkIndex);
 			cxxParserSetEndLineForTagInCorkQueue (iCorkIndex, t->iLineNumber);
 			iCorkIndex = CORK_NIL;
 			if(iCorkIndexFQ != CORK_NIL)

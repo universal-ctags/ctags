@@ -45,6 +45,11 @@ enum CXXTagUnknownRole
 	CXXTagUnknownRoleREFERENCED,
 };
 
+enum CXXTagMemberRole
+{
+	CXXTagMemberRoleINITIALIZED,
+};
+
 // Tags specific to the CPP language.
 enum CXXTagCPPKind
 {

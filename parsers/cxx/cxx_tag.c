@@ -28,6 +28,15 @@ CXX_COMMON_UNKNOWN_ROLES(C);
 CXX_COMMON_UNKNOWN_ROLES(CXX);
 CXX_COMMON_UNKNOWN_ROLES(CUDA);
 
+#define CXX_COMMON_MEMBER_ROLES(__langPrefix) \
+	static roleDefinition __langPrefix##MemberRoles [] = { \
+		{ true, "initialized", "initialized with form '.member = ...'" }, \
+	}
+
+CXX_COMMON_MEMBER_ROLES(C);
+CXX_COMMON_MEMBER_ROLES(CXX);
+CXX_COMMON_MEMBER_ROLES(CUDA);
+
 #define CXX_COMMON_MACRO_ROLES(__langPrefix) \
 	static roleDefinition __langPrefix##MacroRoles [] = { \
 		RoleTemplateUndef, \
@@ -60,7 +69,9 @@ CXX_COMMON_HEADER_ROLES(CUDA);
 			.referenceOnly = true,  ATTACH_ROLES(_langPrefix##HeaderRoles), .syncWith = _syncWith \
 	}, \
 	{ false, 'l', "local",      "local variables", .syncWith = _syncWith },   \
-	{ true,  'm', "member",     _szMemberDescription, .syncWith = _syncWith },	\
+	{ true,  'm', "member",     _szMemberDescription, .syncWith = _syncWith,  \
+			.referenceOnly = false, ATTACH_ROLES(_langPrefix##MemberRoles), .syncWith = _syncWith \
+	},\
 	{ false, 'p', "prototype",  "function prototypes", .syncWith = _syncWith },		\
 	{ true,  's', "struct",     "structure names", .syncWith = _syncWith },		\
 	{ true,  't', "typedef",    "typedefs", .syncWith = _syncWith },			\

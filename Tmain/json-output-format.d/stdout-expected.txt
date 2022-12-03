@@ -93,6 +93,7 @@
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "header", "path": "local", "pattern": "local header"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "header", "path": "system", "pattern": "system header"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "macro", "path": "undef", "pattern": "undefined"}
+{"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "member", "path": "initialized", "pattern": "initialized with form '.member = ...'"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Go", "kindName": "package", "path": "imported", "pattern": "imported package"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Go", "kindName": "unknown", "path": "receiverType", "pattern": "receiver type"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "module", "path": "imported", "pattern": "imported modules"}
