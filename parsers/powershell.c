@@ -41,6 +41,7 @@ typedef enum {
 	K_VARIABLE,
 	K_CLASS,
 	K_FILTER,
+	K_ENUM,
 	COUNT_KIND
 } powerShellKind;
 
@@ -49,6 +50,7 @@ static kindDefinition PowerShellKinds[COUNT_KIND] = {
 	{ true, 'v', "variable",	"variables" },
 	{ true, 'c', "class",		"classes" },
 	{ true, 'i', "filter",		"filter" },
+	{ true, 'g', "enum",		"enum names" },
 };
 
 
@@ -77,6 +79,7 @@ enum {
 	KEYWORD_function,
 	KEYWORD_filter,
 	KEYWORD_class,
+	KEYWORD_enum,
 };
 
 /* We need an integer that is not an unsigned to allow KEYWORD_NONE. */
@@ -86,6 +89,7 @@ static const keywordTable PowerShellKeywordTable[] = {
 	{ "function",	KEYWORD_function },
 	{ "filter",		KEYWORD_filter },
 	{ "class",		KEYWORD_class },
+	{ "enum",		KEYWORD_enum },
 };
 
 typedef struct {
@@ -170,6 +174,18 @@ static void makeClassTag (const tokenInfo *const token)
 		tagEntryInfo e;
 
 		initPowerShellEntry (&e, token, K_CLASS, NULL);
+
+		makeTagEntry (&e);
+	}
+}
+
+static void makeEnumTag (const tokenInfo *const token)
+{
+	if (PowerShellKinds[K_ENUM].enabled)
+	{
+		tagEntryInfo e;
+
+		initPowerShellEntry (&e, token, K_ENUM, NULL);
 
 		makeTagEntry (&e);
 	}
@@ -600,6 +616,39 @@ static bool parseClass (tokenInfo *const token)
 	return readNext;
 }
 
+/* parse a enum
+ *
+ * 	enum EnumName {}
+ */
+static bool parseEnum (tokenInfo *const token)
+{
+	bool readNext = true;
+	vString *nameFree = NULL;
+
+	readToken (token);
+
+	if (token->type != TOKEN_IDENTIFIER)
+		return false;
+
+	makeEnumTag (token);
+	nameFree = vStringNewCopy (token->string);
+	readToken (token);
+
+	while (token->type != TOKEN_OPEN_CURLY && token->type != TOKEN_EOF)
+	{
+		readToken (token);
+	}
+
+	if (token->type == TOKEN_OPEN_CURLY)
+		enterScope (token, nameFree, K_ENUM);
+	else
+		readNext = false;
+
+	vStringDelete (nameFree);
+
+	return readNext;
+}
+
 /* parses declarations of the form
  * 	$var = VALUE
  */
@@ -673,6 +722,10 @@ static void enterScope (tokenInfo *const parentToken,
 
 					case KEYWORD_class:
 						readNext = parseClass (token);
+						break;
+
+					case KEYWORD_enum:
+						readNext = parseEnum (token);
 						break;
 
 					default: break;

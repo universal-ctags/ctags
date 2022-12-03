@@ -1,0 +1,4 @@
+EnumName1	input.ps1	/^enum EnumName1 {$/;"	g
+EnumName2	input.ps1	/^enum EnumName2 {$/;"	g
+EnumName3	input.ps1	/^Enum EnumName3 {$/;"	g
+EnumName4	input.ps1	/^[Flags()] enum EnumName4 {$/;"	g
