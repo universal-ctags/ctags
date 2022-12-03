@@ -6,7 +6,7 @@ ctags-json-output
 ---------------------------------------------------------------------------------
 JSON based ctags output
 ---------------------------------------------------------------------------------
-:Version: 0.0
+:Version: 1.0
 :Manual group: Universal Ctags
 :Manual section: 5
 
@@ -28,7 +28,7 @@ Each JSON line represents a tag.
 .. code-block:: console
 
 	$ ctags --extras=+p --output-format=json --fields=-s input.py
-	{"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "0.0", "pattern": "in development"}
+	{"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "1.0", "pattern": "in development"}
 	{"_type": "ptag", "name": "TAG_FILE_SORTED", "path": "1", "pattern": "0=unsorted, 1=sorted, 2=foldcase"}
 	...
 	{"_type": "tag", "name": "Klass", "path": "/tmp/input.py", "pattern": "/^class Klass:$/", "language": "Python", "kind": "class"}
@@ -45,7 +45,7 @@ is ``tag``, the JSON line represents a regular tag. If the value is
 
 The output format can be changed in the
 future. ``JSON_OUTPUT_VERSION`` pseudo-tag provides a change
-client-tools to handle the changes.  Current version is "0.0". A
+client-tools to handle the changes.  Current version is "1.0". A
 client-tool can extract the version with ``path`` key from the
 pseudo-tag.
 
@@ -91,6 +91,32 @@ used in a field of JSON.
 	boolean (true or false)
 
 For an example, the value for ``pattern`` field of ctags takes a string or a boolean value.
+
+VERSIONS
+--------
+
+Cnages since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New key ``kindName`` for ``TAG_ROLE_DESCRIPTION`` pseudo tag
+
+  ``kindName`` is added to store the name of the kind in ``TAG_ROLE_DESCRIPTION``
+  pseudo tags.
+
+  In 0.0, a "TAG_ROLE_DESCRIPTION" pseudo tag was printed like:
+
+  .. code-block:: JSON
+
+      {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION",
+                        "parserName": "LANG!KIND", }
+
+  In 1.0, it is printed like:
+
+  .. code-block:: JSON
+
+      {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION",
+                        "parserName": "LANG",
+                        "kindName": "KIND",  }
 
 SEE ALSO
 --------
