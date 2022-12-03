@@ -107,7 +107,7 @@ Options for Pseudo-tags
 
 		!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/	extras:pseudo
 
-	If the name of a normal tag in a tag file starts with "!_", a
+	If the name of a regular tag in a tag file starts with "!_", a
 	client tool cannot distinguish whether the tag is a regular-tag or
 	pseudo-tag.  The fields attached with this option help the tool
 	distinguish them.
@@ -494,7 +494,7 @@ A key not starting with ``_`` is mapped to a field of ctags.
 
 A key starting with ``_`` represents meta information of the JSON
 line.  Currently only ``_type`` key is used. If the value for the key
-is ``tag``, the JSON line represents a normal tag. If the value is
+is ``tag``, the JSON line represents a regular tag. If the value is
 ``ptag``, the line represents a pseudo-tag.
 
 The output format can be changed in the

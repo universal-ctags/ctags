@@ -1,0 +1,42 @@
+# regular-name-b_.tags
+regular_tag\\	/path/to/file	/^pattern$/
+
+# regular-name-bb.tags
+regular_tag\\	/path/to/file	/^pattern$/
+
+# regular-name-bt.tags
+regular_tag\t	/path/to/file	/^pattern$/
+
+# regular-input-b_.tags
+regular_tag	/path/to/file\\	/^pattern$/
+
+# regular-input-bb.tags
+regular_tag	/path/to/file\\\\	/^pattern$/
+
+# regular-input-bt.tags
+regular_tag	/path/to/file\\t	/^pattern$/
+
+# regular-kind-b_.tags
+regular_tag	/path/to/file	/^pattern$/;"	kind:\\
+
+# regular-kind-bb.tags
+regular_tag	/path/to/file	/^pattern$/;"	kind:\\
+
+# pseudo-name-b_.tags
+!_PTAG\\	value	/comment/
+
+# pseudo-name-bb.tags
+!_PTAG\\	value	/comment/
+
+# pseudo-name-bt.tags
+!_PTAG\t	value	/comment/
+
+# pseudo-input-b_.tags
+!_PTAG	value\\	/comment/
+
+# pseudo-input-bb.tags
+!_PTAG	value\\\\	/comment/
+
+# pseudo-input-bt.tags
+!_PTAG	value\\t	/comment/
+
