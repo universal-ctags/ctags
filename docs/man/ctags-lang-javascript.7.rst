@@ -6,7 +6,7 @@ ctags-lang-javascript
 
 Random notes about tagging JavaScript source code with Universal Ctags
 
-:Version: 5.9.0
+:Version: 6.0.0
 :Manual group: Universal Ctags
 :Manual section: 7
 

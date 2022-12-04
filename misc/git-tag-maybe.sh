@@ -23,7 +23,7 @@ run() {
 
 ##################################### main #######################################
 
-base=5.9
+base=6.0
 cal=$(date +%Y%m%d)
 chicken=0
 new_tagname="p${base}.${cal}.${chicken}"

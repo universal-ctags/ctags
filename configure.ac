@@ -7,7 +7,7 @@
 #	Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.64])
-AC_INIT([universal-ctags],[5.9.0])
+AC_INIT([universal-ctags],[6.0.0])
 
 if ! test -e "${srcdir}/config.h.in"; then
    echo "---"

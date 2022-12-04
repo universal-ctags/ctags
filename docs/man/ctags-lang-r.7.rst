@@ -6,7 +6,7 @@ ctags-lang-r
 
 Random notes about tagging R source code with Universal Ctags
 
-:Version: 5.9.0
+:Version: 6.0.0
 :Manual group: Universal Ctags
 :Manual section: 7
 
