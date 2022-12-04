@@ -241,8 +241,23 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 {
 #define OPT(X) ((X)?(X):"")
 	json_t *response;
+	char *parserName0 = NULL;
 
-	if (parserName)
+	const char *rest = ((JSON_WRITER_MAJOR > 0) && parserName && desc->jsonObjectKey)
+		? strchr(parserName, '!')
+		: NULL;
+	if (rest)
+	{
+		parserName0 = eStrndup(parserName, rest - parserName);
+		response = json_pack ("{ss ss ss ss ss ss}",
+				      "_type", "ptag",
+				      "name", desc->name,
+				      "parserName", parserName0,
+				      desc->jsonObjectKey, rest + 1,
+				      "path", OPT(fileName),
+				      "pattern", OPT(pattern));
+	}
+	else if (parserName)
 	{
 		response = json_pack ("{ss ss ss ss ss}",
 				      "_type", "ptag",
@@ -264,6 +279,8 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	int length = mio_printf (mio, "%s\n", buf);
 	free (buf);
 	json_decref (response);
+	if (parserName0)
+		eFree(parserName0);
 
 	return length;
 #undef OPT

@@ -69,6 +69,9 @@ struct sPtagDesc {
 	bool (* makeTag) (ptagDesc *, langType, const void *);
 
 	ptagFlag flags;
+
+	/* See writer-json.c */
+	const char *jsonObjectKey;
 };
 
 extern bool makePtagIfEnabled (ptagType type, langType language, const void *data);
