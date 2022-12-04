@@ -8,6 +8,7 @@ Man pages
 	:maxdepth: 3
 
 	ctags(1) <man/ctags.1.rst>
+	ctags-json-output(5) <man/ctags-json-output.5.rst>
 	tags(5) <man/tags.5.rst>
 
 	ctags-optlib(7) <man/ctags-optlib.7.rst>
