@@ -25,6 +25,9 @@
 #ifdef HAVE_JANSSON
 #include <jansson.h>
 
+#define JSON_WRITER_MAJOR 0
+#define JSON_WRITER_MINOR 0
+
 #ifndef json_boolean /* compat with jansson < 2.4 */
 #define json_boolean(val)      ((val) ? json_true() : json_false())
 #endif
@@ -238,8 +241,23 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 {
 #define OPT(X) ((X)?(X):"")
 	json_t *response;
+	char *parserName0 = NULL;
 
-	if (parserName)
+	const char *rest = ((JSON_WRITER_MAJOR > 0) && parserName && desc->jsonObjectKey)
+		? strchr(parserName, '!')
+		: NULL;
+	if (rest)
+	{
+		parserName0 = eStrndup(parserName, rest - parserName);
+		response = json_pack ("{ss ss ss ss ss ss}",
+				      "_type", "ptag",
+				      "name", desc->name,
+				      "parserName", parserName0,
+				      desc->jsonObjectKey, rest + 1,
+				      "path", OPT(fileName),
+				      "pattern", OPT(pattern));
+	}
+	else if (parserName)
 	{
 		response = json_pack ("{ss ss ss ss ss}",
 				      "_type", "ptag",
@@ -261,6 +279,8 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	int length = mio_printf (mio, "%s\n", buf);
 	free (buf);
 	json_decref (response);
+	if (parserName0)
+		eFree(parserName0);
 
 	return length;
 #undef OPT
@@ -270,7 +290,7 @@ extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, langType language CTAGS_A
 									   const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
-			       "0.0",
+			       STRINGIFY(JSON_WRITER_MAJOR) "." STRINGIFY(JSON_WRITER_MINOR),
 			       "in development",
 			       NULL);
 }

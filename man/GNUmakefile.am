@@ -43,6 +43,7 @@ GEN_IN_MAN_FILES = \
 	\
 	readtags.1 \
 	tags.5 \
+	ctags-json-output.5 \
 	\
 	$(NULL)
 
