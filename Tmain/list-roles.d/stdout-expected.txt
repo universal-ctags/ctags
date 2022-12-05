@@ -92,6 +92,7 @@ Protobuf       m/message         extension          on      extending the messag
 Python         Y/unknown         imported           on      imported from the other module
 Python         Y/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
 Python         Y/unknown         ref                off     (EXPERIMENTAL)referenced anyhow
+Python         c/class           super              on      super class
 Python         i/module          imported           on      imported modules
 Python         i/module          indirectlyImported on      module imported in alternative name
 Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
@@ -226,6 +227,7 @@ Protobuf       m/message         extension          on      extending the messag
 Python         Y/unknown         imported           on      imported from the other module
 Python         Y/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
 Python         Y/unknown         ref                off     (EXPERIMENTAL)referenced anyhow
+Python         c/class           super              on      super class
 Python         i/module          imported           on      imported modules
 Python         i/module          indirectlyImported on      module imported in alternative name
 Python         i/module          namespace          on      namespace from where classes/variables/functions are imported

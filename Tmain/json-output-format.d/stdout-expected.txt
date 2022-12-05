@@ -97,6 +97,7 @@
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "struct", "path": "foreigndecl", "pattern": "declared in foreign languages"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Go", "kindName": "package", "path": "imported", "pattern": "imported package"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Go", "kindName": "unknown", "path": "receiverType", "pattern": "receiver type"}
+{"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "class", "path": "super", "pattern": "super class"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "module", "path": "imported", "pattern": "imported modules"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "module", "path": "indirectlyImported", "pattern": "module imported in alternative name"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "module", "path": "namespace", "pattern": "namespace from where classes/variables/functions are imported"}

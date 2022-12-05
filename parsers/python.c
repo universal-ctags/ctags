@@ -101,6 +101,10 @@ typedef enum {
 	PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
 } pythonUnknownRole;
 
+typedef enum {
+	PYTHON_CLASS_SUPERCLASS,
+} pythonClassRole;
+
 /* Roles related to `import'
  * ==========================
  * import X              X = (kind:module, role:imported)
@@ -135,8 +139,13 @@ static roleDefinition PythonUnknownRoles [] = {
 	  "classes/variables/functions/modules imported in alternative name" },
 };
 
+static roleDefinition PythonClassRoles [] = {
+	{ true, "super", "super class" },
+};
+
 static kindDefinition PythonKinds[COUNT_KIND] = {
-	{true, 'c', "class",    "classes"},
+	{true, 'c', "class",    "classes",
+	 .referenceOnly = false, ATTACH_ROLES(PythonClassRoles) },
 	{true, 'f', "function", "functions"},
 	{true, 'm', "member",   "class members"},
 	{true, 'v', "variable", "variables"},
@@ -1042,13 +1051,41 @@ static void deleteTypedParam (struct typedParam *p)
 static void parseInheritanceList (tokenInfo *const token,
 								  vString *const inneritanceList)
 {
+	tokenInfo *lastToken = newToken ();
+
 	do
 	{
+		copyToken (lastToken, token);
 		readTokenFull (token, true);
+		if (lastToken->type == TOKEN_IDENTIFIER
+			&& (token->type == ',' || token->type == ')'))
+		{
+			if (lastToken->reftag == CORK_NIL)
+			{
+				tagEntryInfo e;
+				initRefTagEntry(&e, vStringValue (lastToken->string),
+								K_CLASS, PYTHON_CLASS_SUPERCLASS);
+				e.lineNumber	= lastToken->lineNumber;
+				e.filePosition	= lastToken->filePosition;
+				lastToken->reftag = makeTagEntry (&e);
+			}
+			else
+			{
+				tagEntryInfo *e = getEntryInCorkQueue (lastToken->reftag);
+				if (e)
+				{
+					clearRoles(e);
+					e->kindIndex = K_CLASS;
+					assignRole(e, PYTHON_CLASS_SUPERCLASS);
+				}
+			}
+		}
 		if (token->type != ')')
 			reprCat (inneritanceList, token);
 	}
 	while (token->type != TOKEN_EOF && token->type != ')');
+
+	deleteToken (lastToken);
 }
 
 static void parseArglist (tokenInfo *const token,

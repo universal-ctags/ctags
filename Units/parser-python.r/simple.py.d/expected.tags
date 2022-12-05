@@ -37,9 +37,13 @@ this	input.py	/^                    @blah class this is seen???$/;"	kind:class	l
 _test.ignored_function.more_nesting.deeply_nested.even_more.this	input.py	/^                    @blah class this is seen???$/;"	kind:class	line:41	language:Python	scope:member:_test.ignored_function.more_nesting.deeply_nested.even_more	file:	inherits:	access:private	roles:def	extras:qualified	end:42	decorators:blah
 this	input.py	/^                        @bleh def this also? good!$/;"	kind:member	line:42	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested.even_more.this	access:public	roles:def	end:42	decorators:bleh
 _test.ignored_function.more_nesting.deeply_nested.even_more.this.this	input.py	/^                        @bleh def this also? good!$/;"	kind:member	line:42	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested.even_more.this	access:public	roles:def	extras:qualified	end:42	decorators:bleh
+one	input.py	/^class two (one):$/;"	kind:class	line:46	language:Python	roles:super	extras:reference
 two	input.py	/^class two (one):$/;"	kind:class	line:46	language:Python	inherits:one	access:public	roles:def	end:48
 only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope:class:two	access:public	signature:(arg)	roles:def	end:48
 two.only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope:class:two	access:public	signature:(arg)	roles:def	extras:qualified	end:48
+A	input.py	/^(A, B,$/;"	kind:class	line:53	language:Python	roles:super	extras:reference
+B	input.py	/^(A, B,$/;"	kind:class	line:53	language:Python	roles:super	extras:reference
+C	input.py	/^C):$/;"	kind:class	line:54	language:Python	roles:super	extras:reference
 three	input.py	/^three\\$/;"	kind:class	line:52	language:Python	inherits:A, B, C	access:public	roles:def	end:54
 foo	input.py	/^foo($/;"	kind:function	line:57	language:Python	access:public	signature:( x , y, z)	roles:def	end:60
 input.py	input.py	1;"	kind:file	line:1	language:Python	roles:def	extras:inputFile	end:60

@@ -1,5 +1,5 @@
 a.b	input.py	/^import a.b$/;"	i	roles:imported
-object	input.py	/^class X(object):$/;"	Y	roles:ref
+object	input.py	/^class X(object):$/;"	c	roles:super
 X	input.py	/^class X(object):$/;"	c	roles:def
 __init__	input.py	/^    def __init__(self, n):$/;"	m	class:X	roles:def
 self	input.py	/^    def __init__(self, n):$/;"	z	member:X.__init__	file:	roles:def
