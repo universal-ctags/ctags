@@ -1016,9 +1016,11 @@ Listing Options
 ``--list-excludes``
 	Lists the current exclusion patterns used to exclude files.
 
-``--list-extras[=(<language>|all)]``
+``--list-extras[=(<language>|NONE|all)]``
 	Lists the extras recognized for either the specified *<language>* or
-	``all`` languages. See "`Extras`_" subsection to know what are extras.
+	``all`` languages. If ``NONE`` is specified, it lists only extras
+	common in all languages.
+	See "`Extras`_" subsection to know what are extras.
 	``all`` is used as default value if the option argument is omitted.
 
 	An extra can be enabled or disabled with ``--extras=`` for common

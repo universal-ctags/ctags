@@ -2085,6 +2085,8 @@ static void processListExtrasOption (
 				xtagColprintAddLanguageLines (table, i);
 		}
 	}
+	else if (strcasecmp (parameter, RSV_NONE) == 0)
+		xtagColprintAddCommonLines (table);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
