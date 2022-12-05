@@ -1580,6 +1580,8 @@ static void processListFieldsOption(const char *const option CTAGS_ATTR_UNUSED,
 				fieldColprintAddLanguageLines (table, i);
 		}
 	}
+	else if (strcasecmp (parameter, RSV_NONE) == 0)
+		fieldColprintAddCommonLines (table);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);

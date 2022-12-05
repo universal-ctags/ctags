@@ -1047,9 +1047,11 @@ Listing Options
 ``--list-features``
 	Lists the compiled features.
 
-``--list-fields[=(<language>|all)]``
+``--list-fields[=(<language>|NONE|all)]``
 	Lists the fields recognized for either the specified *<language>* or
-	``all`` languages. See "`Extension fields`_" subsection to know what are fields.
+	``all`` languages. If ``NONE`` is specified, it lists only fields
+	common in all languages.
+	See "`Extension fields`_" subsection to know what are fields.
 	``all`` is used as default value if the option argument is omitted.
 
 	The meaning of columns are as follows:
