@@ -1039,14 +1039,25 @@ static void deleteTypedParam (struct typedParam *p)
 	eFree (p);
 }
 
-static void parseArglist (tokenInfo *const token, const int kind,
+static void parseInheritanceList (tokenInfo *const token,
+								  vString *const inneritanceList)
+{
+	do
+	{
+		readTokenFull (token, true);
+		if (token->type != ')')
+			reprCat (inneritanceList, token);
+	}
+	while (token->type != TOKEN_EOF && token->type != ')');
+}
+
+static void parseArglist (tokenInfo *const token,
 						  vString *const arglist, ptrArray *const parameters)
 {
 	int prevTokenType = token->type;
 	int depth = 1;
 
-	if (kind != K_CLASS)
-		reprCat (arglist, token);
+	reprCat (arglist, token);
 
 	do
 	{
@@ -1059,8 +1070,7 @@ static void parseArglist (tokenInfo *const token, const int kind,
 		}
 
 		readTokenFull (token, true);
-		if (kind != K_CLASS || token->type != ')' || depth > 1)
-			reprCat (arglist, token);
+		reprCat (arglist, token);
 
 		if (token->type == '(' ||
 			token->type == '[' ||
@@ -1070,7 +1080,7 @@ static void parseArglist (tokenInfo *const token, const int kind,
 				 token->type == ']' ||
 				 token->type == '}')
 			depth --;
-		else if (kind != K_CLASS && depth == 1 &&
+		else if (depth == 1 &&
 				 token->type == TOKEN_IDENTIFIER &&
 				 (prevTokenType == '(' || prevTokenType == ',') &&
 				 PythonKinds[K_PARAMETER].enabled)
@@ -1091,8 +1101,8 @@ static void parseArglist (tokenInfo *const token, const int kind,
 	while (token->type != TOKEN_EOF && depth > 0);
 }
 
-static void parseCArglist (tokenInfo *const token, const int kind,
-						  vString *const arglist, ptrArray *const parameters)
+static void parseCArglist (tokenInfo *const token,
+						   vString *const arglist, ptrArray *const parameters)
 {
 	int depth = 1;
 	tokenInfo *pname = newToken ();
@@ -1231,12 +1241,14 @@ static bool parseClassOrDef (tokenInfo *const token,
 	if (token->type == '(')
 	{
 		arglist = vStringNew ();
-		parameters = ptrArrayNew ((ptrArrayDeleteFunc)deleteTypedParam);
+		parameters = (kind == K_CLASS)? NULL: ptrArrayNew ((ptrArrayDeleteFunc)deleteTypedParam);
 
-		if (isCDef && kind != K_CLASS)
-			parseCArglist (token, kind, arglist, parameters);
+		if (kind == K_CLASS)
+			parseInheritanceList (token, arglist);
+		else if (isCDef)
+			parseCArglist (token, arglist, parameters);
 		else
-			parseArglist (token, kind, arglist, parameters);
+			parseArglist (token, arglist, parameters);
 	}
 
 	if (kind == K_CLASS)
