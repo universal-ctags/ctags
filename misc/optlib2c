@@ -58,6 +58,8 @@ my $options =
 	       if (defined $_[0]->{'langdef'});
 	   die "Don't use \"all\" as a language name. It is reserved word."
 	       if ($1 eq "all");
+	   die "Don't use \"all\" as a language name. It is reserved word."
+	       if ($1 eq "NONE");
 
 	   $_[0]->{'langdef'} = $1;
 	   $_[0]->{'base'} = $5 if defined $5;

@@ -143,6 +143,8 @@ OPTIONS
 	``--kinds-(<LANG>|all)=[+|-](<kinds>|*)`` option in ctags(1) about how the
 	reserved word is used.
 
+	``NONE`` is another exception. ``NONE`` as *<name>* is not acceptable.
+
 	The names of built-in parsers are capitalized. When
 	@CTAGS_NAME_EXECUTABLE@ evaluates an option in a command line, and
 	chooses a parser, @CTAGS_NAME_EXECUTABLE@ uses the names of

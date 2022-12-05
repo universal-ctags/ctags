@@ -2,6 +2,8 @@
 ctags: No language specified for "langdef" option
 # all
 ctags: "all" is reserved; don't use it as the name for defining a new language
+# NONE
+ctags: "NONE" is reserved; don't use it as the name for defining a new language
 # C!
 ctags: don't use `!' in a language name (C!)
 # C"
