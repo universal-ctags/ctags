@@ -143,6 +143,8 @@ OPTIONS
 	``--kinds-(<LANG>|all)=[+|-](<kinds>|*)`` option in :ref:`ctags(1) <ctags(1)>` about how the
 	reserved word is used.
 
+	``NONE`` is another exception. ``NONE`` as *<name>* is not acceptable.
+
 	The names of built-in parsers are capitalized. When
 	ctags evaluates an option in a command line, and
 	chooses a parser, ctags uses the names of

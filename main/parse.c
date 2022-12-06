@@ -2261,7 +2261,13 @@ extern void processLanguageDefineOption (
 	else if (strcmp(name, RSV_LANG_ALL) == 0)
 	{
 		eFree (name);
-		error (FATAL, "\"all\" is reserved; don't use it as the name for defining a new language");
+		error (FATAL, "\"" RSV_LANG_ALL "\" is reserved; don't use it as the name for defining a new language");
+	}
+	else if (strcmp(name, RSV_NONE) == 0)
+	{
+		eFree (name);
+		error (FATAL, "\"" RSV_NONE "\" is reserved; don't use it as the name for defining a new language");
+
 	}
 	else if ((unacceptable = strpbrk (name, "!\"$%&'()*,-./:;<=>?@[\\]^`|~")))
 	{

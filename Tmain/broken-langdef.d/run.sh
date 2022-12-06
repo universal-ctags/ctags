@@ -13,6 +13,7 @@ run_ctags()
 
 run_ctags ""
 run_ctags all
+run_ctags NONE
 for c in '!' '"' '$' '%' '&' "'" '(' ')' '*' ',' '-' '.' '/' ':' ';' '<' '=' '>' '?' '@' '[' '\' ']' '^' '`' '|' '~'; do
 	run_ctags "C$c"
 done

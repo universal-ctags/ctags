@@ -1016,9 +1016,11 @@ Listing Options
 ``--list-excludes``
 	Lists the current exclusion patterns used to exclude files.
 
-``--list-extras[=(<language>|all)]``
+``--list-extras[=(<language>|NONE|all)]``
 	Lists the extras recognized for either the specified *<language>* or
-	``all`` languages. See "`Extras`_" subsection to know what are extras.
+	``all`` languages. If ``NONE`` is specified, it lists only extras
+	common in all languages.
+	See "`Extras`_" subsection to know what are extras.
 	``all`` is used as default value if the option argument is omitted.
 
 	An extra can be enabled or disabled with ``--extras=`` for common
@@ -1047,9 +1049,11 @@ Listing Options
 ``--list-features``
 	Lists the compiled features.
 
-``--list-fields[=(<language>|all)]``
+``--list-fields[=(<language>|NONE|all)]``
 	Lists the fields recognized for either the specified *<language>* or
-	``all`` languages. See "`Extension fields`_" subsection to know what are fields.
+	``all`` languages. If ``NONE`` is specified, it lists only fields
+	common in all languages.
+	See "`Extension fields`_" subsection to know what are fields.
 	``all`` is used as default value if the option argument is omitted.
 
 	The meaning of columns are as follows:
