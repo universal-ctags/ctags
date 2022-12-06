@@ -236,7 +236,7 @@ getNextChar:
 	}
 }
 
-static void readToken (tokenInfo *const token, bool skipComments)
+static void readTokenFull (tokenInfo *const token, bool skipComments, bool inScript)
 {
 	int c;
 
@@ -326,7 +326,10 @@ getNextChar:
 		{
 			const int delimiter = c;
 			c = getcFromInputFile ();
-			while (c != EOF && c != delimiter)
+			/* When reading an area of script, HTML's string
+			 * doesn't make sense. */
+			while (c != EOF && c != delimiter
+				   && (inScript == false || c != '\n'))
 			{
 				vStringPut (token->string, c);
 				c = getcFromInputFile ();
@@ -352,6 +355,11 @@ getNextChar:
 	}
 
 	TRACE_PRINT("token: %s (%s)", tokenTypes[token->type], vStringValue (token->string));
+}
+
+static void readToken (tokenInfo *const token, bool skipComments)
+{
+	readTokenFull (token, skipComments, false);
 }
 
 static void appendText (vString *text, vString *appendedText)
@@ -414,7 +422,7 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 		line_tmp[0] = getInputLineNumber ();
 		lineOffset_tmp[0] = getInputLineOffset ();
 
-		readToken (token, false);
+		readTokenFull (token, false, true);
 		type = token->type;
 
 		if (type == TOKEN_CLOSE_TAG_START)

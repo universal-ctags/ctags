@@ -1,0 +1,6 @@
+Foo	input.html	/^<h1>Foo<\/h1>$/;"	heading1	language:HTML
+BAR	input.html	/^<h1>BAR<\/h1>$/;"	heading1	language:HTML
+bar	input.html	/^	const bar = 123$/;"	constant	language:JavaScript
+baz	input.html	/^	function baz () {$/;"	function	language:JavaScript
+bar2	input.html	/^	const bar2 = 123$/;"	constant	language:JavaScript
+baz2	input.html	/^	function baz2 () {$/;"	function	language:JavaScript
