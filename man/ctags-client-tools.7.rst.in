@@ -245,7 +245,10 @@ for using notable ones.
 	``TAG_PROC_CWD`` gives the tool a hint; "input.c" may be at "/tmp".
 
 ``TAG_PROGRAM_NAME``
-	TBW
+	Indicates the name of program generating this tags file.
+
+``TAG_PROGRAM_VERSION``
+	Indicates the version of program generating this tags file.
 
 ``TAG_ROLE_DESCRIPTION`` (new in Universal Ctags)
 	Indicates the names and descriptions of enabled roles::
