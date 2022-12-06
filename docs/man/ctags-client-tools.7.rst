@@ -43,7 +43,7 @@ An example of a pseudo tag::
 
 	!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 
-The value, "2", associated with the pseudo tag "TAG_PROGRAM_NAME", is
+The value, "Universal Ctags", associated with the pseudo tag "TAG_PROGRAM_NAME", is
 used in the field for input file. The description, "Derived from
 Exuberant Ctags", is used in the field for pattern.
 
