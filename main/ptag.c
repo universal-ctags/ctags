@@ -128,6 +128,17 @@ static bool ptagMakeProcCwd (ptagDesc *desc, langType language,
 	return writePseudoTag (desc, CurrentDirectory, "", NULL);
 }
 
+static bool ptagMakeParserVersion(ptagDesc *desc, langType language,
+								  const void *data CTAGS_ATTR_UNUSED)
+{
+	char buf[32];			/* 2^32 '.' 2^32 '\0' */
+	snprintf (buf, sizeof(buf), "%u.%u",
+			  getLanguageVersionCurrent(language),
+			  getLanguageVersionAge(language));
+	const char *name = getLanguageName(language);
+	return writePseudoTag (desc, buf, "current.age", name);
+}
+
 static ptagDesc ptagDescs [] = {
 	{
 	  /* The prefix is not "TAG_".
@@ -207,6 +218,10 @@ static ptagDesc ptagDescs [] = {
 	  "the excmd: number, pattern, mixed, or combine",
 	  ptagMakeCtagsOutputExcmd,
 	  PTAGF_COMMON },
+	{ true, "TAG_PARSER_VERSION",
+	  "the version of the parser (current.age)",
+	  ptagMakeParserVersion,
+	  PTAGF_PARSER },
 };
 
 extern bool makePtagIfEnabled (ptagType type, langType language, const void *data)

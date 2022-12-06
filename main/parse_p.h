@@ -73,7 +73,8 @@ extern kindDefinition* getLanguageKindForName (const langType language, const ch
 extern roleDefinition* getLanguageRole(const langType language, int kindIndex, int roleIndex);
 extern roleDefinition* getLanguageRoleForName (const langType language, int kindIndex,
 											   const char *roleName);
-
+extern unsigned int getLanguageVersionCurrent (const langType language);
+extern unsigned int getLanguageVersionAge (const langType language);
 
 extern int defineLanguageKind (const langType language, kindDefinition *def,
 							   freeKindDefFunc freeKindDef);
@@ -175,6 +176,8 @@ extern bool makeExtraDescriptionsPseudoTags (const langType language,
 					       const ptagDesc *pdesc);
 extern bool makeRoleDescriptionsPseudoTags (const langType language,
 					       const ptagDesc *pdesc);
+extern bool makeParserVersionPseudoTags (const langType language,
+										 const ptagDesc *pdesc);
 
 extern void printLanguageMultitableStatistics (langType language);
 extern void printParserStatisticsIfUsed (langType lang);

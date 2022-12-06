@@ -10,6 +10,7 @@ run_ctags()
 			 --fields=E --extras=p \
 			 --pseudo-tags=-TAG_PROGRAM_VERSION \
 			 --pseudo-tags=-TAG_PROC_CWD \
+			 --pseudo-tags=-TAG_PARSER_VERSION \
 			 $@ \
 			 -o - input.c
 }

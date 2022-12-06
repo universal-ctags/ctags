@@ -43,6 +43,7 @@ typedef enum ePtagType { /* pseudo tag content control */
 	PTAG_PATTERN_TRUNCATION,
 	PTAG_PROC_CWD,
 	PTAG_OUTPUT_EXCMD,
+	PTAG_PARSER_VERSION,
 	PTAG_COUNT
 } ptagType;
 

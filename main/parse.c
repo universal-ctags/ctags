@@ -4857,6 +4857,26 @@ extern bool makeRoleDescriptionsPseudoTags (const langType language,
 	return data.written;
 }
 
+extern unsigned int getLanguageVersionCurrent (const langType language)
+{
+	parserObject *parser;
+	parserDefinition* lang;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable + language;
+	lang = parser->def;
+	return lang->versionCurrent;
+}
+
+extern unsigned int getLanguageVersionAge (const langType language)
+{
+	parserObject *parser;
+	parserDefinition* lang;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable + language;
+	lang = parser->def;
+	return lang->versionAge;
+}
+
 /*
 *   Copyright (c) 2016, Szymon Tomasz Stefanek
 *

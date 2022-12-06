@@ -17,4 +17,5 @@ ${CTAGS} --quiet --options=NONE -o - \
 	 --pseudo-tags=-TAG_FIELD_DESCRIPTION \
 	 --pseudo-tags=-TAG_EXTRA_DESCRIPTION \
 	 --pseudo-tags=-TAG_ROLE_DESCRIPTION \
+	 --pseudo-tags=-TAG_PARSER_VERSION \
 	 input.php
