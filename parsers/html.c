@@ -236,6 +236,58 @@ getNextChar:
 	}
 }
 
+static void readTokenInScript (tokenInfo *const token)
+{
+	int c;
+
+	vStringClear (token->string);
+
+	c = getcFromInputFile ();
+	while (isspace (c))
+		c = getcFromInputFile ();
+
+	switch (c)
+	{
+		case EOF:
+			token->type = TOKEN_EOF;
+			break;
+
+		case '<':
+		{
+			int d = getcFromInputFile ();
+			if (d == '/')
+				token->type = TOKEN_CLOSE_TAG_START;
+			else
+			{
+				ungetcToInputFile (d);
+				token->type = TOKEN_OTHER;
+			}
+			break;
+		}
+		default:
+		{
+			while (!isspace (c) && c != '<' && c != '>' && c != '/' &&
+				   c != '=' && c != '\'' && c != '"' && c != EOF)
+			{
+				vStringPut (token->string, tolower (c));
+				c = getcFromInputFile ();
+			}
+
+			if (vStringLength (token->string) == 0)
+				token->type = TOKEN_OTHER;
+			else
+			{
+				token->type = TOKEN_NAME;
+				if (c != EOF)
+					ungetcToInputFile (c);
+			}
+			break;
+		}
+	}
+
+	TRACE_PRINT("token (in script): %s (%s)", tokenTypes[token->type], vStringValue (token->string));
+}
+
 static void readToken (tokenInfo *const token, bool skipComments)
 {
 	int c;
@@ -414,7 +466,7 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 		line_tmp[0] = getInputLineNumber ();
 		lineOffset_tmp[0] = getInputLineOffset ();
 
-		readToken (token, false);
+		readTokenInScript (token);
 		type = token->type;
 
 		if (type == TOKEN_CLOSE_TAG_START)
