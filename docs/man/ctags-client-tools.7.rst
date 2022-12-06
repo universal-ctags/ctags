@@ -43,7 +43,7 @@ An example of a pseudo tag::
 
 	!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 
-The value, "Universal Ctags", associated with the pseudo tag "TAG_PROGRAM_NAME", is
+The value, "Universal Ctags", associated with the pseudo tag ``TAG_PROGRAM_NAME``, is
 used in the field for input file. The description, "Derived from
 Exuberant Ctags", is used in the field for pattern.
 
@@ -63,7 +63,7 @@ This pseudo-tag says "the function kind of C language is enabled
 when generating this tags file." ``--pseudo-tags`` is the option for
 enabling/disabling individual pseudo-tags. When enabling/disabling a
 pseudo tag with the option, specify the tag name only
-"TAG_KIND_DESCRIPTION", without the prefix ("!_") or the suffix ("!C").
+``TAG_KIND_DESCRIPTION``, without the prefix ("!_") or the suffix ("!C").
 
 
 Options for Pseudo-tags
@@ -477,7 +477,8 @@ CHANGES
 
 Version 6.0
 ~~~~~~~~~~~
-* ctags enables TAG_{KIND,EXTRA,FIELD,ROLE}_DESCRIPTION pseudo tags by default.
+* ctags enables ``TAG_KIND_DESCRIPTION``, ``TAG_ROLE_DESCRIPTION``,
+  ``TAG_FIELD_DESCRIPTION``, and ``TAG_EXTRA_DESCRIPTION`` pseudo tags by default.
 
 SEE ALSO
 --------
