@@ -370,11 +370,11 @@ Client tools could split the line using the following steps:
   * If a ``?`` follows, then the pattern delimiter is ``?``.
   * If a number follows, then:
 
-    * If a ``;/`` follows the number, then the delimiter is ``/``.
-    * If a ``;?`` follows the number, then the delimiter is ``?``.
-    * If a ``;"`` follows the number, then the field uses only line number, and
-      there's no pattern delimiter (since there's no regex pattern). In this
-      case the pattern field ends at the 3rd tab.
+	* If a ``;/`` follows the number, then the delimiter is ``/``.
+	* If a ``;?`` follows the number, then the delimiter is ``?``.
+	* If a ``;"`` follows the number, then the field uses only line number, and
+	  there's no pattern delimiter (since there's no regex pattern). In this
+	  case the pattern field ends at the 3rd tab.
 
 * After the opening delimiter, find the next unescaped pattern delimiter, and
   that's the closing delimiter. It will be followed by ``;"`` and then a tab.
