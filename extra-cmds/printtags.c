@@ -142,8 +142,7 @@ static void tagsPrintTag (const tagEntry *entry,
 					print_str, print_char, outfp);
 
 	print_char ('\t', outfp);
-	printValue  (entry->file, printingWithEscaping,
-				 print_str, print_char, outfp);
+	print_str (entry->file, outfp);
 	print_char ('\t', outfp);
 	print_str (entry->address.pattern, outfp);
 
