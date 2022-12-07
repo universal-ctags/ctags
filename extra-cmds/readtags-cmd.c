@@ -8,6 +8,7 @@
 
 #include "general.h"
 
+#include "ctags.h"
 #include "readtags.h"
 #include "printtags.h"
 #include "routines.h"
@@ -436,6 +437,8 @@ static const char *const Usage =
 	"        Print available terms that can be used in POSTPROCESSOR expression.\n"
 	"        POSTPROCESSOR: filter sorter formatter\n"
 #endif
+	"    %s -v | --version\n"
+	"        Print the version identifier.\n"
 	"    %s [OPTIONS] ACTION\n"
 	"        Do the specified action.\n"
 	"Actions:\n"
@@ -481,6 +484,7 @@ static void printUsage(FILE* stream, int exitCode)
 #ifdef READTAGS_DSL
 			 ProgramName,
 #endif
+			 ProgramName,
 			 ProgramName);
 	exit (exitCode);
 }
@@ -533,6 +537,14 @@ static void *compileExpression(const char* exp, void * (*compiler) (EsObject *),
 	return code;
 }
 #endif
+
+static void printVersion(void)
+{
+	/* readtags uses code of ctags via libutil.
+	 * So we here use the versoin of ctags as the version of readtags. */
+	puts(PROGRAM_VERSION);
+	exit (0);
+}
 
 extern int main (int argc, char **argv)
 {
@@ -595,6 +607,8 @@ extern int main (int argc, char **argv)
 				}
 			}
 #endif
+			else if (strcmp (optname, "version") == 0)
+				printVersion ();
 			else if (strcmp (optname, "escape-output") == 0)
 				escaping = 1;
 			else if (strcmp (optname, "extension-fields") == 0)
@@ -721,6 +735,7 @@ extern int main (int argc, char **argv)
 						else
 							printUsage(stderr, 1);
 #endif
+					case 'v': printVersion ();
 					case 'E': escaping = 1; break;
 					case 'e': extensionFields = 1;         break;
 					case 'i': options |= TAG_IGNORECASE;   break;

@@ -14,6 +14,7 @@ SYNOPSIS
 --------
 |	**readtags** -h | --help
 |	**readtags** (-H | --help-expression) (filter|sorter|formatter)
+|	**readtags** -v | --version
 |	**readtags** [OPTION]... ACTION
 
 DESCRIPTION
