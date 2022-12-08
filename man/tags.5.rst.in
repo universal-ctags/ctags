@@ -17,7 +17,8 @@ The contents of next section is a copy of FORMAT file in Exuberant
 Ctags source code in its subversion repository at sourceforge.net.
 
 Exceptions introduced in Universal Ctags are explained inline with
-"EXCEPTION" marker.
+"EXCEPTION" marker. Statements that are made further clear in Universal
+Ctags are explained inline with "COMMENT" marker.
 
 ----
 
@@ -248,6 +249,10 @@ Use a comment after the {tagaddress} field.  The format would be::
 	not set.  It may be restricted to a line number or a search
 	pattern (Posix).
 
+	COMMENT: {tagaddress} could contain tab characters. See
+	ctags-client-tools(7) to know how to programmatically extract {tagaddress}
+	(called "pattern field" there) and parse it.
+
 Optionally:
 
 ;"
@@ -287,6 +292,10 @@ A tagfield has a name, a colon, and a value: "name:value".
   - The characters in range 0x01 to 0x1F included, and 0x7F are
     converted to ``\x`` prefixed hexadecimal number if the characters are
     not handled in the above "value" rules.
+
+  EXCEPTION: Universal Ctags allows all these escape sequences in {tagname}
+  also.
+
   - The leading space (0x20) and ``!`` (0x21) in {tagname} are converted
     to ``\x`` prefixed hexadecimal number (``\x20`` and ``\x21``) if the
     tag is not a pseudo-tag. As described later, a pseudo-tag starts with
@@ -479,6 +488,14 @@ file, and provided solely for documentation purposes::
 
 EXCEPTION: Universal Ctags introduces more kinds of pseudo-tags.
 See ctags-client-tools(7) about them.
+
+COMMENT: Though pseudo-tags are semantically different from regular tags, They
+use the same format, which is::
+
+	{tagname}<Tab>{tagfile}<Tab>{tagaddress}
+
+, and the escape sequences and illegal characters explained in "Proposal"
+section also applies to pseudo-tags.
 
 ----
 
