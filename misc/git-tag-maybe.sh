@@ -2,9 +2,6 @@
 
 set -e
 
-echo tagging is disabled temporary
-exit 0
-
 ##################################### util #######################################
 
 COLOR_RED='\033[0;31m'          # Red
