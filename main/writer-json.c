@@ -25,8 +25,18 @@
 #ifdef HAVE_JANSSON
 #include <jansson.h>
 
-#define JSON_WRITER_MAJOR 0
-#define JSON_WRITER_MINOR 0
+/* The concept of CURRENT and AGE is taken from libtool.
+ * However, we delete REVISION.
+ * We will update more CURRENT frequently than the assumption
+ * in libtool.
+ *
+ * If KEYS have been added, removed or changed since last release,
+ * increment CURRENT.
+ * If they have been added since last release, increment AGE.
+ * If they have been removed since last release, set AGE to 0
+ */
+#define JSON_WRITER_CURRENT 0
+#define JSON_WRITER_AGE 0
 
 #ifndef json_boolean /* compat with jansson < 2.4 */
 #define json_boolean(val)      ((val) ? json_true() : json_false())
@@ -243,7 +253,7 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	json_t *response;
 	char *parserName0 = NULL;
 
-	const char *rest = ((JSON_WRITER_MAJOR > 0) && parserName && desc->jsonObjectKey)
+	const char *rest = ((JSON_WRITER_CURRENT > 0) && parserName && desc->jsonObjectKey)
 		? strchr(parserName, '!')
 		: NULL;
 	if (rest)
@@ -290,7 +300,7 @@ extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, langType language CTAGS_A
 									   const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
-			       STRINGIFY(JSON_WRITER_MAJOR) "." STRINGIFY(JSON_WRITER_MINOR),
+			       STRINGIFY(JSON_WRITER_CURRENT) "." STRINGIFY(JSON_WRITER_AGE),
 			       "in development",
 			       NULL);
 }

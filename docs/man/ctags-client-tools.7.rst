@@ -43,7 +43,7 @@ An example of a pseudo tag::
 
 	!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 
-The value, "2", associated with the pseudo tag "TAG_PROGRAM_NAME", is
+The value, "Universal Ctags", associated with the pseudo tag ``TAG_PROGRAM_NAME``, is
 used in the field for input file. The description, "Derived from
 Exuberant Ctags", is used in the field for pattern.
 
@@ -63,7 +63,7 @@ This pseudo-tag says "the function kind of C language is enabled
 when generating this tags file." ``--pseudo-tags`` is the option for
 enabling/disabling individual pseudo-tags. When enabling/disabling a
 pseudo tag with the option, specify the tag name only
-"TAG_KIND_DESCRIPTION", without the prefix ("!_") or the suffix ("!C").
+``TAG_KIND_DESCRIPTION``, without the prefix ("!_") or the suffix ("!C").
 
 
 Options for Pseudo-tags
@@ -245,7 +245,10 @@ for using notable ones.
 	``TAG_PROC_CWD`` gives the tool a hint; "input.c" may be at "/tmp".
 
 ``TAG_PROGRAM_NAME``
-	TBW
+	Indicates the name of program generating this tags file.
+
+``TAG_PROGRAM_VERSION``
+	Indicates the version of program generating this tags file.
 
 ``TAG_ROLE_DESCRIPTION`` (new in Universal Ctags)
 	Indicates the names and descriptions of enabled roles::
@@ -367,11 +370,11 @@ Client tools could split the line using the following steps:
   * If a ``?`` follows, then the pattern delimiter is ``?``.
   * If a number follows, then:
 
-    * If a ``;/`` follows the number, then the delimiter is ``/``.
-    * If a ``;?`` follows the number, then the delimiter is ``?``.
-    * If a ``;"`` follows the number, then the field uses only line number, and
-      there's no pattern delimiter (since there's no regex pattern). In this
-      case the pattern field ends at the 3rd tab.
+	* If a ``;/`` follows the number, then the delimiter is ``/``.
+	* If a ``;?`` follows the number, then the delimiter is ``?``.
+	* If a ``;"`` follows the number, then the field uses only line number, and
+	  there's no pattern delimiter (since there's no regex pattern). In this
+	  case the pattern field ends at the 3rd tab.
 
 * After the opening delimiter, find the next unescaped pattern delimiter, and
   that's the closing delimiter. It will be followed by ``;"`` and then a tab.
@@ -477,7 +480,8 @@ CHANGES
 
 Version 6.0
 ~~~~~~~~~~~
-* ctags enables TAG_{KIND,EXTRA,FIELD,ROLE}_DESCRIPTION pseudo tags by default.
+* ctags enables ``TAG_KIND_DESCRIPTION``, ``TAG_ROLE_DESCRIPTION``,
+  ``TAG_FIELD_DESCRIPTION``, and ``TAG_EXTRA_DESCRIPTION`` pseudo tags by default.
 
 SEE ALSO
 --------
