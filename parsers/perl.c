@@ -512,7 +512,9 @@ static void collectHereDocMarkers (struct hereDocMarkerManager *mgr,
 								   const unsigned char *line)
 {
 	const unsigned char *cp = line;
-	while ((cp = collectHereDocMarker(mgr, cp)) != NULL);
+	const unsigned char *last = cp;
+	while ((cp = collectHereDocMarker(mgr, cp)) != NULL)
+		Assert(last < cp);
 }
 
 static bool isInHereDoc (struct hereDocMarkerManager *mgr,
