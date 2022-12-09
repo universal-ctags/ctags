@@ -441,8 +441,8 @@ static unsigned char *readHereDocMarker (unsigned char *line,
 	return cp;
 }
 
-static void collectHereDocMarkers (struct hereDocMarkerManager *mgr,
-								   const unsigned char *line)
+static const unsigned char *collectHereDocMarker (struct hereDocMarkerManager *mgr,
+												  const unsigned char *line)
 {
 	unsigned char *starter = (unsigned char*)strstr((char *)line, "<<");
 	unsigned char *cp = NULL;
@@ -450,32 +450,29 @@ static void collectHereDocMarkers (struct hereDocMarkerManager *mgr,
 	unsigned char quote_char = 0;
 
 	if (starter == NULL)
-		return;
+		return NULL;
 
 	cp = starter + 2;
 	while (isspace (*cp))
 		cp++;
 
 	if (*cp == '\0')
-		return;
+		return NULL;
 
 	/* Is shift operator? */
 	if (isdigit (*cp))
-	{
 		/* Scan the rest of the string. */
-		collectHereDocMarkers (mgr, ++cp);
-		return;
-	}
+		return cp + 1;
 
 	if (*cp == '~') {
 		indented = true;
 		cp++;
 		if (*cp == '\0')
-			return;
+			return NULL;
 		while (isspace (*cp))
 			cp++;
 		if (*cp == '\0')
-			return;
+			return NULL;
 	}
 
 	switch (*cp)
@@ -488,7 +485,7 @@ static void collectHereDocMarkers (struct hereDocMarkerManager *mgr,
 	case '\\':
 		cp++;
 		if (*cp == '\0')
-			return;
+			return NULL;
 		break;
 	default:
 		break;
@@ -507,7 +504,15 @@ static void collectHereDocMarkers (struct hereDocMarkerManager *mgr,
 		hereDocMarkerDelete (marker);
 
 	if (*cp != '\0' && cp != last_cp)
-		collectHereDocMarkers (mgr, cp);
+		return cp;
+	return NULL;
+}
+
+static void collectHereDocMarkers (struct hereDocMarkerManager *mgr,
+								   const unsigned char *line)
+{
+	const unsigned char *cp = line;
+	while ((cp = collectHereDocMarker(mgr, cp)) != NULL);
 }
 
 static bool isInHereDoc (struct hereDocMarkerManager *mgr,
@@ -807,7 +812,6 @@ static void findPerlTags (void)
 				if ((int) *p == ':' && (int) *(p + 1) != ':')
 					kind = KIND_PERL_LABEL;
 			}
-
 			if (kind != KIND_PERL_LABEL)
 				collectHereDocMarkers (&hdoc_mgr, cp);
 		}
