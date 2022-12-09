@@ -574,18 +574,16 @@ static bool parseFunction (tokenInfo *const token, int kind)
 static bool parseClass (tokenInfo *const token)
 {
 	bool readNext = true;
-	tokenInfo *nameFree = NULL;
+	vString *nameFree = NULL;
 
 	readToken (token);
 
 	if (token->type != TOKEN_IDENTIFIER)
 		return false;
 
-	nameFree = newToken ();
-	copyToken (nameFree, token, true);
+	makeClassTag (token);
+	nameFree = vStringNewCopy (token->string);
 	readToken (token);
-
-	makeClassTag (nameFree);
 
 	while (token->type != TOKEN_OPEN_CURLY && token->type != TOKEN_EOF)
 	{
@@ -593,11 +591,11 @@ static bool parseClass (tokenInfo *const token)
 	}
 
 	if (token->type == TOKEN_OPEN_CURLY)
-		enterScope (token, nameFree->string, K_CLASS);
+		enterScope (token, nameFree, K_CLASS);
 	else
 		readNext = false;
 
-	deleteToken (nameFree);
+	vStringDelete (nameFree);
 
 	return readNext;
 }
