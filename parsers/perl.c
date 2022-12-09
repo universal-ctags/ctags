@@ -22,11 +22,9 @@
 #include "routines.h"
 #include "selectors.h"
 #include "subparser.h"
+#include "trace.h"
 #include "vstring.h"
 #include "xtag.h"
-
-#define TRACE_PERL_C 0
-#define TRACE if (TRACE_PERL_C) printf("perl.c:%d: ", __LINE__), printf
 
 /*
 *   DATA DEFINITIONS
@@ -665,7 +663,7 @@ static void findPerlTags (void)
 
 		if (strncmp((const char*) cp, "sub", (size_t) 3) == 0)
 		{
-			TRACE("this looks like a sub\n");
+			TRACE_PRINT("this looks like a sub");
 			cp += 3;
 			kind = KIND_PERL_SUBROUTINE;
 			spaceRequired = true;
@@ -814,11 +812,11 @@ static void findPerlTags (void)
 		}
 		if (kind != KIND_PERL_NONE)
 		{
-			TRACE("cp0: %s\n", (const char *) cp);
+			TRACE_PRINT("cp0: %s", (const char *) cp);
 			if (spaceRequired && *cp && !isspace (*cp))
 				continue;
 
-			TRACE("cp1: %s\n", (const char *) cp);
+			TRACE_PRINT("cp1: %s", (const char *) cp);
 			while (isspace (*cp))
 				cp++;
 
@@ -846,7 +844,7 @@ static void findPerlTags (void)
 				vStringCatS (name, "STDOUT");
 			}
 
-			TRACE("name: %s\n", vStringValue (name));
+			TRACE_PRINT("name: %s", vStringValue (name));
 
 			if (0 == vStringLength(name)) {
 				vStringClear(name);
