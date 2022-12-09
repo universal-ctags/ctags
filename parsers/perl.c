@@ -659,8 +659,6 @@ static void findPerlTags (void)
 		while (isspace (*cp))
 			cp++;
 
-		collectHereDocMarkers (&hdoc_mgr, cp);
-
 		if (strncmp((const char*) cp, "sub", (size_t) 3) == 0)
 		{
 			TRACE_PRINT("this looks like a sub");
@@ -809,6 +807,9 @@ static void findPerlTags (void)
 				if ((int) *p == ':' && (int) *(p + 1) != ':')
 					kind = KIND_PERL_LABEL;
 			}
+
+			if (kind != KIND_PERL_LABEL)
+				collectHereDocMarkers (&hdoc_mgr, cp);
 		}
 		if (kind != KIND_PERL_NONE)
 		{
