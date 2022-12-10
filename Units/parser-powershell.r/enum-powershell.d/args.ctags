@@ -1,0 +1,4 @@
+--sort=no
+# "qualified" extra doesn't work.
+# --extras=+q
+--fields=+S
