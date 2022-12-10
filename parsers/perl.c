@@ -441,6 +441,84 @@ static unsigned char *readHereDocMarker (unsigned char *line,
 	return cp;
 }
 
+enum stringType {
+	STRING_TYPE_NONE = '\0',
+	STRING_TYPE_SINGLEQ = '\'',
+	STRING_TYPE_DOUBLEQ = '"',
+	STRING_TYPE_BACKQ = '`',
+};
+
+
+static const unsigned char *escapeFromString (const unsigned char *line,
+											  const unsigned char *end,
+											  enum stringType stype)
+{
+	bool in_escape = false;
+	const unsigned char *cp = line;
+
+	switch (stype)
+	{
+	case STRING_TYPE_NONE:
+		return line;
+	case STRING_TYPE_SINGLEQ:
+	case STRING_TYPE_DOUBLEQ:
+	case STRING_TYPE_BACKQ:
+		while ((end && cp < end) || (end == NULL && *cp != '\0'))
+		{
+			if (in_escape)
+			{
+				cp++;
+				in_escape = false;
+			}
+			else if (*cp == '\\')
+			{
+				cp++;
+				in_escape = true;
+			}
+			else if (*cp == (unsigned char)stype)
+			{
+				cp++;
+				return cp;
+			}
+			else
+				cp++;
+		}
+		return NULL;
+	default:
+		AssertNotReached ();
+		return NULL;
+	}
+}
+
+static enum stringType isInString (const unsigned char *line,
+								   const unsigned char *end)
+{
+	const unsigned char *cp = line;
+	enum stringType t = STRING_TYPE_NONE;
+
+	while (cp && cp < end)
+	{
+		switch (*cp)
+		{
+		case '\'':
+		case '\"':
+		case '`':
+			t = *cp;
+			break;
+		default:
+			t = STRING_TYPE_NONE;
+			break;
+		}
+
+		cp++;
+		if (t != STRING_TYPE_NONE)
+			cp = escapeFromString (cp, end, t);
+	}
+
+	return (cp == NULL)? t: STRING_TYPE_NONE;
+}
+
+
 static const unsigned char *collectHereDocMarker (struct hereDocMarkerManager *mgr,
 												  const unsigned char *line)
 {
@@ -451,6 +529,10 @@ static const unsigned char *collectHereDocMarker (struct hereDocMarkerManager *m
 
 	if (starter == NULL)
 		return NULL;
+
+	enum stringType stype;
+	if ((stype = isInString(line, starter)) != STRING_TYPE_NONE)
+		return escapeFromString (starter + 2, NULL, stype);
 
 	cp = starter + 2;
 	while (isspace (*cp))
