@@ -693,7 +693,7 @@ static void findPerlTags (void)
 			}
 
 			vString *module = NULL;
-			while (isalnum(*cp) || *cp == ':' || *cp == '.') {
+			while (isalnum(*cp) || *cp == ':' || *cp == '.' || *cp == '_') {
 				if (!module)
 					module = vStringNew();
 				vStringPut(module, *cp);
@@ -753,7 +753,7 @@ static void findPerlTags (void)
 			while (isspace (*cp))
 				cp++;
 			vString *module = NULL;
-			while (isalnum(*cp) || *cp == ':' || *cp == '.') {
+			while (isalnum(*cp) || *cp == ':' || *cp == '.' || *cp == '_') {
 				if (!module)
 					module = vStringNew();
 				vStringPut(module, *cp);

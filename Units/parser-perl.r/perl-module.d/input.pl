@@ -12,3 +12,6 @@ use sort     qw(stable _quicksort _mergesort);
 no integer;
 no strict 'refs';
 no warnings;
+
+use 5.006_001;
+no 5.006_001;
