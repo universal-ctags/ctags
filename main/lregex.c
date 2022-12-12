@@ -3539,17 +3539,18 @@ static matchLoc *make_mloc (scriptWindow *window, int group, bool start)
 	matchLoc *mloc = xMalloc (1, matchLoc);
 	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
 	{
+		mloc->base  = 0;
 		mloc->delta = 0;
 		mloc->line = getInputLineNumber ();
 		mloc->pos = getInputFilePosition ();
 	}
 	else
 	{
+		mloc->base  = window->line - window->start;
 		mloc->delta = (start
 					   ? window->pmatch [group].rm_so
 					   : window->pmatch [group].rm_eo);
-		off_t offset = (window->line + mloc->delta) - window->start;
-		mloc->line = getInputLineNumberForFileOffset (offset);
+		mloc->line = getInputLineNumberForFileOffset (mloc->base + mloc->delta);
 		mloc->pos  = getInputFilePositionForLine (mloc->line);
 	}
 	return mloc;
