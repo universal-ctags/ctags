@@ -296,19 +296,28 @@ example, when searching for a tag that matches ``a\?b``, if using a filter
 expression like ``'(eq? $name "a\?b")'``, since ``\?`` is translated into a
 single ``?`` by readtags, it actually searches for ``a?b``.
 
-Another problem is if a single quote appear in filter expressions (which is
-also wrapped by single quotes), it terminates the expression, producing broken
-expressions, and may even cause unintended shell injection. Single quotes can
-be escaped using ``'"'"'``.
+Another problem is: If the client tools talks to readtags not by subprocess
+directly, but through a shell, then if a single quote appear in filter
+expressions (which is also wrapped by single quotes), it terminates the
+expression, producing broken expressions, and may even cause unintended shell
+injection. Single quotes can be escaped using ``'"'"'``.
 
 So, client tools need to:
 
 * Replace ``\`` by ``\\``
-* Replace ``'`` by ``'"'"'``
+* Replace ``'`` by ``'"'"'``, if it talks to readtags through a shell.
 
 inside the expressions. If the expression also contains strings, ``"`` in the
 strings needs to be replaced by ``\"``.
 
+Another thing to notice is that missing fields are represented by ``#f``, and
+applying string operators to them will produce an error. You should always
+check if a field is missing before applying string operators. See the
+"Filtering" section in readtags(1) to know how to do this. Run "readtags -H
+filter" to see which operators take string arguments.
+
+Build Filter/Sorter Expressions using Lisp Languages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Client tools written in Lisp could build the expression using lists. ``prin1``
 (in Common Lisp style Lisps) and ``write`` (in Scheme style Lisps) can
 translate the list into a string that can be directly used. For example, in
@@ -320,11 +329,13 @@ EmacsLisp:
      (prin1 `(eq? $name ,name)))
    => "(eq\\? $name "hi")"
 
-The "?" is escaped, and readtags can handle it. Scheme style Lisps should do
-proper escaping so the expression readtags gets is just the expression passed
-into ``write``. Common Lisp style Lisps may produce unrecognized escape
-sequences by readtags, like ``\#``. Readtags provides some aliases for these
-Lisps:
+The "?" is escaped, and readtags can handle it.
+
+Escape sequences produced by ``write`` in Scheme style Lisps are exactly those
+supported by readtags, so any legal readtags expressions can be used. Common
+Lisp style Lisps may produce escape sequences that are unrecgonized by
+readtags, like ``\#``, so symbols that contain "#" can't be used. Readtags
+provides some aliases for these Lisps, so they should:
 
 * Use ``true`` for ``#t``.
 * Use ``false`` for ``#f``.
@@ -333,14 +344,9 @@ Lisps:
   ``(string->regexp "PATTERN" :case-fold true)`` for ``#/PATTERN/i``. Notice
   that ``string->regexp`` doesn't require escaping "/" in the pattern.
 
-Notice that even when the client tool uses this method, ``'`` still needs to be
-replaced by ``'"'"'`` to prevent broken expressions and shell injection.
-
-Another thing to notice is that missing fields are represented by ``#f``, and
-applying string operators to them will produce an error. You should always
-check if a field is missing before applying string operators. See the
-"Filtering" section in readtags(1) to know how to do this. Run "readtags -H
-filter" to see which operators take string arguments.
+Notice that if the client tool talks to readtags through a shell, then in the
+produced string, ``'`` still needs to be replaced by ``'"'"'`` to prevent
+broken expressions and shell injection.
 
 Parse Readtags Output
 ~~~~~~~~~~~~~~~~~~~~~
