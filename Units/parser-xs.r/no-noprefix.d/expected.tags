@@ -1,0 +1,3 @@
+X	input.xs	/^MODULE = X	PACKAGE = X	PREFIX = xyz_$/;"	m
+X	input.xs	/^MODULE = X	PACKAGE = X	PREFIX = xyz_$/;"	p	module:X
+xyz_f	input.xs	/^xyz_f(dbtype)$/;"	f	package:X.X	typeref:typename:void

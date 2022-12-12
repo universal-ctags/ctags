@@ -482,6 +482,7 @@ The following parsers have been added:
 * TypeScript
 * Varlink *peg/packcc*
 * WindRes
+* XS *optlib pcre2*
 * XSLT v1.0 *libxml*
 * Yacc
 * Yaml *libyaml*

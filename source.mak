@@ -219,6 +219,7 @@ OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.$(OBJEXT))
 
 OPTLIB2C_PCRE2_INPUT =       \
    optlib/rdoc.ctags         \
+   optlib/xs.ctags           \
    \
    $(NULL)
 OPTLIB2C_PCRE2_SRCS = $(OPTLIB2C_PCRE2_INPUT:.ctags=.c)
