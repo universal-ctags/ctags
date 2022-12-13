@@ -1089,7 +1089,7 @@ EOF
     emit_xtags           $opts;
     emit_regexs          $opts;
     emit_dependencies    $opts;
-    emit_selector         $opts;
+    emit_selector        $opts;
 
     print "\n";
 
