@@ -21,7 +21,7 @@
    of ctags or readtags commands, increment VERSION.
    Removing a parameter of a parser is part of incompatible change
    for the CLI.
-   When OUTPUT_VERSOIN_AGE set to 0, increment VERSION. Set REVISION
+   When OUTPUT_VERSION_AGE set to 0, increment VERSION. Set REVISION
    and PATCH to 0.
    For changing setting versionAge member of a parser, increment
    VERSION. Set REVISION and PATCH to 0.
@@ -30,8 +30,8 @@
    For uppper compatible changes for the CLI,
    increment REVISION.
    Adding a new parameter to a parser is an uppper compatible change.
-   When incrementing OUTPUT_VERSOIN_CURRENT but not setting
-   OUTPUT_VERSOIN_AGE to 0, increment REVISION.
+   When incrementing OUTPUT_VERSION_CURRENT but not setting
+   OUTPUT_VERSION_AGE to 0, increment REVISION.
    For changing increment versionCurrent member of a parser but not
    setting versionAge to 0, increment REVISION.
    When changing REVISION, set PATCH to 0.
