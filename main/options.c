@@ -2687,6 +2687,14 @@ static void processVersionOption (
 {
 	if (parameter == NULL || *parameter == '\0')
 		printProgramIdentification ();
+	else if (strcmp (parameter, RSV_NONE) == 0)
+	{
+		printf("ctags: %s\n", PROGRAM_VERSION);
+		if (! ((ctags_repoinfo == NULL)
+			   || (strcmp (ctags_repoinfo, PROGRAM_VERSION) == 0)))
+			printf("repoinfo: %s\n", ctags_repoinfo);
+		printf("output: %d.%d\n", OUTPUT_VERSION_CURRENT, OUTPUT_VERSION_AGE);
+	}
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
