@@ -53,7 +53,7 @@ my $options =
      #
      # TODO: We should not assume the order of flags.
      #
-     [ qr/^--langdef=([^\{]+)(((\{base=([^\{]+)\})(\{(dedicated|shared|bidirectional)\})?)?)(\{_autoFQTag\})?/, sub {
+     [ qr/^--langdef=([^\{]+)(((\{base=([^\{]+)\})(\{(dedicated|shared|bidirectional)\})?)?)(\{_autoFQTag\})?(\{version=([0-9]+)\.([0-9]+)\})?/, sub {
 	   die "LANG is already defined as $_[0]->{'langdef'}: $1"
 	       if (defined $_[0]->{'langdef'});
 	   die "Don't use \"all\" as a language name. It is reserved word."
@@ -65,6 +65,8 @@ my $options =
 	   $_[0]->{'base'} = $5 if defined $5;
 	   $_[0]->{'direction'} = $7 if defined $7;
 	   $_[0]->{'autoFQTag'} = (defined $8)? 1: 0;
+	   $_[0]->{'versionCurrent'} = (defined $10)? $10: 0;
+	   $_[0]->{'versionAge'} = (defined $11)? $11: 0;
 
 	   die "Don't use a character as a language name other than alphanumeric, # and +: "
 	       . $_[0]->{'langdef'} unless ($_[0]->{'langdef'} =~ /^[a-zA-Z0-9#+]+$/);
@@ -984,6 +986,8 @@ sub emit_fields_initialization {
     }
 
     print <<EOF;
+	def->versionCurrent= $opts->{'versionCurrent'};
+	def->versionAge    = $opts->{'versionAge'};
 	def->enabled       = ${enabled};
 	def->extensions    = extensions;
 	def->patterns      = patterns;
@@ -1089,7 +1093,7 @@ EOF
     emit_xtags           $opts;
     emit_regexs          $opts;
     emit_dependencies    $opts;
-    emit_selector         $opts;
+    emit_selector        $opts;
 
     print "\n";
 

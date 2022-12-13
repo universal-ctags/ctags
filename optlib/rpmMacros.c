@@ -74,6 +74,8 @@ extern parserDefinition* RpmMacrosParser (void)
 
 	parserDefinition* const def = parserNew ("RpmMacros");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

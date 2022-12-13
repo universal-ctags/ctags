@@ -2111,9 +2111,12 @@ extern void enableDefaultFileKind (bool state)
 */
 struct preLangDefFlagData
 {
+	const char *const name;
 	char *base;
 	subparserRunDirection direction;
 	bool autoFQTag;
+	unsigned int versionCurrent;
+	unsigned int versionAge;
 };
 
 static void pre_lang_def_flag_base_long (const char* const optflag, const char* const param, void* data)
@@ -2173,6 +2176,30 @@ static void pre_lang_def_flag_autoFQTag_long (const char* const optflag,
 	flag_data->autoFQTag = true;
 }
 
+static void pre_lang_def_flag_version_long (const char* const optflag CTAGS_ATTR_UNUSED,
+											const char* const param,
+											void* data)
+{
+	struct preLangDefFlagData * flag_data = data;
+	char * verstr = eStrdup (param);
+	char * age = strchr(verstr, '.');
+	if (!age)
+		error (FATAL, "Faile to parse the version number ('.') for language \"%s\": %s",
+			   flag_data->name, param);
+	*age = '\0';
+	age++;
+
+	if (!strToUInt (verstr, 10, &flag_data->versionCurrent))
+		error (FATAL, "Faile to parse the version number (the current part) for language \"%s\": %s",
+			   flag_data->name, param);
+
+	if (!strToUInt (age, 10, &flag_data->versionAge))
+		error (FATAL, "Faile to parse the version number (the age part) for language \"%s\": %s",
+			   flag_data->name, param);
+
+	eFree (verstr);
+}
+
 static flagDefinition PreLangDefFlagDef [] = {
 	{ '\0',  "base", NULL, pre_lang_def_flag_base_long,
 	  "BASEPARSER", "utilize as a base parser"},
@@ -2189,6 +2216,8 @@ static flagDefinition PreLangDefFlagDef [] = {
 	},
 	{ '\0',  "_autoFQTag", NULL, pre_lang_def_flag_autoFQTag_long,
 	  NULL, "make full qualified tags automatically based on scope information"},
+	{ '\0', "version",     NULL, pre_lang_def_flag_version_long,
+	  NULL, "set the version of the parser (current.age)"},
 };
 
 static void optlibFreeDep (langType lang, bool initialized CTAGS_ATTR_UNUSED)
@@ -2287,9 +2316,12 @@ extern void processLanguageDefineOption (
 	memset (LanguageTable + LanguageCount, 0, sizeof(parserObject));
 
 	struct preLangDefFlagData data = {
+		.name = name,
 		.base = NULL,
 		.direction = SUBPARSER_UNKNOWN_DIRECTION,
 		.autoFQTag = false,
+		.versionCurrent = 0,
+		.versionAge = 0,
 	};
 	flagsEval (flags, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef), &data);
 
@@ -2304,6 +2336,8 @@ extern void processLanguageDefineOption (
 		eFree (data.base);
 
 	def->requestAutomaticFQTag = data.autoFQTag;
+	def->versionCurrent = data.versionCurrent;
+	def->versionAge = data.versionAge;
 
 	initializeParsingCommon (def, false);
 	linkDependenciesAtInitializeParsing (def);
@@ -4855,6 +4889,26 @@ extern bool makeRoleDescriptionsPseudoTags (const langType language,
 	}
 
 	return data.written;
+}
+
+extern unsigned int getLanguageVersionCurrent (const langType language)
+{
+	parserObject *parser;
+	parserDefinition* lang;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable + language;
+	lang = parser->def;
+	return lang->versionCurrent;
+}
+
+extern unsigned int getLanguageVersionAge (const langType language)
+{
+	parserObject *parser;
+	parserDefinition* lang;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable + language;
+	lang = parser->def;
+	return lang->versionAge;
 }
 
 /*

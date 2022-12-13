@@ -873,6 +873,8 @@ extern parserDefinition* PuppetManifestParser (void)
 
 	parserDefinition* const def = parserNew ("PuppetManifest");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

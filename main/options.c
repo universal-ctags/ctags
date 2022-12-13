@@ -485,8 +485,9 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"       Print statistics about input and tag files [no]."},
  {1,0,"  --verbose[=(yes|no)]"},
  {1,0,"       Enable verbose messages describing actions on each input file."},
- {1,0,"  --version"},
- {1,0,"       Print version identifier to standard output."},
+ {1,0,"  --version[=<language>]"},
+ {1,0,"       Print version identifier of the program to standard output."},
+ {1,0,"       Print version identifier of the parser for <language>."},
  {1,0,"  -V   Equivalent to --verbose."},
 #ifdef DEBUG
  {1,0,"  -b <line>"},
@@ -2679,10 +2680,20 @@ static void processForceQuitOption (const char *const option CTAGS_ATTR_UNUSED,
 }
 
 static void processVersionOption (
-		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
+		const char *const option,
+		const char *const parameter)
 {
-	printProgramIdentification ();
+	if (parameter == NULL || *parameter == '\0')
+		printProgramIdentification ();
+	else
+	{
+		langType language = getNamedLanguage (parameter, 0);
+		if (language == LANG_IGNORE)
+			error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
+		unsigned int current = getLanguageVersionCurrent (language);
+		unsigned int age = getLanguageVersionAge (language);
+		printf("parser/%s: %u.%u\n", parameter, current, age);
+	}
 	exit (0);
 }
 

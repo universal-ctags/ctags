@@ -243,6 +243,8 @@ extern parserDefinition* MesonParser (void)
 
 	parserDefinition* const def = parserNew ("Meson");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

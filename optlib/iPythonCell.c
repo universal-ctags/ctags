@@ -55,6 +55,8 @@ extern parserDefinition* IPythonCellParser (void)
 
 	parserDefinition* const def = parserNew ("IPythonCell");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

@@ -106,6 +106,8 @@ extern parserDefinition* PodParser (void)
 
 	parserDefinition* const def = parserNew ("Pod");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

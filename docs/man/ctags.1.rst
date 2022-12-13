@@ -1327,10 +1327,15 @@ Miscellaneous Options
 ``-V``
 	Equivalent to ``--verbose``.
 
-``--version``
+``--version[=<language>]``
 	Prints a version identifier for ctags to standard
 	output, and then exits. This is guaranteed to always contain the string
-	"Universal Ctags".
+	"Universal Ctags". See also the description for ``TAG_PROGRAM_VERSION`` in
+	:ref:`ctags-client-tools(7) <ctags-client-tools(7)>`.
+
+	If *<language>* is given, print the version identifier for the parser
+	for *<language>*. See also the description for ``TAG_PARSER_VERSION`` in
+	:ref:`ctags-client-tools(7) <ctags-client-tools(7)>`.
 
 Obsoleted Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
