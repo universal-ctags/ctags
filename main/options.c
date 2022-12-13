@@ -1614,6 +1614,8 @@ static void printProgramIdentification (void)
 
 	printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
 	printf ("  URL: %s\n", PROGRAM_URL);
+	printf ("  Output version: %d.%d\n",
+			OUTPUT_VERSION_CURRENT, OUTPUT_VERSION_AGE);
 
 	printFeatureList ();
 }

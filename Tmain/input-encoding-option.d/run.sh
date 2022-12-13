@@ -20,6 +20,7 @@ if ${CTAGS} --quiet --options=NONE --list-features | grep -q iconv; then
 	      --pseudo-tags=-TAG_FIELD_DESCRIPTION \
 	      --pseudo-tags=-TAG_ROLE_DESCRIPTION \
 	      --pseudo-tags=-TAG_PARSER_VERSION \
+	      --pseudo-tags=-TAG_OUTPUT_VERSION \
 	      --input-encoding=utf-8 --input-encoding-java=shift_jis --input-encoding-javascript=euc-jp \
 	      -o ${BUILDDIR}/tags \
 	      input.js input.java ; then

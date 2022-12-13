@@ -48,6 +48,26 @@
 #define PROGRAM_COPYRIGHT "Copyright (C) 2015-2022"
 #define AUTHOR_NAME       "Universal Ctags Team"
 
+/* The concept of CURRENT and AGE is taken from libtool.
+ * However, we deleted REVISION in libtool when importing
+ * the concept of versioning from libtool.
+ *
+ * If common fields, common extras, pseudo tags have been added,
+ * removed or changed since last release, increment CURRENT.
+ * If they have been added since last release, increment AGE.
+ * If they have been removed since last release, set AGE to 0
+ *
+ * From the command line of ctags, you can see the version
+ * information with --version and --version=NONE.
+ *
+ * In the tags file, !_TAGS_OUTPUT_VERSION shows the the version.
+ *
+ * Chaning for the command line interface, and implementation changes
+ * like bug fixes don't affect the CURRENT an AGE.
+ */
+#define OUTPUT_VERSION_CURRENT 0
+#define OUTPUT_VERSION_AGE 0
+
 /*
  * Constant
  */

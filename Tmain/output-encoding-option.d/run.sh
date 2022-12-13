@@ -19,6 +19,7 @@ if ${CTAGS} --quiet --options=NONE --list-features | grep -q iconv; then
 	       --pseudo-tags=-TAG_EXTRA_DESCRIPTION \
 	       --pseudo-tags=-TAG_ROLE_DESCRIPTION \
 	       --pseudo-tags=-TAG_PARSER_VERSION \
+	       --pseudo-tags=-TAG_OUTPUT_VERSION \
 	       --output-encoding=shift_jis --input-encoding=utf-8 --input-encoding-javascript=euc-jp \
 	       -o ${BUILDDIR}/tags \
 	       input.js input.java ; then
