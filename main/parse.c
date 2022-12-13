@@ -2111,6 +2111,7 @@ extern void enableDefaultFileKind (bool state)
 */
 struct preLangDefFlagData
 {
+	const char *const name;
 	char *base;
 	subparserRunDirection direction;
 	bool autoFQTag;
@@ -2287,6 +2288,7 @@ extern void processLanguageDefineOption (
 	memset (LanguageTable + LanguageCount, 0, sizeof(parserObject));
 
 	struct preLangDefFlagData data = {
+		.name = name,
 		.base = NULL,
 		.direction = SUBPARSER_UNKNOWN_DIRECTION,
 		.autoFQTag = false,
