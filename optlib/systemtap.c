@@ -420,6 +420,8 @@ extern parserDefinition* SystemTapParser (void)
 
 	parserDefinition* const def = parserNew ("SystemTap");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

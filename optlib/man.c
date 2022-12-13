@@ -262,6 +262,8 @@ extern parserDefinition* ManParser (void)
 
 	parserDefinition* const def = parserNew ("Man");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

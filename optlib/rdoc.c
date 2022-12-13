@@ -114,6 +114,8 @@ extern parserDefinition* RDocParser (void)
 
 	parserDefinition* const def = parserNew ("RDoc");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

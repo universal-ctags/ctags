@@ -58,6 +58,8 @@ extern parserDefinition* QemuHXParser (void)
 
 	parserDefinition* const def = parserNew ("QemuHX");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

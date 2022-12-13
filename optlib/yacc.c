@@ -280,6 +280,8 @@ extern parserDefinition* YACCParser (void)
 
 	parserDefinition* const def = parserNew ("YACC");
 
+	def->versionCurrent= 0;
+	def->versionAge    = 0;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
