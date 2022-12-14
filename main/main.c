@@ -59,7 +59,6 @@
 #include "options_p.h"
 #include "optscript.h"
 #include "parse_p.h"
-#include "ptag_p.h"
 #include "read_p.h"
 #include "routines_p.h"
 #include "stats_p.h"
@@ -416,16 +415,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 	char buffer[1024];
 	json_t *request;
 
-	if (isPtagEnabled(PTAG_PROGRAM_NAME))
-	{
-		if (isPtagEnabled(PTAG_PROGRAM_VERSION))
-			fputs ("{\"_type\": \"program\", \"name\": \"" PROGRAM_NAME "\", \"version\": \"" PROGRAM_VERSION "\"}\n", stdout);
-		else
-			fputs ("{\"_type\": \"program\", \"name\": \"" PROGRAM_NAME "\"}\n", stdout);
-	}
-	else if (isPtagEnabled(PTAG_PROGRAM_VERSION))
-		fputs ("{\"_type\": \"program\", \"version\": \"" PROGRAM_VERSION "\"}\n", stdout);
-
+	fputs ("{\"_type\": \"program\", \"name\": \"" PROGRAM_NAME "\", \"version\": \"" PROGRAM_VERSION "\"}\n", stdout);
 	fflush (stdout);
 
 	while (fgets (buffer, sizeof(buffer), stdin))

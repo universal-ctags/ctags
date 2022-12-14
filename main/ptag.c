@@ -139,6 +139,15 @@ static bool ptagMakeParserVersion(ptagDesc *desc, langType language,
 	return writePseudoTag (desc, buf, "current.age", name);
 }
 
+static bool ptagMakeOutputVersion (ptagDesc *desc, langType language,
+								   const void *data CTAGS_ATTR_UNUSED)
+{
+	char buf[32];			/* 2^32 '.' 2^32 '\0' */
+	snprintf (buf, sizeof(buf), "%u.%u",
+			  OUTPUT_VERSION_CURRENT, OUTPUT_VERSION_AGE);
+	return writePseudoTag (desc, buf, "current.age", NULL);
+}
+
 static ptagDesc ptagDescs [] = {
 	{
 	  /* The prefix is not "TAG_".
@@ -222,6 +231,10 @@ static ptagDesc ptagDescs [] = {
 	  "the version of the parser (current.age)",
 	  ptagMakeParserVersion,
 	  PTAGF_PARSER },
+	{ true, "TAG_OUTPUT_VERSION",
+	  "the version of the output interface (current.age)",
+	  ptagMakeOutputVersion,
+	  PTAGF_COMMON },
 };
 
 extern bool makePtagIfEnabled (ptagType type, langType language, const void *data)

@@ -220,6 +220,18 @@ for using notable ones.
 ``TAG_OUTPUT_MODE`` (new in Universal Ctags)
 	TBW
 
+``TAG_OUTPUT_VERSION`` (new in Universal Ctags 6.0)
+    Indicates the language-common interface version of the output::
+
+	  !_TAG_OUTPUT_VERSION	{current}.{age}	/.../
+
+	The public interface includes common fields, common extras,
+	pseudo tags.
+
+	The maintainer of Universal Ctags may update the numbers,
+	"{current}" and "{age}" in the same manner as explained
+	in ``TAG_PARSER_VERSION``.
+
 ``TAG_PARSER_VERSION`` (new in Universal Ctags 6.0)
 	Indicates the interface version of the parser::
 

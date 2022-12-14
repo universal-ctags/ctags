@@ -143,3 +143,8 @@ check_encoding()
 	fi
 	skip "iconv doesn't know about the encoding: $1"
 }
+
+jdropver()
+{
+	sed -e 's/, "version": "5.9.0"//'
+}

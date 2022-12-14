@@ -95,7 +95,7 @@ For an example, the value for ``pattern`` field of ctags takes a string or a boo
 VERSIONS
 --------
 
-Cnages since "0.0"
+Change since "0.0"
 ~~~~~~~~~~~~~~~~~~
 
 * New key ``kindName`` for ``TAG_ROLE_DESCRIPTION`` pseudo tag

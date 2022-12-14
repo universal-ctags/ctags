@@ -8,7 +8,7 @@ CTAGS=$1
 # It seems that the output format is slightly different between libjansson versions
 s()
 {
-	sed -e s/':"'/': "'/g
+	sed -e s/':"'/': "'/g | jdropver
 }
 
 if is_feature_available ${CTAGS} json; then
