@@ -14,7 +14,8 @@ is_feature_available ${CTAGS} '!' gcov
 {
     echo '{"command":"generate-tags", "filename":"input.ctst", "size": 1}'
     echo 'P'
-} | $CTAGS --quiet --options=NONE  --language-force=CTagsSelfTest --_interactive=sandbox \
-		   --pseudo-tags=-TAG_PROGRAM_VERSION
-
-exit $?
+} | $CTAGS --quiet --options=NONE  --language-force=CTagsSelfTest --_interactive=sandbox > /tmp/ctags-Tmain-$$
+r=$?
+jdropver < /tmp/ctags-Tmain-$$
+rm /tmp/ctags-Tmain-$$
+exit $r
