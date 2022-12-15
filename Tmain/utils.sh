@@ -146,5 +146,5 @@ check_encoding()
 
 jdropver()
 {
-	sed -e 's/, "version": "5.9.0"//'
+	sed -e 's/, "version": "[0-9.]*"//'
 }

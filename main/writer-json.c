@@ -35,7 +35,7 @@
  * If they have been added since last release, increment AGE.
  * If they have been removed since last release, set AGE to 0
  */
-#define JSON_WRITER_CURRENT 0
+#define JSON_WRITER_CURRENT 1
 #define JSON_WRITER_AGE 0
 
 #ifndef json_boolean /* compat with jansson < 2.4 */

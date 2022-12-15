@@ -7,7 +7,7 @@ ctags-lang-verilog
 The man page about SystemVerilog/Verilog parser for Universal Ctags
 
 
-:Version: 5.9.0
+:Version: 6.0.0
 :Manual group: Universal Ctags
 :Manual section: 7
 
