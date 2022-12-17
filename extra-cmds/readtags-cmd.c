@@ -17,10 +17,15 @@
 #include <stdlib.h>		/* exit */
 #include <stdio.h>		/* stderr */
 
+typedef struct sReadOption {
+	int sortOverride;
+	sortType sortMethod;
+	/* options passed to libreadtags API functions.*/
+	int matchOpts;
+} readOptions;
+
 static const char *TagFileName = "tags";
 static const char *ProgramName;
-static int SortOverride;
-static sortType SortMethod;
 static int debugMode;
 #ifdef READTAGS_DSL
 #include "dsl/qualifier.h"
@@ -322,7 +327,7 @@ static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
 	return tagsOpen (filePath, info);
 }
 
-static void findTag (const char *const name, const int options,
+static void findTag (const char *const name, readOptions *readOpts,
 					 tagPrintOptions *printOpts)
 {
 	tagFileInfo info;
@@ -338,14 +343,14 @@ static void findTag (const char *const name, const int options,
 		exit (1);
 	}
 
-	if (SortOverride)
+	if (readOpts->sortOverride)
 	{
-		if (tagsSetSortType (file, SortMethod) != TagSuccess)
+		if (tagsSetSortType (file, readOpts->sortMethod) != TagSuccess)
 		{
 			err = tagsGetErrno (file);
 			fprintf (stderr, "%s: cannot set sort type to %d: %s\n",
 					 ProgramName,
-					 SortMethod,
+					 readOpts->sortMethod,
 					 tagsStrerror (err));
 			exit (1);
 		}
@@ -353,7 +358,7 @@ static void findTag (const char *const name, const int options,
 	if (debugMode)
 		fprintf (stderr, "%s: searching for \"%s\" in \"%s\"\n",
 					 ProgramName, name, TagFileName);
-	if (tagsFind (file, &entry, name, options) == TagSuccess)
+	if (tagsFind (file, &entry, name, readOpts->matchOpts) == TagSuccess)
 		walkTags (file, &entry, tagsFindNext,
 #ifdef READTAGS_DSL
 				  Formatter? printTagWithFormatter:
@@ -539,13 +544,14 @@ static void printVersion(void)
 
 extern int main (int argc, char **argv)
 {
-	int options = 0;
 	int actionSupplied = 0;
 	int i;
 	int ignore_prefix = 0;
 	tagPrintOptions printOpts;
+	readOptions readOpts;
 
 	memset (&printOpts, 0, sizeof (printOpts));
+	memset (&readOpts, 0, sizeof (readOpts));
 
 	ProgramName = argv [0];
 	setExecutableName (ProgramName);
@@ -556,7 +562,7 @@ extern int main (int argc, char **argv)
 		const char *const arg = argv [i];
 		if (ignore_prefix || arg [0] != '-')
 		{
-			findTag (arg, options, &printOpts);
+			findTag (arg, &readOpts, &printOpts);
 			actionSupplied = 1;
 		}
 		else if (arg [0] == '-' && arg [1] == '\0')
@@ -608,9 +614,9 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "extension-fields") == 0)
 				printOpts.extensionFields = 1;
 			else if (strcmp (optname, "icase-match") == 0)
-				options |= TAG_IGNORECASE;
+				readOpts.matchOpts |= TAG_IGNORECASE;
 			else if (strcmp (optname, "prefix-match") == 0)
-				options |= TAG_PARTIALMATCH;
+				readOpts.matchOpts |= TAG_PARTIALMATCH;
 			else if (strcmp (optname, "list") == 0)
 			{
 				listTags (0, &printOpts);
@@ -632,13 +638,13 @@ extern int main (int argc, char **argv)
 					const char *sort_spec = argv [++i];
 					if (strcmp (sort_spec, "0") == 0
 						|| strcmp (sort_spec, "unsorted") == 0)
-						SortMethod = 0;
+						readOpts.sortMethod = 0;
 					else if (strcmp (sort_spec, "1") == 0
 							 || strcmp (sort_spec, "sorted") == 0)
-						SortMethod = 1;
+						readOpts.sortMethod = 1;
 					else if (strcmp (sort_spec, "2") == 0
 							 || strcmp (sort_spec, "foldcase") == 0)
-						SortMethod = 2;
+						readOpts.sortMethod = 2;
 					else
 					{
 						fprintf (stderr, "%s: unknown sort method for --%s option\n",
@@ -732,8 +738,8 @@ extern int main (int argc, char **argv)
 					case 'v': printVersion ();
 					case 'E': printOpts.escaping = 1; break;
 					case 'e': printOpts.extensionFields = 1; break;
-					case 'i': options |= TAG_IGNORECASE;   break;
-					case 'p': options |= TAG_PARTIALMATCH; break;
+					case 'i': readOpts.matchOpts |= TAG_IGNORECASE;   break;
+					case 'p': readOpts.matchOpts |= TAG_PARTIALMATCH; break;
 					case 'l': listTags (0, &printOpts); actionSupplied = 1; break;
 					case 'n': printOpts.lineNumber = 1; break;
 					case 't':
@@ -748,12 +754,12 @@ extern int main (int argc, char **argv)
 							printUsage(stderr, 1);
 						break;
 					case 's':
-						SortOverride = 1;
+						readOpts.sortOverride = 1;
 						++j;
 						if (arg [j] == '\0')
-							SortMethod = TAG_SORTED;
+							readOpts.sortMethod = TAG_SORTED;
 						else if (strchr ("012", arg[j]) != NULL)
-							SortMethod = (sortType) (arg[j] - '0');
+							readOpts.sortMethod = (sortType) (arg[j] - '0');
 						else
 							printUsage(stderr, 1);
 						break;
