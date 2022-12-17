@@ -530,7 +530,7 @@ Compatible output and weakness
 .. NOT REVIEWED YET
 
 Default behavior (``--output-format=u-ctags`` option) has the
-exceptions.  In other hand, with ``--output-format=e-ctags`` option
+exceptions.  On the other hand, with ``--output-format=e-ctags`` option
 ctags has no exception; Universal Ctags command may use the same file
 format as Exuberant Ctags. However, ``--output-format=e-ctags`` throws
 away a tag entry which name includes a space or a tab
