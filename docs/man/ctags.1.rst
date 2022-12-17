@@ -312,7 +312,7 @@ Output Format Options
 	See ``-e`` for ``etags``, and ``-x`` for ``xref``.
 	``json`` format is available only if
 	the ctags executable is built with ``libjansson``.
-	See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` for more about ``json`` format.
+	See :ref:`ctags-json-output(5) <ctags-json-output(5)>` for more about ``json`` format.
 
 ``-e``
 	Same as ``--output-format=etags``.
