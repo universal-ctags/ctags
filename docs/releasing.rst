@@ -12,7 +12,7 @@ How to release a new version
 
 ----
 
-#. Update the version number (e.g. "5.9.0", "5,9,0") embedded in the following files:
+#. Update the version numbers (e.g. "5.9.0", "5,9,0") embedded in the following files:
 
    + ``configure.ac``
    + ``Tmain/sandbox-version.d/stdout-expected.txt``
