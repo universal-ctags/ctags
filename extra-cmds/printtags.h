@@ -31,6 +31,7 @@ typedef struct {
 	int extensionFields;
 	int lineNumber;
 	int escaping;
+	int escapingInputField;
 } tagPrintOptions;
 
 /*

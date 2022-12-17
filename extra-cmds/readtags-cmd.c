@@ -327,6 +327,16 @@ static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
 	return tagsOpen (filePath, info);
 }
 
+static int hasPsuedoTag (tagFile *const file,
+						 const char *const ptag, const char *const exepectedValueAsInputField)
+{
+	tagEntry entry;
+
+	return ((tagsFindPseudoTag (file, &entry,
+								ptag, TAG_FULLMATCH) == TagSuccess)
+			&& (strcmp(entry.file, exepectedValueAsInputField) == 0));
+}
+
 static void findTag (const char *const name, readOptions *readOpts,
 					 tagPrintOptions *printOpts)
 {
@@ -341,6 +351,14 @@ static void findTag (const char *const name, readOptions *readOpts,
 		if (file)
 			tagsClose (file);
 		exit (1);
+	}
+
+	if (printOpts->escaping)
+	{
+		printOpts->escapingInputField = 0;
+		if (hasPsuedoTag (file, "!_TAG_OUTPUT_MODE", "u-ctags")
+			&& hasPsuedoTag (file, "!_TAG_OUTPUT_FILESEP", "slash"))
+			printOpts->escapingInputField = 1;
 	}
 
 	if (readOpts->sortOverride)
@@ -389,6 +407,14 @@ static void listTags (int pseudoTags, tagPrintOptions *printOpts)
 		if (file)
 			tagsClose (file);
 		exit (1);
+	}
+
+	if (printOpts->escaping)
+	{
+		printOpts->escapingInputField = 0;
+		if (hasPsuedoTag (file, "!_TAG_OUTPUT_MODE", "u-ctags")
+			&& hasPsuedoTag (file, "!_TAG_OUTPUT_FILESEP", "slash"))
+			printOpts->escapingInputField = 1;
 	}
 
 	if (pseudoTags)

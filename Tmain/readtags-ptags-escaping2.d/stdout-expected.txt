@@ -1,0 +1,69 @@
+readtags -e -t example-e-s.tags -E -D:
+!_TAG_OUTPUT_MODE	e-ctags	/u-ctags or e-ctags/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+readtags -e -t example-e-s.tags -D:
+!_TAG_OUTPUT_MODE	e-ctags	/u-ctags or e-ctags/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+
+readtags -e -t example-e-b.tags -E -D:
+!_TAG_OUTPUT_MODE	e-ctags	/u-ctags or e-ctags/
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+readtags -e -t example-e-b.tags -D:
+!_TAG_OUTPUT_MODE	e-ctags	/u-ctags or e-ctags/
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+
+readtags -e -t example-e-_.tags -E -D:
+!_TAG_OUTPUT_MODE	e-ctags	/u-ctags or e-ctags/
+!_TAG_PROC_CWD	/home/a\tb	//
+readtags -e -t example-e-_.tags -D:
+!_TAG_OUTPUT_MODE	e-ctags	/u-ctags or e-ctags/
+!_TAG_PROC_CWD	/home/a\tb	//
+
+readtags -e -t example-u-s.tags -E -D:
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+readtags -e -t example-u-s.tags -D:
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a	b	//
+
+readtags -e -t example-u-b.tags -E -D:
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+readtags -e -t example-u-b.tags -D:
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+
+readtags -e -t example-u-_.tags -E -D:
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROC_CWD	/home/a\tb	//
+readtags -e -t example-u-_.tags -D:
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROC_CWD	/home/a\tb	//
+
+readtags -e -t example-_-s.tags -E -D:
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+readtags -e -t example-_-s.tags -D:
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+
+readtags -e -t example-_-b.tags -E -D:
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+readtags -e -t example-_-b.tags -D:
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+!_TAG_PROC_CWD	/home/a\tb	//
+
+readtags -e -t example-_-_.tags -E -D:
+!_TAG_PROC_CWD	/home/a\tb	//
+readtags -e -t example-_-_.tags -D:
+!_TAG_PROC_CWD	/home/a\tb	//
+
