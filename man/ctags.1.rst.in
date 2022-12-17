@@ -309,6 +309,10 @@ Output Format Options
 ``--output-format=(u-ctags|e-ctags|etags|xref|json)``
 	Specify the output format. The default is ``u-ctags``.
 	See tags(5) for ``u-ctags`` and ``e-ctags``.
+	``TAG_OUTPUT_MODE`` pseudo tag indicates the choice,
+	``u-ctags`` or ``e-ctags``. See ctags-client-tools(7)
+	for more about the pseudo tag.
+
 	See ``-e`` for ``etags``, and ``-x`` for ``xref``.
 	``json`` format is available only if
 	the ctags executable is built with ``libjansson``.
@@ -792,6 +796,9 @@ See "`TAG ENTRIES`_" about fields, kinds, roles, and extras.
 	('``\``') character when printing ``input:`` field.
 	The default is ``yes`` for the default "u-ctags" output format, and
 	``no`` for the other formats.
+
+	``TAG_OUTPUT_FILESEP`` pseudo tag is for representing  the choice of
+	filename separators with this option. See also ctags-client-tools(7).
 
 	This option is available on MS Windows only.
 
