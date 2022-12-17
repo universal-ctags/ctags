@@ -15,7 +15,6 @@ How to release a new version
 #. Update the version numbers (e.g. "5.9.0", "5,9,0") embedded in the following files:
 
    + ``configure.ac``
-   + ``Tmain/sandbox-version.d/stdout-expected.txt``
    + ``main/ctags.h``
    + ``win32/ctags.rc``
    + ``win32/ctags.exe.manifest``
