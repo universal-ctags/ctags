@@ -8,13 +8,13 @@ regular_tag\\	/path/to/file	/^pattern$/
 regular_tag\t	/path/to/file	/^pattern$/
 
 # regular-input-b_.tags
-regular_tag	/path/to/file\	/^pattern$/
-
-# regular-input-bb.tags
 regular_tag	/path/to/file\\	/^pattern$/
 
+# regular-input-bb.tags
+regular_tag	/path/to/file\\\\	/^pattern$/
+
 # regular-input-bt.tags
-regular_tag	/path/to/file\t	/^pattern$/
+regular_tag	/path/to/file\\t	/^pattern$/
 
 # regular-kind-b_.tags
 regular_tag	/path/to/file	/^pattern$/;"	kind:\\
@@ -32,11 +32,11 @@ regular_tag	/path/to/file	/^pattern$/;"	kind:\\
 !_PTAG\t	value	/comment/
 
 # pseudo-input-b_.tags
-!_PTAG	value\	/comment/
-
-# pseudo-input-bb.tags
 !_PTAG	value\\	/comment/
 
+# pseudo-input-bb.tags
+!_PTAG	value\\\\	/comment/
+
 # pseudo-input-bt.tags
-!_PTAG	value\t	/comment/
+!_PTAG	value\\t	/comment/
 
