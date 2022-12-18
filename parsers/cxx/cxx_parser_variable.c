@@ -759,6 +759,8 @@ got_identifier:
 				//	uProperties |= CXXTagPropertyVolatile;
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenConstexpr)
 					uProperties |= CXXTagPropertyConstexpr;
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenConstinit)
+					uProperties |= CXXTagPropertyConstinit;
 				// consteval is not here; it is for functions.
 
 				pszProperties = cxxTagSetProperties(uProperties);

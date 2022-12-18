@@ -223,6 +223,11 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
+		"constinit",
+		CXXLanguageCPP,
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
+	},
+	{
 		"const_cast",
 		CXXLanguageCPP,
 		0

@@ -155,6 +155,8 @@ typedef enum _CXXTagProperty
 	CXXTagPropertyConstexpr = (1 << 18),
 	// consteval has been seen.
 	CXXTagPropertyConsteval = (1 << 19),
+	// constinit has been seen.
+	CXXTagPropertyConstinit = (1 << 20),
 } CXXTagProperty;
 
 // Set the modifiers field of the tag.
