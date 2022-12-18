@@ -1985,6 +1985,20 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 	parser->lregexControlBlock = allocLregexControlBlock (def);
 }
 
+static char *acceptableLangName(char *name)
+{
+	for (char *c = name; *c != '\0'; c++)
+	{
+		if (isalnum ((unsigned char)*c))
+			continue;
+		else if (*c == '+' || *c == '#')
+			continue;
+		else
+			return c;
+	}
+	return NULL;
+}
+
 extern void initializeParsing (void)
 {
 	unsigned int builtInCount;
@@ -2015,7 +2029,7 @@ extern void initializeParsing (void)
 			Assert (def->name);
 			Assert (def->name[0] != '\0');
 			Assert (strcmp (def->name, RSV_LANG_ALL));
-			Assert (strpbrk (def->name, "!\"$%&'()*,-./:;<=>?@[\\]^`|~") == NULL);
+			Assert (acceptableLangName (def->name) == NULL);
 
 			if (def->method & METHOD_NOT_CRAFTED)
 				def->parser = findRegexTags;
@@ -2298,7 +2312,7 @@ extern void processLanguageDefineOption (
 		error (FATAL, "\"" RSV_NONE "\" is reserved; don't use it as the name for defining a new language");
 
 	}
-	else if ((unacceptable = strpbrk (name, "!\"$%&'()*,-./:;<=>?@[\\]^`|~")))
+	else if ((unacceptable = acceptableLangName(name)))
 	{
 		char c = *unacceptable;
 
