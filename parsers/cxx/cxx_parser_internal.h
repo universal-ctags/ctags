@@ -290,6 +290,8 @@ typedef enum _CXXParserKeywordState
 	CXXParserKeywordStateSeenConsteval = (1 << 14),
 	// "constinit" has been seen
 	CXXParserKeywordStateSeenConstinit = (1 << 15),
+	// "thread_local" has been seen
+	CXXParserKeywordStateSeenThreadLocal = (1 << 16),
 } CXXParserKeywordState;
 
 #define CXX_PARSER_MAXIMUM_NESTING_LEVELS 1024

@@ -646,6 +646,10 @@ process_token:
 					case CXXKeywordCONSTINIT:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenConstinit;
 					break;
+					case CXXKeywordTHREAD_LOCAL:
+						g_cxx.uKeywordState |= CXXParserKeywordStateSeenThreadLocal;
+					break;
+
 					default:
 						if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
 						{

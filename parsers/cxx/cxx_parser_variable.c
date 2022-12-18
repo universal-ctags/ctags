@@ -762,6 +762,8 @@ got_identifier:
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenConstinit)
 					uProperties |= CXXTagPropertyConstinit;
 				// consteval is not here; it is for functions.
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenThreadLocal)
+					uProperties |= CXXTagPropertyThreadLocal;
 
 				pszProperties = cxxTagSetProperties(uProperties);
 			}

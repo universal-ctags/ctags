@@ -475,7 +475,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"thread_local",
 		CXXLanguageCPP,
-		CXXKeywordMayAppearInVariableDeclaration
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"throw",
