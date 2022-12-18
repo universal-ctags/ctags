@@ -1,0 +1,24 @@
+<!-- Taken from #3581 submitted by @polyscone -->
+<h1>Foo</h1>
+
+<script>
+	const bar = 123
+
+	// I don't know why, but an apostrophe breaks
+	// the JavaScript guest language
+	function baz () {
+		return 'abc'
+	}
+</script>
+
+<script>
+	const bar2 = 123
+
+	// I don"t know why, but an apostrophe breaks
+	// the JavaScript guest language
+	function baz2 () {
+		return 'abc'
+	}
+</script>
+
+<h1>BAR</h1>

@@ -1,0 +1,3 @@
+Foo	input.html	/^<h1>Foo<\/h1>$/;"	heading1	language:HTML
+BAR	input.html	/^<h1>BAR<\/h1>$/;"	heading1	language:HTML
+x	input.html	/^  var x/;"	variable	language:JavaScript
