@@ -34,6 +34,7 @@ typedef enum _CXXKeyword
 	CXXKeyword__STDCALL, // Microsoft C/C++
 	CXXKeyword__THISCALL, // Microsoft C/C++
 	CXXKeyword__THREAD, // GCC (https://gcc.gnu.org/onlinedocs/gcc-3.3.1/gcc/Thread-Local.html#Thread-Local)
+	CXXKeyword_THREAD_LOCAL, // C11
 	CXXKeywordALIGNAS, // (since C++11)
 	CXXKeywordALIGNOF, // (since C++11)
 	//CXXKeywordAND,

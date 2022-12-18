@@ -1,3 +1,4 @@
 i	input.c	/^__thread int i;$/;"	v	typeref:typename:int	properties:thread_local
 s	input.c	/^extern __thread struct state s;$/;"	x	typeref:struct:state	properties:extern,thread_local
 p	input.c	/^static __thread char *p;$/;"	v	typeref:typename:char *	file:	properties:static,thread_local
+q	input.c	/^static _Thread_local char *q;$/;"	v	typeref:typename:char *	file:	properties:static,thread_local
