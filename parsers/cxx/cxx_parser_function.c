@@ -1732,6 +1732,8 @@ int cxxParserEmitFunctionTags(
 				uProperties |= CXXTagPropertyDeprecated;
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenConstexpr)
 				uProperties |= CXXTagPropertyConstexpr;
+			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenConsteval)
+				uProperties |= CXXTagPropertyConsteval;
 			if(pInfo->pSignatureConst)
 				uProperties |= CXXTagPropertyConst;
 			if(pInfo->uFlags & CXXFunctionSignatureInfoPure)

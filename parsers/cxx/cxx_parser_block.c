@@ -640,6 +640,9 @@ process_token:
 					case CXXKeywordCONSTEXPR:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenConstexpr;
 					break;
+					case CXXKeywordCONSTEVAL:
+						g_cxx.uKeywordState |= CXXParserKeywordStateSeenConsteval;
+					break;
 					default:
 						if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
 						{

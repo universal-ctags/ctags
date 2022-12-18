@@ -372,6 +372,8 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		ADD_PROPERTY("fntryblock");
 	if (uProperties & CXXTagPropertyConstexpr)
 		ADD_PROPERTY("constexpr");
+	if (uProperties & CXXTagPropertyConsteval)
+		ADD_PROPERTY("consteval");
 
 	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties),false);
 

@@ -52,6 +52,7 @@ typedef enum _CXXKeyword
 	//CXXKeywordCOMPL,
 	CXXKeywordCONCEPT, // Concepts TS
 	CXXKeywordCONST,
+	CXXKeywordCONSTEVAL, // (since C++20)
 	CXXKeywordCONSTEXPR, // (since C++11)
 	CXXKeywordCONST_CAST,
 	CXXKeywordCONTINUE,

@@ -286,6 +286,8 @@ typedef enum _CXXParserKeywordState
 	CXXParserKeywordStateSeenFriend = (1 << 12),
 	// "constexpr" has been seen
 	CXXParserKeywordStateSeenConstexpr = (1 << 13),
+	// "consteval" has been seen
+	CXXParserKeywordStateSeenConsteval = (1 << 14),
 } CXXParserKeywordState;
 
 #define CXX_PARSER_MAXIMUM_NESTING_LEVELS 1024

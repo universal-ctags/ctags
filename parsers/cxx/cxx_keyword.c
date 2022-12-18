@@ -213,6 +213,11 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
+		"consteval",
+		CXXLanguageCPP,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
 		"constexpr",
 		CXXLanguageCPP,
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames

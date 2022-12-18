@@ -153,6 +153,8 @@ typedef enum _CXXTagProperty
 	CXXTagPropertyFunctionTryBlock = (1 << 17),
 	// constexpr has been seen.
 	CXXTagPropertyConstexpr = (1 << 18),
+	// consteval has been seen.
+	CXXTagPropertyConsteval = (1 << 19),
 } CXXTagProperty;
 
 // Set the modifiers field of the tag.
