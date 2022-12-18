@@ -142,6 +142,11 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames,
 	},
 	{
+		"_Thread_local",
+		CXXLanguageC,
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames,
+	},
+	{
 		"alignas",
 		CXXLanguageCPP,
 		CXXKeywordMayAppearInVariableDeclaration

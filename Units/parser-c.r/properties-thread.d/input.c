@@ -2,3 +2,5 @@
 __thread int i;
 extern __thread struct state s;
 static __thread char *p;
+
+static _Thread_local char *q;
