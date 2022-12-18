@@ -370,18 +370,51 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	const char *fieldx = extras? getFieldName (FIELD_EXTRAS): "";
 	const char *xptag = extras? getXtagName (XTAG_PSEUDO_TAGS): "";
 
-	return parserName
+	/* Escaping:
+	 *
+	 * NAME:
+	 *    Defined in ctags. As far as we give a good pseudo tag name,
+	 *    we can print the name as is.
+	 *
+	 * parserName:
+	 *    This can be a part of NAME. An optlib can give a
+	 *    parserName but the characters that can be used in the name are
+	 *    limited in [a-zA-Z0-9+#]. We can print the name as is.
+	 *
+	 * fileName:
+	 *    Any characters can be used. Escaping is needed [TODO].
+	 *
+	 * pattern:
+	 *    Any characters can be used. Escaping is needed always.
+	 *
+	 * fieldx:
+	 *    No escaping is needed.
+	 *
+	 * xptag:
+	 *    No escaping is needed.
+	 *
+	 */
+
+	vString *vpattern = vStringNew ();
+	if (pattern)
+		vStringCatSWithEscapingAsPattern (vpattern, pattern);
+
+	int r = parserName
 
 #define OPT(X) ((X)?(X):"")
 		? mio_printf (mio, "%s%s%s%s\t%s\t/%s/%s%s%s%s\n",
 			      PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
-			      OPT(fileName), OPT(pattern),
+			      OPT(fileName), vStringValue (vpattern),
 				  xsep, fieldx, fsep, xptag)
 		: mio_printf (mio, "%s%s\t%s\t/%s/%s%s%s%s\n",
 			      PSEUDO_TAG_PREFIX, desc->name,
-			      OPT(fileName), OPT(pattern),
+			      OPT(fileName), vStringValue (vpattern),
 			      xsep, fieldx, fsep, xptag);
 #undef OPT
+
+	vStringDelete (vpattern);
+
+	return r;
 }
 
 static fieldType fixedFields [] = {

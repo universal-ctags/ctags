@@ -4702,23 +4702,17 @@ static bool makeKindDescriptionPseudoTag (kindDefinition *kind,
 {
 	struct makeKindDescriptionPseudoTagData *data = user_data;
 	vString *letter_and_name;
-	vString *description;
-	const char *d;
 
 	letter_and_name = vStringNew ();
-	description = vStringNew ();
 
 	vStringPut (letter_and_name, kind -> letter);
 	vStringPut (letter_and_name, ',');
 	vStringCatS (letter_and_name, kind -> name);
 
-	d = kind->description? kind->description: kind->name;
-	vStringCatSWithEscapingAsPattern (description, d);
 	data->written |=  writePseudoTag (data->pdesc, vStringValue (letter_and_name),
-					  vStringValue (description),
-					  data->langName);
+									  kind->description? kind->description: kind->name,
+									  data->langName);
 
-	vStringDelete (description);
 	vStringDelete (letter_and_name);
 
 	return false;
@@ -4734,15 +4728,10 @@ static bool makeRoleDescriptionPseudoTag (kindDefinition *kind,
 	vStringCatS (parser_and_kind_name, PSEUDO_TAG_SEPARATOR);
 	vStringCatS (parser_and_kind_name, kind->name);
 
-	vString *description = vStringNew ();
-	const char *d = role->description? role->description: role->name;
-	vStringCatSWithEscapingAsPattern (description, d);
-
 	data->written |=  writePseudoTag (data->pdesc, role->name,
-									  vStringValue (description),
+									  role->description? role->description: role->name,
 									  vStringValue (parser_and_kind_name));
 
-	vStringDelete (description);
 	vStringDelete (parser_and_kind_name);
 
 	return false;
@@ -4792,22 +4781,14 @@ static bool makeFieldDescriptionPseudoTag (const langType language,
 										   fieldType f,
 										   const ptagDesc *pdesc)
 {
-	vString *description;
 	const char *name = getFieldName (f);
 
 	if (name == NULL || name [0] == '\0')
 		return false;
 
-	description = vStringNew ();
-	vStringCatSWithEscapingAsPattern (description,
-									  getFieldDescription (f));
-
-	bool r = writePseudoTag (pdesc, name,
-							 vStringValue (description),
-							 language == LANG_IGNORE? NULL: getLanguageName (language));
-
-	vStringDelete (description);
-	return r;
+	return writePseudoTag (pdesc, name,
+						   getFieldDescription (f),
+						   language == LANG_IGNORE? NULL: getLanguageName (language));
 }
 
 extern bool makeFieldDescriptionsPseudoTags (const langType language,
@@ -4830,22 +4811,14 @@ static bool makeExtraDescriptionPseudoTag (const langType language,
 										   xtagType x,
 										   const ptagDesc *pdesc)
 {
-	vString *description;
 	const char *name = getXtagName (x);
 
 	if (name == NULL || name [0] == '\0')
 		return false;
 
-	description = vStringNew ();
-	vStringCatSWithEscapingAsPattern (description,
-									  getXtagDescription (x));
-
-	bool r = writePseudoTag (pdesc, name,
-							 vStringValue (description),
-							 language == LANG_IGNORE? NULL: getLanguageName (language));
-
-	vStringDelete (description);
-	return r;
+	return writePseudoTag (pdesc, name,
+						   getXtagDescription (x),
+						   language == LANG_IGNORE? NULL: getLanguageName (language));
 }
 
 extern bool makeExtraDescriptionsPseudoTags (const langType language,
