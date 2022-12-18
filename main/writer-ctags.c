@@ -21,6 +21,7 @@
 #include "xtag.h"
 #include "xtag_p.h"
 
+#include <string.h>
 
 #define CTAGS_FILE  "tags"
 
@@ -356,7 +357,7 @@ static int writeCtagsEntry (tagWriter *writer,
 	return length;
 }
 
-static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+static int writeCtagsPtagEntry (tagWriter *writer,
 				MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
@@ -382,7 +383,7 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	 *    limited in [a-zA-Z0-9+#]. We can print the name as is.
 	 *
 	 * fileName:
-	 *    Any characters can be used. Escaping is needed [TODO].
+	 *    Any characters can be used. Escaping is needed.
 	 *
 	 * pattern:
 	 *    Any characters can be used. Escaping is needed always.
@@ -396,8 +397,29 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	 */
 
 	vString *vfileName = vStringNew ();
-	if (fileName)
-		vStringCatSWithEscaping (vfileName, fileName);
+	if (writer->type == WRITER_U_CTAGS
+#ifdef WIN32
+		&& getFilenameSeparator(Option.useSlashAsFilenameSeparator) == FILENAME_SEP_USE_SLASH
+#endif
+		)
+	{
+		if (fileName)
+			vStringCatSWithEscaping (vfileName, fileName);
+	}
+	else if (fileName)
+	{
+		char *c = NULL;
+		if ((c = strchr (fileName, '\t')) || (c = strchr (fileName, '\n')))
+		{
+			vStringDelete (vfileName);
+			error (WARNING, "skip priting %s%s pseudo tag; the input field of the pseudo tag includes a %s character: %s",
+				   PSEUDO_TAG_PREFIX, desc->name,
+				   *c == '\t'? "tab": "newline",
+				   fileName);
+			return 0;
+		}
+		vStringCatS (vfileName, fileName);
+	}
 
 	vString *vpattern = vStringNew ();
 	if (pattern)
