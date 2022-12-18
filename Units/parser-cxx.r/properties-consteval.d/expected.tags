@@ -1,0 +1,9 @@
+sqr	input.cc	/^consteval int sqr(int n)$/;"	f	typeref:typename:int	properties:consteval
+r	input.cc	/^constexpr int r = sqr(100); \/\/ OK$/;"	v	typeref:typename:int	properties:constexpr
+x	input.cc	/^int x = 100;$/;"	v	typeref:typename:int
+r2	input.cc	/^int r2 = sqr(x);            \/\/ Error: Call does not produce a constant$/;"	v	typeref:typename:int
+sqrsqr	input.cc	/^consteval int sqrsqr(int n)$/;"	f	typeref:typename:int	properties:consteval
+dblsqr	input.cc	/^constexpr int dblsqr(int n)$/;"	f	typeref:typename:int	properties:constexpr
+f	input.cc	/^consteval int f() { return 42; }$/;"	f	typeref:typename:int	properties:consteval
+g	input.cc	/^consteval auto g() { return &f; }$/;"	f	typeref:typename:auto	properties:consteval
+h	input.cc	/^consteval int h(int (*p)() = g()) { return p(); }$/;"	f	typeref:typename:int	properties:consteval

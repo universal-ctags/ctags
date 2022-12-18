@@ -137,6 +137,11 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		0
 	},
 	{
+		"__thread",
+		CXXLanguageC | CXXLanguageCPP,
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames,
+	},
+	{
 		"alignas",
 		CXXLanguageCPP,
 		CXXKeywordMayAppearInVariableDeclaration
@@ -213,7 +218,17 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
+		"consteval",
+		CXXLanguageCPP,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
 		"constexpr",
+		CXXLanguageCPP,
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"constinit",
 		CXXLanguageCPP,
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
@@ -465,7 +480,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"thread_local",
 		CXXLanguageCPP,
-		CXXKeywordMayAppearInVariableDeclaration
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"throw",

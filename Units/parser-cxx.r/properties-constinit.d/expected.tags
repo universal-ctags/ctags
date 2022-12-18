@@ -1,0 +1,5 @@
+g	input.cc	/^const char *g() { return "dynamic initialization"; }$/;"	f	typeref:typename:const char *
+f	input.cc	/^constexpr const char *f(bool p) { return p ? "constant initializer" : g(); }$/;"	f	typeref:typename:const char *	properties:constexpr
+c	input.cc	/^constinit const char *c = f(true); \/\/ OK$/;"	v	typeref:typename:const char *	properties:constinit
+x	input.cc	/^extern thread_local constinit int x;$/;"	x	typeref:typename:int	properties:extern,constinit,thread_local
+f	input.cc	/^int f() { return x; } \/\/ no check of a guard variable needed$/;"	f	typeref:typename:int
