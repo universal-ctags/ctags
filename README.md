@@ -122,4 +122,8 @@ The most significant incompatible changes:
   options. When updating the definitions, using `--kinddef-<LANG>=...` option
   is appreciated.
 
+## [CVE-2022-4515](https://access.redhat.com/security/cve/CVE-2022-4515) ##
+It is not affected to Universal Ctags.
+It was fixed in [e00c55d7a0204dc1d0ae316141323959e1e16162](https://github.com/universal-ctags/ctags/commit/e00c55d7a0204dc1d0ae316141323959e1e16162) in 2016. Thanks to the reporter.
+
 Pull-requests are welcome!
