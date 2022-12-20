@@ -395,24 +395,26 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	 *
 	 */
 
+	vString *vfileName = vStringNew ();
+	if (fileName)
+		vStringCatSWithEscaping (vfileName, fileName);
+
 	vString *vpattern = vStringNew ();
 	if (pattern)
 		vStringCatSWithEscapingAsPattern (vpattern, pattern);
 
 	int r = parserName
-
-#define OPT(X) ((X)?(X):"")
 		? mio_printf (mio, "%s%s%s%s\t%s\t/%s/%s%s%s%s\n",
 			      PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
-			      OPT(fileName), vStringValue (vpattern),
+			      vStringValue (vfileName), vStringValue (vpattern),
 				  xsep, fieldx, fsep, xptag)
 		: mio_printf (mio, "%s%s\t%s\t/%s/%s%s%s%s\n",
 			      PSEUDO_TAG_PREFIX, desc->name,
-			      OPT(fileName), vStringValue (vpattern),
+			      vStringValue (vfileName), vStringValue (vpattern),
 			      xsep, fieldx, fsep, xptag);
-#undef OPT
 
 	vStringDelete (vpattern);
+	vStringDelete (vfileName);
 
 	return r;
 }
