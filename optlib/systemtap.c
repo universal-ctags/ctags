@@ -119,7 +119,7 @@ static void initializeSystemTapParser (const langType language)
 	                               "\\1", "p", "{tenter=probeBody}{scope=push}", NULL);
 	addLanguageTagMultiTableRegex (language, "probe",
 	                               "^([[:alpha:]_][[:alnum:]_.]*)[[:space:]]*",
-	                               "", "", "{tenter=probeBody}{scope=push}", NULL);
+	                               "\\1", "p", "{_role=attached}{tenter=probeBody}{scope=push}", NULL);
 	addLanguageTagMultiTableRegex (language, "probeBody",
 	                               "^[^\\{/#'\"]+",
 	                               "", "", "", NULL);
@@ -403,9 +403,13 @@ extern parserDefinition* SystemTapParser (void)
 		NULL
 	};
 
+	static roleDefinition SystemTapProbeRoleTable [] = {
+		{ true, "attached", "attached by code for probing" },
+	};
 	static kindDefinition SystemTapKindTable [] = {
 		{
 		  true, 'p', "probe", "probe aliases",
+		  ATTACH_ROLES(SystemTapProbeRoleTable),
 		},
 		{
 		  true, 'f', "function", "functions",
@@ -420,8 +424,8 @@ extern parserDefinition* SystemTapParser (void)
 
 	parserDefinition* const def = parserNew ("SystemTap");
 
-	def->versionCurrent= 0;
-	def->versionAge    = 0;
+	def->versionCurrent= 1;
+	def->versionAge    = 1;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

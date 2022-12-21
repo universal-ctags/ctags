@@ -1,0 +1,33 @@
+.. _ctags-lang-systemtap(7):
+
+==============================================================
+ctags-lang-systemtap
+==============================================================
+
+Random notes about tagging SystepTap source code with Universal Ctags
+
+:Version: 6.0.0
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**ctags** ... --languages=+SystemTap ...
+|	**ctags** ... --language-force=SystemTap ...
+|	**ctags** ... --map-SystemTap=+.stp ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging SystemTap scripts.
+
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New role ``attached`` for ``probe`` kind
+
+SEE ALSO
+--------
+:ref:`ctags(1) <ctags(1)>`, `SystemTap Language Reference <https://sourceware.org/systemtap/langref>`_ (https://sourceware.org/systemtap/langref/)
