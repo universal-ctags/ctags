@@ -39,3 +39,34 @@ tcp.ipv6.setsockopt.return	input.stp	/^probe tcp.ipv6.setsockopt.return = kernel
 tcp.receive	input.stp	/^probe tcp.receive = tcp.ipv4.receive, tcp.ipv6.receive$/;"	p	line:667	roles:def	end:669
 tcp.ipv4.receive	input.stp	/^probe tcp.ipv4.receive = kernel.function("tcp_v4_rcv")$/;"	p	line:671	roles:def	end:694
 tcp.ipv6.receive	input.stp	/^probe tcp.ipv6.receive = kernel.function("tcp_v6_rcv")!,$/;"	p	line:696	roles:def	end:730
+linux/version.h	input.stp	/^#include <linux\/version.h>/;"	h	line:22	roles:system
+net/sock.h	input.stp	/^#include <net\/sock.h>/;"	h	line:23	roles:system
+net/tcp.h	input.stp	/^#include <net\/tcp.h>/;"	h	line:24	roles:system
+net/ip.h	input.stp	/^#include <net\/ip.h>/;"	h	line:25	roles:system
+linux/skbuff.h	input.stp	/^#include <linux\/skbuff.h>/;"	h	line:26	roles:system
+TCP_CONGESTION	input.stp	/^#define TCP_CONGESTION /;"	d	line:229	file:	roles:def	end:229
+TCP_MD5SIG	input.stp	/^#define TCP_MD5SIG /;"	d	line:232	file:	roles:def	end:232
+TCP_COOKIE_TRANSACTIONS	input.stp	/^#define TCP_COOKIE_TRANSACTIONS /;"	d	line:235	file:	roles:def	end:235
+TCP_THIN_LINEAR_TIMEOUTS	input.stp	/^#define TCP_THIN_LINEAR_TIMEOUTS /;"	d	line:238	file:	roles:def	end:238
+TCP_THIN_DUPACK	input.stp	/^#define TCP_THIN_DUPACK /;"	d	line:241	file:	roles:def	end:241
+TCP_USER_TIMEOUT	input.stp	/^#define TCP_USER_TIMEOUT /;"	d	line:244	file:	roles:def	end:244
+linux/in6.h	input.stp	/^#include <linux\/in6.h>/;"	h	line:289	roles:system
+IPV6_2292PKTINFO	input.stp	/^#define IPV6_2292PKTINFO /;"	d	line:291	file:	roles:def	end:291
+IPV6_2292HOPOPTS	input.stp	/^#define IPV6_2292HOPOPTS /;"	d	line:294	file:	roles:def	end:294
+IPV6_2292DSTOPTS	input.stp	/^#define IPV6_2292DSTOPTS /;"	d	line:297	file:	roles:def	end:297
+IPV6_2292RTHDR	input.stp	/^#define IPV6_2292RTHDR /;"	d	line:300	file:	roles:def	end:300
+IPV6_2292PKTOPTIONS	input.stp	/^#define IPV6_2292PKTOPTIONS /;"	d	line:303	file:	roles:def	end:303
+IPV6_2292HOPLIMIT	input.stp	/^#define IPV6_2292HOPLIMIT /;"	d	line:306	file:	roles:def	end:306
+IPV6_RECVPKTINFO	input.stp	/^#define IPV6_RECVPKTINFO /;"	d	line:309	file:	roles:def	end:309
+IPV6_RECVHOPLIMIT	input.stp	/^#define IPV6_RECVHOPLIMIT /;"	d	line:312	file:	roles:def	end:312
+IPV6_RECVHOPOPTS	input.stp	/^#define IPV6_RECVHOPOPTS /;"	d	line:315	file:	roles:def	end:315
+IPV6_RTHDRDSTOPTS	input.stp	/^#define IPV6_RTHDRDSTOPTS /;"	d	line:318	file:	roles:def	end:318
+IPV6_RECVRTHDR	input.stp	/^#define IPV6_RECVRTHDR /;"	d	line:321	file:	roles:def	end:321
+IPV6_RECVDSTOPTS	input.stp	/^#define IPV6_RECVDSTOPTS /;"	d	line:324	file:	roles:def	end:324
+IPV6_RECVPATHMTU	input.stp	/^#define IPV6_RECVPATHMTU /;"	d	line:327	file:	roles:def	end:327
+IPV6_PATHMTU	input.stp	/^#define IPV6_PATHMTU /;"	d	line:330	file:	roles:def	end:330
+IPV6_DONTFRAG	input.stp	/^#define IPV6_DONTFRAG /;"	d	line:333	file:	roles:def	end:333
+IPV6_ADDR_PREFERENCES	input.stp	/^#define IPV6_ADDR_PREFERENCES /;"	d	line:336	file:	roles:def	end:336
+IPV6_MINHOPCOUNT	input.stp	/^#define IPV6_MINHOPCOUNT /;"	d	line:339	file:	roles:def	end:339
+IPV6_RECVORIGDSTADDR	input.stp	/^#define IPV6_RECVORIGDSTADDR /;"	d	line:342	file:	roles:def	end:342
+IPV6_TRANSPARENT	input.stp	/^#define IPV6_TRANSPARENT /;"	d	line:345	file:	roles:def	end:345

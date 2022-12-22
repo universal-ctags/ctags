@@ -20,6 +20,26 @@ DESCRIPTION
 -----------
 This man page gathers random notes about tagging SystemTap scripts.
 
+Guests
+~~~~~~~~~~~
+The SystemTap parser runs CPreProcessor as a guest parser on the areas
+surrounded by `%{` and `%}`.
+
+"input.stp"
+
+.. code-block:: SystemTap
+
+	%{
+	#define X 1
+	%}
+
+"output.tags"
+with "--options=NONE -o - --sort=no --extras=+{guest} input.stp"
+
+.. code-block:: tags
+
+	X	input.stp	/^#define X /;"	d	file:
+
 VERSIONS
 --------
 
