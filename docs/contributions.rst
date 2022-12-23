@@ -429,10 +429,10 @@ Title of commit log and pull request
 
 * Use following prefixes for the changes other than parsers.
 
-  main:
+  main
     Changes for files under ``main/`` directory
 
-  Units:
+  Units
     Changes for the test cases under ``Units/`` directory
 
   Tmain
