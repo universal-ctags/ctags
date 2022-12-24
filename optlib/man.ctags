@@ -59,7 +59,7 @@
     /fill-end-of-scope {
          _scopetop pop exch
          % scope-top:int adjustment:int
-         1 /start _matchloc _matchloc2line exch
+         @1 _matchloc2line exch
          % scope-top:int line adjustment:int
          2 copy gt {
              sub end:

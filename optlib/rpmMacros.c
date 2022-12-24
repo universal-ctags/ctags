@@ -38,7 +38,7 @@ static void initializeRpmMacrosParser (const langType language)
 	                               "^(\n)",
 	                               "", "", ""
 		"{{\n"
-		"   1 /start _matchloc end:\n"
+		"   @1 end:\n"
 		"   _tleave\n"
 		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "contline",
@@ -46,7 +46,7 @@ static void initializeRpmMacrosParser (const langType language)
 	                               "", "", ""
 		"{{\n"
 		"    \\1 (\\\\) eq not {\n"
-		"       1 /end _matchloc end:\n"
+		"       1@ end:\n"
 		"       _tleave\n"
 		"    } if\n"
 		"}}", NULL);

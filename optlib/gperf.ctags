@@ -84,7 +84,7 @@
      (lookup-function-name) /lfunc
      (class-name)           /class
      (string-pool-name)     /strpool >> \1 get
-  2 /start _matchloc
+  @2
   _tag _commit pop
 }}
 --_mtable-regex-GPerf=structdec/[^\n]*\n//

@@ -79,7 +79,7 @@
 --regex-Pod=/^=head([1-4])[ \t]+(.+)//{{
     \2
     kindTable \1 tolevel get
-    2 /start _matchloc
+    @2
     _tag _commit
     dup :line 1 sub \1 tolevel scopePopUpTo
     _scopetop {

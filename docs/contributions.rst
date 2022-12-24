@@ -429,20 +429,35 @@ Title of commit log and pull request
 
 * Use following prefixes for the changes other than parsers.
 
-  main:
+  main
     Changes for files under ``main/`` directory
 
-  Units:
+  Units
     Changes for the test cases under ``Units/`` directory
 
   Tmain
     Changes for the test cases under ``Tmain/`` directory
+
+  units
+    Changes for the test harness (misc/units.py) itself
 
   docs(web)
     Changes for the ``docs/*.rst``
 
   docs(man)
     Changes for the ``man/*.rst``
+
+  dsl
+    Changes operators that can be used in optscript command
+
+  operators
+    Changes operators that can be used in optlib `{{` ... `}}` blocks
+
+  prelude
+    Changes optlib procedures defined in main/CommonPrelude.ps
+
+  CXX (or Cxx)
+    Changes affecting all parsers defined in parsers/cxx
 
   See also the output of ``git log`` command.
 

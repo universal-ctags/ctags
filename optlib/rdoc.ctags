@@ -76,7 +76,7 @@
     \1 length kindTable length le {
         \2
         kindTable \1 length 1 sub get
-        2 /start _matchloc
+        @2
         _tag _commit
         dup :line 1 sub \1 scopePopUpTo
         _scopetop {

@@ -319,7 +319,7 @@
             % {tenter=signature,blockHeadPopAtLast}
             /signature /blockHeadPopAtLast _tentercont
         } {
-            2 /start _matchloc _advanceto
+            @2 _advanceto
             /blockHead /endWithPop _tentercont
         } ifelse
     } ifelse
