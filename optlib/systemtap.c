@@ -61,8 +61,17 @@ static void initializeSystemTapParser (const langType language)
 	                               "^global[[:space:]]+",
 	                               "", "", "{tenter=vars}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^%[\\{(]",
-	                               "", "", "{tenter=cfuncStmt}", NULL);
+	                               "^(%\\{)",
+	                               "", "", "{tenter=cfuncStmt}"
+		"{{\n"
+		"    1@ true\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^%\\(",
+	                               "", "", "{tenter=cfuncStmt}"
+		"{{\n"
+		"    false\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -119,7 +128,7 @@ static void initializeSystemTapParser (const langType language)
 	                               "\\1", "p", "{tenter=probeBody}{scope=push}", NULL);
 	addLanguageTagMultiTableRegex (language, "probe",
 	                               "^([[:alpha:]_][[:alnum:]_.]*)[[:space:]]*",
-	                               "", "", "{tenter=probeBody}{scope=push}", NULL);
+	                               "\\1", "p", "{_role=attached}{tenter=probeBody}{scope=push}", NULL);
 	addLanguageTagMultiTableRegex (language, "probeBody",
 	                               "^[^\\{/#'\"]+",
 	                               "", "", "", NULL);
@@ -199,8 +208,17 @@ static void initializeSystemTapParser (const langType language)
 	                               "^\\{",
 	                               "", "", "{tenter=funcStmt,stmtend}", NULL);
 	addLanguageTagMultiTableRegex (language, "funcBody",
-	                               "^%[\\{(]",
-	                               "", "", "{tenter=cfuncStmt,stmtend}", NULL);
+	                               "^(%\\{)",
+	                               "", "", "{tenter=cfuncStmt,stmtend}"
+		"{{\n"
+		"    1@ true\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "funcBody",
+	                               "^%\\(",
+	                               "", "", "{tenter=cfuncStmt,stmtend}"
+		"{{\n"
+		"    false\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "funcBody",
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
@@ -235,8 +253,17 @@ static void initializeSystemTapParser (const langType language)
 	                               "^//",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "funcStmt",
-	                               "^%[\\{(]",
-	                               "", "", "{tenter=cfuncStmt}", NULL);
+	                               "^(%\\{)",
+	                               "", "", "{tenter=cfuncStmt}"
+		"{{\n"
+		"    1@ true\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "funcStmt",
+	                               "^%\\(",
+	                               "", "", "{tenter=cfuncStmt}"
+		"{{\n"
+		"    false\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "funcStmt",
 	                               "^\\{",
 	                               "", "", "{tenter=funcStmt}", NULL);
@@ -262,11 +289,31 @@ static void initializeSystemTapParser (const langType language)
 	                               "^'",
 	                               "", "", "{tenter=ssliteral}", NULL);
 	addLanguageTagMultiTableRegex (language, "cfuncStmt",
-	                               "^%[\\})]",
+	                               "^%\\)",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "cfuncStmt",
-	                               "^%[\\{(]",
-	                               "", "", "{tenter=cfuncStmt}", NULL);
+	                               "^(%\\})",
+	                               "", "", "{tleave}"
+		"{{\n"
+		"    {\n"
+		"        % TODO: If the function name of SystemTap side can be passed to\n"
+		"        % the C code area, running C parser is meaningfully.\n"
+		"        % However, we have not implemented such a feature yet.\n"
+		"        (CPreProcessor) exch @1 _makepromise { pop } if\n"
+		"    } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "cfuncStmt",
+	                               "^(%\\{)",
+	                               "", "", "{tenter=cfuncStmt}"
+		"{{\n"
+		"    1@ true\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "cfuncStmt",
+	                               "^%\\(",
+	                               "", "", "{tenter=cfuncStmt}"
+		"{{\n"
+		"    false\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "cfuncStmt",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -403,9 +450,13 @@ extern parserDefinition* SystemTapParser (void)
 		NULL
 	};
 
+	static roleDefinition SystemTapProbeRoleTable [] = {
+		{ true, "attached", "attached by code for probing" },
+	};
 	static kindDefinition SystemTapKindTable [] = {
 		{
 		  true, 'p', "probe", "probe aliases",
+		  ATTACH_ROLES(SystemTapProbeRoleTable),
 		},
 		{
 		  true, 'f', "function", "functions",
@@ -420,8 +471,8 @@ extern parserDefinition* SystemTapParser (void)
 
 	parserDefinition* const def = parserNew ("SystemTap");
 
-	def->versionCurrent= 0;
-	def->versionAge    = 0;
+	def->versionCurrent= 1;
+	def->versionAge    = 1;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

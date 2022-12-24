@@ -1,2 +1,4 @@
 --sort=no
---fields=+ne
+--fields=+ner
+--extras=+r
+--extras=+g

@@ -41,7 +41,7 @@ static void initializeGPerfParser (const langType language)
 		"     (lookup-function-name) /lfunc\n"
 		"     (class-name)           /class\n"
 		"     (string-pool-name)     /strpool >> \\1 get\n"
-		"  2 /start _matchloc\n"
+		"  @2\n"
 		"  _tag _commit pop\n"
 		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
@@ -92,7 +92,7 @@ static void initializeGPerfParser (const langType language)
 		"     (lookup-function-name) /lfunc\n"
 		"     (class-name)           /class\n"
 		"     (string-pool-name)     /strpool >> \\1 get\n"
-		"  2 /start _matchloc\n"
+		"  @2\n"
 		"  _tag _commit pop\n"
 		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "structdec",

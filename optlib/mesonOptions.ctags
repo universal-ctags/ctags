@@ -33,7 +33,7 @@
     % \2 may point a kind. This must be converted to a name from a string.
     \2 cvn
     % Push the start position of the group 1.
-    1 /start _matchloc
+    @1
     % To skip an unexpected kind name, _tag is wrapped with stopped.
     { _tag } stopped {
         % Unexpected kind. Clear the stack.

@@ -3539,17 +3539,18 @@ static matchLoc *make_mloc (scriptWindow *window, int group, bool start)
 	matchLoc *mloc = xMalloc (1, matchLoc);
 	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
 	{
+		mloc->base  = 0;
 		mloc->delta = 0;
 		mloc->line = getInputLineNumber ();
 		mloc->pos = getInputFilePosition ();
 	}
 	else
 	{
+		mloc->base  = window->line - window->start;
 		mloc->delta = (start
 					   ? window->pmatch [group].rm_so
 					   : window->pmatch [group].rm_eo);
-		off_t offset = (window->line + mloc->delta) - window->start;
-		mloc->line = getInputLineNumberForFileOffset (offset);
+		mloc->line = getInputLineNumberForFileOffset (mloc->base + mloc->delta);
 		mloc->pos  = getInputFilePositionForLine (mloc->line);
 	}
 	return mloc;
@@ -3939,6 +3940,66 @@ static EsObject *lrop_markplaceholder (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject *lrop_makepromise (OptVM *vm, EsObject *name)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	if (lcb->window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
+	{
+		error (WARNING, "don't use `%s' operator in --regex-<LANG> option",
+			   es_symbol_get (name));
+		return OPTSCRIPT_ERR_NOTMTABLEPTRN; /* TODO */
+	}
+
+	EsObject *endobj = opt_vm_ostack_top (vm);
+	if (es_object_get_type (endobj) != OPT_TYPE_MATCHLOC)
+		return OPT_ERR_TYPECHECK;
+	matchLoc *end = es_pointer_get (endobj);
+	off_t end_off = (off_t)(end->base + end->delta);
+
+	EsObject *startobj = opt_vm_ostack_peek (vm, 1);
+	if (es_object_get_type (startobj) != OPT_TYPE_MATCHLOC)
+		return OPT_ERR_TYPECHECK;
+	matchLoc *start = es_pointer_get (startobj);
+	off_t start_off = (off_t)(start->base + start->delta);
+
+	if (! (start_off < end_off))
+		return OPT_ERR_RANGECHECK;
+
+	EsObject *lang = opt_vm_ostack_peek (vm, 2);
+	const char *langc = opt_string_get_cstr (lang);
+	langType t = getNamedLanguageOrAlias (langc, 0);
+	if (t == LANG_IGNORE)
+		return OPTSCRIPT_ERR_UNKNOWNLANGUAGE;
+
+	if (start_off == end_off)
+	{
+		opt_vm_ostack_pop (vm);
+		opt_vm_ostack_pop (vm);
+		opt_vm_ostack_pop (vm);
+		opt_vm_ostack_push (vm, es_false);
+		return es_false;
+	}
+
+	int promise = makePromiseForAreaSpecifiedWithOffsets (langc,
+														  start_off,
+														  end_off);
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_pop (vm);
+
+	if (promise >= 0)
+	{
+		EsObject *promise_obj = es_integer_new (promise);
+		opt_vm_ostack_push (vm, promise_obj);
+		opt_vm_ostack_push (vm, es_true);
+		es_object_unref(promise_obj);
+	}
+	else
+		opt_vm_ostack_push (vm, es_false);
+
+	return es_false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchstr",
@@ -4096,7 +4157,14 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.fn       = lrop_markplaceholder,
 		.arity    = 1,
 		.help_str = "tag:int _MARKPLACEHOLDER -",
-	}
+	},
+	{
+		.name     = "_makepromise",
+		.fn       = lrop_makepromise,
+		.arity    = 3,
+		.help_str = "lang:string start:matchloc end:matchloc _MAKEPROMISE promise:int true%"
+		"lang:string start:matchloc end:matchloc _MAKEPROMISE false",
+	},
 };
 
 extern void initRegexOptscript (void)

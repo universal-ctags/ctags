@@ -27,6 +27,7 @@ Man pages
 	ctags-lang-r(7) <man/ctags-lang-r.7.rst>
 	ctags-lang-rmarkdown(7) <man/ctags-lang-rmarkdown.7.rst>
 	ctags-lang-sql(7) <man/ctags-lang-sql.7.rst>
+	ctags-lang-systemtap(7) <man/ctags-lang-systemtap.7.rst>
 	ctags-lang-tcl(7) <man/ctags-lang-tcl.7.rst>
 	ctags-lang-verilog(7) <man/ctags-lang-verilog.7.rst>
 

@@ -153,6 +153,7 @@ static EsObject* OPT_KEY_dstack;
  */
 
 static EsObject* array_new (unsigned int attr);
+static EsObject* array_shared_new (EsObject* original, unsigned int attr);
 
 static EsObject*    array_es_init_fat (void *fat, void *ptr, void *extra);
 static void         array_es_free  (void *ptr, void *fat);
@@ -375,8 +376,8 @@ declop(execstack);
 declop(type);
 declop(cvn);
 declop(cvs);
-
-/* cvlit, cvx, xcheck, executeonly, noacess, readonly,
+declop(cvx);
+/* cvlit, xcheck, executeonly, noacess, readonly,
    rcheck, wcheck, cvi, cvr, cvrs, cvs,... */
 
 /* Operators for Virtual Memory Operators  */
@@ -570,6 +571,7 @@ opt_init (void)
 	defop (opt_system_dict, type,   1, "any TYPE name");
 	defop (opt_system_dict, cvn,    1, "string CVN name");
 	defop (opt_system_dict, cvs,    2, "any string CVS string");
+	defop (opt_system_dict, cvx,    1, "any CVX any");
 
 	defop (opt_system_dict, null,   0, "- NULL null");
 	defop (opt_system_dict, bind,   1, "proc BIND proc");
@@ -1974,6 +1976,14 @@ array_new (unsigned int attr)
 }
 
 static EsObject*
+array_shared_new (EsObject* original, unsigned int attr)
+{
+	ptrArray *a = es_pointer_get (original);
+	ptrArrayRef (a);
+	return es_fatptr_new (OPT_TYPE_ARRAY, a, &attr);
+}
+
+static EsObject*
 array_es_init_fat (void *fat, void *ptr, void *extra)
 {
 	ArrayFat *a = fat;
@@ -1991,9 +2001,6 @@ array_es_free (void *ptr, void *fat)
 static int
 array_es_equal (const void *a, const void *afat, const void *b, const void *bfat)
 {
-	if (((ArrayFat *)afat)->attr != ((ArrayFat *)bfat)->attr)
-		return 0;
-
 	if (ptrArrayIsEmpty ((ptrArray *)a) && ptrArrayIsEmpty ((ptrArray*)b))
 		return 1;
 	else if (a == b)
@@ -3927,6 +3934,34 @@ op_cvs (OptVM *vm, EsObject *name)
 	ptrArrayDeleteLastInBatch (vm->ostack, 2);
 	vm_ostack_push (vm, o);
 	es_object_unref (o);
+
+	return es_false;
+}
+
+static EsObject*
+op_cvx (OptVM *vm, EsObject *name)
+{
+	EsObject *o = ptrArrayLast (vm->ostack);
+
+	if (es_object_get_type (o) == OPT_TYPE_ARRAY
+		&& (! (((ArrayFat *)es_fatptr_get (o))->attr & ATTR_EXECUTABLE)))
+	{
+		EsObject *xarray = array_shared_new (o,
+											 ((ArrayFat *)es_fatptr_get (o))->attr | ATTR_EXECUTABLE);
+		ptrArrayDeleteLast (vm->ostack);
+		vm_ostack_push (vm, xarray);
+		es_object_unref(xarray);
+
+	}
+	else if (es_object_get_type (o) == OPT_TYPE_NAME
+			 && (! (((NameFat *)es_fatptr_get (o))->attr & ATTR_EXECUTABLE)))
+	{
+		EsObject *symbol = es_pointer_get (o);
+		EsObject *xname = name_new (symbol, ((NameFat *)es_fatptr_get (o))->attr | ATTR_EXECUTABLE);
+		ptrArrayDeleteLast (vm->ostack);
+		vm_ostack_push (vm, xname);
+		es_object_unref(xname);
+	}
 
 	return es_false;
 }
