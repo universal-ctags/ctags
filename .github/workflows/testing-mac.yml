@@ -27,7 +27,7 @@ jobs:
     - name: install tools and libraries
       run: |
         # See https://github.com/actions/runner-images/issues/6817.
-        brew install --overwrite python@3.10
+        brew install --overwrite python@3.10 python@3.11
         brew install automake pkg-config bash libxml2 jansson libyaml gdb docutils pcre2
     - name: autogen.sh
       run: ./autogen.sh
