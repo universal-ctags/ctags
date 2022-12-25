@@ -448,7 +448,6 @@ command can be used::
 
 (replace ^I with a real <Tab>).
 
-
 TAG FILE INFORMATION:
 
 Pseudo-tag lines can be used to encode information into the tag file regarding

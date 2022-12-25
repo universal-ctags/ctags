@@ -217,7 +217,7 @@ for using notable ones.
 ``TAG_OUTPUT_FILESEP`` (new in Universal Ctags)
 	Indicates filename separators ("slash" or "backslsh") used in input fields.
 
-	Universal Ctags running on Windows replaces backslashes with slashes
+	Universal Ctags running on MS Windows replaces backslashes with slashes
 	when emitting input fields by default. This pseudo tag is for
 	notifying this replacement to client tools.
 
