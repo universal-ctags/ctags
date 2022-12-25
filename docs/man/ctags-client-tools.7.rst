@@ -237,7 +237,7 @@ for using notable ones.
 	the tags output format. See :ref:`ctags(1) <ctags(1)>` about the option.
 
 ``TAG_OUTPUT_VERSION`` (new in Universal Ctags 6.0)
-    Indicates the language-common interface version of the output::
+	Indicates the language-common interface version of the output::
 
 	  !_TAG_OUTPUT_VERSION	{current}.{age}	/.../
 
