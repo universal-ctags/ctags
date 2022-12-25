@@ -1,0 +1,29 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	0	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/8d952eba/
+tab0	\tabc	/^tab0$/;"	n
+tab1	a\tbc	/^tab1$/;"	n
+tab2	ab\tc	/^tab2$/;"	n
+tab3	abc\t	/^tab3$/;"	n
+tab4	\\abc	/^tab4$/;"	n
+tab5	a\\bc	/^tab5$/;"	n
+tab6	ab\\c	/^tab6$/;"	n
+tab7	abc\\	/^tab7$/;"	n
+tab8	\nabc	/^tab8$/;"	n
+tab9	a\nbc	/^tab9$/;"	n
+taba	ab\nc	/^taba$/;"	n
+tabb	abc\n	/^tabb$/;"	n
+tabc	\n\\abc	/^tabc$/;"	n
+tabd	\\\nabc	/^tabd$/;"	n
+tabe	a\n\\bc	/^tabe$/;"	n
+tabf	a\\\nbc	/^tabf$/;"	n
+tabg	abc\n\\	/^tabg$/;"	n
+tabh	abc\\\n	/^tabh$/;"	n
+tabi	\t\\\n	/^tabi$/;"	n
+tabj	ab\t\\\nc	/^tabj$/;"	n
