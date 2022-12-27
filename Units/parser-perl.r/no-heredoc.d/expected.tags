@@ -13,3 +13,7 @@ heredoc4tag	input.pl	/^print "abc" . <<heredoc3tag . 'efg' . << "heredoc4tag" . 
 f7tag	input.pl	/^sub f7tag() {}$/;"	s
 f8tag	input.pl	/^sub f8tag() {}$/;"	s
 f9tag	input.pl	/^sub f9tag() {}$/;"	s
+five_sub	input-0.pl	/^sub five_sub() {$/;"	s
+five_mark0	input-0.pl	/^print 3 + 2 . <<five_mark0;$/;"	h
+five_mark1	input-0.pl	/^print 3 + 2 . <<~five_mark1;$/;"	h
+five_mark2	input-0.pl	/^print 3 + 2 . << "five_mark2";$/;"	h
