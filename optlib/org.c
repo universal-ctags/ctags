@@ -35,6 +35,9 @@ static void initializeOrgParser (const langType language)
 	                               "^#\\+(NAME|name):[[:blank:]]+([[:graph:][:blank:]]+)([\n])?",
 	                               "\\2", "d", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^#[^\n]*\n",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^(\\*{1,7})[ \t]+([[:graph:][:blank:]]+)([\n])?",
 	                               "", "", ""
 		"{{\n"

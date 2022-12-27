@@ -57,6 +57,8 @@
 --_mtable-regex-Org=toplevel/#\+begin_src[ ]+([a-zA-Z0-9][-#+a-zA-Z0-9]*)//{tenter=srcblock}{_guest=\1,0end,}
 # labels
 --_mtable-regex-Org=toplevel/#\+(NAME|name):[[:blank:]]+([[:graph:][:blank:]]+)([\n])?/\2/d/
+# skip #...
+--_mtable-regex-Org=toplevel/#[^\n]*\n//
 # sections stuff
 --_mtable-regex-Org=toplevel/(\*{1,7})[ \t]+([[:graph:][:blank:]]+)([\n])?//{{
     \2 kindTable \1 length 1 sub get @2 _tag _commit pop
