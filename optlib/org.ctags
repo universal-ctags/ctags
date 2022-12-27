@@ -36,22 +36,35 @@
 # definition of levels
 --_tabledef-Org=toplevel
 --_tabledef-Org=srcblock
+
+--_prelude-Org={{
+    /kindTable [
+        /part
+        /chapter
+        /section
+        /subsection
+        /subsubsection
+        /paragraph
+        /subparagraph
+    ] def
+}}
+
 ################################
 # beginning of toplevel
 ################################
+--_mtable-regex-Org=toplevel/[^#*<]+//
 # if encounter a src block do language identify languge and defer
---_mtable-regex-Org=toplevel/[:blank:]*#\+begin_src[ ]+([a-zA-Z0-9][-#+a-zA-Z0-9]*)//{tenter=srcblock}{_guest=\1,0end,}
+--_mtable-regex-Org=toplevel/#\+begin_src[ ]+([a-zA-Z0-9][-#+a-zA-Z0-9]*)//{tenter=srcblock}{_guest=\1,0end,}
+# labels
+--_mtable-regex-Org=toplevel/#\+(NAME|name):[[:blank:]]+([[:graph:][:blank:]]+)([\n])?/\2/d/
+# skip #...
+--_mtable-regex-Org=toplevel/#[^\n]*\n//
 # sections stuff
---_mtable-regex-Org=toplevel/\*\*\*\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/G/
---_mtable-regex-Org=toplevel/\*\*\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/P/
---_mtable-regex-Org=toplevel/\*\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/b/
---_mtable-regex-Org=toplevel/\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/u/
---_mtable-regex-Org=toplevel/\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/s/
---_mtable-regex-Org=toplevel/\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/c/
---_mtable-regex-Org=toplevel/\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/p/
+--_mtable-regex-Org=toplevel/(\*{1,7})[ \t]+([[:graph:][:blank:]]+)([\n])?//{{
+    \2 kindTable \1 length 1 sub get @2 _tag _commit pop
+}}
 # labels
 --_mtable-regex-Org=toplevel/<<([^>]+)>>/\1/d/
---_mtable-regex-Org=toplevel/#\+(NAME|name):[[:blank:]]+([[:graph:][:blank:]]+)([\n])?/\2/d/
 ## else do nothing (end of toplevel)
 --_mtable-regex-Org=toplevel/.//
 
@@ -59,6 +72,7 @@
 # beginning of src block
 ################################
 # if end of src block exit
---_mtable-regex-Org=srcblock/[:blank:]*#\+end_src//{tleave}{_guest=,,0end}
+--_mtable-regex-Org=srcblock/[^#]+//
+--_mtable-regex-Org=srcblock/#\+end_src//{tleave}{_guest=,,0end}
 # else do nothing
 --_mtable-regex-Org=srcblock/.//
