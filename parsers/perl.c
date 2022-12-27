@@ -526,6 +526,7 @@ static const unsigned char *collectHereDocMarker (struct hereDocMarkerManager *m
 	unsigned char *cp = NULL;
 	bool indented = false;
 	unsigned char quote_char = 0;
+	bool space_seen = false;
 
 	if (starter == NULL)
 		return NULL;
@@ -536,7 +537,12 @@ static const unsigned char *collectHereDocMarker (struct hereDocMarkerManager *m
 
 	cp = starter + 2;
 	while (isspace (*cp))
+	{
+		/* To avoid confusing with a shift operator, we track
+		 * spaces after the starter (<<). */
+		space_seen = true;
 		cp++;
+	}
 
 	if (*cp == '\0')
 		return NULL;
@@ -547,6 +553,8 @@ static const unsigned char *collectHereDocMarker (struct hereDocMarkerManager *m
 		return cp + 1;
 
 	if (*cp == '~') {
+		if (space_seen)
+			return cp + 1;
 		indented = true;
 		cp++;
 		if (*cp == '\0')
@@ -570,6 +578,8 @@ static const unsigned char *collectHereDocMarker (struct hereDocMarkerManager *m
 			return NULL;
 		break;
 	default:
+		if (space_seen)
+			return cp;
 		break;
 	}
 
