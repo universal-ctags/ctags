@@ -47,7 +47,10 @@ static void initializeOrgParser (const langType language)
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "srcblock",
-	                               "^[:blank:]*#\\+end_src",
+	                               "^[^#]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "srcblock",
+	                               "^#\\+end_src",
 	                               "", "", "{tleave}{_guest=,,0end}", NULL);
 	addLanguageTagMultiTableRegex (language, "srcblock",
 	                               "^.",

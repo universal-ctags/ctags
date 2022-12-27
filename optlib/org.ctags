@@ -69,6 +69,7 @@
 # beginning of src block
 ################################
 # if end of src block exit
---_mtable-regex-Org=srcblock/[:blank:]*#\+end_src//{tleave}{_guest=,,0end}
+--_mtable-regex-Org=srcblock/[^#]+//
+--_mtable-regex-Org=srcblock/#\+end_src//{tleave}{_guest=,,0end}
 # else do nothing
 --_mtable-regex-Org=srcblock/.//
