@@ -547,11 +547,6 @@ static const unsigned char *collectHereDocMarker (struct hereDocMarkerManager *m
 	if (*cp == '\0')
 		return NULL;
 
-	/* Is shift operator? */
-	if (isdigit (*cp))
-		/* Scan the rest of the string. */
-		return cp + 1;
-
 	if (*cp == '~') {
 		if (space_seen)
 			return cp + 1;
@@ -578,6 +573,8 @@ static const unsigned char *collectHereDocMarker (struct hereDocMarkerManager *m
 			return NULL;
 		break;
 	default:
+		if (!isIdentifier1(*cp))
+			return cp;
 		if (space_seen)
 			return cp;
 		break;
