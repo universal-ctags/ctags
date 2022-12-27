@@ -1,0 +1,19 @@
+f0tag	input.pl	/^sub f0tag() {}$/;"	s
+f1tag	input.pl	/^sub f1tag() {}$/;"	s
+f2tag	input.pl	/^sub f2tag() {}$/;"	s
+f3tag	input.pl	/^sub f3tag() {}$/;"	s
+hereodc0tag	input.pl	/^print 'cat <<<heredoct0notag' . <<hereodc0tag;$/;"	h
+f4tag	input.pl	/^sub f4tag() {}$/;"	s
+hereodc1tag	input.pl	/^print "cat <<<heredoct1notag" . <<hereodc1tag;$/;"	h
+f5tag	input.pl	/^sub f5tag() {}$/;"	s
+hereodc2tag	input.pl	/^print `cat <<<heredoct1notag` . <<hereodc2tag;$/;"	h
+f6tag	input.pl	/^sub f6tag() {}$/;"	s
+heredoc3tag	input.pl	/^print "abc" . <<heredoc3tag . 'efg' . << "heredoc4tag" . `ls` . '<<hereodc5notag';$/;"	h
+heredoc4tag	input.pl	/^print "abc" . <<heredoc3tag . 'efg' . << "heredoc4tag" . `ls` . '<<hereodc5notag';$/;"	h
+f7tag	input.pl	/^sub f7tag() {}$/;"	s
+f8tag	input.pl	/^sub f8tag() {}$/;"	s
+f9tag	input.pl	/^sub f9tag() {}$/;"	s
+five_sub	input-0.pl	/^sub five_sub() {$/;"	s
+five_mark0	input-0.pl	/^print 3 + 2 . <<five_mark0;$/;"	h
+five_mark1	input-0.pl	/^print 3 + 2 . <<~five_mark1;$/;"	h
+five_mark2	input-0.pl	/^print 3 + 2 . << "five_mark2";$/;"	h
