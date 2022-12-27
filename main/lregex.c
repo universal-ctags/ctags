@@ -1733,7 +1733,9 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		scriptSetup (optvm, lcb, n, window);
 		EsObject *e = scriptEval (optvm, patbuf->optscript);
 		if (es_error_p (e))
-			error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
+			error (WARNING, "error when evaluating: %s %% input: %s, line:%lu", patbuf->optscript_src,
+				   getInputFileName (),
+				   getInputLineNumberInRegPType(patbuf->regptype, offset));
 		es_object_unref (e);
 		scriptTeardown (optvm, lcb);
 	}
@@ -1886,7 +1888,8 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 			scriptSetup (optvm, lcb, CORK_NIL, &window);
 			EsObject *e = scriptEval (optvm, patbuf->optscript);
 			if (es_error_p (e))
-				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
+				error (WARNING, "error when evaluating: %s %% input: %s", patbuf->optscript_src,
+					   getInputFileName ());
 			es_object_unref (e);
 			scriptTeardown (optvm, lcb);
 		}
@@ -1978,7 +1981,8 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 			scriptSetup (optvm, lcb, CORK_NIL, &window);
 			EsObject *e = scriptEval (optvm, patbuf->optscript);
 			if (es_error_p (e))
-				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
+				error (WARNING, "error when evaluating: %s %% input: %s", patbuf->optscript_src,
+					   getInputFileName ());
 			es_object_unref (e);
 			scriptTeardown (optvm, lcb);
 		}
