@@ -32,6 +32,9 @@ static void initializeOrgParser (const langType language)
 	                               "^#\\+begin_src[ ]+([a-zA-Z0-9][-#+a-zA-Z0-9]*)",
 	                               "", "", "{tenter=srcblock}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^#\\+(NAME|name):[[:blank:]]+([[:graph:][:blank:]]+)([\n])?",
+	                               "\\2", "d", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^(\\*{1,7})[ \t]+([[:graph:][:blank:]]+)([\n])?",
 	                               "", "", ""
 		"{{\n"
@@ -40,9 +43,6 @@ static void initializeOrgParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^<<([^>]+)>>",
 	                               "\\1", "d", "", NULL);
-	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^#\\+(NAME|name):[[:blank:]]+([[:graph:][:blank:]]+)([\n])?",
-	                               "\\2", "d", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^.",
 	                               "", "", "", NULL);
