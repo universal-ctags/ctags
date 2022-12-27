@@ -478,6 +478,7 @@ The following parsers have been added:
 * TerraformVariables *optlib*
 * Thrift *peg/packcc*
 * TTCN
+* Texinfo *optlib pcre2*
 * Txt2tags
 * TypeScript
 * Varlink *peg/packcc*

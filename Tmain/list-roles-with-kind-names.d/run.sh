@@ -7,7 +7,7 @@ echo '{header}'
 ${CTAGS} --list-roles=all.'{header}'
 
 echo '{header}I'
-${CTAGS} --list-roles=all.'{header}I'
+${CTAGS} --machinable=yes --list-roles=all.'{header}I' | grep -v Texinfo
 
 echo 'd{header}'
 ${CTAGS} --list-roles=all.'d{header}'
