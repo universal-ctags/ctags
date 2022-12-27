@@ -39,8 +39,9 @@
 ################################
 # beginning of toplevel
 ################################
+--_mtable-regex-Org=toplevel/[^#*<]+//
 # if encounter a src block do language identify languge and defer
---_mtable-regex-Org=toplevel/[:blank:]*#\+begin_src[ ]+([a-zA-Z0-9][-#+a-zA-Z0-9]*)//{tenter=srcblock}{_guest=\1,0end,}
+--_mtable-regex-Org=toplevel/#\+begin_src[ ]+([a-zA-Z0-9][-#+a-zA-Z0-9]*)//{tenter=srcblock}{_guest=\1,0end,}
 # sections stuff
 --_mtable-regex-Org=toplevel/\*\*\*\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/G/
 --_mtable-regex-Org=toplevel/\*\*\*\*\*\*[ \t]+([[:graph:][:blank:]]+)([\n])?/\1/P/
