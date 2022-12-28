@@ -5089,29 +5089,10 @@ extern vString *anonGenerateNew (const char *prefix, int kind)
 
 extern void applyLanguageParam (const langType language, const char *name, const char *args)
 {
-	parserDefinition* parser;
-
-
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
 	initializeParserOne (language);
-	parser = LanguageTable [language].def;
-
-	if (parser->paramTable)
-	{
-		unsigned int i;
-
-		for (i = 0; i < parser->paramCount; i++)
-		{
-			if (strcmp (parser->paramTable [i].name, name) == 0)
-			{
-				parser->paramTable [i].handleParam (language, name, args);
-				return;
-			}
-		}
-	}
-
-	error (FATAL, "no such parameter in %s: %s", parser->name, name);
+	applyParam (LanguageTable [language].paramControlBlock, name, args);
 }
 
 extern subparser *getNextSubparser(subparser *last,

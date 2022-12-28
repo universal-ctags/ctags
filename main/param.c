@@ -75,6 +75,21 @@ extern int  defineParam (struct paramControlBlock* pcb, paramDefinition *def,
 	return id;
 }
 
+extern void applyParam (struct paramControlBlock* pcb, const char *name, const char *args)
+{
+	for (unsigned int i = 0; i < pcb->count; i++)
+	{
+		paramDefinition *pdef = pcb->param[i].def;
+		if (strcmp(pdef->name, name) == 0)
+		{
+			pdef->handleParam (pcb->owner, name, args);
+			return;
+		}
+	}
+	const char *lang = getLanguageName (pcb->owner);
+	error (FATAL, "no such parameter in %s: %s", lang, name);
+}
+
 extern struct colprintTable * paramColprintTableNew (void)
 {
 	return colprintTableNew ("L:LANGUAGE", "L:NAME","L:DESCRIPTION", NULL);
