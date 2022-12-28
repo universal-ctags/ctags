@@ -41,4 +41,7 @@ extern void paramColprintTablePrint (struct colprintTable *table, bool noparser,
 
 extern struct paramControlBlock* allocParamControlBlock (parserDefinition *parser);
 extern void freeParamControlBlock (struct paramControlBlock* pcb);
+extern int  defineParam (struct paramControlBlock* pcb, paramDefinition *def,
+						 freeParamDefFunc freeParamDef);
+
 #endif	/* CTAGS_MAIN_PARAM_PRIVATE_H */

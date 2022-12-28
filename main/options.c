@@ -381,6 +381,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Copy patterns of a regex table to another regex table."},
  {1,1,"  --_mtable-regex-<LANG>=<table>/<line_pattern>/<name_pattern>/[<flags>]"},
  {1,1,"       Define multitable regular expression for locating tags in specific language."},
+ {1,1,"  --_paramdef-<LANG>=<name>,<description>"},
+ {1,1,"       Define new param for <LANG>."},
  {1,1,"  --_prelude-<LANG>={{ optscript-code }}"},
  {1,1,"       Specify code run before parsing with <LANG> parser."},
  {1,1,"  --_pretend-<NEWLANG>=<OLDLANG>"},
@@ -2018,31 +2020,6 @@ extern bool processMapOption (
 	return true;
 }
 
-extern bool processParamOption (
-			const char *const option, const char *const value)
-{
-	langType language;
-	const char* name;
-	const char* sep;
-
-	language = getLanguageComponentInOption (option, "param-");
-	if (language == LANG_IGNORE)
-		return false;
-
-	sep = option + strlen ("param-") + strlen (getLanguageName (language));
-	/* `:' is only for keeping self compatibility */
-	if (! (*sep == '.' || *sep == ':' ))
-		error (FATAL, "no separator(.) is given for %s=%s", option, value);
-	name = sep + 1;
-
-	if (value == NULL || value [0] == '\0')
-		error (FATAL, "no value is given for %s", option);
-
-	applyParameter (language, name, value);
-
-	return true;
-}
-
 static void processLicenseOption (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
@@ -3351,6 +3328,8 @@ static void processLongOption (
 	else if (processMultilineRegexOption (option, parameter))
 		;
 	else if (processMapOption (option, parameter))
+		;
+	else if (processParamdefOption (option, parameter))
 		;
 	else if (processParamOption (option, parameter))
 		;

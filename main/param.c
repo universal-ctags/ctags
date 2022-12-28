@@ -11,6 +11,7 @@
  */
 
 #include "general.h"
+#include "options.h"
 #include "param.h"
 #include "param_p.h"
 #include "parse.h"
@@ -57,6 +58,21 @@ extern void freeParamControlBlock (struct paramControlBlock* pcb)
 	if (pcb->param)
 		eFree (pcb->param);
 	eFree (pcb);
+}
+
+extern int  defineParam (struct paramControlBlock* pcb, paramDefinition *def,
+						 freeParamDefFunc freeParamDef)
+{
+	unsigned int id = pcb->count++;
+	pcb->param = xRealloc (pcb->param, pcb->count, paramObject);
+	pcb->param [id].def = def;
+	pcb->param [id].free = freeParamDef;
+
+	verbose ("Add param[%d] \"%s,%s\" to %s\n", id,
+			 def->name, def->desc,
+			 getLanguageName (pcb->owner));
+
+	return id;
 }
 
 extern struct colprintTable * paramColprintTableNew (void)

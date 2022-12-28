@@ -3359,6 +3359,108 @@ extern void printLanguageKinds (const langType language, bool allKindFields,
 	}
 }
 
+extern bool processParamOption (
+			const char *const option, const char *const value)
+{
+	langType language;
+	const char* name;
+	const char* sep;
+
+	language = getLanguageComponentInOption (option, "param-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	sep = option + strlen ("param-") + strlen (getLanguageName (language));
+	/* `:' is only for keeping self compatibility */
+	if (! (*sep == '.' || *sep == ':' ))
+		error (FATAL, "no separator(.) is given for %s=%s", option, value);
+	name = sep + 1;
+
+	if (value == NULL || value [0] == '\0')
+		error (FATAL, "no value is given for %s", option);
+
+	applyParameter (language, name, value);
+
+	return true;
+}
+
+static void freePdef (paramDefinition *pdef)
+{
+	eFree ((void *)pdef->name);
+	eFree ((void *)pdef->desc);
+	eFree (pdef);
+}
+
+static void handleParameterDoNothing (langType lang CTAGS_ATTR_UNUSED,
+									  const char *name CTAGS_ATTR_UNUSED,
+									  const char *arg CTAGS_ATTR_UNUSED)
+{
+	/* Do nothing. */
+}
+
+static bool processLangDefineParam (const langType language,
+									const char *const option,
+									const char *const parameter)
+{
+	parserObject *parser;
+
+	paramDefinition *pdef;
+	const char * p = parameter;
+	const char *name_end;
+	const char *desc;
+	const char *flags;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (p);
+
+	if (p[0] == '\0')
+		error (FATAL, "no parameter definition specified in \"--%s\" option", option);
+
+	name_end = strchr (p, ',');
+	if (!name_end)
+		error (FATAL, "no parameter description specified in \"--%s\" option", option);
+	else if (name_end == p)
+		error (FATAL, "the parameter name in \"--%s\" option is empty", option);
+
+	for (; p < name_end; p++)
+	{
+		if (!isalnum (*p) && *p != '_')
+			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
+				   option);
+	}
+
+	p++;
+	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
+		error (FATAL, "parameter description in \"--%s\" option is empty", option);
+
+	desc = extractDescriptionAndFlags (p, &flags);
+
+	pdef = xCalloc (1, paramDefinition);
+	pdef->name = eStrndup (parameter, name_end - parameter);
+	pdef->desc = desc;
+	pdef->handleParameter = handleParameterDoNothing;
+
+#if 0
+	if (flags)
+		flagsEval (flags, NULL, 0, pdef);
+#endif
+
+	parser = LanguageTable + language;
+	defineParam (parser->paramControlBlock, pdef, freePdef);
+	return true;
+}
+
+extern bool processParamdefOption (const char *const option, const char *const value)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_paramdef-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	return processLangDefineParam (language, option, value);
+}
+
 static void printParameters (struct colprintTable *table, langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
