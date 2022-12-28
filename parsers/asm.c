@@ -781,22 +781,22 @@ static paramDefinition AsmParams [] = {
 	{
 		.name = "commentCharsAtBOL",
 		.desc = "line comment chraracters at the begining of line ([" DEFAULT_COMMENT_CHARS_BOL "])",
-		.handleParameter = asmSetCommentCharsAtBOL,
+		.handleParam = asmSetCommentCharsAtBOL,
 	},
 	{
 		.name = "commentCharsInMOL",
 		.desc = "line comment chraracters in the begining of line ([" DEFAULT_COMMENT_CHARS_MOL "])",
-		.handleParameter = asmSetCommentCharsInMOL,
+		.handleParam = asmSetCommentCharsInMOL,
 	},
 	{
 		.name = "extraLinesepChars",
 		.desc = "extra characters used as a line separator ([])",
-		.handleParameter = asmSetExtraLinesepChars,
+		.handleParam = asmSetExtraLinesepChars,
 	},
 	{
 		.name = "useCPreProcessor",
 		.desc = "run CPreProcessor parser for extracting macro definitions ([true] or false)",
-		.handleParameter = setUseCPreProcessor,
+		.handleParam = setUseCPreProcessor,
 	},
 };
 

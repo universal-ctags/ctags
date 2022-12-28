@@ -308,7 +308,7 @@ static void itclForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
 static paramDefinition ItclParams [] = {
 	{ .name = "forceUse",
 	  .desc = "enable the parser even when `itcl' namespace is not specified in the input (true or [false])" ,
-	  .handleParameter = itclForceUseParamHandler,
+	  .handleParam = itclForceUseParamHandler,
 	},
 };
 

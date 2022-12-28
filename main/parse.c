@@ -3391,9 +3391,9 @@ static void freePdef (paramDefinition *pdef)
 	eFree (pdef);
 }
 
-static void handleParameterDoNothing (langType lang CTAGS_ATTR_UNUSED,
-									  const char *name CTAGS_ATTR_UNUSED,
-									  const char *arg CTAGS_ATTR_UNUSED)
+static void handleParamDoNothing (langType lang CTAGS_ATTR_UNUSED,
+								  const char *name CTAGS_ATTR_UNUSED,
+								  const char *arg CTAGS_ATTR_UNUSED)
 {
 	/* Do nothing. */
 }
@@ -3438,7 +3438,7 @@ static bool processLangDefineParam (const langType language,
 	pdef = xCalloc (1, paramDefinition);
 	pdef->name = eStrndup (parameter, name_end - parameter);
 	pdef->desc = desc;
-	pdef->handleParameter = handleParameterDoNothing;
+	pdef->handleParam = handleParamDoNothing;
 
 #if 0
 	if (flags)
@@ -3461,17 +3461,17 @@ extern bool processParamdefOption (const char *const option, const char *const v
 	return processLangDefineParam (language, option, value);
 }
 
-static void printParameters (struct colprintTable *table, langType language)
+static void printParams (struct colprintTable *table, langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
 	initializeParser (language);
-	paramColprintAddParameters(table,
-							   LanguageTable [language].paramControlBlock);
+	paramColprintAddParams (table,
+							LanguageTable [language].paramControlBlock);
 }
 
-extern void printLanguageParameters (const langType language,
-									 bool withListHeader, bool machinable, FILE *fp)
+extern void printLanguageParams (const langType language,
+								 bool withListHeader, bool machinable, FILE *fp)
 {
 	struct colprintTable *table =  paramColprintTableNew();
 
@@ -3484,11 +3484,11 @@ extern void printLanguageParameters (const langType language,
 			if (lang->invisible)
 				continue;
 
-			printParameters (table, i);
+			printParams (table, i);
 		}
 	}
 	else
-		printParameters (table, language);
+		printParams (table, language);
 
 	paramColprintTablePrint (table, (language != LANG_AUTO),
 							 withListHeader, machinable, fp);
@@ -5105,7 +5105,7 @@ extern void applyLanguageParam (const langType language, const char *name, const
 		{
 			if (strcmp (parser->paramTable [i].name, name) == 0)
 			{
-				parser->paramTable [i].handleParameter (language, name, args);
+				parser->paramTable [i].handleParam (language, name, args);
 				return;
 			}
 		}

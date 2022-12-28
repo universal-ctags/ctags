@@ -2106,18 +2106,18 @@ static void processListParametersOption (const char *const option,
 										 const char *const parameter)
 {
 	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
-		printLanguageParameters (LANG_AUTO,
-								 localOption.withListHeader, localOption.machinable,
-								 stdout);
+		printLanguageParams (LANG_AUTO,
+							 localOption.withListHeader, localOption.machinable,
+							 stdout);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageParameters (language,
-									 localOption.withListHeader, localOption.machinable,
-									 stdout);
+			printLanguageParams (language,
+								 localOption.withListHeader, localOption.machinable,
+								 stdout);
 	}
 	exit (0);
 }

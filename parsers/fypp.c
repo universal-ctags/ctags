@@ -453,7 +453,7 @@ static paramDefinition FyppParams [] = {
 	{
 		.name = "guest",
 		.desc = "parser run after Fypp parser parses the original input (\"NONE\" or a parser name [Fortran])" ,
-		.handleParameter = fyppSetGuestParser,
+		.handleParam = fyppSetGuestParser,
 	},
 };
 

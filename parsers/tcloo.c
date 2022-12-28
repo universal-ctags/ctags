@@ -172,7 +172,7 @@ static void tclooForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED
 static paramDefinition TclOOParams [] = {
 	{ .name = "forceUse",
 	  .desc = "enable the parser even when `oo' namespace is not specified in the input (true or [false])" ,
-	  .handleParameter = tclooForceUseParamHandler,
+	  .handleParam = tclooForceUseParamHandler,
 	},
 };
 

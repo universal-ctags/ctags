@@ -2535,19 +2535,19 @@ static void CpreProSetIf0 (const langType language CTAGS_ATTR_UNUSED, const char
 static paramDefinition CpreProParams [] = {
 	{ .name = "if0",
 	  .desc = "examine code within \"#if 0\" branch (true or [false])",
-	  .handleParameter = CpreProSetIf0,
+	  .handleParam = CpreProSetIf0,
 	},
 	{ .name = "ignore",
 	  .desc = "a token to be specially handled",
-	  .handleParameter = CpreProInstallIgnoreToken,
+	  .handleParam = CpreProInstallIgnoreToken,
 	},
 	{ .name = "define",
 	  .desc = "define replacement for an identifier (name(params,...)=definition)",
-	  .handleParameter = CpreProInstallMacroToken,
+	  .handleParam = CpreProInstallMacroToken,
 	},
 	{ .name = "_expand",
 	  .desc = "expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])",
-	  .handleParameter = CpreProExpandMacrosInInput,
+	  .handleParam = CpreProExpandMacrosInInput,
 	}
 };
 

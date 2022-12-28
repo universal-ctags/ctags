@@ -35,8 +35,8 @@ typedef void (* freeParamDefFunc) (paramDefinition *);
 extern void applyParameter (const langType language, const char *name, const char *args);
 
 extern struct colprintTable * paramColprintTableNew (void);
-extern void paramColprintAddParameters (struct colprintTable *table,
-										struct paramControlBlock* pcb);
+extern void paramColprintAddParams (struct colprintTable *table,
+									struct paramControlBlock* pcb);
 extern void paramColprintTablePrint (struct colprintTable *table, bool noparser,
 									bool withListHeader, bool machinable, FILE *fp);
 

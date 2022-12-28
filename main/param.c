@@ -80,8 +80,8 @@ extern struct colprintTable * paramColprintTableNew (void)
 	return colprintTableNew ("L:LANGUAGE", "L:NAME","L:DESCRIPTION", NULL);
 }
 
-extern void paramColprintAddParameters (struct colprintTable *table,
-										struct paramControlBlock* pcb)
+extern void paramColprintAddParams (struct colprintTable *table,
+									struct paramControlBlock* pcb)
 {
 	const char *lang = getLanguageName (pcb->owner);
 	for (unsigned int i = 0; i < pcb->count; i++)
