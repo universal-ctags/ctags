@@ -743,7 +743,7 @@ static void initialize (const langType language)
 }
 
 #define defineCommentCharSetter(PREPOS, POS)							\
-	static void asmSetCommentChars##PREPOS##POS (const langType language CTAGS_ATTR_UNUSED, \
+	static bool asmSetCommentChars##PREPOS##POS (const langType language CTAGS_ATTR_UNUSED, \
 												 const char *optname CTAGS_ATTR_UNUSED, const char *arg) \
 	{																	\
 		if (commentChars##PREPOS##POS != defaultCommentChar##PREPOS##POS) \
@@ -753,12 +753,13 @@ static void initialize (const langType language)
 			commentChars##PREPOS##POS = eStrdup (arg);					\
 		else															\
 			commentChars##PREPOS##POS = defaultCommentChar##PREPOS##POS; \
+		return true;													\
 	}
 
 defineCommentCharSetter(At, BOL);
 defineCommentCharSetter(In, MOL);
 
-static void asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
+static bool asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
 									const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (extraLinesepChars != defaultExtraLinesepChars)
@@ -768,13 +769,16 @@ static void asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
 		extraLinesepChars = eStrdup (arg);
 	else
 		extraLinesepChars = defaultExtraLinesepChars;
+
+	return true;
 }
 
-static void setUseCPreProcessor(const langType language CTAGS_ATTR_UNUSED,
+static bool setUseCPreProcessor(const langType language CTAGS_ATTR_UNUSED,
 								const char *name, const char *arg)
 {
 	useCPreProcessor = paramParserBool (arg, useCPreProcessor,
 										name, "parameter");
+	return true;
 }
 
 static paramDefinition AsmParams [] = {

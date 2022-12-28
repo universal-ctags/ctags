@@ -163,10 +163,11 @@ static void findTclOOTags(void)
 	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
 
-static void tclooForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
+static bool tclooForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
 									  const char *name, const char *arg)
 {
 	tclooForceUse = paramParserBool (arg, tclooForceUse, name, "parameter");
+	return true;
 }
 
 static paramDefinition TclOOParams [] = {

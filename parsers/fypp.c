@@ -425,7 +425,7 @@ static void finalizeFyppParser (langType language, bool initialized)
 	}
 }
 
-static void fyppSetGuestParser (const langType language CTAGS_ATTR_UNUSED,
+static bool fyppSetGuestParser (const langType language CTAGS_ATTR_UNUSED,
 								const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (!strcmp (arg, RSV_NONE))
@@ -435,7 +435,7 @@ static void fyppSetGuestParser (const langType language CTAGS_ATTR_UNUSED,
 			vStringDelete (fyppGuestParser);
 			fyppGuestParser = NULL;
 		}
-		return;
+		return true;
 	}
 
 	langType lang = getNamedLanguage (arg, strlen(arg));
@@ -447,6 +447,8 @@ static void fyppSetGuestParser (const langType language CTAGS_ATTR_UNUSED,
 	else
 		fyppGuestParser = vStringNew();
 	vStringCatS (fyppGuestParser, arg);
+
+	return true;
 }
 
 static paramDefinition FyppParams [] = {

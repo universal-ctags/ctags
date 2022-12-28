@@ -26,7 +26,7 @@
 struct sParamDefinition {
 	const char *name;
 	const char *desc;
-	void  (* handleParam) (langType lang, const char *name, const char *arg);
+	bool  (* handleParam) (langType lang, const char *name, const char *arg);
 };
 
 /*

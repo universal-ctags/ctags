@@ -3163,6 +3163,13 @@ extern void	addOptscriptToHook (struct lregexControlBlock *lcb, enum scriptHook 
 	ptrArrayAdd (lcb->hook[hook], eStrdup (code));
 }
 
+extern void propagateParamToOptscript (struct lregexControlBlock *lcb, const char *param, const char *value)
+{
+	Assert (param);
+	Assert (value);
+	hashTablePutItem (lcb->param_dict, eStrdup (param), eStrdup (value));
+}
+
 /* Return true if available. */
 extern bool checkRegex (void)
 {

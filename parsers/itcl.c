@@ -299,10 +299,11 @@ static void findITclTags(void)
 	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
 
-static void itclForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
+static bool itclForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
 									  const char *name, const char *arg)
 {
 	itclForceUse = paramParserBool (arg, itclForceUse, name, "parameter");
+	return true;
 }
 
 static paramDefinition ItclParams [] = {

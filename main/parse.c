@@ -3379,8 +3379,9 @@ extern bool processParamOption (
 	if (value == NULL || value [0] == '\0')
 		error (FATAL, "no value is given for %s", option);
 
-	applyLanguageParam (language, name, value);
-
+	if (applyLanguageParam (language, name, value))
+		propagateParamToOptscript (LanguageTable [language].lregexControlBlock,
+								   name, value);
 	return true;
 }
 
@@ -3389,13 +3390,6 @@ static void freePdef (paramDefinition *pdef)
 	eFree ((void *)pdef->name);
 	eFree ((void *)pdef->desc);
 	eFree (pdef);
-}
-
-static void handleParamDoNothing (langType lang CTAGS_ATTR_UNUSED,
-								  const char *name CTAGS_ATTR_UNUSED,
-								  const char *arg CTAGS_ATTR_UNUSED)
-{
-	/* Do nothing. */
 }
 
 static bool processLangDefineParam (const langType language,
@@ -3438,7 +3432,6 @@ static bool processLangDefineParam (const langType language,
 	pdef = xCalloc (1, paramDefinition);
 	pdef->name = eStrndup (parameter, name_end - parameter);
 	pdef->desc = desc;
-	pdef->handleParam = handleParamDoNothing;
 
 #if 0
 	if (flags)
@@ -5087,12 +5080,12 @@ extern vString *anonGenerateNew (const char *prefix, int kind)
 }
 
 
-extern void applyLanguageParam (const langType language, const char *name, const char *args)
+extern bool applyLanguageParam (const langType language, const char *name, const char *args)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
 	initializeParserOne (language);
-	applyParam (LanguageTable [language].paramControlBlock, name, args);
+	return applyParam (LanguageTable [language].paramControlBlock, name, args);
 }
 
 extern subparser *getNextSubparser(subparser *last,

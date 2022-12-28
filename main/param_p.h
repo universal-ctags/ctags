@@ -32,7 +32,7 @@ typedef void (* freeParamDefFunc) (paramDefinition *);
 *   FUNCTION PROTOTYPES
 */
 
-extern void applyParameter (const langType language, const char *name, const char *args);
+extern bool applyParameter (const langType language, const char *name, const char *args);
 
 extern struct colprintTable * paramColprintTableNew (void);
 extern void paramColprintAddParams (struct colprintTable *table,
@@ -44,6 +44,6 @@ extern struct paramControlBlock* allocParamControlBlock (parserDefinition *parse
 extern void freeParamControlBlock (struct paramControlBlock* pcb);
 extern int  defineParam (struct paramControlBlock* pcb, paramDefinition *def,
 						 freeParamDefFunc freeParamDef);
-extern void applyParam (struct paramControlBlock* pcb, const char *name, const char *args);
+extern bool applyParam (struct paramControlBlock* pcb, const char *name, const char *args);
 
 #endif	/* CTAGS_MAIN_PARAM_PRIVATE_H */

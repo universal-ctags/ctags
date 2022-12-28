@@ -2486,13 +2486,14 @@ static void finalizeCpp (const langType language, bool initialized)
 	}
 }
 
-static void CpreProExpandMacrosInInput (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
+static bool CpreProExpandMacrosInInput (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
 {
 	doesExpandMacros = paramParserBool (arg, doesExpandMacros,
 										name, "parameter");
+	return true;
 }
 
-static void CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
+static bool CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
@@ -2507,9 +2508,10 @@ static void CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED
 			cmdlineMacroTable = makeMacroTable ();
 		saveIgnoreToken(arg);
 	}
+	return true;
 }
 
-static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
+static bool CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
@@ -2524,12 +2526,14 @@ static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED,
 			cmdlineMacroTable = makeMacroTable ();
 		saveMacro(cmdlineMacroTable, arg);
 	}
+	return true;
 }
 
-static void CpreProSetIf0 (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
+static bool CpreProSetIf0 (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
 {
 	doesExaminCodeWithInIf0Branch = paramParserBool (arg, doesExaminCodeWithInIf0Branch,
 													 name, "parameter");
+	return true;
 }
 
 static paramDefinition CpreProParams [] = {

@@ -111,6 +111,7 @@ extern void initRegexOptscript (void);
 extern void listRegexOpscriptOperators (FILE *fp);
 
 extern void addOptscriptToHook (struct lregexControlBlock *lcb, enum scriptHook hook, const char *code);
+extern void propagateParamToOptscript (struct lregexControlBlock *lcb, const char *param, const char *value);
 
 extern void printMultitableStatistics (struct lregexControlBlock *lcb);
 
