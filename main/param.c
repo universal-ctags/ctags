@@ -17,21 +17,66 @@
 
 #include <string.h>
 
+typedef struct sParamObject {
+	paramDefinition *def;
+	freeParamDefFunc free;
+} paramObject;
+
+struct paramControlBlock {
+	paramObject *param;
+	unsigned int count;
+	langType owner;
+};
+
+extern struct paramControlBlock* allocParamControlBlock (parserDefinition *parser)
+{
+	struct paramControlBlock *pcb;
+
+	pcb = xMalloc (1, struct paramControlBlock);
+	pcb->param = xMalloc (parser->paramCount, paramObject);
+	pcb->count = parser->paramCount;
+	pcb->owner = parser->id;
+
+	for (unsigned int i = 0; i < parser->paramCount; ++i)
+	{
+		paramObject *param = pcb->param + i;
+		param->def = parser->paramTable + i;
+		param->free = NULL;
+	}
+
+	return pcb;
+}
+
+extern void freeParamControlBlock (struct paramControlBlock* pcb)
+{
+	for (unsigned int i = 0; i< pcb->count; ++i)
+	{
+		if (pcb->param [i].free)
+			pcb->param [i].free (pcb->param [i].def);
+	}
+	if (pcb->param)
+		eFree (pcb->param);
+	eFree (pcb);
+}
 
 extern struct colprintTable * paramColprintTableNew (void)
 {
 	return colprintTableNew ("L:LANGUAGE", "L:NAME","L:DESCRIPTION", NULL);
 }
 
-extern void paramColprintAddParameter (struct colprintTable *table,
-									   langType language,
-									   const paramDefinition *const param)
+extern void paramColprintAddParameters (struct colprintTable *table,
+										struct paramControlBlock* pcb)
 {
-	struct colprintLine *line = colprintTableGetNewLine(table);
+	const char *lang = getLanguageName (pcb->owner);
+	for (unsigned int i = 0; i < pcb->count; i++)
+	{
+		paramDefinition *pdef = pcb->param [i].def;
+		struct colprintLine *line = colprintTableGetNewLine(table);
 
-	colprintLineAppendColumnCString (line, getLanguageName (language));
-	colprintLineAppendColumnCString (line, param->name);
-	colprintLineAppendColumnCString (line, param->desc);
+		colprintLineAppendColumnCString (line, lang);
+		colprintLineAppendColumnCString (line, pdef->name);
+		colprintLineAppendColumnCString (line, pdef->desc);
+	}
 }
 
 static int paramColprintCompareLines (struct colprintLine *a , struct colprintLine *b)

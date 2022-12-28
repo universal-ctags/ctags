@@ -95,6 +95,7 @@ typedef struct sParserObject {
 	struct slaveControlBlock *slaveControlBlock;
 	struct kindControlBlock  *kindControlBlock;
 	struct lregexControlBlock *lregexControlBlock;
+	struct paramControlBlock *paramControlBlock;
 
 	langType pretendingAsLanguage; /* OLDLANG in --_pretend-<NEWLANG>=<OLDLANG>
 									  is set here if this parser is NEWLANG.
@@ -1983,6 +1984,7 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 	parser->kindControlBlock  = allocKindControlBlock (def);
 	parser->slaveControlBlock = allocSlaveControlBlock (def);
 	parser->lregexControlBlock = allocLregexControlBlock (def);
+	parser->paramControlBlock = allocParamControlBlock (def);
 }
 
 extern void initializeParsing (void)
@@ -2051,6 +2053,8 @@ extern void freeParserResources (void)
 		finalizeDependencies (parser->def, parser->slaveControlBlock);
 		freeSlaveControlBlock (parser->slaveControlBlock);
 		parser->slaveControlBlock = NULL;
+
+		freeParamControlBlock (parser->paramControlBlock);
 
 		freeList (&parser->currentPatterns);
 		freeList (&parser->currentExtensions);
@@ -3357,17 +3361,11 @@ extern void printLanguageKinds (const langType language, bool allKindFields,
 
 static void printParameters (struct colprintTable *table, langType language)
 {
-	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
 	initializeParser (language);
-	lang = LanguageTable [language].def;
-	if (lang->paramTable != NULL)
-	{
-		for (unsigned int i = 0; i < lang->paramCount; ++i)
-			paramColprintAddParameter(table, language, lang->paramTable + i);
-	}
-
+	paramColprintAddParameters(table,
+							   LanguageTable [language].paramControlBlock);
 }
 
 extern void printLanguageParameters (const langType language,
