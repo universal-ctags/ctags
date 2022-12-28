@@ -449,7 +449,7 @@ static void fyppSetGuestParser (const langType language CTAGS_ATTR_UNUSED,
 	vStringCatS (fyppGuestParser, arg);
 }
 
-static parameterHandlerTable FyppParameterHandlerTable [] = {
+static paramDefinition FyppParams [] = {
 	{
 		.name = "guest",
 		.desc = "parser run after Fypp parser parses the original input (\"NONE\" or a parser name [Fortran])" ,
@@ -469,8 +469,8 @@ extern parserDefinition* FyppParser (void)
 	def->finalize   = finalizeFyppParser;
 	def->method     = METHOD_REGEX;
 
-	def->parameterHandlerTable = FyppParameterHandlerTable;
-	def->parameterHandlerCount = ARRAY_SIZE(FyppParameterHandlerTable);
+	def->paramTable = FyppParams;
+	def->paramCount = ARRAY_SIZE(FyppParams);
 
 	def->useCork = CORK_QUEUE;
 

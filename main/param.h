@@ -23,7 +23,7 @@
 /*
 *   DATA DECLARATIONS
 */
-struct sParameterHandlerTable {
+struct sParamDefinition {
 	const char *name;
 	const char *desc;
 	void  (* handleParameter) (langType lang, const char *name, const char *arg);

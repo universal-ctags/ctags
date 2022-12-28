@@ -25,13 +25,13 @@ extern struct colprintTable * paramColprintTableNew (void)
 
 extern void paramColprintAddParameter (struct colprintTable *table,
 									   langType language,
-									   const parameterHandlerTable *const paramHandler)
+									   const paramDefinition *const param)
 {
 	struct colprintLine *line = colprintTableGetNewLine(table);
 
 	colprintLineAppendColumnCString (line, getLanguageName (language));
-	colprintLineAppendColumnCString (line, paramHandler->name);
-	colprintLineAppendColumnCString (line, paramHandler->desc);
+	colprintLineAppendColumnCString (line, param->name);
+	colprintLineAppendColumnCString (line, param->desc);
 }
 
 static int paramColprintCompareLines (struct colprintLine *a , struct colprintLine *b)

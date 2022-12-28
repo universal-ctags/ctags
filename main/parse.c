@@ -3362,10 +3362,10 @@ static void printParameters (struct colprintTable *table, langType language)
 
 	initializeParser (language);
 	lang = LanguageTable [language].def;
-	if (lang->parameterHandlerTable != NULL)
+	if (lang->paramTable != NULL)
 	{
-		for (unsigned int i = 0; i < lang->parameterHandlerCount; ++i)
-			paramColprintAddParameter(table, language, lang->parameterHandlerTable + i);
+		for (unsigned int i = 0; i < lang->paramCount; ++i)
+			paramColprintAddParameter(table, language, lang->paramTable + i);
 	}
 
 }
@@ -4997,15 +4997,15 @@ extern void applyParameter (const langType language, const char *name, const cha
 	initializeParserOne (language);
 	parser = LanguageTable [language].def;
 
-	if (parser->parameterHandlerTable)
+	if (parser->paramTable)
 	{
 		unsigned int i;
 
-		for (i = 0; i < parser->parameterHandlerCount; i++)
+		for (i = 0; i < parser->paramCount; i++)
 		{
-			if (strcmp (parser->parameterHandlerTable [i].name, name) == 0)
+			if (strcmp (parser->paramTable [i].name, name) == 0)
 			{
-				parser->parameterHandlerTable [i].handleParameter (language, name, args);
+				parser->paramTable [i].handleParameter (language, name, args);
 				return;
 			}
 		}

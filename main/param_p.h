@@ -29,7 +29,7 @@ extern void applyParameter (const langType language, const char *name, const cha
 extern struct colprintTable * paramColprintTableNew (void);
 extern void paramColprintAddParameter (struct colprintTable *table,
 									   langType language,
-									   const parameterHandlerTable *const paramHandler);
+									   const paramDefinition *const param);
 extern void paramColprintTablePrint (struct colprintTable *table, bool noparser,
 									bool withListHeader, bool machinable, FILE *fp);
 

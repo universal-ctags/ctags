@@ -2532,7 +2532,7 @@ static void CpreProSetIf0 (const langType language CTAGS_ATTR_UNUSED, const char
 													 name, "parameter");
 }
 
-static parameterHandlerTable CpreProParameterHandlerTable [] = {
+static paramDefinition CpreProParams [] = {
 	{ .name = "if0",
 	  .desc = "examine code within \"#if 0\" branch (true or [false])",
 	  .handleParameter = CpreProSetIf0,
@@ -2563,8 +2563,8 @@ extern parserDefinition* CPreProParser (void)
 	def->fieldTable = CPreProFields;
 	def->fieldCount = ARRAY_SIZE (CPreProFields);
 
-	def->parameterHandlerTable = CpreProParameterHandlerTable;
-	def->parameterHandlerCount = ARRAY_SIZE(CpreProParameterHandlerTable);
+	def->paramTable = CpreProParams;
+	def->paramCount = ARRAY_SIZE(CpreProParams);
 
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	return def;

@@ -777,7 +777,7 @@ static void setUseCPreProcessor(const langType language CTAGS_ATTR_UNUSED,
 										name, "parameter");
 }
 
-static parameterHandlerTable AsmParameterHandlerTable [] = {
+static paramDefinition AsmParams [] = {
 	{
 		.name = "commentCharsAtBOL",
 		.desc = "line comment chraracters at the begining of line ([" DEFAULT_COMMENT_CHARS_BOL "])",
@@ -828,8 +828,8 @@ extern parserDefinition* AsmParser (void)
 	def->fieldTable = AsmFields;
 	def->fieldCount = ARRAY_SIZE (AsmFields);
 
-	def->parameterHandlerTable = AsmParameterHandlerTable;
-	def->parameterHandlerCount = ARRAY_SIZE(AsmParameterHandlerTable);
+	def->paramTable = AsmParams;
+	def->paramCount = ARRAY_SIZE(AsmParams);
 
 	return def;
 }
