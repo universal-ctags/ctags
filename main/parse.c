@@ -3379,7 +3379,7 @@ extern bool processParamOption (
 	if (value == NULL || value [0] == '\0')
 		error (FATAL, "no value is given for %s", option);
 
-	applyParameter (language, name, value);
+	applyLanguageParam (language, name, value);
 
 	return true;
 }
@@ -5087,7 +5087,7 @@ extern vString *anonGenerateNew (const char *prefix, int kind)
 }
 
 
-extern void applyParameter (const langType language, const char *name, const char *args)
+extern void applyLanguageParam (const langType language, const char *name, const char *args)
 {
 	parserDefinition* parser;
 

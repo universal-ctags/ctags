@@ -182,4 +182,7 @@ extern bool makeParserVersionPseudoTags (const langType language,
 extern void printLanguageMultitableStatistics (langType language);
 extern void printParserStatisticsIfUsed (langType lang);
 
+/* For keeping the API compatibility with Geany, we use a macro here. */
+#define applyLanguageParam applyParameter
+
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */

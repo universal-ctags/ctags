@@ -31,6 +31,7 @@ typedef void (* freeParamDefFunc) (paramDefinition *);
 /*
 *   FUNCTION PROTOTYPES
 */
+
 extern void applyParameter (const langType language, const char *name, const char *args);
 
 extern struct colprintTable * paramColprintTableNew (void);

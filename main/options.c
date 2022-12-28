@@ -1711,7 +1711,7 @@ static void processIf0Option (const char *const option,
 	langType lang = getNamedLanguage ("CPreProcessor", 0);
 	const char *arg = if0? "true": "false";
 
-	applyParameter (lang, "if0", arg);
+	applyLanguageParam (lang, "if0", arg);
 }
 
 static void processLanguageForceOption (
@@ -2572,7 +2572,7 @@ static void readIgnoreList (const char *const list)
 
 	while (token != NULL)
 	{
-		applyParameter (lang, "ignore", token);
+		applyLanguageParam (lang, "ignore", token);
 		token = strtok (NULL, IGNORE_SEPARATORS);
 	}
 	eFree (newList);
@@ -2592,7 +2592,7 @@ static void addIgnoreListFromFile (const char *const fileName)
 	for(i=0;i<c;i++)
 	{
 		vString * s = stringListItem(tokens,i);
-		applyParameter (lang, "ignore", vStringValue(s));
+		applyLanguageParam (lang, "ignore", vStringValue(s));
 	}
 
 	stringListDelete(tokens);
@@ -2603,7 +2603,7 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 	langType lang = getNamedLanguage ("CPreProcessor", 0);
 
 	if (IgnoreOrDefine == 'D')
-		applyParameter (lang, "define", list);
+		applyLanguageParam (lang, "define", list);
 	else if (strchr ("@./\\", list [0]) != NULL)
 	{
 		const char* fileName = (*list == '@') ? list + 1 : list;
@@ -2614,7 +2614,7 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 		addIgnoreListFromFile (list);
 #endif
 	else if (strcmp (list, "-") == 0)
-		applyParameter (lang, "ignore", NULL);
+		applyLanguageParam (lang, "ignore", NULL);
 	else
 		readIgnoreList (list);
 }
