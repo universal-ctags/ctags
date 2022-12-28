@@ -27,3 +27,7 @@ echo
 echo '# CPP MACHINABLE NOHEADER'
 ${C} --with-list-header=no  --machinable --list-params=CPreProcessor
 echo
+
+echo '# CPP MACHINABLE NOHEADER + PARAM DEFINE WITH CMDLINE'
+${C} --_paramdef-CPreProcessor='pragma,handle program' --with-list-header=no  --machinable --list-params=CPreProcessor
+echo

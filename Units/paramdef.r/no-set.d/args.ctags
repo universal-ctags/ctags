@@ -1,0 +1,11 @@
+--langdef=Foo
+--map-Foo=.foo
+--kinddef-Foo=v,xval,externally defined values
+--_paramdef-Foo=VAR,desc
+--regex-Foo=/(x)//{{
+    /VAR _param {
+        /xval _tag _commit pop
+    } {
+        \1 /xval _tag _commit pop
+    } ifelse
+}}
