@@ -232,6 +232,8 @@ Related options
 
 	--list-fields
 
+	--_paramdef-<LANG>=<NAME>,<DESCRIPTION>
+
 You can run optscript code fragments when pattern specified with
 options matches successfully. The options are ``--regex-<LANG>``,
 ``--mline-regex-<LANG>``, and ``--_mtable-regex-<LANG>`` as you
@@ -268,6 +270,12 @@ operators for accessing the field specified in the line.  ``r``
 represents the field has an operator for reading
 (``:fieldname``). ``w`` represents the field has an operator for
 writing (``fieldname:``).
+
+``--_paramdef-<LANG>=<NAME>,<DESCRIPTION>`` defines a language specific
+parameter named  ``<NAME>``. ``--param-<LANG>.<NAME>=<VALUE>`` assigns
+a value ``<VALUE>`` to the parameter. You can access the value from
+Optscript code with ``_param`` operator. Don't use ``{`` character
+in the description. The character is reserved for future extension.
 
 Operators
 ............................
@@ -324,7 +332,45 @@ Data types
 Recipes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBW
+Parameters
+...........................................
+With ``--_paramdef-<LANG>=<param>,<description>`` option, you can
+define a parser-specific parameter to your optlib parser.
+
+In the following example, we define a parser, ``Foo`` with a
+parser-specific parameter ``VAR``. If the parser sees "x" in the
+current input stream, a code fragment attached to the pattern "/(x)/"
+runs. The code fragment does (1) check whether a value for ``VAR`` is
+given, (2) emit a tag with the value given to parameter ``VAR`` as
+name and with ``xval`` kind, and (3) remove the cork index from the
+operand stack.
+
+foo.ctags:
+.. code-block::
+
+	--langdef=Foo
+	--map-Foo=.foo
+	--kinddef-Foo=v,xval,externally defined values
+	--_paramdef-Foo=VAR,desc
+	--regex-Foo=/(x)//{{
+		/VAR _param { % if VAR is defined ....
+			/xval _tag _commit pop
+		} if
+		% if VAR is not defined, we do nothing.
+	}}
+
+input.foo:
+.. code-block::
+
+	x
+
+When running the parser, we can give a value ("hereiam" in the following example)
+for the parameter ``VAR`` from the command line:
+
+.. code-block:: console
+
+	$ ./ctags --options=args.ctags --param-Foo.VAR=hereiam -o - input.foo
+	hereiam	input.foo	/^x$/;"	v
 
 Difference between Optscript and PostScript
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
