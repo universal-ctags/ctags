@@ -2486,13 +2486,14 @@ static void finalizeCpp (const langType language, bool initialized)
 	}
 }
 
-static void CpreProExpandMacrosInInput (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
+static bool CpreProExpandMacrosInInput (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
 {
 	doesExpandMacros = paramParserBool (arg, doesExpandMacros,
 										name, "parameter");
+	return true;
 }
 
-static void CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
+static bool CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
@@ -2507,9 +2508,10 @@ static void CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED
 			cmdlineMacroTable = makeMacroTable ();
 		saveIgnoreToken(arg);
 	}
+	return true;
 }
 
-static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
+static bool CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
@@ -2524,30 +2526,32 @@ static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED,
 			cmdlineMacroTable = makeMacroTable ();
 		saveMacro(cmdlineMacroTable, arg);
 	}
+	return true;
 }
 
-static void CpreProSetIf0 (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
+static bool CpreProSetIf0 (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
 {
 	doesExaminCodeWithInIf0Branch = paramParserBool (arg, doesExaminCodeWithInIf0Branch,
 													 name, "parameter");
+	return true;
 }
 
-static parameterHandlerTable CpreProParameterHandlerTable [] = {
+static paramDefinition CpreProParams [] = {
 	{ .name = "if0",
 	  .desc = "examine code within \"#if 0\" branch (true or [false])",
-	  .handleParameter = CpreProSetIf0,
+	  .handleParam = CpreProSetIf0,
 	},
 	{ .name = "ignore",
 	  .desc = "a token to be specially handled",
-	  .handleParameter = CpreProInstallIgnoreToken,
+	  .handleParam = CpreProInstallIgnoreToken,
 	},
 	{ .name = "define",
 	  .desc = "define replacement for an identifier (name(params,...)=definition)",
-	  .handleParameter = CpreProInstallMacroToken,
+	  .handleParam = CpreProInstallMacroToken,
 	},
 	{ .name = "_expand",
 	  .desc = "expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])",
-	  .handleParameter = CpreProExpandMacrosInInput,
+	  .handleParam = CpreProExpandMacrosInInput,
 	}
 };
 
@@ -2563,8 +2567,8 @@ extern parserDefinition* CPreProParser (void)
 	def->fieldTable = CPreProFields;
 	def->fieldCount = ARRAY_SIZE (CPreProFields);
 
-	def->parameterHandlerTable = CpreProParameterHandlerTable;
-	def->parameterHandlerCount = ARRAY_SIZE(CpreProParameterHandlerTable);
+	def->paramTable = CpreProParams;
+	def->paramCount = ARRAY_SIZE(CpreProParams);
 
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	return def;

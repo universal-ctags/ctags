@@ -95,6 +95,7 @@ typedef struct sParserObject {
 	struct slaveControlBlock *slaveControlBlock;
 	struct kindControlBlock  *kindControlBlock;
 	struct lregexControlBlock *lregexControlBlock;
+	struct paramControlBlock *paramControlBlock;
 
 	langType pretendingAsLanguage; /* OLDLANG in --_pretend-<NEWLANG>=<OLDLANG>
 									  is set here if this parser is NEWLANG.
@@ -1983,6 +1984,7 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 	parser->kindControlBlock  = allocKindControlBlock (def);
 	parser->slaveControlBlock = allocSlaveControlBlock (def);
 	parser->lregexControlBlock = allocLregexControlBlock (def);
+	parser->paramControlBlock = allocParamControlBlock (def);
 }
 
 extern void initializeParsing (void)
@@ -2051,6 +2053,8 @@ extern void freeParserResources (void)
 		finalizeDependencies (parser->def, parser->slaveControlBlock);
 		freeSlaveControlBlock (parser->slaveControlBlock);
 		parser->slaveControlBlock = NULL;
+
+		freeParamControlBlock (parser->paramControlBlock);
 
 		freeList (&parser->currentPatterns);
 		freeList (&parser->currentExtensions);
@@ -3355,23 +3359,112 @@ extern void printLanguageKinds (const langType language, bool allKindFields,
 	}
 }
 
-static void printParameters (struct colprintTable *table, langType language)
+extern bool processParamOption (
+			const char *const option, const char *const value)
 {
-	const parserDefinition* lang;
+	langType language;
+	const char* name;
+	const char* sep;
+
+	language = getLanguageComponentInOption (option, "param-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	sep = option + strlen ("param-") + strlen (getLanguageName (language));
+	/* `:' is only for keeping self compatibility */
+	if (! (*sep == '.' || *sep == ':' ))
+		error (FATAL, "no separator(.) is given for %s=%s", option, value);
+	name = sep + 1;
+
+	if (value == NULL || value [0] == '\0')
+		error (FATAL, "no value is given for %s", option);
+
+	if (applyLanguageParam (language, name, value))
+		propagateParamToOptscript (LanguageTable [language].lregexControlBlock,
+								   name, value);
+	return true;
+}
+
+static void freePdef (paramDefinition *pdef)
+{
+	eFree ((void *)pdef->name);
+	eFree ((void *)pdef->desc);
+	eFree (pdef);
+}
+
+static bool processLangDefineParam (const langType language,
+									const char *const option,
+									const char *const parameter)
+{
+	parserObject *parser;
+
+	paramDefinition *pdef;
+	const char * p = parameter;
+	const char *name_end;
+	const char *desc;
+	const char *flags;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (p);
+
+	if (p[0] == '\0')
+		error (FATAL, "no parameter definition specified in \"--%s\" option", option);
+
+	name_end = strchr (p, ',');
+	if (!name_end)
+		error (FATAL, "no parameter description specified in \"--%s\" option", option);
+	else if (name_end == p)
+		error (FATAL, "the parameter name in \"--%s\" option is empty", option);
+
+	for (; p < name_end; p++)
+	{
+		if (!isalnum (*p) && *p != '_')
+			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
+				   option);
+	}
+
+	p++;
+	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
+		error (FATAL, "parameter description in \"--%s\" option is empty", option);
+
+	desc = extractDescriptionAndFlags (p, &flags);
+
+	pdef = xCalloc (1, paramDefinition);
+	pdef->name = eStrndup (parameter, name_end - parameter);
+	pdef->desc = desc;
+
+#if 0
+	if (flags)
+		flagsEval (flags, NULL, 0, pdef);
+#endif
+
+	parser = LanguageTable + language;
+	defineParam (parser->paramControlBlock, pdef, freePdef);
+	return true;
+}
+
+extern bool processParamdefOption (const char *const option, const char *const value)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_paramdef-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	return processLangDefineParam (language, option, value);
+}
+
+static void printParams (struct colprintTable *table, langType language)
+{
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
 	initializeParser (language);
-	lang = LanguageTable [language].def;
-	if (lang->parameterHandlerTable != NULL)
-	{
-		for (unsigned int i = 0; i < lang->parameterHandlerCount; ++i)
-			paramColprintAddParameter(table, language, lang->parameterHandlerTable + i);
-	}
-
+	paramColprintAddParams (table,
+							LanguageTable [language].paramControlBlock);
 }
 
-extern void printLanguageParameters (const langType language,
-									 bool withListHeader, bool machinable, FILE *fp)
+extern void printLanguageParams (const langType language,
+								 bool withListHeader, bool machinable, FILE *fp)
 {
 	struct colprintTable *table =  paramColprintTableNew();
 
@@ -3384,11 +3477,11 @@ extern void printLanguageParameters (const langType language,
 			if (lang->invisible)
 				continue;
 
-			printParameters (table, i);
+			printParams (table, i);
 		}
 	}
 	else
-		printParameters (table, language);
+		printParams (table, language);
 
 	paramColprintTablePrint (table, (language != LANG_AUTO),
 							 withListHeader, machinable, fp);
@@ -4987,31 +5080,12 @@ extern vString *anonGenerateNew (const char *prefix, int kind)
 }
 
 
-extern void applyParameter (const langType language, const char *name, const char *args)
+extern bool applyLanguageParam (const langType language, const char *name, const char *args)
 {
-	parserDefinition* parser;
-
-
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
 	initializeParserOne (language);
-	parser = LanguageTable [language].def;
-
-	if (parser->parameterHandlerTable)
-	{
-		unsigned int i;
-
-		for (i = 0; i < parser->parameterHandlerCount; i++)
-		{
-			if (strcmp (parser->parameterHandlerTable [i].name, name) == 0)
-			{
-				parser->parameterHandlerTable [i].handleParameter (language, name, args);
-				return;
-			}
-		}
-	}
-
-	error (FATAL, "no such parameter in %s: %s", parser->name, name);
+	return applyParam (LanguageTable [language].paramControlBlock, name, args);
 }
 
 extern subparser *getNextSubparser(subparser *last,

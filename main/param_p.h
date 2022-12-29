@@ -22,15 +22,28 @@
 
 
 /*
+*   DATA DECLARATIONS
+*/
+struct paramControlBlock;
+typedef void (* freeParamDefFunc) (paramDefinition *);
+
+
+/*
 *   FUNCTION PROTOTYPES
 */
-extern void applyParameter (const langType language, const char *name, const char *args);
+
+extern bool applyParameter (const langType language, const char *name, const char *args);
 
 extern struct colprintTable * paramColprintTableNew (void);
-extern void paramColprintAddParameter (struct colprintTable *table,
-									   langType language,
-									   const parameterHandlerTable *const paramHandler);
+extern void paramColprintAddParams (struct colprintTable *table,
+									struct paramControlBlock* pcb);
 extern void paramColprintTablePrint (struct colprintTable *table, bool noparser,
 									bool withListHeader, bool machinable, FILE *fp);
+
+extern struct paramControlBlock* allocParamControlBlock (parserDefinition *parser);
+extern void freeParamControlBlock (struct paramControlBlock* pcb);
+extern int  defineParam (struct paramControlBlock* pcb, paramDefinition *def,
+						 freeParamDefFunc freeParamDef);
+extern bool applyParam (struct paramControlBlock* pcb, const char *name, const char *args);
 
 #endif	/* CTAGS_MAIN_PARAM_PRIVATE_H */

@@ -299,16 +299,17 @@ static void findITclTags(void)
 	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
 
-static void itclForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
+static bool itclForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
 									  const char *name, const char *arg)
 {
 	itclForceUse = paramParserBool (arg, itclForceUse, name, "parameter");
+	return true;
 }
 
-static parameterHandlerTable ItclParameterHandlerTable [] = {
+static paramDefinition ItclParams [] = {
 	{ .name = "forceUse",
 	  .desc = "enable the parser even when `itcl' namespace is not specified in the input (true or [false])" ,
-	  .handleParameter = itclForceUseParamHandler,
+	  .handleParam = itclForceUseParamHandler,
 	},
 };
 
@@ -335,8 +336,8 @@ extern parserDefinition* ITclParser (void)
 	def->keywordTable = ITclKeywordTable;
 	def->keywordCount = ARRAY_SIZE (ITclKeywordTable);
 
-	def->parameterHandlerTable = ItclParameterHandlerTable;
-	def->parameterHandlerCount = ARRAY_SIZE(ItclParameterHandlerTable);
+	def->paramTable = ItclParams;
+	def->paramCount = ARRAY_SIZE(ItclParams);
 
 	return def;
 }

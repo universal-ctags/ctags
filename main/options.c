@@ -381,6 +381,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Copy patterns of a regex table to another regex table."},
  {1,1,"  --_mtable-regex-<LANG>=<table>/<line_pattern>/<name_pattern>/[<flags>]"},
  {1,1,"       Define multitable regular expression for locating tags in specific language."},
+ {1,1,"  --_paramdef-<LANG>=<name>,<description>"},
+ {1,1,"       Define new param for <LANG>."},
  {1,1,"  --_prelude-<LANG>={{ optscript-code }}"},
  {1,1,"       Specify code run before parsing with <LANG> parser."},
  {1,1,"  --_pretend-<NEWLANG>=<OLDLANG>"},
@@ -1709,7 +1711,7 @@ static void processIf0Option (const char *const option,
 	langType lang = getNamedLanguage ("CPreProcessor", 0);
 	const char *arg = if0? "true": "false";
 
-	applyParameter (lang, "if0", arg);
+	applyLanguageParam (lang, "if0", arg);
 }
 
 static void processLanguageForceOption (
@@ -2018,31 +2020,6 @@ extern bool processMapOption (
 	return true;
 }
 
-extern bool processParamOption (
-			const char *const option, const char *const value)
-{
-	langType language;
-	const char* name;
-	const char* sep;
-
-	language = getLanguageComponentInOption (option, "param-");
-	if (language == LANG_IGNORE)
-		return false;
-
-	sep = option + strlen ("param-") + strlen (getLanguageName (language));
-	/* `:' is only for keeping self compatibility */
-	if (! (*sep == '.' || *sep == ':' ))
-		error (FATAL, "no separator(.) is given for %s=%s", option, value);
-	name = sep + 1;
-
-	if (value == NULL || value [0] == '\0')
-		error (FATAL, "no value is given for %s", option);
-
-	applyParameter (language, name, value);
-
-	return true;
-}
-
 static void processLicenseOption (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
@@ -2129,18 +2106,18 @@ static void processListParametersOption (const char *const option,
 										 const char *const parameter)
 {
 	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
-		printLanguageParameters (LANG_AUTO,
-								 localOption.withListHeader, localOption.machinable,
-								 stdout);
+		printLanguageParams (LANG_AUTO,
+							 localOption.withListHeader, localOption.machinable,
+							 stdout);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageParameters (language,
-									 localOption.withListHeader, localOption.machinable,
-									 stdout);
+			printLanguageParams (language,
+								 localOption.withListHeader, localOption.machinable,
+								 stdout);
 	}
 	exit (0);
 }
@@ -2595,7 +2572,7 @@ static void readIgnoreList (const char *const list)
 
 	while (token != NULL)
 	{
-		applyParameter (lang, "ignore", token);
+		applyLanguageParam (lang, "ignore", token);
 		token = strtok (NULL, IGNORE_SEPARATORS);
 	}
 	eFree (newList);
@@ -2615,7 +2592,7 @@ static void addIgnoreListFromFile (const char *const fileName)
 	for(i=0;i<c;i++)
 	{
 		vString * s = stringListItem(tokens,i);
-		applyParameter (lang, "ignore", vStringValue(s));
+		applyLanguageParam (lang, "ignore", vStringValue(s));
 	}
 
 	stringListDelete(tokens);
@@ -2626,7 +2603,7 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 	langType lang = getNamedLanguage ("CPreProcessor", 0);
 
 	if (IgnoreOrDefine == 'D')
-		applyParameter (lang, "define", list);
+		applyLanguageParam (lang, "define", list);
 	else if (strchr ("@./\\", list [0]) != NULL)
 	{
 		const char* fileName = (*list == '@') ? list + 1 : list;
@@ -2637,7 +2614,7 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 		addIgnoreListFromFile (list);
 #endif
 	else if (strcmp (list, "-") == 0)
-		applyParameter (lang, "ignore", NULL);
+		applyLanguageParam (lang, "ignore", NULL);
 	else
 		readIgnoreList (list);
 }
@@ -3351,6 +3328,8 @@ static void processLongOption (
 	else if (processMultilineRegexOption (option, parameter))
 		;
 	else if (processMapOption (option, parameter))
+		;
+	else if (processParamdefOption (option, parameter))
 		;
 	else if (processParamOption (option, parameter))
 		;

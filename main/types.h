@@ -45,7 +45,7 @@ typedef struct sFieldDefinition fieldDefinition;
 struct sXtagDefinition;
 typedef struct sXtagDefinition xtagDefinition;
 
-struct sParameterHandlerTable;
-typedef struct sParameterHandlerTable parameterHandlerTable;
+struct sParamDefinition;
+typedef struct sParamDefinition paramDefinition;
 
 #endif	/* CTAGS_MAIN_TYPES_H */

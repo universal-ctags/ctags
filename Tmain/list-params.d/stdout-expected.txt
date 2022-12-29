@@ -59,3 +59,10 @@ define	define replacement for an identifier (name(params,...)=definition)
 if0	examine code within "#if 0" branch (true or [false])
 ignore	a token to be specially handled
 
+# CPP MACHINABLE NOHEADER + PARAM DEFINE WITH CMDLINE
+_expand	expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
+define	define replacement for an identifier (name(params,...)=definition)
+if0	examine code within "#if 0" branch (true or [false])
+ignore	a token to be specially handled
+pragma	handle program
+

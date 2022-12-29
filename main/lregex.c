@@ -231,6 +231,7 @@ struct lregexControlBlock {
 	struct guestRequest *guest_req;
 
 	EsObject *local_dict;
+	hashTable*param_dict;
 
 	ptrArray *hook[SCRIPT_HOOK_MAX];
 	ptrArray *hook_code[SCRIPT_HOOK_MAX];
@@ -341,6 +342,8 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 	lcb->tstack = ptrArrayNew(NULL);
 	lcb->guest_req = guestRequestNew ();
 	lcb->local_dict = es_nil;
+	lcb->param_dict = hashTableNew (3, hashCstrhash, hashCstreq,
+									eFree, eFree);
 
 	for (int i = 0; i< SCRIPT_HOOK_MAX; i++)
 	{
@@ -372,6 +375,9 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 
 	es_object_unref (lcb->local_dict);
 	lcb->local_dict = es_nil;
+
+	hashTableDelete (lcb->param_dict);
+	lcb->param_dict = NULL;
 
 	for (int i = 0; i < SCRIPT_HOOK_MAX; i++)
 	{
@@ -3157,6 +3163,13 @@ extern void	addOptscriptToHook (struct lregexControlBlock *lcb, enum scriptHook 
 	ptrArrayAdd (lcb->hook[hook], eStrdup (code));
 }
 
+extern void propagateParamToOptscript (struct lregexControlBlock *lcb, const char *param, const char *value)
+{
+	Assert (param);
+	Assert (value);
+	hashTablePutItem (lcb->param_dict, eStrdup (param), eStrdup (value));
+}
+
 /* Return true if available. */
 extern bool checkRegex (void)
 {
@@ -4000,6 +4013,32 @@ static EsObject *lrop_makepromise (OptVM *vm, EsObject *name)
 	return es_false;
 }
 
+static EsObject *lrop_param (OptVM *vm, EsObject *name)
+{
+	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	EsObject *key = opt_vm_ostack_top (vm);
+	if (es_object_get_type (key) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+	EsObject *key_sym = es_pointer_get (key);
+	const char *keyc = es_symbol_get (key_sym);
+	const char *valuec = hashTableGetItem (lcb->param_dict, keyc);
+
+	if (valuec)
+	{
+		opt_vm_ostack_pop (vm);
+		EsObject *value = opt_string_new_from_cstr (valuec);
+		opt_vm_ostack_push (vm, value);
+		es_object_unref (value);
+		opt_vm_ostack_push (vm, es_true);
+	}
+	else
+	{
+		opt_vm_ostack_pop (vm);
+		opt_vm_ostack_push (vm, es_false);
+	}
+	return false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchstr",
@@ -4164,6 +4203,13 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = 3,
 		.help_str = "lang:string start:matchloc end:matchloc _MAKEPROMISE promise:int true%"
 		"lang:string start:matchloc end:matchloc _MAKEPROMISE false",
+	},
+	{
+		.name     = "_param",
+		.fn       = lrop_param,
+		.arity    = 1,
+		.help_str = "param:name _PARAM value:string true%"
+		"param:name _PARAM false",
 	},
 };
 

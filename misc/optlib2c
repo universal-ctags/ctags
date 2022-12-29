@@ -298,6 +298,21 @@ my $options =
 	 scopesep($_[0], $2, $3, $4);
 	 return 1;
        } ],
+     [ qr/^--_paramdef-(.*)=([^,]+),([^\{]+)/, sub {
+	 die "Don't use --_paramdef-<LANG>=+ option before defining the language"
+	     if (! defined $_[0]->{'langdef'});
+	 die "Adding a parameter is allowed only to the language specified with --langdef: $1"
+	     unless ($_[0]->{'langdef'} eq $1);
+
+	 my $name = $2;
+	 my $desc = $3;
+
+	 die "unacceptable character is used for parameter name: $name"
+	     unless ($name =~ /^[_a-zA-Z0-9]+$/);
+
+	 push @{$_[0]->{'paramdefs'}}, { name => $name, desc => $desc };
+	 return 1;
+       } ],
      [ qr/^-.*/, sub {
 	 die "Unhandled option: \"$&\"";
        } ],
@@ -940,6 +955,29 @@ EOF
 EOF
 }
 
+sub emit_params {
+    my $opts = shift;
+
+    return if (! @{$opts->{'paramdefs'}});
+
+    print <<EOF;
+	static paramDefinition $opts->{'Clangdef'}ParamTable [] = {
+EOF
+    for (@{$opts->{'paramdefs'}}) {
+      my $desc = escape_as_cstr $_->{'desc'};
+      print <<EOF;
+		{
+		  .name        = "$_->{'name'}",
+		  .description = "$desc",
+		  .handleParam = NULL,
+		},
+EOF
+    }
+    print <<EOF;
+	};
+EOF
+}
+
 sub emit_fields {
     my $opts = shift;
 
@@ -1028,6 +1066,13 @@ EOF
 EOF
     }
 
+    if (@{$opts->{'paramdefs'}}) {
+	print <<EOF;
+	def->paramTable    = $opts->{'Clangdef'}ParamTable;
+	def->paramCount    = ARRAY_SIZE($opts->{'Clangdef'}ParamTable);
+EOF
+    }
+
     if (@{$opts->{'regexs'}}) {
 	print <<EOF;
 	def->tagRegexTable = $opts->{'Clangdef'}TagRegexTable;
@@ -1091,6 +1136,7 @@ EOF
     emit_kinddefs        $opts;
     emit_fields          $opts;
     emit_xtags           $opts;
+    emit_params          $opts;
     emit_regexs          $opts;
     emit_dependencies    $opts;
     emit_selector        $opts;
@@ -1156,6 +1202,8 @@ sub main {
 			     ],
 		fielddefs => [ # { name => "", desc => "", enabled => 1|0 },
 			      ],
+		paramdefs => [ # { name => "", desc => "" },
+			     ],
 		base => undef,
 		tableNames => [ # ""
 			       ],

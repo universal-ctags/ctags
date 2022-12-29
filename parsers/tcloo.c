@@ -163,16 +163,17 @@ static void findTclOOTags(void)
 	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
 
-static void tclooForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
+static bool tclooForceUseParamHandler (const langType language CTAGS_ATTR_UNUSED,
 									  const char *name, const char *arg)
 {
 	tclooForceUse = paramParserBool (arg, tclooForceUse, name, "parameter");
+	return true;
 }
 
-static parameterHandlerTable TclOOParameterHandlerTable [] = {
+static paramDefinition TclOOParams [] = {
 	{ .name = "forceUse",
 	  .desc = "enable the parser even when `oo' namespace is not specified in the input (true or [false])" ,
-	  .handleParameter = tclooForceUseParamHandler,
+	  .handleParam = tclooForceUseParamHandler,
 	},
 };
 
@@ -194,8 +195,8 @@ extern parserDefinition* TclOOParser (void)
 	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
 
-	def->parameterHandlerTable = TclOOParameterHandlerTable;
-	def->parameterHandlerCount = ARRAY_SIZE(TclOOParameterHandlerTable);
+	def->paramTable = TclOOParams;
+	def->paramCount = ARRAY_SIZE(TclOOParams);
 
 	return def;
 }

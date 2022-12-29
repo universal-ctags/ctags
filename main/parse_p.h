@@ -118,8 +118,8 @@ extern void printLanguageRoles (const langType language, const char* letters,
 extern void printLanguageAliases (const langType language,
 								  bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageList (void);
-extern void printLanguageParameters (const langType language,
-									 bool withListHeader, bool machinable, FILE *fp);
+extern void printLanguageParams (const langType language,
+								 bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageSubparsers (const langType language,
 									 bool withListHeader, bool machinable, FILE *fp);
 extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp);
@@ -181,5 +181,8 @@ extern bool makeParserVersionPseudoTags (const langType language,
 
 extern void printLanguageMultitableStatistics (langType language);
 extern void printParserStatisticsIfUsed (langType lang);
+
+/* For keeping the API compatibility with Geany, we use a macro here. */
+#define applyLanguageParam applyParameter
 
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */

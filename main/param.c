@@ -11,27 +11,105 @@
  */
 
 #include "general.h"
+#include "options.h"
 #include "param.h"
 #include "param_p.h"
 #include "parse.h"
 
 #include <string.h>
 
+typedef struct sParamObject {
+	paramDefinition *def;
+	freeParamDefFunc free;
+} paramObject;
+
+struct paramControlBlock {
+	paramObject *param;
+	unsigned int count;
+	langType owner;
+};
+
+extern struct paramControlBlock* allocParamControlBlock (parserDefinition *parser)
+{
+	struct paramControlBlock *pcb;
+
+	pcb = xMalloc (1, struct paramControlBlock);
+	pcb->param = xMalloc (parser->paramCount, paramObject);
+	pcb->count = parser->paramCount;
+	pcb->owner = parser->id;
+
+	for (unsigned int i = 0; i < parser->paramCount; ++i)
+	{
+		paramObject *param = pcb->param + i;
+		param->def = parser->paramTable + i;
+		param->free = NULL;
+	}
+
+	return pcb;
+}
+
+extern void freeParamControlBlock (struct paramControlBlock* pcb)
+{
+	for (unsigned int i = 0; i< pcb->count; ++i)
+	{
+		if (pcb->param [i].free)
+			pcb->param [i].free (pcb->param [i].def);
+	}
+	if (pcb->param)
+		eFree (pcb->param);
+	eFree (pcb);
+}
+
+extern int  defineParam (struct paramControlBlock* pcb, paramDefinition *def,
+						 freeParamDefFunc freeParamDef)
+{
+	unsigned int id = pcb->count++;
+	pcb->param = xRealloc (pcb->param, pcb->count, paramObject);
+	pcb->param [id].def = def;
+	pcb->param [id].free = freeParamDef;
+
+	verbose ("Add param[%d] \"%s,%s\" to %s\n", id,
+			 def->name, def->desc,
+			 getLanguageName (pcb->owner));
+
+	return id;
+}
+
+extern bool applyParam (struct paramControlBlock* pcb, const char *name, const char *args)
+{
+	for (unsigned int i = 0; i < pcb->count; i++)
+	{
+		paramDefinition *pdef = pcb->param[i].def;
+		if (strcmp(pdef->name, name) == 0)
+		{
+			if (pdef->handleParam == NULL)
+				return true;
+			return pdef->handleParam (pcb->owner, name, args);
+		}
+	}
+	const char *lang = getLanguageName (pcb->owner);
+	error (FATAL, "no such parameter in %s: %s", lang, name);
+	return false;
+}
 
 extern struct colprintTable * paramColprintTableNew (void)
 {
 	return colprintTableNew ("L:LANGUAGE", "L:NAME","L:DESCRIPTION", NULL);
 }
 
-extern void paramColprintAddParameter (struct colprintTable *table,
-									   langType language,
-									   const parameterHandlerTable *const paramHandler)
+extern void paramColprintAddParams (struct colprintTable *table,
+									struct paramControlBlock* pcb)
 {
-	struct colprintLine *line = colprintTableGetNewLine(table);
+	const char *lang = getLanguageName (pcb->owner);
+	for (unsigned int i = 0; i < pcb->count; i++)
+	{
+		paramDefinition *pdef = pcb->param [i].def;
+		struct colprintLine *line = colprintTableGetNewLine(table);
 
-	colprintLineAppendColumnCString (line, getLanguageName (language));
-	colprintLineAppendColumnCString (line, paramHandler->name);
-	colprintLineAppendColumnCString (line, paramHandler->desc);
+		colprintLineAppendColumnCString (line, lang);
+		colprintLineAppendColumnCString (line, pdef->name);
+		colprintLineAppendColumnCString (line, pdef->desc);
+	}
 }
 
 static int paramColprintCompareLines (struct colprintLine *a , struct colprintLine *b)
