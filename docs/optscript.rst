@@ -282,7 +282,7 @@ Operators
 
 **.** -> ``-`` **.** ``corkIndex:int``
 
-    Push the cork index for the tag
+    Push the cork index for the tag.
 
 **\\n** -> ``-`` **\\n** ``matchedString:string``
 
