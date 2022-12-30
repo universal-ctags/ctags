@@ -62,8 +62,7 @@ static const char* tagsStrerror (int err)
 
 static void printTag (const tagEntry *entry, void *data)
 {
-	tagPrintOptions *opts = data;
-	tagsPrint (entry, opts, NULL, stdout);
+	tagsPrint (entry, (tagPrintOptions *)data, NULL, stdout);
 }
 
 #ifdef READTAGS_DSL
@@ -75,8 +74,7 @@ static void printTagWithFormatter (const tagEntry *entry, void *unused)
 
 static void printPseudoTag (const tagEntry *entry, void *data)
 {
-	tagPrintOptions *printOpts = data;
-	tagsPrintPseudoTag (entry, printOpts, NULL, stdout);
+	tagsPrintPseudoTag (entry, (tagPrintOptions *)data, NULL, stdout);
 }
 
 #ifdef READTAGS_DSL
