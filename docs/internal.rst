@@ -80,6 +80,15 @@ used in ctags main part. The functions are used to load option files,
 for example.
 
 
+Escaping and unescaping input fields
+......................................................................
+
+.. figure:: input-escaping.svg
+	    :scale: 80%
+
+.. figure:: input-unescaping.svg
+	    :scale: 80%
+
 .. NOT REVIEWED YET
 
 .. _output-tag-stream:
