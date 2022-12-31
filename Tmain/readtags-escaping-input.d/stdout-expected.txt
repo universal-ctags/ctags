@@ -1,4 +1,0 @@
-# ctags:
-x	a\tb\nc/f.c	/^int x;$/;"	kind:v	typeref:typename:int
-# ctags | readtags:
-x	a\tb\nc/f.c	/^int x;$/;"	kind:v	typeref:typename:int

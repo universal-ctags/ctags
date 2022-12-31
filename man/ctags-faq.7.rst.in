@@ -342,7 +342,7 @@ Does Universal Ctags support Unicode file names?
 Yes, Unicode file names are supported on unix-like platforms (Linux, macOS,
 Cygwin, etc.).
 
-However, on Windows, you need to use Windows 10 version 1903 or later to use
+However, on MS Windows, you need to use Windows 10 version 1903 or later to use
 Unicode file names. (This is an experimental feature, though.) On older versions
 on Windows, Universal Ctags only support file names represented in the current
 code page. If you still want to use Unicode file names on them, use Cygwin or

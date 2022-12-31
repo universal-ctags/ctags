@@ -1987,6 +1987,20 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 	parser->paramControlBlock = allocParamControlBlock (def);
 }
 
+static char *acceptableLangName(char *name)
+{
+	for (char *c = name; *c != '\0'; c++)
+	{
+		if (isalnum ((unsigned char)*c))
+			continue;
+		else if (*c == '+' || *c == '#')
+			continue;
+		else
+			return c;
+	}
+	return NULL;
+}
+
 extern void initializeParsing (void)
 {
 	unsigned int builtInCount;
@@ -2017,7 +2031,7 @@ extern void initializeParsing (void)
 			Assert (def->name);
 			Assert (def->name[0] != '\0');
 			Assert (strcmp (def->name, RSV_LANG_ALL));
-			Assert (strpbrk (def->name, "!\"$%&'()*,-./:;<=>?@[\\]^`|~") == NULL);
+			Assert (acceptableLangName (def->name) == NULL);
 
 			if (def->method & METHOD_NOT_CRAFTED)
 				def->parser = findRegexTags;
@@ -2302,7 +2316,7 @@ extern void processLanguageDefineOption (
 		error (FATAL, "\"" RSV_NONE "\" is reserved; don't use it as the name for defining a new language");
 
 	}
-	else if ((unacceptable = strpbrk (name, "!\"$%&'()*,-./:;<=>?@[\\]^`|~")))
+	else if ((unacceptable = acceptableLangName(name)))
 	{
 		char c = *unacceptable;
 
@@ -4724,7 +4738,6 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 	if (kindCount == 0)
 		return r;
 
-	vString *sepval = vStringNew();
 	for (i = 0; i < kindCount; ++i)
 	{
 		kind = getKind (kcb, i);
@@ -4758,14 +4771,10 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 			}
 
 
-			vStringClear (sepval);
-			vStringCatSWithEscaping (sepval, sep->separator);
-
-			r = writePseudoTag (pdesc, vStringValue (sepval),
+			r = writePseudoTag (pdesc, sep->separator? sep->separator: "",
 					    name, lang->name) || r;
 		}
 	}
-	vStringDelete (sepval);
 
 	return r;
 }
@@ -4781,23 +4790,17 @@ static bool makeKindDescriptionPseudoTag (kindDefinition *kind,
 {
 	struct makeKindDescriptionPseudoTagData *data = user_data;
 	vString *letter_and_name;
-	vString *description;
-	const char *d;
 
 	letter_and_name = vStringNew ();
-	description = vStringNew ();
 
 	vStringPut (letter_and_name, kind -> letter);
 	vStringPut (letter_and_name, ',');
 	vStringCatS (letter_and_name, kind -> name);
 
-	d = kind->description? kind->description: kind->name;
-	vStringCatSWithEscapingAsPattern (description, d);
 	data->written |=  writePseudoTag (data->pdesc, vStringValue (letter_and_name),
-					  vStringValue (description),
-					  data->langName);
+									  kind->description? kind->description: kind->name,
+									  data->langName);
 
-	vStringDelete (description);
 	vStringDelete (letter_and_name);
 
 	return false;
@@ -4813,15 +4816,10 @@ static bool makeRoleDescriptionPseudoTag (kindDefinition *kind,
 	vStringCatS (parser_and_kind_name, PSEUDO_TAG_SEPARATOR);
 	vStringCatS (parser_and_kind_name, kind->name);
 
-	vString *description = vStringNew ();
-	const char *d = role->description? role->description: role->name;
-	vStringCatSWithEscapingAsPattern (description, d);
-
 	data->written |=  writePseudoTag (data->pdesc, role->name,
-									  vStringValue (description),
+									  role->description? role->description: role->name,
 									  vStringValue (parser_and_kind_name));
 
-	vStringDelete (description);
 	vStringDelete (parser_and_kind_name);
 
 	return false;
@@ -4871,22 +4869,14 @@ static bool makeFieldDescriptionPseudoTag (const langType language,
 										   fieldType f,
 										   const ptagDesc *pdesc)
 {
-	vString *description;
 	const char *name = getFieldName (f);
 
 	if (name == NULL || name [0] == '\0')
 		return false;
 
-	description = vStringNew ();
-	vStringCatSWithEscapingAsPattern (description,
-									  getFieldDescription (f));
-
-	bool r = writePseudoTag (pdesc, name,
-							 vStringValue (description),
-							 language == LANG_IGNORE? NULL: getLanguageName (language));
-
-	vStringDelete (description);
-	return r;
+	return writePseudoTag (pdesc, name,
+						   getFieldDescription (f),
+						   language == LANG_IGNORE? NULL: getLanguageName (language));
 }
 
 extern bool makeFieldDescriptionsPseudoTags (const langType language,
@@ -4909,22 +4899,14 @@ static bool makeExtraDescriptionPseudoTag (const langType language,
 										   xtagType x,
 										   const ptagDesc *pdesc)
 {
-	vString *description;
 	const char *name = getXtagName (x);
 
 	if (name == NULL || name [0] == '\0')
 		return false;
 
-	description = vStringNew ();
-	vStringCatSWithEscapingAsPattern (description,
-									  getXtagDescription (x));
-
-	bool r = writePseudoTag (pdesc, name,
-							 vStringValue (description),
-							 language == LANG_IGNORE? NULL: getLanguageName (language));
-
-	vStringDelete (description);
-	return r;
+	return writePseudoTag (pdesc, name,
+						   getXtagDescription (x),
+						   language == LANG_IGNORE? NULL: getLanguageName (language));
 }
 
 extern bool makeExtraDescriptionsPseudoTags (const langType language,

@@ -28,11 +28,10 @@ typedef struct {
 } tagPrintProcs;
 
 typedef struct {
-	/* TODO: int version; */
 	int extensionFields;
 	int lineNumber;
 	int escaping;
-	/* version 1 */
+	int escapingInputField;
 } tagPrintOptions;
 
 /*

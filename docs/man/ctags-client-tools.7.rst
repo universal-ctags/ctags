@@ -215,13 +215,41 @@ for using notable ones.
 	Indicates the specified type of EX command with ``--excmd`` option.
 
 ``TAG_OUTPUT_FILESEP`` (new in Universal Ctags)
-	TBW
+	Indicates filename separators ("slash" or "backslsh") used in input fields.
+
+	Universal Ctags running on MS Windows replaces backslashes with slashes
+	when emitting input fields by default. This pseudo tag is for
+	notifying this replacement to client tools.
+
+	See also the description for ``--use-slash-as-filename-separator``
+	option in :ref:`ctags(1) <ctags(1)>`.
 
 ``TAG_OUTPUT_MODE`` (new in Universal Ctags)
-	TBW
+	Indicates whether using Universal Ctags extended escape sequences ("u-ctags") or not ("e-ctags").
+
+	To reduce illegal characters like <Tab> in tags files, Universal
+	Ctags extends the escape sequences originally used in Exuberant
+	Ctags, and applies the escaping rules to more fields.
+
+	See :ref:`tags(5) <tags(5)>` about the escaping rules.
+
+	``--output-format`` option is for choosing the output mode within
+	the tags output format. See :ref:`ctags(1) <ctags(1)>` about the option.
+
+	In "e-ctags" mode, for not violating the tags file format
+	described in :ref:`tags(5) <tags(5)>`, Universal Ctags skips emitting tag entries
+	including illegal characters like <Tab>.
+
+	In input fields ({tagfile} in :ref:`tags(5) <tags(5)>`), we have one more
+	condition for applying the escaping rules: ``\`` characters
+	are not used as filename separators. UNIX-like systems use ``/``
+	for the purpose. On MS Windows, Universal Ctags converts ``\``
+	in filenames to ``/`` by default. So, generally this condition is
+	satisfied. The condition is not satisfied only when you specify
+	``--use-slash-as-filename-separator=no`` on MS Windows.
 
 ``TAG_OUTPUT_VERSION`` (new in Universal Ctags 6.0)
-    Indicates the language-common interface version of the output::
+	Indicates the language-common interface version of the output::
 
 	  !_TAG_OUTPUT_VERSION	{current}.{age}	/.../
 

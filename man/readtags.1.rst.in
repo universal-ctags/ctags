@@ -92,6 +92,13 @@ human-readable, but when utilizing readtags output in a script or a client
 tool, ``-E`` option should be used. See ctags-client-tools(7) for more
 discussion on this.
 
+About printing input fields ({tagfile} in tags(5)) with ``-E`` option: readtags
+always prints the input field literally (as it is in the tags file), and when
+ctags writes the tags file, the escaping rules are applied only when
+``TAG_OUTPUT_MODE`` pseudo tag has "u-ctags" and ``TAG_OUTPUT_FILESEP`` has
+"slash" as values for their input fields, as explained in
+ctags-client-tools(7).
+
 Filtering, Sorting, and Formatting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Further filtering, sorting, and formatting on the tags listed by actions

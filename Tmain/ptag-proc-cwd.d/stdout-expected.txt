@@ -1,1 +1,1 @@
-!_TAG_PROC_CWD	/	//
+!_TAG_PROC_CWD	/usr/	//

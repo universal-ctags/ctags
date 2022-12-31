@@ -106,6 +106,7 @@ static void tagsPrintTag (const tagEntry *entry,
 						  int printingExtensionFields,
 						  int printingLineNumber,
 						  int printingWithEscaping,
+						  int printInputFieldWithEscaping,
 						  int pseudoTag,
 						  int  (* print_str) (const char *, void *),
 						  int  (* print_char) (int, void *),
@@ -142,7 +143,8 @@ static void tagsPrintTag (const tagEntry *entry,
 					print_str, print_char, outfp);
 
 	print_char ('\t', outfp);
-	print_str (entry->file, outfp);
+	printValue  (entry->file, printInputFieldWithEscaping,
+				 print_str, print_char, outfp);
 	print_char ('\t', outfp);
 	print_str (entry->address.pattern, outfp);
 
@@ -200,6 +202,7 @@ extern int tagsPrint (const tagEntry *entry,
 				  opt->extensionFields,
 				  opt->lineNumber,
 				  opt->escaping,
+				  opt->escapingInputField,
 				  0,
 				  procs->printStr,
 				  procs->printChar,
@@ -217,6 +220,7 @@ extern int tagsPrintPseudoTag (const tagEntry *entry,
 				  opt->extensionFields,
 				  opt->lineNumber,
 				  opt->escaping,
+				  opt->escapingInputField,
 				  1,
 				  procs->printStr,
 				  procs->printChar,

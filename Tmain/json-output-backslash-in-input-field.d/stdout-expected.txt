@@ -1,0 +1,1 @@
+{"_type": "ptag", "name": "TAG_KIND_SEPARATOR", "parserName": "PHP", "path": "\\", "pattern": "nn"}

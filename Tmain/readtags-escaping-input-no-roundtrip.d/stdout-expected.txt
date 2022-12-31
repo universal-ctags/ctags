@@ -1,2 +1,0 @@
-x	a\tb\nc/f.c	/^int x;$/;"	kind:v	typeref:typename:int
-x	a\tb\nc/f.c	/^int x;$/;"	kind:v	typeref:typename:int

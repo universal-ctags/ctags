@@ -21,7 +21,7 @@ speaking `JSON Lines <https://jsonlines.org/>`_) output format if the
 ctags executable is built with ``libjansson``.  JSON output goes to
 standard output by default.
 
-Format
+FORMAT
 ------
 Each JSON line represents a tag.
 
@@ -58,7 +58,7 @@ in the default tags file format.
 * Scope names and scope kinds have distinguished keys: ``scope`` and ``scopeKind``.
   They are combined in the default tags file format.
 
-Data type used in a field
+DATA TYPE USED IN A FIELD
 -------------------------
 Values for the most of all keys are represented in JSON string type.
 However, some of them are represented in string, integer, and/or boolean type.

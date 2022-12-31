@@ -21,6 +21,7 @@
 #include "xtag.h"
 #include "xtag_p.h"
 
+#include <string.h>
 
 #define CTAGS_FILE  "tags"
 
@@ -356,7 +357,7 @@ static int writeCtagsEntry (tagWriter *writer,
 	return length;
 }
 
-static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+static int writeCtagsPtagEntry (tagWriter *writer,
 				MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
@@ -370,18 +371,74 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	const char *fieldx = extras? getFieldName (FIELD_EXTRAS): "";
 	const char *xptag = extras? getXtagName (XTAG_PSEUDO_TAGS): "";
 
-	return parserName
+	/* Escaping:
+	 *
+	 * NAME:
+	 *    Defined in ctags. As far as we give a good pseudo tag name,
+	 *    we can print the name as is.
+	 *
+	 * parserName:
+	 *    This can be a part of NAME. An optlib can give a
+	 *    parserName but the characters that can be used in the name are
+	 *    limited in [a-zA-Z0-9+#]. We can print the name as is.
+	 *
+	 * fileName:
+	 *    Any characters can be used. Escaping is needed.
+	 *
+	 * pattern:
+	 *    Any characters can be used. Escaping is needed always.
+	 *
+	 * fieldx:
+	 *    No escaping is needed.
+	 *
+	 * xptag:
+	 *    No escaping is needed.
+	 *
+	 */
 
-#define OPT(X) ((X)?(X):"")
+	vString *vfileName = vStringNew ();
+	if (writer->type == WRITER_U_CTAGS
+#ifdef WIN32
+		&& getFilenameSeparator(Option.useSlashAsFilenameSeparator) == FILENAME_SEP_USE_SLASH
+#endif
+		)
+	{
+		if (fileName)
+			vStringCatSWithEscaping (vfileName, fileName);
+	}
+	else if (fileName)
+	{
+		char *c = NULL;
+		if ((c = strchr (fileName, '\t')) || (c = strchr (fileName, '\n')))
+		{
+			vStringDelete (vfileName);
+			error (WARNING, "skip priting %s%s pseudo tag; the input field of the pseudo tag includes a %s character: %s",
+				   PSEUDO_TAG_PREFIX, desc->name,
+				   *c == '\t'? "tab": "newline",
+				   fileName);
+			return 0;
+		}
+		vStringCatS (vfileName, fileName);
+	}
+
+	vString *vpattern = vStringNew ();
+	if (pattern)
+		vStringCatSWithEscapingAsPattern (vpattern, pattern);
+
+	int r = parserName
 		? mio_printf (mio, "%s%s%s%s\t%s\t/%s/%s%s%s%s\n",
 			      PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
-			      OPT(fileName), OPT(pattern),
+			      vStringValue (vfileName), vStringValue (vpattern),
 				  xsep, fieldx, fsep, xptag)
 		: mio_printf (mio, "%s%s\t%s\t/%s/%s%s%s%s\n",
 			      PSEUDO_TAG_PREFIX, desc->name,
-			      OPT(fileName), OPT(pattern),
+			      vStringValue (vfileName), vStringValue (vpattern),
 			      xsep, fieldx, fsep, xptag);
-#undef OPT
+
+	vStringDelete (vpattern);
+	vStringDelete (vfileName);
+
+	return r;
 }
 
 static fieldType fixedFields [] = {
