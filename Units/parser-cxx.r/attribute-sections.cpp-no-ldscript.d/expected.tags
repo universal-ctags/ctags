@@ -1,0 +1,5 @@
+f	input.c	/^char f [] __attribute__((section("__ksymtab_strings"), used, aligned(1)));$/;"	v	language:C	typeref:typename:char[]	roles:def	section:__ksymtab_strings
+a	input.c	/^struct duart a __attribute__ ((section ("DUART_A"))) = { 0 };$/;"	v	language:C	typeref:struct:duart	roles:def	section:DUART_A
+b	input.c	/^struct duart b __attribute__ ((section ("DUART_B"))) = { 0 };$/;"	v	language:C	typeref:struct:duart	roles:def	section:DUART_B
+stack	input.c	/^char stack[10000] __attribute__ ((section ("STACK"))) = { 0 };$/;"	v	language:C	typeref:typename:char[10000]	roles:def	section:STACK
+init_data	input.c	/^int init_data __attribute__ ((section ("INITDATA")));$/;"	v	language:C	typeref:typename:int	roles:def	section:INITDATA

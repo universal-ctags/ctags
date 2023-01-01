@@ -5,3 +5,4 @@
 --fields=+S
 --fields=+rl
 --extras=+r
+--languages=-LdScript

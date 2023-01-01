@@ -72,6 +72,7 @@ Julia          n/module          imported           on      loaded by "import"
 Julia          n/module          namespace          on      only some symbols in it are imported
 Julia          n/module          used               on      loaded by "using"
 Kconfig        k/kconfig         source             on      kconfig file loaded with source directive
+LdScript       i/inputSection    destination        on      specified as the destination of code and data
 LdScript       i/inputSection    discarded          on      discarded when linking
 LdScript       i/inputSection    mapped             on      mapped to output section
 LdScript       s/symbol          entrypoint         on      entry points
@@ -204,6 +205,7 @@ Julia          n/module          imported           on      loaded by "import"
 Julia          n/module          namespace          on      only some symbols in it are imported
 Julia          n/module          used               on      loaded by "using"
 Kconfig        k/kconfig         source             on      kconfig file loaded with source directive
+LdScript       i/inputSection    destination        on      specified as the destination of code and data
 LdScript       i/inputSection    discarded          on      discarded when linking
 LdScript       i/inputSection    mapped             on      mapped to output section
 LdScript       s/symbol          entrypoint         on      entry points

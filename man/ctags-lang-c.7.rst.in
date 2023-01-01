@@ -35,4 +35,5 @@ Change since "0.0"
 SEE ALSO
 --------
 ctags(1),
+ctags-lang-ldscript(7),
 `The new C/C++ parser <https://docs.ctags.io/en/latest/parser-cxx.html>`_ (https://docs.ctags.io/en/latest/parser-cxx.html)

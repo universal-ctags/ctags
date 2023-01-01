@@ -82,6 +82,10 @@ Changes about parser specific kinds, roles, fields, and extras
 
   + New kind `variable`
 
+* LdScript
+
+  + New role `destination` for `inputSection` kind
+
 * Markdown
 
   + New kind  `hashtag`
