@@ -450,6 +450,21 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 	return r;
 }
 
+static bool isEligibleAsSectionName (const vString *str)
+{
+	char *c = vStringValue(str);
+	while (*c)
+	{
+		if (!(isalnum(((unsigned char)*c))
+			  || (*c == '.')
+			  || (*c == '-')
+			  || (*c == '_')))
+			return false;
+		c++;
+	}
+	return true;
+}
+
 static const unsigned char *readLineViaCpp (const char *commentChars)
 {
 	static vString *line;
@@ -475,10 +490,39 @@ static const unsigned char *readLineViaCpp (const char *commentChars)
 				continue;
 
 			/* We cannot store these values to vString
-			 * Store a whitespace as a dummy value for them.
+			 * Store a whitespace as a dummy value for them, but...
 			 */
 			if (!truncation)
+			{
 				vStringPut (line, ' ');
+
+				/* Quoted from the info document of Gas:
+				   -------------------------------------
+				   For ELF targets, the assembler supports another type of '.section'
+				   directive for compatibility with the Solaris assembler:
+
+				   .section "NAME"[, FLAGS...]
+				   -------------------------------------
+
+				   If we replace "..." with ' ' here, we can lost the name
+				   of the section. */
+				const vString *str = cppGetLastCharOrStringContents();
+				if (str)
+				{
+					const char *section = strrstr (vStringValue (line), ".section");
+					if (section && isEligibleAsSectionName(str))
+					{
+						section += strlen(".section");
+						while (isspace((unsigned char)*section))
+							section++;
+						if (*section == '\0')
+						{
+							vStringCat (line, str);
+							vStringPut (line, ' ');
+						}
+					}
+				}
+			}
 		}
 		else if (c == '\n' || (extraLinesepChars[0] != '\0'
 							   && strchr (extraLinesepChars, c) != NULL))
