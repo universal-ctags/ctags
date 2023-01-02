@@ -278,6 +278,7 @@ static int makeAsmTag (
 				break;
 			default:
 				r = makeSimpleTag (operator, kind_for_directive);
+				break;
 			}
 		}
 	}
