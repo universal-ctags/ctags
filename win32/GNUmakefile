@@ -32,8 +32,7 @@ MVC_HEADS = $(MVC_GNULIB_HEADS) $(CMDLINE_HEADS) $(LIB_HEADS) $(OPTLIB2C_HEADS) 
 MVC_HEADS_EXCLUDE = main/interactive_p.h main/mbcs.h main/mbcs_p.h main/trace.h
 MVC_HEADS_CONV = $(sort $(subst /,\\,$(filter-out $(MVC_HEADS_EXCLUDE),$(MVC_HEADS))))
 
-MVC_INC_DIRS1 = ..;../main;../gnulib;../parsers;../parsers/cxx;../dsl;
-MVC_INC_DIRS2 = ..;../main;../gnulib;../parsers;../parsers/cxx;
+MVC_INC_DIRS = ..;../main;../gnulib;../parsers;../parsers/cxx;../dsl;
 
 # a portable 'echo' which disables the interpretation of escape characters like 'echo -E' on bash
 # see https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.70/autoconf.html#Limitations-of-Builtins
@@ -59,8 +58,7 @@ $(VCXPROJ): $(VCXPROJ).in $(SOURCE_MAK)
 	# replace @foo@ in $(VCXPROJ).in \
 	sed -e "s![@]SRCS[@]!$$SRCS!" \
 	    -e "s![@]HEADS[@]!$$HEADS!" \
-	    -e "s|[@]INC_DIRS1[@]|${MVC_INC_DIRS1}|" \
-	    -e "s|[@]INC_DIRS2[@]|${MVC_INC_DIRS2}|" $< | $(LF2CRLF) > $@
+	    -e "s|[@]INC_DIRS[@]|${MVC_INC_DIRS}|" $< | $(LF2CRLF) > $@
 
 $(VCXPROJ_FILTERS): $(VCXPROJ_FILTERS).in $(SOURCE_MAK)
 	@echo generating $@ ...
