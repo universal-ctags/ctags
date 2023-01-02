@@ -1,4 +1,6 @@
+gfunc0	input.S	/^GENTRY(gfunc0)$/;"	s
 gfunc0	input.S	/^GENTRY(gfunc0)$/;"	l
 lfunc	input.S	/^LENTRY(lfunc)$/;"	l
 lfunc	input.S	/^LENTRY(lfunc)$/;"	l
+gfunc1	input.S	/^GENTRY(gfunc1)$/;"	s
 gfunc1	input.S	/^GENTRY(gfunc1)$/;"	l

@@ -32,6 +32,7 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
+	K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL = -4,
 	K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION = -3,
 	K_PSUEDO_MACRO_END = -2,
 	K_NONE = -1, K_DEFINE, K_LABEL, K_MACRO, K_TYPE,
@@ -49,6 +50,7 @@ typedef enum {
 	OP_ENDS,
 	OP_EQU,
 	OP_EQUAL,
+	OP_GLOBAL,
 	OP_LABEL,
 	OP_MACRO,
 	OP_PROC,
@@ -96,6 +98,8 @@ static const keywordTable AsmKeywords [] = {
 	{ "endp",     OP_ENDP        },
 	{ "ends",     OP_ENDS        },
 	{ "equ",      OP_EQU         },
+	{ "global",   OP_GLOBAL      },
+	{ "globl",    OP_GLOBAL      },
 	{ "label",    OP_LABEL       },
 	{ "macro",    OP_MACRO       },
 	{ ":=",       OP_COLON_EQUAL },
@@ -124,6 +128,7 @@ static const opKind OpKinds [] = {
 	{ OP_ENDS,        K_NONE   },
 	{ OP_EQU,         K_DEFINE },
 	{ OP_EQUAL,       K_DEFINE },
+	{ OP_GLOBAL,      K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL },
 	{ OP_LABEL,       K_LABEL  },
 	{ OP_MACRO,       K_MACRO  },
 	{ OP_PROC,        K_LABEL  },
@@ -203,7 +208,7 @@ static bool isDefineOperator (const vString *const operator)
 	return result;
 }
 
-static int makeTagForLdScriptSection (const char * section)
+static int makeTagForLdScript (const char * name, int kind, int *scope)
 {
 	tagEntryInfo e;
 	static langType lang = LANG_AUTO;
@@ -213,20 +218,36 @@ static int makeTagForLdScriptSection (const char * section)
 	if(lang == LANG_IGNORE)
 		return CORK_NIL;
 
-	static kindDefinition * kdef = NULL;
-	if(kdef == NULL)
-		kdef = getLanguageKindForName (lang, "inputSection");
-	if(kdef == NULL)
-		return CORK_NIL;
+	if (kind == K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL)
+	{
+		static kindDefinition * kdef = NULL;
+		if(kdef == NULL)
+			kdef = getLanguageKindForName (lang, "symbol");
+		if(kdef == NULL)
+			return CORK_NIL;
 
-	static roleDefinition *rdef = NULL;
-	if(rdef == NULL)
-		rdef = getLanguageRoleForName (lang, kdef->id, "destination");
-	if (rdef == NULL)
-		return CORK_NIL;
+		initForeignTagEntry(&e, name, lang, kdef->id);
+		e.extensionFields.scopeIndex = *scope;
+		return makeTagEntry (&e);
+	}
+	else
+	{
+		static kindDefinition * kdef = NULL;
+		if(kdef == NULL)
+			kdef = getLanguageKindForName (lang, "inputSection");
+		if(kdef == NULL)
+			return CORK_NIL;
 
-	initForeignRefTagEntry(&e, section, lang, kdef->id, rdef->id);
-	return makeTagEntry (&e);
+		static roleDefinition *rdef = NULL;
+		if(rdef == NULL)
+			rdef = getLanguageRoleForName (lang, kdef->id, "destination");
+		if (rdef == NULL)
+			return CORK_NIL;
+
+		initForeignRefTagEntry(&e, name, lang, kdef->id, rdef->id);
+		*scope = makeTagEntry (&e);
+		return *scope;
+	}
 }
 
 static int makeAsmTag (
@@ -235,6 +256,7 @@ static int makeAsmTag (
 		const bool labelCandidate,
 		const bool nameFollows,
 		const bool directive,
+		int *sectionScope,
 		int *macroScope)
 {
 	int r = CORK_NIL;
@@ -258,7 +280,9 @@ static int makeAsmTag (
 		{
 			operatorKind (name, &found);
 			if (! found)
+			{
 				r = makeSimpleTag (name, K_LABEL);
+			}
 		}
 		else if (directive)
 		{
@@ -288,8 +312,10 @@ static int makeAsmTag (
 					*macroScope = macro_tag->extensionFields.scopeIndex;
 				}
 				break;
+			case K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL:
 			case K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION:
-				r = makeTagForLdScriptSection (vStringValue (operator));
+				r = makeTagForLdScript (vStringValue (operator),
+										kind_for_directive, sectionScope);
 				break;
 			default:
 				r = makeSimpleTag (operator, kind_for_directive);
@@ -718,6 +744,7 @@ static void findAsmTagsCommon (bool useCpp)
 				 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
 				 FIELD_UNKNOWN);
 
+	int sectionScope = CORK_NIL;
 	int macroScope = CORK_NIL;
 
 	 while ((line = asmReadLineFromInputFile (commentCharsInMOL, useCpp)) != NULL)
@@ -782,7 +809,8 @@ static void findAsmTagsCommon (bool useCpp)
 			cp = readSymbol (cp, name);
 			nameFollows = true;
 		}
-		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive, &macroScope);
+		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive,
+							&sectionScope, &macroScope);
 		tagEntryInfo *e = getEntryInCorkQueue (r);
 		if (e && e->langType == Lang_asm
 			&& e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))

@@ -156,6 +156,7 @@ with "--options=NONE -o - --param-Asm.useCPreProcessor=1 --param-CPreProcessor._
 
 	ENTRY	input.S	/^#define ENTRY(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
 	main	input.S	/^ENTRY(main):$/;"	l
+	main	input.S	/^ENTRY(main):$/;"	s
 
 The definition of `ENTRY` assumes `;` is a line separator in the host assembly language.
 ``--param-Asm.extraLinesepChars=;`` is for satisfying the assumption in ctags side.

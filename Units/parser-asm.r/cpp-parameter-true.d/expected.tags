@@ -1,2 +1,3 @@
 labelM	input.S	/^#define labelM /;"	d	file:
+labelM	input.S	/^	.global labelM$/;"	s
 labelM	input.S	/^labelM:$/;"	l

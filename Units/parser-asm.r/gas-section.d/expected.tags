@@ -3,4 +3,5 @@ machine/asm.h	input.s	/^#include <machine\/asm.h>/;"	header	language:CPreProcess
 one	input.s	/^one:	.double 1.0$/;"	label	language:Asm	roles:def
 limit	input.s	/^limit:	.double 0.29$/;"	label	language:Asm	roles:def
 .inittext	input-0.s	/^	.section ".inittext","ax"$/;"	inputSection	language:LdScript	roles:destination
+intcall	input-0.s	/^	.globl	intcall$/;"	symbol	language:LdScript	inputSection:.inittext	roles:def
 intcall	input-0.s	/^intcall:$/;"	label	language:Asm	roles:def
