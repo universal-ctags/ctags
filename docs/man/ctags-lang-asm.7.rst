@@ -166,6 +166,20 @@ The parser has no ability to expand the macros defined outside of the
 current input file. The parser doesn't consider `#undef` when
 expanding.
 
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* The kind ``section`` is deleted.
+  The section specified with `.section` directive as tagged as
+  ``placement`` role of ``section`` kind of ``Asm`` language.
+  These kind and role are deleted.
+
+  Instead, it is tagged as ``destination`` role of ``inputSection``
+  kind of ``LdScript`` language.
+
 SEE ALSO
 --------
 :ref:`ctags(1) <ctags(1)>`, Info entries for GNU assembler

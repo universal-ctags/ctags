@@ -1,6 +1,6 @@
-machine/asm.h	input.s	/^#include <machine\/asm.h>/;"	h	roles:system
-.rodata.cst8	input.s	/^	.section .rodata.cst8,"aM",@progbits,8$/;"	s	roles:placement
-one	input.s	/^one:	.double 1.0$/;"	l	roles:def
-limit	input.s	/^limit:	.double 0.29$/;"	l	roles:def
-.inittext	input-0.s	/^	.section ".inittext","ax"$/;"	s	roles:placement
-intcall	input-0.s	/^intcall:$/;"	l	roles:def
+machine/asm.h	input.s	/^#include <machine\/asm.h>/;"	header	language:CPreProcessor	roles:system
+.rodata.cst8	input.s	/^	.section .rodata.cst8,"aM",@progbits,8$/;"	inputSection	language:LdScript	roles:destination
+one	input.s	/^one:	.double 1.0$/;"	label	language:Asm	roles:def
+limit	input.s	/^limit:	.double 0.29$/;"	label	language:Asm	roles:def
+.inittext	input-0.s	/^	.section ".inittext","ax"$/;"	inputSection	language:LdScript	roles:destination
+intcall	input-0.s	/^intcall:$/;"	label	language:Asm	roles:def

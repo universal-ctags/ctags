@@ -46,6 +46,10 @@ Changes about parser specific kinds, roles, fields, and extras
 
 .. See the output of ./misc/news.bash man [v6.0.0]
 
+* Asm
+
+  + `section` kind is deleted.
+
 * AutoIt
 
   + Drop `$` from tags for variables names.

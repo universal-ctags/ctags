@@ -17,6 +17,7 @@
 
 #include "cpreprocessor.h"
 #include "debug.h"
+#include "dependency.h"
 #include "entry.h"
 #include "keyword.h"
 #include "param.h"
@@ -31,9 +32,9 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
+	K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION = -3,
 	K_PSUEDO_MACRO_END = -2,
 	K_NONE = -1, K_DEFINE, K_LABEL, K_MACRO, K_TYPE,
-	K_SECTION,
 	K_PARAM,
 } AsmKind;
 
@@ -59,10 +60,6 @@ typedef enum {
 	OP_LAST
 } opKeyword;
 
-typedef enum {
-	ASM_SECTION_PLACEMENT,
-} asmSectionRole;
-
 typedef struct {
 	opKeyword keyword;
 	AsmKind kind;
@@ -83,17 +80,11 @@ static fieldDefinition AsmFields[] = {
 */
 static langType Lang_asm;
 
-static roleDefinition asmSectionRoles [] = {
-	{ true, "placement", "placement where the assembled code goes" },
-};
-
 static kindDefinition AsmKinds [] = {
 	{ true, 'd', "define", "defines" },
 	{ true, 'l', "label",  "labels"  },
 	{ true, 'm', "macro",  "macros"  },
 	{ true, 't', "type",   "types (structs and records)"   },
-	{ true, 's', "section",   "sections",
-	  .referenceOnly = true, ATTACH_ROLES(asmSectionRoles)},
 	{ false,'z', "parameter", "parameters for a macro" },
 };
 
@@ -138,7 +129,7 @@ static const opKind OpKinds [] = {
 	{ OP_PROC,        K_LABEL  },
 	{ OP_RECORD,      K_TYPE   },
 	{ OP_SECTIONS,    K_NONE   },
-	{ OP_SECTION,     K_SECTION },
+	{ OP_SECTION,     K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION },
 	{ OP_SET,         K_DEFINE },
 	{ OP_STRUCT,      K_TYPE   }
 };
@@ -212,6 +203,32 @@ static bool isDefineOperator (const vString *const operator)
 	return result;
 }
 
+static int makeTagForLdScriptSection (const char * section)
+{
+	tagEntryInfo e;
+	static langType lang = LANG_AUTO;
+
+	if(lang == LANG_AUTO)
+		lang = getNamedLanguage("LdScript", 0);
+	if(lang == LANG_IGNORE)
+		return CORK_NIL;
+
+	static kindDefinition * kdef = NULL;
+	if(kdef == NULL)
+		kdef = getLanguageKindForName (lang, "inputSection");
+	if(kdef == NULL)
+		return CORK_NIL;
+
+	static roleDefinition *rdef = NULL;
+	if(rdef == NULL)
+		rdef = getLanguageRoleForName (lang, kdef->id, "destination");
+	if (rdef == NULL)
+		return CORK_NIL;
+
+	initForeignRefTagEntry(&e, section, lang, kdef->id, rdef->id);
+	return makeTagEntry (&e);
+}
+
 static int makeAsmTag (
 		const vString *const name,
 		const vString *const operator,
@@ -271,10 +288,8 @@ static int makeAsmTag (
 					*macroScope = macro_tag->extensionFields.scopeIndex;
 				}
 				break;
-			case K_SECTION:
-				r = makeSimpleRefTag (operator,
-									  kind_for_directive,
-									  ASM_SECTION_PLACEMENT);
+			case K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION:
+				r = makeTagForLdScriptSection (vStringValue (operator));
 				break;
 			default:
 				r = makeSimpleTag (operator, kind_for_directive);
@@ -769,7 +784,8 @@ static void findAsmTagsCommon (bool useCpp)
 		}
 		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive, &macroScope);
 		tagEntryInfo *e = getEntryInCorkQueue (r);
-		if (e && e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))
+		if (e && e->langType == Lang_asm
+			&& e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))
 			readMacroParameters (r, e, cp);
 	}
 
@@ -869,7 +885,15 @@ extern parserDefinition* AsmParser (void)
 	};
 	static selectLanguage selectors[] = { selectByArrowOfR, NULL };
 
+	static parserDependency dependencies [] = {
+		{ DEPTYPE_FOREIGNER, "LdScript", NULL },
+	};
+
 	parserDefinition* def = parserNew ("Asm");
+	def->versionCurrent = 1;
+	def->versionAge = 0;
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 	def->kindTable      = AsmKinds;
 	def->kindCount  = ARRAY_SIZE (AsmKinds);
 	def->extensions = extensions;
