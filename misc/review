@@ -77,6 +77,19 @@ help_list()
     printf "	%-20s %-30s %s\n" "" "-b" "list .b (known bug) marked cases"
 }
 
+diff_post_processor()
+{
+    local cmd=cat
+
+    if which colordiff > /dev/null 2>&1; then
+	cmd=colordiff
+    elif which pygmentize > /dev/null 2>&1; then
+	cmd="pygmentize -l diff"
+    fi
+
+    $cmd
+}
+
 units_inspect_cmd_accept ()
 {
     local from=./Units/$1/FILTERED.tmp
@@ -131,7 +144,7 @@ units_inspect_cmd_skip ()
     echo "SKIPPING $1" 1>&2
 }
 
-inspect_cmd_show_generic ()
+units_inspect_cmd_show_generic ()
 {
     local tcase=$1
     local file=$2
@@ -149,20 +162,12 @@ inspect_cmd_show_generic ()
 
 units_inspect_cmd_show_diff ()
 {
-    local cmd=cat
-
-    if which colordiff > /dev/null 2>&1; then
-	cmd=colordiff
-    elif which pygmentize > /dev/null 2>&1; then
-	cmd="pygmentize -l diff"
-    fi
-
-    inspect_cmd_show_generic $1 DIFF.tmp cat | ${cmd}
+    units_inspect_cmd_show_generic $1 DIFF.tmp cat | diff_post_processor
 }
 
 units_inspect_show_args_ctags ()
 {
-    inspect_cmd_show_generic $1 args.ctags cat
+    units_inspect_cmd_show_generic $1 args.ctags cat
 }
 
 pygmentize_or_cat ()
@@ -181,7 +186,7 @@ units_inspect_show_input ()
 {
     local tcase=$1
 
-    inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/input.*) pygmentize_or_cat
+    units_inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/input.*) pygmentize_or_cat
 }
 
 # See https://stackoverflow.com/questions/65533232/bash-extglob-pattern-matching-breaks-when-enclosed-in-a-function
@@ -192,7 +197,7 @@ units_inspect_show_expected_tags ()
 
     (
 	shopt -s extglob
-	inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/expected.tags?\(-*\)) "cat" "-n"
+	units_inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/expected.tags?\(-*\)) "cat" "-n"
     )
 }
 shopt -u extglob
