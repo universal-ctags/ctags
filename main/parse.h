@@ -173,7 +173,6 @@ extern bool isLanguageEnabled (const langType language);
 extern bool isLanguageKindEnabled (const langType language, int kindIndex);
 extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int roleIndex);
 
-extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
 extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
 extern roleDefinition* getLanguageRoleForName (const langType language, int kindIndex,
 											   const char *roleName);
