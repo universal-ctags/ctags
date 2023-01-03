@@ -45,6 +45,7 @@ enum CXXTagUnknownRole
 	CXXTagUnknownRoleREFERENCED,
 	CXXTagUnknownRoleVALUE,
 	CXXTagUnknownRoleDEFVAR,
+	CXXTagUnknownRoleAPPLIED,
 };
 
 enum CXXTagMemberRole

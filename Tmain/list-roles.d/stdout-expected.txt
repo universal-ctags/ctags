@@ -18,6 +18,7 @@ Automake       d/directory       program            on      directory for PROGRA
 Automake       d/directory       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
+C              Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
 C              Y/unknown         defvar             on      (maybe type) used for defining variables
 C              Y/unknown         ref                off     referenced anyhow
 C              Y/unknown         value              on      used as right side value
@@ -26,6 +27,7 @@ C              d/macro           undef              on      undefined
 C              h/header          local              on      local header
 C              h/header          system             on      system header
 C              m/member          initialized        on      initialized with form '.member = ...'
+C++            Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
 C++            Y/unknown         defvar             on      (maybe type) used for defining variables
 C++            Y/unknown         ref                off     referenced anyhow
 C++            Y/unknown         value              on      used as right side value
@@ -38,6 +40,7 @@ CPreProcessor  d/macro           condition          off     used in part of #if/
 CPreProcessor  d/macro           undef              on      undefined
 CPreProcessor  h/header          local              on      local header
 CPreProcessor  h/header          system             on      system header
+CUDA           Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
 CUDA           Y/unknown         defvar             on      (maybe type) used for defining variables
 CUDA           Y/unknown         ref                off     referenced anyhow
 CUDA           Y/unknown         value              on      used as right side value
@@ -150,6 +153,7 @@ Automake       d/directory       program            on      directory for PROGRA
 Automake       d/directory       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
+C              Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
 C              Y/unknown         defvar             on      (maybe type) used for defining variables
 C              Y/unknown         ref                off     referenced anyhow
 C              Y/unknown         value              on      used as right side value
@@ -158,6 +162,7 @@ C              d/macro           undef              on      undefined
 C              h/header          local              on      local header
 C              h/header          system             on      system header
 C              m/member          initialized        on      initialized with form '.member = ...'
+C++            Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
 C++            Y/unknown         defvar             on      (maybe type) used for defining variables
 C++            Y/unknown         ref                off     referenced anyhow
 C++            Y/unknown         value              on      used as right side value
@@ -170,6 +175,7 @@ CPreProcessor  d/macro           condition          off     used in part of #if/
 CPreProcessor  d/macro           undef              on      undefined
 CPreProcessor  h/header          local              on      local header
 CPreProcessor  h/header          system             on      system header
+CUDA           Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
 CUDA           Y/unknown         defvar             on      (maybe type) used for defining variables
 CUDA           Y/unknown         ref                off     referenced anyhow
 CUDA           Y/unknown         value              on      used as right side value
@@ -267,6 +273,7 @@ Zsh            s/script          loaded             on      loaded
 # C.*
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -308,6 +315,7 @@ s/script   loaded on      loaded
 # C.* with disabling all roles of all languages
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value
@@ -321,6 +329,7 @@ m/member   initialized off     initialized with form '.member = ...'
 # C.* with disabling all roles of all kinds of all languages
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value
@@ -335,6 +344,7 @@ m/member   initialized off     initialized with form '.member = ...'
 # after disabling system role of header kind of C language
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         on      referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -349,6 +359,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # after disabling system role of header kind of C language
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         on      referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -362,6 +373,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # C.* with disabling all roles in C language
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value
@@ -382,6 +394,7 @@ s/script   loaded    on      loaded
 # C.* with disabling all roles of all kinds in C language
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value
@@ -403,6 +416,7 @@ s/script   loaded    on      loaded
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         on      referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -425,6 +439,7 @@ s/script   loaded    off     loaded
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         on      referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -446,6 +461,7 @@ s/script   loaded    off     loaded
 # C.* with disabling all roles of {header} kind in C language
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -466,6 +482,7 @@ s/script   loaded    on      loaded
 # C.* with disabling all roles of h kind in C language
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -487,6 +504,7 @@ s/script   loaded    on      loaded
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value
@@ -509,6 +527,7 @@ s/script   loaded    off     loaded
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value
@@ -530,6 +549,7 @@ s/script   loaded    off     loaded
 # C.* with disabling system role of h kind
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -543,6 +563,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # C.* with disabling system role of {header} kind
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -556,6 +577,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # C.* with enabling system role of h kind after disabling the role
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -569,6 +591,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # C.* with enabling system role of {header} kind after disabling the role
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -582,6 +605,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # C.* with disabling system and local roles of h kind
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -595,6 +619,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # C.* with disabling system and local roles of {header} kind
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -609,6 +634,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value
@@ -623,6 +649,7 @@ m/member   initialized off     initialized with form '.member = ...'
 # after disabling all roles in all languages
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value
@@ -636,6 +663,7 @@ m/member   initialized off     initialized with form '.member = ...'
 # C.* with disabling local role of h kind and undef role of d kind
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -649,6 +677,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # C.* with enabling all roles of header kinds after disabling all roles of the kind
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      on      (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       on      used as right side value
@@ -662,6 +691,7 @@ m/member   initialized on      initialized with form '.member = ...'
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value
@@ -675,6 +705,7 @@ m/member   initialized off     initialized with form '.member = ...'
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language (short notation)
 #
 #KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
 Y/unknown  defvar      off     (maybe type) used for defining variables
 Y/unknown  ref         off     referenced anyhow
 Y/unknown  value       off     used as right side value

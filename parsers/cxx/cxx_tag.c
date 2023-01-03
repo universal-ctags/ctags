@@ -25,6 +25,7 @@
 		{ false, "ref", "referenced anyhow" }, \
 		{ true,  "value", "used as right side value" }, \
 		{ true,  "defvar", "(maybe type) used for defining variables" }, \
+		{ true,  "applied", "(maybe macro, function, or member) called or expanded" }, \
 	}
 
 CXX_COMMON_UNKNOWN_ROLES(C);

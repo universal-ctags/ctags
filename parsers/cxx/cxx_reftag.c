@@ -40,6 +40,21 @@ void cxxReftagEvalNewToken(void)
 		if (in_subparser)
 			popLanguage();
 	}
+	else if (cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningParenthesis)
+			 && cxxTagKindEnabled(CXXTagKindUNKNOWN) &&
+			 cxxTagRoleEnabled(CXXTagKindUNKNOWN, CXXTagUnknownRoleAPPLIED))
+	{
+		if(g_cxx.pToken->pPrev && cxxTokenTypeIs(g_cxx.pToken->pPrev,
+												 CXXTokenTypeIdentifier))
+		{
+			CXXToken * i = g_cxx.pToken->pPrev;
+			if(i->iCorkIndex != CORK_NIL && i->bCorkIndexForReftag)
+				cxxReftagReset(i->iCorkIndex, CORK_NIL,
+							   CXXTagKindUNKNOWN, CXXTagUnknownRoleAPPLIED, false);
+			else
+				;
+		}
+	}
 }
 
 void cxxReftagReset(int iCorkIndex, int iScopeCorkIndex,

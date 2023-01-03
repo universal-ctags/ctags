@@ -10,4 +10,4 @@ j	input.c	/^	if (j == 0)$/;"	Y	function:f	roles:ref
 i	input.c	/^	return i + B + j + f(0);$/;"	Y	function:f	roles:ref
 B	input.c	/^	return i + B + j + f(0);$/;"	Y	function:f	roles:ref
 j	input.c	/^	return i + B + j + f(0);$/;"	Y	function:f	roles:ref
-f	input.c	/^	return i + B + j + f(0);$/;"	Y	function:f	roles:ref
+f	input.c	/^	return i + B + j + f(0);$/;"	Y	function:f	roles:applied
