@@ -414,7 +414,7 @@ The following parsers have been added:
 * Elm *peg/packcc*
 * Falcon
 * FrontMatter *only YAML syntax, running as a guest on R?Markdown*
-* FunctionParameters *perl based subparser*
+* FunctionParameters *Perl based subparser*
 * Gdbinit script *optlib*
 * GemSpec *Ruby based subparser*
 * GDScript
@@ -423,7 +423,7 @@ The following parsers have been added:
 * GPerf *optlib*
 * Haskell
 * Haxe
-* iPythonCell *optlib*, *pthon based subparser*
+* iPythonCell *optlib*, *Python based subparser*
 * Inko *optlib*
 * JavaProperties
 * JSON
@@ -437,7 +437,7 @@ The following parsers have been added:
 * Maven2 *libxml*
 * MesonBuild (Meson) *optlib*
 * MesonOptions *optlib+script*
-* Moose *perl based subparser*
+* Moose *Perl based subparser*
 * Myrddin
 * M4
 * NSIS
