@@ -1738,9 +1738,16 @@ extern size_t        countEntryInCorkQueue (void)
 	return ptrArrayCount (TagFile.corkQueue);
 }
 
-extern void markTagPlaceholder (tagEntryInfo *e, bool placeholder)
+extern void markTagAsPlaceholder (tagEntryInfo *e, bool placeholder)
 {
 	e->placeholder = placeholder;
+}
+
+extern void markCorkEntryAsPlaceholder (int index, bool placeholder)
+{
+	tagEntryInfo *e = getEntryInCorkQueue(index);
+	if (e)
+		markTagAsPlaceholder(e, placeholder);
 }
 
 extern int makePlaceholder (const char *const name)
@@ -1748,7 +1755,7 @@ extern int makePlaceholder (const char *const name)
 	tagEntryInfo e;
 
 	initTagEntry (&e, name, KIND_GHOST_INDEX);
-	markTagPlaceholder(&e, true);
+	markTagAsPlaceholder(&e, true);
 
 	/*
 	 * makePlaceholder may be called even before reading any bytes
@@ -2078,6 +2085,11 @@ extern void assignRole(tagEntryInfo *const e, int roleIndex)
 	assignRoleFull(e, roleIndex, true);
 }
 
+extern void unassignRole(tagEntryInfo *const e, int roleIndex)
+{
+	assignRoleFull(e, roleIndex, false);
+}
+
 extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex)
 {
 	if (roleIndex == ROLE_DEFINITION_INDEX)
@@ -2151,14 +2163,14 @@ extern const char* getTagFileDirectory (void)
 	return TagFile.directory;
 }
 
-static bool markAsPlaceholder  (int index, tagEntryInfo *e, void *data CTAGS_ATTR_UNUSED)
+static bool markAsPlaceholderRecursively  (int index, tagEntryInfo *e, void *data CTAGS_ATTR_UNUSED)
 {
-	e->placeholder = 1;
+	markTagAsPlaceholder (e, true);
 	markAllEntriesInScopeAsPlaceholder (index);
 	return true;
 }
 
 extern void markAllEntriesInScopeAsPlaceholder (int index)
 {
-	foreachEntriesInScope (index, NULL, markAsPlaceholder, NULL);
+	foreachEntriesInScope (index, NULL, markAsPlaceholderRecursively, NULL);
 }

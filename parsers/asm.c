@@ -218,7 +218,7 @@ static int makeAsmTag (
 		const bool labelCandidate,
 		const bool nameFollows,
 		const bool directive,
-		int *scope)
+		int *macroScope)
 {
 	int r = CORK_NIL;
 
@@ -258,17 +258,17 @@ static int makeAsmTag (
 				macro_tag = getEntryInCorkQueue (r);
 				if (macro_tag)
 				{
-					macro_tag->extensionFields.scopeIndex = *scope;
+					macro_tag->extensionFields.scopeIndex = *macroScope;
 					registerEntry (r);
-					*scope = r;
+					*macroScope = r;
 				}
 				break;
 			case K_PSUEDO_MACRO_END:
-				macro_tag = getEntryInCorkQueue (*scope);
+				macro_tag = getEntryInCorkQueue (*macroScope);
 				if (macro_tag)
 				{
 					macro_tag->extensionFields.endLine = getInputLineNumber ();
-					*scope = macro_tag->extensionFields.scopeIndex;
+					*macroScope = macro_tag->extensionFields.scopeIndex;
 				}
 				break;
 			case K_SECTION:
@@ -278,6 +278,7 @@ static int makeAsmTag (
 				break;
 			default:
 				r = makeSimpleTag (operator, kind_for_directive);
+				break;
 			}
 		}
 	}
@@ -655,7 +656,7 @@ static void findAsmTagsCommon (bool useCpp)
 				 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
 				 FIELD_UNKNOWN);
 
-	int scope = CORK_NIL;
+	int macroScope = CORK_NIL;
 
 	 while ((line = asmReadLineFromInputFile (commentCharsInMOL, useCpp)) != NULL)
 	 {
@@ -719,7 +720,7 @@ static void findAsmTagsCommon (bool useCpp)
 			cp = readSymbol (cp, name);
 			nameFollows = true;
 		}
-		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive, &scope);
+		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive, &macroScope);
 		tagEntryInfo *e = getEntryInCorkQueue (r);
 		if (e && e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))
 			readMacroParameters (r, e, cp);

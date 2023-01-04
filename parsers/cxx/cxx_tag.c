@@ -202,6 +202,21 @@ bool cxxTagKindEnabled(unsigned int uKind)
 	return g_cxx.pKindDefinitions[uKind].enabled;
 }
 
+bool cxxTagRoleEnabled(unsigned int uKind, int iRole)
+{
+	if(!cxxTagKindEnabled(uKind))
+		return true;
+	if(iRole == ROLE_DEFINITION_INDEX)
+		return true;
+
+	CXX_DEBUG_ASSERT(
+		(ROLE_DEFINITION_INDEX < iRole
+		 && iRole < g_cxx.pKindDefinitions[uKind].nRoles),
+		"The role must be associated to the kind (%u)", uKind
+		);
+	return g_cxx.pKindDefinitions[uKind].roles[iRole].enabled;
+}
+
 fieldDefinition * cxxTagGetCPPFieldDefinitionifiers(void)
 {
 	return g_aCXXCPPFields;

@@ -155,6 +155,8 @@ extern void initForeignRefTagEntry (tagEntryInfo *const e, const char *const nam
 									langType type,
 									int kindIndex, int roleIndex);
 extern void assignRole(tagEntryInfo *const e, int roleIndex);
+#define clearRoles(E) assignRole((E), ROLE_DEFINITION_INDEX)
+extern void unassignRole(tagEntryInfo *const e, int roleIndex);
 extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex);
 
 extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
@@ -286,7 +288,8 @@ extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char
 extern const char* getParserFieldValueForType (tagEntryInfo *const tag, fieldType ftype);
 
 extern int makePlaceholder (const char *const name);
-extern void markTagPlaceholder (tagEntryInfo *e, bool placeholder);
+extern void markTagAsPlaceholder (tagEntryInfo *e, bool placeholder);
+extern void markCorkEntryAsPlaceholder (int index, bool placeholder);
 
 /* Marking all tag entries entries under the scope specified
  * with index recursively.

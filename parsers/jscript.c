@@ -1372,7 +1372,7 @@ static int parseMethodsInAnonymousObject (tokenInfo *const token)
 		 */
 		tagEntryInfo *e = getEntryInCorkQueue (index);
 		if (e)
-			markTagPlaceholder (e, true);
+			markTagAsPlaceholder (e, true);
 		index = CORK_NIL;
 	}
 

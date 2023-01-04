@@ -276,16 +276,42 @@ function tmain_inspect_run
     make tmain UNITS=$(basename $t .d)
 }
 
+
+tmain_inspect_cmd_show_diff_generic()
+{
+    local prefix=$1
+    local t=$2
+    local c=$3
+    cat $prefix/$t/$c-diff.txt | diff_post_processor
+}
+
+tmain_inspect_cmd_show_diff_all()
+{
+    local prefix=$1
+    local t=$2
+    local c
+
+    for c in stdout stderr exit; do
+	if [[ -e "$prefix/$t/$c-diff.txt" ]]; then
+	    echo '### ' "$c"
+	    tmain_inspect_cmd_show_diff_generic "$prefix" "$t" "$c"
+	fi
+    done
+}
+
 do_tmain_inspect()
 {
     local next=0
     local r
     local t=$1
 
-    select r in '<n>ext' '<S>hell' '<R>un' '<q>uit'; do
+    select r in '<n>ext' '<d>iff' '<S>hell' '<R>un' '<q>uit'; do
 	case $r-$REPLY in
 	    ("<n>ext"-*|-n)
 		next=1
+		;;
+	    ("<d>iff"-*|-d)
+		tmain_inspect_cmd_show_diff_all Tmain "$t"
 		;;
 	    ("<S>hell"-*|-S)
 		inspect_cmd_shell Tmain "$t"

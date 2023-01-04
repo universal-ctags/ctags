@@ -622,6 +622,11 @@ EOF
 #include "selectors.h"
 EOF
     }
+    if ((scalar @{$opts->{'paramdefs'}}) > 0) {
+	print <<EOF;
+#include "param.h"
+EOF
+    }
     print <<EOF;
 
 
@@ -968,7 +973,7 @@ EOF
       print <<EOF;
 		{
 		  .name        = "$_->{'name'}",
-		  .description = "$desc",
+		  .desc        = "$desc",
 		  .handleParam = NULL,
 		},
 EOF

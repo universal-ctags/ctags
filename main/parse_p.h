@@ -69,10 +69,8 @@ extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern langType getNamedLanguageFull (const char *const name, size_t len, bool noPretending, bool include_aliases);
 
 extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
-extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
+extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
 extern roleDefinition* getLanguageRole(const langType language, int kindIndex, int roleIndex);
-extern roleDefinition* getLanguageRoleForName (const langType language, int kindIndex,
-											   const char *roleName);
 extern unsigned int getLanguageVersionCurrent (const langType language);
 extern unsigned int getLanguageVersionAge (const langType language);
 

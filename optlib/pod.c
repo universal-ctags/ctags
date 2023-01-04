@@ -28,6 +28,7 @@ static void initializePodParser (const langType language CTAGS_ATTR_UNUSED)
 		"        0 get ?1 sub\n"
 		"    } def\n"
 		"\n"
+		"    % cork:int DEPTHFORCORK depth:int\n"
 		"    /depthForCork {\n"
 		"        :kind kindTable exch _aindex pop\n"
 		"    } def\n"

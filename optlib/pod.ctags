@@ -48,6 +48,7 @@
         0 get ?1 sub
     } def
 
+    % cork:int DEPTHFORCORK depth:int
     /depthForCork {
         :kind kindTable exch _aindex pop
     } def
