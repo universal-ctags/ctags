@@ -21,4 +21,6 @@
 ctags: Warning: Because of an internal limitation, Making a sub parser based on the CPreProcessor parser is not allowed: CPreProcessor
 ctags: Warning: Because of an internal limitation, Making a sub parser based on the CPreProcessor parser is not allowed: CPreProcessor
 (enter CPreProcessor)
+(enter CPreProcessor)
+(leave CPreProcessor)
 (leave CPreProcessor)
