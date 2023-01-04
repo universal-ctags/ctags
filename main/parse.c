@@ -1954,6 +1954,9 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 
 		upperParser = LanguageTable + upper;
 
+		verbose ("link dependencies: type = %s, upper = %s, lower = %s\n",
+				 dependencyTypeString(d->type),
+				 upperParser->def->name, lowerParser->name);
 		linkDependencyAtInitializeParsing (d->type, upperParser->def,
 										   upperParser->slaveControlBlock,
 										   upperParser->kindControlBlock,

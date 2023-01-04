@@ -55,4 +55,5 @@ extern void finalizeDependencies (parserDefinition *parser,
 extern slaveParser *getFirstSlaveParser(struct slaveControlBlock *controlBlock);
 extern slaveParser *getNextSlaveParser(slaveParser *last);
 
+extern const char *dependencyTypeString(enum eDepType e);
 #endif	/* CTAGS_MAIN_DEPENDENCY_PRIVATE_H */
