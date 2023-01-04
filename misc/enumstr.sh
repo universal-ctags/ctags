@@ -33,8 +33,34 @@ ENUM_NAME=$2
 FUNNAME=$3
 shift 3
 
+print_usage()
+{
+	echo Usage:
+	echo
+	echo "  $0 <input-file> <enum-name> <funname> [PREFIX_FOR_TRIMMING] [OPTIONS]"
+	echo "  $0 --help|-h"
+	echo
+	echo Options:
+	echo
+	echo "  --use-lower-bits-as-is"
+	echo
+	echo Example:
+	echo
+	echo '  $ bash ./misc/enumstr.sh parsers/jscript.c eTokenType tokenTypeName'
+	exit $1
+}
+
+if [ -z "$INPUT_FILE" ] || [ -z "$ENUM_NAME" ] || [ -z "$FUNNAME" ] || \
+	   [ "$INPUT_FILE" = '-h' ] || [ "$ENUM_NAME" = '-h' ] || [ "$FUNNAME" = '-h' ] || \
+	   [ "$INPUT_FILE" = '--help' ] || [ "$ENUM_NAME" = '--help' ] || [ "$FUNNAME" = '--help' ]; then
+	print_usage 1 1>&2
+fi
+
 while [ $# -gt 0 ]; do
 	case "$1" in
+		--help|-h)
+			print_usage 0
+			;;
 		--use-lower-bits-as-is)
 			USE_LOWER_BITS_AS_IS=$1
 			shift 1
