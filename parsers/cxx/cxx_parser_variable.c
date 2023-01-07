@@ -604,7 +604,12 @@ got_identifier:
 						//   typeof(whatever) variable;
 						cxxTokenTypeIs(pTokenBefore,CXXTokenTypeParenthesisChain) &&
 						pTokenBefore->pPrev &&
-						!pTokenBefore->pPrev->pPrev &&
+						(!pTokenBefore->pPrev->pPrev ||
+						 (
+							 cxxTokenTypeIs(pTokenBefore->pPrev->pPrev,CXXTokenTypeKeyword) &&
+							 cxxKeywordMayAppearInVariableDeclaration(pTokenBefore->pPrev->pPrev->eKeyword)
+						 )
+						) &&
 						(
 							// macro
 							cxxTokenTypeIs(pTokenBefore->pPrev,CXXTokenTypeIdentifier) ||
