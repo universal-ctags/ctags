@@ -32,6 +32,8 @@ Change since "0.0"
 
 * New field ``section``
 
+* New field ``alias``
+
 SEE ALSO
 --------
 :ref:`ctags(1) <ctags(1)>`,

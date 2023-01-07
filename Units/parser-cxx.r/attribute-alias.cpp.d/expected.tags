@@ -1,0 +1,1 @@
+x	input.c	/^int x __attribute__((alias("y")));$/;"	v	typeref:typename:int	alias:y

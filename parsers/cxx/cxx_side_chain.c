@@ -82,14 +82,35 @@ static void cxxScanAttrExtractSection(const CXXToken * pToken)
 	vStringPut(pArgToken->pszWord, '"');
 }
 
+static void cxxScanAttrExtractAlias(const CXXToken * pToken)
+{
+	const CXXToken *pArgToken = cxxExtractFirstArgumentInAttrs(pToken);
+	if(pArgToken == NULL)
+		return;
+
+	Assert(vStringLength(pArgToken->pszWord));
+
+	// Remve doubule quote characters surrounding the constant string.
+	vStringChop(pArgToken->pszWord);
+	cxxTagSetField(CXXTagFieldAlias, vStringValue(pArgToken->pszWord)+1, true);
+
+	vStringPut(pArgToken->pszWord, '"');
+}
+
 static void cxxScanAttributes(const CXXTokenChain * pAttrChain)
 {
 	if(pAttrChain == NULL)
 		return;
 
 	CXXToken * t = pAttrChain->pHead;
-	bool bSection = cxxTagFieldEnabled(CXXTagFieldSection)
-		&& (cxxParserCurrentLanguageIsC() || cxxParserCurrentLanguageIsCPP());
+	bool bSection = false;
+	bool bAlias = false;
+
+	if((cxxParserCurrentLanguageIsC() || cxxParserCurrentLanguageIsCPP()))
+	{
+		bSection = cxxTagFieldEnabled(CXXTagFieldSection);
+		bAlias = cxxTagFieldEnabled(CXXTagFieldAlias);
+	}
 
 	while(t)
 	{
@@ -103,6 +124,12 @@ static void cxxScanAttributes(const CXXTokenChain * pAttrChain)
 					s = cxxTokenChainNextIdentifier(t->pChain->pHead, "__section__");
 				if(s)
 					cxxScanAttrExtractSection(s);
+			}
+			if(bAlias)
+			{
+				CXXToken * s = cxxTokenChainNextIdentifier(t->pChain->pHead, "alias");
+				if(s)
+					cxxScanAttrExtractAlias(s);
 			}
 		}
 		if(t == pAttrChain->pTail)

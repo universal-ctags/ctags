@@ -8,9 +8,11 @@ r       UCTAGSroles          no      NONE             s--    no    r- Roles
 x       UCTAGSxpath          no      NONE             s--    no    -- xpath for the tag
 -       UCTAGSproperties     yes     Asm              s--    no    -- properties (req, vararg for parameters)
 -       UCTAGSproperties     no      AutoIt           s--    no    -- properties (static, volatile, ...)
+-       UCTAGSalias          no      C                s--    no    -- the name of the alias target specified in __attribute__((alias(...)))
 -       UCTAGSmacrodef       no      C                s--    no    -- macro definition
 -       UCTAGSproperties     no      C                s--    no    -- properties (static, inline, mutable,...)
 -       UCTAGSsection        no      C                s--    no    -- the place where the object is placed
+-       UCTAGSalias          no      C++              s--    no    -- the name of the alias target specified in __attribute__((alias(...)))
 -       UCTAGScaptures       no      C++              s--    no    -- lambda capture list
 -       UCTAGSmacrodef       no      C++              s--    no    -- macro definition
 -       UCTAGSname           yes     C++              s--    no    -- aliased names
@@ -19,6 +21,7 @@ x       UCTAGSxpath          no      NONE             s--    no    -- xpath for 
 -       UCTAGSspecialization no      C++              s--    no    -- template specialization parameters
 -       UCTAGStemplate       no      C++              s--    no    -- template parameters
 -       UCTAGSmacrodef       no      CPreProcessor    s--    no    -- macro definition
+-       UCTAGSalias          no      CUDA             s--    no    -- the name of the alias target specified in __attribute__((alias(...)))
 -       UCTAGSmacrodef       no      CUDA             s--    no    -- macro definition
 -       UCTAGSproperties     no      CUDA             s--    no    -- properties (static, inline, mutable,...)
 -       UCTAGSsection        no      CUDA             s--    no    -- the place where the object is placed

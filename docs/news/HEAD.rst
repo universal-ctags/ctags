@@ -66,13 +66,19 @@ Changes about parser specific kinds, roles, fields, and extras
 
   + New filed `section`
 
+  + New field `alias`
+
 * C++
 
   + New filed `section`
 
+  + New field `alias`
+
 * CUDA
 
   + New field `section`
+
+  + New field `alias`
 
 * Fortran
 

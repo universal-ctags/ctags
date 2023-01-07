@@ -26,9 +26,11 @@ x	xpath	no	NONE	s--	no	--	xpath for the tag
 z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field output, [xref and json output] kind in long-name form
 -	properties	yes	Asm	s--	no	--	properties (req, vararg for parameters)
 -	properties	no	AutoIt	s--	no	--	properties (static, volatile, ...)
+-	alias	no	C	s--	no	--	the name of the alias target specified in __attribute__((alias(...)))
 -	macrodef	no	C	s--	no	--	macro definition
 -	properties	no	C	s--	no	--	properties (static, inline, mutable,...)
 -	section	no	C	s--	no	--	the place where the object is placed
+-	alias	no	C++	s--	no	--	the name of the alias target specified in __attribute__((alias(...)))
 -	captures	no	C++	s--	no	--	lambda capture list
 -	macrodef	no	C++	s--	no	--	macro definition
 -	name	yes	C++	s--	no	--	aliased names
@@ -37,6 +39,7 @@ z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field outpu
 -	specialization	no	C++	s--	no	--	template specialization parameters
 -	template	no	C++	s--	no	--	template parameters
 -	macrodef	no	CPreProcessor	s--	no	--	macro definition
+-	alias	no	CUDA	s--	no	--	the name of the alias target specified in __attribute__((alias(...)))
 -	macrodef	no	CUDA	s--	no	--	macro definition
 -	properties	no	CUDA	s--	no	--	properties (static, inline, mutable,...)
 -	section	no	CUDA	s--	no	--	the place where the object is placed
