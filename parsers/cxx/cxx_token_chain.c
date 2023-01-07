@@ -1205,7 +1205,7 @@ void cxxTokenChainNormalizeTypeNameSpacingInRange(CXXToken * pFrom,CXXToken * pT
 		} else if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
 		{
 			t->bFollowedBySpace = t->pNext &&
-				(t->eKeyword != CXXKeywordDECLTYPE) &&
+				(!cxxKeywordIsDecltype(t->eKeyword)) &&
 				cxxTokenTypeIsOneOf(
 						t->pNext,
 						CXXTokenTypeParenthesisChain | CXXTokenTypeIdentifier |

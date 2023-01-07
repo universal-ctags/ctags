@@ -1,0 +1,5 @@
+a	input.cxx	/^int a;$/;"	v	typeref:typename:int
+b	input.cxx	/^decltype(a) b;$/;"	v	typeref:typename:decltype(a)
+c	input.cxx	/^typeof(a) c;$/;"	v	typeref:typename:typeof(a)
+d	input.cxx	/^__typeof__(a) d;$/;"	v	typeref:typename:__typeof__(a)
+d0	input.cxx	/^__typeof(a) d0;$/;"	v	typeref:typename:__typeof(a)

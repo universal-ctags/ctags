@@ -339,7 +339,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 								cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword) &&
 								cxxKeywordMayBePartOfTypeName(t->pPrev->eKeyword) &&
 								// but not decltype(var)!
-								(t->pPrev->eKeyword != CXXKeywordDECLTYPE)
+								!cxxKeywordIsDecltype(t->pPrev->eKeyword)
 							)
 						) &&
 						(
@@ -355,7 +355,8 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				}
 
 				if(
-					cxxTokenIsKeyword(t->pPrev,CXXKeywordDECLTYPE) &&
+					cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword) &&
+					cxxKeywordIsDecltype(t->pPrev->eKeyword) &&
 					t->pNext
 				)
 				{
@@ -598,14 +599,20 @@ got_identifier:
 						// Possibly one of:
 						//   MACRO(whatever) variable;
 						//   decltype(whatever) variable;
+						//   __typeof(whatever) variable;
+						//   __typeof__(whatever) variable;
+						//   typeof(whatever) variable;
 						cxxTokenTypeIs(pTokenBefore,CXXTokenTypeParenthesisChain) &&
 						pTokenBefore->pPrev &&
 						!pTokenBefore->pPrev->pPrev &&
 						(
 							// macro
 							cxxTokenTypeIs(pTokenBefore->pPrev,CXXTokenTypeIdentifier) ||
-							// decltype
-							cxxTokenIsKeyword(pTokenBefore->pPrev,CXXKeywordDECLTYPE)
+							// decltype or typeof
+							(
+								cxxTokenTypeIs(pTokenBefore->pPrev,CXXTokenTypeKeyword) &&
+								cxxKeywordIsDecltype(pTokenBefore->pPrev->eKeyword)
+							)
 						)
 					)
 				{

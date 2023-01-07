@@ -34,7 +34,9 @@ enum CXXKeywordFlag
 	// of the type itself. Keywords that do NOT have this flag simply cannot appear
 	// in a variable declaration.
 	// Examples: __global__, __host__, restrict, register...
-	CXXKeywordMayAppearInVariableDeclaration = (1 << 5)
+	CXXKeywordMayAppearInVariableDeclaration = (1 << 5),
+	// decltype, __typeof, __typeof__, and typeof
+	CXXKeywordIsDecltype = (1 << 6),
 };
 
 typedef struct _CXXKeywordDescriptor
@@ -140,6 +142,16 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		"__thread",
 		CXXLanguageC | CXXLanguageCPP,
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames,
+	},
+	{
+		"__typeof",
+		CXXLanguageC | CXXLanguageCPP,
+		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"__typeof__",
+		CXXLanguageC | CXXLanguageCPP,
+		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"_Thread_local",
@@ -250,7 +262,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"decltype",
 		CXXLanguageCPP,
-		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"default",
@@ -519,6 +531,11 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 			CXXKeywordIsTypeRefMarker
 	},
 	{
+		"typeof",
+		CXXLanguageC | CXXLanguageCPP,
+		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
 		"union",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName |
@@ -607,6 +624,12 @@ bool cxxKeywordIsDisabled(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordIsDisabled;
+}
+
+bool cxxKeywordIsDecltype(CXXKeyword eKeywordId)
+{
+	return g_aCXXKeywordTable[eKeywordId].uFlags &
+			CXXKeywordIsDecltype;
 }
 
 bool cxxKeywordEnablePublicProtectedPrivate(bool bEnableIt)

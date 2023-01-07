@@ -34,6 +34,8 @@ typedef enum _CXXKeyword
 	CXXKeyword__STDCALL, // Microsoft C/C++
 	CXXKeyword__THISCALL, // Microsoft C/C++
 	CXXKeyword__THREAD, // GCC (https://gcc.gnu.org/onlinedocs/gcc-3.3.1/gcc/Thread-Local.html#Thread-Local)
+	CXXKeyword__TYPEOF, // GCC accepts this.
+	CXXKeyword__TYPEOF__, // GCC (https://gcc.gnu.org/onlinedocs/gcc-3.3.1/gcc/Typeof.html#Typeof)
 	CXXKeyword_THREAD_LOCAL, // C11
 	CXXKeywordALIGNAS, // (since C++11)
 	CXXKeywordALIGNOF, // (since C++11)
@@ -116,6 +118,7 @@ typedef enum _CXXKeyword
 	CXXKeywordTYPEDEF,
 	CXXKeywordTYPEID,
 	CXXKeywordTYPENAME,
+	CXXKeywordTYPEOF, // GCC (https://gcc.gnu.org/onlinedocs/gcc-3.3.1/gcc/Typeof.html#Typeof)
 	CXXKeywordUNION,
 	CXXKeywordUNSIGNED,
 	CXXKeywordUSING,
@@ -135,6 +138,7 @@ bool cxxKeywordIsTypeRefMarker(CXXKeyword eKeywordId);
 bool cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId);
 bool cxxKeywordMayAppearInVariableDeclaration(CXXKeyword eKeywordId);
 bool cxxKeywordIsCPPSpecific(CXXKeyword eKeywordId);
+bool cxxKeywordIsDecltype(CXXKeyword eKeywordId);
 
 
 const char * cxxKeywordName(CXXKeyword eKeywordId);

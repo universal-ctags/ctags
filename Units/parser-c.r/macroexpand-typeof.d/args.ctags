@@ -1,0 +1,5 @@
+--sort=no
+--param-CPreProcessor._expand=true
+--fields-C=+{macrodef}
+--fields=+{signature}
+--kinds-C=+x
