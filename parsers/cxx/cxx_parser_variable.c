@@ -348,7 +348,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 						)
 					)
 				{
-					CXX_DEBUG_LEAVE_TEXT("Parenthesis seems to surround a variable definition");
+					CXX_DEBUG_PRINT("Parenthesis seems to surround a variable definition");
 					pTokenBefore = t->pPrev;
 					t = t->pNext;
 					goto got_identifier;
@@ -360,7 +360,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				)
 				{
 					// part of typename -> skip ahead
-					CXX_DEBUG_LEAVE_TEXT("Parenthesis follows decltype(), skipping");
+					CXX_DEBUG_PRINT("Parenthesis follows decltype(), skipping");
 					t = t->pNext;
 					continue;
 				}
