@@ -339,7 +339,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 								cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword) &&
 								cxxKeywordMayBePartOfTypeName(t->pPrev->eKeyword) &&
 								// but not decltype(var)!
-								(t->pPrev->eKeyword != CXXKeywordDECLTYPE)
+								!cxxKeywordIsDecltype(t->pPrev->eKeyword)
 							)
 						) &&
 						(
@@ -348,19 +348,20 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 						)
 					)
 				{
-					CXX_DEBUG_LEAVE_TEXT("Parenthesis seems to surround a variable definition");
+					CXX_DEBUG_PRINT("Parenthesis seems to surround a variable definition");
 					pTokenBefore = t->pPrev;
 					t = t->pNext;
 					goto got_identifier;
 				}
 
 				if(
-					cxxTokenIsKeyword(t->pPrev,CXXKeywordDECLTYPE) &&
+					cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword) &&
+					cxxKeywordIsDecltype(t->pPrev->eKeyword) &&
 					t->pNext
 				)
 				{
 					// part of typename -> skip ahead
-					CXX_DEBUG_LEAVE_TEXT("Parenthesis follows decltype(), skipping");
+					CXX_DEBUG_PRINT("Parenthesis follows decltype(), skipping");
 					t = t->pNext;
 					continue;
 				}
@@ -598,14 +599,25 @@ got_identifier:
 						// Possibly one of:
 						//   MACRO(whatever) variable;
 						//   decltype(whatever) variable;
+						//   __typeof(whatever) variable;
+						//   __typeof__(whatever) variable;
+						//   typeof(whatever) variable;
 						cxxTokenTypeIs(pTokenBefore,CXXTokenTypeParenthesisChain) &&
 						pTokenBefore->pPrev &&
-						!pTokenBefore->pPrev->pPrev &&
+						(!pTokenBefore->pPrev->pPrev ||
+						 (
+							 cxxTokenTypeIs(pTokenBefore->pPrev->pPrev,CXXTokenTypeKeyword) &&
+							 cxxKeywordMayAppearInVariableDeclaration(pTokenBefore->pPrev->pPrev->eKeyword)
+						 )
+						) &&
 						(
 							// macro
 							cxxTokenTypeIs(pTokenBefore->pPrev,CXXTokenTypeIdentifier) ||
-							// decltype
-							cxxTokenIsKeyword(pTokenBefore->pPrev,CXXKeywordDECLTYPE)
+							// decltype or typeof
+							(
+								cxxTokenTypeIs(pTokenBefore->pPrev,CXXTokenTypeKeyword) &&
+								cxxKeywordIsDecltype(pTokenBefore->pPrev->eKeyword)
+							)
 						)
 					)
 				{

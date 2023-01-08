@@ -1,0 +1,5 @@
+__attribute_copy__	input.c	/^# define __attribute_copy__(/;"	d	file:	signature:(arg)	macrodef:__attribute__ ((__copy__ (arg)))
+weak_alias	input.c	/^# define weak_alias(name, aliasname) _weak_alias /;"	d	file:	signature:(name,aliasname)	macrodef:_weak_alias (name, aliasname)
+_weak_alias	input.c	/^# define _weak_alias(/;"	d	file:	signature:(name,aliasname)	macrodef:extern __typeof (name) aliasname __attribute__ ((weak, alias (#name))) __attribute_copy__ (name);
+__brk	input.c	/^__brk (void *addr)$/;"	f	typeref:typename:int	signature:(void * addr)
+brk	input.c	/^weak_alias (__brk, brk)$/;"	x	typeref:typename:__typeof(__brk)

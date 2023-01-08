@@ -1200,12 +1200,20 @@ void cxxTokenChainNormalizeTypeNameSpacingInRange(CXXToken * pFrom,CXXToken * pT
 				CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain
 			))
 		{
+			// decltype(a) const
+			// -----------^
+			// In this case, a space is needed.
+			bool bFollowedBySpace = (
+					t->pPrev &&
+					cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword) &&
+					cxxKeywordIsDecltype(t->pPrev->eKeyword)
+				);
 			cxxTokenChainNormalizeTypeNameSpacing(t->pChain);
-			t->bFollowedBySpace = false;
+			t->bFollowedBySpace = bFollowedBySpace;
 		} else if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
 		{
 			t->bFollowedBySpace = t->pNext &&
-				(t->eKeyword != CXXKeywordDECLTYPE) &&
+				(!cxxKeywordIsDecltype(t->eKeyword)) &&
 				cxxTokenTypeIsOneOf(
 						t->pNext,
 						CXXTokenTypeParenthesisChain | CXXTokenTypeIdentifier |
