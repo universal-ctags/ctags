@@ -318,11 +318,11 @@ static const unsigned char *readOperator (
 
 // We stop applying macro replacements if the unget buffer gets too big
 // as it is a sign of recursive macro expansion
-#define ASM_SCRIPT_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
+#define ASM_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
 
 // We stop applying macro replacements if a macro is used so many
 // times in a recursive macro expansion.
-#define ASM_SCRIPT_PARSER_MAXIMUM_MACRO_USE_COUNT 8
+#define ASM_PARSER_MAXIMUM_MACRO_USE_COUNT 8
 
 static bool collectCppMacroArguments (ptrArray *args)
 {
@@ -427,6 +427,9 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 	cppMacroInfo *macroInfo = cppFindMacro (vStringValue (identifier));
 
 	if (!macroInfo)
+		goto out;
+
+	if(macroInfo && (macroInfo->useCount >= ASM_PARSER_MAXIMUM_MACRO_USE_COUNT))
 		goto out;
 
 	if (lastChar != EOF)

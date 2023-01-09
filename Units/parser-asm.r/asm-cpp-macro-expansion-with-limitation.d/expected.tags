@@ -1,0 +1,3 @@
+X	input.S	/^#define X /;"	d	language:CPreProcessor	file:	macrodef:Y
+Y	input.S	/^#define Y Y$/;"	d	language:CPreProcessor	file:	macrodef:Y
+Y	input.S	/^X:$/;"	l	language:Asm
