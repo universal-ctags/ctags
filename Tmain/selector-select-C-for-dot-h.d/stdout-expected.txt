@@ -1,0 +1,17 @@
+--map-C++=-.h --map-C=+.h
+a	input.h	/^#define a(/;"	d	language:C	signature:(x)	macrodef:(1+(x)))
+--map-C=+.h
+a	input.h	/^#define a(/;"	d	language:C	signature:(x)	macrodef:(1+(x)))
+--map-C=-.h
+a	input.h	/^#define a(x) (1+(x)))$/;"	M	language:ObjectiveC
+--map-ObjectiveC=-.h
+a	input.h	/^#define a(/;"	d	language:C++	signature:(x)
+--map-ObjectiveC=-.h --map-C=-.h
+a	input.h	/^#define a(/;"	d	language:C++	signature:(x)
+--map-ObjectiveC=-.h --map-C++=-.h
+--map-C++=-.h --map-C=+.h --languages=-ObjectiveC
+a	input.h	/^#define a(/;"	d	language:C	signature:(x)	macrodef:(1+(x)))
+--map-C++=-.h --map-C=+.h --languages=-C++
+a	input.h	/^#define a(/;"	d	language:C	signature:(x)	macrodef:(1+(x)))
+--map-C++=-.h --map-C=+.h --languages=-C
+a	input.h	/^#define a(x) (1+(x)))$/;"	M	language:ObjectiveC

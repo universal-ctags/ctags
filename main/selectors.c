@@ -27,8 +27,6 @@ static const char *TR_PERL6	  = "Perl6";
 static const char *TR_OBJC	  = "ObjectiveC";
 static const char *TR_MATLAB  = "MatLab";
 
-static const char *TR_CPP	  = "C++";
-
 static const char *TR_R		  = "R";
 static const char *TR_ASM	  = "Asm";
 
@@ -187,30 +185,46 @@ tasteObjectiveC (const char *line, void *data CTAGS_ATTR_UNUSED)
 
 const char *
 selectByObjectiveCKeywords (MIO * input,
-							langType *candidates CTAGS_ATTR_UNUSED,
-							unsigned int nCandidates CTAGS_ATTR_UNUSED)
+							langType *candidates,
+							unsigned int nCandidates)
 {
 	/* TODO: Ideally opening input should be delayed til
 	   enable/disable based selection is done. */
 
 	static langType objc = LANG_IGNORE;
-	static langType cpp = LANG_IGNORE;
-
 	if (objc == LANG_IGNORE)
 		objc = getNamedLanguage (TR_OBJC, 0);
 
-	if (cpp == LANG_IGNORE)
-		cpp = getNamedLanguage (TR_CPP, 0);
+	bool objcInCandidate = false;
+	const char *altCandidateName = NULL;
+	for (unsigned int i = 0; i < nCandidates; i++)
+	{
+		if (candidates[i] == objc)
+		{
+			objcInCandidate = true;
+			break;
+		}
+		else if (altCandidateName == NULL)
+		{
+			if (isLanguageEnabled (candidates[i]))
+			{
+				altCandidateName = getLanguageName (candidates[i]);
+				Assert (altCandidateName);
+			}
+		}
+	}
 
-	Assert (0 <= objc);
-	Assert (0 <= cpp);
+	if (!objcInCandidate)
+		return altCandidateName;
+	if (altCandidateName == NULL)
+	{
+		if (isLanguageEnabled (objc))
+			return TR_OBJC;
+		return NULL;
+	}
 
-	if (! isLanguageEnabled (objc))
-		return TR_CPP;
-	else if (! isLanguageEnabled (cpp))
-		return TR_OBJC;
-
-	return selectByLines (input, tasteObjectiveC, TR_CPP,
+	Assert (altCandidateName);
+	return selectByLines (input, tasteObjectiveC, altCandidateName,
 						  NULL);
 }
 
