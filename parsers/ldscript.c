@@ -346,8 +346,11 @@ static bool expandCppMacro (cppMacroInfo *macroInfo)
 	}
 
 #ifdef DO_TRACING
-	for (int i = 0; i < ptrArrayCount(args); i++)
-		TRACE_PRINT("[%d] %s", i, (const char *)ptrArrayItem (args, i));
+	if (args)
+	{
+		for (int i = 0; i < ptrArrayCount(args); i++)
+			TRACE_PRINT("[%d] %s", i, (const char *)ptrArrayItem (args, i));
+	}
 #endif
 
 	cppBuildMacroReplacementWithPtrArrayAndUngetResult (macroInfo, args);
