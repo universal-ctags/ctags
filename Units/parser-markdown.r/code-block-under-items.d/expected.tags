@@ -1,0 +1,10 @@
+test	input.md	/^# test$/;"	c	language:Markdown
+department2	input.md	/^  create table department2($/;"	t	language:SQL
+id	input.md	/^      id int primary key,$/;"	E	language:SQL	table:department2
+name	input.md	/^      name varchar(20),$/;"	E	language:SQL	table:department2
+comment	input.md	/^      comment varchar(100)$/;"	E	language:SQL	table:department2
+department3	input.md	/^  create table department3($/;"	t	language:SQL
+id	input.md	/^      id int,$/;"	E	language:SQL	table:department3
+name	input.md	/^      name varchar(20),$/;"	E	language:SQL	table:department3
+comment	input.md	/^      comment varchar(100),$/;"	E	language:SQL	table:department3
+foo	input.md	/^  foo()$/;"	f	language:Sh

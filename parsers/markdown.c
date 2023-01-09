@@ -283,7 +283,7 @@ static void findMarkdownTags (void)
 			char c = line[pos];
 			char otherC = c == '`' ? '~' : '`';
 			int nSame;
-			for (nSame = 1; line[nSame] == line[pos]; ++nSame);
+			for (nSame = 1; line[nSame + pos] == line[pos]; ++nSame);
 
 			if (inCodeChar != otherC && nSame >= 3)
 			{
