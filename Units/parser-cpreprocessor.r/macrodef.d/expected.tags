@@ -1,6 +1,6 @@
 INT	input.h	/^#define INT /;"	d	language:CPreProcessor	macrodef:1
 STR	input.h	/^#define STR /;"	d	language:CPreProcessor	macrodef:"bar"
-CHR	input.h	/^#define CHR /;"	d	language:CPreProcessor	macrodef:''
+CHR	input.h	/^#define CHR /;"	d	language:CPreProcessor	macrodef:'b'
 HEX	input.h	/^#define HEX /;"	d	language:CPreProcessor	macrodef:0xff01
 OCT	input.h	/^#define OCT /;"	d	language:CPreProcessor	macrodef:0644
 SYSCALL_METADATA	input.h	/^#define SYSCALL_METADATA(/;"	d	language:CPreProcessor	signature:(sname,nb,...)	macrodef:

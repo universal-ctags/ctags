@@ -1,6 +1,6 @@
 INT	input.c	/^#define INT /;"	d	language:C	file:	macrodef:1
 STR	input.c	/^#define STR /;"	d	language:C	file:	macrodef:"bar"
-CHR	input.c	/^#define CHR /;"	d	language:C	file:	macrodef:''
+CHR	input.c	/^#define CHR /;"	d	language:C	file:	macrodef:'b'
 HEX	input.c	/^#define HEX /;"	d	language:C	file:	macrodef:0xff01
 OCT	input.c	/^#define OCT /;"	d	language:C	file:	macrodef:0644
 SYSCALL_METADATA	input.c	/^#define SYSCALL_METADATA(/;"	d	language:C	file:	signature:(sname,nb,...)	macrodef:

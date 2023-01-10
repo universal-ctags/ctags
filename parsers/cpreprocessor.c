@@ -1332,10 +1332,19 @@ static int skipToEndOfString (bool ignoreBackslash)
 	{
 		if (c == BACKSLASH && ! ignoreBackslash)
 		{
-			vStringPutWithLimit (Cpp.charOrStringContents, c, 1024);
-			c = cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
-			if (c != EOF)
-				vStringPutWithLimit (Cpp.charOrStringContents, c, 1024);
+			int c0 = cppGetcFromUngetBufferOrFile ();
+			if (c0 == '\n')
+				continue;
+			if (c0 == EOF)
+				break;
+
+			if (vStringPutWithLimit (Cpp.charOrStringContents, c, 1024))
+			{
+				if (vStringPutWithLimit (Cpp.charOrStringContents, c0, 1024))
+					continue;
+				/* delete the last back slash at the end of the vstring. */
+				vStringChop(Cpp.charOrStringContents);
+			}
 		}
 		else if (c == DOUBLE_QUOTE)
 			break;
@@ -1410,10 +1419,19 @@ static int skipToEndOfChar ()
 	    ++count;
 		if (c == BACKSLASH)
 		{
-			vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
-			c = cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
-			if (c != EOF)
-				vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
+			int c0 = cppGetcFromUngetBufferOrFile ();
+			if (c0 == '\n')
+				continue;
+			if (c0 == EOF)
+				break;
+
+			if (vStringPutWithLimit (Cpp.charOrStringContents, c, 10))
+			{
+				if (vStringPutWithLimit (Cpp.charOrStringContents, c0, 10))
+					continue;
+				/* delete the last back slash at the end of the vstring.*/
+				vStringChop(Cpp.charOrStringContents);
+			}
 		}
 		else if (c == SINGLE_QUOTE)
 			break;
@@ -1601,8 +1619,11 @@ process:
 				/* We assume none may want to know the content of the
 				 * literal; just put ''. */
 				if (macrodef)
-					vStringCatS (macrodef, "''");
-
+				{
+					vStringPut (macrodef, '\'');
+					vStringCat (macrodef, Cpp.charOrStringContents);
+					vStringPut (macrodef, '\'');
+				}
 				break;
 
 			case '/':
