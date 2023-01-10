@@ -1601,8 +1601,11 @@ process:
 				/* We assume none may want to know the content of the
 				 * literal; just put ''. */
 				if (macrodef)
-					vStringCatS (macrodef, "''");
-
+				{
+					vStringPut (macrodef, '\'');
+					vStringCat (macrodef, Cpp.charOrStringContents);
+					vStringPut (macrodef, '\'');
+				}
 				break;
 
 			case '/':
