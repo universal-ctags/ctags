@@ -524,7 +524,7 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 	{
 		const char *scope_str = getNameStringForCorkIndex (scope);
 		const char *scope_kind_str = getKindStringForCorkIndex (scope);
-		TRACE_PRINT("Emitting tag for symbol '%s' of kind %s with scope '%s:%s'", name, kindName(kind), scope_kind_str, scope_str);
+		TRACE_PRINT("Emitting tag for symbol '%s' of kind '%s' with scope '%s:%s'", name, kindName(kind), scope_kind_str, scope_str);
 	}
 #endif
 
@@ -3446,13 +3446,13 @@ static void dumpToken (const tokenInfo *const token)
 
 	if (strcmp(scope_str, "placeholder") == 0)
 	{
-		TRACE_PRINT("%s: %s",
+		TRACE_PRINT("%s: '%s'",
 			tokenTypeName (token->type),
 			vStringValue (token->string));
 	}
 	else
 	{
-		TRACE_PRINT("%s: %s (scope '%s' of kind %s)",
+		TRACE_PRINT("%s: '%s' (scope '%s' of kind '%s')",
 			tokenTypeName (token->type),
 			vStringValue (token->string),
 			scope_str, scope_kind_str);
