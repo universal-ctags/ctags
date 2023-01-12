@@ -57,3 +57,10 @@ url	input.js	/^  url: '\/en-US\/docs\/Tools\/Scratchpad'$/;"	p	variable:metadata
 metadata	input.js	/^const metadata = {$/;"	v
 englishTitle	input.js	/^  title: englishTitle, \/\/ rename$/;"	v
 localeTitle	input.js	/^       title: localeTitle, \/\/ rename$/;"	v
+userDisplayName	input-0.js	/^function userDisplayName({displayName: dname}) {$/;"	f	signature:({displayName: dname})
+whois	input-0.js	/^function whois({displayName, fullName: {firstName: name}}) {$/;"	f	signature:({displayName, fullName: {firstName: name}})
+drawChart	input-0.js	/^function drawChart({size = 'big', coords = {x: 0, y: 0}, radius = 25} = {}) {$/;"	f	signature:({size = 'big', coords = {x: 0, y: 0}, radius = 25} = {})
+f	input-1.js	/^function f({ u, x }) {$/;"	f	signature:({ u, x })
+anonymousObjectf91cef720105	input-1.js	/^f({u: 1, x: 2})$/;"	v
+u	input-1.js	/^f({u: 1, x: 2})$/;"	p	variable:anonymousObjectf91cef720105
+x	input-1.js	/^f({u: 1, x: 2})$/;"	p	variable:anonymousObjectf91cef720105
