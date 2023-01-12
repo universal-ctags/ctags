@@ -2196,13 +2196,45 @@ start:
 
 			is_shorthand = isType (token, TOKEN_OPEN_PAREN);
 			bool can_be_field = isType (token, TOKEN_EQUAL_SIGN);
-			if ( isType (token, TOKEN_COLON) || can_be_field || is_shorthand )
+			/* is_comma is for handling
+			 *
+			 *     { ..., name, ... }
+			 *
+			 * . This is shorthand of
+			 *
+			 *     { ... ,name: name, ... }
+			 *
+			 * .
+			 * In this case, the token variables point to:
+			 *
+			 *     { ..., name, ... }
+			 * name-------^   ^
+			 * token----------+
+			 *
+			 */
+			bool is_comma = ((!is_es6_class && isType (token, TOKEN_CLOSE_CURLY)) || isType (token, TOKEN_COMMA));
+			if ( isType (token, TOKEN_COLON) || is_comma || can_be_field || is_shorthand )
 			{
+				tokenInfo * comma = NULL;
 				if (! is_shorthand)
 				{
-					readToken (token);
-					if (isKeyword (token, KEYWORD_async))
+					if (is_comma)
+					{
+						comma = newToken ();
+						copyToken (comma, token, true);
+						copyToken (token, name, true);
+						/*
+						 *     { ..., name, ... }
+						 * token -----^   ^
+						 * comma ---------+
+						 */
+					}
+					else
+					{
 						readToken (token);
+						if (isKeyword (token, KEYWORD_async))
+							readToken (token);
+					}
 				}
 
 				vString * signature = vStringNew ();
@@ -2294,7 +2326,19 @@ function:
 						else
 						{
 							copyToken (saved_token, token, true);
-							readToken (token);
+							if (comma)
+							{
+								copyToken(token, comma, true);
+								deleteToken (comma);
+								comma = NULL;
+								/*
+								 *     { ..., name, ... }
+								 *                ^
+								 * token ---------+
+								 */
+							}
+							else
+								readToken (token);
 						}
 					}
 					deleteToken (saved_token);
@@ -2316,6 +2360,8 @@ function:
 				}
 
 				vStringDelete (signature);
+				if (comma)
+					deleteToken (comma);
 			}
 			else
 			{

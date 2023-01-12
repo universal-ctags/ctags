@@ -64,3 +64,8 @@ f	input-1.js	/^function f({ u, x }) {$/;"	f	signature:({ u, x })
 anonymousObjectf91cef720105	input-1.js	/^f({u: 1, x: 2})$/;"	v
 u	input-1.js	/^f({u: 1, x: 2})$/;"	p	variable:anonymousObjectf91cef720105
 x	input-1.js	/^f({u: 1, x: 2})$/;"	p	variable:anonymousObjectf91cef720105
+f	input-2.js	/^function f(x, y, z) {$/;"	f	signature:(x, y, z)
+anonymousObjectf91d7bd30105	input-2.js	/^f({x, y, z})$/;"	v
+x	input-2.js	/^f({x, y, z})$/;"	p	variable:anonymousObjectf91d7bd30105
+y	input-2.js	/^f({x, y, z})$/;"	p	variable:anonymousObjectf91d7bd30105
+z	input-2.js	/^f({x, y, z})$/;"	p	variable:anonymousObjectf91d7bd30105
