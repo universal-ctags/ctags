@@ -1432,6 +1432,8 @@ static void readToken (tokenInfo *const token)
 
 static int parseMethodsInAnonymousObject (tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	int index = CORK_NIL;
 
 	tokenInfo *const anon_object = newToken ();
@@ -1453,11 +1455,14 @@ static int parseMethodsInAnonymousObject (tokenInfo *const token)
 
 	deleteToken (anon_object);
 
+	TRACE_LEAVE();
 	return index;
 }
 
 static void skipArgumentList (tokenInfo *const token, bool include_newlines, vString *const repr)
 {
+	TRACE_ENTER();
+
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
 	{
 		int nest_level = 1;
@@ -1486,6 +1491,7 @@ static void skipArgumentList (tokenInfo *const token, bool include_newlines, vSt
 		}
 		readTokenFull (token, include_newlines, NULL);
 	}
+	TRACE_LEAVE();
 }
 
 static void skipArrayList (tokenInfo *const token, bool include_newlines)
