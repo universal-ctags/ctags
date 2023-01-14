@@ -815,9 +815,11 @@ static void parseVersions (tokenInfo *const token)
 		do {
 			tokenRead (token);
 			if (tokenIsType(token, IDENTIFIER))
+			{
 				parseVersion (token);
+				tokenSkipToType (token, ';');
+			}
 		} while (! (tokenIsEOF (token) || token->type == '}'));
-		tokenSkipToType (token, ';');
 	}
 }
 
