@@ -116,6 +116,12 @@ static void cxxDebugDumpToken0 (CXXToken *pToken,
 	debugDec();
 
 	debugIndent ();
+	fprintf (stderr, "  sideChain: ");
+	debugInc();
+	cxxDebugDumpChain0 (pToken->pChain, pTokenChecker, pTokenChecker, false);
+	debugDec();
+
+	debugIndent ();
 	fprintf (stderr, ">\n");
 }
 

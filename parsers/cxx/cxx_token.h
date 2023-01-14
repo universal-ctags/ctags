@@ -89,6 +89,9 @@ typedef struct _CXXToken
 	unsigned char uInternalScopeAccess;
 
 	int iCorkIndex;
+
+	// The member keeps tokens started from __attribute__ and __declspec.
+	CXXTokenChain * pSideChain;
 } CXXToken;
 
 CXXToken * cxxTokenCreate(void);
