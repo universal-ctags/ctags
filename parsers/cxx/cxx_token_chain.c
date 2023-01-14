@@ -385,6 +385,22 @@ vString * cxxTokenChainJoin(
 	return s;
 }
 
+void cxxTokenChainAppendEntries(CXXTokenChain * src, CXXTokenChain * dest)
+{
+	CXXToken * pDestLast = cxxTokenChainLast(dest);
+	CXXToken * pSrcFirst = cxxTokenChainFirst(src);
+
+	pDestLast->pNext = pSrcFirst;
+	pSrcFirst->pPrev = pDestLast;
+
+	dest->iCount += src->iCount;
+	dest->pTail = src->pTail;
+
+	src->iCount = 0;
+	src->pHead = NULL;
+	src->pTail = NULL;
+}
+
 #if 0
 // currently unused
 void cxxTokenChainMoveEntries(CXXTokenChain * src,CXXTokenChain * dest)
