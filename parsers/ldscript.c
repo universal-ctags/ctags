@@ -812,12 +812,30 @@ static void parseVersions (tokenInfo *const token)
 	tokenRead (token);
 	if (token->type == '{')
 	{
+		tokenInfo *curly = newTokenByCopying(token);
+		tokenRead (token);
+		if (token->type == '{')
+		{
+			vString *anonver = anonGenerateNew ("ver", K_VERSION);
+			makeSimpleTag (anonver, K_VERSION);
+			vStringDelete(anonver);
+			tokenUnread (token);
+			tokenSkipOverPair (curly);
+			tokenCopy (token, curly);
+			tokenDelete (curly);
+			return;
+		}
+		tokenDelete (curly);
+		tokenUnread (token);
+
 		do {
 			tokenRead (token);
 			if (tokenIsType(token, IDENTIFIER))
+			{
 				parseVersion (token);
+				tokenSkipToType (token, ';');
+			}
 		} while (! (tokenIsEOF (token) || token->type == '}'));
-		tokenSkipToType (token, ';');
 	}
 }
 
