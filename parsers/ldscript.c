@@ -29,10 +29,12 @@
 
 typedef enum {
 	LD_SCRIPT_SYMBOL_ENTRYPOINT,
+	LD_SCRIPT_SYMBOL_ALIASED,
 } ldScriptSymbolRole;
 
 static roleDefinition LdScriptSymbolRoles [] = {
 	{ true, "entrypoint", "entry points" },
+	{ true, "aliased", "aliased with __attribute__((alias(...))) in C/C++ code" },
 };
 
 typedef enum {

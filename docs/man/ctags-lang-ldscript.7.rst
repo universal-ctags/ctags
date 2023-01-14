@@ -29,9 +29,12 @@ Change since "0.0"
 
 * New role ``destination`` for ``inputSection`` kind
 
+* New role ``aliased`` for  ``symbol`` kind
+
 SEE ALSO
 --------
 :ref:`ctags(1) <ctags(1)>`,
+:ref:`ctags-lang-asm(7) <ctags-lang-asm(7)>`,
 :ref:`ctags-lang-c(7) <ctags-lang-c(7)>`,
 :ref:`ctags-lang-c++(7) <ctags-lang-c++(7)>`,
 :ref:`ctags-lang-cuda(7) <ctags-lang-cuda(7)>`

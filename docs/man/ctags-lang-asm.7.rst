@@ -183,4 +183,6 @@ Change since "0.0"
 
 SEE ALSO
 --------
-:ref:`ctags(1) <ctags(1)>`, Info entries for GNU assembler
+:ref:`ctags(1) <ctags(1)>`,
+:ref:`ctags-lang-asm(7) <ctags-lang-asm(7)>`,
+Info entries for GNU assembler

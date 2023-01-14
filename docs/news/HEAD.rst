@@ -64,6 +64,7 @@ Changes about parser specific kinds, roles, fields, and extras
   + New role `foreigndecl` for `function` kind
   + New role `foreigndecl` for `struct` kind
 
+
   + New filed `section`
 
   + New field `alias`
@@ -95,6 +96,8 @@ Changes about parser specific kinds, roles, fields, and extras
 * LdScript
 
   + New role `destination` for `inputSection` kind
+
+  + New role `aliased` for `symbol` kind
 
 * Markdown
 

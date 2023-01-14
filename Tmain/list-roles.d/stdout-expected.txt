@@ -74,6 +74,7 @@ Kconfig        k/kconfig         source             on      kconfig file loaded 
 LdScript       i/inputSection    destination        on      specified as the destination of code and data
 LdScript       i/inputSection    discarded          on      discarded when linking
 LdScript       i/inputSection    mapped             on      mapped to output section
+LdScript       s/symbol          aliased            on      aliased with __attribute__((alias(...))) in C/C++ code
 LdScript       s/symbol          entrypoint         on      entry points
 Lua            Y/unknown         referenced         off     referenced somehow
 M4             I/macrofile       included           on      included macro
@@ -206,6 +207,7 @@ Kconfig        k/kconfig         source             on      kconfig file loaded 
 LdScript       i/inputSection    destination        on      specified as the destination of code and data
 LdScript       i/inputSection    discarded          on      discarded when linking
 LdScript       i/inputSection    mapped             on      mapped to output section
+LdScript       s/symbol          aliased            on      aliased with __attribute__((alias(...))) in C/C++ code
 LdScript       s/symbol          entrypoint         on      entry points
 Lua            Y/unknown         referenced         off     referenced somehow
 M4             I/macrofile       included           on      included macro

@@ -94,6 +94,31 @@ static void cxxScanAttrExtractAlias(const CXXToken * pToken)
 	vStringChop(pArgToken->pszWord);
 	cxxTagSetField(CXXTagFieldAlias, vStringValue(pArgToken->pszWord)+1, true);
 
+	tagEntryInfo e;
+	static langType lang = LANG_AUTO;
+
+	if(lang == LANG_AUTO)
+		lang = getNamedLanguage("LdScript", 0);
+	if(lang == LANG_IGNORE)
+		goto out;
+
+	static kindDefinition * kdef = NULL;
+	if(kdef == NULL)
+		kdef = getLanguageKindForName (lang, "symbol");
+	if(kdef == NULL)
+		goto out;
+
+	static roleDefinition *rdef = NULL;
+	if(rdef == NULL)
+		rdef = getLanguageRoleForName (lang, kdef->id, "aliased");
+	if(rdef == NULL)
+		goto out;
+
+	initForeignRefTagEntry(&e, vStringValue(pArgToken->pszWord)+1,
+						   lang, kdef->id, rdef->id);
+	makeTagEntry(&e);
+
+ out:
 	vStringPut(pArgToken->pszWord, '"');
 }
 

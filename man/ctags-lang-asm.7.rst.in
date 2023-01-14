@@ -183,4 +183,6 @@ Change since "0.0"
 
 SEE ALSO
 --------
-ctags(1), Info entries for GNU assembler
+ctags(1),
+ctags-lang-asm(7),
+Info entries for GNU assembler

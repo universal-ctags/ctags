@@ -1,1 +1,2 @@
-x	input.c	/^int x __attribute__((alias("y")));$/;"	v	typeref:typename:int	alias:y
+y	input.c	/^int x __attribute__((alias("y")));$/;"	s	language:LdScript	roles:aliased
+x	input.c	/^int x __attribute__((alias("y")));$/;"	v	language:C	typeref:typename:int	roles:def	alias:y
