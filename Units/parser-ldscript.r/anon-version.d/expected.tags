@@ -1,0 +1,4 @@
+jiffies	input.lds	/^jiffies = jiffies_64;$/;"	s
+verd85df1730102	input.lds	/^  {$/;"	v
+__executable_start	input.lds	/^  PROVIDE (__executable_start = START);$/;"	s	assignment:provide
+__binary_start	input.lds	/^  __binary_start = START;$/;"	s
