@@ -23,6 +23,7 @@ Man pages
 	ctags-lang-iPythonCell(7) <man/ctags-lang-iPythonCell.7.rst>
 	ctags-lang-javascript(7) <man/ctags-lang-javascript.7.rst>
 	ctags-lang-julia(7) <man/ctags-lang-julia.7.rst>
+	ctags-lang-kconfig(7) <man/ctags-lang-kconfig.7.rst>
 	ctags-lang-python(7) <man/ctags-lang-python.7.rst>
 	ctags-lang-r(7) <man/ctags-lang-r.7.rst>
 	ctags-lang-rmarkdown(7) <man/ctags-lang-rmarkdown.7.rst>

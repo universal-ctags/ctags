@@ -8,12 +8,14 @@
 #
 #  Reference
 #     https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html
+#     https://www.kernel.org/doc/html/latest/kbuild/kconfig-macro-language.html
 #
 #
 #  This parser was originally written in C as proplosed in #2553 by Maxime.
 #  Masatake converted it to an optlib file.
 #
---langdef=Kconfig
+
+--langdef=Kconfig{version=1.1}
 --map-Kconfig=+(Kconfig*)
 
 --kinddef-Kconfig=c,config,configs
@@ -21,6 +23,7 @@
 --kinddef-Kconfig=M,mainMenu,the main menu
 --kinddef-Kconfig=k,kconfig,kconfig file
 --kinddef-Kconfig=C,choice,choices
+--kinddef-Kconfig=v,variable,macro variables
 
 --_roledef-Kconfig.{kconfig}=source,kconfig file loaded with source directive
 
@@ -65,3 +68,5 @@
 --regex-Kconfig=/^[ \t]*endchoice[ \t]*//{scope=pop}{placeholder}{exclusive}
 
 --regex-Kconfig=/^[ \t]*mainmenu[ \t]+"([^"]+)"[ \t]*/\1/M/{exclusive}
+
+--regex-Kconfig=/^([-a-zA-Z0-9_$]+)[ \t]*:?=/\1/v/{exclusive}

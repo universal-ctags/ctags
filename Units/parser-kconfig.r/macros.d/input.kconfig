@@ -1,0 +1,10 @@
+# Taken from https://www.kernel.org/doc/html/latest/kbuild/kconfig-macro-language.html
+CC := gcc
+
+config CC_HAS_FOO
+        def_bool $(shell, $(srctree)/scripts/gcc-check-foo.sh $(CC))
+
+# Taken from linux/scripts/Kbuild.include
+###
+# Quote a string to pass it to C files. foo => '"foo"'
+stringify = $(squote)$(quote)$1$(quote)$(squote)
