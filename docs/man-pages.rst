@@ -19,8 +19,8 @@ Man pages
 	ctags-lang-asm(7) <man/ctags-lang-asm.7.rst>
 	ctags-lang-elm(7) <man/ctags-lang-elm.7.rst>
 	ctags-lang-gdscript(7) <man/ctags-lang-gdscript.7.rst>
-	ctags-lang-inko(7) <man/ctags-lang-inko.7.rst>
 	ctags-lang-iPythonCell(7) <man/ctags-lang-iPythonCell.7.rst>
+	ctags-lang-inko(7) <man/ctags-lang-inko.7.rst>
 	ctags-lang-javascript(7) <man/ctags-lang-javascript.7.rst>
 	ctags-lang-julia(7) <man/ctags-lang-julia.7.rst>
 	ctags-lang-kconfig(7) <man/ctags-lang-kconfig.7.rst>
