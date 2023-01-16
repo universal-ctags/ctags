@@ -601,7 +601,9 @@ static void collectHereDocMarkers (struct hereDocMarkerManager *mgr,
 								   const unsigned char *line)
 {
 	const unsigned char *cp = line;
+#ifdef DEBUG
 	const unsigned char *last = cp;
+#endif
 	while ((cp = collectHereDocMarker(mgr, cp)) != NULL)
 		Assert(last < cp);
 }
