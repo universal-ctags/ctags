@@ -1,0 +1,5 @@
+CC	input.kconfig	/^CC := gcc$/;"	v
+CC_HAS_FOO	input.kconfig	/^config CC_HAS_FOO$/;"	c
+CONFIG_CC_HAS_FOO	input.kconfig	/^config CC_HAS_FOO$/;"	c
+CONFIG_CC_HAS_FOO_MODULE	input.kconfig	/^config CC_HAS_FOO$/;"	c
+stringify	input.kconfig	/^stringify = $(squote)$(quote)$1$(quote)$(squote)$/;"	v

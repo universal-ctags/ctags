@@ -28,19 +28,20 @@ GEN_IN_MAN_FILES = \
 	ctags-faq.7 \
 	\
 	ctags-lang-asm.7 \
+	ctags-lang-elm.7 \
 	ctags-lang-gdscript.7 \
 	ctags-lang-iPythonCell.7 \
+	ctags-lang-inko.7 \
 	ctags-lang-javascript.7 \
 	ctags-lang-julia.7 \
+	ctags-lang-kconfig.7 \
 	ctags-lang-python.7 \
-	ctags-lang-tcl.7 \
-	ctags-lang-verilog.7 \
-	ctags-lang-inko.7 \
 	ctags-lang-r.7 \
 	ctags-lang-rmarkdown.7 \
 	ctags-lang-sql.7 \
-	ctags-lang-elm.7 \
 	ctags-lang-systemtap.7 \
+	ctags-lang-tcl.7 \
+	ctags-lang-verilog.7 \
 	\
 	readtags.1 \
 	tags.5 \

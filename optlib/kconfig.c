@@ -14,6 +14,7 @@ typedef enum {
 	K_MAINMENU,
 	K_KCONFIG,
 	K_CHOICE,
+	K_VARIABLE,
 } KconfigKind;
 
 
@@ -56,6 +57,9 @@ extern parserDefinition* KconfigParser (void)
 		{
 		  true, 'C', "choice", "choices",
 		},
+		{
+		  true, 'v', "variable", "macro variables",
+		},
 	};
 	static xtagDefinition KconfigXtagTable [] = {
 		{
@@ -87,13 +91,15 @@ extern parserDefinition* KconfigParser (void)
 		"", "{scope=pop}{placeholder}{exclusive}", NULL, false},
 		{"^[ \t]*mainmenu[ \t]+\"([^\"]+)\"[ \t]*", "\\1",
 		"M", "{exclusive}", NULL, false},
+		{"^([-a-zA-Z0-9_$]+)[ \t]*:?=", "\\1",
+		"v", "{exclusive}", NULL, false},
 	};
 
 
 	parserDefinition* const def = parserNew ("Kconfig");
 
-	def->versionCurrent= 0;
-	def->versionAge    = 0;
+	def->versionCurrent= 1;
+	def->versionAge    = 1;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
