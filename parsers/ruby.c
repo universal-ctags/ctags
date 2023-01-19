@@ -117,7 +117,7 @@ static vString* nestingLevelsToScope (const NestingLevels* nls)
 	{
 	    NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
 	    tagEntryInfo *e = getEntryOfNestingLevel (nl);
-	    if (e && strlen (e->name) > 0 && (!e->placeholder))
+	    if (e && (*e->name != '\0') && (!e->placeholder))
 	    {
 	        if (chunks_output++ > 0)
 	            vStringPut (result, SCOPE_SEPARATOR);
@@ -917,7 +917,7 @@ static int readAndEmitDef (const unsigned char **cp)
 	 *   end
 	 * end
 	 */
-	if (e_scope && e_scope->kindIndex == K_CLASS && strlen (e_scope->name) == 0)
+	if (e_scope && e_scope->kindIndex == K_CLASS && *(e_scope->name) == '\0')
 		kind = K_SINGLETON;
 	int corkIndex = readAndEmitTag (cp, kind);
 	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
