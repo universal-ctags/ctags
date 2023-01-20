@@ -1,0 +1,11 @@
+__anona00f52fc0100	input.rb	/^Class.new {$/;"	c	end:5
+f	input.rb	/^  def f(n)$/;"	S	class:__anona00f52fc0100	signature:(n)	end:4
+x	input.rb	/^def x$/;"	f	signature:()	end:9
+__anone0f8ea590100	input-0.rb	/^Class.new do$/;"	c	end:3
+f0	input-0.rb	/^  def f0(n) n end$/;"	S	class:__anone0f8ea590100	signature:(n)	end:2
+y	input-0.rb	/^def y$/;"	f	signature:()	end:7
+C	input-1.rb	/^class C$/;"	c	end:5
+f1	input-1.rb	/^    def f1(n) n end$/;"	S	class:C	signature:(n)	end:3
+z	input-1.rb	/^def z$/;"	f	signature:()	end:9
+__anone0fa031b0100	input-2.rb	/^Class.new {$/;"	c	end:3
+f2	input-2.rb	/^  def f2() end$/;"	S	class:__anone0fa031b0100	signature:()	end:2
