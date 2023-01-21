@@ -534,6 +534,9 @@
     <ClCompile Include="..\parsers\pythonloggingconfig.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\quarto.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\r-r6class.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>

@@ -1,0 +1,169 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "CTAGS-JSON-OUTPUT" 5 "" "1.0" "Universal Ctags"
+.SH NAME
+ctags-json-output \- JSON based ctags output
+.SH SYNOPSIS
+.nf
+\fBctags\fP \-\-output\-format=json ...
+.fi
+.sp
+.SH DESCRIPTION
+.sp
+Universal Ctags supports \fI\%JSON\fP (strictly
+speaking \fI\%JSON Lines\fP) output format if the
+ctags executable is built with \fBlibjansson\fP\&.  JSON output goes to
+standard output by default.
+.SH FORMAT
+.sp
+Each JSON line represents a tag.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ ctags \-\-extras=+p \-\-output\-format=json \-\-fields=\-s input.py
+{\(dq_type\(dq: \(dqptag\(dq, \(dqname\(dq: \(dqJSON_OUTPUT_VERSION\(dq, \(dqpath\(dq: \(dq1.0\(dq, \(dqpattern\(dq: \(dqin development\(dq}
+{\(dq_type\(dq: \(dqptag\(dq, \(dqname\(dq: \(dqTAG_FILE_SORTED\(dq, \(dqpath\(dq: \(dq1\(dq, \(dqpattern\(dq: \(dq0=unsorted, 1=sorted, 2=foldcase\(dq}
+\&...
+{\(dq_type\(dq: \(dqtag\(dq, \(dqname\(dq: \(dqKlass\(dq, \(dqpath\(dq: \(dq/tmp/input.py\(dq, \(dqpattern\(dq: \(dq/^class Klass:$/\(dq, \(dqlanguage\(dq: \(dqPython\(dq, \(dqkind\(dq: \(dqclass\(dq}
+{\(dq_type\(dq: \(dqtag\(dq, \(dqname\(dq: \(dqmethod\(dq, \(dqpath\(dq: \(dq/tmp/input.py\(dq, \(dqpattern\(dq: \(dq/^    def method(self):$/\(dq, \(dqlanguage\(dq: \(dqPython\(dq, \(dqkind\(dq: \(dqmember\(dq, \(dqscope\(dq: \(dqKlass\(dq, \(dqscopeKind\(dq: \(dqclass\(dq}
+\&...
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+A key not starting with \fB_\fP is mapped to a field of ctags.
+\(dq\fB\-\-output\-format=json \-\-list\-fields\fP\(dq options list the fields.
+.sp
+A key starting with \fB_\fP represents meta information of the JSON
+line.  Currently only \fB_type\fP key is used. If the value for the key
+is \fBtag\fP, the JSON line represents a regular tag. If the value is
+\fBptag\fP, the line represents a pseudo\-tag.
+.sp
+The output format can be changed in the
+future. \fBJSON_OUTPUT_VERSION\fP pseudo\-tag provides a change
+client\-tools to handle the changes.  Current version is \(dq1.0\(dq. A
+client\-tool can extract the version with \fBpath\fP key from the
+pseudo\-tag.
+.sp
+The JSON output format is newly designed and has no limitation found
+in the default tags file format.
+.INDENT 0.0
+.IP \(bu 2
+The values for \fBkind\fP key are represented in long\-name flags.
+No one\-letter is here.
+.IP \(bu 2
+Scope names and scope kinds have distinguished keys: \fBscope\fP and \fBscopeKind\fP\&.
+They are combined in the default tags file format.
+.UNINDENT
+.SH DATA TYPE USED IN A FIELD
+.sp
+Values for the most of all keys are represented in JSON string type.
+However, some of them are represented in string, integer, and/or boolean type.
+.sp
+\(dq\fB\-\-output\-format=json \-\-list\-fields\fP\(dq options show What kind of data type
+used in a field of JSON.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ ctags \-\-output\-format=json \-\-list\-fields
+#LETTER NAME           ENABLED LANGUAGE         JSTYPE FIXED DESCRIPTION
+F       input          yes     NONE             s\-\-    no    input file
+\&...
+P       pattern        yes     NONE             s\-b    no    pattern
+\&...
+f       file           yes     NONE             \-\-b    no    File\-restricted scoping
+\&...
+e       end            no      NONE             \-i\-    no    end lines of various items
+\&...
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+\fBJSTYPE\fP column shows the data types.
+.INDENT 0.0
+.TP
+.B \(aq\fBs\fP\(aq
+string
+.TP
+.B \(aq\fBi\fP\(aq
+integer
+.TP
+.B \(aq\fBb\fP\(aq
+boolean (true or false)
+.UNINDENT
+.sp
+For an example, the value for \fBpattern\fP field of ctags takes a string or a boolean value.
+.SH VERSIONS
+.SS Change since \(dq0.0\(dq
+.INDENT 0.0
+.IP \(bu 2
+New key \fBkindName\fP for \fBTAG_ROLE_DESCRIPTION\fP pseudo tag
+.sp
+\fBkindName\fP is added to store the name of the kind in \fBTAG_ROLE_DESCRIPTION\fP
+pseudo tags.
+.sp
+In 0.0, a \(dqTAG_ROLE_DESCRIPTION\(dq pseudo tag was printed like:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+{\(dq_type\(dq: \(dqptag\(dq, \(dqname\(dq: \(dqTAG_ROLE_DESCRIPTION\(dq,
+                  \(dqparserName\(dq: \(dqLANG!KIND\(dq, }
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+In 1.0, it is printed like:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+{\(dq_type\(dq: \(dqptag\(dq, \(dqname\(dq: \(dqTAG_ROLE_DESCRIPTION\(dq,
+                  \(dqparserName\(dq: \(dqLANG\(dq,
+                  \(dqkindName\(dq: \(dqKIND\(dq,  }
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH SEE ALSO
+.sp
+ctags(1), tags(5), ctags\-client\-tools(7)
+.\" Generated by docutils manpage writer.
+.

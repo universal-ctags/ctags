@@ -6,7 +6,9 @@
  *   GNU General Public License version 2 or (at your option) any later version.
  *
  * This module contains functions for generating tags for Quarto Markdown files.
+ * https://quarto.org/docs/get-started/hello/rstudio.html
  *
+ * Maintainer: Anish S. Shah, https://github.com/asshah4
  */
 
 /*
@@ -107,7 +109,7 @@ static bool extractLanguageForCodeBlock (markdownSubparser *s,
 
 extern parserDefinition* QuartoMarkdownParser (void)
 {
-	static const char *const extensions [] = { "rmd", NULL };
+	static const char *const extensions [] = { "qmd", NULL };
 	static struct sQuartoMarkdownSubparser quartomarkdownSubparser = {
 		.markdown = {
 			.subparser = {

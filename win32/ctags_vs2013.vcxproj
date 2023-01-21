@@ -337,6 +337,7 @@
     <ClCompile Include="..\parsers\protobuf.c" />
     <ClCompile Include="..\parsers\python.c" />
     <ClCompile Include="..\parsers\pythonloggingconfig.c" />
+    <ClCompile Include="..\parsers\quarto.c" />
     <ClCompile Include="..\parsers\r-r6class.c" />
     <ClCompile Include="..\parsers\r-s4class.c" />
     <ClCompile Include="..\parsers\r.c" />
