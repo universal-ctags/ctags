@@ -387,6 +387,7 @@ PARSER_SRCS =				\
 	parsers/r.c			\
 	parsers/rake.c			\
 	parsers/rexx.c			\
+	parsers/quarto.c		\
 	parsers/rmarkdown.c		\
 	parsers/robot.c			\
 	parsers/rpmspec.c		\
