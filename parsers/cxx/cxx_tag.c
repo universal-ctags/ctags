@@ -311,7 +311,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 		// scopeIndex is used in the parser internally.
 		g_oCXXTag.extensionFields.scopeIndex = cxxScopeGetDefTag();
-		if (g_oCXXTag.extensionFields.scopeIndex != CORK_NIL)
+		if (isFieldEnabled(FIELD_NTH) && g_oCXXTag.extensionFields.scopeIndex != CORK_NIL)
 		{
 			if (uKind == CXXTagKindMEMBER || uKind == CXXTagKindENUMERATOR
 				|| uKind == CXXTagKindPARAMETER || uKind == CXXTagCPPKindTEMPLATEPARAM)
