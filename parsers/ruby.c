@@ -117,7 +117,7 @@ static vString* nestingLevelsToScope (const NestingLevels* nls)
 	{
 	    NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
 	    tagEntryInfo *e = getEntryOfNestingLevel (nl);
-	    if (e && strlen (e->name) > 0 && (!e->placeholder))
+	    if (e && (*e->name != '\0') && (!e->placeholder))
 	    {
 	        if (chunks_output++ > 0)
 	            vStringPut (result, SCOPE_SEPARATOR);
@@ -917,7 +917,18 @@ static int readAndEmitDef (const unsigned char **cp)
 	 *   end
 	 * end
 	 */
-	if (e_scope && e_scope->kindIndex == K_CLASS && strlen (e_scope->name) == 0)
+	if (e_scope && e_scope->kindIndex == K_CLASS
+		&& (
+			/* Class.new do
+			   ... in this case, an anonymous class is created and
+			   ... pushed. */
+			isTagExtraBitMarked (e_scope, XTAG_ANONYMOUS)
+			||
+			/* class <<
+			   ... in this case, a placeholder tag having an empty
+			   ... name is created and pushed. */
+			*(e_scope->name) == '\0'
+			))
 		kind = K_SINGLETON;
 	int corkIndex = readAndEmitTag (cp, kind);
 	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
@@ -1060,7 +1071,10 @@ static void findRubyTags (void)
 
 			int r;
 			if (*(cp - 1) != 's')
+			{
 				r = emitRubyTagFull(NULL, K_CLASS, true, false);
+				expect_separator = true;
+			}
 			else
 				r = readAndEmitTag (&cp, K_CLASS); /* "class" */
 
@@ -1183,8 +1197,11 @@ static void findRubyTags (void)
 			{
 				enterUnnamedScope ();
 			}
-			else if (canMatchKeyword (&cp, "do"))
+			else if (canMatchKeyword (&cp, "do") || (*cp == '{'))
 			{
+				if (*cp == '{')
+					++cp;
+
 				if (! expect_separator)
 				{
 					enterUnnamedScope ();
@@ -1194,8 +1211,11 @@ static void findRubyTags (void)
 				else
 					expect_separator = false;
 			}
-			else if (canMatchKeyword (&cp, "end") && nesting->n > 0)
+			else if ((canMatchKeyword (&cp, "end") || (*cp == '}')) && nesting->n > 0)
 			{
+				if (*cp == '}')
+					++cp;
+
 				/* Leave the most recent scope. */
 				nestingLevelsPop (nesting);
 			}
