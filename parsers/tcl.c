@@ -177,7 +177,7 @@ static void readIdentifier (vString *string)
 	while (1)
 	{
 		int c = getcFromInputFile ();
-		if (isgraph (c) && (!strchr ("{}[]", c)))
+		if (isgraph (c) && (!strchr ("{}[]\"", c)))
 			vStringPut (string, c);
 		else
 		{
