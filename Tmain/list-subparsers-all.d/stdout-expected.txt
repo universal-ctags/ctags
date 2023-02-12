@@ -18,6 +18,7 @@ PythonLoggingConfig  Iniconf    base <> sub {bidirectional}
 QtMoc                C++        base <> sub {bidirectional}
 R6Class              R          base <> sub {bidirectional}
 RMarkdown            Markdown   base <= sub {dedicated}
+Quarto 							 Markdown   base <= sub {dedicated}
 RSpec                Ruby       base => sub {shared}
 Rake                 Ruby       base <= sub {dedicated}
 RelaxNG              XML        base <> sub {bidirectional}

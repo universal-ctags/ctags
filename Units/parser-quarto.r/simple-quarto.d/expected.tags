@@ -1,8 +1,8 @@
 S1	input.qmd	/^# S1$/;"	chapter	line:1	language:Markdown	end:14
-xyX	input.qmd	/^```{r xyX}$/;"	chunklabel	line:3	language:QuartoMarkdown	extras:subparser
+xyX	input.qmd	/^```{r xyX}$/;"	chunklabel	line:3	language:Quarto	extras:subparser
 S2	input.qmd	/^# S2$/;"	chapter	line:15	language:Markdown	end:25
-__anon4a45a9700100	input.qmd	/^```{r, cache = TRUE, dependson = "xyX"}$/;"	chunklabel	line:17	language:QuartoMarkdown	extras:subparser,anonymous
-__anon4a45a9700200	input.qmd	/^```{python}$/;"	chunklabel	line:21	language:QuartoMarkdown	extras:subparser,anonymous
+__anon4a45a9700100	input.qmd	/^```{r, cache = TRUE, dependson = "xyX"}$/;"	chunklabel	line:17	language:Quarto	extras:subparser,anonymous
+__anon4a45a9700200	input.qmd	/^```{python}$/;"	chunklabel	line:21	language:Quarto	extras:subparser,anonymous
 S3	input.qmd	/^# S3$/;"	chapter	line:26	language:Markdown	end:27
 x	input.qmd	/^x <- 1$/;"	globalVar	line:5	language:R	extras:guest	end:5
 foo	input.qmd	/^foo <- function () {$/;"	function	line:6	language:R	extras:guest	end:9
