@@ -148,7 +148,7 @@
 	PythonLoggingConfigParser, \
 	QemuHXParser, \
 	QtMocParser, \
-	QuartoMarkdownParser, \
+	QuartoParser, \
 	RMarkdownParser, \
 	RParser, \
 	RakeParser, \
