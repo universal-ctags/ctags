@@ -28,13 +28,13 @@
  */
 typedef enum {
 	K_CHUNK_LABEL = 0,
-} quartomarkdownKind;
+} quartoKind;
 
-static kindDefinition QuartoMarkdownKinds[] = {
+static kindDefinition QuartoKinds[] = {
 	{ true, 'l', "chunklabel",       "chunk labels"},
 };
 
-struct sQuartoMarkdownSubparser {
+struct sQuartoSubparser {
 	markdownSubparser markdown;
 };
 
@@ -42,14 +42,14 @@ struct sQuartoMarkdownSubparser {
 *   FUNCTION DEFINITIONS
 */
 
-static void findQuartoMarkdownTags (void)
+static void findQuartoTags (void)
 {
 	scheduleRunningBaseparser (0);
 }
 
 #define skip_space(CP) 	while (*CP == ' ' || *CP == '\t') CP++;
 
-static void makeQuartoMarkdownTag (vString *name, int kindIndex, bool anonymous)
+static void makeQuartoTag (vString *name, int kindIndex, bool anonymous)
 {
 	tagEntryInfo e;
 	initTagEntry (&e, vStringValue (name), kindIndex);
@@ -81,7 +81,7 @@ static bool extractLanguageForCodeBlock (markdownSubparser *s,
 	if (*cp == ',' || *cp == '}')
 	{
 		vString *name = anonGenerateNew("__anon", K_CHUNK_LABEL);
-		makeQuartoMarkdownTag (name, K_CHUNK_LABEL, true);
+		makeQuartoTag (name, K_CHUNK_LABEL, true);
 		vStringDelete (name);
 		return true;
 	}
@@ -101,16 +101,16 @@ static bool extractLanguageForCodeBlock (markdownSubparser *s,
 
 	skip_space(cp);
 	if (*cp == ',' || *cp == '}')
-		makeQuartoMarkdownTag (chunk_label, K_CHUNK_LABEL, anonymous);
+		makeQuartoTag (chunk_label, K_CHUNK_LABEL, anonymous);
 
 	vStringDelete (chunk_label);
 	return true;
 }
 
-extern parserDefinition* QuartoMarkdownParser (void)
+extern parserDefinition* QuartoParser (void)
 {
 	static const char *const extensions [] = { "qmd", NULL };
-	static struct sQuartoMarkdownSubparser quartomarkdownSubparser = {
+	static struct sQuartoSubparser quartoSubparser = {
 		.markdown = {
 			.subparser = {
 				.direction = SUBPARSER_SUB_RUNS_BASE,
@@ -119,17 +119,17 @@ extern parserDefinition* QuartoMarkdownParser (void)
 		},
 	};
 	static parserDependency dependencies [] = {
-		[0] = { DEPTYPE_SUBPARSER, "Markdown", &quartomarkdownSubparser },
+		[0] = { DEPTYPE_SUBPARSER, "Markdown", &quartoSubparser },
 	};
 
-	parserDefinition* const def = parserNew ("QuartoMarkdown");
+	parserDefinition* const def = parserNew ("Quarto");
 
 
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE(dependencies);
-	def->kindTable      = QuartoMarkdownKinds;
-	def->kindCount  = ARRAY_SIZE (QuartoMarkdownKinds);
+	def->kindTable      = QuartoKinds;
+	def->kindCount  = ARRAY_SIZE (QuartoKinds);
 	def->extensions = extensions;
-	def->parser     = findQuartoMarkdownTags;
+	def->parser     = findQuartoTags;
 	return def;
 }
