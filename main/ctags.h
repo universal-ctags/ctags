@@ -41,7 +41,7 @@
 #if defined (HAVE_CONFIG_H)
 # define PROGRAM_VERSION PACKAGE_VERSION
 #else
-# define PROGRAM_VERSION "6.0.0"
+# define PROGRAM_VERSION "6.0.1"
 #endif
 #define PROGRAM_NAME      "Universal Ctags"
 #define PROGRAM_URL       "https://ctags.io/"

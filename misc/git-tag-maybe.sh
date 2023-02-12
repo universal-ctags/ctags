@@ -22,7 +22,7 @@ run() {
 
 base=6.0
 cal=$(date +%Y%m%d)
-chicken=0
+chicken=1
 new_tagname="p${base}.${cal}.${chicken}"
 
 run git --version
