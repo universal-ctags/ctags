@@ -314,7 +314,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 		if (g_oCXXTag.extensionFields.scopeIndex != CORK_NIL)
 		{
 			if (uKind == CXXTagKindMEMBER || uKind == CXXTagKindENUMERATOR
-				|| uKind == CXXTagKindPARAMETER || CXXTagCPPKindTEMPLATEPARAM)
+				|| uKind == CXXTagKindPARAMETER || uKind == CXXTagCPPKindTEMPLATEPARAM)
 				g_oCXXTag.extensionFields.nth =
 					(short) countEntriesInScope(g_oCXXTag.extensionFields.scopeIndex,
 												true,
