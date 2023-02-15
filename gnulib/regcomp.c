@@ -768,7 +768,8 @@ re_compile_internal (regex_t *preg, const char * pattern, size_t length,
 #ifdef DEBUG
   /* Note: length+1 will not overflow since it is checked in init_dfa.  */
   dfa->re_str = re_malloc (char, length + 1);
-  strncpy (dfa->re_str, pattern, length + 1);
+  if (__glibc_likely (dfa->re_str != NULL))
+    strncpy (dfa->re_str, pattern, length + 1);
 #endif
 
   err = re_string_construct (&regexp, pattern, length, preg->translate,
