@@ -46,6 +46,10 @@ If you want to try the latest Universal Ctags without building it yourself...
 Daily builds are available at the [ctags-win32](https://github.com/universal-ctags/ctags-win32) project.
 Go to the [releases](https://github.com/universal-ctags/ctags-win32/releases) page to download zip packages.
 
+### Unix-like
+Nightly builds are available at the [ctags-nightly-build](https://github.com/universal-ctags/ctags-nightly-build) project.
+Go to the [releases](https://github.com/universal-ctags/ctags-nightly-build/releases) page to download tarball archives.
+
 ### Mac
 See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
 
