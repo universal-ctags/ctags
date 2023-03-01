@@ -1,2 +1,2 @@
-defvar_with_comment	input.sv	/^`define defvar_with_comment \\$/;"	c
-defvar_without_comment	input.sv	/^`define defvar_without_comment \\$/;"	c
+defvar_with_comment	input.sv	/^`define defvar_with_comment \\$/;"	d
+defvar_without_comment	input.sv	/^`define defvar_without_comment \\$/;"	d

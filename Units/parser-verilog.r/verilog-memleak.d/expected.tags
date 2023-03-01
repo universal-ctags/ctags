@@ -1,4 +1,4 @@
-DEFINE	input.v	/^`define DEFINE$/;"	c
+DEFINE	input.v	/^`define DEFINE$/;"	d
 mod	input.v	/^module mod ($/;"	m
 PARAM	input.v	/^parameter PARAM = 1;$/;"	c	module:mod
 a	input.v	/^input a,b, c, d ;$/;"	p	module:mod

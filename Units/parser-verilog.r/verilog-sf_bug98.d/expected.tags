@@ -2,5 +2,5 @@ pass_task_1	input.v	/^task pass_task_1;$/;"	t
 fail_task_2	input.v	/^task fail_task_2;$/;"	t
 pass_func_1	input.v	/^function pass_func_1;$/;"	f
 fail_func_2	input.v	/^function fail_func_2;$/;"	f
-pass_define_1	input.v	/^`define pass_define_1 1'b1;$/;"	c
-fail_define_2	input.v	/^`define fail_define_2 1'b1;$/;"	c
+pass_define_1	input.v	/^`define pass_define_1 1'b1;$/;"	d
+fail_define_2	input.v	/^`define fail_define_2 1'b1;$/;"	d

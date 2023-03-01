@@ -1,6 +1,6 @@
-DEFINE	input.v	/^`define DEFINE$/;"	c
-DEF_WITH_EQ	input.v	/^`define DEF_WITH_EQ = 1'd100$/;"	c
-DEF_VALUE	input.v	/^`define DEF_VALUE   1'd100$/;"	c
+DEFINE	input.v	/^`define DEFINE$/;"	d
+DEF_WITH_EQ	input.v	/^`define DEF_WITH_EQ = 1'd100$/;"	d
+DEF_VALUE	input.v	/^`define DEF_VALUE   1'd100$/;"	d
 mod	input.v	/^module mod#($/;"	m
 PARAM1	input.v	/^    parameter PARAM1 = 10,$/;"	c	module:mod
 mod.PARAM1	input.v	/^    parameter PARAM1 = 10,$/;"	c	module:mod

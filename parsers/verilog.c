@@ -65,7 +65,6 @@
 typedef enum {
 	/* parser private items */
 	K_IGNORE = -16,	/* Verilog/SystemVerilog keywords to be ignored */
-	K_DEFINE,
 	K_DIRECTIVE,
 	K_END,
 	K_END_DE,	/* End of Design Elements */
@@ -78,6 +77,7 @@ typedef enum {
 	K_UNDEFINED = KEYWORD_NONE,
 	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
 	K_CONSTANT= 0,
+	K_DEFINE,
 	K_EVENT,
 	K_FUNCTION,
 	K_MODULE,
@@ -154,7 +154,8 @@ static roleDefinition SystemVerilogModuleRoles [] = {
 };
 
 static kindDefinition VerilogKinds [] = {
- { true, 'c', "constant",  "constants (define, parameter, specparam)" },
+ { true, 'c', "constant",  "constants (parameter, specparam)" },
+ { true, 'd', "define",    "text macros" },
  { true, 'e', "event",     "events" },
  { true, 'f', "function",  "functions" },
  { true, 'm', "module",    "modules",
@@ -168,7 +169,8 @@ static kindDefinition VerilogKinds [] = {
 };
 
 static kindDefinition SystemVerilogKinds [] = {
- { true, 'c', "constant",  "constants (define, parameter, specparam, enum values)" },
+ { true, 'c', "constant",  "constants (parameter, specparam, enum values)" },
+ { true, 'd', "define",    "text macros" },
  { true, 'e', "event",     "events" },
  { true, 'f', "function",  "functions" },
  { true, 'm', "module",    "modules",
@@ -1412,7 +1414,7 @@ static int processDefine (tokenInfo *const token, int c)
 	if (isWordToken (c))
 	{
 		c = readWordTokenNoSkip (token, c);
-		createTag (token, K_CONSTANT);
+		createTag (token, K_DEFINE);
 	}
 	c = skipToNewLine (c);
 	c = skipWhite (c);
@@ -2086,6 +2088,8 @@ extern parserDefinition* VerilogParser (void)
 {
 	static const char *const extensions [] = { "v", NULL };
 	parserDefinition* def = parserNew ("Verilog");
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	def->kindTable  = VerilogKinds;
 	def->kindCount  = ARRAY_SIZE (VerilogKinds);
 	def->fieldTable = VerilogFields;
@@ -2100,6 +2104,8 @@ extern parserDefinition* SystemVerilogParser (void)
 {
 	static const char *const extensions [] = { "sv", "svh", "svi", NULL };
 	parserDefinition* def = parserNew ("SystemVerilog");
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	def->kindTable  = SystemVerilogKinds;
 	def->kindCount  = ARRAY_SIZE (SystemVerilogKinds);
 	def->fieldTable = SystemVerilogFields;

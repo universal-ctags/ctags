@@ -1,6 +1,6 @@
-DEFINE	input.sv	/^`define DEFINE$/;"	c
-DEF_WITH_EQ	input.sv	/^`define DEF_WITH_EQ = 1'd100$/;"	c
-DEF_VALUE	input.sv	/^`define DEF_VALUE   1'd100$/;"	c
+DEFINE	input.sv	/^`define DEFINE$/;"	d
+DEF_WITH_EQ	input.sv	/^`define DEF_WITH_EQ = 1'd100$/;"	d
+DEF_VALUE	input.sv	/^`define DEF_VALUE   1'd100$/;"	d
 PARAM	input.sv	/^parameter PARAM = 1;$/;"	c
 LOCALPARAM	input.sv	/^localparam LOCALPARAM = 2**2;$/;"	c
 STATE1	input.sv	/^localparam STATE1 = 4'h0,$/;"	c
