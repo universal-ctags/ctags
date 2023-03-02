@@ -87,6 +87,7 @@ enum eKeywordId {
 	KEYWORD_drop,
 	KEYWORD_else,
 	KEYWORD_elseif,
+	KEYWORD_elsif,
 	KEYWORD_end,
 	KEYWORD_endif,
 	KEYWORD_event,
@@ -177,7 +178,12 @@ typedef enum eTokenType {
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_TILDE,
 	TOKEN_FORWARD_SLASH,
-	TOKEN_EQUAL
+	TOKEN_EQUAL,
+	TOKEN_PREPROC_IF,
+	TOKEN_PREPROC_ELSIF,
+	TOKEN_PREPROC_ELSE,
+	TOKEN_PREPROC_THEN,
+	TOKEN_PREPROC_END,
 } tokenType;
 
 typedef struct sTokenInfoSQL {
@@ -294,6 +300,7 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "drop",							KEYWORD_drop			      },
 	{ "else",							KEYWORD_else			      },
 	{ "elseif",							KEYWORD_elseif			      },
+	{ "elsif",							KEYWORD_elsif			      },
 	{ "end",							KEYWORD_end				      },
 	{ "endif",							KEYWORD_endif			      },
 	{ "event",							KEYWORD_event			      },
@@ -431,6 +438,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	[KEYWORD_drop]          = {1 & 0&1&1&1 & 1&1 & 1},
 	[KEYWORD_else]          = {1 & 1&1&1&1 & 1&1 & 1},
 	[KEYWORD_elseif]        = {1 & 0&0&0&0 & 0&0 & 1},
+	[KEYWORD_elsif]         = {0 & 0&0&0&0 & 0&1 & 0},
 	[KEYWORD_end]           = {0 & 1&1&1&1 & 0&1 & 1},
 	[KEYWORD_endif]         = {0 & 0&0&0&0 & 0&0 & 1},
 	[KEYWORD_event]         = {0 & 0&0&0&0 & 0&0 & 0},
@@ -725,6 +733,10 @@ static bool isCCFlag(const char *str)
  * The syntax for dollar-quoted string ca collide with PL/SQL inquiry directive ($$name).
  * https://docs.oracle.com/en/database/oracle/oracle-database/18/lnpls/plsql-language-fundamentals.html#GUID-E918087C-D5A8-4CEE-841B-5333DE6D4C15
  * https://github.com/universal-ctags/ctags/issues/3006
+
+ * In addition, it can also collide with variable checks in PL/SQL selection directives such as:
+ * $IF $$my_var > 1 $THEN ... $END
+ * https://docs.oracle.com/en/database/oracle/oracle-database/19/lnpls/plsql-language-fundamentals.html#GUID-78F2074C-C799-4CF9-9290-EB8473D0C8FB
  */
 static tokenType parseDollarQuote (vString *const string, const int delimiter, int *promise)
 {
@@ -752,8 +764,20 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter, i
 
 	if (c != delimiter)
 	{
-		/* damn that's not valid, what can we do? */
+		/* not a dollar quote */
+		keywordId kw = lookupCaseKeyword (tag+1, Lang_sql);
 		ungetcToInputFile (c);
+
+		if (kw == KEYWORD_if)
+			return TOKEN_PREPROC_IF;
+		else if (kw == KEYWORD_elsif)
+			return TOKEN_PREPROC_ELSIF;
+		else if (kw == KEYWORD_else)
+			return TOKEN_PREPROC_ELSE;
+		else if (kw == KEYWORD_then)
+			return TOKEN_PREPROC_THEN;
+		else if (kw == KEYWORD_end)
+			return TOKEN_PREPROC_END;
 		return TOKEN_UNDEFINED;
 	}
 
@@ -828,7 +852,7 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter, i
 	return TOKEN_STRING;
 }
 
-static void readToken (tokenInfo *const token)
+static void readTokenFull (tokenInfo *const token, bool skippingPreproc)
 {
 	int c;
 
@@ -952,10 +976,39 @@ getNextChar:
 				  }
 
 		case '$':
-				  token->type = parseDollarQuote (token->string, c, &token->promise);
-				  token->lineNumber = getInputLineNumber ();
-				  token->filePosition = getInputFilePosition ();
-				  break;
+				  {
+					  tokenType t;
+					  if (skippingPreproc)
+					  {
+						  int d = getcFromInputFile ();
+						  if (d != '$')
+							  ungetcToInputFile (d);
+					  }
+					  t = parseDollarQuote (token->string, c, &token->promise);
+					  if (t == TOKEN_PREPROC_IF)
+					  {
+						  /* skip until $THEN and keep the content of this branch */
+						  readTokenFull (token, true);
+						  while (!isType (token, TOKEN_PREPROC_THEN) && !isType (token, TOKEN_EOF))
+							  readTokenFull (token, true);
+						  readTokenFull (token, false);
+					  }
+					  else if (!skippingPreproc && (t == TOKEN_PREPROC_ELSIF || t == TOKEN_PREPROC_ELSE))
+					  {
+						  /* skip until $END and drop $ELSIF and $ELSE branches */
+						  readTokenFull (token, true);
+						  while (!isType (token, TOKEN_PREPROC_END) && !isType (token, TOKEN_EOF))
+							  readTokenFull (token, true);
+						  readTokenFull (token, false);
+					  }
+					  else
+					  {
+						  token->type = t;
+						  token->lineNumber = getInputLineNumber ();
+						  token->filePosition = getInputFilePosition ();
+					  }
+					  break;
+				  }
 
 		default:
 				  if (! isIdentChar1 (c))
@@ -979,6 +1032,11 @@ getNextChar:
 				  }
 				  break;
 	}
+}
+
+static void readToken (tokenInfo *const token)
+{
+	readTokenFull (token, false);
 }
 
 /*
