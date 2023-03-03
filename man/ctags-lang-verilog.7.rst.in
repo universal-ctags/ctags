@@ -197,6 +197,14 @@ KNOWN ISSUES
 
 See https://github.com/universal-ctags/ctags/issues/2674 for more information.
 
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New kind ``define``
+
 SEE ALSO
 --------
 

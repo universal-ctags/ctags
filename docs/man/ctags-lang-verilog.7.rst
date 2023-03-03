@@ -54,7 +54,8 @@ Supported Kinds
 	T       typedef    yes     no      0      NONE   type declarations
 	V       covergroup yes     no      0      NONE   covergroups
 	b       block      yes     no      0      NONE   blocks (begin, fork)
-	c       constant   yes     no      0      NONE   constants (define, parameter, specparam, enum values)
+	c       constant   yes     no      0      NONE   constants (parameter, specparam, enum values)
+	d       define     yes     no      0      NONE   text macros
 	e       event      yes     no      0      NONE   events
 	f       function   yes     no      0      NONE   functions
 	i       instance   yes     no      0      NONE   instances of module or interface
@@ -74,7 +75,8 @@ Note that ``prototype`` (``Q``) is disabled by default.
 	$ ctags --list-kinds-full=Verilog
 	#LETTER NAME     ENABLED REFONLY NROLES MASTER DESCRIPTION
 	b       block    yes     no      0      NONE   blocks (begin, fork)
-	c       constant yes     no      0      NONE   constants (define, parameter, specparam)
+	c       constant yes     no      0      NONE   constants (parameter, specparam)
+	d       define   yes     no      0      NONE   text macros
 	e       event    yes     no      0      NONE   events
 	f       function yes     no      0      NONE   functions
 	i       instance yes     no      0      NONE   instances of module
@@ -194,6 +196,14 @@ KNOWN ISSUES
 ---------------------------------------------------------------------
 
 See https://github.com/universal-ctags/ctags/issues/2674 for more information.
+
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New kind ``define``
 
 SEE ALSO
 --------
