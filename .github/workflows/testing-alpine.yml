@@ -23,7 +23,7 @@ jobs:
       # this is to fix https://github.com/actions/checkout/issues/760
       - run: git config --global --add safe.directory /__w/ctags/ctags
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - run: cc --version
 
