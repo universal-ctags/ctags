@@ -1820,8 +1820,11 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 					parsingValue = false;
 					break;
 				case TOKEN_OPEN_PAREN:
-					if (! member) break;
 					uwiUngetC ('(');
+					if (! member) {
+						parsed = tryParser (parseParens, token, false);
+						break;
+					}
 
 					const int nscope = emitTag (member, isGenerator ? TSTAG_GENERATOR : TSTAG_METHOD);
 
