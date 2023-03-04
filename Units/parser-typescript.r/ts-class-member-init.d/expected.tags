@@ -1,0 +1,6 @@
+User	input.ts	/^class User {$/;"	c
+soundMan	input.ts	/^	private readonly soundMan = singletons.getSoundManager();$/;"	p	class:User
+lssMan	input.ts	/^	private readonly lssMan = singletons.getLoopedSoundSourceManager();$/;"	p	class:User
+minimapStyle	input.ts	/^	override minimapStyle = Color.USER;$/;"	p	class:User
+destroy	input.ts	/^	override destroy(parent: any) {$/;"	m	class:User
+parent	input.ts	/^	override destroy(parent: any) {$/;"	z	method:User.destroy
