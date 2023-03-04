@@ -21,7 +21,7 @@ jobs:
       BUILDDIR: ${{ matrix.os }}-${{ matrix.compiler }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: update package information
       run: brew update
     - name: install tools and libraries
