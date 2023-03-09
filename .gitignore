@@ -11,6 +11,7 @@
 *.od
 *.pdf
 *.pyc
+*.swp
 *.c3workspace
 *.c3workspace.user
 *.tar.gz
