@@ -2,6 +2,9 @@ ErrorActionPreference	input.ps1	/^$ErrorActionPreference = "Stop"$/;"	v
 Settings	input.ps1	/^$Global:Settings = $null$/;"	v
 ALocalVar	input.ps1	/^$Local:ALocalVar = $null$/;"	v
 BasePath	input.ps1	/^$BasePath = split-path -parent $Global:MyInvocation.InvocationName$/;"	v
+cDrive	input.ps1	/^$cDrive="C:\\"$/;"	v
+nextLine	input.ps1	/^$nextLine="`n"$/;"	v
+backtick	input.ps1	/^$backtick='`'$/;"	v
 Read-Configuration-File	input.ps1	/^FUNCTION Read-Configuration-File() {$/;"	f	signature:()
 LogMessageOK	input.ps1	/^Function LogMessageOK()$/;"	f	signature:()
 LogMessage	input.ps1	/^function LogMessage() {$/;"	f	signature:()

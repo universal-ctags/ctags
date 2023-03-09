@@ -248,7 +248,7 @@ static void parseString (vString *const string, const int delimiter)
 	{
 		int c = getcFromInputFile ();
 
-		if (c == '\\' && (c = getcFromInputFile ()) != EOF)
+		if (delimiter == '"' && c == '`' && (c = getcFromInputFile ()) != EOF)
 			vStringPut (string, c);
 		else if (c == EOF || c == delimiter)
 			break;
