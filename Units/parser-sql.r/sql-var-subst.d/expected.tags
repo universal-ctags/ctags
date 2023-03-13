@@ -1,0 +1,18 @@
+tb_name${dt}	input.sql	/^create table  database.tb_name${dt} as$/;"	t
+col_a	input.sql	/^select col_a, col_b from database.tb_name;$/;"	E	table:tb_name${dt}
+col_b	input.sql	/^select col_a, col_b from database.tb_name;$/;"	E	table:tb_name${dt}
+tb_name${dt}${dt0}	input.sql	/^create table  database.tb_name${dt}${dt0} as$/;"	t
+col_a	input.sql	/^select col_a, col_b from database.tb_name;$/;"	E	table:tb_name${dt}${dt0}
+col_b	input.sql	/^select col_a, col_b from database.tb_name;$/;"	E	table:tb_name${dt}${dt0}
+${dt1}tb_name${dt}${dt0}	input.sql	/^create table  database.${dt1}tb_name${dt}${dt0} as$/;"	t
+col_a	input.sql	/^select col_a, col_b from database.tb_name;$/;"	E	table:${dt1}tb_name${dt}${dt0}
+col_b	input.sql	/^select col_a, col_b from database.tb_name;$/;"	E	table:${dt1}tb_name${dt}${dt0}
+${dt1}tb_name${dt}${dt0}Z	input.sql	/^create table  database.${dt1}tb_name${dt}${dt0}Z as$/;"	t
+col_a	input.sql	/^select col_a, col_b from database.tb_name;$/;"	E	table:${dt1}tb_name${dt}${dt0}Z
+col_b	input.sql	/^select col_a, col_b from database.tb_name;$/;"	E	table:${dt1}tb_name${dt}${dt0}Z
+tb_${dt2}_name	input.sql	/^create table  database.tb_${dt2}_name as$/;"	t
+col_${key0}	input.sql	/^select col_${key0}, col_${key1} from database.tb_name;$/;"	E	table:tb_${dt2}_name
+col_${key1}	input.sql	/^select col_${key0}, col_${key1} from database.tb_name;$/;"	E	table:tb_${dt2}_name
+tb_${${d}${t:h}${i}}_name	input.sql	/^create table  database.tb_${${d}${t:h}${i}}_name as$/;"	t
+col_${key${n}${m}a}	input.sql	/^select col_${key${n}${m}a}, col_${key${m}${n}b} from database.tb_name;$/;"	E	table:tb_${${d}${t:h}${i}}_name
+col_${key${m}${n}b}	input.sql	/^select col_${key${n}${m}a}, col_${key${m}${n}b} from database.tb_name;$/;"	E	table:tb_${${d}${t:h}${i}}_name

@@ -699,16 +699,68 @@ static void parseString (vString *const string, const int delimiter, int *promis
 	}
 }
 
+/* Parsing ${foo}.
+ *
+ * HiveQL is one of implementation having the variable substitution feature.
+ * https://cwiki.apache.org/confluence/display/Hive/LanguageManual+VariableSubstitution
+ */
+static int parseVarSubstSequence (vString *const string, const int firstChar);
+static int parseVarSubst (vString *const string, const int firstChar)
+{
+	int c = firstChar;
+	Assert (c == '$');
+	vStringPut (string, c);
+
+	c = getcFromInputFile ();
+	if (c != '{')
+		return c;
+	vStringPut (string, c);
+
+	while ((c = getcFromInputFile ())!= EOF)
+	{
+		if (c == '}')
+		{
+			vStringPut (string, c);
+			c = getcFromInputFile ();
+			return c;
+		}
+		else if (c == '$')
+		{
+			c = parseVarSubstSequence (string, c);
+			ungetcToInputFile (c);
+		}
+		else
+			vStringPut (string, c);
+	}
+
+	return c;
+}
+
+static int parseVarSubstSequence (vString *const string, const int firstChar)
+{
+	int c = firstChar;
+
+	do
+		c = parseVarSubst (string, c);
+	while (c == '$');
+
+	return c;
+}
+
 /*	Read a C identifier beginning with "firstChar" and places it into "name".
 */
 static void parseIdentifier (vString *const string, const int firstChar)
 {
 	int c = firstChar;
-	Assert (isIdentChar1 (c));
+	Assert (vStringLength (string) > 0 || isIdentChar1 (c));
 	do
 	{
 		vStringPut (string, c);
 		c = getcFromInputFile ();
+
+		/* Handle ${var} in HiveQL. */
+		if (c == '$')
+			c = parseVarSubstSequence (string, c);
 	} while (isIdentChar (c));
 	if (!isspace (c))
 		ungetcToInputFile (c);		/* unget non-identifier character */
@@ -952,15 +1004,23 @@ getNextChar:
 				  }
 
 		case '$':
-				  token->type = parseDollarQuote (token->string, c, &token->promise);
-				  token->lineNumber = getInputLineNumber ();
-				  token->filePosition = getInputFilePosition ();
-				  break;
+				  {
+					  int c0 = getcFromInputFile ();
+					  ungetcToInputFile (c0);
+					  if (c0 != '{')
+					  {
+						  token->type = parseDollarQuote (token->string, c, &token->promise);
+						  token->lineNumber = getInputLineNumber ();
+						  token->filePosition = getInputFilePosition ();
+						  break;
+					  }
+					  c = parseVarSubstSequence (token->string, c);
+					  /* FALL THROUGH */
+				  }
 
 		default:
-				  if (! isIdentChar1 (c))
-					  token->type = TOKEN_UNDEFINED;
-				  else
+				  if ( isIdentChar1 (c)
+					   ||  (vStringLength (token->string) > 0 && isIdentChar (c)))
 				  {
 					  parseIdentifier (token->string, c);
 					  token->lineNumber = getInputLineNumber ();
@@ -977,6 +1037,18 @@ getNextChar:
 					  else
 						  token->type = TOKEN_KEYWORD;
 				  }
+				  else if (vStringLength (token->string) > 0)
+				  {
+					  ungetcToInputFile (c);
+
+					  /* token->string may be ${var}.
+					   * We regard ${var} as an identifier. */
+					  token->type = TOKEN_IDENTIFIER;
+					  token->lineNumber = getInputLineNumber ();
+					  token->filePosition = getInputFilePosition ();
+				  }
+				  else
+					  token->type = TOKEN_UNDEFINED;
 				  break;
 	}
 }
