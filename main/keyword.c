@@ -36,6 +36,7 @@ typedef struct sHashEntry {
 */
 static const unsigned int TableSize = 2039;  /* prime */
 static hashEntry **HashTable = NULL;
+static unsigned int MaxEntryLen = 0;
 
 /*
 *   FUNCTION DEFINITIONS
@@ -70,7 +71,8 @@ static hashEntry *getHashTableEntry (unsigned long hashedValue)
 	return entry;
 }
 
-static unsigned int hashValue (const char *const string, langType language)
+static unsigned int hashValue (const char *const string, langType language,
+	unsigned int maxLen, bool *maxLenReached)
 {
 	const signed char *p;
 	unsigned int h = 5381;
@@ -79,11 +81,19 @@ static unsigned int hashValue (const char *const string, langType language)
 
 	/* "djb" hash as used in g_str_hash() in glib */
 	for (p = (const signed char *)string; *p != '\0'; p++)
+	{
 		h = (h << 5) + h + tolower (*p);
+		if (p - (const signed char *)string > maxLen)
+		{
+			*maxLenReached = true;
+			return 0;
+		}
+	}
 
 	/* consider language as an extra "character" and add it to the hash */
 	h = (h << 5) + h + language;
 
+	*maxLenReached = false;
 	return h;
 }
 
@@ -107,8 +117,13 @@ static hashEntry *newEntry (
  */
 extern void addKeyword (const char *const string, langType language, int value)
 {
-	const unsigned int index = hashValue (string, language) % TableSize;
+	bool dummy;
+	const unsigned int index = hashValue (string, language, 1000, &dummy) % TableSize;
 	hashEntry *entry = getHashTableEntry (index);
+	size_t len = strlen (string);
+
+	if (len > MaxEntryLen)
+		MaxEntryLen = len;
 
 	if (entry == NULL)
 	{
@@ -139,9 +154,15 @@ extern void addKeyword (const char *const string, langType language, int value)
 
 static int lookupKeywordFull (const char *const string, bool caseSensitive, langType language)
 {
-	const unsigned int index = hashValue (string, language) % TableSize;
-	hashEntry *entry = getHashTableEntry (index);
+	bool maxLenReached;
+	const unsigned int index = hashValue (string, language, MaxEntryLen, &maxLenReached) % TableSize;
+	hashEntry *entry;
 	int result = KEYWORD_NONE;
+
+	if (maxLenReached)
+		return KEYWORD_NONE;
+
+	entry = getHashTableEntry (index);
 
 	while (entry != NULL)
 	{
