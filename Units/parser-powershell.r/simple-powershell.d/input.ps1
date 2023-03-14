@@ -25,6 +25,10 @@ $Local:ALocalVar = $null
 # a usual variable
 $BasePath = split-path -parent $Global:MyInvocation.InvocationName
 
+# different type of escape in string
+$cDrive="C:\"
+$nextLine="`n"
+$backtick='`'
 
 FUNCTION Read-Configuration-File() {
     $Hostname = [System.Environment]::MachineName
