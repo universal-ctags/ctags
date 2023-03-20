@@ -18,6 +18,7 @@ Man pages
 
 	ctags-lang-asm(7) <man/ctags-lang-asm.7.rst>
 	ctags-lang-elm(7) <man/ctags-lang-elm.7.rst>
+	ctags-lang-fortran(7) <man/ctags-lang-fortran.7.rst>
 	ctags-lang-gdscript(7) <man/ctags-lang-gdscript.7.rst>
 	ctags-lang-iPythonCell(7) <man/ctags-lang-iPythonCell.7.rst>
 	ctags-lang-inko(7) <man/ctags-lang-inko.7.rst>
