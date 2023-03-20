@@ -275,12 +275,28 @@ void cxxTagUseTokensInRangeAsPartOfDefTags(int iCorkIndex, CXXToken * pFrom, CXX
 	}
 }
 
-static bool countSameKindEntry(int corkIndex,
-							   tagEntryInfo * entry,
-							   void * data)
+static short cxxTagLookBackLastNth(langType iLangType, int iScopeIndex, unsigned int uKind)
 {
-	unsigned int *uKind = data;
-	return (entry->kindIndex == *uKind);
+	for (size_t uCount = countEntryInCorkQueue (); uCount > (CORK_NIL + 1); uCount--)
+	{
+		int iCorkIndex = (int)(uCount - 1);
+		tagEntryInfo *pTag = getEntryInCorkQueue(iCorkIndex);
+		if (iCorkIndex == iScopeIndex)
+			return 0;
+		else if (pTag->extensionFields.scopeIndex == iScopeIndex
+				 && pTag->langType == iLangType
+				 && pTag->kindIndex == uKind)
+		{
+			return pTag->extensionFields.nth + (
+				/* Over-wrapped; if the value is too large for sizeof(nth),
+				 * Don't increment more. */
+				((short)(pTag->extensionFields.nth + 1) > 0)
+				? 1
+				: 0
+				);
+		}
+	}
+	return NO_NTH_FIELD;
 }
 
 tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
@@ -311,14 +327,13 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 		// scopeIndex is used in the parser internally.
 		g_oCXXTag.extensionFields.scopeIndex = cxxScopeGetDefTag();
-		if (g_oCXXTag.extensionFields.scopeIndex != CORK_NIL)
+		if (isFieldEnabled(FIELD_NTH) && g_oCXXTag.extensionFields.scopeIndex != CORK_NIL)
 		{
 			if (uKind == CXXTagKindMEMBER || uKind == CXXTagKindENUMERATOR
 				|| uKind == CXXTagKindPARAMETER || uKind == CXXTagCPPKindTEMPLATEPARAM)
-				g_oCXXTag.extensionFields.nth =
-					(short) countEntriesInScope(g_oCXXTag.extensionFields.scopeIndex,
-												true,
-												countSameKindEntry, &uKind);
+				g_oCXXTag.extensionFields.nth = cxxTagLookBackLastNth(g_oCXXTag.langType,
+																	  g_oCXXTag.extensionFields.scopeIndex,
+																	  uKind);
 		}
 	}
 
