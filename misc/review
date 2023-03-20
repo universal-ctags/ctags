@@ -327,7 +327,7 @@ do_tmain_inspect()
 	    ("<n>ext"-*|-n)
 		next=1
 		;;
-	    ("<d>iff"-*|-d)
+	    ("<d>iff"-*|-d|-=|-diff)
 		tmain_inspect_cmd_show_diff_all Tmain "$t"
 		;;
 	    ("<S>hell"-*|-S)
