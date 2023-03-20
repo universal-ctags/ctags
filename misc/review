@@ -304,22 +304,39 @@ tmain_inspect_cmd_show_diff_all()
     done
 }
 
+tmain_inspect_cmd_accept()
+{
+    local prefix=$1
+    local t=$2
+    local c
+    for c in stdout stderr exit; do
+	if [[ -e "$prefix/$t/$c-diff.txt" ]]; then
+	    mv "$prefix/$t/$c-actual.txt" "$prefix/$t/$c-expected.txt"
+	fi
+    done
+}
+
 do_tmain_inspect()
 {
     local next=0
     local r
     local t=$1
 
-    select r in '<n>ext' '<d>iff' '<S>hell' '<R>un' '<q>uit'; do
+    select r in '<n>ext' '<d>iff' '<a>ccept' '<S>hell' '<R>un' '<q>uit'; do
 	case $r-$REPLY in
 	    ("<n>ext"-*|-n)
 		next=1
 		;;
-	    ("<d>iff"-*|-d)
+	    ("<d>iff"-*|-d|-=|-diff)
 		tmain_inspect_cmd_show_diff_all Tmain "$t"
 		;;
 	    ("<S>hell"-*|-S)
 		inspect_cmd_shell Tmain "$t"
+		;;
+	    ("<a>ccept"-*|-a)
+		if tmain_inspect_cmd_accept Tmain "$t"; then
+		    next=1
+		fi
 		;;
 	    ("<R>un"-*|-R)
 		tmain_inspect_run "$t"
