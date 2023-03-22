@@ -512,7 +512,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 static void parseBlock (tokenInfo *const token, const bool local);
 static void parseBlockFull (tokenInfo *const token, const bool local, langType lang);
 static void parseDeclare (tokenInfo *const token, const bool local);
-static void parseKeywords (tokenInfo *const token);
+static void parseKeywords (tokenInfo *const token, enum eKeywordId precedingKeyword);
 static tokenType parseSqlFile (tokenInfo *const token);
 
 /*
@@ -1914,7 +1914,7 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 
 				case KEYWORD_create:
 					readToken (token);
-					parseKeywords(token);
+					parseKeywords(token, KEYWORD_create);
 					break;
 
 				case KEYWORD_declare:
@@ -3095,7 +3095,7 @@ static void parseDatabase (tokenInfo *const token, enum eKeywordId keyword)
 	findCmdTerm (token, true);
 }
 
-static void parseKeywords (tokenInfo *const token)
+static void parseKeywords (tokenInfo *const token, enum eKeywordId precedingKeyword)
 {
 		switch (token->keyword)
 		{
@@ -3106,7 +3106,10 @@ static void parseKeywords (tokenInfo *const token)
 				break;
 			case KEYWORD_comment:		parseComment (token); break;
 			case KEYWORD_cursor:		parseSimple (token, SQLTAG_CURSOR); break;
-			case KEYWORD_database:		parseDatabase (token, KEYWORD_database); break;
+			case KEYWORD_database:
+				if (precedingKeyword == KEYWORD_create)
+					parseDatabase (token, KEYWORD_database);
+				break;
 			case KEYWORD_datatype:		parseDomain (token); break;
 			case KEYWORD_declare:		parseBlock (token, false); break;
 			case KEYWORD_domain:		parseDomain (token); break;
@@ -3130,7 +3133,10 @@ static void parseKeywords (tokenInfo *const token)
 			case KEYWORD_package:		parsePackage (token); break;
 			case KEYWORD_procedure:		parseSubProgram (token); break;
 			case KEYWORD_publication:	parsePublication (token); break;
-			case KEYWORD_schema:		parseDatabase (token, KEYWORD_schema); break;
+			case KEYWORD_schema:
+				if (precedingKeyword == KEYWORD_create)
+					parseDatabase (token, KEYWORD_schema);
+				break;
 			case KEYWORD_service:		parseService (token); break;
 			case KEYWORD_subtype:		parseSimple (token, SQLTAG_SUBTYPE); break;
 			case KEYWORD_synonym:		parseSynonym (token); break;
@@ -3149,12 +3155,13 @@ static tokenType parseSqlFile (tokenInfo *const token)
 {
 	do
 	{
+		enum eKeywordId k = token->keyword;
 		readToken (token);
 
 		if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
 			parseLabel (token);
 		else
-			parseKeywords (token);
+			parseKeywords (token, k);
 	} while (! isKeyword (token, KEYWORD_end) &&
 			 ! isType (token, TOKEN_EOF));
 
