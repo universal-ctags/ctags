@@ -1011,10 +1011,16 @@ static void findRubyTags (void)
 		 * separators are "do", ";" or newline */
 		bool expect_separator = false;
 
-		if (found_rdoc == false && strncmp ((const char*)cp, "# =", 3) == 0)
+		if (found_rdoc == false)
 		{
-			found_rdoc = true;
-			makePromise ("RDoc", 0, 0, 0, 0, 0);
+			if (strncmp ((const char*)cp, "__END__", 7) == 0)
+				break;
+
+			if (strncmp ((const char*)cp, "# =", 3) == 0)
+			{
+				found_rdoc = true;
+				makePromise ("RDoc", 0, 0, 0, 0, 0);
+			}
 		}
 
 		if (canMatch (&cp, "=begin", isWhitespace))
