@@ -395,6 +395,7 @@
     <ClInclude Include="..\main\gvars.h" />
     <ClInclude Include="..\main\htable.h" />
     <ClInclude Include="..\main\inline.h" />
+    <ClInclude Include="..\main\interval_tree_generic.h" />
     <ClInclude Include="..\main\keyword.h" />
     <ClInclude Include="..\main\keyword_p.h" />
     <ClInclude Include="..\main\kind.h" />

@@ -44,6 +44,7 @@
 #include "field.h"
 #include "fmt_p.h"
 #include "kind.h"
+#include "interval_tree_generic.h"
 #include "nestlevel.h"
 #include "options_p.h"
 #include "ptag_p.h"
@@ -95,6 +96,7 @@ typedef struct eTagFile {
 	int cork;
 	unsigned int corkFlags;
 	ptrArray *corkQueue;
+	struct rb_root intervaltab;
 
 	bool patternCacheValid;
 } tagFile;
@@ -104,6 +106,8 @@ typedef struct sTagEntryInfoX  {
 	int corkIndex;
 	struct rb_root symtab;
 	struct rb_node symnode;
+	struct rb_node intervalnode;
+	unsigned long __intervalnode_subtree_last;
 } tagEntryInfoX;
 
 /*
@@ -119,6 +123,13 @@ static tagFile TagFile = {
 	NULL,                /* vLine */
 	.cork = false,
 	.corkQueue = NULL,
+	/* .intervaltab = RB_ROOT,
+	 *
+	 * msvc doesn't accept the above expression:
+	 *
+	 *   main\entry.c(128) : error C2099: initializer is not a constant
+	 *
+	 */
 	.patternCacheValid = false,
 };
 
@@ -134,6 +145,13 @@ extern int truncate (const char *path, off_t length);
 #ifdef NEED_PROTO_FTRUNCATE
 extern int ftruncate (int fd, off_t length);
 #endif
+
+#define INTERVAL_START(node) ((node)->slot.lineNumber)
+#define INTERVAL_END(node)   ((node)->slot.extensionFields.endLine)
+
+INTERVAL_TREE_DEFINE(tagEntryInfoX, intervalnode,
+					 unsigned long, __intervalnode_subtree_last,
+					 INTERVAL_START, INTERVAL_END, /*static*/, intervaltab)
 
 /*
 *   FUNCTION DEFINITIONS
@@ -1068,6 +1086,8 @@ static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 	tagEntryInfoX *x = xMalloc (1, tagEntryInfoX);
 	x->symtab = RB_ROOT;
 	x->corkIndex = CORK_NIL;
+	memset(&x->intervalnode, 0, sizeof (x->intervalnode));
+	x->__intervalnode_subtree_last = 0;
 	tagEntryInfo  *slot = (tagEntryInfo *)x;
 
 	*slot = *tag;
@@ -1680,6 +1700,7 @@ extern void corkTagFile (unsigned int corkFlags)
 		TagFile.corkQueue = ptrArrayNew (deleteTagEnry);
 		tagEntryInfo *nil = newNilTagEntry (corkFlags);
 		ptrArrayAdd (TagFile.corkQueue, nil);
+		TagFile.intervaltab = RB_ROOT;
 	}
 }
 
