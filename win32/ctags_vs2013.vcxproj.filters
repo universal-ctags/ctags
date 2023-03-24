@@ -782,6 +782,9 @@
     <ClInclude Include="..\main\rbtree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\rbtree_augmented.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\read.h">
       <Filter>Header Files</Filter>
     </ClInclude>
