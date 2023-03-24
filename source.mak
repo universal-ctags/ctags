@@ -74,6 +74,7 @@ MAIN_PUBLIC_HEADS =		\
 	main/entry.h		\
 	main/field.h		\
 	main/gvars.h		\
+	main/interval_tree_generic.h \
 	main/keyword.h		\
 	main/kind.h		\
 	main/lregex.h		\
