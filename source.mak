@@ -86,6 +86,7 @@ MAIN_PUBLIC_HEADS =		\
 	main/parse.h		\
 	main/promise.h		\
 	main/rbtree.h		\
+	main/rbtree_augmented.h	\
 	main/read.h		\
 	main/selectors.h	\
 	main/strlist.h		\

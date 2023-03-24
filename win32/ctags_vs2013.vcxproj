@@ -427,6 +427,7 @@
     <ClInclude Include="..\main\ptag_p.h" />
     <ClInclude Include="..\main\ptrarray.h" />
     <ClInclude Include="..\main\rbtree.h" />
+    <ClInclude Include="..\main\rbtree_augmented.h" />
     <ClInclude Include="..\main\read.h" />
     <ClInclude Include="..\main\read_p.h" />
     <ClInclude Include="..\main\routines.h" />
