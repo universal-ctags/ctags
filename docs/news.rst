@@ -454,6 +454,7 @@ The following parsers have been added:
 * PythonLoggingConfig
 * QemuHX *optlib*
 * QtMoc
+* Quarto *Markdown based subparser*
 * R
 * R6Class *R based subparser*
 * Rake *Ruby based subparser*

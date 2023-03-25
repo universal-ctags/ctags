@@ -1,0 +1,2 @@
+defun	input.qmd	/^#| label: defun$/;"	l	line:2	language:Quarto	end:6
+f	input.qmd	/^def f():$/;"	f	line:4	language:Python	end:5
