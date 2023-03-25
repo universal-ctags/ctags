@@ -18,6 +18,7 @@
 
 #include "entry.h"
 #include "parse.h"
+#include "read.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -35,6 +36,7 @@ static kindDefinition RMarkdownKinds[] = {
 
 struct sRMarkdownSubparser {
 	markdownSubparser markdown;
+	int lastChunkLabel;
 };
 
 /*
@@ -48,19 +50,20 @@ static void findRMarkdownTags (void)
 
 #define skip_space(CP) 	while (*CP == ' ' || *CP == '\t') CP++;
 
-static void makeRMarkdownTag (vString *name, int kindIndex, bool anonymous)
+static int makeRMarkdownTag (vString *name, int kindIndex, bool anonymous)
 {
 	tagEntryInfo e;
 	initTagEntry (&e, vStringValue (name), kindIndex);
 	if (anonymous)
 		markTagExtraBit (&e, XTAG_ANONYMOUS);
-	makeTagEntry (&e);
+	return makeTagEntry (&e);
 }
 
 static bool extractLanguageForCodeBlock (markdownSubparser *s,
 										 const char *langMarker,
 										 vString *langName)
 {
+	struct sRMarkdownSubparser *rmarkdown = (struct sRMarkdownSubparser *)s;
 	const char *cp = langMarker;
 
 	if (*cp != '{')
@@ -80,7 +83,7 @@ static bool extractLanguageForCodeBlock (markdownSubparser *s,
 	if (*cp == ',' || *cp == '}')
 	{
 		vString *name = anonGenerateNew("__anon", K_CHUNK_LABEL);
-		makeRMarkdownTag (name, K_CHUNK_LABEL, true);
+		rmarkdown->lastChunkLabel = makeRMarkdownTag (name, K_CHUNK_LABEL, true);
 		vStringDelete (name);
 		return true;
 	}
@@ -100,10 +103,31 @@ static bool extractLanguageForCodeBlock (markdownSubparser *s,
 
 	skip_space(cp);
 	if (*cp == ',' || *cp == '}')
-		makeRMarkdownTag (chunk_label, K_CHUNK_LABEL, anonymous);
+		rmarkdown->lastChunkLabel = makeRMarkdownTag (chunk_label, K_CHUNK_LABEL, anonymous);
 
 	vStringDelete (chunk_label);
 	return true;
+}
+
+static void notifyEndOfCodeBlock (markdownSubparser *s)
+{
+	struct sRMarkdownSubparser *rmarkdown = (struct sRMarkdownSubparser *)s;
+
+	if (rmarkdown->lastChunkLabel == CORK_NIL)
+		return;
+
+	tagEntryInfo *e = getEntryInCorkQueue (rmarkdown->lastChunkLabel);
+	if (e)
+		e->extensionFields.endLine = getInputLineNumber ();
+
+	rmarkdown->lastChunkLabel = CORK_NIL;
+}
+
+static void inputStart (subparser *s)
+{
+	struct sRMarkdownSubparser *rmarkdown = (struct sRMarkdownSubparser*)s;
+
+	rmarkdown->lastChunkLabel = CORK_NIL;
 }
 
 extern parserDefinition* RMarkdownParser (void)
@@ -113,8 +137,10 @@ extern parserDefinition* RMarkdownParser (void)
 		.markdown = {
 			.subparser = {
 				.direction = SUBPARSER_SUB_RUNS_BASE,
+				.inputStart = inputStart,
 			},
 			.extractLanguageForCodeBlock = extractLanguageForCodeBlock,
+			.notifyEndOfCodeBlock = notifyEndOfCodeBlock,
 		},
 	};
 	static parserDependency dependencies [] = {

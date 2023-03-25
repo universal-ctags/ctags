@@ -1,8 +1,8 @@
 S1	input.rmd	/^# S1$/;"	chapter	line:1	language:Markdown	end:14
-xyX	input.rmd	/^```{r xyX}$/;"	chunklabel	line:3	language:RMarkdown	extras:subparser
+xyX	input.rmd	/^```{r xyX}$/;"	chunklabel	line:3	language:RMarkdown	extras:subparser	end:13
 S2	input.rmd	/^# S2$/;"	chapter	line:15	language:Markdown	end:25
-__anon4a45a9700100	input.rmd	/^```{r, cache = TRUE, dependson = "xyX"}$/;"	chunklabel	line:17	language:RMarkdown	extras:subparser,anonymous
-__anon4a45a9700200	input.rmd	/^```{python}$/;"	chunklabel	line:21	language:RMarkdown	extras:subparser,anonymous
+__anon4a45a9700100	input.rmd	/^```{r, cache = TRUE, dependson = "xyX"}$/;"	chunklabel	line:17	language:RMarkdown	extras:subparser,anonymous	end:19
+__anon4a45a9700200	input.rmd	/^```{python}$/;"	chunklabel	line:21	language:RMarkdown	extras:subparser,anonymous	end:25
 S3	input.rmd	/^# S3$/;"	chapter	line:26	language:Markdown	end:27
 x	input.rmd	/^x <- 1$/;"	globalVar	line:5	language:R	extras:guest	end:5
 foo	input.rmd	/^foo <- function () {$/;"	function	line:6	language:R	extras:guest	end:9
