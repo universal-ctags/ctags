@@ -334,6 +334,34 @@ representation. ``--list-regex-flags`` lists all the flags.
 	can be an empty string.  See the following description of
 	``scope=...`` flag about how this is useful.
 
+``postrun``
+	Match the pattern at the end of all the parsing processes,
+	including running build-in parsers, applying
+	``--mline-regex-<LANG>`` patterns, and applying
+	``--_mtable-regex-<LANG>`` patterns. This flag is useful for
+	extending a built-in parser with the ``--regex-<LANG>=`` option.
+
+	A built-in parser processes source files line by line provided by
+	the main part of ctags.  The main part of
+	ctags applies ``--regex-<LANG>=`` patterns to a
+	line when providing the line to the built-in parser. Both the
+	built-in parser for ``<LANG>`` and the patterns of
+	``--regex-<LANG>=`` without ``postrun`` run side-by-side.
+
+	Thus, ``--regex-<LANG>=`` patterns without ``postrun`` cannot use
+	the tags information finally extracted by the built-in parser for
+	``<LANG>``.  This is where the ``postrun`` comes into play. The
+	main part never applies patterns with ``postrun`` when providing
+	lines to built-in parsers. Instead, it applies the patterns after
+	running the built-in parser.  In other words, it applies the
+	patterns to a source file after providing all the file lines. The
+	patterns can utilize the tags information completely extracted by
+	the built-in parser.
+
+	``--mline-regex-<LANG>`` and ``--_mtable-regex-<LANG>`` have no
+	``{postrun}`` flag because the main part always applies the patterns
+	specified with the options after running a built-in parser.
+
 ``scope=(ref|push|pop|clear|set|replace)``
 
 	Specify what to do with the internal scope stack.

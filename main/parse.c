@@ -4580,6 +4580,11 @@ static bool lregexQueryParserAndSubparsers (const langType language, bool (* pre
 	return r;
 }
 
+extern bool hasLanguagePostRunRegexPatterns (const langType language)
+{
+	return lregexQueryParserAndSubparsers (language, regexIsPostRun);
+}
+
 extern bool hasLanguageMultilineRegexPatterns (const langType language)
 {
 	return lregexQueryParserAndSubparsers (language, regexNeedsMultilineBuffer);
@@ -4603,16 +4608,16 @@ extern bool doesLanguageExpectCorkInRegex (const langType language)
 	return hasScopeAction;
 }
 
-extern void matchLanguageRegex (const langType language, const vString* const line)
+extern void matchLanguageRegex (const langType language, const vString* const line, bool postrun)
 {
 	subparser *tmp;
 
-	matchRegex ((LanguageTable + language)->lregexControlBlock, line);
+	matchRegex ((LanguageTable + language)->lregexControlBlock, line, postrun);
 	foreachSubparser(tmp, true)
 	{
 		langType t = getSubparserLanguage (tmp);
 		enterSubparser (tmp);
-		matchLanguageRegex (t, line);
+		matchLanguageRegex (t, line, postrun);
 		leaveSubparser ();
 	}
 }

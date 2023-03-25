@@ -1,0 +1,3 @@
+inline-x	input.c	/^\/* def:x *\/$/;"	d	line:1	language:TESTC
+f	input.c	/^int f(void)$/;"	f	line:2	language:C	typeref:typename:int
+post-x	input.c	/^\/* def:x *\/$/;"	d	line:1	language:TESTC

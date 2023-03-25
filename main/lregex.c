@@ -142,6 +142,7 @@ typedef struct {
 	enum pType type;
 	bool exclusive;
 	bool accept_empty_name;
+	bool postrun;
 	union {
 		struct {
 			int kindIndex;
@@ -596,9 +597,17 @@ static void pre_ptrn_flag_exclusive_long (const char* const s CTAGS_ATTR_UNUSED,
 	pre_ptrn_flag_exclusive_short ('x', data);
 }
 
+static void pre_ptrn_flag_postrun_long (const char* const s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
+{
+	regexPattern * ptrn = data;
+	ptrn->postrun = true;
+}
+
 static flagDefinition prePtrnFlagDef[] = {
 	{ 'x',  "exclusive", pre_ptrn_flag_exclusive_short, pre_ptrn_flag_exclusive_long ,
 	  NULL, "skip testing the other patterns if a line is matched to this pattern"},
+	{ '\0', "postrun",   NULL, pre_ptrn_flag_postrun_long,
+	  NULL, "run after parsing with built-in code, multline regex patterns, and multitable regex patterns" },
 };
 
 static void scope_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
@@ -689,6 +698,7 @@ static regexPattern * newPattern (regexCompiledCode* const pattern,
 	ptrn->pattern.code = pattern->code;
 
 	ptrn->exclusive = false;
+	ptrn->postrun = false;
 	ptrn->accept_empty_name = false;
 	ptrn->regptype = regptype;
 	ptrn->xtagType = XTAG_UNKNOWN;
@@ -2128,7 +2138,21 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 /* Match against all patterns for specified language. Returns true if at least
  * on pattern matched.
  */
-extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const line)
+extern bool regexIsPostRun (struct lregexControlBlock *lcb)
+{
+	for (unsigned int i = 0  ;  i < ptrArrayCount(lcb->entries[REG_PARSER_SINGLE_LINE])  ;  ++i)
+	{
+		regexTableEntry *entry = ptrArrayItem(lcb->entries[REG_PARSER_SINGLE_LINE], i);
+		regexPattern *ptrn = entry->pattern;
+
+		if (ptrn->postrun)
+			return true;
+	}
+
+	return false;
+}
+
+extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const line, bool postrun)
 {
 	bool result = false;
 	unsigned int i;
@@ -2138,6 +2162,9 @@ extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const lin
 		regexPattern *ptrn = entry->pattern;
 
 		Assert (ptrn);
+
+		if (postrun != ptrn->postrun)
+			continue;
 
 		if ((ptrn->xtagType != XTAG_UNKNOWN)
 			&& (!isXtagEnabled (ptrn->xtagType)))
