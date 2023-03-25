@@ -312,6 +312,7 @@ tmain_inspect_cmd_accept()
     for c in stdout stderr exit; do
 	if [[ -e "$prefix/$t/$c-diff.txt" ]]; then
 	    mv "$prefix/$t/$c-actual.txt" "$prefix/$t/$c-expected.txt"
+	    rm "$prefix/$t/$c-diff.txt"
 	fi
     done
 }
