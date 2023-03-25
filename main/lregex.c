@@ -587,8 +587,8 @@ static bool parseTagRegex (
 
 static void pre_ptrn_flag_exclusive_short (char c CTAGS_ATTR_UNUSED, void* data)
 {
-	bool *exclusive = data;
-	*exclusive = true;
+	regexPattern * ptrn = data;
+	ptrn->exclusive = true;
 }
 
 static void pre_ptrn_flag_exclusive_long (const char* const s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
@@ -1389,7 +1389,7 @@ static void patternEvalFlags (struct lregexControlBlock *lcb,
 	};
 
 	if (regptype == REG_PARSER_SINGLE_LINE)
-		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &ptrn->exclusive);
+		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), ptrn);
 
 	const char * optscript = flagsEval (flags, commonSpecFlagDef, ARRAY_SIZE(commonSpecFlagDef), &commonFlagData);
 	if (optscript)
@@ -1450,13 +1450,11 @@ static regexPattern *addCompiledCallbackPattern (struct lregexControlBlock *lcb,
 					void *userData)
 {
 	regexPattern * ptrn;
-	bool exclusive = false;
-	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
 	ptrn = addCompiledTagCommon(lcb, TABLE_INDEX_UNUSED, pattern, REG_PARSER_SINGLE_LINE);
+	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), ptrn);
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->u.callback.function = callback;
 	ptrn->u.callback.userData = userData;
-	ptrn->exclusive = exclusive;
 	ptrn->disabled = disabled;
 	return ptrn;
 }
