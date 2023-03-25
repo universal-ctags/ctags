@@ -7,7 +7,7 @@ x       exclusive                                     skip testing the other pat
 -       fatal="MESSAGE"                               print the given MESSAGE and exit
 -       placeholder                                   don't put this tag to tags file.
 -       postrun                                       run after parsing with built-in code, multline regex patterns, and multitable regex patterns
--       scope=ACTION                                  use scope stack: ACTION = ref|push|pop|clear|set|replace
+-       scope=ACTION                                  use scope stack: ACTION = ref|push|pop|clear|set|replace|intervaltab
 -       warning="MESSAGE"                             print the given MESSAGE at WARNING level
 -       _anonymous=PREFIX                             make an anonymous tag with PREFIX
 -       _extra=EXTRA                                  record the tag only when the extra is enabled

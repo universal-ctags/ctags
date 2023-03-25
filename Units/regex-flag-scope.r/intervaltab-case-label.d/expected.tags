@@ -1,0 +1,9 @@
+empty0	input.c	/^empty0(void)$/;"	f	typeref:typename:void
+foo	input.c	/^foo(void)$/;"	f	typeref:typename:int
+empty1	input.c	/^empty1(void)$/;"	f	typeref:typename:void
+bar	input.c	/^bar(void)$/;"	f	typeref:typename:int
+empty2	input.c	/^empty2(void)$/;"	f	typeref:typename:void
+A	input.c	/^	case A:$/;"	H	function:foo
+B	input.c	/^	case B:$/;"	H	function:foo
+C	input.c	/^	case C:$/;"	H	function:bar
+D	input.c	/^	case D:$/;"	H	function:bar

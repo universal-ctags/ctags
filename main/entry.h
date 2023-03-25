@@ -253,7 +253,7 @@ extern void    setTagEndLineToCorkEntry (int corkIndex, unsigned long endLine);
 
 extern int     queryIntervalTabByLine(unsigned long lineNum);
 extern int     queryIntervalTabByRange(unsigned long startLine, unsigned long endLine);
-extern int     queryIntervalTabByCork(int corkIndex);
+extern int     queryIntervalTabByCorkEntry(int corkIndex);
 extern bool    removeFromIntervalTabMaybe(int corkIndex);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);

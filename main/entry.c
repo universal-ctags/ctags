@@ -2306,7 +2306,7 @@ extern int queryIntervalTabByRange(unsigned long start, unsigned long end)
 	return index;
 }
 
-extern int queryIntervalTabByCork(int corkIndex)
+extern int queryIntervalTabByCorkEntry(int corkIndex)
 {
 	Assert (corkIndex != CORK_NIL);
 

@@ -78,6 +78,7 @@ enum scopeAction {
 	SCOPE_CLEAR   = 1UL << 3,
 	SCOPE_REF_AFTER_POP = 1UL << 4,
 	SCOPE_PLACEHOLDER = 1UL << 5,
+	SCOPE_INTERVALTAB = 1UL << 6,
 };
 
 enum tableAction {
@@ -627,6 +628,8 @@ static void scope_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
 		*bfields |= (SCOPE_CLEAR | SCOPE_PUSH);
 	else if (strcmp (v, "replace") == 0)
 		*bfields |= (SCOPE_POP|SCOPE_REF_AFTER_POP|SCOPE_PUSH);
+	else if (strcmp (v, "intervaltab") == 0)
+		*bfields |= SCOPE_INTERVALTAB;
 	else
 		error (FATAL, "Unexpected value for scope flag in regex definition: scope=%s", v);
 }
@@ -640,7 +643,7 @@ static void placeholder_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
 
 static flagDefinition scopePtrnFlagDef[] = {
 	{ '\0', "scope",     NULL, scope_ptrn_flag_eval,
-	  "ACTION", "use scope stack: ACTION = ref|push|pop|clear|set|replace"},
+	  "ACTION", "use scope stack: ACTION = ref|push|pop|clear|set|replace|intervaltab"},
 	{ '\0', "placeholder",  NULL, placeholder_ptrn_flag_eval,
 	  NULL, "don't put this tag to tags file."},
 };
@@ -1777,6 +1780,15 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		n = CORK_NIL;
 		kind = patbuf->u.tag.kindIndex;
 		roleBits = patbuf->u.tag.roleBits;
+
+		if (scope == CORK_NIL && (patbuf->scopeActions & SCOPE_INTERVALTAB))
+		{
+			unsigned long ln0 = ln;
+			if (ln0 == 0)
+				ln0 = getInputLineNumber();
+			if (ln0)
+				scope = queryIntervalTabByLine(ln0);
+		}
 
 		initRegexTag (&e, vStringValue (name), kind, ROLE_DEFINITION_INDEX, scope, placeholder,
 					  ln, ln == 0? NULL: &pos, patbuf->xtagType, patbuf->foreign_lang);

@@ -1,0 +1,14 @@
+proc_pid_cmdline_ops	input.c	/^static const struct file_operations proc_pid_cmdline_ops = {$/;"	v	line:3	typeref:typename:const struct file_operations	file:	roles:def	end:6
+proc_lstats_operations	input.c	/^static const struct file_operations proc_lstats_operations = {$/;"	v	line:8	typeref:typename:const struct file_operations	file:	roles:def	end:14
+proc_single_file_operations	input.c	/^static const struct file_operations proc_single_file_operations = {$/;"	v	line:16	typeref:typename:const struct file_operations	file:	roles:def	end:21
+proc_pid_cmdline_read	input.c	/^	.read	= proc_pid_cmdline_read,$/;"	r	line:4	variable:proc_pid_cmdline_ops	roles:def	method:read
+generic_file_llseek	input.c	/^	.llseek	= generic_file_llseek,$/;"	r	line:5	variable:proc_pid_cmdline_ops	roles:def	method:llseek
+lstats_open	input.c	/^	.open		= lstats_open,$/;"	r	line:9	variable:proc_lstats_operations	roles:def	method:open
+seq_read	input.c	/^	.read		= seq_read,$/;"	r	line:10	variable:proc_lstats_operations	roles:def	method:read
+lstats_write	input.c	/^	.write		= lstats_write,$/;"	r	line:11	variable:proc_lstats_operations	roles:def	method:write
+seq_lseek	input.c	/^	.llseek		= seq_lseek,$/;"	r	line:12	variable:proc_lstats_operations	roles:def	method:llseek
+single_release	input.c	/^	.release	= single_release,$/;"	r	line:13	variable:proc_lstats_operations	roles:def	method:release
+proc_single_open	input.c	/^	.open		= proc_single_open,$/;"	r	line:17	variable:proc_single_file_operations	roles:def	method:open
+seq_read	input.c	/^	.read		= seq_read,$/;"	r	line:18	variable:proc_single_file_operations	roles:def	method:read
+seq_lseek	input.c	/^	.llseek		= seq_lseek,$/;"	r	line:19	variable:proc_single_file_operations	roles:def	method:llseek
+single_release	input.c	/^	.release	= single_release,$/;"	r	line:20	variable:proc_single_file_operations	roles:def	method:release
