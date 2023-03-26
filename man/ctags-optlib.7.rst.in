@@ -249,7 +249,7 @@ OPTIONS
 	Universal Ctags.
 
 	The full form of *<kind-spec>* is in the form of
-	``<letter>,<name>,<description>``. 	Either the kind *<name>* and/or the
+	``<letter>,<name>,<description>``. Either the kind *<name>* and/or the
 	*<description>* can be omitted. See the description of
 	``--kinddef-<LANG>=<letter>,<name>,<description>`` option about the
 	elements.
@@ -414,7 +414,6 @@ FLAGS FOR ``--mline-regex-<LANG>`` OPTION
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``mgroup=<N>``
-
 	decide the location of the tag extracted with
 	``--mline-regex-<LANG>`` option.
 
