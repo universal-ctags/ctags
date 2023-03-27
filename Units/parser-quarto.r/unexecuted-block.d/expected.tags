@@ -1,0 +1,4 @@
+__anon53b260bc0100	input.qmd	/^```{python}$/;"	l	line:1	language:Quarto	end:4
+__anon53b260bc0200	input.qmd	/^```{{python}}$/;"	l	line:6	language:Quarto	end:9
+f	input.qmd	/^def f():$/;"	f	line:2	language:Python	end:3
+g	input.qmd	/^def g():$/;"	f	line:7	language:Python	end:8

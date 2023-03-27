@@ -1,0 +1,7 @@
+```{python}
+#| label: defun
+#| fig-cap: "Define a function"
+def f():
+    pass
+```
+

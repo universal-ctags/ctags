@@ -212,24 +212,51 @@ static void getFootnoteMaybe (const char *line)
 	vStringDelete (footnote);
 }
 
-static bool extractLanguageForCodeBlock (const char *langMarker,
-										 vString *codeLang)
+static markdownSubparser * extractLanguageForCodeBlock (const char *langMarker,
+														vString *codeLang)
 {
-	subparser *s;
-	bool r = false;
+	subparser *s = NULL;
+	bool b = false;
+	markdownSubparser *r = NULL;
 
 	foreachSubparser (s, false)
 	{
 		markdownSubparser *m = (markdownSubparser *)s;
 		enterSubparser(s);
 		if (m->extractLanguageForCodeBlock)
-			r = m->extractLanguageForCodeBlock (m, langMarker, codeLang);
+			b = m->extractLanguageForCodeBlock (m, langMarker, codeLang);
 		leaveSubparser();
-		if (r)
+		if (b)
+		{
+			r = m;
 			break;
+		}
 	}
 
 	return r;
+}
+
+static void notifyCodeBlockLine (markdownSubparser *m, const unsigned char *line)
+{
+	subparser *s = (subparser *)m;
+	if (m->notifyCodeBlockLine)
+	{
+		enterSubparser(s);
+		m->notifyCodeBlockLine (m, line);
+		leaveSubparser();
+	}
+}
+
+static void notifyEndOfCodeBlock (markdownSubparser *m)
+{
+	subparser *s = (subparser *)m;
+
+	if (m->notifyEndOfCodeBlock)
+	{
+		enterSubparser(s);
+		m->notifyEndOfCodeBlock (m);
+		leaveSubparser();
+	}
 }
 
 static void findMarkdownTags (void)
@@ -249,6 +276,7 @@ static void findMarkdownTags (void)
 
 	nestingLevels = nestingLevelsNewFull (0, fillEndField);
 
+	markdownSubparser *marksub = NULL;
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		int lineLen = strlen ((const char*) line);
@@ -296,7 +324,8 @@ static void findMarkdownTags (void)
 					startLineNumber = startSourceLineNumber = lineNum + 1;
 
 					vStringClear (codeLang);
-					if (! extractLanguageForCodeBlock (langMarker, codeLang))
+					marksub = extractLanguageForCodeBlock (langMarker, codeLang);
+					if (! marksub)
 					{
 						vStringCopyS (codeLang, langMarker);
 						vStringStripLeading (codeLang);
@@ -309,7 +338,12 @@ static void findMarkdownTags (void)
 					if (vStringLength (codeLang) > 0
 						&& startLineNumber < endLineNumber)
 						makePromise (vStringValue (codeLang), startLineNumber, 0,
-							endLineNumber, 0, startSourceLineNumber);
+									 endLineNumber, 0, startSourceLineNumber);
+					if (marksub)
+					{
+						notifyEndOfCodeBlock(marksub);
+						marksub = NULL;
+					}
 				}
 
 				lineProcessed = true;
@@ -329,6 +363,9 @@ static void findMarkdownTags (void)
 			inComment = false;
 			lineProcessed = true;
 		}
+
+		if (marksub)
+			notifyCodeBlockLine (marksub, line);
 
 		/* code block or comment */
 		if (inCodeChar || inComment)

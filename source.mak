@@ -382,6 +382,7 @@ PARSER_SRCS =				\
 	parsers/protobuf.c		\
 	parsers/python.c		\
 	parsers/pythonloggingconfig.c	\
+	parsers/quarto.c		\
 	parsers/r-r6class.c		\
 	parsers/r-s4class.c		\
 	parsers/r.c			\
