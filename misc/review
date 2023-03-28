@@ -154,7 +154,7 @@ units_inspect_cmd_show_generic ()
     if [[ -r "$f" ]]; then
 	"$@" "$f"
     else
-	echo "No ${file}" 1>&2
+	echo "No $f" 1>&2
     fi
     echo '---'
     echo '# ' "$f"
@@ -197,7 +197,7 @@ units_inspect_show_expected_tags ()
 
     (
 	shopt -s extglob
-	units_inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/expected.tags?\(-*\)) "cat" "-n"
+	units_inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/expected.tags?(-*)) "cat" "-n"
     )
 }
 shopt -u extglob
