@@ -54,6 +54,8 @@ struct sTagEntryInfo {
 	unsigned int isPseudoTag:1;	/* Used only in xref output.
 								   If a tag is a pseudo, set this. */
 	unsigned int inCorkQueue:1;
+	unsigned int isInputFileNameShared: 1; /* shares the value for inputFileName.
+											* Set in the cork queue; don't touch this.*/
 
 	unsigned long lineNumber;     /* line number of tag */
 	const char* pattern;	      /* pattern for locating input line
@@ -61,7 +63,15 @@ struct sTagEntryInfo {
 	unsigned int boundaryInfo;    /* info about nested input stream */
 	MIOPos      filePosition;     /* file position of line containing tag */
 	langType langType;         /* language of input file */
-	const char *inputFileName;   /* name of input file */
+	const char *inputFileName;   /* name of input file.
+									You cannot modify the contents of buffer pointed
+									by this member of the tagEntryInfo returned from
+									getEntryInCorkQueue(). The buffer may be shared
+									between tag entries in the cork queue.
+
+									Further more, modifying this member of the
+									tagEntryInfo returned from getEntryInCorkQueue()
+									may cause a memory leak. */
 	const char *name;             /* name of the tag */
 	int kindIndex;	      /* kind descriptor */
 	uint8_t extra[ ((XTAG_COUNT) / 8) + 1 ];

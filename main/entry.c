@@ -1059,11 +1059,14 @@ static tagEntryInfo *newNilTagEntry (unsigned int corkFlags)
 	x->corkIndex = CORK_NIL;
 	x->symtab = RB_ROOT;
 	x->slot.kindIndex = KIND_FILE_INDEX;
+	x->slot.inputFileName = getInputFileName ();
+	x->slot.inputFileName = eStrdup (x->slot.inputFileName);
 	return &(x->slot);
 }
 
 static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
-								   unsigned int corkFlags)
+									const char *shareInputFileName,
+									unsigned int corkFlags)
 {
 	tagEntryInfoX *x = xMalloc (1, tagEntryInfoX);
 	x->symtab = RB_ROOT;
@@ -1075,7 +1078,17 @@ static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 	if (slot->pattern)
 		slot->pattern = eStrdup (slot->pattern);
 
-	slot->inputFileName = eStrdup (slot->inputFileName);
+	if (slot->inputFileName == getInputFileName ())
+	{
+		slot->inputFileName = shareInputFileName;
+		slot->isInputFileNameShared = 1;
+	}
+	else
+	{
+		slot->inputFileName = eStrdup (slot->inputFileName);
+		slot->isInputFileNameShared = 0;
+	}
+
 	slot->name = eStrdup (slot->name);
 	if (slot->extensionFields.access)
 		slot->extensionFields.access = eStrdup (slot->extensionFields.access);
@@ -1146,11 +1159,17 @@ static void deleteTagEnry (void *data)
 	tagEntryInfo *slot = data;
 
 	if (slot->kindIndex == KIND_FILE_INDEX)
+	{
+		eFree ((char *)slot->inputFileName);
 		goto out;
+	}
 
 	if (slot->pattern)
 		eFree ((char *)slot->pattern);
-	eFree ((char *)slot->inputFileName);
+
+	if (!slot->isInputFileNameShared)
+		eFree ((char *)slot->inputFileName);
+
 	eFree ((char *)slot->name);
 
 	if (slot->extensionFields.access)
@@ -1515,7 +1534,8 @@ static int queueTagEntry (const tagEntryInfo *const tag)
 	static bool warned;
 
 	int corkIndex;
-	tagEntryInfoX * entry = copyTagEntry (tag,
+	tagEntryInfo * nil = ptrArrayItem (TagFile.corkQueue, 0);
+	tagEntryInfoX * entry = copyTagEntry (tag, nil->inputFileName,
 										TagFile.corkFlags);
 
 	if (ptrArrayCount (TagFile.corkQueue) == (size_t)INT_MAX)
