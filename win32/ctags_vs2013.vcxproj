@@ -251,6 +251,7 @@
     <ClCompile Include="..\optlib\rpmMacros.c" />
     <ClCompile Include="..\optlib\scss.c" />
     <ClCompile Include="..\optlib\systemtap.c" />
+    <ClCompile Include="..\optlib\terraform.c" />
     <ClCompile Include="..\optlib\yacc.c" />
     <ClCompile Include="..\parsers\abaqus.c" />
     <ClCompile Include="..\parsers\abc.c" />
@@ -358,7 +359,6 @@
     <ClCompile Include="..\parsers\systemdunit.c" />
     <ClCompile Include="..\parsers\tcl.c" />
     <ClCompile Include="..\parsers\tcloo.c" />
-    <ClCompile Include="..\parsers\terraform.c" />
     <ClCompile Include="..\parsers\tex-beamer.c" />
     <ClCompile Include="..\parsers\tex.c" />
     <ClCompile Include="..\parsers\ttcn.c" />

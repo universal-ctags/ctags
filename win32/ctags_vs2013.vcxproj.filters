@@ -276,6 +276,9 @@
     <ClCompile Include="..\optlib\systemtap.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\terraform.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\yacc.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
@@ -596,9 +599,6 @@
     </ClCompile>
     <ClCompile Include="..\parsers\tcloo.c">
       <Filter>Source Files\parsers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\terraform.c">
-      <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\tex-beamer.c">
       <Filter>Source Files\parsers</Filter>
