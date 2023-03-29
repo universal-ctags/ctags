@@ -50,17 +50,17 @@ extern parserDefinition* TerraformParser (void)
 	};
 	static tagRegexTable TerraformTagRegexTable [] = {
 		{"^resource[[:space:]]\"([^\"]+)\"[[:space:]]\"([^\"]+)\"", "\\2",
-		"r,Resource", NULL, NULL, false},
+		"r", NULL, NULL, false},
 		{"^data[[:space:]]\"([^\"]+)\"[[:space:]]\"([^\"]+)\"", "\\2",
-		"d,Data", NULL, NULL, false},
+		"d", NULL, NULL, false},
 		{"^variable[[:space:]]\"([^\"]+)\"", "\\1",
-		"v,Variable", NULL, NULL, false},
+		"v", NULL, NULL, false},
 		{"^provider[[:space:]]\"([^\"]+)\"", "\\1",
-		"p,Provider", NULL, NULL, false},
+		"p", NULL, NULL, false},
 		{"^module[[:space:]]\"([^\"]+)\"", "\\1",
-		"m,Module", NULL, NULL, false},
+		"m", NULL, NULL, false},
 		{"^output[[:space:]]\"([^\"]+)\"", "\\1",
-		"o,Output", NULL, NULL, false},
+		"o", NULL, NULL, false},
 		{"^([a-z0-9_]+)[[:space:]]*=", "\\1",
 		"f,TFVar", NULL, NULL, false},
 	};

@@ -25,11 +25,11 @@
 --kinddef-terraform=p,Provider,Terraform Provider
 --kinddef-terraform=m,Module,Terraform Module
 --kinddef-terraform=o,Output,Terraform Output
---regex-terraform=/^resource[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/r,Resource/
---regex-terraform=/^data[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/d,Data/
---regex-terraform=/^variable[[:space:]]"([^"]+)"/\1/v,Variable/
---regex-terraform=/^provider[[:space:]]"([^"]+)"/\1/p,Provider/
---regex-terraform=/^module[[:space:]]"([^"]+)"/\1/m,Module/
---regex-terraform=/^output[[:space:]]"([^"]+)"/\1/o,Output/
+--regex-terraform=/^resource[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/r/
+--regex-terraform=/^data[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/d/
+--regex-terraform=/^variable[[:space:]]"([^"]+)"/\1/v/
+--regex-terraform=/^provider[[:space:]]"([^"]+)"/\1/p/
+--regex-terraform=/^module[[:space:]]"([^"]+)"/\1/m/
+--regex-terraform=/^output[[:space:]]"([^"]+)"/\1/o/
 --regex-terraform=/^([a-z0-9_]+)[[:space:]]*=/\1/f,TFVar/
 
