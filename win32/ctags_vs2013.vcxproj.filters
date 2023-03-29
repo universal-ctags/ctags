@@ -597,6 +597,9 @@
     <ClCompile Include="..\parsers\tcloo.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\terraform.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\tex-beamer.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>

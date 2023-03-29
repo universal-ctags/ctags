@@ -1,0 +1,35 @@
+#
+# terraform.ctags: regex parse for Terraform (HCL).
+#
+# Author: Antony Southworth <https://github.com/antonysouthworth-halter>
+#
+# This source code is released for free distribution under the terms of the
+# GNU General Public License version 2 or (at your option) any later version.
+#
+# Derived from `vim-terraform-completion`:
+#   - https://github.com/juliosueiras/vim-terraform-completion/blob/master/ctags/terraform.ctags
+#
+# Changed the name from `terraform` to `tf` so vim will recognise it properly based
+# on file extension (*.tf).
+#
+# A notable abscence is `local`, because `locals` are defined inside a block and
+# it's way harder to write a good regex for that.
+#   - https://www.terraform.io/docs/language/values/locals.html
+
+--langdef=terraform
+--map-terraform=+.tf
+--map-terraform=+.tfvars
+--kinddef-terraform=r,Resource,Terraform Resource
+--kinddef-terraform=d,Data,Terraform Data
+--kinddef-terraform=v,Variable,Terraform Variable
+--kinddef-terraform=p,Provider,Terraform Provider
+--kinddef-terraform=m,Module,Terraform Module
+--kinddef-terraform=o,Output,Terraform Output
+--regex-terraform=/^[[:space:]]*resource[[:space:]]*"([^"]*)"[[:space:]]*"([^"]*)"/\2/r,Resource/
+--regex-terraform=/^[[:space:]]*data[[:space:]]*"([^"]*)"[[:space:]]*"([^"]*)"/\2/d,Data/
+--regex-terraform=/^[[:space:]]*variable[[:space:]]*"([^"]*)"/\1/v,Variable/
+--regex-terraform=/^[[:space:]]*provider[[:space:]]*"([^"]*)"/\1/p,Provider/
+--regex-terraform=/^[[:space:]]*module[[:space:]]*"([^"]*)"/\1/m,Module/
+--regex-terraform=/^[[:space:]]*output[[:space:]]*"([^"]*)"/\1/o,Output/
+--regex-terraform=/^([a-z0-9_]+)[[:space:]]*=/\1/f,TFVar/
+
