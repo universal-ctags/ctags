@@ -16,20 +16,20 @@
 # it's way harder to write a good regex for that.
 #   - https://www.terraform.io/docs/language/values/locals.html
 
---langdef=terraform
---map-terraform=+.tf
---map-terraform=+.tfvars
---kinddef-terraform=r,Resource,Terraform Resource
---kinddef-terraform=d,Data,Terraform Data
---kinddef-terraform=v,Variable,Terraform Variable
---kinddef-terraform=p,Provider,Terraform Provider
---kinddef-terraform=m,Module,Terraform Module
---kinddef-terraform=o,Output,Terraform Output
---regex-terraform=/^resource[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/r/
---regex-terraform=/^data[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/d/
---regex-terraform=/^variable[[:space:]]"([^"]+)"/\1/v/
---regex-terraform=/^provider[[:space:]]"([^"]+)"/\1/p/
---regex-terraform=/^module[[:space:]]"([^"]+)"/\1/m/
---regex-terraform=/^output[[:space:]]"([^"]+)"/\1/o/
---regex-terraform=/^([a-z0-9_]+)[[:space:]]*=/\1/f,TFVar/
+--langdef=Terraform
+--map-Terraform=+.tf
+--map-Terraform=+.tfvars
+--kinddef-Terraform=r,Resource,Terraform Resource
+--kinddef-Terraform=d,Data,Terraform Data
+--kinddef-Terraform=v,Variable,Terraform Variable
+--kinddef-Terraform=p,Provider,Terraform Provider
+--kinddef-Terraform=m,Module,Terraform Module
+--kinddef-Terraform=o,Output,Terraform Output
+--regex-Terraform=/^resource[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/r/
+--regex-Terraform=/^data[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/d/
+--regex-Terraform=/^variable[[:space:]]"([^"]+)"/\1/v/
+--regex-Terraform=/^provider[[:space:]]"([^"]+)"/\1/p/
+--regex-Terraform=/^module[[:space:]]"([^"]+)"/\1/m/
+--regex-Terraform=/^output[[:space:]]"([^"]+)"/\1/o/
+--regex-Terraform=/^([a-z0-9_]+)[[:space:]]*=/\1/f,TFVar/
 

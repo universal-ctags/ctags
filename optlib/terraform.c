@@ -66,7 +66,7 @@ extern parserDefinition* TerraformParser (void)
 	};
 
 
-	parserDefinition* const def = parserNew ("terraform");
+	parserDefinition* const def = parserNew ("Terraform");
 
 	def->versionCurrent= 0;
 	def->versionAge    = 0;
