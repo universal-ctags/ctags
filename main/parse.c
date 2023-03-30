@@ -2427,6 +2427,33 @@ extern void processLanguageDefineOption (
 	eFree (name);
 }
 
+extern bool doesLanguageHaveForeignDependency (const langType lang,
+											   const langType foreignLang)
+{
+	Assert (lang != LANG_IGNORE
+			&& lang != LANG_AUTO
+			&& lang < (int) LanguageCount);
+	Assert (foreignLang != LANG_IGNORE
+			&& foreignLang != LANG_AUTO
+			&& foreignLang < (int) LanguageCount);
+
+
+	parserDefinition * pdef = LanguageTable [lang].def;
+
+	for (size_t i = 0; i < pdef->dependencyCount; i++)
+	{
+		parserDependency *dep = pdef->dependencies + i;
+
+		if (dep->type == DEPTYPE_FOREIGNER)
+		{
+			if (getNamedLanguage (dep->upperParser, 0) == foreignLang)
+				return true;
+		}
+	}
+
+	return false;
+}
+
 extern bool isLanguageKindEnabled (const langType language, int kindIndex)
 {
 	kindDefinition * kdef = getLanguageKind (language, kindIndex);

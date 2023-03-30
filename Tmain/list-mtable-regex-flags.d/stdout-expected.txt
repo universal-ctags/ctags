@@ -18,4 +18,5 @@ p       pcre2                                         use pcre2 regex engine
 -       _extra=EXTRA                                  record the tag only when the extra is enabled
 -       _field=FIELD:VALUE                            record the matched string(VALUE) to parser own FIELD of the tag
 -       _guest=PARSERSPEC,N0[start|end],N1[start|end] run guest parser on the area
+-       _language=LANG                                make a foreign tag for LANG
 -       _role=ROLE                                    set the given ROLE to the roles field
