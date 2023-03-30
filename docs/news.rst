@@ -475,6 +475,7 @@ The following parsers have been added:
 * SVG *libxml*
 * TclOO (see :ref:`The new Tcl parser <tcl>`)
 * Terraform (HCL) *optlib*
+* TerraformVariables *optlib*
 * Thrift *peg/packcc*
 * TTCN
 * Txt2tags

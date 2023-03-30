@@ -1,0 +1,20 @@
+#
+#  Copyright (c) 2021, Julio Tain Sueiras
+#  Copyright (c) 2023 Masatake YAMATO
+#  Copyright (c) 2023 Red Hat, Inc.
+#
+#  This source code is released for free distribution under the terms of the
+#  GNU General Public License version 2 or (at your option) any later version.
+#
+#  The regex pattern is derrived from
+#  - https://github.com/juliosueiras/vim-terraform-completion/blob/master/ctags/terraform.ctags
+#
+#  This module contains functions to extract language objects for Terraform from
+#  Terraform Variable Definitions (.tfvars) files.
+#  See: https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files
+#
+--langdef=TerraformVariables{_foreignLanguage=Terraform}
+
+--map-TerraformVariables=+.tfvars
+
+--regex-TerraformVariables=/^([a-z0-9_]+)[[:space:]]*=/\1/v/{_role=assigned}{_language=Terraform}

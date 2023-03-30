@@ -102,6 +102,7 @@ SystemdUnit    u/unit            RequiredBy         on      referred in Required
 SystemdUnit    u/unit            Requires           on      referred in Requires key
 SystemdUnit    u/unit            WantedBy           on      referred in WantedBy key
 SystemdUnit    u/unit            Wants              on      referred in Wants key
+Terraform      v/variable        assigned           on      assigned in Variable Definitions (.tfvars) files
 Tex            e/environment     used               off     environment usage introduced by \begin{MyEnv}
 Tex            i/xinput          bibliography       on      bibliography (.bib) file
 Tex            i/xinput          included           on      external input file specified with \include
@@ -221,6 +222,7 @@ SystemdUnit    u/unit            RequiredBy         on      referred in Required
 SystemdUnit    u/unit            Requires           on      referred in Requires key
 SystemdUnit    u/unit            WantedBy           on      referred in WantedBy key
 SystemdUnit    u/unit            Wants              on      referred in Wants key
+Terraform      v/variable        assigned           on      assigned in Variable Definitions (.tfvars) files
 Tex            e/environment     used               off     environment usage introduced by \begin{MyEnv}
 Tex            i/xinput          bibliography       on      bibliography (.bib) file
 Tex            i/xinput          included           on      external input file specified with \include

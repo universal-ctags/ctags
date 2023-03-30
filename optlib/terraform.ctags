@@ -24,13 +24,19 @@
 #
 # Another notable thing is that this parser doesn't skip /* block comments */.
 #
+# .tfvars files relates code are moved to TerraformVariables parser.
+#
 --langdef=Terraform
 
 --map-Terraform=+.tf
 
 --kinddef-Terraform=r,resource,resources
 --kinddef-Terraform=d,data,data
+
 --kinddef-Terraform=v,variable,variables
+# See https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files
+--_roledef-Terraform.v=assigned,assigned in Variable Definitions (.tfvars) files
+
 --kinddef-Terraform=p,provider,providers
 --kinddef-Terraform=m,module,modules
 --kinddef-Terraform=o,output,output

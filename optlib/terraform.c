@@ -27,6 +27,9 @@ extern parserDefinition* TerraformParser (void)
 		NULL
 	};
 
+	static roleDefinition TerraformVariableRoleTable [] = {
+		{ true, "assigned", "assigned in Variable Definitions (.tfvars) files" },
+	};
 	static kindDefinition TerraformKindTable [] = {
 		{
 		  true, 'r', "resource", "resources",
@@ -36,6 +39,7 @@ extern parserDefinition* TerraformParser (void)
 		},
 		{
 		  true, 'v', "variable", "variables",
+		  ATTACH_ROLES(TerraformVariableRoleTable),
 		},
 		{
 		  true, 'p', "provider", "providers",

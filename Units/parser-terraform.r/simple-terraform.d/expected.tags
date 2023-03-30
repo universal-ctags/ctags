@@ -1,6 +1,7 @@
-aws	input.tf	/^provider "aws" {$/;"	p
-events_bus_name	input.tf	/^variable "events_bus_name" {$/;"	v
-example_events_bus	input.tf	/^resource "aws_cloudwatch_event_bus" "example_events_bus" {$/;"	r
-database	input.tf	/^module "database" {$/;"	m
-example_database_password	input.tf	/^data "aws_ssm_parameter" "example_database_password" {$/;"	d
-password	input.tf	/^output "password" {$/;"	o
+aws	input.tf	/^provider "aws" {$/;"	p	language:Terraform	roles:def
+events_bus_name	input.tf	/^variable "events_bus_name" {$/;"	v	language:Terraform	roles:def
+example_events_bus	input.tf	/^resource "aws_cloudwatch_event_bus" "example_events_bus" {$/;"	r	language:Terraform	roles:def
+database	input.tf	/^module "database" {$/;"	m	language:Terraform	roles:def
+example_database_password	input.tf	/^data "aws_ssm_parameter" "example_database_password" {$/;"	d	language:Terraform	roles:def
+password	input.tf	/^output "password" {$/;"	o	language:Terraform	roles:def
+events_bus_name	input-0.tfvars	/^events_bus_name = "hyper-connector"$/;"	v	language:Terraform	roles:assigned
