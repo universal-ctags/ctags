@@ -53,6 +53,9 @@ my $langdef_flags =
 	 $_[0]->{'versionCurrent'} = $1;
 	 $_[0]->{'versionAge'} = $2;
        } ],
+     [ qr/\{_foreignLanguage=([^}]+)\}/, sub {
+	 push @{$_[0]->{'foreignLanguages'}}, $1;
+       } ],
     ];
 
 my $options =
@@ -84,6 +87,7 @@ my $options =
 	   $_[0]->{'autoFQTag'} = 0;
 	   $_[0]->{'versionCurrent'} = 0;
 	   $_[0]->{'versionAge'} = 0;
+	   $_[0]->{'foreignLanguages'} = [];
 	   parse_flags ($rest, $_[0], $langdef_flags,);
 
 	   return 1;
@@ -650,6 +654,11 @@ EOF
 #include "subparser.h"
 EOF
     }
+    if ((scalar @{$opts->{'foreignLanguages'}}) > 0) {
+	print <<EOF;
+#include "dependency.h"
+EOF
+}
     if (defined $opts->{'selector'}) {
 	print <<EOF;
 #include "selectors.h"
@@ -940,7 +949,8 @@ EOF
 sub emit_dependencies {
     my $opts = shift;
 
-    return if (! defined $opts->{'base'});
+    return if ((! defined $opts->{'base'})
+	       && ((scalar @{$opts->{'foreignLanguages'}}) == 0));
 
     my $direction = "SUBPARSER_BASE_RUNS_SUB";
 
@@ -958,12 +968,32 @@ sub emit_dependencies {
 	}
     }
 
-    print <<EOF;
+    if (defined $opts->{'base'}) {
+	print <<EOF;
 	static subparser $opts->{'Clangdef'}Subparser = {
 		.direction = $direction,
 	};
+EOF
+    }
+
+    print <<EOF;
 	static parserDependency $opts->{'Clangdef'}Dependencies [] = {
-		[0] = { DEPTYPE_SUBPARSER, "$opts->{'base'}", &$opts->{'Clangdef'}Subparser },
+EOF
+    my $i = 0;
+    if (defined $opts->{'base'}) {
+	print <<EOF;
+		[$i] = { DEPTYPE_SUBPARSER, "$opts->{'base'}", &$opts->{'Clangdef'}Subparser },
+EOF
+	$i++;
+    }
+    for (@{$opts->{'foreignLanguages'}}) {
+	print <<EOF;
+		[$i] = { DEPTYPE_FOREIGNER, "$_", NULL },
+EOF
+	$i++;
+    }
+
+print <<EOF;
 	};
 EOF
 
@@ -1118,7 +1148,7 @@ EOF
 EOF
     }
 
-    if (defined $opts->{'base'}) {
+    if (defined $opts->{'base'} || (scalar @{$opts->{'foreignLanguages'}}) > 0) {
 	print <<EOF;
 	def->dependencies    = $opts->{'Clangdef'}Dependencies;
 	def->dependencyCount = ARRAY_SIZE($opts->{'Clangdef'}Dependencies);
