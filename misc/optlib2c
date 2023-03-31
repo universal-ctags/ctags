@@ -322,10 +322,10 @@ my $options =
     ];
 
 sub parse_line {
-    my ($line, $opts) = @_;
+    my ($line, $opts, $table) = @_;
     my $r = 0;
 
-    for (@{$options}) {
+    for (@{$table}) {
 	my ($pat, $action) = @{$_};
 	if ($line =~ $pat) {
 	    $r = $action -> ($opts);
@@ -506,7 +506,7 @@ sub parse_optlib {
 	} else {
 	    s/^\s*//;
 	    next if ( /^\s*$/ );
-	    $receiver = parse_line ($_, $opts);
+	    $receiver = parse_line ($_, $opts, $options);
 	    if (! $receiver) {
 		return undef;
 	    }
