@@ -1,0 +1,47 @@
+.. _ctags-lang-terraform(7):
+
+==============================================================
+ctags-lang-terraform
+==============================================================
+---------------------------------------------------------------------
+Random notes about tagging Terraform files with Universal Ctags
+---------------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+Terraform ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=Terraform ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Terraform=+.tf ...
+|
+|	**@CTAGS_NAME_EXECUTABLE@** ... --extras=+{reference} --languages=+TerraformVariables ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --extras=+{reference} --language-force=TerraformVariables ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --extras=+{reference} --map-Terraform=+.tfvars ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging Terraform files.
+
+TIPS
+-----------
+
+Extracting variables assigned in Variable definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Specify ``--extras=+{reference}`` and ``--languages=+TerraformVariables``
+to extract variables assigned in variables definitions (`*.tfvars`).
+The TerraformVariables parser extracts variables in `*.tfvars` files
+with ``variable`` kind with ``assigned`` role of ``Terraform`` language.
+
+KNOWN BUGS
+----------
+* The parser doesn't ignore strings inside a block comment (``/* ... */``).
+
+* The parser doesn't extract variables defined with ``locals`` keyword.
+
+SEE ALSO
+--------
+ctags(1),
+`Configuration Syntax <https://developer.hashicorp.com/terraform/language/syntax/configuration>`_ (https://developer.hashicorp.com/terraform/language/syntax/configuration),
+`Variable Definitions (.tfvars) Files <https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files>`_ (https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files)
