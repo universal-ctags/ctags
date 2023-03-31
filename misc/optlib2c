@@ -38,6 +38,23 @@ EOF
 # PARSE
 #
 ########################################################################
+my $langdef_flags =
+    [
+     [ qr/\{base=([^\{]+)\}/, sub {
+	 $_[0]->{'base'} = $1;
+       } ],
+     [ qr/\{(dedicated|shared|bidirectional)\}/, sub {
+	 $_[0]->{'direction'} = $1;
+       } ],
+     [ qr/\{_autoFQTag\}/, sub {
+	 $_[0]->{'autoFQTag'} = 1;
+       } ],
+     [ qr/\{version=([0-9]+)\.([0-9]+)\}/, sub {
+	 $_[0]->{'versionCurrent'} = $1;
+	 $_[0]->{'versionAge'} = $2;
+       } ],
+    ];
+
 my $options =
     [
      [ qr/^--options=(.*)/, sub {
@@ -50,10 +67,7 @@ my $options =
 	 $_[0]->{'selector'} = $2;
 	 return 1;
        } ],
-     #
-     # TODO: We should not assume the order of flags.
-     #
-     [ qr/^--langdef=([^\{]+)(((\{base=([^\{]+)\})(\{(dedicated|shared|bidirectional)\})?)?)(\{_autoFQTag\})?(\{version=([0-9]+)\.([0-9]+)\})?/, sub {
+     [ qr/^--langdef=([^\{]+)(.*)/, sub {
 	   die "LANG is already defined as $_[0]->{'langdef'}: $1"
 	       if (defined $_[0]->{'langdef'});
 	   die "Don't use \"all\" as a language name. It is reserved word."
@@ -62,14 +76,16 @@ my $options =
 	       if ($1 eq "NONE");
 
 	   $_[0]->{'langdef'} = $1;
-	   $_[0]->{'base'} = $5 if defined $5;
-	   $_[0]->{'direction'} = $7 if defined $7;
-	   $_[0]->{'autoFQTag'} = (defined $8)? 1: 0;
-	   $_[0]->{'versionCurrent'} = (defined $10)? $10: 0;
-	   $_[0]->{'versionAge'} = (defined $11)? $11: 0;
+	   my $rest = $2;
 
 	   die "Don't use a character as a language name other than alphanumeric, # and +: "
 	       . $_[0]->{'langdef'} unless ($_[0]->{'langdef'} =~ /^[a-zA-Z0-9#+]+$/);
+
+	   $_[0]->{'autoFQTag'} = 0;
+	   $_[0]->{'versionCurrent'} = 0;
+	   $_[0]->{'versionAge'} = 0;
+	   parse_flags ($rest, $_[0], $langdef_flags,);
+
 	   return 1;
        } ],
      [ qr/^--kinddef-(.*)=([^,]),([^,]+),([^\{]+)(\{_refonly\})?/, sub {
@@ -320,6 +336,23 @@ my $options =
 	 die "Unhandled argument: \"$&\"";
        } ],
     ];
+
+sub parse_flags
+{
+    my ($line, $opts, $table) = @_;
+
+    TOP: while (1) {
+	for (@{$table}) {
+	    my ($pat, $action) = @{$_};
+	    if ($line =~ $pat) {
+		$line = "$`$'";
+		$action -> ($opts);
+		redo TOP;
+	    }
+	}
+	last;
+    }
+}
 
 sub parse_line {
     my ($line, $opts, $table) = @_;
