@@ -1119,11 +1119,17 @@ static void common_flag_role_long (const char* const s, const char* const v, voi
 		return;
 	}
 
-	role = getLanguageRoleForName((ptrn->foreign_lang == LANG_IGNORE? cdata->owner: ptrn->foreign_lang),
+	langType lang = (ptrn->foreign_lang == LANG_IGNORE)
+		? cdata->owner
+		: ptrn->foreign_lang;
+	role = getLanguageRoleForName(lang,
 								  ptrn->u.tag.kindIndex, v);
 	if (!role)
 	{
-		error (WARNING, "no such role: %s", v);
+		error (WARNING, "no such role: %s in kind: %s of language: %s",
+			   v,
+			   getLanguageKind(lang, ptrn->u.tag.kindIndex)->name,
+			   getLanguageName (lang));
 		return;
 	}
 
