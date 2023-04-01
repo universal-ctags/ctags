@@ -138,6 +138,8 @@ extern bool runParserInNarrowedInputStream (const langType language,
 extern void freeEncodingResources (void);
 #endif
 
+extern bool doesLanguageHaveForeignDependency (const langType language, const langType foreign_lang);
+
 /* Regex interface */
 extern bool processLanguageRegexOption (langType language, enum regexParserType regptype, const char *const parameter);
 extern void notifyLanguageRegexInputStart (langType language);

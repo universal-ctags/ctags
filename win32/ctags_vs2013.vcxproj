@@ -251,6 +251,8 @@
     <ClCompile Include="..\optlib\rpmMacros.c" />
     <ClCompile Include="..\optlib\scss.c" />
     <ClCompile Include="..\optlib\systemtap.c" />
+    <ClCompile Include="..\optlib\terraform.c" />
+    <ClCompile Include="..\optlib\terraformvariables.c" />
     <ClCompile Include="..\optlib\yacc.c" />
     <ClCompile Include="..\parsers\abaqus.c" />
     <ClCompile Include="..\parsers\abc.c" />

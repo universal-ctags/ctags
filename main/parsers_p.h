@@ -172,6 +172,8 @@
 	SystemTapParser, \
 	TclParser, \
 	TclOOParser, \
+	TerraformParser, \
+	TerraformVariablesParser, \
 	TexParser, \
 	TexBeamerParser, \
 	TTCNParser, \

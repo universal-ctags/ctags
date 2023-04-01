@@ -2136,6 +2136,7 @@ struct preLangDefFlagData
 	char *base;
 	subparserRunDirection direction;
 	bool autoFQTag;
+	intArray *foreignLanguages;
 	unsigned int versionCurrent;
 	unsigned int versionAge;
 };
@@ -2197,6 +2198,26 @@ static void pre_lang_def_flag_autoFQTag_long (const char* const optflag,
 	flag_data->autoFQTag = true;
 }
 
+static void pre_lang_def_flag_foreignLanguage_long (const char* const optflag,
+											const char* const param,
+											void* data)
+{
+	struct preLangDefFlagData * flag_data = data;
+	if (!param)
+	{
+		error (WARNING, "value for '%s' flag is empty", optflag);
+		return;
+	}
+
+	langType lang = getNamedLanguage (param, 0);
+	if (lang == LANG_IGNORE)
+		error (FATAL, "language named '%s' is not found or not initialized yet",
+			   param);
+
+	verbose ("Foreign language for %s: %s\n", flag_data->name, getLanguageName (lang));
+	intArrayAdd (flag_data->foreignLanguages, lang);
+}
+
 static void pre_lang_def_flag_version_long (const char* const optflag CTAGS_ATTR_UNUSED,
 											const char* const param,
 											void* data)
@@ -2237,6 +2258,8 @@ static flagDefinition PreLangDefFlagDef [] = {
 	},
 	{ '\0',  "_autoFQTag", NULL, pre_lang_def_flag_autoFQTag_long,
 	  NULL, "make full qualified tags automatically based on scope information"},
+	{ '\0', "_foreignLanguage",    NULL, pre_lang_def_flag_foreignLanguage_long,
+	  "LANG", "initialize another parser" },
 	{ '\0', "version",     NULL, pre_lang_def_flag_version_long,
 	  NULL, "set the version of the parser (current.age)"},
 };
@@ -2245,39 +2268,68 @@ static void optlibFreeDep (langType lang, bool initialized CTAGS_ATTR_UNUSED)
 {
 	parserDefinition * pdef = LanguageTable [lang].def;
 
-	if (pdef->dependencyCount == 1)
+	for (size_t i = 0; i < pdef->dependencyCount; i++)
 	{
-		parserDependency *dep = pdef->dependencies;
+		parserDependency *dep = pdef->dependencies + i;
 
 		eFree ((char *)dep->upperParser); /* Dirty cast */
 		dep->upperParser = NULL;
-		eFree (dep->data);
-		dep->data = NULL;
-		eFree (dep);
+
+		if (dep->data)
+		{
+			eFree (dep->data);
+			dep->data = NULL;
+		}
+	}
+	if (pdef->dependencies)
+	{
+		eFree (pdef->dependencies);
 		pdef->dependencies = NULL;
 	}
 }
 
 static parserDefinition* OptlibParser(const char *name, const char *base,
-									  subparserRunDirection direction)
+									  subparserRunDirection direction,
+									  intArray *foreignLanguages)
 {
 	parserDefinition *def;
+	parserDependency *dep = NULL;
 
 	def = parserNew (name);
 	def->initialize        = lazyInitialize;
 	def->method            = METHOD_NOT_CRAFTED;
+
+	size_t dep_count = (base? 1: 0) + intArrayCount (foreignLanguages);
+
+	if (dep_count)
+	{
+		dep = xCalloc (dep_count, parserDependency);
+		def->dependencies = dep;
+		def->dependencyCount = dep_count;
+		def->finalize = optlibFreeDep;
+	}
+
 	if (base)
 	{
 		subparser *sub = xCalloc (1, subparser);
-		parserDependency *dep = xCalloc (1, parserDependency);
 
 		sub->direction = direction;
-		dep->type = DEPTYPE_SUBPARSER;
-		dep->upperParser = eStrdup (base);
-		dep->data = sub;
-		def->dependencies = dep;
-		def->dependencyCount = 1;
-		def->finalize = optlibFreeDep;
+		dep[0].type = DEPTYPE_SUBPARSER;
+		dep[0].upperParser = eStrdup (base);
+		dep[0].data = sub;
+	}
+
+	for (size_t i = 0 ; i < intArrayCount (foreignLanguages); i++)
+	{
+		size_t index = (base? 1: 0) + i;
+		langType lang = intArrayItem (foreignLanguages, i);
+		Assert (lang != LANG_IGNORE
+				&& lang != LANG_AUTO
+				&& lang < (int) LanguageCount);
+
+		dep[index].type = DEPTYPE_FOREIGNER;
+		dep[index].upperParser = eStrdup (getLanguageName (lang));
+		dep[index].data = NULL;
 	}
 
 	return def;
@@ -2344,6 +2396,8 @@ extern void processLanguageDefineOption (
 		.versionCurrent = 0,
 		.versionAge = 0,
 	};
+	data.foreignLanguages = intArrayNew ();
+
 	flagsEval (flags, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef), &data);
 
 	if (data.base == NULL && data.direction != SUBPARSER_UNKNOWN_DIRECTION)
@@ -2352,7 +2406,8 @@ extern void processLanguageDefineOption (
 	if (data.base && data.direction == SUBPARSER_UNKNOWN_DIRECTION)
 		data.direction = SUBPARSER_BASE_RUNS_SUB;
 
-	def = OptlibParser (name, data.base, data.direction);
+	def = OptlibParser (name, data.base, data.direction,
+						data.foreignLanguages);
 	if (data.base)
 		eFree (data.base);
 
@@ -2368,7 +2423,35 @@ extern void processLanguageDefineOption (
 	LanguageTable [def->id].pretendingAsLanguage = LANG_IGNORE;
 	LanguageTable [def->id].pretendedAsLanguage = LANG_IGNORE;
 
+	intArrayDelete (data.foreignLanguages);
 	eFree (name);
+}
+
+extern bool doesLanguageHaveForeignDependency (const langType lang,
+											   const langType foreignLang)
+{
+	Assert (lang != LANG_IGNORE
+			&& lang != LANG_AUTO
+			&& lang < (int) LanguageCount);
+	Assert (foreignLang != LANG_IGNORE
+			&& foreignLang != LANG_AUTO
+			&& foreignLang < (int) LanguageCount);
+
+
+	parserDefinition * pdef = LanguageTable [lang].def;
+
+	for (size_t i = 0; i < pdef->dependencyCount; i++)
+	{
+		parserDependency *dep = pdef->dependencies + i;
+
+		if (dep->type == DEPTYPE_FOREIGNER)
+		{
+			if (getNamedLanguage (dep->upperParser, 0) == foreignLang)
+				return true;
+		}
+	}
+
+	return false;
 }
 
 extern bool isLanguageKindEnabled (const langType language, int kindIndex)

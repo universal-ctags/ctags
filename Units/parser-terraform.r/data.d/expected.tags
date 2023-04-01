@@ -1,0 +1,1 @@
+example_database_password	input.tf	/^data "aws_ssm_parameter" "example_database_password" {$/;"	d

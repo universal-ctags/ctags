@@ -1,0 +1,1 @@
+events_bus_name	input.tf	/^variable "events_bus_name" {$/;"	v

@@ -244,6 +244,8 @@ OPTLIB2C_INPUT = \
 	optlib/rpmMacros.ctags			\
 	optlib/scss.ctags			\
 	optlib/systemtap.ctags			\
+	optlib/terraform.ctags			\
+	optlib/terraformvariables.ctags		\
 	optlib/yacc.ctags			\
 	\
 	$(NULL)

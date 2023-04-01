@@ -167,6 +167,7 @@ typedef struct {
 	char *pattern_string;
 
 	char *anonymous_tag_prefix;
+	langType foreign_lang;
 
 	struct {
 		errorSelection selection;
@@ -397,10 +398,14 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 
 static void initRegexTag (tagEntryInfo *e,
 		const char * name, int kindIndex, int roleIndex, int scopeIndex, int placeholder,
-		unsigned long line, MIOPos *pos, int xtag_type)
+		unsigned long line, MIOPos *pos, int xtag_type, langType foreign_lang)
 {
 	Assert (name != NULL  &&  ((name[0] != '\0') || placeholder));
-	initRefTagEntry (e, name, kindIndex, roleIndex);
+
+	if (foreign_lang == LANG_IGNORE)
+		initRefTagEntry (e, name, kindIndex, roleIndex);
+	else
+		initForeignRefTagEntry (e, name, foreign_lang, kindIndex, roleIndex);
 	e->extensionFields.scopeIndex = scopeIndex;
 	e->placeholder = !!placeholder;
 	if (line)
@@ -671,6 +676,8 @@ static regexPattern * newPattern (regexCompiledCode* const pattern,
 
 	ptrn->optscript = NULL;
 	ptrn->optscript_src = NULL;
+
+	ptrn->foreign_lang = LANG_IGNORE;
 
 	return ptrn;
 }
@@ -1112,7 +1119,7 @@ static void common_flag_role_long (const char* const s, const char* const v, voi
 		return;
 	}
 
-	role = getLanguageRoleForName(cdata->owner,
+	role = getLanguageRoleForName((ptrn->foreign_lang == LANG_IGNORE? cdata->owner: ptrn->foreign_lang),
 								  ptrn->u.tag.kindIndex, v);
 	if (!role)
 	{
@@ -1153,6 +1160,39 @@ static void common_flag_anonymous_long (const char* const s, const char* const v
 
 	ptrn->anonymous_tag_prefix = eStrdup (v);
 }
+
+static void precommon_flag_foreign_lang (const char* const s, const char* const v, void* data)
+{
+	struct commonFlagData * cdata = data;
+	regexPattern *ptrn = cdata->ptrn;
+
+	Assert (ptrn);
+
+	if (ptrn->foreign_lang != LANG_IGNORE)
+		error (FATAL, "foreign language for this pattern (%s) is already given: %s",
+			   ptrn->pattern_string? ptrn->pattern_string: "",
+			   getLanguageName(ptrn->foreign_lang));
+
+	if (!v)
+		error (FATAL, "no LANG for foreign flag is given (pattern == %s)",
+			   ptrn->pattern_string? ptrn->pattern_string: "");
+
+	langType lang = getNamedLanguage (v, 0);
+	if (lang == LANG_IGNORE)
+		error (FATAL, "language named '%s' specified is not found or not initialized yet",
+			   v);
+
+	if (!doesLanguageHaveForeignDependency (cdata->owner, lang))
+		error (FATAL, "%s is not declared as a foreign language in %s parser",
+			   v, getLanguageName (cdata->owner));
+
+	ptrn->foreign_lang = lang;
+}
+
+static flagDefinition preCommonSpecFlagDef[] = {
+	{ '\0',  EXPERIMENTAL "language", NULL, precommon_flag_foreign_lang,
+	  "LANG", "make a foreign tag for LANG"},
+};
 
 static flagDefinition commonSpecFlagDef[] = {
 	{ '\0',  "fatal", NULL, common_flag_msg_long ,
@@ -1262,7 +1302,9 @@ static void setKind(regexPattern * ptrn, const langType owner,
 	Assert (ptrn);
 	Assert (ptrn->u.tag.name_pattern);
 	Assert (kindName);
-	kindDefinition *kdef = getLanguageKindForLetter (owner, kindLetter);
+
+	langType lang = (ptrn->foreign_lang == LANG_IGNORE? owner: ptrn->foreign_lang);
+	kindDefinition *kdef = getLanguageKindForLetter (lang, kindLetter);
 
 	if (kdef)
 	{
@@ -1270,7 +1312,7 @@ static void setKind(regexPattern * ptrn, const langType owner,
 			/* When using a same kind letter for multiple regex patterns, the name of kind
 			   should be the same. */
 			error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
-					kdef->letter, getLanguageName (owner),
+					kdef->letter, getLanguageName (lang),
 					kdef->name, kindName);
 		ptrn->u.tag.kindIndex = kdef->id;
 	}
@@ -1282,9 +1324,23 @@ static void setKind(regexPattern * ptrn, const langType owner,
 	else
 	{
 		kdef = kindNew (kindLetter, kindName, description);
-		defineLanguageKind (owner, kdef, kindFree);
+		defineLanguageKind (lang, kdef, kindFree);
 		ptrn->u.tag.kindIndex = kdef->id;
 	}
+}
+
+static void prePatternEvalFlags(struct lregexControlBlock *lcb,
+							  regexPattern * ptrn,
+							  enum regexParserType regptype,
+							  const char* flags)
+{
+	struct commonFlagData commonFlagData = {
+		.owner = lcb->owner,
+		.lcb = lcb,
+		.ptrn = ptrn
+	};
+
+	flagsEval (flags, preCommonSpecFlagDef, ARRAY_SIZE(preCommonSpecFlagDef), &commonFlagData);
 }
 
 static void patternEvalFlags (struct lregexControlBlock *lcb,
@@ -1347,6 +1403,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	ptrn->u.tag.name_pattern = eStrdup (name);
 	ptrn->disabled = disabled;
 
+	prePatternEvalFlags (lcb, ptrn, regptype, flags);
 	setKind(ptrn, lcb->owner, kindLetter, kindName, description, kind_explicitly_defined);
 	patternEvalFlags (lcb, ptrn, regptype, flags);
 
@@ -1680,7 +1737,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		roleBits = patbuf->u.tag.roleBits;
 
 		initRegexTag (&e, vStringValue (name), kind, ROLE_DEFINITION_INDEX, scope, placeholder,
-					  ln, ln == 0? NULL: &pos, patbuf->xtagType);
+					  ln, ln == 0? NULL: &pos, patbuf->xtagType, patbuf->foreign_lang);
 
 		if (field_trashbox == NULL)
 		{
@@ -2472,6 +2529,7 @@ extern void printRegexFlags (bool withListHeader, bool machinable, const char *f
 		flagsColprintAddDefinitions (table, prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
 		flagsColprintAddDefinitions (table, guestPtrnFlagDef, ARRAY_SIZE (guestPtrnFlagDef));
 		flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
+		flagsColprintAddDefinitions (table, preCommonSpecFlagDef, ARRAY_SIZE (preCommonSpecFlagDef));
 		flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 	}
 
@@ -2497,6 +2555,7 @@ extern void printMultilineRegexFlags (bool withListHeader, bool machinable, cons
 		flagsColprintAddDefinitions (table, backendCommonRegexFlagDefs, ARRAY_SIZE(backendCommonRegexFlagDefs));
 		flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
 		flagsColprintAddDefinitions (table, guestPtrnFlagDef, ARRAY_SIZE (guestPtrnFlagDef));
+		flagsColprintAddDefinitions (table, preCommonSpecFlagDef, ARRAY_SIZE (preCommonSpecFlagDef));
 		flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 	}
 
@@ -2524,6 +2583,7 @@ extern void printMultitableRegexFlags (bool withListHeader, bool machinable, con
 		flagsColprintAddDefinitions (table, multitablePtrnFlagDef, ARRAY_SIZE (multitablePtrnFlagDef));
 		flagsColprintAddDefinitions (table, guestPtrnFlagDef, ARRAY_SIZE (guestPtrnFlagDef));
 		flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
+		flagsColprintAddDefinitions (table, preCommonSpecFlagDef, ARRAY_SIZE (preCommonSpecFlagDef));
 		flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 	}
 
@@ -3247,7 +3307,7 @@ static EsObject* lrop_make_tag (OptVM *vm, EsObject *name)
 	tagEntryInfo *e = xMalloc (1, tagEntryInfo);
 	initRegexTag (e, eStrdup (n),
 				  kind_index, ROLE_DEFINITION_INDEX, CORK_NIL, 0,
-				  loc? loc->line: 0, loc? &loc->pos: NULL, XTAG_UNKNOWN);
+				  loc? loc->line: 0, loc? &loc->pos: NULL, XTAG_UNKNOWN, LANG_IGNORE);
 	EsObject *obj = es_pointer_new (OPT_TYPE_TAG, e);
 	if (es_error_p (obj))
 		return obj;
@@ -3324,7 +3384,7 @@ static EsObject* lrop_make_reftag (OptVM *vm, EsObject *name)
 				  loc? loc->line: 0, loc? &loc->pos: NULL,
 				  role_index == ROLE_DEFINITION_INDEX
 				  ? XTAG_UNKNOWN
-				  : XTAG_REFERENCE_TAGS);
+				  : XTAG_REFERENCE_TAGS, LANG_IGNORE);
 	EsObject *obj = es_pointer_new (OPT_TYPE_TAG, e);
 	if (es_error_p (obj))
 		return obj;

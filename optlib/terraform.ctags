@@ -1,0 +1,50 @@
+#
+# terraform.ctags: regex parse for Terraform (HCL).
+#
+# Copyright (c) 2021, Julio Tain Sueiras
+# Copyright (c) 2021, Antony Southworth
+#
+# Antony Southworth adapted Julio's code to Universal Ctags.
+#
+# This source code is released for free distribution under the terms of the
+# GNU General Public License version 2 or (at your option) any later version.
+#
+# Derived from `vim-terraform-completion`:
+#   - https://github.com/juliosueiras/vim-terraform-completion/blob/master/ctags/terraform.ctags
+#
+# About the language:
+#   - https://developer.hashicorp.com/terraform/language/syntax/configuration
+#
+# Changed the name from `terraform` to `tf` so vim will recognise it properly based
+# on file extension (*.tf).
+#
+# A notable abscence is `local`, because `locals` are defined inside a block and
+# it's way harder to write a good regex for that.
+#   - https://www.terraform.io/docs/language/values/locals.html
+#
+# Another notable thing is that this parser doesn't skip /* block comments */.
+#
+# .tfvars files relates code are moved to TerraformVariables parser.
+#
+--langdef=Terraform
+
+--map-Terraform=+.tf
+
+--kinddef-Terraform=r,resource,resources
+--kinddef-Terraform=d,data,data
+
+--kinddef-Terraform=v,variable,variables
+# See https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files
+--_roledef-Terraform.v=assigned,assigned in Variable Definitions (.tfvars) files
+
+--kinddef-Terraform=p,provider,providers
+--kinddef-Terraform=m,module,modules
+--kinddef-Terraform=o,output,output
+
+--regex-Terraform=/^[[:space:]]*(#|\/\/)"//{exclusive}
+--regex-Terraform=/^resource[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/r/{exclusive}
+--regex-Terraform=/^data[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/d/{exclusive}
+--regex-Terraform=/^variable[[:space:]]"([^"]+)"/\1/v/{exclusive}
+--regex-Terraform=/^provider[[:space:]]"([^"]+)"/\1/p/{exclusive}
+--regex-Terraform=/^module[[:space:]]"([^"]+)"/\1/m/{exclusive}
+--regex-Terraform=/^output[[:space:]]"([^"]+)"/\1/o/{exclusive}
