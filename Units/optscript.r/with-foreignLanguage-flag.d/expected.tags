@@ -1,0 +1,10 @@
+a	input.xxx	/^a$/;"	a	language:XXX	roles:def
+b	input.xxx	/^b$/;"	a	language:XXX	roles:def
+c	input.xxx	/^c$/;"	a	language:XXX	roles:assigned
+d	input.xxx	/^d$/;"	a	language:XXX	roles:assigned
+A	input.xxx	/^\/*A()*\/$/;"	f	language:C	roles:def
+B	input.xxx	/^\/*B()*\/$/;"	f	language:C	roles:def
+C	input.xxx	/^\/*C()*\/$/;"	f	language:C	roles:arolefortesting
+D	input.xxx	/^\/*D()*\/$/;"	f	language:C	roles:arolefortesting
+E	input.xxx	/^\/*E()*\/$/;"	f	language:C	roles:arolefortesting
+myfunc	input-0.c	/^FUNC(myfunc);$/;"	f	language:C	roles:def

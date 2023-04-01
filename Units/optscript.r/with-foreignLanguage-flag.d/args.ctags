@@ -1,0 +1,32 @@
+--sort=no
+--extras=+r
+--fields=+rl
+
+--langdef=XXX{_foreignLanguage=C}
+--map-XXX=.xxx
+--kinddef-XXX=a,abc,abcx
+--_roledef-XXX.a=assigned,assigned
+
+--regex-XXX=/^(a)$/\1/a/
+
+--regex-XXX=/^(b)$//{{
+    \1 /abc _tag _commit pop
+}}
+--regex-XXX=/^(c)$/\1/a/{_role=assigned}
+--regex-XXX=/^(d)$//{{
+    \1 /abc /assigned _reftag _commit pop
+}}
+
+--_roledef-C.f=arolefortesting,a role for testing
+--regex-XXX=/\/\*(A)\(\)\*\//\1/f/{_language=C}
+--regex-XXX=/\/\*(B)\(\)\*\///{{
+    \1 /C /function _foreigntag _commit pop
+}}
+
+--regex-XXX=/\/\*(C)\(\)\*\//\1/f/{_language=C}{_role=arolefortesting}
+--regex-XXX=/\/\*(D)\(\)\*\//\1/f/{_role=arolefortesting}{_language=C}
+--regex-XXX=/\/\*(E)\(\)\*\///{{
+    \1 /C /function /arolefortesting _foreignreftag _commit pop
+}}
+
+--regex-C=/FUNC\(([a-z]*)\);/\1/f/

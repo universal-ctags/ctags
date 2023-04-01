@@ -3262,73 +3262,9 @@ extern bool checkRegex (void)
 }
 
 static EsObject *OPTSCRIPT_ERR_UNKNOWNKIND;
-
-/* name:str kind:name loc _TAG tag
- * name:str kind:name     _TAG tag */
-static EsObject* lrop_make_tag (OptVM *vm, EsObject *name)
-{
-	matchLoc *loc;
-
-	if (opt_vm_ostack_count (vm) < 1)
-		return OPT_ERR_UNDERFLOW;
-
-	int index;
-	EsObject *top = opt_vm_ostack_top (vm);
-	if (es_object_get_type (top) == OPT_TYPE_MATCHLOC)
-	{
-		if (opt_vm_ostack_count (vm) < 3)
-			return OPT_ERR_UNDERFLOW;
-		loc = es_pointer_get (top);
-		index = 1;
-	}
-	else
-	{
-		struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-		if (lcb->window->patbuf->regptype != REG_PARSER_SINGLE_LINE)
-			return OPT_ERR_TYPECHECK;
-		if (opt_vm_ostack_count (vm) < 2)
-			return OPT_ERR_UNDERFLOW;
-		loc = NULL;
-		index = 0;
-	}
-
-	EsObject *kind = opt_vm_ostack_peek (vm, index++);
-	if (es_object_get_type (kind) != OPT_TYPE_NAME)
-		return OPT_ERR_TYPECHECK;
-	EsObject *kind_sym = es_pointer_get (kind);
-	const char *kind_str = es_symbol_get (kind_sym);
-	kindDefinition* kind_def = getLanguageKindForName (getInputLanguage (),
-													   kind_str);
-	if (!kind_def)
-		return OPTSCRIPT_ERR_UNKNOWNKIND;
-	int kind_index = kind_def->id;
-
-	EsObject *tname = opt_vm_ostack_peek (vm, index++);
-	if (es_object_get_type (tname) != OPT_TYPE_STRING)
-		return OPT_ERR_TYPECHECK;
-	const char *n = opt_string_get_cstr (tname);
-	if (n [0] == '\0')
-		return OPT_ERR_RANGECHECK; /* TODO */
-
-	tagEntryInfo *e = xMalloc (1, tagEntryInfo);
-	initRegexTag (e, eStrdup (n),
-				  kind_index, ROLE_DEFINITION_INDEX, CORK_NIL, 0,
-				  loc? loc->line: 0, loc? &loc->pos: NULL, XTAG_UNKNOWN, LANG_IGNORE);
-	EsObject *obj = es_pointer_new (OPT_TYPE_TAG, e);
-	if (es_error_p (obj))
-		return obj;
-
-	while (index-- > 0)
-		opt_vm_ostack_pop (vm);
-
-	opt_vm_ostack_push (vm, obj);
-	es_object_unref (obj);
-	return es_false;
-}
-
 static EsObject *OPTSCRIPT_ERR_UNKNOWNROLE;
 
-static EsObject* lrop_make_reftag (OptVM *vm, EsObject *name)
+static EsObject* lrop_make_foreignreftag (OptVM *vm, EsObject *name)
 {
 	matchLoc *loc;
 
@@ -3339,7 +3275,7 @@ static EsObject* lrop_make_reftag (OptVM *vm, EsObject *name)
 	EsObject *top = opt_vm_ostack_top (vm);
 	if (es_object_get_type (top) == OPT_TYPE_MATCHLOC)
 	{
-		if (opt_vm_ostack_count (vm) < 4)
+		if (opt_vm_ostack_count (vm) < 5)
 			return OPT_ERR_UNDERFLOW;
 		loc = es_pointer_get (top);
 		index = 1;
@@ -3349,33 +3285,55 @@ static EsObject* lrop_make_reftag (OptVM *vm, EsObject *name)
 		struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
 		if (lcb->window->patbuf->regptype != REG_PARSER_SINGLE_LINE)
 			return OPT_ERR_TYPECHECK;
-		if (opt_vm_ostack_count (vm) < 3)
+		if (opt_vm_ostack_count (vm) < 4)
 			return OPT_ERR_UNDERFLOW;
 		loc = NULL;
 		index = 0;
 	}
 
-	EsObject *role = opt_vm_ostack_peek (vm, index++);
-	if (es_object_get_type (role) != OPT_TYPE_NAME)
+	EsObject *role_obj = opt_vm_ostack_peek (vm, index++);
+	if (es_nil != role_obj
+		&& es_object_get_type (role_obj) != OPT_TYPE_NAME)
 		return OPT_ERR_TYPECHECK;
 
-	EsObject *kind = opt_vm_ostack_peek (vm, index++);
-	if (es_object_get_type (kind) != OPT_TYPE_NAME)
+	EsObject *kind_obj = opt_vm_ostack_peek (vm, index++);
+	if (es_object_get_type (kind_obj) != OPT_TYPE_NAME)
 		return OPT_ERR_TYPECHECK;
-	EsObject *kind_sym = es_pointer_get (kind);
+
+	EsObject *lang_obj = opt_vm_ostack_peek (vm, index++);
+	langType lang;
+	if (es_nil == lang_obj)
+		lang = getInputLanguage ();
+	else if (es_object_get_type (lang_obj) == OPT_TYPE_NAME)
+	{
+		EsObject *lang_sym = es_pointer_get (lang_obj);
+		const char *lang_str = es_symbol_get (lang_sym);
+		lang = getNamedLanguage (lang_str, 0);
+		if (lang == LANG_IGNORE)
+			return OPTSCRIPT_ERR_UNKNOWNLANGUAGE;
+	}
+	else
+		return OPT_ERR_TYPECHECK;
+
+	EsObject *kind_sym = es_pointer_get (kind_obj);
 	const char *kind_str = es_symbol_get (kind_sym);
-	langType lang = getInputLanguage ();
 	kindDefinition* kind_def = getLanguageKindForName (lang, kind_str);
 	if (!kind_def)
 		return OPTSCRIPT_ERR_UNKNOWNKIND;
 	int kind_index = kind_def->id;
 
-	EsObject *role_sym = es_pointer_get (role);
-	const char *role_str = es_symbol_get (role_sym);
-	roleDefinition* role_def = getLanguageRoleForName (lang, kind_index, role_str);
-	if (!role_def)
-		return OPTSCRIPT_ERR_UNKNOWNROLE;
-	int role_index = role_def->id;
+	int role_index;
+	if (es_nil == role_obj)
+		role_index = ROLE_DEFINITION_INDEX;
+	else
+	{
+		EsObject *role_sym = es_pointer_get (role_obj);
+		const char *role_str = es_symbol_get (role_sym);
+		roleDefinition* role_def = getLanguageRoleForName (lang, kind_index, role_str);
+		if (!role_def)
+			return OPTSCRIPT_ERR_UNKNOWNROLE;
+		role_index = role_def->id;
+	}
 
 	EsObject *tname = opt_vm_ostack_peek (vm, index++);
 	if (es_object_get_type (tname) != OPT_TYPE_STRING)
@@ -3390,7 +3348,7 @@ static EsObject* lrop_make_reftag (OptVM *vm, EsObject *name)
 				  loc? loc->line: 0, loc? &loc->pos: NULL,
 				  role_index == ROLE_DEFINITION_INDEX
 				  ? XTAG_UNKNOWN
-				  : XTAG_REFERENCE_TAGS, LANG_IGNORE);
+				  : XTAG_REFERENCE_TAGS, lang);
 	EsObject *obj = es_pointer_new (OPT_TYPE_TAG, e);
 	if (es_error_p (obj))
 		return obj;
@@ -4186,18 +4144,11 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.help_str = "index:int _TAGLOC matchloc",
 	},
 	{
-		.name     = "_tag",
-		.fn       = lrop_make_tag,
+		.name     = "_foreignreftag",
+		.fn       = lrop_make_foreignreftag,
 		.arity    = -1,
-		.help_str = "name:str kind:name matchloc _TAG tag%"
-		"name:str kind:name _TAG tag",
-	},
-	{
-		.name     = "_reftag",
-		.fn       = lrop_make_reftag,
-		.arity    = -1,
-		.help_str = "name:str kind:name role:name matchloc _REFTAG tag%"
-		"name:str kind:name role:name _REFTAG tag%",
+		.help_str = "name:str lang:name kind:name role:name matchloc _FOREIGNREFTAG tag%"
+		"name:str lang:name|null kind:name role:name|null _FOREIGNREFTAG tag%",
 	},
 	{
 		.name     = "_commit",

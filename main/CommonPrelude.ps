@@ -197,3 +197,39 @@
     exch
     [ exch /end /_matchloc cvx ] cvx __bddef
 } for
+
+(name:str kind:name matchloc _TAG tag
+ name:str kind:name _TAG tag)
+/_tag {
+    dup type /nametype eq {
+        % name:str kind:name
+        null exch null
+        % name:str null kind:name null
+    } {
+        % name:str kind:name matchloc
+        null 3 1 roll null exch
+        % name:str null kind:name matchloc null
+    } ifelse
+    _foreignreftag
+} __bddef
+
+(name:str kind:name role:name matchloc _REFTAG tag
+ name:str kind:name role:name _REFTAG tag)
+/_reftag {
+    dup type /nametype eq {
+        % name:str kind:name role:name
+        null 3 1 roll
+        % name:str null kind:name role:name
+    } {
+        % name:str kind:name role:name matchloc
+        null 4 1 roll
+        % name:str null kind:name role:name matchloc
+    } ifelse
+    _foreignreftag
+} __bddef
+
+(name:str language:name kind:name matchloc _FOREIGNTAG tag
+ name:str lang:name kind:name _FOREIGNTAG tag)
+/_foreigntag {
+    null _foreignreftag
+} __bddef
