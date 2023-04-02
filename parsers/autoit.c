@@ -190,15 +190,13 @@ static void findAutoItTags (void)
 			else if (match (p, "region", &p))
 			{
 				skipSpaces (&p);
-				while (*p != '\0')
-				{
-					vStringPut (name, (int) *p);
-					++p;
-				}
 
-				if (vStringLength(name) > 0)
+				if (*p != '\0')
 				{
-					int k = makeSimpleAutoItTag (nls, name, K_REGION);
+					int k;
+
+					vStringCatS (name, (const char *) p);
+					k = makeSimpleAutoItTag (nls, name, K_REGION);
 					nestingLevelsPush (nls, k);
 					vStringClear (name);
 				}
