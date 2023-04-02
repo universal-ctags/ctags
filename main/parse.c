@@ -4057,39 +4057,15 @@ static rescanReason createTagsForFile (const langType language,
 extern void notifyLanguageRegexInputStart (langType language)
 {
 	parserObject *pobj = LanguageTable + language;
-	parserDefinition *pdef = pobj->def;
 
 	notifyRegexInputStart(pobj->lregexControlBlock);
-	for (unsigned int i = 0; i < pdef->dependencyCount; i++)
-	{
-		parserDependency *d = pdef->dependencies + i;
-		if (d->type != DEPTYPE_FOREIGNER)
-			continue;
-		langType foreigner = getNamedLanguage (d->upperParser, 0);
-		if (foreigner == LANG_IGNORE)
-			continue;
-
-		notifyLanguageRegexInputStart (foreigner);
-	}
 }
 
 extern void notifyLanguageRegexInputEnd (langType language)
 {
 	parserObject *pobj = LanguageTable + language;
-	parserDefinition *pdef = pobj->def;
 
-	for (unsigned int i = 0; i < pdef->dependencyCount; i++)
-	{
-		parserDependency *d = pdef->dependencies + i;
-		if (d->type != DEPTYPE_FOREIGNER)
-			continue;
-		langType foreigner = getNamedLanguage (d->upperParser, 0);
-		if (foreigner == LANG_IGNORE)
-			continue;
-
-		notifyLanguageRegexInputEnd (foreigner);
-	}
-	notifyRegexInputEnd((LanguageTable + language)->lregexControlBlock);
+	notifyRegexInputEnd(pobj->lregexControlBlock);
 }
 
 static unsigned int parserCorkFlags (parserDefinition *parser)
