@@ -4283,7 +4283,7 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.fn       = lrop_extraenabled,
 		.arity    = 1,
 		.help_str = "extra:name _extraenabled bool%"
-		"language.extra _extraenabled bool",
+		"lang.extra:name _extraenabled bool",
 	},
 	{
 		.name     = "_markextra",
