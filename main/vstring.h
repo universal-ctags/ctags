@@ -106,7 +106,7 @@ CTAGS_INLINE void vStringPut (vString *const string, const int c)
 	if (string->length + 1 == string->size)  /*  check for buffer overflow */
 		vStringResize (string, string->size * 2);
 
-	string->buffer [string->length] = c;
+	string->buffer [string->length] = (char) c;
 	if (c != '\0')
 		string->buffer [++string->length] = '\0';
 }

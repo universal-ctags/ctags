@@ -244,11 +244,7 @@ extern void vStringCopyToLower (vString *const dest, const vString *const src)
 		vStringResize (dest, src->size);
 	d = dest->buffer;
 	for (i = 0  ;  i < length  ;  ++i)
-	{
-		int c = s [i];
-
-		d [i] = tolower (c);
-	}
+		d [i] = (char) tolower (s [i]);
 	d [i] = '\0';
 }
 
@@ -294,7 +290,7 @@ extern char    *vStringStrdup (const vString *const string)
 	return str;
 }
 
-static char valueToXDigit (int v)
+static int valueToXDigit (int v)
 {
 	Assert (v >= 0 && v <= 0xF);
 
