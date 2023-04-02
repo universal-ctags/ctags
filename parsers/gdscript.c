@@ -286,7 +286,7 @@ static int makeFunctionTag (const tokenInfo *const token,
 		if (decorators && stringListCount (decorators) > 0)
 		{
 			vstr = makeDecoratorString (decorators);
-			attachParserField (&e, false, GDScriptFields[F_ANNOTATIONS].ftype,
+			attachParserField (&e, GDScriptFields[F_ANNOTATIONS].ftype,
 							   vStringValue (vstr));
 		}
 
@@ -1172,7 +1172,7 @@ static bool parseVariable (tokenInfo *const token, const gdscriptKind kind,
 	if (e && decorators && stringListCount (decorators) > 0)
 	{
 		vString *vstr = makeDecoratorString (decorators);
-		attachParserField (e, true, GDScriptFields[F_ANNOTATIONS].ftype,
+		attachParserField (e, GDScriptFields[F_ANNOTATIONS].ftype,
 						   vStringValue (vstr));
 		vStringDelete (vstr);
 	}

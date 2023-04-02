@@ -224,7 +224,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 		}
 
 		if (assignment)
-			attachParserField (e, false, LdScriptFields[F_ASSIGNMENT].ftype,
+			attachParserField (e, LdScriptFields[F_ASSIGNMENT].ftype,
 							   assignment);
 	}
 

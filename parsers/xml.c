@@ -147,7 +147,7 @@ static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 	tag.filePosition = getInputFilePositionForLine (tag.lineNumber);
 	char *p = (char *)xmlGetNodePath (node);
 	if (ns->href && *ns->href)
-		attachParserField (&tag, false, XmlFields [F_NS_URI].ftype, (char *)ns->href);
+		attachParserField (&tag, XmlFields [F_NS_URI].ftype, (char *)ns->href);
 
 	n = makeTagWithNotificationCommon (&tag, node);
 	if (p)

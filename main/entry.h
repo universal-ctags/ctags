@@ -245,13 +245,7 @@ extern bool isTagExtra (const tagEntryInfo *const tag);
  *
  * If your parser uses the Cork API, and your parser called
  * makeTagEntry () already, you can use both
- * attachParserFieldToCorkEntry () and attachParserField ().  Your
- * parser has the cork index returned from makeTagEntry ().  With the
- * cork index, your parser can call attachParserFieldToCorkEntry ().
- * If your parser already call getEntryInCorkQueue () to get the tag
- * entry for the cork index, your parser can call attachParserField ()
- * with passing true for `inCorkQueue' parameter. attachParserField ()
- * is a bit faster than attachParserFieldToCorkEntry ().
+ * attachParserFieldToCorkEntry () and attachParserField ().
  *
  * attachParserField () and attachParserFieldToCorkEntry () duplicates
  * the memory object specified with `value' and stores the duplicated
@@ -264,9 +258,7 @@ extern bool isTagExtra (const tagEntryInfo *const tag);
  * Case B:
  *
  * If your parser called one of initTagEntry () family but didn't call
- * makeTagEntry () for a tagEntry yet, use attachParserField () with
- * false for `inCorkQueue' whether your parser uses the Cork API or
- * not.
+ * makeTagEntry () for a tagEntry yet, use attachParserField ().
  *
  * The parser (== caller) keeps the memory object specified with `value'
  * till calling makeTagEntry (). The parser must free the memory object
@@ -293,7 +285,7 @@ extern bool isTagExtra (const tagEntryInfo *const tag);
  * The other data type and the combination of types are not implemented yet.
  *
  */
-extern void attachParserField (tagEntryInfo *const tag, bool inCorkQueue, fieldType ftype, const char* value);
+extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
 extern const char* getParserFieldValueForType (tagEntryInfo *const tag, fieldType ftype);
 

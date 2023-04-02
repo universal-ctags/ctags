@@ -605,7 +605,7 @@ void cxxTagSetField(unsigned int uField,const char * szValue,bool bCopyValue)
 	/* If we make a copy for the value, the copy must be freed after
 	 * calling cxxTagCommit() for g_oCXXTag. The parser trash box
 	 * allows us to delay freeing the copy. */
-	attachParserField(&g_oCXXTag,false,g_cxx.pFieldOptions[uField].ftype,
+	attachParserField(&g_oCXXTag,g_cxx.pFieldOptions[uField].ftype,
 					  bCopyValue?parserTrashBoxPut(eStrdup(szValue),eFree):szValue);
 }
 
