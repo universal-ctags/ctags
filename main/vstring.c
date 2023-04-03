@@ -240,6 +240,13 @@ extern void vStringNCopyS (
 	vStringNCatS (string, s, length);
 }
 
+extern void vStringNCopySUnsafe (
+		vString *const string, const char *const s, const size_t length)
+{
+	vStringClear (string);
+	vStringNCatSUnsafe (string, s, length);
+}
+
 extern void vStringCopyToLower (vString *const dest, const vString *const src)
 {
 	const size_t length = src->length;
