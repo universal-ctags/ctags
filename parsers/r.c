@@ -366,7 +366,7 @@ static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
 		if (assignmentOp)
 		{
 			if (strlen (assignmentOp) > 0)
-				attachParserField (tag, true,
+				attachParserField (tag,
 								   RFields [F_ASSIGNMENT_OPERATOR].ftype,
 								   assignmentOp);
 			else
@@ -409,7 +409,7 @@ static int makeSimpleRTag (tokenInfo *const token, int parent, bool in_func, int
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (r);
 		if (e)
-			attachParserField (e, true,
+			attachParserField (e,
 							   RFields [F_CONSTRUCTOR].ftype,
 							   ctor);
 	}

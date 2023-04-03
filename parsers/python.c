@@ -297,7 +297,7 @@ static int makeClassTag (const tokenInfo *const token,
 		e.extensionFields.inheritance = inheritance ? vStringValue (inheritance) : "";
 		if (decorators && vStringLength (decorators) > 0)
 		{
-			attachParserField (&e, false, PythonFields[F_DECORATORS].ftype,
+			attachParserField (&e, PythonFields[F_DECORATORS].ftype,
 			                   vStringValue (decorators));
 		}
 
@@ -321,7 +321,7 @@ static int makeFunctionTag (const tokenInfo *const token,
 			e.extensionFields.signature = vStringValue (arglist);
 		if (decorators && vStringLength (decorators) > 0)
 		{
-			attachParserField (&e, false, PythonFields[F_DECORATORS].ftype,
+			attachParserField (&e, PythonFields[F_DECORATORS].ftype,
 			                   vStringValue (decorators));
 		}
 
@@ -1579,7 +1579,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 						vString *nameref = vStringNewInit (PythonKinds [K_FUNCTION].name);
 						vStringPut (nameref, ':');
 						vStringCat (nameref, anon->string);
-						attachParserField (ve, true, PythonFields[F_NAMEREF].ftype,
+						attachParserField (ve, PythonFields[F_NAMEREF].ftype,
 										   vStringValue (nameref));
 						vStringDelete (nameref);
 					}

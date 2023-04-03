@@ -602,7 +602,7 @@ static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned cha
 			{
 				cp += 3;
 				if (e)
-					attachParserField (e, true, AsmFields[F_PROPERTIES].ftype,
+					attachParserField (e, AsmFields[F_PROPERTIES].ftype,
 									   "req");
 				vStringCatS (signature, ":req");
 			}
@@ -610,7 +610,7 @@ static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned cha
 			{
 				cp += 6;
 				if (e)
-					attachParserField (e, true, AsmFields[F_PROPERTIES].ftype,
+					attachParserField (e, AsmFields[F_PROPERTIES].ftype,
 									   "vararg");
 				vStringCatS (signature, ":vararg");
 			}

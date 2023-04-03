@@ -177,7 +177,7 @@ static char* attachVersionIfExisting (struct sTagEntryInfo *tag, xmlNode *node)
 		}
 	}
 	if (version)
-		attachParserField (tag, false, Maven2Fields [F_VERSION].ftype, version);
+		attachParserField (tag, Maven2Fields [F_VERSION].ftype, version);
 	return version;
 }
 

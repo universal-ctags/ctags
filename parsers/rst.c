@@ -164,10 +164,10 @@ static void makeSectionRstTag(const vString* const name, const int kind, const M
 			e.extensionFields.scopeIndex = nl->corkIndex;
 
 		m[0] = marker;
-		attachParserField (&e, false, RstFields [F_SECTION_MARKER].ftype, m);
+		attachParserField (&e, RstFields [F_SECTION_MARKER].ftype, m);
 
 		if (overline)
-			attachParserField (&e, false, RstFields [F_SECTION_OVERLINE].ftype, "");
+			attachParserField (&e, RstFields [F_SECTION_OVERLINE].ftype, "");
 
 		r = makeTagEntry (&e);
 	}

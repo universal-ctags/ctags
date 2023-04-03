@@ -1026,7 +1026,7 @@ static void createTagFull (tokenInfo *const token, verilogKind kind, int role, t
 	}
 
 	if (token->parameter)
-		attachParserField (&tag, false, fieldTable [F_PARAMETER].ftype, "");
+		attachParserField (&tag, fieldTable [F_PARAMETER].ftype, "");
 
 	makeTagEntry (&tag);
 

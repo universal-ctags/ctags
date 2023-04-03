@@ -5732,7 +5732,7 @@ static void createCTSTTags (void)
 
 						name [0] = c++;
 						initTagEntry (&e, name, i);
-						attachParserField (&e, false,
+						attachParserField (&e,
 										   CTSTFields[F_BOOLEAN_FIELD].ftype, "");
 						makeTagEntry (&e);
 
@@ -5742,13 +5742,13 @@ static void createCTSTTags (void)
 
 						name [0] = c++;
 						initTagEntry (&e, name, i);
-						attachParserField (&e, false,
+						attachParserField (&e,
 										   CTSTFields[F_BOOLEAN_AND_STRING_FIELD].ftype, "val");
 						makeTagEntry (&e);
 
 						name [0] = c++;
 						initTagEntry (&e, name, i);
-						attachParserField (&e, false,
+						attachParserField (&e,
 										   CTSTFields[F_BOOLEAN_AND_STRING_FIELD].ftype, "");
 						makeTagEntry (&e);
 

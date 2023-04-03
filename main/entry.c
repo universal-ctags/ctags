@@ -979,11 +979,11 @@ static void attachParserFieldGeneric (tagEntryInfo *const tag, fieldType ftype, 
 	}
 }
 
-extern void attachParserField (tagEntryInfo *const tag, bool inCorkQueue, fieldType ftype, const char * value)
+extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char * value)
 {
 	Assert (tag != NULL);
 
-	if (inCorkQueue)
+	if (tag->inCorkQueue)
 	{
 		const char * v;
 		v = eStrdup (value);
@@ -1003,7 +1003,7 @@ extern void attachParserFieldToCorkEntry (int index,
 {
 	tagEntryInfo * tag = getEntryInCorkQueue (index);
 	if (tag)
-		attachParserField (tag, true, ftype, value);
+		attachParserField (tag, ftype, value);
 }
 
 extern const tagField* getParserFieldForIndex (const tagEntryInfo * tag, int index)
