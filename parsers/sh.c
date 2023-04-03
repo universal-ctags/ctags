@@ -328,12 +328,8 @@ static int hdocStateReadDestfileName (struct hereDocParsingState *hstate,
 
 static void hdocStateUpdateTag (struct hereDocParsingState *hstate, unsigned long endLine)
 {
-	tagEntryInfo *tag = getEntryInCorkQueue (hstate->corkIndex);
-	if (tag)
-	{
-		tag->extensionFields.endLine = endLine;
-		hstate->corkIndex = CORK_NIL;
-	}
+	setTagEndLineToCorkEntry (hstate->corkIndex, endLine);
+	hstate->corkIndex = CORK_NIL;
 }
 
 static size_t handleShKeyword (int keyword,

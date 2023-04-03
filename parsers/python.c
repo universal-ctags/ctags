@@ -1628,9 +1628,7 @@ static void setIndent (tokenInfo *const token)
 
 	while (lv && PY_NL (lv)->indentation >= token->indent)
 	{
-		tagEntryInfo *e = getEntryInCorkQueue (lv->corkIndex);
-		if (e)
-			e->extensionFields.endLine = token->lineNumber;
+		setTagEndLineToCorkEntry (lv->corkIndex, token->lineNumber);
 
 		nestingLevelsPop (PythonNestingLevels);
 		lv = nestingLevelsGetCurrent (PythonNestingLevels);

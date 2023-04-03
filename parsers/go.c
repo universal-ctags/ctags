@@ -862,7 +862,7 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		{
 			skipToMatched (token, NULL);
 			if (e)
-				e->extensionFields.endLine = getInputLineNumber ();
+				setTagEndLine (e, getInputLineNumber());
 		}
 	}
 
@@ -1256,7 +1256,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 		{
 			tagEntryInfo *e = getEntryInCorkQueue (member_scope);
 			if (e)
-				e->extensionFields.endLine = getInputLineNumber ();
+				setTagEndLine(e, getInputLineNumber ());
 		}
 
 		if (usesParens && !isType (token, TOKEN_CLOSE_PAREN))

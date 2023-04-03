@@ -123,7 +123,7 @@ struct sTagEntryInfo {
 #ifdef HAVE_LIBXML
 		const char* xpath;
 #endif
-		unsigned long endLine;
+		unsigned long _endLine;	/* Don't set directly. Use setTagEndLine() */
 		time_t epoch;
 #define NO_NTH_FIELD -1
 		short nth;
@@ -244,6 +244,9 @@ int           anyKindsEntryInScopeRecursive (int corkIndex,
 											 const char *name,
 											 const int * kinds, int count,
 											 bool onlyDefinitionTag);
+
+extern void    setTagEndLine (tagEntryInfo *tag, unsigned long endLine);
+extern void    setTagEndLineToCorkEntry (int corkIndex, unsigned long endLine);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern void    unmarkTagExtraBit   (tagEntryInfo *const tag, xtagType extra);

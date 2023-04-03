@@ -605,7 +605,7 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 			if (!isType (token, TOKEN_SEMICOLON))
 				skipToCharacterInInputFile (';');
 			if (ended)
-				e->extensionFields.endLine = getInputLineNumber ();
+				setTagEndLine (e, getInputLineNumber ());
 		}
 		else
 		{
@@ -748,7 +748,7 @@ static void parseModule (tokenInfo * const token, int parent)
 		{
 			tagEntryInfo *e = getEntryInCorkQueue (index);
 			if (e)
-				e->extensionFields.endLine = getInputLineNumber ();
+				setTagEndLine (e, getInputLineNumber ());
 		}
 
 		if (kind == VHDLTAG_ENTITY)
@@ -776,7 +776,7 @@ static void parseRecord (tokenInfo * const token, int parent)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (parent);
 		if (e)
-			e->extensionFields.endLine = getInputLineNumber ();
+			setTagEndLine (e, getInputLineNumber ());
 	}
 
 	deleteToken (name);

@@ -129,7 +129,7 @@ static NestingLevel *getNestingLevel(const int kind)
 		if ((nl && (e == NULL)) || (e && e->kindIndex >= kind))
 		{
 			if (e)
-				e->extensionFields.endLine = (getInputLineNumber() - d);
+				setTagEndLine (e, (getInputLineNumber() - d));
 			nestingLevelsPop(nestingLevels);
 		}
 		else

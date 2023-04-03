@@ -182,9 +182,7 @@ static void inputStart (subparser *s)
 static void inputEnd (subparser *s)
 {
 	struct mooseSubparser *moose = (struct mooseSubparser *)s;
-	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
-	if (e)
-		e->extensionFields.endLine = getInputLineNumber ();
+	setTagEndLineToCorkEntry (moose->classCork, getInputLineNumber ());
 
 	vStringDelete (moose->supersOrRoles);
 	moose->supersOrRoles = NULL;
@@ -261,11 +259,7 @@ static void leaveMoose (struct mooseSubparser *moose)
 {
 	moose->notContinuousExtendsLines = true;
 
-	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
-	if (!e)
-		return;
-
-	e->extensionFields.endLine = getInputLineNumber ();
+	setTagEndLineToCorkEntry (moose->classCork, getInputLineNumber ());
 
 	moose->classCork = CORK_NIL;
 	moose->notInMoose = true;

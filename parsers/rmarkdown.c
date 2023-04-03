@@ -116,9 +116,7 @@ static void notifyEndOfCodeBlock (markdownSubparser *s)
 	if (rmarkdown->lastChunkLabel == CORK_NIL)
 		return;
 
-	tagEntryInfo *e = getEntryInCorkQueue (rmarkdown->lastChunkLabel);
-	if (e)
-		e->extensionFields.endLine = getInputLineNumber ();
+	setTagEndLineToCorkEntry (rmarkdown->lastChunkLabel, getInputLineNumber ());
 
 	rmarkdown->lastChunkLabel = CORK_NIL;
 }

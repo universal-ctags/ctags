@@ -300,10 +300,7 @@ static int makeDtdTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 
 static void backpatchEndField (int index, unsigned long lineNumber)
 {
-	tagEntryInfo *ep = getEntryInCorkQueue (index);
-
-	if (ep)
-		ep->extensionFields.endLine = lineNumber;
+	setTagEndLineToCorkEntry (index, lineNumber);
 }
 
 static void parseEntity (tokenInfo *const token)

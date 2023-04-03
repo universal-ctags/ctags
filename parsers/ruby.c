@@ -749,13 +749,13 @@ static void deleteBlockData (NestingLevel *nl, void *data CTAGS_ATTR_UNUSED)
 
 	tagEntryInfo *e = getEntryInCorkQueue (nl->corkIndex);
 	if (e && !e->placeholder)
-		e->extensionFields.endLine = getInputLineNumber ();
+		setTagEndLine (e, getInputLineNumber ());
 
 	tagEntryInfo *sub_e;
 	if (bdata->subparserCorkIndex != CORK_NIL
 		&& (sub_e = getEntryInCorkQueue (bdata->subparserCorkIndex)))
 	{
-		sub_e->extensionFields.endLine = getInputLineNumber ();
+		setTagEndLine (sub_e, getInputLineNumber ());
 		if (bdata->subparser)
 			bdata->subparser->leaveBlockNotify (bdata->subparser,
 												bdata->subparserCorkIndex);

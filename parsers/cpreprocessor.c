@@ -1483,12 +1483,12 @@ static int skipToEndOfChar (void)
 static void attachFields (int macroCorkIndex, unsigned long endLine, const char *macrodef)
 {
 	tagEntryInfo *tag = getEntryInCorkQueue (macroCorkIndex);
-	if (!tag)
-		return;
-
-	tag->extensionFields.endLine = endLine;
-	if (macrodef)
-		attachParserFieldToCorkEntry (macroCorkIndex, Cpp.macrodefFieldIndex, macrodef);
+	if (tag)
+	{
+		setTagEndLine (tag, endLine);
+		if (macrodef)
+			attachParserField (tag, Cpp.macrodefFieldIndex, macrodef);
+	}
 }
 
 static vString * conditionMayFlush (vString* condition, bool del)

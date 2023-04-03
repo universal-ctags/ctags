@@ -200,7 +200,7 @@ extern void makeFileTag (const char *const fileName)
 		   unnecessary read line loop. */
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
-		tag.extensionFields.endLine = getInputLineNumber ();
+		setTagEndLine(&tag, getInputLineNumber ());
 	}
 
 	if (isFieldEnabled (FIELD_EPOCH))
@@ -1557,6 +1557,29 @@ static int queueTagEntry (const tagEntryInfo *const tag)
 	entry->slot.inCorkQueue = 1;
 
 	return corkIndex;
+}
+
+extern void setTagEndLine(tagEntryInfo *tag, unsigned long endLine)
+{
+	if (endLine != 0 && endLine < tag->lineNumber)
+	{
+		error (WARNING,
+			   "given end line (%lu) for the tag (%s) in the file (%s) is smaller than its tart line: %lu",
+			   tag->lineNumber,
+			   tag->name,
+			   tag->inputFileName,
+			   tag->lineNumber);
+		return;
+	}
+
+	tag->extensionFields._endLine = endLine;
+}
+
+extern void setTagEndLineToCorkEntry (int corkIndex, unsigned long endLine)
+{
+	tagEntryInfo *entry = getEntryInCorkQueue (corkIndex);
+	if (entry)
+		setTagEndLine (entry, endLine);
 }
 
 extern void setupWriter (void *writerClientData)

@@ -1123,9 +1123,9 @@ static const char *renderFieldEnd (const tagEntryInfo *const tag,
 {
 	static char buf[21];
 
-	if (tag->extensionFields.endLine != 0)
+	if (tag->extensionFields._endLine != 0)
 	{
-		sprintf (buf, "%lu", tag->extensionFields.endLine);
+		sprintf (buf, "%lu", tag->extensionFields._endLine);
 		return renderAsIs (b, buf);
 	}
 	else
@@ -1211,7 +1211,7 @@ static bool     isXpathFieldAvailable      (const tagEntryInfo *const tag)
 
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag)
 {
-	return (tag->extensionFields.endLine != 0)? true: false;
+	return (tag->extensionFields._endLine != 0)? true: false;
 }
 
 static bool isEpochAvailable (const tagEntryInfo *const tag)
@@ -1845,9 +1845,9 @@ static EsObject* getFieldValueForRoles (const tagEntryInfo *tag, const fieldDefi
 static EsObject* getFieldValueForLineCommon (const tagEntryInfo *tag, const fieldDefinition *fdef)
 {
 	if (fdef->ftype == FIELD_END_LINE)
-		return ((int)tag->extensionFields.endLine == 0)
+		return ((int)tag->extensionFields._endLine == 0)
 			? es_nil
-			: es_integer_new ((int)tag->extensionFields.endLine);
+			: es_integer_new ((int)tag->extensionFields._endLine);
 	else
 		return ((int)tag->lineNumber == 0)
 			? es_nil
@@ -1885,7 +1885,7 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 		return OPT_ERR_TYPECHECK;
 
 	if (fdef->ftype == FIELD_END_LINE)
-		tag->extensionFields.endLine = l;
+		setTagEndLine(tag, (unsigned long)l);
 	else
 	{
 		tag->lineNumber = l;

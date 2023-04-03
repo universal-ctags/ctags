@@ -124,10 +124,10 @@ static int makeSimpleAutoItTag (const NestingLevels *const nls,
 static void setEndLine (const NestingLevels *const nls)
 {
 	NestingLevel *nl = nestingLevelsGetCurrent (nls);
-	tagEntryInfo *entry;
 
-	if (nl && (entry = getEntryInCorkQueue (nl->corkIndex)) != NULL)
-		entry->extensionFields.endLine = getInputLineNumber ();
+	if (nl)
+		setTagEndLineToCorkEntry (nl->corkIndex,
+								  getInputLineNumber ());
 }
 
 static void skipSpaces (const unsigned char **p)

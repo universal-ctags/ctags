@@ -167,7 +167,7 @@ static void popScope (void)
 #endif
 	if (e)
 	{
-		e->extensionFields.endLine = getInputLineNumber ();
+		setTagEndLine (e, getInputLineNumber());
 		currentScope = e->extensionFields.scopeIndex;
 	}
 	else

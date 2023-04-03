@@ -1659,9 +1659,9 @@ static void fillEndLineFieldOfUpperScopes (struct lregexControlBlock *lcb, unsig
 	int n = lcb->currentScope;
 
 	while ((entry = getEntryInCorkQueue (n))
-		   && (entry->extensionFields.endLine == 0))
+		   && (entry->extensionFields._endLine == 0))
 	{
-		entry->extensionFields.endLine = endline;
+		setTagEndLine (entry, endline);
 		n = entry->extensionFields.scopeIndex;
 	}
 }
@@ -1724,9 +1724,9 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	{
 		tagEntryInfo *entry = getEntryInCorkQueue (lcb->currentScope);
 
-		if (entry && (entry->extensionFields.endLine == 0))
+		if (entry && (entry->extensionFields._endLine == 0))
 		{
-			entry->extensionFields.endLine = getInputLineNumberInRegPType(patbuf->regptype, offset);
+			setTagEndLine (entry, getInputLineNumberInRegPType(patbuf->regptype, offset));
 
 			/*
 			 * SCOPE_POP|SCOPE_REF_AFTER_POP implies that "replace" was specified as the
@@ -1735,8 +1735,8 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 			 * the new scope. There is a gap. We must adjust the "end:" field here.
 			 */
 			if ((patbuf->scopeActions & SCOPE_REF_AFTER_POP) &&
-				entry->extensionFields.endLine > 1)
-				entry->extensionFields.endLine--;
+				entry->extensionFields._endLine > 1)
+				setTagEndLine (entry, entry->extensionFields._endLine - 1);
 		}
 
 		lcb->currentScope = entry? entry->extensionFields.scopeIndex: CORK_NIL;

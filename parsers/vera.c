@@ -2014,9 +2014,7 @@ static void checkStatementEnd (statementInfo *const st, int corkIndex)
 {
 	const tokenInfo *const token = activeToken (st);
 
-	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
-	if (e)
-		e->extensionFields.endLine = token->lineNumber;
+	setTagEndLineToCorkEntry (corkIndex, token->lineNumber);
 
 	if (isType (token, TOKEN_COMMA))
 		reinitStatement (st, true);

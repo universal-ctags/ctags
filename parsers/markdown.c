@@ -189,7 +189,7 @@ static void fillEndField (NestingLevel *nl, void *ctxData)
 	if (e)
 	{
 		unsigned long line = (unsigned long)(HT_PTR_TO_UINT (ctxData));
-		e->extensionFields.endLine = line;
+		setTagEndLine (e, line);
 	}
 }
 
