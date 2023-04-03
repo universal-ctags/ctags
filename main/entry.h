@@ -72,6 +72,7 @@ struct sTagEntryInfo {
 	unsigned int isInputFileNameShared: 1; /* shares the value for inputFileName.
 											* Set in the cork queue; don't touch this.*/
 	unsigned int boundaryInfo: 2; /* info about nested input stream */
+	unsigned int inIntevalTab:1;
 
 	unsigned long lineNumber;     /* line number of tag;
 									 use updateTagLine() for updating this member. */
@@ -249,6 +250,11 @@ int           anyKindsEntryInScopeRecursive (int corkIndex,
 extern void    updateTagLine(tagEntryInfo *tag, unsigned long lineNumber, MIOPos filePosition);
 extern void    setTagEndLine (tagEntryInfo *tag, unsigned long endLine);
 extern void    setTagEndLineToCorkEntry (int corkIndex, unsigned long endLine);
+
+extern int     queryIntervalTabByLine(unsigned long lineNum);
+extern int     queryIntervalTabByRange(unsigned long startLine, unsigned long endLine);
+extern int     queryIntervalTabByCork(int corkIndex);
+extern bool    removeFromIntervalTabMaybe(int corkIndex);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern void    unmarkTagExtraBit   (tagEntryInfo *const tag, xtagType extra);
