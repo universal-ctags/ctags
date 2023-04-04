@@ -1,0 +1,6 @@
+proc_pid_cmdline_ops	input.foo	/^static const struct file_operations proc_pid_cmdline_ops = {$/;"	v	typeref:typename:const struct file_operations	file:
+proc_lstats_operations	input.foo	/^static const struct file_operations proc_lstats_operations = {$/;"	v	typeref:typename:const struct file_operations	file:
+proc_single_file_operations	input.foo	/^static const struct file_operations proc_single_file_operations = {$/;"	v	typeref:typename:const struct file_operations	file:
+proc_pid_cmdline_read	input.foo	/^	.read	= proc_pid_cmdline_read,$/;"	R	variable:proc_pid_cmdline_ops
+seq_read	input.foo	/^	.read		= seq_read,$/;"	R	variable:proc_lstats_operations
+seq_read	input.foo	/^	.read		= seq_read,$/;"	R	variable:proc_single_file_operations

@@ -648,6 +648,25 @@ static flagDefinition scopePtrnFlagDef[] = {
 	  NULL, "don't put this tag to tags file."},
 };
 
+static void intervaltab_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
+										const char* const v, void* data)
+{
+	unsigned int *bfields = data;
+	if (strcmp (v, "intervaltab") != 0)
+	{
+		error (WARNING, "Unexpected value for scope flag in mline regex definition: scope=%s", v);
+		error (WARNING, "NOTE: --mline-regex-<LANG> accepts only {scope=intervaltab}");
+		return;
+	}
+
+	*bfields |= SCOPE_INTERVALTAB;
+}
+
+static flagDefinition intervaltabPtrnFlagDef[] = {
+	{ '\0', "scope",     NULL, intervaltab_ptrn_flag_eval,
+	  "intervaltab", "set scope for the tag with the interval table" },
+};
+
 static kindDefinition *kindNew (char letter, const char *name, const char *description)
 {
 	kindDefinition *kdef = xCalloc (1, kindDefinition);
@@ -1417,6 +1436,11 @@ static void patternEvalFlags (struct lregexControlBlock *lcb,
 		if ((ptrn->scopeActions & (SCOPE_REF|SCOPE_REF_AFTER_POP)) == (SCOPE_REF|SCOPE_REF_AFTER_POP))
 			error (WARNING, "%s: don't combine \"replace\" with the other scope action.",
 				   getLanguageName (lcb->owner));
+	}
+	else
+	{
+		flagsEval (flags, intervaltabPtrnFlagDef, ARRAY_SIZE(intervaltabPtrnFlagDef), &ptrn->scopeActions);
+		Assert (ptrn->scopeActions == 0 || ptrn->scopeActions == SCOPE_INTERVALTAB);
 	}
 
 	if (regptype == REG_PARSER_MULTI_LINE || regptype == REG_PARSER_MULTI_TABLE)
@@ -2627,6 +2651,7 @@ extern void printMultilineRegexFlags (bool withListHeader, bool machinable, cons
 		flagsColprintAddDefinitions (table, backendCommonRegexFlagDefs, ARRAY_SIZE(backendCommonRegexFlagDefs));
 		flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
 		flagsColprintAddDefinitions (table, guestPtrnFlagDef, ARRAY_SIZE (guestPtrnFlagDef));
+		flagsColprintAddDefinitions (table, intervaltabPtrnFlagDef, ARRAY_SIZE (intervaltabPtrnFlagDef));
 		flagsColprintAddDefinitions (table, preCommonSpecFlagDef, ARRAY_SIZE (preCommonSpecFlagDef));
 		flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 	}
