@@ -1,4 +1,3 @@
-
 /*
 *   Copyright (c) 2010, Vincent Berthoux
 *
