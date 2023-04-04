@@ -513,6 +513,9 @@ static int addTag (vString * const ident, int kind)
 	if (! ObjcKinds[kind].enabled)
 		return CORK_NIL;
 
+	if (vStringIsEmpty (ident))
+		return CORK_NIL;
+
 	prepareTag (&toCreate, ident, kind);
 	return makeTagEntry (&toCreate);
 }
