@@ -279,7 +279,7 @@ OPTIONS
 	This option is similar to ``--regex-<LANG>`` option except the pattern is
 	applied to the whole file’s contents, not line by line.
 
-	See "`FLAGS FOR ``--mline-regex-<LANG>`` OPTION`_" about ``{mgroup=<N>}``.
+	See "`FLAGS FOR --mline-regex-<LANG> OPTION`_" about ``{mgroup=<N>}``.
 	``{mgroup=<N>}`` flag is a must.
 
 ``--_echo=<message>``

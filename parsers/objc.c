@@ -1,4 +1,3 @@
-
 /*
 *   Copyright (c) 2010, Vincent Berthoux
 *
@@ -512,6 +511,9 @@ static int addTag (vString * const ident, int kind)
 	tagEntryInfo toCreate;
 
 	if (! ObjcKinds[kind].enabled)
+		return CORK_NIL;
+
+	if (vStringIsEmpty (ident))
 		return CORK_NIL;
 
 	prepareTag (&toCreate, ident, kind);
