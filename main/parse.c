@@ -88,6 +88,7 @@ typedef struct sParserObject {
 									  the subparser). */
 	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
 										  is emitted or not. */
+	unsigned int justRunForSchedulingBase:1;
 	unsigned int used;			/* Used for printing language specific statistics. */
 
 	unsigned int anonymousIdentiferId; /* managed by anon* functions */
@@ -4171,6 +4172,7 @@ static bool createTagsWithFallback1 (const langType language,
 	tagFilePosition (&tagfpos);
 
 	anonResetMaybe (parser);
+	parser->justRunForSchedulingBase = 0;
 
 	while ( ( whyRescan =
 		  createTagsForFile (language, ++passCount) )
@@ -4201,8 +4203,9 @@ static bool createTagsWithFallback1 (const langType language,
 		}
 	}
 
-	/* Force filling allLines buffer and kick the multiline regex parser */
-	if (hasLanguageMultilineRegexPatterns (language))
+	if (!parser->justRunForSchedulingBase
+		/* Force filling allLines buffer and kick the multiline regex parser */
+		&& hasLanguageMultilineRegexPatterns (language))
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
@@ -5181,8 +5184,11 @@ extern slaveParser *getNextSlaveParser(slaveParser *last)
 extern void scheduleRunningBaseparser (int dependencyIndex)
 {
 	langType current = getInputLanguage ();
-	parserDefinition *current_parser = LanguageTable [current].def;
+	parserObject *current_pobj = LanguageTable + current;
+	parserDefinition *current_parser = current_pobj->def;
 	parserDependency *dep = NULL;
+
+	current_pobj->justRunForSchedulingBase = 1;
 
 	if (dependencyIndex == RUN_DEFAULT_SUBPARSERS)
 	{
