@@ -2697,6 +2697,13 @@ extern void freeRegexResources (void)
 	opt_vm_delete (optvm);
 }
 
+extern bool lregexControlBlockHasAny(struct lregexControlBlock *lcb)
+{
+	return (ptrArrayCount(lcb->entries [REG_PARSER_MULTI_LINE])
+			|| ptrArrayCount(lcb->tables)
+			|| ptrArrayCount(lcb->entries[REG_PARSER_SINGLE_LINE]));
+}
+
 extern bool regexNeedsMultilineBuffer (struct lregexControlBlock *lcb)
 {
 	if  (ptrArrayCount(lcb->entries [REG_PARSER_MULTI_LINE]) > 0)

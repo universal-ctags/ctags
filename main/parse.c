@@ -120,6 +120,7 @@ static void anonResetMaybe (parserObject *parser);
 static void setupAnon (void);
 static void teardownAnon (void);
 static void uninstallTagXpathTable (const langType language);
+static bool hasLanguageAnyRegexPatterns (const langType language);
 
 /*
 *   DATA DEFINITIONS
@@ -4204,8 +4205,8 @@ static bool createTagsWithFallback1 (const langType language,
 	}
 
 	if (!parser->justRunForSchedulingBase
-		/* Force filling allLines buffer and kick the multiline regex parser */
-		&& hasLanguageMultilineRegexPatterns (language))
+		/* Force applying regex patterns */
+		&& hasLanguageAnyRegexPatterns (language))
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
@@ -4593,6 +4594,10 @@ extern bool hasLanguageMultilineRegexPatterns (const langType language)
 	return lregexQueryParserAndSubparsers (language, regexNeedsMultilineBuffer);
 }
 
+static bool hasLanguageAnyRegexPatterns (const langType language)
+{
+	return lregexQueryParserAndSubparsers (language, lregexControlBlockHasAny);
+}
 
 extern void addLanguageCallbackRegex (const langType language, const char *const regex, const char *const flags,
 									  const regexCallback callback, bool *disabled, void *userData)

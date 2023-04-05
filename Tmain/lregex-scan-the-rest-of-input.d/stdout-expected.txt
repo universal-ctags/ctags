@@ -1,0 +1,3 @@
+x	input.cst	/^restdef:x$/;"	a
+y	input.cst	/^restdef:y$/;"	a
+z	input.cst	/^restdef:z$/;"	a
