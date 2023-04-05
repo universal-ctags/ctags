@@ -5500,6 +5500,7 @@ typedef enum {
 #if defined(DEBUG) && defined(HAVE_SECCOMP)
 	K_CALL_GETPPID,
 #endif
+	K_QUIT,
 	K_DISABLED,
 	K_ENABLED,
 	K_ROLES,
@@ -5576,6 +5577,7 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 #if defined(DEBUG) && defined(HAVE_SECCOMP)
 	{true, 'P', "callGetPPid", "trigger calling getppid(2) that seccomp sandbox disallows"},
 #endif
+	{true, 'Q', "quit", "stop the parsing"},
 	{false,'d', "disabled", "a kind disabled by default",
 	 .referenceOnly = false, ATTACH_ROLES (CTST_DisabledKindRoles)},
 	{true, 'e', "enabled", "a kind enabled by default",
@@ -5618,9 +5620,11 @@ static void createCTSTTags (void)
 
 	int found_enabled_disabled[2] = {0, 0};
 
+	bool quit = false;
+
 	TRACE_ENTER_TEXT("Parsing starts");
 
-	while ((line = readLineFromInputFile ()) != NULL)
+	while (!quit && (line = readLineFromInputFile ()) != NULL)
 	{
 		int c = line[0];
 
@@ -5678,6 +5682,9 @@ static void createCTSTTags (void)
 						getppid();
 						break;
 #endif
+					case K_QUIT:
+						quit = true;
+						break;
 				    case K_DISABLED:
 				    case K_ENABLED:
 						{
@@ -5771,6 +5778,9 @@ static void createCTSTTags (void)
 						notice ("notice output for testing: %s", CTST_Kinds [i].name);
 						break;
 				}
+
+				if (quit)
+					break;
 			}
 	}
 
