@@ -4229,6 +4229,81 @@ static EsObject *lrop_param (OptVM *vm, EsObject *name)
 	return false;
 }
 
+static EsObject *lrop_intervaltab (OptVM *vm, EsObject *name)
+{
+	EsObject *nobj = opt_vm_ostack_top (vm);
+	int parent;
+
+	if (es_object_get_type (nobj) == ES_TYPE_INTEGER)
+	{
+		int index = es_integer_get(nobj);
+		if (index < 0 || index == CORK_NIL)
+			return OPT_ERR_RANGECHECK;
+		parent = queryIntervalTabByCorkEntry (index);
+	}
+	else if (es_object_get_type (nobj) == OPT_TYPE_TAG)
+	{
+		tagEntryInfo *e = es_pointer_get (nobj);
+		if (e->extensionFields._endLine)
+			parent =  queryIntervalTabByRange(e->lineNumber,
+											  e->extensionFields._endLine);
+		else
+			parent = queryIntervalTabByLine(e->lineNumber);
+	}
+	else if (es_object_get_type (nobj) == OPT_TYPE_MATCHLOC)
+	{
+		matchLoc *mloc = es_pointer_get (nobj);
+		parent = queryIntervalTabByLine(mloc->line);
+	}
+	else if (es_object_get_type (nobj) == OPT_TYPE_ARRAY)
+	{
+		unsigned long start, end;
+
+		if (opt_array_length(nobj) == 0)
+			return OPT_ERR_RANGECHECK;
+
+		ptrArray *a = es_pointer_get (nobj);
+		EsObject *nobj0 = ptrArrayItem (a, 0);
+		if (es_object_get_type (nobj0) != ES_TYPE_INTEGER)
+			return OPT_ERR_TYPECHECK;
+		int n = es_integer_get (nobj0);
+		if (n <= 0)
+			return OPT_ERR_RANGECHECK;
+
+		start = (unsigned long)n;
+		if (ptrArrayCount(a) == 1)
+			parent = queryIntervalTabByLine (start);
+		else
+		{
+			nobj0 = ptrArrayItem (a, 1);
+			if (es_object_get_type (nobj0) != ES_TYPE_INTEGER)
+				return OPT_ERR_TYPECHECK;
+			int n = es_integer_get (nobj0);
+			if (n <= 0)
+				return OPT_ERR_RANGECHECK;
+
+			end = (unsigned long)n;
+			if (end < start)
+				return OPT_ERR_RANGECHECK;
+			parent = queryIntervalTabByRange (start, end);
+		}
+	}
+	else
+		return OPT_ERR_TYPECHECK;
+
+	opt_vm_ostack_pop (vm);
+	if (parent == CORK_NIL)
+		opt_vm_ostack_push (vm, es_false);
+	else
+	{
+		EsObject *parent_obj = es_integer_new (parent);
+		opt_vm_ostack_push (vm, parent_obj);
+		opt_vm_ostack_push (vm, es_true);
+		es_object_unref (parent_obj);
+	}
+	return false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchstr",
@@ -4406,6 +4481,13 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = 2,
 		.help_str = "tag:int|tag:tag role:name _UNASSIGNROLE -",
 	},
+	{
+		.name     = "_intervaltab",
+		.fn       = lrop_intervaltab,
+		.arity    = 1,
+		.help_str = "tag:int|tag:tag|matchloc|[line:int]|[startline:int endline:int] _INTERVALTAB parent:int true%"
+		"tag:int|tag:tag|matchloc|[startline:int endline:int] _INTERVALTAB false",
+	}
 };
 
 extern void initRegexOptscript (void)

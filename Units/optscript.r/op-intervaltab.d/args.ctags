@@ -1,0 +1,72 @@
+--sort=no
+
+--langdef=Foo{base=C}{shared}
+--fields=+lr
+--extras=+r
+
+--kinddef-Foo=r,readhandler,read handlers
+--kinddef-Foo=m,method,methods
+--_roledef-Foo.m=set,set a handler
+--kinddef-Foo=w,writehandler,write handlers
+--kinddef-Foo=s,seekhandler,seek handlers
+--kinddef-Foo=o,openhandler,open handlers
+--kinddef-Foo=R,releasehandler,release handlers
+
+# tag:int
+--regex-Foo=/= ([a-z_]*_read),//{postrun}{{
+   \1 /readhandler _tag _commit dup
+   _intervaltab {
+      scope:
+   } {
+      pop
+   } ifelse
+}}
+
+# tag:tag
+--regex-Foo=/\.([a-z_]+)[ \t]*=//{postrun}{{
+   \1 /method /set _reftag dup
+   _intervaltab {
+      exch _commit exch scope:
+   } {
+      _commit
+   } ifelse
+}}
+
+# matchloc
+--regex-Foo=/= ([a-z_]*_write),//{postrun}{{
+   \1 /writehandler _tag _commit
+   @1 _intervaltab {
+      scope:
+   } {
+      pop
+   } ifelse
+}}
+
+--regex-Foo=/= ([a-z_]*_l?lseek),//{postrun}{{
+   \1 /seekhandler _tag _commit
+   1@ _intervaltab {
+      scope:
+   } {
+      pop
+   } ifelse
+}}
+
+# [line:int]
+--regex-Foo=/= ([a-z_]*_release),//{postrun}{{
+   \1 /releasehandler _tag _commit
+   [ 1@ _matchloc2line  ] _intervaltab {
+      scope:
+   } {
+      pop
+   } ifelse
+}}
+
+# [startline:int endline:int]
+--regex-Foo=/= ([a-z_]*_open)(,)//{postrun}{{
+   \1 /openhandler _tag _commit
+   [ 1@ _matchloc2line @2 _matchloc2line ] _intervaltab {
+      scope:
+   } {
+      pop
+   } ifelse
+}}
