@@ -56,11 +56,11 @@ struct sTagEntryInfo {
 	unsigned int inCorkQueue:1;
 	unsigned int isInputFileNameShared: 1; /* shares the value for inputFileName.
 											* Set in the cork queue; don't touch this.*/
+	unsigned int boundaryInfo: 2; /* info about nested input stream */
 
 	unsigned long lineNumber;     /* line number of tag */
 	const char* pattern;	      /* pattern for locating input line
 				       * (may be NULL if not present) *//*  */
-	unsigned int boundaryInfo;    /* info about nested input stream */
 	MIOPos      filePosition;     /* file position of line containing tag */
 	langType langType;         /* language of input file */
 	const char *inputFileName;   /* name of input file.
