@@ -1497,7 +1497,8 @@ void cxxParserAnalyzeOtherStatement(void)
 
 	CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
 
-	if(!cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword))
+	if(!cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword
+							| CXXTokenTypeMultipleColons))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Statement does not start with an identifier or keyword");
 		return;

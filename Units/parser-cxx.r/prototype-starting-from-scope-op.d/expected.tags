@@ -1,0 +1,2 @@
+bar	input.cpp	/^::std::string bar();$/;"	p	typeref:typename:::std::string	file:
+baz	input.cpp	/^::std::string baz() { return "not a prototype"; }$/;"	f	typeref:typename:::std::string
