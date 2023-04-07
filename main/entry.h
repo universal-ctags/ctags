@@ -42,15 +42,26 @@ typedef uint64_t roleBitsType;
 /*  Information about the current tag candidate.
  */
 struct sTagEntryInfo {
+	/*
+	 * the bit fields parsers may access for setting DIRECTLY
+	 */
 	unsigned int lineNumberEntry:1;  /* pattern or line number entry */
 	unsigned int isFileScope    :1;  /* is tag visible only within input file? */
-	unsigned int isFileEntry    :1;  /* is this just an entry for a file name? */
 	unsigned int truncateLineAfterTag :1;  /* truncate tag line at end of tag name? */
+	unsigned int skipAutoFQEmission:1; /* If a parser makes a fq tag for the
+										  current tag by itself, set this. */
+
+	/*
+	 * the bit fields parser may access for setting via accessor
+	 */
 	unsigned int placeholder    :1;	 /* is used only for keeping corkIndex based scope chain.
 					    Put this entry to cork queue but
 					    don't print it to tags file. */
-	unsigned int skipAutoFQEmission:1; /* If a parser makes a fq tag for the
-										  current tag by itself, set this. */
+
+	/*
+	 * the bit fields only the main part can access.
+	 */
+	unsigned int isFileEntry    :1;  /* is this just an entry for a file name? */
 	unsigned int isPseudoTag:1;	/* Used only in xref output.
 								   If a tag is a pseudo, set this. */
 	unsigned int inCorkQueue:1;
