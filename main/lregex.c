@@ -116,8 +116,8 @@ struct guestLangSpec {
 
 struct guestSpec {
 	struct guestLangSpec lang;
-#define BOUNDARY_START 0
-#define BOUNDARY_END  1
+#define GUEST_BOUNDARY_START 0
+#define GUEST_BOUNDARY_END  1
 	struct boundarySpec boundary[2];
 };
 
@@ -871,9 +871,9 @@ static void pre_ptrn_flag_guest_long (const char* const s, const char* const v, 
 	for (int i = 0; i < 2; i++)
 	{
 		current = guest->boundary + i;
-		const char *current_field_str = (i == BOUNDARY_START? "start": "end");
+		const char *current_field_str = (i == GUEST_BOUNDARY_START? "start": "end");
 
-		if (tmp [0] == ((i == BOUNDARY_START)? ',': '\0'))
+		if (tmp [0] == ((i == GUEST_BOUNDARY_START)? ',': '\0'))
 		{
 			if (type == REG_PARSER_MULTI_LINE)
 				error (WARNING,
@@ -1856,7 +1856,8 @@ static void printMessage(const langType language,
 static bool isGuestRequestConsistent (struct guestRequest *guest_req)
 {
 	return (guest_req->lang != LANG_IGNORE)
-		&& (guest_req->boundary[BOUNDARY_START].offset < guest_req->boundary[BOUNDARY_END].offset);
+		&& (guest_req->boundary[GUEST_BOUNDARY_START].offset
+			< guest_req->boundary[GUEST_BOUNDARY_END].offset);
 }
 
 static bool fillGuestRequest (const char *start,
@@ -3150,8 +3151,8 @@ static bool   guestRequestIsFilled(struct guestRequest *r)
 static void   guestRequestClear (struct guestRequest *r)
 {
 	r->lang_set = false;
-	r->boundary[BOUNDARY_START].offset_set = false;
-	r->boundary[BOUNDARY_END].offset_set = false;
+	r->boundary[GUEST_BOUNDARY_START].offset_set = false;
+	r->boundary[GUEST_BOUNDARY_END].offset_set = false;
 }
 
 static void   guestRequestSubmit (struct guestRequest *r)
@@ -3160,11 +3161,11 @@ static void   guestRequestSubmit (struct guestRequest *r)
 	verbose ("guestRequestSubmit: %s; "
 			 "range: %"PRId64" - %"PRId64"\n",
 			 langName,
-			 (int64_t)r->boundary[BOUNDARY_START].offset,
-			 (int64_t)r->boundary[BOUNDARY_END].offset);
+			 (int64_t)r->boundary[GUEST_BOUNDARY_START].offset,
+			 (int64_t)r->boundary[GUEST_BOUNDARY_END].offset);
 	makePromiseForAreaSpecifiedWithOffsets (langName,
-											r->boundary[BOUNDARY_START].offset,
-											r->boundary[BOUNDARY_END].offset);
+											r->boundary[GUEST_BOUNDARY_START].offset,
+											r->boundary[GUEST_BOUNDARY_END].offset);
 }
 
 /*

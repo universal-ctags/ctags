@@ -1194,10 +1194,10 @@ extern unsigned int getNestedInputBoundaryInfo (unsigned long lineNumber)
 	info = 0;
 	if (File.nestedInputStreamInfo.startLine == lineNumber
 	    && File.nestedInputStreamInfo.startCharOffset != 0)
-		info |= BOUNDARY_START;
+		info |= INPUT_BOUNDARY_START;
 	if (File.nestedInputStreamInfo.endLine == lineNumber
 	    && File.nestedInputStreamInfo.endCharOffset != 0)
-		info |= BOUNDARY_END;
+		info |= INPUT_BOUNDARY_END;
 
 	return info;
 }

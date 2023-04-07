@@ -23,8 +23,8 @@
 */
 
 enum nestedInputBoundaryFlag {
-	BOUNDARY_START = 1UL << 0,
-	BOUNDARY_END   = 1UL << 1,
+	INPUT_BOUNDARY_START = 1UL << 0,
+	INPUT_BOUNDARY_END   = 1UL << 1,
 };
 
 /*
