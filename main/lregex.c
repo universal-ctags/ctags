@@ -407,7 +407,7 @@ static void initRegexTag (tagEntryInfo *e,
 	else
 		initForeignRefTagEntry (e, name, foreign_lang, kindIndex, roleIndex);
 	e->extensionFields.scopeIndex = scopeIndex;
-	e->placeholder = !!placeholder;
+	markTagAsPlaceholder(e, placeholder);
 	if (line)
 	{
 		e->lineNumber = line;
@@ -3345,7 +3345,7 @@ static EsObject* lrop_make_foreignreftag (OptVM *vm, EsObject *name)
 
 	tagEntryInfo *e = xMalloc (1, tagEntryInfo);
 	initRegexTag (e, eStrdup (n),
-				  kind_index, role_index, CORK_NIL, 0,
+				  kind_index, role_index, CORK_NIL, false,
 				  loc? loc->line: 0, loc? &loc->pos: NULL,
 				  role_index == ROLE_DEFINITION_INDEX
 				  ? XTAG_UNKNOWN

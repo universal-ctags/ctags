@@ -959,7 +959,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 			foreachEntriesInScope (corkIndex, NULL,
 								   findNonPlaceholder, &any_non_placehoders);
 			if (!any_non_placehoders)
-				tag->placeholder = 1;
+				markTagAsPlaceholder (tag, true);
 		}
 	}
 

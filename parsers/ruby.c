@@ -705,7 +705,7 @@ static void enterUnnamedScope (void)
 	{
 		tagEntryInfo e;
 		initTagEntry (&e, "", e_parent->kindIndex);
-		e.placeholder = 1;
+		markTagAsPlaceholder(&e, true);
 		r = makeTagEntry (&e);
 	}
 	nestingLevelsPush (nesting, r);
