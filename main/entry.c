@@ -914,7 +914,7 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	}
 
 	length += putc_func(searchChar, output);
-	if ((tag->boundaryInfo & BOUNDARY_START) == 0)
+	if ((tag->boundaryInfo & INPUT_BOUNDARY_START) == 0)
 		length += putc_func('^', output);
 	length += appendInputLine (putc_func, line, Option.patternLengthLimit,
 							   output, &omitted);

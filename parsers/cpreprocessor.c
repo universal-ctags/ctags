@@ -888,7 +888,7 @@ static void makeParamTag (vString *name, short nth, bool placeholder)
 	{
 		e->extensionFields.nth = nth;
 		if (placeholder)
-			e->placeholder = 1;
+			markTagAsPlaceholder (e, placeholder);
 	}
 }
 
