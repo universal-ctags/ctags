@@ -362,6 +362,28 @@ representation. ``--list-regex-flags`` lists all the flags.
 	``{postrun}`` flag because the main part always applies the patterns
 	specified with the options after running a built-in parser.
 
+	See also the description of ``scope=intervaltab`` flag.
+
+``scope=intervaltab``
+	Use an interval table to fill in the ``scope:`` field.
+	This flag is useful for extending a built-in parser with the
+	``--regex-<LANG>=`` option. Use this flag with ``postrun`` flag.
+
+	The interval table maintained by the main part of
+	@CTAGS_NAME_EXECUTABLE@ holds tag entries with both ``line:`` and
+	``end:`` fields. Tag entries are stored in a table keyed by their
+	``line:`` and ``end:`` field pairs. Therefore, the table can
+	answer the query, "Which tag entry contains this row?"
+
+	The source line where ``--regex-<LANG>`` pattern finds a language
+	object is used to query the table. The tag entry returned by the
+	table is set in the ``scope:`` field of the newly created tag
+	entry for the language object.
+
+	``postrun`` flag is needed for running the built-in parser that
+	stores tag entries before applying patterns specified with
+	``--regex-<LANG>``.
+
 ``scope=(ref|push|pop|clear|set|replace)``
 	Specify what to do with the internal scope stack.
 
@@ -450,6 +472,13 @@ FLAGS FOR ``--mline-regex-<LANG>`` OPTION
 	even if the *<N>* is ``0`` (meaning the start position of the
 	whole regex pattern).
 
+``scope=intervaltab``
+   See the description for the flag in
+   "`FLAGS FOR --regex-<LANG> OPTION`_".
+
+   Unlike ``--regex-<LANG>`` option, you don't have to specify
+   ``postrun`` flag.
+
 EXAMPLES
 -------------
 
@@ -517,6 +546,62 @@ command line and output::
 	methodA	input.srb	/^  def methodA$/;"	method	class:Example	end:4
 	methodB	input.srb	/^  def methodB$/;"	method	class:Example	end:7
 
+Using the interval table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Let's try to extract kernel threads defined in Linux kernel.
+
+``kthread_run`` is the function for creating and starting a
+kernel thread. For example, ``kswapd`` kernel thread is created
+with the function like (quoted from linux/mm/vmscan.c):
+
+.. code-block:: C
+
+	void kswapd_run(int nid)
+	{
+			/* ... */
+			pgdat->kswapd = kthread_run(kswapd, pgdat, "kswapd%d", nid);
+			/* ... */
+
+``kthread-v1.ctags`` illustrates the way to extract the name of kernel threads
+appeared at the third argument of ``kthread_run``.
+
+``kthread-v1.ctags``:
+
+.. code-block:: ctags
+
+	--kinddef-C=K,kernelThread,the name of kernel thread in Linux kernel
+	--regex-C=/kthread_run\([^"]+"([^"]+)"/\1/K/
+
+With ``kthread-v1.ctags``, ctags emits the following tags:
+
+.. code-block:: console
+
+	$ ctags --options=linux/kthread-v1.ctags  -o - vmscan.c
+	...
+	kswapd%d	vmscan.c	/^... = kthread_run(kswapd, pgdat, "kswapd%d"...$/;"	K
+	...
+
+Using the interval table, you can attach the name of the function
+where the kernel thread is defined.
+
+``kthread-v2.ctags``:
+
+.. code-block:: ctags
+
+	--kinddef-C=K,kernelThread,the name of kernel thread in Linux kernel
+	--regex-C=/kthread_run\([^"]+"([^"]+)"/\1/K/{postrun}{scope=intervaltab}
+
+With ``kthread-v2.ctags``, ctags emits the following tags:
+
+.. code-block:: console
+
+	$ ctags --options=linux/kthread-v2.ctags  -o - vmscan.c
+	...
+	kswapd%d	vmscan.c	/^... = kthread_run(kswapd, pgdat, "kswapd%d"...$/;"	K	function:kswapd_run
+	...
+
+With the new .ctags file, ``function:kswapd_run`` is attach to
+the tag entry as its scope field.
 
 SEE ALSO
 --------
