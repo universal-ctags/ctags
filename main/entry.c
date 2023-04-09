@@ -1593,9 +1593,22 @@ static int queueTagEntry (const tagEntryInfo *const tag)
 extern void updateTagLine (tagEntryInfo *tag, unsigned long lineNumber,
 						   MIOPos filePosition)
 {
+	tagEntryInfoX *entry = NULL;
+	if (tag->inIntevalTab)
+	{
+		entry = (tagEntryInfoX *)tag;
+		removeFromIntervalTabMaybe (entry->corkIndex);
+	}
+
 	tag->lineNumber = lineNumber;
 	tag->filePosition = filePosition;
 	tag->boundaryInfo = getNestedInputBoundaryInfo (lineNumber);
+
+	if (entry && tag->lineNumber < tag->extensionFields._endLine)
+	{
+		intervaltab_insert(entry, &TagFile.intervaltab);
+		tag->inIntevalTab = 1;
+	}
 }
 
 extern void setTagEndLine(tagEntryInfo *tag, unsigned long endLine)
