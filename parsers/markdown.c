@@ -116,12 +116,12 @@ static int makeMarkdownTag (const vString* const name, const int kind, const boo
 		if (twoLine)
 		{
 			/* we want the line before the '---' underline chars */
-			const unsigned long line = getInputLineNumber ();
-			Assert (line > 0);
-			if (line > 0)
+			Assert (e.lineNumber > 1);
+			if (e.lineNumber > 1)
 			{
-				e.lineNumber--;
-				e.filePosition = getInputFilePositionForLine (line - 1);
+				unsigned long lineNumber = e.lineNumber - 1;
+				e.lineNumber = lineNumber;
+				e.filePosition = getInputFilePositionForLine (lineNumber);
 			}
 		}
 
