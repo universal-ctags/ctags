@@ -278,8 +278,7 @@ static int emitTag(const tokenInfo *const token, const tsKind kind)
 	tagEntryInfo e;
 
 	initTagEntry (&e, name, kind);
-	e.lineNumber   = token->lineNumber;
-	e.filePosition = token->filePosition;
+	updateTagLine (&e, token->lineNumber, token->filePosition);
 	e.extensionFields.scopeIndex = token->scope;
 
 	switch (token->accessKeyword)

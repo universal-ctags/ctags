@@ -73,7 +73,8 @@ struct sTagEntryInfo {
 											* Set in the cork queue; don't touch this.*/
 	unsigned int boundaryInfo: 2; /* info about nested input stream */
 
-	unsigned long lineNumber;     /* line number of tag */
+	unsigned long lineNumber;     /* line number of tag;
+									 use updateTagLine() for updating this member. */
 	const char* pattern;	      /* pattern for locating input line
 				       * (may be NULL if not present) *//*  */
 	MIOPos      filePosition;     /* file position of line containing tag */
@@ -245,6 +246,7 @@ int           anyKindsEntryInScopeRecursive (int corkIndex,
 											 const int * kinds, int count,
 											 bool onlyDefinitionTag);
 
+extern void    updateTagLine(tagEntryInfo *tag, unsigned long lineNumber, MIOPos filePosition);
 extern void    setTagEndLine (tagEntryInfo *tag, unsigned long endLine);
 extern void    setTagEndLineToCorkEntry (int corkIndex, unsigned long endLine);
 

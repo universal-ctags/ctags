@@ -916,8 +916,7 @@ static int makeTag (const tokenInfo *const token,
 		kind  = kindIndexForType(type);
 		initTagEntry (&e, vStringValue (token->name), kind);
 
-		e.lineNumber	= token->lineNumber;
-		e.filePosition	= token->filePosition;
+		updateTagLine (&e, token->lineNumber, token->filePosition);
 		e.isFileScope	= isFileScope;
 		if (e.isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);

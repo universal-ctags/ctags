@@ -104,8 +104,8 @@ static int makeAsciidocTag (const vString* const name, const int kind, const boo
 			if (e.lineNumber > 1)
 			{
 				unsigned long lineNumber = e.lineNumber - 1;
-				e.lineNumber = lineNumber;
-				e.filePosition = getInputFilePositionForLine(lineNumber);
+				updateTagLine (&e, lineNumber,
+							   getInputFilePositionForLine(lineNumber));
 			}
 		}
 

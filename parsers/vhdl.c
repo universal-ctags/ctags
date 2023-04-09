@@ -570,8 +570,7 @@ static int makeVhdlTagWithScope (tokenInfo * const token, const vhdlKind kind, i
 	const char *const name = vStringValue (token->string);
 	tagEntryInfo e;
 	initTagEntry (&e, name, kind);
-	e.lineNumber = token->lineNumber;
-	e.filePosition = token->filePosition;
+	updateTagLine (&e, token->lineNumber, token->filePosition);
 	e.extensionFields.scopeIndex = parent;
 	return makeTagEntry (&e);
 }

@@ -351,8 +351,7 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 
 	initTagEntry (e, vStringValue (token->string), kind);
 
-	e->lineNumber	= token->lineNumber;
-	e->filePosition	= token->filePosition;
+	updateTagLine (e, token->lineNumber, token->filePosition);
 
 	if (access != ACCESS_UNDEFINED)
 		e->extensionFields.access = accessToString (access);
@@ -443,8 +442,7 @@ static void makeNamespacePhpTag (const tokenInfo *const token, const vString *co
 
 		initTagEntry (&e, vStringValue (name), K_NAMESPACE);
 
-		e.lineNumber	= token->lineNumber;
-		e.filePosition	= token->filePosition;
+		updateTagLine (&e, token->lineNumber, token->filePosition);
 
 		makePhpTagEntry (&e);
 	}

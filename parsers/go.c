@@ -693,8 +693,7 @@ static int makeTagFull (tokenInfo *const token, const goKind kind,
 
 	initRefTagEntry (&e, name, kind, role);
 
-	e.lineNumber = token->lineNumber;
-	e.filePosition = token->filePosition;
+	updateTagLine (&e, token->lineNumber, token->filePosition);
 	if (argList)
 		e.extensionFields.signature = argList;
 	if (typeref)

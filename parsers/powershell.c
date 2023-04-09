@@ -124,8 +124,7 @@ static void initPowerShellEntry (tagEntryInfo *const e, const tokenInfo *const t
 {
 	initTagEntry (e, vStringValue (token->string), kind);
 
-	e->lineNumber	= token->lineNumber;
-	e->filePosition	= token->filePosition;
+	updateTagLine (e, token->lineNumber, token->filePosition);
 
 	if (access != NULL)
 		e->extensionFields.access = access;

@@ -43,8 +43,8 @@ static void makeKotlinTag (struct parserCtx *auxil, const char *name, long offse
         stripped = eStrndup (name + 1, len);
         initTagEntry(&e, stripped, k);
     }
-    e.lineNumber = getInputLineNumberForFileOffset (offset);
-    e.filePosition = getInputFilePositionForLine (e.lineNumber);
+    unsigned long lineNumber = getInputLineNumberForFileOffset (offset);
+    updateTagLine (&e, lineNumber, getInputFilePositionForLine (lineNumber));
     e.extensionFields.scopeIndex = BASE_SCOPE(auxil);
     int scope_index = makeTagEntry (&e);
     if (pushScope)

@@ -279,8 +279,7 @@ static void enterMoose (struct mooseSubparser *moose, bool role)
 
 	tagEntryInfo moose_e;
 	initTagEntry (&moose_e, perl_e->name, role? K_ROLE: K_CLASS);
-	moose_e.lineNumber = perl_e->lineNumber;
-	moose_e.filePosition = perl_e->filePosition;
+	updateTagLine(&moose_e, perl_e->lineNumber, perl_e->filePosition);
 	moose->classCork = makeTagEntry (&moose_e);
 	vStringClear (moose->supersOrRoles);
 

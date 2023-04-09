@@ -54,8 +54,8 @@ static void simpleXpathMakeTag (xmlNode *node,
 		goto out;
 
 
-	tag.lineNumber = XML_GET_LINE (node);
-	tag.filePosition = getInputFilePositionForLine (tag.lineNumber);
+	unsigned long lineNumber = XML_GET_LINE (node);
+	updateTagLine(&tag, lineNumber, getInputFilePositionForLine (lineNumber));
 
 	path = (char *)xmlGetNodePath (node);
 	tag.extensionFields.xpath = path;

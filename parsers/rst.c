@@ -166,13 +166,9 @@ static void makeSectionRstTag(const vString* const name, const int kind, const M
 
 		initTagEntry (&e, vStringValue (name), kind);
 		Assert (e.lineNumber > 1);
+		/* we want the line before the '---' underline chars */
 		if (e.lineNumber > 1)
-		{
-			/* we want the line before the '---' underline chars */
-			unsigned long lineNumber = e.lineNumber - 1;
-			e.lineNumber = lineNumber;
-			e.filePosition = filepos;
-		}
+			updateTagLine (&e, e.lineNumber - 1, filepos);
 
 		parent = getEntryOfNestingLevel (nl);
 		if (parent && (parent->kindIndex < kind))

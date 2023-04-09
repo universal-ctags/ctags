@@ -253,8 +253,7 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 
 	initTagEntry (e, vStringValue (token->string), kind);
 
-	e->lineNumber	= token->lineNumber;
-	e->filePosition	= token->filePosition;
+	updateTagLine (e, token->lineNumber, token->filePosition);
 
 	nl = nestingLevelsGetCurrent (PythonNestingLevels);
 	if (nl)
@@ -357,8 +356,7 @@ static int makeSimplePythonRefTag (const tokenInfo *const token,
 		initRefTagEntry (&e, vStringValue (altName ? altName : token->string),
 		                 kind, roleIndex);
 
-		e.lineNumber	= token->lineNumber;
-		e.filePosition	= token->filePosition;
+		updateTagLine (&e, token->lineNumber, token->filePosition);
 
 		if (xtag != XTAG_UNKNOWN)
 			markTagExtraBit (&e, xtag);

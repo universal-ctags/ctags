@@ -1559,6 +1559,14 @@ static int queueTagEntry (const tagEntryInfo *const tag)
 	return corkIndex;
 }
 
+extern void updateTagLine (tagEntryInfo *tag, unsigned long lineNumber,
+						   MIOPos filePosition)
+{
+	tag->lineNumber = lineNumber;
+	tag->filePosition = filePosition;
+	tag->boundaryInfo = getNestedInputBoundaryInfo (lineNumber);
+}
+
 extern void setTagEndLine(tagEntryInfo *tag, unsigned long endLine)
 {
 	if (endLine != 0 && endLine < tag->lineNumber)
@@ -1911,9 +1919,8 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 extern void setTagPositionFromTag (tagEntryInfo *const dst,
 								   const tagEntryInfo *const src)
 {
-		dst->lineNumber = src->lineNumber;
-		dst->boundaryInfo = src->boundaryInfo;
-		dst->filePosition = src->filePosition;
+	updateTagLine (dst, src->lineNumber, src->filePosition);
+	dst->boundaryInfo = src->boundaryInfo;
 }
 
 static void initTagEntryFull (tagEntryInfo *const e, const char *const name,

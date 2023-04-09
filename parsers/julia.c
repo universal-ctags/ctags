@@ -874,8 +874,7 @@ static void addTag (vString* ident, const char* type, const char* arg_list, int 
     tagEntryInfo tag;
     initTagEntry(&tag, vStringValue(ident), kind);
 
-    tag.lineNumber = line;
-    tag.filePosition = pos;
+    updateTagLine(&tag, line, pos);
     tag.sourceFileName = getInputFileName();
 
     tag.extensionFields.signature = arg_list;
@@ -896,8 +895,7 @@ static void addReferenceTag (vString* ident, int kind, int role, unsigned long l
     }
     tagEntryInfo tag;
     initRefTagEntry(&tag, vStringValue(ident), kind, role);
-    tag.lineNumber = line;
-    tag.filePosition = pos;
+    updateTagLine(&tag, line, pos);
     if (parent_kind != K_NONE)
     {
         tag.extensionFields.scopeKindIndex = parent_kind;

@@ -460,8 +460,7 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 		}
 
 		initRefTagEntry (&e, name, kind, role);
-		e.lineNumber = token->lineNumber;
-		e.filePosition = token->filePosition;
+		updateTagLine (&e, token->lineNumber, token->filePosition);
 		e.extensionFields.scopeIndex = scope;
 
 		index = makeTagEntry (&e);
@@ -515,8 +514,7 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 
 	tagEntryInfo e;
 	initTagEntry (&e, name, kind);
-	e.lineNumber   = token->lineNumber;
-	e.filePosition = token->filePosition;
+	updateTagLine (&e, token->lineNumber, token->filePosition);
 	e.extensionFields.scopeIndex = scope;
 
 #ifdef DO_TRACING

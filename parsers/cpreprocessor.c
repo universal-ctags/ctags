@@ -994,8 +994,7 @@ static int directiveDefine (const int c, bool undef)
 				tagEntryInfo *e = getEntryInCorkQueue (r);
 				if (e)
 				{
-					e->lineNumber = lineNumber;
-					e->filePosition = filePosition;
+					updateTagLine (e, lineNumber, filePosition);
 					patchScopeFieldOfParameters (param_start, param_end, r);
 				}
 			}

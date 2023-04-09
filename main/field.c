@@ -1887,10 +1887,7 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 	if (fdef->ftype == FIELD_END_LINE)
 		setTagEndLine(tag, (unsigned long)l);
 	else
-	{
-		tag->lineNumber = l;
-		tag->filePosition = getInputFilePositionForLine (l);
-	}
+		updateTagLine (tag, l, getInputFilePositionForLine (l));
 
 	return es_false;
 }

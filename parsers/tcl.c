@@ -466,8 +466,7 @@ static void parseProc (tokenInfo *const token,
 			tagEntryInfo e;
 
 			initTagEntry (&e, last, K_PROCEDURE);
-			e.lineNumber = token->lineNumber;
-			e.filePosition = token->filePosition;
+			updateTagLine (&e, token->lineNumber, token->filePosition);
 
 			int len  = (last - tokenString (token));
 			vString *ns = vStringNew();

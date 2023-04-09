@@ -291,8 +291,7 @@ static int makeDtdTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 	initRefTagEntry (e, tokenString (token),
 					 kind,
 					 role);
-	e->lineNumber = token->lineNumber;
-	e->filePosition = token->filePosition;
+	updateTagLine (e, token->lineNumber, token->filePosition);
 	e->extensionFields.scopeIndex = DTD (token)->scopeIndex;
 
 	return makeTagEntry (e);

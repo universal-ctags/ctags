@@ -210,9 +210,7 @@ static void initGDScriptEntry (tagEntryInfo *const e, const tokenInfo *const tok
 	NestingLevel *nl;
 
 	initTagEntry (e, vStringValue (token->string), kind);
-
-	e->lineNumber	= token->lineNumber;
-	e->filePosition	= token->filePosition;
+	updateTagLine (e, token->lineNumber, token->filePosition);
 
 	nl = nestingLevelsGetCurrent (GDScriptNestingLevels);
 	if (nl)
@@ -322,9 +320,7 @@ static int makeSimpleGDScriptRefTag (const tokenInfo *const token,
 
 		initRefTagEntry (&e, vStringValue (token->string),
 						 kind, roleIndex);
-
-		e.lineNumber	= token->lineNumber;
-		e.filePosition	= token->filePosition;
+		updateTagLine (&e, token->lineNumber, token->filePosition);
 
 		if (xtag != XTAG_UNKNOWN)
 			markTagExtraBit (&e, xtag);

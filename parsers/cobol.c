@@ -242,8 +242,7 @@ static void initCOBOLRefTagEntry (tagEntryInfo *e, const char *name,
 								  const cobolKind kind, const int role)
 {
 	initRefTagEntry (e, name, kind, role);
-	e->lineNumber = CblInputState.lineNumber;
-	e->filePosition = CblInputState.filePosition;
+	updateTagLine (e, CblInputState.lineNumber, CblInputState.filePosition);
 }
 
 static void initCOBOLTagEntry (tagEntryInfo *e, const char *name, const cobolKind kind)

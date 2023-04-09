@@ -341,8 +341,7 @@ static int makeTexTag (tokenInfo *const token, int kind,
 	tagEntryInfo e;
 	initTagEntry (&e, name, kind);
 
-	e.lineNumber   = token->lineNumber;
-	e.filePosition = token->filePosition;
+	updateTagLine (&e, token->lineNumber, token->filePosition);
 
 	vString *parentName = NULL;
 

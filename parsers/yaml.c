@@ -80,10 +80,7 @@ extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asE
 	if (asEndPosition)
 		setTagEndLine (tag, ln);
 	else
-	{
-		tag->lineNumber = ln;
-		tag->filePosition = getInputFilePositionForLine (tag->lineNumber);
-	}
+		updateTagLine (tag, ln, getInputFilePositionForLine (ln));
 }
 
 enum YamlKind {

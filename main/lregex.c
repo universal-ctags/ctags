@@ -440,10 +440,7 @@ static void initRegexTag (tagEntryInfo *e,
 	e->extensionFields.scopeIndex = scopeIndex;
 	markTagAsPlaceholder(e, placeholder);
 	if (line)
-	{
-		e->lineNumber = line;
-		e->filePosition = *pos;
-	}
+		updateTagLine(e, line, *pos);
 
 	if (xtag_type != XTAG_UNKNOWN)
 		markTagExtraBit (e, xtag_type);

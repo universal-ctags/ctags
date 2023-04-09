@@ -898,8 +898,7 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, int kind)
 	/* Ripped out of read.h initTagEntry, because of line number
 	 * shenanigans.
 	 * Ugh. Lookahead is harder than I expected. */
-	tag->lineNumber = ocaLineNumber;
-	tag->filePosition = ocaFilePosition;
+	updateTagLine(tag, ocaLineNumber, ocaFilePosition);
 
 	parentIndex = getLastNamedIndex ();
 	if (parentIndex >= 0)
