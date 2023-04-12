@@ -131,6 +131,12 @@ static const char *const HeaderExtensions [] = {
 	"h", "H", "hh", "hpp", "hxx", "h++", "inc", "def", NULL
 };
 
+static const char *const SourceExtensions [] = {
+	"c", "c++", "cc", "cp", "cpp", "cxx", "C", "CPP", "CXX", NULL
+};
+
+static stringList* SourceExt;
+
 long ctags_debugLevel = 0L;
 bool ctags_verbose = false;
 
@@ -1142,7 +1148,9 @@ extern bool isIncludeFile (const char *const fileName)
 	const char *const extension = fileExtension (fileName);
 	if (Option.headerExt != NULL)
 		result = stringListExtensionMatched (Option.headerExt, extension);
-	return result;
+	if (result)
+		return true;
+	return !stringListExtensionMatched (SourceExt, extension);
 }
 
 /*
@@ -3856,6 +3864,7 @@ extern void initOptions (void)
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
+	SourceExt = stringListNewFromArgv (SourceExtensions);
 	verbose ("  Installing default language mappings:\n");
 	installLanguageMapDefaults ();
 	verbose ("  Installing default language aliases:\n");
@@ -3935,6 +3944,7 @@ extern void freeOptionResources (void)
 	freeList (&Excluded);
 	freeList (&ExcludedException);
 	freeList (&Option.headerExt);
+	freeList (&SourceExt);
 	freeList (&Option.etagsInclude);
 
 	freeSearchPathList (&OptlibPathList);
