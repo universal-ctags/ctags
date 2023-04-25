@@ -1020,7 +1020,7 @@ extern const tagField* getParserFieldForIndex (const tagEntryInfo * tag, int ind
 	}
 }
 
-extern const char* getParserFieldValueForType (tagEntryInfo *const tag, fieldType ftype)
+extern const char* getParserFieldValueForType (const tagEntryInfo *const tag, fieldType ftype)
 {
 	for (int i = 0; i < tag->usedParserFields; i++)
 	{
