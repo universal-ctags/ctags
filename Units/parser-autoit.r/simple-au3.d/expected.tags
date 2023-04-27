@@ -1,8 +1,3 @@
-$iDoubled	input.au3	/^Local $iDoubled = 0$/;"	l	roles:def
-$iFirst	input.au3	/^    LOCAL STATIC $iFirst = 0$/;"	l	func:All functions.MyDummy	roles:def	properties:static
-$iNumber	input.au3	/^Local $iNumber = 10$/;"	l	roles:def
-$iSecond	input.au3	/^    STATIC LOCAL $iSecond = 1$/;"	l	func:All functions.MyDummy	roles:def	properties:static
-$iSomething	input.au3	/^    Local $iSomething = 42$/;"	l	func:All functions.MyDouble0	roles:def
 All functions	input.au3	/^#Region All functions$/;"	r	roles:def	end:54
 Constants.au3	input.au3	/^#include <Constants.au3>$/;"	S	roles:system
 GUIConstantsEx.au3	input.au3	/^#include<GUIConstantsEx.au3>$/;"	S	roles:system
@@ -12,3 +7,8 @@ MyDouble1	input.au3	/^    	FUNC MyDouble1($iValue)$/;"	f	region:All functions	si
 MyDummy	input.au3	/^FUNC MyDummy($iValue)$/;"	f	region:All functions	signature:($iValue)	roles:def	end:53
 MyVolatileDouble	input.au3	/^Volatile Func MyVolatileDouble ($iValue)$/;"	f	region:All functions	signature:($iValue)	roles:def	end:47	properties:volatile
 WindowsConstants.au3	input.au3	/^#include "WindowsConstants.au3"$/;"	S	roles:local
+iDoubled	input.au3	/^Local $iDoubled = 0$/;"	l	roles:def
+iFirst	input.au3	/^    LOCAL STATIC $iFirst = 0$/;"	l	func:All functions.MyDummy	roles:def	properties:static
+iNumber	input.au3	/^Local $iNumber = 10$/;"	l	roles:def
+iSecond	input.au3	/^    STATIC LOCAL $iSecond = 1$/;"	l	func:All functions.MyDummy	roles:def	properties:static
+iSomething	input.au3	/^    Local $iSomething = 42$/;"	l	func:All functions.MyDouble0	roles:def

@@ -281,7 +281,7 @@ static void findAutoItTags (void)
 					skipSpaces (&p);
 				if (*p == '$')
 				{
-					vStringPut (name, (int) *p++);
+					p++;
 					while (isIdentChar ((int) *p))
 					{
 						vStringPut (name, (int) *p);
@@ -313,5 +313,7 @@ parserDefinition *AutoItParser (void)
 	def->extensions = extensions;
 	def->parser     = findAutoItTags;
 	def->useCork    = CORK_QUEUE;
+	def->versionCurrent = 1;
+	def->versionAge = 0;
 	return def;
 }
