@@ -313,5 +313,7 @@ parserDefinition *AutoItParser (void)
 	def->extensions = extensions;
 	def->parser     = findAutoItTags;
 	def->useCork    = CORK_QUEUE;
+	def->versionCurrent = 1;
+	def->versionAge = 0;
 	return def;
 }
