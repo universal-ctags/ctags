@@ -3,7 +3,7 @@ jobs:
   #
   # This is for the latest RELEASED Fedora.
   # Update the version of Fedora when new version is released.
-  # We don't use row hide, the development version of Fedora
+  # We don't use rawhide, the development version of Fedora
   # till the list of TODO items of u-ctags becomes nil.
   #
   # We assume GNU Make is available.
