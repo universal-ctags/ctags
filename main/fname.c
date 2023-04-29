@@ -151,12 +151,26 @@ static char *fsimplify_abs0 (char *fname, struct comp *parent)
 	return fsimplify_abs0 (next + 1, &comp);
 }
 
+static bool is_special_link(const char *name)
+{
+	/* strcmp (comp.str, "..") || !strcmp (comp.str, ".") */
+	if (name [0] != '.')
+		return false;
+	if (name [1] == '\0')
+		return true;
+	if (name [1] != '.')
+		return false;
+	if (name [2] == '\0')
+		return true;
+	return false;
+}
+
 extern char *canonicalizeAbsoluteFileName (char *fname)
 {
 	char  *next = strchr (fname, '/');
 	if (next == NULL)
 	{
-		if (!strcmp (fname, "..") || !strcmp (fname, "."))
+		if (is_special_link(fname))
 		{
 			fname [0] = '/';
 			fname [1] = '\0';
@@ -175,7 +189,7 @@ extern char *canonicalizeAbsoluteFileName (char *fname)
 		.parent = NULL,
 		.child = NULL
 	};
-	if (!strcmp (comp.str, "..") || !strcmp (comp.str, "."))
+	if (is_special_link (comp.str))
 	{
 		comp.str[0] = '\0';
 		comp.len = 0;
