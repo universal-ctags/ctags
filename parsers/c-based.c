@@ -494,6 +494,7 @@ static const keywordDesc KeywordTable [] = {
 *   FUNCTION PROTOTYPES
 */
 static void createTags (const unsigned int nestLevel, statementInfo *const parent);
+static void parseAtMarkStyleAnnotation (statementInfo *const st);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -2213,7 +2214,7 @@ static void processAngleBracket (void)
 	}
 }
 
-static void parseJavaAnnotation (statementInfo *const st)
+static void parseAtMarkStyleAnnotation (statementInfo *const st)
 {
 	/*
 	 * @Override
@@ -2348,7 +2349,7 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 			default:
 				if (c == '@' && isInputLanguage (Lang_java))
 				{
-					parseJavaAnnotation(st);
+					parseAtMarkStyleAnnotation (st);
 				}
 				else if (cppIsident1 (c))
 				{
@@ -2639,7 +2640,7 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 	}
 	else if (c == '@' && isInputLanguage (Lang_java))
 	{
-		parseJavaAnnotation (st);
+		parseAtMarkStyleAnnotation (st);
 	}
 	else if (c == STRING_SYMBOL) {
 		setToken(st, TOKEN_NONE);
