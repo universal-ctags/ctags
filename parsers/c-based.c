@@ -2123,6 +2123,10 @@ static bool skipPostArgumentStuff (
 					break;
 				}
 			}
+			else if (isInputLanguage (Lang_d) && c == '@')
+			{
+				parseAtMarkStyleAnnotation (st);
+			}
 		}
 		if (! end)
 		{
@@ -2226,7 +2230,11 @@ static void parseAtMarkStyleAnnotation (statementInfo *const st)
 	tokenInfo *const token = activeToken (st);
 
 	int c = skipToNonWhite ();
-	readIdentifier (token, c);
+	if (cppIsident1 (c))
+		readIdentifier (token, c);
+	else
+		cppUngetc (c); // D allows: @ ( ArgumentList )
+
 	if (token->keyword == KEYWORD_INTERFACE)
 	{
 		/* Oops. This was actually "@interface" defining a new annotation. */
@@ -2347,7 +2355,7 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 				break;
 
 			default:
-				if (c == '@' && isInputLanguage (Lang_java))
+				if (c == '@' && (isInputLanguage (Lang_d) || isInputLanguage (Lang_java)))
 				{
 					parseAtMarkStyleAnnotation (st);
 				}
@@ -2638,7 +2646,7 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 		if (c2 != '=')
 			cppUngetc (c2);
 	}
-	else if (c == '@' && isInputLanguage (Lang_java))
+	else if (c == '@' && (isInputLanguage (Lang_d) || isInputLanguage (Lang_java)))
 	{
 		parseAtMarkStyleAnnotation (st);
 	}
