@@ -32,4 +32,10 @@ run_test good1.tags --canonicalize-input -l &&
 run_test good2.tags -C -l &&
 ! run_test drive-letter0.tags --canonicalize-input -l &&
 ! run_test drive-letter1.tags -C -l &&
-run_test good-ptags.tags -C -D
+run_test good-ptags.tags -C -D &&
+run_test good0.tags -A -l &&
+run_test good1.tags --absolute-input -l &&
+run_test good2.tags -A -l &&
+! run_test drive-letter0.tags --absolute-input -l &&
+! run_test drive-letter1.tags -A -l &&
+run_test good-ptags.tags -A -D

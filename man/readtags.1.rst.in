@@ -73,6 +73,9 @@ Controlling the Output
 By default, the output of readtags contains only the name, input and pattern
 field. The Output can be tweaked using these options:
 
+``-A``, ``--absolute-input``
+	Do the same as ``-C`` option but use only absolute path form.
+
 ``-C``, ``--canonicalize-input``
 	Resolve '..' and '.' in input fields of regular tags.
 	This produces a unique representation of the input path.

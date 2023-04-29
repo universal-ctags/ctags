@@ -32,6 +32,7 @@ typedef struct sReadOption {
 struct canonWorkArea {
 	struct canonFnameCacheTable *cacheTable;
 	int ptags;
+	bool absoluteOnly;
 };
 
 static const char *TagFileName = "tags";
@@ -215,8 +216,8 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 		{
 			shadowRec = *first_entry;
 			shadow = &shadowRec;
-			shadow->file = canonicalizeRelativeFileName (canon->cacheTable,
-														 first_entry->file);
+			shadow->file = canonicalizeFileName (canon->cacheTable,
+												 first_entry->file);
 		}
 
 		if (Qualifier)
@@ -357,11 +358,12 @@ static const char *loadCtagsCWD (tagFile *const file, tagEntry *pentry)
 	return pentry->file;
 }
 
-static struct canonFnameCacheTable *makeCanonFnameCacheTable (tagFile *const file)
+static struct canonFnameCacheTable *makeCanonFnameCacheTable (tagFile *const file,
+															  bool absoluteOnly)
 {
 	tagEntry pentry;
 	const char *cwd = loadCtagsCWD (file, &pentry);
-	return canonFnameCacheTableNew (cwd);
+	return canonFnameCacheTableNew (cwd, absoluteOnly);
 }
 
 static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
@@ -426,7 +428,7 @@ static void findTag (const char *const name, readOptions *readOpts,
 	}
 
 	if (canon && canon->cacheTable == NULL)
-		canon->cacheTable = makeCanonFnameCacheTable (file);
+		canon->cacheTable = makeCanonFnameCacheTable (file, canon->absoluteOnly);
 
 	if (printOpts->escaping)
 	{
@@ -487,7 +489,7 @@ static void listTags (int pseudoTags, tagPrintOptions *printOpts,
 	}
 
 	if (canon && canon->cacheTable == NULL)
-		canon->cacheTable = makeCanonFnameCacheTable (file);
+		canon->cacheTable = makeCanonFnameCacheTable (file, canon->absoluteOnly);
 
 	if (printOpts->escaping)
 	{
@@ -573,6 +575,8 @@ static const char *const Usage =
 	"        METHOD: unsorted|sorted|foldcase\n"
 	"    -C | --canonicalize-input\n"
 	"        Reduct '..' and '.' in input fields.\n"
+	"    -A | --absolute-input\n"
+	"        Do the same as -C but use absolute path form\n"
 #ifdef READTAGS_DSL
 	"    -F EXP | --formatter EXP\n"
 	"        Format the tags listed by ACTION with EXP when printing.\n"
@@ -666,6 +670,12 @@ extern int main (int argc, char **argv)
 	struct canonWorkArea canonWorkArea = {
 		.cacheTable = NULL,
 		.ptags = 0,
+		.absoluteOnly = false,
+	};
+	struct canonWorkArea canonWorkAreaAbsForm = {
+		.cacheTable = NULL,
+		.ptags = 0,
+		.absoluteOnly = true,
 	};
 	struct canonWorkArea *canon = NULL;
 
@@ -782,6 +792,8 @@ extern int main (int argc, char **argv)
 					exit (1);
 				}
 			}
+			else if (strcmp (optname, "absolute-input") == 0)
+				canon = &canonWorkAreaAbsForm;
 			else if (strcmp (optname, "canonicalize-input") == 0)
 				canon = &canonWorkArea;
 #ifdef READTAGS_DSL
@@ -897,6 +909,9 @@ extern int main (int argc, char **argv)
 							readOpts.sortMethod = (sortType) (arg[j] - '0');
 						else
 							printUsage(stderr, 1);
+						break;
+					case 'A':
+						canon = &canonWorkAreaAbsForm;
 						break;
 					case 'C':
 						canon = &canonWorkArea;

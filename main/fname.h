@@ -12,7 +12,7 @@
 #include "htable.h"
 
 struct canonFnameCacheTable;
-extern struct canonFnameCacheTable *canonFnameCacheTableNew (const char *cwd);
+extern struct canonFnameCacheTable *canonFnameCacheTableNew (const char *cwd, bool absoluteOnly);
 extern void canonFnameCacheTableDelete (struct canonFnameCacheTable *cache_table);
 
 /*
@@ -23,7 +23,11 @@ extern void canonFnameCacheTableDelete (struct canonFnameCacheTable *cache_table
  * working directly is the CWD passed canonFnameCacheTableNew(). The return
  * string may absolute or relative path form.
  *
- * In most of all cases, the string return from this function doesn't
+ * Return the result in absolute path form always if CACHE_TABLE is made
+ * with absoluteOnly == true.
+ *
+ * If CACHE_TABLE is made with absoluteOnly == false,
+ * in most of all cases, the string return from this function doesn't
  * include ".". There is one exception.
  * If the resolved file name is the same as CWD canonFnameCacheTableNew(),
  * this function returns just ".".
@@ -33,8 +37,8 @@ extern void canonFnameCacheTableDelete (struct canonFnameCacheTable *cache_table
  * same INPUT more than twice. canonFnameCacheTableDelete() destroys all C
  * strings returned from this function.
  */
-extern const char *canonicalizeRelativeFileName(struct canonFnameCacheTable *cache_table,
-												const char *input);
+extern const char *canonicalizeFileName(struct canonFnameCacheTable *cache_table,
+										const char *input);
 
 /*
  * Resolve '.', '..', and '//' in FNAME as if the current working
