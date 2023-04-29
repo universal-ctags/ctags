@@ -224,7 +224,7 @@ static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *re
 			if (r[dir_len] == '/')
 			{
 				if (r[dir_len + 1] == '\0')
-					vStringCopyS (buf, ".");
+					vStringNCopyS (buf, ".", 1);
 				else
 					vStringCopyS (buf, r + dir_len + 1);
 				eFree (r);
@@ -232,7 +232,7 @@ static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *re
 			}
 			else if (r[dir_len] == '\0')
 			{
-				vStringCopyS (buf, ".");
+				vStringNCopyS (buf, ".", 1);
 				eFree (r);
 				return vStringDeleteUnwrap (buf);
 			}
