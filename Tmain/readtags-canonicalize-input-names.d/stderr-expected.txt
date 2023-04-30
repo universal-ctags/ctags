@@ -1,0 +1,16 @@
+# good0.tags -C -l
+# good1.tags --canonicalize-input -l
+# good2.tags -C -l
+# drive-letter0.tags --canonicalize-input -l
+!_TAG_PROC_CWD must start with '/': C:\tmp
+# drive-letter1.tags -C -l
+!_TAG_PROC_CWD must start with '/': D:/tmp
+# good-ptags.tags -C -D
+# good0.tags -A -l
+# good1.tags --absolute-input -l
+# good2.tags -A -l
+# drive-letter0.tags --absolute-input -l
+!_TAG_PROC_CWD must start with '/': C:\tmp
+# drive-letter1.tags -A -l
+!_TAG_PROC_CWD must start with '/': D:/tmp
+# good-ptags.tags -A -D

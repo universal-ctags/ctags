@@ -46,6 +46,157 @@ static void test_fname_absolute(void)
 
 	T("..//////a", "/a");
 	T("..//..//..//a", "/a");
+#undef T
+}
+
+static void test_fname_absolute_with_cache(void)
+{
+	struct canonFnameCacheTable *ct;
+	bool absoluteOnly;
+#define T(INPUT,OUTPUT) \
+	if (!TEST_CHECK(strcmp(canonicalizeFileName (ct, INPUT), \
+			       OUTPUT) == 0))				\
+		fprintf(stderr, "	ACTUAL: %s (%s)\n", canonicalizeFileName (ct, INPUT), absoluteOnly? "absOnly": "relaOK")
+
+	absoluteOnly = true;
+	ct = canonFnameCacheTableNew ("/abc", absoluteOnly);
+	T("/abc/input", "/abc/input");
+	T("/abc/../input", "/input");
+	T("/abc/../../input", "/input");
+	T("/abc/.././../input", "/input");
+	T("/abc/./input", "/abc/input");
+	T("/abc/.//input", "/abc/input");
+	T("/abc/.//.//input", "/abc/input");
+	T("/input", "/input");
+	T("/./input", "/input");
+	T("/../z/../input", "/input");
+	T("/../z/../..input", "/..input");
+
+	T("input", "/abc/input");
+	T("./input", "/abc/input");
+	T("../input", "/input");
+	T("..//input", "/input");
+	T(".././input", "/input");
+	T("..//.//input", "/input");
+	T("../d/input", "/d/input");
+	T("../d/../input", "/input");
+	T("../d/..//input", "/input");
+	T("../d/..///./input", "/input");
+	canonFnameCacheTableDelete (ct);
+
+	absoluteOnly = true;
+	ct = canonFnameCacheTableNew ("/abc/efg", absoluteOnly);
+	T("input", "/abc/efg/input");
+	T("../input", "/abc/input");
+	T("..//input", "/abc/input");
+	T(".././input", "/abc/input");
+	T("..//.//input", "/abc/input");
+	T("../d/input", "/abc/d/input");
+	T("../d/../input", "/abc/input");
+	T("../d/..//input", "/abc/input");
+	T("../d/..///./input", "/abc/input");
+	T("../d/..///./input/.././input", "/abc/input");
+	T("", "/abc/efg");
+	T(".", "/abc/efg");
+	T("./", "/abc/efg");
+	T("./..", "/abc");
+	T("./.", "/abc/efg");
+	T("././//", "/abc/efg");
+	T("././//.", "/abc/efg");
+	T("././../efg/.", "/abc/efg");
+	T("..", "/abc");
+	T("../..", "/");
+	T("../../", "/");
+	T("../..", "/");
+	T("../../..", "/");
+	T("../../../..", "/");
+	T("../././..", "/");
+	T("./././..", "/abc");
+	T("...", "/abc/efg/...");
+	T(".../", "/abc/efg/...");
+	T("...//", "/abc/efg/...");
+	T("..././", "/abc/efg/...");
+	T("...//./", "/abc/efg/...");
+	T("...//.//", "/abc/efg/...");
+	T("..././/", "/abc/efg/...");
+	T("..././.../", "/abc/efg/.../...");
+	canonFnameCacheTableDelete (ct);
+#undef T
+}
+
+static void test_fname_relative(void)
+{
+	struct canonFnameCacheTable *ct;
+	bool absoluteOnly;
+#define T(INPUT,OUTPUT) \
+	if (!TEST_CHECK(strcmp(canonicalizeFileName (ct, INPUT), \
+			       OUTPUT) == 0))				\
+		fprintf(stderr, "	ACTUAL: %s (%s)\n", canonicalizeFileName (ct, INPUT), absoluteOnly? "absOnly": "relaOK")
+
+	absoluteOnly = false;
+	ct = canonFnameCacheTableNew ("/abc", absoluteOnly);
+	T("/abc/input", "/abc/input");
+	T("/abc/../input", "/input");
+	T("/abc/../../input", "/input");
+	T("/abc/.././../input", "/input");
+	T("/abc/./input", "/abc/input");
+	T("/abc/.//input", "/abc/input");
+	T("/abc/.//.//input", "/abc/input");
+	T("/input", "/input");
+	T("/./input", "/input");
+	T("/../z/../input", "/input");
+	T("/../z/../..input", "/..input");
+
+	T("input", "input");
+	T("./input", "input");
+	T("../input", "/input");
+	T("..//input", "/input");
+	T(".././input", "/input");
+	T("..//.//input", "/input");
+	T("../d/input", "/d/input");
+	T("../d/../input", "/input");
+	T("../d/..//input", "/input");
+	T("../d/..///./input", "/input");
+	canonFnameCacheTableDelete (ct);
+
+	absoluteOnly = false;
+	ct = canonFnameCacheTableNew ("/abc/efg", absoluteOnly);
+	T("input", "input");
+	T("../input", "/abc/input");
+	T("..//input", "/abc/input");
+	T(".././input", "/abc/input");
+	T("..//.//input", "/abc/input");
+	T("../d/input", "/abc/d/input");
+	T("../d/../input", "/abc/input");
+	T("../d/..//input", "/abc/input");
+	T("../d/..///./input", "/abc/input");
+	T("../d/..///./input/.././input", "/abc/input");
+	T("", ".");
+	T(".", ".");
+	T("./", ".");
+	T("./..", "/abc");
+	T("./.", ".");
+	T("././//", ".");
+	T("././//.", ".");
+	T("././../efg/.", ".");
+	T("..", "/abc");
+	T("../..", "/");
+	T("../../", "/");
+	T("../..", "/");
+	T("../../..", "/");
+	T("../../../..", "/");
+	T("../././..", "/");
+	T("./././..", "/abc");
+	T("...", "...");
+	T(".../", "...");
+	T("...//", "...");
+	T("..././", "...");
+	T("...//./", "...");
+	T("...//.//", "...");
+	T("..././/", "...");
+	T("..././.../", ".../...");
+	canonFnameCacheTableDelete (ct);
+#undef T
 }
 
 static void test_htable_update(void)
@@ -71,6 +222,8 @@ static void test_routines_strrstr(void)
 
 TEST_LIST = {
    { "fname/absolute",   test_fname_absolute   },
+   { "fname/absolute+cache", test_fname_absolute_with_cache },
+   { "fname/relative",   test_fname_relative   },
    { "htable/update",    test_htable_update    },
    { "routines/strrstr", test_routines_strrstr },
    { NULL, NULL }     /* zeroed record marking the end of the list */

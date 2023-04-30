@@ -1,0 +1,174 @@
+# good0.tags -C -l
+a_fn	xyz/a.c
+b_fn	b.c
+c_fn	c.c
+d_fn	/tmp/d.c
+e_fn	/tmp/e.c
+f_fn	/f.c
+g_fn	/g.c
+h_fn	/h.c
+i_fn	/i.c
+j_fn	/j.c
+k_fn	/k.c
+l_fn	l.c
+m_fn	m.c
+n_fn	n.c
+o_fn	o.c
+p_fn	/tmp/xyz/p.c
+q_fn	/tmp/xyz/q.c
+r_fn	/r.c
+s_fn	/s.c
+t_fn	/t.c
+u_fn	/tmp/u.c
+v_fn	/tmp/abc/v.c
+w_fn	/abc/w.c
+# good1.tags --canonicalize-input -l
+a_fn	xyz/a.c
+b_fn	b.c
+c_fn	c.c
+d_fn	/tmp/d.c
+e_fn	/tmp/e.c
+f_fn	/f.c
+g_fn	/g.c
+h_fn	/h.c
+i_fn	/i.c
+j_fn	/j.c
+k_fn	/k.c
+l_fn	l.c
+m_fn	m.c
+n_fn	n.c
+o_fn	o.c
+p_fn	/tmp/xyz/p.c
+q_fn	/tmp/xyz/q.c
+r_fn	/r.c
+s_fn	/s.c
+t_fn	/t.c
+u_fn	/tmp/u.c
+v_fn	/tmp/abc/v.c
+w_fn	/abc/w.c
+# good2.tags -C -l
+a_fn	xyz/a.c
+b_fn	b.c
+c_fn	c.c
+d_fn	/tmp/d.c
+e_fn	/tmp/e.c
+f_fn	/f.c
+g_fn	/g.c
+h_fn	/h.c
+i_fn	/i.c
+j_fn	/j.c
+k_fn	/k.c
+l_fn	l.c
+m_fn	m.c
+n_fn	n.c
+o_fn	o.c
+p_fn	/tmp/xyz/p.c
+q_fn	/tmp/xyz/q.c
+r_fn	/r.c
+s_fn	/s.c
+t_fn	/t.c
+u_fn	/tmp/u.c
+v_fn	/tmp/abc/v.c
+w_fn	/abc/w.c
+# drive-letter0.tags --canonicalize-input -l
+# drive-letter1.tags -C -l
+# good-ptags.tags -C -D
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/tmp	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/e08db39a3/
+!_TAG_PROC_DUMMY	/../../tmp	//
+# good0.tags -A -l
+a_fn	/tmp/abc/xyz/a.c
+b_fn	/tmp/abc/b.c
+c_fn	/tmp/abc/c.c
+d_fn	/tmp/d.c
+e_fn	/tmp/e.c
+f_fn	/f.c
+g_fn	/g.c
+h_fn	/h.c
+i_fn	/i.c
+j_fn	/j.c
+k_fn	/k.c
+l_fn	/tmp/abc/l.c
+m_fn	/tmp/abc/m.c
+n_fn	/tmp/abc/n.c
+o_fn	/tmp/abc/o.c
+p_fn	/tmp/xyz/p.c
+q_fn	/tmp/xyz/q.c
+r_fn	/r.c
+s_fn	/s.c
+t_fn	/t.c
+u_fn	/tmp/u.c
+v_fn	/tmp/abc/v.c
+w_fn	/abc/w.c
+# good1.tags --absolute-input -l
+a_fn	/tmp/abc/xyz/a.c
+b_fn	/tmp/abc/b.c
+c_fn	/tmp/abc/c.c
+d_fn	/tmp/d.c
+e_fn	/tmp/e.c
+f_fn	/f.c
+g_fn	/g.c
+h_fn	/h.c
+i_fn	/i.c
+j_fn	/j.c
+k_fn	/k.c
+l_fn	/tmp/abc/l.c
+m_fn	/tmp/abc/m.c
+n_fn	/tmp/abc/n.c
+o_fn	/tmp/abc/o.c
+p_fn	/tmp/xyz/p.c
+q_fn	/tmp/xyz/q.c
+r_fn	/r.c
+s_fn	/s.c
+t_fn	/t.c
+u_fn	/tmp/u.c
+v_fn	/tmp/abc/v.c
+w_fn	/abc/w.c
+# good2.tags -A -l
+a_fn	/tmp/abc/xyz/a.c
+b_fn	/tmp/abc/b.c
+c_fn	/tmp/abc/c.c
+d_fn	/tmp/d.c
+e_fn	/tmp/e.c
+f_fn	/f.c
+g_fn	/g.c
+h_fn	/h.c
+i_fn	/i.c
+j_fn	/j.c
+k_fn	/k.c
+l_fn	/tmp/abc/l.c
+m_fn	/tmp/abc/m.c
+n_fn	/tmp/abc/n.c
+o_fn	/tmp/abc/o.c
+p_fn	/tmp/xyz/p.c
+q_fn	/tmp/xyz/q.c
+r_fn	/r.c
+s_fn	/s.c
+t_fn	/t.c
+u_fn	/tmp/u.c
+v_fn	/tmp/abc/v.c
+w_fn	/abc/w.c
+# drive-letter0.tags --absolute-input -l
+# drive-letter1.tags -A -l
+# good-ptags.tags -A -D
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/tmp	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/e08db39a3/
+!_TAG_PROC_DUMMY	/../../tmp	//

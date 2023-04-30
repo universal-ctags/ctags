@@ -22,10 +22,38 @@ struct comp {
 };
 
 
-extern hashTable *canonFnameCacheTableNew (void)
+struct canonFnameCacheTable {
+	hashTable *table;
+	const char *cwd;
+	size_t cwd_len;
+	char *input_last;
+	char *return_last;
+	bool absoluteOnly;
+};
+
+extern struct canonFnameCacheTable *canonFnameCacheTableNew (const char *cwd, bool absoluteOnly)
 {
-	return hashTableNew (7, hashCstrhash, hashCstreq,
-						 eFree, eFree);
+	struct canonFnameCacheTable *r = xMalloc (1, struct canonFnameCacheTable);
+	r->table = hashTableNew (7, hashCstrhash, hashCstreq,
+				 eFree, eFree);
+	r->input_last = NULL;
+	r->return_last = NULL;
+
+	char *cwd_tmp = eStrdup (cwd);
+	r->cwd = canonicalizeAbsoluteFileName (cwd_tmp);
+	eFree (cwd_tmp);
+	r->cwd_len = strlen (r->cwd);
+
+	r->absoluteOnly = absoluteOnly;
+
+	return r;
+}
+
+extern void canonFnameCacheTableDelete (struct canonFnameCacheTable *cache_table)
+{
+	eFree ((void *)cache_table->cwd);
+	hashTableDelete (cache_table->table);
+	eFree (cache_table);
 }
 
 static void strcpy_comps (char *buf, struct comp *comp)
@@ -123,12 +151,26 @@ static char *fsimplify_abs0 (char *fname, struct comp *parent)
 	return fsimplify_abs0 (next + 1, &comp);
 }
 
+static bool is_special_link(const char *name)
+{
+	/* strcmp (comp.str, "..") || !strcmp (comp.str, ".") */
+	if (name [0] != '.')
+		return false;
+	if (name [1] == '\0')
+		return true;
+	if (name [1] != '.')
+		return false;
+	if (name [2] == '\0')
+		return true;
+	return false;
+}
+
 extern char *canonicalizeAbsoluteFileName (char *fname)
 {
 	char  *next = strchr (fname, '/');
 	if (next == NULL)
 	{
-		if (!strcmp (fname, "..") || !strcmp (fname, "."))
+		if (is_special_link(fname))
 		{
 			fname [0] = '/';
 			fname [1] = '\0';
@@ -147,7 +189,7 @@ extern char *canonicalizeAbsoluteFileName (char *fname)
 		.parent = NULL,
 		.child = NULL
 	};
-	if (!strcmp (comp.str, "..") || !strcmp (comp.str, "."))
+	if (is_special_link (comp.str))
 	{
 		comp.str[0] = '\0';
 		comp.len = 0;
@@ -155,21 +197,23 @@ extern char *canonicalizeAbsoluteFileName (char *fname)
 	return fsimplify_abs0 (next + 1, &comp);
 }
 
-static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *rela)
+static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *rela,
+								 bool absoluteOnly)
 {
 	bool relative = false;
 	vString *buf = vStringNew ();
 
 	if (rela == NULL)
-		vStringCopyS (buf, dir);
+		vStringNCopyS (buf, dir, dir_len);
 	else if (rela[0] == '/')
 		vStringCopyS (buf, rela);
 	else
 	{
-		vStringCopyS (buf, dir);
+		vStringNCopyS (buf, dir, dir_len);
 		vStringPut (buf, '/');
 		vStringCatS (buf, rela);
-		relative = true;
+		if (!absoluteOnly)
+			relative = true;
 	}
 
 	char *r = canonicalizeAbsoluteFileName (vStringValue (buf));
@@ -180,7 +224,7 @@ static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *re
 			if (r[dir_len] == '/')
 			{
 				if (r[dir_len + 1] == '\0')
-					vStringCopyS (buf, ".");
+					vStringNCopyS (buf, ".", 1);
 				else
 					vStringCopyS (buf, r + dir_len + 1);
 				eFree (r);
@@ -188,7 +232,7 @@ static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *re
 			}
 			else if (r[dir_len] == '\0')
 			{
-				vStringCopyS (buf, ".");
+				vStringNCopyS (buf, ".", 1);
 				eFree (r);
 				return vStringDeleteUnwrap (buf);
 			}
@@ -204,27 +248,25 @@ static char *canonicalizePathNew(const char *dir, size_t dir_len, const char *re
 	return r;
 }
 
-extern const char *canonicalizeRelativeFileName (const char *cwd, size_t cwd_len, const char *input,
-												 hashTable* cache_table)
+extern const char *canonicalizeFileName (struct canonFnameCacheTable *cache_table,
+										 const char *input)
 {
-	static char *input_last;
-	static char *return_last;
-
-	if (input_last)
+	if (cache_table->input_last)
 	{
-		if (strcmp (input, input_last) == 0)
-			return return_last;
-		input_last = NULL;
+		if (strcmp (input, cache_table->input_last) == 0)
+			return cache_table->return_last;
+		cache_table->input_last = NULL;
 	}
 
-	char *r = hashTableGetItem (cache_table, input);
+	char *r = hashTableGetItem (cache_table->table, input);
 	if (r)
 		return r;
 
-	r = canonicalizePathNew (cwd, cwd_len, input);
+	r = canonicalizePathNew (cache_table->cwd, cache_table->cwd_len, input,
+							 cache_table->absoluteOnly);
 
-	input_last = eStrdup (input);
-	return_last = r;
-	hashTablePutItem (cache_table, input_last, return_last);
-	return return_last;
+	cache_table->input_last = eStrdup (input);
+	cache_table->return_last = r;
+	hashTablePutItem (cache_table->table, cache_table->input_last, cache_table->return_last);
+	return cache_table->return_last;
 }

@@ -46,6 +46,8 @@ extern int tagsPrint (const tagEntry *entry,
 extern int tagsPrintPseudoTag (const tagEntry *entry,
 							   tagPrintOptions *opts, tagPrintProcs *procs, void *outfp);
 
+extern int tagsPrintValue (const char *val, int escaping, tagPrintProcs *procs, void *outfp);
+
 #ifdef __cplusplus
 };
 #endif

@@ -102,6 +102,20 @@ static void printValue (const char *val, int printingWithEscaping,
 		print_str (val, outfp);
 }
 
+extern int tagsPrintValue (const char *val,
+						   int escaping,
+						   tagPrintProcs *procs,
+						   void *outfp)
+{
+	if (!procs)
+		procs = &printFILEProcs;
+
+	printValue (val, escaping,
+				procs->printStr, procs->printChar,
+				outfp);
+	return 1;
+}
+
 static void tagsPrintTag (const tagEntry *entry,
 						  int printingExtensionFields,
 						  int printingLineNumber,
