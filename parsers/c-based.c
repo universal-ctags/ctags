@@ -1134,7 +1134,8 @@ static bool findScopeHierarchy (vString *const string, const statementInfo *cons
 			{
 				if (s->declaration == DECL_PRIVATE ||
 					s->declaration == DECL_PROTECTED ||
-					s->declaration == DECL_PUBLIC) {
+					s->declaration == DECL_PUBLIC)
+				{
 					continue;
 				}
 
@@ -1757,11 +1758,13 @@ static void setAccess (statementInfo *const st, const accessType access)
 			st->member.access = access;
 			cppUngetc (c);
 		}
-		else if (c == ':') {
+		else if (c == ':')
+		{
 			reinitStatement (st, false);
 			st->member.accessDefault = access;
 		}
-		else {
+		else
+		{
 			cppUngetc (c);
 		}
 	}
@@ -2177,12 +2180,15 @@ static void analyzePostParens (statementInfo *const st, parenInfo *const info)
 	cppUngetc (c);
 	if (isOneOf (c, "{;,="))
 		;
-	else if (isInputLanguage (Lang_java)) {
-
-		if (!insideAnnotationBody(st)) {
+	else if (isInputLanguage (Lang_java))
+	{
+		if (!insideAnnotationBody(st))
+		{
 			skipJavaThrows (st);
 		}
-	} else {
+	}
+	else
+	{
 		if (! skipPostArgumentStuff (st, info))
 		{
 			verbose (
@@ -2201,19 +2207,27 @@ static bool languageSupportsGenerics (void)
 static void processAngleBracket (void)
 {
 	int c = cppGetc ();
-	if (c == '>') {
+	if (c == '>')
+	{
 		/* already found match for template */
-	} else if (languageSupportsGenerics () && c != '<' && c != '=') {
+	}
+	else if (languageSupportsGenerics () && c != '<' && c != '=')
+	{
 		/* this is a template */
 		cppUngetc (c);
 		skipToMatch ("<>");
-	} else if (c == '<') {
+	}
+	else if (c == '<')
+	{
 		/* skip "<<" or "<<=". */
 		c = cppGetc ();
-		if (c != '=') {
+		if (c != '=')
+		{
 			cppUngetc (c);
 		}
-	} else {
+	}
+	else
+	{
 		cppUngetc (c);
 	}
 }
@@ -2650,7 +2664,8 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 	{
 		parseAtMarkStyleAnnotation (st);
 	}
-	else if (c == STRING_SYMBOL) {
+	else if (c == STRING_SYMBOL)
+	{
 		setToken(st, TOKEN_NONE);
 	}
 }
@@ -2830,7 +2845,8 @@ static int tagCheck (statementInfo *const st)
 			{
 				if (st->declaration == DECL_TEMPLATE)
 					corkIndex = qualifyBlockTag (st, prev2);
-				else if (st->declaration == DECL_FUNCTION_TEMPLATE) {
+				else if (st->declaration == DECL_FUNCTION_TEMPLATE)
+				{
 					corkIndex = qualifyFunctionTag (st, st->blockName);
 				}
 				else if (st->haveQualifyingName)
@@ -2875,8 +2891,8 @@ static int tagCheck (statementInfo *const st)
 			break;
 
 		case TOKEN_KEYWORD:
-
-			if (token->keyword == KEYWORD_DEFAULT && isType(prev, TOKEN_ARGS) && insideAnnotationBody(st)) {
+			if (token->keyword == KEYWORD_DEFAULT && isType(prev, TOKEN_ARGS) && insideAnnotationBody(st))
+			{
 				corkIndex = qualifyFunctionDeclTag(st, prev2);
 			}
 			break;
