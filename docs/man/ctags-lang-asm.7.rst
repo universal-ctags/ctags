@@ -60,7 +60,7 @@ The main effects of running the CPreProcessor parser;
 
 * lines started from `//` are stripped as comments,
 * areas surrounded by the pair of `/*` and `*/` are
-  started as comments, and
+  stripped as comments, and
 * macros defined with `#define` are extracted as tags.
 
 Set ``runCPreProcessor`` to ``false`` for disabling the CPreProcessor
