@@ -11,6 +11,8 @@ TemplateAlias	input.d	/^	alias TemplateAlias = a!T;$/;"	a	file:
 UT	input.d	/^union UT(T){}$/;"	u	file:
 Union	input.d	/^	union Union$/;"	u	struct:Struct	file:
 _bar	input.d	/^	private AliasInt _bar;$/;"	m	class:Class	file:
+attr_anon	input.d	/^@(obj) T attr_anon;$/;"	v
+attr_decl	input.d	/^@attr(i) int attr_decl = 1;$/;"	v
 bar	input.d	/^	bar,$/;"	e	enum:Enum	file:
 bar	input.d	/^	public AliasInt bar()$/;"	f	class:Class
 conditional	input.d	/^	T conditional;$/;"	v	file:
