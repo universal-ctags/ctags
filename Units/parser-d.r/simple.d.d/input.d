@@ -71,6 +71,11 @@ template Template(alias a, T...)
 
 Object obj;
 
+const(int)* type_con;
+immutable(int)* type_imm;
+inout(int)* f_inout(inout Object); // FIXME
+shared(int)[] type_shar;
+
 private:
 int i;
 

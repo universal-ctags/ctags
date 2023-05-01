@@ -69,7 +69,8 @@ enum eKeywordId {
 	KEYWORD_FINAL, KEYWORD_FLOAT, KEYWORD_FOR, KEYWORD_FOREACH,
 	KEYWORD_FRIEND, KEYWORD_FUNCTION,
 	KEYWORD_GOTO,
-	KEYWORD_IF, KEYWORD_IMPLEMENTS, KEYWORD_IMPORT, KEYWORD_INLINE, KEYWORD_INT,
+	KEYWORD_IF, KEYWORD_IMMUTABLE, KEYWORD_IMPLEMENTS, KEYWORD_IMPORT,
+	KEYWORD_INLINE, KEYWORD_INT,
 	KEYWORD_INOUT, KEYWORD_INTERFACE,
 	KEYWORD_INTERNAL,
 	KEYWORD_LONG,
@@ -78,7 +79,7 @@ enum eKeywordId {
 	KEYWORD_OPERATOR, KEYWORD_OVERLOAD, KEYWORD_OVERRIDE,
 	KEYWORD_PACKAGE, KEYWORD_PRIVATE,
 	KEYWORD_PROTECTED, KEYWORD_PUBLIC,
-	KEYWORD_REGISTER, KEYWORD_RETURN,
+	KEYWORD_REGISTER, KEYWORD_RETURN, KEYWORD_SHARED,
 	KEYWORD_SHORT, KEYWORD_SIGNED, KEYWORD_STATIC, KEYWORD_STRING,
 	KEYWORD_STRUCT, KEYWORD_SWITCH, KEYWORD_SYNCHRONIZED,
 	KEYWORD_TEMPLATE, KEYWORD_THIS, KEYWORD_THROW,
@@ -419,6 +420,7 @@ static const keywordDesc KeywordTable [] = {
      { "idouble",         KEYWORD_IDOUBLE,         { 0, 1, 0 } },
      { "if",              KEYWORD_IF,              { 1, 1, 1 } },
      { "ifloat",          KEYWORD_IFLOAT,          { 0, 1, 0 } },
+     { "immutable",       KEYWORD_IMMUTABLE,       { 0, 1, 0 } },
      { "implements",      KEYWORD_IMPLEMENTS,      { 0, 0, 1 } },
      { "import",          KEYWORD_IMPORT,          { 0, 1, 1 } },
      { "in",              KEYWORD_IN,              { 0, 1, 0 } },
@@ -452,6 +454,7 @@ static const keywordDesc KeywordTable [] = {
      { "register",        KEYWORD_REGISTER,        { 0, 1, 0 } },
      { "return",          KEYWORD_RETURN,          { 1, 1, 1 } },
      { "scope",           KEYWORD_SCOPE,           { 0, 1, 0 } },
+     { "shared",          KEYWORD_SHARED,          { 0, 1, 0 } },
      { "short",           KEYWORD_SHORT,           { 1, 1, 1 } },
      { "signed",          KEYWORD_SIGNED,          { 0, 1, 0 } },
      { "static",          KEYWORD_STATIC,          { 1, 1, 1 } },
@@ -1877,7 +1880,16 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_CATCH:     skipParens (); skipBraces ();           break;
 		case KEYWORD_CHAR:      st->declaration = DECL_BASE;            break;
 		case KEYWORD_CLASS:     checkIsClassEnum (st, DECL_CLASS);      break;
-		case KEYWORD_CONST:     st->declaration = DECL_BASE;            break;
+		case KEYWORD_IMMUTABLE:
+		case KEYWORD_INOUT:
+		case KEYWORD_SHARED:
+			if (!isInputLanguage (Lang_d))
+				break;
+		case KEYWORD_CONST:
+			st->declaration = DECL_BASE;
+			if (isInputLanguage (Lang_d))
+				skipParens ();
+			break;
 		case KEYWORD_DOUBLE:    st->declaration = DECL_BASE;            break;
 		case KEYWORD_ENUM:      st->declaration = DECL_ENUM;            break;
 		case KEYWORD_EXTENDS:   readParents (st, '.');
@@ -2076,6 +2088,9 @@ static bool skipPostArgumentStuff (
 				case KEYWORD_TRY:                       break;
 
 				case KEYWORD_CONST:
+				case KEYWORD_IMMUTABLE:
+				case KEYWORD_INOUT:
+				case KEYWORD_SHARED:
 				case KEYWORD_VOLATILE:
 					if (vStringLength (Signature) > 0)
 					{
@@ -2381,6 +2396,9 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 					else if (isType (token, TOKEN_KEYWORD))
 					{
 						if (token->keyword != KEYWORD_CONST &&
+							token->keyword != KEYWORD_IMMUTABLE &&
+							token->keyword != KEYWORD_INOUT &&
+							token->keyword != KEYWORD_SHARED &&
 							token->keyword != KEYWORD_VOLATILE)
 						{
 							info->isNameCandidate = false;
