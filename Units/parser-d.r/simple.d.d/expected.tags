@@ -23,6 +23,7 @@ main	input.d	/^void main(string[] args)$/;"	f	file:
 member	input.d	/^		T member;$/;"	m	class:Class.CT	file:
 modulevar	input.d	/^	int modulevar;$/;"	m	file:
 obj	input.d	/^Object obj;$/;"	v
+out_contract	input.d	/^void out_contract()$/;"	f	file:
 qar	input.d	/^		int qar;$/;"	m	union:Struct.Union	file:
 quxx	input.d	/^		bool quxx;$/;"	m	union:Struct.Union	file:
 test.simple	input.d	/^module test.simple;$/;"	M

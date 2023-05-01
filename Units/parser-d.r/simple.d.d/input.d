@@ -90,7 +90,11 @@ static assert( num < TL.length, "Name '"~name~"' is not found");
 
 __gshared int globalVar;
 
+void out_contract()
+out(r; r > 0) {}
+
 void main(string[] args)
+in(args.length > 0)
 {
 	auto foo = new Class(1337);
 
