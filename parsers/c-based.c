@@ -2843,9 +2843,7 @@ static int tagCheck (statementInfo *const st)
 		case TOKEN_BRACE_OPEN:
 			if (isType (prev, TOKEN_ARGS))
 			{
-				if (st->declaration == DECL_TEMPLATE)
-					corkIndex = qualifyBlockTag (st, prev2);
-				else if (st->declaration == DECL_FUNCTION_TEMPLATE)
+				if (st->declaration == DECL_FUNCTION_TEMPLATE)
 				{
 					corkIndex = qualifyFunctionTag (st, st->blockName);
 				}
@@ -2857,7 +2855,8 @@ static int tagCheck (statementInfo *const st)
 					/* D declaration templates */
 					if (isInputLanguage (Lang_d) &&
 						(st->declaration == DECL_CLASS || st->declaration == DECL_STRUCT ||
-						st->declaration == DECL_INTERFACE || st->declaration == DECL_UNION))
+						st->declaration == DECL_INTERFACE || st->declaration == DECL_UNION ||
+						st->declaration == DECL_TEMPLATE))
 						corkIndex = qualifyBlockTag (st, prev2);
 					else
 					{
