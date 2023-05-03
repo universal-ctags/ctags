@@ -20,3 +20,9 @@ counttomark ==
 /A 5 1 roll
 cleartomark
 pstack
+{ (a) (b) (c) -1 3 roll } stopped {
+    _errorname ==
+} {
+    (RANGECHECK error is expected but got NONE) ==
+} ifelse
+clear
