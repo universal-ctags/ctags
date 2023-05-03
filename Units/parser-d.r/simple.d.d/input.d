@@ -108,3 +108,5 @@ in(args.length > 0)
 
 	writefln("%s", foo.bar());
 }
+
+ref int fref(return ref int x) { return x; }
