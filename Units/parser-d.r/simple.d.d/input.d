@@ -33,6 +33,8 @@ class Class : Interface
 		this._bar = x;
 	}
 
+	override string toString() { return ""; }
+
 	public AliasInt bar()
 	{
 		return this._bar;
