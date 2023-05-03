@@ -76,7 +76,7 @@ enum eKeywordId {
 	KEYWORD_LONG,
 	KEYWORD_MUTABLE,
 	KEYWORD_NAMESPACE, KEYWORD_NEW, KEYWORD_NATIVE,
-	KEYWORD_OPERATOR, KEYWORD_OVERLOAD, KEYWORD_OVERRIDE,
+	KEYWORD_OPERATOR, KEYWORD_OVERRIDE,
 	KEYWORD_PACKAGE, KEYWORD_PRIVATE,
 	KEYWORD_PROTECTED, KEYWORD_PUBLIC,
 	KEYWORD_REGISTER, KEYWORD_RETURN, KEYWORD_SHARED,
@@ -443,7 +443,6 @@ static const keywordDesc KeywordTable [] = {
      { "null",            KEYWORD_NULL,            { 0, 1, 0 } },
      { "operator",        KEYWORD_OPERATOR,        { 1, 1, 0 } },
      { "out",             KEYWORD_OUT,             { 0, 1, 0 } },
-     { "overload",        KEYWORD_OVERLOAD,        { 0, 1, 0 } },
      { "override",        KEYWORD_OVERRIDE,        { 1, 1, 0 } },
      { "package",         KEYWORD_PACKAGE,         { 0, 1, 1 } },
      { "pragma",          KEYWORD_PRAGMA,          { 0, 1, 0 } },
@@ -2115,7 +2114,7 @@ static bool skipPostArgumentStuff (
 				case KEYWORD_NAMESPACE:
 				case KEYWORD_NEW:
 				case KEYWORD_OPERATOR:
-				case KEYWORD_OVERLOAD:
+				case KEYWORD_OVERRIDE:
 				case KEYWORD_PRIVATE:
 				case KEYWORD_PROTECTED:
 				case KEYWORD_PUBLIC:

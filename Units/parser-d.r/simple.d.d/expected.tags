@@ -29,6 +29,7 @@ quxx	input.d	/^		bool quxx;$/;"	m	union:Struct.Union	file:
 test.simple	input.d	/^module test.simple;$/;"	M
 tfun	input.d	/^	auto tfun(T)(T v)$/;"	f	class:Class
 this	input.d	/^	public this(AliasInt x)$/;"	f	class:Class
+toString	input.d	/^	override string toString() { return ""; }$/;"	f	class:Class
 type_con	input.d	/^const(int)* type_con;$/;"	v
 type_imm	input.d	/^immutable(int)* type_imm;$/;"	v
 type_shar	input.d	/^shared(int)[] type_shar;$/;"	v
