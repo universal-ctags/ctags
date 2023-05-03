@@ -118,6 +118,27 @@
     exch copy pop
 } __bddef
 
+(string _CHOP string)
+/_chop {
+    mark exch {} forall pop _buildstring
+} __bddef
+
+(string _CHOP_SPACE string)
+/_chop_space {
+    dup length dup 0 gt {
+        % string length
+        1 sub
+        % string `length - 1`
+        1 index exch
+        % string string `length - 1`
+        get (\n\t\r\f\v ) exch _amember {
+            _chop
+        } if
+    } {
+        pop                     % pop the length
+    } ifelse
+} __bddef
+
 % /x mark 40 (a) 32 32 10 (b) 10 10 9 9 (xyz) 9 9 41 _buildstring def
 % x _normalize_spaces! x pstack
 
