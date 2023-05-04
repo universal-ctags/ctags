@@ -2,13 +2,8 @@ AliasInt	input.d	/^alias AliasInt = int;$/;"	a	file:
 CT	input.d	/^	class CT(T)$/;"	c	class:Class	file:
 Class	input.d	/^class Class : Interface$/;"	c	file:
 Enum	input.d	/^enum Enum : int$/;"	g	file:
-IT	input.d	/^interface IT(T){}$/;"	i	file:
 Interface	input.d	/^interface Interface$/;"	i	file:
-ST	input.d	/^struct ST(T){}$/;"	s	file:
 Struct	input.d	/^struct Struct$/;"	s	file:
-Template	input.d	/^template Template(alias a, T...)$/;"	T	file:
-TemplateAlias	input.d	/^	alias TemplateAlias = a!T;$/;"	a	file:
-UT	input.d	/^union UT(T){}$/;"	u	file:
 Union	input.d	/^	union Union$/;"	u	struct:Struct	file:
 _bar	input.d	/^	private AliasInt _bar;$/;"	m	class:Class	file:
 attr_anon	input.d	/^@(obj) T attr_anon;$/;"	v

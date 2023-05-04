@@ -1,0 +1,12 @@
+Template	input.d	/^template Template(alias a, T...)$/;"	T	file:
+TemplateAlias	input.d	/^    alias TemplateAlias = a!T;$/;"	a	template:Template	file:
+memb	input.d	/^    int memb;$/;"	m	template:Template	file:
+b	input.d	/^Foo!x b;$/;"	v
+each	input.d	/^template each(alias fun = "a")$/;"	T	file:
+child	input.d	/^    template child(){}$/;"	T	template:each	file:
+tmethod	input.d	/^    void tmethod()(){}$/;"	f	template:each
+ImplementLength	input.d	/^mixin ImplementLength!source; \/\/ FIXME source too!$/;"	X
+source	input.d	/^mixin ImplementLength!source; \/\/ FIXME source too!$/;"	X
+IT	input.d	/^interface IT(T){}$/;"	i	file:
+ST	input.d	/^struct ST(T){}$/;"	s	file:
+UT	input.d	/^union UT(T){}$/;"	u	file:

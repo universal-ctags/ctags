@@ -58,19 +58,6 @@ public
 	int modulevar;
 }
 
-// declaration templates
-interface IT(T){}
-struct ST(T){}
-union UT(T){}
-// FIXME - parsed as 'T'
-//alias AT(T) = T;
-//enum ET(T) = T.init;
-
-template Template(alias a, T...)
-{
-	alias TemplateAlias = a!T;
-}
-
 Object obj;
 
 const(int)* type_con;
