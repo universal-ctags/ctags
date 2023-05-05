@@ -1257,8 +1257,7 @@ static void processExcmdOption (
 
 static void resetXtags (langType lang, bool mode)
 {
-	int i;
-	for (i = 0; i < countXtags (); i++)
+	for (unsigned int i = 0; i < countXtags (); i++)
 		if ((lang == LANG_AUTO) || (lang == getXtagOwner (i)))
 			enableXtag (i, mode);
 }

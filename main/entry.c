@@ -1111,7 +1111,7 @@ static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 
 	if (slot->extraDynamic)
 	{
-		int n = countXtags () - XTAG_COUNT;
+		unsigned int n = countXtags () - XTAG_COUNT;
 		slot->extraDynamic = xCalloc ((n / 8) + 1, uint8_t);
 		memcpy (slot->extraDynamic, tag->extraDynamic, (n / 8) + 1);
 	}
@@ -2017,8 +2017,8 @@ static void markTagExtraBitFull (tagEntryInfo *const tag, xtagType extra, bool m
 	else
 	{
 		Assert (extra < countXtags ());
-
-		int n = countXtags () - XTAG_COUNT;
+		Assert (XTAG_COUNT <= countXtags ());
+		unsigned int n = countXtags () - XTAG_COUNT;
 		tag->extraDynamic = xCalloc ((n / 8) + 1, uint8_t);
 		if (!tag->inCorkQueue)
 			PARSER_TRASH_BOX(tag->extraDynamic, eFree);

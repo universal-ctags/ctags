@@ -1072,9 +1072,9 @@ static const char *renderFieldExtras (const tagEntryInfo *const tag,
 				     const char *value CTAGS_ATTR_UNUSED,
 				     vString* b)
 {
-	int i;
+	unsigned int i;
 	bool hasExtra = false;
-	int c = countXtags();
+	unsigned int c = countXtags();
 
 	for (i = 0; i < c; i++)
 	{
@@ -1757,7 +1757,7 @@ static EsObject* getFieldValueForExtras (const tagEntryInfo *tag, const fieldDef
 
 	EsObject* a = opt_array_new ();
 
-	for (int i = 0; i < countXtags (); i++)
+	for (unsigned int i = 0; i < countXtags (); i++)
 	{
 		if (!isTagExtraBitMarked (tag, i))
 			continue;
