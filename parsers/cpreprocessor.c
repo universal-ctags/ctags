@@ -871,7 +871,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 	}
 }
 
-static void makeParamTag (vString *name, short nth, bool placeholder)
+static int makeParamTag (vString *name, short nth, bool placeholder)
 {
 	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_MACRO);
 
@@ -890,15 +890,17 @@ static void makeParamTag (vString *name, short nth, bool placeholder)
 		if (placeholder)
 			markTagAsPlaceholder (e, placeholder);
 	}
+	return r;
 }
 
-static void regenreateSignatureFromParameters (vString * buffer, int from, int to)
+static void makeSignatureStringFromParameters (vString * buffer, intArray *parameters)
 {
 	vStringPut(buffer, '(');
-	for (int pindex = from; pindex < to; pindex++)
+	for (size_t i = 0; i < intArrayCount (parameters); i++)
 	{
+		int pindex = intArrayItem (parameters, i);
 		tagEntryInfo *e = getEntryInCorkQueue (pindex);
-		if (e && !isTagExtra (e))
+		if (e)
 		{
 			vStringCatS (buffer, e->name);
 			vStringPut (buffer, ',');
@@ -939,6 +941,7 @@ static int directiveDefine (const int c, bool undef)
 
 			if (p == '(')
 			{
+				intArray *params = intArrayNew ();
 				vString *param = vStringNew ();
 				int param_start = (int)countEntryInCorkQueue();
 				do {
@@ -953,7 +956,8 @@ static int directiveDefine (const int c, bool undef)
 
 					if (vStringLength (param) > 0)
 					{
-						makeParamTag (param, nth++, vStringChar(param, 0) == '.');
+						int r = makeParamTag (param, nth++, vStringChar(param, 0) == '.');
+						intArrayAdd (params, r);
 						vStringClear (param);
 					}
 					if (p == '\\')
@@ -965,12 +969,13 @@ static int directiveDefine (const int c, bool undef)
 				if (p == ')')
 				{
 					vString *signature = vStringNew ();
-					regenreateSignatureFromParameters (signature, param_start, param_end);
+					makeSignatureStringFromParameters (signature, params);
 					r = makeDefineTag (vStringValue (Cpp.directive.name), vStringValue (signature), undef);
 					vStringDelete (signature);
 				}
 				else
 					r = makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
+				intArrayDelete (params);
 
 				tagEntryInfo *e = getEntryInCorkQueue (r);
 				if (e)

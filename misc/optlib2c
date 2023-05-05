@@ -282,7 +282,7 @@ my $options =
 	   unless ($_[0]->{'langdef'} eq $1);
 	 return parse_regex ($3, $_[0], 1, $2);
        } ],
-     [ qr/^--_mtable-extend-([^=]*)=(.*)\+(.*)/, sub {
+     [ qr/^--_mtable-extend-([^=]*)=([a-zA-Z_0-9]+)\+([a-zA-Z_0-9]+)/, sub {
 	 die "Don't use --_mline-extend-<LANG>= option before defining the language"
 	   if (! defined $_[0]->{'langdef'});
 	 die "Extending a multitable regex is allowed only to the language specified with --langdef: $1"

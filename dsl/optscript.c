@@ -2772,6 +2772,8 @@ op_roll (OptVM *vm, EsObject *name)
 	if (!es_integer_p (nobj))
 		return OPT_ERR_TYPECHECK;
 	int n = es_integer_get (nobj);
+	if (n < 0)
+		return OPT_ERR_RANGECHECK;
 
 	if ((((int)c) - 2) < n)
 		return OPT_ERR_UNDERFLOW;

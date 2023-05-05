@@ -2564,9 +2564,8 @@ static void processHeaderListOption (const int option, const char *parameter)
 /*
  *  Token ignore processing
  */
-static void readIgnoreList (const char *const list)
+static void readIgnoreList (langType lang, const char *const list)
 {
-	langType lang = getNamedLanguage ("CPreProcessor", 0);
 	char* newList = stringCopy (list);
 	const char *token = strtok (newList, IGNORE_SEPARATORS);
 
@@ -2578,10 +2577,8 @@ static void readIgnoreList (const char *const list)
 	eFree (newList);
 }
 
-static void addIgnoreListFromFile (const char *const fileName)
+static void addIgnoreListFromFile (langType lang, const char *const fileName)
 {
-	langType lang = getNamedLanguage ("CPreProcessor", 0);
-
 	stringList* tokens = stringListNewFromFile (fileName);
 	if (tokens == NULL)
 		error (FATAL | PERROR, "cannot open \"%s\"", fileName);
@@ -2607,16 +2604,16 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 	else if (strchr ("@./\\", list [0]) != NULL)
 	{
 		const char* fileName = (*list == '@') ? list + 1 : list;
-		addIgnoreListFromFile (fileName);
+		addIgnoreListFromFile (lang, fileName);
 	}
 #if defined (WIN32)
 	else if (isalpha (list [0])  &&  list [1] == ':')
-		addIgnoreListFromFile (list);
+		addIgnoreListFromFile (lang, list);
 #endif
 	else if (strcmp (list, "-") == 0)
 		applyLanguageParam (lang, "ignore", NULL);
 	else
-		readIgnoreList (list);
+		readIgnoreList (lang, list);
 }
 
 static void processAnonHashOption (const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
