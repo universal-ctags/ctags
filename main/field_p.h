@@ -64,7 +64,7 @@ extern const char* renderFieldNoEscaping (fieldType type, const tagEntryInfo *ta
 extern bool  doesFieldHaveTabOrNewlineChar (fieldType type, const tagEntryInfo *tag, int index);
 
 extern void initFieldObjects (void);
-extern int countFields (void);
+extern unsigned int countFields (void);
 
 /* language should be typed to langType.
    Use int here to avoid circular dependency */

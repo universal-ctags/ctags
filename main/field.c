@@ -1285,7 +1285,7 @@ extern bool doesFieldHaveRenderer (fieldType type, bool noEscaping)
 		return getFieldObject(type)->def->render? true: false;
 }
 
-extern int countFields (void)
+extern unsigned int countFields (void)
 {
 	return fieldObjectUsed;
 }
