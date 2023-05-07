@@ -1713,8 +1713,12 @@ static EsObject* checkFieldValueForTyperef (const fieldDefinition *fdef, const E
 		;
 	else if (es_integer_p (obj))
 	{
-		int index = es_integer_get (obj);
-		if (index >= countEntryInCorkQueue ())
+		int index0 = es_integer_get (obj);
+		if (index0 < 0)
+			return OPT_ERR_RANGECHECK;
+
+		unsigned int index = index0;
+		if (index == 0 || index >= countEntryInCorkQueue ())
 			return OPTSCRIPT_ERR_NOTAGENTRY;
 	}
 	else
@@ -1729,10 +1733,10 @@ static EsObject* getFieldValueForScope (const tagEntryInfo *tag, const fieldDefi
 
 static EsObject* setFieldValueForScope (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
 {
-	int index = es_integer_get (obj);
+	unsigned int index = es_integer_get (obj);
 	if (index < countEntryInCorkQueue ())
 	{
-		tag->extensionFields.scopeIndex = index;
+		tag->extensionFields.scopeIndex = (int)index;
 		return es_false;
 	}
 
@@ -1864,7 +1868,7 @@ static EsObject* checkFieldValueForLineCommon (const fieldDefinition *fdef, cons
 
 static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
 {
-	int l;
+	unsigned int l;
 	if (es_object_get_type (obj) == OPT_TYPE_MATCHLOC)
 	{
 		matchLoc *loc = es_pointer_get (obj);
@@ -1872,10 +1876,11 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 	}
 	else if (es_integer_p (obj))
 	{
-		l = es_integer_get (obj);
-		if (l < 1)
+		int l0 = es_integer_get (obj);
+		if (l0 < 1)
 			return OPT_ERR_RANGECHECK;
 
+		l = (unsigned int)l0;
 		/* If the new line number is too large,
 		   we cannot fill tag->filePosition wit
 		   getInputFilePositionForLine(); */
