@@ -83,7 +83,8 @@ static unsigned int hashValue (const char *const string, langType language,
 	for (p = (const signed char *)string; *p != '\0'; p++)
 	{
 		h = (h << 5) + h + tolower (*p);
-		if (p - (const signed char *)string > maxLen)
+
+		if (p > (const signed char *)string + maxLen)
 		{
 			*maxLenReached = true;
 			return 0;
