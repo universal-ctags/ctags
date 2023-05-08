@@ -21,7 +21,7 @@ enum Enum : int
 
 interface Interface
 {
-	public AliasInt bar();
+	public AliasInt bar(); // FIXME prototypes
 }
 
 class Class : Interface
@@ -73,7 +73,8 @@ Object obj;
 
 const(int)* type_con;
 immutable(int)* type_imm;
-inout(int)* f_inout(inout Object); // FIXME
+inout(int)* f_inout(inout Object); // FIXME prototypes
+inout(int)* g_inout(inout(int)* p) { return p; }
 shared(int)[] type_shar;
 
 private:
@@ -86,7 +87,7 @@ int error;
 @attr(i) int attr_decl = 1;
 @attr(i) attr_decl_infer = 1; // FIXME
 @(obj) T attr_anon;
-void attr_post() @attr(obj); // FIXME
+void attr_post() @attr(obj); // FIXME prototypes
 
 static if (is(typeof(__traits(getMember, a, name)) == function))
 	T conditional;
