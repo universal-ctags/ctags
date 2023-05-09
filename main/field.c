@@ -1141,11 +1141,16 @@ static const char *renderFieldEpoch (const tagEntryInfo *const tag,
 {
 #define buf_len 21
 	static char buf[buf_len];
-
-	if (snprintf (buf, buf_len, "%lld", (long long)tag->extensionFields.epoch) > 0)
+#ifdef _MSC_VER
+#define FMTLL "%I64d"
+#else
+#define FMTLL "%lld"
+#endif
+	if (snprintf (buf, buf_len, FMTLL, (long long)tag->extensionFields.epoch) > 0)
 		return renderAsIs (b, buf);
 	else
 		return NULL;
+#undef FMTLL
 #undef buf_len
 }
 
