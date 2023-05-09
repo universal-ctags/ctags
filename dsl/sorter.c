@@ -386,7 +386,10 @@ int s_compare        (const tagEntry * a, const tagEntry * b, SCode *code)
 	dsl_cache_reset (DSL_SORTER);
 
 	if (exit_code)
+	{
+		i = 0;					/* For suppress the warning. */
 		exit (exit_code);
+	}
 
 	return i;
 }
