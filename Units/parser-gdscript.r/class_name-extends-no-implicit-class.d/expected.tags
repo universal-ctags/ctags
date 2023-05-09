@@ -1,2 +1,2 @@
-Node	input.gd	/^class_name MyNode extends Node$/;"	class	roles:extended
+Node	input.gd	/^class_name MyNode extends Node$/;"	class	roles:extended	extras:reference
 MyNode	input.gd	/^class_name MyNode extends Node$/;"	class	inherits:Node	roles:def

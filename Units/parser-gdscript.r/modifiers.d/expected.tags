@@ -1,4 +1,4 @@
-anon_class_025551790100	input.gd	/^# Taken from godot-demo-projects\/3d\/voxel\/world\/chunk.gd$/;"	c
+anon_class_025551790100	input.gd	/^# Taken from godot-demo-projects\/3d\/voxel\/world\/chunk.gd$/;"	c	extras:anonymous,implicitClass
 _create_block_collider	input.gd	/^func _create_block_collider(block_sub_position):$/;"	m	class:anon_class_025551790100
 block_sub_position	input.gd	/^func _create_block_collider(block_sub_position):$/;"	z	method:anon_class_025551790100._create_block_collider	file:
 collider	input.gd	/^        var collider = CollisionShape.new()$/;"	l	method:anon_class_025551790100._create_block_collider	file:

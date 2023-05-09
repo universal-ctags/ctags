@@ -1,4 +1,5 @@
 --sort=no
 --kinds-GDScript=+zl
+--fields=+E
 --fields-GDScript={annotations}
 --extras-GDScript=+{implicitClass}

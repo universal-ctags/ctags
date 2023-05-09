@@ -1031,6 +1031,7 @@ static bool parseClassName (tokenInfo *const token)
 			klass->name = name;
 			name = NULL;
 			unmarkTagExtraBit (klass, XTAG_ANONYMOUS);
+			unmarkTagExtraBit (klass, GDScriptXtagTable[X_IMPLICIT_CLASS].xtype);
 
 			/* Adjust the position. */
 			setTagPositionFromTag (klass, &e);
@@ -1263,7 +1264,12 @@ static void findGDScriptTags (void)
 	GDScriptNestingLevels = nestingLevelsNew (sizeof (struct gdscriptNestingLevelUserData));
 
 	if (isXtagEnabled (GDScriptXtagTable[X_IMPLICIT_CLASS].xtype))
-		prepareUnnamedClass (GDScriptNestingLevels);
+	{
+		int index = prepareUnnamedClass (GDScriptNestingLevels);
+		tagEntryInfo *e = getEntryInCorkQueue (index);
+		if (e)
+			markTagExtraBit (e, GDScriptXtagTable[X_IMPLICIT_CLASS].xtype);
+	}
 
 	readToken (token);
 	while (token->type != TOKEN_EOF)
