@@ -1,5 +1,5 @@
 my_mod	input.f	/^      module my_mod$/;"	m
-__anon9b9a88660103	input.f	/^        enumerator :: my_constr = 1, my_second_constr = 4$/;"	E	module:my_mod
+__anon9b9a88660103	input.f	/^        enumerator :: my_constr = 1, my_second_constr = 4$/;"	E	module:my_mod	extras:anonymous
 my_constr	input.f	/^        enumerator :: my_constr /;"	N	enum:__anon9b9a88660103
 my_second_constr	input.f	/^        enumerator :: my_constr = 1, my_second_constr /;"	N	enum:__anon9b9a88660103
 my_type	input.f	/^      type my_type$/;"	t	module:my_mod
@@ -12,22 +12,22 @@ a	input.f	/^        integer a$/;"	k	type:my_sequence_type
 b	input.f	/^        integer b$/;"	k	type:my_sequence_type
 my_mod_type	input.f	/^      type(my_sequence_type) :: my_mod_type$/;"	v	module:my_mod
 my_mod_common	input.f	23;"	c	module:my_mod
-my_mod_common_	input.f	23;"	c	module:my_mod
+my_mod_common_	input.f	23;"	c	module:my_mod	extras:linkName
 my_func	input.f	/^      function my_func(/;"	f	module:my_mod
-my_func_	input.f	/^      function my_func(x)$/;"	f	module:my_mod
+my_func_	input.f	/^      function my_func(x)$/;"	f	module:my_mod	extras:linkName
 my_block	input.f	/^      block data my_block$/;"	b
-my_block_	input.f	/^      block data my_block$/;"	b
+my_block_	input.f	/^      block data my_block$/;"	b	extras:linkName
 my_var	input.f	/^        integer my_var$/;"	v	blockData:my_block
 my_common	input.f	40;"	c	blockData:my_block
-my_common_	input.f	40;"	c	blockData:my_block
+my_common_	input.f	40;"	c	blockData:my_block	extras:linkName
 my_subr	input.f	/^      subroutine my_subr$/;"	s
-my_subr_	input.f	/^      subroutine my_subr$/;"	s
+my_subr_	input.f	/^      subroutine my_subr$/;"	s	extras:linkName
 my_entry	input.f	/^        entry my_entry$/;"	e	subroutine:my_subr
-my_entry_	input.f	/^        entry my_entry$/;"	e	subroutine:my_subr
+my_entry_	input.f	/^        entry my_entry$/;"	e	subroutine:my_subr	extras:linkName
 my_main	input.f	/^      program my_main$/;"	p
 my_interface	input.f	/^        interface my_interface$/;"	i	program:my_main
 my_var	input.f	/^        integer my_var$/;"	v	program:my_main
 my_namelist	input.f	/^        namelist \/my_namelist\//;"	n	program:my_main
 my_conc_type	input.f	/^        type(my_type) :: my_conc_type$/;"	v	program:my_main
 my_common	input.f	64;"	c	program:my_main
-my_common_	input.f	64;"	c	program:my_main
+my_common_	input.f	64;"	c	program:my_main	extras:linkName
