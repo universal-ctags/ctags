@@ -12,6 +12,7 @@ bar	input.d	/^	bar,$/;"	e	enum:Enum	file:
 bar	input.d	/^	public AliasInt bar()$/;"	f	class:Class
 conditional	input.d	/^	T conditional;$/;"	v	file:
 foo	input.d	/^	foo,$/;"	e	enum:Enum	file:
+g_inout	input.d	/^inout(int)* g_inout(inout(int)* p) { return p; }$/;"	f
 globalVar	input.d	/^__gshared int globalVar;$/;"	v
 i	input.d	/^int i;$/;"	v
 main	input.d	/^void main(string[] args)$/;"	f	file:
