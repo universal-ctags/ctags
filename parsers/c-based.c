@@ -2716,6 +2716,17 @@ static void nextToken (statementInfo *const st)
 			case '[': skipToMatch ("[]");                       break;
 			case '{': setToken (st, TOKEN_BRACE_OPEN);          break;
 			case '}': setToken (st, TOKEN_BRACE_CLOSE);         break;
+			case '!':
+				if (isInputLanguage (Lang_d))
+				{
+					c = skipToNonWhite ();
+					if (c == '(')
+					{
+						// template instance with parameter list
+						skipToMatch("()");
+						break;
+					}
+				}
 			default:  parseGeneralToken (st, c);                break;
 		}
 		token = activeToken (st);
