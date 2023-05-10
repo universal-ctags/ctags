@@ -8,9 +8,10 @@ private:
 }
 
 Foo!x b;
-Foo!(x) c; // FIXME
-Foo!(x < 2) d; // FIXME
-void f(Foo!x); // FIXME
+Foo!(x) c;
+Foo!(x < 2) d;
+void f(Foo!x); // FIXME prototypes
+void g(Foo!x) {}
 
 template each(alias fun = "a")
 {

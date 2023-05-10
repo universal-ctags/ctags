@@ -2,6 +2,9 @@ Template	input.d	/^template Template(alias a, T...)$/;"	T	file:
 TemplateAlias	input.d	/^    alias TemplateAlias = a!T;$/;"	a	template:Template	file:
 memb	input.d	/^    int memb;$/;"	m	template:Template	file:
 b	input.d	/^Foo!x b;$/;"	v
+c	input.d	/^Foo!(x) c;$/;"	v
+d	input.d	/^Foo!(x < 2) d;$/;"	v
+g	input.d	/^void g(Foo!x) {}$/;"	f
 each	input.d	/^template each(alias fun = "a")$/;"	T	file:
 child	input.d	/^    template child(){}$/;"	T	template:each	file:
 tmethod	input.d	/^    void tmethod()(){}$/;"	f	template:each
