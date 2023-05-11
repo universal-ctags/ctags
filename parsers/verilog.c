@@ -106,6 +106,7 @@ typedef enum {
 	K_IFCLASS,	/* interface class */
 	K_CONSTRAINT,
 	K_NETTYPE,
+	K_VIRTUAL,
 } verilogKind;
 
 typedef enum {
@@ -132,6 +133,7 @@ typedef struct sTokenInfo {
 	bool                classScope;    /* Context is local to the current sub-context */
 	bool				parameter;	   /* parameter which can be overridden */
 	bool				hasParamList;  /* module definition has a parameter port list */
+	bool				virtual;       /* has virtual */
 } tokenInfo;
 
 typedef enum {
@@ -292,7 +294,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "void",          	K_REGISTER,  	{ 1, 0 } },
 	{ "with",          	K_WITH,			{ 1, 0 } },
 	{ "nettype",       	K_NETTYPE,		{ 1, 0 } },
-//	{ "virtual",       	K_PROTOTYPE,	{ 1, 0 } },		// do not add for now
+	{ "virtual",       	K_VIRTUAL,		{ 1, 0 } },
 };
 
 static tokenInfo *currentContext = NULL;
@@ -496,6 +498,7 @@ static void clearToken (tokenInfo *token)
 	token->classScope = false;
 	token->parameter = false;
 	token->hasParamList = false;
+	token->virtual = false;
 }
 
 static tokenInfo *newToken (void)
@@ -1973,6 +1976,10 @@ static int findTag (tokenInfo *const token, int c)
 			break;
 
 		case K_INTERFACE:
+			// a virtual interface variable
+			if (currentContext->virtual)
+				break;
+			// fallthrough
 		case K_MODULE:
 		case K_PROGRAM:
 			c = processDesignElementL (token, c);
@@ -2008,6 +2015,10 @@ static int findTag (tokenInfo *const token, int c)
 
 		case K_DEFINE:
 			c = processDefine (token, c);
+			break;
+
+		case K_VIRTUAL:
+			currentContext->virtual = true;
 			break;
 
 		case K_IGNORE:

@@ -28,3 +28,8 @@ intf_automatic	input.sv	/^interface automatic intf_automatic;$/;"	I
 logic_automatic	input.sv	/^    logic logic_automatic;$/;"	r	interface:intf_automatic
 intf_automatic.logic_automatic	input.sv	/^    logic logic_automatic;$/;"	r	interface:intf_automatic
 external_interface	input.sv	/^extern interface external_interface;$/;"	Q
+ubus_env	input.sv	/^class ubus_env extends uvm_env;$/;"	C
+vif	input.sv	/^  protected virtual interface ubus_if vif;$/;"	r	class:ubus_env
+ubus_env.vif	input.sv	/^  protected virtual interface ubus_if vif;$/;"	r	class:ubus_env
+has_bus_monitor	input.sv	/^  protected bit has_bus_monitor = 1;$/;"	r	class:ubus_env
+ubus_env.has_bus_monitor	input.sv	/^  protected bit has_bus_monitor = 1;$/;"	r	class:ubus_env
