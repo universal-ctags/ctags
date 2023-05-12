@@ -900,7 +900,8 @@ def action_run(parser, action, *args):
             help='run a test case with specified timeout in seconds. 0 means no timeout (default).')
     parser.add_argument('--with-valgrind', action='store_true', default=False,
             help='run a test case under valgrind')
-    parser.add_argument('--colorized-output', choices=['yes', 'no'], default='yes',
+    parser.add_argument('--colorized-output', choices=['yes', 'no'],
+            default='yes' if len(os.environ.get('NO_COLOR', "")) == 0 else 'no',
             help='print the result in color.')
     parser.add_argument('--run-shrink', action='store_true', default=False,
             help='(TODO: NOT IMPLEMENTED YET)')
