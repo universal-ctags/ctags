@@ -601,7 +601,7 @@ static void makeFortranLinkNameTag(tagEntryInfo *e)
 
 	tagEntryInfo ln_e = *e;
 	ln_e.name = vStringValue (ln);
-	markTagExtraBit (&ln_e, X_LINK_NAME);
+	markTagExtraBit (&ln_e, FortranXtagTable[X_LINK_NAME].xtype);
 	makeTagEntry (&ln_e);
 	vStringDelete (ln);
 }
