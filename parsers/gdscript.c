@@ -368,7 +368,7 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src)
 	dest->type = src->type;
 	dest->keyword = src->keyword;
 	dest->indent = src->indent;
-	vStringCopy(dest->string, src->string);
+	vStringCopy (dest->string, src->string);
 }
 
 /* Skip a single or double quoted string. */
@@ -827,7 +827,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
 	tokenInfo *parameterTokens[16] = { NULL };
-	vString   *parameterTypes [ARRAY_SIZE(parameterTokens)] = { NULL };
+	vString   *parameterTypes [ARRAY_SIZE (parameterTokens)] = { NULL };
 	unsigned int parameterCount = 0;
 	NestingLevel *lv;
 	int corkIndex;
@@ -967,7 +967,7 @@ static bool parseEnum (tokenInfo *const token)
 	}
 	else if (token->type == TOKEN_IDENTIFIER)
 	{
-		corkIndex = makeSimpleGDScriptTag(token, K_ENUM);
+		corkIndex = makeSimpleGDScriptTag (token, K_ENUM);
 		readToken (token);
 	}
 	else
@@ -982,7 +982,7 @@ static bool parseEnum (tokenInfo *const token)
 	while (token->type != '}' && token->type != TOKEN_EOF)
 	{
 		if (token->type == TOKEN_IDENTIFIER)
-			makeSimpleGDScriptTag(token, K_ENUMERATOR);
+			makeSimpleGDScriptTag (token, K_ENUMERATOR);
 		else if (token->type == '=')
 		{
 			/* Skip the right value. */
@@ -1030,7 +1030,8 @@ static bool parseClassName (tokenInfo *const token)
 			eFree ((void *)klass->name);
 			klass->name = name;
 			name = NULL;
-			unmarkTagExtraBit(klass, XTAG_ANONYMOUS);
+			unmarkTagExtraBit (klass, XTAG_ANONYMOUS);
+			unmarkTagExtraBit (klass, GDScriptXtagTable[X_IMPLICIT_CLASS].xtype);
 
 			/* Adjust the position. */
 			setTagPositionFromTag (klass, &e);
@@ -1054,7 +1055,7 @@ static bool parseClassName (tokenInfo *const token)
 					klass->extensionFields.inheritance = vStringStrdup (token->string);
 				}
 				else
-					e.extensionFields.inheritance = vStringValue(token->string);
+					e.extensionFields.inheritance = vStringValue (token->string);
 			}
 		}
 
@@ -1089,7 +1090,7 @@ static bool parseExtends (tokenInfo *const token)
 				{
 					if (klass->extensionFields.inheritance)
 						eFree ((void *)klass->extensionFields.inheritance);
-					klass->extensionFields.inheritance = vStringStrdup(token->string);
+					klass->extensionFields.inheritance = vStringStrdup (token->string);
 				}
 			}
 		}
@@ -1148,8 +1149,8 @@ static bool parseVariable (tokenInfo *const token, const gdscriptKind kind,
 							const stringList *const decorators,
 							const int keyword)
 {
-	readToken(token);
-	vString *type = vStringNew();
+	readToken (token);
+	vString *type = vStringNew ();
 	tokenInfo *name = newToken ();
 	copyToken (name, token);
 	if (!name)
@@ -1166,7 +1167,7 @@ static bool parseVariable (tokenInfo *const token, const gdscriptKind kind,
 		readToken (token);
 
 	int index = makeSimpleGDScriptTag (name, kind);
-	deleteToken(name);
+	deleteToken (name);
 	tagEntryInfo *e = getEntryInCorkQueue (index);
 
 	if (e && decorators && stringListCount (decorators) > 0)
@@ -1177,22 +1178,22 @@ static bool parseVariable (tokenInfo *const token, const gdscriptKind kind,
 		vStringDelete (vstr);
 	}
 
-	vString *vtype = vStringNew();
+	vString *vtype = vStringNew ();
 	char * stype = vStringValue (type);
-	if (strcmp(stype, "=") && strcmp(stype, ""))
+	if (strcmp (stype, "=") && strcmp (stype, ""))
 	{
-			vStringCatS(vtype, stype);
+			vStringCatS (vtype, stype);
 	}
-	vStringDelete(type);
+	vStringDelete (type);
 
-	if (e && vStringLength(vtype) > 0) /// TODO: Fix types away
+	if (e && vStringLength (vtype) > 0) /// TODO: Fix types away
 	{
 		e->extensionFields.typeRef [0] = eStrdup ("typename");
 		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (vtype);
 	}
 	else
 	{
-		vStringDelete(vtype);
+		vStringDelete (vtype);
 	}
 
 
@@ -1255,7 +1256,7 @@ static int prepareUnnamedClass (struct NestingLevels *nls)
 static void findGDScriptTags (void)
 {
 	tokenInfo *const token = newToken ();
-	stringList *decorators = stringListNew();
+	stringList *decorators = stringListNew ();
 	bool atStatementStart = true;
 
 	TokenContinuationDepth = 0;
@@ -1263,7 +1264,12 @@ static void findGDScriptTags (void)
 	GDScriptNestingLevels = nestingLevelsNew (sizeof (struct gdscriptNestingLevelUserData));
 
 	if (isXtagEnabled (GDScriptXtagTable[X_IMPLICIT_CLASS].xtype))
-		prepareUnnamedClass (GDScriptNestingLevels);
+	{
+		int index = prepareUnnamedClass (GDScriptNestingLevels);
+		tagEntryInfo *e = getEntryInCorkQueue (index);
+		if (e)
+			markTagExtraBit (e, GDScriptXtagTable[X_IMPLICIT_CLASS].xtype);
+	}
 
 	readToken (token);
 	while (token->type != TOKEN_EOF)
@@ -1285,7 +1291,7 @@ static void findGDScriptTags (void)
 			case KEYWORD_func:   kind = K_METHOD; break;
 			case KEYWORD_signal: kind = K_SIGNAL; break;
 			default:
-				AssertNotReached();
+				AssertNotReached ();
 			}
 			readNext = parseClassOrDef (token, decorators, kind);
 		}
@@ -1325,7 +1331,7 @@ static void findGDScriptTags (void)
 		else if (token->type == TOKEN_KEYWORD
 				 && token->keyword == KEYWORD_modifier)
 		{
-			stringListAdd (decorators, vStringNewCopy(token->string));
+			stringListAdd (decorators, vStringNewCopy (token->string));
 		}
 		else if (token->type == '@' && atStatementStart &&
 				 GDScriptFields[F_ANNOTATIONS].enabled)
@@ -1337,7 +1343,7 @@ static void findGDScriptTags (void)
 				readNext = false;
 			else
 			{
-				stringListAdd (decorators, vStringNewCopy(token->string));
+				stringListAdd (decorators, vStringNewCopy (token->string));
 				readToken (token);
 
 				vString *d = vStringNew ();
@@ -1402,8 +1408,8 @@ extern parserDefinition* GDScriptParser (void)
 	def->keywordCount = ARRAY_SIZE (GDScriptKeywordTable);
 	def->fieldTable = GDScriptFields;
 	def->fieldCount = ARRAY_SIZE (GDScriptFields);
-	def->xtagTable     = GDScriptXtagTable;
-	def->xtagCount     = ARRAY_SIZE(GDScriptXtagTable);
+	def->xtagTable = GDScriptXtagTable;
+	def->xtagCount = ARRAY_SIZE (GDScriptXtagTable);
 	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
 	return def;

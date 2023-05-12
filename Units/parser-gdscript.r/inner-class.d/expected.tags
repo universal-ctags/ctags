@@ -1,4 +1,4 @@
-anon_class_186e00360100	input.gd	/^# Taken from godot-demo-projects\/networking\/webrtc_signaling\/server\/ws_webrtc_server.gd$/;"	c	inherits:Node
+anon_class_186e00360100	input.gd	/^# Taken from godot-demo-projects\/networking\/webrtc_signaling\/server\/ws_webrtc_server.gd$/;"	c	inherits:Node	extras:anonymous,implicitClass
 TIMEOUT	input.gd	/^const TIMEOUT = 1000 # Unresponsive clients times out after 1 sec$/;"	C	class:anon_class_186e00360100
 SEAL_TIME	input.gd	/^const SEAL_TIME = 10000 # A sealed room will be closed after this time$/;"	C	class:anon_class_186e00360100
 ALFNUM	input.gd	/^const ALFNUM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"$/;"	C	class:anon_class_186e00360100
