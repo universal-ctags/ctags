@@ -351,9 +351,9 @@ static void shiftKinds(int shift, rstKind baseKind)
 											   hashPtreq, NULL, NULL);
 	hashTableSetValueForUnknownKey(remapping_table, HT_INT_TO_PTR(CORK_NIL), NULL);
 
-	for (int index = 0; index < count; index++)
+	for (size_t index = 0; index < count; index++)
 	{
-		tagEntryInfo *e = getEntryInCorkQueue(index);
+		tagEntryInfo *e = getEntryInCorkQueue((int)index);
 		if (e && (baseKind <= e->kindIndex && e->kindIndex < SECTION_COUNT))
 		{
 			e->kindIndex += shift;
@@ -369,9 +369,9 @@ static void shiftKinds(int shift, rstKind baseKind)
 		}
 	}
 
-	for (int index = 0; index < count; index++)
+	for (size_t index = 0; index < count; index++)
 	{
-		tagEntryInfo *e = getEntryInCorkQueue(index);
+		tagEntryInfo *e = getEntryInCorkQueue((int)index);
 		if (e && e->extensionFields.scopeIndex != CORK_NIL)
 		{
 			void *remapping_to = hashTableGetItem (remapping_table,
@@ -424,9 +424,9 @@ static void inlineScopes (void)
 	   +Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Chapter 1.Section 1.1.Subsection 1.1.1
 	*/
 	size_t count = countEntryInCorkQueue();
-	for (int index = 0; index < count; index++)
+	for (size_t index = 0; index < count; index++)
 	{
-		tagEntryInfo *e = getEntryInCorkQueue(index);
+		tagEntryInfo *e = getEntryInCorkQueue((int)index);
 
 		if (e && e->extensionFields.scopeIndex != CORK_NIL)
 			inlineTagScope(e, e->extensionFields.scopeIndex);

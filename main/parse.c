@@ -4945,7 +4945,7 @@ extern bool makeFieldDescriptionsPseudoTags (const langType language,
 											 const ptagDesc *pdesc)
 {
 	bool written = false;
-	for (int i = 0; i < countFields (); i++)
+	for (unsigned int i = 0; i < countFields (); i++)
 	{
 		if (getFieldOwner (i) == language
 			&& isFieldEnabled (i))
@@ -4975,7 +4975,7 @@ extern bool makeExtraDescriptionsPseudoTags (const langType language,
 											 const ptagDesc *pdesc)
 {
 	bool written = false;
-	for (int i = 0; i < countXtags (); i++)
+	for (unsigned int i = 0; i < countXtags (); i++)
 	{
 		if (getXtagOwner (i) == language
 			&& isXtagEnabled (i))

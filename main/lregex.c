@@ -3025,9 +3025,9 @@ extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, c
 		error (FATAL, "no such regex table in %s: %s", getLanguageName(lcb->owner), dist);
 	dist_table = ptrArrayItem(lcb->tables, i);
 
-	for (i = 0; i < (int)ptrArrayCount(src_table->entries); i++)
+	for (unsigned int n = 0; n < ptrArrayCount(src_table->entries); n++)
 	{
-		regexTableEntry *entry = ptrArrayItem (src_table->entries, i);
+		regexTableEntry *entry = ptrArrayItem (src_table->entries, n);
 		ptrArrayAdd(dist_table->entries, newRefPatternEntry(entry));
 	}
 }
@@ -3197,7 +3197,7 @@ static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum scri
 {
 	if (ptrArrayCount (lcb->hook_code[hook]) == 0)
 	{
-		for (int i = 0; i < ptrArrayCount (lcb->hook[hook]); i++)
+		for (unsigned int i = 0; i < ptrArrayCount (lcb->hook[hook]); i++)
 		{
 			const char *src = ptrArrayItem (lcb->hook[hook], i);
 			EsObject *code = scriptRead (vm, src);
@@ -3207,7 +3207,7 @@ static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum scri
 			es_object_unref (code);
 		}
 	}
-	for (int i = 0; i < ptrArrayCount (lcb->hook_code[hook]); i++)
+	for (unsigned int i = 0; i < ptrArrayCount (lcb->hook_code[hook]); i++)
 	{
 		EsObject *code = ptrArrayItem (lcb->hook_code[hook], i);
 		EsObject * e = optscriptEval (vm, code);
@@ -3368,7 +3368,10 @@ static EsObject* lrop_assign_role_common (OptVM *vm, EsObject *name, bool assign
 	tagEntryInfo *e;
 	if (es_integer_p (tag))
 	{
-		int n = es_integer_get (tag);
+		int n0 = es_integer_get (tag);
+		if (n0 < 0)
+			return OPT_ERR_RANGECHECK;
+		unsigned int n = n0;
 		if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
 			return OPT_ERR_RANGECHECK;
 		e = getEntryInCorkQueue (n);
@@ -3531,7 +3534,10 @@ static EsObject* lrop_get_tag_loc (OptVM *vm, EsObject *name)
 	if (es_object_get_type (nobj) != ES_TYPE_INTEGER)
 		return OPT_ERR_TYPECHECK;
 
-	int n = es_integer_get(nobj);
+	int n0 = es_integer_get(nobj);
+	if (n0 < 0)
+		return OPT_ERR_RANGECHECK;
+	unsigned int n = n0;
 	if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
 			return OPT_ERR_RANGECHECK;
 
@@ -3653,15 +3659,15 @@ static EsObject* lrop_set_scope (OptVM *vm, EsObject *name)
 	if (!es_integer_p (corkIndex))
 		return OPT_ERR_TYPECHECK;
 
-	int n = es_integer_get (corkIndex);
-	if (n < 0)
+	int n0 = es_integer_get (corkIndex);
+	if (n0 < 0)
 		return OPT_ERR_RANGECHECK;
-
+	unsigned int n = n0;
 	if (n >= countEntryInCorkQueue())
 		return OPT_ERR_RANGECHECK;
 
 	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-	lcb->currentScope = n;
+	lcb->currentScope = n0;
 
 	opt_vm_ostack_pop (vm);
 
@@ -3951,10 +3957,13 @@ static EsObject *lrop_markextra (OptVM *vm, EsObject *name)
 	tagEntryInfo *e;
 	if (es_integer_p (tag))
 	{
-		int n = es_integer_get (tag);
+		int n0 = es_integer_get (tag);
+		if (n0 < 0)
+			return OPT_ERR_RANGECHECK;
+		unsigned int n = n0;
 		if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
 			return OPT_ERR_RANGECHECK;
-		e = getEntryInCorkQueue (n);
+		e = getEntryInCorkQueue (n0);
 	}
 	else if (es_object_get_type (tag) == OPT_TYPE_TAG)
 		e = es_pointer_get (tag);
@@ -4017,11 +4026,15 @@ static EsObject *lrop_markplaceholder (OptVM *vm, EsObject *name)
 	if (!es_integer_p (tag))
 		return OPT_ERR_TYPECHECK;
 
-	int n = es_integer_get (tag);
+	int n0 = es_integer_get (tag);
+	if (n0 < 0)
+		return OPT_ERR_RANGECHECK;
+
+	unsigned int n = n0;
 	if (! (CORK_NIL < n && n < countEntryInCorkQueue()))
 		return OPT_ERR_RANGECHECK;
 
-	tagEntryInfo *e = getEntryInCorkQueue (n);
+	tagEntryInfo *e = getEntryInCorkQueue (n0);
 	if (e == NULL)
 		return OPTSCRIPT_ERR_NOTAGENTRY;
 

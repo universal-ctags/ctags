@@ -300,7 +300,7 @@ static void parseExtendsClass (const char *input,
 							   vString *inherits,
 							   bool *notContinuousLine)
 {
-	int i = 0;
+	size_t i = 0;
 	do
 	{
 		if (input [i] == ',')

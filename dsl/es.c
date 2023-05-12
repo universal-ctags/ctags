@@ -822,7 +822,6 @@ es_symbol_print(const EsObject* object, MIO* fp)
 	unsigned char cc;
 	unsigned char mask;
 	int needs_bar;
-	int i;
 
 	string = es_symbol_get(object);
 	if (!string)
@@ -840,7 +839,7 @@ es_symbol_print(const EsObject* object, MIO* fp)
     {
 		/* 0 => 1? */
 		mask = 0x2;
-		for (i = 0; i< len; i++)
+		for (size_t i = 0; i< len; i++)
 		{
 			c = string[i];
 			cc = get_char_class(c);
@@ -854,7 +853,7 @@ es_symbol_print(const EsObject* object, MIO* fp)
 	if (needs_bar)
 		mio_printf(fp, "|");
 
-	for (i = 0; i < len; i++)
+	for (size_t i = 0; i < len; i++)
     {
 		c = string[i];
 		if (c == '\\' || c == '|')
@@ -1028,7 +1027,7 @@ es_string_print(const EsObject* object, MIO* fp)
 	const char* string;
 	char  c;
 	size_t len;
-	int      i;
+	size_t   i;
 
 
 	string = es_string_get(object);
@@ -2167,7 +2166,7 @@ static void
 dump_token (MIO* stream, const char* prefix, Token* seed)
 {
 	const char* buf;
-	int i;
+	size_t i;
 	char  c;
 
 

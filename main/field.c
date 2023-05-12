@@ -1072,9 +1072,9 @@ static const char *renderFieldExtras (const tagEntryInfo *const tag,
 				     const char *value CTAGS_ATTR_UNUSED,
 				     vString* b)
 {
-	int i;
+	unsigned int i;
 	bool hasExtra = false;
-	int c = countXtags();
+	unsigned int c = countXtags();
 
 	for (i = 0; i < c; i++)
 	{
@@ -1141,11 +1141,16 @@ static const char *renderFieldEpoch (const tagEntryInfo *const tag,
 {
 #define buf_len 21
 	static char buf[buf_len];
-
-	if (snprintf (buf, buf_len, "%lld", (long long)tag->extensionFields.epoch) > 0)
+#ifdef _MSC_VER
+#define FMTLL "%I64d"
+#else
+#define FMTLL "%lld"
+#endif
+	if (snprintf (buf, buf_len, FMTLL, (long long)tag->extensionFields.epoch) > 0)
 		return renderAsIs (b, buf);
 	else
 		return NULL;
+#undef FMTLL
 #undef buf_len
 }
 
@@ -1277,7 +1282,7 @@ extern bool doesFieldHaveRenderer (fieldType type, bool noEscaping)
 		return getFieldObject(type)->def->render? true: false;
 }
 
-extern int countFields (void)
+extern unsigned int countFields (void)
 {
 	return fieldObjectUsed;
 }
@@ -1705,8 +1710,12 @@ static EsObject* checkFieldValueForTyperef (const fieldDefinition *fdef, const E
 		;
 	else if (es_integer_p (obj))
 	{
-		int index = es_integer_get (obj);
-		if (index >= countEntryInCorkQueue ())
+		int index0 = es_integer_get (obj);
+		if (index0 < 0)
+			return OPT_ERR_RANGECHECK;
+
+		unsigned int index = index0;
+		if (index == 0 || index >= countEntryInCorkQueue ())
 			return OPTSCRIPT_ERR_NOTAGENTRY;
 	}
 	else
@@ -1721,10 +1730,10 @@ static EsObject* getFieldValueForScope (const tagEntryInfo *tag, const fieldDefi
 
 static EsObject* setFieldValueForScope (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
 {
-	int index = es_integer_get (obj);
+	unsigned int index = es_integer_get (obj);
 	if (index < countEntryInCorkQueue ())
 	{
-		tag->extensionFields.scopeIndex = index;
+		tag->extensionFields.scopeIndex = (int)index;
 		return es_false;
 	}
 
@@ -1749,7 +1758,7 @@ static EsObject* getFieldValueForExtras (const tagEntryInfo *tag, const fieldDef
 
 	EsObject* a = opt_array_new ();
 
-	for (int i = 0; i < countXtags (); i++)
+	for (unsigned int i = 0; i < countXtags (); i++)
 	{
 		if (!isTagExtraBitMarked (tag, i))
 			continue;
@@ -1856,7 +1865,7 @@ static EsObject* checkFieldValueForLineCommon (const fieldDefinition *fdef, cons
 
 static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
 {
-	int l;
+	unsigned int l;
 	if (es_object_get_type (obj) == OPT_TYPE_MATCHLOC)
 	{
 		matchLoc *loc = es_pointer_get (obj);
@@ -1864,10 +1873,11 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 	}
 	else if (es_integer_p (obj))
 	{
-		l = es_integer_get (obj);
-		if (l < 1)
+		int l0 = es_integer_get (obj);
+		if (l0 < 1)
 			return OPT_ERR_RANGECHECK;
 
+		l = (unsigned int)l0;
 		/* If the new line number is too large,
 		   we cannot fill tag->filePosition wit
 		   getInputFilePositionForLine(); */

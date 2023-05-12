@@ -2437,13 +2437,16 @@ GEN_PRINTER(op__print,             vm_print_full (vm, elt, true,  0))
 static EsObject*
 op__make_array (OptVM *vm, EsObject *name)
 {
-	int n = vm_ostack_counttomark (vm);
-	if (n < 0)
+	int n0 = vm_ostack_counttomark (vm);
+	if (n0 < 0)
 		return OPT_ERR_UNMATCHEDMARK;
+	unsigned int n = (unsigned int)n0;
 
 	unsigned int count = vm_ostack_count (vm);
+	Assert(count > n);
+
 	EsObject *a = array_new (ATTR_READABLE | ATTR_WRITABLE);
-	for (int i = (int)(count - n); i < count; i++)
+	for (unsigned int i = count - n; i < count; i++)
 	{
 		EsObject *elt = ptrArrayItem (vm->ostack, i);
 		array_op_add (a, elt);
@@ -2713,18 +2716,19 @@ op_copy (OptVM *vm, EsObject *name)
 		if (!es_integer_p (nobj))
 			return op__copy_compound (vm, name, c, nobj);
 
-		int n = es_integer_get (nobj);
-		if (n < 0)
+		int n0 = es_integer_get (nobj);
+		if (n0 < 0)
 			return OPT_ERR_RANGECHECK;
+		unsigned int n = (unsigned int)n0;
 
 		c--;
 
-		if (((int)c) - n < 0)
+		if (c < n)
 			return OPT_ERR_UNDERFLOW;
 
 		ptrArrayDeleteLast(vm->ostack);
 
-		for (int i = c - n; i < c; i++)
+		for (unsigned int i = c - n; i < c; i++)
 		{
 			EsObject * elt = ptrArrayItem (vm->ostack, i);
 			vm_ostack_push (vm, elt);
@@ -4211,11 +4215,9 @@ op__forall_array (OptVM *vm, EsObject *name,
 {
 	ptrArray *a = es_pointer_get (obj);
 	unsigned int c = ptrArrayCount (a);
-	if (((int)c) < 0)
-		return OPT_ERR_INTERNALERROR; /* TODO: integer overflow */
 
 	EsObject *e = es_false;
-	for (int i = 0; i < c; i++)
+	for (unsigned int i = 0; i < c; i++)
 	{
 		EsObject *o = ptrArrayItem (a, i);
 		es_object_ref (o);
@@ -4287,11 +4289,9 @@ op__forall_string (OptVM *vm, EsObject *name,
 {
 	vString *s = es_pointer_get (obj);
 	unsigned int c = vStringLength (s);
-	if (((int)c) < 0)
-		return OPT_ERR_INTERNALERROR; /* TODO: integer overflow */
 
 	EsObject *e = es_false;
-	for (int i = 0; i < c; i++)
+	for (unsigned int i = 0; i < c; i++)
 	{
 		unsigned char chr = vStringChar (s, i);
 		EsObject *o = es_integer_new (chr);
@@ -4343,23 +4343,24 @@ op_forall (OptVM *vm, EsObject *name)
 
 static EsObject*
 op__putinterval_array (OptVM *vm, EsObject *name,
-					   ptrArray *srca, int index, ptrArray *dsta)
+					   ptrArray *srca, unsigned int index, ptrArray *dsta)
 {
 	unsigned int dlen = ptrArrayCount (dsta);
 	unsigned int slen = ptrArrayCount (srca);
 	if (dlen > index)
 	{
-		if ((dlen - index) <= slen)
+		unsigned d = dlen - index;
+		if (d <= slen)
 		{
-			ptrArrayDeleteLastInBatch (dsta, dlen - index);
+			ptrArrayDeleteLastInBatch (dsta, d);
 			for (unsigned int i = 0; i < slen; i++)
 				ptrArrayAdd (dsta, es_object_ref (ptrArrayItem (srca, i)));
 			return es_false;
 		}
 		else
 		{
-			for (size_t i = 0; i < slen; i++)
-				ptrArrayUpdate (dsta, ((size_t)index) + i,
+			for (unsigned int i = 0; i < slen; i++)
+				ptrArrayUpdate (dsta, index + i,
 								es_object_ref (ptrArrayItem (srca, i)),
 								es_nil);
 			return es_false;
@@ -4377,21 +4378,22 @@ op__putinterval_array (OptVM *vm, EsObject *name,
 
 static EsObject*
 op__putinterval_string (OptVM *vm, EsObject *name,
-						vString *srcv, int index, vString *dstv)
+						vString *srcv, unsigned int index, vString *dstv)
 {
-	size_t dlen = vStringLength (dstv);
+	unsigned int dlen = vStringLength (dstv);
 	if (dlen > index)
 	{
-		size_t slen = vStringLength (srcv);
-		if ((dlen - index) <= slen)
+		unsigned int d = dlen - index;
+		unsigned int slen = vStringLength (srcv);
+		if (d <= slen)
 		{
-			vStringTruncate (dstv, (size_t)index);
+			vStringTruncate (dstv, index);
 			vStringCat (dstv, srcv);
 			return es_false;
 		}
 		else
 		{
-			for (size_t i = 0; i < slen; i++)
+			for (unsigned int i = 0; i < slen; i++)
 				vStringChar (dstv, index + i) = vStringChar (srcv, i);
 			return es_false;
 		}
@@ -4423,9 +4425,10 @@ op_putinterval (OptVM *vm, EsObject *name)
 	else
 		return OPT_ERR_TYPECHECK;
 
-	int index = es_integer_get (indexobj);
-	if (index < 0)
+	int index0 = es_integer_get (indexobj);
+	if (index0 < 0)
 		return OPT_ERR_RANGECHECK;
+	unsigned int index = (size_t)index0;
 
 	EsObject *r;
 	if (t == OPT_TYPE_ARRAY)
@@ -4448,19 +4451,19 @@ op_putinterval (OptVM *vm, EsObject *name)
 static EsObject*
 op__copyinterval_array (OptVM *vm, EsObject *name,
 						ptrArray *dsta,
-						int count,
-						int index,
+						unsigned int count,
+						unsigned int index,
 						ptrArray *srca)
 {
-	unsigned long srcl = ptrArrayCount (srca);
+	unsigned int srcl = ptrArrayCount (srca);
 
-	if ((unsigned long)index > srcl)
+	if (index > srcl)
 		return OPT_ERR_RANGECHECK;
 
-	if ((unsigned long)(index + count) > srcl)
+	if ((index + count) > srcl)
 		return OPT_ERR_RANGECHECK;
 
-	for (unsigned int i = (unsigned int)index; i < index + count; i++)
+	for (unsigned int i = index; i < index + count; i++)
 		ptrArrayAdd (dsta, es_object_ref (ptrArrayItem (srca, i)));
 	return es_false;
 }
@@ -4468,19 +4471,19 @@ op__copyinterval_array (OptVM *vm, EsObject *name,
 static EsObject*
 op__copyinterval_string (OptVM *vm, EsObject *name,
 						 vString *dsts,
-						 int count,
-						 int index,
+						 unsigned int count,
+						 unsigned int index,
 						 vString *srcs)
 {
-	size_t srcl = vStringLength (srcs);
+	unsigned int srcl = vStringLength (srcs);
 
-	if ((size_t)index > srcl)
+	if (index > srcl)
 		return OPT_ERR_RANGECHECK;
 
-	if ((size_t)(index + count) > srcl)
+	if ((index + count) > srcl)
 		return OPT_ERR_RANGECHECK;
 
-	vStringNCatSUnsafe (dsts, vStringValue (srcs) + index, (size_t)count);
+	vStringNCatSUnsafe (dsts, vStringValue (srcs) + index, count);
 	return es_false;
 }
 
@@ -4503,13 +4506,15 @@ op__copyinterval (OptVM *vm, EsObject *name)
 	if (!es_integer_p (indexobj))
 		return OPT_ERR_TYPECHECK;
 
-	int count = es_integer_get (countobj);
-	if (count < 0)
+	int count0 = es_integer_get (countobj);
+	if (count0 < 0)
 		return OPT_ERR_RANGECHECK;
+	unsigned int count = (unsigned int)count0;
 
-	int index = es_integer_get (indexobj);
-	if (index < 0)
+	int index0 = es_integer_get (indexobj);
+	if (index0 < 0)
 		return OPT_ERR_RANGECHECK;
+	unsigned int index = (size_t)index0;
 
 	EsObject* r;
 	if (t == OPT_TYPE_ARRAY)

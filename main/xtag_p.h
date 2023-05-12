@@ -43,7 +43,7 @@ extern const char* getXtagName (xtagType type);
 extern const char* getXtagDescription (xtagType type);
 
 extern void initXtagObjects (void);
-extern int countXtags (void);
+extern unsigned int countXtags (void);
 
 extern int defineXtag (xtagDefinition *def, langType language);
 extern xtagType nextSiblingXtag (xtagType type);

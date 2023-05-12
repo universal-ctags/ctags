@@ -324,7 +324,7 @@ extern void initXtagObjects (void)
 	}
 }
 
-extern int countXtags (void)
+extern unsigned int countXtags (void)
 {
 	return xtagObjectUsed;
 }
