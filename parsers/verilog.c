@@ -830,12 +830,17 @@ static int skipMacro (int c, tokenInfo *token)
 			c = processDefine (localToken, c);
 		}
 		/* return macro expansion */
-		else
+		else if (localToken->kind == K_IDENTIFIER)
 		{
 			swapToken (token, localToken);
 			c = skipWhite (c);
 			if (c == '(')
 				c = skipPastMatch ("()");
+			break;
+		}
+		else
+		{
+			VERBOSE ("Unexpected input: localToken->kind %d\n", localToken->kind);
 			break;
 		}
 	}
@@ -877,7 +882,7 @@ static int readWordToken (tokenInfo *const token, int c)
 
 // read a word token starting with "c".
 // returns the next charactor of the token read.
-// for compiler directives. Since they are line-based, skipWhite() cannot be used.
+// For compiler directives which are line-based, skipWhite() cannot be used.
 static int readWordTokenNoSkip (tokenInfo *const token, int c)
 {
 	return _readWordToken (token, c, false);
@@ -894,7 +899,8 @@ static bool isIdentifier (tokenInfo* token)
 			int c = vStringChar (token->name, i);
 			if (i == 0)
 			{
-				if (c == '`' || !isWordToken (c))
+				// treat a text-macro as an identifier (#3712)
+				if (!isWordToken (c))
 					return false;
 			}
 			else
@@ -2080,6 +2086,7 @@ static void findVerilogTags (void)
 			default :
 				if (isWordToken (c))
 				{
+					// NoSkip for compiler directives
 					c = readWordTokenNoSkip (token, c);
 					if (token->kind == K_DIRECTIVE)
 					{
@@ -2087,7 +2094,12 @@ static void findVerilogTags (void)
 						c = skipToNewLine (c);
 						c = skipWhite (c);
 					}
-					else if (token->kind != K_UNDEFINED)
+					else if ((token->kind == K_UNDEFINED)
+							 || (token->kind == K_IDENTIFIER && vStringChar(token->name, 0) == '`'))
+						// ignore an undefined token and text-macro identifier, i.e.`foo(bar) (#3712)
+						break;
+					else
+						// call findTag() after skipping whitespaces
 						c = findTag (token, skipWhite (c));
 				}
 				else
