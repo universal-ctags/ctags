@@ -2307,9 +2307,7 @@ static void freeSearchPathList (searchPathList** pathList)
 static vString* expandOnSearchPathList (searchPathList *pathList, const char* leaf,
 					bool (* check) (const char *const))
 {
-	unsigned int i;
-
-	for (i = stringListCount (pathList); i > 0; --i)
+	for (unsigned int i = stringListCount (pathList); i > 0; --i)
 	{
 		const char* const body = vStringValue (stringListItem (pathList, i - 1));
 		char* tmp = combinePathAndFile (body, leaf);
