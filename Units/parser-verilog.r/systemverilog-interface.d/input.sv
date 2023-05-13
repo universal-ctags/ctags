@@ -22,3 +22,13 @@ interface automatic intf_automatic;
 endinterface
 
 extern interface external_interface;
+
+// from UVM-1.2
+class ubus_env extends uvm_env;
+
+  // Virtual Interface variable
+  protected virtual interface ubus_if vif;
+
+  // Control properties
+  protected bit has_bus_monitor = 1;
+endclass : ubus_env
