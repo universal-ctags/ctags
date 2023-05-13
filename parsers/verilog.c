@@ -1,27 +1,27 @@
 /*
- *   Copyright (c) 2003, Darren Hiebert
- *   Copyright (c) 2017, Vitor Antunes
- *   Copyright (c) 2020, Hiroo Hayashi
+ *	 Copyright (c) 2003, Darren Hiebert
+ *	 Copyright (c) 2017, Vitor Antunes
+ *	 Copyright (c) 2020, Hiroo Hayashi
  *
- *   This source code is released for free distribution under the terms of the
- *   GNU General Public License version 2 or (at your option) any later version.
+ *	 This source code is released for free distribution under the terms of the
+ *	 GNU General Public License version 2 or (at your option) any later version.
  *
- *   This module contains functions for generating tags for the Verilog or
- *   SystemVerilog HDL (Hardware Description Language).
+ *	 This module contains functions for generating tags for the Verilog or
+ *	 SystemVerilog HDL (Hardware Description Language).
  *
- *   References:
- *       IEEE Std 1800-2017, SystemVerilog Language Reference Manual
- *          https://ieeexplore.ieee.org/document/8299595
- *       SystemVerilog IEEE Std 1800-2012 Grammer
- *          https://insights.sigasi.com/tech/systemverilog.ebnf/
- *       Verilog Formal Syntax Specification
- *          http://www.verilog.com/VerilogBNF.html
+ *	 References:
+ *		IEEE Std 1800-2017, SystemVerilog Language Reference Manual
+ *			https://ieeexplore.ieee.org/document/8299595
+ *		SystemVerilog IEEE Std 1800-2012 Grammer
+ *			https://insights.sigasi.com/tech/systemverilog.ebnf/
+ *		Verilog Formal Syntax Specification
+ *			http://www.verilog.com/VerilogBNF.html
  */
 
 /*
- *   INCLUDE FILES
+ *	 INCLUDE FILES
  */
-#include "general.h"  /* must always come first */
+#include "general.h"	/* must always come first */
 
 #include <string.h>
 
@@ -36,11 +36,11 @@
 #include "ptrarray.h"
 
 /*
- *   MACROS
+ *	 MACROS
  */
-#define NUMBER_LANGUAGES    2   /* Indicates number of defined indexes */
-#define IDX_SYSTEMVERILOG   0
-#define IDX_VERILOG         1
+#define NUMBER_LANGUAGES	2	/* Indicates number of defined indexes */
+#define IDX_SYSTEMVERILOG	0
+#define IDX_VERILOG			1
 
 #ifndef DEBUG
 #define VERBOSE(...) do { \
@@ -55,7 +55,7 @@
 #endif
 
 /*
- *   DATA DECLARATIONS
+ *	 DATA DECLARATIONS
  */
 
 /* A callback function searching a symbol from the cork symbol table assumes
@@ -110,7 +110,7 @@ typedef enum {
 } verilogKind;
 
 typedef enum {
-       R_MODULE_DECL,
+	R_MODULE_DECL,
 } verilogModuleRole;
 
 typedef struct {
@@ -120,20 +120,20 @@ typedef struct {
 } keywordAssoc;
 
 typedef struct sTokenInfo {
-	verilogKind         kind;
-	vString*            name;          /* the name of the token */
-	unsigned long       lineNumber;    /* line number where token was found */
-	MIOPos              filePosition;  /* file position where token was found */
-	struct sTokenInfo*  scope;         /* context of keyword */
-	int                 nestLevel;     /* Current nest level */
-	verilogKind         lastKind;      /* Kind of last found tag */
-	vString*            blockName;     /* Current block name */
-	vString*            inheritance;   /* Class inheritance */
-	bool                prototype;     /* Is only a prototype */
-	bool                classScope;    /* Context is local to the current sub-context */
-	bool				parameter;	   /* parameter which can be overridden */
-	bool				hasParamList;  /* module definition has a parameter port list */
-	bool				virtual;       /* has virtual */
+	verilogKind			kind;
+	vString*			name;			/* the name of the token */
+	unsigned long		lineNumber;		/* line number where token was found */
+	MIOPos				filePosition;	/* file position where token was found */
+	struct sTokenInfo*	scope;			/* context of keyword */
+	int					nestLevel;		/* Current nest level */
+	verilogKind			lastKind;		/* Kind of last found tag */
+	vString*			blockName;		/* Current block name */
+	vString*			inheritance;	/* Class inheritance */
+	bool				prototype;		/* Is only a prototype */
+	bool				classScope;		/* Context is local to the current sub-context */
+	bool				parameter;		/* parameter which can be overridden */
+	bool				hasParamList;	/* module definition has a parameter port list */
+	bool				virtual;		/* has virtual */
 } tokenInfo;
 
 typedef enum {
@@ -141,7 +141,7 @@ typedef enum {
 } verilogField;
 
 /*
- *   DATA DEFINITIONS
+ *	 DATA DEFINITIONS
  */
 static int Ungetc;
 static int Lang_verilog;
@@ -156,145 +156,145 @@ static roleDefinition SystemVerilogModuleRoles [] = {
 };
 
 static kindDefinition VerilogKinds [] = {
- { true, 'c', "constant",  "constants (parameter, specparam)" },
- { true, 'd', "define",    "text macros" },
- { true, 'e', "event",     "events" },
- { true, 'f', "function",  "functions" },
- { true, 'm', "module",    "modules",
+ { true, 'c', "constant",	"constants (parameter, specparam)" },
+ { true, 'd', "define",		"text macros" },
+ { true, 'e', "event",		"events" },
+ { true, 'f', "function",	"functions" },
+ { true, 'm', "module",		"modules",
    .referenceOnly = false, ATTACH_ROLES(VerilogModuleRoles) },
- { true, 'n', "net",       "net data types" },
- { true, 'p', "port",      "ports" },
- { true, 'r', "register",  "variable data types" },
- { true, 't', "task",      "tasks" },
- { true, 'b', "block",     "blocks (begin, fork)" },
- { true, 'i', "instance",  "instances of module" },
+ { true, 'n', "net",		"net data types" },
+ { true, 'p', "port",		"ports" },
+ { true, 'r', "register",	"variable data types" },
+ { true, 't', "task",		"tasks" },
+ { true, 'b', "block",		"blocks (begin, fork)" },
+ { true, 'i', "instance",	"instances of module" },
 };
 
 static kindDefinition SystemVerilogKinds [] = {
- { true, 'c', "constant",  "constants (parameter, specparam, enum values)" },
- { true, 'd', "define",    "text macros" },
- { true, 'e', "event",     "events" },
- { true, 'f', "function",  "functions" },
- { true, 'm', "module",    "modules",
+ { true, 'c', "constant",	"constants (parameter, specparam, enum values)" },
+ { true, 'd', "define",		"text macros" },
+ { true, 'e', "event",		"events" },
+ { true, 'f', "function",	"functions" },
+ { true, 'm', "module",		"modules",
    .referenceOnly = false, ATTACH_ROLES(SystemVerilogModuleRoles) },
- { true, 'n', "net",       "net data types" },
- { true, 'p', "port",      "ports" },
- { true, 'r', "register",  "variable data types" },
- { true, 't', "task",      "tasks" },
- { true, 'b', "block",     "blocks (begin, fork)" },
- { true, 'i', "instance",  "instances of module or interface" },
- { true, 'A', "assert",    "assertions (assert, assume, cover, restrict)" },
- { true, 'C', "class",     "classes" },
- { true, 'V', "covergroup","covergroups" },
- { true, 'E', "enum",      "enumerators" },
- { true, 'I', "interface", "interfaces" },
- { true, 'M', "modport",   "modports" },
- { true, 'K', "package",   "packages" },
- { true, 'P', "program",   "programs" },
- { false,'Q', "prototype", "prototypes (extern, pure)" },
- { true, 'R', "property",  "properties" },
- { true, 'S', "struct",    "structs and unions" },
- { true, 'T', "typedef",   "type declarations" },
- { true, 'H', "checker",   "checkers" },
- { true, 'L', "clocking",  "clocking" },
- { true, 'q', "sequence",  "sequences" },
- { true, 'w', "member",    "struct and union members" },
- { true, 'l', "ifclass",   "interface class" },
- { true, 'O', "constraint","constraints" },
- { true, 'N', "nettype",   "nettype declarations" },
+ { true, 'n', "net",		"net data types" },
+ { true, 'p', "port",		"ports" },
+ { true, 'r', "register",	"variable data types" },
+ { true, 't', "task",		"tasks" },
+ { true, 'b', "block",		"blocks (begin, fork)" },
+ { true, 'i', "instance",	"instances of module or interface" },
+ { true, 'A', "assert",		"assertions (assert, assume, cover, restrict)" },
+ { true, 'C', "class",		"classes" },
+ { true, 'V', "covergroup",	"covergroups" },
+ { true, 'E', "enum",		"enumerators" },
+ { true, 'I', "interface", 	"interfaces" },
+ { true, 'M', "modport",	"modports" },
+ { true, 'K', "package",	"packages" },
+ { true, 'P', "program",	"programs" },
+ { false,'Q', "prototype",	"prototypes (extern, pure)" },
+ { true, 'R', "property",	"properties" },
+ { true, 'S', "struct",		"structs and unions" },
+ { true, 'T', "typedef",	"type declarations" },
+ { true, 'H', "checker",	"checkers" },
+ { true, 'L', "clocking",	"clocking" },
+ { true, 'q', "sequence",	"sequences" },
+ { true, 'w', "member",		"struct and union members" },
+ { true, 'l', "ifclass",	"interface class" },
+ { true, 'O', "constraint",	"constraints" },
+ { true, 'N', "nettype",	"nettype declarations" },
 };
 
 static const keywordAssoc KeywordTable [] = {
-	/*                 	             	  SystemVerilog */
-	/*                 	             	  |  Verilog    */
-	/* keyword         	keyword ID   	  |  |          */
-	{ "`define",       	K_DEFINE,   	{ 1, 1 } },
-	{ "begin",         	K_BLOCK,     	{ 1, 1 } },
-	{ "end",           	K_END,       	{ 1, 1 } },
-	{ "endfunction",   	K_END_DE,    	{ 1, 1 } },
-	{ "endmodule",     	K_END_DE,    	{ 1, 1 } },
-	{ "endtask",       	K_END_DE,    	{ 1, 1 } },
-	{ "event",         	K_EVENT,     	{ 1, 1 } },
-	{ "fork",          	K_BLOCK,     	{ 1, 1 } },
-	{ "function",      	K_FUNCTION,  	{ 1, 1 } },
-	{ "genvar",        	K_REGISTER,  	{ 1, 1 } },
-	{ "inout",         	K_PORT,      	{ 1, 1 } },
-	{ "input",         	K_PORT,      	{ 1, 1 } },
-	{ "integer",       	K_REGISTER,  	{ 1, 1 } },
-	{ "join",          	K_END,       	{ 1, 1 } },
-	{ "localparam",    	K_LOCALPARAM,  	{ 1, 1 } },
-	{ "module",        	K_MODULE,    	{ 1, 1 } },
-	{ "output",        	K_PORT,      	{ 1, 1 } },
-	{ "parameter",     	K_PARAMETER,  	{ 1, 1 } },
-	{ "real",          	K_REGISTER,  	{ 1, 1 } },
-	{ "realtime",      	K_REGISTER,  	{ 1, 1 } },
-	{ "reg",           	K_REGISTER,  	{ 1, 1 } },
-	{ "signed",        	K_IGNORE,    	{ 1, 1 } },
-	{ "specparam",     	K_CONSTANT,  	{ 1, 1 } },
-	{ "supply0",       	K_NET,       	{ 1, 1 } },
-	{ "supply1",       	K_NET,       	{ 1, 1 } },
-	{ "task",          	K_TASK,      	{ 1, 1 } },
-	{ "time",          	K_REGISTER,  	{ 1, 1 } },
-	{ "tri",           	K_NET,       	{ 1, 1 } },
-	{ "triand",        	K_NET,       	{ 1, 1 } },
-	{ "trior",         	K_NET,       	{ 1, 1 } },
-	{ "trireg",        	K_NET,       	{ 1, 1 } },
-	{ "tri0",          	K_NET,       	{ 1, 1 } },
-	{ "tri1",          	K_NET,       	{ 1, 1 } },
-	{ "uwire",         	K_NET,       	{ 1, 1 } },
-	{ "wand",          	K_NET,       	{ 1, 1 } },
-	{ "wire",          	K_NET,       	{ 1, 1 } },
-	{ "wor",           	K_NET,       	{ 1, 1 } },
-	{ "assert",        	K_ASSERTION, 	{ 1, 0 } },
-	{ "assume",        	K_ASSERTION, 	{ 1, 0 } },
-	{ "bit",           	K_REGISTER,  	{ 1, 0 } },
-	{ "byte",          	K_REGISTER,  	{ 1, 0 } },
-	{ "chandle",       	K_REGISTER,  	{ 1, 0 } },
-	{ "checker",       	K_CHECKER,  	{ 1, 0 } },
-	{ "class",         	K_CLASS,     	{ 1, 0 } },
-	{ "constraint",   	K_CONSTRAINT, 	{ 1, 0 } },
-	{ "cover",         	K_ASSERTION, 	{ 1, 0 } },
-	{ "clocking",       K_CLOCKING,     { 1, 0 } },
-	{ "covergroup",    	K_COVERGROUP,	{ 1, 0 } },
-	{ "endchecker",    	K_END_DE,    	{ 1, 0 } },
-	{ "endclass",      	K_END_DE,    	{ 1, 0 } },
-	{ "endclocking",    K_END_DE,     	{ 1, 0 } },
-	{ "endgroup",      	K_END_DE,    	{ 1, 0 } },
-	{ "endinterface",  	K_END_DE,    	{ 1, 0 } },
-	{ "endpackage",    	K_END_DE,    	{ 1, 0 } },
-	{ "endprogram",    	K_END_DE,    	{ 1, 0 } },
-	{ "endproperty",   	K_END_DE,    	{ 1, 0 } },
-	{ "endsequence",   	K_END_DE,    	{ 1, 0 } },
-	{ "enum",          	K_ENUM,      	{ 1, 0 } },
-	{ "extern",        	K_PROTOTYPE, 	{ 1, 0 } },
-	{ "import",        	K_IMPORT,	  	{ 1, 0 } },
-	{ "int",           	K_REGISTER,  	{ 1, 0 } },
-	{ "interconnect",  	K_NET,       	{ 1, 0 } },
-	{ "interface",     	K_INTERFACE, 	{ 1, 0 } },
-	{ "join_any",      	K_END,       	{ 1, 0 } },
-	{ "join_none",     	K_END,       	{ 1, 0 } },
-	{ "logic",         	K_REGISTER,  	{ 1, 0 } },
-	{ "longint",       	K_REGISTER,  	{ 1, 0 } },
-	{ "modport",       	K_MODPORT,   	{ 1, 0 } },
-	{ "package",       	K_PACKAGE,   	{ 1, 0 } },
-	{ "program",       	K_PROGRAM,   	{ 1, 0 } },
-	{ "property",      	K_PROPERTY,  	{ 1, 0 } },
-	{ "pure",          	K_PROTOTYPE, 	{ 1, 0 } },
-	{ "ref",           	K_PORT,      	{ 1, 0 } },
-	{ "restrict",      	K_ASSERTION, 	{ 1, 0 } },
-	{ "sequence",      	K_SEQUENCE,  	{ 1, 0 } },
-	{ "shortint",      	K_REGISTER,  	{ 1, 0 } },
-	{ "shortreal",     	K_REGISTER,  	{ 1, 0 } },
-	{ "string",        	K_REGISTER,  	{ 1, 0 } },
-	{ "struct",        	K_STRUCT,    	{ 1, 0 } },
-	{ "type",          	K_REGISTER,  	{ 1, 0 } },
-	{ "typedef",       	K_TYPEDEF,   	{ 1, 0 } },
-	{ "union",         	K_STRUCT,    	{ 1, 0 } },
-	{ "var",           	K_REGISTER,  	{ 1, 0 } },
-	{ "void",          	K_REGISTER,  	{ 1, 0 } },
-	{ "with",          	K_WITH,			{ 1, 0 } },
-	{ "nettype",       	K_NETTYPE,		{ 1, 0 } },
-	{ "virtual",       	K_VIRTUAL,		{ 1, 0 } },
+	/*								 	  SystemVerilog	*/
+	/*								 	  |  Verilog	*/
+	/* keyword		 	keyword ID	 	  |  |			*/
+	{ "`define",		K_DEFINE,		{ 1, 1 } },
+	{ "begin",			K_BLOCK,		{ 1, 1 } },
+	{ "end",			K_END,			{ 1, 1 } },
+	{ "endfunction",	K_END_DE,		{ 1, 1 } },
+	{ "endmodule",		K_END_DE,		{ 1, 1 } },
+	{ "endtask",		K_END_DE,		{ 1, 1 } },
+	{ "event",			K_EVENT,		{ 1, 1 } },
+	{ "fork",			K_BLOCK,		{ 1, 1 } },
+	{ "function",		K_FUNCTION,		{ 1, 1 } },
+	{ "genvar",			K_REGISTER,		{ 1, 1 } },
+	{ "inout",			K_PORT,			{ 1, 1 } },
+	{ "input",			K_PORT,			{ 1, 1 } },
+	{ "integer",		K_REGISTER,		{ 1, 1 } },
+	{ "join",			K_END,			{ 1, 1 } },
+	{ "localparam",		K_LOCALPARAM,	{ 1, 1 } },
+	{ "module",			K_MODULE,		{ 1, 1 } },
+	{ "output",			K_PORT,			{ 1, 1 } },
+	{ "parameter",		K_PARAMETER,	{ 1, 1 } },
+	{ "real",			K_REGISTER,		{ 1, 1 } },
+	{ "realtime",		K_REGISTER,		{ 1, 1 } },
+	{ "reg",			K_REGISTER,		{ 1, 1 } },
+	{ "signed",			K_IGNORE,		{ 1, 1 } },
+	{ "specparam",		K_CONSTANT,		{ 1, 1 } },
+	{ "supply0",		K_NET,			{ 1, 1 } },
+	{ "supply1",		K_NET,			{ 1, 1 } },
+	{ "task",			K_TASK,			{ 1, 1 } },
+	{ "time",			K_REGISTER,		{ 1, 1 } },
+	{ "tri",			K_NET,			{ 1, 1 } },
+	{ "triand",			K_NET,			{ 1, 1 } },
+	{ "trior",			K_NET,			{ 1, 1 } },
+	{ "trireg",			K_NET,			{ 1, 1 } },
+	{ "tri0",			K_NET,			{ 1, 1 } },
+	{ "tri1",			K_NET,			{ 1, 1 } },
+	{ "uwire",			K_NET,			{ 1, 1 } },
+	{ "wand",			K_NET,			{ 1, 1 } },
+	{ "wire",			K_NET,			{ 1, 1 } },
+	{ "wor",			K_NET,			{ 1, 1 } },
+	{ "assert",			K_ASSERTION,	{ 1, 0 } },
+	{ "assume",			K_ASSERTION,	{ 1, 0 } },
+	{ "bit",			K_REGISTER,		{ 1, 0 } },
+	{ "byte",			K_REGISTER,		{ 1, 0 } },
+	{ "chandle",		K_REGISTER,		{ 1, 0 } },
+	{ "checker",		K_CHECKER,		{ 1, 0 } },
+	{ "class",			K_CLASS,		{ 1, 0 } },
+	{ "constraint",		K_CONSTRAINT,	{ 1, 0 } },
+	{ "cover",			K_ASSERTION,	{ 1, 0 } },
+	{ "clocking",		K_CLOCKING,		{ 1, 0 } },
+	{ "covergroup",		K_COVERGROUP,	{ 1, 0 } },
+	{ "endchecker",		K_END_DE,		{ 1, 0 } },
+	{ "endclass",		K_END_DE,		{ 1, 0 } },
+	{ "endclocking",	K_END_DE,		{ 1, 0 } },
+	{ "endgroup",		K_END_DE,		{ 1, 0 } },
+	{ "endinterface",	K_END_DE,		{ 1, 0 } },
+	{ "endpackage",		K_END_DE,		{ 1, 0 } },
+	{ "endprogram",		K_END_DE,		{ 1, 0 } },
+	{ "endproperty",	K_END_DE,		{ 1, 0 } },
+	{ "endsequence",	K_END_DE,		{ 1, 0 } },
+	{ "enum",			K_ENUM,			{ 1, 0 } },
+	{ "extern",			K_PROTOTYPE,	{ 1, 0 } },
+	{ "import",			K_IMPORT,		{ 1, 0 } },
+	{ "int",			K_REGISTER,		{ 1, 0 } },
+	{ "interconnect",	K_NET,			{ 1, 0 } },
+	{ "interface",		K_INTERFACE,	{ 1, 0 } },
+	{ "join_any",		K_END,			{ 1, 0 } },
+	{ "join_none",		K_END,			{ 1, 0 } },
+	{ "logic",			K_REGISTER,		{ 1, 0 } },
+	{ "longint",		K_REGISTER,		{ 1, 0 } },
+	{ "modport",		K_MODPORT,		{ 1, 0 } },
+	{ "package",		K_PACKAGE,		{ 1, 0 } },
+	{ "program",		K_PROGRAM,		{ 1, 0 } },
+	{ "property",		K_PROPERTY,		{ 1, 0 } },
+	{ "pure",			K_PROTOTYPE,	{ 1, 0 } },
+	{ "ref",			K_PORT,			{ 1, 0 } },
+	{ "restrict",		K_ASSERTION,	{ 1, 0 } },
+	{ "sequence",		K_SEQUENCE,		{ 1, 0 } },
+	{ "shortint",		K_REGISTER,		{ 1, 0 } },
+	{ "shortreal",		K_REGISTER,		{ 1, 0 } },
+	{ "string",			K_REGISTER,		{ 1, 0 } },
+	{ "struct",			K_STRUCT,		{ 1, 0 } },
+	{ "type",			K_REGISTER,		{ 1, 0 } },
+	{ "typedef",		K_TYPEDEF,		{ 1, 0 } },
+	{ "union",			K_STRUCT,		{ 1, 0 } },
+	{ "var",			K_REGISTER,		{ 1, 0 } },
+	{ "void",			K_REGISTER,		{ 1, 0 } },
+	{ "with",			K_WITH,			{ 1, 0 } },
+	{ "nettype",		K_NETTYPE,		{ 1, 0 } },
+	{ "virtual",		K_VIRTUAL,		{ 1, 0 } },
 };
 
 static tokenInfo *currentContext = NULL;
@@ -407,21 +407,25 @@ const static struct keywordGroup systemVerilogDirectives = {
 
 // .enabled field cannot be shared by two languages
 static fieldDefinition VerilogFields[] = {
-	{ .name = "parameter",
-	  .description = "parameter whose value can be overridden.",
-	  .enabled = false,
-	  .dataType = FIELDTYPE_BOOL },
+	{
+		.name = "parameter",
+		.description = "parameter whose value can be overridden.",
+		.enabled = false,
+		.dataType = FIELDTYPE_BOOL,
+	},
 };
 
 static fieldDefinition SystemVerilogFields[] = {
-	{ .name = "parameter",
-	  .description = "parameter whose value can be overridden.",
-	  .enabled = false,
-	  .dataType = FIELDTYPE_BOOL },
+	{
+		.name = "parameter",
+		.description = "parameter whose value can be overridden.",
+		.enabled = false,
+		.dataType = FIELDTYPE_BOOL,
+	},
 };
 
 /*
- *   PROTOTYPE DEFINITIONS
+ *	 PROTOTYPE DEFINITIONS
  */
 
 static bool isIdentifier (tokenInfo* token);
@@ -438,7 +442,7 @@ static int tagIdsInPort (tokenInfo *const token, int c, verilogKind kind, bool m
 static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind);
 
 /*
- *   FUNCTION DEFINITIONS
+ *	 FUNCTION DEFINITIONS
  */
 
 static short isContainer (verilogKind kind)
@@ -589,7 +593,7 @@ static void buildKeywordHash (const langType language, unsigned int idx)
 {
 	size_t i;
 	const size_t count = ARRAY_SIZE (KeywordTable);
-	for (i = 0  ;  i < count  ;  ++i)
+	for (i = 0; i < count; ++i)
 	{
 		const keywordAssoc *p = &KeywordTable [i];
 		if (p->isValid [idx])
@@ -627,13 +631,13 @@ static void vUngetc (int c)
 /* Mostly copied from cppSkipOverCComment() in cpreprocessor.c.
  *
  * cppSkipOverCComment() uses the internal ungetc buffer of
- * CPreProcessor.  On the other hand, the Verilog parser uses
+ * CPreProcessor. On the other hand, the Verilog parser uses
  * getcFromInputFile() directly. getcFromInputFile() uses just
  * another internal ungetc buffer. Using them mixed way will
  * cause a trouble. */
 static int verilogSkipOverCComment (void)
 {
-	int c =  getcFromInputFile ();
+	int c = getcFromInputFile ();
 
 	while (c != EOF)
 	{
@@ -647,7 +651,7 @@ static int verilogSkipOverCComment (void)
 				c = next;
 			else
 			{
-				c = SPACE;  /* replace comment with space */
+				c = SPACE;	/* replace comment with space */
 				break;
 			}
 		}
@@ -670,13 +674,13 @@ static int _vGetc (bool inSkipPastMatch)
 		int c2 = getcFromInputFile ();
 		if (c2 == EOF)
 			return EOF;
-		else if (c2 == '/')  /* strip comment until end-of-line */
+		else if (c2 == '/')	/* strip comment until end-of-line */
 		{
 			do
 				c = getcFromInputFile ();
-			while (c != '\n'  &&  c != EOF);
+			while (c != '\n' && c != EOF);
 		}
-		else if (c2 == '*')  /* strip block comment */
+		else if (c2 == '*')	/* strip block comment */
 			c = verilogSkipOverCComment ();
 		else
 			ungetcToInputFile (c2);
@@ -688,7 +692,7 @@ static int _vGetc (bool inSkipPastMatch)
 		int c2;
 		do
 			c2 = getcFromInputFile ();
-		while (c2 != '"'  &&  c2 != EOF);
+		while (c2 != '"' && c2 != EOF);
 		c = '@';
 	}
 	return c;
@@ -777,7 +781,7 @@ static int skipString (int c)
 
 static int skipExpression (int c)
 {
-	while (c != ','  &&  c != ';' && c != ')' && c != '}' && c != ']' && c != EOF)
+	while (c != ',' && c != ';' && c != ')' && c != '}' && c != ']' && c != EOF)
 	{
 		if (c == '(')
 			c = skipPastMatch ("()");
@@ -873,14 +877,14 @@ static int readWordToken (tokenInfo *const token, int c)
 
 // read a word token starting with "c".
 // returns the next charactor of the token read.
-// for compiler directives.  Since they are line-based, skipWhite() cannot be used.
+// for compiler directives. Since they are line-based, skipWhite() cannot be used.
 static int readWordTokenNoSkip (tokenInfo *const token, int c)
 {
 	return _readWordToken (token, c, false);
 }
 
 /* check if an identifier:
- *   simple_identifier ::= [ a-zA-Z_ ] { [ a-zA-Z0-9_$ ] } */
+ *	 simple_identifier ::= [ a-zA-Z_ ] { [ a-zA-Z0-9_$ ] } */
 static bool isIdentifier (tokenInfo* token)
 {
 	if (token->kind == K_UNDEFINED)
@@ -941,7 +945,7 @@ static int dropEndContext (tokenInfo *const token, int c)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
 	if ((currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0)
-	    || (currentContext->kind == K_IFCLASS && strcmp (vStringValue (token->name), "endclass") == 0))
+		|| (currentContext->kind == K_IFCLASS && strcmp (vStringValue (token->name), "endclass") == 0))
 	{
 		dropContext ();
 		c = skipBlockName (token ,c);
@@ -1171,7 +1175,7 @@ static int processFunction (tokenInfo *const token, int c)
 		else
 			c = skipWhite (vGetc ());
 		/* skip parameter assignment of a class type
-		 *    ex. function uvm_port_base #(IF) get_if(int index=0); */
+		 *	ex. function uvm_port_base #(IF) get_if(int index=0); */
 		c = skipParameterAssignment (c);
 
 		/* Identify class type prefixes and create respective context*/
@@ -1213,7 +1217,7 @@ static int processEnum (tokenInfo *const token, int c)
 	deleteToken (enumToken);
 
 	// Clean up the tag content list at the end of the declaration to support multiple variables
-	//   enum { ... } foo, bar;
+	//	 enum { ... } foo, bar;
 	ptrArrayClear (tagContents);
 	return c;
 }
@@ -1241,13 +1245,13 @@ static int processStruct (tokenInfo *const token, int c)
 }
 
 // data_declaration ::=
-//       [ const ] [ var ] [ static | automatic ] data_type_or_implicit list_of_variable_decl_assignments ;
-//     | typedef data_type type_identifier { [ ... ] } ;
-//     | typedef interface_instance_identifier [ ... ] . type_identifier type_identifier ; // interface based typedef
-//     | typedef [ enum | struct | union | class | interface class ] type_identifier ;
-//     | import < package_import_item > ;
-//     | nettype data_type net_type_identifier [ with [ class_type :: | package_identifier :: | $unit :: ] tf_identifier ] ;
-//     | nettype [ class_type :: | package_identifier :: | $unit :: ] net_type_identifier net_type_identifier ;
+//	     [ const ] [ var ] [ static | automatic ] data_type_or_implicit list_of_variable_decl_assignments ;
+//	   | typedef data_type type_identifier { [ ... ] } ;
+//	   | typedef interface_instance_identifier [ ... ] . type_identifier type_identifier ; // interface based typedef
+//	   | typedef [ enum | struct | union | class | interface class ] type_identifier ;
+//	   | import < package_import_item > ;
+//	   | nettype data_type net_type_identifier [ with [ class_type :: | package_identifier :: | $unit :: ] tf_identifier ] ;
+//	   | nettype [ class_type :: | package_identifier :: | $unit :: ] net_type_identifier net_type_identifier ;
 static int processTypedef (tokenInfo *const token, int c)
 {
 	verilogKind kindSave = token->kind;	// K_TYPEDEF or K_NETTYPE
@@ -1259,7 +1263,7 @@ static int processTypedef (tokenInfo *const token, int c)
 		kind = token->kind;
 	}
 	// forward typedef (LRM 6.18) is tagged as prototype
-	//   (I don't know why...)
+	//	 (I don't know why...)
 	switch (kind)
 	{
 		case K_CLASS:
@@ -1346,7 +1350,7 @@ static int processParameterList (tokenInfo *token, int c)
 }
 
 // [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
-//     [ extends class_type [ ( list_of_arguments ) ] ] [ implements < interface_class_type > ] ;
+//	   [ extends class_type [ ( list_of_arguments ) ] ] [ implements < interface_class_type > ] ;
 // interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
 static int processClass (tokenInfo *const token, int c, verilogKind kind)
 {
@@ -1425,13 +1429,13 @@ static int processDefine (tokenInfo *const token, int c)
 }
 
 // immediate_assertion_statement ::=
-//     ( assert | asume | cover ) [ #0 | final ] '(' expression ')' block
+//	   ( assert | asume | cover ) [ #0 | final ] '(' expression ')' block
 // concurrent_assertion_statement ::=
-//     ( assert | assume ) property ( property_spec ) action_block
-//   | expect ( property_spec ) action_block  # ignore : processed as same as "if"
-//   | cover property ( property_spec ) statement_or_null
-//   | cover sequence ( [clocking_event ] [ disable iff ( expression_or_dist ) ] sequence_expr ) statement_or_null
-//   | restrict property ( property_spec ) ;
+//	   ( assert | assume ) property ( property_spec ) action_block
+//	 | expect ( property_spec ) action_block  # ignore : processed as same as "if"
+//	 | cover property ( property_spec ) statement_or_null
+//	 | cover sequence ( [clocking_event ] [ disable iff ( expression_or_dist ) ] sequence_expr ) statement_or_null
+//	 | restrict property ( property_spec ) ;
 static int processAssertion (tokenInfo *const token, int c)
 {
 	if (vStringLength (currentContext->blockName) > 0)
@@ -1452,10 +1456,10 @@ static int processAssertion (tokenInfo *const token, int c)
 }
 
 // data_declaration ::=
-//   ...
-//   import < package_identifier :: identifier | package_identifier :: * > ;
+//	 ...
+//	 import < package_identifier :: identifier | package_identifier :: * > ;
 // dpi_import_export ::=
-//   import ( "DPI-C" | "DPI" ) [ context | pure ] [ c_identifier = ] function data_type_or_void function_identifier [ ( [ tf_port_list ] ) ] ;
+//	 import ( "DPI-C" | "DPI" ) [ context | pure ] [ c_identifier = ] function data_type_or_void function_identifier [ ( [ tf_port_list ] ) ] ;
 // | import ( "DPI-C" | "DPI" ) [ context ]        [ c_identifier = ] task task_identifier [ ( [ tf_port_list ] ) ] ;
 // | export ( "DPI-C" | "DPI" ) [ c_identifier = ] function function_identifier ;
 // | export ( "DPI-C" | "DPI" ) [ c_identifier = ] task     task_identifier ;
@@ -1531,7 +1535,7 @@ static int processDesignElementL (tokenInfo *const token, int c)
 
 // ( checker | property | sequence ) identifier [ ( [ port_list ] ) ] ;
 // covergroup identifier [ ( [ port_list ] ) ] [ coverage_event ] ;
-//   coverage_event ::= clocking_event | with function sample ( ... ) | @@( ... )
+//	 coverage_event ::= clocking_event | with function sample ( ... ) | @@( ... )
 // package identifier ;
 // modport < identifier ( < ports_declaration > ) > ;
 // [ default | global ] clocking [ identifier ] ( @ identifier | @ ( event_expression ) )
@@ -1686,10 +1690,10 @@ static int pushMembers (tokenInfo* token, int c)
 }
 
 // input
-//   kind: kind of context
+//	 kind: kind of context
 // output
-//   kind: kind of type
-//   token: identifier token (unless K_IDENTIFIER nor K_UNDEFINED)
+//	 kind: kind of type
+//	 token: identifier token (unless K_IDENTIFIER nor K_UNDEFINED)
 static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 {
 	verilogKind actualKind = K_UNDEFINED;
@@ -1758,7 +1762,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 }
 
 // class_type ::=
-//       ps_class_identifier [ # ( ... ) ] { :: class_identifier [ # ( ... ) ] }
+//		 ps_class_identifier [ # ( ... ) ] { :: class_identifier [ # ( ... ) ] }
 // "interface_identifier ." is also handled
 static int skipClassType (tokenInfo* token, int c)
 {
@@ -1795,13 +1799,13 @@ static int skipClassType (tokenInfo* token, int c)
 
 // Tag a list of identifiers in a port list
 // data_type :: =
-//   ...
-//   | virtual [ interface ] identifier [ # ( [ ... ] ) ]  [ . identifier ]
-//   | [ class_type :: | identifier :: | $unit :: ] identifier { [ ... ] }
-//   | [ identifier :: | $unit :: ] identifier [ # ( ... ) ] { :: identifier [ # ( ... ) ] }
-//   | ...
+//	 ...
+//	 | virtual [ interface ] identifier [ # ( [ ... ] ) ]  [ . identifier ]
+//	 | [ class_type :: | identifier :: | $unit :: ] identifier { [ ... ] }
+//	 | [ identifier :: | $unit :: ] identifier [ # ( ... ) ] { :: identifier [ # ( ... ) ] }
+//	 | ...
 //
-//   mayPortDecl: may be a ANSI port declaration.  true for module, interface, or program.
+//	 mayPortDecl: may be a ANSI port declaration.  true for module, interface, or program.
 static int tagIdsInPort (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl)
 {
 	bool first_port = true;
@@ -1903,7 +1907,7 @@ static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 			// var `add_t(foo) = '0;
 			if (c == ';' || c == ',')
 			{
-				tokenSaved->kind = K_MODULE;   // for typeRef field
+				tokenSaved->kind = K_MODULE;	// for typeRef field
 				verbose ("find instance: %s with kind %s\n", vStringValue (token->name), getNameForKind (K_INSTANCE));
 				createTagWithTypeRef (token, K_INSTANCE, tokenSaved);
 				createRefTag (tokenSaved, K_MODULE, R_MODULE_DECL);
