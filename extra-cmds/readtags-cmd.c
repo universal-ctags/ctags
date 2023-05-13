@@ -826,9 +826,9 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "formatter") == 0)
 			{
 				if (i + 1 < argc)
-					Sorter = compileExpression (argv[++i],
-												(void * (*)(EsObject *))f_compile,
-												optname);
+					Formatter = compileExpression (argv[++i],
+												   (void * (*)(EsObject *))f_compile,
+												   optname);
 				else
 				{
 					fprintf (stderr, "%s: missing formatter expression for --%s option\n",
