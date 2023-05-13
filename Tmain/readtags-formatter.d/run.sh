@@ -23,7 +23,7 @@ if ! ( "${READTAGS}" -h | grep -q -e -F ); then
 fi
 
 echo '# FQ' &&
-	${V} ${READTAGS} -t output.tags -Q '(eq? $kind "function")' -F '(list $name #t)' -l &&
+	${V} ${READTAGS} -t output.tags -Q '(eq? $kind "function")' --formatter '(list $name #t)' -l &&
 echo '# F' &&
 ${V} ${READTAGS} -t output.tags -F '(if (eq? $kind "function") (list $name #t) #f)' -l &&
 echo '# F declarations' &&
