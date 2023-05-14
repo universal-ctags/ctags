@@ -4947,7 +4947,7 @@ extern bool makeFieldDescriptionsPseudoTags (const langType language,
 	bool written = false;
 	for (unsigned int i = 0; i < countFields (); i++)
 	{
-		if (getFieldOwner (i) == language
+		if (getFieldLanguage (i) == language
 			&& isFieldEnabled (i))
 		{
 			if (makeFieldDescriptionPseudoTag (language, i, pdesc))

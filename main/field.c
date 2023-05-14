@@ -1249,7 +1249,7 @@ extern bool enableField (fieldType type, bool state)
 	else
 		verbose ("enable field \"%s\"<%s>: %s\n",
 				 getFieldObject(type)->def->name,
-				 getLanguageName (getFieldOwner(type)),
+				 getLanguageName (getFieldLanguage(type)),
 				 (state? "yes": "no"));
 	return old;
 }
@@ -1259,7 +1259,7 @@ extern bool isCommonField (fieldType type)
 	return (FIELD_BUILTIN_LAST < type)? false: true;
 }
 
-extern langType getFieldOwner (fieldType type)
+extern langType getFieldLanguage (fieldType type)
 {
 	return getFieldObject(type)->language;
 }

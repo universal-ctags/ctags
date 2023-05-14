@@ -1346,7 +1346,7 @@ static void processExtraTagsOption (
 static void resetFieldsOption (langType lang, bool mode)
 {
 	for (unsigned int i = 0; i < countFields (); ++i)
-		if ((lang == LANG_AUTO) || (lang == getFieldOwner (i)))
+		if ((lang == LANG_AUTO) || (lang == getFieldLanguage (i)))
 			enableField (i, mode);
 
 	if ((lang == LANG_AUTO || lang == LANG_IGNORE)&& !mode)
