@@ -1,0 +1,9 @@
+XXX_TOP	input.sv	/^`define XXX_TOP  foo_top$/;"	d
+XXX	input.sv	/^`define XXX          foo$/;"	d
+`XXX	input.sv	/^module `XXX ();$/;"	m
+add_t	input.sv	/^`define add_t(f) f``_t$/;"	d	module:`XXX
+`XXX_TOP	input.sv	/^module `XXX_TOP();$/;"	m
+foo	input.sv	/^class foo;$/;"	C
+new	input.sv	/^  function new(string name="...");$/;"	f	class:foo
+name	input.sv	/^  function new(string name="...");$/;"	p	function:foo.new
+`add_t	input.sv	/^  var `add_t(foo) = '0;$/;"	r	class:foo
