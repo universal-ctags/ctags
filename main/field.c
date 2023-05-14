@@ -541,7 +541,7 @@ static fieldObject* getFieldObject(fieldType type)
 	return fieldObjects + type;
 }
 
-extern fieldType getFieldTypeForOption (char letter)
+extern fieldType getFieldTypeForLetter (char letter)
 {
 	unsigned int i;
 
@@ -1249,7 +1249,7 @@ extern bool enableField (fieldType type, bool state)
 	else
 		verbose ("enable field \"%s\"<%s>: %s\n",
 				 getFieldObject(type)->def->name,
-				 getLanguageName (getFieldOwner(type)),
+				 getLanguageName (getFieldLanguage(type)),
 				 (state? "yes": "no"));
 	return old;
 }
@@ -1259,7 +1259,7 @@ extern bool isCommonField (fieldType type)
 	return (FIELD_BUILTIN_LAST < type)? false: true;
 }
 
-extern int     getFieldOwner (fieldType type)
+extern langType getFieldLanguage (fieldType type)
 {
 	return getFieldObject(type)->language;
 }
@@ -1763,7 +1763,7 @@ static EsObject* getFieldValueForExtras (const tagEntryInfo *tag, const fieldDef
 		if (!isTagExtraBitMarked (tag, i))
 			continue;
 
-		langType lang = getXtagOwner (i);
+		langType lang = getXtagLanguage (i);
 		const char *lang_name = (lang == LANG_IGNORE)
 			? NULL
 			: getLanguageName (lang);

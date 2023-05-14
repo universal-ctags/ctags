@@ -1258,7 +1258,7 @@ static void processExcmdOption (
 static void resetXtags (langType lang, bool mode)
 {
 	for (unsigned int i = 0; i < countXtags (); i++)
-		if ((lang == LANG_AUTO) || (lang == getXtagOwner (i)))
+		if ((lang == LANG_AUTO) || (lang == getXtagLanguage (i)))
 			enableXtag (i, mode);
 }
 
@@ -1346,7 +1346,7 @@ static void processExtraTagsOption (
 static void resetFieldsOption (langType lang, bool mode)
 {
 	for (unsigned int i = 0; i < countFields (); ++i)
-		if ((lang == LANG_AUTO) || (lang == getFieldOwner (i)))
+		if ((lang == LANG_AUTO) || (lang == getFieldLanguage (i)))
 			enableField (i, mode);
 
 	if ((lang == LANG_AUTO || lang == LANG_IGNORE)&& !mode)
@@ -1419,7 +1419,7 @@ static void processFieldsOption (
 				vStringPut (longName, c);
 			else
 			{
-				t = getFieldTypeForOption (c);
+				t = getFieldTypeForLetter (c);
 				if (t == FIELD_UNKNOWN)
 					error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
 					      c, option);

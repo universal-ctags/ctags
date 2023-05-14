@@ -201,7 +201,7 @@ static fmtElement** queueTagField (fmtElement **last, long width, bool truncatio
 	else
 	{
 		language = LANG_IGNORE;
-		ftype = getFieldTypeForOption (field_letter);
+		ftype = getFieldTypeForLetter (field_letter);
 	}
 
 	if (ftype == FIELD_UNKNOWN)

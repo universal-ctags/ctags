@@ -37,7 +37,7 @@ extern bool isXtagFixed (xtagType type);
 extern bool isCommonXtag (xtagType type);
 
 /* Return LANG_IGNORE for common fields. */
-extern langType getXtagOwner (xtagType type);
+extern langType getXtagLanguage (xtagType type);
 
 extern const char* getXtagName (xtagType type);
 extern const char* getXtagDescription (xtagType type);

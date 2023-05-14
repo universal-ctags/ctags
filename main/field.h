@@ -83,7 +83,6 @@ typedef const char* (*fieldRenderer)(const tagEntryInfo *const,
 									 const char *,
 									 vString *);
 
-#define FIELD_LETTER_NO_USE '\0'
 struct sFieldDefinition {
 	/* letter, and ftype are initialized in the main part,
 	   not in a parser. */

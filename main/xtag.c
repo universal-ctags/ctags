@@ -282,7 +282,7 @@ extern bool isCommonXtag (xtagType type)
 	return (type < XTAG_COUNT)? true: false;
 }
 
-extern langType getXtagOwner (xtagType type)
+extern langType getXtagLanguage (xtagType type)
 {
 	return getXtagObject (type)->language;
 }
