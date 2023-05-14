@@ -3981,7 +3981,7 @@ static EsObject *lrop_markextra (OptVM *vm, EsObject *name)
 	if (xt == XTAG_UNKNOWN)
 		return OPTSCRIPT_ERR_UNKNOWNEXTRA;
 
-	langType lang = getXtagOwner (xt);
+	langType lang = getXtagLanguage (xt);
 	if (lang != LANG_IGNORE && e->langType != lang)
 	{
 		error (WARNING,

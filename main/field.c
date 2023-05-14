@@ -1763,7 +1763,7 @@ static EsObject* getFieldValueForExtras (const tagEntryInfo *tag, const fieldDef
 		if (!isTagExtraBitMarked (tag, i))
 			continue;
 
-		langType lang = getXtagOwner (i);
+		langType lang = getXtagLanguage (i);
 		const char *lang_name = (lang == LANG_IGNORE)
 			? NULL
 			: getLanguageName (lang);
