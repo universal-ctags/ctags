@@ -541,7 +541,7 @@ static fieldObject* getFieldObject(fieldType type)
 	return fieldObjects + type;
 }
 
-extern fieldType getFieldTypeForOption (char letter)
+extern fieldType getFieldTypeForLetter (char letter)
 {
 	unsigned int i;
 

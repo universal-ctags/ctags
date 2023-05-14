@@ -29,7 +29,7 @@
 *   FUNCTION PROTOTYPES
 */
 
-extern fieldType getFieldTypeForOption (char letter);
+extern fieldType getFieldTypeForLetter (char letter);
 
 /*
    `getFieldTypeForName' is for looking for a field not owned by any parser,

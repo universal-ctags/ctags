@@ -1419,7 +1419,7 @@ static void processFieldsOption (
 				vStringPut (longName, c);
 			else
 			{
-				t = getFieldTypeForOption (c);
+				t = getFieldTypeForLetter (c);
 				if (t == FIELD_UNKNOWN)
 					error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
 					      c, option);
