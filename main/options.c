@@ -464,6 +464,8 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"       --list-{aliases,extras,features,fields,kind-full,langdef-flags,params," },
  {1,0,"       pseudo-tags,regex-flags,roles,subparsers} support this option."},
  {1,0,"       Specify before --list-* option."},
+ {1,1,"  --_list-fielddef-flags"},
+ {1,1,"       Output list of flags which can be used with --fielddef option."},
  {1,1,"  --_list-kinddef-flags"},
  {1,1,"       Output list of flags which can be used with --kinddef option."},
  {1,1,"  --_list-langdef-flags"},
@@ -2234,6 +2236,14 @@ static void processListKinddefFlagsOptions (
 	exit (0);
 }
 
+static void processListFielddefFlagsOptions (
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	printFielddefFlags (localOption.withListHeader, localOption.machinable, stdout);
+	exit (0);
+}
+
 attr__noreturn
 static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 				     const char *const parameter)
@@ -2935,6 +2945,7 @@ static parametricOption ParametricOptions [] = {
 #ifdef HAVE_JANSSON
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
 #endif
+	{ "_list-fielddef-flags",   processListFielddefFlagsOptions,true,   STAGE_ANY },
 	{ "_list-kinddef-flags",    processListKinddefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-langdef-flags",    processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
