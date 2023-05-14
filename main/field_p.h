@@ -46,7 +46,7 @@ extern fieldType getFieldTypeForName (const char *name);
 extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language);
 extern bool enableField (fieldType type, bool state);
 extern bool isCommonField (fieldType type);
-extern int     getFieldOwner (fieldType type);
+extern langType getFieldOwner (fieldType type);
 extern const char* getFieldDescription (fieldType type);
 extern const char* getFieldName (fieldType type);
 extern unsigned char getFieldLetter (fieldType type);

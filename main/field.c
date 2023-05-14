@@ -1259,7 +1259,7 @@ extern bool isCommonField (fieldType type)
 	return (FIELD_BUILTIN_LAST < type)? false: true;
 }
 
-extern int     getFieldOwner (fieldType type)
+extern langType getFieldOwner (fieldType type)
 {
 	return getFieldObject(type)->language;
 }
