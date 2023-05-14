@@ -4001,6 +4001,33 @@ static void fieldDefinitionDestroy (fieldDefinition *fdef)
 	eFree (fdef);
 }
 
+static void field_def_flag_datatype_long (const char *const optflag CTAGS_ATTR_UNUSED,
+										  const char* const param,
+										  void *data)
+{
+	fieldDefinition *fdef = data;
+
+	if (*param == '\0')
+		error (FATAL, "no datatype given for field: \"%s\"", fdef->name);
+
+	fdef->dataType = 0;
+	if (strcmp (param, "int") == 0)
+		fdef->dataType |= FIELDTYPE_INTEGER;
+	else if (strcmp (param, "str") == 0)
+		fdef->dataType |= FIELDTYPE_STRING;
+	else if (strcmp (param, "bool") == 0)
+		fdef->dataType |= FIELDTYPE_BOOL;
+	else if (strcmp (param, "str+bool") == 0)
+		fdef->dataType |= FIELDTYPE_STRING|FIELDTYPE_BOOL;
+	else
+		error (FATAL, "unknown datatype for field \"%s\": \"%s\"", fdef->name, param);
+}
+
+static flagDefinition FieldDefFlagDef [] = {
+	{ '\0', "datatype", NULL, field_def_flag_datatype_long,
+	  "TYPE", "acceaptable datatype of the field ([str]|bool|int|str+bool)" },
+};
+
 static bool processLangDefineField (const langType language,
 									const char *const option,
 									const char *const parameter)
@@ -4047,12 +4074,13 @@ static bool processLangDefineField (const langType language,
 	fdef->setValueObject = NULL;
 	fdef->setterValueType = NULL;
 	fdef->checkValueForSetter = NULL;
-	fdef->dataType = FIELDTYPE_STRING; /* TODO */
+	fdef->dataType = 0;
+	if (flags)
+		flagsEval (flags, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef), fdef);
+	if (!fdef->dataType)
+		fdef->dataType = FIELDTYPE_STRING;
 	fdef->ftype = FIELD_UNKNOWN;
 	DEFAULT_TRASH_BOX(fdef, fieldDefinitionDestroy);
-
-	if (flags)
-		flagsEval (flags, NULL, 0, fdef);
 
 	defineField (fdef, language);
 
@@ -5357,6 +5385,18 @@ extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp)
 	table = flagsColprintTableNew ();
 
 	flagsColprintAddDefinitions (table, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef));
+
+	flagsColprintTablePrint (table, withListHeader, machinable, fp);
+	colprintTableDelete(table);
+}
+
+extern void printFielddefFlags (bool withListHeader, bool machinable, FILE *fp)
+{
+	struct colprintTable * table;
+
+	table = flagsColprintTableNew ();
+
+	flagsColprintAddDefinitions (table, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);

@@ -1,0 +1,5 @@
+ctags: unknown datatype for field "fooA": "bar"
+ctags: unknown datatype for field "fooB": "int+baz"
+ctags: no datatype given for field: "fooC"
+ctags: unknown datatype for field "fooD": "+baz"
+ctags: unknown datatype for field "fooE": "bool+str"
