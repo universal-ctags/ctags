@@ -1,0 +1,10 @@
+--langdef=unknownx{_foreignLanguage=knownz}
+--kinddef-unknownx=f,func,functions
+--map-unknownx=+.unknownx
+
+--_fielddef-unknownx=protection,protections
+--_fielddef-unknownx=signature,signatures
+
+--regex-unknownx=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
+--regex-unknownx=/^X:([a-z]+)@([a-z]+)/\1/m/{_language=knownz}{_field=owner:\2}
+--regex-unknownx=/^Y:([a-z0-9]+)=([a-z0-9]+)/\2/m/{_field=owner:\1}{_language=knownz}

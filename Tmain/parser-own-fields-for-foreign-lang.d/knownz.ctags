@@ -1,0 +1,4 @@
+--langdef=knownz
+--kinddef-knownz=m,mark,makers
+
+--_fielddef-knownz=owner,the owner of the markers
