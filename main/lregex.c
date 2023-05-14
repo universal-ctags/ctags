@@ -1134,10 +1134,14 @@ static void common_flag_field_long (const char* const s, const char* const v, vo
 	}
 
 	fname = eStrndup (v, tmp - v);
-	ftype = getFieldTypeForNameAndLanguage (fname, cdata->owner);
+
+	langType lang = (ptrn->foreign_lang == LANG_IGNORE)
+		? cdata->owner
+		: ptrn->foreign_lang;
+	ftype = getFieldTypeForNameAndLanguage (fname, lang);
 	if (ftype == FIELD_UNKNOWN)
 	{
-		error (WARNING, "no such field \"%s\" in %s", fname, getLanguageName(cdata->owner));
+		error (WARNING, "no such field \"%s\" in %s", fname, getLanguageName(lang));
 		eFree (fname);
 		return;
 	}
@@ -1269,7 +1273,7 @@ static flagDefinition commonSpecFlagDef[] = {
 	{ '\0',  EXPERIMENTAL "extra", NULL, common_flag_extra_long ,
 	  "EXTRA", "record the tag only when the extra is enabled"},
 	{ '\0',  EXPERIMENTAL "field", NULL, common_flag_field_long ,
-	  "FIELD:VALUE", "record the matched string(VALUE) to parser own FIELD of the tag"},
+	  "FIELD:VALUE", "record the matched string(VALUE) to the (foreign) language specific FIELD of the tag"},
 	{ '\0',  EXPERIMENTAL "role", NULL, common_flag_role_long,
 	  "ROLE", "set the given ROLE to the roles field"},
 	{ '\0',  EXPERIMENTAL "anonymous", NULL, common_flag_anonymous_long,
