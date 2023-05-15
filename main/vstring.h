@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 
+#include "debug.h"
 #include "inline.h"
 
 /*
@@ -103,6 +104,9 @@ CTAGS_INLINE void vStringPutNewlinAgainUnsafe (vString *const string)
 
 CTAGS_INLINE void vStringPut (vString *const string, const int c)
 {
+	/* verify the given character is an unsigned char value */
+	Assert (c >= 0 && c <= 0xff);
+
 	if (string->length + 1 == string->size)  /*  check for buffer overflow */
 		vStringResize (string, string->size * 2);
 
