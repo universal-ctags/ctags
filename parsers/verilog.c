@@ -896,7 +896,7 @@ static bool isIdentifier (tokenInfo* token)
 	{
 		for (int i = 0; i < vStringLength (token->name); i++)
 		{
-			int c = vStringChar (token->name, i);
+			int c = (unsigned char) vStringChar (token->name, i);
 			if (i == 0)
 			{
 				// treat a text-macro as an identifier (#3712)

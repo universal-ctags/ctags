@@ -252,16 +252,16 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 	const char *b, *e;
 	if (! PerlKinds[KIND_PERL_CONSTANT].enabled)
 		return;
-	for (e = end - 1; e > begin && isspace(*e); --e)
+	for (e = end - 1; e > begin && isspace((unsigned char) *e); --e)
 		;
 	if (e < begin)
 		return;
-	for (b = e; b >= begin && isIdentifier(*b); --b)
+	for (b = e; b >= begin && isIdentifier((unsigned char) *b); --b)
 		;
 	/* Identifier must be either beginning of line of have some whitespace
 	 * on its left:
 	 */
-	if (b < begin || isspace(*b) || ',' == *b)
+	if (b < begin || isspace((unsigned char) *b) || ',' == *b)
 		++b;
 	else if (b != begin)
 		return;
@@ -874,7 +874,7 @@ static void findPerlTags (void)
 			else
 				vStringClear (package);
 			const unsigned char *const first = cp;
-			while (*cp && (int) *cp != ';'  &&  !isspace ((int) *cp))
+			while (*cp && (int) *cp != ';'  &&  !isspace (*cp))
 			{
 				vStringPut (package, *cp);
 				cp++;

@@ -91,7 +91,7 @@ static void initRoleObject (roleObject *robj, roleDefinition *rdef, freeRoleDefF
 #ifdef DEBUG
 	size_t len = strlen (rdef->name);
 	for (int i = 0; i < len; i++)
-		Assert (isalnum (rdef->name [i]));
+		Assert (isalnum ((unsigned char) rdef->name [i]));
 #endif
 	robj->def = rdef;
 	robj->free = freefunc;

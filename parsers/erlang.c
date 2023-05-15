@@ -55,7 +55,7 @@ static bool isIdentifierCharacter (int c)
 
 static const unsigned char *skipSpace (const unsigned char *cp)
 {
-	while (isspace ((int) *cp))
+	while (isspace (*cp))
 		++cp;
 	return cp;
 }
@@ -64,7 +64,7 @@ static const unsigned char *parseIdentifier (
 		const unsigned char *cp, vString *const identifier)
 {
 	vStringClear (identifier);
-	while (isIdentifierCharacter ((int) *cp))
+	while (isIdentifierCharacter (*cp))
 	{
 		vStringPut (identifier, *cp);
 		++cp;
@@ -171,7 +171,7 @@ static void findErlangTags (void)
 			++cp;  /* Move off of the '-' */
 			parseDirective(cp, module);
 		}
-		else if (isIdentifierFirstCharacter ((int) *cp))
+		else if (isIdentifierFirstCharacter (*cp))
 			parseFunctionTag (cp, module);
 	}
 	vStringDelete (module);

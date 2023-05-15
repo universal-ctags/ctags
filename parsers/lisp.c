@@ -266,7 +266,7 @@ static void L_getit (vString *const name, const unsigned char *dbp,
 		while (isspace (*dbp))
 			dbp++;
 	}
-	for (p=dbp ; *p!='\0' && *p!='(' && !isspace ((int) *p) && *p!=')' ; p++)
+	for (p=dbp ; *p!='\0' && *p!='(' && !isspace (*p) && *p!=')' ; p++)
 		vStringPut (name, *p);
 
 	if (vStringLength (name) > 0)
@@ -296,13 +296,13 @@ static void findLispTagsCommon (bool case_insensitive,
 			if (L_isdef (p, case_insensitive))
 			{
 				vStringClear (kind_hint);
-				while (*p != '\0' && !isspace ((int) *p))
+				while (*p != '\0' && !isspace (*p))
 				{
 					vStringPut (kind_hint,
-								case_insensitive? toupper((int)*p): *p);
+								case_insensitive? toupper(*p): *p);
 					p++;
 				}
-				while (isspace ((int) *p))
+				while (isspace (*p))
 					p++;
 				L_getit (name, p, case_insensitive, hint2kind, kind_hint);
 			}
@@ -310,7 +310,7 @@ static void findLispTagsCommon (bool case_insensitive,
 			{
 				do
 					p++;
-				while (*p != '\0' && !isspace ((int) *p)
+				while (*p != '\0' && !isspace (*p)
 						&& *p != ':' && *p != '(' && *p != ')');
 				if (*p == ':')
 				{
@@ -321,10 +321,10 @@ static void findLispTagsCommon (bool case_insensitive,
 					if (L_isdef (p - 1, case_insensitive))
 					{
 						vStringClear (kind_hint);
-						while (*p != '\0' && !isspace ((int) *p))
+						while (*p != '\0' && !isspace (*p))
 						{
 							vStringPut (kind_hint,
-										case_insensitive? toupper((int)*p): *p);
+										case_insensitive? toupper(*p): *p);
 							p++;
 						}
 						while (isspace (*p))

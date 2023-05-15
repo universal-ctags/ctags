@@ -878,7 +878,7 @@ static const char* renderCompactInputLine (vString *b,  const char *const line)
 
 				/*  Consume repeating white space.
 				 */
-				while (next = *(p+1) , isspace (next)  &&  next != NEWLINE)
+				while (next = (unsigned char) *(p+1), isspace (next) && next != NEWLINE)
 					++p;
 				c = ' ';  /* force space character for any white space */
 			}
@@ -1328,7 +1328,7 @@ extern int defineField (fieldDefinition *def, langType language)
 	Assert (def->name);
 	for (i = 0; i < strlen (def->name); i++)
 	{
-		Assert ( isalpha (def->name [i]) );
+		Assert ( isalpha ((unsigned char) def->name [i]) );
 	}
 	def->letter = NUL_FIELD_LETTER;
 

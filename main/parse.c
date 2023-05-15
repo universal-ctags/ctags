@@ -573,7 +573,7 @@ static bool processLangDefineScopesep(const langType language,
 		error (FATAL,
 			   "the kind letter `%c' in \"--%s\" option is reserved for \"%s\" kind and no separator can be assigned to",
 			   KIND_FILE_DEFAULT_LETTER, option, KIND_FILE_DEFAULT_NAME);
-	else if (isalpha (parentKletter))
+	else if (isalpha ((unsigned char) parentKletter))
 	{
 		kindDefinition *kdef = getKindForLetter (parser->kindControlBlock, parentKletter);
 		if (kdef == NULL)
@@ -623,7 +623,7 @@ static bool processLangDefineScopesep(const langType language,
 		error (FATAL,
 			   "the kind letter `%c' in \"--%s\" option is reserved for \"%s\" kind and no separator can be assigned to",
 			   KIND_FILE_DEFAULT_LETTER, option, KIND_FILE_DEFAULT_NAME);
-	else if (isalpha (kletter))
+	else if (isalpha ((unsigned char) kletter))
 	{
 		kindDefinition *kdef = getKindForLetter (parser->kindControlBlock, kletter);
 		if (kdef == NULL)
@@ -748,9 +748,9 @@ static vString* determineInterpreter (const char* const cmd)
 	do
 	{
 		vStringClear (interpreter);
-		for ( ;  isspace ((int) *p)  ;  ++p)
+		for ( ;  isspace ((unsigned char) *p)  ;  ++p)
 			;  /* no-op */
-		for ( ;  *p != '\0'  &&  ! isspace ((int) *p)  ;  ++p)
+		for ( ;  *p != '\0'  &&  ! isspace ((unsigned char) *p)  ;  ++p)
 			vStringPut (interpreter, *p);
 	} while (strcmp (vStringValue (interpreter), "env") == 0);
 	return interpreter;
@@ -795,7 +795,7 @@ static bool isShellZsh (const char *p)
 
 	if (*p == ':')
 		p++;
-	while (isspace ((int) *p))
+	while (isspace ((unsigned char) *p))
 		p++;
 
 	if (strncmp (p, "\"zsh\"", 5) == 0
@@ -813,16 +813,16 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 		goto out;
 	p += strlen("-*-");
 
-	for ( ;  isspace ((int) *p)  ;  ++p)
+	for ( ;  isspace ((unsigned char) *p)  ;  ++p)
 		;  /* no-op */
 
 	if (strncasecmp(p, "mode:", strlen("mode:")) == 0)
 	{
 		/* -*- mode: MODE; -*- */
 		p += strlen("mode:");
-		for ( ;  isspace ((int) *p)  ;  ++p)
+		for ( ;  isspace ((unsigned char) *p)  ;  ++p)
 			;  /* no-op */
-		for ( ;  *p != '\0'  &&  isLanguageNameChar ((int) *p)  ;  ++p)
+		for ( ;  *p != '\0'  &&  isLanguageNameChar ((unsigned char) *p)  ;  ++p)
 			vStringPut (mode, *p);
 
 		if ((strcmp(vStringValue (mode), "sh") == 0
@@ -838,10 +838,10 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 		if (end == NULL)
 			goto out;
 
-		for ( ;  p < end &&  isLanguageNameChar ((int) *p)  ;  ++p)
+		for ( ;  p < end &&  isLanguageNameChar ((unsigned char) *p)  ;  ++p)
 			vStringPut (mode, *p);
 
-		for ( ;  isspace ((int) *p)  ;  ++p)
+		for ( ;  isspace ((unsigned char) *p)  ;  ++p)
 			;  /* no-op */
 		if (strncmp(p, "-*-", strlen("-*-")) != 0)
 			vStringClear (mode);
@@ -888,9 +888,9 @@ static vString* determineEmacsModeAtEOF (MIO* const fp)
 			headerFound = false;
 
 			p += strlen ("mode:");
-			for ( ;  isspace ((int) *p)  ;  ++p)
+			for ( ;  isspace ((unsigned char) *p)  ;  ++p)
 				;  /* no-op */
-			for ( ;  *p != '\0'  &&  isLanguageNameChar ((int) *p)  ;  ++p)
+			for ( ;  *p != '\0'  &&  isLanguageNameChar ((unsigned char) *p)  ;  ++p)
 				vStringPut (mode, *p);
 
 			is_shell_mode = ((strcasecmp (vStringValue (mode), "sh") == 0
@@ -903,7 +903,7 @@ static vString* determineEmacsModeAtEOF (MIO* const fp)
 		else if (is_shell_mode && (p = strstr (line, "sh-set-shell")))
 		{
 			p += strlen("sh-set-shell");
-			while (isspace ((int) *p))
+			while (isspace ((unsigned char) *p))
 				p++;
 			if (strncmp (p, "\"zsh\"", 5) == 0)
 				vStringCopyS (mode, "Zsh");
@@ -954,7 +954,7 @@ static vString* determineVimFileType (const char *const modeline)
 			continue;
 
 		p += strlen(filetype_prefix[i]);
-		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+		for ( ;  *p != '\0'  &&  isalnum ((unsigned char) *p)  ;  ++p)
 			vStringPut (filetype, *p);
 		break;
 	}
@@ -1011,7 +1011,7 @@ static vString* extractVimFileTypeCommon(MIO* input, bool eof)
 			if ((p = strstr (vStringValue (ring[j]), prefix[k])) != NULL)
 			{
 				p += strlen(prefix[k]);
-				for ( ;  isspace ((int) *p)  ;  ++p)
+				for ( ;  isspace ((unsigned char) *p)  ;  ++p)
 					;  /* no-op */
 				filetype = determineVimFileType(p);
 				break;
@@ -1066,9 +1066,11 @@ static vString* determineZshAutoloadTag (const char *const modeline,
 	   #compdef ...
 	   #autoload [ OPTIONS ] */
 
-	if (((strncmp (modeline, "#compdef", 8) == 0) && isspace (*(modeline + 8)))
+	if (((strncmp (modeline, "#compdef", 8) == 0)
+	     && isspace ((unsigned char) *(modeline + 8)))
 	    || ((strncmp (modeline, "#autoload", 9) == 0)
-		&& (isspace (*(modeline + 9)) || *(modeline + 9) == '\0')))
+	        && (isspace ((unsigned char) *(modeline + 9))
+	            || *(modeline + 9) == '\0')))
 		return vStringNewInit ("zsh");
 	else
 		return NULL;
@@ -2701,7 +2703,7 @@ static bool processLangDefineKind(const langType language,
 	{
 		if (p == name_start)
 		{
-			if (!isalpha(*p))
+			if (!isalpha((unsigned char) *p))
 			{
 				char *name_in_msg = eStrndup (name_start, marker_end - name_start);
 				error (FATAL,
@@ -2712,7 +2714,7 @@ static bool processLangDefineKind(const langType language,
 		}
 		else
 		{
-			if (!isalnum (*p))
+			if (!isalnum ((unsigned char) *p))
 			{
 				char *name_in_msg = eStrndup (name_start, marker_end - name_start);
 				error (FATAL,
@@ -2833,7 +2835,7 @@ static bool processLangDefineRole(const langType language,
 	const char * tmp_start = p;
 	while (p != tmp_end)
 	{
-		if (!isalnum (*p))
+		if (!isalnum ((unsigned char) *p))
 			error (FATAL, "unacceptable char as part of role name in \"--%s\" option: %c",
 				   option, *p);
 		p++;
@@ -3518,7 +3520,7 @@ static bool processLangDefineParam (const langType language,
 
 	for (; p < name_end; p++)
 	{
-		if (!isalnum (*p) && *p != '_')
+		if (!isalnum ((unsigned char) *p) && *p != '_')
 			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
 				   option);
 	}
@@ -3914,7 +3916,7 @@ static bool processLangDefineExtra (const langType language,
 
 	for (; p < name_end; p++)
 	{
-		if (!isalnum (*p))
+		if (!isalnum ((unsigned char) *p))
 			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
 				   option);
 	}
@@ -3983,7 +3985,7 @@ static bool processLangDefineField (const langType language,
 
 	for (; p < name_end; p++)
 	{
-		if (!isalpha (*p))
+		if (!isalpha ((unsigned char) *p))
 			error (FATAL, "unacceptable char as part of field name in \"--%s\" option",
 				   option);
 	}

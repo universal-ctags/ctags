@@ -637,7 +637,8 @@ static void movePos (int amount)
  * cmp () because comments don't have to have whitespace or separation-type
  * characters following the "--" */
 #define isAdaComment(buf, pos, len)										\
-	(((pos) == 0 || (!isalnum ((buf)[(pos) - 1]) && (buf)[(pos) - 1] != '_')) && \
+	(((pos) == 0 || (!isalnum ((unsigned char) (buf)[(pos) - 1]) &&		\
+	                 (buf)[(pos) - 1] != '_')) &&						\
 	 (pos) < (len) &&													\
 	 strncasecmp (&(buf)[(pos)], "--", strlen ("--")) == 0)
 #define isAdaStringLiteral(buf, pos, len)		\
@@ -673,7 +674,7 @@ static bool cmp (const char *buf, int len, const char *match)
 	if ((strncasecmp (buf, match, matchLen) == 0) &&
 		(matchLen == len ||
 		 (matchLen < len &&
-		  (isspace (buf[matchLen]) || buf[matchLen] == '(' ||
+		  (isspace ((unsigned char) buf[matchLen]) || buf[matchLen] == '(' ||
 		   buf[matchLen] == ')' || buf[matchLen] == ':' ||
 		   buf[matchLen] == ';'))))
 	{
@@ -740,7 +741,7 @@ static void skipUntilWhiteSpace (void)
 	 * check to be true immediately */
 	skipComments ();
 
-	while (!eof_reached && !isspace (line[pos]))
+	while (!eof_reached && !isspace ((unsigned char) line[pos]))
 	{
 		/* don't use movePos () because if we read in a new line with this function
 		 * we need to stop */
@@ -776,7 +777,7 @@ static void skipWhiteSpace (void)
 	 * check to fail immediately */
 	skipComments ();
 
-	while (!eof_reached && isspace (line[pos]))
+	while (!eof_reached && isspace ((unsigned char) line[pos]))
 	{
 		movePos (1);
 
@@ -866,7 +867,7 @@ static void skipPastWord (void)
 
 	/* now increment until we hit a non-word character... Specifically,
 	 * whitespace, '(', ')', ':', and ';' */
-	while (!eof_reached && !isspace (line[pos]) &&
+	while (!eof_reached && !isspace ((unsigned char) line[pos]) &&
 		   line[pos] != '(' && line[pos] != ')' && line[pos] != ':' &&
 		   line[pos] != ';')
 	{
@@ -987,8 +988,9 @@ static adaTokenInfo *adaParseBlock (adaTokenInfo *parent, adaKind kind)
 	/* we are at the start of what should be the tag now... But we have to get
 	 * it's length.  So loop until we hit whitespace, init the counter to 1
 	 * since we know that the current position is not whitespace */
-	for (i = 1; (pos + i) < lineLen && !isspace (line[pos + i]) &&
-			 line[pos + i] != '(' && line[pos + i] != ';'; i++);
+	for (i = 1; (pos + i) < lineLen &&
+	            !isspace ((unsigned char) line[pos + i]) &&
+	            line[pos + i] != '(' && line[pos + i] != ';'; i++);
 
 	/* we have reached the tag of the package, so create the tag */
 	token = newAdaToken (&line[pos], i, kind, isSpec, parent);
@@ -1088,8 +1090,9 @@ static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 	 * it's length.  So loop until we hit whitespace or the beginning of the
 	 * parameter list.  Init the counter to 1 * since we know that the current
 	 * position is not whitespace */
-	for (i = 1; (pos + i) < lineLen && !isspace (line[pos + i]) &&
-			 line[pos + i] != '(' && line[pos + i] != ';'; i++);
+	for (i = 1; (pos + i) < lineLen &&
+	            !isspace ((unsigned char) line[pos + i]) &&
+	            line[pos + i] != '(' && line[pos + i] != ';'; i++);
 
 	/* we have reached the tag of the subprogram, so create the tag... Init the
 	 * isSpec flag to false and we will adjust it when we see if there is an
@@ -1205,8 +1208,9 @@ static adaTokenInfo *adaParseType (adaTokenInfo *parent, adaKind kind)
 	skipWhiteSpace ();
 
 	/* get the name of the type */
-	for (i = 1; (pos + i) < lineLen && !isspace (line[pos + i]) &&
-			 line[pos + i] != '(' && line[pos + i] != ';'; i++);
+	for (i = 1; (pos + i) < lineLen &&
+	            !isspace ((unsigned char) line[pos + i]) &&
+	            line[pos + i] != '(' && line[pos + i] != ';'; i++);
 
 	token = newAdaToken (&line[pos], i, kind, false, parent);
 
@@ -1405,12 +1409,13 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 		 * because if it "constant" or "exception" then we must tag this slightly
 		 * differently, But only check this for normal variables */
 		else if (kind == ADA_KIND_VARIABLE && varEndPos != -1 &&
-				 !isspace (buf[bufPos]) && tokenStart == -1)
+				 !isspace ((unsigned char) buf[bufPos]) && tokenStart == -1)
 		{
 			tokenStart = bufPos;
 		}
 		else if (kind == ADA_KIND_VARIABLE && varEndPos != -1 && tokenStart >= 0 &&
-				 ((bufPos + 1) >= bufLen || isspace (buf[bufPos + 1]) ||
+				 ((bufPos + 1) >= bufLen ||
+				  isspace ((unsigned char) buf[bufPos + 1]) ||
 				  buf[bufPos + 1] == ';'))
 		{
 			if (cmp (&buf[tokenStart], bufLen - tokenStart,
@@ -1487,8 +1492,8 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 				 * buf */
 				for ( ; i < varEndPos && buf[i] != '\0'; i++);
 			}
-			else if (tokenStart != -1 && (isspace (buf[i]) || buf[i] == ',' ||
-										  buf[i] == '\0'))
+			else if (tokenStart != -1 && (isspace ((unsigned char) buf[i]) ||
+			                              buf[i] == ',' || buf[i] == '\0'))
 			{
 				/* only store the word if it is not an in/out keyword */
 				if (!cmp (&buf[tokenStart], varEndPos, "in") &&
@@ -1504,8 +1509,8 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 				}
 				tokenStart = -1;
 			}
-			else if (tokenStart == -1 && !(isspace (buf[i]) || buf[i] == ',' ||
-										   buf[i] == '\0'))
+			else if (tokenStart == -1 && !(isspace ((unsigned char) buf[i]) ||
+			                               buf[i] == ',' || buf[i] == '\0'))
 			{
 				/* only set the tokenStart for non-newline characters */
 				tokenStart = i;
@@ -1550,7 +1555,8 @@ static adaTokenInfo *adaParseLoopVar (adaTokenInfo *parent)
 	adaTokenInfo *token = NULL;
 
 	skipWhiteSpace ();
-	for (i = 1; (pos + i) < lineLen && !isspace (line[pos + i]); i++);
+	for (i = 1; (pos + i) < lineLen &&
+	            !isspace ((unsigned char) line[pos + i]); i++);
 	token = newAdaToken (&line[pos], i, ADA_KIND_AUTOMATIC_VARIABLE, false,
 						 parent);
 	movePos (i);
@@ -1640,7 +1646,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 
 					/* get length of tag */
 					for (i = 1; (pos + i) < lineLen && line[pos + i] != ')' &&
-							 !isspace (line[pos + i]); i++);
+							 !isspace ((unsigned char) line[pos + i]); i++);
 
 					/* the original comment before we introduced reference tags:
 					 * -----------------------------------------------------------------
@@ -1730,8 +1736,9 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				skipWhiteSpace ();
 
 				/* get length of tag */
-				for (i = 1; (pos + i) < lineLen && !isspace (line[pos + i]) &&
-						 line[pos + i] != '(' && line[pos + i] != ';'; i++);
+				for (i = 1; (pos + i) < lineLen &&
+				            !isspace ((unsigned char) line[pos + i]) &&
+				            line[pos + i] != '(' && line[pos + i] != ';'; i++);
 
 				appendAdaToken (&genericParamsRoot,
 								newAdaToken (&line[pos], i, ADA_KIND_FORMAL, false,
@@ -1749,8 +1756,9 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				skipWhiteSpace ();
 
 				/* get length of tag */
-				for (i = 1; (pos + i) < lineLen && !isspace (line[pos + i]) &&
-						 line[pos + i] != '(' && line[pos + i] != ';'; i++);
+				for (i = 1; (pos + i) < lineLen &&
+				            !isspace ((unsigned char) line[pos + i]) &&
+				            line[pos + i] != '(' && line[pos + i] != ';'; i++);
 
 				appendAdaToken (&genericParamsRoot,
 								newAdaToken (&line[pos], i, ADA_KIND_FORMAL, false,
@@ -2089,7 +2097,8 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				/* there is a possibility that this may be a loop or block
 				 * identifier, so check for a <random_word>[ ]?: statement */
 				for (i = 1; (pos + i) < lineLen; i++)
-					if(!(isalnum (line[pos + i]) || line[pos + i] == '_'))
+					if (!(isalnum ((unsigned char) line[pos + i]) ||
+					      line[pos + i] == '_'))
 						break;
 				i_end = i;		/* Records the end of identifier. */
 

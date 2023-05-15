@@ -29,27 +29,31 @@ static kindDefinition ClojureKinds[] = {
 
 static int isNamespace (const char *strp)
 {
-	return strncmp (++strp, "ns", 2) == 0 && isspace (strp[2]);
+	return strncmp (++strp, "ns", 2) == 0 && isspace ((unsigned char) strp[2]);
 }
 
 static int isCoreNamespace (const char *strp)
 {
-	return strncmp (++strp, "clojure.core/ns", 15) == 0 && isspace (strp[15]);
+	return strncmp (++strp, "clojure.core/ns", 15) == 0 &&
+	       isspace ((unsigned char) strp[15]);
 }
 
 static int isFunction (const char *strp)
 {
-	return (strncmp (++strp, "defn", 4) == 0 && isspace (strp[4]));
+	return (strncmp (++strp, "defn", 4) == 0 &&
+	        isspace ((unsigned char) strp[4]));
 }
 
 static int isCoreFunction (const char *strp)
 {
-	return (strncmp (++strp, "clojure.core/defn", 17) == 0 && isspace (strp[17]));
+	return (strncmp (++strp, "clojure.core/defn", 17) == 0 &&
+	        isspace ((unsigned char) strp[17]));
 }
 
 static int isQuote (const char *strp)
 {
-	return strncmp (++strp, "quote", 5) == 0 && isspace (strp[5]);
+	return strncmp (++strp, "quote", 5) == 0 &&
+	       isspace ((unsigned char) strp[5]);
 }
 
 static void functionName (vString * const name, const char *dbp)
@@ -61,12 +65,12 @@ static void functionName (vString * const name, const char *dbp)
 	else if (*dbp == '(' && isQuote (dbp))
 	{
 		dbp += 7;
-		while (isspace (*dbp))
+		while (isspace ((unsigned char) *dbp))
 			dbp++;
 	}
 
-	for (p = dbp; *p != '\0' && *p != '(' && !isspace ((int) *p) && *p != ')';
-		p++)
+	for (p = dbp; *p != '\0' && *p != '(' && !isspace ((unsigned char) *p)
+		 && *p != ')'; p++)
 		vStringPut (name, *p);
 }
 
@@ -139,9 +143,9 @@ static void makeFunctionTag (vString * const name, const char *dbp, int scope_in
 
 static void skipToSymbol (const char **p)
 {
-	while (**p != '\0' && !isspace ((int) **p))
+	while (**p != '\0' && !isspace ((unsigned char) **p))
 		*p = *p + 1;
-	while (isspace ((int) **p))
+	while (isspace ((unsigned char) **p))
 		*p = *p + 1;
 }
 
@@ -155,7 +159,7 @@ static void findClojureTags (void)
 	{
 		vStringClear (name);
 
-		while (isspace (*p))
+		while (isspace ((unsigned char) *p))
 			p++;
 
 		if (*p == '(')

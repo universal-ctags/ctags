@@ -66,17 +66,17 @@ static ResParserState parseResDefinition(const unsigned char *line)
 	vString *name, *type;
 
 	name = vStringNew();
-	while (*line && !isspace((int) *line))
+	while (*line && !isspace(*line))
 	{
 		vStringPut(name, *line);
 		line++;
 	}
 
-	while (*line && isspace((int) *line))
+	while (*line && isspace(*line))
 		line++;
 
 	type = vStringNew();
-	while (*line && !isspace((int) *line))
+	while (*line && !isspace(*line))
 	{
 		vStringPut(type, *line);
 		line++;
@@ -133,7 +133,7 @@ static ResParserState parseResLine(const unsigned char *line, ResParserState sta
 {
 	while (*line != '\0')	/* readLineFromInputFile returns NULL terminated strings */
 	{
-		while (isspace((int) *line))
+		while (isspace(*line))
 			line++;
 
 		switch (state)
@@ -155,7 +155,7 @@ static ResParserState parseResLine(const unsigned char *line, ResParserState sta
 				{
 					state = P_STATE_IN_COMMENT;
 				}
-				else if (isalnum((int) *line))
+				else if (isalnum(*line))
 				{
 					return parseResDefinition(line);
 				}

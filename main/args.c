@@ -31,7 +31,7 @@ static char *nextStringArg (const char** const next)
 	const char* start;
 
 	Assert (*next != NULL);
-	for (start = *next  ;  isspace ((int) *start)  ;  ++start)
+	for (start = *next  ;  isspace ((unsigned char) *start)  ;  ++start)
 		;
 	if (*start == '\0')
 		*next = start;
@@ -40,7 +40,7 @@ static char *nextStringArg (const char** const next)
 		size_t length;
 		const char* end;
 
-		for (end = start ;  *end != '\0'  &&  ! isspace ((int) *end)  ;  ++end)
+		for (end = start; *end != '\0' && ! isspace ((unsigned char) *end); ++end)
 			;
 		length = end - start;
 		Assert (length > 0);
@@ -156,7 +156,7 @@ static char* nextFileLine (FILE* const fp)
 
 static bool isCommentLine (char* line)
 {
-	while (isspace(*line))
+	while (isspace((unsigned char) *line))
 		++line;
 	return (*line == '#');
 }

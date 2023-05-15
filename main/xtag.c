@@ -355,7 +355,7 @@ extern int defineXtag (xtagDefinition *def, langType language)
 	Assert (def->name);
 	for (i = 0; i < strlen (def->name); i++)
 	{
-		Assert ( isalnum (def->name [i]) );
+		Assert ( isalnum ((unsigned char) def->name [i]) );
 	}
 	def->letter = NUL_XTAG_LETTER;
 

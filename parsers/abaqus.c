@@ -44,7 +44,9 @@ static int getWord(const char *ref, const char **ptr)
 {
 	const char *p = *ptr;
 
-	while ((*ref != '\0') && (*p != '\0') && (tolower(*ref) == tolower(*p))) ref++, p++;
+	while ((*ref != '\0') && (*p != '\0') &&
+	       (tolower((unsigned char) *ref) == tolower((unsigned char) *p)))
+		ref++, p++;
 
 	if (*ref) return false;
 

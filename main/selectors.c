@@ -57,13 +57,13 @@ static const char *selectByLines (MIO *input,
 static const char *
 tastePerlLine (const char *line, void *data CTAGS_ATTR_UNUSED)
 {
-	while (isspace(*line))
+	while (isspace((unsigned char) *line))
 		++line;
 #define STRLEN(s) (sizeof(s) - 1)
 /* Assume the first character has been checked: */
 #define CHECK_PART(line, s) (								\
 		0 == strncmp((line) + 1, (s) + 1, STRLEN(s) - 1) && \
-		!isalnum((line)[STRLEN(s)]))
+		!isalnum((unsigned char) (line)[STRLEN(s)]))
 	switch (line[0]) {
 	case '#':		/* TODO: taste modeline */
 	case '\0':
@@ -154,7 +154,7 @@ tasteObjectiveCOrMatLabLines (const char *line, void *data CTAGS_ATTR_UNUSED)
 	else {
 		if (startsWith (line, "function ")) {
 			const char *p = line + strlen ("function ");
-			while (isspace(*p))
+			while (isspace((unsigned char) *p))
 				p++;
 			if (*p != '\0' && *p != '(')
 				return TR_MATLAB;

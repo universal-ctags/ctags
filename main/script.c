@@ -39,7 +39,7 @@ static void vStringCatToupperS (vString *str, const char *s)
 {
 	for (const char *tmp = s; *tmp != '\0'; tmp++)
 	{
-		int c = toupper (*tmp);
+		int c = toupper ((unsigned char) *tmp);
 		vStringPut (str, c);
 	}
 }

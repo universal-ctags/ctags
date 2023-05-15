@@ -100,7 +100,7 @@ static bool isSpecialTarget (vString *const name)
 	}
 	while (i < vStringLength (name)) {
 		char ch = vStringChar (name, i++);
-		if (ch != '_' && !isupper (ch))
+		if (ch != '_' && !isupper ((unsigned char) ch))
 		{
 			return false;
 		}

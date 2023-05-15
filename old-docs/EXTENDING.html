@@ -232,12 +232,12 @@ static void findSwineTags (void)
     {
         /* Look for a line beginning with "def" followed by name */
         if (strncmp ((const char*) line, "def", (size_t) 3) == 0  &amp;&amp;
-            isspace ((int) line [3]))
+            isspace (line [3]))
         {
             const unsigned char *cp = line + 4;
-            while (isspace ((int) *cp))
+            while (isspace (*cp))
                 ++cp;
-            while (isalnum ((int) *cp)  ||  *cp == '_')
+            while (isalnum (*cp)  ||  *cp == '_')
             {
                 vStringPut (name, *cp);
                 ++cp;

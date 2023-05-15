@@ -180,7 +180,7 @@ static void cblppAppendLine (vString *buffer,
 			if (*indicator == '-')
 			{
 				vStringStripTrailing (buffer);
-				while (isspace (*lineStart))
+				while (isspace ((unsigned char) *lineStart))
 					lineStart++;
 			}
 
@@ -328,14 +328,14 @@ static void findCOBOLTags (const CobolFormat format)
 	do { \
 		const char READ_LITERAL__q = isQuote (*line) ? *line++ : 0; \
 		READ_WHILE (word, (READ_LITERAL__q && READ_LITERAL__q != *line) || \
-		                   isIdentifierChar (*line)); \
+		                   isIdentifierChar ((unsigned char) *line)); \
 		if (READ_LITERAL__q && READ_LITERAL__q == *line) \
 			line++; \
 		keyword = lookupCaseKeyword (word, Lang_cobol); \
 	} while (0)
 #define READ_WORD(word, keyword) \
 	do { \
-		READ_WHILE (word, isIdentifierChar (*line)); \
+		READ_WHILE (word, isIdentifierChar ((unsigned char) *line)); \
 		keyword = lookupCaseKeyword (word, Lang_cobol); \
 	} while (0)
 #define READ_KEYWORD(keyword) \
@@ -343,7 +343,8 @@ static void findCOBOLTags (const CobolFormat format)
 		char READ_KEYWORD__word[64]; \
 		READ_WORD (READ_KEYWORD__word, keyword); \
 	} while (0)
-#define SKIP_SPACES() do { while (isspace (*line)) line++; } while (0)
+#define SKIP_SPACES() \
+	do { while (isspace ((unsigned char) *line)) line++; } while (0)
 
 		SKIP_SPACES ();
 		READ_WORD (word, keyword);

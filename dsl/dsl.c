@@ -803,7 +803,7 @@ static EsObject* caseop (EsObject *o, int (*op)(int))
 		char *r = strdup (s);
 
 		for (char *tmp = r; *tmp != '\0'; tmp++)
-			*tmp = op (*tmp);
+			*tmp = op ((unsigned char) *tmp);
 
 		EsObject *q = es_object_autounref (es_string_new (r));
 		free (r);
