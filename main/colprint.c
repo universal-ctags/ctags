@@ -27,7 +27,7 @@ enum colprintJustification {
 struct colprintHeaderColumn {
 	vString *value;
 	enum colprintJustification justification;
-	unsigned int maxWidth;
+	size_t maxWidth;
 	bool needPrefix;
 };
 
@@ -36,7 +36,7 @@ struct colprintTable {
 	ptrArray *lines;
 };
 
-static void fillWithWhitespaces (int i, FILE *fp)
+static void fillWithWhitespaces (size_t i, FILE *fp)
 {
 	while (i-- > 0)
 	{
@@ -119,7 +119,7 @@ void colprintTableDelete (struct colprintTable *table)
 
 static void colprintColumnPrintGeneric (vString *column, struct colprintHeaderColumn *spec, bool machinable, FILE *fp)
 {
-	int maxWidth = spec->maxWidth + (spec->needPrefix? 1: 0);
+	size_t maxWidth = spec->maxWidth + (spec->needPrefix? 1: 0);
 
 	if ((column == spec->value) && (spec->needPrefix))
 	{
@@ -135,7 +135,10 @@ static void colprintColumnPrintGeneric (vString *column, struct colprintHeaderCo
 	}
 	else
 	{
-		int padLen = maxWidth - vStringLength (column);
+		size_t padLen = 0;
+		size_t colLen = vStringLength (column);
+		if (colLen < maxWidth)
+			padLen = maxWidth - colLen;
 		if (spec->justification == COLPRINT_LEFT
 			|| spec->justification == COLPRINT_LAST)
 		{
