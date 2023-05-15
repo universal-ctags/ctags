@@ -13,6 +13,7 @@
 
 #include "general.h"  /* must always come first */
 
+#include "field.h"
 #include "optscript.h"
 #include "mio.h"
 
@@ -33,6 +34,7 @@ extern EsObject *OPTSCRIPT_ERR_LANGMISMATCH;
 extern OptVM *optscriptInit (void);
 
 extern void optscriptInstallProcs (EsObject *dict, OptOperatorFn matchResultAccessor);
+extern void optscriptInstallFieldAccessor (EsObject *dict, fieldType ftype);
 
 extern void optscriptSetup (OptVM *vm, EsObject *dict, int corkIndex);
 extern void optscriptTeardown (OptVM *vm, EsObject *dict);
