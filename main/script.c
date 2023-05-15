@@ -25,6 +25,7 @@
 
 EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
 EsObject *OPTSCRIPT_ERR_UNKNOWNLANGUAGE;
+EsObject *OPTSCRIPT_ERR_LANGMISMATCH;
 
 int OPT_TYPE_MATCHLOC;
 static int locEqual (const void *a, const void  *b);
@@ -61,6 +62,7 @@ extern OptVM *optscriptInit (void)
 	mio_unref (in);
 
 	OPTSCRIPT_ERR_NOTAGENTRY = es_error_intern ("notagentry");
+	OPTSCRIPT_ERR_LANGMISMATCH = es_error_intern ("langmismatch");
 
 	OPT_TYPE_MATCHLOC = es_type_define_pointer ("matchloc",
 												eFreeNoNullCheck,
@@ -86,6 +88,13 @@ static EsObject* lrop_get_field_value (OptVM *vm, EsObject *name)
 
 	void * data = es_symbol_get_data (name);
 	fieldType ftype = HT_PTR_TO_INT (data);
+
+	if (! isCommonField (ftype))
+	{
+		if (getFieldLanguage (ftype) != e->langType)
+			return OPTSCRIPT_ERR_LANGMISMATCH;
+	}
+
 	EsObject *val = getFieldValue (ftype, e);
 	if (es_error_p (val))
 		return val;
@@ -124,6 +133,12 @@ static EsObject* lrop_set_field_value (OptVM *vm, EsObject *name)
 	void * data = es_symbol_get_data (name);
 	fieldType ftype = HT_PTR_TO_INT (data);
 	unsigned int fdata_type = getFieldDataType (ftype);
+
+	if (! isCommonField (ftype))
+	{
+		if (getFieldLanguage (ftype) != e->langType)
+			return OPTSCRIPT_ERR_LANGMISMATCH;
+	}
 
 	EsObject *valobj = opt_vm_ostack_top (vm);
 	int valtype = es_object_get_type (valobj);
