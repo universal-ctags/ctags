@@ -164,19 +164,19 @@ status: 1
 #
 # --roles-C.h={system{local}
 #
-ctags: Warning: no such role: system{local of h kind in language C
+ctags: Warning: no such role: "system{local" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h=+{system{local}
 #
-ctags: Warning: no such role: system{local of h kind in language C
+ctags: Warning: no such role: "system{local" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h=-{system{local}
 #
-ctags: Warning: no such role: system{local of h kind in language C
+ctags: Warning: no such role: "system{local" in kind 'h' in language "C"
 status: 42
 
 #
@@ -218,127 +218,127 @@ status: 1
 #
 # --roles-C.{header}={system{local}
 #
-ctags: Warning: no such role: system{local of h kind in language C
+ctags: Warning: no such role: "system{local" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}=+{system{local}
 #
-ctags: Warning: no such role: system{local of h kind in language C
+ctags: Warning: no such role: "system{local" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}=-{system{local}
 #
-ctags: Warning: no such role: system{local of h kind in language C
+ctags: Warning: no such role: "system{local" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h={noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h=+{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h=-{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h={system}{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h={noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h=+{system}{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h=-{system}{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h=+{system}-{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.h=-{system}+{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}={noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}=+{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}=-{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}={system}{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}={noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}=+{system}{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}=-{system}{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}=+{system}-{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #
 # --roles-C.{header}=-{system}+{noSuchRole}
 #
-ctags: Warning: no such role: noSuchRole of h kind in language C
+ctags: Warning: no such role: "noSuchRole" in kind 'h' in language "C"
 status: 42
 
 #

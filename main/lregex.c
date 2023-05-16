@@ -1126,7 +1126,7 @@ static void common_flag_role_long (const char* const s, const char* const v, voi
 								  ptrn->u.tag.kindIndex, v);
 	if (!role)
 	{
-		error (WARNING, "no such role: %s in kind: %s of language: %s",
+		error (WARNING, "no such role: \"%s\" in kind: \"%s\" of language: \"%s\"",
 			   v,
 			   getLanguageKind(lang, ptrn->u.tag.kindIndex)->name,
 			   getLanguageName (lang));

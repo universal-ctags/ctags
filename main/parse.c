@@ -3176,7 +3176,7 @@ static void processLangKindRoleDefinition (
 			char *rname = eStrndup (p,  q - p);
 			roleDefinition *rdef = getLanguageRoleForName (language, kindIndex, rname);
 			if (!rdef)
-				error (WARNING, "no such role: %s of %c kind in language %s",
+				error (WARNING, "no such role: \"%s\" in kind \'%c\' in language \"%s\"",
 					   rname, getLanguageKind (language, kindIndex)->letter,
 					   getLanguageName (language));
 			else
