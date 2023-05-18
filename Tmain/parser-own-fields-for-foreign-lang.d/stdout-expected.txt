@@ -2,4 +2,5 @@ bar	input.unknownx	/^protected func bar(n);$/;"	f	language:unknownx	protection:p
 baz	input.unknownx	/^private func baz(n,...);$/;"	f	language:unknownx	protection:private 	signature:(n,...)
 foo	input.unknownx	/^public func foo(n, m);$/;"	f	language:unknownx	protection:public 	signature:(n, m)
 tagme	input.unknownx	/^X:tagme@iamowner$/;"	m	language:knownz	owner:iamowner
+tagme-z	input.unknownx	/^Z:tagme-z@iamowner-z$/;"	m	language:knownz	owner:iamowner-z	len:10	lenplus:11
 tagme2	input.unknownx	/^Y:iamowner2=tagme2$/;"	m	language:knownz	owner:iamowner2
