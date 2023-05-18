@@ -1925,3 +1925,62 @@ static EsObject* setFieldValueForInherits (tagEntryInfo *tag, const fieldDefinit
 
 	return es_false;
 }
+
+extern EsObject* getFieldValueGeneric (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	const char *value = getParserFieldValueForType(tag, fdef->ftype);
+
+	if (value == NULL)
+		return es_nil;
+
+	unsigned int dt = fdef->dataType;
+	if (dt & FIELDTYPE_STRING)
+		return (dt & FIELDTYPE_BOOL && value[0] == '\0')
+			? es_false
+			: opt_string_new_from_cstr (value);
+	else if (dt & FIELDTYPE_INTEGER)
+	{
+		long tmp;
+		if (strToLong (value, 10, &tmp))
+			return es_integer_new ((int)tmp); /* TODO: if tmp is not in the range of int, return es_nil */
+		else
+		{
+			AssertNotReached ();
+			return es_nil;
+		}
+	}
+	else if (dt & FIELDTYPE_BOOL)
+		return value [0]? es_true: es_false;
+	else
+	{
+		AssertNotReached ();
+		return es_nil;
+	}
+}
+
+extern EsObject* setFieldValueGeneric (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *obj)
+{
+	unsigned int dt = fdef->dataType;
+	const char * val;
+	char buf[1 /* [+-] */ + 20 + 1 /* for \0 */];
+
+	if (dt & FIELDTYPE_STRING)
+		val = opt_string_get_cstr (obj);
+	else if (dt & FIELDTYPE_INTEGER)
+	{
+		int tmp = es_integer_get (obj);
+		/* 2^64 => "18446744073709551616" */
+		snprintf(buf, 22, "%d", tmp);
+		val = buf;
+	}
+	else if (dt & FIELDTYPE_BOOL)
+		val = es_boolean_get (obj)? "t": "";
+	else
+	{
+		val = "";
+		AssertNotReached ();
+	}
+
+	attachParserField (tag, fdef->ftype, val);
+	return es_false;
+}
