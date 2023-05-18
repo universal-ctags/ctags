@@ -40,7 +40,7 @@ EOF
 ########################################################################
 my $langdef_flags =
     [
-     [ qr/\{base=([^\{]+)\}/, sub {
+     [ qr/\{base=([^\}]+)\}/, sub {
 	 $_[0]->{'base'} = $1;
        } ],
      [ qr/\{(dedicated|shared|bidirectional)\}/, sub {
