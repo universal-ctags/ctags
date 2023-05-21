@@ -874,7 +874,7 @@ static void deleteBlockData (NestingLevel *nl, void *data CTAGS_ATTR_UNUSED)
 		&& (sub_e = getEntryInCorkQueue (bdata->subparserCorkIndex)))
 	{
 		setTagEndLine (sub_e, getInputLineNumber ());
-		if (bdata->subparser)
+		if (bdata->subparser && bdata->subparser->leaveBlockNotify)
 			bdata->subparser->leaveBlockNotify (bdata->subparser,
 												bdata->subparserCorkIndex);
 	}
