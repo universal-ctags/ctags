@@ -1,5 +1,5 @@
 #
-# lex.ctags --- multitable regex parser for gperf input
+# gperf.ctags --- multitable regex parser for gperf input
 #
 # Copyright (c) 2022, Red Hat, Inc.
 # Copyright (c) 2022, Masatake YAMATO

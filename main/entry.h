@@ -250,8 +250,8 @@ extern bool isTagExtra (const tagEntryInfo *const tag);
 
 /* Functions for attaching parser specific fields
  *
- * Which function you should use?
- * ------------------------------
+ * Which function should I use?
+ * ----------------------------
  * Case A:
  *
  * If your parser uses the Cork API, and your parser called
