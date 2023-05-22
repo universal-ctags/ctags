@@ -1605,7 +1605,7 @@ static vString* substitute (
 			if (0 < dig  &&  dig < nmatch  &&  pmatch [dig].rm_so != -1)
 			{
 				const int diglen = pmatch [dig].rm_eo - pmatch [dig].rm_so;
-				vStringNCatS (result, in + pmatch [dig].rm_so, diglen);
+				vStringNCatSUnsafe (result, in + pmatch [dig].rm_so, diglen);
 			}
 		}
 		else if (*p != '\n'  &&  *p != '\r')
