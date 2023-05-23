@@ -222,7 +222,7 @@ static void readCString (lexingState * st)
 		else
 		{
 			lastIsBackSlash = *c == '\\';
-			vStringPut (st->name, (int) *c);
+			vStringPut (st->name, *c);
 		}
 
 		c++;
@@ -271,11 +271,11 @@ static void readIdentifier (lexingState * st)
 
 	/* first char is a simple letter */
 	if (isAlpha (*st->cp) || *st->cp == '_')
-		vStringPut (st->name, (int) *st->cp);
+		vStringPut (st->name, *st->cp);
 
 	/* Go till you get identifier chars */
 	for (p = st->cp + 1; isIdent (*p); p++)
-		vStringPut (st->name, (int) *p);
+		vStringPut (st->name, *p);
 
 	st->cp = p;
 }
@@ -288,11 +288,11 @@ static void readIdentifierObjcDirective (lexingState * st)
 
 	/* first char is a simple letter */
 	if (*st->cp == '@')
-		vStringPut (st->name, (int) *st->cp);
+		vStringPut (st->name, *st->cp);
 
 	/* Go till you get identifier chars */
 	for (p = st->cp + 1; isIdent (*p); p++)
-		vStringPut (st->name, (int) *p);
+		vStringPut (st->name, *p);
 
 	st->cp = p;
 }

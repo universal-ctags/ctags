@@ -863,13 +863,12 @@ extern bool  doesFieldHaveTabOrNewlineChar (fieldType type, const tagEntryInfo *
 static const char* renderCompactInputLine (vString *b,  const char *const line)
 {
 	bool lineStarted = false;
-	const char *p;
-	int c;
 
 	/*  Write everything up to, but not including, the newline.
 	 */
-	for (p = line, c = *p  ;  c != NEWLINE  &&  c != '\0'  ;  c = *++p)
+	for (const char *p = line; *p != NEWLINE && *p != '\0'; ++p)
 	{
+		int c = (unsigned char) *p;
 		if (lineStarted  || ! isspace (c))  /* ignore leading spaces */
 		{
 			lineStarted = true;

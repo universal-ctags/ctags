@@ -1286,7 +1286,7 @@ static void processExtraTagsOption (
 
 	longName = vStringNewOrClearWithAutoRelease (longName);
 
-	while ((c = *p++) != '\0')
+	while ((c = (unsigned char) *p++) != '\0')
 	{
 		switch (c)
 		{
@@ -1374,7 +1374,7 @@ static void processFieldsOption (
 	else if (*p != '+'  &&  *p != '-')
 		resetFieldsOption (LANG_IGNORE, false);
 
-	while ((c = *p++) != '\0') switch (c)
+	while ((c = (unsigned char) *p++) != '\0') switch (c)
 	{
 		case '+':
 			if (inLongName)
@@ -3084,7 +3084,7 @@ static bool processLangSpecificFieldsOption (const char *const option,
 		error (WARNING, "Wrong per language field specification: %s", p);
 
 	longName = vStringNewOrClearWithAutoRelease (longName);
-	while ((c = *p++) != '\0')
+	while ((c = (unsigned char) *p++) != '\0')
 	{
 		switch (c)
 		{
@@ -3185,7 +3185,7 @@ static bool processLangSpecificExtraOption (const char *const option,
 		error (WARNING, "Wrong per language extra specification: %s", p);
 
 	longName = vStringNewOrClearWithAutoRelease (longName);
-	while ((c = *p++) != '\0')
+	while ((c = (unsigned char) *p++) != '\0')
 	{
 		switch (c)
 		{

@@ -68,7 +68,7 @@ static ResParserState parseResDefinition(const unsigned char *line)
 	name = vStringNew();
 	while (*line && !isspace((int) *line))
 	{
-		vStringPut(name, (int) *line);
+		vStringPut(name, *line);
 		line++;
 	}
 
@@ -78,7 +78,7 @@ static ResParserState parseResDefinition(const unsigned char *line)
 	type = vStringNew();
 	while (*line && !isspace((int) *line))
 	{
-		vStringPut(type, (int) *line);
+		vStringPut(type, *line);
 		line++;
 	}
 

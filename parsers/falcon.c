@@ -83,7 +83,7 @@ static void findFalconTags (void)
 
             while (isIdentifierChar ((int) *cp))
             {
-                vStringPut (name, (int) *cp);
+                vStringPut (name, *cp);
                 ++cp;
             }
             makeSimpleTag (name, K_FUNCTION);
@@ -96,7 +96,7 @@ static void findFalconTags (void)
 
             while (isIdentifierChar ((int) *cp))
             {
-                vStringPut (name, (int) *cp);
+                vStringPut (name, *cp);
                 ++cp;
             }
             makeSimpleTag (name, K_CLASS);
@@ -109,7 +109,7 @@ static void findFalconTags (void)
 
             while (isIdentifierChar ((int) *cp))
             {
-                vStringPut (name, (int) *cp);
+                vStringPut (name, *cp);
                 ++cp;
             }
             makeSimpleTag (name, K_NAMESPACE);
@@ -122,7 +122,7 @@ static void findFalconTags (void)
 
             while (isIdentifierChar ((int) *cp))
             {
-                vStringPut (name, (int) *cp);
+                vStringPut (name, *cp);
                 ++cp;
             }
             makeSimpleTag (name, K_NAMESPACE);

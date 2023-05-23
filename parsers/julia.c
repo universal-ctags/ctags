@@ -235,7 +235,7 @@ static void advanceAndStoreChar (lexerState *lexer)
 {
     if (vStringLength(lexer->token_str) < MAX_STRING_LENGTH)
     {
-        vStringPut(lexer->token_str, (char) lexer->cur_c);
+        vStringPut(lexer->token_str, lexer->cur_c);
     }
     advanceChar(lexer);
 }

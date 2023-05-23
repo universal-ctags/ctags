@@ -465,7 +465,7 @@ static void readIdentifier (vString *const string, const int firstChar)
 	int c = firstChar;
 	do
 	{
-		vStringPut (string, (char) c);
+		vStringPut (string, c);
 		c = getcFromInputFile ();
 	}
 	while (isIdentifierChar (c));

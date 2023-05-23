@@ -131,7 +131,7 @@ static void extract_next_token (const char *begin, const char *end_sentinel, vSt
 			vStringClear (name);
 		}
 		else if (isLuaIdentifier (*c))
-			vStringPut (name, (int) *c);
+			vStringPut (name, *c);
 		else
 		{
 			/* An unexpected character is found

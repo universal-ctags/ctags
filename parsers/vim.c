@@ -299,7 +299,7 @@ static void parseFunction (const unsigned char *line)
 
 				do
 				{
-					vStringPut (name, (int) *cp);
+					vStringPut (name, *cp);
 					++cp;
 				} while (isalnum ((int) *cp) || *cp == '_' || *cp == '.' || *cp == '#');
 				index = makeSimpleTag (name, K_FUNCTION);
@@ -484,7 +484,7 @@ static bool parseCommand (const unsigned char *line)
 
 	do
 	{
-		vStringPut (name, (int) *cp);
+		vStringPut (name, *cp);
 		++cp;
 	} while (isalnum ((int) *cp) || *cp == '_');
 
@@ -544,7 +544,7 @@ static void parseVariableOrConstant (const unsigned char *line, int infunction, 
 			if (!*cp)
 				break;
 
-			vStringPut (name, (int) *cp);
+			vStringPut (name, *cp);
 			++cp;
 		} while (isalnum ((int) *cp) || *cp == '_' || *cp == '#' || *cp == ':' || *cp == '$');
 		makeSimpleTag (name, kindIndex);
@@ -622,7 +622,7 @@ static bool parseMap (const unsigned char *line)
 
 	do
 	{
-		vStringPut (name, (int) *cp);
+		vStringPut (name, *cp);
 		++cp;
 	} while (*cp && *cp != ' ');
 
@@ -722,7 +722,7 @@ static void parseVimBallFile (const unsigned char *line)
 			cp = line;
 			do
 			{
-				vStringPut (fname, (int) *cp);
+				vStringPut (fname, *cp);
 				++cp;
 			} while (isalnum ((int) *cp) || *cp == '.' || *cp == '/' || *cp == '\\');
 			makeSimpleTag (fname, K_FILENAME);

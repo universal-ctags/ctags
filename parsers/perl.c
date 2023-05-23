@@ -876,7 +876,7 @@ static void findPerlTags (void)
 			const unsigned char *const first = cp;
 			while (*cp && (int) *cp != ';'  &&  !isspace ((int) *cp))
 			{
-				vStringPut (package, (int) *cp);
+				vStringPut (package, *cp);
 				cp++;
 			}
 			vStringCatS (package, "::");
@@ -929,7 +929,7 @@ static void findPerlTags (void)
 
 			while (isIdentifier (*cp) || (KIND_PERL_PACKAGE == kind && ':' == *cp))
 			{
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				cp++;
 			}
 

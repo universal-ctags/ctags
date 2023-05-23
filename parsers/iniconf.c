@@ -134,7 +134,7 @@ static void findIniconfTags (void)
 			++cp;
 			while (*cp != '\0' && *cp != ']')
 			{
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				++cp;
 			}
 
@@ -164,7 +164,7 @@ static void findIniconfTags (void)
 			{
 				while (isIdentifier ((int) *cp))
 				{
-					vStringPut (name, (int) *cp);
+					vStringPut (name, *cp);
 					++cp;
 				}
 				vStringStripTrailing (name);
@@ -178,7 +178,7 @@ static void findIniconfTags (void)
 						++cp;
 					while (isValue ((int) *cp))
 					{
-						vStringPut (val, (int) *cp);
+						vStringPut (val, *cp);
 						++cp;
 					}
 					vStringStripTrailing (val);

@@ -304,7 +304,7 @@ extern void vStringCatSWithEscaping (vString* b, const char *s)
 {
 	for(; *s; s++)
 	{
-		int c = *s;
+		unsigned char c = (unsigned char) *s;
 
 		/* escape control characters (incl. \t) */
 		if ((c > 0x00 && c <= 0x1F) || c == 0x7F || c == '\\')

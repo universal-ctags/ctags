@@ -70,7 +70,7 @@ static void createTag(AbaqusKind kind, const char *buf)
 
 	do
 	{
-		vStringPut(name, (int) *buf);
+		vStringPut(name, *buf);
 		++buf;
 	} while ((*buf != '\0') && (*buf != ','));
 	makeSimpleTag(name, kind);

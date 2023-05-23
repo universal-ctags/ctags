@@ -213,7 +213,7 @@ static int readDestfileName (const unsigned char *cp, vString *destfile)
 
 	vStringClear(destfile);
 	do {
-		vStringPut (destfile, (int) *cp);
+		vStringPut (destfile, *cp);
 		++cp;
 	} while (isFileChar ((int) *cp));
 
@@ -645,7 +645,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 
 				while (check_char ((int) *cp))
 				{
-					vStringPut (name, (int) *cp);
+					vStringPut (name, *cp);
 					++cp;
 				}
 			}

@@ -130,7 +130,7 @@ static const unsigned char *parseIdentifier (
 
 	while (isIdentifier ((int) *cp))
 	{
-		vStringPut (identifier, (int) *cp);
+		vStringPut (identifier, *cp);
 		cp++;
 	}
 	return cp;

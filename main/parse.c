@@ -751,7 +751,7 @@ static vString* determineInterpreter (const char* const cmd)
 		for ( ;  isspace ((int) *p)  ;  ++p)
 			;  /* no-op */
 		for ( ;  *p != '\0'  &&  ! isspace ((int) *p)  ;  ++p)
-			vStringPut (interpreter, (int) *p);
+			vStringPut (interpreter, *p);
 	} while (strcmp (vStringValue (interpreter), "env") == 0);
 	return interpreter;
 }
@@ -823,7 +823,7 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 		for ( ;  isspace ((int) *p)  ;  ++p)
 			;  /* no-op */
 		for ( ;  *p != '\0'  &&  isLanguageNameChar ((int) *p)  ;  ++p)
-			vStringPut (mode, (int) *p);
+			vStringPut (mode, *p);
 
 		if ((strcmp(vStringValue (mode), "sh") == 0
 			 || strcmp(vStringValue (mode), "shell-script") == 0)
@@ -839,7 +839,7 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 			goto out;
 
 		for ( ;  p < end &&  isLanguageNameChar ((int) *p)  ;  ++p)
-			vStringPut (mode, (int) *p);
+			vStringPut (mode, *p);
 
 		for ( ;  isspace ((int) *p)  ;  ++p)
 			;  /* no-op */
@@ -891,7 +891,7 @@ static vString* determineEmacsModeAtEOF (MIO* const fp)
 			for ( ;  isspace ((int) *p)  ;  ++p)
 				;  /* no-op */
 			for ( ;  *p != '\0'  &&  isLanguageNameChar ((int) *p)  ;  ++p)
-				vStringPut (mode, (int) *p);
+				vStringPut (mode, *p);
 
 			is_shell_mode = ((strcasecmp (vStringValue (mode), "sh") == 0
 								 || strcasecmp (vStringValue (mode), "shell-script") == 0));
@@ -955,7 +955,7 @@ static vString* determineVimFileType (const char *const modeline)
 
 		p += strlen(filetype_prefix[i]);
 		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
-			vStringPut (filetype, (int) *p);
+			vStringPut (filetype, *p);
 		break;
 	}
 	return filetype;
@@ -2542,7 +2542,7 @@ static void processLangKindDefinition (
 
 	longName = vStringNewOrClearWithAutoRelease (longName);
 
-	while ((c = *p++) != '\0')
+	while ((c = (unsigned char) *p++) != '\0')
 	{
 		switch (c)
 		{
