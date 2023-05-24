@@ -1079,7 +1079,7 @@ static void findRubyTags (void)
 		{
 
 			int r;
-			if (*(cp - 1) != 's')
+			if (*(cp - 1) != 's') /* clas* != s */
 			{
 				r = emitRubyTagFull(NULL, K_CLASS, true, false);
 				expect_separator = true;
@@ -1248,6 +1248,19 @@ static void findRubyTags (void)
 					++cp;
 				while (isIdentChar (*cp));
 			}
+		}
+
+		if (expect_separator)
+		{
+			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
+			tagEntryInfo *e_scope  = getEntryOfNestingLevel (nl);
+			if (e_scope && e_scope->kindIndex == K_CLASS
+				&& isTagExtraBitMarked (e_scope, XTAG_ANONYMOUS))
+				/* Class.new() ... was found but "do" or `{' is not
+				 * found at the end; no block is made. Let's
+				 * pop the nesting level push when Class.new()
+				 * was found. */
+				nestingLevelsPop (nesting);
 		}
 	}
 	nestingLevelsFree (nesting);
