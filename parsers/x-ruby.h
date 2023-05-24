@@ -49,8 +49,16 @@ extern bool rubySkipWhitespace (const unsigned char **cp);
 extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal);
 extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* literal);
 
+/* rubyParseString() moves the *CP to the char just after the string literal started from
+ * BOUNDARY (' or "). The string with no BOUNDARY is stored to VSTR.
+ * You can use rubyParseString() just for skipping if you specify NULL as VSTR.
+
+ * rubyParseString() returns false if **s is '\0' else true.
+ * NOTE: even if the string is not terminated with BOUNDARY, the function moves *cp
+ * and returns true. */
 extern bool rubyParseString (const unsigned char** cp, unsigned char boundary, vString* vstr);
 extern bool rubyParsePercentString (const unsigned char** cp, vString* vstr);
+
 extern bool rubyParseMethodName (const unsigned char **cp, vString* vstr);
 extern bool rubyParseModuleName (const unsigned char **cp, vString* vstr);
 
