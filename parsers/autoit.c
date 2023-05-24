@@ -145,7 +145,7 @@ static int parseFunc (const unsigned char *p, NestingLevels *nls)
 	skipSpaces (&p);
 	while (isIdentChar ((int) *p))
 	{
-		vStringPut (name, (int) *p);
+		vStringPut (name, *p);
 		++p;
 	}
 	skipSpaces (&p);
@@ -154,7 +154,7 @@ static int parseFunc (const unsigned char *p, NestingLevels *nls)
 		vString *signature = vStringNew ();
 
 		do
-			vStringPut (signature, (int) *p);
+			vStringPut (signature, *p);
 		while (*p != ')' && *p++);
 
 		k = makeAutoItTag (nls, name, K_FUNCTION, signature);
@@ -218,7 +218,7 @@ static void findAutoItTags (void)
 					++p;
 					while (*p != '\0' && *p != '>' && *p != '"')
 					{
-						vStringPut (name, (int) *p);
+						vStringPut (name, *p);
 						++p;
 					}
 					if (vStringLength(name) > 0)
@@ -284,7 +284,7 @@ static void findAutoItTags (void)
 					p++;
 					while (isIdentChar ((int) *p))
 					{
-						vStringPut (name, (int) *p);
+						vStringPut (name, *p);
 						++p;
 					}
 					if (vStringLength(name) > 0)

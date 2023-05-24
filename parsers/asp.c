@@ -127,7 +127,7 @@ static void findAspTags (void)
 						    ++cp;
 					    while (isalnum ((int) *cp)  ||  *cp == '_')
 					    {
-						    vStringPut (name, (int) *cp);
+						    vStringPut (name, *cp);
 						    ++cp;
 					    }
 					    makeSimpleTag (name, K_FUNCTION);
@@ -140,7 +140,7 @@ static void findAspTags (void)
 						    ++cp;
 					    while (isalnum ((int) *cp)  ||  *cp == '_')
 					    {
-						    vStringPut (name, (int) *cp);
+						    vStringPut (name, *cp);
 						    ++cp;
 					    }
 					    makeSimpleTag (name, K_SUB);
@@ -149,7 +149,7 @@ static void findAspTags (void)
 					else {
 					    while (isalnum ((int) *cp)  ||  *cp == '_')
 					    {
-						    vStringPut (name, (int) *cp);
+						    vStringPut (name, *cp);
 						    ++cp;
 					    }
 					    makeSimpleTag (name, K_DIM);
@@ -171,7 +171,7 @@ static void findAspTags (void)
 						    ++cp;
 					    while (isalnum ((int) *cp)  ||  *cp == '_')
 					    {
-						    vStringPut (name, (int) *cp);
+						    vStringPut (name, *cp);
 						    ++cp;
 					    }
 					    makeSimpleTag (name, K_FUNCTION);
@@ -184,7 +184,7 @@ static void findAspTags (void)
 						    ++cp;
 					    while (isalnum ((int) *cp)  ||  *cp == '_')
 					    {
-						    vStringPut (name, (int) *cp);
+						    vStringPut (name, *cp);
 						    ++cp;
 					    }
 					    makeSimpleTag (name, K_SUB);
@@ -193,7 +193,7 @@ static void findAspTags (void)
 					else {
 					    while (isalnum ((int) *cp)  ||  *cp == '_')
 					    {
-						    vStringPut (name, (int) *cp);
+						    vStringPut (name, *cp);
 						    ++cp;
 					    }
 					    makeSimpleTag (name, K_DIM);
@@ -213,7 +213,7 @@ static void findAspTags (void)
 						++cp;
 					while (isalnum ((int) *cp)  ||  *cp == '_')
 					{
-						vStringPut (name, (int) *cp);
+						vStringPut (name, *cp);
 						++cp;
 					}
 					makeSimpleTag (name, K_FUNCTION);
@@ -231,7 +231,7 @@ static void findAspTags (void)
 						++cp;
 					while (isalnum ((int) *cp)  ||  *cp == '_')
 					{
-						vStringPut (name, (int) *cp);
+						vStringPut (name, *cp);
 						++cp;
 					}
 					makeSimpleTag (name, K_SUB);
@@ -249,7 +249,7 @@ static void findAspTags (void)
 						++cp;
 					while (isalnum ((int) *cp)  ||  *cp == '_')
 					{
-						vStringPut (name, (int) *cp);
+						vStringPut (name, *cp);
 						++cp;
 					}
 					makeSimpleTag (name, K_DIM);
@@ -267,7 +267,7 @@ static void findAspTags (void)
 						++cp;
 					while (isalnum ((int) *cp)  ||  *cp == '_')
 					{
-						vStringPut (name, (int) *cp);
+						vStringPut (name, *cp);
 						++cp;
 					}
 					makeSimpleTag (name, K_CLASS);
@@ -285,7 +285,7 @@ static void findAspTags (void)
 						++cp;
 					while (isalnum ((int) *cp)  ||  *cp == '_')
 					{
-						vStringPut (name, (int) *cp);
+						vStringPut (name, *cp);
 						++cp;
 					}
 					makeSimpleTag (name, K_CONST);

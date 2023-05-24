@@ -58,7 +58,7 @@ static void parseSelector (vString *const string, const int firstChar)
 	int c = firstChar;
 	do
 	{
-		vStringPut (string, (char) c);
+		vStringPut (string, c);
 		c = getcFromInputFile ();
 	} while (isSelectorChar (c));
 	ungetcToInputFile (c);

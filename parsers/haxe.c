@@ -88,7 +88,7 @@ another:
 			vStringClear (name);
 			while (isalnum ((int) *cp)  ||  *cp == '_')
 			{
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				++cp;
 			}
 			makeSimpleTag (name, HXTAG_VARIABLE);
@@ -106,7 +106,7 @@ another:
 			vStringClear (name);
 			while (isalnum ((int) *cp)  ||  *cp == '_')
 			{
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				++cp;
 			}
 			makeSimpleTag (name, HXTAG_METHODS);
@@ -123,7 +123,7 @@ another:
 			vStringClear (name);
 			while (isalnum ((int) *cp)  ||  *cp == '_')
 			{
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				++cp;
 			}
 			makeSimpleTag (name, HXTAG_CLASS);
@@ -140,7 +140,7 @@ another:
 			vStringClear (name);
 			while (isalnum ((int) *cp)  ||  *cp == '_')
 			{
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				++cp;
 			}
 			makeSimpleTag (name, HXTAG_ENUM);
@@ -169,7 +169,7 @@ another:
 				++cp;
 			vStringClear (name);
 			while (isalnum ((int) *cp)  ||  *cp == '_') {
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				++cp;
 			}
 			makeSimpleTag (name, HXTAG_INTERFACE);
@@ -181,7 +181,7 @@ another:
 				++cp;
 			vStringClear (name);
 			while (isalnum ((int) *cp)  ||  *cp == '_') {
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				++cp;
 			}
 			makeSimpleTag (name, HXTAG_TYPEDEF);

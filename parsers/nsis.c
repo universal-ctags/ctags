@@ -110,7 +110,7 @@ static int makeSimpleTagWithScope(vString *name, int kindIndex, int parentCorkIn
 #define fillName(NAME,CP,CONDITION)				\
 	while (CONDITION)							\
 	{											\
-		vStringPut ((NAME), (int) *(CP));		\
+		vStringPut ((NAME), *(CP));				\
 		++(CP);									\
 	}											\
 	do {} while (0)
@@ -149,7 +149,7 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 			int in_escape = 0;
 			do
 			{
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				++cp;
 
 				if (*cp == '\0')
@@ -186,7 +186,7 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 			   || *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!'
 			   || *cp == '$' || *cp == '{' || *cp == '}' || *cp == '(' || *cp == ')')
 		{
-			vStringPut (name, (int) *cp);
+			vStringPut (name, *cp);
 			++cp;
 		}
 	}

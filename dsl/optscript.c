@@ -4184,7 +4184,7 @@ op__put_str (OptVM *vm, EsObject *name,
 		for (size_t i = 0; i < d; i++)
 			vStringPut (vstr, ' ');
 		if (c != 0)
-			vStringPut (vstr, (char)c);
+			vStringPut (vstr, c);
 	}
 
 	ptrArrayDeleteLastInBatch (vm->ostack, 3);

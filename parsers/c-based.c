@@ -1486,7 +1486,22 @@ static void skipToMatch (const char *const pair)
 	while (matchLevel > 0  &&  (c = skipToNonWhite ()) != EOF)
 	{
 		if (CollectingSignature)
-			vStringPut (Signature, c);
+		{
+			if (c <= 0xff)
+				vStringPut (Signature, c);
+			else
+			{
+				switch (c)
+				{
+					case CHAR_SYMBOL:
+					case STRING_SYMBOL:
+						vStringCat (Signature, cppGetLastCharOrStringContents ());
+						break;
+					default:
+						AssertNotReached();
+				}
+			}
+		}
 		if (c == begin)
 		{
 			++matchLevel;

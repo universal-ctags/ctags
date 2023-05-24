@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 
+#include "debug.h"
 #include "inline.h"
 
 /*
@@ -101,18 +102,25 @@ CTAGS_INLINE void vStringPutNewlinAgainUnsafe (vString *const string)
 	string->buffer [string->length++] = '\n';
 }
 
-CTAGS_INLINE void vStringPut (vString *const string, const int c)
+CTAGS_INLINE void vStringPutImpl (vString *const string, const int c)
 {
+	/* verify the given character is an unsigned char value */
+	Assert (c >= 0 && c <= 0xff);
+
 	if (string->length + 1 == string->size)  /*  check for buffer overflow */
 		vStringResize (string, string->size * 2);
 
-	string->buffer [string->length] = c;
+	string->buffer [string->length] = (char) c;
 	if (c != '\0')
 		string->buffer [++string->length] = '\0';
 }
 
-CTAGS_INLINE bool vStringPutWithLimit (vString *const string, const int c,
-									   unsigned int maxlen)
+#define vStringPut(s, c) (sizeof(c) == sizeof(char) \
+						  ? vStringPutImpl((s), (unsigned char) (c)) \
+						  : vStringPutImpl((s), (c)))
+
+CTAGS_INLINE bool vStringPutWithLimitImpl (vString *const string, const int c,
+										   unsigned int maxlen)
 {
 	if (vStringLength (string) < maxlen || maxlen == 0)
 	{
@@ -121,5 +129,10 @@ CTAGS_INLINE bool vStringPutWithLimit (vString *const string, const int c,
 	}
 	return false;
 }
+
+#define vStringPutWithLimit(s, c, l) \
+	(sizeof(c) == sizeof(char) \
+	 ? vStringPutWithLimitImpl((s), (unsigned char) (c), (l)) \
+	 : vStringPutWithLimitImpl((s), (c), (l)))
 
 #endif  /* CTAGS_MAIN_VSTRING_H */

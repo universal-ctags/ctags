@@ -53,7 +53,7 @@ static void findAwkTags (void)
 				++cp;
 			while (isalnum ((int) *cp)  ||  *cp == '_')
 			{
-				vStringPut (name, (int) *cp);
+				vStringPut (name, *cp);
 				++cp;
 			}
 			while (isspace ((int) *cp))

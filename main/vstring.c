@@ -244,11 +244,7 @@ extern void vStringCopyToLower (vString *const dest, const vString *const src)
 		vStringResize (dest, src->size);
 	d = dest->buffer;
 	for (i = 0  ;  i < length  ;  ++i)
-	{
-		int c = s [i];
-
-		d [i] = tolower (c);
-	}
+		d [i] = (char) tolower (s [i]);
 	d [i] = '\0';
 }
 
@@ -294,7 +290,7 @@ extern char    *vStringStrdup (const vString *const string)
 	return str;
 }
 
-static char valueToXDigit (int v)
+static int valueToXDigit (int v)
 {
 	Assert (v >= 0 && v <= 0xF);
 
@@ -308,7 +304,7 @@ extern void vStringCatSWithEscaping (vString* b, const char *s)
 {
 	for(; *s; s++)
 	{
-		int c = *s;
+		unsigned char c = (unsigned char) *s;
 
 		/* escape control characters (incl. \t) */
 		if ((c > 0x00 && c <= 0x1F) || c == 0x7F || c == '\\')

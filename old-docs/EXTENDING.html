@@ -239,7 +239,7 @@ static void findSwineTags (void)
                 ++cp;
             while (isalnum ((int) *cp)  ||  *cp == '_')
             {
-                vStringPut (name, (int) *cp);
+                vStringPut (name, *cp);
                 ++cp;
             }
             makeSimpleTag (name, SwineKinds, K_DEFINE);
