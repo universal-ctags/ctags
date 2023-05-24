@@ -115,14 +115,14 @@ static vString* nestingLevelsToScope (const NestingLevels* nls)
 	vString* result = vStringNew ();
 	for (i = 0; i < nls->n; ++i)
 	{
-	    NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
-	    tagEntryInfo *e = getEntryOfNestingLevel (nl);
-	    if (e && (*e->name != '\0') && (!e->placeholder))
-	    {
-	        if (chunks_output++ > 0)
-	            vStringPut (result, SCOPE_SEPARATOR);
-	        vStringCatS (result, e->name);
-	    }
+		NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
+		tagEntryInfo *e = getEntryOfNestingLevel (nl);
+		if (e && (*e->name != '\0') && (!e->placeholder))
+		{
+			if (chunks_output++ > 0)
+				vStringPut (result, SCOPE_SEPARATOR);
+			vStringCatS (result, e->name);
+		}
 	}
 	return result;
 }
@@ -144,12 +144,12 @@ static bool canMatch (const unsigned char** s, const char* literal,
 	const unsigned char next_char = *(*s + literal_length);
 	if (strncmp ((const char*) *s, literal, literal_length) != 0)
 	{
-	    return false;
+		return false;
 	}
 	/* Additionally check that we're at the end of a token. */
 	if (! end_check (next_char))
 	{
-	    return false;
+		return false;
 	}
 	*s += literal_length;
 	return true;
@@ -168,11 +168,11 @@ static bool notIdentCharButColon (int c)
 static bool isOperatorChar (int c)
 {
 	return (c == '[' || c == ']' ||
-	        c == '=' || c == '!' || c == '~' ||
-	        c == '+' || c == '-' ||
-	        c == '@' || c == '*' || c == '/' || c == '%' ||
-	        c == '<' || c == '>' ||
-	        c == '&' || c == '^' || c == '|');
+			c == '=' || c == '!' || c == '~' ||
+			c == '+' || c == '-' ||
+			c == '@' || c == '*' || c == '/' || c == '%' ||
+			c == '<' || c == '>' ||
+			c == '&' || c == '^' || c == '|');
 }
 
 static bool notOperatorChar (int c)
@@ -270,27 +270,27 @@ extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* 
 static bool parseRubyOperator (vString* name, const unsigned char** cp)
 {
 	static const char* RUBY_OPERATORS[] = {
-	    "[]", "[]=",
-	    "**",
-	    "!", "~", "+@", "-@",
-	    "*", "/", "%",
-	    "+", "-",
-	    ">>", "<<",
-	    "&",
-	    "^", "|",
-	    "<=", "<", ">", ">=",
-	    "<=>", "==", "===", "!=", "=~", "!~",
-	    "`",
-	    NULL
+		"[]", "[]=",
+			"**",
+			"!", "~", "+@", "-@",
+			"*", "/", "%",
+			"+", "-",
+			">>", "<<",
+			"&",
+			"^", "|",
+			"<=", "<", ">", ">=",
+			"<=>", "==", "===", "!=", "=~", "!~",
+			"`",
+			NULL
 	};
 	int i;
 	for (i = 0; RUBY_OPERATORS[i] != NULL; ++i)
 	{
-	    if (canMatch (cp, RUBY_OPERATORS[i], notOperatorChar))
-	    {
-	        vStringCatS (name, RUBY_OPERATORS[i]);
-	        return true;
-	    }
+		if (canMatch (cp, RUBY_OPERATORS[i], notOperatorChar))
+		{
+			vStringCatS (name, RUBY_OPERATORS[i]);
+			return true;
+		}
 	}
 	return false;
 }
@@ -335,7 +335,7 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 			if (vStringLength (scope) > 0)
 				vStringPut (scope, SCOPE_SEPARATOR);
 			vStringNCatS (scope, qualified_name,
-			              unqualified_name - qualified_name);
+						  unqualified_name - qualified_name);
 			/* assume module parent type for a lack of a better option */
 			parent_kind = K_MODULE;
 		}
@@ -351,7 +351,7 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 	if (unqualified_name[0] != '$'
 		&& vStringLength (scope) > 0) {
 		Assert (0 <= parent_kind &&
-		        (size_t) parent_kind < (ARRAY_SIZE (RubyKinds)));
+				(size_t) parent_kind < (ARRAY_SIZE (RubyKinds)));
 
 		tag.extensionFields.scopeKindIndex = parent_kind;
 		tag.extensionFields.scopeName = vStringValue (scope);
@@ -393,7 +393,7 @@ extern void rubySkipWhitespace (const unsigned char** cp)
 {
 	while (isspace (**cp))
 	{
-	    ++*cp;
+		++*cp;
 	}
 }
 
@@ -1049,15 +1049,15 @@ static void findRubyTags (void)
 		*/
 
 		if (canMatchKeywordWithAssign (&cp, "for") ||
-		    canMatchKeywordWithAssign (&cp, "until") ||
-		    canMatchKeywordWithAssign (&cp, "while"))
+			canMatchKeywordWithAssign (&cp, "until") ||
+			canMatchKeywordWithAssign (&cp, "while"))
 		{
 			expect_separator = true;
 			enterUnnamedScope ();
 		}
 		else if (canMatchKeywordWithAssign (&cp, "case") ||
-		         canMatchKeywordWithAssign (&cp, "if") ||
-		         canMatchKeywordWithAssign (&cp, "unless"))
+				 canMatchKeywordWithAssign (&cp, "if") ||
+				 canMatchKeywordWithAssign (&cp, "unless"))
 		{
 			enterUnnamedScope ();
 		}
