@@ -389,12 +389,15 @@ static bool charIsIn (char ch, const char* list)
 
 /* Advances 'cp' over leading whitespace. */
 #define skipWhitespace rubySkipWhitespace
-extern void rubySkipWhitespace (const unsigned char** cp)
+extern bool rubySkipWhitespace (const unsigned char** cp)
 {
+	bool r = false;
 	while (isspace (**cp))
 	{
 		++*cp;
+		r = true;
 	}
+	return r;
 }
 
 static void parseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
