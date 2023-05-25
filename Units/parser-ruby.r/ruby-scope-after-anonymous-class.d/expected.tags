@@ -1,3 +1,7 @@
 C	input.rb	/^class C$/;"	c
+D	input.rb	/^class D$/;"	c
+__anon2ddc3f230100	input.rb	/^  Class.new(C) do$/;"	c	class:D
 bar	input.rb	/^  def bar(); end$/;"	f	class:C
+f0	input.rb	/^    def f0()$/;"	S	class:D.__anon2ddc3f230100
+f1	input.rb	/^  def f1()$/;"	f	class:D
 foo	input.rb	/^    def foo() end$/;"	S	class:C

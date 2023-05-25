@@ -167,7 +167,7 @@ static bool isWhitespace (int c)
  * Advance 's' while the passed predicate is true. Returns true if
  * advanced by at least one position.
  */
-static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
+static bool advanceWhileFull (const unsigned char** s, bool (*predicate) (int), vString *repr)
 {
 	const unsigned char* original_pos = *s;
 
@@ -178,10 +178,17 @@ static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
 			return *s != original_pos;
 		}
 
+		if (repr)
+			vStringPut (repr, **s);
 		(*s)++;
 	}
 
 	return *s != original_pos;
+}
+
+static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
+{
+	return advanceWhileFull (s, predicate, NULL);
 }
 
 #define canMatchKeyword rubyCanMatchKeyword
@@ -199,10 +206,14 @@ extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal)
  * Extends canMatch. Works similarly, but allows assignment to precede
  * the keyword, as block assignment is a common Ruby idiom.
  */
-#define canMatchKeywordWithAssign rubyCanMatchKeywordWithAssign
-extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* literal)
+#define vStringTruncateMaybe(VS,LEN) if (VS) vStringTruncate ((VS), (LEN))
+
+extern bool canMatchKeywordWithAssignFull (const unsigned char** s, const char* literal, vString *assignee)
 {
 	const unsigned char* original_pos = *s;
+	size_t original_len;
+	if (assignee)
+		original_len = vStringLength  (assignee);
 
 	if (canMatchKeyword (s, literal))
 	{
@@ -211,9 +222,10 @@ extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* 
 
 	advanceWhile (s, isSigilChar);
 
-	if (! advanceWhile (s, isIdentChar))
+	if (! advanceWhileFull (s, isIdentChar, assignee))
 	{
 		*s = original_pos;
+		vStringTruncateMaybe (assignee, original_len);
 		return false;
 	}
 
@@ -222,6 +234,7 @@ extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* 
 	if (! (advanceWhile (s, isOperatorChar) && *(*s - 1) == '='))
 	{
 		*s = original_pos;
+		vStringTruncateMaybe (assignee, original_len);
 		return false;
 	}
 
@@ -233,7 +246,14 @@ extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* 
 	}
 
 	*s = original_pos;
+	vStringTruncateMaybe (assignee, original_len);
 	return false;
+}
+
+#define canMatchKeywordWithAssign rubyCanMatchKeywordWithAssign
+extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* literal)
+{
+	return canMatchKeywordWithAssignFull (s, literal, NULL);
 }
 
 /*
@@ -964,6 +984,7 @@ static void findRubyTags (void)
 	const unsigned char *line;
 	bool inMultiLineComment = false;
 	vString *constant = vStringNew ();
+	vString *leftSide = vStringNew ();
 	bool found_rdoc = false;
 
 	nesting = nestingLevelsNewFull (sizeof (struct blockData), deleteBlockData);
@@ -1046,14 +1067,15 @@ static void findRubyTags (void)
 			readAndEmitTag (&cp, K_MODULE);
 		}
 		else if (canMatchKeywordWithAssign (&cp, "class")
-				 || (canMatchKeywordWithAssign (&cp, "Class.new")))
+				 || (canMatchKeywordWithAssignFull (&cp, "Class.new", leftSide)))
 
 		{
 
 			int r;
 			if (*(cp - 1) != 's') /* clas* != s */
 			{
-				r = emitRubyTagFull(NULL, K_CLASS, true, false);
+				r = emitRubyTagFull(vStringLength (leftSide) > 0? leftSide: NULL, K_CLASS, true, false);
+				vStringClear (leftSide);
 				expect_separator = true;
 			}
 			else
@@ -1233,8 +1255,7 @@ static void findRubyTags (void)
 		{
 			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
 			tagEntryInfo *e_scope  = getEntryOfNestingLevel (nl);
-			if (e_scope && e_scope->kindIndex == K_CLASS
-				&& isTagExtraBitMarked (e_scope, XTAG_ANONYMOUS))
+			if (e_scope && e_scope->kindIndex == K_CLASS)
 				/* Class.new() ... was found but "do" or `{' is not
 				 * found at the end; no block is made. Let's
 				 * pop the nesting level push when Class.new()
@@ -1243,6 +1264,7 @@ static void findRubyTags (void)
 		}
 	}
 	nestingLevelsFree (nesting);
+	vStringDelete (leftSide);
 	vStringDelete (constant);
 }
 

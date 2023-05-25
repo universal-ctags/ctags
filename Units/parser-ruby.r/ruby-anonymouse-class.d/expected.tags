@@ -1,4 +1,4 @@
 __anonfe5966820100	input.rb	/^Class.new do$/;"	c
 foo	input.rb	/^  def foo() end$/;"	S	class:__anonfe5966820100
-__anonfe5966820200	input.rb	/^D = Class.new$/;"	c
+D	input.rb	/^D = Class.new$/;"	c
 bar	input.rb	/^def bar()$/;"	f
