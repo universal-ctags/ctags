@@ -293,7 +293,7 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 		return CORK_NIL;
 	}
 
-	scope = nestingLevelsToScopeNew (nesting);
+	scope = nestingLevelsToScopeNew (nesting, SCOPE_SEPARATOR);
 	lvl = nestingLevelsGetCurrent (nesting);
 	parent = getEntryOfNestingLevel (lvl);
 	if (parent)
@@ -1064,7 +1064,8 @@ static void findRubyTags (void)
 			if (e)
 			{
 				skipWhitespace (&cp);
-				if (*cp == '<' && *(cp + 1) != '<')
+				if ((*cp == '<' && *(cp + 1) != '<')
+					|| (expect_separator && (*cp == '(')))
 				{
 					cp++;
 					vString *parent = vStringNew ();
@@ -1073,6 +1074,12 @@ static void findRubyTags (void)
 						e->extensionFields.inheritance = vStringDeleteUnwrap (parent);
 					else
 						vStringDelete (parent);
+					if (expect_separator)
+					{
+						skipWhitespace (&cp);
+						if (*cp == ')')
+							cp++;
+					}
 				}
 			}
 		}
