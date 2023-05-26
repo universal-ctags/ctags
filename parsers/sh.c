@@ -194,7 +194,7 @@ static int readDestfileName (const unsigned char *cp, vString *destfile)
 {
 	const unsigned char *origin = cp;
 
-	while (isspace ((int) *cp))
+	while (isspace (*cp))
 		++cp;
 
 	/* >... */
@@ -205,17 +205,17 @@ static int readDestfileName (const unsigned char *cp, vString *destfile)
 	if (*cp == '>')
 		++cp;
 
-	while (isspace ((int) *cp))
+	while (isspace (*cp))
 		++cp;
 
-	if (!isFileChar ((int) *cp))
+	if (!isFileChar (*cp))
 		return 0;
 
 	vStringClear(destfile);
 	do {
 		vStringPut (destfile, *cp);
 		++cp;
-	} while (isFileChar ((int) *cp));
+	} while (isFileChar (*cp));
 
 	if (vStringLength(destfile) > 0)
 		return cp - origin;
@@ -509,7 +509,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 			int sub_n = 0;
 
 			/* jump over whitespace */
-			while (isspace ((int)*cp))
+			while (isspace (*cp))
 				cp++;
 
 			/* jump over strings */
@@ -556,7 +556,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 				}
 				else
 				{
-					while (isIdentChar ((int) *cp))
+					while (isIdentChar (*cp))
 						cp++;
 					end = cp;
 				}
@@ -584,7 +584,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 			check_char = isBashFunctionChar;
 
 			if (cp [0] == '.'
-				    && isspace((int) cp [1]))
+				    && isspace(cp [1]))
 			{
 				found_kind = K_SCRIPT;
 				found_role = R_SCRIPT_LOADED;
@@ -617,7 +617,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 			}
 
 			if (found_kind != K_NOTHING)
-				while (isspace ((int) *cp))
+				while (isspace (*cp))
 					++cp;
 
 			if (found_kind == K_SUBPARSER)
@@ -629,7 +629,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 			else
 			{
 				// Get the name of the function, alias or file to be read by source
-				if (! check_char ((int) *cp))
+				if (! check_char (*cp))
 				{
 					found_kind = K_NOTHING;
 					found_role = ROLE_DEFINITION_INDEX;
@@ -643,21 +643,21 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 					continue;
 				}
 
-				while (check_char ((int) *cp))
+				while (check_char (*cp))
 				{
 					vStringPut (name, *cp);
 					++cp;
 				}
 			}
 
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 
 			if ((found_kind != K_SCRIPT)
 			    && *cp == '(')
 			{
 				++cp;
-				while (isspace ((int) *cp))
+				while (isspace (*cp))
 					++cp;
 				if (*cp == ')')
 				{

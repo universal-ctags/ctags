@@ -99,8 +99,11 @@ static void findBetaTags (void)
 		last = vStringLength (line) - 1;
 		first = 0;
 		/* skip white space at start and end of line */
-		while (last > 0 && isspace ((int) vStringChar (line, last))) last--;
-		while (first < last && isspace ((int) vStringChar (line, first))) first++;
+		while (last > 0 && isspace ((unsigned char) vStringChar (line, last)))
+			last--;
+		while (first < last &&
+		       isspace ((unsigned char) vStringChar (line, first)))
+			first++;
 		/* if line still has a reasonable length and ... */
 		if (last - first > 4 &&
 			(vStringChar (line, first)     == '-' &&
@@ -118,9 +121,11 @@ static void findBetaTags (void)
 				last -= 2;
 				first += 2;
 				while (last && vStringChar (line, last) != ':') last--;
-				while (last && (isspace ((int) vStringChar (line, last-1)))) last--;
+				while (last &&
+				       (isspace ((unsigned char) vStringChar (line, last-1))))
+					last--;
 				while (first < last &&
-					   (isspace ((int) vStringChar (line, first)) ||
+					   (isspace ((unsigned char) vStringChar (line, first)) ||
 						vStringChar (line, first) == '-'))
 					first++;
 				/* If there's anything left it is a fragment title */
@@ -178,21 +183,23 @@ static void findBetaTags (void)
 					char c2;
 					pos += 2; /* skip past << */
 					/* skip past space before SLOT */
-					while (pos < len && isspace ((int) vStringChar (line, pos)))
+					while (pos < len &&
+					       isspace ((unsigned char) vStringChar (line, pos)))
 						pos++;
 					/* skip past SLOT */
 					if (pos+4 <= len &&
 						!strncasecmp (vStringValue(line) + pos, "SLOT", (size_t)4))
 						pos += 4;
 					/* skip past space after SLOT */
-					while (pos < len && isspace ((int) vStringChar (line, pos)))
+					while (pos < len &&
+					       isspace ((unsigned char) vStringChar (line, pos)))
 						pos++;
 					eoname = pos;
 					/* skip to end of name */
 					while (eoname < len &&
 							(c2 = vStringChar (line, eoname)) != '>' &&
 							c2 != ':' &&
-							!isspace ((int) c2))
+							!isspace ((unsigned char) c2))
 						eoname++;
 					if (eoname < len)
 					{
@@ -229,7 +236,8 @@ static void findBetaTags (void)
 					/* Found pattern name, get start and end */
 					int eoname = pos;
 					int soname;
-					while (eoname && isspace ((int) vStringChar (line, eoname-1)))
+					while (eoname &&
+					       isspace ((unsigned char) vStringChar (line, eoname-1)))
 						eoname--;
 				foundanothername:
 					/* terminate right after name */
@@ -245,7 +253,7 @@ static void findBetaTags (void)
 						makeBetaTag (vStringValue (line) + soname, K_PATTERN);
 						/* scan back past white space */
 						while (soname &&
-								isspace ((int) vStringChar (line, soname-1)))
+						       isspace ((unsigned char) vStringChar (line, soname-1)))
 							soname--;
 						if (soname && vStringChar (line, soname-1) == ',')
 						{

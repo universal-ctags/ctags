@@ -67,16 +67,16 @@ static void makePascalTag (const tagEntryInfo* const tag)
 
 static const unsigned char* dbp;
 
-#define starttoken(c) (isalpha ((int) c) || (int) c == '_')
-#define intoken(c)    (isalnum ((int) c) || (int) c == '_' || (int) c == '.')
-#define endtoken(c)   (! intoken (c)  &&  ! isdigit ((int) c))
+#define starttoken(c) (isalpha ((unsigned char) c) || (int) c == '_')
+#define intoken(c)    (isalnum ((unsigned char) c) || (int) c == '_' || (int) c == '.')
+#define endtoken(c)   (! intoken (c)  &&  ! isdigit ((unsigned char) c))
 
 static bool tail (const char *cp)
 {
 	bool result = false;
 	register int len = 0;
 
-	while (*cp != '\0' && tolower ((int) *cp) == tolower ((int) dbp [len]))
+	while (*cp != '\0' && tolower ((unsigned char) *cp) == tolower (dbp [len]))
 		cp++, len++;
 	if (*cp == '\0' && !intoken (dbp [len]))
 	{
@@ -121,7 +121,7 @@ static void parseArglist (const char *buf, vString *arglist, vString *vartype)
 		if (NULL != (var = strchr (end, ':')))
 		{
 			var++; /* skip ':' */
-			while (isspace ((int) *var))
+			while (isspace ((unsigned char) *var))
 				++var;
 
 			if (starttoken (*var))
@@ -240,7 +240,7 @@ static void findPascalTags (void)
 			/* check if this is an "extern" declaration */
 			if (*dbp == '\0')
 				continue;
-			if (tolower ((int) *dbp == 'e'))
+			if (tolower (*dbp == 'e'))
 			{
 				if (tail ("extern"))  /* superfluous, really! */
 				{
@@ -248,7 +248,7 @@ static void findPascalTags (void)
 					verify_tag = false;
 				}
 			}
-			else if (tolower ((int) *dbp) == 'f')
+			else if (tolower (*dbp) == 'f')
 			{
 				if (tail ("forward"))  /*  check for forward reference */
 				{
@@ -272,7 +272,7 @@ static void findPascalTags (void)
 				continue;
 
 			/* grab block name */
-			while (isspace ((int) *dbp))
+			while (isspace (*dbp))
 				++dbp;
 			if (!starttoken(*dbp))
 				continue;
@@ -292,7 +292,7 @@ static void findPascalTags (void)
 		}
 		else if (!incomment && !inquote && !found_tag)
 		{
-			switch (tolower ((int) c))
+			switch (tolower (c))
 			{
 				case 'c':
 					if (tail ("onstructor"))

@@ -546,7 +546,7 @@ static void makeClassRefTags (const char *classes)
 
 	do
 	{
-		if (*classes && !isspace (*classes))
+		if (*classes && !isspace ((unsigned char) *classes))
 			vStringPut (klass, *classes);
 		else if (!vStringIsEmpty (klass))
 		{

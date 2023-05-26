@@ -224,7 +224,7 @@ static const char *nextPos (const char *pos)
 	return pos;
 }
 
-static bool isIdentChar (char c)
+static bool isIdentChar (int c)
 {
 	return c && !isspace (c) && c != '(' && c != ',' && c != '=';
 }
@@ -251,7 +251,7 @@ static void extract_dim (char const *pos, BasicKind kind)
 	if (strncasecmp (pos, "shared", 6) == 0)
 		pos += 6; /* skip keyword "shared" */
 
-	while (isspace (*pos))
+	while (isspace ((unsigned char) *pos))
 		pos++;
 
 	/* capture "dim as String str" */
@@ -259,30 +259,31 @@ static void extract_dim (char const *pos, BasicKind kind)
 	{
 			pos += 2; /* skip keyword "as" */
 
-		while (isspace (*pos))
+		while (isspace ((unsigned char) *pos))
 			pos++;
-		while (!isspace (*pos) && *pos) /* skip next part which is a type */
+		while (!isspace ((unsigned char) *pos) && *pos) /* skip next part which is a type */
 			pos++;
-		while (isspace (*pos))
+		while (isspace ((unsigned char) *pos))
 			pos++;
 		/* now we are at the name */
 	}
 	/* capture "dim as foo ptr bar" */
-	if (strncasecmp (pos, "ptr", 3) == 0 && isspace(*(pos+3)))
+	if (strncasecmp (pos, "ptr", 3) == 0 && isspace((unsigned char) *(pos+3)))
 	{
 		pos += 3; /* skip keyword "ptr" */
-		while (isspace (*pos))
+		while (isspace ((unsigned char) *pos))
 			pos++;
 	}
 	/*	capture "dim as string * 4096 chunk" */
 	if (strncmp (pos, "*", 1) == 0)
 	{
 		pos += 1; /* skip "*" */
-		while (isspace (*pos) || isdigit(*pos) || ispunct(*pos))
+		while (isspace ((unsigned char) *pos) || isdigit((unsigned char) *pos) ||
+		       ispunct((unsigned char) *pos))
 			pos++;
 	}
 
-	for (; isIdentChar (*pos); pos++)
+	for (; isIdentChar ((unsigned char) *pos); pos++)
 		vStringPut (name, *pos);
 	makeBasicTag (name, kind);
 
@@ -296,14 +297,14 @@ static void extract_dim (char const *pos, BasicKind kind)
 		if (*pos == '\'')
 			break; /* break if we are in a comment */
 
-		while (isspace (*pos) || *pos == ',')
+		while (isspace ((unsigned char) *pos) || *pos == ',')
 			pos++;
 
 		if (*pos == '\'')
 			break; /* break if we are in a comment */
 
 		vStringClear (name);
-		for (; isIdentChar (*pos); pos++)
+		for (; isIdentChar ((unsigned char) *pos); pos++)
 			vStringPut (name, *pos);
 		makeBasicTag (name, kind);
 	}
@@ -316,7 +317,7 @@ static int extract_name (char const *pos, BasicKind kind, struct matchState *sta
 {
 	int r = CORK_NIL;
 	vString *name = vStringNew ();
-	for (; isIdentChar (*pos); pos++)
+	for (; isIdentChar ((unsigned char) *pos); pos++)
 		vStringPut (name, *pos);
 	if (state && state->declaration)
 	{
@@ -358,7 +359,7 @@ static bool match_keyword (const char **cp, vString *buf,
 		return false;
 
 	const char *old_p = p;
-	while (isspace (*p))
+	while (isspace ((unsigned char) *p))
 		p++;
 
 	if (kw == KEYWORD_ACCESS)
@@ -403,7 +404,7 @@ static bool match_keyword (const char **cp, vString *buf,
 static void match_colon_label (char const *p)
 {
 	char const *end = p + strlen (p) - 1;
-	while (isspace (*end))
+	while (isspace ((unsigned char) *end))
 		end--;
 	if (*end == ':')
 	{
@@ -430,7 +431,7 @@ static void findBasicTags (void)
 	{
 		const char *p = line;
 
-		while (isspace (*p))
+		while (isspace ((unsigned char) *p))
 			p++;
 
 		/* Empty line? */
@@ -439,7 +440,7 @@ static void findBasicTags (void)
 
 		/* REM comment? */
 		if (strncasecmp (p, "REM", 3) == 0  &&
-			(isspace (*(p + 3)) || *(p + 3) == '\0'))
+			(isspace ((unsigned char) *(p + 3)) || *(p + 3) == '\0'))
 			continue;
 
 		/* Single-quote comment? */

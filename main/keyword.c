@@ -74,17 +74,17 @@ static hashEntry *getHashTableEntry (unsigned long hashedValue)
 static unsigned int hashValue (const char *const string, langType language,
 	unsigned int maxLen, bool *maxLenReached)
 {
-	const signed char *p;
+	const char *p;
 	unsigned int h = 5381;
 
 	Assert (string != NULL);
 
 	/* "djb" hash as used in g_str_hash() in glib */
-	for (p = (const signed char *)string; *p != '\0'; p++)
+	for (p = string; *p != '\0'; p++)
 	{
-		h = (h << 5) + h + tolower (*p);
+		h = (h << 5) + h + (signed char) tolower ((unsigned char) *p);
 
-		if (p > (const signed char *)string + maxLen)
+		if (p > string + maxLen)
 		{
 			*maxLenReached = true;
 			return 0;

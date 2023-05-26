@@ -130,7 +130,7 @@ static const unsigned char *skipPrefix (const unsigned char *name, int *scope)
 					break;
 			}
 			++counter;
-		} while (isalnum ((int) name[counter]) ||
+		} while (isalnum (name[counter]) ||
 				name[counter] == '_'           ||
 				name[counter] == '.'           ||
 				name[counter] == '#'
@@ -203,7 +203,7 @@ static const unsigned char *readVimLine (void)
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
-		while (isspace ((int) *line))
+		while (isspace (*line))
 			++line;
 
 		if ((int) *line == '"')
@@ -245,7 +245,7 @@ static vString *parseSignature (const unsigned char *cp,
 
 	while (*cp != '\0')
 	{
-		if (isspace ((int) *cp)
+		if (isspace (*cp)
 			&& vStringLast (buf) == ',')
 		{
 			++cp;
@@ -278,15 +278,15 @@ static void parseFunction (const unsigned char *line)
 
 	if (*cp == '!')
 		++cp;
-	if (isspace ((int) *cp))
+	if (isspace (*cp))
 	{
-		while (*cp && isspace ((int) *cp))
+		while (*cp && isspace (*cp))
 			++cp;
 
 		if (*cp)
 		{
 			cp = skipPrefix (cp, &scope);
-			if (isupper ((int) *cp)  ||
+			if (isupper (*cp)  ||
 					scope == 's'  ||  /* script scope */
 					scope == '<'  ||  /* script scope */
 					scope == 'g'  ||  /* global scope */
@@ -301,14 +301,14 @@ static void parseFunction (const unsigned char *line)
 				{
 					vStringPut (name, *cp);
 					++cp;
-				} while (isalnum ((int) *cp) || *cp == '_' || *cp == '.' || *cp == '#');
+				} while (isalnum (*cp) || *cp == '_' || *cp == '.' || *cp == '#');
 				index = makeSimpleTag (name, K_FUNCTION);
 				vStringClear (name);
 
 				e = getEntryInCorkQueue (index);
 				if (e && isFieldEnabled (FIELD_SIGNATURE))
 				{
-					while (*cp && isspace ((int) *cp))
+					while (*cp && isspace (*cp))
 						++cp;
 					if (*cp == '(')
 						signature = parseSignature (cp, e, NULL);
@@ -323,7 +323,7 @@ static void parseFunction (const unsigned char *line)
 		if (signature)
 		{
 			cp = line;
-			while (*cp && isspace ((int) *cp))
+			while (*cp && isspace (*cp))
 				++cp;
 			/* A backslash at the start of a line stands for a line continuation.
 			 * https://vimhelp.org/repeat.txt.html#line-continuation */
@@ -351,9 +351,9 @@ static void parseAutogroup (const unsigned char *line)
 
 	/* Found Autocommand Group (augroup) */
 	const unsigned char *cp = line;
-	if (isspace ((int) *cp))
+	if (isspace (*cp))
 	{
-		while (*cp && isspace ((int) *cp))
+		while (*cp && isspace (*cp))
 			++cp;
 
 		if (*cp)
@@ -406,7 +406,7 @@ static bool parseCommand (const unsigned char *line)
 		if (*cp == '\\')
 			++cp;
 
-		while (*cp && isspace ((int) *cp))
+		while (*cp && isspace (*cp))
 			++cp;
 	}
 	else if (line && wordMatchLen (cp, "command", 3))
@@ -427,7 +427,7 @@ static bool parseCommand (const unsigned char *line)
 			goto cleanUp;
 		}
 
-		while (*cp && isspace ((int) *cp))
+		while (*cp && isspace (*cp))
 			++cp;
 	}
 	else
@@ -447,7 +447,7 @@ static bool parseCommand (const unsigned char *line)
 	 */
 	do
 	{
-		if (isspace ((int) *cp))
+		if (isspace (*cp))
 		{
 			++cp;
 		}
@@ -456,10 +456,10 @@ static bool parseCommand (const unsigned char *line)
 			/*
 			 * Read until the next space which separates options or the name
 			 */
-			while (*cp && !isspace ((int) *cp))
+			while (*cp && !isspace (*cp))
 				++cp;
 		}
-		else if (!isalnum ((int) *cp))
+		else if (!isalnum (*cp))
 		{
 			/*
 			 * Broken syntax: throw away this line
@@ -467,7 +467,7 @@ static bool parseCommand (const unsigned char *line)
 			cmdProcessed = true;
 			goto cleanUp;
 		}
-	} while (*cp &&  !isalnum ((int) *cp));
+	} while (*cp &&  !isalnum (*cp));
 
 	if (!*cp)
 	{
@@ -486,7 +486,7 @@ static bool parseCommand (const unsigned char *line)
 	{
 		vStringPut (name, *cp);
 		++cp;
-	} while (isalnum ((int) *cp) || *cp == '_');
+	} while (isalnum (*cp) || *cp == '_');
 
 	makeSimpleTag (name, K_COMMAND);
 	vStringClear (name);
@@ -504,9 +504,9 @@ static void parseVariableOrConstant (const unsigned char *line, int infunction, 
 	const unsigned char *cp = line;
 	const unsigned char *np = line;
 	/* get the name */
-	if (isspace ((int) *cp))
+	if (isspace (*cp))
 	{
-		while (*cp && isspace ((int) *cp))
+		while (*cp && isspace (*cp))
 			++cp;
 
 		/*
@@ -532,7 +532,7 @@ static void parseVariableOrConstant (const unsigned char *line, int infunction, 
 			goto cleanUp;
 
 		/* deal with spaces, $, @ and & */
-		while (*cp && *cp != '$' && !isalnum ((int) *cp))
+		while (*cp && *cp != '$' && !isalnum (*cp))
 			++cp;
 
 		if (!*cp)
@@ -546,7 +546,7 @@ static void parseVariableOrConstant (const unsigned char *line, int infunction, 
 
 			vStringPut (name, *cp);
 			++cp;
-		} while (isalnum ((int) *cp) || *cp == '_' || *cp == '#' || *cp == ':' || *cp == '$');
+		} while (isalnum (*cp) || *cp == '_' || *cp == '#' || *cp == ':' || *cp == '$');
 		makeSimpleTag (name, kindIndex);
 		vStringClear (name);
 	}
@@ -587,7 +587,7 @@ static bool parseMap (const unsigned char *line)
 
 	do
 	{
-		while (*cp && isspace ((int) *cp))
+		while (*cp && isspace (*cp))
 			++cp;
 
 		if (strncmp ((const char *) cp, "<Leader>", (size_t) 8) == 0)
@@ -724,7 +724,7 @@ static void parseVimBallFile (const unsigned char *line)
 			{
 				vStringPut (fname, *cp);
 				++cp;
-			} while (isalnum ((int) *cp) || *cp == '.' || *cp == '/' || *cp == '\\');
+			} while (isalnum (*cp) || *cp == '.' || *cp == '/' || *cp == '\\');
 			makeSimpleTag (fname, K_FILENAME);
 			vStringClear (fname);
 		}

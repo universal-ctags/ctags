@@ -274,7 +274,7 @@ next_line:
         if (!s)
             return 0;                           /* EOF */
     }
-    while (*s && isspace(*s))                   /* Skip whitespace */
+    while (*s && isspace((unsigned char) *s))   /* Skip whitespace */
         ++s;
     if ('#' == *s)
         goto next_line;

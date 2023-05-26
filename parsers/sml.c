@@ -86,7 +86,7 @@ static void makeSmlTag (smlKind type, vString *name)
 
 static const unsigned char *skipSpace (const unsigned char *cp)
 {
-	while (isspace ((int) *cp))
+	while (isspace (*cp))
 		++cp;
 	return cp;
 }
@@ -108,7 +108,7 @@ static const unsigned char *parseIdentifier (
 {
 	bool stringLit = false;
 	vStringClear (identifier);
-	while (*cp != '\0'  &&  (!isIdentifier ((int) *cp) || stringLit))
+	while (*cp != '\0'  &&  (!isIdentifier (*cp) || stringLit))
 	{
 		int oneback = *cp;
 		cp++;
@@ -128,7 +128,7 @@ static const unsigned char *parseIdentifier (
 	if (strcmp ((const char *) cp, "") == 0 || cp == NULL)
 		return cp;
 
-	while (isIdentifier ((int) *cp))
+	while (isIdentifier (*cp))
 	{
 		vStringPut (identifier, *cp);
 		cp++;

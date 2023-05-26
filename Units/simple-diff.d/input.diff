@@ -106,7 +106,7 @@ index 0000000..a1bf5f3
 +		if (strncmp ((const char*) cp, DiffDelims[delim], 4u) == 0)
 +		{
 +			cp += 4;
-+			if (isspace ((int) *cp)) continue;
++			if (isspace (*cp)) continue;
 +			/* when original filename is /dev/null use the new one instead */
 +			if (delim == DIFF_DELIM_MINUS &&
 +				strncmp ((const char*) cp, "/dev/null", 9u) == 0 &&

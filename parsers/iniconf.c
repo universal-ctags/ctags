@@ -124,7 +124,7 @@ static void findIniconfTags (void)
 		const unsigned char* cp = line;
 		bool possible = true;
 
-		if (isspace ((int) *cp) || *cp == '#' || *cp == ';' || *cp == '\0'
+		if (isspace (*cp) || *cp == '#' || *cp == ';' || *cp == '\0'
 		    || (*cp == '/' && *(cp+1) == '/'))
 			continue;
 
@@ -160,23 +160,23 @@ static void findIniconfTags (void)
 		while (*cp != '\0')
 		{
 			/*  We look for any sequence of identifier characters following a white space */
-			if (possible && isIdentifier ((int) *cp))
+			if (possible && isIdentifier (*cp))
 			{
-				while (isIdentifier ((int) *cp))
+				while (isIdentifier (*cp))
 				{
 					vStringPut (name, *cp);
 					++cp;
 				}
 				vStringStripTrailing (name);
-				while (isspace ((int) *cp))
+				while (isspace (*cp))
 					++cp;
 				if (*cp == '=' || *cp == ':')
 				{
 
 					cp++;
-					while (isspace ((int) *cp))
+					while (isspace (*cp))
 						++cp;
-					while (isValue ((int) *cp))
+					while (isValue (*cp))
 					{
 						vStringPut (val, *cp);
 						++cp;
@@ -211,7 +211,7 @@ static void findIniconfTags (void)
 				vStringClear (name);
 			}
 			else
-				possible = !!(isspace ((int) *cp));
+				possible = !!(isspace (*cp));
 
 			if (*cp != '\0')
 				++cp;

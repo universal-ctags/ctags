@@ -132,7 +132,7 @@ static void setEndLine (const NestingLevels *const nls)
 
 static void skipSpaces (const unsigned char **p)
 {
-	while (isspace ((int) **p))
+	while (isspace (**p))
 		++(*p);
 }
 
@@ -143,7 +143,7 @@ static int parseFunc (const unsigned char *p, NestingLevels *nls)
 	vString *name = vStringNew ();
 
 	skipSpaces (&p);
-	while (isIdentChar ((int) *p))
+	while (isIdentChar (*p))
 	{
 		vStringPut (name, *p);
 		++p;
@@ -282,7 +282,7 @@ static void findAutoItTags (void)
 				if (*p == '$')
 				{
 					p++;
-					while (isIdentChar ((int) *p))
+					while (isIdentChar (*p))
 					{
 						vStringPut (name, *p);
 						++p;

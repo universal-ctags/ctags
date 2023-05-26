@@ -3010,7 +3010,7 @@ static void parseCCFLAGS (tokenInfo *const token)
 	/* http://web.deu.edu.tr/doc/oracle/B19306_01/server.102/b14237/initparams158.htm#REFRN10261 */
 	while (*s)
 	{
-		if (in_var && isIdentChar1((int)*s))
+		if (in_var && isIdentChar1((unsigned char) *s))
 			vStringPut(ccflag, *s);
 		else if (*s == ':' && !vStringIsEmpty(ccflag))
 		{

@@ -175,7 +175,7 @@ extern void vStringStripLeading (vString *const string)
 {
 	size_t n = 0;
 
-	while (n < string->length && isspace ((int) string->buffer [n]))
+	while (n < string->length && isspace ((unsigned char) string->buffer [n]))
 		n++;
 	if (n > 0)
 	{
@@ -189,7 +189,7 @@ extern void vStringStripLeading (vString *const string)
 extern void vStringStripTrailing (vString *const string)
 {
 	while (string->length > 0 &&
-		   isspace ((int) string->buffer [string->length - 1]))
+	       isspace ((unsigned char) string->buffer [string->length - 1]))
 	{
 		string->length--;
 		string->buffer [string->length] = '\0';
@@ -244,7 +244,7 @@ extern void vStringCopyToLower (vString *const dest, const vString *const src)
 		vStringResize (dest, src->size);
 	d = dest->buffer;
 	for (i = 0  ;  i < length  ;  ++i)
-		d [i] = (char) tolower (s [i]);
+		d [i] = (char) tolower ((unsigned char) s [i]);
 	d [i] = '\0';
 }
 

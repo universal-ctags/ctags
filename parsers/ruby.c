@@ -564,7 +564,7 @@ static void parseSignature (const unsigned char** cp, vString* vstr)
 				vStringPut (vstr, b);
 				continue;
 			}
-			else if (isspace (vStringLast (vstr)))
+			else if (isspace ((unsigned char) vStringLast (vstr)))
 			{
 				if (! (isspace (**cp)))
 				{

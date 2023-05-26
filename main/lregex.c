@@ -824,7 +824,7 @@ static void pre_ptrn_flag_guest_long (const char* const s, const char* const v, 
 	{
 		const char *n_tmp = v + 1;
 		const char *n = n_tmp;
-		for (; isdigit (*n_tmp); n_tmp++);
+		for (; isdigit ((unsigned char) *n_tmp); n_tmp++);
 		char c = *n_tmp;
 		*(char *)n_tmp = '\0';
 		if (!strToInt (n, 10, &(guest->lang.spec.patternGroup)))
@@ -886,7 +886,7 @@ static void pre_ptrn_flag_guest_long (const char* const s, const char* const v, 
 		{
 			char *n = tmp;
 
-			for (; isdigit (*tmp); tmp++);
+			for (; isdigit ((unsigned char) *tmp); tmp++);
 			char c = *tmp;
 			*tmp = '\0';
 			if (!strToInt (n, 10, &(current->patternGroup)))
@@ -1599,7 +1599,7 @@ static vString* substitute (
 	const char* p;
 	for (p = out  ;  *p != '\0'  ;  p++)
 	{
-		if (*p == '\\'  &&  isdigit ((int) *++p))
+		if (*p == '\\'  &&  isdigit ((unsigned char) *++p))
 		{
 			const int dig = *p - '0';
 			if (0 < dig  &&  dig < nmatch  &&  pmatch [dig].rm_so != -1)
@@ -2294,7 +2294,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 	{
 		if (p == kindName)
 		{
-			if (!isalpha(*p))
+			if (!isalpha((unsigned char) *p))
 				error (FATAL,
 					   "A kind name doesn't start with an alphabetical character: "
 					   "'%s' in \"--%s-%s\" option",
@@ -2310,7 +2310,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 			 * in which Exuberant-ctags users define kind names with whitespaces.
 			 * "FATAL" error breaks the compatibility.
 			 */
-			if (!isalnum(*p))
+			if (!isalnum((unsigned char) *p))
 				error (/* regptype == REG_PARSER_SINGLE_LINE? WARNING: */ FATAL,
 					   "Non-alphanumeric char is used in kind name: "
 					   "'%s' in \"--%s-%s\" option",
@@ -2433,7 +2433,7 @@ static void addTagRegexOption (struct lregexControlBlock *lcb,
 		const char *c;
 		for (c = pattern; *c; c++)
 		{
-			if (! (isalnum(*c) || *c == '_'))
+			if (! (isalnum((unsigned char) *c) || *c == '_'))
 			{
 				if (*c &&  (*(c + 1) != '^'))
 				{
@@ -2652,7 +2652,7 @@ extern void addRegexTable (struct lregexControlBlock *lcb, const char *name)
 {
 	const char *c;
 	for (c = name; *c; c++)
-		if (! (isalnum(*c) || *c == '_'))
+		if (! (isalnum((unsigned char) *c) || *c == '_'))
 			error (FATAL, "`%c' in \"%s\" is not acceptable as part of table name", *c, name);
 
 	if (getTableIndexForName(lcb, name) >= 0)

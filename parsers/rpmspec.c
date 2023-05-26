@@ -134,7 +134,7 @@ static void scan_configure_options (const char *line)
 			tmp += strlen(prefix->prefix);
 			while (*tmp)
 			{
-				if (isspace (*tmp) || iscntrl (*tmp)
+				if (isspace ((unsigned char) *tmp) || iscntrl ((unsigned char) *tmp)
 					|| *tmp == '=' || *tmp == '\\')
 					break;
 				vStringPut(name, *tmp);
@@ -258,7 +258,7 @@ static bool found_undef_cb (const char *line,
 
 static bool alldigits (const char * str)
 {
-	while (isdigit ((int)*str))
+	while (isdigit ((unsigned char) *str))
 		str++;
 
 	if (*str == '\0')

@@ -529,7 +529,7 @@ static unsigned long readLineNumber (char **str)
 
 	skipWhite (str);
 	s = *str;
-	while (*s != '\0' && isdigit (*s))
+	while (*s != '\0' && isdigit ((unsigned char) *s))
 	{
 		lNum = (lNum * 10) + (*s - '0');
 		s++;
@@ -578,7 +578,7 @@ static bool parseLineDirective (char *s)
 	skipWhite (&s);
 	DebugStatement ( const char* lineStr = ""; )
 
-	if (isdigit (*s))
+	if (isdigit ((unsigned char) *s))
 		result = true;
 	else if (strncmp (s, "line", 4) == 0)
 	{

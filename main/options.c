@@ -2604,7 +2604,7 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 		addIgnoreListFromFile (lang, fileName);
 	}
 #if defined (WIN32)
-	else if (isalpha (list [0])  &&  list [1] == ':')
+	else if (isalpha ((unsigned char) list [0])  &&  list [1] == ':')
 		addIgnoreListFromFile (lang, list);
 #endif
 	else if (strcmp (list, "-") == 0)

@@ -2194,7 +2194,7 @@ static cppMacroInfo * saveMacro(hashTable *table, const char * macro)
 		return NULL;
 	}
 
-	if(!(isalpha(*c) || (*c == '_' || (*c == '$') )))
+	if(!(isalpha((unsigned char) *c) || (*c == '_' || (*c == '$') )))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Macro does not start with an alphanumeric character");
 		return NULL; // must be a sequence of letters and digits
@@ -2202,7 +2202,7 @@ static cppMacroInfo * saveMacro(hashTable *table, const char * macro)
 
 	const char * identifierBegin = c;
 
-	while(*c && (isalnum(*c) || (*c == '_') || (*c == '$') ))
+	while(*c && (isalnum((unsigned char) *c) || (*c == '_') || (*c == '$') ))
 		c++;
 
 	const char * identifierEnd = c;
@@ -2335,14 +2335,14 @@ static cppMacroInfo * saveMacro(hashTable *table, const char * macro)
 
 		while(*c)
 		{
-			if(isalpha(*c) || (*c == '_'))
+			if(isalpha((unsigned char) *c) || (*c == '_'))
 			{
 				if(c > begin)
 					ADD_CONSTANT_REPLACEMENT(begin,c - begin);
 
 				const char * tokenBegin = c;
 
-				while(*c && (isalnum(*c) || (*c == '_')))
+				while(*c && (isalnum((unsigned char) *c) || (*c == '_')))
 					c++;
 
 				// check if it is a parameter

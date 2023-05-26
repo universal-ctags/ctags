@@ -725,25 +725,27 @@ static bool readUnicodeEscapeSequenceValue (uint32_t *const value,
 			 * We skip the leading 0s because there can be any number of them
 			 * and they don't change any meaning. */
 			bool has_leading_zero = false;
+			int l;
 
-			while ((cp[cp_len] = (char) getcFromInputFile ()) == '0')
+			while ((cp[cp_len] = (char) (l = getcFromInputFile ())) == '0')
 				has_leading_zero = true;
 
-			while (isxdigit (cp[cp_len]) && ++cp_len < ARRAY_SIZE (cp))
-				cp[cp_len] = (char) getcFromInputFile ();
+			while (isxdigit (l) && ++cp_len < ARRAY_SIZE (cp))
+				cp[cp_len] = (char) (l = getcFromInputFile ());
 			valid = ((cp_len > 0 || has_leading_zero) &&
 					 cp_len < ARRAY_SIZE (cp) && cp[cp_len] == '}' &&
 					 /* also check if it's a valid Unicode code point */
 					 (cp_len < 6 ||
 					  (cp_len == 6 && strncmp (cp, "110000", 6) < 0)));
 			if (! valid) /* put back the last (likely invalid) character */
-				ungetcToInputFile (cp[cp_len]);
+				ungetcToInputFile (l);
 		}
 		else
 		{	/* Handles Unicode escape sequences: \u Hex4Digits */
+			int l;
 			do
-				cp[cp_len] = (char) ((cp_len == 0) ? e : getcFromInputFile ());
-			while (isxdigit (cp[cp_len]) && ++cp_len < 4);
+				cp[cp_len] = (char) (l = ((cp_len == 0) ? e : getcFromInputFile ()));
+			while (isxdigit (l) && ++cp_len < 4);
 			valid = (cp_len == 4);
 		}
 

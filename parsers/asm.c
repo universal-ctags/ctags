@@ -205,7 +205,7 @@ static bool isDefineOperator (const vString *const operator)
 		(unsigned char*) vStringValue (operator);
 	const size_t length = vStringLength (operator);
 	const bool result = (bool) (length > 0  &&
-		toupper ((int) *op) == 'D'  &&
+		toupper (*op) == 'D'  &&
 		(length == 2 ||
 		 (length == 4  &&  (int) op [2] == '.') ||
 		 (length == 5  &&  (int) op [3] == '.')));
@@ -291,9 +291,9 @@ static const unsigned char *readSymbol (
 {
 	const unsigned char *cp = start;
 	vStringClear (sym);
-	if (isInitialSymbolCharacter ((int) *cp))
+	if (isInitialSymbolCharacter (*cp))
 	{
-		while (isSymbolCharacter ((int) *cp))
+		while (isSymbolCharacter (*cp))
 		{
 			vStringPut (sym, *cp);
 			++cp;
@@ -308,7 +308,7 @@ static const unsigned char *readOperator (
 {
 	const unsigned char *cp = start;
 	vStringClear (operator);
-	while (*cp != '\0'  &&  ! isspace ((int) *cp) && *cp != ',')
+	while (*cp != '\0'  &&  ! isspace (*cp) && *cp != ',')
 	{
 		vStringPut (operator, *cp);
 		++cp;
@@ -574,7 +574,7 @@ static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned cha
 		const unsigned char *tmp;
 		tagEntryInfo *e = NULL;
 
-		while (isspace ((int) *cp))
+		while (isspace (*cp))
 			++cp;
 
 		tmp = cp;
@@ -632,7 +632,7 @@ static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned cha
 			}
 		}
 
-		while (isspace ((int) *cp))
+		while (isspace (*cp))
 			++cp;
 
 		if (*cp == ',')
@@ -664,7 +664,7 @@ static void findAsmTagsCommon (bool useCpp)
 	 while ((line = asmReadLineFromInputFile (commentCharsInMOL, useCpp)) != NULL)
 	 {
 		const unsigned char *cp = line;
-		bool labelCandidate = (bool) (! isspace ((int) *cp));
+		bool labelCandidate = (bool) (! isspace (*cp));
 		bool nameFollows = false;
 		bool directive = false;
 		const bool isComment = (bool)
@@ -675,7 +675,7 @@ static void findAsmTagsCommon (bool useCpp)
 			continue;
 
 		/* skip white space */
-		while (isspace ((int) *cp))
+		while (isspace (*cp))
 			++cp;
 
 		/* read symbol */
@@ -700,11 +700,11 @@ static void findAsmTagsCommon (bool useCpp)
 				labelCandidate = false;
 		}
 
-		if (! isspace ((int) *cp)  &&  *cp != '\0')
+		if (! isspace (*cp)  &&  *cp != '\0')
 			continue;
 
 		/* skip white space */
-		while (isspace ((int) *cp))
+		while (isspace (*cp))
 			++cp;
 
 		/* skip leading dot */
@@ -718,7 +718,7 @@ static void findAsmTagsCommon (bool useCpp)
 		/* attempt second read of symbol */
 		if (vStringLength (name) == 0)
 		{
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 			cp = readSymbol (cp, name);
 			nameFollows = true;

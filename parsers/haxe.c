@@ -78,15 +78,15 @@ another:
 		vStringCopyS(laccess,priv);
 
 		if (strncmp ((const char*) cp, "var", (size_t) 3) == 0  &&
-			isspace ((int) cp [3]))
+			isspace (cp [3]))
 		{
 			cp += 3;
 
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 
 			vStringClear (name);
-			while (isalnum ((int) *cp)  ||  *cp == '_')
+			while (isalnum (*cp)  ||  *cp == '_')
 			{
 				vStringPut (name, *cp);
 				++cp;
@@ -96,15 +96,15 @@ another:
 			vStringClear (name);
 		}
 		else if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
-			isspace ((int) cp [8]))
+			isspace (cp [8]))
 		{
 			cp += 8;
 
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 
 			vStringClear (name);
-			while (isalnum ((int) *cp)  ||  *cp == '_')
+			while (isalnum (*cp)  ||  *cp == '_')
 			{
 				vStringPut (name, *cp);
 				++cp;
@@ -114,14 +114,14 @@ another:
 			vStringClear (name);
 		}
 		else if (strncmp ((const char*) cp, "class", (size_t) 5) == 0 &&
-				 isspace ((int) cp [5]))
+				 isspace (cp [5]))
 		{
 			cp += 5;
 
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 			vStringClear (name);
-			while (isalnum ((int) *cp)  ||  *cp == '_')
+			while (isalnum (*cp)  ||  *cp == '_')
 			{
 				vStringPut (name, *cp);
 				++cp;
@@ -131,14 +131,14 @@ another:
 			vStringClear (name);
 		}
 		else if (strncmp ((const char*) cp, "enum", (size_t) 4) == 0 &&
-				  isspace ((int) cp [4]))
+				  isspace (cp [4]))
 		{
 			cp += 4;
 
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 			vStringClear (name);
-			while (isalnum ((int) *cp)  ||  *cp == '_')
+			while (isalnum (*cp)  ||  *cp == '_')
 			{
 				vStringPut (name, *cp);
 				++cp;
@@ -146,41 +146,41 @@ another:
 			makeSimpleTag (name, HXTAG_ENUM);
 			vStringClear (name);
 		} else if (strncmp ((const char*) cp, "public", (size_t) 6) == 0 &&
-				 isspace((int) cp [6]))
+				 isspace(cp [6]))
 		{
 			cp += 6;
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 			vStringCopyS(laccess,pub);
 			goto another;
 		} else if (strncmp ((const char*) cp, "static", (size_t) 6) == 0 &&
-				 isspace((int) cp [6]))
+				 isspace(cp [6]))
 		{
 			cp += 6;
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 			goto another;
 		} else if (strncmp ((const char*) cp, "interface", (size_t) 9) == 0 &&
-			isspace((int) cp [9]))
+			isspace(cp [9]))
 		{
 			cp += 9;
 
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 			vStringClear (name);
-			while (isalnum ((int) *cp)  ||  *cp == '_') {
+			while (isalnum (*cp)  ||  *cp == '_') {
 				vStringPut (name, *cp);
 				++cp;
 			}
 			makeSimpleTag (name, HXTAG_INTERFACE);
 			vStringClear (name);
-		} else if (strncmp ((const char *) cp,"typedef",(size_t) 7) == 0 && isspace(((int) cp[7]))) {
+		} else if (strncmp ((const char *) cp,"typedef",(size_t) 7) == 0 && isspace((cp[7]))) {
 			cp += 7;
 
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 			vStringClear (name);
-			while (isalnum ((int) *cp)  ||  *cp == '_') {
+			while (isalnum (*cp)  ||  *cp == '_') {
 				vStringPut (name, *cp);
 				++cp;
 			}

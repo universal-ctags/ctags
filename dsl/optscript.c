@@ -1160,7 +1160,7 @@ name_or_number_new (const char* s, void *data)
 	const char *t = s;
 	while (*t)
 	{
-		if (!isdigit ((int)*t))
+		if (!isdigit ((unsigned char) *t))
 		{
 			number = false;
 			break;

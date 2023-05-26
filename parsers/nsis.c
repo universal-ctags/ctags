@@ -76,7 +76,7 @@ static fieldDefinition NsisFields[] = {
 
 static const unsigned char* skipWhitespace (const unsigned char* cp)
 {
-	while (isspace ((int) *cp))
+	while (isspace (*cp))
 		++cp;
 	return cp;
 }
@@ -86,9 +86,9 @@ static const unsigned char* skipFlags (const unsigned char* cp)
 	while (*cp == '/')
 	{
 		++cp;
-		while (! isspace ((int) *cp))
+		while (! isspace (*cp))
 			++cp;
-		while (isspace ((int) *cp))
+		while (isspace (*cp))
 			++cp;
 	}
 	return cp;
@@ -104,8 +104,8 @@ static int makeSimpleTagWithScope(vString *name, int kindIndex, int parentCorkIn
 
 #define lineStartingWith(CP,EXPECTED,EOL)								\
 	(strncasecmp ((const char*) CP, EXPECTED, strlen(EXPECTED)) == 0	\
-		&& (EOL ? (isspace ((int) CP [strlen(EXPECTED)]) || CP [strlen(EXPECTED)] == '\0') \
-			: isspace ((int) CP [strlen(EXPECTED)])))
+		&& (EOL ? (isspace ((unsigned char) CP [strlen(EXPECTED)]) || CP [strlen(EXPECTED)] == '\0') \
+			: isspace ((unsigned char) CP [strlen(EXPECTED)])))
 
 #define fillName(NAME,CP,CONDITION)				\
 	while (CONDITION)							\
@@ -182,7 +182,7 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 	}
 	else
 	{
-		while (isalnum ((int) *cp)
+		while (isalnum (*cp)
 			   || *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!'
 			   || *cp == '$' || *cp == '{' || *cp == '}' || *cp == '(' || *cp == ')')
 		{
@@ -201,7 +201,7 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 		vStringClear (name);
 		cp = skipWhitespace (cp);
 
-		fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+		fillName (name, cp, (isalnum (*cp) || *cp == '_'));
 
 		if (vStringLength (name) > 0)
 		{
@@ -221,7 +221,7 @@ static const unsigned char* parseLangString (const unsigned char* cp, vString *n
 	 * e.g.
 	 * https://github.com/vim/vim/blob/3dabd718f4b2d8e09de9e2ec73832620b91c2f79/nsis/lang/english.nsi
 	 */
-	fillName (name, cp, (isalnum ((int) *cp) || *cp == '_' || *cp == '^'));
+	fillName (name, cp, (isalnum (*cp) || *cp == '_' || *cp == '^'));
 
 	if (vStringLength (name) > 0)
 	{
@@ -231,7 +231,7 @@ static const unsigned char* parseLangString (const unsigned char* cp, vString *n
 		vStringClear (name);
 
 		cp = skipWhitespace (cp);
-		fillName (name, cp, ((*cp != '\0') && (!isspace ((int) *cp))));
+		fillName (name, cp, ((*cp != '\0') && (!isspace (*cp))));
 		if (vStringLength (name) > 0)
 		{
 			attachParserFieldToCorkEntry (r, NsisFields[F_LANGID].ftype,
@@ -266,7 +266,7 @@ static void findNsisTags (void)
 			cp = skipWhitespace (cp);
 
 			fillName (name, cp,
-					  (isalnum ((int) *cp) || *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!'));
+					  (isalnum (*cp) || *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!'));
 
 			makeSimpleTag (name, K_FUNCTION);
 			vStringClear (name);
@@ -278,7 +278,7 @@ static void findNsisTags (void)
 			cp = skipWhitespace (cp);
 			cp = skipFlags (cp);
 
-			fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+			fillName (name, cp, (isalnum (*cp) || *cp == '_'));
 
 			makeSimpleTag (name, K_VARIABLE);
 			vStringClear (name);
@@ -319,7 +319,7 @@ static void findNsisTags (void)
 			cp = skipWhitespace (cp);
 			cp = skipFlags (cp);
 
-			fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+			fillName (name, cp, (isalnum (*cp) || *cp == '_'));
 
 			makeSimpleTag (name, K_DEFINITION);
 			vStringClear (name);
@@ -331,7 +331,7 @@ static void findNsisTags (void)
 			cp = skipWhitespace (cp);
 			cp = skipFlags (cp);
 
-			fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+			fillName (name, cp, (isalnum (*cp) || *cp == '_'));
 
 			int index = makeSimpleTag (name, K_MACRO);
 			if (vStringLength (name) > 0)
@@ -340,7 +340,7 @@ static void findNsisTags (void)
 				{
 					vStringClear (name);
 					cp = skipWhitespace (cp);
-					fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+					fillName (name, cp, (isalnum (*cp) || *cp == '_'));
 					if (vStringLength (name) == 0)
 						break;
 					makeSimpleTagWithScope (name, K_MACRO_PARAM, index);

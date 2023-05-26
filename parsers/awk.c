@@ -41,22 +41,22 @@ static void findAwkTags (void)
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
-		while (isspace ((int) *line))
+		while (isspace (*line))
 			++line;
 
 		if (strncmp ((const char *) line, "function", (size_t) 8) == 0  &&
-			isspace ((int) line [8]))
+			isspace (line [8]))
 		{
 			const unsigned char *cp = line + 8;
 
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
-			while (isalnum ((int) *cp)  ||  *cp == '_')
+			while (isalnum (*cp)  ||  *cp == '_')
 			{
 				vStringPut (name, *cp);
 				++cp;
 			}
-			while (isspace ((int) *cp))
+			while (isspace (*cp))
 				++cp;
 			if (*cp == '(')
 				makeSimpleTag (name, K_FUNCTION);

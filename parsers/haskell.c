@@ -105,7 +105,7 @@ static void add_tag(const char *token, haskellKind kind, vString *name)
 	vStringClear(name);
 }
 
-static int isident(char c)
+static int isident(int c)
 {
 	return isalnum(c) || c == '_' || c == '\'' || c == '$';
 }

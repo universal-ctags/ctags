@@ -149,7 +149,7 @@ static void findDiffTags (void)
 		{
 			scope_index = CORK_NIL;
 			cp += 4;
-			if (isspace ((int) *cp)) continue;
+			if (isspace (*cp)) continue;
 			/* when original filename is /dev/null use the new one instead */
 			if (delim == DIFF_DELIM_MINUS &&
 				strncmp ((const char*) cp, "/dev/null", 9u) == 0 &&
@@ -184,7 +184,7 @@ static void findDiffTags (void)
 			 && (strncmp ((const char*) cp, DiffDelims[1], 4u) == 0))
 		{
 			cp += 4;
-			if (isspace ((int) *cp)) continue;
+			if (isspace (*cp)) continue;
 			/* when modified filename is /dev/null, the original name is deleted. */
 			if (strncmp ((const char*) cp, "/dev/null", 9u) == 0 &&
 			    (cp[9] == 0 || isspace (cp[9])))
