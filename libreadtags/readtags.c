@@ -135,7 +135,7 @@ static int readtags_fseek(FILE *fp, rt_off_t pos, int whence)
 }
 
 /* Converts a hexadecimal digit to its value */
-static int xdigitValue (char digit)
+static int xdigitValue (unsigned char digit)
 {
 	if (digit >= '0' && digit <= '9')
 		return digit - '0';
@@ -151,38 +151,41 @@ static int xdigitValue (char digit)
  * Reads the first character from the string, possibly un-escaping it, and
  * advances *s to the start of the next character.
  */
-static int readTagCharacter (const char **s)
+static int readTagCharacter (const char **const s)
 {
-	int c = **(const unsigned char **)s;
+	const unsigned char *p = (const unsigned char *) *s;
+	int c = *p;
 
-	(*s)++;
+	p++;
 
 	if (c == '\\')
 	{
-		switch (**s)
+		switch (*p)
 		{
-			case 't': c = '\t'; (*s)++; break;
-			case 'r': c = '\r'; (*s)++; break;
-			case 'n': c = '\n'; (*s)++; break;
-			case '\\': c = '\\'; (*s)++; break;
+			case 't': c = '\t'; p++; break;
+			case 'r': c = '\r'; p++; break;
+			case 'n': c = '\n'; p++; break;
+			case '\\': c = '\\'; p++; break;
 			/* Universal-CTags extensions */
-			case 'a': c = '\a'; (*s)++; break;
-			case 'b': c = '\b'; (*s)++; break;
-			case 'v': c = '\v'; (*s)++; break;
-			case 'f': c = '\f'; (*s)++; break;
+			case 'a': c = '\a'; p++; break;
+			case 'b': c = '\b'; p++; break;
+			case 'v': c = '\v'; p++; break;
+			case 'f': c = '\f'; p++; break;
 			case 'x':
-				if (isxdigit ((*s)[1]) && isxdigit ((*s)[2]))
+				if (isxdigit (p[1]) && isxdigit (p[2]))
 				{
-					int val = (xdigitValue ((*s)[1]) << 4) | xdigitValue ((*s)[2]);
+					int val = (xdigitValue (p[1]) << 4) | xdigitValue (p[2]);
 					if (val < 0x80)
 					{
-						(*s) += 3;
+						p += 3;
 						c = val;
 					}
 				}
 				break;
 		}
 	}
+
+	*s = (const char *) p;
 
 	return c;
 }
@@ -610,12 +613,12 @@ static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 				else
 					++p;
 			}
-			else if (isdigit ((int) *(unsigned char*) p))
+			else if (isdigit (*(unsigned char*) p))
 			{
 				/* parse line number */
 				entry->address.pattern = p;
 				entry->address.lineNumber = atol (p);
-				while (isdigit ((int) *(unsigned char*) p))
+				while (isdigit (*(unsigned char*) p))
 					++p;
 				if (p)
 				{
