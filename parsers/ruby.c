@@ -499,7 +499,30 @@ static rubyKind parseIdentifier (
 			/* Recognize singleton methods. */
 			if (last_char == '.')
 			{
-				vStringClear (name);
+				if (strcmp (vStringValue (name), "self.") == 0)
+					vStringClear (name);
+				else
+				{
+					vString *scope = nestingLevelsToScopeNew (nesting, SCOPE_SEPARATOR);
+					const char *scope_cstr = vStringValue(scope);
+					const char *scope_last = strrchr (scope_cstr, SCOPE_SEPARATOR);
+					size_t scope_slen;
+					if (scope_last)
+					{
+						scope_last++;
+						scope_slen = strlen (scope_last);
+					}
+					else
+					{
+						scope_last = scope_cstr;
+						scope_slen = vStringLength (scope);
+					}
+					if (strncmp (vStringValue (name), scope_last, scope_slen) == 0
+						&& *(vStringValue (name) + scope_slen) == '.')
+							vStringClear (name);
+
+					vStringDelete (scope);
+				}
 				return parseIdentifier (cp, name, K_SINGLETON);
 			}
 		}
