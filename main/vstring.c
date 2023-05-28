@@ -176,6 +176,14 @@ extern void vStringStripLeading (vString *const string)
 
 	while (n < string->length && isspace ((unsigned char) string->buffer [n]))
 		n++;
+	vStringTruncateLeading (string, n);
+}
+
+extern void vStringTruncateLeading (vString *const string, const size_t length)
+{
+	size_t n = vStringLength (string);
+	if (n > length)
+		n = length;
 	if (n > 0)
 	{
 		memmove (string->buffer, string->buffer + n, string->length - n);

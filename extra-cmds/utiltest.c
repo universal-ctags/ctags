@@ -271,6 +271,26 @@ static void test_vstring_ncats(void)
 	vStringDelete (vstr);
 }
 
+static void test_vstring_truncate_leading(void)
+{
+	vString *vstr = vStringNewInit ("   abcdefg");
+	TEST_CHECK(vstr != NULL);
+
+	vStringStripLeading (vstr);
+	TEST_CHECK(strcmp(vStringValue(vstr), "abcdefg") == 0);
+
+	vStringTruncateLeading (vstr, 3);
+	TEST_CHECK(strcmp(vStringValue(vstr), "defg") == 0);
+
+	vStringTruncateLeading (vstr, 0);
+	TEST_CHECK(strcmp(vStringValue(vstr), "defg") == 0);
+
+	vStringTruncateLeading (vstr, 100);
+	TEST_CHECK(strcmp(vStringValue(vstr), "") == 0);
+
+	vStringDelete (vstr);
+}
+
 TEST_LIST = {
    { "fname/absolute",   test_fname_absolute   },
    { "fname/absolute+cache", test_fname_absolute_with_cache },
@@ -279,5 +299,6 @@ TEST_LIST = {
    { "htable/grow",      test_htable_grow      },
    { "routines/strrstr", test_routines_strrstr },
    { "vstring/ncats",    test_vstring_ncats    },
+   { "vstring/truncate_leading", test_vstring_truncate_leading },
    { NULL, NULL }     /* zeroed record marking the end of the list */
 };
