@@ -1,0 +1,12 @@
+main	input.v	/^module main$/;"	p	line:1	roles:def
+os	input.v	/^import os$/;"	p	line:2	roles:imported	extras:reference
+a	input.v	/^import a.b.cd$/;"	p	line:3	roles:imported	extras:reference
+b	input.v	/^import a.b.cd$/;"	p	line:3	module:a	roles:imported	extras:reference
+cd	input.v	/^import a.b.cd$/;"	p	line:3	module:a.b	roles:imported	extras:reference
+os	input-1.v	/^import os { abc, def }$/;"	p	line:1	roles:imported	extras:reference
+abc	input-1.v	/^import os { abc, def }$/;"	Y	line:1	module:os	roles:imported	extras:reference
+def	input-1.v	/^import os { abc, def }$/;"	Y	line:1	module:os	roles:imported	extras:reference
+xyz	input-2.v	/^import mymod.sha256 as xyz$/;"	p	line:1	roles:imported	extras:reference
+foo	input-3.v	/^import os as foo { a, b }$/;"	p	line:1	roles:imported	extras:reference
+a	input-3.v	/^import os as foo { a, b }$/;"	Y	line:1	module:foo	roles:imported	extras:reference
+b	input-3.v	/^import os as foo { a, b }$/;"	Y	line:1	module:foo	roles:imported	extras:reference

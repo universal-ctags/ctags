@@ -367,6 +367,7 @@
     <ClCompile Include="..\parsers\ttcn.c" />
     <ClCompile Include="..\parsers\txt2tags.c" />
     <ClCompile Include="..\parsers\typescript.c" />
+    <ClCompile Include="..\parsers\v.c" />
     <ClCompile Include="..\parsers\vera.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />

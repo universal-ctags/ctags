@@ -415,6 +415,7 @@ PARSER_SRCS =				\
 	parsers/ttcn.c			\
 	parsers/txt2tags.c		\
 	parsers/typescript.c		\
+	parsers/v.c			\
 	parsers/vera.c			\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\

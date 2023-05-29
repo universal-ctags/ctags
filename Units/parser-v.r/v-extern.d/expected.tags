@@ -1,0 +1,9 @@
+C	input.v	/^struct C.SYSTEM_INFO {$/;"	p	line:1	language:V	roles:foreignlang	extras:reference
+SYSTEM_INFO	input.v	/^struct C.SYSTEM_INFO {$/;"	s	line:1	language:V	module:C	roles:def	end:2
+SYSTEM_INFO	input.v	/^struct C.SYSTEM_INFO {$/;"	s	line:1	language:C	roles:foreigndecl	extras:reference
+C	input.v	/^fn C.foo(bar string) i64$/;"	p	line:3	language:V	roles:foreignlang	extras:reference
+foo	input.v	/^fn C.foo(bar string) i64$/;"	f	line:3	language:V	module:C	typeref:typename:i64	signature:(bar string)	roles:def
+foo	input.v	/^fn C.foo(bar string) i64$/;"	f	line:3	language:C	roles:foreigndecl	extras:reference
+JS	input.v	/^fn JS.bar(baz string) int$/;"	p	line:4	language:V	roles:foreignlang	extras:reference
+bar	input.v	/^fn JS.bar(baz string) int$/;"	f	line:4	language:V	module:JS	typeref:typename:int	signature:(baz string)	roles:def
+bar	input.v	/^fn JS.bar(baz string) int$/;"	f	line:4	language:JavaScript	roles:foreigndecl	extras:reference

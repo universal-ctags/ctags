@@ -32,6 +32,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "selectors.h"
 #include "xtag.h"
 #include "ptrarray.h"
 
@@ -2116,6 +2117,7 @@ extern parserDefinition* VerilogParser (void)
 {
 	static const char *const extensions [] = { "v", NULL };
 	parserDefinition* def = parserNew ("Verilog");
+	static selectLanguage selectors[] = { selectVOrVerilogByKeywords, NULL };
 	def->versionCurrent = 1;
 	def->versionAge = 1;
 	def->kindTable  = VerilogKinds;
@@ -2125,6 +2127,7 @@ extern parserDefinition* VerilogParser (void)
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeVerilog;
+	def->selectLanguage  = selectors;
 	return def;
 }
 

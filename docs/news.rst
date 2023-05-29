@@ -483,6 +483,7 @@ The following parsers have been added:
 * TTCN
 * Txt2tags
 * TypeScript
+* V
 * Varlink *peg/packcc*
 * WindRes
 * XSLT v1.0 *libxml*
