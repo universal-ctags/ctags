@@ -267,24 +267,25 @@ deinitP6Ctx (struct p6Ctx *ctx)
 static int
 getNonSpaceStr (struct p6Ctx *ctx, const char **ptok)
 {
-    const char *s = ctx->line;
-    if (!s) {
-next_line:
-        s = (const char *) readLineFromInputFile();
-        if (!s)
-            return 0;                           /* EOF */
+    size_t non_white_len;
+    const char *s;
+
+    while (ctx->line)
+    {
+        s = ctx->line;
+        while (*s && isspace((unsigned char) *s))   /* Skip whitespace */
+            ++s;
+        if ('#' != *s                               /* Skip comments */
+                && (non_white_len = strcspn(s, ",; \t"), non_white_len > 0))
+        {
+            ctx->line = s + non_white_len;          /* Save state */
+            *ptok = s;
+            return non_white_len;
+        }
+        ctx->line = (const char *) readLineFromInputFile();
     }
-    while (*s && isspace((unsigned char) *s))   /* Skip whitespace */
-        ++s;
-    if ('#' == *s)
-        goto next_line;
-    int non_white_len = strcspn(s, ",; \t");
-    if (non_white_len) {
-        ctx->line = s + non_white_len;          /* Save state */
-        *ptok = s;
-        return non_white_len;
-    } else
-        goto next_line;
+
+    return 0;
 }
 
 static void
@@ -309,6 +310,7 @@ findPerl6Tags (void)
     const char *s;
     int len;
 
+    ctx.line = (const char *) readLineFromInputFile();
     while ((len = getNonSpaceStr(&ctx, &s)) > 0) {
         enum token token = matchToken(s, len);
         if ((int) token >= 0) {
