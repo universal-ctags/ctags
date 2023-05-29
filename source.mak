@@ -368,7 +368,7 @@ PARSER_SRCS =				\
 	parsers/lua.c			\
 	parsers/m4.c			\
 	parsers/make.c			\
-	parsers/markdown.c			\
+	parsers/markdown.c		\
 	parsers/matlab.c		\
 	parsers/myrddin.c		\
 	parsers/nsis.c			\
@@ -410,6 +410,7 @@ PARSER_SRCS =				\
 	parsers/ttcn.c			\
 	parsers/txt2tags.c		\
 	parsers/typescript.c		\
+	parsers/v.c			\
 	parsers/vera.c			\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\
