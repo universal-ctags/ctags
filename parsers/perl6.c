@@ -267,24 +267,31 @@ deinitP6Ctx (struct p6Ctx *ctx)
 static int
 getNonSpaceStr (struct p6Ctx *ctx, const char **ptok)
 {
-    const char *s = ctx->line;
-    if (!s) {
-next_line:
-        s = (const char *) readLineFromInputFile();
-        if (!s)
-            return 0;                           /* EOF */
+    size_t non_white_len;
+    const char *s;
+
+    switch (!!ctx->line)
+    {
+    case 0:
+        while (1) {
+            ctx->line = (const char *) readLineFromInputFile();
+            if (!ctx->line)
+                return 0;                           /* EOF */
+            /* fall through */
+    default:
+            s = ctx->line;
+            while (*s && isspace((unsigned char) *s))   /* Skip whitespace */
+                ++s;
+            if ('#' == *s)
+                continue;
+            non_white_len = strcspn(s, ",; \t");
+            if (non_white_len) {
+                ctx->line = s + non_white_len;          /* Save state */
+                *ptok = s;
+                return (int) non_white_len;
+            }
+        }
     }
-    while (*s && isspace((unsigned char) *s))   /* Skip whitespace */
-        ++s;
-    if ('#' == *s)
-        goto next_line;
-    int non_white_len = strcspn(s, ",; \t");
-    if (non_white_len) {
-        ctx->line = s + non_white_len;          /* Save state */
-        *ptok = s;
-        return non_white_len;
-    } else
-        goto next_line;
 }
 
 static void
