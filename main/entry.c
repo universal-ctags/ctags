@@ -1803,8 +1803,9 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	if (tag->name [0] == '\0' && (!tag->placeholder))
 	{
 		if (!doesInputLanguageAllowNullTag())
-			error (WARNING, "ignoring null tag in %s(line: %lu)",
-				   getInputFileName (), tag->lineNumber);
+			error (WARNING, "ignoring null tag in %s(line: %lu, language: %s)",
+				   getInputFileName (), tag->lineNumber,
+				   getLanguageName (tag->langType));
 		goto out;
 	}
 
