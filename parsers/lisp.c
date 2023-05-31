@@ -149,106 +149,94 @@ static int  lisp_hint2kind (const vString *const hint)
 	return k;
 }
 
-/* TODO: implement this in hashtable. */
+/* Lookup code produced by gperf version 3.1 */
+static unsigned int hash_hint (const char *str, size_t len)
+{
+	static unsigned char asso_values[] =
+	{
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41,  8, 41, 30,
+		41, 41,  0, 20, 41,  5, 41, 41, 41,  5,
+		41, 41, 41, 41, 41,  0, 15, 15,  0, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+		41, 41, 41, 41, 41, 41
+	};
+	return len + asso_values[(unsigned char)str[4]];
+}
+
 static int  elisp_hint2kind (const vString *const hint)
 {
-	int k = eK_UNKNOWN;
-	int n;
 
-	/* 4 means strlen("(def"). */
-#define EQN(X) strncmp(vStringValue (hint) + 4, &X[3], n) == 0
-	switch (vStringLength (hint) - 4)
+#define MIN_WORD_LENGTH 6
+#define MAX_WORD_LENGTH 31
+#define MAX_HASH_VALUE 40
+
+	static const char *wordlist[] =
 	{
-	case 2:
-		n = 2;
-		if (EQN("defun"))
-			k = eK_FUNCTION;
-		break;
-	case 3:
-		n = 3;
-		if (EQN("defvar"))
-			k = eK_VARIABLE;
-		else if (EQN("defun*"))
-			k = eK_FUNCTION;
-		break;
-	case 4:
-		n = 4;
-		if (EQN("defface"))
-			k = eK_FACE;
-	case 5:
-		n = 5;
-		if (EQN("defconst"))
-			k = eK_CONST;
-		else if (EQN("defmacro"))
-			k = eK_MACRO;
-		else if (EQN("defalias"))
-			k = eK_ALIAS;
-		else if (EQN("defsubst"))
-			k = eK_SUBST;
-		else if (EQN("defgroup"))
-			k = eK_GROUP;
-		else if (EQN("deftheme"))
-			k = eK_THEME;
-		break;
-	case 6:
-		n = 6;
-		if (EQN("defcustom"))
-			k = eK_CUSTOM;
-		else if (EQN("defsubst*"))
-			k = eK_SUBST;
-		else if (EQN("defmacro*"))
-			k = eK_MACRO;
-		break;
-	case 7:
-		n = 7;
-		if (EQN("define-key"))
-			k = KIND_GHOST_INDEX;
-		break;
-	case 9:
-		n = 9;
-		if (EQN("defvar-local"))
-			k = eK_VARIABLE;
-		else if (EQN("define-error"))
-			k = eK_ERROR;
-		break;
-	case 8:
-		n = 8;
-		if (EQN("defvaralias"))
-			k = eK_VARALIAS;
-		break;
-	case 10:
-		n = 10;
-		if (EQN("define-inline"))
-			k = eK_INLINE;
-		break;
-	case 14:
-		n = 14;
-		if (EQN("define-minor-mode"))
-			k = eK_MINOR_MODE;
-		break;
-	case 16:
-		n = 16;
-		if (EQN("define-derived-mode"))
-			k = eK_DERIVED_MODE;
-		break;
-	case 21:
-		n = 21;
-		if (EQN("define-global-minor-mode"))
-			k = eK_MINOR_MODE;
-		break;
-	case 25:
-		n = 25;
-		if (EQN("define-globalized-minor-mode"))
-			k = eK_MINOR_MODE;
-		break;
-	case 27:
-		n = 27;
-		if (EQN("define-obsolete-function-alias"))
-			k = eK_ALIAS;
-		break;
+		"", "", "", "", "", "", "", "(defvar", "(defface",
+		"(defsubst", "(defsubst*", "", "(defvaralias",
+		"(defvar-local", "(defmacro", "(defmacro*", "(define-key",
+		"(defalias", "(define-error", "(define-inline",
+		"", "(defun", "(defun*", "(define-minor-mode",
+		"(deftheme", "(define-derived-mode", "", "",
+		"", "(defgroup", "(define-global-minor-mode",
+		"", "", "", "(define-globalized-minor-mode", "",
+		"(define-obsolete-function-alias", "", "", "(defconst",
+		"(defcustom"
+	};
+
+	static const int tokenKinds[] =
+	{
+		eK_UNKNOWN, eK_UNKNOWN, eK_UNKNOWN, eK_UNKNOWN,
+		eK_UNKNOWN, eK_UNKNOWN, eK_UNKNOWN, eK_VARIABLE, eK_FACE,
+		eK_SUBST, eK_SUBST, eK_UNKNOWN, eK_VARALIAS, eK_VARIABLE,
+		eK_MACRO, eK_MACRO, KIND_GHOST_INDEX, eK_ALIAS, eK_ERROR,
+		eK_INLINE, eK_UNKNOWN, eK_FUNCTION, eK_FUNCTION,
+		eK_MINOR_MODE, eK_THEME, eK_DERIVED_MODE, eK_UNKNOWN,
+		eK_UNKNOWN, eK_UNKNOWN, eK_GROUP, eK_MINOR_MODE,
+		eK_UNKNOWN, eK_UNKNOWN, eK_UNKNOWN, eK_MINOR_MODE,
+		eK_UNKNOWN, eK_ALIAS, eK_UNKNOWN, eK_UNKNOWN, eK_CONST,
+		eK_CUSTOM,
+	};
+
+	const char *const str = vStringValue (hint);
+	const size_t len = vStringLength (hint);
+	if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
+	{
+		const unsigned int key = hash_hint (str, len);
+		if (key <= MAX_HASH_VALUE)
+		{
+			const char *const s = wordlist[key];
+			if (*str == *s && 0 == strncmp (str + 1, s + 1, len - 1))
+				return tokenKinds[key];
+		}
 	}
-#undef EQN
-	return k;
+	return eK_UNKNOWN;
+
+#undef MIN_WORD_LENGTH
+#undef MAX_WORD_LENGTH
+#undef MAX_HASH_VALUE
+
 }
 
 static void L_getit (vString *const name, const unsigned char *dbp,
