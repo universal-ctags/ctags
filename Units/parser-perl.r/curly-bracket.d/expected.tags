@@ -1,0 +1,2 @@
+X	input.pl	/^{  package X;$/;"	p
+foo	input.pl	/^}  sub foo { return 42 }$/;"	s
