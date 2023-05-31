@@ -1,0 +1,27 @@
+.discard	input.lds	/^		*(.discard)$/;"	i	roles:discarded
+.discard.	input.lds	/^		*(.discard.*)$/;"	i	roles:discarded
+__ksymtab	input.lds	/^	__ksymtab		0 : { *(SORT(___ksymtab+*)) }$/;"	S	roles:def
+___ksymtab	input.lds	/^	__ksymtab		0 : { *(SORT(___ksymtab+*)) }$/;"	i	section:__ksymtab	roles:mapped
+__ksymtab_gpl	input.lds	/^	__ksymtab_gpl		0 : { *(SORT(___ksymtab_gpl+*)) }$/;"	S	roles:def
+___ksymtab_gpl	input.lds	/^	__ksymtab_gpl		0 : { *(SORT(___ksymtab_gpl+*)) }$/;"	i	section:__ksymtab_gpl	roles:mapped
+__ksymtab_unused	input.lds	/^	__ksymtab_unused	0 : { *(SORT(___ksymtab_unused+*)) }$/;"	S	roles:def
+___ksymtab_unused	input.lds	/^	__ksymtab_unused	0 : { *(SORT(___ksymtab_unused+*)) }$/;"	i	section:__ksymtab_unused	roles:mapped
+__ksymtab_unused_gpl	input.lds	/^	__ksymtab_unused_gpl	0 : { *(SORT(___ksymtab_unused_gpl+*)) }$/;"	S	roles:def
+___ksymtab_unused_gpl	input.lds	/^	__ksymtab_unused_gpl	0 : { *(SORT(___ksymtab_unused_gpl+*)) }$/;"	i	section:__ksymtab_unused_gpl	roles:mapped
+__ksymtab_gpl_future	input.lds	/^	__ksymtab_gpl_future	0 : { *(SORT(___ksymtab_gpl_future+*)) }$/;"	S	roles:def
+___ksymtab_gpl_future	input.lds	/^	__ksymtab_gpl_future	0 : { *(SORT(___ksymtab_gpl_future+*)) }$/;"	i	section:__ksymtab_gpl_future	roles:mapped
+__kcrctab	input.lds	/^	__kcrctab		0 : { *(SORT(___kcrctab+*)) }$/;"	S	roles:def
+___kcrctab	input.lds	/^	__kcrctab		0 : { *(SORT(___kcrctab+*)) }$/;"	i	section:__kcrctab	roles:mapped
+__kcrctab_gpl	input.lds	/^	__kcrctab_gpl		0 : { *(SORT(___kcrctab_gpl+*)) }$/;"	S	roles:def
+___kcrctab_gpl	input.lds	/^	__kcrctab_gpl		0 : { *(SORT(___kcrctab_gpl+*)) }$/;"	i	section:__kcrctab_gpl	roles:mapped
+__kcrctab_unused	input.lds	/^	__kcrctab_unused	0 : { *(SORT(___kcrctab_unused+*)) }$/;"	S	roles:def
+___kcrctab_unused	input.lds	/^	__kcrctab_unused	0 : { *(SORT(___kcrctab_unused+*)) }$/;"	i	section:__kcrctab_unused	roles:mapped
+__kcrctab_unused_gpl	input.lds	/^	__kcrctab_unused_gpl	0 : { *(SORT(___kcrctab_unused_gpl+*)) }$/;"	S	roles:def
+___kcrctab_unused_gpl	input.lds	/^	__kcrctab_unused_gpl	0 : { *(SORT(___kcrctab_unused_gpl+*)) }$/;"	i	section:__kcrctab_unused_gpl	roles:mapped
+__kcrctab_gpl_future	input.lds	/^	__kcrctab_gpl_future	0 : { *(SORT(___kcrctab_gpl_future+*)) }$/;"	S	roles:def
+___kcrctab_gpl_future	input.lds	/^	__kcrctab_gpl_future	0 : { *(SORT(___kcrctab_gpl_future+*)) }$/;"	i	section:__kcrctab_gpl_future	roles:mapped
+.init_array	input.lds	/^	.init_array		0 : ALIGN(8) { *(SORT(.init_array.*)) *(.init_array) }$/;"	S	roles:def
+.init_array.	input.lds	/^	.init_array		0 : ALIGN(8) { *(SORT(.init_array.*)) *(.init_array) }$/;"	i	section:.init_array	roles:mapped
+.init_array	input.lds	/^	.init_array		0 : ALIGN(8) { *(SORT(.init_array.*)) *(.init_array) }$/;"	i	section:.init_array	roles:mapped
+__jump_table	input.lds	/^	__jump_table		0 : ALIGN(8) { KEEP(*(__jump_table)) }$/;"	S	roles:def
+__jump_table	input.lds	/^	__jump_table		0 : ALIGN(8) { KEEP(*(__jump_table)) }$/;"	i	section:__jump_table	roles:mapped
