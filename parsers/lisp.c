@@ -149,7 +149,15 @@ static int  lisp_hint2kind (const vString *const hint)
 	return k;
 }
 
-/* Lookup code produced by gperf version 3.1 */
+/* Lookup code produced by gperf version 3.1
+ *
+ * For example, run
+ *
+ * 	echo -e "(defconst\n(defmacro\n(defgroup\n(defalias" | gperf
+ *
+ * This is not included in the build process because gperf might not be
+ * available on all systems.
+ */
 static unsigned int hash_hint (const char *str, size_t len)
 {
 	static unsigned char asso_values[] =
