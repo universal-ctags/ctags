@@ -87,8 +87,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 				str = renderField (f->ftype, tag, findex);
 				if ((dt & FIELDTYPE_BOOL) && str[0] == '\0')
 				{
-					/* TODO: FIELD_NULL_LETTER_STRING */
-					str = "-";
+					str = FIELD_NULL_LETTER_STRING;
 				}
 			}
 			else if (dt & FIELDTYPE_BOOL)
