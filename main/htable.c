@@ -258,24 +258,25 @@ static void       hashTablePutItem00    (hashTable *htable, void *key, void *val
 	htable->count++;
 }
 
-/* TODO: A pre-calculated array can be used instead of
- * finding a new one at runtume. */
+/* "doubling" primes smaller than 2^32 */
+static const unsigned int primes[] = {
+	3, 7, 17, 37, 79, 163, 331, 673, 1361, 2729, 5471, 10949, 21911,
+	43853, 87719, 175447, 350899, 701819, 1403641, 2807303, 5614657,
+	11229331, 22458671, 44917381, 89834777, 179669557, 359339171,
+	718678369, 1437356741, 2874713497,
+};
+
 static unsigned int
 prime_double(unsigned int i)
 {
+	unsigned int j;
+
 	Assert (i > 2);
 	Assert (i % 2);
 
-	for (unsigned int c = 2 * i + 1; ; c += 2)
-	{
-		for (unsigned int i0 = 3; i0 < i; i0 += 2)
-		{
-			if ((c % i0) == 0)
-				goto next;
-		}
-		return c;
-	next:;
-	}
+	for (j = 0; j < sizeof(primes) / sizeof(primes[0]); ++j)
+		if (primes[j] > i)
+			return primes[j];
 
 	return i;
 }
