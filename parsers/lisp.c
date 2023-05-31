@@ -191,32 +191,51 @@ static int  elisp_hint2kind (const vString *const hint)
 #define MAX_WORD_LENGTH 31
 #define MAX_HASH_VALUE 40
 
-	static const char *wordlist[] =
-	{
-		"", "", "", "", "", "", "", "(defvar", "(defface",
-		"(defsubst", "(defsubst*", "", "(defvaralias",
-		"(defvar-local", "(defmacro", "(defmacro*", "(define-key",
-		"(defalias", "(define-error", "(define-inline",
-		"", "(defun", "(defun*", "(define-minor-mode",
-		"(deftheme", "(define-derived-mode", "", "",
-		"", "(defgroup", "(define-global-minor-mode",
-		"", "", "", "(define-globalized-minor-mode", "",
-		"(define-obsolete-function-alias", "", "", "(defconst",
-		"(defcustom"
-	};
-
-	static const int tokenKinds[] =
-	{
-		eK_UNKNOWN, eK_UNKNOWN, eK_UNKNOWN, eK_UNKNOWN,
-		eK_UNKNOWN, eK_UNKNOWN, eK_UNKNOWN, eK_VARIABLE, eK_FACE,
-		eK_SUBST, eK_SUBST, eK_UNKNOWN, eK_VARALIAS, eK_VARIABLE,
-		eK_MACRO, eK_MACRO, KIND_GHOST_INDEX, eK_ALIAS, eK_ERROR,
-		eK_INLINE, eK_UNKNOWN, eK_FUNCTION, eK_FUNCTION,
-		eK_MINOR_MODE, eK_THEME, eK_DERIVED_MODE, eK_UNKNOWN,
-		eK_UNKNOWN, eK_UNKNOWN, eK_GROUP, eK_MINOR_MODE,
-		eK_UNKNOWN, eK_UNKNOWN, eK_UNKNOWN, eK_MINOR_MODE,
-		eK_UNKNOWN, eK_ALIAS, eK_UNKNOWN, eK_UNKNOWN, eK_CONST,
-		eK_CUSTOM,
+	static const struct {
+		const char *str;
+		int			kind;
+	} tokens[] = {
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "(defvar",                          eK_VARIABLE, },
+		{ "(defface",                         eK_FACE, },
+		{ "(defsubst",                        eK_SUBST, },
+		{ "(defsubst*",                       eK_SUBST, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "(defvaralias",                     eK_VARALIAS, },
+		{ "(defvar-local",                    eK_VARIABLE, },
+		{ "(defmacro",                        eK_MACRO, },
+		{ "(defmacro*",                       eK_MACRO, },
+		{ "(define-key",                      KIND_GHOST_INDEX, },
+		{ "(defalias",                        eK_ALIAS, },
+		{ "(define-error",                    eK_ERROR, },
+		{ "(define-inline",                   eK_INLINE, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "(defun",                           eK_FUNCTION, },
+		{ "(defun*",                          eK_FUNCTION, },
+		{ "(define-minor-mode",               eK_MINOR_MODE, },
+		{ "(deftheme",                        eK_THEME, },
+		{ "(define-derived-mode",             eK_DERIVED_MODE, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "(defgroup",                        eK_GROUP, },
+		{ "(define-global-minor-mode",        eK_MINOR_MODE, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "(define-globalized-minor-mode",    eK_MINOR_MODE, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "(define-obsolete-function-alias",  eK_ALIAS, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "",                                 eK_UNKNOWN, },
+		{ "(defconst",                        eK_CONST, },
+		{ "(defcustom",                       eK_CUSTOM, },
 	};
 
 	const char *const str = vStringValue (hint);
@@ -226,9 +245,9 @@ static int  elisp_hint2kind (const vString *const hint)
 		const unsigned int key = hash_hint (str, len);
 		if (key <= MAX_HASH_VALUE)
 		{
-			const char *const s = wordlist[key];
+			const char *const s = tokens[key].str;
 			if (*str == *s && 0 == strncmp (str + 1, s + 1, len - 1))
-				return tokenKinds[key];
+				return tokens[key].kind;
 		}
 	}
 	return eK_UNKNOWN;
