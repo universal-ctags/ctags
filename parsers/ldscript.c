@@ -93,6 +93,7 @@ static const keywordTable LdScriptKeywordTable[] = {
 	{ "INPUT_SECTION_FLAGS", KEYWORD_INPUT_SECTION_FLAGS },
 	{ "COMMON",			KEYWORD_COMMON },
 	{ "KEEP",			KEYWORD_KEEP },
+	{ "SORT",			KEYWORD_KEEP },
 	{ "BYTE",			KEYWORD_DATA },
 	{ "SHORT",			KEYWORD_DATA },
 	{ "LONG",			KEYWORD_DATA },
