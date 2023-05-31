@@ -7,6 +7,8 @@
 #	Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.64])
+
+dnl You must update PROGRAM_VERSION in main/ctags.h, too.
 AC_INIT([universal-ctags],[6.0.0])
 
 if ! test -e "${srcdir}/config.h.in"; then

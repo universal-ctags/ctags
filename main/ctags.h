@@ -39,6 +39,7 @@
    For implementation changes like bug fixes, increment PATCH. */
 
 #if defined (HAVE_CONFIG_H)
+/* You must update PACKAGE_VERSION in configure.ac, too. */
 # define PROGRAM_VERSION PACKAGE_VERSION
 #else
 # define PROGRAM_VERSION "6.0.0"

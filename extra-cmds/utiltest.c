@@ -11,6 +11,7 @@
 #include "fname.h"
 #include "htable.h"
 #include "routines.h"
+#include "vstring.h"
 #include <string.h>
 
 static void test_fname_absolute(void)
@@ -238,6 +239,58 @@ static void test_routines_strrstr(void)
 	TEST_CHECK(strcmp(strrstr("abcdcdb", "cd"), "cdb") == 0);
 }
 
+static void test_vstring_ncats(void)
+{
+	vString *vstr = vStringNew ();
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 0);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abc") == 0);
+	vStringClear (vstr);
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 1);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abcd") == 0);
+	vStringClear (vstr);
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 2);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abcde") == 0);
+	vStringClear (vstr);
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 3);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abcdef") == 0);
+	vStringClear (vstr);
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 4);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abcdef") == 0);
+	vStringClear (vstr);
+
+	vStringDelete (vstr);
+}
+
+static void test_vstring_truncate_leading(void)
+{
+	vString *vstr = vStringNewInit ("   abcdefg");
+	TEST_CHECK(vstr != NULL);
+
+	vStringStripLeading (vstr);
+	TEST_CHECK(strcmp(vStringValue(vstr), "abcdefg") == 0);
+
+	vStringTruncateLeading (vstr, 3);
+	TEST_CHECK(strcmp(vStringValue(vstr), "defg") == 0);
+
+	vStringTruncateLeading (vstr, 0);
+	TEST_CHECK(strcmp(vStringValue(vstr), "defg") == 0);
+
+	vStringTruncateLeading (vstr, 100);
+	TEST_CHECK(strcmp(vStringValue(vstr), "") == 0);
+
+	vStringDelete (vstr);
+}
+
 TEST_LIST = {
    { "fname/absolute",   test_fname_absolute   },
    { "fname/absolute+cache", test_fname_absolute_with_cache },
@@ -245,5 +298,7 @@ TEST_LIST = {
    { "htable/update",    test_htable_update    },
    { "htable/grow",      test_htable_grow      },
    { "routines/strrstr", test_routines_strrstr },
+   { "vstring/ncats",    test_vstring_ncats    },
+   { "vstring/truncate_leading", test_vstring_truncate_leading },
    { NULL, NULL }     /* zeroed record marking the end of the list */
 };

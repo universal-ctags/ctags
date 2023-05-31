@@ -1486,12 +1486,11 @@ static int excludesCompare (struct colprintLine *a, struct colprintLine *b)
 static void processListExcludesOption(const char *const option CTAGS_ATTR_UNUSED,
 				      const char *const parameter CTAGS_ATTR_UNUSED)
 {
-	int i;
 	struct colprintTable *table = colprintTableNew ("L:NAME", NULL);
 
-	const int max = Excluded ? stringListCount (Excluded) : 0;
+	const unsigned int max = Excluded ? stringListCount (Excluded) : 0;
 
-	for (i = 0; i < max; ++i)
+	for (unsigned int i = 0; i < max; ++i)
 	{
 		struct colprintLine * line = colprintTableGetNewLine (table);
 		colprintLineAppendColumnVString (line, stringListItem (Excluded, i));
@@ -1501,7 +1500,8 @@ static void processListExcludesOption(const char *const option CTAGS_ATTR_UNUSED
 	colprintTablePrint (table, 0, localOption.withListHeader, localOption.machinable, stdout);
 	colprintTableDelete (table);
 
-	if (i == 0)
+	/* No line is printed. */
+	if (max == 0)
 		putchar ('\n');
 
 	exit (0);
@@ -2307,9 +2307,7 @@ static void freeSearchPathList (searchPathList** pathList)
 static vString* expandOnSearchPathList (searchPathList *pathList, const char* leaf,
 					bool (* check) (const char *const))
 {
-	unsigned int i;
-
-	for (i = stringListCount (pathList); i > 0; --i)
+	for (unsigned int i = stringListCount (pathList); i > 0; --i)
 	{
 		const char* const body = vStringValue (stringListItem (pathList, i - 1));
 		char* tmp = combinePathAndFile (body, leaf);
@@ -2581,9 +2579,8 @@ static void addIgnoreListFromFile (langType lang, const char *const fileName)
 		error (FATAL | PERROR, "cannot open \"%s\"", fileName);
 
 	int c = stringListCount(tokens);
-	int i;
 
-	for(i=0;i<c;i++)
+	for(unsigned int i=0;i<c;i++)
 	{
 		vString * s = stringListItem(tokens,i);
 		applyLanguageParam (lang, "ignore", vStringValue(s));
