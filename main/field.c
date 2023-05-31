@@ -34,9 +34,6 @@
 #include "optscript.h"
 #include "script_p.h"
 
-#define FIELD_NULL_LETTER_CHAR '-'
-#define FIELD_NULL_LETTER_STRING "-"
-
 typedef struct sFieldObject {
 	fieldDefinition *def;
 	vString     *buffer;
