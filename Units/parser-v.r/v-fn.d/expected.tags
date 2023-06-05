@@ -1,0 +1,22 @@
+fn1	input.v	/^fn fn1() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:2
+fn2	input.v	/^fn fn2(a int) {$/;"	f	line:4	typeref:typename:	signature:(a int)	roles:def	end:5
+fn3	input.v	/^fn fn3(a int, b string, c Foo) {$/;"	f	line:7	typeref:typename:	signature:(a int, b string, c Foo)	roles:def	end:8
+fn4	input.v	/^fn fn4() ! {$/;"	f	line:10	typeref:typename:!	signature:()	roles:def	end:11
+fn5	input.v	/^fn fn5() ?Test {$/;"	f	line:13	typeref:typename:?Test	signature:()	roles:def	end:14
+fn6	input.v	/^fn fn6() (int, int) {$/;"	f	line:16	typeref:typename:(int, int)	signature:()	roles:def	end:23
+fn7	input.v	/^    fn fn7() {$/;"	f	line:18	fn:fn6	typeref:typename:	signature:()	roles:def	end:22
+fn8	input.v	/^        fn fn8(a int, b string, c Foo) (!Test, int, Foo) {$/;"	f	line:20	fn:fn6.fn7	typeref:typename:(!Test, int, Foo)	signature:(a int, b string, c Foo)	roles:def	end:21
+fnR1	input.v	/^fn (s Foo) fnR1(a int) {$/;"	f	line:27	typeref:typename:	signature:(s Foo)(a int)	roles:def	end:28
+s	input.v	/^fn (s Foo) fnR1(a int) {$/;"	r	line:27	fn:fnR1	roles:def
+fnR2	input.v	/^fn (s *Foo) fnR2(a int, b string, c Foo) ?Foo {$/;"	f	line:30	typeref:typename:?Foo	signature:(s *Foo)(a int, b string, c Foo)	roles:def	end:31
+s	input.v	/^fn (s *Foo) fnR2(a int, b string, c Foo) ?Foo {$/;"	r	line:30	fn:fnR2	roles:def
+main	input.v	/^fn main () {$/;"	f	line:33	typeref:typename:	signature:()	roles:def	end:48
+x	input.v	/^    x := fn(a int, b int) int { return a + b }$/;"	v	line:36	roles:def
+y	input.v	/^    y := x(0, 0)$/;"	v	line:37	roles:def
+z	input.v	/^    z := fn() {$/;"	v	line:38	roles:def
+a	input.v	/^        a := 0$/;"	v	line:41	roles:def
+b	input.v	/^        b := 0$/;"	v	line:42	roles:def
+add	input.v	/^        add :=$/;"	v	line:43	roles:def
+xyz	input-1.v	/^module xyz$/;"	m	line:1	roles:def
+yesnow	input-1.v	/^fn (mut s Foo) yesnow() ! {$/;"	f	line:3	module:xyz	typeref:typename:!	signature:(mut s Foo)()	roles:def	end:4
+s	input-1.v	/^fn (mut s Foo) yesnow() ! {$/;"	r	line:3	fn:xyz.yesnow	roles:def

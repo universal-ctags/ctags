@@ -1,5 +1,5 @@
 main	input.v	/^module main$/;"	m	line:1	roles:def
-os	input.v	/^import a.b.cd$/;"	m	line:3	roles:imported	extras:reference
+os	input.v	/^import os$/;"	m	line:2	roles:imported	extras:reference
 a.b.cd	input.v	/^import a.b.cd$/;"	m	line:3	roles:imported	extras:reference
 os	input-1.v	/^import os { abc, def }$/;"	m	line:1	roles:imported	extras:reference
 abc	input-1.v	/^import os { abc, def }$/;"	Y	line:1	module:os	roles:imported	extras:reference

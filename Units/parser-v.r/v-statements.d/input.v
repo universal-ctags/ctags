@@ -1,5 +1,5 @@
 fn test_if() {
-    a := 0
+    a := 0 // test
     if a {
         b := 0
     }
@@ -11,27 +11,35 @@ fn test_if() {
     }
     if a {
         e := 0
-    }
+    } // // test
     else if b {
         f := 0
-    }
+    } // test
     else {
         g := 0
     }
     if a {
         if b {
-            h := 0
+            h := 0 /* test */
         }
         else {
-            i := 0
+            i := 0 /* test /* NESTED */ test */
         }
     }
     else {
         if c {
             j := 0
         }
-        else {
+             else {
             k := 0
         }
     }
 }
+
+/*
+MULTILINE
+/*
+NESTED
+*/
+COMMENT
+*/
