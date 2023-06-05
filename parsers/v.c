@@ -1122,6 +1122,7 @@ static void parseExpression (tokenInfo *const token, int scope)
 // return >expr?
 static void parseReturn (tokenInfo *const token, int scope)
 {
+	PARSER_PROLOGUE ("return");
 	readToken (token);
 	if (isToken (token, TOKEN_EXCLAMATION, TOKEN_QUESTION, TOKEN_AMPERSAND,
 	             TOKEN_IMMEDIATE, TOKEN_OPEN_PAREN, TOKEN_IDENT) ||
@@ -1129,16 +1130,19 @@ static void parseReturn (tokenInfo *const token, int scope)
 		parseExpression (token, scope);
 	else
 		unreadToken ();
+	PARSER_EPILOGUE ();
 }
 
 // defer >block
 static void parseDefer (tokenInfo *const token, int scope)
 {
+	PARSER_PROLOGUE ("defer");
 	readToken (token);
 	if (expectToken (token, TOKEN_OPEN_CURLY))
 		parseBlock (token, scope);
 	else
 		unreadToken ();
+	PARSER_EPILOGUE ();
 }
 
 static void parseStmt (tokenInfo *const token, int scope)
@@ -1270,15 +1274,13 @@ static void parseConst (tokenInfo *const token, vString *const access)
 	PARSER_EPILOGUE ();
 }
 
-// >[ 'pub' | 'mut']*
-static bool parseAccess (tokenInfo *const token, vString *const capture)
+static bool isAccess (tokenInfo *const token, vString *const capture)
 {
 	const char *add = NULL;
 	if (isKeyword (token, KEYWORD_mut))
 		add = "mut";
 	else if (isKeyword (token, KEYWORD_pub))
 		add = "pub";
-
 	if (add && capture)
 	{
 		if (!vStringIsEmpty (capture))
@@ -1296,7 +1298,7 @@ static void parseFile (tokenInfo *const token)
 	do
 	{
 		readToken (token);
-		if (parseAccess (token, access))
+		if (isAccess (token, access))
 			continue;
 
 		if (isToken (token, TOKEN_OPEN_PAREN, TOKEN_OPEN_CURLY,
