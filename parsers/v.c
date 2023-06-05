@@ -77,6 +77,7 @@ enum {
 	KEYWORD_return,
 	KEYWORD_mut,
 	KEYWORD_pub,
+	KEYWORD_defer,
 	COUNT_KEYWORD,
 	KEYWORD_TYPE,
 	KEYWORD_REST,
@@ -90,8 +91,7 @@ const static struct keywordGroup VTypeKeywords = {
 		"voidptr", "byteptr", "charptr", "i8", "i16", "i32", "int", "i64",
 		"byte", "u8", "u16", "u32", "u64", "f32", "f64", "char", "bool",
 		"string", "rune", "array", "mapnode", "chan", "size_t", "usize",
-		"isize", "float_literal", "int_literal", "thread", "IError",
-		NULL
+		"isize", "float_literal", "int_literal", "thread", "IError", NULL
 	},
 };
 
@@ -100,7 +100,7 @@ const static struct keywordGroup VRestKeywords = {
 	.addingUnlessExisting = true,
 	.keywords = {
 		"shared", "static", "__global", "assert", "as",
-		"go", "spawn", "asm", "type", "for", "in", "is", "if", "else",
+		"go", "spawn", "asm", "type", "for", "in", "is",
 		"union", "struct", "enum", "interface", "defer", "unsafe", "match",
 		"lock", "rlock", "select",
 		NULL
@@ -120,6 +120,7 @@ static const keywordTable VKeywordTable[COUNT_KEYWORD] = {
 	{"return", KEYWORD_return},
 	{"mut", KEYWORD_mut},
 	{"pub", KEYWORD_pub},
+	{"defer", KEYWORD_defer},
 };
 
 typedef enum eTokenType {
@@ -145,6 +146,7 @@ typedef enum eTokenType {
 	TOKEN_ASSIGN,
 	TOKEN_ASTERISK,
 	TOKEN_AMPERSAND,
+	TOKEN_TILDE,
 	TOKEN_EOF,
 	COUNT_TOKEN
 } tokenType;
@@ -171,6 +173,8 @@ static char *const tokenNames[COUNT_TOKEN] = {
 	"SLICE",
 	"ASSIGN",
 	"ASTERISK",
+	"AMPERSAND",
+	"TILDE",
 	"EOF"
 };
 
@@ -372,14 +376,14 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 
 		if (c == '/')
 		{
-			c = getcFromInputFile ();
-			if (c == '/')
+			int d = getcFromInputFile ();
+			if (d == '/')
 				skipInputFileTillEOL ();
-			else if (c == '*')
+			else if (d == '*')
 				skipInputFileTillCommentEnd ();
 			else
 			{
-				ungetcToInputFile (c);
+				ungetcToInputFile (d);
 				break;
 			}
 		}
@@ -389,21 +393,21 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 
 	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
+	vStringClear (token->string);
+
+	if (capture && c != EOF &&
+	    (isDigit (c) || isIdentInitial (c) || isOneOf (c, "-+.'\\*\"`")) &&
+	    (LastTokenType == TOKEN_IDENT || LastTokenType == TOKEN_KEYWORD ||
+	     LastTokenType == TOKEN_TYPE || LastTokenType == TOKEN_COMMA))
+		vStringPut (capture, ' ');
 
 #ifdef DEBUG_V_TOKENISER
 	vString *const oldCapture = capture;
 	capture = vStringNew ();
 #endif
 
-	vStringClear (token->string);
 	if (capture && c != EOF)
-	{
-		if ((isDigit (c) || isIdentInitial (c) || isOneOf (c, "-+.'\\*\"`")) &&
-		    (LastTokenType == TOKEN_IDENT || LastTokenType == TOKEN_KEYWORD ||
-		     LastTokenType == TOKEN_TYPE || LastTokenType == TOKEN_COMMA))
-			vStringPut (capture, ' ');
 		vStringPut (capture, c);
-	}
 
 	if (c == EOF)
 		token->type = TOKEN_EOF;
@@ -421,64 +425,10 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		token->type = TOKEN_CLOSE_SQUARE;
 	else if (c == '?')
 		token->type = TOKEN_QUESTION;
-	else if (c == '&')
-		token->type = TOKEN_AMPERSAND;
 	else if (c == ',')
 		token->type = TOKEN_COMMA;
-	else if (c == '*')
-	{
-		if (getcFromInputFileAndKeepIfEq ('=', capture))
-			token->type = TOKEN_ASSIGN; // *=
-		else
-			token->type = TOKEN_ASTERISK; // *
-	}
-	else if (c == '.')
-	{
-		if (getcFromInputFileAndKeepIfEq ('.', capture))
-		{
-			getcFromInputFileAndKeepIfEq ('.', capture);
-			token->type = TOKEN_SLICE; // .. ...
-		}
-		else
-			token->type = TOKEN_DOT; // .
-	}
-	else if (c == '!')
-	{
-		if (getcFromInputFileAndKeepIfEq ('=', capture))
-			token->type = TOKEN_OPERATOR; // !=
-		else
-			token->type = TOKEN_EXCLAMATION; // !
-	}
-	else if (c == ':')
-	{
-		if (getcFromInputFileAndKeepIfEq ('=', capture))
-			token->type = TOKEN_DECLARE; // :=
-		else
-			token->type = TOKEN_COLON; // :
-	}
-	else if (isOneOf (c, "=<>"))
-	{
-		bool assign = c == '=' && !getcFromInputFileAndKeepIfEq ('=', capture);
-		token->type = assign? TOKEN_ASSIGN : TOKEN_OPERATOR; // = == < <= > >=
-	}
-	else if (isOneOf (c, "\"'`"))
-	{
-		int terminator = c;
-		bool inEscape = false;
-		token->type = TOKEN_IMMEDIATE;
-		do
-		{
-			if (!inEscape && c == '\\')
-				inEscape = true;
-			else
-			{
-				inEscape = false;
-				vStringPut (token->string, c);
-			}
-			c = getcFromInputFile ();
-			if (capture) vStringPut (capture, c);
-		} while (c != EOF && (c != terminator || inEscape));
-	}
+	else if (c == '~')
+		token->type = TOKEN_TILDE;
 	else if (isDigit (c) ||
 	         (isOneOf (c, "-+.") && isDigit (peekcFromInputFile ())))
 	{
@@ -497,12 +447,79 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		} while (more);
 		ungetcToInputFile (c);
 	}
-	else if (isOneOf (c, "/+-"))
+	else if (isOneOf (c, "+-*/%&|^"))
 	{
 		if (getcFromInputFileAndKeepIfEq ('=', capture))
-			token->type = TOKEN_ASSIGN; // /= += -=
+			token->type = TOKEN_ASSIGN; // += -= *= /= %= &= |= ^=
+		else if (c == '*')
+			token->type = TOKEN_ASTERISK; // *
+		else if (isOneOf (c, "&|") && getcFromInputFileAndKeepIfEq (c, capture))
+			token->type = TOKEN_OPERATOR; // && ||
+		else if (c == '&')
+			token->type = TOKEN_AMPERSAND; // &
 		else
-			token->type = TOKEN_OPERATOR; // / + -
+			token->type = TOKEN_OPERATOR; // + - / % | ^
+	}
+	else if (isOneOf (c, "=!"))
+	{
+		if (getcFromInputFileAndKeepIfEq ('=', capture))
+			token->type = TOKEN_OPERATOR; // == !=
+		else if (c == '=')
+			token->type = TOKEN_ASSIGN; // =
+		else
+			token->type = TOKEN_EXCLAMATION; // !
+	}
+	else if (isOneOf (c, "<>"))
+	{
+		if (getcFromInputFileAndKeepIfEq (c, capture))
+		{
+			if (c == '>')
+				getcFromInputFileAndKeepIfEq ('>', capture);
+			if (getcFromInputFileAndKeepIfEq ('=', capture))
+				token->type = TOKEN_ASSIGN; // <<= >>= >>>=
+			else
+				token->type = TOKEN_OPERATOR; // << >> >>>
+		}
+		else
+		{
+			getcFromInputFileAndKeepIfEq ('=', capture);
+			token->type = TOKEN_OPERATOR; // < > <= >=
+		}
+	}
+	else if (c == '.')
+	{
+		if (getcFromInputFileAndKeepIfEq ('.', capture))
+		{
+			getcFromInputFileAndKeepIfEq ('.', capture);
+			token->type = TOKEN_SLICE; // .. ...
+		}
+		else
+			token->type = TOKEN_DOT; // .
+	}
+	else if (c == ':')
+	{
+		if (getcFromInputFileAndKeepIfEq ('=', capture))
+			token->type = TOKEN_DECLARE; // :=
+		else
+			token->type = TOKEN_COLON; // :
+	}
+	else if (isOneOf (c, "\"'`"))
+	{
+		int terminator = c;
+		bool inEscape = false;
+		token->type = TOKEN_IMMEDIATE;
+		do
+		{
+			if (!inEscape && c == '\\')
+				inEscape = true;
+			else
+			{
+				inEscape = false;
+				vStringPut (token->string, c);
+			}
+			c = getcFromInputFile ();
+			if (capture) vStringPut (capture, c);
+		} while (c != EOF && (c != terminator || inEscape));
 	}
 	else if (isIdentInitial (c))
 	{
@@ -532,8 +549,9 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	else
 	{
 		DebugStatement (
-			debugPrintf (DEBUG_PARSE, "\nUNRECOGNISED CHAR AT LINE %lu: %c\n",
-			             token->lineNumber, c);
+			debugPrintf (DEBUG_PARSE,
+			             "\nUNRECOGNISED CHAR AT LINE %lu: %c (%u)\n",
+			             token->lineNumber, c, c);
 		);
 	}
 
@@ -1035,7 +1053,7 @@ static void parseExpression (tokenInfo *const token, int scope)
 			parseFnCall (token, scope);
 		else if (isToken (token, TOKEN_DECLARE))
 			parseDeclare (token, identifier, scope);
-		else if (isToken (token, TOKEN_OPERATOR, TOKEN_ASTERISK))
+		else if (isToken (token, TOKEN_OPERATOR, TOKEN_AMPERSAND, TOKEN_ASTERISK))
 		{
 			readToken (token);
 			parseExpression (token, scope);
@@ -1044,6 +1062,17 @@ static void parseExpression (tokenInfo *const token, int scope)
 			unreadToken ();
 
 		vStringDelete (identifier);
+	}
+	else if (isToken (token, TOKEN_IMMEDIATE))
+	{
+		readToken (token);
+		if (isToken (token, TOKEN_OPERATOR, TOKEN_AMPERSAND, TOKEN_ASTERISK))
+		{
+			readToken (token);
+			parseExpression (token, scope);
+		}
+		else
+			unreadToken();
 	}
 	else if (isToken (token, TOKEN_TYPE))
 	{
@@ -1058,9 +1087,8 @@ static void parseExpression (tokenInfo *const token, int scope)
 	else if (isToken (token, TOKEN_AMPERSAND))
 	{
 		readToken (token);
-		if (expectToken (token, TOKEN_TYPE, TOKEN_KEYWORD) &&
-		    (isToken (token, TOKEN_TYPE) ||
-		     expectKeyword (token, KEYWORD_map, KEYWORD_TYPE)))
+		if (expectToken (token, TOKEN_TYPE, TOKEN_KEYWORD) ||
+		    expectKeyword (token, KEYWORD_map, KEYWORD_TYPE))
 			parseExpression (token, scope);
 		else
 			unreadToken ();
@@ -1075,13 +1103,10 @@ static void parseExpression (tokenInfo *const token, int scope)
 		else
 			unreadToken ();
 	}
-	else if (isToken (token, TOKEN_IMMEDIATE))
+	else if (isToken (token, TOKEN_TILDE, TOKEN_EXCLAMATION))
 	{
 		readToken (token);
-		if (isToken (token, TOKEN_OPERATOR))
-			parseExpression (token, scope);
-		else
-			unreadToken();
+		parseExpression (token, scope);
 	}
 	else if (isKeyword (token, KEYWORD_fn))
 		parseFn (token, scope, true, NULL);
@@ -1106,11 +1131,23 @@ static void parseReturn (tokenInfo *const token, int scope)
 		unreadToken ();
 }
 
+// defer >block
+static void parseDefer (tokenInfo *const token, int scope)
+{
+	readToken (token);
+	if (expectToken (token, TOKEN_OPEN_CURLY))
+		parseBlock (token, scope);
+	else
+		unreadToken ();
+}
+
 static void parseStmt (tokenInfo *const token, int scope)
 {
 	PARSER_PROLOGUE ("stmt");
 	if (isKeyword (token, KEYWORD_return))
 		parseReturn (token, scope);
+	else if (isKeyword (token, KEYWORD_defer))
+		parseDefer (token, scope);
 	else
 		parseExpression (token, scope);
 	PARSER_EPILOGUE ();

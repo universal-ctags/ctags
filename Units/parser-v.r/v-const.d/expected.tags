@@ -31,3 +31,12 @@ test3	input.v	/^    test3 = 0$/;"	c	line:47	roles:def
 a	input.v	/^    a = 9 + 3$/;"	c	line:51	access:pub	roles:def
 b	input.v	/^    b = a[3]$/;"	c	line:52	access:pub	roles:def
 c	input.v	/^    c = 0$/;"	c	line:53	access:pub	roles:def
+a	input-1.v	/^    a = x + -8$/;"	c	line:2	roles:def
+b	input-1.v	/^    b = x \/ x$/;"	c	line:3	roles:def
+c	input-1.v	/^    c = x * x$/;"	c	line:4	roles:def
+d	input-1.v	/^    d = x - +8$/;"	c	line:5	roles:def
+e	input-1.v	/^    e = x | x & x && x || x$/;"	c	line:6	roles:def
+f	input-1.v	/^    f = !x | !!x$/;"	c	line:7	roles:def
+g	input-1.v	/^    g = ~x == ~~~~~~~~~~~~x != !!!!!!!x$/;"	c	line:8	roles:def
+h	input-1.v	/^    h = x ^ x ^ x$/;"	c	line:9	roles:def
+i	input-1.v	/^    i = x$/;"	c	line:10	roles:def
