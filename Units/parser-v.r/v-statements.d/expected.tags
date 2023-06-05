@@ -1,12 +1,12 @@
-<#fn:test_if [typename:]#><#variable:a#><#variable:b#><#variable:c#><#variable:d#><#variable:e#><#variable:f#><#variable:g#><#variable:h#><#variable:i#><#variable:j#><#variable:k#>test_if	input.v	/^fn test_if() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:37
-a	input.v	/^    a := 0$/;"	v	line:2	roles:def
+test_if	input.v	/^fn test_if() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:37
+a	input.v	/^    a := 0 \/\/ test$/;"	v	line:2	roles:def
 b	input.v	/^        b := 0$/;"	v	line:4	roles:def
 c	input.v	/^        c := 0$/;"	v	line:7	roles:def
 d	input.v	/^        d := 0$/;"	v	line:10	roles:def
 e	input.v	/^        e := 0$/;"	v	line:13	roles:def
 f	input.v	/^        f := 0$/;"	v	line:16	roles:def
 g	input.v	/^        g := 0$/;"	v	line:19	roles:def
-h	input.v	/^            h := 0$/;"	v	line:23	roles:def
-i	input.v	/^            i := 0$/;"	v	line:26	roles:def
+h	input.v	/^            h := 0 \/* test *\/$/;"	v	line:23	roles:def
+i	input.v	/^            i := 0 \/* test \/* NESTED *\/ test *\/$/;"	v	line:26	roles:def
 j	input.v	/^            j := 0$/;"	v	line:31	roles:def
 k	input.v	/^            k := 0$/;"	v	line:34	roles:def
