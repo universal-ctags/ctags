@@ -38,6 +38,7 @@ const (
         g: 0
         b: 0
     }
+    green = &Colour{0, 255, 0}
     blue = rgb(0, 0, 255)
     test1 = [
         Aaa{},
