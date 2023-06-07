@@ -1,6 +1,9 @@
-fn main() {
-    x := foo()
+fn test_defer_return() {
+    x := get_lock()
     defer {
-        x.unfoo()
+        x.unlock()
     }
+    return x.value()
+    return
+    assert a == a
 }
