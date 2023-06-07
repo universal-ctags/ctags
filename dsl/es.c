@@ -30,6 +30,7 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
+#include <math.h>
 
 #include <regex.h>
 
@@ -2561,8 +2562,8 @@ is_real      (const char* cstr,
 		return 0;
 	else if (*endptr != '\0')
 		return 0;
-
-	/* TODO: INF, NAN... */
+	else if (isinf(*d) || isnan(*d))
+		return 0;
 	return 1;
 }
 
