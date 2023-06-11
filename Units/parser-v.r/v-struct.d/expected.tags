@@ -1,0 +1,26 @@
+x	input.v	/^module x$/;"	p	line:1	roles:def
+Foo	input.v	/^struct Foo {$/;"	s	line:3	module:x	roles:def	end:12
+a	input.v	/^    a int$/;"	f	line:4	struct:x.Foo	roles:def
+b	input.v	/^    b Foo$/;"	f	line:5	struct:x.Foo	roles:def
+c	input.v	/^    c map[int]Foo$/;"	f	line:7	struct:x.Foo	access:mut	roles:def
+d	input.v	/^    d []int$/;"	f	line:9	struct:x.Foo	access:pub	roles:def
+e	input.v	/^    e u8 [required]$/;"	f	line:11	struct:x.Foo	access:pub mut	roles:def
+Bar	input-1.v	/^struct Bar {$/;"	s	line:1	roles:def	end:8
+f	input-1.v	/^    f int = 99$/;"	f	line:2	struct:Bar	roles:def
+g	input-1.v	/^    g Foo = Foo{66}$/;"	f	line:3	struct:Bar	roles:def
+h	input-1.v	/^    h string = "hi"$/;"	f	line:4	struct:Bar	roles:def
+i	input-1.v	/^    i int [required]$/;"	f	line:5	struct:Bar	roles:def
+j	input-1.v	/^    j int [required] = 99$/;"	f	line:6	struct:Bar	roles:def
+k	input-1.v	/^    k string [json: 'k'] = "j"$/;"	f	line:7	struct:Bar	roles:def
+Model	input-2.v	/^pub struct Model {$/;"	s	line:2	access:pub	roles:def	end:9
+geometry	input-2.v	/^    geometry &map[u64]Geom = &map[u64]Geom{}$/;"	f	line:4	struct:Model	access:mut	roles:def
+layers	input-2.v	/^    layers [][]Id = [][]Id{ len: int( Layer.len ), init: []Id{} }$/;"	f	line:5	struct:Model	access:mut	roles:def
+last_id	input-2.v	/^    last_id Id [required]$/;"	f	line:6	struct:Model	access:mut	roles:def
+highlighted	input-2.v	/^    highlighted []Id = []Id{}$/;"	f	line:7	struct:Model	access:mut	roles:def
+selected	input-2.v	/^    selected []Id = []Id{}$/;"	f	line:8	struct:Model	access:mut	roles:def
+aaa	input-3.v	/^module aaa$/;"	p	line:1	roles:def
+Foo	input-3.v	/^interface Foo {$/;"	i	line:3	module:aaa	roles:def	end:8
+id	input-3.v	/^    id string$/;"	f	line:4	interface:aaa.Foo	roles:def
+foo	input-3.v	/^    foo &Foo$/;"	f	line:5	interface:aaa.Foo	roles:def
+fn1	input-3.v	/^    fn1(a int, b int, c int)$/;"	m	line:6	interface:aaa.Foo	typeref:typename:	signature:(a int, b int, c int)	roles:def
+fn2	input-3.v	/^    fn2() !&Test$/;"	m	line:7	interface:aaa.Foo	typeref:typename:!&Test	signature:()	roles:def

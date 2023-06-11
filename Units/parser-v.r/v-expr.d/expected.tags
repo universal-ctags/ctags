@@ -73,3 +73,15 @@ ah	input-1.v	/^    ah := x <= x$/;"	v	line:39	roles:def
 ai	input-1.v	/^    ai := x >= x$/;"	v	line:40	roles:def
 aj	input-1.v	/^    aj := x++ - 3$/;"	v	line:42	roles:def
 ak	input-1.v	/^    ak := x-- + 3$/;"	v	line:43	roles:def
+main	input-2.v	/^fn main () {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:10
+a	input-2.v	/^    a := 0$/;"	v	line:2	roles:def
+b	input-2.v	/^    mut b := 0$/;"	v	line:3	access:mut	roles:def
+c	input-2.v	/^    mut c, d := foo()$/;"	v	line:4	access:mut	roles:def
+d	input-2.v	/^    mut c, d := foo()$/;"	v	line:4	roles:def
+e	input-2.v	/^    e, mut f := foo()$/;"	v	line:5	roles:def
+f	input-2.v	/^    e, mut f := foo()$/;"	v	line:5	access:mut	roles:def
+g	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	roles:def
+h	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	roles:def
+i	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	roles:def
+j	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	access:mut	roles:def
+k	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	roles:def

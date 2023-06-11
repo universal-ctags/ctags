@@ -6,4 +6,5 @@ fn main () {
     x, x = foo()
     x, x, x = a, b, c
     g, h, i, mut j, k := x, x, x, x, x
+    l = unsafe{ nil }
 }
