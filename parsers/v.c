@@ -88,6 +88,8 @@ enum {
 	KEYWORD_assert,
 	KEYWORD_struct,
 	KEYWORD_interface,
+	KEYWORD_is,
+	KEYWORD_enum,
 	COUNT_KEYWORD,
 	KEYWORD_TYPE,
 	KEYWORD_REST,
@@ -109,9 +111,9 @@ const static struct keywordGroup VRestKeywords = {
 	.value = KEYWORD_REST,
 	.addingUnlessExisting = true,
 	.keywords = {
-		"shared", "static", "__global", "as",
-		"go", "spawn", "asm", "type", "is",
-		"union", "enum", "defer", "unsafe", "match",
+		"shared", "static", "__global",
+		"go", "spawn", "asm", "type",
+		"union", "enum", "match",
 		"lock", "rlock", "select",
 		NULL
 	},
@@ -139,6 +141,8 @@ static const keywordTable VKeywordTable[COUNT_KEYWORD] = {
 	{"assert", KEYWORD_assert},
 	{"struct", KEYWORD_struct},
 	{"interface", KEYWORD_interface},
+	{"is", KEYWORD_is},
+	{"enum", KEYWORD_enum},
 };
 
 typedef enum eTokenType {
@@ -233,6 +237,8 @@ typedef enum {
 	KIND_STRUCT,
 	KIND_FIELD,
 	KIND_METHOD,
+	KIND_ENUMERATOR,
+	KIND_ENUMERATION,
 	/* KIND_TYPE, */
 	KIND_INTERFACE,
 	/* KING_ALIAS, */
@@ -251,8 +257,10 @@ static kindDefinition VKinds[COUNT_KIND] = {
 	//{false, 'c', "closure", "closure parameters in functions"},
 	{true, 'l', "label", "labels"},
 	{true, 's', "struct", "structs"},
-	{true, 'f',  "field", "struct/interface fields"},
-	{true, 'm',  "method", "interface methods"},
+	{true, 'f', "field", "struct/interface fields"},
+	{true, 'm', "method", "interface methods"},
+	{true, 'e', "enumerator", "enumerators (values inside an enumeration)"},
+	{true, 'g', "enum", "enumeration names"},
 	/* {true, 't', "type", "types"}, */
 	{true, 'i', "interface", "interfaces"},
 	/* {true, 'a', "alias", "type aliases"}, */
@@ -567,6 +575,20 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 			if (capture) vStringPut (capture, c);
 		} while (c != EOF && (c != terminator || inEscape));
 	}
+	else if (c == '@')
+	{
+		token->type = TOKEN_IDENT;
+		bool more;
+		do
+		{
+			vStringPut (token->string, c);
+			c = getcFromInputFile ();
+			more = isIdentSubsequent (c);
+			if (capture && more)
+				vStringPut (capture, c);
+		} while (more);
+		ungetcToInputFile (c);
+	}
 	else if (isIdentInitial (c))
 	{
 		bool more;
@@ -601,7 +623,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	LastTokenType = token->type;
 
 #ifdef DEBUG_V_PARSER
-	vDebugPrintf("%s[%s]", tokenNames[token->type], vStringValue (capture));
+	vDebugPrintf ("%s[%s]", tokenNames[token->type], vStringValue (capture));
 	if (oldCapture)
 		vStringCat (oldCapture, capture);
 	vStringDelete (capture);
@@ -693,7 +715,9 @@ static bool _isToken (tokenInfo *const token, bool expected, bool keyword,
 	);
 	// Although we don't show a debug parser error, we always return failure for
 	// expectToken() on a keyword token, so that the call can be chained to an
-	// expectKeyword() call to check it (note that isToken() is not affected).
+	// expectKeyword() call to check which keyword it is. E.g.:
+	//     expectToken (token, xxx, TOKEN_KEYWORD) || expectKeyword (token, xxx)
+	// Note that isToken() is not affected by this special case.
 	return (expected && !keyword && token->type == TOKEN_KEYWORD)? false : found;
 }
 
@@ -1193,7 +1217,7 @@ static void parseExprBlock (tokenInfo *const token, int scope)
 static void parseExpression (tokenInfo *const token, int scope,
                              vString *const access, bool canBeList)
 {
-	PARSER_PROLOGUE (canBeList? "exprl" : "expr");
+	PARSER_PROLOGUE (canBeList? "expr-list" : "expr");
 
 	vString *_access = access;
 	while (true)
@@ -1645,6 +1669,55 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 	PARSER_EPILOGUE ();
 }
 
+// 'enum' type ['as' type]? '{' [ident ['=' immediate]?]* '}'
+static void parseEnum (tokenInfo *const token, vString *const access, int scope)
+{
+	PARSER_PROLOGUE ("enum");
+	readToken (token);
+	if (expectToken (token, TOKEN_TYPE)) {
+		int newScope = makeTagEx (token, NULL, KIND_ENUMERATION, scope, access);
+		readToken (token);
+		if (isKeyword (token, KEYWORD_as))
+		{
+			readToken (token);
+			if (expectToken (token, TOKEN_TYPE, TOKEN_KEYWORD) ||
+				expectKeyword (token, KEYWORD_TYPE))
+				readToken (token);
+		}
+		if (expectToken (token, TOKEN_OPEN_CURLY))
+		{
+			vString *capture = vStringNewInit (".");
+			readTokenFull (token, capture);
+			while (expectToken (token, TOKEN_CLOSE_CURLY, TOKEN_IDENT))
+			{
+				if (isToken (token, TOKEN_CLOSE_CURLY))
+					break;
+
+				makeTag (token, capture, KIND_ENUMERATOR, newScope);
+				vStringCopyS (capture, ".");
+				LastTokenType = TOKEN_DOT; // prevent capture adding ' '
+
+				readTokenFull (token, capture);
+				if (isToken (token, TOKEN_ASSIGN))
+				{
+					vStringCopyS (capture, ".");
+					readToken (token);
+					if (expectToken (token, TOKEN_IMMEDIATE))
+						readTokenFull (token, capture);
+				}
+			}
+			vStringDelete (capture);
+
+			tagEntryInfo *entry = getEntryInCorkQueue (newScope);
+			if (entry)
+				entry->extensionFields.endLine = token->lineNumber;
+		}
+	}
+	else
+		unreadToken (token);
+	PARSER_EPILOGUE ();
+}
+
 static void parseFile (tokenInfo *const token)
 {
 	PARSER_PROLOGUE ("file");
@@ -1671,6 +1744,8 @@ static void parseFile (tokenInfo *const token)
 			parseStruct (token, access, scope, KIND_STRUCT);
 		else if (isKeyword (token, KEYWORD_interface))
 			parseStruct (token, access, scope, KIND_INTERFACE);
+		else if (isKeyword (token, KEYWORD_enum))
+			parseEnum (token, access, scope);
 		else
 			expectToken (token, TOKEN_EOF);
 
