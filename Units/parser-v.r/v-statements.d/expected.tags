@@ -23,5 +23,5 @@ e	input-1.v	/^    for _, e in x {$/;"	v	line:13	roles:def
 f	input-1.v	/^    for f, _ in x {$/;"	v	line:15	roles:def
 g	input-1.v	/^    for g in 0..5 {$/;"	v	line:19	roles:def
 i	input-1.v	/^    for i := 0; i < 100; i++ {$/;"	v	line:30	roles:def
-test_defer_return	input-2.v	/^fn test_defer_return() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:9
+test_defer_return	input-2.v	/^fn test_defer_return() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:12
 x	input-2.v	/^    x := get_lock()$/;"	v	line:2	roles:def

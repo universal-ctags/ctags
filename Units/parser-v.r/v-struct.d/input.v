@@ -9,4 +9,7 @@ pub:
     d []int
 pub mut:
     e u8 [required]
+__global:
+    f ?[]Foo
+    g []?Foo
 }
