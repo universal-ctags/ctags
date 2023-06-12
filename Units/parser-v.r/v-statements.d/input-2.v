@@ -6,4 +6,7 @@ fn test_defer_return() {
     return x.value()
     return
     assert a == a
+    if a is Cat {
+        a.meow()
+    }
 }

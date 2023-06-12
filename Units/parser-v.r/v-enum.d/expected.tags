@@ -1,10 +1,10 @@
-Foo	input.v	/^enum Foo {$/;"	g	line:1	roles:def	end:8
-.aaa	input.v	/^    aaa = 5$/;"	e	line:2	enum:Foo	roles:def
-.bbb	input.v	/^    bbb$/;"	e	line:3	enum:Foo	roles:def
-.ccc	input.v	/^    ccc$/;"	e	line:4	enum:Foo	roles:def
-.@fn	input.v	/^    @fn$/;"	e	line:5	enum:Foo	roles:def
-.@struct	input.v	/^    @struct$/;"	e	line:6	enum:Foo	roles:def
-.ddd	input.v	/^    ddd$/;"	e	line:7	enum:Foo	roles:def
+Foo	input.v	/^enum Foo {$/;"	g	line:3	roles:def	end:10
+.aaa	input.v	/^    aaa = 5$/;"	e	line:4	enum:Foo	roles:def
+.bbb	input.v	/^    bbb$/;"	e	line:5	enum:Foo	roles:def
+.ccc	input.v	/^    ccc$/;"	e	line:6	enum:Foo	roles:def
+.@fn	input.v	/^    @fn$/;"	e	line:7	enum:Foo	roles:def
+.@struct	input.v	/^    @struct$/;"	e	line:8	enum:Foo	roles:def
+.ddd	input.v	/^    ddd$/;"	e	line:9	enum:Foo	roles:def
 aaa	input-1.v	/^module aaa$/;"	p	line:1	roles:def
 Foo	input-1.v	/^enum Foo {$/;"	g	line:3	module:aaa	roles:def	end:10
 .aaa	input-1.v	/^    aaa = 5$/;"	e	line:4	enum:aaa.Foo	roles:def
