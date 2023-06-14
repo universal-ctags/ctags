@@ -73,7 +73,7 @@ ah	input-1.v	/^    ah := x <= x$/;"	v	line:39	roles:def
 ai	input-1.v	/^    ai := x >= x$/;"	v	line:40	roles:def
 aj	input-1.v	/^    aj := x++ - 3$/;"	v	line:42	roles:def
 ak	input-1.v	/^    ak := x-- + 3$/;"	v	line:43	roles:def
-main	input-2.v	/^fn main () {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:10
+main	input-2.v	/^fn main () {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:11
 a	input-2.v	/^    a := 0$/;"	v	line:2	roles:def
 b	input-2.v	/^    mut b := 0$/;"	v	line:3	access:mut	roles:def
 c	input-2.v	/^    mut c, d := foo()$/;"	v	line:4	access:mut	roles:def
@@ -85,3 +85,6 @@ h	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	roles:def
 i	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	roles:def
 j	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	access:mut	roles:def
 k	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	roles:def
+m	input-2.v	/^    m := chan int{cap: 1}$/;"	v	line:10	roles:def
+foo	input-2.v	/^fn foo(ch chan int) {$/;"	f	line:13	typeref:typename:	signature:(ch chan int)	roles:def	end:18
+n	input-2.v	/^    n := <-ch or {$/;"	v	line:15	roles:def

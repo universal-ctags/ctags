@@ -20,3 +20,7 @@ add	input.v	/^        add :=$/;"	v	line:43	roles:def
 xyz	input-1.v	/^module xyz$/;"	p	line:1	roles:def
 yesnow	input-1.v	/^fn (mut s Foo) yesnow() ! {$/;"	f	line:3	module:xyz	typeref:typename:!	signature:(mut s Foo)()	roles:def	end:4
 s	input-1.v	/^fn (mut s Foo) yesnow() ! {$/;"	R	line:3	fn:xyz.yesnow	roles:def
+new_repo	input-2.v	/^fn new_repo[T](db DB) Repo[T] {$/;"	f	line:3	typeref:typename:Repo[T]	signature:[T](db DB)	roles:def	end:5
+find_by_id	input-2.v	/^fn (r Repo[T]) find_by_id(id int) ?T {$/;"	f	line:7	typeref:typename:?T	signature:(r Repo[T])(id int)	roles:def	end:10
+r	input-2.v	/^fn (r Repo[T]) find_by_id(id int) ?T {$/;"	R	line:7	fn:find_by_id	roles:def
+table_name	input-2.v	/^    table_name := T.name \/\/ in this example getting the name of the type gives us the table na/;"	v	line:8	roles:def

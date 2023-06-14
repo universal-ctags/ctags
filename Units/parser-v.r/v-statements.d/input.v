@@ -30,9 +30,12 @@ fn test_if() {
         if c {
             j := 0
         }
-             else {
+        else {
             k := 0
         }
+    }
+    if mut x is SomeStruct {
+        l := x
     }
 }
 
