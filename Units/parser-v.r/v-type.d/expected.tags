@@ -1,2 +1,3 @@
-Foo	input.v	/^type Foo int$/;"	a	line:1	roles:def
-Bar	input.v	/^type Bar []map[string]Foo$/;"	a	line:3	roles:def
+Foo	input.v	/^type Foo = int$/;"	a	line:1	roles:def
+Bar	input.v	/^type Bar = []map[string]Foo$/;"	a	line:3	roles:def
+World	input-1.v	/^type World = Mars | Moon | Venus$/;"	a	line:1	roles:def

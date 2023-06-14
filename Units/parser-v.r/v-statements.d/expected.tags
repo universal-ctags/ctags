@@ -1,4 +1,4 @@
-test_if	input.v	/^fn test_if() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:37
+test_if	input.v	/^fn test_if() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:40
 a	input.v	/^    a := 0 \/\/ test$/;"	v	line:2	roles:def
 b	input.v	/^        b := 0$/;"	v	line:4	roles:def
 c	input.v	/^        c := 0$/;"	v	line:7	roles:def
@@ -10,6 +10,7 @@ h	input.v	/^            h := 0 \/* test *\/$/;"	v	line:23	roles:def
 i	input.v	/^            i := 0 \/* test \/* NESTED *\/ test *\/$/;"	v	line:26	roles:def
 j	input.v	/^            j := 0$/;"	v	line:31	roles:def
 k	input.v	/^            k := 0$/;"	v	line:34	roles:def
+l	input.v	/^        l := x$/;"	v	line:38	roles:def
 test_for	input-1.v	/^fn test_for() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:32
 a	input-1.v	/^    for a in x {$/;"	v	line:3	roles:def
 foo	input-1.v	/^foo:$/;"	l	line:5	fn:test_for	roles:def
@@ -25,3 +26,7 @@ g	input-1.v	/^    for g in 0..5 {$/;"	v	line:19	roles:def
 i	input-1.v	/^    for i := 0; i < 100; i++ {$/;"	v	line:30	roles:def
 test_defer_return	input-2.v	/^fn test_defer_return() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:12
 x	input-2.v	/^    x := get_lock()$/;"	v	line:2	roles:def
+main	input-3.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:5
+a	input-3.v	/^        a := 55$/;"	v	line:3	roles:def
+main	input-4.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:7
+a	input-4.v	/^    a := 1$/;"	v	line:6	roles:def

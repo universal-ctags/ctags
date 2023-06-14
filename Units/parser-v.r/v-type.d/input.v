@@ -1,3 +1,3 @@
-type Foo int
+type Foo = int
 
-type Bar []map[string]Foo
+type Bar = []map[string]Foo
