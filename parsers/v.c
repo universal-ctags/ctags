@@ -27,7 +27,6 @@
 #include "htable.h"
 
 //#define DEBUG_V_PARSER
-
 #define _NARGS(_1, _2, _3, _4, _5, _6, _7, _8, _9, N, ...) N
 #define nArgs(...) _NARGS (__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1)
 #define newToken() (objPoolGet (TokenPool))
@@ -107,6 +106,7 @@ enum {
 	KEYWORD___global,
 	KEYWORD_asm,
 	KEYWORD_chan,
+	KEYWORD_match,
 	COUNT_KEYWORD,
 	KEYWORD_TYPE,
 	KEYWORD_REST,
@@ -166,6 +166,7 @@ static const keywordTable VKeywordTable[COUNT_KEYWORD] = {
 	{"__global", KEYWORD___global},
 	{"asm", KEYWORD_asm},
 	{"chan", KEYWORD_chan},
+	{"match", KEYWORD_match},
 };
 
 typedef enum eTokenType {
@@ -843,25 +844,28 @@ static void skipToClose (tokenType open, vString *const capture)
 	}
 }
 
-static bool isAccess (tokenInfo *const token, vString **const capture)
+static void skipAccessReadToken (tokenInfo *const token, vString **capture)
 {
-	const char *add = NULL;
-	if (isKeyword (token, KEYWORD_mut))
-		add = "mut";
-	else if (isKeyword (token, KEYWORD_pub))
-		add = "pub";
-	else if (isKeyword (token, KEYWORD___global))
-		add = "__global";
-	if (add && capture)
+	while (true)
 	{
+		const char *add = NULL;
+		if (isKeyword (token, KEYWORD_mut))
+			add = "mut";
+		else if (isKeyword (token, KEYWORD_pub))
+			add = "pub";
+		else if (isKeyword (token, KEYWORD___global))
+			add = "__global";
+		if (!add)
+			break;
 		if (*capture == NULL)
 			*capture = vStringNew ();
-		if (!vStringIsEmpty (*capture))
+		else if(!vStringIsEmpty(*capture))
 			vStringPut (*capture, ' ');
 		vStringCatS (*capture, add);
+		readToken (token);
 	}
-	return !!add;
 }
+
 
 static char *nextCommaIdent (char *s)
 {
@@ -1315,14 +1319,19 @@ static void parseArrowPop (tokenInfo *const token, int scope)
 	PARSER_EPILOGUE ();
 }
 
+// 'match' [access]* fqident '{' [[ fqtype [',' fqtype]* | expr-list | else ] block]* '}'
+static void parseMatch (tokenInfo *const token, int scope)
+{
+//	vString *access = consumeAccess (token);
+}
+
 static void parseExpression (tokenInfo *const token, int scope,
                              vString *const access, bool canBeList)
 {
 	PARSER_PROLOGUE (canBeList? "expr-list" : "expr");
 
-	vString *_access = access;
-	while (isAccess (token, &_access))
-		readToken (token);
+	vString *_access = NULL;
+	skipAccessReadToken (token, &_access);
 
 	if (isToken (token, TOKEN_IDENT, TOKEN_TYPE))
 		parseFullyQualified (token, true);
@@ -1336,24 +1345,23 @@ static void parseExpression (tokenInfo *const token, int scope,
 		else if (canBeList && isToken (token, TOKEN_COMMA))
 		{
 			_access = _access? _access : vStringNew ();
-			tokenType prev = TOKEN_IDENT;
 			while (true)
 			{
-				tokenType tmp = token->type;
-				if (prev == TOKEN_IDENT && isToken (token, TOKEN_COMMA))
-				{
-					vStringPut (identifier, ',');
-					vStringPut (_access, ',');
-				}
-				else if (prev != TOKEN_IDENT && isToken (token, TOKEN_IDENT))
-					parseFQIdent (token, identifier);
-				else if (prev != TOKEN_IDENT && isAccess (token, &_access))
-					;
+				vStringPut (identifier, ',');
+				vStringPut (_access, ',');
+				readToken (token);
+				skipAccessReadToken (token, &_access);
+				if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
+					parseFullyQualified (token, true);
+				if (isToken (token, TOKEN_IDENT))
+					vStringCat (identifier, token->string);
 				else
 					break;
-				prev = tmp;
 				readToken (token);
+				if (!isToken (token, TOKEN_COMMA))
+					break;
 			}
+
 			if (isToken (token, TOKEN_DECLARE, TOKEN_ASSIGN))
 				parseAssign (token, identifier, scope, _access);
 			else
@@ -1440,6 +1448,10 @@ static void parseExpression (tokenInfo *const token, int scope,
 		parseFn (token, scope, NULL, KIND_NONE);
 	else if (isKeyword (token, KEYWORD_if, KEYWORD_Sif))
 		parseIf (token, scope);
+	else if (isKeyword (token, KEYWORD_unsafe))
+		parseExprBlock (token, scope);
+	else if (isKeyword (token, KEYWORD_match))
+		parseMatch (token, scope);
 	else if (isToken (token, TOKEN_OPEN_SQUARE))
 	{
 		tokenInfo *tmpToken = newToken (); // []type or [x,x,x]?
@@ -1457,8 +1469,6 @@ static void parseExpression (tokenInfo *const token, int scope,
 		}
 		deleteToken (tmpToken);
 	}
-	else if (isKeyword (token, KEYWORD_unsafe))
-		parseExprBlock (token, scope);
 	else
 		expectToken (token, NULL);
 
@@ -1507,8 +1517,7 @@ static void parseFor (tokenInfo *const token, int scope)
 	vString *var1Access = NULL;
 	vString *var2Access = NULL;
 	readToken (token);
-	if (isAccess (token, &var1Access))
-		readToken (token);
+	skipAccessReadToken (token, &var1Access);
 	if (expectToken (token, TOKEN_IDENT, TOKEN_OPEN_CURLY) &&
 	    isToken (token, TOKEN_IDENT))
 	{
@@ -1520,8 +1529,7 @@ static void parseFor (tokenInfo *const token, int scope)
 			if (isToken (token, TOKEN_COMMA))
 			{
 				readToken (token);
-				if (isAccess (token, &var2Access))
-					readToken (token);
+				skipAccessReadToken (token, &var2Access);
 				if (expectToken (token, TOKEN_IDENT))
 				{
 					var2Token = dupToken (token);
@@ -1738,9 +1746,8 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 			while (true)
 			{
 				vString *tmp = NULL;
-				do
-					readToken (token);
-				while (isAccess (token, &tmp));
+				readToken (token);
+				skipAccessReadToken (token, &tmp);
 				if (tmp)
 				{
 					vStringDelete (fieldAccess);
@@ -1901,8 +1908,7 @@ static void parseFile (tokenInfo *const token)
 	do
 	{
 		readToken (token);
-		if (isAccess (token, &access))
-			continue;
+		skipAccessReadToken (token, &access);
 
 		if (isToken (token, TOKEN_OPEN_PAREN, TOKEN_OPEN_CURLY,
 		             TOKEN_OPEN_SQUARE)) // attributes
