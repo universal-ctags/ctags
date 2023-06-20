@@ -35,3 +35,6 @@ Bosh	input-4.v	/^enum Bosh {$/;"	g	line:5	module:xyz	roles:def	end:8
 .bam	input-4.v	/^    bam$/;"	e	line:7	enum:xyz.Bosh	roles:def
 from_string	input-4.v	/^fn Bosh.from_string(s string) !Bosh {$/;"	f	line:10	enum:xyz.Bosh	typeref:typename:!Bosh	signature:(s string)	roles:def	end:11
 Bogus.nope	input-4.v	/^fn Bogus.nope() {$/;"	f	line:13	module:xyz	typeref:typename:	signature:()	roles:def	end:14
+main	input-5.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:4
+a	input-5.v	/^    a := foo().bar()$/;"	v	line:2	roles:def
+b	input-5.v	/^    b := Foo.bar().foo.bar()$/;"	v	line:3	roles:def
