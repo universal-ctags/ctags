@@ -25,8 +25,7 @@
 #include "xtag.h"
 #include "field.h"
 #include "htable.h"
-
-//#define DEBUG_V_PARSER
+#include "param.h"
 
 #define _NARGS(_1, _2, _3, _4, _5, _6, _7, _8, _9, N, ...) N
 #define nArgs(...) _NARGS (__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1)
@@ -52,29 +51,27 @@
 #define isIdentInitial(c) ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || \
                            c == '_' || c == '$')
 #define isIdentSubsequent(c) (isIdentInitial (c) || isDigit (c))
+#define isOperator(c) (isToken (c, TOKEN_OPERATOR, TOKEN_AMPERSAND, \
+                                TOKEN_ASTERISK, TOKEN_PIPE, TOKEN_ARROWOP))
 #define unreadToken(t) (unreadTokenFull (t, NULL))
 
 #ifdef DEBUG
 #define vDebugPrintf(...) \
 	DebugStatement ( if (debug (DEBUG_CPP)) fprintf (stderr, __VA_ARGS__); )
-#else
-#define vDebugPrintf(...)
-#endif
-
-#ifdef DEBUG_V_PARSER
+#define vDebugParserPrintf(...) \
+	do { if (parserSpew) vDebugPrintf(__VA_ARGS__); }while(0)
 #define PARSER_PROLOGUE(c) \
 	const char *const _prevParser = CurrentParser; \
 	CurrentParser = (c); \
-    vDebugPrintf ("{%s:", CurrentParser)
+    vDebugParserPrintf ("{%s:", CurrentParser)
 #define PARSER_EPILOGUE() \
-    vDebugPrintf (":%s}", CurrentParser); \
+    vDebugParserPrintf (":%s}", CurrentParser); \
 	CurrentParser = _prevParser
 #else
-#define PARSER_PROLOGUE(c) \
-	const char *const _prevParser = CurrentParser; \
-	CurrentParser = (c);
-#define PARSER_EPILOGUE() \
-	CurrentParser = _prevParser
+#define vDebugPrintf(...)
+#define vDebugParserPrintf(...)
+#define PARSER_PROLOGUE(c)
+#define PARSER_EPILOGUE()
 #endif
 
 enum {
@@ -327,10 +324,12 @@ static const char *CurrentParser;
 /* static int AnonymousId = 0; */
 static tokenType LastTokenType = TOKEN_NONE;
 static size_t LastCaptureLen = 0;
+static bool parserSpew = false;
 
-static void parseBlock (tokenInfo *const, int);
+static void parseBlock (tokenInfo *const, int, bool);
 static void parseExpression (tokenInfo *const, int, vString *const, bool);
 static void parseStruct (tokenInfo *const, vString *const, int, kindType);
+static void parseFnCall (tokenInfo *const, int);
 
 static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
@@ -434,10 +433,8 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		copyPoolToken (token, ReplayToken);
 		deleteToken (ReplayToken);
 		ReplayToken = NULL;
-#ifdef DEBUG_V_PARSER
-		vDebugPrintf ("*%s[%s]", tokenNames[token->type],
-		              ReplayCapture? vStringValue (ReplayCapture) : "");
-#endif
+		vDebugParserPrintf ("*%s[%s]", tokenNames[token->type],
+		                    ReplayCapture? vStringValue (ReplayCapture) : "");
 		LastCaptureLen = capture? vStringLength (capture) : 0;
 		if (ReplayCapture && capture)
 			vStringCat (capture, ReplayCapture);
@@ -481,7 +478,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	     LastTokenType == TOKEN_TYPE || LastTokenType == TOKEN_COMMA))
 		vStringPut (capture, ' ');
 
-#ifdef DEBUG_V_PARSER
+#ifdef DEBUG
 	vString *const oldCapture = capture;
 	capture = vStringNew ();
 #endif
@@ -660,8 +657,9 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 
 	LastTokenType = token->type;
 
-#ifdef DEBUG_V_PARSER
-	vDebugPrintf ("%s[%s]", tokenNames[token->type], vStringValue (capture));
+#ifdef DEBUG
+	vDebugParserPrintf ("%s[%s]", tokenNames[token->type],
+	                    vStringValue (capture));
 	if (oldCapture)
 		vStringCat (oldCapture, capture);
 	vStringDelete (capture);
@@ -670,9 +668,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 
 static void unreadTokenFull (tokenInfo *const token, vString *const acc)
 {
-#ifdef DEBUG_V_PARSER
-	vDebugPrintf ("#");
-#endif
+	vDebugParserPrintf ("#");
 	deleteToken (ReplayToken);
 	ReplayToken = dupToken (token);
 	if (acc)
@@ -957,7 +953,7 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 
 static void parseFQIdent (tokenInfo *const token, vString *const capture)
 {
-	PARSER_PROLOGUE ("fqident")
+	PARSER_PROLOGUE ("fqident");
 	parseFullyQualified (token, !!capture);
 	expectToken (token, TOKEN_IDENT);
 	if (capture && token->string)
@@ -969,7 +965,7 @@ static void parseFQIdent (tokenInfo *const token, vString *const capture)
 static void parseType (tokenInfo *const token, vString *const capture,
                          int scope)
 {
-	PARSER_PROLOGUE ("fqtype");
+	PARSER_PROLOGUE ("type");
 
 	while (true)
 	{
@@ -1067,7 +1063,27 @@ static void parseFQTypeInit (tokenInfo *const token, int scope)
 		unreadToken (token);
 }
 
-// '(' expr-list ')' ['!' | '?' | 'or' block]?
+// '.' ident ['.' ident]* '(' fncall
+static void parseChainCall (tokenInfo *const token, int scope)
+{
+	PARSER_PROLOGUE ("chain");
+	tokenType last;
+	do
+	{
+		last = isToken (token, TOKEN_DOT);
+		readToken (token);
+	}
+	while ((isToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_DOT) ||
+	        isKeyword (token, KEYWORD_TYPE)) &&
+	       isToken (token, TOKEN_DOT) != last);
+	if (expectToken (token, TOKEN_OPEN_PAREN))
+		parseFnCall (token, scope);
+	else
+		unreadToken (token);
+	PARSER_EPILOGUE ();
+}
+
+// '(' expr-list ')' ['!' | '?' | 'or' block]? ['.' chain | op expr]?
 static void parseFnCall (tokenInfo *const token, int scope)
 {
 	PARSER_PROLOGUE ("fncall");
@@ -1084,14 +1100,22 @@ static void parseFnCall (tokenInfo *const token, int scope)
 	{
 		readToken (token);
 		if (isToken (token, TOKEN_EXCLAMATION, TOKEN_QUESTION))
-			;
+			readToken (token);
 		else if (isKeyword (token, KEYWORD_or))
 		{
 			readToken (token);
 			if (expectToken (token, TOKEN_OPEN_CURLY))
-				parseBlock (token, scope);
-			else
-				unreadToken (token);
+			{
+				parseBlock (token, scope, true);
+				readToken (token);
+			}
+		}
+		if (isToken (token, TOKEN_DOT))
+			parseChainCall (token, scope);
+		else if (isOperator (token))
+		{
+			readToken (token);
+			parseExpression (token, scope, NULL, false);
 		}
 		else
 			unreadToken (token);
@@ -1135,13 +1159,13 @@ static void parseIf (tokenInfo *const token, int scope)
 		readToken (token);
 	if (expectToken (token, TOKEN_OPEN_CURLY))
 	{
-		parseBlock (token, scope);
+		parseBlock (token, scope, false);
 		readToken (token);
 		if (isKeyword (token, KEYWORD_else, KEYWORD_Selse))
 		{
 			readToken (token);
 			if (isToken (token, TOKEN_OPEN_CURLY))
-				parseBlock (token, scope);
+				parseBlock (token, scope, false);
 			else if (isKeyword (token, KEYWORD_if, KEYWORD_Sif))
 				parseIf (token, scope);
 			else
@@ -1273,7 +1297,7 @@ static void parseFn (tokenInfo *const token, int scope, vString *const access,
 		// block
 		if (kind != KIND_METHOD && expectToken (token, TOKEN_OPEN_CURLY))
 		{
-			parseBlock (token, newScope);
+			parseBlock (token, newScope, false);
 			tagEntryInfo *entry = getEntryInCorkQueue (newScope);
 			if (entry)
 				entry->extensionFields.endLine = token->lineNumber;
@@ -1290,18 +1314,6 @@ static void parseFn (tokenInfo *const token, int scope, vString *const access,
 	vStringDelete (acc);
 	vStringDelete (argList);
 	vStringDelete (retType);
-	PARSER_EPILOGUE ();
-}
-
-// kw block
-static void parseStmtBlock (tokenInfo *const token, int scope)
-{
-	PARSER_PROLOGUE ("stmt-block");
-	readToken (token);
-	if (expectToken (token, TOKEN_OPEN_CURLY))
-		parseBlock (token, scope);
-	else
-		unreadToken (token);
 	PARSER_EPILOGUE ();
 }
 
@@ -1338,7 +1350,7 @@ static void parseChanPop (tokenInfo *const token, int scope)
 		{
 			readToken (token);
 			if (expectToken (token, TOKEN_OPEN_CURLY))
-				parseBlock (token, scope);
+				parseBlock (token, scope, true);
 			else
 				unreadToken (token);
 		}
@@ -1388,7 +1400,7 @@ static void parseMatch (tokenInfo *const token, int scope)
 			    }
 			    if (expectToken (token, TOKEN_OPEN_CURLY))
 			    {
-				    parseBlock (token, scope);
+				    parseBlock (token, scope, false);
 				    readToken (token);
 			    }
 			    else
@@ -1450,29 +1462,37 @@ static void parseExpression (tokenInfo *const token, int scope,
 			if (isToken (token, TOKEN_INCDECOP))
 				readToken (token);
 
-			if (isToken (token, TOKEN_OPEN_SQUARE)) // template args
+			bool chainCall = false;
+			if (isToken (token, TOKEN_OPEN_SQUARE)) // template/array args
 			{
 				skipToClose (TOKEN_OPEN_SQUARE, NULL);
 				readToken (token);
+				if (isKeyword (token, KEYWORD_or))
+				{
+					readToken (token);
+					if (expectToken (token, TOKEN_OPEN_CURLY))
+						parseBlock (token, scope, true);
+				}
 			}
-
-			if (isToken (token, TOKEN_OPEN_PAREN))
-				parseFnCall (token, scope);
-			else if (isToken (token, TOKEN_DECLARE, TOKEN_ASSIGN))
-				parseAssign (token, identifier, scope, _access);
-			else if (isToken (token, TOKEN_OPERATOR, TOKEN_AMPERSAND,
-			                  TOKEN_ASTERISK, TOKEN_PIPE, TOKEN_ARROWOP))
+			if (!chainCall)
 			{
-				readToken (token);
-				parseExpression (token, scope, NULL, false);
+				if (isToken (token, TOKEN_OPEN_PAREN))
+					parseFnCall (token, scope);
+				else if (isToken (token, TOKEN_DECLARE, TOKEN_ASSIGN))
+					parseAssign (token, identifier, scope, _access);
+				else if (isOperator (token))
+				{
+					readToken (token);
+					parseExpression (token, scope, NULL, false);
+				}
+				else if (isKeyword (token, KEYWORD_is))
+				{
+					readToken (token);
+					parseType (token, NULL, scope);
+				}
+				else
+					unreadToken (token);
 			}
-			else if (isKeyword (token, KEYWORD_is))
-			{
-				readToken (token);
-				parseType (token, NULL, scope);
-			}
-			else
-				unreadToken (token);
 		}
 
 		vStringDelete (identifier);
@@ -1485,8 +1505,7 @@ static void parseExpression (tokenInfo *const token, int scope,
 			expectToken (token, TOKEN_IDENT);
 		}
 		readToken (token);
-		if (isToken (token, TOKEN_OPERATOR, TOKEN_AMPERSAND, TOKEN_ASTERISK,
-		             TOKEN_PIPE))
+		if (isOperator (token))
 		{
 			readToken (token);
 			parseExpression (token, scope, NULL, false);
@@ -1499,8 +1518,17 @@ static void parseExpression (tokenInfo *const token, int scope,
 		else
 			unreadToken (token);
 	}
-	else if (isToken (token, TOKEN_TYPE) ||
-	         isKeyword (token, KEYWORD_chan))
+	else if (isToken (token, TOKEN_TYPE))
+	{
+		readToken (token);
+		if (isToken (token, TOKEN_OPEN_CURLY))
+			parseInit (token, scope);
+		else if (isToken (token, TOKEN_OPEN_PAREN))
+			parseFnCall (token, scope);
+		else
+			unreadToken (token);
+	}
+	else if (isKeyword (token, KEYWORD_chan))
 		parseFQTypeInit (token, scope);
 	else if (isToken (token, TOKEN_ARROWOP))
 		parseChanPop (token, scope);
@@ -1534,6 +1562,8 @@ static void parseExpression (tokenInfo *const token, int scope,
 		parseExprBlock (token, scope);
 	else if (isKeyword (token, KEYWORD_match))
 		parseMatch (token, scope);
+	else if (isToken (token, TOKEN_OPEN_CURLY))
+		parseInit (token, scope);
 	else if (isToken (token, TOKEN_OPEN_SQUARE))
 	{
 		tokenInfo *tmpToken = newToken (); // []type or [x,x,x]?
@@ -1572,18 +1602,6 @@ static void parseExpression (tokenInfo *const token, int scope,
 
 	if (!access)
 		vStringDelete (_access);
-	PARSER_EPILOGUE ();
-}
-
-// return expr-list?
-static void parseReturn (tokenInfo *const token, int scope)
-{
-	PARSER_PROLOGUE ("return");
-	readToken (token);
-	if (!isToken (token, TOKEN_CLOSE_CURLY))
-		parseExpression (token, scope, NULL, true);
-	else
-		unreadToken (token);
 	PARSER_EPILOGUE ();
 }
 
@@ -1642,7 +1660,7 @@ static void parseFor (tokenInfo *const token, int scope)
 		}
 	}
 	if (expectToken (token, TOKEN_OPEN_CURLY))
-		parseBlock (token, scope);
+		parseBlock (token, scope, false);
 	else
 		unreadToken (token);
 	deleteToken (var1Token);
@@ -1655,12 +1673,24 @@ static void parseFor (tokenInfo *const token, int scope)
 static void parseStatment (tokenInfo *const token, int scope)
 {
 	PARSER_PROLOGUE ("stmt");
-	if (isKeyword (token, KEYWORD_return))
-		parseReturn (token, scope);
-	else if (isKeyword (token, KEYWORD_defer))
-		parseStmtBlock (token, scope);
-	else if (isKeyword (token, KEYWORD_for))
+	if (isKeyword (token, KEYWORD_for))
 		parseFor (token, scope);
+	else if (isKeyword (token, KEYWORD_return))
+	{
+		readToken (token);
+		if (!isToken (token, TOKEN_CLOSE_CURLY))
+			parseExpression (token, scope, NULL, true);
+		else
+			unreadToken (token);
+	}
+	else if (isKeyword (token, KEYWORD_defer))
+	{
+		readToken (token);
+		if (expectToken (token, TOKEN_OPEN_CURLY))
+			parseBlock (token, scope, false);
+		else
+			unreadToken (token);
+	}
 	else if (isKeyword (token, KEYWORD_assert))
 	{
 		readToken (token);
@@ -1684,7 +1714,7 @@ static void parseStatment (tokenInfo *const token, int scope)
 }
 
 // '{' statement* '}'
-static void parseBlock (tokenInfo *const token, int scope)
+static void parseBlock (tokenInfo *const token, int scope, bool canChainCall)
 {
 	PARSER_PROLOGUE ("block");
 	tokenType close = getClose (token->type);
@@ -1697,6 +1727,14 @@ static void parseBlock (tokenInfo *const token, int scope)
 			parseStatment (token, scope);
 	}
 	while (!isToken (token, TOKEN_EOF));
+	if (canChainCall)
+	{
+		readToken (token);
+		if (isToken (token, TOKEN_DOT))
+			parseChainCall (token, scope);
+		else
+			unreadToken (token);
+	}
 	PARSER_EPILOGUE ();
 }
 
@@ -2031,9 +2069,7 @@ static void findVTags (void)
 	tokenInfo *const token = newToken ();
 
 	parseFile (token);
-#ifdef DEBUG_V_PARSER
-	vDebugPrintf ("\n");
-#endif
+	vDebugParserPrintf ("\n");
 
 	deleteToken (token);
 }
@@ -2057,6 +2093,26 @@ static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
 	objPoolDelete (TokenPool);
 }
 
+#ifdef DEBUG
+static bool vSetParserSpew (const langType language CTAGS_ATTR_UNUSED,
+                            const char *optname CTAGS_ATTR_UNUSED,
+                            const char *arg)
+{
+	parserSpew = arg && (arg[0] == 'y' || arg[0] == 'Y' || arg[0] == 't' ||
+	                     arg[0] == 'T' || arg[0] == 'o' || arg[0] == 'O' ||
+	                     arg[0] == '1');
+	return true;
+}
+
+static paramDefinition VParams[] = {
+	{
+		.name = "parserSpew",
+		.desc = "spews debug information about the parser to stderr",
+		.handleParam = vSetParserSpew,
+	},
+};
+#endif
+
 extern parserDefinition *VParser (void)
 {
 	static const char *const extensions[] = { "v", NULL };
@@ -2073,5 +2129,9 @@ extern parserDefinition *VParser (void)
 	def->fieldCount = ARRAY_SIZE (VFields);
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->requestAutomaticFQTag = true;
+#ifdef DEBUG
+	def->paramTable = VParams;
+	def->paramCount = ARRAY_SIZE (VParams);
+#endif
 	return def;
 }
