@@ -24,8 +24,12 @@ e	input-1.v	/^    for _, e in x {$/;"	v	line:13	roles:def
 f	input-1.v	/^    for f, _ in x {$/;"	v	line:15	roles:def
 g	input-1.v	/^    for g in 0..5 {$/;"	v	line:19	roles:def
 i	input-1.v	/^    for i := 0; i < 100; i++ {$/;"	v	line:30	roles:def
-test_defer_return	input-2.v	/^fn test_defer_return() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:12
+test_defer_return	input-2.v	/^fn test_defer_return() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:6
 x	input-2.v	/^    x := get_lock()$/;"	v	line:2	roles:def
+test_return_with_expr	input-2.v	/^fn test_return_with_expr() {$/;"	f	line:8	typeref:typename:	signature:()	roles:def	end:10
+test_return_wo_expr	input-2.v	/^fn test_return_wo_expr() {$/;"	f	line:12	typeref:typename:	signature:()	roles:def	end:14
+test_assert	input-2.v	/^fn test_assert() {$/;"	f	line:16	typeref:typename:	signature:()	roles:def	end:18
+test_is_operator	input-2.v	/^fn test_is_operator() {$/;"	f	line:20	typeref:typename:	signature:()	roles:def	end:24
 main	input-3.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:5
 a	input-3.v	/^        a := 55$/;"	v	line:3	roles:def
 main	input-4.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:7

@@ -27,6 +27,7 @@
 #include "htable.h"
 
 //#define DEBUG_V_PARSER
+
 #define _NARGS(_1, _2, _3, _4, _5, _6, _7, _8, _9, N, ...) N
 #define nArgs(...) _NARGS (__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1)
 #define newToken() (objPoolGet (TokenPool))
@@ -299,6 +300,12 @@ static fieldDefinition VFields [] = {
 		.description = "the name of the module",
 		.enabled = true,
 	},
+};
+
+static kindType vLookupKinds[] = {
+	KIND_STRUCT,
+	KIND_ENUMERATION,
+	KIND_INTERFACE,
 };
 
 typedef struct {
@@ -866,14 +873,13 @@ static void skipAccessReadToken (tokenInfo *const token, vString **capture)
 	}
 }
 
-
-static char *nextCommaIdent (char *s)
+static char *nextCharIdent (char *s, char sep)
 {
 	if (s)
 	{
-		while (*s != ',' && *s != '\0')
+		while (*s != sep && *s != '\0')
 			s++;
-		if (*s == ',')
+		if (*s == sep)
 			*(s++) = '\0';
 		while (*s == ' ')
 			s++;
@@ -881,6 +887,28 @@ static char *nextCommaIdent (char *s)
 			s = NULL;
 	}
 	return s;
+}
+
+static int lookupName (vString *name, int scope)
+{
+	vString *tmp = vStringNewCopy (name);
+	char *last, *part = vStringValue (tmp);
+	int origScope = scope;
+	unsigned int nkinds = sizeof (vLookupKinds) / sizeof (kindType);
+	while (part)
+	{
+		last = part;
+		part = nextCharIdent (part, '.');
+		if (part && *last != '\0') // has one more (i.e. don't lookup last part)
+			scope = anyKindsEntryInScope (
+				scope, last, vLookupKinds, nkinds, true);
+		if (scope == CORK_NIL)
+			break;
+	}
+	if (scope != CORK_NIL)
+		vStringCopyS (name, last);
+	vStringDelete (tmp);
+	return scope == CORK_NIL? origScope : scope;
 }
 
 // _____________________________________________________________________________
@@ -1085,8 +1113,8 @@ static void parseAssign (tokenInfo *const token, vString *const names,
 		while (name)
 		{
 			char *n = name, *a = access;
-			name = nextCommaIdent (name);
-			access = nextCommaIdent (access);
+			name = nextCharIdent (name, ',');
+			access = nextCharIdent (access, ',');
 			makeTagFull (token, n, KIND_VARIABLE, CORK_NIL,
 			             ROLE_DEFINITION_INDEX, NULL, NULL, a);
 		}
@@ -1183,12 +1211,15 @@ static void parseFn (tokenInfo *const token, int scope, vString *const access,
 			skipToClose (TOKEN_OPEN_PAREN, NULL);
 	}
 	// name
-	if ((kind == KIND_NONE && isToken (token, TOKEN_IDENT)) ||
-		(kind == KIND_FUNCTION && expectToken (token, TOKEN_IDENT)))
+	if ((kind == KIND_NONE && isToken (token, TOKEN_IDENT, TOKEN_TYPE)) ||
+		(kind == KIND_FUNCTION && expectToken (token, TOKEN_IDENT, TOKEN_TYPE)))
 	{
+		name = vStringNew ();
+		parseFQIdent (token, name);
 		deleteToken (fnToken);
 		fnToken = dupToken (token);
-		name = vStringSteal (token->string);
+		// lookup parent scope
+		scope = lookupName (name, scope);
 		readToken (token);
 	}
 	// closure/template args
@@ -1296,7 +1327,7 @@ static void parseExprBlock (tokenInfo *const token, int scope)
 }
 
 // <- fqident ['or' block]?
-static void parseArrowPop (tokenInfo *const token, int scope)
+static void parseChanPop (tokenInfo *const token, int scope)
 {
 	PARSER_PROLOGUE ("arrow-pop");
 	readToken (token);
@@ -1322,7 +1353,53 @@ static void parseArrowPop (tokenInfo *const token, int scope)
 // 'match' [access]* fqident '{' [[ fqtype [',' fqtype]* | expr-list | else ] block]* '}'
 static void parseMatch (tokenInfo *const token, int scope)
 {
-//	vString *access = consumeAccess (token);
+	PARSER_PROLOGUE ("match");
+	vString *access = NULL;
+	readToken (token);
+    skipAccessReadToken (token, &access);
+    if (expectToken (token, TOKEN_TYPE, TOKEN_IDENT))
+    {
+	    parseFQIdent (token, NULL);
+	    readToken (token);
+	    if (expectToken (token, TOKEN_OPEN_CURLY))
+	    {
+		    readToken (token);
+		    do // match clauses
+		    {
+			    while (true) // match clause comma-list
+			    {
+				    if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
+					    parseFullyQualified (token, true);
+
+				    if (isToken (token, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY))
+					    break;
+				    else if (isToken (token, TOKEN_TYPE) ||
+				             isKeyword (token, KEYWORD_TYPE, KEYWORD_else))
+				    {
+					    readToken (token);
+					    break;
+				    }
+				    else
+					    parseExpression (token, scope, NULL, false);
+				    readToken (token);
+				    if (!isToken (token, TOKEN_COMMA))
+					    break;
+				    readToken (token);
+			    }
+			    if (expectToken (token, TOKEN_OPEN_CURLY))
+			    {
+				    parseBlock (token, scope);
+				    readToken (token);
+			    }
+			    else
+				    break;
+		    }
+		    while (!isToken (token, TOKEN_EOF, TOKEN_CLOSE_CURLY));
+		    if (!expectToken (token, TOKEN_CLOSE_CURLY))
+			    skipToClose (TOKEN_OPEN_CURLY, NULL);
+	    }
+    }
+    PARSER_EPILOGUE ();
 }
 
 static void parseExpression (tokenInfo *const token, int scope,
@@ -1400,8 +1477,13 @@ static void parseExpression (tokenInfo *const token, int scope,
 
 		vStringDelete (identifier);
 	}
-	else if (isToken (token, TOKEN_IMMEDIATE))
+	else if (isToken (token, TOKEN_IMMEDIATE, TOKEN_DOT))
 	{
+		if (isToken (token, TOKEN_DOT)) // enumerations
+		{
+			readToken (token);
+			expectToken (token, TOKEN_IDENT);
+		}
 		readToken (token);
 		if (isToken (token, TOKEN_OPERATOR, TOKEN_AMPERSAND, TOKEN_ASTERISK,
 		             TOKEN_PIPE))
@@ -1421,7 +1503,7 @@ static void parseExpression (tokenInfo *const token, int scope,
 	         isKeyword (token, KEYWORD_chan))
 		parseFQTypeInit (token, scope);
 	else if (isToken (token, TOKEN_ARROWOP))
-		parseArrowPop (token, scope);
+		parseChanPop (token, scope);
 	else if (isToken (token, TOKEN_AMPERSAND))
 	{
 		readToken (token);
@@ -1498,9 +1580,7 @@ static void parseReturn (tokenInfo *const token, int scope)
 {
 	PARSER_PROLOGUE ("return");
 	readToken (token);
-	if (isToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_EXCLAMATION,
-	             TOKEN_QUESTION, TOKEN_AMPERSAND, TOKEN_IMMEDIATE,
-	             TOKEN_OPEN_SQUARE))
+	if (!isToken (token, TOKEN_CLOSE_CURLY))
 		parseExpression (token, scope, NULL, true);
 	else
 		unreadToken (token);
@@ -1737,6 +1817,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 		{
 			kindType realKind = kind == KIND_NONE? KIND_STRUCT : kind;
 			newScope = makeTagEx (token, NULL, realKind, scope, access);
+			registerEntry (newScope);
 			readToken (token);
 		}
 		if (expectToken (token, TOKEN_OPEN_CURLY))
@@ -1826,6 +1907,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 	readToken (token);
 	if (expectToken (token, TOKEN_TYPE)) {
 		int newScope = makeTagEx (token, NULL, KIND_ENUMERATION, scope, access);
+		registerEntry (newScope);
 		readToken (token);
 		if (isKeyword (token, KEYWORD_as))
 		{
@@ -1875,7 +1957,8 @@ static void parseAlias (tokenInfo *const token, vString *const access, int scope
 	readToken (token);
 	if (expectToken (token, TOKEN_TYPE))
 	{
-		makeTagEx (token, NULL, KIND_ALIAS, scope, access);
+		int newScope = makeTagEx (token, NULL, KIND_ALIAS, scope, access);
+		registerEntry (newScope);
 		readToken (token);
 		if (expectToken (token, TOKEN_ASSIGN))
 		{
