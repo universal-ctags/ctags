@@ -195,6 +195,9 @@
     <ClCompile Include="..\main\unwindi.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\utf8_str.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\vstring.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
@@ -837,6 +840,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\unwindi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\utf8_str.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\vstring.h">
