@@ -1,6 +1,10 @@
+should	input.md	/^  #should NOT be included0 as a chapter$/;"	h
 should be included0 as a chapter	input.md	/^  # should be included0 as a chapter$/;"	c
+should	input.md	/^ #should NOT be included1 as a chapter$/;"	h	chapter:should be included0 as a chapter
 should be included1 as a chapter	input.md	/^ # should be included1 as a chapter$/;"	c
+should	input.md	/^#should NOT be included2 as a chapter$/;"	h	chapter:should be included1 as a chapter
 should be included2 as a chapter	input.md	/^# should be included2 as a chapter$/;"	c
+not-title-1	input.md	/^   #not-title-1$/;"	h	chapter:should be included2 as a chapter
 title 1	input.md	/^   # title 1$/;"	c
 title 2	input.md	/^ ## title 2$/;"	s	chapter:title 1
 title 3	input.md	/^   # title 3$/;"	c
