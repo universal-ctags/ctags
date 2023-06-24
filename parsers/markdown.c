@@ -379,7 +379,7 @@ static void findMarkdownTags (void)
 		else if (line[pos] == '=' || line[pos] == '-' || line[pos] == '#' || line[pos] == '>')
 		{
 			int nSame;
-			for (nSame = 1; line[nSame] == line[pos]; ++nSame);
+			for (nSame = 1; line[pos + nSame] == line[pos]; ++nSame);
 
 			/* quote */
 			if (line[pos] == '>')
@@ -406,11 +406,11 @@ static void findMarkdownTags (void)
 					makeSectionMarkdownTag (prevLine, kind, marker);
 			}
 			/* otherwise is it a one line title */
-			else if (line[pos] == '#' && nSame <= K_SECTION_COUNT && isspace (line[nSame]))
+			else if (line[pos] == '#' && nSame <= K_SECTION_COUNT && isspace (line[pos + nSame]))
 			{
 				int kind = nSame - 1;
 				bool delimited = false;
-				vString *name = getHeading (kind, line, lineLen, &delimited);
+				vString *name = getHeading (kind, line + pos, lineLen - pos, &delimited);
 				if (vStringLength (name) > 0)
 					makeSectionMarkdownTag (name, kind, delimited ? "##" : "#");
 				vStringDelete (name);
