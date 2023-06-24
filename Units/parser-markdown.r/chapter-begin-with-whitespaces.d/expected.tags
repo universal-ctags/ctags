@@ -1,0 +1,7 @@
+# title 1	input.md	/^   # title 1$/;"	c	end:5	sectionMarker:#
+# title 2	input.md	/^ ## title 2$/;"	s	chapter:# title 1	end:5	sectionMarker:#
+# title 3	input.md	/^   # title 3$/;"	c	end:19	sectionMarker:#
+# title 4	input.md	/^ ### title 4$/;"	S	chapter:# title 3	end:19	sectionMarker:#
+# title 5	input.md	/^ #### title 5$/;"	t	subsection:# title 3""# title 4	end:19	sectionMarker:#
+# title 6	input.md	/^ ##### title 6$/;"	T	subsubsection:# title 3""# title 4""# title 5	end:19	sectionMarker:#
+# title 7	input.md	/^ ###### title 7$/;"	u	l4subsection:# title 3""# title 4""# title 5""# title 6	end:19	sectionMarker:#
