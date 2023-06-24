@@ -4,4 +4,4 @@ main	input-1.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:d
 kind	input-2.v	/^fn (c Colour) kind() {$/;"	f	line:1	typeref:typename:	signature:(c Colour)()	roles:def	end:7
 c	input-2.v	/^fn (c Colour) kind() {$/;"	R	line:1	fn:kind	roles:def
 main	input-3.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:6
-main	input-4.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:6
+main	input-4.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:12

@@ -52,4 +52,6 @@ pub const (
     a = 9 + 3
     b = a[3]
     c = 0
+    d = r'hi'
+    e = r"there"
 )
