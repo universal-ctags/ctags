@@ -224,6 +224,7 @@
     <ClCompile Include="..\main\tokeninfo.c" />
     <ClCompile Include="..\main\trashbox.c" />
     <ClCompile Include="..\main\unwindi.c" />
+    <ClCompile Include="..\main\utf8_str.c" />
     <ClCompile Include="..\main\vstring.c" />
     <ClCompile Include="..\main\writer-ctags.c" />
     <ClCompile Include="..\main\writer-etags.c" />
@@ -440,6 +441,7 @@
     <ClInclude Include="..\main\trashbox_p.h" />
     <ClInclude Include="..\main\types.h" />
     <ClInclude Include="..\main\unwindi.h" />
+    <ClInclude Include="..\main\utf8_str.h" />
     <ClInclude Include="..\main\vstring.h" />
     <ClInclude Include="..\main\writer_p.h" />
     <ClInclude Include="..\main\xtag.h" />

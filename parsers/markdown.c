@@ -28,6 +28,7 @@
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
+#include "utf8_str.h"
 #include "nestlevel.h"
 #include "routines.h"
 #include "promise.h"
@@ -47,6 +48,7 @@ typedef enum {
 	K_LEVEL5SECTION,
 	K_SECTION_COUNT,
 	K_FOOTNOTE = K_SECTION_COUNT,
+	K_HASHTAG,
 } markdownKind;
 
 static kindDefinition MarkdownKinds[] = {
@@ -57,6 +59,7 @@ static kindDefinition MarkdownKinds[] = {
 	{ true, 'T', "l4subsection",  "level 4 sections" },
 	{ true, 'u', "l5subsection",  "level 5 sections" },
 	{ true, 'n', "footnote",      "footnotes" },
+	{ true, 'h', "hashtag",       "hashtags"},
 };
 
 static fieldDefinition MarkdownFields [] = {
@@ -259,6 +262,93 @@ static void notifyEndOfCodeBlock (markdownSubparser *m)
 	}
 }
 
+typedef enum {
+	HTAG_SPACE_FOUND,
+	HTAG_HASHTAG_FOUND,
+	HTAG_TEXT,
+} hashtagState;
+
+/*
+   State machine to find all hashtags in a line.
+ */
+static void getAllHashTagsInLineMaybe (const unsigned char *line, int pos,
+	int lineLen, hashtagState state)
+{
+	while (pos < lineLen)
+	{
+		switch (state)
+		{
+		case HTAG_SPACE_FOUND:
+			if (line[pos] == '#')
+			{
+				state = HTAG_HASHTAG_FOUND;
+			}
+			else if (!isspace (line[pos]))
+				state = HTAG_TEXT;
+			pos++;
+			break;
+		case HTAG_HASHTAG_FOUND:
+		{
+			/* `#123` is invalid */
+			bool hasNonNumericalChar = false;
+
+			const int hashtag_start = pos;
+			while (pos < lineLen)
+			{
+				int utf8_len;
+				if (isalpha (line[pos])
+					|| line[pos] == '_' || line[pos] == '-' || line[pos] == '/')
+				{
+					hasNonNumericalChar = true;
+					pos++;
+				}
+				else if (isdigit (line[pos]))
+				{
+					pos++;
+				}
+				else if ((utf8_len =
+						utf8_raw_strlen ((const char *) &line[pos],
+							lineLen - pos)) > 0)
+				{
+					hasNonNumericalChar = true;
+					pos += utf8_len;
+					Assert (pos <= lineLen);
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			int hashtag_length = pos - hashtag_start;
+			if (hasNonNumericalChar && hashtag_length > 0)
+			{
+				vString *tag =
+					vStringNewNInit ((const char *) (&(line[hashtag_start])), hashtag_length);
+				makeMarkdownTag (tag, K_HASHTAG, false);
+				vStringDelete (tag);
+			}
+
+			if (pos < lineLen)
+			{
+				if (isspace (line[pos]))
+					state = HTAG_SPACE_FOUND;
+				else
+					state = HTAG_TEXT;
+			}
+		}
+			break;
+		case HTAG_TEXT:
+			while (pos < lineLen && !isspace (line[pos]))
+				pos++;
+			state = HTAG_SPACE_FOUND;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
 static void findMarkdownTags (void)
 {
 	vString *prevLine = vStringNew ();
@@ -378,6 +468,8 @@ static void findMarkdownTags (void)
 		/* if it's a title underline, or a delimited block marking character */
 		else if (line[pos] == '=' || line[pos] == '-' || line[pos] == '#' || line[pos] == '>')
 		{
+			/* hashtags may follow the title or quote */
+			getAllHashTagsInLineMaybe(line, pos, lineLen, line[pos] == '#' ? HTAG_SPACE_FOUND :HTAG_TEXT);
 			int nSame;
 			for (nSame = 1; line[pos + nSame] == line[pos]; ++nSame);
 
@@ -422,6 +514,7 @@ static void findMarkdownTags (void)
 		vStringClear (prevLine);
 		if (!lineProcessed)
 		{
+			getAllHashTagsInLineMaybe(line, pos, lineLen, HTAG_SPACE_FOUND);
 			getFootnoteMaybe ((const char *)line);
 			vStringCatS (prevLine, (const char*) line);
 		}

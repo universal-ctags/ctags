@@ -128,6 +128,7 @@ LIB_PRIVATE_HEADS =		\
 	main/stats_p.h		\
 	main/subparser_p.h	\
 	main/trashbox_p.h	\
+	main/utf8_str.h		\
 	main/writer_p.h		\
 	main/xtag_p.h		\
 	\
@@ -182,6 +183,7 @@ LIB_SRCS =			\
 	main/trace.c			\
 	main/tokeninfo.c		\
 	main/unwindi.c			\
+	main/utf8_str.c			\
 	main/writer.c			\
 	main/writer-etags.c		\
 	main/writer-ctags.c		\

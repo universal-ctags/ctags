@@ -21,6 +21,7 @@
 /Makefile
 /packcc
 /packcc.exe
+.cache
 .deps
 .dirstamp
 .DS_Store
@@ -30,6 +31,7 @@ autom4te.cache
 badinput
 commit-stamp
 compile
+compile_commands.json
 config.cache
 config.guess
 config.h
