@@ -4,7 +4,7 @@
 ctags-lang-systemtap
 ==============================================================
 ---------------------------------------------------------------------
-Random notes about tagging SystepTap source code with Universal Ctags
+Random notes about tagging SystemTap source code with Universal Ctags
 ---------------------------------------------------------------------
 :Version: @VERSION@
 :Manual group: Universal Ctags
