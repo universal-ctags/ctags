@@ -1,0 +1,2 @@
+main	input.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:6
+a	input.v	/^    a := 1$/;"	v	line:3	roles:def
