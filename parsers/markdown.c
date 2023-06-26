@@ -532,6 +532,9 @@ extern parserDefinition* MarkdownParser (void)
 	parserDefinition* const def = parserNew ("Markdown");
 	static const char *const extensions [] = { "md", "markdown", NULL };
 
+	def->versionCurrent = 1;
+	def->versionAge = 1;
+
 	def->enabled  = true;
 	def->extensions = extensions;
 	def->useCork = CORK_QUEUE;
