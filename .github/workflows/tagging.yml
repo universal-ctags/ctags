@@ -1,26 +1,19 @@
-name: Create a periodical tag
+name: Create a weekly tag
 
 on:
   schedule:
     - cron:  '0 0 * * 0'
-
-env:
-  # Account for creating a tag
-  USER_NAME: "Universal-ctags CI"
-  USER_EMAIL: "Universal-ctags@users.noreply.github.com"
 
 jobs:
   tag:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        path: ctags
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: create a weekly tag
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        cd ctags
-        misc/git-tag-maybe.sh
+      - run: git config user.name  'Universal-ctags CI'
+      - run: git config user.email 'Universal-ctags@users.noreply.github.com'
+
+      - run: misc/git-tag-maybe.sh
