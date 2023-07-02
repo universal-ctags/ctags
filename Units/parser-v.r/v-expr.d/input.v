@@ -78,4 +78,12 @@ fn test_exprs() {
     ak := 0
     x = x-- + 3
     al := 0
+    x = x in x
+    am := 0
+    x = x !in x
+    an := 0
+    x = x is X
+    ao := 0
+    x = x !is X
+    ap := 0
 }

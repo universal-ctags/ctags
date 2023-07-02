@@ -7,4 +7,6 @@ fn main() {
 	}
 	if (s.pos - 1 >= 0 && s.text[s.pos - 1] != `\\`) && ch == `"` {
 	}
+	for (flags & ttf.tfkc_more_components) > 0 {
+	}
 }
