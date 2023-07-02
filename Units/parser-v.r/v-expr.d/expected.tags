@@ -1,4 +1,4 @@
-test_exprs	input.v	/^fn test_exprs() {$/;"	f	line:2	typeref:typename:	signature:()	roles:def	end:81
+test_exprs	input.v	/^fn test_exprs() {$/;"	f	line:2	typeref:typename:	signature:()	roles:def	end:89
 a	input.v	/^    a := 0$/;"	v	line:3	roles:def
 b	input.v	/^    b := 0$/;"	v	line:5	roles:def
 c	input.v	/^    c := 0$/;"	v	line:7	roles:def
@@ -36,6 +36,10 @@ ai	input.v	/^    ai := 0$/;"	v	line:73	roles:def
 aj	input.v	/^    aj := 0$/;"	v	line:75	roles:def
 ak	input.v	/^    ak := 0$/;"	v	line:78	roles:def
 al	input.v	/^    al := 0$/;"	v	line:80	roles:def
+am	input.v	/^    am := 0$/;"	v	line:82	roles:def
+an	input.v	/^    an := 0$/;"	v	line:84	roles:def
+ao	input.v	/^    ao := 0$/;"	v	line:86	roles:def
+ap	input.v	/^    ap := 0$/;"	v	line:88	roles:def
 test_exprs	input-1.v	/^fn test_exprs() {$/;"	f	line:2	typeref:typename:	signature:()	roles:def	end:44
 a	input-1.v	/^    a := x + x + x$/;"	v	line:3	roles:def
 b	input-1.v	/^    b := x - x - x$/;"	v	line:4	roles:def

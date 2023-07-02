@@ -29,4 +29,9 @@ bar:
     }
     for i := 0; i < 100; i++ {
     }
+    // other expr
+    for (i & whatever) == true {
+    }
+    for if a { b } else { c } == 8 {
+    }
 }

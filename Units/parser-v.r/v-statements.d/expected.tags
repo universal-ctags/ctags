@@ -11,7 +11,7 @@ i	input.v	/^            i := 0 \/* test \/* NESTED *\/ test *\/$/;"	v	line:26	ro
 j	input.v	/^            j := 0$/;"	v	line:31	roles:def
 k	input.v	/^            k := 0$/;"	v	line:34	roles:def
 l	input.v	/^        l := x$/;"	v	line:38	roles:def
-test_for	input-1.v	/^fn test_for() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:32
+test_for	input-1.v	/^fn test_for() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:37
 a	input-1.v	/^    for a in x {$/;"	v	line:3	roles:def
 foo	input-1.v	/^foo:$/;"	l	line:5	fn:test_for	roles:def
 i	input-1.v	/^    for mut i, b in x {$/;"	v	line:6	access:mut	roles:def
