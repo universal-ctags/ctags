@@ -1,7 +1,7 @@
 # ALL
 #LANGUAGE      NAME              DESCRIPTION
-Asm            commentCharsAtBOL line comment chraracters at the begining of line ([;*@])
-Asm            commentCharsInMOL line comment chraracters in the begining of line ([])
+Asm            commentCharsAtBOL line comment chraracters at the beginning of line ([;*@])
+Asm            commentCharsInMOL line comment chraracters in the beginning of line ([])
 Asm            extraLinesepChars extra characters used as a line separator ([])
 Asm            useCPreProcessor  run CPreProcessor parser for extracting macro definitions ([true] or false)
 CPreProcessor  _expand           expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
@@ -14,8 +14,8 @@ TclOO          forceUse          enable the parser even when `oo' namespace is n
 
 # ALL MACHINABLE
 #LANGUAGE	NAME	DESCRIPTION
-Asm	commentCharsAtBOL	line comment chraracters at the begining of line ([;*@])
-Asm	commentCharsInMOL	line comment chraracters in the begining of line ([])
+Asm	commentCharsAtBOL	line comment chraracters at the beginning of line ([;*@])
+Asm	commentCharsInMOL	line comment chraracters in the beginning of line ([])
 Asm	extraLinesepChars	extra characters used as a line separator ([])
 Asm	useCPreProcessor	run CPreProcessor parser for extracting macro definitions ([true] or false)
 CPreProcessor	_expand	expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
@@ -27,8 +27,8 @@ ITcl	forceUse	enable the parser even when `itcl' namespace is not specified in t
 TclOO	forceUse	enable the parser even when `oo' namespace is not specified in the input (true or [false])
 
 # ALL MACHINABLE NOHEADER
-Asm	commentCharsAtBOL	line comment chraracters at the begining of line ([;*@])
-Asm	commentCharsInMOL	line comment chraracters in the begining of line ([])
+Asm	commentCharsAtBOL	line comment chraracters at the beginning of line ([;*@])
+Asm	commentCharsInMOL	line comment chraracters in the beginning of line ([])
 Asm	extraLinesepChars	extra characters used as a line separator ([])
 Asm	useCPreProcessor	run CPreProcessor parser for extracting macro definitions ([true] or false)
 CPreProcessor	_expand	expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])
