@@ -104,6 +104,8 @@ extern vString *vStringNewNInit (const char *const s, const size_t length)
 
 extern vString *vStringNewVPrintf (const char *const format, va_list ap)
 {
+	int i = 0;
+	fprintf(stderr, "stage[%d]: %s\n", i++, format);
 	static MIO *mio;
 	if (mio == NULL)
 	{
@@ -113,14 +115,19 @@ extern vString *vStringNewVPrintf (const char *const format, va_list ap)
 	else
 		mio_try_resize (mio, 0);
 
+	fprintf(stderr, "stage[%d]: %s\n", i++, format);
 	mio_vprintf (mio, format, ap);
+	fprintf(stderr, "stage[%d]: %s\n", i++, format);
 
 	size_t size;
 	unsigned char *data = mio_memory_get_data (mio, &size);
 
+	fprintf(stderr, "stage[%d]: %s\n", i++, format);
 	if (data == NULL)
 		return vStringNew ();
 
+
+	fprintf(stderr, "stage[%d]: %s\n", i++, format);
 	return vStringNewNInit ((char *)data, size);
 }
 
