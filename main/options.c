@@ -3546,7 +3546,15 @@ extern void previewFirstOption (cookedArgs* const args)
 	{
 		if (strcmp (args->item, "V") == 0
 		    || strcmp (args->item, "verbose") == 0
-		    || strcmp (args->item, "quiet") == 0)
+		    || strcmp (args->item, "quiet") == 0
+			/* Make some fundamental options work even
+			 * if a bropen .ctags is given. */
+			|| (strcmp (args->item, "version") == 0 &&
+				(strcmp (args->parameter, RSV_NONE) == 0
+				 ||  (*args->parameter == '\0')))
+			|| strcmp (args->item, "help") == 0
+			|| strcmp (args->item, "help-full") == 0
+			|| strcmp (args->item, "license") == 0)
 			parseOption (args);
 		else if (strcmp (args->item, "options") == 0  &&
 				strcmp (args->parameter, RSV_NONE) == 0)
