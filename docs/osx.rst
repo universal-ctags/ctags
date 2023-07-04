@@ -5,6 +5,10 @@ Building on Mac OS
 
 ----
 
+.. warning::
+
+   Universal Ctags has not been tested on Mac OS. See https://github.com/universal-ctags/ctags/pull/3004#issuecomment-1616344602.
+
 This part of the documentation is written by Cameron Eagans, a co-maintainer of Universal Ctags and the maintainer of
 the OSX packaging of this project.
 

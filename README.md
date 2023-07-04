@@ -53,6 +53,11 @@ Go to the [releases](https://github.com/universal-ctags/ctags-nightly-build/rele
 ### Mac
 See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
 
+**Warning**
+
+	QA for OSX at Universal Ctags project was stopped. OSX has been an unsupported platfrom.
+	See https://github.com/universal-ctags/ctags/pull/3004#issuecomment-1616344602 for more details.
+
 ### Snap
 Go to [ctags-snap](https://github.com/universal-ctags/ctags-snap) and
 clone the `ctags-snap` repo. Then, follow instructions to build the
@@ -61,7 +66,7 @@ code from GitHub.
 
 ## How to build and install ##
 
-To build with Autotools (Autoconf and Automake) on GNU/Linux, OSX, or Windows 10 WSL,
+To build with Autotools (Autoconf and Automake) on GNU/Linux, or Windows 10 WSL,
 ```
     $ git clone https://github.com/universal-ctags/ctags.git
     $ cd ctags
