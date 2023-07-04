@@ -22,8 +22,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: update package information
-      run: brew update
+
+    # temporarily disabled, because it always fails these days.
+    #- name: update package information
+    #  run: brew update
+
     - name: install tools and libraries
       run: |
         # See https://github.com/actions/runner-images/issues/6817.
