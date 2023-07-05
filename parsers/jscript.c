@@ -1753,6 +1753,12 @@ static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, co
 
 	copyToken (name, token, true);
 	readToken (name);
+	if (isType (name, TOKEN_KEYWORD) &&
+		(isKeyword (name, KEYWORD_get) || isKeyword (name, KEYWORD_set)))
+	{
+		name->type = TOKEN_IDENTIFIER;	// treat as function name
+	}
+
 	if (isType (name, TOKEN_STAR))
 	{
 		is_generator = true;
