@@ -1,7 +1,10 @@
+Foo	input.js	/^Foo.prototype.get = function() {};$/;"	c
 definedWithFunctionAfter	input.js	/^function definedWithFunctionAfter() {};$/;"	f
 definedWithFunctionBefore	input.js	/^function definedWithFunctionBefore() {};$/;"	f
 functionExpressionAfter	input.js	/^const functionExpressionAfter = () => {};$/;"	f
 functionExpressionBefore	input.js	/^const functionExpressionBefore = () => {};$/;"	f
+get	input.js	/^Foo.prototype.get = function() {};$/;"	m	class:Foo
 get	input.js	/^function get() {};$/;"	f
+set	input.js	/^Foo.prototype.set = () => {};$/;"	m	class:Foo
 variableAfter	input.js	/^let variableAfter = "bar";$/;"	v
 variableBefore	input.js	/^let variableBefore = "foo";$/;"	v

@@ -5,3 +5,6 @@ function get() {};
 function definedWithFunctionAfter() {};
 const functionExpressionAfter = () => {};
 let variableAfter = "bar";
+
+Foo.prototype.get = function() {};
+Foo.prototype.set = () => {};
