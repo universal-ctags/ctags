@@ -2800,7 +2800,7 @@ extern bool ptagMakePatternLengthLimit (ptagDesc *pdesc, langType language CTAGS
 
 static void setBooleanToXtagWithWarning(booleanOption *const option, bool value)
 {
-	/* WARNING/TODO: This function breaks capsulization. */
+	/* WARNING/TODO: This function breaks encapsulation. */
 
 	char x = 0;
 
