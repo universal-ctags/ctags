@@ -1338,12 +1338,6 @@ static void localLet (vString * const ident, ocaToken what, ocaToken whatNext)
  * because their syntax is similar.  */
 static void matchPattern (vString * const ident, ocaToken what, ocaToken whatNext)
 {
-	/* keep track of [], as it
-	 * can be used in patterns and can
-	 * mean the end of match expression in
-	 * revised syntax */
-	static int braceCount = 0;
-
 	switch (what)
 	{
 	case Tok_To:
@@ -1351,12 +1345,9 @@ static void matchPattern (vString * const ident, ocaToken what, ocaToken whatNex
 		toDoNext = &mayRedeclare;
 		break;
 
-	case Tok_BRL:
-	braceCount++;
-	break;
-
 	case OcaKEYWORD_value:
 		popLastNamed ();
+		// fall through
 	case OcaKEYWORD_and:
 	case OcaKEYWORD_end:
 		// why was this global? matches only make sense in local scope
