@@ -1,0 +1,7 @@
+definedWithFunctionAfter	input.js	/^function definedWithFunctionAfter() {};$/;"	f
+definedWithFunctionBefore	input.js	/^function definedWithFunctionBefore() {};$/;"	f
+functionExpressionAfter	input.js	/^const functionExpressionAfter = () => {};$/;"	f
+functionExpressionBefore	input.js	/^const functionExpressionBefore = () => {};$/;"	f
+get	input.js	/^function get() {};$/;"	f
+variableAfter	input.js	/^let variableAfter = "bar";$/;"	v
+variableBefore	input.js	/^let variableBefore = "foo";$/;"	v
