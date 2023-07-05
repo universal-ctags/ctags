@@ -2791,6 +2791,10 @@ nextVar:
 		{
 			readToken(token);
 		}
+		else if (isType (token, TOKEN_OPEN_SQUARE))
+		{
+			skipArrayList (token, false);
+		}
 	}
 
 	copyToken(name, token, true);
