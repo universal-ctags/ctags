@@ -2174,8 +2174,9 @@ function:
 			}
 			else
 			{
-				makeJsTag (name, JSTAG_FIELD, NULL, NULL);
-				if (!isType (token, TOKEN_SEMICOLON))
+				bool is_property = isType (token, TOKEN_COMMA);
+				makeJsTag (name, is_property ? JSTAG_PROPERTY : JSTAG_FIELD, NULL, NULL);
+				if (!isType (token, TOKEN_SEMICOLON) && !is_property)
 					dont_read = true;
 			}
 		}
