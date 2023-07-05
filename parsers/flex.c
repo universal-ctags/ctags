@@ -464,7 +464,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 static void readTokenFull (tokenInfo *const token, bool include_newlines)
 {
 	int c;
-	int i;
 	bool newline_encountered = false;
 
 	/* if we've got a token held back, emit it */
@@ -481,13 +480,11 @@ static void readTokenFull (tokenInfo *const token, bool include_newlines)
 	vStringClear (token->string);
 
 getNextChar:
-	i = 0;
 	do
 	{
 		c = getcFromInputFile ();
 		if (include_newlines && (c == '\r' || c == '\n'))
 			newline_encountered = true;
-		i++;
 	}
 	while (c == '\t' || c == ' ' || c == '\r' || c == '\n');
 
