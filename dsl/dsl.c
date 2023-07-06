@@ -124,9 +124,13 @@ static DSLEngine engines [DSL_ENGINE_COUNT];
 
 static DSLProcBind pbinds_interanl_pseudo [] = {
 	{ "#/PATTERN/", NULL, NULL, 0, 0,
-	  .helpstr = "(#/patter/ <string>) -> <boolean>; regular expression matching" },
+	  .helpstr = "(#/patter/ <string>) -> <boolean>; regular expression matching\n"
+	  "(#/patter/ <string> <integer>) -> <string>|\"\"; extact a group matching to the pattern\n"
+	  "(#/patter/ <string> <integer> <any:default>) -> <string>|default; ...returning DEFAULT in case of no match"},
 	{ "#/PATTERN/i", NULL, NULL, 0, 0,
-	  .helpstr = "(#/patter/i <string>) -> <boolean>; in case insensitive way" },
+	  .helpstr = "(#/patter/i <string>) -> <boolean>; in case insensitive way\n"
+	  "(#/patter/i <string> <integer>) -> <string>|\"\"; extact a group matching to the pattern\n"
+	  "(#/patter/i <string> <integer> <any:default>) -> <string>|default; ...returning DEFAULT in case of no match"},
 };
 
 static DSLProcBind pbinds [] = {
@@ -436,7 +440,8 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 
 		if (l < 1)
 			dsl_throw (TOO_FEW_ARGUMENTS, car);
-		else if (l > 1)
+
+		if (l > 3)
 			dsl_throw (TOO_MANY_ARGUMENTS, car);
 
 		cdr = eval0(cdr, env);
@@ -450,8 +455,30 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 		if (!es_string_p (cadr))
 			dsl_throw (WRONG_TYPE_ARGUMENT, object);
 
-		r = es_regex_exec (car, cadr);
-		return r;
+		if (l == 1)
+			return es_regex_exec (car, cadr);
+
+		EsObject *cddr = es_cdr (cdr);
+		EsObject *caddr = es_car (cddr);
+		if (!es_number_p (caddr))
+			dsl_throw (WRONG_TYPE_ARGUMENT, object);
+		int group = es_integer_get(caddr);
+		if (group < 1)
+			dsl_throw (WRONG_REGEX_GROUP, object);
+		EsObject *matched = es_regex_exec_extract_match_new (car, cadr, group);
+
+		if (es_string_p(matched))
+			return es_object_autounref(matched);
+		else if (es_null(matched))
+			dsl_throw (WRONG_REGEX_GROUP, object);
+
+		if (l == 3)
+		{
+			EsObject *cdddr = es_cdr (cddr);
+			return es_car (cdddr);
+		}
+
+		return es_object_autounref(es_string_new(""));
 	}
 	else if (es_error_p(car))
 		return car;

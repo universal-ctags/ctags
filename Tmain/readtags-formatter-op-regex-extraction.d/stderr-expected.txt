@@ -1,0 +1,2 @@
+GOT ERROR in FORMATTING: wrong-regex-group: (#/BPF_PROG_TYPE_(.*)/ $name 0)
+GOT ERROR in FORMATTING: wrong-regex-group: (#/BPF_PROG_TYPE_UNSPE(.*)/ $name 100)
