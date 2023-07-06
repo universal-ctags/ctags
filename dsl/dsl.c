@@ -317,7 +317,33 @@ static void dsl_help0 (DSLEngineType engine, FILE *fp)
 	for (int i = 0; i < e->pbinds_count; i++)
 	{
 		const char* hs = e->pbinds [i].helpstr;
-		fprintf(fp, "%15s: %s\n", e->pbinds [i].name, hs? hs: "");
+
+		if (!hs)
+		{
+			fprintf(fp, "%15s: \n", e->pbinds [i].name);
+			continue;
+		}
+
+		while (hs)
+		{
+			const char *hs0 = strchr (hs, '\n');
+
+			fprintf(fp, "%15s: ", (e->pbinds [i].helpstr == hs
+								   ? e->pbinds [i].name
+								   : ""));
+
+			if (hs0)
+			{
+				hs0++;
+				fwrite(hs, 1, hs0 - hs, fp);
+			}
+			else
+			{
+				fputs(hs, fp);
+				fputc('\n', fp);
+			}
+			hs = hs0;
+		}
 	}
 }
 
