@@ -159,6 +159,12 @@ int          es_regex_p       (const EsObject* object);
 EsObject*    es_regex_exec    (const EsObject* regex,
 							   const EsObject* str);
 
+/* Return #f if unmatched.
+ * Retrun NIL is the associate group is not in REGEX. */
+EsObject*    es_regex_exec_extract_match_new (const EsObject* regex,
+											  const EsObject* str,
+											  unsigned int group);
+
 /*
  * Foreign pointer
  */
