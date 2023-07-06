@@ -2373,6 +2373,12 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 		 * Handle CASE 1
 		 */
 		readToken (token);
+		if (isType (token, TOKEN_KEYWORD) &&
+			(isKeyword (token, KEYWORD_get) || isKeyword (token, KEYWORD_set)))
+		{
+			token->type = TOKEN_IDENTIFIER;	// treat as function name
+		}
+
 		if (! isType(token, TOKEN_KEYWORD))
 		{
 			vString *const signature = vStringNew ();
