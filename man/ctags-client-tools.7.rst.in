@@ -99,6 +99,7 @@ Options for Pseudo-tags
 	If a name is preceded by either the '+' or '-' characters, that
 	tags's effect has been added or removed. Otherwise the names replace
 	any current settings. All entries are included if '*' is given.
+	All entries are removed if nothing ('') is given.
 
 ``--fields=+E`` (or ``--fields=+{extras}``)
 	Attach "extras:pseudo" field to pseudo-tags.
