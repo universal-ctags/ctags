@@ -53,10 +53,6 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
-#define isIdentChar(c) \
-	(isalpha (c) || isdigit (c) || (c) == '$' || \
-		(c) == '@' || (c) == '_' || (c) == '#' || \
-		(c) >= 0x80)
 #define newToken() (objPoolGet (TokenPool))
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
@@ -922,6 +918,28 @@ static void parseRegExp (void)
 /* Read a C identifier beginning with "first_char" and places it into
  * "name".
  */
+
+static int include_period_in_identifier = 0;
+
+static void accept_period_in_identifier(bool incl)
+{
+	if (incl)
+	{
+		include_period_in_identifier++;
+	}
+	else if (!incl && include_period_in_identifier > 0)
+	{
+		include_period_in_identifier--;
+	}
+}
+
+static bool isIdentChar(const int c)
+{
+	return (isalpha (c) || isdigit (c) || c == '$' || \
+			c == '@' || c == '_' || c == '#' || \
+			c >= 0x80 || (include_period_in_identifier > 0 && c == '.'));
+}
+
 static void parseIdentifier (vString *const string, const int first_char)
 {
 	int c = first_char;
@@ -2320,6 +2338,8 @@ typedef struct sStatementState {
 	bool foundThis;
 } statementState;
 
+static void deleteTokenFn(void *token) { deleteToken(token); }
+
 static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, statementState *const state)
 {
 	TRACE_ENTER();
@@ -2334,7 +2354,8 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 	 *
 	 * CASE 1
 	 * Specified function name: "build"
-	 *     BindAgent.prototype.build = function( mode ) {
+	 *     BindAgent.prototype.build =
+	 *     BondAgent.prototype.crush = function( mode ) {
 	 *         maybe parse nested functions
 	 *     }
 	 *
@@ -2385,6 +2406,10 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 
 			token->scope = state->indexForName;
 
+			tokenInfo *identifier_token = newToken ();
+			ptrArray *prototype_tokens = NULL;
+			accept_period_in_identifier(true);
+
 			tokenInfo *const method_body_token = newToken ();
 			copyToken (method_body_token, token, true);
 			readToken (method_body_token);
@@ -2398,10 +2423,44 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 					skipArgumentList(method_body_token, false,
 									 vStringLength (signature) == 0 ? signature : NULL);
 				else
+				{
+					char* s1 = vStringValue (identifier_token->string);
+					char* s2 = NULL;
+					if ( isType (method_body_token, TOKEN_EQUAL_SIGN) &&
+						! isType (identifier_token, TOKEN_UNDEFINED) &&
+						(s2 = strstr (s1, ".prototype.")))
+					{
+						if (prototype_tokens == NULL)
+							prototype_tokens = ptrArrayNew (deleteTokenFn);
+
+						memmove (s2, s2+10, strlen (s2+10) + 1);
+						vStringSetLength (identifier_token->string);
+
+						tokenInfo *const save_token = newToken ();
+						copyToken (save_token, identifier_token, true);
+						ptrArrayAdd (prototype_tokens, save_token);
+						identifier_token->type = TOKEN_UNDEFINED;
+					}
+					else if ( isType(method_body_token, TOKEN_IDENTIFIER))
+						copyToken (identifier_token, method_body_token, false);
+
 					readToken (method_body_token);
+				}
 			}
+			deleteToken (identifier_token);
+			accept_period_in_identifier(false);
 
 			int index = makeJsTag (token, JSTAG_METHOD, signature, NULL);
+
+			if (prototype_tokens != NULL)
+			{
+				for (int i=0; i<ptrArrayCount (prototype_tokens); i++)
+				{
+					makeJsTag (ptrArrayItem (prototype_tokens, i), JSTAG_METHOD, signature, NULL);
+				}
+				ptrArrayUnref (prototype_tokens);
+			}
+
 			vStringDelete (signature);
 
 			if ( isType (method_body_token, TOKEN_OPEN_CURLY))
