@@ -2792,7 +2792,6 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 
 nextVar:
 	state.indexForName = CORK_NIL;
-	state.isClass = false;
 	state.foundThis = false;
 	if ( isKeyword(token, KEYWORD_this) )
 	{
@@ -2889,6 +2888,7 @@ nextVar:
 		if (isType (token, TOKEN_COMMA))
 		{
 			readToken (token);
+			state.isClass = false;
 			goto nextVar;
 		}
 	}
@@ -2922,6 +2922,7 @@ nextVar:
 			if (isType (token, TOKEN_COMMA))
 			{
 				readToken (token);
+				state.isClass = false;
 				goto nextVar;
 			}
 		}
