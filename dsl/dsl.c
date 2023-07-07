@@ -11,7 +11,9 @@
  */
 #include "dsl.h"
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -943,14 +945,22 @@ EsObject* dsl_entry_xget_string (const tagEntry *entry, const char* name)
 
 EsObject* dsl_entry_xget_integer (const tagEntry *entry, const char* name)
 {
-	const char *end_str = entry_xget(entry, name);
+	const char *str = entry_xget(entry, name);
 	EsObject *o;
 
-	if (end_str)
+	if (str)
 	{
-		o = es_read_from_string (end_str, NULL);
-		if (es_integer_p (o))
+		long value;
+		char *endstr;
+
+		errno = 0;
+		value = strtol (str, &endstr, 10);
+		if (*endstr == '\0' && str != endstr && errno == 0 &&
+			value <= INT_MAX  && value >= INT_MIN)
+		{
+			o = es_integer_new ((int)value);
 			return es_object_autounref (o);
+		}
 		else
 			return es_false;
 	}
