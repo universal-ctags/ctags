@@ -1,3 +1,6 @@
 A	input.js	/^function A() {$/;"	c
 m1	input.js	/^    m1 : function() {$/;"	m	class:A
 m2	input.js	/^    m2: function() {$/;"	m	class:A
+m3	input.js	/^A.prototype.m3 =$/;"	m	class:A
+m4	input.js	/^B.prototype.m4 =$/;"	m	class:B
+m5	input.js	/^A.prototype.m5 = () => {};$/;"	m	class:A

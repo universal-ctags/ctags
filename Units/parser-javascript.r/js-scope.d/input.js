@@ -16,3 +16,7 @@ A.prototype = {
         return this.a;
     },
 };
+
+A.prototype.m3 =
+B.prototype.m4 =
+A.prototype.m5 = () => {};
