@@ -4,7 +4,7 @@ fn fn1() {
 fn fn2(a int) {
 }
 
-fn fn3(a int, b string, c Foo) {
+fn fn3(a int, b string, c Foo) os.Signal {
 }
 
 fn fn4() ! {
