@@ -115,14 +115,14 @@ static vString* nestingLevelsToScope (const NestingLevels* nls)
 	vString* result = vStringNew ();
 	for (i = 0; i < nls->n; ++i)
 	{
-	    NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
-	    tagEntryInfo *e = getEntryOfNestingLevel (nl);
-	    if (e && (*e->name != '\0') && (!e->placeholder))
-	    {
-	        if (chunks_output++ > 0)
-	            vStringPut (result, SCOPE_SEPARATOR);
-	        vStringCatS (result, e->name);
-	    }
+		NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
+		tagEntryInfo *e = getEntryOfNestingLevel (nl);
+		if (e && (*e->name != '\0') && (!e->placeholder))
+		{
+			if (chunks_output++ > 0)
+				vStringPut (result, SCOPE_SEPARATOR);
+			vStringCatS (result, e->name);
+		}
 	}
 	return result;
 }
@@ -144,12 +144,12 @@ static bool canMatch (const unsigned char** s, const char* literal,
 	const unsigned char next_char = *(*s + literal_length);
 	if (strncmp ((const char*) *s, literal, literal_length) != 0)
 	{
-	    return false;
+		return false;
 	}
 	/* Additionally check that we're at the end of a token. */
 	if (! end_check (next_char))
 	{
-	    return false;
+		return false;
 	}
 	*s += literal_length;
 	return true;
@@ -168,11 +168,11 @@ static bool notIdentCharButColon (int c)
 static bool isOperatorChar (int c)
 {
 	return (c == '[' || c == ']' ||
-	        c == '=' || c == '!' || c == '~' ||
-	        c == '+' || c == '-' ||
-	        c == '@' || c == '*' || c == '/' || c == '%' ||
-	        c == '<' || c == '>' ||
-	        c == '&' || c == '^' || c == '|');
+			c == '=' || c == '!' || c == '~' ||
+			c == '+' || c == '-' ||
+			c == '@' || c == '*' || c == '/' || c == '%' ||
+			c == '<' || c == '>' ||
+			c == '&' || c == '^' || c == '|');
 }
 
 static bool notOperatorChar (int c)
@@ -270,27 +270,27 @@ extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* 
 static bool parseRubyOperator (vString* name, const unsigned char** cp)
 {
 	static const char* RUBY_OPERATORS[] = {
-	    "[]", "[]=",
-	    "**",
-	    "!", "~", "+@", "-@",
-	    "*", "/", "%",
-	    "+", "-",
-	    ">>", "<<",
-	    "&",
-	    "^", "|",
-	    "<=", "<", ">", ">=",
-	    "<=>", "==", "===", "!=", "=~", "!~",
-	    "`",
-	    NULL
+		"[]", "[]=",
+			"**",
+			"!", "~", "+@", "-@",
+			"*", "/", "%",
+			"+", "-",
+			">>", "<<",
+			"&",
+			"^", "|",
+			"<=", "<", ">", ">=",
+			"<=>", "==", "===", "!=", "=~", "!~",
+			"`",
+			NULL
 	};
 	int i;
 	for (i = 0; RUBY_OPERATORS[i] != NULL; ++i)
 	{
-	    if (canMatch (cp, RUBY_OPERATORS[i], notOperatorChar))
-	    {
-	        vStringCatS (name, RUBY_OPERATORS[i]);
-	        return true;
-	    }
+		if (canMatch (cp, RUBY_OPERATORS[i], notOperatorChar))
+		{
+			vStringCatS (name, RUBY_OPERATORS[i]);
+			return true;
+		}
 	}
 	return false;
 }
@@ -335,7 +335,7 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 			if (vStringLength (scope) > 0)
 				vStringPut (scope, SCOPE_SEPARATOR);
 			vStringNCatS (scope, qualified_name,
-			              unqualified_name - qualified_name);
+						  unqualified_name - qualified_name);
 			/* assume module parent type for a lack of a better option */
 			parent_kind = K_MODULE;
 		}
@@ -351,7 +351,7 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 	if (unqualified_name[0] != '$'
 		&& vStringLength (scope) > 0) {
 		Assert (0 <= parent_kind &&
-		        (size_t) parent_kind < (ARRAY_SIZE (RubyKinds)));
+				(size_t) parent_kind < (ARRAY_SIZE (RubyKinds)));
 
 		tag.extensionFields.scopeKindIndex = parent_kind;
 		tag.extensionFields.scopeName = vStringValue (scope);
@@ -389,12 +389,15 @@ static bool charIsIn (char ch, const char* list)
 
 /* Advances 'cp' over leading whitespace. */
 #define skipWhitespace rubySkipWhitespace
-extern void rubySkipWhitespace (const unsigned char** cp)
+extern bool rubySkipWhitespace (const unsigned char** cp)
 {
+	bool r = false;
 	while (isspace (**cp))
 	{
-	    ++*cp;
+		++*cp;
+		r = true;
 	}
+	return r;
 }
 
 static void parseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
@@ -1049,15 +1052,15 @@ static void findRubyTags (void)
 		*/
 
 		if (canMatchKeywordWithAssign (&cp, "for") ||
-		    canMatchKeywordWithAssign (&cp, "until") ||
-		    canMatchKeywordWithAssign (&cp, "while"))
+			canMatchKeywordWithAssign (&cp, "until") ||
+			canMatchKeywordWithAssign (&cp, "while"))
 		{
 			expect_separator = true;
 			enterUnnamedScope ();
 		}
 		else if (canMatchKeywordWithAssign (&cp, "case") ||
-		         canMatchKeywordWithAssign (&cp, "if") ||
-		         canMatchKeywordWithAssign (&cp, "unless"))
+				 canMatchKeywordWithAssign (&cp, "if") ||
+				 canMatchKeywordWithAssign (&cp, "unless"))
 		{
 			enterUnnamedScope ();
 		}
@@ -1076,7 +1079,7 @@ static void findRubyTags (void)
 		{
 
 			int r;
-			if (*(cp - 1) != 's')
+			if (*(cp - 1) != 's') /* clas* != s */
 			{
 				r = emitRubyTagFull(NULL, K_CLASS, true, false);
 				expect_separator = true;
@@ -1245,6 +1248,19 @@ static void findRubyTags (void)
 					++cp;
 				while (isIdentChar (*cp));
 			}
+		}
+
+		if (expect_separator)
+		{
+			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
+			tagEntryInfo *e_scope  = getEntryOfNestingLevel (nl);
+			if (e_scope && e_scope->kindIndex == K_CLASS
+				&& isTagExtraBitMarked (e_scope, XTAG_ANONYMOUS))
+				/* Class.new() ... was found but "do" or `{' is not
+				 * found at the end; no block is made. Let's
+				 * pop the nesting level push when Class.new()
+				 * was found. */
+				nestingLevelsPop (nesting);
 		}
 	}
 	nestingLevelsFree (nesting);
