@@ -1,6 +1,6 @@
 fn1	input.v	/^fn fn1() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:2
 fn2	input.v	/^fn fn2(a int) {$/;"	f	line:4	typeref:typename:	signature:(a int)	roles:def	end:5
-fn3	input.v	/^fn fn3(a int, b string, c Foo) {$/;"	f	line:7	typeref:typename:	signature:(a int, b string, c Foo)	roles:def	end:8
+fn3	input.v	/^fn fn3(a int, b string, c Foo) os.Signal {$/;"	f	line:7	typeref:typename:os.Signal	signature:(a int, b string, c Foo)	roles:def	end:8
 fn4	input.v	/^fn fn4() ! {$/;"	f	line:10	typeref:typename:!	signature:()	roles:def	end:11
 fn5	input.v	/^fn fn5() ?Test {$/;"	f	line:13	typeref:typename:?Test	signature:()	roles:def	end:14
 fn6	input.v	/^fn fn6() (int, int) {$/;"	f	line:16	typeref:typename:(int, int)	signature:()	roles:def	end:23
@@ -38,3 +38,9 @@ Bogus.nope	input-4.v	/^fn Bogus.nope() {$/;"	f	line:13	module:xyz	typeref:typena
 main	input-5.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:4
 a	input-5.v	/^    a := foo().bar()$/;"	v	line:2	roles:def
 b	input-5.v	/^    b := Foo.bar().foo.bar()$/;"	v	line:3	roles:def
+a	input-6.v	/^pub fn a() Test$/;"	f	line:1	typeref:typename:Test	access:pub	signature:()	roles:def
+b	input-6.v	/^pub fn b() !Test$/;"	f	line:2	typeref:typename:!Test	access:pub	signature:()	roles:def
+c	input-6.v	/^pub fn c() []Test$/;"	f	line:3	typeref:typename:[]Test	access:pub	signature:()	roles:def
+d	input-6.v	/^pub fn d() [][]Test$/;"	f	line:4	typeref:typename:[][]Test	access:pub	signature:()	roles:def
+e	input-6.v	/^pub fn e() a.b.C$/;"	f	line:5	typeref:typename:a.b.C	access:pub	signature:()	roles:def
+f	input-6.v	/^pub fn f() [][][]a.b.C$/;"	f	line:6	typeref:typename:[][][]a.b.C	access:pub	signature:()	roles:def

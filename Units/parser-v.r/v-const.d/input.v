@@ -54,4 +54,10 @@ pub const (
     c = 0
     d = r'hi'
     e = r"there"
+    f = '"'
+    g = "'"
+    h = '${"'"}'
+    i = '\${'
+    j = '$'
+    z = 'done'
 )

@@ -7,6 +7,10 @@ fn main() {
 	}
 	if (s.pos - 1 >= 0 && s.text[s.pos - 1] != `\\`) && ch == `"` {
 	}
+	if g.cur_fn != unsafe { nil } && g.cur_fn.generic_names.len > 0 {
+	}
 	for (flags & ttf.tfkc_more_components) > 0 {
+		res << 'foo' + foo.bar.map(it.str()).join('|')
+		res << 'foo' + foo.bar.chan(it.str()).join('|')
 	}
 }
