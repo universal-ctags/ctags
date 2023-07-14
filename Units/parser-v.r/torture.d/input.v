@@ -13,4 +13,5 @@ fn main() {
 		res << 'foo' + foo.bar.map(it.str()).join('|')
 		res << 'foo' + foo.bar.chan(it.str()).join('|')
 	}
+    e.run_func(e.mods['main']['main'] or { ast.FnDecl{} } as ast.FnDecl, ...args)
 }
