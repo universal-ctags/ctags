@@ -1,0 +1,16 @@
+input	input.m	/^classdef input < handle$/;"	c
+get.myproperty	input.m	/^    function out=get.myproperty(obj)$/;"	f
+set.myproperty	input.m	/^    function out=set.myproperty(obj,val)$/;"	f
+classfunc1	input.m	/^        function [x,y,z] = classfunc1$/;"	f
+classfunc2	input.m	/^        function x = classfunc2()$/;"	f
+x	input.m	/^            x = func2(1);$/;"	v
+classfunc3	input.m	/^        function classfunc3;$/;"	f
+func1	input.m	/^function [x,y,z] = func1() % Silly function with multiple outputs$/;"	f
+x	input.m	/^    x = 1;$/;"	v
+y	input.m	/^    y = 2;$/;"	v
+z	input.m	/^    z = 3;$/;"	v
+func2	input.m	/^function x = func2(arg)$/;"	f
+x	input.m	/^    x = arg;$/;"	v
+func3	input.m	/^function func3()$/;"	f
+A	input.m	/^    A = magic(4);$/;"	v
+R	input.m	/^    R = randn(3,4,5);$/;"	v
