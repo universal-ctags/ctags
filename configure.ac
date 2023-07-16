@@ -295,7 +295,7 @@ if test "$cross_compiling" = "yes"; then
 
     BUILD_OBJEXT='o'
 
-    if [ -f "$TEMP_DIR_FOR_CHECKING/test.exe" ] ; then
+    if test -f "$TEMP_DIR_FOR_CHECKING/test.exe" ; then
         BUILD_EXEEXT='.exe'
     fi
 else
