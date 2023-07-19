@@ -1,6 +1,7 @@
 /*
- * perl6.c -- Perl6 parser.
+ * raku.c -- Raku parser.
  * Author: Dmitri Tikhonov <dmitri@cpan.org>
+ * Author: Will Coleda <will@coleda.com>
  *
  * This is a very basic Perl 6 parser.  It does not know how to:
  *   - skip POD;
@@ -25,7 +26,7 @@
 #include "selectors.h"
 #include "vstring.h"
 
-enum perl6Kind {
+enum rakuKind {
     K_NONE = -1,
     K_CLASS,
     K_GRAMMAR,
@@ -39,7 +40,7 @@ enum perl6Kind {
     K_TOKEN,
 };
 
-static kindDefinition perl6Kinds[] = {
+static kindDefinition rakuKinds[] = {
     [K_CLASS]       = { true,  'c', "class",      "classes" },
     [K_GRAMMAR]     = { true,  'g', "grammar",    "grammars" },
     [K_METHOD]      = { true,  'm', "method",     "methods" },
@@ -70,7 +71,7 @@ enum token {
     T_TOKEN,
 };
 
-static const enum perl6Kind token2kind[] = {
+static const enum rakuKind token2kind[] = {
     [T_CLASS]       = K_CLASS,
     [T_GRAMMAR]     = K_GRAMMAR,
     [T_METHOD]      = K_METHOD,
@@ -164,7 +165,7 @@ matchToken (const char *s, int len)
     return -1;
 }
 
-static const int validPerl6Identifier[0x100] = {
+static const int validRakuIdentifier[0x100] = {
 /* r!perl -e "print qq([(int)'\$_'] = 1,\n)for a..z,A..Z,0..9,':','-','_'"|fmt
  */
     [(int)'a'] = 1, [(int)'b'] = 1, [(int)'c'] = 1, [(int)'d'] = 1,
@@ -198,7 +199,7 @@ static const int kindMayHaveMethodPrefix = (1 << K_SUBMETHOD) |
  * identifier is invalid.
  */
 static int
-trimIdentifier (enum perl6Kind kind, const char **ps, int len)
+trimIdentifier (enum rakuKind kind, const char **ps, int len)
 {
     Assert(len > 0);
     const char *const end = *ps + len;
@@ -209,7 +210,7 @@ trimIdentifier (enum perl6Kind kind, const char **ps, int len)
     /* Record the start of identifier: */
     *ps = s;
     /* Continuous string of valid characters: */
-    while (s < end && validPerl6Identifier[(int)*s])
+    while (s < end && validRakuIdentifier[(int)*s])
         ++s;
     /* sub multi infix:<...>        -- we want the "infix" only */
     while (s - *ps > 0 && ':' == s[-1])
@@ -218,7 +219,7 @@ trimIdentifier (enum perl6Kind kind, const char **ps, int len)
     return s - *ps;
 }
 
-struct p6Ctx {
+struct rakuCtx {
     enum token  tokens[128 /* unlikely to need more than this */];
     unsigned int n_tokens;
     vString    *name;
@@ -226,7 +227,7 @@ struct p6Ctx {
 };
 
 static void
-makeTag (struct p6Ctx *ctx, int kind, const char *name, int len)
+makeTag (struct rakuCtx *ctx, int kind, const char *name, int len)
 {
     tagEntryInfo entry;
     vStringNCopyS(ctx->name, name, len);
@@ -235,17 +236,17 @@ makeTag (struct p6Ctx *ctx, int kind, const char *name, int len)
 }
 
 static void
-possiblyMakeTag (struct p6Ctx *ctx, const char *s, int len)
+possiblyMakeTag (struct rakuCtx *ctx, const char *s, int len)
 {
     Assert(ctx->n_tokens > 0);
-    enum perl6Kind kind = token2kind[ ctx->tokens[ctx->n_tokens - 1] ];
-    if (K_NONE != kind && perl6Kinds[kind].enabled
+    enum rakuKind kind = token2kind[ ctx->tokens[ctx->n_tokens - 1] ];
+    if (K_NONE != kind && rakuKinds[kind].enabled
                        && (len = trimIdentifier(kind, &s, len)) > 0)
         makeTag(ctx, kind, s, len);
 }
 
 static void
-initP6Ctx (struct p6Ctx *ctx)
+initRakuCtx (struct rakuCtx *ctx)
 {
     ctx->n_tokens = 0;
     ctx->name = vStringNew();
@@ -253,7 +254,7 @@ initP6Ctx (struct p6Ctx *ctx)
 }
 
 static void
-deinitP6Ctx (struct p6Ctx *ctx)
+deinitRakuCtx (struct rakuCtx *ctx)
 {
     vStringDelete(ctx->name);
 }
@@ -265,7 +266,7 @@ deinitP6Ctx (struct p6Ctx *ctx)
  * TODO: Currently, POD and multi-line comments are not handled.
  */
 static int
-getNonSpaceStr (struct p6Ctx *ctx, const char **ptok)
+getNonSpaceStr (struct rakuCtx *ctx, const char **ptok)
 {
     size_t non_white_len;
     const char *s;
@@ -289,9 +290,9 @@ getNonSpaceStr (struct p6Ctx *ctx, const char **ptok)
 }
 
 static void
-findPerl6Tags (void)
+findRakuTags (void)
 {
-    struct p6Ctx ctx;
+    struct rakuCtx ctx;
 
 #define RESET_TOKENS() do { ctx.n_tokens = 0; } while (0)
 
@@ -305,7 +306,7 @@ findPerl6Tags (void)
     }                                                                   \
 } while (0)
 
-    initP6Ctx(&ctx);
+    initRakuCtx(&ctx);
 
     const char *s;
     int len;
@@ -321,21 +322,20 @@ findPerl6Tags (void)
         }
     }
 
-    deinitP6Ctx(&ctx);
+    deinitRakuCtx(&ctx);
 }
 
 parserDefinition *
-Perl6Parser (void)
+RakuParser (void)
 {
-    static const char *const extensions[] = { "p6", "pm6", "pm", "pl6",
-		"t6", "raku", "rakumod", "rakutest", NULL };
+    static const char *const extensions[] = { "raku", "rakumod", "rakutest", "rakudoc", NULL };
     static selectLanguage selectors [] = { selectByPickingPerlVersion,
 					   NULL };
-    parserDefinition* def = parserNew("Perl6");
-    def->kindTable      = perl6Kinds;
-    def->kindCount  = ARRAY_SIZE(perl6Kinds);
+    parserDefinition* def = parserNew("Raku");
+    def->kindTable      = rakuKinds;
+    def->kindCount  = ARRAY_SIZE(rakuKinds);
     def->extensions = extensions;
-    def->parser     = findPerl6Tags;
+    def->parser     = findRakuTags;
     def->selectLanguage = selectors;
     return def;
 }

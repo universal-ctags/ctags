@@ -138,7 +138,6 @@
 	PasswdParser, \
 	PascalParser, \
 	PerlParser, \
-	Perl6Parser, \
 	PhpParser, \
 	PodParser, \
 	PowerShellParser, \
@@ -152,6 +151,7 @@
 	RMarkdownParser, \
 	RParser, \
 	RakeParser, \
+	RakuParser, \
 	R6ClassParser, \
 	RSpecParser, \
 	RexxParser, \

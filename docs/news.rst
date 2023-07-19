@@ -446,7 +446,6 @@ The following parsers have been added:
 * OpenAPI (3.x.x / Swagger 2.0) *Yaml based subparser*
 * Passwd *optlib*
 * PuppetManifest *optlib*
-* Perl6
 * Pod *optlib*
 * PowerShell
 * PropertyList(plist) *libxml*
@@ -458,6 +457,7 @@ The following parsers have been added:
 * R
 * R6Class *R based subparser*
 * Rake *Ruby based subparser*
+* Raku *formerly Perl6*
 * RDoc *optlib pcre2*
 * RelaxNG *libxml*
 * ReStructuredText

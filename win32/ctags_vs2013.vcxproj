@@ -334,7 +334,6 @@
     <ClCompile Include="..\parsers\perl-function-parameters.c" />
     <ClCompile Include="..\parsers\perl-moose.c" />
     <ClCompile Include="..\parsers\perl.c" />
-    <ClCompile Include="..\parsers\perl6.c" />
     <ClCompile Include="..\parsers\php.c" />
     <ClCompile Include="..\parsers\powershell.c" />
     <ClCompile Include="..\parsers\protobuf.c" />
@@ -345,6 +344,7 @@
     <ClCompile Include="..\parsers\r-s4class.c" />
     <ClCompile Include="..\parsers\r.c" />
     <ClCompile Include="..\parsers\rake.c" />
+    <ClCompile Include="..\parsers\raku.c" />
     <ClCompile Include="..\parsers\rexx.c" />
     <ClCompile Include="..\parsers\rmarkdown.c" />
     <ClCompile Include="..\parsers\robot.c" />
