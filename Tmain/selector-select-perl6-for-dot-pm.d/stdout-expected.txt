@@ -1,0 +1,5 @@
+# --print-language
+input0.pm: Perl6
+input1.pm: Perl6
+input2.pm: Perl6
+input3.pm: Perl
