@@ -12,6 +12,7 @@
 */
 #include "general.h"  /* must always come first */
 
+#include <errno.h>
 #if defined (HAVE_IO_H)
 # include <io.h>
 #endif
@@ -93,6 +94,7 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 	PE_CONST char *const sortOrder2 = "LC_ALL=C";
 # endif
 	int ret = -1;
+	int system_errno = 0;
 
 	{
 		vString *cmd = vStringNew ();
@@ -143,16 +145,28 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 			if (lseek (fdstdin, 0, SEEK_SET) != 0)
 				error (FATAL | PERROR, "cannot rewind tag file");
 			ret = system (vStringValue (cmd));
+			system_errno = errno;
 			if (dup2 (fdsave, fdstdin) < 0)
 				error (FATAL | PERROR, "cannot restore stdin fd");
 			close (fdsave);
 		}
 		else
+		{
 			ret = system (vStringValue (cmd));
+			system_errno = errno;
+		}
 		vStringDelete (cmd);
 	}
 	if (ret != 0)
-		error (FATAL | PERROR, "cannot sort tag file");
+	{
+		errorSelection selection = FATAL;
+		if (ret == -1)
+		{
+			selection |= PERROR;
+			errno = system_errno;
+		}
+		error (selection, "cannot sort tag file");
+	}
 }
 
 #else
