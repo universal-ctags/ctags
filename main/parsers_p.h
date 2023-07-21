@@ -138,6 +138,7 @@
 	PasswdParser, \
 	PascalParser, \
 	PerlParser, \
+	Perl6Parser, \
 	PhpParser, \
 	PodParser, \
 	PowerShellParser, \

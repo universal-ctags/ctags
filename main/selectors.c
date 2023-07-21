@@ -22,7 +22,7 @@
 
 static const char *TR_UNKNOWN = NULL;
 static const char *TR_PERL5	  = "Perl";
-static const char *TR_RAKU	  = "Raku";
+static const char *TR_PERL6	  = "Perl6";
 
 static const char *TR_OBJC	  = "ObjectiveC";
 static const char *TR_MATLAB  = "MatLab";
@@ -53,8 +53,7 @@ static const char *selectByLines (MIO *input,
 	return defaultLang;
 }
 
-/* Returns "Perl" or "Raku" or NULL if it does not taste like anything 
-   Raku is included as it was formerly known as Perl6 */
+/* Returns "Perl" or "Perl6" or NULL if it does not taste like anything */
 static const char *
 tastePerlLine (const char *line, void *data CTAGS_ATTR_UNUSED)
 {
@@ -77,24 +76,24 @@ tastePerlLine (const char *line, void *data CTAGS_ATTR_UNUSED)
 		break;
 	case 'c':
 		if (CHECK_PART(line, "class"))
-			return TR_RAKU;
+			return TR_PERL6;
 		break;
 	case 'g':
 		if (CHECK_PART(line, "grammar"))
-			return TR_RAKU;
+			return TR_PERL6;
 		break;
 	case 'm':
 		/* TODO: my may be many things: class, role, etc. */
 		if (CHECK_PART(line, "my class"))
-			return TR_RAKU;
+			return TR_PERL6;
 		if (CHECK_PART(line, "method"))
-			return TR_RAKU;
+			return TR_PERL6;
 		if (CHECK_PART(line, "multi"))
-			return TR_RAKU;
+			return TR_PERL6;
 		break;
 	case 'n':
 		if (CHECK_PART(line, "need"))
-			return TR_RAKU;
+			return TR_PERL6;
 		break;
 	case 'p':
 		if (CHECK_PART(line, "package"))
@@ -102,15 +101,15 @@ tastePerlLine (const char *line, void *data CTAGS_ATTR_UNUSED)
 		break;
 	case 'r':
 		if (CHECK_PART(line, "role"))
-			return TR_RAKU;
+			return TR_PERL6;
 		if (CHECK_PART(line, "require 5"))
 			return TR_PERL5;
 		break;
 	case 'u':
 		if (CHECK_PART(line, "unit"))
-			return TR_RAKU;
+			return TR_PERL6;
 		if (CHECK_PART(line, "use v6"))
-			return TR_RAKU;
+			return TR_PERL6;
 		if (CHECK_PART(line, "use nqp"))
 			return TR_PERL5;
 		if (CHECK_PART(line, "use warnings"))

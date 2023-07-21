@@ -23,7 +23,6 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
-#include "selectors.h"
 #include "vstring.h"
 
 enum rakuKind {
@@ -329,13 +328,40 @@ parserDefinition *
 RakuParser (void)
 {
     static const char *const extensions[] = { "raku", "rakumod", "rakutest", "rakudoc", NULL };
-    static selectLanguage selectors [] = { selectByPickingPerlVersion,
-					   NULL };
     parserDefinition* def = parserNew("Raku");
     def->kindTable      = rakuKinds;
     def->kindCount  = ARRAY_SIZE(rakuKinds);
     def->extensions = extensions;
     def->parser     = findRakuTags;
+    return def;
+}
+
+
+/*
+ * Perl6 for keeping backward compatibility of the CLI.
+ */
+#include "selectors.h"
+/* TODO: sharing a kind array within two parsers are bad idea.
+ * e.g. The combination of --kinds-Perl6=+c and --kinds-Raku=-c
+ * doesn't work.
+ */
+#define perl6Kinds rakuKinds
+/* NOTE: We assume the grammer of Raku is upper compatible with
+ * Perl6. When this assumption is no longer true, we may have to
+ * copy the function, or this file. Don't waste your time to
+ * make one function support two languages; Copying may be enough. */
+#define findPerl6Tags findRakuTags
+parserDefinition *
+Perl6Parser (void)
+{
+	static const char *const extensions[] = { "p6", "pm6", "pm", "pl6", "t6", NULL };
+    static selectLanguage selectors [] = { selectByPickingPerlVersion,
+					   NULL };
+    parserDefinition* def = parserNew("Perl6");
+    def->kindTable      = perl6Kinds;
+    def->kindCount  = ARRAY_SIZE(perl6Kinds);
+    def->extensions = extensions;
+    def->parser     = findPerl6Tags;
     def->selectLanguage = selectors;
     return def;
 }
