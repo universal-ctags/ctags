@@ -109,19 +109,12 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 		putenv (sortOrder1);
 		putenv (sortOrder2);
 # endif
-		vStringCatS (cmd, sortCommand);
-		if (! toStdout)
-		{
-			vStringCatS (cmd, " -o ");
-			appendCstringWithQuotes (cmd, tagFileName ());
-			vStringPut (cmd, ' ');
-			appendCstringWithQuotes (cmd, tagFileName ());
-		}
 #else
 		vStringCatS (cmd, sortOrder1);
 		vStringPut (cmd, ' ');
 		vStringCatS (cmd, sortOrder2);
 		vStringPut (cmd, ' ');
+#endif
 		vStringCatS (cmd, sortCommand);
 		if (! toStdout)
 		{
@@ -130,7 +123,6 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 			vStringPut (cmd, ' ');
 			appendCstringWithQuotes (cmd, tagFileName ());
 		}
-#endif
 		verbose ("system (\"%s\")\n", vStringValue (cmd));
 		if (toStdout)
 		{
