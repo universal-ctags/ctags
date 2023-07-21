@@ -152,6 +152,7 @@
 	RMarkdownParser, \
 	RParser, \
 	RakeParser, \
+	RakuParser, \
 	R6ClassParser, \
 	RSpecParser, \
 	RexxParser, \

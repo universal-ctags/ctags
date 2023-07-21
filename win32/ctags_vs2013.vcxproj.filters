@@ -525,9 +525,6 @@
     <ClCompile Include="..\parsers\perl.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\perl6.c">
-      <Filter>Source Files\parsers</Filter>
-    </ClCompile>
     <ClCompile Include="..\parsers\php.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
@@ -556,6 +553,9 @@
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\rake.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\raku.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\rexx.c">

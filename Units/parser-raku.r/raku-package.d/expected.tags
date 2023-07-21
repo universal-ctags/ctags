@@ -4,5 +4,5 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	Development	//
-Foo	input.pm	/^package Foo {$/;"	p
-hello-world	input.pm	/^    sub hello-world is export {$/;"	s
+Foo	input.rakumod	/^package Foo {$/;"	p
+hello-world	input.rakumod	/^    sub hello-world is export {$/;"	s

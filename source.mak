@@ -380,7 +380,6 @@ PARSER_SRCS =				\
 	parsers/perl.c			\
 	parsers/perl-function-parameters.c \
 	parsers/perl-moose.c		\
-	parsers/perl6.c			\
 	parsers/php.c			\
 	parsers/powershell.c		\
 	parsers/protobuf.c		\
@@ -391,6 +390,7 @@ PARSER_SRCS =				\
 	parsers/r-s4class.c		\
 	parsers/r.c			\
 	parsers/rake.c			\
+	parsers/raku.c			\
 	parsers/rexx.c			\
 	parsers/rmarkdown.c		\
 	parsers/robot.c			\
