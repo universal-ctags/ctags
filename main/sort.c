@@ -123,7 +123,7 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 		vStringCatS (cmd, sortCommand);
 		if (! toStdout)
 		{
-			vStringCats (cmd, " -o ");
+			vStringCatS (cmd, " -o ");
 			appendCstringWithQuotes (cmd, tagFileName ());
 			vStringPut (cmd, ' ');
 			appendCstringWithQuotes (cmd, tagFileName ());
