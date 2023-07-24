@@ -1,0 +1,4 @@
+buf0	input.cxx	/^alignas(64) int buf0[8192];$/;"	v	typeref:typename:int[8192]
+buf1	input.cxx	/^alignas(void *) int buf1[8192];$/;"	v	typeref:typename:int[8192]
+S	input.cxx	/^struct alignas(32) S {$/;"	s	file:
+i	input.cxx	/^  alignas(4) int i;$/;"	m	struct:S	typeref:typename:int	file:
