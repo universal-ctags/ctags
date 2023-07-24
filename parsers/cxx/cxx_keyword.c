@@ -164,8 +164,8 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	},
 	{
 		"alignas",
-		CXXLanguageCPP,
-		CXXKeywordMayAppearInVariableDeclaration
+		CXXLanguageC | CXXLanguageCPP,
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordMayDropInTokenizer,
 	},
 	{
 		"alignof",

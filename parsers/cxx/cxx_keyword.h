@@ -37,7 +37,7 @@ typedef enum _CXXKeyword
 	CXXKeyword__TYPEOF, // GCC accepts this.
 	CXXKeyword__TYPEOF__, // GCC (https://gcc.gnu.org/onlinedocs/gcc-3.3.1/gcc/Typeof.html#Typeof)
 	CXXKeyword_THREAD_LOCAL, // C11
-	CXXKeywordALIGNAS, // (since C++11)
+	CXXKeywordALIGNAS, // (since C++11, C11 (stdalign.h), C23)
 	CXXKeywordALIGNOF, // (since C++11)
 	//CXXKeywordAND,
 	//CXXKeywordAND_EQ,
