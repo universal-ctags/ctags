@@ -7,6 +7,7 @@
 struct sse_t
 {
     alignas(16) float sse_data[4];
+    _Alignas(16) float sse_data_[4];
 };
 
 // every object of type struct data will be aligned to 128-byte boundary
@@ -15,6 +16,8 @@ struct data
     char x;
     alignas(128) char cacheline[128]; // over-aligned array of char,
                                       // not array of over-aligned chars
+    _Alignas(128) char cacheline_[128];
+
 };
 
 int main(void)
@@ -25,5 +28,6 @@ int main(void)
     printf("alignment of sse_t is %zu\n", alignof(struct sse_t));
 
     alignas(2048) struct data d; // this instance of data is aligned even stricter
+    _Alignas(2048) struct data d_;
     (void)d; // suppresses "maybe unused" warning
 }

@@ -158,6 +158,11 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
+		"_Alignas",
+		CXXLanguageC,
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordMayDropInTokenizer,
+	},
+	{
 		"_Thread_local",
 		CXXLanguageC,
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames,
