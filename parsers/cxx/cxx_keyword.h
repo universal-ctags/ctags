@@ -139,6 +139,7 @@ bool cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId);
 bool cxxKeywordMayAppearInVariableDeclaration(CXXKeyword eKeywordId);
 bool cxxKeywordIsCPPSpecific(CXXKeyword eKeywordId);
 bool cxxKeywordIsDecltype(CXXKeyword eKeywordId);
+bool cxxKeywordMayDropInTokenizer(CXXKeyword eKeywordId);
 
 
 const char * cxxKeywordName(CXXKeyword eKeywordId);
