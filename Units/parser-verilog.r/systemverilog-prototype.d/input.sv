@@ -1,6 +1,6 @@
 // disabled K_PROTOTYPE: don't use "--extras=+q" for coverage
 class C;
-  extern function ext_func ();
+  extern function void ext_func ();
   pure virtual task ext_pure_virt_task (x);
   typedef class   fwd_type_class;
 endclass

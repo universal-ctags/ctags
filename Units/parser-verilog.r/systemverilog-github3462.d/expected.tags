@@ -1,3 +1,4 @@
+foo	input.sv	/^module foo;$/;"	m
 foo	input.sv	/^package foo;$/;"	K
 import_func	input.sv	/^  import "DPI-C" context function int import_func (string str);$/;"	Q	package:foo
 str	input.sv	/^  import "DPI-C" context function int import_func (string str);$/;"	p	prototype:foo.import_func

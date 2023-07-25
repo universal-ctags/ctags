@@ -19,6 +19,7 @@ proto2	input.sv	/^  extern constraint proto2; \/\/ explicit form$/;"	Q	class:C
 D	input.sv	/^virtual class D;$/;"	C
 Test	input.sv	/^  pure constraint Test;$/;"	Q	class:D
 E	input.sv	/^class E;$/;"	C
+c1	input.sv	/^  constraint c1 {$/;"	O	class:E
 a	input.sv	/^  rand byte a[5];$/;"	r	class:E
 b	input.sv	/^  rand byte b;$/;"	r	class:E
 excluded	input.sv	/^  rand byte excluded;$/;"	r	class:E

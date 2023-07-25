@@ -22,10 +22,10 @@ mod_prog1	input.sv	/^program mod_prog1;$/;"	P	module:topmod
 topmod.mod_prog1	input.sv	/^program mod_prog1;$/;"	P	module:topmod
 mod_prog2	input.sv	/^program mod_prog2;$/;"	P	module:topmod
 topmod.mod_prog2	input.sv	/^program mod_prog2;$/;"	P	module:topmod
-reg_in_anon_prog	input.sv	/^    reg reg_in_anon_prog;$/;"	r
-topmod_anon	input.sv	/^module topmod_anon;$/;"	m
-reg_in_anon_prog2	input.sv	/^    reg reg_in_anon_prog2;$/;"	r	module:topmod_anon
-topmod_anon.reg_in_anon_prog2	input.sv	/^    reg reg_in_anon_prog2;$/;"	r	module:topmod_anon
+func_in_anon_prog	input.sv	/^    function func_in_anon_prog;$/;"	f
+anon_pkg	input.sv	/^package anon_pkg;$/;"	K
+func_in_anon_prog2	input.sv	/^    function func_in_anon_prog2;$/;"	f	package:anon_pkg
+anon_pkg.func_in_anon_prog2	input.sv	/^    function func_in_anon_prog2;$/;"	f	package:anon_pkg
 prog_static	input.sv	/^program static prog_static;$/;"	P
 logic_static	input.sv	/^    logic logic_static;$/;"	r	program:prog_static
 prog_static.logic_static	input.sv	/^    logic logic_static;$/;"	r	program:prog_static
