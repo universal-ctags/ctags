@@ -562,7 +562,7 @@ static void parseSyntax (void)
 	nextTokenFull (true);
 	if (token.type == TOKEN_STR)
 	{
-		const vString *proto = cppGetLastCharOrStringContents ();
+		const vString *proto = token.value;
 		if (strcmp (vStringValue (proto), "proto2") == 0)
 			syntax = SYNTAX_PROTO2;
 		else if (strcmp (vStringValue (proto), "proto3") == 0)
