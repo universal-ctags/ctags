@@ -52,17 +52,13 @@
 		isToken (c, TOKEN_OPERATOR, TOKEN_PLUSMINUS, TOKEN_ASTERISK, \
 		         TOKEN_AMPERSAND, TOKEN_CHPOP, TOKEN_PIPE) || \
 		isKeyword (token, KEYWORD_in) )
-#define isInitialType(c) ( \
-		isToken (c, TOKEN_TYPE, TOKEN_OPEN_SQUARE, TOKEN_QUESTION, \
+#define isInitialType(c) (\
+		isToken (c, TOKEN_TYPE, TOKEN_CSYM, TOKEN_OPEN_SQUARE, TOKEN_QUESTION, \
 		         TOKEN_EXCLAMATION, TOKEN_ASTERISK, TOKEN_AMPERSAND) || \
 		isKeyword (c, KEYWORD_TYPE, KEYWORD_map, KEYWORD_Smap, KEYWORD_shared, \
 		           KEYWORD_fn))
 #define isClose(c) ( \
 		isToken (c, TOKEN_CLOSE_PAREN, TOKEN_CLOSE_SQUARE, TOKEN_CLOSE_CURLY))
-#define isInC(c) ( \
-		!vStringIsEmpty (c->string) && vStringValue (c->string)[0] == 'C' && ( \
-			vStringValue (c->string)[1] == '\0' || \
-			vStringValue (c->string)[1] == '.' ))
 #define unreadToken(t) (unreadTokenFull (t, NULL))
 #define RED "\033[91m\033[1m"
 #define NORM "\033[0m\n"
@@ -236,6 +232,7 @@ typedef enum eTokenType {
 	TOKEN_LABEL,
 	TOKEN_ENUMERATOR,
 	TOKEN_EOF,
+	TOKEN_CSYM,
 	COUNT_TOKEN
 } tokenType;
 
@@ -270,7 +267,8 @@ static char *const tokenNames[COUNT_TOKEN] = {
 	"CHPOP",
 	"LABEL",
 	"ENUMERATOR",
-	"EOF"
+	"EOF",
+	"CSYM"
 };
 
 typedef enum {
@@ -1110,7 +1108,7 @@ static int lookupName (vString *name, int scope)
 // unread the last token, if is not within their purview.
 
 // fq: [ident | type] ['.' [ident | type | kwtype]]*
-// on return, token->type is IDENT/TYPE and ->string is f.q.name if capturing
+// on return, token->type is IDENT/TYPE/CSYM, token->string is fully-qualified
 static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 {
 	Assert (isToken (token, TOKEN_IDENT, TOKEN_TYPE));
@@ -1119,13 +1117,10 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 		return;
 	PARSER_PROLOGUE ("fq");
 
-	vString *acc = NULL;
-	if (captureInToken)
-	{
-		acc = token->string;
-		token->string = NULL;
-	}
-
+	vString *acc = captureInToken? token->string : NULL;
+	bool isInC = token->string && vStringValue (token->string)[0] == 'C' && (
+		vStringValue (token->string)[1] == '\0' ||
+		vStringValue (token->string)[1] == '.' );
 	tokenType prev = TOKEN_NONE, prevprev = TOKEN_NONE;
 	tokenInfo *tokens[2] = { NULL, NULL };
 	int count = 0, idx = 1;
@@ -1155,13 +1150,11 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 	deleteToken (tokens[1]);
 
 	// load token with type (and fq name)
-    token->type = prev;
+    token->type = isInC? TOKEN_CSYM : prev;
     token->fullyQualified = true;
-    vStringDelete (token->string);
-    token->string = acc;
 
     // should end on one of these
-    expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_KEYWORD) ||
+    expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_CSYM, TOKEN_KEYWORD) ||
 	    expectKeyword (token, KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan);
 
     PARSER_EPILOGUE ();
@@ -1171,10 +1164,8 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 static void parseFQIdent (tokenInfo *const token, vString *const capture)
 {
 	Assert (isToken (token, TOKEN_IDENT, TOKEN_TYPE));
-	bool inC = isInC (token);
 	parseFullyQualified (token, !!capture);
-	if (!inC)
-		expectToken (token, TOKEN_IDENT);
+	expectToken (token, TOKEN_IDENT, TOKEN_CSYM);
 	if (capture && token->string)
 		vStringCat (capture, token->string);
 }
@@ -1506,9 +1497,9 @@ static void parseFunction (tokenInfo *const token, int scope,
 		readTokenFull (token, acc);
 		if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
 		{
-			vStringClear (token->string); // it's already accumulated
+			size_t len = vStringLength (token->string);
 			parseFullyQualified (token, true);
-			vStringAccumulate (acc, token->string);
+			vStringCatS (acc, vStringValue (token->string) + len);
 		}
 		// type
 		if (isInitialType (token))
@@ -1654,7 +1645,7 @@ static void parseMatch (tokenInfo *const token, int scope)
 }
 
 // for: 'for' access* [
-//     ident [[',' access? ident]? 'in' expr | expr [';' expr]*]
+//     ident [[',' access? ident]? 'in' expr | [';' expr]*]
 // ]? block
 static void parseFor (tokenInfo *const token, int scope)
 {
@@ -1712,6 +1703,19 @@ static void parseFor (tokenInfo *const token, int scope)
 					break;
 			}
 		}
+	}
+	else if (isToken (token, TOKEN_SEMICOLON))
+	{
+		do
+		{
+			readToken (token);
+			if (!isToken (token, TOKEN_OPEN_CURLY, TOKEN_SEMICOLON))
+			{
+				parseExprList (token, scope, NULL);
+				readToken (token);
+			}
+		}
+		while (isToken (token, TOKEN_SEMICOLON));
 	}
 	else if (!isToken (token, TOKEN_OPEN_CURLY))
 	{
@@ -1781,10 +1785,10 @@ static void parseImport (tokenInfo *const token)
 	PARSER_EPILOGUE ();
 }
 
-// struct: 'struct' fqtype ['[' any ']']? struct-rest
-// iface: 'interface' fqtype ['[' any ']']? struct-rest
-// union: 'union' fqtype ['[' any ']']? struct-rest
-// anon: ['struct' | 'union'] [fqtype ['[' any ']']]? struct-rest
+// struct: 'struct' [fqtype | csym] ['[' any ']']? struct-rest
+// iface: 'interface' [fqtype | csym] ['[' any ']']? struct-rest
+// union: 'union' [fqtype | csym] ['[' any ']']? struct-rest
+// anon: ['struct' | 'union'] [[fqtype | csym] ['[' any ']']]? struct-rest
 // struct-rest: '{' [[access* ':']? fqtype]? [
 //     access* ident method |
 //     access* ident vtype ['[' any ']']? ['=' expr]?
@@ -1807,8 +1811,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 		if (isToken (token, TOKEN_TYPE))
 		{
 			parseFullyQualified (token, true);
-			if ((isInC (token) && isToken (token, TOKEN_IDENT)) ||
-			    expectToken (token, TOKEN_TYPE))
+			if (expectToken (token, TOKEN_TYPE, TOKEN_CSYM))
 			{
 				scope = lookupName (token->string, scope);
 				kindType realKind = kind == KIND_NONE? KIND_STRUCT : kind;
@@ -1911,7 +1914,9 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 	PARSER_EPILOGUE ();
 }
 
-// enum: 'enum' type ['as' type]? '{' [[ident | kwtype] ['=' immediate]?]* '}'
+// enum: 'enum' type ['as' type]? '{' [
+//     [ident | kwtype] ['=' [immediate | csym]]?
+// ]* '}'
 static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 {
 	Assert (isKeyword (token, KEYWORD_enum));
@@ -1950,7 +1955,9 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 				{
 					vStringCopyS (capture, ".");
 					readToken (token);
-					if (expectToken (token, TOKEN_IMMEDIATE))
+					if (isToken (token, TOKEN_IDENT, TOKEN_TYPE))
+						parseFullyQualified (token, true);
+					if (expectToken (token, TOKEN_IMMEDIATE, TOKEN_CSYM))
 						readTokenFull (token, capture);
 				}
 			}
@@ -1968,7 +1975,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 }
 
 // vtype: ['!' | '?' | '[' any ']' | '&']* [
-//    fqtype ['[' any ']']? | ['chan' | 'shared'] vtype | kwtype |
+//    [fqtype | csym] ['[' any ']']? | ['chan' | 'shared'] vtype | kwtype |
 //    'struct' struct | 'map' '[' any* ']' vtype | 'fn' fntype |
 //    '$map' | '$struct' | '$enum' | '$array' | '$sumtype' | '$alias'
 // ] ['{' init]?
@@ -1990,12 +1997,11 @@ static void parseVType (tokenInfo *const token, vString *const capture,
 
 	if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
 	{
-		if (capture && token->string)
-			vStringClear (token->string);
+		size_t len = capture? vStringLength (token->string) : 0;
 		parseFullyQualified (token, !!capture);
 		if (capture)
-			vStringCat (capture, token->string);
-		expectToken (token, TOKEN_TYPE);
+			vStringCatS (capture, vStringValue (token->string) + len);
+		expectToken (token, TOKEN_TYPE, TOKEN_CSYM);
 
 		readTokenFull (token, capture);
 		if (isToken (token, TOKEN_OPEN_SQUARE))
@@ -2330,7 +2336,7 @@ static void parseExpression (tokenInfo *const token, int scope,
 	if (isToken (token, TOKEN_IDENT, TOKEN_TYPE))
 		parseFullyQualified (token, false);
 
-	if (isToken (token, TOKEN_IDENT))
+	if (isToken (token, TOKEN_IDENT, TOKEN_CSYM))
 	{
 		readToken (token);
 		if (!parseExprCont (token, scope, false))
@@ -2689,6 +2695,8 @@ static void parseFile (tokenInfo *const token)
 		else if (isToken (token, TOKEN_IDENT, TOKEN_TYPE) &&
 		         access && !strcmp (vStringValue (access), "__global"))
 			parseGlobal (token, access, scope);
+		else if (isKeyword (token, KEYWORD_Sif))
+			parseIf (token, scope);
 		else
 			expectToken (token, TOKEN_EOF);
 
