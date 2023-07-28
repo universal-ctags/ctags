@@ -6,6 +6,10 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for rpm spec files.
+*
+*   References:
+*   	- https://rpm-software-management.github.io/rpm/manual/macros.html
+*   	- https://rpm-software-management.github.io/rpm/manual/spec.html
 */
 
 /*
