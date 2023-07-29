@@ -208,11 +208,23 @@ module delay_control #(d, e);
 endmodule
 
 // 10.3 Continuous assignments
+module cont_a;
+  wire (strong1, pull0) mynet = enable;
+endmodule
+
+module cont_b;
+  wire mynet;
+  assign (strong1, pull0) mynet = enable;
+endmodule
+
+// 10.3.3 Continuous assignment delays
 module delay_control_wire #(d, e);
-  wire wirea #10 = wireb;
-  wire wireb #d = wireb;
-  wire wirec #((d+e)/2) = wireb;
-  wire wired #wirer = wirer + 1;
+  wire #10 wireA;
+  assign wireA = wireB;
+  wire #10 wirea = wireb;
+  wire #d wireb = wireb;
+  wire #((d+e)/2) wirec = wireb;
+  wire #wirer wired = wirer + 1;
   wire w$ire, wire$;  // '$' included
 endmodule
 
