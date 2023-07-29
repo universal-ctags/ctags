@@ -1,5 +1,5 @@
 C	input.sv	/^class C;$/;"	C
-ext_func	input.sv	/^  extern function ext_func ();$/;"	Q	class:C
+ext_func	input.sv	/^  extern function void ext_func ();$/;"	Q	class:C
 ext_pure_virt_task	input.sv	/^  pure virtual task ext_pure_virt_task (x);$/;"	Q	class:C
 x	input.sv	/^  pure virtual task ext_pure_virt_task (x);$/;"	p	prototype:C.ext_pure_virt_task
 fwd_type_class	input.sv	/^  typedef class   fwd_type_class;$/;"	Q	class:C

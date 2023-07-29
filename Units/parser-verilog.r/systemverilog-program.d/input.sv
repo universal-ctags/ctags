@@ -28,17 +28,21 @@ endprogram : mod_prog2
 endmodule
 
 
-program;
-    reg reg_in_anon_prog;
+program;  // anounymous program inside compilation unit
+    // reg reg_in_anon_prog; /* a variable cannot be defined in anonymous program */
+    function func_in_anon_prog;
+    endfunction
 endprogram
 
-module topmod_anon;
+package anon_pkg;
 
-program;
-    reg reg_in_anon_prog2;
+program;  // anounymous program inside package
+    // reg reg_in_anon_prog2; /* a variable cannot be defined in anonymous program */
+    function func_in_anon_prog2;
+    endfunction
 endprogram
 
-endmodule
+endpackage
 
 program static prog_static;
     logic logic_static;

@@ -6,6 +6,7 @@
 `define DEF_WITH_EQ = 1'd100
 `define DEF_VALUE   1'd100
 
+module a;
 parameter PARAM = 1;
 
 localparam LOCALPARAM = 2**2;
@@ -24,8 +25,8 @@ wire g;
 real k;
 integer l;
 
+byte m;
 initial begin
-    byte m;
     add(a, b, f);
 end
 
@@ -42,3 +43,5 @@ function mult (
     temp = x * y;
     return temp;
 endfunction : mult
+
+endmodule

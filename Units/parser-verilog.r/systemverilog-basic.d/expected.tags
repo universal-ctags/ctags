@@ -81,8 +81,8 @@ ref_test	input.sv	/^function ref_test ($/;"	f	module:mod
 mod.ref_test	input.sv	/^function ref_test ($/;"	f	module:mod
 tref1	input.sv	/^    ref tref1,$/;"	p	function:mod.ref_test
 mod.ref_test.tref1	input.sv	/^    ref tref1,$/;"	p	function:mod.ref_test
-tref2	input.sv	/^    ref wire tref2$/;"	p	function:mod.ref_test
-mod.ref_test.tref2	input.sv	/^    ref wire tref2$/;"	p	function:mod.ref_test
+tref2	input.sv	/^    ref logic tref2$/;"	p	function:mod.ref_test
+mod.ref_test.tref2	input.sv	/^    ref logic tref2$/;"	p	function:mod.ref_test
 mynet	input.sv	/^wire [PARAM1-1:0] mynet;$/;"	n	module:mod
 mod.mynet	input.sv	/^wire [PARAM1-1:0] mynet;$/;"	n	module:mod
 gencnt	input.sv	/^genvar gencnt;$/;"	r	module:mod

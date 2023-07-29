@@ -13,5 +13,6 @@
  * I happen to end in a strange
  * (but legal) way: **/
 module wahoo ()
-begin
-end
+;
+endmodule
+

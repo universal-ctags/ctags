@@ -1,36 +1,58 @@
 DEFINE	input.sv	/^`define DEFINE$/;"	d
 DEF_WITH_EQ	input.sv	/^`define DEF_WITH_EQ = 1'd100$/;"	d
 DEF_VALUE	input.sv	/^`define DEF_VALUE   1'd100$/;"	d
-PARAM	input.sv	/^parameter PARAM = 1;$/;"	c
-LOCALPARAM	input.sv	/^localparam LOCALPARAM = 2**2;$/;"	c
-STATE1	input.sv	/^localparam STATE1 = 4'h0,$/;"	c
-STATE2	input.sv	/^           STATE2 = 4'h1,$/;"	c
-STATE3	input.sv	/^           STATE3 = 4'h2,$/;"	c
-STATE4	input.sv	/^           STATE4 = 4'h5    ,$/;"	c
-STATE5	input.sv	/^           STATE5 = 4'h6    ,$/;"	c
-STATE6	input.sv	/^           STATE6 = 4'h7    ,$/;"	c
-STATE7	input.sv	/^           STATE7 = 4'h8;$/;"	c
-a	input.sv	/^wire a,b,c,d,e;$/;"	n
-b	input.sv	/^wire a,b,c,d,e;$/;"	n
-c	input.sv	/^wire a,b,c,d,e;$/;"	n
-d	input.sv	/^wire a,b,c,d,e;$/;"	n
-e	input.sv	/^wire a,b,c,d,e;$/;"	n
-f	input.sv	/^reg f;$/;"	r
-g	input.sv	/^wire g;$/;"	n
-k	input.sv	/^real k;$/;"	r
-l	input.sv	/^integer l;$/;"	r
-m	input.sv	/^    byte m;$/;"	r
-add	input.sv	/^task add ($/;"	t
-x	input.sv	/^    input x, y,$/;"	p	task:add
-add.x	input.sv	/^    input x, y,$/;"	p	task:add
-y	input.sv	/^    input x, y,$/;"	p	task:add
-add.y	input.sv	/^    input x, y,$/;"	p	task:add
-z	input.sv	/^    output z$/;"	p	task:add
-add.z	input.sv	/^    output z$/;"	p	task:add
-mult	input.sv	/^function mult ($/;"	f
-x	input.sv	/^    input x,$/;"	p	function:mult
-mult.x	input.sv	/^    input x,$/;"	p	function:mult
-y	input.sv	/^    input y);$/;"	p	function:mult
-mult.y	input.sv	/^    input y);$/;"	p	function:mult
-temp	input.sv	/^    reg temp;$/;"	r	function:mult
-mult.temp	input.sv	/^    reg temp;$/;"	r	function:mult
+a	input.sv	/^module a;$/;"	m
+PARAM	input.sv	/^parameter PARAM = 1;$/;"	c	module:a
+a.PARAM	input.sv	/^parameter PARAM = 1;$/;"	c	module:a
+LOCALPARAM	input.sv	/^localparam LOCALPARAM = 2**2;$/;"	c	module:a
+a.LOCALPARAM	input.sv	/^localparam LOCALPARAM = 2**2;$/;"	c	module:a
+STATE1	input.sv	/^localparam STATE1 = 4'h0,$/;"	c	module:a
+a.STATE1	input.sv	/^localparam STATE1 = 4'h0,$/;"	c	module:a
+STATE2	input.sv	/^           STATE2 = 4'h1,$/;"	c	module:a
+a.STATE2	input.sv	/^           STATE2 = 4'h1,$/;"	c	module:a
+STATE3	input.sv	/^           STATE3 = 4'h2,$/;"	c	module:a
+a.STATE3	input.sv	/^           STATE3 = 4'h2,$/;"	c	module:a
+STATE4	input.sv	/^           STATE4 = 4'h5    ,$/;"	c	module:a
+a.STATE4	input.sv	/^           STATE4 = 4'h5    ,$/;"	c	module:a
+STATE5	input.sv	/^           STATE5 = 4'h6    ,$/;"	c	module:a
+a.STATE5	input.sv	/^           STATE5 = 4'h6    ,$/;"	c	module:a
+STATE6	input.sv	/^           STATE6 = 4'h7    ,$/;"	c	module:a
+a.STATE6	input.sv	/^           STATE6 = 4'h7    ,$/;"	c	module:a
+STATE7	input.sv	/^           STATE7 = 4'h8;$/;"	c	module:a
+a.STATE7	input.sv	/^           STATE7 = 4'h8;$/;"	c	module:a
+a	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+a.a	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+b	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+a.b	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+c	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+a.c	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+d	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+a.d	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+e	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+a.e	input.sv	/^wire a,b,c,d,e;$/;"	n	module:a
+f	input.sv	/^reg f;$/;"	r	module:a
+a.f	input.sv	/^reg f;$/;"	r	module:a
+g	input.sv	/^wire g;$/;"	n	module:a
+a.g	input.sv	/^wire g;$/;"	n	module:a
+k	input.sv	/^real k;$/;"	r	module:a
+a.k	input.sv	/^real k;$/;"	r	module:a
+l	input.sv	/^integer l;$/;"	r	module:a
+a.l	input.sv	/^integer l;$/;"	r	module:a
+m	input.sv	/^byte m;$/;"	r	module:a
+a.m	input.sv	/^byte m;$/;"	r	module:a
+add	input.sv	/^task add ($/;"	t	module:a
+a.add	input.sv	/^task add ($/;"	t	module:a
+x	input.sv	/^    input x, y,$/;"	p	task:a.add
+a.add.x	input.sv	/^    input x, y,$/;"	p	task:a.add
+y	input.sv	/^    input x, y,$/;"	p	task:a.add
+a.add.y	input.sv	/^    input x, y,$/;"	p	task:a.add
+z	input.sv	/^    output z$/;"	p	task:a.add
+a.add.z	input.sv	/^    output z$/;"	p	task:a.add
+mult	input.sv	/^function mult ($/;"	f	module:a
+a.mult	input.sv	/^function mult ($/;"	f	module:a
+x	input.sv	/^    input x,$/;"	p	function:a.mult
+a.mult.x	input.sv	/^    input x,$/;"	p	function:a.mult
+y	input.sv	/^    input y);$/;"	p	function:a.mult
+a.mult.y	input.sv	/^    input y);$/;"	p	function:a.mult
+temp	input.sv	/^    reg temp;$/;"	r	function:a.mult
+a.mult.temp	input.sv	/^    reg temp;$/;"	r	function:a.mult
