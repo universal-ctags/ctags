@@ -573,6 +573,9 @@ PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
 PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 	       [-Wall])
 
+# Checks for function availability
+# -----------------------------------
+
 # For gnulib.
 #   Place it further down in the file, typically where you normally check for
 #   header files or functions.
@@ -598,7 +601,7 @@ if test "$have_mkstemp" != yes -a "$have_tempnam" != yes; then
 fi
 
 AC_CHECK_FUNCS(opendir findfirst _findfirst, break)
-AC_CHECK_FUNCS(strerror)
+AC_CHECK_FUNCS(strerror strsignal)
 
 AC_CHECK_FUNCS(truncate, have_truncate=yes)
 # === Cannot nest AC_CHECK_FUNCS() calls
