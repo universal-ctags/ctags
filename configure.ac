@@ -573,6 +573,9 @@ PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
 PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 	       [-Wall])
 
+# Checks for function availability
+# -----------------------------------
+
 # For gnulib.
 #   Place it further down in the file, typically where you normally check for
 #   header files or functions.
