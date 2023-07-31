@@ -601,7 +601,7 @@ if test "$have_mkstemp" != yes -a "$have_tempnam" != yes; then
 fi
 
 AC_CHECK_FUNCS(opendir findfirst _findfirst, break)
-AC_CHECK_FUNCS(strerror)
+AC_CHECK_FUNCS(strerror strsignal)
 
 AC_CHECK_FUNCS(truncate, have_truncate=yes)
 # === Cannot nest AC_CHECK_FUNCS() calls

@@ -96,8 +96,8 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 	int ret = -1;
 	int system_errno = 0;
 
+	vString *cmd = vStringNew ();
 	{
-		vString *cmd = vStringNew ();
 
 		/*  Ensure ASCII value sort order.
 		 */
@@ -147,18 +147,26 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 			ret = system (vStringValue (cmd));
 			system_errno = errno;
 		}
-		vStringDelete (cmd);
 	}
 	if (ret != 0)
 	{
 		errorSelection selection = FATAL;
 		if (ret == -1)
 		{
-			selection |= PERROR;
 			errno = system_errno;
+			error (selection|PERROR, "cannot sort tag file");
 		}
-		error (selection, "cannot sort tag file");
+
+#ifdef HAVE_STRSIGNAL
+		error (selection, "cannot sort tag file: system (\"%s\") exited with %d (%s?)",
+			   vStringValue(cmd), ret, strsignal(ret));
+#else
+		error (selection, "cannot sort tag file: system (\"%s\") exited with %d",
+			   vStringValue(cmd), ret);
+#endif
+
 	}
+	vStringDelete (cmd);
 }
 
 #else
