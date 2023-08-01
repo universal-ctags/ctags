@@ -420,7 +420,11 @@ static void findRstTags (void)
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
-		if ((markup_line = is_markup_line (line, '_')) != NULL)
+		const unsigned char *line_trimmed = line;
+		while (isspace(*line_trimmed))
+			   line_trimmed++;
+
+		if ((markup_line = is_markup_line (line_trimmed, '_')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Handle .. _target:
@@ -432,7 +436,7 @@ static void findRstTags (void)
 				continue;
 			}
 		}
-		else if ((markup_line = is_markup_line (line, '[')) != NULL)
+		else if ((markup_line = is_markup_line (line_trimmed, '[')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Handle .. [citation]
@@ -444,7 +448,7 @@ static void findRstTags (void)
 				continue;
 			}
 		}
-		else if ((markup_line = is_markup_line (line, '|')) != NULL)
+		else if ((markup_line = is_markup_line (line_trimmed, '|')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Hanle .. |substitute definition|
