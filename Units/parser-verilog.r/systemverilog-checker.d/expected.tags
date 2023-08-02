@@ -43,6 +43,7 @@ c1	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	H
 clk	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	p	checker:c1
 a	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	p	checker:c1
 b	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	p	checker:c1
+MAX_SUM	input.sv	/^    `define MAX_SUM 8$/;"	d	checker:c1
 sum	input.sv	/^    logic [7:0] sum;$/;"	r	checker:c1
 p0	input.sv	/^        p0: assert property (sum < `MAX_SUM);$/;"	A	checker:c1
 p1	input.sv	/^    p1: assert property (@clk sum < `MAX_SUM);$/;"	A	checker:c1

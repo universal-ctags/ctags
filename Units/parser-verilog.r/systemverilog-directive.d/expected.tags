@@ -62,3 +62,4 @@ assert_clk	input.sv	/^`define assert_clk(arg, __clk=clk, __rst_n=rst_n) \\$/;"	d
 forSkipMacro	input.sv	/^module forSkipMacro;$/;"	m
 add_t	input.sv	/^`define add_t(f) f``_t$/;"	d	module:forSkipMacro
 `add_t	input.sv	/^    var `add_t(foo) = '0;$/;"	r	module:forSkipMacro
+macro	input.sv	/^`define macro$/;"	d	module:forSkipMacro

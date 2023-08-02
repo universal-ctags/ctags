@@ -1,5 +1,7 @@
 XXX_TOP	input.sv	/^`define XXX_TOP  foo_top$/;"	d
 XXX	input.sv	/^`define XXX          foo$/;"	d
+xxx_begin	input.sv	/^`define xxx_begin$/;"	d
+xxx_end	input.sv	/^`define xxx_end$/;"	d
 `XXX	input.sv	/^module `XXX ();$/;"	m
 add_t	input.sv	/^`define add_t(f) f``_t$/;"	d	module:`XXX
 `XXX_TOP	input.sv	/^module `XXX_TOP();$/;"	m

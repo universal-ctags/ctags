@@ -70,5 +70,6 @@ typedef enum foo_t {
 typedef classname#(paramvalue) type_class;
 
 // from UVM-1.2
+`define UVM_CORESERVICE_TYPE uvm_default_coreservice_t
 typedef class `UVM_CORESERVICE_TYPE;
-typedef class `UVM_CORESERVICE_TYPE(arg);
+// typedef class `UVM_CORESERVICE_TYPE(arg);
