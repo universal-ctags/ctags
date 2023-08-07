@@ -34,4 +34,6 @@ bar:
     }
     for if a { b } else { c } == 8 {
     }
+    for p, q := a.b.c, x.y.z; p < q; {
+    }
 }

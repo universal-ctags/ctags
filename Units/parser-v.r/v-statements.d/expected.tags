@@ -11,7 +11,7 @@ i	input.v	/^            i := 0 \/* test \/* NESTED *\/ test *\/$/;"	v	line:26	ro
 j	input.v	/^            j := 0$/;"	v	line:31	roles:def
 k	input.v	/^            k := 0$/;"	v	line:34	roles:def
 l	input.v	/^        l := x$/;"	v	line:38	roles:def
-test_for	input-1.v	/^fn test_for() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:37
+test_for	input-1.v	/^fn test_for() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:39
 a	input-1.v	/^    for a in x {$/;"	v	line:3	roles:def
 foo	input-1.v	/^foo:$/;"	l	line:5	fn:test_for	roles:def
 i	input-1.v	/^    for mut i, b in x {$/;"	v	line:6	access:mut	roles:def
@@ -24,6 +24,8 @@ e	input-1.v	/^    for _, e in x {$/;"	v	line:13	roles:def
 f	input-1.v	/^    for f, _ in x {$/;"	v	line:15	roles:def
 g	input-1.v	/^    for g in 0..5 {$/;"	v	line:19	roles:def
 i	input-1.v	/^    for i := 0; i < 100; i++ {$/;"	v	line:30	roles:def
+p	input-1.v	/^    for p, q := a.b.c, x.y.z; p < q; {$/;"	v	line:37	roles:def
+q	input-1.v	/^    for p, q := a.b.c, x.y.z; p < q; {$/;"	v	line:37	roles:def
 test_defer_return	input-2.v	/^fn test_defer_return() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:6
 x	input-2.v	/^    x := get_lock()$/;"	v	line:2	roles:def
 test_return_with_expr	input-2.v	/^fn test_return_with_expr() {$/;"	f	line:8	typeref:typename:	signature:()	roles:def	end:10
