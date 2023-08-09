@@ -19,10 +19,12 @@ jobs:
              yum -y install git gdb procps-ng
        - checkout
        - run:
-           name: Install build tools
+           name: Install tools for building ctags and validating test input files
            command: |
              dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
              dnf -y install jq puppet python3-sphinx
+             # These are for input-validation.
+             dnf -y install g++ jq puppet nodejs
        - run:
            name: Build
            command: |
@@ -32,7 +34,7 @@ jobs:
        - run:
            name: Test
            command: |
-             make check
+             make check validate-input
        - run:
            name: Make HTML documents
            command: |
@@ -91,10 +93,9 @@ jobs:
              dnf -y install git gdb
        - checkout
        - run:
-           name: Install packages for building ctags and validating test input files
+           name: Install packages for building ctags with bmake and checking code
            command: |
              dnf -y install gcc automake autoconf pkgconfig bmake libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils sudo
-             dnf -y install g++ jq puppet node
        - run:
            name: Build
            command: |
@@ -104,7 +105,7 @@ jobs:
        - run:
            name: Test
            command: |
-             MAKE=bmake bmake validate-input check codecheck
+             MAKE=bmake bmake check codecheck
 
    fedora30_bmake_roundtrip:
      working_directory: ~/universal-ctags
