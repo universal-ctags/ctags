@@ -416,17 +416,17 @@ static void clearPoolToken (void *data)
 	token->onNewline = false;
 }
 
-static void copyToken (tokenInfo *const dest, tokenInfo *const src)
+static void copyToken (tokenInfo *const dst, tokenInfo *const src)
 {
-	dest->type = src->type;
-	dest->keyword = src->keyword;
-	vStringDelete (dest->string);
-	dest->string = src->string? vStringNewCopy (src->string) : NULL;
-	dest->fullyQualified = src->fullyQualified;
-	dest->lineNumber = src->lineNumber;
-	dest->filePosition = src->filePosition;
-	dest->captureLen = src->captureLen;
-	dest->onNewline = src->onNewline;
+	dst->type = src->type;
+	dst->keyword = src->keyword;
+	vStringDelete (dst->string);
+	dst->string = src->string? vStringNewCopy (src->string) : NULL;
+	dst->fullyQualified = src->fullyQualified;
+	dst->lineNumber = src->lineNumber;
+	dst->filePosition = src->filePosition;
+	dst->captureLen = src->captureLen;
+	dst->onNewline = src->onNewline;
 }
 
 static tokenInfo *dupToken (tokenInfo *const token)
@@ -551,12 +551,13 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		else if (isOneOf (c, "/#"))
 		{
 			int d = getcFromInputFile ();
-			if (c == '/' && d == '/')
-				skipInputFileTillEOL (); // //
-			else if (c == '/' && d == '*')
+			if (c == '/' && d == '*')
 				skipInputFileTillCommentEnd (); // /*
-			else if (c == '#' && d != '[')
-				skipInputFileTillEOL (); // #flag #include
+			else if ((c == '/' && d == '/') || (c == '#' && d != '['))
+			{
+				skipInputFileTillEOL (); // // #flag #include
+				skippedNewline = true;
+			}
 			else
 			{
 				ungetcToInputFile (d);
@@ -808,7 +809,6 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 
 static void unreadTokenFull (tokenInfo *const token, vString *const acc)
 {
-	vDebugParserPrintf ("˄ ");
 	Assert (NumReplays < MAX_REPLAYS);
 	DebugStatement (
 		// multiple-replay in only possible where additional tokenInfos are
@@ -816,6 +816,8 @@ static void unreadTokenFull (tokenInfo *const token, vString *const acc)
 		for (int i = 0; i < NumReplays; i++)
 			Assert (token->id != ReplayTokens[i]->id);
 	);
+	vDebugParserPrintf ("˄ ");
+
 	ReplayTokens[NumReplays] = dupToken (token);
 	if (acc)
 	{
@@ -1085,7 +1087,7 @@ static int lookupName (vString *name, int scope)
 // prior to calling, but will not themselves over-read on exit. Parsers will
 // unread the last token, if is not within their purview.
 
-// fq: [ident | type] ['.' [ident | type | kwtype]]*
+// fq: [ident | type] ['.' [ident | type | kwtype | 'assert']]*
 // on return, token->type is IDENT/TYPE/EXTERN, token->string is fully-qualified
 static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 {
@@ -1110,7 +1112,8 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 	while (prev == TOKEN_NONE ||
 	       (prev == TOKEN_DOT &&
 	        (isToken (tokens[idx], TOKEN_IDENT, TOKEN_TYPE) ||
-	         isKeyword (tokens[idx], KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan))) ||
+	         isKeyword (tokens[idx], KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan) ||
+	         (isExtern && isKeyword (tokens[idx], KEYWORD_assert)))) ||
 	       (prev != TOKEN_DOT && isToken (tokens[idx], TOKEN_DOT)))
 	{
 		prevprev = prev;
@@ -1764,7 +1767,7 @@ static void parseImport (tokenInfo *const token)
 // anon: ['struct' | 'union'] [[fqtype | extern] ['[' any ']']?]? struct-rest
 // struct-rest: '{' [
 //     [access* ':'] | [
-//         fqtype | extern | [ident | kwtype] method |
+//         fqtype | extern | [ident | kwtype | 'map'] method |
 //         [ident | extern] vtype ['[' any ']']? ['=' expr]?
 //     ]*
 // ]* '}'
@@ -1843,9 +1846,9 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 		            continue; // method
 	            }
             }
-            else if (kind == KIND_INTERFACE && isKeyword (token, TOKEN_TYPE))
+            else if (kind == KIND_INTERFACE &&
+                     isKeyword (token, KEYWORD_TYPE, KEYWORD_map))
             {
-	            readToken (token);
 	            parseFunction (token, newScope, fieldAccess, KIND_METHOD);
 	            readToken (token);
 	            continue; // method
