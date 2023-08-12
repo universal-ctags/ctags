@@ -1,0 +1,1 @@
+exec	input.texi	/^(defun exec (cmd)$/;"	f

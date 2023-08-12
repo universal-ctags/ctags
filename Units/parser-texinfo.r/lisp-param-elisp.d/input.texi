@@ -1,0 +1,4 @@
+@lisp
+(defun exec (cmd)
+       ...)
+@end lisp

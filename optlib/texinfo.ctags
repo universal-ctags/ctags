@@ -1,0 +1,282 @@
+#
+#  Copyright (c) 2022, Red Hat, Inc.
+#  Copyright (c) 2022, Masatake YAMATO
+#
+#  Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+#  Reference
+#     https://www.gnu.org/software/texinfo/manual/texinfo/texinfo.html
+#
+# TODO
+# ----
+# * @def...
+# * index commands like @cindex
+# * @part
+# * @verbatiminclude
+# * @direntry
+#
+
+--langdef=Texinfo
+--map-Texinfo=+.texi
+--map-Texinfo=+.texinfo
+
+--_paramdef-Texinfo=LispLang,a guest parser running on @lisp...@end areas [EmacsLisp]
+
+#
+# kind definitions
+#
+--kinddef-Texinfo=a,anchor,anchors
+--kinddef-Texinfo=A,alias,aliases
+--kinddef-Texinfo=f,flag,flags
+--kinddef-Texinfo=m,macro,macros
+--kinddef-Texinfo=M,menu,menus
+--kinddef-Texinfo=n,node,nodes
+  --_roledef-Texinfo.{node}=menu,node name referenced in @menu...@end
+  --_roledef-Texinfo.{node}=upper,node name referenced @node ..., UP
+--kinddef-Texinfo=e,mentry,menu entries
+--kinddef-Texinfo=c,chapter,chapters
+--kinddef-Texinfo=s,section,sections
+--kinddef-Texinfo=u,subsection,subsections
+--kinddef-Texinfo=b,subsubsection,subsubsections
+--kinddef-Texinfo=T,title,titles
+--kinddef-Texinfo=U,subtitle,subtitles
+--kinddef-Texinfo=z,macroparam,macro parameters
+--kinddef-Texinfo=I,info,info file names
+  --_roledef-Texinfo.{info}=referenced,referenced
+--kinddef-Texinfo=X,texinfo,texinfo files
+  --_roledef-Texinfo.{texinfo}=included,included with @include command
+--kinds-Texinfo=-z
+
+#
+# separators
+#
+# Separator definitions must come after kind definitions.
+# This is the limitation of optlib2c.
+--_scopesep-Texinfo=*/*:""
+
+#
+# table declarations
+#
+--_tabledef-Texinfo=main
+--_tabledef-Texinfo=macro
+--_tabledef-Texinfo=macroparam
+--_tabledef-Texinfo=comment
+--_tabledef-Texinfo=menu
+
+#
+# scripts
+#
+--_prelude-Texinfo={{
+    /LispLang /LispLang _param not {
+        (EmacsLisp)
+    } if def
+
+    /kindTable [
+        /title /chapter /section /subsection /subsubsection
+    ] def
+
+    % cork:int DEPTHFORCORK depth:int
+    /depthForCork {
+        :kind kindTable exch _aindex pop
+    } def
+
+    % endline:int goal:int scopePopUpTo -
+    /scopePopUpTo {
+        {
+            _scopetop {
+                dup
+                % endline goal scope scope
+                depthForCork 2 index ge {
+                    % endline goal scope
+                    2 index end:
+                    _scopepop
+                } {
+                    pop
+                    exit
+                } ifelse
+            } {
+                exit
+            } ifelse
+        } loop
+        pop
+        pop
+    } def
+
+    % - SCOPEACTION -
+    /scopeAction {
+        . :line 1 sub . depthForCork scopePopUpTo
+        _scopetop {
+        . exch scope: . _scopepush
+        } {
+            . _scopepush
+        } ifelse
+    } def
+}}
+
+#
+# tables: comment
+#
+--_tabledef-Texinfo=linecomment
+--_tabledef-Texinfo=blockcomment
+--_tabledef-Texinfo=blockcommentbody
+
+--_mtable-regex-Texinfo=linecomment/(?:@c|@comment)[[:space:]]+[^\n]*//p
+
+--_mtable-regex-Texinfo=blockcommentbody/[^@]+//p
+--_mtable-regex-Texinfo=blockcommentbody/@end[[:space:]]+ignore[[:space:]]*//p{tleave}
+--_mtable-regex-Texinfo=blockcommentbody/.//p
+--_mtable-regex-Texinfo=blockcomment/@ignore[[:space:]]*//p{tenter=blockcommentbody}
+
+--_mtable-extend-Texinfo=comment+linecomment
+--_mtable-extend-Texinfo=comment+blockcomment
+
+#
+# tables: main
+#
+--_mtable-regex-Texinfo=main/[^@]+//p
+--_mtable-regex-Texinfo=main/@[^achilmnust][^@]*//p
+--_mtable-extend-Texinfo=main+comment
+--_mtable-regex-Texinfo=main/@menu//M/p{tenter=menu}{_anonymous=menu}{scope=push}
+--_mtable-regex-Texinfo=main/@node[[:space:]]+([^,\n]+)(?:,[[:space:]]+(?:[^,\n]+),[[:space:]]+(?:[^,\n]+),[[:space:]]+([^,\n]+))?[[:space:]]*\n?/\1/n/p{{
+    \2 false ne {
+        .
+        \2 /node @2 _tag _commit dup /upper _assignrole
+        scope:
+    } if
+}}
+--_mtable-regex-Texinfo=main/@macro[[:space:]]+([^[:space:]\{]+)[[:space:]]*/\1/m/p{tenter=macro}{scope=push}{{
+    . [ ({)
+}}
+--_mtable-regex-Texinfo=main/@(chapter|unnumbered|appendix|chapheading)[[:space:]]+([^\n]+)\n?/\2/c/p{{
+    scopeAction
+}}
+--_mtable-regex-Texinfo=main/@(section|unnumberedsec|appendixsec|heading)[[:space:]]+([^\n]+)\n?/\2/s/p{{
+    scopeAction
+}}
+--_mtable-regex-Texinfo=main/@(subsection|unnumberedsubsec|appendixsubsec|subheading)[[:space:]]+([^\n]+)\n?/\2/u/p{{
+    scopeAction
+}}
+--_mtable-regex-Texinfo=main/@(subsubsection|unnumberedsubsubsec|appendixsubsubsec|subsubheading)[[:space:]]+([^\n]+)\n?/\2/b/p{{
+    scopeAction
+}}
+--_mtable-regex-Texinfo=main/@setfilename[[:space:]]+([^\n]+)\n?/\1/I/p
+--_mtable-regex-Texinfo=main/@settitle[[:space:]]+([^\n]+)\n?/\1/T/p{{
+    scopeAction
+}}
+--_mtable-regex-Texinfo=main/@subtitle[[:space:]]+([^\n]+)\n?/\1/U/p{scope=ref}
+--_mtable-regex-Texinfo=main/@anchor[[:space:]]*\{([^\}]+)\}/\1/a/p{scope=ref}
+--_mtable-regex-Texinfo=main/@set[[:space:]]+([-a-zA-Z_0-9][^[:space:]@^<>~`^+]*)/\1/f/p{scope=ref}
+--_mtable-regex-Texinfo=main/@include[[:space:]]+([^\n]+)[[:space:]]*\n?/\1/X/p{_role=included}{scope=ref}
+--_mtable-regex-Texinfo=main/@alias[[:space:]]+([^[:space:]=]+)[[:space:]]*=[^\n]*\n/\1/A/p{scope=ref}
+--_mtable-regex-Texinfo=main/@tex[[:space:]]*\n(.*)\n@end[[:space:]]+tex//p{_guest=Tex,1start,1end}
+--_mtable-regex-Texinfo=main/@lisp[[:space:]]*\n(.*)\n@end[[:space:]]+lisp//p{{
+    LispLang @1 1@ _makepromise { pop } if
+}}
+--_mtable-regex-Texinfo=main/.//p
+
+#
+# tables: menu
+#
+# * MENU-ENTRY-NAME: NODE-NAME.   DESCRIPTION
+# The parser extracts MENU-ENTRY-NAME with /entry kind, and
+# NODE-NAME with /node kind.
+#
+# * NAME.   DESCRIPTION
+# The parser extracts NAME twice, once with /entry kind, and
+# once with /node kind.
+#
+# * FIRST-ENTRY-NAME:(FILENAME)NODENAME.     DESCRIPTION
+# The parser extracts FIRST-ENTRY-NAME with /entry kind,
+# FILENAME with /info kind + /referred role, and NODENAME with /node kind +
+# FILENAME as scope.
+#
+# * (FILENAME)SECOND-NODE::                  DESCRIPTION
+# The parser extracts FILENAME with /info kind + /referred role.
+# The parser extracts SECOND-NODE twice, once with /entry kind, and once with /node kind.
+# For SECOND-NODE of /node kind, FILENAME is attached as scope.
+#
+--_mtable-regex-Texinfo=menu/[*][[:space:]]*(?:\(([^\)]+)\))?[[:space:]]*([^[:space:]\(:][^:]*):(?:([:])|[[:space:]]*(?:\(([^\)]+)\))?[[:space:]]*([^[:space:]\(:.][^.]*)[.])[[:space:]]*[^\n]*\n/\2/e/p{scope=ref}{{
+    \1 false ne {
+        \1 /info @1 _tag _commit dup /referenced _assignrole true
+    } {
+        \4 false ne {
+            \4 /info @4 _tag _commit dup /referenced _assignrole true
+    } {
+        false
+        } ifelse
+    } ifelse
+    \3 false eq {
+        \5 /node @5 _tag _commit
+    } {
+        \2 /node @2 _tag _commit
+    } ifelse
+    dup /menu _assignrole
+    % scope true index
+    % false cork
+    exch {
+        exch scope:
+    } {
+        pop
+    } ifelse
+}}
+
+# * FIRST-ENTRY-NAME:(FILENAME).     DESCRIPTION
+--_mtable-regex-Texinfo=menu/[*][[:space:]]*([^[[:space:]\(:]+):[[:space:]]*\(([^\)]+)\)[.][^\n]*\n/\1/e/p{scope=ref}{{
+    \2 /info @2 _tag  _commit dup /referenced _assignrole
+}}
+
+# * (FILENAME)::                  DESCRIPTION
+--_mtable-regex-Texinfo=menu/[*][[:space:]]*\(([^\)]+)\)::[^\n]*\n/\1/I/p{scope=ref}{_role=referenced}
+
+--_mtable-regex-Texinfo=menu/@detailmenu//M/p{tenter=menu}{_anonymous=menu}{scope=push}
+
+--_mtable-regex-Texinfo=menu/@end[[:space:]]+(menu|detailmenu)//p{tleave}{scope=pop}
+--_mtable-regex-Texinfo=menu/[^\n]*\n//p
+--_mtable-regex-Texinfo=menu/.//p
+
+#
+# tables: macroparam
+#
+--_mtable-regex-Texinfo=macroparam/\}//p{tleave}
+--_mtable-regex-Texinfo=macroparam/([^[:space:],\}]+)(?:[[:space:],]*)/\1/z/p{scope=ref}{{
+    \1 (,)
+}}
+--_mtable-regex-Texinfo=macroparam/.//p
+
+#
+# tables: macro
+#
+--_mtable-regex-Texinfo=macro/\{[[:space:]]*//p{tenter=macroparam}
+--_mtable-extend-Texinfo=macro+comment
+--_mtable-regex-Texinfo=macro/@end[[:space:]]+macro//p{tleave}{scope=pop}{{
+    % drop the last (,)
+    dup (,) eq {
+        pop
+    } if
+    % does the macro take parameters?
+    dup ({) eq {
+        % No.
+    % pop . [ ({)
+        pop pop pop
+    } {
+        % Yes. build signature string and assign it to thet tag for macro.
+        (}) _buildstring signature:
+    } ifelse
+}}
+--_mtable-regex-Texinfo=macro/[^\n]+//p
+--_mtable-regex-Texinfo=macro/.//p
