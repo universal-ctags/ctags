@@ -506,6 +506,15 @@ two cases, the target skips validating input files:
 
     A command for a validator is not available.
 
+*validate-input* make target supports the CATEGORIES variable as *units* make target does.
+
+.. code-block:: console
+
+  $ make validate-input units CATEGORIES=parser-json.r
+  ...
+
+This example shows validating input files and running units test on *parser-json.r* category.
+
 *validator* file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
