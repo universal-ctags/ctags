@@ -477,7 +477,7 @@ Here is an example validating an input file for JSON.
 
   $ make validate-input VALIDATORS=jq
   ...
-  Category: ROOT
+  Category: parser-json.r
   ------------------------------------------------------------
   simple-json.d/input.json with jq                                 valid
 
@@ -547,6 +547,9 @@ directory has its specific *validator* file.
 If a *Unit* test case doesn't have *expected.tags* file, the make
 target doesn't run the validator on the file even if a default
 validator is given in its category directory.
+
+If a *Unit* test case specifies NONE in its *validator* file,
+the make target doesn't run the validator, either.
 
 If a *Unit* test case specifies KNOWN-INVALIDATION in its *validator*
 file, the make target just increments "#skipped (known invalidation)"
