@@ -477,7 +477,7 @@ Here is an example validating an input file for JSON.
 
   $ make validate-input VALIDATORS=jq
   ...
-  Category: ROOT
+  Category: parser-json.r
   ------------------------------------------------------------
   simple-json.d/input.json with jq                                 valid
 
@@ -505,6 +505,15 @@ two cases, the target skips validating input files:
 #skipped (validator unavailable)
 
     A command for a validator is not available.
+
+*validate-input* make target supports the CATEGORIES variable as *units* make target does.
+
+.. code-block:: console
+
+  $ make validate-input units CATEGORIES=parser-json.r
+  ...
+
+This example shows validating input files and running units test on *parser-json.r* category.
 
 *validator* file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -538,6 +547,9 @@ directory has its specific *validator* file.
 If a *Unit* test case doesn't have *expected.tags* file, the make
 target doesn't run the validator on the file even if a default
 validator is given in its category directory.
+
+If a *Unit* test case specifies NONE in its *validator* file,
+the make target doesn't run the validator, either.
 
 If a *Unit* test case specifies KNOWN-INVALIDATION in its *validator*
 file, the make target just increments "#skipped (known invalidation)"

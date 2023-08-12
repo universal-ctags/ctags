@@ -2522,6 +2522,7 @@ $0 validate-input [OPTIONS] UNITS-DIR VALIDATORS-DIR
 		--validators=validator[,...]: Validate test cases specifying
 					    given validators.
 		--colorized-output: yes|no: print the result in color.
+		--categories CATEGORY1[,CATEGORY2,...]: run only CATEGORY* related cases.
 EOF
 }
 
@@ -2843,6 +2844,16 @@ validate_category ()
     local d
     local default_validator=${_NOOP_VALIDATOR}
 
+    #
+    # Filtered by CATEGORIES
+    #
+    if [ -n "$CATEGORIES" ] && ! member_p "${category}" $CATEGORIES; then
+	return 1
+    fi
+    echo
+    echo "Category: ${category}"
+    line
+
     if [ -r "${base_dir}/validator" ]; then
 	default_validator=$(cat "${base_dir}/validator" | grep -v '#')
 	if [ -z "${default_validator}" ]; then
@@ -2938,6 +2949,27 @@ action_validate_input ()
 		COLORIZED_OUTPUT=${1#--colorized-output=}
 		shift
 		;;
+	    --categories)
+		shift
+		for c in $(echo "$1" | tr ',' ' '); do
+		    if [ "$c" = "ROOT" ]; then
+			CATEGORIES="$CATEGORIES ROOT"
+		    else
+			CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    fi
+		done
+		shift
+		;;
+	    --categories=*)
+		for c in $(echo "${1#--categories=}" | tr ',' ' '); do
+		    if [ "$c" = "ROOT" ]; then
+			CATEGORIES="$CATEGORIES ROOT"
+		    else
+			CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    fi
+		done
+		shift
+		;;
 	    -*)
 		ERROR 1 "unknown option \"${1}\" for ${action} action"
 		;;
@@ -2979,9 +3011,6 @@ action_validate_input ()
     for d in ${units_dir}/*.r; do
 	[ -d "$d" ] || continue
 	category=${d##*/}
-	echo
-	echo "Category: ${category}"
-	line
 	validate_category "${category}" "$d" "${validators_dir}"
     done
 
