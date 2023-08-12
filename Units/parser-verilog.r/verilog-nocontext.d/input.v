@@ -6,6 +6,7 @@
 `define DEF_WITH_EQ = 1'd100
 `define DEF_VALUE   1'd100
 
+module foo;
 parameter PARAM = 1;
 
 localparam LOCALPARAM = 2**2;
@@ -43,3 +44,5 @@ begin
     mult = x * y;
 end
 endfunction
+
+endmodule

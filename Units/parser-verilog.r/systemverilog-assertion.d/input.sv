@@ -1,13 +1,17 @@
+module deffered_assert;
+// LRM 16.3 Immediate assertions
+// LRM 16.4 Deferred assertions
+var expr;
 initial begin : deferred_immediate_assertions
-    immediate_assertion : assert () myTask();
-    immediate_cover     : cover () myTask();
-    immediate_assume    : assume () myTask();
-    deferred_assertion1 : assert #0 () myTask();
-    deferred_cover1     : cover #0 () myTask();
-    deferred_assume1    : assume #0 () myTask();
-    deferred_assertion2 : assert final () myTask();
-    deferred_cover2     : cover final () myTask();
-    deferred_assume2    : assume final () myTask();
+    immediate_assertion : assert (expr) myTask();
+    immediate_cover     : cover (expr) myTask();
+    immediate_assume    : assume (expr) myTask();
+    deferred_assertion1 : assert #0 (expr) myTask();
+    deferred_cover1     : cover #0 (expr) myTask();
+    deferred_assume1    : assume #0 (expr) myTask();
+    deferred_assertion2 : assert final (expr) myTask();
+    deferred_cover2     : cover final (expr) myTask();
+    deferred_assume2    : assume final (expr) myTask();
 end
 
 property prop1 (
@@ -15,14 +19,16 @@ property prop1 (
     logic [1:0] n,
     int o
 );
-
+  m;
 endproperty :prop1
 
 property prop2 (a, b);
-
+  a ##1 b;
 endproperty : prop2
 
-concurrent_assertion1   : assert property prop2 (l, m);
+concurrent_assertion1   : assert property (prop2 (l, m));
+
+endmodule
 
 module assert_test;
     // 16.3 Immediate assertions
@@ -54,8 +60,8 @@ module assert_test;
         a2: assert #0 (not_a != a); // Should pass once values have settled
     end
 
-    assign a = ...;
-    assign b = ...;
+    assign a = '0;
+    assign b = '1;
     always_comb begin : b1
         c1: cover (b != a);
         c2: cover #0 (b != a);
@@ -74,7 +80,7 @@ module assert_test;
             $error("Error on operation of type %d\n", error_type(opcode));
             a2: assert #0 (my_cond) else
             error_type(opcode);
-            ...
+            //...
         end
 endmodule
 
@@ -122,7 +128,7 @@ module m (input a, b);
     always_comb begin
         a1: assert #0 (a == b);
     end
-endmodule 
+endmodule
 
 // 16.4.4 Disabling deferred assertions
 module m (input bad_val, bad_val_ok, a, b, c, clear_b2);
@@ -170,14 +176,14 @@ module m;
 
     property p1;
         @(posedge clk)
-        count == 7 |-> $realtime – t < 50.5;
+        count == 7 |-> $realtime - t < 50.5;
     endproperty
 
     property p2;
         realtime l_t;
         @(posedge clk)
         (count == 0, l_t = $realtime) ##1 (count == 7)[->1] |->
-        $realtime – l_t < 50.5;
+          $realtime - l_t < 50.5;
     endproperty
 endmodule
 
@@ -239,8 +245,8 @@ module m;
         w ##1 x ##[2:10] y;
     endsequence
 
-    s1(.w(a), .x(bit'(b)), .y(c));
-    s2(.w(a), .x(b), .y(c));
+    cover property (s1(.w(a), .x(bit'(b)), .y(c)));
+    cover property (s2(.w(a), .x(b), .y(c)));
 
     sequence delay_arg_example (max, shortint delay1, delay2, min);
         x ##delay1 y[*min:max] ##delay2 z;
@@ -256,14 +262,14 @@ module m;
     endsequence
     cover property (event_arg_example(posedge clk));
 
-    cover property (@(posedge clk) x ##1 y));
+    cover property (@(posedge clk) x ##1 y);
 
     sequence event_arg_example2 (reg sig);
         @(posedge sig) x ##1 y;
     endsequence
     cover property (event_arg_example2(clk));
 
-    cover property (@(posedge clk) x ##1 y));
+    cover property (@(posedge clk) x ##1 y);
 
     sequence s(bit a, bit b);
         bit loc_a;
@@ -277,6 +283,7 @@ module m;
     sequence s;
         logic u, v = a, w = v || b;
         // ...
+        v ##1 w;
     endsequence
 
     property e;
@@ -351,7 +358,7 @@ program tst;
     initial begin
         # 200ms;
         expect( @(posedge clk) a ##1 b ##1 c ) else $error( "expect failed" );
-        ABC: ; // ...
+        // ABC: d...
     end
 
     integer data;
@@ -388,7 +395,7 @@ module A;
     property p1;
         @(posedge clk) a;
     endproperty
-    
+
     property p2;
         @(posedge clk) cb_with_input.a;
     endproperty
@@ -401,6 +408,7 @@ endmodule
 
 // original test
 // excerpt from UVM 1.2:examples/integrated/ubus/sv/ubus_slave_monitor.sv
+`define uvm_error(id, msg) $display("%0t: UVM_ERROR @ %m [%0s] %s", $time, id, msg);
 class C;
   protected function void check_transfer_size();
     assert_transfer_size : assert(trans_collected.size == 1) else begin
@@ -412,3 +420,5 @@ class C;
   // check_transfer_data_size
   protected function void check_transfer_data_size();
   endfunction : check_transfer_data_size
+
+endclass : C

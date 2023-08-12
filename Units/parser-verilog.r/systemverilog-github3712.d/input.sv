@@ -2,6 +2,8 @@
 
 `define XXX_TOP  foo_top
 `define XXX          foo
+`define xxx_begin
+`define xxx_end
 
 module `XXX ();
 `define add_t(f) f``_t
