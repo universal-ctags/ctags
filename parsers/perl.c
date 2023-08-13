@@ -754,7 +754,7 @@ static void findPerlTags (void)
 		if (parse_only_pod_area)
 			continue;
 
-		while (isspace (*cp))
+		while (isspace (*cp) || *cp == '{' || *cp == '}')
 			cp++;
 
 		if (strncmp((const char*) cp, "sub", (size_t) 3) == 0)

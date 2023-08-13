@@ -1,0 +1,45 @@
+JSONPrettyActions	input.rakumod	/^my class JSONPrettyActions {$/;"	c
+JSONPrettyGrammar	input.rakumod	/^my grammar JSONPrettyGrammar {$/;"	g
+TOP	input.rakumod	/^    method TOP($\/) {$/;"	m
+TOP	input.rakumod	/^    token TOP       { ^ \\s* [ <object> | <array> ] \\s* $ }$/;"	t
+array	input.rakumod	/^    method array($\/) {$/;"	m
+array	input.rakumod	/^    rule array      { '[' ~ ']' <arraylist>    }$/;"	u
+arraylist	input.rakumod	/^    method arraylist($\/) {$/;"	m
+arraylist	input.rakumod	/^    rule arraylist  {  <value> * % [ \\, ]        }$/;"	u
+from-json	input.rakumod	/^sub from-json($text) {$/;"	s
+object	input.rakumod	/^    method object($\/) {$/;"	m
+object	input.rakumod	/^    rule object     { '{' ~ '}' <pairlist>     }$/;"	u
+pair	input.rakumod	/^    method pair($\/) {$/;"	m
+pair	input.rakumod	/^    rule pair       { <string> ':' <value>     }$/;"	u
+pairlist	input.rakumod	/^    method pairlist($\/) {$/;"	m
+pairlist	input.rakumod	/^    rule pairlist   { <pair> * % \\,            }$/;"	u
+str	input.rakumod	/^    method str($\/)               { make ~$\/ }$/;"	m
+str	input.rakumod	/^    token str {$/;"	t
+str_escape	input.rakumod	/^    method str_escape($\/) {$/;"	m
+str_escape	input.rakumod	/^    token str_escape {$/;"	t
+string	input.rakumod	/^    method string($\/) {$/;"	m
+string	input.rakumod	/^    token string {$/;"	t
+to-json	input.rakumod	/^multi sub to-json(Associative:D $d, :$indent = 0, :$first = 0) {$/;"	s
+to-json	input.rakumod	/^multi sub to-json(Bool:D $d, :$indent = 0, :$first = 0) { (' ' x $first) ~ ($d ?? 'true' !! 'fal/;"	s
+to-json	input.rakumod	/^multi sub to-json(Mu:D $s, :$indent = 0, :$first = 0) {$/;"	s
+to-json	input.rakumod	/^multi sub to-json(Mu:U $, :$indent = 0, :$first = 0) { 'null' }$/;"	s
+to-json	input.rakumod	/^multi sub to-json(Positional:D $d, :$indent = 0, :$first = 0) {$/;"	s
+to-json	input.rakumod	/^multi sub to-json(Real:D $d, :$indent = 0, :$first = 0) { (' ' x $first) ~ ~$d }$/;"	s
+to-json	input.rakumod	/^multi sub to-json(Str:D $d, :$indent = 0, :$first = 0) {$/;"	s
+to-json	input.rakumod	/^multi sub to-json(Version:D $v, :$indent = 0, :$first = 0) { to-json(~$v, :$indent, :$first) }$/;"	s
+to-json	input.rakumod	/^proto sub to-json($, :$indent = 0, :$first = 0) {*}$/;"	s
+value	input.rakumod	/^    proto token value {*};$/;"	t
+value:sym	input.rakumod	/^    method value:sym<array>($\/)  { make $<array>.ast }$/;"	m
+value:sym	input.rakumod	/^    method value:sym<false>($\/)  { make Bool::False }$/;"	m
+value:sym	input.rakumod	/^    method value:sym<null>($\/)   { make Any }$/;"	m
+value:sym	input.rakumod	/^    method value:sym<number>($\/) { make +$\/.Str }$/;"	m
+value:sym	input.rakumod	/^    method value:sym<object>($\/) { make $<object>.ast }$/;"	m
+value:sym	input.rakumod	/^    method value:sym<string>($\/) { make $<string>.ast }$/;"	m
+value:sym	input.rakumod	/^    method value:sym<true>($\/)   { make Bool::True  }$/;"	m
+value:sym	input.rakumod	/^    token value:sym<array>   { <array>  };$/;"	t
+value:sym	input.rakumod	/^    token value:sym<false>   { <sym>    };$/;"	t
+value:sym	input.rakumod	/^    token value:sym<null>    { <sym>    };$/;"	t
+value:sym	input.rakumod	/^    token value:sym<number> {$/;"	t
+value:sym	input.rakumod	/^    token value:sym<object>  { <object> };$/;"	t
+value:sym	input.rakumod	/^    token value:sym<string>  { <string> }$/;"	t
+value:sym	input.rakumod	/^    token value:sym<true>    { <sym>    };$/;"	t

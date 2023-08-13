@@ -35,6 +35,7 @@ num	input.sv	/^  typedef union { int i; shortreal f; } num;  \/\/ named union ty
 i	input.sv	/^  typedef union { int i; shortreal f; } num;  \/\/ named union type$/;"	w	typedef:U.num
 f	input.sv	/^  typedef union { int i; shortreal f; } num;  \/\/ named union type$/;"	w	typedef:U.num
 n	input.sv	/^  num n;$/;"	r	class:U
+new	input.sv	/^  function new;$/;"	f	class:U
 tagged_st	input.sv	/^  } tagged_st;                        \/\/ named structure$/;"	T	class:U
 isfloat	input.sv	/^    bit isfloat;$/;"	w	typedef:U.tagged_st
 n	input.sv	/^    union { int i; shortreal f; } n;  \/\/ anonymous union type$/;"	w	typedef:U.tagged_st

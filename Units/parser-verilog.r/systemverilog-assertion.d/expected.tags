@@ -1,21 +1,23 @@
-deferred_immediate_assertions	input.sv	/^initial begin : deferred_immediate_assertions$/;"	b
-immediate_assertion	input.sv	/^    immediate_assertion : assert () myTask();$/;"	A	block:deferred_immediate_assertions
-immediate_cover	input.sv	/^    immediate_cover     : cover () myTask();$/;"	A	block:deferred_immediate_assertions
-immediate_assume	input.sv	/^    immediate_assume    : assume () myTask();$/;"	A	block:deferred_immediate_assertions
-deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 () myTask();$/;"	A	block:deferred_immediate_assertions
-deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 () myTask();$/;"	A	block:deferred_immediate_assertions
-deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 () myTask();$/;"	A	block:deferred_immediate_assertions
-deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final () myTask();$/;"	A	block:deferred_immediate_assertions
-deferred_cover2	input.sv	/^    deferred_cover2     : cover final () myTask();$/;"	A	block:deferred_immediate_assertions
-deferred_assume2	input.sv	/^    deferred_assume2    : assume final () myTask();$/;"	A	block:deferred_immediate_assertions
-prop1	input.sv	/^property prop1 ($/;"	R
-m	input.sv	/^    local input int m,$/;"	p	property:prop1
-n	input.sv	/^    logic [1:0] n,$/;"	p	property:prop1
-o	input.sv	/^    int o$/;"	p	property:prop1
-prop2	input.sv	/^property prop2 (a, b);$/;"	R
-a	input.sv	/^property prop2 (a, b);$/;"	p	property:prop2
-b	input.sv	/^property prop2 (a, b);$/;"	p	property:prop2
-concurrent_assertion1	input.sv	/^concurrent_assertion1   : assert property prop2 (l, m);$/;"	A
+deffered_assert	input.sv	/^module deffered_assert;$/;"	m
+expr	input.sv	/^var expr;$/;"	r	module:deffered_assert
+deferred_immediate_assertions	input.sv	/^initial begin : deferred_immediate_assertions$/;"	b	module:deffered_assert
+immediate_assertion	input.sv	/^    immediate_assertion : assert (expr) myTask();$/;"	A	block:deffered_assert.deferred_immediate_assertions
+immediate_cover	input.sv	/^    immediate_cover     : cover (expr) myTask();$/;"	A	block:deffered_assert.deferred_immediate_assertions
+immediate_assume	input.sv	/^    immediate_assume    : assume (expr) myTask();$/;"	A	block:deffered_assert.deferred_immediate_assertions
+deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 (expr) myTask();$/;"	A	block:deffered_assert.deferred_immediate_assertions
+deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 (expr) myTask();$/;"	A	block:deffered_assert.deferred_immediate_assertions
+deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 (expr) myTask();$/;"	A	block:deffered_assert.deferred_immediate_assertions
+deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final (expr) myTask();$/;"	A	block:deffered_assert.deferred_immediate_assertions
+deferred_cover2	input.sv	/^    deferred_cover2     : cover final (expr) myTask();$/;"	A	block:deffered_assert.deferred_immediate_assertions
+deferred_assume2	input.sv	/^    deferred_assume2    : assume final (expr) myTask();$/;"	A	block:deffered_assert.deferred_immediate_assertions
+prop1	input.sv	/^property prop1 ($/;"	R	module:deffered_assert
+m	input.sv	/^    local input int m,$/;"	p	property:deffered_assert.prop1
+n	input.sv	/^    logic [1:0] n,$/;"	p	property:deffered_assert.prop1
+o	input.sv	/^    int o$/;"	p	property:deffered_assert.prop1
+prop2	input.sv	/^property prop2 (a, b);$/;"	R	module:deffered_assert
+a	input.sv	/^property prop2 (a, b);$/;"	p	property:deffered_assert.prop2
+b	input.sv	/^property prop2 (a, b);$/;"	p	property:deffered_assert.prop2
+concurrent_assertion1	input.sv	/^concurrent_assertion1   : assert property (prop2 (l, m));$/;"	A	module:deffered_assert
 assert_test	input.sv	/^module assert_test;$/;"	m
 assert_f	input.sv	/^        assert_f: assert(f) $info("passed"); else $error("failed");$/;"	A	module:assert_test
 assume_inputs	input.sv	/^        assume_inputs: assume (in_a || in_b) $info("assumption holds");$/;"	A	module:assert_test
@@ -178,6 +180,7 @@ a1	input.sv	/^    a1: assert property (p1);$/;"	A	module:A
 a2	input.sv	/^    a2: assert property (cb_with_input.p1);$/;"	A	module:A
 a3	input.sv	/^    a3: assert property (p2);$/;"	A	module:A
 a4	input.sv	/^    a4: assert property (cb_without_input.p1);$/;"	A	module:A
+uvm_error	input.sv	/^`define uvm_error(id, msg) $display("%0t: UVM_ERROR @ %m [%0s] %s", $time, id, msg);$/;"	d
 C	input.sv	/^class C;$/;"	C
 check_transfer_size	input.sv	/^  protected function void check_transfer_size();$/;"	f	class:C
 assert_transfer_size	input.sv	/^    assert_transfer_size : assert(trans_collected.size == 1) else begin$/;"	A	function:C.check_transfer_size

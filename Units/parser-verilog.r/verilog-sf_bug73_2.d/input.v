@@ -1,5 +1,6 @@
 // Taken from http://www.europa.com/~celiac/fsm_samp.html
 
+module foo;
 // These are the symbolic names for states
 parameter  [1:0]       //synopsys enum state_info
   S0 = 2'h0,
@@ -59,3 +60,5 @@ begin
     state <= next_state;
   end
 end
+
+endmodule

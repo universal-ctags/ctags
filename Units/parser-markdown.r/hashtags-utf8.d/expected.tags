@@ -1,0 +1,26 @@
+标签	input.md	/^#标签 #태그 #وسم   $/;"	h
+태그	input.md	/^#标签 #태그 #وسم   $/;"	h
+وسم	input.md	/^#标签 #태그 #وسم   $/;"	h
+t1	input.md	/^#t1 #t2#invalid#invalid2$/;"	h
+t2	input.md	/^#t1 #t2#invalid#invalid2$/;"	h
+ta	input.md	/^#ta #123$/;"	h
+9_	input.md	/^#9_$/;"	h
+-_-	input.md	/^#-_-$/;"	h
+t/s1	input.md	/^#t\/s1 #t\/s2$/;"	h
+t/s2	input.md	/^#t\/s1 #t\/s2$/;"	h
+t4-5-6	input.md	/^#t4-5-6+excluded  #t7;excluded    #t8#excluded#excluded$/;"	h
+t7	input.md	/^#t4-5-6+excluded  #t7;excluded    #t8#excluded#excluded$/;"	h
+t8	input.md	/^#t4-5-6+excluded  #t7;excluded    #t8#excluded#excluded$/;"	h
+hashtag	input.md	/^text#text #hashtag text#text$/;"	h
+included	input.md	/^#included$/;"	h
+included	input.md	/^   #included$/;"	h
+タブ1/タブ2	input.md	/^ excluded #タブ1\/タブ2 excluded$/;"	h
+T_in_quote	input.md	/^> #T_in_quote$/;"	h
+T_in_quote	input.md	/^>> #T_in_quote$/;"	h
+Title	input.md	/^# Title #$/;"	c	end:22	sectionMarker:##
+t3	input.md	/^# Title2 #t3$/;"	h	chapter:Title
+Title2 #t3	input.md	/^# Title2 #t3$/;"	c	end:39	sectionMarker:#
+t4	input.md	/^#t4$/;"	h	chapter:Title2 #t3
+tag-in-list	input.md	/^- #tag-in-list$/;"	h	chapter:Title2 #t3
+/	input.md	/^#\/$/;"	h	chapter:Title2 #t3
+//////	input.md	/^#\/\/\/\/\/\/$/;"	h	chapter:Title2 #t3

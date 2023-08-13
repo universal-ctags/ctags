@@ -93,6 +93,7 @@ static const keywordTable LdScriptKeywordTable[] = {
 	{ "INPUT_SECTION_FLAGS", KEYWORD_INPUT_SECTION_FLAGS },
 	{ "COMMON",			KEYWORD_COMMON },
 	{ "KEEP",			KEYWORD_KEEP },
+	{ "SORT",			KEYWORD_KEEP },
 	{ "BYTE",			KEYWORD_DATA },
 	{ "SHORT",			KEYWORD_DATA },
 	{ "LONG",			KEYWORD_DATA },
@@ -232,7 +233,8 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 }
 
 #define isIdentifierChar(c)										\
-	(cppIsalnum (c) || (c) == '_' || (c) == '.' || (c) == '-' || (c) >= 0x80)
+	(cppIsalnum (c) || (c) == '_' || (c) == '.' || (c) == '-' \
+	 || (((c) >= 0x80) && ((c) <= 0xff)))
 
 static int readPrefixedToken (tokenInfo *const token, int type)
 {

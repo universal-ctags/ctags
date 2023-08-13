@@ -1,6 +1,7 @@
-S0	input.v	/^  S0 = 2'h0,$/;"	c
-S1	input.v	/^  S1 = 2'h1,$/;"	c
-S2	input.v	/^  S2 = 2'h2,$/;"	c
-S3	input.v	/^  S3 = 2'h3;$/;"	c
-state	input.v	/^reg [1:0] \/* synopsys enum state_info *\/ state;$/;"	r
-next_state	input.v	/^reg [1:0] \/* synopsys enum state_info *\/ next_state;$/;"	r
+foo	input.v	/^module foo;$/;"	m
+S0	input.v	/^  S0 = 2'h0,$/;"	c	module:foo
+S1	input.v	/^  S1 = 2'h1,$/;"	c	module:foo
+S2	input.v	/^  S2 = 2'h2,$/;"	c	module:foo
+S3	input.v	/^  S3 = 2'h3;$/;"	c	module:foo
+state	input.v	/^reg [1:0] \/* synopsys enum state_info *\/ state;$/;"	r	module:foo
+next_state	input.v	/^reg [1:0] \/* synopsys enum state_info *\/ next_state;$/;"	r	module:foo

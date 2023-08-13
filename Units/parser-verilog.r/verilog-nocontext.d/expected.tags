@@ -1,33 +1,54 @@
 DEFINE	input.v	/^`define DEFINE$/;"	d
 DEF_WITH_EQ	input.v	/^`define DEF_WITH_EQ = 1'd100$/;"	d
 DEF_VALUE	input.v	/^`define DEF_VALUE   1'd100$/;"	d
-PARAM	input.v	/^parameter PARAM = 1;$/;"	c
-LOCALPARAM	input.v	/^localparam LOCALPARAM = 2**2;$/;"	c
-STATE1	input.v	/^localparam STATE1 = 4'h0,$/;"	c
-STATE2	input.v	/^           STATE2 = 4'h1,$/;"	c
-STATE3	input.v	/^           STATE3 = 4'h2,$/;"	c
-STATE4	input.v	/^           STATE4 = 4'h5    ,$/;"	c
-STATE5	input.v	/^           STATE5 = 4'h6    ,$/;"	c
-STATE6	input.v	/^           STATE6 = 4'h7    ,$/;"	c
-STATE7	input.v	/^           STATE7 = 4'h8;$/;"	c
-a	input.v	/^wire a,b,c,d,e;$/;"	n
-b	input.v	/^wire a,b,c,d,e;$/;"	n
-c	input.v	/^wire a,b,c,d,e;$/;"	n
-d	input.v	/^wire a,b,c,d,e;$/;"	n
-e	input.v	/^wire a,b,c,d,e;$/;"	n
-f	input.v	/^reg f;$/;"	r
-g	input.v	/^wire g;$/;"	n
-k	input.v	/^real k;$/;"	r
-l	input.v	/^integer l;$/;"	r
-add	input.v	/^task add;$/;"	t
-x	input.v	/^    input x, y;$/;"	p	task:add
-add.x	input.v	/^    input x, y;$/;"	p	task:add
-y	input.v	/^    input x, y;$/;"	p	task:add
-add.y	input.v	/^    input x, y;$/;"	p	task:add
-z	input.v	/^    output z;$/;"	p	task:add
-add.z	input.v	/^    output z;$/;"	p	task:add
-mult	input.v	/^function mult;$/;"	f
-x	input.v	/^    input x;$/;"	p	function:mult
-mult.x	input.v	/^    input x;$/;"	p	function:mult
-y	input.v	/^    input y;$/;"	p	function:mult
-mult.y	input.v	/^    input y;$/;"	p	function:mult
+foo	input.v	/^module foo;$/;"	m
+PARAM	input.v	/^parameter PARAM = 1;$/;"	c	module:foo
+foo.PARAM	input.v	/^parameter PARAM = 1;$/;"	c	module:foo
+LOCALPARAM	input.v	/^localparam LOCALPARAM = 2**2;$/;"	c	module:foo
+foo.LOCALPARAM	input.v	/^localparam LOCALPARAM = 2**2;$/;"	c	module:foo
+STATE1	input.v	/^localparam STATE1 = 4'h0,$/;"	c	module:foo
+foo.STATE1	input.v	/^localparam STATE1 = 4'h0,$/;"	c	module:foo
+STATE2	input.v	/^           STATE2 = 4'h1,$/;"	c	module:foo
+foo.STATE2	input.v	/^           STATE2 = 4'h1,$/;"	c	module:foo
+STATE3	input.v	/^           STATE3 = 4'h2,$/;"	c	module:foo
+foo.STATE3	input.v	/^           STATE3 = 4'h2,$/;"	c	module:foo
+STATE4	input.v	/^           STATE4 = 4'h5    ,$/;"	c	module:foo
+foo.STATE4	input.v	/^           STATE4 = 4'h5    ,$/;"	c	module:foo
+STATE5	input.v	/^           STATE5 = 4'h6    ,$/;"	c	module:foo
+foo.STATE5	input.v	/^           STATE5 = 4'h6    ,$/;"	c	module:foo
+STATE6	input.v	/^           STATE6 = 4'h7    ,$/;"	c	module:foo
+foo.STATE6	input.v	/^           STATE6 = 4'h7    ,$/;"	c	module:foo
+STATE7	input.v	/^           STATE7 = 4'h8;$/;"	c	module:foo
+foo.STATE7	input.v	/^           STATE7 = 4'h8;$/;"	c	module:foo
+a	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+foo.a	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+b	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+foo.b	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+c	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+foo.c	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+d	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+foo.d	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+e	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+foo.e	input.v	/^wire a,b,c,d,e;$/;"	n	module:foo
+f	input.v	/^reg f;$/;"	r	module:foo
+foo.f	input.v	/^reg f;$/;"	r	module:foo
+g	input.v	/^wire g;$/;"	n	module:foo
+foo.g	input.v	/^wire g;$/;"	n	module:foo
+k	input.v	/^real k;$/;"	r	module:foo
+foo.k	input.v	/^real k;$/;"	r	module:foo
+l	input.v	/^integer l;$/;"	r	module:foo
+foo.l	input.v	/^integer l;$/;"	r	module:foo
+add	input.v	/^task add;$/;"	t	module:foo
+foo.add	input.v	/^task add;$/;"	t	module:foo
+x	input.v	/^    input x, y;$/;"	p	task:foo.add
+foo.add.x	input.v	/^    input x, y;$/;"	p	task:foo.add
+y	input.v	/^    input x, y;$/;"	p	task:foo.add
+foo.add.y	input.v	/^    input x, y;$/;"	p	task:foo.add
+z	input.v	/^    output z;$/;"	p	task:foo.add
+foo.add.z	input.v	/^    output z;$/;"	p	task:foo.add
+mult	input.v	/^function mult;$/;"	f	module:foo
+foo.mult	input.v	/^function mult;$/;"	f	module:foo
+x	input.v	/^    input x;$/;"	p	function:foo.mult
+foo.mult.x	input.v	/^    input x;$/;"	p	function:foo.mult
+y	input.v	/^    input y;$/;"	p	function:foo.mult
+foo.mult.y	input.v	/^    input y;$/;"	p	function:foo.mult

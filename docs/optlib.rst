@@ -15,7 +15,7 @@ Extending ctags with Regex parser (*optlib*)
 Exuberant Ctags allows a user to add a new parser to ctags with ``--langdef=<LANG>``
 and ``--regex-<LANG>=...`` options.
 Universal Ctags follows and extends the design of Exuberant Ctags in more
-powerful ways and call the feature as *optlib parser*, which is described in in
+powerful ways and call the feature as *optlib parser*, which is described in
 :ref:`ctags-optlib(7) <ctags-optlib(7)>` and the following sections.
 
 :ref:`ctags-optlib(7) <ctags-optlib(7)>` is the primary document of the optlib

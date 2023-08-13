@@ -3749,8 +3749,6 @@ static EsObject* lrop_refN_scope (OptVM *vm, EsObject *name)
 
 static EsObject* lrop_get_scope_depth (OptVM *vm, EsObject *name)
 {
-	int n = 0;
-
 	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
 	int scope = lcb->currentScope;
 
@@ -3761,7 +3759,6 @@ static EsObject* lrop_get_scope_depth (OptVM *vm, EsObject *name)
 			break;
 
 		scope = e->extensionFields.scopeIndex;
-		n++;
 	}
 
 	EsObject *q = es_integer_new (scope);

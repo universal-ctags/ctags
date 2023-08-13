@@ -1,0 +1,4 @@
+OVERVIEW	input.rst	/^  .. [OVERVIEW] `Satellite Overview, Concepts, and Deployment Considerations <https:\/\/access.r/;"	C
+ADMIN	input.rst	/^  .. [ADMIN] `Administering Red Hat Satellite <https:\/\/access.redhat.com\/documentation\/en-us/;"	C
+LOC	input.rst	/^  .. [LOC] `Chapter 6. Managing Locations <https:\/\/access.redhat.com\/documentation\/en-us\/re/;"	C
+USERROLE	input.rst	/^  .. [USERROLE] `Chapter 7. Managing Users and Roles <https:\/\/access.redhat.com\/documentation/;"	C

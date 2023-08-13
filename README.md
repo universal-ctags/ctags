@@ -51,7 +51,7 @@ Nightly builds are available at the [ctags-nightly-build](https://github.com/uni
 Go to the [releases](https://github.com/universal-ctags/ctags-nightly-build/releases) page to download tarball archives.
 
 ### Mac
-See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
+Recent builds are available via the [`universal-ctags` Homebrew formula](https://formulae.brew.sh/formula/universal-ctags).
 
 ### Snap
 Go to [ctags-snap](https://github.com/universal-ctags/ctags-snap) and

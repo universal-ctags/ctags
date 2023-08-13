@@ -147,13 +147,18 @@ e	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control
 rega	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 regb	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 regr	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
+cont_a	input.sv	/^module cont_a;$/;"	m
+mynet	input.sv	/^  wire (strong1, pull0) mynet = enable;$/;"	n	module:cont_a
+cont_b	input.sv	/^module cont_b;$/;"	m
+mynet	input.sv	/^  wire mynet;$/;"	n	module:cont_b
 delay_control_wire	input.sv	/^module delay_control_wire #(d, e);$/;"	m
 d	input.sv	/^module delay_control_wire #(d, e);$/;"	c	module:delay_control_wire
 e	input.sv	/^module delay_control_wire #(d, e);$/;"	c	module:delay_control_wire
-wirea	input.sv	/^  wire wirea #10 = wireb;$/;"	n	module:delay_control_wire
-wireb	input.sv	/^  wire wireb #d = wireb;$/;"	n	module:delay_control_wire
-wirec	input.sv	/^  wire wirec #((d+e)\/2) = wireb;$/;"	n	module:delay_control_wire
-wired	input.sv	/^  wire wired #wirer = wirer + 1;$/;"	n	module:delay_control_wire
+wireA	input.sv	/^  wire #10 wireA;$/;"	n	module:delay_control_wire
+wirea	input.sv	/^  wire #10 wirea = wireb;$/;"	n	module:delay_control_wire
+wireb	input.sv	/^  wire #d wireb = wireb;$/;"	n	module:delay_control_wire
+wirec	input.sv	/^  wire #((d+e)\/2) wirec = wireb;$/;"	n	module:delay_control_wire
+wired	input.sv	/^  wire #wirer wired = wirer + 1;$/;"	n	module:delay_control_wire
 w$ire	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire
 wire$	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire
 rst	input.sv	/^module rst;$/;"	m

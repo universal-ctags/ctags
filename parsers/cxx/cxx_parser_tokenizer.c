@@ -912,8 +912,8 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 	CXX_DEBUG_ENTER();
 
 	CXX_DEBUG_ASSERT(
-			cxxTokenIsKeyword(g_cxx.pToken,CXXKeyword__ATTRIBUTE__)
-			|| cxxTokenIsKeyword(g_cxx.pToken,CXXKeyword__DECLSPEC),
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword) &&
+			(cxxKeywordMayDropInTokenizer(g_cxx.pToken->eKeyword)),
 			"This function should be called only after we have parsed __attribute__ or __declspec"
 		);
 
@@ -1327,8 +1327,8 @@ bool cxxParserParseNextToken(void)
 				t->eType = CXXTokenTypeKeyword;
 				t->eKeyword = (CXXKeyword)iCXXKeyword;
 
-				if(iCXXKeyword == CXXKeyword__ATTRIBUTE__
-					|| iCXXKeyword == CXXKeyword__DECLSPEC)
+
+				if(cxxKeywordMayDropInTokenizer(iCXXKeyword))
 				{
 					// special handling for __attribute__ and __declspec
 					return cxxParserParseNextTokenCondenseAttribute();

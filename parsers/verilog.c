@@ -1878,7 +1878,8 @@ static int tagIdsInPort (tokenInfo *const token, int c, verilogKind kind, bool m
 // Tag a list of identifiers in a data declaration
 static int tagIdsInDataDecl (tokenInfo* token, int c, verilogKind kind)
 {
-	c = skipClassType (token, c);
+	if (token->kind != K_NET)
+		c = skipClassType (token, c);
 	if (c == ';')
 		return c;
 

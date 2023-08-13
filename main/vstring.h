@@ -64,10 +64,10 @@ extern void vStringCat (vString *const string, const vString *const s);
 extern void vStringCatS (vString *const string, const char *const s);
 extern void vStringNCat (vString *const string, const vString *const s, const size_t length);
 
-/* vStringNCatS calls strlen(S) thought it takes LENGTH because
- * the handle the case that strlen(S) is smaller than LENGTH.
+/* vStringNCatS calls strnlen(S,LENGTH) thought it takes LENGTH because
+ * the handle the case that the length of S is smaller than LENGTH.
  *
- * In the case a caller knows strlen(S) equals to or is greater than LENGTH,
+ * In the case a caller knows the length equals to or is greater than LENGTH,
  * calling strlen is just overhead. vStringNCatSUnsafe doesn't call strlen. */
 extern void vStringNCatS (vString *const string, const char *const s, const size_t length);
 extern void vStringNCatSUnsafe (vString *const string, const char *const s, const size_t length);
@@ -82,6 +82,8 @@ extern void vStringNCopyS (vString *const string, const char *const s, const siz
 extern void vStringCopyToLower (vString *const dest, const vString *const src);
 extern void vStringSetLength (vString *const string);
 extern void vStringTruncate (vString *const string, const size_t length);
+#define vStringTruncateTrailing vStringTruncate
+extern void vStringTruncateLeading (vString *const string, const size_t length);
 extern void vStringTranslate(vString *const string, char fromC, char toC);
 
 extern vString *vStringNewOrClear (vString *const string);

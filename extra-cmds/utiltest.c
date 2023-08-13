@@ -11,6 +11,7 @@
 #include "fname.h"
 #include "htable.h"
 #include "routines.h"
+#include "vstring.h"
 #include <string.h>
 
 static void test_fname_absolute(void)
@@ -215,9 +216,79 @@ static void test_htable_update(void)
 	hashTableDelete(htable);
 }
 
+static void test_htable_grow(void)
+{
+	hashTable *htable;
+	int i;
+	char keyBuf[20];
+
+	htable = hashTableNew (3, hashCstrhash, hashCstreq, eFree, NULL);
+
+	for (i = 0; i < 1000; ++i)
+	{
+		snprintf(keyBuf, sizeof(keyBuf), "str_%d", i);
+		hashTablePutItem (htable, strdup(keyBuf), strdup(keyBuf));
+	}
+
+	TEST_CHECK (strcmp (hashTableGetItem (htable, "str_123"), "str_123") == 0);
+	hashTableDelete(htable);
+}
+
 static void test_routines_strrstr(void)
 {
 	TEST_CHECK(strcmp(strrstr("abcdcdb", "cd"), "cdb") == 0);
+}
+
+static void test_vstring_ncats(void)
+{
+	vString *vstr = vStringNew ();
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 0);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abc") == 0);
+	vStringClear (vstr);
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 1);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abcd") == 0);
+	vStringClear (vstr);
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 2);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abcde") == 0);
+	vStringClear (vstr);
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 3);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abcdef") == 0);
+	vStringClear (vstr);
+
+	vStringCatS (vstr, "abc");
+	vStringNCatS (vstr, "def", 4);
+	TEST_CHECK(strcmp (vStringValue (vstr), "abcdef") == 0);
+	vStringClear (vstr);
+
+	vStringDelete (vstr);
+}
+
+static void test_vstring_truncate_leading(void)
+{
+	vString *vstr = vStringNewInit ("   abcdefg");
+	TEST_CHECK(vstr != NULL);
+
+	vStringStripLeading (vstr);
+	TEST_CHECK(strcmp(vStringValue(vstr), "abcdefg") == 0);
+
+	vStringTruncateLeading (vstr, 3);
+	TEST_CHECK(strcmp(vStringValue(vstr), "defg") == 0);
+
+	vStringTruncateLeading (vstr, 0);
+	TEST_CHECK(strcmp(vStringValue(vstr), "defg") == 0);
+
+	vStringTruncateLeading (vstr, 100);
+	TEST_CHECK(strcmp(vStringValue(vstr), "") == 0);
+
+	vStringDelete (vstr);
 }
 
 TEST_LIST = {
@@ -225,6 +296,9 @@ TEST_LIST = {
    { "fname/absolute+cache", test_fname_absolute_with_cache },
    { "fname/relative",   test_fname_relative   },
    { "htable/update",    test_htable_update    },
+   { "htable/grow",      test_htable_grow      },
    { "routines/strrstr", test_routines_strrstr },
+   { "vstring/ncats",    test_vstring_ncats    },
+   { "vstring/truncate_leading", test_vstring_truncate_leading },
    { NULL, NULL }     /* zeroed record marking the end of the list */
 };

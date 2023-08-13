@@ -1,0 +1,4 @@
+email2	input.js	/^const x = { name1, email2, other:1 };$/;"	p	variable:x
+name1	input.js	/^const x = { name1, email2, other:1 };$/;"	p	variable:x
+other	input.js	/^const x = { name1, email2, other:1 };$/;"	p	variable:x
+x	input.js	/^const x = { name1, email2, other:1 };$/;"	v

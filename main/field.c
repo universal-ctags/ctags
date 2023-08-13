@@ -34,9 +34,6 @@
 #include "optscript.h"
 #include "script_p.h"
 
-#define FIELD_NULL_LETTER_CHAR '-'
-#define FIELD_NULL_LETTER_STRING "-"
-
 typedef struct sFieldObject {
 	fieldDefinition *def;
 	vString     *buffer;
@@ -1412,7 +1409,7 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 			 bmask < FIELDTYPE_END_MARKER;
 			 bmask <<= 1, offset++)
 			if (type & bmask)
-				typefields[offset] = fieldDataTypeFalgs[offset];
+				typefields[offset] = fieldDataTypeFlags[offset];
 	}
 	colprintLineAppendColumnCString (line, typefields);
 	colprintLineAppendColumnBool (line, writerDoesTreatFieldAsFixed (i));

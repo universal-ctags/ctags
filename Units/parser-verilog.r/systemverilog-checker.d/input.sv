@@ -8,7 +8,7 @@
 checker my_check1 (logic test_sig, event clock);
     default clocking @clock; endclocking
     property p(logic sig);
-        // ...
+        sig ##1 !sig; // ...
     endproperty
     a1: assert property (p (test_sig));
     c1: cover property (!test_sig ##1 test_sig);
@@ -53,7 +53,7 @@ module m;
         default disable iff rst2;
         // ...
     endchecker : c2
-    ...
+    // ...
 endmodule : m
 
 // 17.3 Checker instantiation
@@ -71,6 +71,7 @@ endmodule : m
 
 
 checker c1(event clk, logic[7:0] a, b);
+    `define MAX_SUM 8
     logic [7:0] sum;
     always_ff @(clk) begin
         sum <= a + 1'b1;

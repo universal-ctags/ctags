@@ -32,7 +32,7 @@ struct sRubySubparser {
 	int corkIndex;
 };
 
-extern void rubySkipWhitespace (const unsigned char **cp);
+extern bool rubySkipWhitespace (const unsigned char **cp);
 extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal);
 extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* literal);
 

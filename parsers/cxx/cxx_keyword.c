@@ -37,6 +37,10 @@ enum CXXKeywordFlag
 	CXXKeywordMayAppearInVariableDeclaration = (1 << 5),
 	// decltype, __typeof, __typeof__, and typeof
 	CXXKeywordIsDecltype = (1 << 6),
+	// keywords making the parsers too complicated; they are dropped in
+	// cxxParserParseNextToken().
+	// Examples: __attribute__(), __declspec, ...
+	CXXKeywordMayDropInTokenizer = (1 << 7),
 };
 
 typedef struct _CXXKeywordDescriptor
@@ -52,7 +56,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"__attribute__",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordMayAppearInVariableDeclaration
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordMayDropInTokenizer
 	},
 	{
 		"__constant__",
@@ -62,7 +66,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"__declspec",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames | CXXKeywordMayDropInTokenizer
 	},
 	{
 		"__device__",
@@ -154,14 +158,19 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
+		"_Alignas",
+		CXXLanguageC,
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordMayDropInTokenizer,
+	},
+	{
 		"_Thread_local",
 		CXXLanguageC,
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames,
 	},
 	{
 		"alignas",
-		CXXLanguageCPP,
-		CXXKeywordMayAppearInVariableDeclaration
+		CXXLanguageC | CXXLanguageCPP,
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordMayDropInTokenizer,
 	},
 	{
 		"alignof",
@@ -630,6 +639,12 @@ bool cxxKeywordIsDecltype(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordIsDecltype;
+}
+
+bool cxxKeywordMayDropInTokenizer(CXXKeyword eKeywordId)
+{
+	return g_aCXXKeywordTable[eKeywordId].uFlags &
+		CXXKeywordMayDropInTokenizer;
 }
 
 bool cxxKeywordEnablePublicProtectedPrivate(bool bEnableIt)

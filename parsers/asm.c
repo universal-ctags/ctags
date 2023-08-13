@@ -788,12 +788,12 @@ static bool setUseCPreProcessor(const langType language CTAGS_ATTR_UNUSED,
 static paramDefinition AsmParams [] = {
 	{
 		.name = "commentCharsAtBOL",
-		.desc = "line comment chraracters at the begining of line ([" DEFAULT_COMMENT_CHARS_BOL "])",
+		.desc = "line comment chraracters at the beginning of line ([" DEFAULT_COMMENT_CHARS_BOL "])",
 		.handleParam = asmSetCommentCharsAtBOL,
 	},
 	{
 		.name = "commentCharsInMOL",
-		.desc = "line comment chraracters in the begining of line ([" DEFAULT_COMMENT_CHARS_MOL "])",
+		.desc = "line comment chraracters in the beginning of line ([" DEFAULT_COMMENT_CHARS_MOL "])",
 		.handleParam = asmSetCommentCharsInMOL,
 	},
 	{

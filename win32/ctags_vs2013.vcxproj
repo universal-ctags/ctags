@@ -224,6 +224,7 @@
     <ClCompile Include="..\main\tokeninfo.c" />
     <ClCompile Include="..\main\trashbox.c" />
     <ClCompile Include="..\main\unwindi.c" />
+    <ClCompile Include="..\main\utf8_str.c" />
     <ClCompile Include="..\main\vstring.c" />
     <ClCompile Include="..\main\writer-ctags.c" />
     <ClCompile Include="..\main\writer-etags.c" />
@@ -333,7 +334,6 @@
     <ClCompile Include="..\parsers\perl-function-parameters.c" />
     <ClCompile Include="..\parsers\perl-moose.c" />
     <ClCompile Include="..\parsers\perl.c" />
-    <ClCompile Include="..\parsers\perl6.c" />
     <ClCompile Include="..\parsers\php.c" />
     <ClCompile Include="..\parsers\powershell.c" />
     <ClCompile Include="..\parsers\protobuf.c" />
@@ -344,6 +344,7 @@
     <ClCompile Include="..\parsers\r-s4class.c" />
     <ClCompile Include="..\parsers\r.c" />
     <ClCompile Include="..\parsers\rake.c" />
+    <ClCompile Include="..\parsers\raku.c" />
     <ClCompile Include="..\parsers\rexx.c" />
     <ClCompile Include="..\parsers\rmarkdown.c" />
     <ClCompile Include="..\parsers\robot.c" />
@@ -440,6 +441,7 @@
     <ClInclude Include="..\main\trashbox_p.h" />
     <ClInclude Include="..\main\types.h" />
     <ClInclude Include="..\main\unwindi.h" />
+    <ClInclude Include="..\main\utf8_str.h" />
     <ClInclude Include="..\main\vstring.h" />
     <ClInclude Include="..\main\writer_p.h" />
     <ClInclude Include="..\main\xtag.h" />

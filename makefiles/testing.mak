@@ -169,8 +169,10 @@ validate-input:
 	if test -n "$(VALIDATORS)"; then	\
 		VALIDATORS="--validators=$(VALIDATORS)"; \
 	fi; \
-	c="$(srcdir)/misc/units validate-input $${VALIDATORS}"; \
-		$(SHELL) $${c} $(srcdir)/Units $(srcdir)/misc/validators
+	c="$(srcdir)/misc/units validate-input \
+		--categories=$(CATEGORIES) \
+		$${VALIDATORS}"; \
+	$(SHELL) $${c} $(srcdir)/Units $(srcdir)/misc/validators
 #
 # Test main part, not parsers
 #

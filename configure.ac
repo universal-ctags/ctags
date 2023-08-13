@@ -7,6 +7,8 @@
 #	Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.64])
+
+dnl You must update PROGRAM_VERSION in main/ctags.h, too.
 AC_INIT([universal-ctags],[6.0.0])
 
 if ! test -e "${srcdir}/config.h.in"; then
@@ -293,7 +295,7 @@ if test "$cross_compiling" = "yes"; then
 
     BUILD_OBJEXT='o'
 
-    if [ -f "$TEMP_DIR_FOR_CHECKING/test.exe" ] ; then
+    if test -f "$TEMP_DIR_FOR_CHECKING/test.exe" ; then
         BUILD_EXEEXT='.exe'
     fi
 else
@@ -571,6 +573,9 @@ PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
 PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 	       [-Wall])
 
+# Checks for function availability
+# -----------------------------------
+
 # For gnulib.
 #   Place it further down in the file, typically where you normally check for
 #   header files or functions.
@@ -596,7 +601,7 @@ if test "$have_mkstemp" != yes -a "$have_tempnam" != yes; then
 fi
 
 AC_CHECK_FUNCS(opendir findfirst _findfirst, break)
-AC_CHECK_FUNCS(strerror)
+AC_CHECK_FUNCS(strerror strsignal)
 
 AC_CHECK_FUNCS(truncate, have_truncate=yes)
 # === Cannot nest AC_CHECK_FUNCS() calls

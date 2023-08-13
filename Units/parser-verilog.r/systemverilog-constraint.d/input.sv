@@ -45,8 +45,10 @@ endclass
 
 class E;
   // 18.5.4 Distribution
-  x != 200;
-  x dist {100 := 1, 200 := 2, 300 := 5}
+  constraint c1 {
+    x != 200;
+    x dist {100 := 1, 200 := 2, 300 := 5};
+  }
 
   // 18.5.5 Uniqueness constraints
   rand byte a[5];

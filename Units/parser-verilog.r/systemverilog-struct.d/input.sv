@@ -54,7 +54,9 @@ endclass
 class U;
   typedef union { int i; shortreal f; } num;  // named union type
   num n;
-  n.f = 0.0;  // set n in floating point format
+  function new;
+    n.f = 0.0;  // set n in floating point format
+  endfunction
 
   typedef struct {
     bit isfloat;

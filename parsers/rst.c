@@ -24,6 +24,7 @@
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
+#include "utf8_str.h"
 #include "nestlevel.h"
 #include "entry.h"
 #include "routines.h"
@@ -215,36 +216,6 @@ static int get_kind(char c, bool overline, struct sectionTracker tracker[])
 	}
 	return -1;
 }
-
-
-/* computes the length of an UTF-8 string
- * if the string doesn't look like UTF-8, return -1 */
-static int utf8_strlen(const char *buf, int buf_len)
-{
-	int len = 0;
-	const char *end = buf + buf_len;
-
-	for (len = 0; buf < end; len ++)
-	{
-		/* perform quick and naive validation (no sub-byte checking) */
-		if (! (*buf & 0x80))
-			buf ++;
-		else if ((*buf & 0xe0) == 0xc0)
-			buf += 2;
-		else if ((*buf & 0xf0) == 0xe0)
-			buf += 3;
-		else if ((*buf & 0xf8) == 0xf0)
-			buf += 4;
-		else /* not a valid leading UTF-8 byte, abort */
-			return -1;
-
-		if (buf > end) /* incomplete last byte */
-			return -1;
-	}
-
-	return len;
-}
-
 
 static const unsigned char *is_markup_line (const unsigned char *line, char reftype)
 {
@@ -449,7 +420,11 @@ static void findRstTags (void)
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
-		if ((markup_line = is_markup_line (line, '_')) != NULL)
+		const unsigned char *line_trimmed = line;
+		while (isspace(*line_trimmed))
+			   line_trimmed++;
+
+		if ((markup_line = is_markup_line (line_trimmed, '_')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Handle .. _target:
@@ -461,7 +436,7 @@ static void findRstTags (void)
 				continue;
 			}
 		}
-		else if ((markup_line = is_markup_line (line, '[')) != NULL)
+		else if ((markup_line = is_markup_line (line_trimmed, '[')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Handle .. [citation]
@@ -473,7 +448,7 @@ static void findRstTags (void)
 				continue;
 			}
 		}
-		else if ((markup_line = is_markup_line (line, '|')) != NULL)
+		else if ((markup_line = is_markup_line (line_trimmed, '|')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Hanle .. |substitute definition|
