@@ -30,7 +30,7 @@ fn3	input-3.v	/^    fn3(a int, b int, c int) !&Test$/;"	n	line:8	interface:aaa.F
 fn4	input-3.v	/^    fn4() [][]a.b.c.D$/;"	n	line:9	interface:aaa.Foo	typeref:typename:[][]a.b.c.D	signature:()	roles:def
 fn5	input-3.v	/^    fn5()$/;"	n	line:10	interface:aaa.Foo	typeref:typename:	signature:()	roles:def
 main	input-4.v	/^fn main() {$/;"	f	line:2	typeref:typename:	signature:()	roles:def	end:15
-a	input-4.v	/^    a := SomeStruct{$/;"	v	line:3	roles:def
+a	input-4.v	/^    a := SomeStruct{$/;"	v	line:3	fn:main	roles:def
 Foo	input-5.v	/^struct Foo {$/;"	s	line:2	roles:def	end:11
 a	input-5.v	/^    a string$/;"	m	line:3	struct:Foo	roles:def
 Bar	input-5.v	/^    b struct Bar {$/;"	s	line:4	struct:Foo	roles:def

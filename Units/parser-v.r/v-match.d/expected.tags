@@ -1,5 +1,5 @@
 main	input.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:7
-a	input.v	/^    a := match os {$/;"	v	line:2	roles:def
+a	input.v	/^    a := match os {$/;"	v	line:2	fn:main	roles:def
 main	input-1.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:7
 kind	input-2.v	/^fn (c Colour) kind() {$/;"	f	line:1	typeref:typename:	signature:(c Colour)()	roles:def	end:7
 c	input-2.v	/^fn (c Colour) kind() {$/;"	R	line:1	fn:kind	roles:def

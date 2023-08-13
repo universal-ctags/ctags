@@ -240,6 +240,7 @@ typedef enum eTokenType {
 	COUNT_TOKEN
 } tokenType;
 
+#ifdef DEBUG
 static char *const tokenNames[COUNT_TOKEN] = {
 	"NONE",
 	"KEYWORD",
@@ -274,6 +275,7 @@ static char *const tokenNames[COUNT_TOKEN] = {
 	"EXTERN",
 	"EOF"
 };
+#endif
 
 typedef enum {
 	ROLE_IMPORTED_MODULE,
@@ -368,15 +370,15 @@ typedef struct {
 
 static langType Lang_v;
 static objPool *TokenPool = NULL;
-static const char *CurrentParser;
 static tokenType LastTokenType = TOKEN_IMMEDIATE; // not NONE
-static bool ParserSpew = false;
 static int NumReplays = 0;
 static tokenInfo *ReplayTokens[MAX_REPLAYS];
 static vString *ReplayCaptures[MAX_REPLAYS];
 static tokenType ReplayLastTokenTypes[MAX_REPLAYS];
 static bool IsBuiltin = false;
 #ifdef DEBUG
+static const char *CurrentParser;
+static bool ParserSpew = false;
 static int NextTokenId = 1;
 #endif
 
@@ -1317,7 +1319,7 @@ static void parseDeclare (tokenInfo *const token, vString *const names,
 			char *n = name, *a = access;
 			name = nextCharIdent (name, ',');
 			access = nextCharIdent (access, ',');
-			makeTagFull (token, n, KIND_VARIABLE, CORK_NIL,
+			makeTagFull (token, n, KIND_VARIABLE, scope,
 			             ROLE_DEFINITION_INDEX, NULL, NULL, a);
 		}
 	}
@@ -1690,7 +1692,7 @@ static void parseFor (tokenInfo *const token, int scope)
 	skipAccessAndReadToken (token, &access);
 	if (!isToken (token, TOKEN_OPEN_CURLY, TOKEN_SEMICOLON, TOKEN_EOF))
 	{
-		parseExprList (token, scope, access, true);
+		parseExprList (token, CORK_NIL, access, true);
 		readToken (token);
 	}
 	while (isToken (token, TOKEN_SEMICOLON))
@@ -2784,8 +2786,6 @@ static void parseFile (tokenInfo *const token)
 {
 	PARSER_PROLOGUE ("file");
 
-	IsBuiltin = false;
-
 	int scope = CORK_NIL;
 	vString *access = NULL;
 	do
@@ -2830,6 +2830,16 @@ static void parseFile (tokenInfo *const token)
 	while (!isToken (token, TOKEN_EOF));
 	vStringDelete (access);
 
+	// reset global parser state :(
+	for (int i = 0; i < NumReplays; i++)
+	{
+		deleteToken (ReplayTokens[i]);
+		vStringDelete (ReplayCaptures[i]);
+	}
+	NumReplays = 0;
+	IsBuiltin = false;
+	LastTokenType = TOKEN_IMMEDIATE;
+
 	PARSER_EPILOGUE ();
 }
 
@@ -2859,12 +2869,6 @@ static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
 {
 	if (!initialized)
 		return;
-
-	for (int i = 0; i < NumReplays; i++)
-	{
-		deleteToken (ReplayTokens[i]);
-		vStringDelete (ReplayCaptures[i]);
-	}
 
 	objPoolDelete (TokenPool);
 }
