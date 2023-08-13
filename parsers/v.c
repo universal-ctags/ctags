@@ -347,7 +347,7 @@ static fieldDefinition VFields [] = {
 	},
 };
 
-static kindType vLookupKinds[] = {
+static int vLookupKinds[] = { // int, compatible with anyKindsEntryInScope()
 	KIND_STRUCT,
 	KIND_ENUMERATION,
 	KIND_INTERFACE,
@@ -1055,7 +1055,7 @@ static int lookupName (vString *name, int scope)
 	vString *tmp = vStringNewCopy (name);
 	char *last, *part = vStringValue (tmp);
 	int origScope = scope;
-	unsigned int nkinds = sizeof (vLookupKinds) / sizeof (kindType);
+	unsigned int nkinds = sizeof (vLookupKinds) / sizeof (int);
 	bool once = true;
 	while (part)
 	{
