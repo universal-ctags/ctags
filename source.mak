@@ -372,7 +372,7 @@ PARSER_SRCS =				\
 	parsers/lua.c			\
 	parsers/m4.c			\
 	parsers/make.c			\
-	parsers/markdown.c		\
+	parsers/markdown.c			\
 	parsers/matlab.c		\
 	parsers/myrddin.c		\
 	parsers/nsis.c			\
