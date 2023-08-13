@@ -30,9 +30,9 @@ and list the names of any files that fail to parser is:
 Debugging
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The V parser can also emit a dump of its operation by running ctags with
-`--param-v.parserSpew=on`.  (Note: this parser-specific option is also only
-available when ctags has been built with `--enable-debugging`.)
+The V parser can also emit a dump of its operation by running ctags with `-d 8`.
+(Note: like the parser warnings, this also requires ctags to have been built
+with `--enable-debugging`.)
 
 The dump is extremely useful for debugging the parser and shows:
 

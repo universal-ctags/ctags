@@ -11,7 +11,6 @@ CPreProcessor  ignore            a token to be specially handled
 Fypp           guest             parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
 ITcl           forceUse          enable the parser even when `itcl' namespace is not specified in the input (true or [false])
 TclOO          forceUse          enable the parser even when `oo' namespace is not specified in the input (true or [false])
-V              parserSpew        spews debug information about the parser to stderr
 
 # ALL MACHINABLE
 #LANGUAGE	NAME	DESCRIPTION
@@ -26,7 +25,6 @@ CPreProcessor	ignore	a token to be specially handled
 Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
 ITcl	forceUse	enable the parser even when `itcl' namespace is not specified in the input (true or [false])
 TclOO	forceUse	enable the parser even when `oo' namespace is not specified in the input (true or [false])
-V	parserSpew	spews debug information about the parser to stderr
 
 # ALL MACHINABLE NOHEADER
 Asm	commentCharsAtBOL	line comment chraracters at the beginning of line ([;*@])
@@ -40,7 +38,6 @@ CPreProcessor	ignore	a token to be specially handled
 Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
 ITcl	forceUse	enable the parser even when `itcl' namespace is not specified in the input (true or [false])
 TclOO	forceUse	enable the parser even when `oo' namespace is not specified in the input (true or [false])
-V	parserSpew	spews debug information about the parser to stderr
 
 # CPP
 #NAME    DESCRIPTION
@@ -68,4 +65,3 @@ define	define replacement for an identifier (name(params,...)=definition)
 if0	examine code within "#if 0" branch (true or [false])
 ignore	a token to be specially handled
 pragma	handle program
-
