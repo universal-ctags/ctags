@@ -70,7 +70,7 @@
 #define vDebugPrintf(...) \
 	do { if (debug (DEBUG_CPP)) fprintf (stderr, __VA_ARGS__); }while(0)
 #define vDebugParserPrintf(...) \
-	do { if (ParserSpew) vDebugPrintf(__VA_ARGS__); }while(0)
+	do { if (debug (DEBUG_OPTION)) fprintf(stderr, __VA_ARGS__); }while(0)
 #define vDebugUnexpected(t, e, l) vDebugPrintf ( \
 	RED "\nUNEXPECTED %s%s%s%s in {%s} at %s:%lu (v.c:%i)" NORM, \
 	t->keyword != KEYWORD_NONE? "KEYWORD" : tokenNames[t->type], \
@@ -378,7 +378,6 @@ static tokenType ReplayLastTokenTypes[MAX_REPLAYS];
 static bool IsBuiltin = false;
 #ifdef DEBUG
 static const char *CurrentParser;
-static bool ParserSpew = false;
 static int NextTokenId = 1;
 #endif
 
@@ -2873,26 +2872,6 @@ static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
 	objPoolDelete (TokenPool);
 }
 
-#ifdef DEBUG
-static bool vSetParserSpew (const langType language CTAGS_ATTR_UNUSED,
-                            const char *optname CTAGS_ATTR_UNUSED,
-                            const char *arg)
-{
-	ParserSpew = arg && (arg[0] == 'y' || arg[0] == 'Y' || arg[0] == 't' ||
-	                     arg[0] == 'T' || arg[0] == 'o' || arg[0] == 'O' ||
-	                     arg[0] == '1');
-	return true;
-}
-
-static paramDefinition VParams[] = {
-	{
-		.name = "parserSpew",
-		.desc = "spews debug information about the parser to stderr",
-		.handleParam = vSetParserSpew,
-	},
-};
-#endif
-
 extern parserDefinition *VParser (void)
 {
 	static const char *const extensions[] = { "v", NULL };
@@ -2909,9 +2888,5 @@ extern parserDefinition *VParser (void)
 	def->fieldCount = ARRAY_SIZE (VFields);
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->requestAutomaticFQTag = true;
-#ifdef DEBUG
-	def->paramTable = VParams;
-	def->paramCount = ARRAY_SIZE (VParams);
-#endif
 	return def;
 }
