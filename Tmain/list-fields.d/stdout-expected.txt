@@ -61,6 +61,7 @@ z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field outpu
 -	parameter	no	SystemVerilog	--b	no	--	parameter whose value can be overridden.
 -	target	yes	Thrift	s--	no	--	the target language specified at "namespace"
 -	throws	yes	Thrift	s--	no	--	throws list of function
+-	module	yes	V	s--	no	--	the name of the module
 -	architecture	yes	VHDL	s--	no	--	architecture designing the entity
 -	parameter	no	Verilog	--b	no	--	parameter whose value can be overridden.
 #
