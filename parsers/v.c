@@ -28,6 +28,7 @@
 #include "field.h"
 #include "htable.h"
 #include "param.h"
+#include "selectors.h"
 
 #define MAX_REPLAYS 2
 #define _NARGS(_1, _2, _3, _4, _5, _6, _7, _8, _9, N, ...) N
@@ -2876,12 +2877,14 @@ extern parserDefinition *VParser (void)
 {
 	static const char *const extensions[] = { "v", NULL };
 	parserDefinition *def = parserNew ("V");
+	static selectLanguage selectors[] = { selectVorVerilogByKeywords, NULL };
 	def->kindTable = VKinds;
 	def->kindCount = ARRAY_SIZE (VKinds);
 	def->extensions = extensions;
 	def->parser = findVTags;
 	def->initialize = initialize;
 	def->finalize = finalize;
+	def->selectLanguage  = selectors;
 	def->keywordTable = VKeywordTable;
 	def->keywordCount = ARRAY_SIZE (VKeywordTable);
 	def->fieldTable = VFields;

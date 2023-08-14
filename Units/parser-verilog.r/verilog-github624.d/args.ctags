@@ -1,1 +1,3 @@
 --sort=no
+# The input is too short. selectVorVerilogByKeywords() doesn't work well.
+--language-force=Verilog
