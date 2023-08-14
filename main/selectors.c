@@ -36,6 +36,9 @@ static const char *TR_DOSBATCH = "DosBatch";
 static const char *TR_LISP	   = "Lisp";
 static const char *TR_LEX	   = "LEX";
 
+static const char *TR_V = "V";
+static const char *TR_VERILOG = "Verilog";
+
 #define startsWith(line,prefix)									\
 	(strncmp(line, prefix, strlen(prefix)) == 0? true: false)
 
@@ -335,6 +338,58 @@ selectLispOrLEXByLEXMarker (MIO *input,
 							unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
 	return selectByLines (input, tasteLispOrLEXLines, TR_LISP, NULL);
+}
+
+struct VorVerilogScore {
+	int v;
+	int verilog;
+};
+
+static const char *
+tasteVOrVerilogLines (const char *line, void *data)
+{
+	struct VorVerilogScore *score = (struct VorVerilogScore *)data;
+
+	while ((*line == ' ')
+		   || (*line == '\t'))
+		line++;
+
+	/* fn, and pub imply V. */
+	if ((line[0] == 'f' && line[1] == 'n'
+		 && (line[2] == ' ' || line[2] == '\t'))
+		|| (line[0] == 'p' && line[1] == 'u' && line[2] == 'b'
+			&& (line[3] == ' ' || line[3] == '\t')))
+		score->v++;
+	/* `define, end, begin, and reg  imply Verilog */
+	else if (strncmp(line, "end", 3) == 0
+			 || strncmp(line, "begin", 5) == 0
+			 || strncmp(line, "reg", 3) == 0
+			 || strncmp(line, "wire", 4) == 0
+			 || strncmp(line, "parameter", 9) == 0
+			 || strncmp(line, "`define", 5) == 0)
+		score->verilog++;
+
+	return TR_UNKNOWN;
+}
+
+const char *
+selectVorVerilogByKeywords (MIO *input,
+							langType *candidates CTAGS_ATTR_UNUSED,
+							unsigned int nCandidates CTAGS_ATTR_UNUSED)
+{
+	struct VorVerilogScore score = {
+		.v = 0,
+		.verilog = 0,
+	};
+	selectByLines (input, tasteVOrVerilogLines, TR_UNKNOWN, &score);
+
+	int d = score.v - score.verilog;
+	if (d > 0)
+		return TR_V;
+	else if (d < 0)
+		return TR_VERILOG;
+	else
+		return TR_UNKNOWN;
 }
 
 #ifdef HAVE_LIBXML
