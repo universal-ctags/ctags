@@ -1599,9 +1599,8 @@ static void parseMatch (tokenInfo *const token, int scope)
 	Assert (isKeyword (token, KEYWORD_match));
 	PARSER_PROLOGUE ("match");
 
-	vString *access = NULL;
 	readToken (token);
-	skipAccessAndReadToken (token, &access);
+	skipAccessAndReadToken (token, NULL);
 	if (!isClose (token))
 	{
 		parseExprList (token, scope, NULL, false);
@@ -1695,6 +1694,7 @@ static void parseFor (tokenInfo *const token, int scope)
 		parseExprList (token, CORK_NIL, access, true);
 		readToken (token);
 	}
+	vStringDelete (access);
 	while (isToken (token, TOKEN_SEMICOLON))
 	{
 		readToken (token);
@@ -1732,6 +1732,7 @@ static void parseImport (tokenInfo *const token)
 			readToken (token);
 			if (expectToken (token, TOKEN_IDENT))
 			{
+				vStringDelete (moduleName);
 				moduleName = token->string;
 				token->string = NULL;
 			}
