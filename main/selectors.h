@@ -31,7 +31,7 @@ const char *
 selectLispOrLEXByLEXMarker (struct _MIO *, langType *, unsigned int);
 
 const char *
-selectVorVerilogByKeywords (struct _MIO *, langType *, unsigned int);
+selectVOrVerilogByKeywords (struct _MIO *, langType *, unsigned int);
 
 const char *
 selectByXpathFileSpec (struct _MIO *input, langType *candidates, unsigned int nCandidates);

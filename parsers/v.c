@@ -2877,7 +2877,7 @@ extern parserDefinition *VParser (void)
 {
 	static const char *const extensions[] = { "v", NULL };
 	parserDefinition *def = parserNew ("V");
-	static selectLanguage selectors[] = { selectVorVerilogByKeywords, NULL };
+	static selectLanguage selectors[] = { selectVOrVerilogByKeywords, NULL };
 	def->kindTable = VKinds;
 	def->kindCount = ARRAY_SIZE (VKinds);
 	def->extensions = extensions;
