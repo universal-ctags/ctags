@@ -2117,7 +2117,7 @@ extern parserDefinition* VerilogParser (void)
 {
 	static const char *const extensions [] = { "v", NULL };
 	parserDefinition* def = parserNew ("Verilog");
-	static selectLanguage selectors[] = { selectVorVerilogByKeywords, NULL };
+	static selectLanguage selectors[] = { selectVOrVerilogByKeywords, NULL };
 	def->versionCurrent = 1;
 	def->versionAge = 1;
 	def->kindTable  = VerilogKinds;

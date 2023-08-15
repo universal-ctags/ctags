@@ -360,7 +360,7 @@ selectFortranOrForthByForthMarker (MIO *input,
 	return selectByLines (input, tasteFortranOrForthLines, TR_FORTRAN, NULL);
 }
 
-struct VorVerilogScore {
+struct VOrVerilogScore {
 	int v;
 	int verilog;
 };
@@ -368,17 +368,24 @@ struct VorVerilogScore {
 static const char *
 tasteVOrVerilogLines (const char *line, void *data)
 {
-	struct VorVerilogScore *score = (struct VorVerilogScore *)data;
+	struct VOrVerilogScore *score = (struct VOrVerilogScore *)data;
 
 	while ((*line == ' ')
 		   || (*line == '\t'))
 		line++;
 
-	/* fn, and pub imply V. */
-	if ((line[0] == 'f' && line[1] == 'n'
-		 && (line[2] == ' ' || line[2] == '\t'))
-		|| (line[0] == 'p' && line[1] == 'u' && line[2] == 'b'
-			&& (line[3] == ' ' || line[3] == '\t')))
+	/* top 10 line-starting words most commonly present in first 150 lines of
+	 * all files in V v0.4 project source code (at time of writing) */
+	if (strncmp(line, "fn", 2) == 0 ||      /* present in 82.8% files */
+		strncmp(line, "return", 6) == 0 ||  /* present in 46.2% files */
+		strncmp(line, "mut", 3) == 0 ||     /* present in 43.7% files */
+		strncmp(line, "println", 7) == 0 || /* present in 38.9% files */
+		strncmp(line, "assert", 6) == 0 ||  /* present in 38.8% files */
+		strncmp(line, "struct", 6) == 0 ||  /* present in 34.5% files */
+		strncmp(line, "module", 6) == 0 ||  /* present in 29.6% files */
+		strncmp(line, "import", 6) == 0 ||  /* present in 27.6% files */
+		strncmp(line, "if", 2) == 0 ||      /* present in 24.9% files */
+		strncmp(line, "pub", 3) == 0)       /* present in 24.1% files */
 		score->v++;
 	/* `define, end, begin, and reg  imply Verilog */
 	else if (strncmp(line, "end", 3) == 0
@@ -393,11 +400,11 @@ tasteVOrVerilogLines (const char *line, void *data)
 }
 
 const char *
-selectVorVerilogByKeywords (MIO *input,
+selectVOrVerilogByKeywords (MIO *input,
 							langType *candidates CTAGS_ATTR_UNUSED,
 							unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
-	struct VorVerilogScore score = {
+	struct VOrVerilogScore score = {
 		.v = 0,
 		.verilog = 0,
 	};
