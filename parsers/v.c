@@ -47,20 +47,20 @@
 	_isToken (token, true, true, __LINE__, nArgs (__VA_ARGS__), __VA_ARGS__)
 #define isDigit(c) (c >= '0' && c <= '9')
 #define isHexDigit(c) (isDigit (c) || \
-                       (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+					   (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
 #define isInitialIdent(c) ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || \
-                           c == '_' || c == '$')
+						   c == '_' || c == '$')
 #define isSubsequentIdent(c) (isInitialIdent (c) || isDigit (c))
 #define isOperator(t) ( \
 		isToken (t, TOKEN_OPERATOR, TOKEN_PLUSMINUS, TOKEN_ANDAND, \
-		         TOKEN_ASTERISK, TOKEN_AMPERSAND, TOKEN_CHPOP, TOKEN_PIPE) || \
+				 TOKEN_ASTERISK, TOKEN_AMPERSAND, TOKEN_CHPOP, TOKEN_PIPE) || \
 		isKeyword (token, KEYWORD_in))
 #define isInitialType(t) ( \
 		isToken (t, TOKEN_TYPE, TOKEN_EXTERN, TOKEN_OPEN_SQUARE, \
-		         TOKEN_QUESTION, TOKEN_EXCLAMATION, TOKEN_ASTERISK, \
-		         TOKEN_AMPERSAND, TOKEN_ANDAND) || \
+				 TOKEN_QUESTION, TOKEN_EXCLAMATION, TOKEN_ASTERISK, \
+				 TOKEN_AMPERSAND, TOKEN_ANDAND) || \
 		isKeyword (t, KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan, KEYWORD_Smap, \
-		           KEYWORD_shared, KEYWORD_fn, KEYWORD_none))
+				   KEYWORD_shared, KEYWORD_fn, KEYWORD_none))
 #define isClose(t) ( \
 		isToken (t, TOKEN_CLOSE_PAREN, TOKEN_CLOSE_SQUARE, TOKEN_CLOSE_CURLY))
 #define unreadToken(t) (unreadTokenFull (t, NULL))
@@ -80,9 +80,9 @@
 #define PARSER_PROLOGUE(c) \
 	const char *const _prevParser = CurrentParser; \
 	CurrentParser = (c); \
-    vDebugParserPrintf ("{%s: ", CurrentParser)
+	vDebugParserPrintf ("{%s: ", CurrentParser)
 #define PARSER_EPILOGUE() \
-    vDebugParserPrintf (":%s} ", CurrentParser); \
+	vDebugParserPrintf (":%s} ", CurrentParser); \
 	CurrentParser = _prevParser
 #else
 #define vDebugPrintf(...)
@@ -451,7 +451,7 @@ static void captureChar (vString *capture, tokenInfo *token, char c)
 }
 
 static bool getcAndCaptureIfEq (int expect,
-                                vString *const capture, tokenInfo *token)
+								vString *const capture, tokenInfo *token)
 {
 	int c = getcFromInputFile ();
 	if (c != expect)
@@ -583,11 +583,11 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 
 	// start capture
 	if (c != EOF &&
-	    (isDigit (c) || isInitialIdent (c) || isOneOf (c, "-+'\\*\"`")))
+		(isDigit (c) || isInitialIdent (c) || isOneOf (c, "-+'\\*\"`")))
 	{
 		Assert (LastTokenType != TOKEN_NONE);
 		if (LastTokenType == TOKEN_IDENT || LastTokenType == TOKEN_KEYWORD ||
-		    LastTokenType == TOKEN_TYPE || LastTokenType == TOKEN_COMMA)
+			LastTokenType == TOKEN_TYPE || LastTokenType == TOKEN_COMMA)
 			captureChar (capture, token, ' ');
 	}
 	if (c != EOF)
@@ -619,7 +619,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	else if (c == '#' && getcAndCaptureIfEq ('[', capture, token))
 		token->type = TOKEN_OPEN_SQUARE; // #[
 	else if (isDigit (c) ||
-	         (isOneOf (c, "-+.") && isDigit (peekcFromInputFile ())))
+			 (isOneOf (c, "-+.") && isDigit (peekcFromInputFile ())))
 	{
 		bool more;
 		token->type = TOKEN_IMMEDIATE;
@@ -629,7 +629,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 			more = isHexDigit (c) ||
 				(isOneOf (c, ".-+xo_") && isHexDigit (peekcFromInputFile ())) ||
 				(isOneOf (c, "eE") && (isDigit (peekcFromInputFile ()) ||
-				                       isOneOf (peekcFromInputFile (), "-+")));
+									   isOneOf (peekcFromInputFile (), "-+")));
 			if (more)
 				captureChar (capture, token, c);
 		} while (more);
@@ -732,7 +732,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 			c = getcFromInputFile ();
 			captureChar (capture, token, c);
 		} while (c != EOF &&
-		         (c != terminator || inEscape || (inEval && evalLevel > 0)));
+				 (c != terminator || inEscape || (inEval && evalLevel > 0)));
 		checkLabel (token, capture);
 	}
 	else if (c == '@')
@@ -774,8 +774,8 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 			if (initChar >= 'A' && initChar <= 'Z')
 				token->type = TOKEN_TYPE;
 			else if (isOneOf (initChar, "rc") &&
-			         vStringLength (token->string) == 1 &&
-			         isOneOf (peekcFromInputFile (), "'\"`"))
+					 vStringLength (token->string) == 1 &&
+					 isOneOf (peekcFromInputFile (), "'\"`"))
 			{
 				int end = getcFromInputFile ();
 				captureChar (capture, token, end);
@@ -799,7 +799,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	else
 	{
 		vDebugPrintf (RED "\nUNRECOGNISED CHAR at %s:%lu: %c (%u)" NORM,
-		              getInputFileName (), token->lineNumber, c, c);
+					  getInputFileName (), token->lineNumber, c, c);
 	}
 
 	vDebugParserPrintf (
@@ -846,7 +846,7 @@ static void readToken (tokenInfo *const token)
 //                                                                    HELPER FNS
 
 static bool _isToken (tokenInfo *const token, bool expect, bool keyword,
-                      int lineNum, int nTypes, ...)
+					  int lineNum, int nTypes, ...)
 {
 	va_list argp;
 	va_start (argp, nTypes);
@@ -894,9 +894,9 @@ static bool _isToken (tokenInfo *const token, bool expect, bool keyword,
 }
 
 static int makeTagFull (tokenInfo *const token, const char *name,
-                        const kindType kind, const int scope, int role,
-                        vString *const argList, vString *retType,
-                        const char *access)
+						const kindType kind, const int scope, int role,
+						vString *const argList, vString *retType,
+						const char *access)
 {
 	vDebugParserPrintf ("# ");
 	tagEntryInfo e;
@@ -905,7 +905,7 @@ static int makeTagFull (tokenInfo *const token, const char *name,
 	const char *const tagName =
 		name? name : (token->string? vStringValue (token->string) : "");
 	Assert (tagName && tagName[0] != '\0');
-    if (!strcmp (tagName, "_")) return CORK_NIL; // ignore _
+	if (!strcmp (tagName, "_")) return CORK_NIL; // ignore _
 	initRefTagEntry (&e, tagName, kind, role);
 
 	e.lineNumber = token->lineNumber;
@@ -925,34 +925,34 @@ static int makeTagFull (tokenInfo *const token, const char *name,
 }
 
 static int makeFnTag (tokenInfo *const token, vString *const name,
-                      kindType kind, const int scope, vString *const argList,
-                      vString *const retType, vString *const access)
+					  kindType kind, const int scope, vString *const argList,
+					  vString *const retType, vString *const access)
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind,
-	                    scope, ROLE_DEFINITION_INDEX, argList, retType,
-	                    access? vStringValue (access) : NULL);
+						scope, ROLE_DEFINITION_INDEX, argList, retType,
+						access? vStringValue (access) : NULL);
 }
 
 static int makeTag (tokenInfo *const token, vString *const name, kindType kind,
-                    int scope)
+					int scope)
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind, scope,
-	                    ROLE_DEFINITION_INDEX, NULL, NULL, NULL);
+						ROLE_DEFINITION_INDEX, NULL, NULL, NULL);
 }
 
 static int makeTagEx (tokenInfo *const token, vString *const name, kindType kind,
-                      int scope, vString *const access)
+					  int scope, vString *const access)
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind, scope,
-	                    ROLE_DEFINITION_INDEX, NULL, NULL,
-	                    access? vStringValue (access) : NULL);
+						ROLE_DEFINITION_INDEX, NULL, NULL,
+						access? vStringValue (access) : NULL);
 }
 
 static int makeReferenceTag (tokenInfo *const token, vString *const name,
-                             kindType kind, int scope, int role)
+							 kindType kind, int scope, int role)
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind, scope,
-	                    role, NULL, NULL, NULL);
+						role, NULL, NULL, NULL);
 }
 
 static tokenType getOpen (tokenType close)
@@ -978,7 +978,7 @@ static tokenType getClose (tokenType open)
 }
 
 static void skipToTokenFull (tokenType type, vString *const capture,
-                             tokenInfo *token)
+							 tokenInfo *token)
 {
 	if (type != TOKEN_NONE)
 	{
@@ -1114,11 +1114,11 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 	tokenInfo *tokens[2] = { NULL, NULL };
 	int count = 0, idx = 1;
 	while (prev == TOKEN_NONE ||
-	       (prev == TOKEN_DOT &&
-	        (isToken (tokens[idx], TOKEN_IDENT, TOKEN_TYPE) ||
-	         isKeyword (tokens[idx], KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan) ||
-	         (isExtern && isKeyword (tokens[idx], KEYWORD_assert)))) ||
-	       (prev != TOKEN_DOT && isToken (tokens[idx], TOKEN_DOT)))
+		   (prev == TOKEN_DOT &&
+			(isToken (tokens[idx], TOKEN_IDENT, TOKEN_TYPE) ||
+			 isKeyword (tokens[idx], KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan) ||
+			 (isExtern && isKeyword (tokens[idx], KEYWORD_assert)))) ||
+		   (prev != TOKEN_DOT && isToken (tokens[idx], TOKEN_DOT)))
 	{
 		prevprev = prev;
 		prev = prev == TOKEN_NONE? token->type : tokens[idx]->type;
@@ -1140,14 +1140,14 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 	deleteToken (tokens[1]);
 
 	// load token with type (and fq name)
-    token->type = isExtern? TOKEN_EXTERN : prev;
-    token->fullyQualified = true;
+	token->type = isExtern? TOKEN_EXTERN : prev;
+	token->fullyQualified = true;
 
-    // should end on one of these
-    expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN, TOKEN_KEYWORD) ||
-	    expectKeyword (token, KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan);
+	// should end on one of these
+	expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN, TOKEN_KEYWORD) ||
+		expectKeyword (token, KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan);
 
-    PARSER_EPILOGUE ();
+	PARSER_EPILOGUE ();
 }
 
 // fqident: [ident | type] fq
@@ -1248,7 +1248,7 @@ static void parseChain (tokenInfo *const token, int scope)
 
 	readToken (token);
 	if (expectToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_DOT, TOKEN_KEYWORD) ||
-	    expectKeyword (token, KEYWORD_TYPE, KEYWORD_map))
+		expectKeyword (token, KEYWORD_TYPE, KEYWORD_map))
 	{
 		tokenType last;
 		do
@@ -1257,8 +1257,8 @@ static void parseChain (tokenInfo *const token, int scope)
 			readToken (token);
 		}
 		while ((isToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_DOT) ||
-		        isKeyword (token, KEYWORD_TYPE, KEYWORD_map)) &&
-		       isToken (token, TOKEN_DOT) != last);
+				isKeyword (token, KEYWORD_TYPE, KEYWORD_map)) &&
+			   isToken (token, TOKEN_DOT) != last);
 		if (isToken (token, TOKEN_DOT))
 			unreadToken (token);
 		else if (isToken (token, TOKEN_OPEN_PAREN))
@@ -1305,7 +1305,7 @@ static int parseBlock (tokenInfo *const token, int scope, bool hasChain)
 
 // decl: [':=' | 'in'] list
 static void parseDeclare (tokenInfo *const token, vString *const names,
-                          int scope, vString *const accesses)
+						  int scope, vString *const accesses)
 {
 	Assert (isToken (token, TOKEN_DECLARE) || isKeyword (token, KEYWORD_in));
 	PARSER_PROLOGUE ("decl");
@@ -1320,7 +1320,7 @@ static void parseDeclare (tokenInfo *const token, vString *const names,
 			name = nextCharIdent (name, ',');
 			access = nextCharIdent (access, ',');
 			makeTagFull (token, n, KIND_VARIABLE, scope,
-			             ROLE_DEFINITION_INDEX, NULL, NULL, a);
+						 ROLE_DEFINITION_INDEX, NULL, NULL, a);
 		}
 	}
 	readToken (token);
@@ -1385,14 +1385,14 @@ static void parseIf (tokenInfo *const token, int scope)
 // clsr-args: '[' any ']'
 // args: '(' any ')'
 static void parseFunction (tokenInfo *const token, int scope,
-                        vString *const access, kindType kind)
+						vString *const access, kindType kind)
 {
 	Assert (kind == KIND_FUNCTION || kind == KIND_METHOD ||
-	        kind == KIND_ALIAS || kind == KIND_NONE);
+			kind == KIND_ALIAS || kind == KIND_NONE);
 	Assert (kind == KIND_METHOD || isKeyword (token, KEYWORD_fn));
 	PARSER_PROLOGUE (kind == KIND_FUNCTION? "fndef" :
-	                 (kind == KIND_METHOD? "method" :
-	                  (kind == KIND_ALIAS? "fntype" : "lambda")));
+					 (kind == KIND_METHOD? "method" :
+					  (kind == KIND_ALIAS? "fntype" : "lambda")));
 
 	// TODO: make return false if calling function should not further read token
 	// due to failure of this function to process token (like parseExpression)
@@ -1442,13 +1442,13 @@ static void parseFunction (tokenInfo *const token, int scope,
 	}
 	// name
 	if ((kind == KIND_NONE && (
-		     isToken (token, TOKEN_IDENT, TOKEN_TYPE) ||
-		     isKeyword (token, KEYWORD_TYPE))) ||
-	    (kind == KIND_FUNCTION && (
-		    expectToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_KEYWORD,
-		                 TOKEN_OPERATOR, TOKEN_PLUSMINUS, TOKEN_ANDAND,
-		                 TOKEN_ASTERISK) ||
-		    expectKeyword (token, KEYWORD_TYPE, KEYWORD_map))))
+			 isToken (token, TOKEN_IDENT, TOKEN_TYPE) ||
+			 isKeyword (token, KEYWORD_TYPE))) ||
+		(kind == KIND_FUNCTION && (
+			expectToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_KEYWORD,
+						 TOKEN_OPERATOR, TOKEN_PLUSMINUS, TOKEN_ANDAND,
+						 TOKEN_ASTERISK) ||
+			expectKeyword (token, KEYWORD_TYPE, KEYWORD_map))))
 	{
 		if (isToken (token, TOKEN_KEYWORD))
 		{
@@ -1469,7 +1469,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 	}
 	// closure args
 	if (kind == KIND_NONE && name == NULL &&
-	    isToken (token, TOKEN_OPEN_SQUARE))
+		isToken (token, TOKEN_OPEN_SQUARE))
 	{
 		vStringPut (argList, '[');
 		skipToToken (TOKEN_CLOSE_SQUARE, acc);
@@ -1478,8 +1478,8 @@ static void parseFunction (tokenInfo *const token, int scope,
 	}
 	// template args
 	if ((kind == KIND_FUNCTION ||
-	     (kind == KIND_NONE && name == NULL)) &&
-	    isToken (token, TOKEN_OPEN_SQUARE))
+		 (kind == KIND_NONE && name == NULL)) &&
+		isToken (token, TOKEN_OPEN_SQUARE))
 	{
 		vStringPut (argList, '[');
 		skipToToken (TOKEN_CLOSE_SQUARE, acc);
@@ -1514,7 +1514,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 			readToken (token);
 		}
 		else if ((kind == KIND_METHOD || kind == KIND_ALIAS) &&
-		         isToken (token, TOKEN_IDENT))
+				 isToken (token, TOKEN_IDENT))
 		{
 			vStringDelete (token->string);
 			token->string = acc;
@@ -1525,7 +1525,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 		{
 			kindType fnKind = kind == KIND_NONE? KIND_FUNCTION : kind;
 			newScope = makeFnTag (fnToken, name, fnKind, scope,
-			                      argList, retType, access);
+								  argList, retType, access);
 			if (receiver)
 				makeTag (rxToken, NULL, KIND_RECEIVER, newScope);
 		}
@@ -1601,54 +1601,54 @@ static void parseMatch (tokenInfo *const token, int scope)
 
 	vString *access = NULL;
 	readToken (token);
-    skipAccessAndReadToken (token, &access);
-    if (!isClose (token))
-    {
-	    parseExprList (token, scope, NULL, false);
-	    readToken (token);
-    }
-    if (!expectToken (token, TOKEN_OPEN_CURLY))
-	    skipToTokenFull (TOKEN_OPEN_CURLY, NULL, token);
-    if (isToken (token, TOKEN_OPEN_CURLY))
-    {
-	    readToken (token);
-	    do // match clauses
-	    {
-		    while (true) // match clause comma-list
-		    {
-			    if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
-				    parseFullyQualified (token, true);
+	skipAccessAndReadToken (token, &access);
+	if (!isClose (token))
+	{
+		parseExprList (token, scope, NULL, false);
+		readToken (token);
+	}
+	if (!expectToken (token, TOKEN_OPEN_CURLY))
+		skipToTokenFull (TOKEN_OPEN_CURLY, NULL, token);
+	if (isToken (token, TOKEN_OPEN_CURLY))
+	{
+		readToken (token);
+		do // match clauses
+		{
+			while (true) // match clause comma-list
+			{
+				if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
+					parseFullyQualified (token, true);
 
-			    if (isToken (token, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY))
-				    break;
-			    else if (isInitialType (token))
-				    parseVType (token, NULL, scope, false, false);
-			    else if (isKeyword (token, KEYWORD_else))
-			    {
-				    readToken (token);
-				    break;
-			    }
-			    else
-				    parseExpression (token, scope, NULL);
-			    readToken (token);
-			    if (!isToken (token, TOKEN_COMMA))
-				    break;
-			    readToken (token);
-		    }
-		    if (expectToken (token, TOKEN_OPEN_CURLY))
-		    {
-			    parseBlock (token, scope, false);
-			    readToken (token);
-		    }
-		    else
-			    break;
-	    }
-	    while (!isToken (token, TOKEN_EOF, TOKEN_CLOSE_CURLY));
-	    if (!expectToken (token, TOKEN_CLOSE_CURLY))
-		    skipToToken (TOKEN_CLOSE_CURLY, NULL);
-    }
+				if (isToken (token, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY))
+					break;
+				else if (isInitialType (token))
+					parseVType (token, NULL, scope, false, false);
+				else if (isKeyword (token, KEYWORD_else))
+				{
+					readToken (token);
+					break;
+				}
+				else
+					parseExpression (token, scope, NULL);
+				readToken (token);
+				if (!isToken (token, TOKEN_COMMA))
+					break;
+				readToken (token);
+			}
+			if (expectToken (token, TOKEN_OPEN_CURLY))
+			{
+				parseBlock (token, scope, false);
+				readToken (token);
+			}
+			else
+				break;
+		}
+		while (!isToken (token, TOKEN_EOF, TOKEN_CLOSE_CURLY));
+		if (!expectToken (token, TOKEN_CLOSE_CURLY))
+			skipToToken (TOKEN_CLOSE_CURLY, NULL);
+	}
 
-    PARSER_EPILOGUE ();
+	PARSER_EPILOGUE ();
 }
 
 // select: 'select' '{' [list block]* '}'
@@ -1658,27 +1658,27 @@ static void parseSelect (tokenInfo *const token, int scope)
 	PARSER_PROLOGUE ("select");
 
 	readToken (token);
-    if (expectToken (token, TOKEN_OPEN_CURLY))
-    {
-	    readToken (token);
-	    do // select clauses
-	    {
-		    if (!isToken (token, TOKEN_CLOSE_CURLY))
-			    parseExprList (token, scope, NULL, false);
-		    readToken (token);
-		    if (expectToken (token, TOKEN_OPEN_CURLY))
-		    {
-			    parseBlock (token, scope, false);
-			    readToken (token);
-		    }
-	    }
-	    while (!isToken (token, TOKEN_EOF, TOKEN_CLOSE_CURLY));
-	    expectToken (token, TOKEN_CLOSE_CURLY);
-    }
-    else
-	    unreadToken (token);
+	if (expectToken (token, TOKEN_OPEN_CURLY))
+	{
+		readToken (token);
+		do // select clauses
+		{
+			if (!isToken (token, TOKEN_CLOSE_CURLY))
+				parseExprList (token, scope, NULL, false);
+			readToken (token);
+			if (expectToken (token, TOKEN_OPEN_CURLY))
+			{
+				parseBlock (token, scope, false);
+				readToken (token);
+			}
+		}
+		while (!isToken (token, TOKEN_EOF, TOKEN_CLOSE_CURLY));
+		expectToken (token, TOKEN_CLOSE_CURLY);
+	}
+	else
+		unreadToken (token);
 
-    PARSER_EPILOGUE ();
+	PARSER_EPILOGUE ();
 }
 
 // for: list? [';' expr]* block
@@ -1738,7 +1738,7 @@ static void parseImport (tokenInfo *const token)
 			readToken (token);
 		}
 		int moduleScope = makeReferenceTag (moduleToken, moduleName, KIND_MODULE,
-		                                    CORK_NIL, ROLE_IMPORTED_MODULE);
+											CORK_NIL, ROLE_IMPORTED_MODULE);
 		vStringDelete (moduleName);
 		deleteToken (moduleToken);
 		if (isToken (token, TOKEN_OPEN_CURLY))
@@ -1749,7 +1749,7 @@ static void parseImport (tokenInfo *const token)
 				if (expectToken (token, TOKEN_IDENT))
 				{
 					makeReferenceTag (token, NULL, KIND_UNKNOWN, moduleScope,
-					         ROLE_IMPORTED_SYMBOL);
+							 ROLE_IMPORTED_SYMBOL);
 					readToken (token);
 					expectToken (token, TOKEN_COMMA, TOKEN_CLOSE_CURLY);
 				}
@@ -1776,7 +1776,7 @@ static void parseImport (tokenInfo *const token)
 //     ]*
 // ]* '}'
 static void parseStruct (tokenInfo *const token, vString *const access,
-                         int scope, kindType kind)
+						 int scope, kindType kind)
 {
 	Assert (
 		(kind == KIND_STRUCT && isKeyword (token, KEYWORD_struct)) ||
@@ -1784,18 +1784,18 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 		(kind == KIND_UNION && isKeyword (token, KEYWORD_union)) ||
 		(kind == KIND_NONE && isKeyword (token, KEYWORD_struct, KEYWORD_union)));
 	PARSER_PROLOGUE (kind == KIND_INTERFACE? "iface" :
-	                 (kind == KIND_UNION? "union" :
-	                  (kind == KIND_STRUCT? "struct" : "anon")));
+					 (kind == KIND_UNION? "union" :
+					  (kind == KIND_STRUCT? "struct" : "anon")));
 
 	int newScope = scope;
 	readToken (token);
 
 	// name
 	if ((kind == KIND_STRUCT || kind == KIND_INTERFACE) && IsBuiltin &&
-	    scope == CORK_NIL && isKeyword (token, KEYWORD_TYPE, KEYWORD_map))
+		scope == CORK_NIL && isKeyword (token, KEYWORD_TYPE, KEYWORD_map))
 		readToken (token);
 	else if ((kind != KIND_NONE && expectToken (token, TOKEN_TYPE)) ||
-	         (kind == KIND_NONE && isToken (token, TOKEN_TYPE)))
+			 (kind == KIND_NONE && isToken (token, TOKEN_TYPE)))
 	{
 		parseFullyQualified (token, true);
 		if (expectToken (token, TOKEN_TYPE, TOKEN_EXTERN))
@@ -1830,75 +1830,75 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 				continue;
 			}
 
-            if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
-	            parseFullyQualified (token, true);
+			if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
+				parseFullyQualified (token, true);
 
-            // if set, parse field below (with next token already read)
+			// if set, parse field below (with next token already read)
 			tokenInfo *fieldToken = NULL;
 
-            if (isToken (token, TOKEN_IDENT))
-            {
-	            fieldToken = dupToken (token);
-	            readToken (token);
-	            if (kind == KIND_INTERFACE && isToken (token, TOKEN_OPEN_PAREN))
-	            {
-		            unreadToken (token);
-		            copyToken (token, fieldToken);
-		            deleteToken (fieldToken);
-		            parseFunction (token, newScope, fieldAccess, KIND_METHOD);
-		            readToken (token);
-		            continue; // method
-	            }
-            }
-            else if (kind == KIND_INTERFACE &&
-                     isKeyword (token, KEYWORD_TYPE, KEYWORD_map))
-            {
-	            parseFunction (token, newScope, fieldAccess, KIND_METHOD);
-	            readToken (token);
-	            continue; // method
-            }
-            else if (isToken (token, TOKEN_TYPE))
-            {
-	            if (IsBuiltin)
-	            {
-		            fieldToken = dupToken (token);
-		            readToken (token);
-		            if (token->onNewline)
-		            {
-			            deleteToken (fieldToken);
-			            continue; // embed type (after all)
-		            }
-	            }
-	            else
-	            {
-		            readToken (token);
-		            continue; // embedded type
-	            }
-            }
-            else if (isToken (token, TOKEN_EXTERN))
-            {
-	            fieldToken = dupToken (token);
-	            readToken (token);
-	            if (token->onNewline)
-	            {
-		            deleteToken (fieldToken);
-		            continue; // embedded extern
-	            }
-            }
-            else
-            {
-                expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN,
-                             TOKEN_KEYWORD);
-                skipToToken (TOKEN_CLOSE_CURLY, false);
-                break;
-            }
+			if (isToken (token, TOKEN_IDENT))
+			{
+				fieldToken = dupToken (token);
+				readToken (token);
+				if (kind == KIND_INTERFACE && isToken (token, TOKEN_OPEN_PAREN))
+				{
+					unreadToken (token);
+					copyToken (token, fieldToken);
+					deleteToken (fieldToken);
+					parseFunction (token, newScope, fieldAccess, KIND_METHOD);
+					readToken (token);
+					continue; // method
+				}
+			}
+			else if (kind == KIND_INTERFACE &&
+					 isKeyword (token, KEYWORD_TYPE, KEYWORD_map))
+			{
+				parseFunction (token, newScope, fieldAccess, KIND_METHOD);
+				readToken (token);
+				continue; // method
+			}
+			else if (isToken (token, TOKEN_TYPE))
+			{
+				if (IsBuiltin)
+				{
+					fieldToken = dupToken (token);
+					readToken (token);
+					if (token->onNewline)
+					{
+						deleteToken (fieldToken);
+						continue; // embed type (after all)
+					}
+				}
+				else
+				{
+					readToken (token);
+					continue; // embedded type
+				}
+			}
+			else if (isToken (token, TOKEN_EXTERN))
+			{
+				fieldToken = dupToken (token);
+				readToken (token);
+				if (token->onNewline)
+				{
+					deleteToken (fieldToken);
+					continue; // embedded extern
+				}
+			}
+			else
+			{
+				expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN,
+							 TOKEN_KEYWORD);
+				skipToToken (TOKEN_CLOSE_CURLY, false);
+				break;
+			}
 
-	        if (fieldToken) // parse field
-	        {
-		        if (parseVType (token, NULL, newScope, false, false))
-		        {
+			if (fieldToken) // parse field
+			{
+				if (parseVType (token, NULL, newScope, false, false))
+				{
 					makeTagEx (fieldToken, NULL, KIND_FIELD, newScope,
-					           fieldAccess);
+							   fieldAccess);
 
 					readToken (token);
 					if (isToken (token, TOKEN_OPEN_SQUARE))
@@ -1913,10 +1913,10 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 							readToken (token);
 					}
 				}
-		        else
-			        vDebugUnexpected (token, "vtype", 0);
-		        deleteToken (fieldToken);
-	        }
+				else
+					vDebugUnexpected (token, "vtype", 0);
+				deleteToken (fieldToken);
+			}
 		}
 		vStringDelete (fieldAccess);
 	}
@@ -1956,9 +1956,9 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 			vString *capture = vStringNewInit (".");
 			readTokenFull (token, capture);
 			while (expectToken (token, TOKEN_CLOSE_CURLY, TOKEN_IDENT,
-			                    TOKEN_KEYWORD) ||
-			       expectKeyword (token, KEYWORD_TYPE, KEYWORD_map,
-			                      KEYWORD_chan))
+								TOKEN_KEYWORD) ||
+				   expectKeyword (token, KEYWORD_TYPE, KEYWORD_map,
+								  KEYWORD_chan))
 			{
 				if (isToken (token, TOKEN_CLOSE_CURLY))
 					break;
@@ -2000,7 +2000,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 // set letInit false to parse *only* V type (with no {...} initialisation after)
 // set canInit false unless tokens already read which would permit it (e.g., [])
 static bool parseVType (tokenInfo *const token, vString *const capture,
-                        int scope, bool canInit, bool letInit)
+						int scope, bool canInit, bool letInit)
 {
 	PARSER_PROLOGUE ("vtype");
 
@@ -2019,7 +2019,7 @@ static bool parseVType (tokenInfo *const token, vString *const capture,
 	{
 		readTokenFull (token, capture);
 		if (!token->onNewline &&
-		    parseVType (token, capture, scope, false, false))
+			parseVType (token, capture, scope, false, false))
 			canInit = true;
 		else
 			unreadTokenFull (token, capture);
@@ -2032,7 +2032,7 @@ static bool parseVType (tokenInfo *const token, vString *const capture,
 		else if (!parseVType (token, capture, scope, false, false))
 		{
 			vDebugUnexpected (token, "vtype", 0);
-            unreadTokenFull (token, capture);
+			unreadTokenFull (token, capture);
 		}
 	}
 	else if (isToken (token, TOKEN_AMPERSAND, TOKEN_ANDAND))
@@ -2065,8 +2065,8 @@ static bool parseVType (tokenInfo *const token, vString *const capture,
 		}
 	}
 	else if (isKeyword (token, KEYWORD_TYPE, KEYWORD_Smap, KEYWORD_Sstruct,
-	                    KEYWORD_Senum, KEYWORD_Sarray, KEYWORD_Ssumtype,
-	                    KEYWORD_Salias, KEYWORD_none))
+						KEYWORD_Senum, KEYWORD_Sarray, KEYWORD_Ssumtype,
+						KEYWORD_Salias, KEYWORD_none))
 		;
 	else if (isKeyword (token, KEYWORD_chan, KEYWORD_shared))
 	{
@@ -2123,8 +2123,8 @@ static void parseAlias (tokenInfo *const token, vString *const access, int scope
 
 	readToken (token);
 	if ((!IsBuiltin && expectToken (token, TOKEN_TYPE)) ||
-	    (IsBuiltin && (expectToken (token, TOKEN_TYPE, TOKEN_KEYWORD) ||
-	                   expectKeyword (token, KEYWORD_TYPE))))
+		(IsBuiltin && (expectToken (token, TOKEN_TYPE, TOKEN_KEYWORD) ||
+					   expectKeyword (token, KEYWORD_TYPE))))
 	{
 		int newScope = makeTagEx (token, NULL, KIND_ALIAS, scope, access);
 		registerEntry (newScope);
@@ -2167,7 +2167,7 @@ static void parseAlias (tokenInfo *const token, vString *const access, int scope
 //     [expr? [',' expr]*]
 // ]
 static void parseExprList (tokenInfo *const token, int scope,
-                           vString *const access, bool hasInDecl)
+						   vString *const access, bool hasInDecl)
 {
 	PARSER_PROLOGUE ("list");
 
@@ -2203,7 +2203,7 @@ static void parseExprList (tokenInfo *const token, int scope,
 		if (consumedIdent)
 		{
 			if (isToken (token, TOKEN_DECLARE) ||
-			    (hasInDecl && isKeyword (token, KEYWORD_in)))
+				(hasInDecl && isKeyword (token, KEYWORD_in)))
 				parseDeclare (token, idents, scope, accesses);
 			else
 			{
@@ -2227,7 +2227,7 @@ static void parseExprList (tokenInfo *const token, int scope,
 	else
 		parseExpression (token, scope, NULL);
 
-    while (true)
+	while (true)
 	{
 		if (!consumedIdent)
 			consumedIdent = true;
@@ -2240,11 +2240,11 @@ static void parseExprList (tokenInfo *const token, int scope,
 			skipAccessAndReadToken (token, NULL);
 		}
 		if (isToken (token, TOKEN_EOF, TOKEN_CLOSE_PAREN, TOKEN_CLOSE_SQUARE,
-		             TOKEN_CLOSE_CURLY))
+					 TOKEN_CLOSE_CURLY))
 			break;
 		parseExpression (token, scope, NULL);
 	}
-    unreadToken (token);
+	unreadToken (token);
 
 	PARSER_EPILOGUE ();
 }
@@ -2422,7 +2422,7 @@ static void parseLock (tokenInfo *const token, int scope)
 }
 
 static bool parseExpression (tokenInfo *const token, int scope,
-                             vString *const access)
+							 vString *const access)
 {
 	PARSER_PROLOGUE ("expr");
 
@@ -2436,7 +2436,7 @@ static bool parseExpression (tokenInfo *const token, int scope,
 	if (isToken (token, TOKEN_IDENT, TOKEN_TYPE))
 		parseFullyQualified (token, false);
 	if (isToken (token, TOKEN_IDENT) ||
-	    isKeyword (token, KEYWORD_none, KEYWORD_TYPE))
+		isKeyword (token, KEYWORD_none, KEYWORD_TYPE))
 	{
 		readToken (token);
 		if (!parseExprCont (token, scope, true))
@@ -2465,9 +2465,9 @@ static bool parseExpression (tokenInfo *const token, int scope,
 		{
 			readToken (token);
 			if (!(expectToken (token, TOKEN_IDENT, TOKEN_KEYWORD) ||
-				    expectKeyword (token, KEYWORD_TYPE, KEYWORD_map,
-				                   KEYWORD_chan)) &&
-			    isClose (token))
+					expectKeyword (token, KEYWORD_TYPE, KEYWORD_map,
+								   KEYWORD_chan)) &&
+				isClose (token))
 				unreadToken (token);
 		}
 		readToken (token);
@@ -2479,8 +2479,8 @@ static bool parseExpression (tokenInfo *const token, int scope,
 		parseVType (token, NULL, scope, false, true);
 		readToken (token);
 		if (!(isToken (token, TOKEN_OPEN_PAREN) ||
-		      isKeyword (token, KEYWORD_is, KEYWORD_in)) ||
-		    !parseExprCont (token, scope, false))
+			  isKeyword (token, KEYWORD_is, KEYWORD_in)) ||
+			!parseExprCont (token, scope, false))
 			unreadToken (token);
 	}
 	else if (isKeyword (token, KEYWORD_lock, KEYWORD_rlock))
@@ -2502,9 +2502,9 @@ static bool parseExpression (tokenInfo *const token, int scope,
 	else if (isKeyword (token, KEYWORD_unsafe))
 		parseUnsafe (token, scope);
 	else if (isToken (token, TOKEN_TILDE, TOKEN_EXCLAMATION, TOKEN_QUESTION,
-	                  TOKEN_ASTERISK, TOKEN_AMPERSAND, TOKEN_PLUSMINUS,
-	                  TOKEN_ANDAND) ||
-	         isKeyword (token, KEYWORD_spawn, KEYWORD_go))
+					  TOKEN_ASTERISK, TOKEN_AMPERSAND, TOKEN_PLUSMINUS,
+					  TOKEN_ANDAND) ||
+			 isKeyword (token, KEYWORD_spawn, KEYWORD_go))
 	{
 		readToken (token);
 		parseExpression (token, scope, NULL);
@@ -2572,7 +2572,7 @@ static bool parseExpression (tokenInfo *const token, int scope,
 				if (parseExprCont (token, scope, false))
 					;
 				else if (!token->onNewline && isInitialType (token) &&
-				         parseVType (token, NULL, scope, true, true))
+						 parseVType (token, NULL, scope, true, true))
 					;
 				else
 					unreadToken (token);
@@ -2794,7 +2794,7 @@ static void parseFile (tokenInfo *const token)
 		skipAccessAndReadToken (token, &access);
 
 		if (isToken (token, TOKEN_OPEN_PAREN, TOKEN_OPEN_CURLY,
-		             TOKEN_OPEN_SQUARE)) // attributes
+					 TOKEN_OPEN_SQUARE)) // attributes
 			skipToToken (getClose (token->type), NULL);
 		else if (isKeyword (token, KEYWORD_module))
 			scope = parseModule (token);
@@ -2815,7 +2815,7 @@ static void parseFile (tokenInfo *const token)
 		else if (isKeyword (token, KEYWORD_type))
 			parseAlias (token, access, scope);
 		else if (isToken (token, TOKEN_IDENT, TOKEN_TYPE) &&
-		         access && !strcmp (vStringValue (access), "__global"))
+				 access && !strcmp (vStringValue (access), "__global"))
 			parseGlobal (token, access, scope);
 		else if (isKeyword (token, KEYWORD_Sif))
 			parseIf (token, scope);
