@@ -382,7 +382,7 @@ tasteVOrVerilogLines (const char *line, void *data)
 		strncmp(line, "println", 7) == 0 || /* present in 38.9% files */
 		strncmp(line, "assert", 6) == 0 ||  /* present in 38.8% files */
 		strncmp(line, "struct", 6) == 0 ||  /* present in 34.5% files */
-		strncmp(line, "module", 6) == 0 ||  /* present in 29.6% files */
+		/* "module" is present in 29.6% files, but also ued in verilog */
 		strncmp(line, "import", 6) == 0 ||  /* present in 27.6% files */
 		strncmp(line, "if", 2) == 0 ||      /* present in 24.9% files */
 		strncmp(line, "pub", 3) == 0)       /* present in 24.1% files */

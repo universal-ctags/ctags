@@ -584,8 +584,8 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	// start capture
 	if (c != EOF &&
 		(isDigit (c) || isInitialIdent (c) || isOneOf (c, "-+'\\*\"`")) &&
-	    (LastTokenType == TOKEN_IDENT || LastTokenType == TOKEN_KEYWORD ||
-	     LastTokenType == TOKEN_TYPE || LastTokenType == TOKEN_COMMA))
+		(LastTokenType == TOKEN_IDENT || LastTokenType == TOKEN_KEYWORD ||
+		 LastTokenType == TOKEN_TYPE || LastTokenType == TOKEN_COMMA))
 		captureChar (capture, token, ' ');
 	if (c != EOF)
 		captureChar (capture, token, c);
