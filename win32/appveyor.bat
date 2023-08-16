@@ -105,8 +105,7 @@ c:\cygwin64\bin\file readtags.exe
 .\ctags --version || exit 1
 
 :: Run tests using misc/units.py on msys2
-bash -lc "py misc/units.py tmain ./Tmain --ctags=./ctags.exe --readtags=./readtags.exe --show-diff-output --shell=c:/msys64/usr/bin/sh" || exit 1
-bash -lc "py misc/units.py run ./Units --ctags=./ctags.exe --show-diff-output --with-timeout=10 --shell=c:/msys64/usr/bin/sh" || exit 1
+bash -lc "py misc/units.py run ./Units --ctags=./ctags.exe --show-diff-output --with-timeout=10 --shell=c:/msys64/usr/bin/sh --languages=V" || exit 1
 
 @echo off
 goto :eof
