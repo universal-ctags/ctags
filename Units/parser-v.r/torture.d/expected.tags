@@ -1,4 +1,0 @@
-main	input.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:17
-a	input.v	/^	a := 1$/;"	v	line:3	fn:main	roles:def
-C.SYSTEM_INFO	input-1.v	/^struct C.SYSTEM_INFO {$/;"	s	line:1	roles:def	end:2
-C.foo	input-1.v	/^fn C.foo(bar string) i64$/;"	f	line:3	typeref:typename:i64	signature:(bar string)	roles:def
