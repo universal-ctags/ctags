@@ -42,17 +42,17 @@ bool isMainTraced(void);
 
 #ifdef DO_TRACING
 
-	#define TRACE_ENTER() traceEnter(__func__,"")
-	#define TRACE_LEAVE() traceLeave(__func__,"")
+	#define TRACE_ENTER() traceEnter(ASSERT_FUNCTION,"")
+	#define TRACE_LEAVE() traceLeave(ASSERT_FUNCTION,"")
 
 	#define TRACE_ENTER_TEXT(_szFormat,...) \
-		traceEnter(__func__,_szFormat,## __VA_ARGS__)
+		traceEnter(ASSERT_FUNCTION,_szFormat,## __VA_ARGS__)
 
 	#define TRACE_LEAVE_TEXT(_szFormat,...) \
-		traceLeave(__func__,_szFormat,## __VA_ARGS__)
+		traceLeave(ASSERT_FUNCTION,_szFormat,## __VA_ARGS__)
 
 	#define TRACE_PRINT(_szFormat,...) \
-		tracePrint(__func__,_szFormat,## __VA_ARGS__)
+		tracePrint(ASSERT_FUNCTION,_szFormat,## __VA_ARGS__)
 
 	/* TRACE_PRINT prints line at once.
 	 * If you want to print a trace line incrementally,
@@ -63,7 +63,7 @@ bool isMainTraced(void);
 	 * TRACE_PRINT_NEWLINE: just print a newline.
 	 */
 	#define TRACE_PRINT_PREFIX() \
-		tracePrintPrefix(__func__)
+		tracePrintPrefix(ASSERT_FUNCTION)
 	#define TRACE_PRINT_FMT(_szFormat,...) \
 		tracePrintFmt(_szFormat,## __VA_ARGS__)
 	#define TRACE_PRINT_NEWLINE() \
@@ -73,7 +73,7 @@ bool isMainTraced(void);
 		do { \
 			if(!(_condition)) \
 			{ \
-				tracePrint(__func__,_szFormat,## __VA_ARGS__); \
+				tracePrint(ASSERT_FUNCTION,_szFormat,## __VA_ARGS__); \
 				Assert(false); \
 			} \
 		} while(0)
