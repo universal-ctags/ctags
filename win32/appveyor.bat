@@ -87,7 +87,7 @@ copy %ICONV_BUILD_DIR%\msvc10\iconv.dll %APPVEYOR_BUILD_FOLDER% > nul
 :: Build ctags with nmake
 @echo on
 cd %APPVEYOR_BUILD_FOLDER%
-nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes || exit 1
+nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes DEBUG=1 || exit 1
 
 @echo off
 goto :eof
