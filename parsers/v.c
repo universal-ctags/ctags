@@ -529,7 +529,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		copyToken (token, ReplayTokens[NumReplays]);
 		deleteToken (ReplayTokens[NumReplays]);
 		vDebugParserPrintf (
-			"˅%s%s%s%s%s ", token->id > 1? "[" : "", tokenNames[token->type],
+			"\n^%s%s%s%s%s .\n", token->id > 1? "[" : "", tokenNames[token->type],
 			(token->string && !vStringIsEmpty (token->string))? ":" : "",
 			token->string? vStringValue (token->string) : "",
 			token->id > 1? "]" : "");
@@ -800,7 +800,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	}
 
 	vDebugParserPrintf (
-		"%s%s%s%s%s ", token->id > 1? "[" : "", tokenNames[token->type],
+		"\n^%s%s%s%s%s .\n", token->id > 1? "[" : "", tokenNames[token->type],
 		(token->string && !vStringIsEmpty (token->string))? ":" : "",
 		token->string? vStringValue (token->string) : "",
 		token->id > 1? "]" : "");
