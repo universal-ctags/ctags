@@ -336,9 +336,6 @@
     <ClCompile Include="..\parsers\c-based.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\c.c">
-      <Filter>Source Files\parsers</Filter>
-    </ClCompile>
     <ClCompile Include="..\parsers\clojure.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
