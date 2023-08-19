@@ -1491,11 +1491,17 @@ static void skipToMatch (const char *const pair)
 				vStringPut (Signature, c);
 			else
 			{
+				char marker = '"';
+
 				switch (c)
 				{
 					case CHAR_SYMBOL:
+						marker = '\'';
+						/* Fall through */
 					case STRING_SYMBOL:
+						vStringPut (Signature, marker);
 						vStringCat (Signature, cppGetLastCharOrStringContents ());
+						vStringPut (Signature, marker);
 						break;
 					default:
 						AssertNotReached();
