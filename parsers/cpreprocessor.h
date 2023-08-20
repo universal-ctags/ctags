@@ -100,6 +100,11 @@ extern void cppUngetString(const char * string,int len);
 extern int cppGetc (void);
 extern const vString * cppGetLastCharOrStringContents (void);
 
+/*
+ * Replacement for vStringPut that can handle c > 0xff
+ */
+extern void cStringPut (vString * string, const int c);
+
 /* Notify the external parser state for the purpose of conditional
  * branch choice. The CXX parser stores the block level here. */
 extern void cppPushExternalParserBlock(void);

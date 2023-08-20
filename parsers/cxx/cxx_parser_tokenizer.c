@@ -857,7 +857,7 @@ static CXXCharTypeData g_aCharTable[128] =
 		0 ,
 		0
 	},
-	// 127 (0x7f) ''
+	// 127 (0x7f)
 	{ 0, 0, 0 }
 };
 
@@ -1491,9 +1491,7 @@ bool cxxParserParseNextToken(void)
 	if(g_cxx.iChar == STRING_SYMBOL)
 	{
 		t->eType = CXXTokenTypeStringConstant;
-		vStringPut(t->pszWord,'"');
-		vStringCat(t->pszWord,cppGetLastCharOrStringContents());
-		vStringPut(t->pszWord,'"');
+		cStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
 		return true;
@@ -1539,9 +1537,7 @@ bool cxxParserParseNextToken(void)
 	if(g_cxx.iChar == CHAR_SYMBOL)
 	{
 		t->eType = CXXTokenTypeCharacterConstant;
-		vStringPut(t->pszWord,'\'');
-		vStringCat(t->pszWord,cppGetLastCharOrStringContents());
-		vStringPut(t->pszWord,'\'');
+		cStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
 		return true;
@@ -1683,7 +1679,7 @@ bool cxxParserParseNextToken(void)
 	}
 
 	t->eType = CXXTokenTypeUnknown;
-	vStringPut(t->pszWord,g_cxx.iChar);
+	cStringPut(t->pszWord,g_cxx.iChar);
 	g_cxx.iChar = cppGetc();
 	t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
 

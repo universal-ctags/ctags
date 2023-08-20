@@ -13,3 +13,16 @@ public class C {
 		}
 	}
 }
+
+public enum StringEnum {
+
+	X("X"),
+	Y("Y"),
+	Z("Z");
+
+	private StringEnum(String _s) {
+		s = _s;
+	}
+
+	private final String s;
+}

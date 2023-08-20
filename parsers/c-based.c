@@ -1486,28 +1486,8 @@ static void skipToMatch (const char *const pair)
 	while (matchLevel > 0  &&  (c = skipToNonWhite ()) != EOF)
 	{
 		if (CollectingSignature)
-		{
-			if (c <= 0xff)
-				vStringPut (Signature, c);
-			else
-			{
-				char marker = '"';
+			cStringPut (Signature, c);
 
-				switch (c)
-				{
-					case CHAR_SYMBOL:
-						marker = '\'';
-						/* Fall through */
-					case STRING_SYMBOL:
-						vStringPut (Signature, marker);
-						vStringCat (Signature, cppGetLastCharOrStringContents ());
-						vStringPut (Signature, marker);
-						break;
-					default:
-						AssertNotReached();
-				}
-			}
-		}
 		if (c == begin)
 		{
 			++matchLevel;
@@ -1592,11 +1572,11 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 
 	do
 	{
-		vStringPut (name, c);
+		cStringPut (name, c);
 		if (CollectingSignature)
 		{
 			if (!first)
-				vStringPut (Signature, c);
+				cStringPut (Signature, c);
 			first = false;
 		}
 		c = cppGetc ();
@@ -1725,7 +1705,7 @@ static void readOperator (statementInfo *const st)
 					vStringPut (name, ' ');
 					whiteSpace = false;
 				}
-				vStringPut (name, c);
+				cStringPut (name, c);
 			}
 			c = cppGetc ();
 		} while (! isOneOf (c, "(;")  &&  c != EOF);
@@ -1735,7 +1715,7 @@ static void readOperator (statementInfo *const st)
 		vStringPut (name, ' ');  /* always separate operator from keyword */
 		do
 		{
-			vStringPut (name, c);
+			vStringPut (name, c);	/* acceptable are all ascii */
 			c = cppGetc ();
 		} while (isOneOf (c, acceptable));
 	}
@@ -2316,8 +2296,8 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 	do
 	{
 		int c = skipToNonWhite ();
-		vStringPut (Signature, c);
 
+		cStringPut (Signature, c);
 		switch (c)
 		{
 			case '^':
