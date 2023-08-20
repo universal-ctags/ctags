@@ -131,8 +131,6 @@
 	MyrddinParser, \
 	NsisParser, \
 	ObjcParser, \
-	OldCppParser, \
-	OldCParser, \
 	OcamlParser, \
 	OrgParser, \
 	PasswdParser, \

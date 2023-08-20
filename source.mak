@@ -317,7 +317,6 @@ PARSER_SRCS =				\
 	parsers/beta.c			\
 	parsers/bibtex.c		\
 	parsers/c-based.c		\
-	parsers/c.c			\
 	parsers/clojure.c		\
 	parsers/css.c			\
 	parsers/cobol.c			\

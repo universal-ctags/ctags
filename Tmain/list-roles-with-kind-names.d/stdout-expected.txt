@@ -8,10 +8,6 @@ CPreProcessor  h/header  local  on      local header
 CPreProcessor  h/header  system on      system header
 CUDA           h/header  local  on      local header
 CUDA           h/header  system on      system header
-OldC           h/header  local  on      local header
-OldC           h/header  system on      system header
-OldC++         h/header  local  on      local header
-OldC++         h/header  system on      system header
 Vera           h/header  local  on      local header
 Vera           h/header  system on      system header
 {header}I
@@ -29,10 +25,6 @@ M4             I/macrofile included  on      included macro
 M4             I/macrofile sincluded on      silently included macro
 Make           I/makefile  included  on      included
 Make           I/makefile  optional  on      optionally included
-OldC           h/header    local     on      local header
-OldC           h/header    system    on      system header
-OldC++         h/header    local     on      local header
-OldC++         h/header    system    on      system header
 Vera           h/header    local     on      local header
 Vera           h/header    system    on      system header
 d{header}
@@ -60,14 +52,6 @@ CUDA           d/macro     undef     on      undefined
 CUDA           h/header    local     on      local header
 CUDA           h/header    system    on      system header
 M4             d/macro     undef     on      undefined
-OldC           d/macro     condition off     used in part of #if/#ifdef/#elif conditions
-OldC           d/macro     undef     on      undefined
-OldC           h/header    local     on      local header
-OldC           h/header    system    on      system header
-OldC++         d/macro     condition off     used in part of #if/#ifdef/#elif conditions
-OldC++         d/macro     undef     on      undefined
-OldC++         h/header    local     on      local header
-OldC++         h/header    system    on      system header
 Vera           d/macro     condition off     used in part of #if/#ifdef/#elif conditions
 Vera           d/macro     undef     on      undefined
 Vera           h/header    local     on      local header
