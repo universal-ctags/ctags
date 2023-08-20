@@ -235,6 +235,7 @@ typedef enum eTokenType {
 	TOKEN_INCDECOP, // ++ --
 	TOKEN_PIPE,
 	TOKEN_CHPOP, // <-
+	TOKEN_AT,
 	TOKEN_LABEL, // ident-then-colon (e.g., "foo:")
 	TOKEN_EXTERN, // symbol in exteral namespace (e.g., "C.foo" or "JS.Object")
 	TOKEN_EOF,
@@ -272,6 +273,7 @@ static char *const tokenNames[COUNT_TOKEN] = {
 	"INCDECOP",
 	"PIPE",
 	"CHPOP",
+	"AT",
 	"LABEL",
 	"EXTERN",
 	"EOF"
@@ -734,19 +736,24 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	}
 	else if (c == '@')
 	{
-		token->type = TOKEN_IDENT;
-		token->string = vStringNew ();
-		bool more;
-		do
+		if (isSubsequentIdent (peekcFromInputFile ()))
 		{
-			vStringPut (token->string, c);
-			c = getcFromInputFile ();
-			more = isSubsequentIdent (c);
-			if (more)
-				captureChar (capture, token, c);
-		} while (more);
-		ungetcToInputFile (c);
-		checkLabel (token, capture);
+			token->type = TOKEN_IDENT;
+			token->string = vStringNew ();
+			bool more;
+			do
+			{
+				vStringPut (token->string, c);
+				c = getcFromInputFile ();
+				more = isSubsequentIdent (c);
+				if (more)
+					captureChar (capture, token, c);
+			} while (more);
+			ungetcToInputFile (c);
+			checkLabel (token, capture);
+		}
+		else
+			token->type = TOKEN_AT;
 	}
 	else if (isInitialIdent (c))
 	{
@@ -1770,7 +1777,7 @@ static void parseImport (tokenInfo *const token)
 // struct-rest: '{' [
 //     [access* ':'] | [
 //         fqtype | extern | [ident | kwtype | 'map'] method |
-//         [ident | extern] vtype ['[' any ']']? ['=' expr]?
+//         [ident | extern] vtype ['@'? '[' any ']']? ['=' expr]?
 //     ]*
 // ]* '}'
 static void parseStruct (tokenInfo *const token, vString *const access,
@@ -1899,7 +1906,16 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 							   fieldAccess);
 
 					readToken (token);
-					if (isToken (token, TOKEN_OPEN_SQUARE))
+					if (isToken (token, TOKEN_AT))
+					{
+						readToken (token);
+						if (expectToken (token, TOKEN_OPEN_SQUARE))
+						{
+							skipToToken (TOKEN_CLOSE_SQUARE, NULL);
+							readToken (token);
+						}
+					}
+					else if (isToken (token, TOKEN_OPEN_SQUARE))
 					{
 						skipToToken (TOKEN_CLOSE_SQUARE, NULL);
 						readToken (token);
@@ -1930,7 +1946,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 }
 
 // enum: 'enum' type ['as' type]? '{' [
-//     [ident | kwtype] ['=' [immediate | extern]]?
+//     [ident | kwtype] ['=' [immediate | extern]]? ['@'? '[' any ']']?
 // ]* '}'
 static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 {
@@ -1968,12 +1984,32 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 				readTokenFull (token, capture);
 				if (isToken (token, TOKEN_ASSIGN))
 				{
-					vStringCopyS (capture, ".");
 					readToken (token);
 					if (isToken (token, TOKEN_IDENT, TOKEN_TYPE))
 						parseFullyQualified (token, true);
+					vStringCopyS (capture, ".");
+					LastTokenType = TOKEN_DOT; // prevent capture adding ' '
 					if (expectToken (token, TOKEN_IMMEDIATE, TOKEN_EXTERN))
 						readTokenFull (token, capture);
+				}
+
+				if (isToken (token, TOKEN_AT))
+				{
+					readToken (token);
+					if (expectToken (token, TOKEN_OPEN_SQUARE))
+					{
+						skipToToken (TOKEN_CLOSE_SQUARE, NULL);
+						vStringCopyS (capture, ".");
+						LastTokenType = TOKEN_DOT; // prevent capture adding ' '
+						readTokenFull (token, capture);
+					}
+				}
+				else if (isToken (token, TOKEN_OPEN_SQUARE))
+				{
+					skipToToken (TOKEN_CLOSE_SQUARE, NULL);
+					vStringCopyS (capture, ".");
+					LastTokenType = TOKEN_DOT; // prevent capture adding ' '
+					readTokenFull (token, capture);
 				}
 			}
 			vStringDelete (capture);

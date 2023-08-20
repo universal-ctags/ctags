@@ -11,9 +11,9 @@ Bar	input-1.v	/^struct Bar {$/;"	s	line:1	roles:def	end:8
 f	input-1.v	/^    f int = 99$/;"	m	line:2	struct:Bar	roles:def
 g	input-1.v	/^    g Foo = Foo{66}$/;"	m	line:3	struct:Bar	roles:def
 h	input-1.v	/^    h string = "hi"$/;"	m	line:4	struct:Bar	roles:def
-i	input-1.v	/^    i int [required]$/;"	m	line:5	struct:Bar	roles:def
-j	input-1.v	/^    j int [required] = 99$/;"	m	line:6	struct:Bar	roles:def
-k	input-1.v	/^    k string [json: 'k'] = "j"$/;"	m	line:7	struct:Bar	roles:def
+i	input-1.v	/^    i int @[required]$/;"	m	line:5	struct:Bar	roles:def
+j	input-1.v	/^    j int @[required] = 99$/;"	m	line:6	struct:Bar	roles:def
+k	input-1.v	/^    k string @[json: 'k'] = "j"$/;"	m	line:7	struct:Bar	roles:def
 Model	input-2.v	/^pub struct Model {$/;"	s	line:2	access:pub	roles:def	end:9
 geometry	input-2.v	/^    geometry &map[u64]Geom = &map[u64]Geom{}$/;"	m	line:4	struct:Model	access:mut	roles:def
 layers	input-2.v	/^    layers [][]Id = [][]Id{ len: int( Layer.len ), init: []Id{} }$/;"	m	line:5	struct:Model	access:mut	roles:def

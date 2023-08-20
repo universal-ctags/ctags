@@ -3,8 +3,8 @@ module aaa
 enum Foo {
     aaa = 5
     bbb
-    ccc
+    ccc = C.foo
     @fn
-    @struct
-    ddd
+    @struct [attr]
+    ddd = 999  @[attr]
 }
