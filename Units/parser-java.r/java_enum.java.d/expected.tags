@@ -5,6 +5,12 @@ FIRST_VALUE	input.java	/^		FIRST_VALUE,$/;"	e	enum:C.TrivialEnum	file:	end:3
 FancyEnum	input.java	/^		FancyEnum(int i) {$/;"	m	class:C.FancyEnum	end:11
 FancyEnum	input.java	/^	public enum FancyEnum {$/;"	g	class:C	end:14
 SECOND_VALUE	input.java	/^		SECOND_VALUE$/;"	e	enum:C.TrivialEnum	file:	end:4
+StringEnum	input.java	/^	private StringEnum(String _s) {$/;"	m	class:StringEnum	file:	end:25
+StringEnum	input.java	/^public enum StringEnum {$/;"	g	end:28
 TrivialEnum	input.java	/^	public enum TrivialEnum {$/;"	g	class:C	end:5
+X	input.java	/^	X("X"),$/;"	e	enum:StringEnum	file:	end:19
+Y	input.java	/^	Y("Y"),$/;"	e	enum:StringEnum	file:	end:20
+Z	input.java	/^	Z("Z");$/;"	e	enum:StringEnum	file:	end:21
 i	input.java	/^		private int i;$/;"	f	class:C.FancyEnum	file:	end:8
 m	input.java	/^		void m() {$/;"	m	class:C.FancyEnum	end:13
+s	input.java	/^	private final String s;$/;"	f	class:StringEnum	file:	end:27

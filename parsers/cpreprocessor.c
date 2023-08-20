@@ -461,6 +461,20 @@ extern void cppEndStatement (void)
 /*  This puts a character back into the input queue for the input File. */
 extern void cppUngetc (const int c)
 {
+	if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
+	{
+		Assert(Cpp.charOrStringContents != NULL);
+		cppUngetc(c == STRING_SYMBOL ? '"' : '\'');
+		cppUngetString(vStringValue(Cpp.charOrStringContents), vStringLength(Cpp.charOrStringContents));
+		cppUngetc(c == STRING_SYMBOL ? '"' : '\'');
+		vStringClear(Cpp.charOrStringContents);
+		return;
+	}
+	else if (c == EOF)
+	{
+		return;
+	}
+
 	if(!Cpp.ungetPointer)
 	{
 		// no unget data
@@ -1518,6 +1532,29 @@ static void conditionMayPut (vString *condition, int c)
 	if (vStringLength (condition) > 0
 		|| (!isdigit(c)))
 		vStringPut(condition, c);
+}
+
+extern void cStringPut (vString* string, const int c)
+{
+	if (c <= 0xff)
+		vStringPut (string, c);
+	else
+	{
+		char marker = '"';
+		switch (c)
+		{
+			case CHAR_SYMBOL:
+				marker = '\'';
+				/* Fall through */
+			case STRING_SYMBOL:
+				vStringPut (string, marker);
+				vStringCat (string, cppGetLastCharOrStringContents ());
+				vStringPut (string, marker);
+				break;
+			default:
+				AssertNotReached();
+		}
+	}
 }
 
 /*  This function returns the next character, stripping out comments,
