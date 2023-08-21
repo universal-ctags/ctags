@@ -1,0 +1,83 @@
+name: build with Vistual Studio / NMake
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+
+    strategy:
+      matrix:
+        version: [2022, 2019]
+        arch: [x64, x86]
+
+    runs-on: windows-${{ matrix.version }}
+
+    defaults:
+      run:
+        shell: cmd /C {0}
+
+    steps:
+      - run: choco install -y file
+
+      - uses: actions/checkout@v3
+
+      - name: setup nmake
+        run: |
+          if "${{ matrix.version }}" == "2019" (
+            set "XX= (x86)"
+          ) else (
+            set "XX="
+          )
+
+          if "${{ matrix.arch }}" == "x64" (
+            set "TARGET_ARCH=amd64"
+          ) else (
+            set "TARGET_ARCH=x86"
+          )
+
+          @echo on
+
+          echo call "C:\Program Files%XX%\Microsoft Visual Studio\${{ matrix.version }}\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %TARGET_ARCH% > nmake-setup.cmd
+          type nmake-setup.cmd
+
+      - name: build libiconv
+        run: |
+          @echo on
+
+          git clone --depth=1 https://github.com/koron/libiconv libiconv-source
+          cd libiconv-source\msvc10
+
+          call "${{ github.workspace }}\nmake-setup.cmd"
+          nmake NODEBUG=1 NOMSVCRT=1
+
+      - name: install libiconv
+        run: |
+          @echo on
+
+          mkdir libiconv-installed\include
+          mkdir libiconv-installed\lib
+
+          copy  libiconv-source\msvc10\iconv.h   libiconv-installed\include
+          copy  libiconv-source\msvc10\iconv.lib libiconv-installed\lib
+          copy  libiconv-source\msvc10\iconv.dll .
+
+      - name: build ctags with nmake
+        run: |
+          @echo on
+          call nmake-setup.cmd
+          nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=libiconv-installed PDB=yes
+
+      - run: dir
+
+      - name: dumpbin ctags.exe
+        run: |
+          @echo on
+          call nmake-setup.cmd
+          dumpbin /dependents ctags.exe
+
+      - run: file ctags.exe
+      - run: ctags.exe --version
