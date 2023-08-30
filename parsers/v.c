@@ -76,14 +76,14 @@
 	RED "\nUNEXPECTED %s%s%s%s in {%s} at %s:%lu (v.c:%i)" NORM, \
 	t->keyword != KEYWORD_NONE? "KEYWORD" : tokenNames[t->type], \
 	(e)? " (expected " : "", e? e : "", (e)? ")" : "", \
-	CurrentParser, getInputFileName (), t->lineNumber, l? l : __LINE__)
+	PS->currentParser, getInputFileName (), t->lineNumber, l? l : __LINE__)
 #define PARSER_PROLOGUE(c) \
-	const char *const _prevParser = CurrentParser; \
-	CurrentParser = (c); \
-	vDebugParserPrintf ("{%s: ", CurrentParser)
+	const char *const _prevParser = PS->currentParser; \
+	PS->currentParser = (c); \
+	vDebugParserPrintf ("{%s: ", PS->currentParser)
 #define PARSER_EPILOGUE() \
-	vDebugParserPrintf (":%s} ", CurrentParser); \
-	CurrentParser = _prevParser
+	vDebugParserPrintf (":%s} ", PS->currentParser); \
+	PS->currentParser = _prevParser
 #else
 #define vDebugPrintf(...)
 #define vDebugParserPrintf(...)
@@ -299,6 +299,15 @@ static roleDefinition VUnknownRoles [COUNT_UNKNOWN_ROLE] = {
 };
 
 typedef enum {
+	ROLE_EXTERNAL_SYMBOL,
+	COUNT_EXTERN_ROLE
+} VExternRole;
+
+static roleDefinition VExternRoles [COUNT_EXTERN_ROLE] = {
+	{ true, "external", "external symbol" },
+};
+
+typedef enum {
 	KIND_NONE = -1,
 	KIND_FUNCTION,
 	KIND_MODULE,
@@ -316,6 +325,7 @@ typedef enum {
 	KIND_ALIAS,
 	KIND_INTERFACE,
 	KIND_UNION,
+	KIND_EXTERN,
 	KIND_UNKNOWN,
 	COUNT_KIND
 } kindType;
@@ -338,7 +348,9 @@ static kindDefinition VKinds[COUNT_KIND] = {
 	{true, 'a', "alias", "type aliases"},
 	{true, 'i', "interface", "interfaces"},
 	{true, 'u', "union", "union names"},
-	{true, 'Y', "unknown", "unknown, imported symbols",
+	{false, 'x', "external", "external symbols",
+	 .referenceOnly = false, ATTACH_ROLES (VExternRoles)},
+	{true, 'Y', "unknown", "unknown (imported) variables, types and functions",
 	 .referenceOnly = false, ATTACH_ROLES (VUnknownRoles)},
 };
 
@@ -356,6 +368,7 @@ static int vLookupKinds[] = { // int, compatible with anyKindsEntryInScope()
 	KIND_INTERFACE,
 	KIND_UNION,
 };
+const static int vLookupNumKinds = sizeof (vLookupKinds) / sizeof (int);
 
 typedef struct {
 	int type;
@@ -371,19 +384,32 @@ typedef struct {
 #endif
 } tokenInfo;
 
+typedef struct {
+	tokenType lastTokenType;
+	int numReplays;
+	struct {
+		tokenInfo *token;
+		vString *capture;
+		tokenType lastTokenType;
+	} replays[MAX_REPLAYS];
+	//tokenInfo *replayTokens[MAX_REPLAYS];
+	//vString *replayCaptures[MAX_REPLAYS];
+	//tokenType replayLastTokenTypes[MAX_REPLAYS];
+	bool isBuiltin;
+	tokenInfo *sofToken;
+	int externCorkIdC;
+	int externCorkIdJS;
+#ifdef DEBUG
+	const char *currentParser;
+	int nextTokenId;
+#endif
+} parserState;
+
 static langType Lang_v;
 static objPool *TokenPool = NULL;
-static tokenType LastTokenType = TOKEN_IMMEDIATE;
-static int NumReplays = 0;
-static tokenInfo *ReplayTokens[MAX_REPLAYS];
-static vString *ReplayCaptures[MAX_REPLAYS];
-static tokenType ReplayLastTokenTypes[MAX_REPLAYS];
-static bool IsBuiltin = false;
-#ifdef DEBUG
-static const char *CurrentParser;
-static int NextTokenId = 1;
-#endif
+static parserState *PS = NULL; // global parser state
 
+static int lookupQualifiedName (vString *, int);
 static void parseStatement (tokenInfo *const, int);
 static bool parseExpression (tokenInfo *const, int, vString *const);
 static void parseExprList (tokenInfo *const, int, vString *const, bool);
@@ -395,7 +421,7 @@ static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 	tokenInfo *token = xMalloc (1, tokenInfo);
 	token->string = NULL;
 #ifdef DEBUG
-	token->id = NextTokenId++;
+	token->id = PS->nextTokenId++;
 #endif
 	return token;
 }
@@ -440,6 +466,32 @@ static tokenInfo *dupToken (tokenInfo *const token)
 	tokenInfo *newToken = newToken ();
 	copyToken (newToken, token);
 	return newToken;
+}
+
+static parserState *newParserState ()
+{
+	parserState *st = xMalloc (1, parserState);
+	st->sofToken = NULL;
+	st->numReplays = 0;
+	st->isBuiltin = false;
+	st->lastTokenType = TOKEN_IMMEDIATE;
+	st->externCorkIdC = 0;
+	st->externCorkIdJS = 0;
+#ifdef DEBUG
+	st->nextTokenId = 1;
+#endif
+	return st;
+}
+
+static void deleteParserState (parserState *st)
+{
+	deleteToken (st->sofToken);
+	for (int i = 0; i < st->numReplays; i++)
+	{
+		deleteToken (st->replays[i].token);
+		vStringDelete (st->replays[i].capture);
+	}
+	eFree (st);
 }
 
 // _____________________________________________________________________________
@@ -525,11 +577,11 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	int c;
 
 	// replay?
-	if (NumReplays > 0)
+	if (PS->numReplays > 0)
 	{
-		NumReplays--;
-		copyToken (token, ReplayTokens[NumReplays]);
-		deleteToken (ReplayTokens[NumReplays]);
+		PS->numReplays--;
+		copyToken (token, PS->replays[PS->numReplays].token);
+		deleteToken (PS->replays[PS->numReplays].token);
 		vDebugParserPrintf (
 			"˅%s%s%s%s%s ", token->id > 1? "[" : "", tokenNames[token->type],
 			(token->string && !vStringIsEmpty (token->string))? ":" : "",
@@ -537,11 +589,11 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 			token->id > 1? "]" : "");
 		if (capture)
 		{
-			Assert (ReplayCaptures[NumReplays]);
-			vStringCat (capture, ReplayCaptures[NumReplays]);
+			Assert (PS->replays[PS->numReplays].capture);
+			vStringCat (capture, PS->replays[PS->numReplays].capture);
 		}
-		vStringDelete (ReplayCaptures[NumReplays]);
-		LastTokenType = ReplayLastTokenTypes[NumReplays];
+		vStringDelete (PS->replays[PS->numReplays].capture);
+		PS->lastTokenType = PS->replays[PS->numReplays].lastTokenType;
 		return;
 	}
 
@@ -586,8 +638,10 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	// start capture
 	if (c != EOF &&
 		(isDigit (c) || isInitialIdent (c) || isOneOf (c, "-+'\\*\"`")) &&
-		(LastTokenType == TOKEN_IDENT || LastTokenType == TOKEN_KEYWORD ||
-		 LastTokenType == TOKEN_TYPE || LastTokenType == TOKEN_COMMA))
+		(PS->lastTokenType == TOKEN_IDENT ||
+		 PS->lastTokenType == TOKEN_KEYWORD ||
+		 PS->lastTokenType == TOKEN_TYPE ||
+		 PS->lastTokenType == TOKEN_COMMA))
 		captureChar (capture, token, ' ');
 	if (c != EOF)
 		captureChar (capture, token, c);
@@ -812,33 +866,34 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		token->string? vStringValue (token->string) : "",
 		token->id > 1? "]" : "");
 
-	LastTokenType = token->type;
+	PS->lastTokenType = token->type;
 }
 
 static void unreadTokenFull (tokenInfo *const token, vString *const acc)
 {
-	Assert (NumReplays < MAX_REPLAYS);
+	Assert (PS->numReplays < MAX_REPLAYS);
 	DebugStatement (
 		// multiple-replay in only possible where additional tokenInfos are
 		// loaded with tokens so different tokens can be unread.
-		for (int i = 0; i < NumReplays; i++)
-			Assert (token->id != ReplayTokens[i]->id);
+		for (int i = 0; i < PS->numReplays; i++)
+			Assert (token->id != PS->replays[i].token->id);
 	);
 	vDebugParserPrintf ("˄ ");
 
-	ReplayTokens[NumReplays] = dupToken (token);
+	PS->replays[PS->numReplays].token = dupToken (token);
 	if (acc)
 	{
 		Assert (token->captureLen > -1);
 		Assert (token->captureLen <= vStringLength (acc));
 		int off = vStringLength (acc) - token->captureLen;
-		ReplayCaptures[NumReplays] = vStringNewInit (vStringValue (acc) + off);
+		PS->replays[PS->numReplays].capture =
+			vStringNewInit (vStringValue (acc) + off);
 		vStringTruncate (acc, off);
 	}
 	else
-		ReplayCaptures[NumReplays] = NULL;
-	ReplayLastTokenTypes[NumReplays] = LastTokenType;
-	NumReplays++;
+		PS->replays[PS->numReplays].capture = NULL;
+	PS->replays[PS->numReplays].lastTokenType = PS->lastTokenType;
+	PS->numReplays++;
 }
 
 static void readToken (tokenInfo *const token)
@@ -900,20 +955,24 @@ static bool _isToken (tokenInfo *const token, bool expect, bool keyword,
 static int makeTagFull (tokenInfo *const token, const char *name,
 						const kindType kind, const int scope, int role,
 						vString *const argList, vString *retType,
-						const char *access)
+						const char *access, bool extraQualified)
 {
-	vDebugParserPrintf ("# ");
+	Assert (token || kind == KIND_EXTERN);
+	Assert (name == NULL || name[0] != '\0');
+	Assert (name != NULL || (token && token->string != NULL &&
+							 vStringLength (token->string) > 0));
+	vDebugParserPrintf ("#%c ", VKinds[kind].letter);
+
 	tagEntryInfo e;
 
-	Assert (name || token->string);
 	const char *const tagName =
 		name? name : (token->string? vStringValue (token->string) : "");
-	Assert (tagName && tagName[0] != '\0');
-	if (!strcmp (tagName, "_")) return CORK_NIL; // ignore _
+	if (!strcmp (tagName, "_"))
+		return CORK_NIL; // ignore _
 	initRefTagEntry (&e, tagName, kind, role);
 
-	e.lineNumber = token->lineNumber;
-	e.filePosition = token->filePosition;
+	e.lineNumber = token? token->lineNumber : 0;
+	e.filePosition = (token? token : PS->sofToken)->filePosition;
 	if (argList && !vStringIsEmpty (argList))
 		e.extensionFields.signature = vStringValue (argList);
 	if (access && *access != '\0')
@@ -924,24 +983,29 @@ static int makeTagFull (tokenInfo *const token, const char *name,
 		e.extensionFields.typeRef [1] = vStringValue( retType );
 	}
 	e.extensionFields.scopeIndex = scope;
+	if (extraQualified)
+		markTagExtraBit (&e, XTAG_QUALIFIED_TAGS);
 
 	return makeTagEntry (&e);
 }
 
 static int makeFnTag (tokenInfo *const token, vString *const name,
-					  kindType kind, const int scope, vString *const argList,
+					  kindType kind, int scope, vString *const argList,
 					  vString *const retType, vString *const access)
 {
+	// lookup parent scope
+	if (name)
+		scope = lookupQualifiedName (name, scope);
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind,
 						scope, ROLE_DEFINITION_INDEX, argList, retType,
-						access? vStringValue (access) : NULL);
+						access? vStringValue (access) : NULL, false);
 }
 
 static int makeTag (tokenInfo *const token, vString *const name, kindType kind,
 					int scope)
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind, scope,
-						ROLE_DEFINITION_INDEX, NULL, NULL, NULL);
+						ROLE_DEFINITION_INDEX, NULL, NULL, NULL, false);
 }
 
 static int makeTagEx (tokenInfo *const token, vString *const name, kindType kind,
@@ -949,14 +1013,14 @@ static int makeTagEx (tokenInfo *const token, vString *const name, kindType kind
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind, scope,
 						ROLE_DEFINITION_INDEX, NULL, NULL,
-						access? vStringValue (access) : NULL);
+						access? vStringValue (access) : NULL, false);
 }
 
 static int makeReferenceTag (tokenInfo *const token, vString *const name,
 							 kindType kind, int scope, int role)
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind, scope,
-						role, NULL, NULL, NULL);
+						role, NULL, NULL, NULL, false);
 }
 
 static tokenType getOpen (tokenType close)
@@ -1054,38 +1118,47 @@ static char *nextCharIdent (char *s, char sep)
 	return s;
 }
 
-static int lookupName (vString *name, int scope)
+static int lookupQualifiedName (vString *name, int scope)
 {
 	vString *tmp = vStringNewCopy (name);
-	char *last, *part = vStringValue (tmp);
-	int origScope = scope;
-	unsigned int nkinds = sizeof (vLookupKinds) / sizeof (int);
-	bool once = true;
-	while (part)
+	char *part, *next = vStringValue (tmp);
+	bool once = true, ongoing = true, external = false;
+	while (next)
 	{
-		last = part;
-		part = nextCharIdent (part, '.');
-		if (*last != '\0' && part) // has another part (don't lookup last part)
+		part = next;
+		next = nextCharIdent (next, '.');
+		if (*part != '\0' && next) // has another next (don't lookup last next)
 		{
-			if (once) {
+			if (once)
+			{
 				once = false;
-				if (!strcmp (last, "C"))
+				int *externCorkId = NULL;
+				if (!strcmp (part, "C"))
+					externCorkId = &PS->externCorkIdC;
+				else if (!strcmp (part, "JS"))
+					externCorkId = &PS->externCorkIdJS;
+				if (externCorkId)
 				{
-					scope = origScope = CORK_NIL;
-					break;
+					external = true;
+					if (*externCorkId == CORK_NIL)
+						*externCorkId = makeTagFull ( // reference
+							PS->sofToken, part, KIND_EXTERN, CORK_NIL,
+							ROLE_EXTERNAL_SYMBOL, NULL, NULL, NULL, false);
+					scope = *externCorkId;
 				}
 			}
-			if (part)
+			if (!external && ongoing)
+			{
 				scope = anyKindsEntryInScope (
-					scope, last, vLookupKinds, nkinds, true);
+					scope, part, vLookupKinds, vLookupNumKinds, true);
+				ongoing = scope != CORK_NIL;
+			}
 		}
-		if (scope == CORK_NIL)
-			break;
 	}
 	if (scope != CORK_NIL)
-		vStringCopyS (name, last);
+		vStringCopyS (name, part);
 	vStringDelete (tmp);
-	return scope == CORK_NIL? origScope : scope;
+	return scope;
 }
 
 // _____________________________________________________________________________
@@ -1324,7 +1397,7 @@ static void parseDeclare (tokenInfo *const token, vString *const names,
 			name = nextCharIdent (name, ',');
 			access = nextCharIdent (access, ',');
 			makeTagFull (token, n, KIND_VARIABLE, scope,
-						 ROLE_DEFINITION_INDEX, NULL, NULL, a);
+						 ROLE_DEFINITION_INDEX, NULL, NULL, a, false);
 		}
 	}
 	readToken (token);
@@ -1466,9 +1539,6 @@ static void parseFunction (tokenInfo *const token, int scope,
 		}
 		deleteToken (fnToken);
 		fnToken = dupToken (token);
-		// lookup parent scope
-		if (name)
-			scope = lookupName (name, scope);
 		readToken (token);
 	}
 	// closure args
@@ -1796,7 +1866,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 	readToken (token);
 
 	// name
-	if ((kind == KIND_STRUCT || kind == KIND_INTERFACE) && IsBuiltin &&
+	if ((kind == KIND_STRUCT || kind == KIND_INTERFACE) && PS->isBuiltin &&
 		scope == CORK_NIL && isKeyword (token, KEYWORD_TYPE, KEYWORD_map))
 		readToken (token);
 	else if ((kind != KIND_NONE && expectToken (token, TOKEN_TYPE)) ||
@@ -1805,7 +1875,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 		parseFullyQualified (token, true);
 		if (expectToken (token, TOKEN_TYPE, TOKEN_EXTERN))
 		{
-			scope = lookupName (token->string, scope);
+			scope = lookupQualifiedName (token->string, scope);
 			kindType realKind = kind == KIND_NONE? KIND_STRUCT : kind;
 			newScope = makeTagEx (token, NULL, realKind, scope, access);
 			registerEntry (newScope);
@@ -1864,7 +1934,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 			}
 			else if (isToken (token, TOKEN_TYPE))
 			{
-				if (IsBuiltin)
+				if (PS->isBuiltin)
 				{
 					fieldToken = dupToken (token);
 					readToken (token);
@@ -1979,7 +2049,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 
 				makeTag (token, capture, KIND_ENUMERATOR, newScope);
 				vStringCopyS (capture, ".");
-				LastTokenType = TOKEN_DOT; // prevent capture adding ' '
+				PS->lastTokenType = TOKEN_DOT; // prevent capture of ' '
 
 				readTokenFull (token, capture);
 				if (isToken (token, TOKEN_ASSIGN))
@@ -1988,7 +2058,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 					if (isToken (token, TOKEN_IDENT, TOKEN_TYPE))
 						parseFullyQualified (token, true);
 					vStringCopyS (capture, ".");
-					LastTokenType = TOKEN_DOT; // prevent capture adding ' '
+					PS->lastTokenType = TOKEN_DOT; // prevent capture of ' '
 					if (expectToken (token, TOKEN_IMMEDIATE, TOKEN_EXTERN))
 						readTokenFull (token, capture);
 				}
@@ -2000,7 +2070,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 					{
 						skipToToken (TOKEN_CLOSE_SQUARE, NULL);
 						vStringCopyS (capture, ".");
-						LastTokenType = TOKEN_DOT; // prevent capture adding ' '
+						PS->lastTokenType = TOKEN_DOT; // prevent capture of ' '
 						readTokenFull (token, capture);
 					}
 				}
@@ -2008,7 +2078,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 				{
 					skipToToken (TOKEN_CLOSE_SQUARE, NULL);
 					vStringCopyS (capture, ".");
-					LastTokenType = TOKEN_DOT; // prevent capture adding ' '
+					PS->lastTokenType = TOKEN_DOT; // prevent capture of ' '
 					readTokenFull (token, capture);
 				}
 			}
@@ -2113,8 +2183,8 @@ static bool parseVType (tokenInfo *const token, vString *const capture,
 	else if (isKeyword (token, KEYWORD_map))
 	{
 		readTokenFull (token, capture);
-		if ((!IsBuiltin && expectToken (token, TOKEN_OPEN_SQUARE)) ||
-			(IsBuiltin && isToken (token, TOKEN_OPEN_SQUARE)))
+		if ((!PS->isBuiltin && expectToken (token, TOKEN_OPEN_SQUARE)) ||
+			(PS->isBuiltin && isToken (token, TOKEN_OPEN_SQUARE)))
 		{
 			skipToToken (TOKEN_CLOSE_SQUARE, capture);
 			readTokenFull (token, capture);
@@ -2156,8 +2226,8 @@ static void parseAlias (tokenInfo *const token, vString *const access, int scope
 	PARSER_PROLOGUE ("alias");
 
 	readToken (token);
-	if ((!IsBuiltin && expectToken (token, TOKEN_TYPE)) ||
-		(IsBuiltin && (expectToken (token, TOKEN_TYPE, TOKEN_KEYWORD) ||
+	if ((!PS->isBuiltin && expectToken (token, TOKEN_TYPE)) ||
+		(PS->isBuiltin && (expectToken (token, TOKEN_TYPE, TOKEN_KEYWORD) ||
 					   expectKeyword (token, KEYWORD_TYPE))))
 	{
 		int newScope = makeTagEx (token, NULL, KIND_ALIAS, scope, access);
@@ -2779,7 +2849,7 @@ static int parseModule (tokenInfo *const token)
 	if (expectToken (token, TOKEN_IDENT))
 	{
 		if (!strcmp (vStringValue (token->string), "builtin"))
-			IsBuiltin = true;
+			PS->isBuiltin = true;
 		else
 			scope = makeTag (token, NULL, KIND_MODULE, CORK_NIL);
 	}
@@ -2825,6 +2895,8 @@ static void parseFile (tokenInfo *const token)
 	do
 	{
 		readToken (token);
+		if (PS->sofToken == NULL)
+			PS->sofToken = dupToken (token);
 		skipAccessAndReadToken (token, &access);
 
 		if (isToken (token, TOKEN_OPEN_PAREN, TOKEN_OPEN_CURLY,
@@ -2864,16 +2936,6 @@ static void parseFile (tokenInfo *const token)
 	while (!isToken (token, TOKEN_EOF));
 	vStringDelete (access);
 
-	// reset global parser state :(
-	for (int i = 0; i < NumReplays; i++)
-	{
-		deleteToken (ReplayTokens[i]);
-		vStringDelete (ReplayCaptures[i]);
-	}
-	NumReplays = 0;
-	IsBuiltin = false;
-	LastTokenType = TOKEN_IMMEDIATE;
-
 	PARSER_EPILOGUE ();
 }
 
@@ -2882,12 +2944,15 @@ static void parseFile (tokenInfo *const token)
 
 static void findVTags (void)
 {
+	PS = newParserState ();
 	tokenInfo *const token = newToken ();
 
 	parseFile (token);
-	vDebugParserPrintf ("\n");
 
 	deleteToken (token);
+	deleteParserState (PS);
+
+	vDebugParserPrintf ("\n");
 }
 
 static void initialize (const langType language)
