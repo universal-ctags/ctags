@@ -13,8 +13,7 @@ include source.mak
 COMMON_DEFINES =
 DEFINES = -DWIN32 $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DHAVE_PACKCC -DREADTAGS_DSL
 INCLUDES = -I. -Ignulib -Imain -Iparsers -Ilibreadtags -Idsl
-OPT = /O2 /WX /experimental:preprocessor
-# Note: /experimental:preprocessor is /Zc:preprocessor in Visual Studio 2019+
+OPT = /O2 /WX /Zc:preprocessor
 PACKCC = packcc.exe
 GNULIB_OBJS = $(MVC_GNULIB_SRCS:.c=.obj)
 WIN32_OBJS = $(WIN32_SRCS:.c=.obj)
