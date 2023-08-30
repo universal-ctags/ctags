@@ -116,6 +116,7 @@ Tex            i/xinput          input              on      external input file 
 Thrift         T/thriftFile      included           on      included file
 V              Y/unknown         imported           on      imported symbol
 V              p/module          imported           on      imported module
+V              x/external        external           on      external symbol
 VHDL           e/entity          desigend           on      designed by an architecture
 Vera           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 Vera           d/macro           undef              on      undefined
@@ -244,6 +245,7 @@ Tex            i/xinput          input              on      external input file 
 Thrift         T/thriftFile      included           on      included file
 V              Y/unknown         imported           on      imported symbol
 V              p/module          imported           on      imported module
+V              x/external        external           on      external symbol
 VHDL           e/entity          desigend           on      designed by an architecture
 Vera           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 Vera           d/macro           undef              on      undefined
