@@ -2037,8 +2037,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 		}
 		if (expectToken (token, TOKEN_OPEN_CURLY))
 		{
-			vString *capture = vStringNewInit (".");
-			readTokenFull (token, capture);
+			readToken (token);
 			while (expectToken (token, TOKEN_CLOSE_CURLY, TOKEN_IDENT,
 								TOKEN_KEYWORD) ||
 				   expectKeyword (token, KEYWORD_TYPE, KEYWORD_map,
@@ -2047,20 +2046,16 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 				if (isToken (token, TOKEN_CLOSE_CURLY))
 					break;
 
-				makeTag (token, capture, KIND_ENUMERATOR, newScope);
-				vStringCopyS (capture, ".");
-				PS->lastTokenType = TOKEN_DOT; // prevent capture of ' '
+				makeTag (token, NULL, KIND_ENUMERATOR, newScope);
 
-				readTokenFull (token, capture);
+				readToken (token);
 				if (isToken (token, TOKEN_ASSIGN))
 				{
 					readToken (token);
 					if (isToken (token, TOKEN_IDENT, TOKEN_TYPE))
 						parseFullyQualified (token, true);
-					vStringCopyS (capture, ".");
-					PS->lastTokenType = TOKEN_DOT; // prevent capture of ' '
 					if (expectToken (token, TOKEN_IMMEDIATE, TOKEN_EXTERN))
-						readTokenFull (token, capture);
+						readToken (token);
 				}
 
 				if (isToken (token, TOKEN_AT))
@@ -2069,20 +2064,15 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 					if (expectToken (token, TOKEN_OPEN_SQUARE))
 					{
 						skipToToken (TOKEN_CLOSE_SQUARE, NULL);
-						vStringCopyS (capture, ".");
-						PS->lastTokenType = TOKEN_DOT; // prevent capture of ' '
-						readTokenFull (token, capture);
+						readToken (token);
 					}
 				}
 				else if (isToken (token, TOKEN_OPEN_SQUARE))
 				{
 					skipToToken (TOKEN_CLOSE_SQUARE, NULL);
-					vStringCopyS (capture, ".");
-					PS->lastTokenType = TOKEN_DOT; // prevent capture of ' '
-					readTokenFull (token, capture);
+					readToken (token);
 				}
 			}
-			vStringDelete (capture);
 
 			tagEntryInfo *entry = getEntryInCorkQueue (newScope);
 			if (entry)

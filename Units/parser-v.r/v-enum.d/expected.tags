@@ -1,15 +1,15 @@
 Foo	input.v	/^enum Foo {$/;"	g	line:3	roles:def	end:10
-.aaa	input.v	/^    aaa = 5$/;"	e	line:4	enum:Foo	roles:def
-.bbb	input.v	/^    bbb$/;"	e	line:5	enum:Foo	roles:def
-.ccc	input.v	/^    ccc$/;"	e	line:6	enum:Foo	roles:def
-.@fn	input.v	/^    @fn$/;"	e	line:7	enum:Foo	roles:def
-.@struct	input.v	/^    @struct$/;"	e	line:8	enum:Foo	roles:def
-.ddd	input.v	/^    ddd$/;"	e	line:9	enum:Foo	roles:def
+aaa	input.v	/^    aaa = 5$/;"	e	line:4	enum:Foo	roles:def
+bbb	input.v	/^    bbb$/;"	e	line:5	enum:Foo	roles:def
+ccc	input.v	/^    ccc$/;"	e	line:6	enum:Foo	roles:def
+@fn	input.v	/^    @fn$/;"	e	line:7	enum:Foo	roles:def
+@struct	input.v	/^    @struct$/;"	e	line:8	enum:Foo	roles:def
+ddd	input.v	/^    ddd$/;"	e	line:9	enum:Foo	roles:def
 aaa	input-1.v	/^module aaa$/;"	p	line:1	roles:def
 Foo	input-1.v	/^enum Foo {$/;"	g	line:3	module:aaa	roles:def	end:10
-.aaa	input-1.v	/^    aaa = 5$/;"	e	line:4	enum:aaa.Foo	roles:def
-.bbb	input-1.v	/^    bbb$/;"	e	line:5	enum:aaa.Foo	roles:def
-.ccc	input-1.v	/^    ccc = C.foo$/;"	e	line:6	enum:aaa.Foo	roles:def
-.@fn	input-1.v	/^    @fn$/;"	e	line:7	enum:aaa.Foo	roles:def
-.@struct	input-1.v	/^    @struct [attr]$/;"	e	line:8	enum:aaa.Foo	roles:def
-.ddd	input-1.v	/^    ddd = 999  @[attr]$/;"	e	line:9	enum:aaa.Foo	roles:def
+aaa	input-1.v	/^    aaa = 5$/;"	e	line:4	enum:aaa.Foo	roles:def
+bbb	input-1.v	/^    bbb$/;"	e	line:5	enum:aaa.Foo	roles:def
+ccc	input-1.v	/^    ccc = C.foo$/;"	e	line:6	enum:aaa.Foo	roles:def
+@fn	input-1.v	/^    @fn$/;"	e	line:7	enum:aaa.Foo	roles:def
+@struct	input-1.v	/^    @struct [attr]$/;"	e	line:8	enum:aaa.Foo	roles:def
+ddd	input-1.v	/^    ddd = 999  @[attr]$/;"	e	line:9	enum:aaa.Foo	roles:def

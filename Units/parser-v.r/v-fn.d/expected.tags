@@ -25,14 +25,14 @@ find_by_id	input-2.v	/^pub fn (r Repo[T]) find_by_id(id int) ?T {$/;"	f	line:7	t
 r	input-2.v	/^pub fn (r Repo[T]) find_by_id(id int) ?T {$/;"	R	line:7	fn:find_by_id	roles:def
 table_name	input-2.v	/^    table_name := T.name \/\/ in this example getting the name of the type gives us the table na/;"	v	line:8	fn:find_by_id	roles:def
 Bosh	input-3.v	/^enum Bosh {$/;"	g	line:3	roles:def	end:6
-.bim	input-3.v	/^    bim$/;"	e	line:4	enum:Bosh	roles:def
-.bam	input-3.v	/^    bam$/;"	e	line:5	enum:Bosh	roles:def
+bim	input-3.v	/^    bim$/;"	e	line:4	enum:Bosh	roles:def
+bam	input-3.v	/^    bam$/;"	e	line:5	enum:Bosh	roles:def
 from_string	input-3.v	/^fn Bosh.from_string(s string) !Bosh {$/;"	f	line:8	enum:Bosh	typeref:typename:!Bosh	signature:(s string)	roles:def	end:9
 Bogus.nope	input-3.v	/^fn Bogus.nope() {$/;"	f	line:11	typeref:typename:	signature:()	roles:def	end:12
 xyz	input-4.v	/^module xyz$/;"	p	line:1	roles:def
 Bosh	input-4.v	/^enum Bosh {$/;"	g	line:5	module:xyz	roles:def	end:8
-.bim	input-4.v	/^    bim$/;"	e	line:6	enum:xyz.Bosh	roles:def
-.bam	input-4.v	/^    bam$/;"	e	line:7	enum:xyz.Bosh	roles:def
+bim	input-4.v	/^    bim$/;"	e	line:6	enum:xyz.Bosh	roles:def
+bam	input-4.v	/^    bam$/;"	e	line:7	enum:xyz.Bosh	roles:def
 from_string	input-4.v	/^fn Bosh.from_string(s string) !Bosh {$/;"	f	line:10	enum:xyz.Bosh	typeref:typename:!Bosh	signature:(s string)	roles:def	end:11
 Bogus.nope	input-4.v	/^fn Bogus.nope() {$/;"	f	line:13	typeref:typename:	signature:()	roles:def	end:14
 main	input-5.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:4
