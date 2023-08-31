@@ -43,6 +43,5 @@ x       UCTAGSxpath          no      NONE             s--    no    -- xpath for 
 -       UCTAGSparameter      no      SystemVerilog    --b    no    -- parameter whose value can be overridden.
 -       UCTAGStarget         yes     Thrift           s--    no    -- the target language specified at "namespace"
 -       UCTAGSthrows         yes     Thrift           s--    no    -- throws list of function
--       UCTAGSmodule         yes     V                s--    no    -- the name of the module
 -       UCTAGSarchitecture   yes     VHDL             s--    no    -- architecture designing the entity
 -       UCTAGSparameter      no      Verilog          --b    no    -- parameter whose value can be overridden.

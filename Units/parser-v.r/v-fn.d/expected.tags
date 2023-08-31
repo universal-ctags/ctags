@@ -28,13 +28,13 @@ Bosh	input-3.v	/^enum Bosh {$/;"	g	line:3	roles:def	end:6
 bim	input-3.v	/^    bim$/;"	e	line:4	enum:Bosh	roles:def
 bam	input-3.v	/^    bam$/;"	e	line:5	enum:Bosh	roles:def
 from_string	input-3.v	/^fn Bosh.from_string(s string) !Bosh {$/;"	f	line:8	enum:Bosh	typeref:typename:!Bosh	signature:(s string)	roles:def	end:9
-Bogus.nope	input-3.v	/^fn Bogus.nope() {$/;"	f	line:11	typeref:typename:	signature:()	roles:def	end:12
+nope	input-3.v	/^fn Bogus.nope() {$/;"	f	line:11	typeref:typename:	signature:()	roles:def	end:12
 xyz	input-4.v	/^module xyz$/;"	p	line:1	roles:def
 Bosh	input-4.v	/^enum Bosh {$/;"	g	line:5	module:xyz	roles:def	end:8
 bim	input-4.v	/^    bim$/;"	e	line:6	enum:xyz.Bosh	roles:def
 bam	input-4.v	/^    bam$/;"	e	line:7	enum:xyz.Bosh	roles:def
 from_string	input-4.v	/^fn Bosh.from_string(s string) !Bosh {$/;"	f	line:10	enum:xyz.Bosh	typeref:typename:!Bosh	signature:(s string)	roles:def	end:11
-Bogus.nope	input-4.v	/^fn Bogus.nope() {$/;"	f	line:13	typeref:typename:	signature:()	roles:def	end:14
+nope	input-4.v	/^fn Bogus.nope() {$/;"	f	line:13	typeref:typename:	signature:()	roles:def	end:14
 main	input-5.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:4
 a	input-5.v	/^    a := foo().bar()$/;"	v	line:2	fn:main	roles:def
 b	input-5.v	/^    b := Foo.bar().foo.bar()$/;"	v	line:3	fn:main	roles:def

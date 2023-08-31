@@ -133,6 +133,7 @@ enum {
 	KEYWORD_lock,
 	KEYWORD_rlock,
 	KEYWORD_shared,
+	KEYWORD_sql,
 	KEYWORD_Smap,
 	KEYWORD_Sarray,
 	KEYWORD_Ssumtype,
@@ -197,6 +198,7 @@ static const keywordTable VKeywordTable[COUNT_KEYWORD] = {
 	{"lock", KEYWORD_lock},
 	{"rlock", KEYWORD_rlock},
 	{"shared", KEYWORD_shared},
+	{"sql", KEYWORD_sql},
 	{"$map", KEYWORD_Smap},
 	{"$array", KEYWORD_Sarray},
 	{"$sumtype", KEYWORD_Ssumtype},
@@ -299,12 +301,12 @@ static roleDefinition VUnknownRoles [COUNT_UNKNOWN_ROLE] = {
 };
 
 typedef enum {
-	ROLE_EXTERNAL_SYMBOL,
+	ROLE_EXTERN_SYMBOL,
 	COUNT_EXTERN_ROLE
 } VExternRole;
 
 static roleDefinition VExternRoles [COUNT_EXTERN_ROLE] = {
-	{ true, "external", "external symbol" },
+	{ true, "extern", "external symbol" },
 };
 
 typedef enum {
@@ -348,18 +350,10 @@ static kindDefinition VKinds[COUNT_KIND] = {
 	{true, 'a', "alias", "type aliases"},
 	{true, 'i', "interface", "interfaces"},
 	{true, 'u', "union", "union names"},
-	{false, 'x', "external", "external symbols",
+	{false, 'x', "extern", "external symbols (i.e., C, JS...)",
 	 .referenceOnly = false, ATTACH_ROLES (VExternRoles)},
 	{true, 'Y', "unknown", "unknown (imported) variables, types and functions",
 	 .referenceOnly = false, ATTACH_ROLES (VUnknownRoles)},
-};
-
-static fieldDefinition VFields [] = {
-	{
-		.name = "module",
-		.description = "the name of the module",
-		.enabled = true,
-	},
 };
 
 static int vLookupKinds[] = { // int, compatible with anyKindsEntryInScope()
@@ -367,8 +361,14 @@ static int vLookupKinds[] = { // int, compatible with anyKindsEntryInScope()
 	KIND_ENUMERATION,
 	KIND_INTERFACE,
 	KIND_UNION,
+	KIND_MODULE,
 };
 const static int vLookupNumKinds = sizeof (vLookupKinds) / sizeof (int);
+
+typedef struct {
+	kindType kind;
+	int role;
+} refSpec;
 
 typedef struct {
 	int type;
@@ -392,13 +392,7 @@ typedef struct {
 		vString *capture;
 		tokenType lastTokenType;
 	} replays[MAX_REPLAYS];
-	//tokenInfo *replayTokens[MAX_REPLAYS];
-	//vString *replayCaptures[MAX_REPLAYS];
-	//tokenType replayLastTokenTypes[MAX_REPLAYS];
 	bool isBuiltin;
-	tokenInfo *sofToken;
-	int externCorkIdC;
-	int externCorkIdJS;
 #ifdef DEBUG
 	const char *currentParser;
 	int nextTokenId;
@@ -409,7 +403,8 @@ static langType Lang_v;
 static objPool *TokenPool = NULL;
 static parserState *PS = NULL; // global parser state
 
-static int lookupQualifiedName (vString *, int);
+static int lookupQualifiedName (tokenInfo *const, vString *, int,
+								const refSpec *);
 static void parseStatement (tokenInfo *const, int);
 static bool parseExpression (tokenInfo *const, int, vString *const);
 static void parseExprList (tokenInfo *const, int, vString *const, bool);
@@ -471,12 +466,9 @@ static tokenInfo *dupToken (tokenInfo *const token)
 static parserState *newParserState ()
 {
 	parserState *st = xMalloc (1, parserState);
-	st->sofToken = NULL;
 	st->numReplays = 0;
 	st->isBuiltin = false;
 	st->lastTokenType = TOKEN_IMMEDIATE;
-	st->externCorkIdC = 0;
-	st->externCorkIdJS = 0;
 #ifdef DEBUG
 	st->nextTokenId = 1;
 #endif
@@ -485,7 +477,6 @@ static parserState *newParserState ()
 
 static void deleteParserState (parserState *st)
 {
-	deleteToken (st->sofToken);
 	for (int i = 0; i < st->numReplays; i++)
 	{
 		deleteToken (st->replays[i].token);
@@ -955,11 +946,11 @@ static bool _isToken (tokenInfo *const token, bool expect, bool keyword,
 static int makeTagFull (tokenInfo *const token, const char *name,
 						const kindType kind, const int scope, int role,
 						vString *const argList, vString *retType,
-						const char *access, bool extraQualified)
+						const char *access)
 {
-	Assert (token || kind == KIND_EXTERN);
+	Assert (token);
 	Assert (name == NULL || name[0] != '\0');
-	Assert (name != NULL || (token && token->string != NULL &&
+	Assert (name != NULL || (token->string != NULL &&
 							 vStringLength (token->string) > 0));
 	vDebugParserPrintf ("#%c ", VKinds[kind].letter);
 
@@ -971,8 +962,8 @@ static int makeTagFull (tokenInfo *const token, const char *name,
 		return CORK_NIL; // ignore _
 	initRefTagEntry (&e, tagName, kind, role);
 
-	e.lineNumber = token? token->lineNumber : 0;
-	e.filePosition = (token? token : PS->sofToken)->filePosition;
+	e.lineNumber = token->lineNumber;
+	e.filePosition = token->filePosition;
 	if (argList && !vStringIsEmpty (argList))
 		e.extensionFields.signature = vStringValue (argList);
 	if (access && *access != '\0')
@@ -983,8 +974,6 @@ static int makeTagFull (tokenInfo *const token, const char *name,
 		e.extensionFields.typeRef [1] = vStringValue( retType );
 	}
 	e.extensionFields.scopeIndex = scope;
-	if (extraQualified)
-		markTagExtraBit (&e, XTAG_QUALIFIED_TAGS);
 
 	return makeTagEntry (&e);
 }
@@ -993,19 +982,16 @@ static int makeFnTag (tokenInfo *const token, vString *const name,
 					  kindType kind, int scope, vString *const argList,
 					  vString *const retType, vString *const access)
 {
-	// lookup parent scope
-	if (name)
-		scope = lookupQualifiedName (name, scope);
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind,
 						scope, ROLE_DEFINITION_INDEX, argList, retType,
-						access? vStringValue (access) : NULL, false);
+						access? vStringValue (access) : NULL);
 }
 
 static int makeTag (tokenInfo *const token, vString *const name, kindType kind,
 					int scope)
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind, scope,
-						ROLE_DEFINITION_INDEX, NULL, NULL, NULL, false);
+						ROLE_DEFINITION_INDEX, NULL, NULL, NULL);
 }
 
 static int makeTagEx (tokenInfo *const token, vString *const name, kindType kind,
@@ -1013,14 +999,14 @@ static int makeTagEx (tokenInfo *const token, vString *const name, kindType kind
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind, scope,
 						ROLE_DEFINITION_INDEX, NULL, NULL,
-						access? vStringValue (access) : NULL, false);
+						access? vStringValue (access) : NULL);
 }
 
-static int makeReferenceTag (tokenInfo *const token, vString *const name,
-							 kindType kind, int scope, int role)
+static int makeRefTag (tokenInfo *const token, vString *const name,
+					   kindType kind, int scope, int role)
 {
 	return makeTagFull (token, name? vStringValue (name) : NULL, kind, scope,
-						role, NULL, NULL, NULL, false);
+						role, NULL, NULL, NULL);
 }
 
 static tokenType getOpen (tokenType close)
@@ -1088,6 +1074,8 @@ static void skipAccessAndReadToken (tokenInfo *const token, vString **capture)
 			add = "static";
 		else if (isKeyword (token, KEYWORD___global))
 			add = "__global";
+		else if (isKeyword (token, KEYWORD_shared))
+			add = "shared";
 		if (!add)
 			break;
 		if (capture)
@@ -1118,9 +1106,17 @@ static char *nextCharIdent (char *s, char sep)
 	return s;
 }
 
-static int lookupQualifiedName (vString *name, int scope)
+// lookup qualified name, updating it (name or token->string) to last part and
+// returning the last part's scope, and making references of intermediate parts
+// which can not be looked-up, if requested
+static int lookupQualifiedName (tokenInfo *const token, vString *name,
+								int scope, const refSpec *makeRefs)
 {
-	vString *tmp = vStringNewCopy (name);
+	Assert (token);
+	Assert (!name || vStringLength (name) > 0);
+	Assert (name || (token->string && vStringLength (token->string) > 0));
+
+	vString *tmp = vStringNewCopy (name? name : token->string);
 	char *part, *next = vStringValue (tmp);
 	bool once = true, ongoing = true, external = false;
 	while (next)
@@ -1132,31 +1128,26 @@ static int lookupQualifiedName (vString *name, int scope)
 			if (once)
 			{
 				once = false;
-				int *externCorkId = NULL;
-				if (!strcmp (part, "C"))
-					externCorkId = &PS->externCorkIdC;
-				else if (!strcmp (part, "JS"))
-					externCorkId = &PS->externCorkIdJS;
-				if (externCorkId)
+				if (!strcmp (part, "C") || !strcmp (part, "JS"))
 				{
 					external = true;
-					if (*externCorkId == CORK_NIL)
-						*externCorkId = makeTagFull ( // reference
-							PS->sofToken, part, KIND_EXTERN, CORK_NIL,
-							ROLE_EXTERNAL_SYMBOL, NULL, NULL, NULL, false);
-					scope = *externCorkId;
+					scope = makeTagFull (token, part, KIND_EXTERN, CORK_NIL,
+										 ROLE_EXTERN_SYMBOL, NULL, NULL, NULL);
 				}
 			}
 			if (!external && ongoing)
 			{
-				scope = anyKindsEntryInScope (
+				int newScope = anyKindsEntryInScope (
 					scope, part, vLookupKinds, vLookupNumKinds, true);
+				if (makeRefs)
+					newScope = makeTagFull (token, part, makeRefs->kind, scope,
+											makeRefs->role, NULL, NULL, NULL);
+				scope = newScope;
 				ongoing = scope != CORK_NIL;
 			}
 		}
 	}
-	if (scope != CORK_NIL)
-		vStringCopyS (name, part);
+	vStringCopyS (name? name : token->string, part);
 	vStringDelete (tmp);
 	return scope;
 }
@@ -1193,7 +1184,8 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 	while (prev == TOKEN_NONE ||
 		   (prev == TOKEN_DOT &&
 			(isToken (tokens[idx], TOKEN_IDENT, TOKEN_TYPE) ||
-			 isKeyword (tokens[idx], KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan) ||
+			 isKeyword (tokens[idx], KEYWORD_TYPE,
+						KEYWORD_map, KEYWORD_chan, KEYWORD_sql) ||
 			 (isExtern && isKeyword (tokens[idx], KEYWORD_assert)))) ||
 		   (prev != TOKEN_DOT && isToken (tokens[idx], TOKEN_DOT)))
 	{
@@ -1222,7 +1214,8 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 
 	// should end on one of these
 	expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN, TOKEN_KEYWORD) ||
-		expectKeyword (token, KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan);
+		expectKeyword (token, KEYWORD_TYPE,
+					   KEYWORD_map, KEYWORD_chan, KEYWORD_sql);
 
 	PARSER_EPILOGUE ();
 }
@@ -1246,11 +1239,11 @@ static void parseInit (tokenInfo *const token, int scope)
 	Assert (isToken (token, TOKEN_OPEN_CURLY, TOKEN_OPEN_PAREN));
 	PARSER_PROLOGUE ("init");
 
-	bool hasDestruc = isToken (token, TOKEN_OPEN_CURLY);
-	bool hasVarargs = isToken (token, TOKEN_OPEN_PAREN);
+	bool hasDestructure = isToken (token, TOKEN_OPEN_CURLY);
+	bool hasVarArgs = isToken (token, TOKEN_OPEN_PAREN);
 	tokenType close = getClose (token->type);
 	readToken (token);
-	if (hasDestruc && isToken (token, TOKEN_SLICE))
+	if (hasDestructure && isToken (token, TOKEN_SLICE))
 	{
 		readToken (token);
 		if (!isToken (token, close))
@@ -1278,7 +1271,7 @@ static void parseInit (tokenInfo *const token, int scope)
 				else
 					unreadToken (token);
 			}
-			else if (hasVarargs && isToken (token, TOKEN_SLICE))
+			else if (hasVarArgs && isToken (token, TOKEN_SLICE))
 				readToken (token);
 			if (!isToken (token, close))
 			{
@@ -1325,7 +1318,7 @@ static void parseChain (tokenInfo *const token, int scope)
 
 	readToken (token);
 	if (expectToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_DOT, TOKEN_KEYWORD) ||
-		expectKeyword (token, KEYWORD_TYPE, KEYWORD_map))
+		expectKeyword (token, KEYWORD_TYPE, KEYWORD_map, KEYWORD_sql))
 	{
 		tokenType last;
 		do
@@ -1334,7 +1327,7 @@ static void parseChain (tokenInfo *const token, int scope)
 			readToken (token);
 		}
 		while ((isToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_DOT) ||
-				isKeyword (token, KEYWORD_TYPE, KEYWORD_map)) &&
+				isKeyword (token, KEYWORD_TYPE, KEYWORD_map, KEYWORD_sql)) &&
 			   isToken (token, TOKEN_DOT) != last);
 		if (isToken (token, TOKEN_DOT))
 			unreadToken (token);
@@ -1397,7 +1390,7 @@ static void parseDeclare (tokenInfo *const token, vString *const names,
 			name = nextCharIdent (name, ',');
 			access = nextCharIdent (access, ',');
 			makeTagFull (token, n, KIND_VARIABLE, scope,
-						 ROLE_DEFINITION_INDEX, NULL, NULL, a, false);
+						 ROLE_DEFINITION_INDEX, NULL, NULL, a);
 		}
 	}
 	readToken (token);
@@ -1597,8 +1590,10 @@ static void parseFunction (tokenInfo *const token, int scope,
 		int newScope = CORK_NIL;
 		if (name || kind == KIND_METHOD)
 		{
-			kindType fnKind = kind == KIND_NONE? KIND_FUNCTION : kind;
-			newScope = makeFnTag (fnToken, name, fnKind, scope,
+			kindType realKind = kind == KIND_NONE? KIND_FUNCTION : kind;
+			int realScope = name?
+				lookupQualifiedName (fnToken, name, scope, NULL) : scope;
+			newScope = makeFnTag (fnToken, name, realKind, realScope,
 								  argList, retType, access);
 			if (receiver)
 				makeTag (rxToken, NULL, KIND_RECEIVER, newScope);
@@ -1794,11 +1789,17 @@ static void parseImport (tokenInfo *const token)
 	Assert (isKeyword (token, KEYWORD_import));
 	PARSER_PROLOGUE ("import");
 
+	static const refSpec makeModules = {
+		.kind = KIND_MODULE,
+		.role = ROLE_IMPORTED_MODULE
+	};
+
 	readToken (token);
 	if (expectToken (token, TOKEN_IDENT))
 	{
 		tokenInfo *moduleToken = dupToken (token);
 		vString *moduleName = vStringNew ();
+		int scope = CORK_NIL;
 		parseFQIdent (token, moduleName);
 		readToken (token);
 		if (isKeyword (token, KEYWORD_as))
@@ -1812,8 +1813,11 @@ static void parseImport (tokenInfo *const token)
 			}
 			readToken (token);
 		}
-		int moduleScope = makeReferenceTag (moduleToken, moduleName, KIND_MODULE,
-											CORK_NIL, ROLE_IMPORTED_MODULE);
+		else
+			scope = lookupQualifiedName (
+				moduleToken, moduleName, scope, &makeModules);
+		int moduleScope = makeRefTag (moduleToken, moduleName, KIND_MODULE,
+									  scope, ROLE_IMPORTED_MODULE);
 		vStringDelete (moduleName);
 		deleteToken (moduleToken);
 		if (isToken (token, TOKEN_OPEN_CURLY))
@@ -1821,10 +1825,10 @@ static void parseImport (tokenInfo *const token)
 			do
 			{
 				readToken (token);
-				if (expectToken (token, TOKEN_IDENT))
+				if (expectToken (token, TOKEN_IDENT, TOKEN_TYPE))
 				{
-					makeReferenceTag (token, NULL, KIND_UNKNOWN, moduleScope,
-							 ROLE_IMPORTED_SYMBOL);
+					makeRefTag (token, NULL, KIND_UNKNOWN, moduleScope,
+								ROLE_IMPORTED_SYMBOL);
 					readToken (token);
 					expectToken (token, TOKEN_COMMA, TOKEN_CLOSE_CURLY);
 				}
@@ -1875,7 +1879,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 		parseFullyQualified (token, true);
 		if (expectToken (token, TOKEN_TYPE, TOKEN_EXTERN))
 		{
-			scope = lookupQualifiedName (token->string, scope);
+			scope = lookupQualifiedName (token, NULL, scope, false);
 			kindType realKind = kind == KIND_NONE? KIND_STRUCT : kind;
 			newScope = makeTagEx (token, NULL, realKind, scope, access);
 			registerEntry (newScope);
@@ -2515,12 +2519,44 @@ static void parseLock (tokenInfo *const token, int scope)
 	PARSER_EPILOGUE ();
 }
 
+// sql: 'sql' fqident '{' any '}' err cont
+static void parseSql (tokenInfo *const token, int scope)
+{
+	Assert (isKeyword (token, KEYWORD_sql));
+	PARSER_PROLOGUE ("sql");
+
+	readToken (token);
+	if (expectToken (token, TOKEN_IDENT, TOKEN_TYPE))
+		parseFullyQualified (token, false);
+	readToken (token);
+	if (expectToken (token, TOKEN_OPEN_CURLY))
+	{
+		skipToToken (TOKEN_CLOSE_CURLY, NULL);
+		readToken (token);
+		if (!parseExprCont (token, scope, true))
+			unreadToken (token);
+	}
+	else
+		unreadToken (token);
+
+	PARSER_EPILOGUE ();
+}
+
+// expr: access* label? [
+//     [fqident | 'none' | kwtype] err-cont | extern ['{' '}' | err-cont ] |
+//     '.' [[ident | kwtype | 'map' | 'chan'] cont]? | immediate cont | init |
+//     vtype [['(' | 'is' | 'in'] cont]? | kwtype fncall? | '(' expr ')' |
+//     lock | sql | lambda | if | match | select | chpop | unsafe | init |
+//     ['~' | '!' | '?' | '*' | '&' | '+' | '-' | 'spawn' | 'go'] expr |
+//     '[' list ']' '!'? [cont | vtype]? | '[' ']' [vtype fncall?]?
+// ]
 static bool parseExpression (tokenInfo *const token, int scope,
 							 vString *const access)
 {
 	PARSER_PROLOGUE ("expr");
 
 	bool ok = true;
+	bool cont = false, contErr = false, contRead = false;
 
 	skipAccessAndReadToken (token, NULL);
 
@@ -2531,11 +2567,7 @@ static bool parseExpression (tokenInfo *const token, int scope,
 		parseFullyQualified (token, false);
 	if (isToken (token, TOKEN_IDENT) ||
 		isKeyword (token, KEYWORD_none, KEYWORD_TYPE))
-	{
-		readToken (token);
-		if (!parseExprCont (token, scope, true))
-			unreadToken (token);
-	}
+		cont = contRead = contErr = true;
 	else if (isToken (token, TOKEN_EXTERN))
 	{
 		readToken (token);
@@ -2546,39 +2578,37 @@ static bool parseExpression (tokenInfo *const token, int scope,
 			if (!isToken (tmpToken, TOKEN_CLOSE_CURLY))
 			{
 				unreadToken (tmpToken);
-				if (!parseExprCont (token, scope, true))
-					unreadToken (token);
+				cont = contErr = true;
 			}
 		}
-		else if (!parseExprCont (token, scope, true))
-			unreadToken (token);
+		else
+			cont = contErr = true;
 	}
-	else if (isToken (token, TOKEN_IMMEDIATE, TOKEN_DOT))
+	else if (isToken (token, TOKEN_DOT)) // enumerators
 	{
-		if (isToken (token, TOKEN_DOT)) // enumerators
-		{
-			readToken (token);
-			if (!(expectToken (token, TOKEN_IDENT, TOKEN_KEYWORD) ||
-					expectKeyword (token, KEYWORD_TYPE, KEYWORD_map,
-								   KEYWORD_chan)) &&
-				isClose (token))
-				unreadToken (token);
-		}
 		readToken (token);
-		if (!parseExprCont (token, scope, false))
+		if (expectToken (token, TOKEN_IDENT, TOKEN_KEYWORD) ||
+			expectKeyword (token, KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan))
+			cont = contRead = true;
+		else // if (isClose (token))
 			unreadToken (token);
 	}
+	else if (isToken (token, TOKEN_IMMEDIATE))
+		cont = contRead = true;
 	else if (isToken (token, TOKEN_TYPE))
 	{
 		parseVType (token, NULL, scope, false, true);
 		readToken (token);
-		if (!(isToken (token, TOKEN_OPEN_PAREN) ||
-			  isKeyword (token, KEYWORD_is, KEYWORD_in)) ||
-			!parseExprCont (token, scope, false))
+		if (isToken (token, TOKEN_OPEN_PAREN) ||
+			isKeyword (token, KEYWORD_is, KEYWORD_in))
+			cont = true;
+		else
 			unreadToken (token);
 	}
 	else if (isKeyword (token, KEYWORD_lock, KEYWORD_rlock))
 		parseLock (token, scope);
+	else if (isKeyword (token, KEYWORD_sql))
+		parseSql (token, scope);
 	else if (isKeyword (token, KEYWORD_fn))
 		parseFunction (token, scope, NULL, KIND_NONE);
 	else if (isKeyword (token, KEYWORD_if, KEYWORD_Sif))
@@ -2614,19 +2644,15 @@ static bool parseExpression (tokenInfo *const token, int scope,
 	else if (isToken (token, TOKEN_OPEN_PAREN))
 	{
 		readToken (token);
-		if (!isClose (token))
+		if (isToken (token, TOKEN_CLOSE_PAREN))
+			vDebugUnexpected (token, "CLOSE_PAREN", 0);
+		else
 		{
 			parseExpression (token, scope, NULL);
 			readToken (token);
 		}
-		else
-			expectToken (token, TOKEN_NONE);
 		if (expectToken (token, TOKEN_CLOSE_PAREN))
-		{
-			readToken (token);
-			if (!parseExprCont (token, scope, false))
-				unreadToken (token);
-		}
+			cont = contRead = true;
 		else
 			skipToToken (TOKEN_CLOSE_PAREN, NULL);
 	}
@@ -2679,6 +2705,14 @@ static bool parseExpression (tokenInfo *const token, int scope,
 	{
 		vDebugUnexpected (token, "expression", 0);
 		ok = false;
+	}
+
+	if (cont)
+	{
+		if (contRead)
+			readToken (token);
+		if (!parseExprCont (token, scope, contErr))
+			unreadToken (token);
 	}
 
 	PARSER_EPILOGUE ();
@@ -2885,8 +2919,6 @@ static void parseFile (tokenInfo *const token)
 	do
 	{
 		readToken (token);
-		if (PS->sofToken == NULL)
-			PS->sofToken = dupToken (token);
 		skipAccessAndReadToken (token, &access);
 
 		if (isToken (token, TOKEN_OPEN_PAREN, TOKEN_OPEN_CURLY,
@@ -2976,8 +3008,6 @@ extern parserDefinition *VParser (void)
 	def->selectLanguage  = selectors;
 	def->keywordTable = VKeywordTable;
 	def->keywordCount = ARRAY_SIZE (VKeywordTable);
-	def->fieldTable = VFields;
-	def->fieldCount = ARRAY_SIZE (VFields);
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->requestAutomaticFQTag = true;
 	return def;

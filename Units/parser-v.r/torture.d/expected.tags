@@ -1,4 +1,15 @@
 main	input.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:17
 a	input.v	/^	a := 1$/;"	v	line:3	fn:main	roles:def
-SYSTEM_INFO	input-1.v	/^struct C.SYSTEM_INFO {$/;"	s	line:1	external:C	roles:def	end:2
-foo	input-1.v	/^fn C.foo(bar string) i64$/;"	f	line:3	external:C	typeref:typename:i64	signature:(bar string)	roles:def
+SYSTEM_INFO	input-1.v	/^struct C.SYSTEM_INFO {$/;"	s	line:1	extern:C	roles:def	end:2
+foo	input-1.v	/^fn C.foo(bar string) i64$/;"	f	line:3	extern:C	typeref:typename:i64	signature:(bar string)	roles:def
+thismodule	input-2.v	/^module thismodule$/;"	p	line:1	roles:def
+that	input-2.v	/^import that.aaa$/;"	p	line:3	roles:imported	extras:reference
+aaa	input-2.v	/^import that.aaa$/;"	p	line:3	module:that	roles:imported	extras:reference
+that	input-2.v	/^import that.bbb { Bbb }$/;"	p	line:4	roles:imported	extras:reference
+bbb	input-2.v	/^import that.bbb { Bbb }$/;"	p	line:4	module:that	roles:imported	extras:reference
+Bbb	input-2.v	/^import that.bbb { Bbb }$/;"	Y	line:4	module:that.bbb	roles:imported	extras:reference
+Foo	input-2.v	/^struct Foo {$/;"	s	line:6	module:thismodule	roles:def	end:9
+a	input-2.v	/^	a aaa.Aaa$/;"	m	line:7	struct:thismodule.Foo	roles:def
+b	input-2.v	/^	b Bbb$/;"	m	line:8	struct:thismodule.Foo	roles:def
+main	input-2.v	/^fn main() {$/;"	f	line:11	module:thismodule	typeref:typename:	signature:()	roles:def	end:15
+foo	input-2.v	/^	foo := Foo{}$/;"	v	line:12	fn:thismodule.main	roles:def
