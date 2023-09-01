@@ -1309,31 +1309,18 @@ static void parseFnCall (tokenInfo *const token, int scope)
 	PARSER_EPILOGUE ();
 }
 
-// chain: '.' [ident | type | kwtype] ['.' [ident | type | kwtype]]*
-//     ['(' fncall]?
+// chain: '.' [ident | type | kwtype | 'map'] err-cont?
 static void parseChain (tokenInfo *const token, int scope)
 {
 	Assert (isToken (token, TOKEN_DOT));
 	PARSER_PROLOGUE ("chain");
 
 	readToken (token);
-	if (expectToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_DOT, TOKEN_KEYWORD) ||
-		expectKeyword (token, KEYWORD_TYPE, KEYWORD_map, KEYWORD_sql))
+	if (expectToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_KEYWORD) ||
+		expectKeyword (token, KEYWORD_TYPE, KEYWORD_map))
 	{
-		tokenType last;
-		do
-		{
-			last = isToken (token, TOKEN_DOT);
-			readToken (token);
-		}
-		while ((isToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_DOT) ||
-				isKeyword (token, KEYWORD_TYPE, KEYWORD_map, KEYWORD_sql)) &&
-			   isToken (token, TOKEN_DOT) != last);
-		if (isToken (token, TOKEN_DOT))
-			unreadToken (token);
-		else if (isToken (token, TOKEN_OPEN_PAREN))
-			parseFnCall (token, scope);
-		else if (!parseExprCont (token, scope, false))
+		readToken (token);
+		if (!parseExprCont (token, scope, true))
 			unreadToken (token);
 	}
 	else
@@ -1342,7 +1329,7 @@ static void parseChain (tokenInfo *const token, int scope)
 	PARSER_EPILOGUE ();
 }
 
-// block: '{' statement* '}' ['.' chain]?
+// block: '{' statement* '}' chain?
 // returns line number of CLOSE_CURLY
 static int parseBlock (tokenInfo *const token, int scope, bool hasChain)
 {
@@ -2093,7 +2080,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 //    [fqtype | extern] ['[' any ']']? | ['chan' | 'shared'] vtype | kwtype |
 //    'struct' struct | 'map' '[' any* ']' vtype | 'fn' fntype |
 //    '$map' | '$struct' | '$enum' | '$array' | '$sumtype' | '$alias' |
-// ] ['{' init]?
+// ] init?
 // return false if token is rejected
 // set letInit false to parse *only* V type (with no {...} initialisation after)
 // set canInit false unless tokens already read which would permit it (e.g., [])
@@ -2349,8 +2336,8 @@ static void parseExprList (tokenInfo *const token, int scope,
 
 // err: ['!' | '?' | 'or' block]?
 // cont: ['--' | '++']? [
-//     '.' chain | op expr | '...' expr? | ['is' | 'as'] vtype cont |
-//     '[' '...'? list ']' err-cont | ['=' ':='] expr | '(' fncall
+//     chain | op expr | '...' expr? | ['is' | 'as'] vtype cont |
+//     '[' '...'? list ']' err-cont | ['=' ':='] expr | fncall
 // ]?
 // return false if token is rejected
 static bool parseExprCont (tokenInfo *const token, int scope, bool hasErr)
@@ -2544,9 +2531,9 @@ static void parseSql (tokenInfo *const token, int scope)
 
 // expr: access* label? [
 //     [fqident | 'none' | kwtype] err-cont | extern ['{' '}' | err-cont ] |
-//     '.' [[ident | kwtype | 'map' | 'chan'] cont]? | immediate cont | init |
-//     vtype [['(' | 'is' | 'in'] cont]? | kwtype fncall? | '(' expr ')' |
-//     lock | sql | lambda | if | match | select | chpop | unsafe | init |
+//     '.' [ident | kwtype | 'map' | 'chan'] cont | '(' expr ')' |
+//     vtype cont? | kwtype fncall? | immediate cont | 'struct'? init |
+//     lock | sql | lambda | if | match | select | chpop | unsafe |
 //     ['~' | '!' | '?' | '*' | '&' | '+' | '-' | 'spawn' | 'go'] expr |
 //     '[' list ']' '!'? [cont | vtype]? | '[' ']' [vtype fncall?]?
 // ]
@@ -2599,7 +2586,7 @@ static bool parseExpression (tokenInfo *const token, int scope,
 	{
 		parseVType (token, NULL, scope, false, true);
 		readToken (token);
-		if (isToken (token, TOKEN_OPEN_PAREN) ||
+		if (isToken (token, TOKEN_OPEN_PAREN, TOKEN_OPERATOR) ||
 			isKeyword (token, KEYWORD_is, KEYWORD_in))
 			cont = true;
 		else
@@ -2638,6 +2625,14 @@ static bool parseExpression (tokenInfo *const token, int scope,
 		readToken (token);
 		if (isToken (token, TOKEN_OPEN_PAREN))
 			parseFnCall (token, scope);
+		else
+			unreadToken (token);
+	}
+	else if (isKeyword (token, KEYWORD_struct))
+	{
+		readToken (token);
+		if (expectToken (token, TOKEN_OPEN_CURLY))
+			parseInit (token, scope);
 		else
 			unreadToken (token);
 	}
