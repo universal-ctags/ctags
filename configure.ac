@@ -848,6 +848,8 @@ fi
 # Output files
 # ------------
 
+AC_CHECK_LIB([m], [isnan])
+
 AC_CHECK_FUNCS(mblen)
 
 AC_CONFIG_FILES([Makefile gnulib/Makefile man/GNUmakefile])
