@@ -235,6 +235,7 @@
     <ClCompile Include="..\optlib\cmake.c" />
     <ClCompile Include="..\optlib\ctags-optlib.c" />
     <ClCompile Include="..\optlib\elixir.c" />
+    <ClCompile Include="..\optlib\forth.c" />
     <ClCompile Include="..\optlib\gdbinit.c" />
     <ClCompile Include="..\optlib\gperf.c" />
     <ClCompile Include="..\optlib\iPythonCell.c" />
