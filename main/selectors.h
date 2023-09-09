@@ -33,4 +33,7 @@ selectLispOrLEXByLEXMarker (struct _MIO *, langType *, unsigned int);
 const char *
 selectByXpathFileSpec (struct _MIO *input, langType *candidates, unsigned int nCandidates);
 
+const char *
+selectFortranOrForthByForthMarker (struct _MIO *input, langType *candidates, unsigned int nCandidates);
+
 #endif

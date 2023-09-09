@@ -36,6 +36,9 @@ static const char *TR_DOSBATCH = "DosBatch";
 static const char *TR_LISP	   = "Lisp";
 static const char *TR_LEX	   = "LEX";
 
+static const char *TR_FORTH	   = "Forth";
+static const char *TR_FORTRAN  = "Fortran";
+
 #define startsWith(line,prefix)									\
 	(strncmp(line, prefix, strlen(prefix)) == 0? true: false)
 
@@ -335,6 +338,23 @@ selectLispOrLEXByLEXMarker (MIO *input,
 							unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
 	return selectByLines (input, tasteLispOrLEXLines, TR_LISP, NULL);
+}
+
+static const char *
+tasteFortranOrForthLines (const char *line, void *data CTAGS_ATTR_UNUSED)
+{
+	if (line[0] && ((line[0] == ':' && line[1] && isspace((unsigned char)line[1]))
+					|| line[0] == '\\'))
+		return TR_FORTH;
+	return TR_UNKNOWN;
+}
+
+const char *
+selectFortranOrForthByForthMarker (MIO *input,
+								   langType *candidates CTAGS_ATTR_UNUSED,
+								   unsigned int nCandidates CTAGS_ATTR_UNUSED)
+{
+	return selectByLines (input, tasteFortranOrForthLines, TR_FORTRAN, NULL);
 }
 
 #ifdef HAVE_LIBXML
