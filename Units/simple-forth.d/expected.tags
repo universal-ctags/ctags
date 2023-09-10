@@ -1,0 +1,4 @@
+: fizz?  	input.fth	/^: fizz?  $/;"	s
+: buzz?  	input.fth	/^: buzz?  $/;"	s
+: fizz-buzz?  	input.fth	/^: fizz-buzz?  $/;"	s
+: do-fizz-buzz  	input.fth	/^: do-fizz-buzz  $/;"	s

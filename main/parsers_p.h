@@ -93,6 +93,7 @@
 	ErlangParser, \
 	FalconParser, \
 	FlexParser, \
+	ForthParser, \
 	FortranParser, \
 	FrontMatterParser, \
 	FunctionParametersParser, \

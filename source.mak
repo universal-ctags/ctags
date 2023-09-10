@@ -349,6 +349,7 @@ PARSER_SRCS =				\
 	parsers/erlang.c		\
 	parsers/falcon.c		\
 	parsers/flex.c			\
+	parsers/forth.c		    \
 	parsers/fortran.c		\
 	parsers/frontmatter.c		\
 	parsers/fypp.c			\
