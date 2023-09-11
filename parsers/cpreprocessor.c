@@ -14,6 +14,7 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
+#include <ctype.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -29,6 +30,14 @@
 #include "xtag.h"
 
 #include "cxx/cxx_debug.h"
+
+/* Ideally these four functions should be private in "main" part.
+ * Because the CPreProcessor parser is imperfect as a base parser, the
+ * parser must call them directly. */
+extern subparser* teardownLanguageSubparsersInUse (const langType language);
+extern void setupLanguageSubparsersInUse (const langType language);
+extern void notifyInputStart (void);
+extern void notifyInputEnd   (void);
 
 /*
 *   MACROS
@@ -296,6 +305,9 @@ static void cppInitCommon(langType clientLang,
 		t = getNamedLanguage ("CPreProcessor", 0);
 		initializeParser (t);
 	}
+	pushLanguage(Cpp.lang);
+	setupLanguageSubparsersInUse (Cpp.lang);
+	popLanguage();
 
 	Cpp.clientLang = clientLang;
 	Cpp.ungetBuffer = NULL;
@@ -377,6 +389,10 @@ static void cppInitCommon(langType clientLang,
 								   : clientLang) & CORK_SYMTAB))
 		? makeMacroTable ()
 		: NULL;
+
+	pushLanguage(Cpp.lang);
+	notifyInputStart ();
+	popLanguage();
 }
 
 extern void cppInit (const bool state, const bool hasAtLiteralStrings,
@@ -412,6 +428,10 @@ static void cppClearMacroInUse (cppMacroInfo **pM)
 
 extern void cppTerminate (void)
 {
+	pushLanguage(Cpp.lang);
+	notifyInputEnd ();
+	popLanguage();
+
 	if (Cpp.directive.name != NULL)
 	{
 		vStringDelete (Cpp.directive.name);
@@ -439,6 +459,9 @@ extern void cppTerminate (void)
 		hashTableDelete (Cpp.fileMacroTable);
 		Cpp.fileMacroTable = NULL;
 	}
+	pushLanguage(Cpp.lang);
+	teardownLanguageSubparsersInUse (Cpp.lang);
+	popLanguage();
 }
 
 extern void cppBeginStatement (void)
@@ -1262,30 +1285,135 @@ static Comment isComment (void)
 	return comment;
 }
 
+static cPreProcessorSubparser *notifyLineToSubparsers (cPreProcessorSubparser *sub,
+													   char firstchar,
+													   vString *line,
+													   bool *sentThe1stLine)
+{
+	if (sub == NULL && *sentThe1stLine == true)
+		return NULL;
+
+	if (!*sentThe1stLine)
+	{
+		Assert (sub == NULL);
+
+		subparser *s;
+
+		*sentThe1stLine = true;
+
+		pushLanguage (Cpp.lang);
+		foreachSubparser(s, false)
+		{
+			bool b = false;
+			cPreProcessorSubparser *cpp = (cPreProcessorSubparser *)s;
+			enterSubparser(s);
+			if (cpp->firstLineNotify)
+				b = cpp->firstLineNotify (cpp, firstchar, vStringValue(line));
+			leaveSubparser();
+
+			if (b)
+			{
+				sub = cpp;
+				break;
+			}
+		}
+		popLanguage ();
+		return sub;
+	}
+
+	enterSubparser(&sub->subparser);
+	if (sub->restLineNotify)
+		sub->restLineNotify (sub, vStringValue(line));
+	leaveSubparser();
+	return sub;
+}
+
+static void notifyEndOfComment (cPreProcessorSubparser *cpp)
+{
+	enterSubparser(&cpp->subparser);
+	if (cpp->endOfCommentNotify)
+		cpp->endOfCommentNotify(cpp);
+	leaveSubparser();
+}
+
+static bool isDocCommentStarter(int c)
+{
+	return c == '*';
+}
+
+static bool isWhitespaceOnly (vString *line)
+{
+	const char *c = vStringValue(line);
+
+	while (*c)
+	{
+		if (!isspace((unsigned char) *c)
+			&& !isDocCommentStarter(*c))
+			return false;
+		c++;
+	}
+	return true;
+}
+
 /*  Skips over a C style comment. According to ANSI specification a comment
  *  is treated as white space, so we perform this substitution.
+ *
+ *  As side effects, running subparsers interested in comments.
  */
 static int cppSkipOverCComment (void)
 {
 	int c = cppGetcFromUngetBufferOrFile ();
+	int c0 = 0;
+	vString *line = NULL;
+	bool sentThe1stLine = false;
+	cPreProcessorSubparser *sub = NULL;
+
+
+	if (isDocCommentStarter (c))
+	{
+		c0 = c;
+		c = cppGetcFromUngetBufferOrFile ();
+		if (c0 == '*' && c == '/')
+			return SPACE;
+		cppUngetc (c);
+		c = c0;
+		line = vStringNew ();
+	}
 
 	while (c != EOF)
 	{
-		if (c != '*')
-			c = cppGetcFromUngetBufferOrFile ();
-		else
+		if (c == '*')
 		{
 			const int next = cppGetcFromUngetBufferOrFile ();
 
-			if (next != '/')
-				c = next;
-			else
+			if (next == '/')
 			{
 				c = SPACE;  /* replace comment with space */
 				break;
 			}
+			cppUngetc (next);
 		}
+
+		if (line)
+		{
+			vStringPut (line, c);
+			if (c == '\n')
+			{
+				if (sub || !isWhitespaceOnly (line))
+					sub = notifyLineToSubparsers (sub, c0, line, &sentThe1stLine);
+				vStringClear (line);
+			}
+		}
+		c = cppGetcFromUngetBufferOrFile ();
 	}
+
+	if (line && !vStringIsEmpty(line) && (sub || !isWhitespaceOnly (line)))
+		sub = notifyLineToSubparsers (sub, c0, line, &sentThe1stLine);
+
+	if (sub)
+		notifyEndOfComment (sub);
+
+	vStringDelete (line);		/* NULL is acceptable */
 	return c;
 }
 

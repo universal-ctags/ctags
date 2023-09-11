@@ -364,6 +364,7 @@ PARSER_SRCS =				\
 	parsers/jscript.c		\
 	parsers/json.c			\
 	parsers/julia.c			\
+	parsers/kerneldoc.c		\
 	parsers/ldscript.c		\
 	parsers/lisp.c			\
 	parsers/lua.c			\

@@ -4091,7 +4091,8 @@ static unsigned int parserCorkFlags (parserDefinition *parser)
 	return r;
 }
 
-static void setupLanguageSubparsersInUse (const langType language)
+/* NOTE: Exported only for CPreProcessor */
+extern void setupLanguageSubparsersInUse (const langType language)
 {
 	subparser *tmp;
 
@@ -4105,7 +4106,8 @@ static void setupLanguageSubparsersInUse (const langType language)
 	}
 }
 
-static subparser* teardownLanguageSubparsersInUse (const langType language)
+/* NOTE: Exported only for CPreProcessor */
+extern subparser* teardownLanguageSubparsersInUse (const langType language)
 {
 	subparser *tmp;
 

@@ -1,0 +1,13 @@
+dots in members	input.c	/^ * DOC: dots in members$/;"	doc	language:KernelDoc
+nested_foobar	input.c	/^ * struct nested_foobar - a struct with nested unions and structs$/;"	struct	language:KernelDoc	doc:dots in members
+memb1	input.c	/^ * @memb1: first member of anonymous union\/anonymous struct$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+memb2	input.c	/^ * @memb2: second member of anonymous union\/anonymous struct$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+memb3	input.c	/^ * @memb3: third member of anonymous union\/anonymous struct$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+memb4	input.c	/^ * @memb4: fourth member of anonymous union\/anonymous struct$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+bar	input.c	/^ * @bar: non-anonymous union$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+bar.st1	input.c	/^ * @bar.st1: struct st1 inside @bar$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+bar.st2	input.c	/^ * @bar.st2: struct st2 inside @bar$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+bar.st1.memb1	input.c	/^ * @bar.st1.memb1: first member of struct st1 on union bar$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+bar.st1.memb2	input.c	/^ * @bar.st1.memb2: second member of struct st1 on union bar$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+bar.st2.memb1	input.c	/^ * @bar.st2.memb1: first member of struct st2 on union bar$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar
+bar.st2.memb2	input.c	/^ * @bar.st2.memb2: second member of struct st2 on union bar$/;"	member	language:KernelDoc	struct:dots in members""nested_foobar

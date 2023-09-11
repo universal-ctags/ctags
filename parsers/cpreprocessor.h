@@ -17,6 +17,8 @@
 #include "types.h"
 #include "vstring.h"
 
+#include "subparser.h"
+
 /*
 *   MACROS
 */
@@ -148,5 +150,16 @@ extern vString * cppBuildMacroReplacement(
 extern void cppBuildMacroReplacementWithPtrArrayAndUngetResult(
 		cppMacroInfo * macro,
 		const ptrArray * args);
+
+/* Running a parser inside comments. */
+typedef struct sCPreProcessorSubparser cPreProcessorSubparser;
+
+struct sCPreProcessorSubparser {
+	subparser subparser;
+
+	bool (* firstLineNotify) (cPreProcessorSubparser *s, char firstchar, const char *line);
+	void (* restLineNotify) (cPreProcessorSubparser *s, const char *line);
+	void (* endOfCommentNotify) (cPreProcessorSubparser *s);
+};
 
 #endif  /* CTAGS_MAIN_GET_H */

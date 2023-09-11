@@ -477,6 +477,9 @@
     <ClCompile Include="..\parsers\julia.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\kerneldoc.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\ldscript.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>

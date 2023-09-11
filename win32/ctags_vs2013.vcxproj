@@ -318,6 +318,7 @@
     <ClCompile Include="..\parsers\jscript.c" />
     <ClCompile Include="..\parsers\json.c" />
     <ClCompile Include="..\parsers\julia.c" />
+    <ClCompile Include="..\parsers\kerneldoc.c" />
     <ClCompile Include="..\parsers\ldscript.c" />
     <ClCompile Include="..\parsers\lisp.c" />
     <ClCompile Include="..\parsers\lua.c" />

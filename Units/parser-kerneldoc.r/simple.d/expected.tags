@@ -1,0 +1,29 @@
+simple	input.c	/^ * DOC: simple$/;"	doc	language:KernelDoc
+cpuhp_invoke_callback	input.c	/^ * cpuhp_invoke_callback - Invoke the callbacks for a given state$/;"	unknown	language:KernelDoc	doc:simple
+cpu	input.c	/^ * @cpu:	The cpu for which the callback should be invoked$/;"	parameter	language:KernelDoc	unknown:simple""cpuhp_invoke_callback
+state	input.c	/^ * @state:	The state to do callbacks for$/;"	parameter	language:KernelDoc	unknown:simple""cpuhp_invoke_callback
+bringup	input.c	/^ * @bringup:	True if the bringup callback should be invoked$/;"	parameter	language:KernelDoc	unknown:simple""cpuhp_invoke_callback
+node	input.c	/^ * @node:	For multi-instance, do a single entry callback for install\/remove$/;"	parameter	language:KernelDoc	unknown:simple""cpuhp_invoke_callback
+lastp	input.c	/^ * @lastp:	For multi-instance rollback, remember how far we got$/;"	parameter	language:KernelDoc	unknown:simple""cpuhp_invoke_callback
+ACPI_DEVICE_CLASS	input.c	/^ * ACPI_DEVICE_CLASS - macro used to describe an ACPI device with$/;"	unknown	language:KernelDoc	doc:simple
+_cls 	input.c	/^ * @_cls : the class, subclass, prog-if triple for this device$/;"	parameter	language:KernelDoc	unknown:simple""ACPI_DEVICE_CLASS
+_msk 	input.c	/^ * @_msk : the class mask for this device$/;"	parameter	language:KernelDoc	unknown:simple""ACPI_DEVICE_CLASS
+acpi_dma_spec	input.c	/^ * struct acpi_dma_spec - slave device DMA resources$/;"	struct	language:KernelDoc	doc:simple
+chan_id	input.c	/^ * @chan_id:	channel unique id$/;"	member	language:KernelDoc	struct:simple""acpi_dma_spec
+slave_id	input.c	/^ * @slave_id:	request line unique id$/;"	member	language:KernelDoc	struct:simple""acpi_dma_spec
+dev	input.c	/^ * @dev:	struct device of the DMA controller to be used in the filter$/;"	member	language:KernelDoc	struct:simple""acpi_dma_spec
+dma_cookie_t	input.c	/^ * typedef dma_cookie_t - an opaque DMA cookie$/;"	typedef	language:KernelDoc	doc:simple
+coresight_dev_subtype	input.c	/^ * union coresight_dev_subtype - further characterisation of a type$/;"	union	language:KernelDoc	doc:simple
+sink_subtype	input.c	/^ * @sink_subtype:	type of sink this component is, as defined$/;"	member	language:KernelDoc	union:simple""coresight_dev_subtype
+link_subtype	input.c	/^ * @link_subtype:	type of link this component is, as defined$/;"	member	language:KernelDoc	union:simple""coresight_dev_subtype
+source_subtype	input.c	/^ * @source_subtype:	type of source this component is, as defined$/;"	member	language:KernelDoc	union:simple""coresight_dev_subtype
+helper_subtype	input.c	/^ * @helper_subtype:	type of helper this component is, as defined$/;"	member	language:KernelDoc	union:simple""coresight_dev_subtype
+ect_subtype	input.c	/^ * @ect_subtype:        type of cross trigger this component is, as$/;"	member	language:KernelDoc	union:simple""coresight_dev_subtype
+smp_cond_load_relaxed	input-0.c	/^ * smp_cond_load_relaxed() - (Spin) wait for cond with no ordering guarantees$/;"	function	language:KernelDoc
+ptr	input-0.c	/^ * @ptr: pointer to the variable to wait on$/;"	parameter	language:KernelDoc	function:smp_cond_load_relaxed
+cond	input-0.c	/^ * @cond: boolean expression to wait for$/;"	parameter	language:KernelDoc	function:smp_cond_load_relaxed
+extra test input	input-0.c	/^ * DOC: extra test input$/;"	doc	language:KernelDoc
+kunit_status	input-0.c	/^ * enum kunit_status - Type of result for a test or test suite$/;"	enum	language:KernelDoc	doc:extra test input
+KUNIT_SUCCESS	input-0.c	/^ * @KUNIT_SUCCESS: Denotes the test suite has not failed nor been skipped$/;"	enumerator	language:KernelDoc	enum:extra test input""kunit_status
+KUNIT_FAILURE	input-0.c	/^ * @KUNIT_FAILURE: Denotes the test has failed.$/;"	enumerator	language:KernelDoc	enum:extra test input""kunit_status
+KUNIT_SKIPPED	input-0.c	/^ * @KUNIT_SKIPPED: Denotes the test has been skipped.$/;"	enumerator	language:KernelDoc	enum:extra test input""kunit_status
