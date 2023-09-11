@@ -54,11 +54,7 @@ static void findForthTags (void)
 			vStringCatS(name, (const char *) line);
 //			makeSimpleTag(name, K_SECTION);
 			makeSimpleTag(name, K_FUNCTION);
-		}
-		else {
 			vStringClear (name);
-			if (! isspace(*line))
-				vStringCatS(name, (const char*) line);
 		}
 	}
 	vStringDelete (name);
