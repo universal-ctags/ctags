@@ -21,7 +21,7 @@ jobs:
       BUILDDIR: ${{ matrix.os }}-${{ matrix.compiler }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     # temporarily disabled, because it always fails these days.
     #- name: update package information
