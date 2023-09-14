@@ -1,0 +1,27 @@
+#
+#  Copyright (c) 2023, Eric Forgeot
+#  Copyright (c) 2023, Masatake YAMATO
+#
+#  This source code is released for free distribution under the terms of the
+#  GNU General Public License version 2 or (at your opinion) any later version.
+#
+#  This module contains functions for generating tags for Forth files
+#  https://www.forth.com/starting-forth/1-forth-stacks-dictionary/
+#
+--langdef=Forth
+--map-Forth=+.fth
+--map-Forth=+.forth
+--map-Forth=+.fs
+--map-Forth=+.4th
+
+--map-Forth=+.f
+--__selector-Forth=selectFortranOrForthByForthMarker
+
+--kinddef-Forth=w,word,words
+--kinddef-Forth=v,variable,variables
+--kinddef-Forth=c,constant,constants
+
+--regex-Forth=/^[[:space:]]*\\.*//{exclusive}
+--regex-Forth=/^:[[:space:]]+([^[:space:]]+)/\1/w/{exclusive}
+--regex-Forth=/^variable[[:space:]]+([^[:space:]]+)/\1/v/{exclusive}{icase}
+--regex-Forth=/^[[:alnum:]]+[[:space:]]+constant[[:space:]]+([^[:space:]]+)/\1/c/{exclusive}{icase}

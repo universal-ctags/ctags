@@ -228,6 +228,9 @@
     <ClCompile Include="..\optlib\elixir.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\forth.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\gdbinit.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>

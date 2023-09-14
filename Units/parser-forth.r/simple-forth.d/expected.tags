@@ -1,0 +1,9 @@
+DUMMY1	input.fth	/^10 constant DUMMY1$/;"	c
+DUMMY2	input.fth	/^12 CONSTANT DUMMY2$/;"	c
+dummy3	input.fth	/^variable dummy3$/;"	v
+dummy4	input.fth	/^variable dummy4$/;"	v
+dummy5	input.fth	/^VARIABLE dummy5$/;"	v
+fizz?	input.fth	/^: fizz?  \\ a simple comment $/;"	w
+buzz?	input.fth	/^: buzz?  $/;"	w
+fizz-buzz?	input.fth	/^: fizz-buzz?  $/;"	w
+do-fizz-buzz	input.fth	/^: do-fizz-buzz  $/;"	w

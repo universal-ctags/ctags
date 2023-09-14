@@ -24,6 +24,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "selectors.h"
 #include "vstring.h"
 #include "xtag.h"
 
@@ -2771,6 +2772,9 @@ extern parserDefinition* FortranParser (void)
 #endif
 		NULL
 	};
+	static selectLanguage selectors[] = { selectFortranOrForthByForthMarker,
+					      NULL };
+
 	parserDefinition* def = parserNew ("Fortran");
 	def->kindTable      = FortranKinds;
 	def->kindCount  = ARRAY_SIZE (FortranKinds);
@@ -2784,6 +2788,7 @@ extern parserDefinition* FortranParser (void)
 
 	def->versionCurrent = 1;
 	def->versionAge = 1;
+	def->selectLanguage = selectors;
 
 	return def;
 }

@@ -229,6 +229,7 @@ OPTLIB2C_INPUT = \
 	optlib/cmake.ctags			\
 	optlib/ctags-optlib.ctags		\
 	optlib/elixir.ctags			\
+	optlib/forth.ctags			\
 	optlib/gdbinit.ctags			\
 	optlib/gperf.ctags			\
 	optlib/inko.ctags			\
