@@ -33,15 +33,9 @@ jobs:
             set "XX="
           )
 
-          if "${{ matrix.arch }}" == "x64" (
-            set "TARGET_ARCH=amd64"
-          ) else (
-            set "TARGET_ARCH=x86"
-          )
-
           @echo on
 
-          echo call "C:\Program Files%XX%\Microsoft Visual Studio\${{ matrix.version }}\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %TARGET_ARCH% > nmake-setup.cmd
+          echo call "C:\Program Files%XX%\Microsoft Visual Studio\${{ matrix.version }}\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.arch }} > nmake-setup.cmd
           type nmake-setup.cmd
 
       - name: build libiconv
