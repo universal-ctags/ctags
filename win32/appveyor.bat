@@ -67,11 +67,10 @@ goto :eof
 set MSYS2_ARCH=x86_64
 set MSYS2_DIR=msys64
 set MSYSTEM=MINGW64
-call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %ARCH%
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
 
 :: Build libiconv (MSVC port)
 set ICONV_BUILD_DIR=C:\projects\libiconv
-set "INCLUDE=%INCLUDE%;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
 git clone -q --branch=master --depth=1 https://github.com/koron/libiconv.git %ICONV_BUILD_DIR%
 cd %ICONV_BUILD_DIR%\msvc10
 nmake NODEBUG=1 NOMSVCRT=1
