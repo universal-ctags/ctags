@@ -130,7 +130,7 @@ static void baseDebug(struct parserBaseCtx *auxil, int event, const char *rule, 
 	if (!baseIsDebugRule(auxil, rule))
 		return;
 
-	fprintf(stderr, "<level:%2lu, len:%4lu>[%7s] %10s: ",
+	fprintf(stderr, "<level:%2zu, len:%4zu>[%7s] %10s: ",
 			level, len,
 			event == 0 /*PCC_DBG_EVALUATE*/ ? "eval" :
 			event == 1 /*PCC_DBG_MATCH*/    ? "match":
