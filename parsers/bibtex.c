@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include "debug.h"
+#include "bibtex.h"
 #include "entry.h"
 #include "keyword.h"
 #include "parse.h"
@@ -165,24 +166,6 @@ static void deleteToken (tokenInfo *const token)
 }
 
 /*
- *	 Tag generation functions
- */
-static void makeBibTag (tokenInfo *const token, bibKind kind)
-{
-	if (BibKinds [kind].enabled)
-	{
-		const char *const name = vStringValue (token->string);
-		tagEntryInfo e;
-		initTagEntry (&e, name, kind);
-
-		e.lineNumber   = token->lineNumber;
-		e.filePosition = token->filePosition;
-
-		makeTagEntry (&e);
-	}
-}
-
-/*
  *	 Parsing functions
  */
 
@@ -275,7 +258,7 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
  *	 Scanning functions
  */
 
-static bool parseTag (tokenInfo *const token, bibKind kind)
+static bool parseTag (tokenInfo *const token, bool foreignKeyword, int kind)
 {
 	tokenInfo *	const name = newToken ();
 	vString *		currentid;
@@ -291,7 +274,7 @@ static bool parseTag (tokenInfo *const token, bibKind kind)
 	 * a comma brace for the tag name.
 	 *
 	 */
-	if (isType (token, TOKEN_KEYWORD))
+	if (isType (token, TOKEN_KEYWORD) || foreignKeyword)
 	{
 		copyToken (name, token);
 		if (!readToken (token))
@@ -314,7 +297,7 @@ static bool parseTag (tokenInfo *const token, bibKind kind)
 			if (vStringLength (currentid) > 0)
 			{
 				vStringCopy (name->string, currentid);
-				makeBibTag (name, kind);
+				makeSimpleTag (name->string, kind);
 			}
 		}
 		else
@@ -327,6 +310,34 @@ static bool parseTag (tokenInfo *const token, bibKind kind)
  out:
 	deleteToken (name);
 	vStringDelete (currentid);
+	return eof;
+}
+
+static bool mayParseTokenInSubparser (tokenInfo *const token)
+{
+	bool eof = false;
+	subparser *sub;
+
+	if (*vStringValue (token->string) != '@')
+		return eof;
+
+	foreachSubparser (sub, true)
+	{
+		bibTexSubparser *bibsub = (bibTexSubparser *)sub;
+		if (bibsub->isKeywordForTagging)
+		{
+			int kind;
+			enterSubparser (sub);
+			kind = bibsub->isKeywordForTagging (bibsub,
+												vStringValue (token->string) + 1);
+			if (kind != KIND_GHOST_INDEX)
+				eof = parseTag (token, true, kind);
+			leaveSubparser ();
+			if (kind != KIND_GHOST_INDEX)
+				break;
+		}
+	}
+
 	return eof;
 }
 
@@ -394,7 +405,9 @@ static void parseBibFile (tokenInfo *const token)
 		}
 
 		if (kind != KIND_GHOST_INDEX)
-			eof = parseTag (token, kind);
+			eof = parseTag (token, false, kind);
+		else
+			eof = mayParseTokenInSubparser(token);
 
 	} while (!eof);
 }

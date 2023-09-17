@@ -69,6 +69,7 @@
 	BasicParser, \
 	BatsParser, \
 	BetaParser, \
+	BibLaTeXParser, \
 	BibtexParser, \
 	ClojureParser, \
 	CMakeParser, \

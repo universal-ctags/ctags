@@ -287,6 +287,7 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h \
 	\
+	parsers/bibtex.h \
 	parsers/frontmatter.h \
 	parsers/iniconf.h \
 	parsers/m4.h \
@@ -316,6 +317,7 @@ PARSER_SRCS =				\
 	parsers/basic.c			\
 	parsers/bats.c			\
 	parsers/beta.c			\
+	parsers/biblatex.c		\
 	parsers/bibtex.c		\
 	parsers/c-based.c		\
 	parsers/clojure.c		\
