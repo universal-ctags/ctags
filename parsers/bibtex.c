@@ -339,62 +339,64 @@ static void parseBibFile (tokenInfo *const token)
 		if (!readToken (token))
 			break;
 
+		bibKind kind = KIND_GHOST_INDEX;;
+
 		if (isType (token, TOKEN_KEYWORD))
 		{
 			switch (token->keyword)
 			{
 				case KEYWORD_article:
-					eof = parseTag (token, BIBTAG_ARTICLE);
+					kind = BIBTAG_ARTICLE;
 					break;
 				case KEYWORD_book:
-					eof = parseTag (token, BIBTAG_BOOK);
+					kind = BIBTAG_BOOK;
 					break;
 				case KEYWORD_booklet:
-					eof = parseTag (token, BIBTAG_BOOKLET);
+					kind = BIBTAG_BOOKLET;
 					break;
 				case KEYWORD_conference:
-					eof = parseTag (token, BIBTAG_CONFERENCE);
+					kind = BIBTAG_CONFERENCE;
 					break;
 				case KEYWORD_inbook:
-					eof = parseTag (token, BIBTAG_INBOOK);
+					kind = BIBTAG_INBOOK;
 					break;
 				case KEYWORD_incollection:
-					eof = parseTag (token, BIBTAG_INCOLLECTION);
+					kind = BIBTAG_INCOLLECTION;
 					break;
 				case KEYWORD_inproceedings:
-					eof = parseTag (token, BIBTAG_INPROCEEDINGS);
+					kind = BIBTAG_INPROCEEDINGS;
 					break;
 				case KEYWORD_manual:
-					eof = parseTag (token, BIBTAG_MANUAL);
+					kind = BIBTAG_MANUAL;
 					break;
 				case KEYWORD_mastersthesis:
-					eof = parseTag (token, BIBTAG_MASTERSTHESIS);
+					kind = BIBTAG_MASTERSTHESIS;
 					break;
 				case KEYWORD_misc:
-					eof = parseTag (token, BIBTAG_MISC);
+					kind = BIBTAG_MISC;
 					break;
 				case KEYWORD_phdthesis:
-					eof = parseTag (token, BIBTAG_PHDTHESIS);
+					kind = BIBTAG_PHDTHESIS;
 					break;
 				case KEYWORD_proceedings:
-					eof = parseTag (token, BIBTAG_PROCEEDINGS);
+					kind = BIBTAG_PROCEEDINGS;
 					break;
 				case KEYWORD_string:
-					eof = parseTag (token, BIBTAG_STRING);
+					kind = BIBTAG_STRING;
 					break;
 				case KEYWORD_techreport:
-					eof = parseTag (token, BIBTAG_TECHREPORT);
+					kind = BIBTAG_TECHREPORT;
 					break;
 				case KEYWORD_unpublished:
-					eof = parseTag (token, BIBTAG_UNPUBLISHED);
-					break;
-				default:
+					kind = BIBTAG_UNPUBLISHED;
 					break;
 			}
 		}
-		if (eof)
-			break;
-	} while (true);
+
+		if (kind != KIND_GHOST_INDEX)
+			eof = parseTag (token, kind);
+
+	} while (!eof);
 }
 
 static void initialize (const langType language)
