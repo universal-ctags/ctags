@@ -15,3 +15,4 @@ john_doe	input.bib	/^@string{john_doe = "Prof. Dr. John Doe"}$/;"	s	language:Bib
 xx_thoughts	input.bib	/^@unpublished{xx_thoughts,$/;"	u	language:BibTeX
 hicks:2001	input.bib	/^@Book{hicks:2001,$/;"	b	language:BibTeX
 knuthwebsite	input.bib	/^@online{knuthwebsite,$/;"	V	language:BibLaTeX
+10.1145/605432.605407	input.bib	/^@Article{10.1145\/605432.605407,$/;"	a	language:BibTeX
