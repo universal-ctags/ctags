@@ -398,6 +398,7 @@ The following parsers have been added:
 * Autoconf
 * Automake
 * AutoIt
+* BibLaTeX *BibTeX based subparser*
 * BibTeX
 * Clojure
 * CMake *optlib*

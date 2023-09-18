@@ -270,6 +270,7 @@
     <ClCompile Include="..\parsers\basic.c" />
     <ClCompile Include="..\parsers\bats.c" />
     <ClCompile Include="..\parsers\beta.c" />
+    <ClCompile Include="..\parsers\biblatex.c" />
     <ClCompile Include="..\parsers\bibtex.c" />
     <ClCompile Include="..\parsers\c-based.c" />
     <ClCompile Include="..\parsers\clojure.c" />
@@ -447,6 +448,7 @@
     <ClInclude Include="..\main\xtag.h" />
     <ClInclude Include="..\main\xtag_p.h" />
     <ClInclude Include="..\parsers\autoconf.h" />
+    <ClInclude Include="..\parsers\bibtex.h" />
     <ClInclude Include="..\parsers\cpreprocessor.h" />
     <ClInclude Include="..\parsers\cxx\cxx_debug.h" />
     <ClInclude Include="..\parsers\cxx\cxx_keyword.h" />

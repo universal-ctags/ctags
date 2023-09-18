@@ -1,16 +1,17 @@
-1957-doe_loc_ident	input.bib	/^@article{1957-doe_loc_ident,$/;"	a
-1959-rocket_exploration	input.bib	/^@INPROCEEDINGS{1959-rocket_exploration,$/;"	j
-1960-doe-location_splits	input.bib	/^@incollection{1960-doe-location_splits,$/;"	I
-1960-rocket_deep-exploration	input.bib	/^@conference{1960-rocket_deep-exploration,$/;"	c
-1960_conf_splits	input.bib	/^@proceedings{1960_conf_splits,$/;"	P
-1961-doe-diverse_splits	input.bib	/^@inbook{1961-doe-diverse_splits,$/;"	i
-1961_splits	input.bib	/^@techreport{1961_splits$/;"	t
-doe+rocket	input.bib	/^@Book{doe+rocket,$/;"	b
-doe_mastersth	input.bib	/^@mastersthesis{doe_mastersth,$/;"	M
-doe_mastersth_data	input.bib	/^@misc{doe_mastersth_data,$/;"	n
-doe_phd	input.bib	/^@phdthesis{doe_phd,$/;"	p
-hicks:2001	input.bib	/^@Book{hicks:2001,$/;"	b
-john_doe	input.bib	/^@string{john_doe = "Prof. Dr. John Doe"}$/;"	s
-man_loc_splits	input.bib	/^@manual{man_loc_splits,$/;"	m
-tiny_collect	input.bib	/^@booklet{tiny_collect,$/;"	B
-xx_thoughts	input.bib	/^@unpublished{xx_thoughts,$/;"	u
+1957-doe_loc_ident	input.bib	/^@article{1957-doe_loc_ident,$/;"	a	language:BibTeX
+doe+rocket	input.bib	/^@Book{doe+rocket,$/;"	b	language:BibTeX
+tiny_collect	input.bib	/^@booklet{tiny_collect,$/;"	B	language:BibTeX
+1960-rocket_deep-exploration	input.bib	/^@conference{1960-rocket_deep-exploration,$/;"	c	language:BibTeX
+1961-doe-diverse_splits	input.bib	/^@inbook{1961-doe-diverse_splits,$/;"	i	language:BibTeX
+1960-doe-location_splits	input.bib	/^@incollection{1960-doe-location_splits,$/;"	I	language:BibTeX
+1959-rocket_exploration	input.bib	/^@INPROCEEDINGS{1959-rocket_exploration,$/;"	j	language:BibTeX
+man_loc_splits	input.bib	/^@manual{man_loc_splits,$/;"	m	language:BibTeX
+doe_mastersth	input.bib	/^@mastersthesis{doe_mastersth,$/;"	M	language:BibTeX
+doe_mastersth_data	input.bib	/^@misc{doe_mastersth_data,$/;"	n	language:BibTeX
+doe_phd	input.bib	/^@phdthesis{doe_phd,$/;"	p	language:BibTeX
+1960_conf_splits	input.bib	/^@proceedings{1960_conf_splits,$/;"	P	language:BibTeX
+john_doe	input.bib	/^@string{john_doe = "Prof. Dr. John Doe"}$/;"	s	language:BibTeX
+1961_splits	input.bib	/^@techreport{1961_splits$/;"	t	language:BibTeX
+xx_thoughts	input.bib	/^@unpublished{xx_thoughts,$/;"	u	language:BibTeX
+hicks:2001	input.bib	/^@Book{hicks:2001,$/;"	b	language:BibTeX
+knuthwebsite	input.bib	/^@online{knuthwebsite,$/;"	V	language:BibLaTeX
