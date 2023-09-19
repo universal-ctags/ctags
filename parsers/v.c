@@ -1288,6 +1288,8 @@ static void parseInit (tokenInfo *const token, int scope)
 						}
 					}
 				}
+				else
+					readToken(token);
 			}
 		}
 	}
