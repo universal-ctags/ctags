@@ -16,6 +16,7 @@ environment:
     #   MSYSTEM: MINGW32
     - compiler: msvc
       ARCH: x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
     #- compiler: msvc
     #  ARCH: x86
     - compiler: mingw
