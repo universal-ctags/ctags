@@ -833,7 +833,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 					c = getcFromInputFile ();
 					captureChar (capture, token, c);
 				}
-				while (c != end);
+				while (c != end && c != EOF);
 				vStringDelete (token->string);
 				token->string = NULL;
 				token->type = TOKEN_IMMEDIATE; // raw string
