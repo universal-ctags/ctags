@@ -854,6 +854,9 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 
 static void unreadTokenFull (tokenInfo *const token, vString *const acc)
 {
+	if (token->type == TOKEN_EOF) {
+		return;
+	}
 	Assert (PS->numReplays < MAX_REPLAYS);
 	DebugStatement (
 		// multiple-replay in only possible where additional tokenInfos are
