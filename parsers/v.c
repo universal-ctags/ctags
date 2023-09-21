@@ -414,7 +414,7 @@ static bool parseVType (tokenInfo *const, vString *const, int, bool, bool);
 static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
 	tokenInfo *token = xMalloc (1, tokenInfo);
-	token->string = NULL;
+	token->string = vStringNew();
 #ifdef DEBUG
 	token->id = PS->nextTokenId++;
 #endif
@@ -434,8 +434,7 @@ static void clearPoolToken (void *data)
 
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
-	vStringDelete (token->string);
-	token->string = NULL;
+	vStringClear (token->string);
 	token->fullyQualified = false;
 	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
@@ -447,8 +446,7 @@ static void copyToken (tokenInfo *const dst, tokenInfo *const src)
 {
 	dst->type = src->type;
 	dst->keyword = src->keyword;
-	vStringDelete (dst->string);
-	dst->string = src->string? vStringNewCopy (src->string) : NULL;
+	vStringCopy (dst->string, src->string);
 	dst->fullyQualified = src->fullyQualified;
 	dst->lineNumber = src->lineNumber;
 	dst->filePosition = src->filePosition;
@@ -575,9 +573,8 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		deleteToken (PS->replays[PS->numReplays].token);
 		vDebugParserPrintf (
 			"˅%s%s%s%s%s ", token->id > 1? "[" : "", tokenNames[token->type],
-			(token->string && !vStringIsEmpty (token->string))? ":" : "",
-			token->string? vStringValue (token->string) : "",
-			token->id > 1? "]" : "");
+			!vStringIsEmpty (token->string)? ":" : "",
+			vStringValue (token->string), token->id > 1? "]" : "");
 		if (capture)
 		{
 			Assert (PS->replays[PS->numReplays].capture);
@@ -620,8 +617,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	// init token
 	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
-	vStringDelete (token->string);
-	token->string = NULL;
+	vStringClear (token->string);
 	token->captureLen = 0;
 	token->onNewline = skippedNewline;
 	token->keyword = KEYWORD_NONE;
@@ -784,7 +780,6 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		if (isSubsequentIdent (peekcFromInputFile ()))
 		{
 			token->type = TOKEN_IDENT;
-			token->string = vStringNew ();
 			bool more;
 			do
 			{
@@ -802,7 +797,6 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 	}
 	else if (isInitialIdent (c))
 	{
-		token->string = vStringNew ();
 		bool more;
 		do
 		{
@@ -834,8 +828,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 					captureChar (capture, token, c);
 				}
 				while (c != end && c != EOF);
-				vStringDelete (token->string);
-				token->string = NULL;
+				vStringClear (token->string);
 				token->type = TOKEN_IMMEDIATE; // raw string
 			}
 			else
@@ -853,9 +846,8 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 
 	vDebugParserPrintf (
 		"%s%s%s%s%s ", token->id > 1? "[" : "", tokenNames[token->type],
-		(token->string && !vStringIsEmpty (token->string))? ":" : "",
-		token->string? vStringValue (token->string) : "",
-		token->id > 1? "]" : "");
+		!vStringIsEmpty (token->string)? ":" : "",
+		vStringValue (token->string), token->id > 1? "]" : "");
 
 	PS->lastTokenType = token->type;
 }
@@ -950,14 +942,12 @@ static int makeTagFull (tokenInfo *const token, const char *name,
 {
 	Assert (token);
 	Assert (name == NULL || name[0] != '\0');
-	Assert (name != NULL || (token->string != NULL &&
-							 vStringLength (token->string) > 0));
+	Assert (name != NULL || !vStringIsEmpty(token->string));
 	vDebugParserPrintf ("#%c ", VKinds[kind].letter);
 
 	tagEntryInfo e;
 
-	const char *const tagName =
-		name? name : (token->string? vStringValue (token->string) : "");
+	const char *const tagName = name? name : vStringValue (token->string);
 	if (!strcmp (tagName, "_"))
 		return CORK_NIL; // ignore _
 	initRefTagEntry (&e, tagName, kind, role);
@@ -1114,7 +1104,7 @@ static int lookupQualifiedName (tokenInfo *const token, vString *name,
 {
 	Assert (token);
 	Assert (!name || vStringLength (name) > 0);
-	Assert (name || (token->string && vStringLength (token->string) > 0));
+	Assert (name || !vStringIsEmpty (token->string));
 
 	vString *tmp = vStringNewCopy (name? name : token->string);
 	char *part, *next = vStringValue (tmp);
@@ -1164,19 +1154,14 @@ static int lookupQualifiedName (tokenInfo *const token, vString *name,
 static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 {
 	Assert (isToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_EXTERN));
-	Assert (!captureInToken || token->string);
 	if (token->fullyQualified)
 		return;
 	PARSER_PROLOGUE ("fq");
 
-	bool isExtern = false;
-	if (token->string)
-	{
-		const char *s = vStringValue (token->string);
-		isExtern =
-			(s[0] == 'C' && (s[1] == '\0' || s[1] == '.')) ||
-			(s[0] == 'J' && s[1] == 'S' && (s[2] == '\0' || s[2] == '.'));
-	}
+	const char *s = vStringValue (token->string);
+	bool isExtern =
+		(s[0] == 'C' && (s[1] == '\0' || s[1] == '.')) ||
+		(s[0] == 'J' && s[1] == 'S' && (s[2] == '\0' || s[2] == '.'));
 	vString *acc = captureInToken? token->string : NULL;
 	tokenType prev = TOKEN_NONE, prevprev = TOKEN_NONE;
 	tokenInfo *tokens[2] = { NULL, NULL };
@@ -1226,7 +1211,7 @@ static void parseFQIdent (tokenInfo *const token, vString *const capture)
 	Assert (isToken (token, TOKEN_IDENT, TOKEN_TYPE, TOKEN_EXTERN));
 	parseFullyQualified (token, !!capture);
 	expectToken (token, TOKEN_IDENT, TOKEN_EXTERN);
-	if (capture && token->string)
+	if (capture)
 		vStringCat (capture, token->string);
 }
 
@@ -1478,8 +1463,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 			if (expectToken (token, TOKEN_IDENT))
 			{
 				rxToken = dupToken (token);
-				receiver = token->string;
-				token->string = NULL;
+				receiver = vStringNewCopy (token->string);
 
 				readTokenFull (token, acc);
 				if (isToken (token, TOKEN_ASTERISK))
@@ -1510,10 +1494,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 			expectKeyword (token, KEYWORD_TYPE, KEYWORD_map))))
 	{
 		if (isToken (token, TOKEN_KEYWORD))
-		{
-			name = token->string;
-			token->string = NULL;
-		}
+			name = vStringNewCopy (token->string);
 		else if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
 		{
 			name = vStringNew ();
@@ -1797,8 +1778,7 @@ static void parseImport (tokenInfo *const token)
 			if (expectToken (token, TOKEN_IDENT))
 			{
 				vStringDelete (moduleName);
-				moduleName = token->string;
-				token->string = NULL;
+				moduleName = vStringNewCopy (token->string);
 			}
 			readToken (token);
 		}
@@ -2264,8 +2244,7 @@ static void parseExprList (tokenInfo *const token, int scope,
 	{
 		tokenInfo *identToken = dupToken (token);
 		vString *accesses = accesses = access? access : vStringNew ();
-		vString *idents = token->string;
-		token->string = NULL;
+		vString *idents = vStringNewCopy (token->string);
 		readToken (token);
 		if (isToken (token, TOKEN_COMMA))
 		{
