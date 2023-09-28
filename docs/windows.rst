@@ -18,7 +18,7 @@ Microsoft Visual Studio
 .............................................................................
 https://www.visualstudio.com/
 
-Obviously there is Microsoft Visual Studio 2013. Many professional developers targeting Windows use Visual Studio. Visual Studio comes in a couple of different editions. Their Express and Community editions are free to use, but a Microsoft-account is required to download the .iso and when you want to continue using it after a 30-days trial period. Other editions of Visual Studio must be purchased.
+Many professional developers targeting Windows use Visual Studio. Visual Studio comes in a couple of different editions. Their Express and Community editions are free to use, but a Microsoft-account is required to download the .iso and when you want to continue using it after a 30-days trial period. Other editions of Visual Studio must be purchased.
 
 Installing Visual Studio will give you the IDE, the command line compilers and the MS-version of make named nmake.
 
@@ -46,7 +46,48 @@ Building ctags from the command line
 Microsoft Visual Studio
 .............................................................................
 
-Most users of Visual Studio will use the IDE and not the command line to compile a project. But by default a shortcut to the command prompt that sets the proper path is installed in the Start Menu. When this command prompt is used ``nmake -f mk_mvc.mak`` will compile ctags. You can also go into the ``win32`` subdirectory and run ``msbuild ctags_vs2013.sln`` for the default build. Use ``msbuild ctags_vs2013.sln /p:Configuration=Release`` to specifically build a release build. MSBuild is what the IDE uses internally and therefore will produce the same files as the IDE.
+Microsoft Visual Studio provides ``Visual Studio Developer Command Prompt`` for command-line enthusiasts.
+
+There are two ways to setup ``Visual Studio Developer Command Prompt``.
+
+The first way to setup ``Visual Studio Developer Command Prompt`` is by clicking the ``Windows Start Menu``, details please refer to https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2019
+
+The second way to setup ``Visual Studio Developer Command Prompt`` is opening ``Command Prompt`` Application and calling ``vcvarsall.bat`` in current ``Command Prompt``.
+
+The location of ``vcvarsall.bat`` is various for different Microsoft Visual Studio versions and editions.
+
+For Microsoft Visual Studio 2022 Enterprise::
+
+        C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat
+
+For Microsoft Visual Studio 2022 Community::
+
+        C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat
+
+For Microsoft Visual Studio 2019 Enterprise::
+
+        C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat
+
+For Microsoft Visual Studio 2019 Community::
+
+        C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat
+
+Following is an example shows you how to use ``vcvarsall.bat`` to setup ``Visual Studio Developer Command Prompt``::
+
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+
+For more details about ``vcvarsall.bat`` please refer to https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-160
+
+Once ``Visual Studio Developer Command Prompt`` is setup, you can build ctags with ``NMake`` or ``MSBuild``.
+
+Building ctags with NMake
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This requires Microsoft Visual Studio 2019 or later.
+
+The simplest build instructions like below::
+
+        nmake -f mk_mvc.mak
 
 If you want to build an iconv enabled version, you must specify ``WITH_ICONV=yes`` and ``ICONV_DIR`` like below::
 
@@ -60,6 +101,29 @@ If you want to create PDB files for debugging even for a release version, you mu
 
         nmake -f mk_mvc.mak PDB=1
 
+Building ctags with MSBuild
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This supports only Microsoft Visual Studio 2013.
+
+Before starting to build, you need to copy somes file to proper location::
+
+        copy win32\config_mvc.h config.h
+        copy win32\gnulib_h\langinfo.h gnulib
+        copy win32\gnulib_h\fnmatch.h gnulib
+
+The simplest build instruction like below::
+
+        msbuild win32\ctags_vs2013.sln
+
+If you want to build a release version, run command like below::
+
+        msbuild win32\ctags_vs2013.sln /p:Configuration=Release
+
+MSBuild is what the IDE uses internally and therefore will produce the same files as the IDE.
+
+For more information about MSBuild, please refer to https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild?view=vs-2019
+
 GCC
 .............................................................................
 
@@ -70,19 +134,6 @@ All the GCC's come with installers or with zipped archives. Install or extract t
 GNU Make builds for Win32 are available as well, and sometimes are included with the compilers. Make sure it is in your path, for instance by copying the make.exe in the bin directory of your compiler.
 
 Native win32 versions of the GNU/Linux commands cp, rm and mv can be useful. rm is almost always used in by the ``clean`` target of a makefile.
-
-
-**CMD**
-
-Any Windows includes a command prompt. Not the most advanced, but it is enough to do the build tasks. Make sure the path is set properly and ``make -f mk_mingw.mak`` should do the trick.
-
-If you want to build an iconv enabled version, you must specify ``WITH_ICONV=yes`` like below::
-
-        make -f mk_mingw.mak WITH_ICONV=yes
-
-If you want to build a debug version, you must specify ``DEBUG=1`` like below::
-
-        make -f mk_mingw.mak DEBUG=1
 
 **MSYS2**
 
@@ -146,7 +197,7 @@ All major distributions have both MinGW and MinGW-w64 packages. Cross-compiling 
 Building ctags with IDEs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-I have no idea how things work for most GNU/Linux developers, but most Windows developers are used to IDEs. Not many use a command prompt and running the debugger from the command line is not a thing a Windows developers would normally do. Many IDEs exist for Windows, I use the two below.
+I have no idea how things work for the most GNU/Linux developers, but most of Windows developers prefer to use IDE over command prompt, running the debugger from the command line is not a thing a Windows developers would normally do. Many IDEs exist for Windows, I use the two below.
 
 Microsoft Visual Studio
 .............................................................................
