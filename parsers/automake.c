@@ -91,11 +91,6 @@ struct sBlacklist {
 	enum { BL_END, BL_PREFIX } type;
 	const char* substr;
 	size_t len;
-} am_blacklist [] = {
-	{ BL_PREFIX, "EXTRA",  5 },
-	{ BL_PREFIX, "noinst", 6 },
-	{ BL_PREFIX, "check",  5 },
-	{ BL_END,    NULL,     0 },
 };
 
 struct sAutomakeSubparser {
@@ -152,12 +147,19 @@ static void addAutomakeDirectory (hashTable* directories, vString *const name, i
 
 static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 							 char* name, const char* suffix, bool appending,
-							 int kindex, int rindex, struct sBlacklist *blacklist)
+							 int kindex, int rindex)
 {
 	size_t expected_len;
 	size_t len;
 	char* tail;
 	vString *subname;
+
+	static struct sBlacklist dir_blacklist [] = {
+		{ BL_PREFIX, "EXTRA",  5 },
+		{ BL_PREFIX, "noinst", 6 },
+		{ BL_PREFIX, "check",  5 },
+		{ BL_END,    NULL,     0 },
+	};
 
 	len = strlen (name);
 	expected_len = strlen (suffix);
@@ -165,7 +167,7 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	if (len <= expected_len)
 		return false;
 
-	if (bl_check(name, blacklist, NULL) == false)
+	if (bl_check(name, dir_blacklist, NULL) == false)
 		return false;
 
 	tail = name + len - expected_len;
@@ -298,25 +300,25 @@ static void newMacroCallback (makeSubparser *make, char* name, bool with_define_
 	(void)(0
 	       || automakeMakeTag (automake,
 							   name, "dir", appending,
-							   K_AM_DIR, ROLE_DEFINITION_INDEX, am_blacklist)
+							   K_AM_DIR, ROLE_DEFINITION_INDEX)
 	       || automakeMakeTag (automake,
 							   name, "_PROGRAMS", appending,
-							   K_AM_DIR, R_AM_DIR_PROGRAMS, am_blacklist)
+							   K_AM_DIR, R_AM_DIR_PROGRAMS)
 	       || automakeMakeTag (automake,
 							   name, "_MANS", appending,
-							   K_AM_DIR, R_AM_DIR_MANS, am_blacklist)
+							   K_AM_DIR, R_AM_DIR_MANS)
 	       || automakeMakeTag (automake,
 							   name, "_LTLIBRARIES", appending,
-							   K_AM_DIR, R_AM_DIR_LTLIBRARIES, am_blacklist)
+							   K_AM_DIR, R_AM_DIR_LTLIBRARIES)
 	       || automakeMakeTag (automake,
 							   name, "_LIBRARIES", appending,
-							   K_AM_DIR, R_AM_DIR_LIBRARIES, am_blacklist)
+							   K_AM_DIR, R_AM_DIR_LIBRARIES)
 	       || automakeMakeTag (automake,
 							   name, "_SCRIPTS", appending,
-							   K_AM_DIR, R_AM_DIR_SCRIPTS, am_blacklist)
+							   K_AM_DIR, R_AM_DIR_SCRIPTS)
 	       || automakeMakeTag  (automake,
 								name, "_DATA", appending,
-								K_AM_DIR, R_AM_DIR_DATA, am_blacklist)
+								K_AM_DIR, R_AM_DIR_DATA)
 		);
 }
 
