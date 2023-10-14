@@ -87,6 +87,18 @@ static kindDefinition AutomakeKinds [] = {
 	{ true, 's', "subdir", "subdirs" },
 };
 
+typedef enum {
+	X_CANONICALIZED_NAME,
+} automakeXtag;
+
+static xtagDefinition AutomakeXtagTable [] = {
+	{
+		.enabled = true,
+		.name = "canonicalizedName",
+		.description = "Include canonicalized object name like libctags_a",
+	},
+};
+
 struct sBlacklist {
 	enum { BL_END, BL_PREFIX } type;
 	const char* substr;
@@ -232,6 +244,33 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	return true;
 }
 
+static void canonicalizeName (vString *dst, const char *name)
+{
+	while (*name)
+	{
+		if (isalnum ((unsigned char) *name) ||
+			*name == '_' || *name == '@')
+			vStringPut (dst, *name);
+		else
+			vStringPut (dst, '_');
+		name++;
+	}
+}
+
+static void makeCanonicalizedTag (tagEntryInfo *e, const char *name)
+{
+	vString *xname = vStringNew ();
+
+	canonicalizeName (xname, name);
+	e->name = vStringValue (xname);
+	if (strcmp(e->name, name))
+	{
+		makeTagEntry (e);
+		markTagExtraBit (e, AutomakeXtagTable[X_CANONICALIZED_NAME].xtype);
+	}
+	vStringDelete (xname);
+}
+
 static void valueCallback (makeSubparser *make, char *name)
 {
 	struct sAutomakeSubparser *automake = (struct sAutomakeSubparser *)make;
@@ -254,6 +293,10 @@ static void valueCallback (makeSubparser *make, char *name)
 		if (!parent->placeholder)
 			elt.extensionFields.scopeIndex = p;
 		makeTagEntry (&elt);
+
+		if (isXtagEnabled (AutomakeXtagTable[X_CANONICALIZED_NAME].xtype)
+			&& (k == K_AM_PROGRAM || k == K_AM_LTLIBRARY || k == K_AM_LIBRARY))
+			makeCanonicalizedTag (&elt, name);
 	}
 	else if (automake->in_subdirs)
 	{
@@ -406,6 +449,10 @@ extern parserDefinition* AutomakeParser (void)
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser     = findAutomakeTags;
+	def->xtagTable = AutomakeXtagTable;
+	def->xtagCount = ARRAY_SIZE (AutomakeXtagTable);
 	def->useCork    = CORK_QUEUE;
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	return def;
 }
