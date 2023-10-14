@@ -156,36 +156,52 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	size_t prefix_len;
 	bool placeholder = false;
 
+	expected_len = strlen (suffix);
+
+	/* Drop "dist" in "dist_data_DATA" */
+	size_t uscore_len_ = 0;
+	const static struct sBlacklist obj_blacklist [] = {
+		{ BL_PREFIX, "dist",    4 },
+		{ BL_PREFIX, "nodist",  6 },
+		{ BL_PREFIX, "nobase",  6 },
+		{ BL_PREFIX, "notrans", 7 },
+		{ BL_END,    NULL,      0 },
+	};
+	while (bl_check(name + uscore_len_, obj_blacklist, &prefix_len) == false)
+	{
+		name += (uscore_len_ + prefix_len);
+		uscore_len_ =  (name [0] == '_')? 1: 0;
+	}
+	/* => _data_DATA */
+
 	const static struct sBlacklist dir_blacklist [] = {
 		{ BL_PREFIX, "EXTRA",  5 },
 		{ BL_PREFIX, "noinst", 6 },
 		{ BL_PREFIX, "check",  5 },
 		{ BL_END,    NULL,     0 },
 	};
-
-	expected_len = strlen (suffix);
-
-	if (bl_check(name, dir_blacklist, &prefix_len) == false)
+	uscore_len_ =  (name [0] == '_')? 1: 0;
+	if (bl_check(name + uscore_len_, dir_blacklist, &prefix_len) == false)
 	{
 		placeholder = true;
-		name += prefix_len;
+		name += (uscore_len_ + prefix_len);
 	}
 
 	len = strlen (name);
 	if (len < expected_len)
 		return false;
+	else if (len > expected_len && name[0] == '_')
+	{
+		name++;
+		len--;
+		/* _data_DATA => data_DATA */
+	}
 
 	tail = name + len - expected_len;
 	if (strcmp (tail, suffix))
 		return false;
 
-	subname = vStringNew();
-
-	/* ??? dist, nodist, nobase, notrans,... */
-	if (strncmp (name, "dist_", 5) == 0)
-		vStringNCopyS(subname, name + 5, len - expected_len - 5);
-	else
-		vStringNCopyS(subname, name, len - expected_len);
+	subname = vStringNewNInit(name, len - expected_len);
 
 	if (rindex == ROLE_DEFINITION_INDEX)
 	{

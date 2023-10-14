@@ -1,0 +1,17 @@
+dist_data_DATA	input.am	/^dist_data_DATA = distribute-this$/;"	kind:macro	language:Make	roles:def
+data	input.am	/^dist_data_DATA = distribute-this$/;"	kind:directory	language:Automake	roles:data	extras:reference,subparser
+distribute-this	input.am	/^dist_data_DATA = distribute-this$/;"	kind:data	language:Automake	scope:directory:data	roles:def	extras:subparser
+bin_PROGRAMS	input.am	/^bin_PROGRAMS = foo$/;"	kind:macro	language:Make	roles:def
+bin	input.am	/^bin_PROGRAMS = foo$/;"	kind:directory	language:Automake	roles:program	extras:reference,subparser
+foo	input.am	/^bin_PROGRAMS = foo$/;"	kind:program	language:Automake	scope:directory:bin	roles:def	extras:subparser
+nodist_foo_SOURCES	input.am	/^nodist_foo_SOURCES = do-not-distribute.c$/;"	kind:macro	language:Make	roles:def
+nobase_include_HEADERS	input.am	/^nobase_include_HEADERS = sys\/types.h$/;"	kind:macro	language:Make	roles:def
+man_MANS	input.am	/^man_MANS = foo.1$/;"	kind:macro	language:Make	roles:def
+man	input.am	/^man_MANS = foo.1$/;"	kind:directory	language:Automake	roles:man	extras:reference,subparser
+foo.1	input.am	/^man_MANS = foo.1$/;"	kind:man	language:Automake	scope:directory:man	roles:def	extras:subparser
+notrans_man_MANS	input.am	/^notrans_man_MANS = foo.3$/;"	kind:macro	language:Make	roles:def
+man	input.am	/^notrans_man_MANS = foo.3$/;"	kind:directory	language:Automake	roles:man	extras:reference,subparser
+foo.3	input.am	/^notrans_man_MANS = foo.3$/;"	kind:man	language:Automake	scope:directory:man	roles:def	extras:subparser
+notrans_dist_man3_MANS	input.am	/^notrans_dist_man3_MANS = bar.3$/;"	kind:macro	language:Make	roles:def
+man3	input.am	/^notrans_dist_man3_MANS = bar.3$/;"	kind:directory	language:Automake	roles:man	extras:reference,subparser
+bar.3	input.am	/^notrans_dist_man3_MANS = bar.3$/;"	kind:man	language:Automake	scope:directory:man3	roles:def	extras:subparser
