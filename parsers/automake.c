@@ -102,7 +102,7 @@ struct sAutomakeSubparser {
 };
 
 
-static bool bl_check0 (const char *name, struct sBlacklist *blacklist)
+static bool bl_check0 (const char *name, const struct sBlacklist *blacklist)
 {
 	if ((blacklist->type == BL_PREFIX) &&
 	    (strncmp (blacklist->substr, name, blacklist->len) == 0))
@@ -111,7 +111,7 @@ static bool bl_check0 (const char *name, struct sBlacklist *blacklist)
 		return true;
 }
 
-static bool bl_check (const char *name, struct sBlacklist *blacklist, size_t *prefix_len)
+static bool bl_check (const char *name, const struct sBlacklist *blacklist, size_t *prefix_len)
 {
 	for (int i = 0; blacklist[i].type != BL_END; i++)
 	{
@@ -154,7 +154,7 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	char* tail;
 	vString *subname;
 
-	static struct sBlacklist dir_blacklist [] = {
+	const static struct sBlacklist dir_blacklist [] = {
 		{ BL_PREFIX, "EXTRA",  5 },
 		{ BL_PREFIX, "noinst", 6 },
 		{ BL_PREFIX, "check",  5 },
