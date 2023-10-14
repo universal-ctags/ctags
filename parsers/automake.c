@@ -116,12 +116,16 @@ static bool bl_check0 (const char *name, struct sBlacklist *blacklist)
 		return true;
 }
 
-static bool bl_check (const char *name, struct sBlacklist *blacklist)
+static bool bl_check (const char *name, struct sBlacklist *blacklist, size_t *prefix_len)
 {
 	for (int i = 0; blacklist[i].type != BL_END; i++)
 	{
 		if (bl_check0 (name, blacklist + i) == false)
+		{
+			if (prefix_len)
+				*prefix_len = blacklist [i].len;
 			return false;
+		}
 	}
 	return true;
 }
@@ -161,7 +165,7 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	if (len <= expected_len)
 		return false;
 
-	if (bl_check(name, blacklist) == false)
+	if (bl_check(name, blacklist, NULL) == false)
 		return false;
 
 	tail = name + len - expected_len;
