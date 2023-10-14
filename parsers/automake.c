@@ -153,6 +153,8 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	size_t len;
 	char* tail;
 	vString *subname;
+	size_t prefix_len;
+	bool placeholder = false;
 
 	const static struct sBlacklist dir_blacklist [] = {
 		{ BL_PREFIX, "EXTRA",  5 },
@@ -161,13 +163,16 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 		{ BL_END,    NULL,     0 },
 	};
 
-	len = strlen (name);
 	expected_len = strlen (suffix);
 
-	if (len <= expected_len)
-		return false;
+	if (bl_check(name, dir_blacklist, &prefix_len) == false)
+	{
+		placeholder = true;
+		name += prefix_len;
+	}
 
-	if (bl_check(name, dir_blacklist, NULL) == false)
+	len = strlen (name);
+	if (len < expected_len)
 		return false;
 
 	tail = name + len - expected_len;
@@ -194,7 +199,17 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 			automake->index = lookupAutomakeDirectory (automake->directories, subname);
 
 		if ((!appending) || (automake->index == CORK_NIL))
+		{
+			if (placeholder && vStringIsEmpty (subname))
+				vStringCatS(subname, "DUMMY");
 			automake->index = makeSimpleRefTag (subname, kindex, rindex);
+			if (placeholder)
+			{
+				tagEntryInfo *e = getEntryInCorkQueue (automake->index);
+				if (e)
+					e->placeholder = 1;
+			}
+		}
 	}
 
 	vStringDelete (subname);
@@ -220,7 +235,8 @@ static void valueCallback (makeSubparser *make, char *name)
 
 		k = K_AM_PROGRAM + roleIndex;
 		initTagEntry (&elt, name, k);
-		elt.extensionFields.scopeIndex = p;
+		if (!parent->placeholder)
+			elt.extensionFields.scopeIndex = p;
 		makeTagEntry (&elt);
 	}
 	else if (automake->in_subdirs)

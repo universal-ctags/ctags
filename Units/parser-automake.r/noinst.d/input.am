@@ -1,0 +1,3 @@
+check_LIBRARIES = libt0.a libt1.a
+check_PROGRAMS = testprog0  testprog1
+EXTRA_PROGRAMS = xprog0 xprog1
