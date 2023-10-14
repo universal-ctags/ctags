@@ -107,13 +107,23 @@ struct sAutomakeSubparser {
 };
 
 
-static bool bl_check (const char *name, struct sBlacklist *blacklist)
+static bool bl_check0 (const char *name, struct sBlacklist *blacklist)
 {
 	if ((blacklist->type == BL_PREFIX) &&
 	    (strncmp (blacklist->substr, name, blacklist->len) == 0))
 		return false;
 	else
 		return true;
+}
+
+static bool bl_check (const char *name, struct sBlacklist *blacklist)
+{
+	for (int i = 0; blacklist[i].type != BL_END; i++)
+	{
+		if (bl_check0 (name, blacklist + i) == false)
+			return false;
+	}
+	return true;
 }
 
 static int lookupAutomakeDirectory (hashTable* directories,  vString *const name)
@@ -144,7 +154,6 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	size_t len;
 	char* tail;
 	vString *subname;
-	int i;
 
 	len = strlen (name);
 	expected_len = strlen (suffix);
@@ -152,11 +161,8 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	if (len <= expected_len)
 		return false;
 
-	for (i = 0; blacklist[i].type != BL_END; i++)
-	{
-		if (bl_check (name, blacklist + i) == false)
-			return false;
-	}
+	if (bl_check(name, blacklist) == false)
+		return false;
 
 	tail = name + len - expected_len;
 	if (strcmp (tail, suffix))
