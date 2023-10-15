@@ -16,6 +16,12 @@ Automake       d/directory       ltlibrary          on      directory for LTLIBR
 Automake       d/directory       man                on      directory for MANS primary
 Automake       d/directory       program            on      directory for PROGRAMS primary
 Automake       d/directory       script             on      directory for SCRIPTS primary
+Automake       p/pseudodir       data               on      directory for DATA primary
+Automake       p/pseudodir       library            on      directory for LIBRARIES primary
+Automake       p/pseudodir       ltlibrary          on      directory for LTLIBRARIES primary
+Automake       p/pseudodir       man                on      directory for MANS primary
+Automake       p/pseudodir       program            on      directory for PROGRAMS primary
+Automake       p/pseudodir       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
@@ -136,6 +142,12 @@ Automake       d/directory       ltlibrary          on      directory for LTLIBR
 Automake       d/directory       man                on      directory for MANS primary
 Automake       d/directory       program            on      directory for PROGRAMS primary
 Automake       d/directory       script             on      directory for SCRIPTS primary
+Automake       p/pseudodir       data               on      directory for DATA primary
+Automake       p/pseudodir       library            on      directory for LIBRARIES primary
+Automake       p/pseudodir       ltlibrary          on      directory for LTLIBRARIES primary
+Automake       p/pseudodir       man                on      directory for MANS primary
+Automake       p/pseudodir       program            on      directory for PROGRAMS primary
+Automake       p/pseudodir       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions

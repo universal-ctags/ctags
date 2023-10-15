@@ -27,6 +27,7 @@ Change since "0.0"
 ~~~~~~~~~~~~~~~~~~
 
 * Add ``canonicalizedName`` extra.
+* Add ``pseudodir`` kind.
 
 SEE ALSO
 --------

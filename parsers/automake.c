@@ -35,6 +35,7 @@ typedef enum {
 	K_AM_DATA,
 	K_AM_CONDITION,
 	K_AM_SUBDIR,
+	K_AM_PSEUDODIR,
 } makeAMKind;
 
 typedef enum {
@@ -46,13 +47,20 @@ typedef enum {
 	R_AM_DIR_DATA,
 } makeAMDirectoryRole;
 
-static roleDefinition AutomakeDirectoryRoles [] = {
-	{ true, "program",   "directory for PROGRAMS primary" },
-	{ true, "man",       "directory for MANS primary" },
-	{ true, "ltlibrary", "directory for LTLIBRARIES primary"},
-	{ true, "library",   "directory for LIBRARIES primary"},
-	{ true, "script",    "directory for SCRIPTS primary"},
+#define DIR_ROLES \
+	{ true, "program",   "directory for PROGRAMS primary" },	\
+	{ true, "man",       "directory for MANS primary" },		\
+	{ true, "ltlibrary", "directory for LTLIBRARIES primary"},	\
+	{ true, "library",   "directory for LIBRARIES primary"},	\
+	{ true, "script",    "directory for SCRIPTS primary"},		\
 	{ true, "data",      "directory for DATA primary"},
+
+static roleDefinition AutomakeDirectoryRoles [] = {
+	DIR_ROLES
+};
+
+static roleDefinition AutomakePseudodirRoles [] = {
+	DIR_ROLES
 };
 
 typedef enum {
@@ -85,6 +93,8 @@ static kindDefinition AutomakeKinds [] = {
 	{ true, 'c', "condition", "conditions",
 	  .referenceOnly = true, ATTACH_ROLES(AutomakeConditionRoles) },
 	{ true, 's', "subdir", "subdirs" },
+	{ false,'p', "pseudodir", "placeholder for EXTRA_, noinst_, and _check_ prefixed primaries (internal use)",
+	  .referenceOnly = true, ATTACH_ROLES(AutomakePseudodirRoles)},
 };
 
 typedef enum {
@@ -167,18 +177,6 @@ static const char *skipPrefix(const char *name)
 		name += prefix_len;
 	/* => data_DATA */
 
-	/* Drop  "check" in "check_PROGRAM" */
-	const static struct sPrefix dir_prefixlist [] = {
-		{ "EXTRA_",  6 },
-		{ "noinst_", 7 },
-		{ "check_",  6 },
-		{ NULL,     0 },
-	};
-	if ((prefix_len = has_prefix(name, dir_prefixlist)))
-		name += (prefix_len - 1);
-	/* keep the initial `_' */
-	/* => "_PROGRAM" */
-
 	return name;
 }
 
@@ -208,25 +206,25 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	}
 	else
 	{
+		bool pseudodir = false;
+		if (strcmp(vStringValue (subname), "EXTRA") == 0
+			|| strcmp(vStringValue (subname), "noinst") == 0
+			|| strcmp(vStringValue (subname), "check") == 0)
+		{
+			pseudodir = true;
+			if (kindex == K_AM_DIR)
+				kindex = K_AM_PSEUDODIR;
+		}
+
 		automake->index = CORK_NIL;
-		if (appending)
+		if (appending || pseudodir)
 			automake->index = lookupAutomakeDirectory (automake->directories, subname);
 
 		if ((!appending) || (automake->index == CORK_NIL))
 		{
-			bool placeholder = false;
-			if (vStringIsEmpty (subname))
-			{
-				vStringCatS(subname, "DUMMY");
-				placeholder = true;
-			}
 			automake->index = makeSimpleRefTag (subname, kindex, rindex);
-			if (placeholder)
-			{
-				tagEntryInfo *e = getEntryInCorkQueue (automake->index);
-				if (e)
-					e->placeholder = 1;
-			}
+			if ((automake->index != CORK_NIL) && pseudodir)
+				addAutomakeDirectory (automake->directories, subname, automake->index);
 		}
 	}
 
@@ -270,7 +268,7 @@ static void valueCallback (makeSubparser *make, char *name)
 	tagEntryInfo elt;
 
 	parent = getEntryInCorkQueue (p);
-	if (parent && (parent->kindIndex == K_AM_DIR)
+	if (parent && (parent->kindIndex == K_AM_DIR || parent->kindIndex == K_AM_PSEUDODIR)
 	    && (parent->extensionFields.roleBits))
 	{
 		int roleIndex;
@@ -280,8 +278,7 @@ static void valueCallback (makeSubparser *make, char *name)
 
 		k = K_AM_PROGRAM + roleIndex;
 		initTagEntry (&elt, name, k);
-		if (!parent->placeholder)
-			elt.extensionFields.scopeIndex = p;
+		elt.extensionFields.scopeIndex = p;
 		makeTagEntry (&elt);
 
 		if (isXtagEnabled (AutomakeXtagTable[X_CANONICALIZED_NAME].xtype)
