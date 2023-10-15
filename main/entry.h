@@ -56,7 +56,11 @@ struct sTagEntryInfo {
 	 */
 	unsigned int placeholder    :1;	 /* is used only for keeping corkIndex based scope chain.
 					    Put this entry to cork queue but
-					    don't print it to tags file. */
+						the tag is not printed:
+						* not printed as a tag entry,
+						* never used as a part of automatically generated FQ tag, and
+						* not printed as a part of scope.
+						See getTagScopeInformation(). */
 
 	/*
 	 * the bit fields only the main part can access.
