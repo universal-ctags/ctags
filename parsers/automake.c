@@ -99,8 +99,7 @@ static xtagDefinition AutomakeXtagTable [] = {
 	},
 };
 
-struct sBlacklist {
-	enum { BL_END, BL_PREFIX } type;
+struct sPrefix {
 	const char* substr;
 	size_t len;
 };
@@ -114,27 +113,22 @@ struct sAutomakeSubparser {
 };
 
 
-static bool bl_check0 (const char *name, const struct sBlacklist *blacklist)
+static bool has_prefix0 (const char *name, const struct sPrefix *prefix)
 {
-	if ((blacklist->type == BL_PREFIX) &&
-	    (strncmp (blacklist->substr, name, blacklist->len) == 0))
+	if (strncmp (prefix->substr, name, prefix->len) == 0)
 		return false;
 	else
 		return true;
 }
 
-static bool bl_check (const char *name, const struct sBlacklist *blacklist, size_t *prefix_len)
+static size_t has_prefix (const char *name, const struct sPrefix *prefixlist)
 {
-	for (int i = 0; blacklist[i].type != BL_END; i++)
+	for (int i = 0; prefixlist[i].substr; i++)
 	{
-		if (bl_check0 (name, blacklist + i) == false)
-		{
-			if (prefix_len)
-				*prefix_len = blacklist [i].len;
-			return false;
-		}
+		if (has_prefix0 (name, prefixlist + i) == false)
+			return prefixlist [i].len;
 	}
-	return true;
+	return 0;
 }
 
 static int lookupAutomakeDirectory (hashTable* directories,  vString *const name)
@@ -162,25 +156,25 @@ static const char *skipPrefix(const char *name)
 	size_t prefix_len;
 
 	/* Drop "dist_" in "dist_data_DATA" */
-	const static struct sBlacklist obj_blacklist [] = {
-		{ BL_PREFIX, "dist_",    5 },
-		{ BL_PREFIX, "nodist_",  7 },
-		{ BL_PREFIX, "nobase_",  7 },
-		{ BL_PREFIX, "notrans_", 8 },
-		{ BL_END,    NULL,       0 },
+	const static struct sPrefix obj_prefixlist [] = {
+		{ "dist_",    5 },
+		{ "nodist_",  7 },
+		{ "nobase_",  7 },
+		{ "notrans_", 8 },
+		{ NULL,       0 },
 	};
-	while (bl_check(name, obj_blacklist, &prefix_len) == false)
+	while ((prefix_len = has_prefix(name, obj_prefixlist)))
 		name += prefix_len;
 	/* => data_DATA */
 
 	/* Drop  "check" in "check_PROGRAM" */
-	const static struct sBlacklist dir_blacklist [] = {
-		{ BL_PREFIX, "EXTRA_",  6 },
-		{ BL_PREFIX, "noinst_", 7 },
-		{ BL_PREFIX, "check_",  6 },
-		{ BL_END,    NULL,     0 },
+	const static struct sPrefix dir_prefixlist [] = {
+		{ "EXTRA_",  6 },
+		{ "noinst_", 7 },
+		{ "check_",  6 },
+		{ NULL,     0 },
 	};
-	if (bl_check(name, dir_blacklist, &prefix_len) == false)
+	if ((prefix_len = has_prefix(name, dir_prefixlist)))
 		name += (prefix_len - 1);
 	/* keep the initial `_' */
 	/* => "_PROGRAM" */
