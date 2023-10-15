@@ -157,57 +157,52 @@ static void addAutomakeDirectory (hashTable* directories, vString *const name, i
 	hashTablePutItem (directories, k, i);
 }
 
+static const char *skipPrefix(const char *name)
+{
+	size_t prefix_len;
+
+	/* Drop "dist_" in "dist_data_DATA" */
+	const static struct sBlacklist obj_blacklist [] = {
+		{ BL_PREFIX, "dist_",    5 },
+		{ BL_PREFIX, "nodist_",  7 },
+		{ BL_PREFIX, "nobase_",  7 },
+		{ BL_PREFIX, "notrans_", 8 },
+		{ BL_END,    NULL,       0 },
+	};
+	while (bl_check(name, obj_blacklist, &prefix_len) == false)
+		name += prefix_len;
+	/* => data_DATA */
+
+	/* Drop  "check" in "check_PROGRAM" */
+	const static struct sBlacklist dir_blacklist [] = {
+		{ BL_PREFIX, "EXTRA_",  6 },
+		{ BL_PREFIX, "noinst_", 7 },
+		{ BL_PREFIX, "check_",  6 },
+		{ BL_END,    NULL,     0 },
+	};
+	if (bl_check(name, dir_blacklist, &prefix_len) == false)
+		name += (prefix_len - 1);
+	/* keep the initial `_' */
+	/* => "_PROGRAM" */
+
+	return name;
+}
+
 static bool automakeMakeTag (struct sAutomakeSubparser* automake,
-							 char* name, const char* suffix, bool appending,
+							 const char* name, const char* suffix, bool appending,
 							 int kindex, int rindex)
 {
 	size_t expected_len;
 	size_t len;
-	char* tail;
+	const char* tail;
 	vString *subname;
-	size_t prefix_len;
-	bool placeholder = false;
 
-	expected_len = strlen (suffix);
-
-	/* Drop "dist" in "dist_data_DATA" */
-	size_t uscore_len_ = 0;
-	const static struct sBlacklist obj_blacklist [] = {
-		{ BL_PREFIX, "dist",    4 },
-		{ BL_PREFIX, "nodist",  6 },
-		{ BL_PREFIX, "nobase",  6 },
-		{ BL_PREFIX, "notrans", 7 },
-		{ BL_END,    NULL,      0 },
-	};
-	while (bl_check(name + uscore_len_, obj_blacklist, &prefix_len) == false)
-	{
-		name += (uscore_len_ + prefix_len);
-		uscore_len_ =  (name [0] == '_')? 1: 0;
-	}
-	/* => _data_DATA */
-
-	const static struct sBlacklist dir_blacklist [] = {
-		{ BL_PREFIX, "EXTRA",  5 },
-		{ BL_PREFIX, "noinst", 6 },
-		{ BL_PREFIX, "check",  5 },
-		{ BL_END,    NULL,     0 },
-	};
-	uscore_len_ =  (name [0] == '_')? 1: 0;
-	if (bl_check(name + uscore_len_, dir_blacklist, &prefix_len) == false)
-	{
-		placeholder = true;
-		name += (uscore_len_ + prefix_len);
-	}
+	name = skipPrefix(name);
 
 	len = strlen (name);
+	expected_len = strlen (suffix);
 	if (len < expected_len)
 		return false;
-	else if (len > expected_len && name[0] == '_')
-	{
-		name++;
-		len--;
-		/* _data_DATA => data_DATA */
-	}
 
 	tail = name + len - expected_len;
 	if (strcmp (tail, suffix))
@@ -228,8 +223,12 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 
 		if ((!appending) || (automake->index == CORK_NIL))
 		{
-			if (placeholder && vStringIsEmpty (subname))
+			bool placeholder = false;
+			if (vStringIsEmpty (subname))
+			{
 				vStringCatS(subname, "DUMMY");
+				placeholder = true;
+			}
 			automake->index = makeSimpleRefTag (subname, kindex, rindex);
 			if (placeholder)
 			{
