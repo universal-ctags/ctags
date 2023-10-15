@@ -189,26 +189,23 @@ static const char *skipPrefix(const char *name)
 }
 
 static bool automakeMakeTag (struct sAutomakeSubparser* automake,
-							 const char* name, const char* suffix, bool appending,
+							 const char* name, size_t len,
+							 const char* suffix, size_t suffix_len,
+							 bool appending,
 							 int kindex, int rindex)
 {
-	size_t expected_len;
-	size_t len;
 	const char* tail;
 	vString *subname;
 
-	name = skipPrefix(name);
-
-	len = strlen (name);
-	expected_len = strlen (suffix);
-	if (len < expected_len)
+	suffix_len = strlen (suffix);
+	if (len < suffix_len)
 		return false;
 
-	tail = name + len - expected_len;
+	tail = name + len - suffix_len;
 	if (strcmp (tail, suffix))
 		return false;
 
-	subname = vStringNewNInit(name, len - expected_len);
+	subname = vStringNewNInit(name, len - suffix_len);
 
 	if (rindex == ROLE_DEFINITION_INDEX)
 	{
@@ -371,29 +368,38 @@ static void newMacroCallback (makeSubparser *make, char* name, bool with_define_
 		return;
 	}
 
+	size_t len = strlen (name);
+	if (automakeMakeTag (automake,
+						 name, len, "dir", 3, appending,
+						 K_AM_DIR, ROLE_DEFINITION_INDEX))
+		return;
+
+	const char *trimmed_name = skipPrefix (name);
+	if (trimmed_name != name)
+		len = strlen (trimmed_name);
+
+#define S(X) X, strlen(X)
 	(void)(0
 	       || automakeMakeTag (automake,
-							   name, "dir", appending,
-							   K_AM_DIR, ROLE_DEFINITION_INDEX)
+							   trimmed_name, len, S("_PROGRAMS"),
+							   appending, K_AM_DIR, R_AM_DIR_PROGRAMS)
 	       || automakeMakeTag (automake,
-							   name, "_PROGRAMS", appending,
-							   K_AM_DIR, R_AM_DIR_PROGRAMS)
+							   trimmed_name, len, S("_MANS"),
+							   appending, K_AM_DIR, R_AM_DIR_MANS)
 	       || automakeMakeTag (automake,
-							   name, "_MANS", appending,
-							   K_AM_DIR, R_AM_DIR_MANS)
-	       || automakeMakeTag (automake,
-							   name, "_LTLIBRARIES", appending,
+							   trimmed_name, len, S("_LTLIBRARIES"), appending,
 							   K_AM_DIR, R_AM_DIR_LTLIBRARIES)
 	       || automakeMakeTag (automake,
-							   name, "_LIBRARIES", appending,
+							   trimmed_name, len, S("_LIBRARIES"), appending,
 							   K_AM_DIR, R_AM_DIR_LIBRARIES)
 	       || automakeMakeTag (automake,
-							   name, "_SCRIPTS", appending,
+							   trimmed_name, len, S("_SCRIPTS"), appending,
 							   K_AM_DIR, R_AM_DIR_SCRIPTS)
 	       || automakeMakeTag  (automake,
-								name, "_DATA", appending,
+								trimmed_name, len, S("_DATA"), appending,
 								K_AM_DIR, R_AM_DIR_DATA)
 		);
+#undef S
 }
 
 static void inputStart (subparser *s)
