@@ -35,6 +35,7 @@ typedef enum {
 	K_AM_DATA,
 	K_AM_CONDITION,
 	K_AM_SUBDIR,
+	K_AM_PSEUDODIR,
 } makeAMKind;
 
 typedef enum {
@@ -46,13 +47,20 @@ typedef enum {
 	R_AM_DIR_DATA,
 } makeAMDirectoryRole;
 
-static roleDefinition AutomakeDirectoryRoles [] = {
-	{ true, "program",   "directory for PROGRAMS primary" },
-	{ true, "man",       "directory for MANS primary" },
-	{ true, "ltlibrary", "directory for LTLIBRARIES primary"},
-	{ true, "library",   "directory for LIBRARIES primary"},
-	{ true, "script",    "directory for SCRIPTS primary"},
+#define DIR_ROLES \
+	{ true, "program",   "directory for PROGRAMS primary" },	\
+	{ true, "man",       "directory for MANS primary" },		\
+	{ true, "ltlibrary", "directory for LTLIBRARIES primary"},	\
+	{ true, "library",   "directory for LIBRARIES primary"},	\
+	{ true, "script",    "directory for SCRIPTS primary"},		\
 	{ true, "data",      "directory for DATA primary"},
+
+static roleDefinition AutomakeDirectoryRoles [] = {
+	DIR_ROLES
+};
+
+static roleDefinition AutomakePseudodirRoles [] = {
+	DIR_ROLES
 };
 
 typedef enum {
@@ -85,17 +93,25 @@ static kindDefinition AutomakeKinds [] = {
 	{ true, 'c', "condition", "conditions",
 	  .referenceOnly = true, ATTACH_ROLES(AutomakeConditionRoles) },
 	{ true, 's', "subdir", "subdirs" },
+	{ false,'p', "pseudodir", "placeholder for EXTRA_, noinst_, and _check_ prefixed primaries (internal use)",
+	  .referenceOnly = true, ATTACH_ROLES(AutomakePseudodirRoles)},
 };
 
-struct sBlacklist {
-	enum { BL_END, BL_PREFIX } type;
+typedef enum {
+	X_CANONICALIZED_NAME,
+} automakeXtag;
+
+static xtagDefinition AutomakeXtagTable [] = {
+	{
+		.enabled = true,
+		.name = "canonicalizedName",
+		.description = "Include canonicalized object name like libctags_a",
+	},
+};
+
+struct sPrefix {
 	const char* substr;
 	size_t len;
-} am_blacklist [] = {
-	{ BL_PREFIX, "EXTRA",  5 },
-	{ BL_PREFIX, "noinst", 6 },
-	{ BL_PREFIX, "check",  5 },
-	{ BL_END,    NULL,     0 },
 };
 
 struct sAutomakeSubparser {
@@ -107,13 +123,22 @@ struct sAutomakeSubparser {
 };
 
 
-static bool bl_check (const char *name, struct sBlacklist *blacklist)
+static bool has_prefix0 (const char *name, const struct sPrefix *prefix)
 {
-	if ((blacklist->type == BL_PREFIX) &&
-	    (strncmp (blacklist->substr, name, blacklist->len) == 0))
+	if (strncmp (prefix->substr, name, prefix->len) == 0)
 		return false;
 	else
 		return true;
+}
+
+static size_t has_prefix (const char *name, const struct sPrefix *prefixlist)
+{
+	for (int i = 0; prefixlist[i].substr; i++)
+	{
+		if (has_prefix0 (name, prefixlist + i) == false)
+			return prefixlist [i].len;
+	}
+	return 0;
 }
 
 static int lookupAutomakeDirectory (hashTable* directories,  vString *const name)
@@ -136,39 +161,43 @@ static void addAutomakeDirectory (hashTable* directories, vString *const name, i
 	hashTablePutItem (directories, k, i);
 }
 
-static bool automakeMakeTag (struct sAutomakeSubparser* automake,
-							 char* name, const char* suffix, bool appending,
-							 int kindex, int rindex, struct sBlacklist *blacklist)
+static const char *skipPrefix(const char *name)
 {
-	size_t expected_len;
-	size_t len;
-	char* tail;
+	size_t prefix_len;
+
+	/* Drop "dist_" in "dist_data_DATA" */
+	const static struct sPrefix obj_prefixlist [] = {
+		{ "dist_",    5 },
+		{ "nodist_",  7 },
+		{ "nobase_",  7 },
+		{ "notrans_", 8 },
+		{ NULL,       0 },
+	};
+	while ((prefix_len = has_prefix(name, obj_prefixlist)))
+		name += prefix_len;
+	/* => data_DATA */
+
+	return name;
+}
+
+static bool automakeMakeTag (struct sAutomakeSubparser* automake,
+							 const char* name, size_t len,
+							 const char* suffix, size_t suffix_len,
+							 bool appending,
+							 int kindex, int rindex)
+{
+	const char* tail;
 	vString *subname;
-	int i;
 
-	len = strlen (name);
-	expected_len = strlen (suffix);
-
-	if (len <= expected_len)
+	suffix_len = strlen (suffix);
+	if (len < suffix_len)
 		return false;
 
-	for (i = 0; blacklist[i].type != BL_END; i++)
-	{
-		if (bl_check (name, blacklist + i) == false)
-			return false;
-	}
-
-	tail = name + len - expected_len;
+	tail = name + len - suffix_len;
 	if (strcmp (tail, suffix))
 		return false;
 
-	subname = vStringNew();
-
-	/* ??? dist, nodist, nobase, notrans,... */
-	if (strncmp (name, "dist_", 5) == 0)
-		vStringNCopyS(subname, name + 5, len - expected_len - 5);
-	else
-		vStringNCopyS(subname, name, len - expected_len);
+	subname = vStringNewNInit(name, len - suffix_len);
 
 	if (rindex == ROLE_DEFINITION_INDEX)
 	{
@@ -177,16 +206,57 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	}
 	else
 	{
+		bool pseudodir = false;
+		if (strcmp(vStringValue (subname), "EXTRA") == 0
+			|| strcmp(vStringValue (subname), "noinst") == 0
+			|| strcmp(vStringValue (subname), "check") == 0)
+		{
+			pseudodir = true;
+			if (kindex == K_AM_DIR)
+				kindex = K_AM_PSEUDODIR;
+		}
+
 		automake->index = CORK_NIL;
-		if (appending)
+		if (appending || pseudodir)
 			automake->index = lookupAutomakeDirectory (automake->directories, subname);
 
 		if ((!appending) || (automake->index == CORK_NIL))
+		{
 			automake->index = makeSimpleRefTag (subname, kindex, rindex);
+			if ((automake->index != CORK_NIL) && pseudodir)
+				addAutomakeDirectory (automake->directories, subname, automake->index);
+		}
 	}
 
 	vStringDelete (subname);
 	return true;
+}
+
+static void canonicalizeName (vString *dst, const char *name)
+{
+	while (*name)
+	{
+		if (isalnum ((unsigned char) *name) ||
+			*name == '_' || *name == '@')
+			vStringPut (dst, *name);
+		else
+			vStringPut (dst, '_');
+		name++;
+	}
+}
+
+static void makeCanonicalizedTag (tagEntryInfo *e, const char *name)
+{
+	vString *xname = vStringNew ();
+
+	canonicalizeName (xname, name);
+	e->name = vStringValue (xname);
+	if (strcmp(e->name, name))
+	{
+		makeTagEntry (e);
+		markTagExtraBit (e, AutomakeXtagTable[X_CANONICALIZED_NAME].xtype);
+	}
+	vStringDelete (xname);
 }
 
 static void valueCallback (makeSubparser *make, char *name)
@@ -198,7 +268,7 @@ static void valueCallback (makeSubparser *make, char *name)
 	tagEntryInfo elt;
 
 	parent = getEntryInCorkQueue (p);
-	if (parent && (parent->kindIndex == K_AM_DIR)
+	if (parent && (parent->kindIndex == K_AM_DIR || parent->kindIndex == K_AM_PSEUDODIR)
 	    && (parent->extensionFields.roleBits))
 	{
 		int roleIndex;
@@ -210,6 +280,10 @@ static void valueCallback (makeSubparser *make, char *name)
 		initTagEntry (&elt, name, k);
 		elt.extensionFields.scopeIndex = p;
 		makeTagEntry (&elt);
+
+		if (isXtagEnabled (AutomakeXtagTable[X_CANONICALIZED_NAME].xtype)
+			&& (k == K_AM_PROGRAM || k == K_AM_LTLIBRARY || k == K_AM_LIBRARY))
+			makeCanonicalizedTag (&elt, name);
 	}
 	else if (automake->in_subdirs)
 	{
@@ -285,29 +359,38 @@ static void newMacroCallback (makeSubparser *make, char* name, bool with_define_
 		return;
 	}
 
+	size_t len = strlen (name);
+	if (automakeMakeTag (automake,
+						 name, len, "dir", 3, appending,
+						 K_AM_DIR, ROLE_DEFINITION_INDEX))
+		return;
+
+	const char *trimmed_name = skipPrefix (name);
+	if (trimmed_name != name)
+		len = strlen (trimmed_name);
+
+#define S(X) X, strlen(X)
 	(void)(0
 	       || automakeMakeTag (automake,
-							   name, "dir", appending,
-							   K_AM_DIR, ROLE_DEFINITION_INDEX, am_blacklist)
+							   trimmed_name, len, S("_PROGRAMS"),
+							   appending, K_AM_DIR, R_AM_DIR_PROGRAMS)
 	       || automakeMakeTag (automake,
-							   name, "_PROGRAMS", appending,
-							   K_AM_DIR, R_AM_DIR_PROGRAMS, am_blacklist)
+							   trimmed_name, len, S("_MANS"),
+							   appending, K_AM_DIR, R_AM_DIR_MANS)
 	       || automakeMakeTag (automake,
-							   name, "_MANS", appending,
-							   K_AM_DIR, R_AM_DIR_MANS, am_blacklist)
+							   trimmed_name, len, S("_LTLIBRARIES"), appending,
+							   K_AM_DIR, R_AM_DIR_LTLIBRARIES)
 	       || automakeMakeTag (automake,
-							   name, "_LTLIBRARIES", appending,
-							   K_AM_DIR, R_AM_DIR_LTLIBRARIES, am_blacklist)
+							   trimmed_name, len, S("_LIBRARIES"), appending,
+							   K_AM_DIR, R_AM_DIR_LIBRARIES)
 	       || automakeMakeTag (automake,
-							   name, "_LIBRARIES", appending,
-							   K_AM_DIR, R_AM_DIR_LIBRARIES, am_blacklist)
-	       || automakeMakeTag (automake,
-							   name, "_SCRIPTS", appending,
-							   K_AM_DIR, R_AM_DIR_SCRIPTS, am_blacklist)
+							   trimmed_name, len, S("_SCRIPTS"), appending,
+							   K_AM_DIR, R_AM_DIR_SCRIPTS)
 	       || automakeMakeTag  (automake,
-								name, "_DATA", appending,
-								K_AM_DIR, R_AM_DIR_DATA, am_blacklist)
+								trimmed_name, len, S("_DATA"), appending,
+								K_AM_DIR, R_AM_DIR_DATA)
 		);
+#undef S
 }
 
 static void inputStart (subparser *s)
@@ -362,6 +445,10 @@ extern parserDefinition* AutomakeParser (void)
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser     = findAutomakeTags;
+	def->xtagTable = AutomakeXtagTable;
+	def->xtagCount = ARRAY_SIZE (AutomakeXtagTable);
 	def->useCork    = CORK_QUEUE;
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	return def;
 }

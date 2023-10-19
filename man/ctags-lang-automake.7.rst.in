@@ -1,0 +1,34 @@
+.. _ctags-lang-automake(7):
+
+==============================================================
+ctags-lang-automake
+==============================================================
+--------------------------------------------------------------------------------------
+Random notes about tagging Automake source code (Makefile.am) with Universal Ctags
+--------------------------------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+Automake ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=Automake ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Automake=+.am ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging Automake source code (Makefile.am).
+
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* Add ``canonicalizedName`` extra.
+* Add ``pseudodir`` kind.
+
+SEE ALSO
+--------
+ctags(1)

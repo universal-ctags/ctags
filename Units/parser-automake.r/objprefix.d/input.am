@@ -1,0 +1,7 @@
+dist_data_DATA = distribute-this
+bin_PROGRAMS = foo
+nodist_foo_SOURCES = do-not-distribute.c
+nobase_include_HEADERS = sys/types.h
+man_MANS = foo.1
+notrans_man_MANS = foo.3
+notrans_dist_man3_MANS = bar.3
