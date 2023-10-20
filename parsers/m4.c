@@ -17,6 +17,7 @@
 #include "htable.h"
 #include "keyword.h"
 #include "m4.h"
+#include "numarray.h"
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
@@ -77,7 +78,7 @@ static const keywordTable m4KeywordTable[] = {
 
 struct m4Ctx {
 	m4Subparser *sub;
-	int index;
+	intArray *indexStack;
 };
 
 static void parseM4Char(struct m4Ctx *ctx, vString *const token, int c);
@@ -106,7 +107,7 @@ static int getCloseQuote(int openQuote)
 	return 0;
 }
 
-static void skipQuotes(int c)
+static void parseQuotes(struct m4Ctx *ctx, vString *const token, int c)
 {
 	unsigned int depth = 0;
 	int openQuote = 0, closeQuote = 0;
@@ -117,17 +118,42 @@ static void skipQuotes(int c)
 	else
 		openQuote = c;
 
+	bool reenter = false;
+	if (ctx->sub && ctx->sub->doesWantToParseInsideQuotes)
+	{
+		enterSubparser ((subparser *)ctx->sub);
+		reenter = ctx->sub->doesWantToParseInsideQuotes (ctx->sub, ctx->indexStack);
+		leaveSubparser ();
+	}
+
 	for (; c != EOF; c = getcFromInputFile())
 	{
 		if (c == closeQuote)
 			depth --;
 		else if (c == openQuote)
 			depth ++;
+		else if (reenter)
+			parseM4Char (ctx, token, c);
+
 		if (depth == 0)
 			break;
 	}
 }
 
+static void pushIndex (struct m4Ctx *ctx, int index)
+{
+	intArrayAdd (ctx->indexStack, index);
+}
+
+static int popIndexSafe (struct m4Ctx *ctx)
+{
+	return intArrayIsEmpty (ctx->indexStack)? CORK_NIL: intArrayRemoveLast (ctx->indexStack);
+}
+
+static int topIndex (struct m4Ctx *ctx)
+{
+	return intArrayIsEmpty (ctx->indexStack)? CORK_NIL: intArrayLast (ctx->indexStack);
+}
 
 /* parser */
 
@@ -470,7 +496,7 @@ static void parseM4Char (struct m4Ctx *ctx, vString *const token, int c)
 	if (doesLineCommentStart (ctx->sub, c, vStringValue (token)))
 		skipLine(c);
 	else if (doesQuoteStart (c))
-		skipQuotes(c);
+		parseQuotes(ctx, token, c);
 	else if (doesStringLiteralStart (ctx->sub, c))
 		skipToCharacter(c, false);
 	else if (c == '(' && vStringLength(token) > 0) /* catch a few macro calls */
@@ -482,9 +508,12 @@ static void parseM4Char (struct m4Ctx *ctx, vString *const token, int c)
 
 		r = newMacroM4 (vStringValue (token));
 		if (r.consumed)
-			ctx->index = r.index;
+			pushIndex (ctx, r.index);
 		else if (ctx->sub)
-			ctx->index = notifyNewMacro (ctx->sub, vStringValue (token));
+		{
+			int index = notifyNewMacro (ctx->sub, vStringValue (token));
+			pushIndex (ctx, index);
+		}
 	}
 
 	vStringClear(token);
@@ -495,16 +524,16 @@ static void parseM4Char (struct m4Ctx *ctx, vString *const token, int c)
 	}
 	else if (c == ')')
 	{
-		tagEntryInfo *e = getEntryInCorkQueue (ctx->index);
+		tagEntryInfo *e = getEntryInCorkQueue (topIndex(ctx));
 		if (e)
 			e->extensionFields.endLine = getInputLineNumber ();
-		ctx->index = CORK_NIL;
+		popIndexSafe (ctx);
 	}
 }
 
 static void findM4Tags(void)
 {
-	struct m4Ctx ctx = { .index = CORK_NIL, };
+	struct m4Ctx ctx;
 	vString *const token = vStringNew();
 
 	setM4Quotes ('`', '\'');
@@ -513,9 +542,13 @@ static void findM4Tags(void)
 	if (ctx.sub)
 		chooseExclusiveSubparser ((subparser *)ctx.sub, NULL);
 
+	ctx.indexStack = intArrayNew ();
+
 	int c;
 	while ((c = getcFromInputFile()) != EOF)
 		parseM4Char (&ctx, token, c);
+
+	intArrayDelete (ctx.indexStack);
 
 	vStringDelete(token);
 }

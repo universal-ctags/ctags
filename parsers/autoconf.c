@@ -78,6 +78,11 @@ static bool doesStringLiteralStart (m4Subparser *m4 CTAGS_ATTR_UNUSED, int c CTA
 	return false;
 }
 
+static bool doesWantToParseInsideQuotes (m4Subparser *m4 CTAGS_ATTR_UNUSED, intArray *indexStack CTAGS_ATTR_UNUSED)
+{
+	return true;
+}
+
 static bool probeLanguage (m4Subparser *m4 CTAGS_ATTR_UNUSED, const char* token)
 {
 	return strncmp (token, "m4_", 3) == 0
@@ -175,6 +180,7 @@ extern parserDefinition* AutoconfParser (void)
 		.newMacroNotify = newMacroCallback,
 		.doesLineCommentStart = doesLineCommentStart,
 		.doesStringLiteralStart = doesStringLiteralStart,
+		.doesWantToParseInsideQuotes = doesWantToParseInsideQuotes,
 	};
 	static parserDependency dependencies [] = {
 		[0] = { DEPTYPE_SUBPARSER, "M4", &autoconfSubparser },

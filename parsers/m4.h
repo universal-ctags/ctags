@@ -17,6 +17,7 @@
 #include "types.h"
 #include "subparser.h"
 #include "vstring.h"
+#include "numarray.h"
 
 typedef struct sM4Subparser m4Subparser;
 struct sM4Subparser {
@@ -29,6 +30,8 @@ struct sM4Subparser {
 
 	bool (* doesLineCommentStart)   (m4Subparser *m4, int c, const char *token);
 	bool (* doesStringLiteralStart) (m4Subparser *m4, int c);
+
+	bool (* doesWantToParseInsideQuotes) (m4Subparser *m4, intArray *indexStack);
 };
 
 /* Helpers functions */

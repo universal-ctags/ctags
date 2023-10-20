@@ -5,4 +5,3 @@ true	input.ac	/^	AH_TEMPLATE([true],  [value of 'true' if <stdbool.h> is missing
 false	input.ac	/^	AH_TEMPLATE([false], [value of 'false' if <stdbool.h> is missing or broken.])$/;"	kind:template	line:9	language:Autoconf	end:9
 true	input.ac	/^	AC_DEFINE([true],  [1])$/;"	kind:definition	line:10	language:Autoconf	end:10
 false	input.ac	/^	AC_DEFINE([false], [0])$/;"	kind:definition	line:11	language:Autoconf	end:11
-input.ac	input.ac	1;"	kind:file	line:1	language:Autoconf	extra:inputFile	end:12
