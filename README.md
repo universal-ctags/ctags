@@ -63,12 +63,12 @@ code from GitHub.
 
 To build with Autotools (Autoconf and Automake) on GNU/Linux, OSX, or Windows 10 WSL,
 ```
-    $ git clone https://github.com/universal-ctags/ctags.git
-    $ cd ctags
-    $ ./autogen.sh
-    $ ./configure --prefix=/where/you/want # defaults to /usr/local
-    $ make
-    $ make install # may require extra privileges depending on where to install
+git clone https://github.com/universal-ctags/ctags.git
+cd ctags
+./autogen.sh
+./configure  # use --prefix=/where/you/want to override installation directory, defaults to /usr/local
+make
+make install # may require extra privileges depending on where to install
 ```
 
 GNU make is assumed as the `make` command.
