@@ -75,6 +75,13 @@ static const keywordTable m4KeywordTable[] = {
 };
 
 
+struct m4Ctx {
+	m4Subparser *sub;
+	int index;
+};
+
+static void parseM4Char(struct m4Ctx *ctx, vString *const token, int c);
+
 /* Quote handling */
 
 /* TODO: Characters are assumed for quoting.
@@ -458,56 +465,57 @@ static struct newMacroResult newMacroM4 (const char* token)
 
 
 /* parser instance  */
+static void parseM4Char (struct m4Ctx *ctx, vString *const token, int c)
+{
+	if (doesLineCommentStart (ctx->sub, c, vStringValue (token)))
+		skipLine(c);
+	else if (doesQuoteStart (c))
+		skipQuotes(c);
+	else if (doesStringLiteralStart (ctx->sub, c))
+		skipToCharacter(c, false);
+	else if (c == '(' && vStringLength(token) > 0) /* catch a few macro calls */
+	{
+		struct newMacroResult r;
+
+		if (!ctx->sub)
+			ctx->sub = maySwitchLanguage (vStringValue (token));
+
+		r = newMacroM4 (vStringValue (token));
+		if (r.consumed)
+			ctx->index = r.index;
+		else if (ctx->sub)
+			ctx->index = notifyNewMacro (ctx->sub, vStringValue (token));
+	}
+
+	vStringClear(token);
+	if (IS_WORD(c))
+	{
+		ungetcToInputFile(c);
+		readQuotedWord(token);
+	}
+	else if (c == ')')
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (ctx->index);
+		if (e)
+			e->extensionFields.endLine = getInputLineNumber ();
+		ctx->index = CORK_NIL;
+	}
+}
 
 static void findM4Tags(void)
 {
-	m4Subparser *sub;
+	struct m4Ctx ctx = { .index = CORK_NIL, };
 	vString *const token = vStringNew();
-	int c;
-	int index = CORK_NIL;
 
 	setM4Quotes ('`', '\'');
 
-	sub = (m4Subparser *)getSubparserRunningBaseparser();
-	if (sub)
-		chooseExclusiveSubparser ((subparser *)sub, NULL);
+	ctx.sub = (m4Subparser *)getSubparserRunningBaseparser();
+	if (ctx.sub)
+		chooseExclusiveSubparser ((subparser *)ctx.sub, NULL);
 
+	int c;
 	while ((c = getcFromInputFile()) != EOF)
-	{
-		if (doesLineCommentStart (sub, c, vStringValue (token)))
-			skipLine(c);
-		else if (doesQuoteStart (c))
-			skipQuotes(c);
-		else if (doesStringLiteralStart (sub, c))
-			skipToCharacter(c, false);
-		else if (c == '(' && vStringLength(token) > 0) /* catch a few macro calls */
-		{
-			struct newMacroResult r;
-
-			if (!sub)
-				sub = maySwitchLanguage (vStringValue (token));
-
-			r = newMacroM4 (vStringValue (token));
-			if (r.consumed)
-				index = r.index;
-			else if (sub)
-				index = notifyNewMacro (sub, vStringValue (token));
-		}
-
-		vStringClear(token);
-		if (IS_WORD(c))
-		{
-			ungetcToInputFile(c);
-			readQuotedWord(token);
-		}
-		else if (c == ')')
-		{
-			tagEntryInfo *e = getEntryInCorkQueue (index);
-			if (e)
-				e->extensionFields.endLine = getInputLineNumber ();
-			index = CORK_NIL;
-		}
-	}
+		parseM4Char (&ctx, token, c);
 
 	vStringDelete(token);
 }
