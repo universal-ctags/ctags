@@ -48,11 +48,14 @@
 		return current->count++;										\
 	}																	\
 																		\
-	extern void prefix##ArrayRemoveLast (prefix##Array *const current)	\
+	extern type prefix##ArrayRemoveLast (prefix##Array *const current)	\
 	{																	\
 		Assert (current != NULL);										\
 		Assert (current->count > 0);									\
+																		\
+		type last = prefix##ArrayLast (current);						\
 		--current->count;												\
+		return last;													\
 	}																	\
 																		\
 	extern void prefix##ArrayCombine (prefix##Array *const current, prefix##Array *const from) \
