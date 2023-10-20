@@ -345,7 +345,7 @@ extern int main (int argc, char **argv)
 		/* set to something else */
 		addIgnoreSymbol("FOO");
 
-		printf("Number of all parsers is: %d\n", ctagsGetLangCount());
+		printf("The total number of parsers is: %d\n", ctagsGetLangCount());
 		printf("We are parsing %s which provides the following kinds:\n",
 			ctagsGetLangName(lang));
 		for (i = 0; kinds[i] != '\0'; i++)
