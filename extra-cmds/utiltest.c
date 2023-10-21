@@ -10,6 +10,7 @@
 #include "acutest.h"
 #include "fname.h"
 #include "htable.h"
+#include "numarray.h"
 #include "routines.h"
 #include "vstring.h"
 #include <string.h>
@@ -234,6 +235,25 @@ static void test_htable_grow(void)
 	hashTableDelete(htable);
 }
 
+static void test_numarray(void)
+{
+	intArray *a = intArrayNew ();
+
+	intArrayAdd(a, 0);
+	intArrayAdd(a, 1);
+	intArrayAdd(a, 2);
+
+	TEST_CHECK (intArrayCount(a) == 3);
+	TEST_CHECK (intArrayItem(a, 0) == 0);
+	TEST_CHECK (intArrayItem(a, 1) == 1);
+	TEST_CHECK (intArrayItem(a, 2) == 2);
+	TEST_CHECK (intArrayLast(a) == 2);
+	TEST_CHECK (intArrayRemoveLast(a) == 2);
+	TEST_CHECK (intArrayLast(a) == 1);
+
+	intArrayDelete(a);
+}
+
 static void test_routines_strrstr(void)
 {
 	TEST_CHECK(strcmp(strrstr("abcdcdb", "cd"), "cdb") == 0);
@@ -297,6 +317,7 @@ TEST_LIST = {
    { "fname/relative",   test_fname_relative   },
    { "htable/update",    test_htable_update    },
    { "htable/grow",      test_htable_grow      },
+   { "numarray",         test_numarray         },
    { "routines/strrstr", test_routines_strrstr },
    { "vstring/ncats",    test_vstring_ncats    },
    { "vstring/truncate_leading", test_vstring_truncate_leading },

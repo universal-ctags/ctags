@@ -21,6 +21,7 @@ UTIL_PUBLIC_HEADS = \
 	main/gcc-attr.h		\
 	main/htable.h		\
 	main/inline.h		\
+	main/numarray.h		\
 	main/ptrarray.h		\
 	main/routines.h		\
 	main/trashbox.h 	\
@@ -42,6 +43,7 @@ UTIL_HEADS = \
 UTIL_SRCS = \
 	main/fname.c		\
 	main/htable.c		\
+	main/numarray.c		\
 	main/ptrarray.c		\
 	main/routines.c		\
 	main/trashbox.c		\
@@ -78,7 +80,6 @@ MAIN_PUBLIC_HEADS =		\
 	main/lxpath.h		\
 	main/mbcs.h		\
 	main/nestlevel.h	\
-	main/numarray.h		\
 	main/objpool.h		\
 	main/options.h		\
 	main/param.h		\
@@ -164,7 +165,6 @@ LIB_SRCS =			\
 	main/main.c			\
 	main/mbcs.c			\
 	main/nestlevel.c		\
-	main/numarray.c			\
 	main/objpool.c			\
 	main/options.c			\
 	main/param.c			\
