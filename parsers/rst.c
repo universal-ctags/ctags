@@ -217,7 +217,7 @@ static int get_kind(char c, bool overline, struct sectionTracker tracker[])
 	return -1;
 }
 
-static const unsigned char *is_markup_line (const unsigned char *line, char reftype)
+static const unsigned char *is_markup_line_with_char (const unsigned char *line, char reftype)
 {
 	if ((line [0] == '.') && (line [1] == '.') && (line [2] == ' ')
 		&& (line [3] == reftype))
@@ -424,7 +424,7 @@ static void findRstTags (void)
 		while (isspace(*line_trimmed))
 			   line_trimmed++;
 
-		if ((markup_line = is_markup_line (line_trimmed, '_')) != NULL)
+		if ((markup_line = is_markup_line_with_char (line_trimmed, '_')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Handle .. _target:
@@ -436,7 +436,7 @@ static void findRstTags (void)
 				continue;
 			}
 		}
-		else if ((markup_line = is_markup_line (line_trimmed, '[')) != NULL)
+		else if ((markup_line = is_markup_line_with_char (line_trimmed, '[')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Handle .. [citation]
@@ -448,7 +448,7 @@ static void findRstTags (void)
 				continue;
 			}
 		}
-		else if ((markup_line = is_markup_line (line_trimmed, '|')) != NULL)
+		else if ((markup_line = is_markup_line_with_char (line_trimmed, '|')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Hanle .. |substitute definition|
