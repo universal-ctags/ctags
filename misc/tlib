@@ -32,11 +32,11 @@ fi
 ${VALGRIND} ${MINI_GEANY} > ${actual}
 echo "${VALGRIND} ${MINI_GEANY} output:"
 cat ${actual}
-N=$(sed -n -e 's/^Number of all parsers is: \([0-9]*\)$/\1/p' ${actual})
+N=$(sed -n -e 's/^The total number of parsers is: \([0-9]*\)$/\1/p' ${actual})
 
 test "$N" -gt 0
 
-sed -i -e '/^Number of all parsers is: [0-9]*$/d' ${actual}
+sed -i -e '/^The total number of parsers is: [0-9]*$/d' ${actual}
 
 echo "comparing with expected output:"
 diff -uN --strip-trailing-cr ${expected} ${actual} && rm ${actual}
