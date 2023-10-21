@@ -21,9 +21,12 @@ jobs:
     # temporarily disabled, because it always fails these days.
     #- run: brew update
 
-    # https://github.com/actions/runner-images/issues/6817
-    - run: brew install --overwrite python@3.10 python@3.11
-    - run: brew install automake pkg-config jansson libyaml docutils pcre2
+    # NOTE: DO NOT try to install python3 package via brew, it has already been included in macos-xx runner images
+    # https://github.com/actions/runner-images/blob/macos-13/20231002.1/images/macos/macos-13-Readme.md#python
+
+    - run: brew install automake pkg-config jansson libyaml pcre2
+
+    - run: pip3 install docutils
 
     - run: cc --version
     - run: make --version
