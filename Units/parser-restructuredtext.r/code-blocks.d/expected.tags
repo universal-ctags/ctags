@@ -1,0 +1,10 @@
+C Language Example	input.rst	/^C Language Example$/;"	H	language:ReStructuredText
+Test 1	input.rst	/^Test 1$/;"	c	language:ReStructuredText	title:C Language Example
+Test 2	input.rst	/^Test 2$/;"	c	language:ReStructuredText	title:C Language Example
+test1_0	input.rst	/^	int test1_0(void)$/;"	f	language:C	typeref:typename:int	extras:guest
+test1_1	input.rst	/^	int test1_1(void)$/;"	f	language:C	typeref:typename:int	extras:guest
+test1_2	input.rst	/^	int test1_2(void)$/;"	f	language:C	typeref:typename:int	extras:guest
+test1_3	input.rst	/^	int test1_3(void)$/;"	f	language:C	typeref:typename:int	extras:guest
+test2_0	input.rst	/^	int test2_0(void)$/;"	f	language:C	typeref:typename:int	extras:guest
+TITLE	input-1.rst	/^TITLE$/;"	H	language:ReStructuredText
+DEF	input-2.rst	/^	  #define DEF /;"	d	language:C	file:	extras:fileScope,guest

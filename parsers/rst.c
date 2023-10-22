@@ -31,6 +31,7 @@
 #include "field.h"
 #include "htable.h"
 #include "debug.h"
+#include "promise.h"
 
 /*
 *   DATA DEFINITIONS
@@ -92,6 +93,14 @@ struct olineTracker
 {
 	char c;
 	size_t len;
+};
+
+struct codeblockTracker {
+	size_t blockIndent;
+	char *language;
+	unsigned long startLine;
+	unsigned long endLine;
+	unsigned long endLineLength;
 };
 
 /*
@@ -217,11 +226,19 @@ static int get_kind(char c, bool overline, struct sectionTracker tracker[])
 	return -1;
 }
 
-static const unsigned char *is_markup_line (const unsigned char *line, char reftype)
+static const unsigned char *is_markup_line_with_char (const unsigned char *line, char reftype)
 {
 	if ((line [0] == '.') && (line [1] == '.') && (line [2] == ' ')
 		&& (line [3] == reftype))
 		return line + 4;
+	return NULL;
+}
+
+static const unsigned char *is_markup_line_with_cstr (const unsigned char *line, char *str, size_t len)
+{
+	if ((line [0] == '.') && (line [1] == '.') && (line [2] == ' ')
+		&& (strncmp ((char *)line + 3, str, len) == 0))
+		return line + 3 + len;
 	return NULL;
 }
 
@@ -298,6 +315,54 @@ static void overline_set(struct olineTracker *ol, char c, size_t len)
 static bool has_overline(struct olineTracker *ol)
 {
 	return (ol->c != 0);
+}
+
+static void init_codeblock (struct codeblockTracker *codeblock, const char *language,
+							size_t blockIndent, unsigned long startLine)
+{
+	codeblock->language = eStrdup (language);
+	codeblock->blockIndent = blockIndent;
+	codeblock->startLine = startLine;
+	codeblock->endLine = 0;
+	codeblock->endLineLength = 0;
+}
+
+static bool is_in_codeblock (struct codeblockTracker *codeblock)
+{
+	return (codeblock->language != NULL);
+}
+
+static void reset_codeblock (struct codeblockTracker *codeblock)
+{
+	eFree (codeblock->language);
+	codeblock->language = NULL;
+}
+
+static bool does_codeblock_continue (struct codeblockTracker *codeblock, size_t blockOffset,
+								   unsigned char initChar)
+{
+	if (blockOffset > codeblock->blockIndent)
+		return true;
+
+	if (blockOffset <= codeblock->blockIndent && initChar == '\0')
+		return true;
+
+	return false;
+}
+
+static void update_codeblock (struct codeblockTracker *codeblock, unsigned int endLine, unsigned long endLineLength)
+{
+	codeblock->endLine = endLine;
+	codeblock->endLineLength = endLineLength;
+}
+
+static void submit_codeblock (struct codeblockTracker *codeblock)
+{
+	if (codeblock->endLine)
+		makePromise (codeblock->language,
+					 codeblock->startLine, 0,
+					 codeblock->endLine, codeblock->endLineLength, codeblock->startLine);
+	reset_codeblock (codeblock);
 }
 
 static int getFosterEntry(tagEntryInfo *e, int shift)
@@ -412,6 +477,8 @@ static void findRstTags (void)
 	const unsigned char *markup_line;
 	struct sectionTracker section_tracker[SECTION_COUNT];
 	struct olineTracker overline;
+	struct codeblockTracker codeblock = { .language = NULL };
+	const bool run_guest = isXtagEnabled (XTAG_GUEST);
 
 	memset(&filepos, 0, sizeof(filepos));
 	memset(section_tracker, 0, sizeof section_tracker);
@@ -424,7 +491,18 @@ static void findRstTags (void)
 		while (isspace(*line_trimmed))
 			   line_trimmed++;
 
-		if ((markup_line = is_markup_line (line_trimmed, '_')) != NULL)
+		if (run_guest && is_in_codeblock (&codeblock))
+		{
+			if (does_codeblock_continue (&codeblock, (line_trimmed - line), *line_trimmed))
+			{
+				update_codeblock(&codeblock, getInputLineNumber(), strlen((const char *)line));
+				continue;
+			}
+			else
+				submit_codeblock(&codeblock);
+		}
+
+		if ((markup_line = is_markup_line_with_char (line_trimmed, '_')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Handle .. _target:
@@ -436,7 +514,7 @@ static void findRstTags (void)
 				continue;
 			}
 		}
-		else if ((markup_line = is_markup_line (line_trimmed, '[')) != NULL)
+		else if ((markup_line = is_markup_line_with_char (line_trimmed, '[')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Handle .. [citation]
@@ -448,7 +526,7 @@ static void findRstTags (void)
 				continue;
 			}
 		}
-		else if ((markup_line = is_markup_line (line_trimmed, '|')) != NULL)
+		else if ((markup_line = is_markup_line_with_char (line_trimmed, '|')) != NULL)
 		{
 			overline_clear(&overline);
 			/* Hanle .. |substitute definition|
@@ -457,6 +535,22 @@ static void findRstTags (void)
 			if (capture_markup (markup_line, '|', K_SUBSTDEF) != CORK_NIL)
 			{
 				vStringClear (name);
+				continue;
+			}
+		}
+		else if (run_guest
+				 && (markup_line = is_markup_line_with_cstr (line_trimmed, "code-block::", 12)) != NULL)
+		{
+			if (is_in_codeblock (&codeblock))
+				reset_codeblock (&codeblock);
+
+			while (isspace(*markup_line))
+				markup_line++;
+
+			if (*markup_line)
+			{
+				init_codeblock (&codeblock, (const char *)markup_line, line_trimmed - line,
+								getInputLineNumber() + 1);
 				continue;
 			}
 		}
@@ -527,6 +621,10 @@ static void findRstTags (void)
 			filepos = getInputFilePosition();
 		}
 	}
+
+	if (run_guest && is_in_codeblock (&codeblock))
+		submit_codeblock(&codeblock);
+
 	/* Force popping all nesting levels */
 	getNestingLevel (K_EOF);
 	vStringDelete (name);
@@ -534,6 +632,9 @@ static void findRstTags (void)
 
 	adjustSectionKinds(section_tracker);
 	inlineScopes();
+
+	if (run_guest && codeblock.language)
+		eFree (codeblock.language);
 }
 
 extern parserDefinition* RstParser (void)
