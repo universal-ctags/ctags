@@ -365,7 +365,7 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "without",						KEYWORD_without			      },
 };
 
-const static struct keywordGroup predefinedInquiryDirective = {
+static const struct keywordGroup predefinedInquiryDirective = {
 	.value = KEYWORD_inquiry_directive,
 	.addingUnlessExisting = false,
 	.keywords = {

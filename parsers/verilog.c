@@ -302,7 +302,7 @@ static ptrArray *tagContents;
 static fieldDefinition *fieldTable = NULL;
 
 // IEEE Std 1364-2005 LRM, Appendix B "List of Keywords"
-const static struct keywordGroup verilogKeywords = {
+static const struct keywordGroup verilogKeywords = {
 	.value = K_IGNORE,
 	.addingUnlessExisting = true,
 	.keywords = {
@@ -329,7 +329,7 @@ const static struct keywordGroup verilogKeywords = {
 	},
 };
 // IEEE Std 1800-2017 LRM, Annex B "Keywords"
-const static struct keywordGroup systemVerilogKeywords = {
+static const struct keywordGroup systemVerilogKeywords = {
 	.value = K_IGNORE,
 	.addingUnlessExisting = true,
 	.keywords = {
@@ -379,7 +379,7 @@ const static struct keywordGroup systemVerilogKeywords = {
 };
 
 // IEEE Std 1364-2005 LRM, "19. Compiler directives"
-const static struct keywordGroup verilogDirectives = {
+static const struct keywordGroup verilogDirectives = {
 	.value = K_DIRECTIVE,
 	.addingUnlessExisting = true,
 	.keywords = {
@@ -392,7 +392,7 @@ const static struct keywordGroup verilogDirectives = {
 };
 
 // IEEE Std 1800-2017 LRM, "22. Compiler directives"
-const static struct keywordGroup systemVerilogDirectives = {
+static const struct keywordGroup systemVerilogDirectives = {
 	.value = K_DIRECTIVE,
 	.addingUnlessExisting = true,
 	.keywords = {

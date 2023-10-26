@@ -139,7 +139,7 @@ static const keywordTable GDScriptKeywordTable[] = {
 
 };
 
-const static struct keywordGroup modifierKeywords = {
+static const struct keywordGroup modifierKeywords = {
 	.value = KEYWORD_modifier,
 	.addingUnlessExisting = false,
 	.keywords = {
