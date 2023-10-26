@@ -34,6 +34,7 @@
 #include "routines_p.h"
 #include "xtag_p.h"
 #include "param_p.h"
+#include "param.h"
 #include "error_p.h"
 #include "interactive_p.h"
 #include "writer_p.h"
