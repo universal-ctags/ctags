@@ -44,6 +44,7 @@ tagWriter customWriter = {
 
 
 /* we need to be able to provide an error printer which doesn't crash Geany on error */
+CTAGS_ATTR_PRINTF(2, 0)
 static bool nofatalErrorPrinter (const errorSelection selection,
 					  const char *const format,
 					  va_list ap, void *data CTAGS_ATTR_UNUSED)

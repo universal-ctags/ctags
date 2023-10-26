@@ -16,11 +16,11 @@
 #include "routines.h"
 
 typedef bool (* errorPrintFunc) (const errorSelection selection, const char *const format,
-				    va_list ap, void *data);
+				    va_list ap, void *data) CTAGS_ATTR_PRINTF (2, 0);
 
 extern void setErrorPrinter (errorPrintFunc printer, void *data);
 
 extern bool stderrDefaultErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
-					  void *data);
+					  void *data) CTAGS_ATTR_PRINTF (2, 0);
 
 #endif
