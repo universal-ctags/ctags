@@ -2009,7 +2009,7 @@ static bool buildMacroInfoFromTagEntry (int corkIndex,
 	return true;
 }
 
-extern cppMacroInfo * cppFindMacroFromSymtab (const char *const name)
+static cppMacroInfo * cppFindMacroFromSymtab (const char *const name)
 {
 	cppMacroInfo *info = NULL;
 	foreachEntriesInScope (CORK_NIL, name, buildMacroInfoFromTagEntry, &info);

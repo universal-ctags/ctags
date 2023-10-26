@@ -182,7 +182,7 @@ static unsigned int ctagsGetLangCount(void)
 }
 
 
-void addIgnoreSymbol(const char *value)
+static void addIgnoreSymbol(const char *value)
 {
 	langType lang = getNamedLanguage ("CPreProcessor", 0);
 	/*

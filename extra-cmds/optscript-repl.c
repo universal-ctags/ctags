@@ -38,7 +38,7 @@ op_renew (OptVM *vm, EsObject *name)
 	return OPT_ERR_QUIT;
 }
 
-int
+static int
 optscript_run (OptVM *vm, char *prompt, void *app_data)
 {
 	int r = 0;

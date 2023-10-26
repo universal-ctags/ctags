@@ -456,7 +456,7 @@ static void resetLangOnStack (inputLangInfo *langInfo, langType lang)
 	langStackPush (& (langInfo->stack), lang);
 }
 
-extern langType baseLangOnStack (inputLangInfo *langInfo)
+static langType baseLangOnStack (inputLangInfo *langInfo)
 {
 	Assert (langInfo->stack.count > 0);
 	return langStackBotom (& (langInfo->stack));
