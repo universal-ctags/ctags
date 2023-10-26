@@ -2217,6 +2217,7 @@ static void processListKinddefFlagsOptions (
 	exit (0);
 }
 
+attr__noreturn
 static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 				     const char *const parameter)
 {
