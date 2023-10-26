@@ -760,8 +760,8 @@ static void initialize (const langType language)
 		return true;													\
 	}
 
-defineCommentCharSetter(At, BOL);
-defineCommentCharSetter(In, MOL);
+defineCommentCharSetter(At, BOL)
+defineCommentCharSetter(In, MOL)
 
 static bool asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
 									const char *optname CTAGS_ATTR_UNUSED, const char *arg)
