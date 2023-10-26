@@ -73,7 +73,7 @@ struct hereDocMarkerManager {
 *   FUNCTION DEFINITIONS
 */
 
-static void notifyEnteringPod ()
+static void notifyEnteringPod (void)
 {
 	subparser *sub;
 
@@ -89,7 +89,7 @@ static void notifyEnteringPod ()
 	}
 }
 
-static void notifyLeavingPod ()
+static void notifyLeavingPod (void)
 {
 	subparser *sub;
 

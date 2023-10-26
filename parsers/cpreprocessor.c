@@ -512,7 +512,7 @@ extern void cppUngetc (const int c)
 	Cpp.ungetDataSize++;
 }
 
-int cppUngetBufferSize()
+int cppUngetBufferSize(void)
 {
 	return Cpp.ungetBufferSize;
 }
@@ -1426,7 +1426,7 @@ static int skipToEndOfCxxRawLiteralString (void)
  *  special character to symbolically represent a generic character.
  *  Also detects Vera numbers that include a base specifier (ie. 'b1010).
  */
-static int skipToEndOfChar ()
+static int skipToEndOfChar (void)
 {
 	int c;
 	int count = 0, veraBase = '\0';

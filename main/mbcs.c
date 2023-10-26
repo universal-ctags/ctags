@@ -53,7 +53,7 @@ extern bool openConverter (const char* inputEncoding, const char* outputEncoding
 	return true;
 }
 
-extern bool isConverting ()
+extern bool isConverting (void)
 {
 	return iconv_fd != (iconv_t) -1;
 }
@@ -101,7 +101,7 @@ retry:
 	return true;
 }
 
-extern void closeConverter ()
+extern void closeConverter (void)
 {
 	if (iconv_fd != (iconv_t) -1)
 	{

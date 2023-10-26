@@ -940,7 +940,7 @@ static void createContext (verilogKind kind, vString* const name)
 	}
 }
 
-static void dropContext ()
+static void dropContext (void)
 {
 	verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 	currentContext = popToken (currentContext);

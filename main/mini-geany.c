@@ -75,7 +75,7 @@ static void enableRoles(unsigned int lang, unsigned int kind)
 
 
 /* we need to be able to enable all kinds and roles for all languages (some are disabled by default) */
-static void enableKindsAndRoles()
+static void enableKindsAndRoles(void)
 {
 	unsigned int lang;
 
