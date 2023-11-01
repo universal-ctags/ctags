@@ -1,0 +1,50 @@
+## Taken from https://toml.io/en/v0.5.0#example
+
+# This is a TOML document.
+
+title = "TOML Example"
+
+[dog."tater.man"]
+type.name = "pug"
+x = 1
+
+[owner]
+name = "Tom Preston-Werner"
+dob = 1979-05-27T07:32:00-08:00 # First class dates
+
+[database]
+server = "192.168.1.1"
+ports = [ 8001, 8001, 8002 ]
+connection_max = 5000
+enabled = true
+
+[servers]
+
+  # Indentation (tabs and/or spaces) is allowed but not required
+  [servers.alpha]
+  ip = "10.0.0.1"
+  dc = "eqdc10"
+
+  [servers.beta]
+  ip = "10.0.0.2"
+  dc = "eqdc10"
+
+[clients]
+data = [ ["gamma", "delta"], [1, 2] ]
+
+# Line breaks are OK when inside arrays
+hosts = [
+  "alpha",
+  "omega"
+]
+
+[[products]] # 0
+name = "Hammer"
+sku = 738594937
+
+[[products]] # 1
+
+[[products]] # 2
+name = "Nail"
+sku = 284758393
+color = "gray"

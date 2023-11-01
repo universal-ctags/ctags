@@ -480,6 +480,7 @@ The following parsers have been added:
 * Terraform (HCL) *optlib*
 * TerraformVariables *optlib*
 * Thrift *peg/packcc*
+* TOML *peg/packcc*
 * TTCN
 * Txt2tags
 * TypeScript
