@@ -22,6 +22,9 @@
  * MACROS
  */
 
+/* dummy definition to allow/require an extra semicolon */
+#define END_DEF(sfx) typedef int ctags_dummy_int_type_ignore_me_##sfx
+
 #define DECLARE_ALT_VALUE_FN(N)									\
 static EsObject* alt_value_##N (EsObject *args, DSLEnv *env)
 
@@ -31,7 +34,7 @@ static EsObject* alt_value_##N (EsObject *args, DSLEnv *env)			\
 	if (!env->alt_entry)												\
 		dsl_throw (NO_ALT_ENTRY, es_symbol_intern ("&" #N)); 			\
 	return dsl_entry_##N (env->alt_entry);								\
-}
+} END_DEF(alt_value_##N)
 
 
 /*
@@ -145,29 +148,29 @@ static DSLProcBind pbinds [] = {
 /*
  * Value functions
  */
-DEFINE_ALT_VALUE_FN(name)
-DEFINE_ALT_VALUE_FN(input)
-DEFINE_ALT_VALUE_FN(pattern)
-DEFINE_ALT_VALUE_FN(line)
+DEFINE_ALT_VALUE_FN(name);
+DEFINE_ALT_VALUE_FN(input);
+DEFINE_ALT_VALUE_FN(pattern);
+DEFINE_ALT_VALUE_FN(line);
 
-DEFINE_ALT_VALUE_FN(access)
-DEFINE_ALT_VALUE_FN(end)
-DEFINE_ALT_VALUE_FN(extras)
-DEFINE_ALT_VALUE_FN(file)
-DEFINE_ALT_VALUE_FN(inherits)
-DEFINE_ALT_VALUE_FN(implementation)
-DEFINE_ALT_VALUE_FN(kind)
-DEFINE_ALT_VALUE_FN(language)
-DEFINE_ALT_VALUE_FN(nth)
-DEFINE_ALT_VALUE_FN(scope)
-DEFINE_ALT_VALUE_FN(scope_kind)
-DEFINE_ALT_VALUE_FN(scope_name)
-DEFINE_ALT_VALUE_FN(signature)
-DEFINE_ALT_VALUE_FN(typeref)
-DEFINE_ALT_VALUE_FN(typeref_kind)
-DEFINE_ALT_VALUE_FN(typeref_name)
-DEFINE_ALT_VALUE_FN(roles)
-DEFINE_ALT_VALUE_FN(xpath)
+DEFINE_ALT_VALUE_FN(access);
+DEFINE_ALT_VALUE_FN(end);
+DEFINE_ALT_VALUE_FN(extras);
+DEFINE_ALT_VALUE_FN(file);
+DEFINE_ALT_VALUE_FN(inherits);
+DEFINE_ALT_VALUE_FN(implementation);
+DEFINE_ALT_VALUE_FN(kind);
+DEFINE_ALT_VALUE_FN(language);
+DEFINE_ALT_VALUE_FN(nth);
+DEFINE_ALT_VALUE_FN(scope);
+DEFINE_ALT_VALUE_FN(scope_kind);
+DEFINE_ALT_VALUE_FN(scope_name);
+DEFINE_ALT_VALUE_FN(signature);
+DEFINE_ALT_VALUE_FN(typeref);
+DEFINE_ALT_VALUE_FN(typeref_kind);
+DEFINE_ALT_VALUE_FN(typeref_name);
+DEFINE_ALT_VALUE_FN(roles);
+DEFINE_ALT_VALUE_FN(xpath);
 
 /*
  * Special form(s)

@@ -746,6 +746,9 @@ static void initialize (const langType language)
 	Lang_asm = language;
 }
 
+/* dummy definition to allow/require an extra semicolon */
+#define END_DEF(sfx) typedef int ctags_dummy_int_type_ignore_me_##sfx
+
 #define defineCommentCharSetter(PREPOS, POS)							\
 	static bool asmSetCommentChars##PREPOS##POS (const langType language CTAGS_ATTR_UNUSED, \
 												 const char *optname CTAGS_ATTR_UNUSED, const char *arg) \
@@ -758,10 +761,10 @@ static void initialize (const langType language)
 		else															\
 			commentChars##PREPOS##POS = defaultCommentChar##PREPOS##POS; \
 		return true;													\
-	}
+	} END_DEF(asmSetCommentChars##PREPOS##POS)
 
-defineCommentCharSetter(At, BOL)
-defineCommentCharSetter(In, MOL)
+defineCommentCharSetter(At, BOL);
+defineCommentCharSetter(In, MOL);
 
 static bool asmSetExtraLinesepChars(const langType language CTAGS_ATTR_UNUSED,
 									const char *optname CTAGS_ATTR_UNUSED, const char *arg)
