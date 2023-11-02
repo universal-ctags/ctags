@@ -123,6 +123,96 @@ static void handlYamlToken (yaml_token_t *token)
 	}
 }
 
+static int ypathCompileTable (langType language, tagYpathTable *table, int keywordId);
+static void ypathCompileTables (langType language, tagYpathTable tables[], size_t count, int keywordId);
+static void ypathCompiledCodeDelete (tagYpathTable tables[], size_t count);
+
+static void ypathHandleToken (yamlSubparser *yaml, yaml_token_t *token, int state, tagYpathTable tables[], size_t count);
+
+static void ypathPushType (yamlSubparser *yaml, yaml_token_t *token);
+static void ypathPopType (yamlSubparser *yaml);
+static void ypathPopAllTypes (yamlSubparser *yaml);
+static void ypathFillKeywordOfTokenMaybe (yamlSubparser *yaml, yaml_token_t *token, langType lang);
+
+static void ypathDefaultStateMachine (yamlSubparser *s, yaml_token_t *token)
+{
+#ifdef DO_TRACING
+	ypathPrintTypeStack (s);
+#endif
+
+	switch (token->type)
+	{
+	case YAML_KEY_TOKEN:
+		s->detectionState = YPATH_DSTAT_LAST_KEY;
+		break;
+	case YAML_SCALAR_TOKEN:
+		switch (s->detectionState)
+		{
+		case YPATH_DSTAT_LAST_KEY:
+			ypathFillKeywordOfTokenMaybe (s, token, getInputLanguage ());
+			/* FALL THROUGH */
+		case YPATH_DSTAT_LAST_VALUE:
+			TRACE_PRINT("token-callback: %s: %s",
+						(s->detectionState == YPATH_DSTAT_LAST_KEY)? "key": "value",
+						(char*)token->data.scalar.value);
+			ypathHandleToken (s, token, s->detectionState,
+							  s->ypathTables, s->ypathTableCount);
+			break;
+		default:
+			break;
+		}
+
+		s->detectionState = YPATH_DSTAT_INITIAL;
+
+		break;
+	case YAML_VALUE_TOKEN:
+		s->detectionState = YPATH_DSTAT_LAST_VALUE;
+		break;
+
+	default:
+		s->detectionState = YPATH_DSTAT_INITIAL;
+		break;
+	}
+}
+
+static void ypathDefaultNewTokenCallback (yamlSubparser *s, yaml_token_t *token)
+{
+	if (token->type == YAML_BLOCK_SEQUENCE_START_TOKEN
+		|| token->type == YAML_BLOCK_MAPPING_START_TOKEN)
+		ypathPushType (s, token);
+
+	ypathDefaultStateMachine (s, token);
+
+	if (token->type == YAML_BLOCK_END_TOKEN)
+		ypathPopType (s);
+	else if (token->type == YAML_STREAM_END_TOKEN)
+		ypathPopAllTypes (s);
+}
+
+static void finiSubparserState (yamlSubparser *yaml)
+{
+	ypathCompiledCodeDelete (yaml->ypathTables,
+							 yaml->ypathTableCount);
+	yaml->compiled = false;
+}
+
+static void initSubparserState (yamlSubparser *yaml, langType sublang)
+{
+	yaml->ypathTypeStack = NULL;
+	yaml->detectionState = YPATH_DSTAT_INITIAL;
+	if (yaml->ypathTables && !yaml->compiled)
+	{
+		ypathCompileTables (sublang, yaml->ypathTables,
+							yaml->ypathTableCount, 0);
+		yaml->compiled = true;
+
+		/* We cannot use the finalize method of the YAML parser for releasing
+		 * the compiled code because foreachSubparser doesn't work in the
+		 * method. In the context. We use the global trash instead. */
+		DEFAULT_TRASH_BOX(yaml, finiSubparserState);
+	}
+}
+
 static void findYamlTags (void)
 {
 	subparser *sub;
@@ -132,14 +222,13 @@ static void findYamlTags (void)
 
 	yamlInit (&yaml);
 
-	findRegexTags ();
-
 	foreachSubparser(sub, false)
 	{
-		enterSubparser (sub);
-		((yamlSubparser*)sub)->ypathTypeStack = NULL;
-		leaveSubparser ();
+		langType sublang = getSubparserLanguage(sub);
+		initSubparserState ((yamlSubparser*)sub, sublang);
 	}
+
+	findRegexTags ();
 
 	sub = getSubparserRunningBaseparser();
 	if (sub)
@@ -155,7 +244,10 @@ static void findYamlTags (void)
 		foreachSubparser(sub, false)
 		{
 			enterSubparser (sub);
-			((yamlSubparser *)sub)->newTokenNotfify ((yamlSubparser *)sub, &token);
+			if (((yamlSubparser *)sub)->newTokenNotfify)
+				((yamlSubparser *)sub)->newTokenNotfify ((yamlSubparser *)sub, &token);
+			else
+				ypathDefaultNewTokenCallback ((yamlSubparser *)sub, &token);
 			leaveSubparser ();
 		}
 
@@ -210,7 +302,7 @@ struct ypathTypeStack {
 	struct ypathTypeStack *next;
 };
 
-extern int ypathCompileTable (langType language, tagYpathTable *table, int keywordId)
+static int ypathCompileTable (langType language, tagYpathTable *table, int keywordId)
 {
 	vString *tmpkey = vStringNew();
 	intArray *code = intArrayNew ();
@@ -251,13 +343,13 @@ extern int ypathCompileTable (langType language, tagYpathTable *table, int keywo
 	return keywordId;
 }
 
-extern void ypathCompileTables (langType language, tagYpathTable tables[], size_t count, int keywordId)
+static void ypathCompileTables (langType language, tagYpathTable tables[], size_t count, int keywordId)
 {
 	for (size_t i = 0; i < count; i++)
 		keywordId = ypathCompileTable (language, tables + i, keywordId);
 }
 
-extern void ypathCompiledCodeDelete (tagYpathTable tables[], size_t count)
+static void ypathCompiledCodeDelete (tagYpathTable tables[], size_t count)
 {
 	for (size_t i = 0; i < count; i++)
 	{
@@ -266,7 +358,7 @@ extern void ypathCompiledCodeDelete (tagYpathTable tables[], size_t count)
 	}
 }
 
-extern void ypathPushType (yamlSubparser *yaml, yaml_token_t *token)
+static void ypathPushType (yamlSubparser *yaml, yaml_token_t *token)
 {
 	struct ypathTypeStack *s;
 
@@ -279,7 +371,7 @@ extern void ypathPushType (yamlSubparser *yaml, yaml_token_t *token)
 	s->key = KEYWORD_NONE;
 }
 
-extern void ypathPopType (yamlSubparser *yaml)
+static void ypathPopType (yamlSubparser *yaml)
 {
 	struct ypathTypeStack *s;
 
@@ -291,13 +383,13 @@ extern void ypathPopType (yamlSubparser *yaml)
 	eFree (s);
 }
 
-extern void ypathPopAllTypes (yamlSubparser *yaml)
+static void ypathPopAllTypes (yamlSubparser *yaml)
 {
 	while (yaml->ypathTypeStack)
 		ypathPopType (yaml);
 }
 
-extern void ypathFillKeywordOfTokenMaybe (yamlSubparser *yaml, yaml_token_t *token, langType lang)
+static void ypathFillKeywordOfTokenMaybe (yamlSubparser *yaml, yaml_token_t *token, langType lang)
 {
 	if (!yaml->ypathTypeStack)
 		return;
@@ -326,7 +418,7 @@ static bool ypathStateStackMatch (struct ypathTypeStack *stack,
 		return false;
 }
 
-extern void ypathHandleToken (yamlSubparser *yaml, yaml_token_t *token, int state,
+static void ypathHandleToken (yamlSubparser *yaml, yaml_token_t *token, int state,
 							  tagYpathTable tables[], size_t count)
 {
 	if (!yaml->ypathTypeStack)
