@@ -130,8 +130,8 @@ static void ypathCompiledCodeDelete (tagYpathTable tables[], size_t count);
 static void ypathHandleToken (yamlSubparser *yaml, yaml_token_t *token, int state, tagYpathTable tables[], size_t count);
 
 static void ypathPushType (yamlSubparser *yaml, yaml_token_t *token);
-static void ypathPopType (yamlSubparser *yaml);
-static void ypathPopAllTypes (yamlSubparser *yaml);
+static void ypathPopType (yamlSubparser *yaml, yaml_token_t *token);
+static void ypathPopAllTypes (yamlSubparser *yaml, yaml_token_t *token);
 static void ypathFillKeywordOfTokenMaybe (yamlSubparser *yaml, yaml_token_t *token, langType lang);
 
 static void ypathDefaultStateMachine (yamlSubparser *s, yaml_token_t *token)
@@ -184,9 +184,9 @@ static void ypathDefaultNewTokenCallback (yamlSubparser *s, yaml_token_t *token)
 	ypathDefaultStateMachine (s, token);
 
 	if (token->type == YAML_BLOCK_END_TOKEN)
-		ypathPopType (s);
+		ypathPopType (s, token);
 	else if (token->type == YAML_STREAM_END_TOKEN)
-		ypathPopAllTypes (s);
+		ypathPopAllTypes (s, token);
 }
 
 static void finiSubparserState (yamlSubparser *yaml)
@@ -270,7 +270,7 @@ static void findYamlTags (void)
 	foreachSubparser(sub, false)
 	{
 		enterSubparser (sub);
-		ypathPopAllTypes ((yamlSubparser*)sub);
+		ypathPopAllTypes ((yamlSubparser*)sub, NULL);
 		leaveSubparser ();
 	}
 
@@ -369,11 +369,17 @@ static void ypathPushType (yamlSubparser *yaml, yaml_token_t *token)
 
 	s->type = token->type;
 	s->key = KEYWORD_NONE;
+
+	if (yaml->enterBlockNotify)
+		yaml->enterBlockNotify (yaml, token);
 }
 
-static void ypathPopType (yamlSubparser *yaml)
+static void ypathPopType (yamlSubparser *yaml, yaml_token_t *token)
 {
 	struct ypathTypeStack *s;
+
+	if (yaml->leaveBlockNotify)
+		yaml->leaveBlockNotify (yaml, token);
 
 	s = yaml->ypathTypeStack;
 	yaml->ypathTypeStack = s->next;
@@ -383,10 +389,10 @@ static void ypathPopType (yamlSubparser *yaml)
 	eFree (s);
 }
 
-static void ypathPopAllTypes (yamlSubparser *yaml)
+static void ypathPopAllTypes (yamlSubparser *yaml, yaml_token_t *token)
 {
 	while (yaml->ypathTypeStack)
-		ypathPopType (yaml);
+		ypathPopType (yaml, token);
 }
 
 static void ypathFillKeywordOfTokenMaybe (yamlSubparser *yaml, yaml_token_t *token, langType lang)

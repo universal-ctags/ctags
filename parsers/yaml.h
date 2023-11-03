@@ -28,6 +28,10 @@ typedef struct sYamlSubparser yamlSubparser;
 struct sYamlSubparser {
 	subparser subparser;
 	void (* newTokenNotfify) (yamlSubparser *s, yaml_token_t *token);
+
+	void (* enterBlockNotify) (yamlSubparser *s, yaml_token_t *token);
+	void (* leaveBlockNotify) (yamlSubparser *s, yaml_token_t *token);
+
 	struct sTagYpathTable *ypathTables;
 	size_t ypathTableCount;
 
