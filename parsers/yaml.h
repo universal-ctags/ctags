@@ -31,6 +31,7 @@ struct sYamlSubparser {
 
 	void (* enterBlockNotify) (yamlSubparser *s, yaml_token_t *token);
 	void (* leaveBlockNotify) (yamlSubparser *s, yaml_token_t *token);
+	void (* makeTagEntryNotifyViaYpath) (yamlSubparser *s, int corkIndex);
 
 	struct sTagYpathTable *ypathTables;
 	size_t ypathTableCount;

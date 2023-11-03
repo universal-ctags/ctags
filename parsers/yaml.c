@@ -461,7 +461,9 @@ static void ypathHandleToken (yamlSubparser *yaml, yaml_token_t *token, int stat
 			if (r)
 			{
 				attachYamlPosition (&tag, token, false);
-				makeTagEntry (&tag);
+				int index = makeTagEntry (&tag);
+				if (index != CORK_NIL && yaml->makeTagEntryNotifyViaYpath)
+					yaml->makeTagEntryNotifyViaYpath (yaml, index);
 			}
 			break;
 		}
