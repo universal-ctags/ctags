@@ -62,7 +62,7 @@ classParameters <- LPAREN __* (classParameter (__* COMMA __* classParameter)* (_
 classParameter <- (modifiers? _* VAL {PUSH_KIND(auxil, K_CONSTANT);} / modifiers? _* VAR {PUSH_KIND(auxil, K_VARIABLE);} / modifiers? {PUSH_KIND(auxil, K_IGNORE);} _*)? __* <simpleIdentifier> {makeKotlinTag(auxil, $1, $1s, true);} _* COLON __* type (__* ASSIGNMENT __* expression)? {POP_SCOPE(auxil);}
 delegationSpecifiers <- annotatedDelegationSpecifier (__* COMMA __* annotatedDelegationSpecifier)*
 delegationSpecifier <- constructorInvocation / explicitDelegation / userType / functionType
-constructorInvocation <- userType _* valueArguments
+constructorInvocation <- userType __* valueArguments
 annotatedDelegationSpecifier <- annotation* __* delegationSpecifier
 explicitDelegation <- (userType / functionType) __* BY __* expression
 typeParameters <- LANGLE __* typeParameter (__* COMMA __* typeParameter)* (__* COMMA)? __* RANGLE
@@ -74,7 +74,7 @@ typeConstraint <- annotation* simpleIdentifier __* COLON __* type
 classMemberDeclarations <- (classMemberDeclaration semis?)*
 classMemberDeclaration <- secondaryConstructor / anonymousInitializer / companionObject / declaration
 anonymousInitializer <- INIT __* block
-companionObject <- modifiers? COMPANION __* OBJECT {PUSH_KIND(auxil, K_OBJECT);} <(__* simpleIdentifier)?> {makeKotlinTag(auxil, $1e-$1s != 0 ? $1 : "Companion", $1s, true);} (__* COLON __* delegationSpecifiers)? (__* classBody)? {POP_SCOPE(auxil);}
+companionObject <- modifiers? COMPANION __* (DATA __*)? OBJECT {PUSH_KIND(auxil, K_OBJECT);} <(__* simpleIdentifier)?> {makeKotlinTag(auxil, $1e-$1s != 0 ? $1 : "Companion", $1s, true);} (__* COLON __* delegationSpecifiers)? (__* classBody)? {POP_SCOPE(auxil);}
 functionValueParameters <- LPAREN __* (functionValueParameter (__* COMMA __* functionValueParameter)* (__* COMMA)?)? __* RPAREN
 functionValueParameter <- parameterModifiers? _* parameter (__* ASSIGNMENT __* expression)?
 functionDeclaration <- modifiers? _* FUN {PUSH_KIND(auxil, K_METHOD);} _* (__* typeParameters)? _* (__* receiverTypeAndDot)? __* <simpleIdentifier> {makeKotlinTag(auxil, $1, $1s, true);} __* functionValueParameters _* (__* COLON __* type)? _* (__* typeConstraints)? _* (__* functionBody)? {POP_SCOPE(auxil);}
@@ -141,7 +141,7 @@ infixOperation <- elvisExpression (_* inOperator __* elvisExpression / _* isOper
 elvisExpression <- infixFunctionCall (__* elvis __* infixFunctionCall)*
 elvis <- QUEST_NO_WS COLON
 infixFunctionCall <- rangeExpression (_* simpleIdentifier __* rangeExpression)*
-rangeExpression <- additiveExpression (_* RANGE __* additiveExpression)*
+rangeExpression <- additiveExpression (_* (RANGE_UNTIL / RANGE) __* additiveExpression)*
 additiveExpression <- multiplicativeExpression (_* additiveOperator __* multiplicativeExpression)*
 multiplicativeExpression <- asExpression (_* multiplicativeOperator __* asExpression)*
 asExpression <- prefixUnaryExpression (__* asOperator __* type)*
@@ -203,9 +203,9 @@ inside_valueArgument <- annotation? __* (simpleIdentifier __* ASSIGNMENT __*)? M
 lambdaLiteral <- LCURL {PUSH_KIND(auxil, K_METHOD); makeKotlinTag(auxil, "<lambda>", $0s, true);} __* statements __* RCURL {POP_SCOPE(auxil);} / LCURL {PUSH_KIND(auxil, K_METHOD); makeKotlinTag(auxil, "<lambda>", 8, true);} __* lambdaParameters? __* ARROW __* statements __* RCURL {POP_SCOPE(auxil);}
 lambdaParameters <- lambdaParameter (__* COMMA __* lambdaParameter)* (__* COMMA)?
 lambdaParameter <- variableDeclaration / multiVariableDeclaration (__* COLON __* type)?
-anonymousFunction <- FUN {PUSH_KIND(auxil, K_METHOD); makeKotlinTag(auxil, "<anonymous>", $0s, true);} (__* type __* DOT)? __* parametersWithOptionalType (__* COLON __* type)? (__* typeConstraints)? (__* functionBody)? {POP_SCOPE(auxil);}
+anonymousFunction <- (SUSPEND __*)? FUN {PUSH_KIND(auxil, K_METHOD); makeKotlinTag(auxil, "<anonymous>", $0s, true);} (__* type __* DOT)? __* parametersWithOptionalType (__* COLON __* type)? (__* typeConstraints)? (__* functionBody)? {POP_SCOPE(auxil);}
 functionLiteral <- lambdaLiteral / anonymousFunction
-objectLiteral <- OBJECT __* COLON __* delegationSpecifiers __* classBody / OBJECT __* classBody
+objectLiteral <- (DATA __*)? OBJECT __* COLON __* delegationSpecifiers __* classBody / OBJECT __* classBody
 thisExpression <- THIS_AT / THIS !(Letter / UnicodeDigit)
 superExpression <- SUPER_AT / SUPER (LANGLE __* type __* RANGLE)? (AT_NO_WS simpleIdentifier)?
 ifExpression <- IF __* LPAREN __* expression __* RPAREN __* controlStructureBody? __* SEMICOLON? __* ELSE __* (controlStructureBody / SEMICOLON) / IF __* LPAREN __* expression __* RPAREN __* (controlStructureBody / SEMICOLON)
@@ -314,6 +314,7 @@ MOD_ASSIGNMENT <- '%='
 ARROW <- '->'
 #DOUBLE_ARROW <- '=>'
 RANGE <- '..'
+RANGE_UNTIL <- '..<'
 COLONCOLON <- '::'
 #DOUBLE_SEMICOLON <- ';;'
 #HASH <- '#'
