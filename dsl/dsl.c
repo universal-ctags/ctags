@@ -36,6 +36,9 @@ typedef struct sDSLEngine DSLEngine;
  * MACROS
  */
 
+/* dummy definition to allow/require an extra semicolon */
+#define END_DEF(sfx) typedef int ctags_dummy_int_type_ignore_me_##sfx
+
 #define DECLARE_VALUE_FN(N)									\
 static EsObject* value_##N (EsObject *args, DSLEnv *env)
 
@@ -43,7 +46,7 @@ static EsObject* value_##N (EsObject *args, DSLEnv *env)
 static EsObject* value_##N (EsObject *args, DSLEnv *env)	\
 {															\
 	return dsl_entry_##N (env->entry);						\
-}
+} END_DEF(value_##N)
 
 /*
  * FUNCTION DECLARATIONS
@@ -698,7 +701,7 @@ static EsObject* builtin_not  (EsObject *args, DSLEnv *env)
 			return es_true;					\
 		else							\
 			return es_false;				\
-	}
+	} END_DEF(builtin_##N)
 
 static EsObject* builtin_eq  (EsObject *args, DSLEnv *env)
 {
@@ -895,29 +898,29 @@ static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env)
 /*
  * Value functions
  */
-DEFINE_VALUE_FN(name)
-DEFINE_VALUE_FN(input)
-DEFINE_VALUE_FN(pattern)
-DEFINE_VALUE_FN(line)
+DEFINE_VALUE_FN(name);
+DEFINE_VALUE_FN(input);
+DEFINE_VALUE_FN(pattern);
+DEFINE_VALUE_FN(line);
 
-DEFINE_VALUE_FN(access)
-DEFINE_VALUE_FN(end)
-DEFINE_VALUE_FN(extras)
-DEFINE_VALUE_FN(file)
-DEFINE_VALUE_FN(inherits)
-DEFINE_VALUE_FN(implementation)
-DEFINE_VALUE_FN(kind)
-DEFINE_VALUE_FN(language)
-DEFINE_VALUE_FN(nth)
-DEFINE_VALUE_FN(scope)
-DEFINE_VALUE_FN(scope_kind)
-DEFINE_VALUE_FN(scope_name)
-DEFINE_VALUE_FN(signature)
-DEFINE_VALUE_FN(typeref)
-DEFINE_VALUE_FN(typeref_kind)
-DEFINE_VALUE_FN(typeref_name)
-DEFINE_VALUE_FN(roles)
-DEFINE_VALUE_FN(xpath)
+DEFINE_VALUE_FN(access);
+DEFINE_VALUE_FN(end);
+DEFINE_VALUE_FN(extras);
+DEFINE_VALUE_FN(file);
+DEFINE_VALUE_FN(inherits);
+DEFINE_VALUE_FN(implementation);
+DEFINE_VALUE_FN(kind);
+DEFINE_VALUE_FN(language);
+DEFINE_VALUE_FN(nth);
+DEFINE_VALUE_FN(scope);
+DEFINE_VALUE_FN(scope_kind);
+DEFINE_VALUE_FN(scope_name);
+DEFINE_VALUE_FN(signature);
+DEFINE_VALUE_FN(typeref);
+DEFINE_VALUE_FN(typeref_kind);
+DEFINE_VALUE_FN(typeref_name);
+DEFINE_VALUE_FN(roles);
+DEFINE_VALUE_FN(xpath);
 
 static const char*entry_xget (const tagEntry *entry, const char* name)
 {

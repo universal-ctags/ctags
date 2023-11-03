@@ -166,7 +166,7 @@ static const keywordTable PythonKeywordTable[] = {
 };
 
 /* Taken from https://docs.python.org/3/reference/lexical_analysis.html#keywords */
-const static struct keywordGroup PythonRestKeywords = {
+static const struct keywordGroup PythonRestKeywords = {
 	.value = KEYWORD_REST,
 	.addingUnlessExisting = true,
 	.keywords = {

@@ -152,7 +152,7 @@ struct tagEntryArray {
 	struct tagEntryHolder *a;
 };
 
-struct tagEntryArray *tagEntryArrayNew (void)
+static struct tagEntryArray *tagEntryArrayNew (void)
 {
 	struct tagEntryArray * a = eMalloc (sizeof (struct tagEntryArray));
 
@@ -163,7 +163,7 @@ struct tagEntryArray *tagEntryArrayNew (void)
 	return a;
 }
 
-void tagEntryArrayPush (struct tagEntryArray *a, tagEntry *e)
+static void tagEntryArrayPush (struct tagEntryArray *a, tagEntry *e)
 {
 	if (a->count + 1 == a->length)
 	{
@@ -180,7 +180,7 @@ void tagEntryArrayPush (struct tagEntryArray *a, tagEntry *e)
 	a->a[a->count++].e = e;
 }
 
-void tagEntryArrayFree (struct tagEntryArray *a, int freeTags)
+static void tagEntryArrayFree (struct tagEntryArray *a, int freeTags)
 {
 	if (freeTags)
 	{

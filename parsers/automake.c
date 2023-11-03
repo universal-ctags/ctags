@@ -166,7 +166,7 @@ static const char *skipPrefix(const char *name)
 	size_t prefix_len;
 
 	/* Drop "dist_" in "dist_data_DATA" */
-	const static struct sPrefix obj_prefixlist [] = {
+	static const struct sPrefix obj_prefixlist [] = {
 		{ "dist_",    5 },
 		{ "nodist_",  7 },
 		{ "nobase_",  7 },

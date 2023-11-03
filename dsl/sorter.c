@@ -22,6 +22,9 @@
  * MACROS
  */
 
+/* dummy definition to allow/require an extra semicolon */
+#define END_DEF(sfx) typedef int ctags_dummy_int_type_ignore_me_##sfx
+
 #define DECLARE_ALT_VALUE_FN(N)									\
 static EsObject* alt_value_##N (EsObject *args, DSLEnv *env)
 
@@ -31,7 +34,7 @@ static EsObject* alt_value_##N (EsObject *args, DSLEnv *env)			\
 	if (!env->alt_entry)												\
 		dsl_throw (NO_ALT_ENTRY, es_symbol_intern ("&" #N)); 			\
 	return dsl_entry_##N (env->alt_entry);								\
-}
+} END_DEF(alt_value_##N)
 
 
 /*

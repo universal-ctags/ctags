@@ -165,7 +165,7 @@ CTAGS_INLINE void uugcInjectC (int chr)
 	uugcUngetC (c);
 }
 
-CTAGS_INLINE long uugcGetLineNumber ()
+CTAGS_INLINE long uugcGetLineNumber (void)
 {
 	Assert (uugcInputFile);
 
@@ -248,7 +248,7 @@ extern void uwiDeactivate (struct sUwiStats *statsToBeUpdated)
 	uugcDeactive();
 }
 
-extern int uwiGetC ()
+extern int uwiGetC (void)
 {
 	int c;
 	uugcChar *chr = uugciGetC ();
@@ -337,7 +337,7 @@ extern void uwiClearMarker (const int upto, const bool revertChars)
 	}
 }
 
-extern void uwiDropMaker ()
+extern void uwiDropMaker (void)
 {
 	uwiPopMarker (0, false);
 }

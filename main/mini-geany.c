@@ -44,6 +44,7 @@ tagWriter customWriter = {
 
 
 /* we need to be able to provide an error printer which doesn't crash Geany on error */
+CTAGS_ATTR_PRINTF(2, 0)
 static bool nofatalErrorPrinter (const errorSelection selection,
 					  const char *const format,
 					  va_list ap, void *data CTAGS_ATTR_UNUSED)
@@ -75,7 +76,7 @@ static void enableRoles(unsigned int lang, unsigned int kind)
 
 
 /* we need to be able to enable all kinds and roles for all languages (some are disabled by default) */
-static void enableKindsAndRoles()
+static void enableKindsAndRoles(void)
 {
 	unsigned int lang;
 
@@ -181,7 +182,7 @@ static unsigned int ctagsGetLangCount(void)
 }
 
 
-void addIgnoreSymbol(const char *value)
+static void addIgnoreSymbol(const char *value)
 {
 	langType lang = getNamedLanguage ("CPreProcessor", 0);
 	/*

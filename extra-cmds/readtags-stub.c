@@ -39,9 +39,10 @@ extern void debugAssert (const char *assertion, const char *file, unsigned int l
 
 #define selected(var,feature)	(((int)(var) & (int)(feature)) == (int)feature)
 
-extern bool stderrDefaultErrorPrinter (const errorSelection selection,
-					  const char *const format,
-					  va_list ap, void *data CTAGS_ATTR_UNUSED)
+CTAGS_ATTR_PRINTF (2, 0)
+static bool stderrDefaultErrorPrinter (const errorSelection selection,
+				       const char *const format,
+				       va_list ap, void *data CTAGS_ATTR_UNUSED)
 {
 	fprintf (stderr, "%s: %s", getExecutableName (),
 		 selected (selection, WARNING) ? "Warning: " :

@@ -13,6 +13,7 @@
 #include "debug.h"
 #include "routines.h"
 #include "trashbox.h"
+#include "trashbox_p.h"
 
 typedef TrashBoxDestroyItemProc TrashDestroyItemProc;
 typedef struct sTrash {

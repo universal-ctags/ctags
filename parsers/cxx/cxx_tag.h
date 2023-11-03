@@ -188,7 +188,7 @@ void cxxTagSetCorkQueueField(
 	);
 
 // Handle the template-related parts of the tag (class, function, variable)
-void cxxTagHandleTemplateFields();
+void cxxTagHandleTemplateFields(void);
 
 // Commit the composed tag. Must follow a successful cxxTagBegin() call.
 // Returns the index of the tag in the cork queue.

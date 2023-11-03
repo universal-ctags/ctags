@@ -358,7 +358,7 @@ extern void ypathHandleToken (yamlSubparser *yaml, yaml_token_t *token, int stat
 }
 
 #ifdef DO_TRACING
-extern void ypathPrintTypeStack0(struct ypathTypeStack *stack)
+static void ypathPrintTypeStack0(struct ypathTypeStack *stack)
 {
 	if (!stack)
 	{

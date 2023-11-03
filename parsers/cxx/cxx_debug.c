@@ -123,11 +123,11 @@ typedef void (* cxxDebugDumpCommonFunc)(void *,
 										struct circularRefChecker *,
 										struct circularRefChecker *,
 										bool);
-void cxxDebugDumpCommon (void *data,
-						 void (* func)(void *,
-									   struct circularRefChecker *,
-									   struct circularRefChecker *,
-									   bool))
+static void cxxDebugDumpCommon (void *data,
+								void (* func)(void *,
+											  struct circularRefChecker *,
+											  struct circularRefChecker *,
+											  bool))
 {
 	static struct circularRefChecker *pTokenChecker;
 	static struct circularRefChecker *pChainChecker;

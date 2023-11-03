@@ -16,6 +16,7 @@
 
 #include "general.h"  /* must always come first */
 #include "types.h"
+#include "lxpath.h"
 
 
 /*
