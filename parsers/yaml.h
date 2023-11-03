@@ -47,6 +47,7 @@ struct sYamlSubparser {
 #define YAML(S) ((yamlSubparser *)S)
 
 extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asEndPosition);
+extern size_t ypathGetTypeStackDepth (yamlSubparser *yaml);
 
 /*
  * Experimental Ypath code

@@ -395,6 +395,19 @@ static void ypathPopAllTypes (yamlSubparser *yaml, yaml_token_t *token)
 		ypathPopType (yaml, token);
 }
 
+extern size_t ypathGetTypeStackDepth (yamlSubparser *yaml)
+{
+	size_t depth = 0;
+	struct ypathTypeStack *s = yaml->ypathTypeStack;
+
+	while (s) {
+		depth++;
+		s = s->next;
+	}
+
+	return depth;
+}
+
 static void ypathFillKeywordOfTokenMaybe (yamlSubparser *yaml, yaml_token_t *token, langType lang)
 {
 	if (!yaml->ypathTypeStack)
