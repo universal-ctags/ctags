@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/universal-ctags/ctags/badge.svg?branch=master&service=github)](https://coveralls.io/github/universal-ctags/ctags?branch=master)
 [![Build status](https://ci.appveyor.com/api/projects/status/6hk2p5lv6jsrd9o7/branch/master?svg=true)](https://ci.appveyor.com/project/universalctags/ctags/branch/master)
 [![RTD build status](https://readthedocs.org/projects/ctags/badge)](https://docs.ctags.io)
-[![CircleCI Build Status](https://circleci.com/gh/universal-ctags/ctags.svg?style=shield&circle-token=2e582261da84ebc6d21725b05381f410bc5de29d)](https://circleci.com/gh/universal-ctags)
+[![CircleCI Build Status](https://dl.circleci.com/status-badge/img/gh/universal-ctags/ctags/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/universal-ctags/ctags/tree/master)
 ![GitHub Actions/VALGRIND](https://github.com/universal-ctags/ctags/workflows/run%20units%20target%20under%20VALGRIND/badge.svg)
 
 [Universal Ctags](https://ctags.io/) (abbreviated as u-ctags) is a *maintained*
