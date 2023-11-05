@@ -25,7 +25,6 @@
 *   FUNCTION PROTOTYPES
 */
 extern subparser *getFirstSubparser(struct slaveControlBlock *controlBlock);
-extern langType getSubparserLanguage (subparser *s);
 
 /* A base parser doesn't have to call the following three functions.
    The main part calls them internally. */

@@ -62,6 +62,7 @@ extern subparser* getSubparserRunningBaseparser (void);
 extern void chooseExclusiveSubparser (subparser *s, void *data);
 
 extern subparser *getLanguageSubparser (langType sublang, bool including_none_crafted_parser);
+extern langType getSubparserLanguage (subparser *s);
 
 /* Interface for Subparsers   */
 #define RUN_DEFAULT_SUBPARSERS -1
