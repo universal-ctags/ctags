@@ -2019,6 +2019,12 @@ static bool parseMethods (tokenInfo *const token, int class_index,
 
 			deleteToken (saved_token);
 		}
+		else if (isType (token, TOKEN_DOTS))
+		{
+			/* maybe spread operator. Just skip the next expression. */
+			findCmdTerm(token, true, true);
+			continue;
+		}
 
 		if (! isType (token, TOKEN_KEYWORD) &&
 			! isType (token, TOKEN_SEMICOLON))

@@ -1,0 +1,8 @@
+foo	input.js	/^const embedded = { foo: 'bar' }$/;"	p	variable:embedded
+embedded	input.js	/^const embedded = { foo: 'bar' }$/;"	v
+baz	input.js	/^  baz: 'fox',$/;"	p	variable:something
+something	input.js	/^const something = {$/;"	v
+mapGetters	input.js	/^const mapGetters = function() {}$/;"	f
+computed	input.js	/^const computed = {$/;"	C
+fn	input.js	/^  fn: () => { \/* doing something *\/ },$/;"	m	variable:FNO
+FNO	input.js	/^const FNO = {$/;"	v
