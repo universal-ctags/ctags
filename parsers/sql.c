@@ -2752,10 +2752,15 @@ static void parseView (tokenInfo *const token)
 	 *     create view VIEW;
 	 *     create view VIEW as ...;
 	 *     create view VIEW (...) as ...;
+	 *     create view if not exists VIEW as ...;
+	 *       -- [SQLITE] https://www.sqlite.org/lang_createview.html
 	 */
 
 	readIdentifier (name);
 	readToken (token);
+
+	parseIdAfterIfNotExists(name, token, false);
+
 	if (isType (token, TOKEN_PERIOD))
 	{
 		readIdentifier (name);

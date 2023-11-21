@@ -1,0 +1,1 @@
+messages_data	input.sql	/^CREATE VIEW IF NOT EXISTS messages_data AS$/;"	V
