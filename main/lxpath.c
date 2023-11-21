@@ -20,6 +20,7 @@
 #include "xtag.h"
 
 #ifdef HAVE_LIBXML
+#include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <libxml/tree.h>
 
