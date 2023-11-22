@@ -11,34 +11,33 @@ jobs:
     runs-on: windows-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        msystem: [MSYS, MINGW32, MINGW64]
+        msystem: [MSYS, MINGW32, MINGW64, CLANG32, CLANG64]
 
     defaults:
       run:
         shell: msys2 {0}
 
     steps:
-    - uses: msys2/setup-msys2@v2
+    - if: ${{ matrix.msystem == 'MSYS' }}
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MSYS
+        update: true
+        install: automake autoconf make dos2unix gcc pkgconf python3 jansson libxml2 libyaml pcre2
+
+    - if: ${{ matrix.msystem != 'MSYS' }}
+      uses: msys2/setup-msys2@v2
       with:
         msystem: ${{ matrix.msystem }}
         update: true
-        install: git make automake1.16 autoconf
-
-    - if:  matrix.msystem == 'MSYS'
-      run: pacman -S --noconfirm gcc libiconv-devel pkg-config python dos2unix
-
-    - if:  matrix.msystem == 'MINGW32'
-      run: pacman -S --noconfirm mingw-w64-i686-toolchain python dos2unix
-
-    - if:  matrix.msystem == 'MINGW64'
-      run: pacman -S --noconfirm mingw-w64-x86_64-toolchain python dos2unix
-
-    - run: ln -s /usr/bin/automake-1.16 /usr/bin/automake
-    - run: ln -s /usr/bin/aclocal-1.16  /usr/bin/aclocal
+        install: automake autoconf make dos2unix
+        pacboy: toolchain:p python3-sphinx:p jansson:p libxml2:p libyaml:p pcre2:p
 
     - run: git config --global core.autocrlf input
       shell: bash
+
     - uses: actions/checkout@v4
 
     - run: ./autogen.sh
@@ -52,7 +51,7 @@ jobs:
 
     # FAILED: "./readtags.exe" -t "/d/a/ctags2/ctags2/Units/parser-asciidoc.r/utf8-asciidoc.d/expected.tags" - "@Ѐ–𐀀"
     # The raw tag name was "@Ѐ–𐀀"
-    - if:  matrix.msystem == 'MSYS'
+    - if: ${{ matrix.msystem == 'MSYS' }}
       run: make roundtrip
 
     - run: make tmain
