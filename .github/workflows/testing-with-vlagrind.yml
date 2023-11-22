@@ -13,17 +13,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: update package information
-      run: sudo apt-get update
-    - name: install tools and libraries
-      run: sudo apt-get install valgrind pkg-config automake bash libjansson-dev libyaml-dev libseccomp-dev libxml2-dev libpcre2-dev gdb
-    - name: autogen.sh
-      run: ./autogen.sh
-    - name: report the version of cc
-      run: cc --version
-    - name: configure
-      run: ./configure --enable-debugging
-    - name: make
-      run: make CFLAGS='-g -O0'
-    - name: make units
-      run: make units VG=1
+
+    - run: sudo apt-get update
+    - run: sudo apt-get install valgrind pkg-config automake bash libjansson-dev libyaml-dev libseccomp-dev libxml2-dev libpcre2-dev gdb
+
+    - run: cc --version
+
+    - run: ./autogen.sh
+    - run: ./configure --enable-debugging
+    - run: make CFLAGS='-g -O0'
+    - run: make units VG=1
