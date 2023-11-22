@@ -358,7 +358,7 @@ selectFortranOrForthByForthMarker (MIO *input,
 }
 
 #ifdef HAVE_LIBXML
-
+#include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <libxml/tree.h>
 
