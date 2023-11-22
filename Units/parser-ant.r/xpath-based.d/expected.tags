@@ -1,10 +1,10 @@
-MyProject	input.xml	/^<project name="MyProject" default="deploy" basedir=".">$/;"	p	language:Ant	roles:def
-another.ant	input.xml	/^  <import file="another.ant"\/>$/;"	i	language:Ant	project:MyProject	roles:imported
-base.classpath	input.xml	/^    <path id="base.classpath">$/;"	i	language:XML	roles:def
-clean	input.xml	/^  <target name="clean" depends="init">$/;"	t	language:Ant	project:MyProject	roles:def
-compile_something	input.xml	/^  <target name="compile_something" depends="init">$/;"	t	language:Ant	project:MyProject	roles:def
-deploy	input.xml	/^    <target name="deploy" depends="compile_something, generate_h_from_java">$/;"	t	language:Ant	project:MyProject	roles:def
-generate_h_from_java	input.xml	/^  <target name="generate_h_from_java" depends="compile_something">$/;"	t	language:Ant	project:MyProject	roles:def
-init	input.xml	/^  <target name="init">$/;"	t	language:Ant	project:MyProject	roles:def
-javadoc	input.xml	/^  <target name="javadoc">$/;"	t	language:Ant	project:MyProject	roles:def
-x	input.xml	/^  <property name="x" value="y" \/>$/;"	P	language:Ant	project:MyProject	roles:def
+MyProject	input.xml	/^<project name="MyProject" default="deploy" basedir=".">$/;"	p	line:3	language:Ant	roles:def
+another.ant	input.xml	/^  <import file="another.ant"\/>$/;"	i	line:4	language:Ant	project:MyProject	roles:imported
+base.classpath	input.xml	/^    <path id="base.classpath">$/;"	i	line:11	language:XML	roles:def
+clean	input.xml	/^  <target name="clean" depends="init">$/;"	t	line:16	language:Ant	project:MyProject	roles:def
+compile_something	input.xml	/^  <target name="compile_something" depends="init">$/;"	t	line:23	language:Ant	project:MyProject	roles:def
+deploy	input.xml	/^    <target name="deploy" depends="compile_something, generate_h_from_java">$/;"	t	line:68	language:Ant	project:MyProject	roles:def
+generate_h_from_java	input.xml	/^  <target name="generate_h_from_java" depends="compile_something">$/;"	t	line:47	language:Ant	project:MyProject	roles:def
+init	input.xml	/^  <target name="init">$/;"	t	line:6	language:Ant	project:MyProject	roles:def
+javadoc	input.xml	/^  <target name="javadoc">$/;"	t	line:52	language:Ant	project:MyProject	roles:def
+x	input.xml	/^  <property name="x" value="y" \/>$/;"	P	line:5	language:Ant	project:MyProject	roles:def
