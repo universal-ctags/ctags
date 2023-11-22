@@ -18,7 +18,7 @@ jobs:
     container: alpine:${{ matrix.tag }}
 
     steps:
-      - run: apk add libc-dev gcc make automake autoconf pkgconf python3 file diffutils git
+      - run: apk add libc-dev gcc make automake autoconf pkgconf python3 file diffutils git pcre2-dev jansson-dev yaml-dev libxml2-dev
 
       # this is to fix https://github.com/actions/checkout/issues/760
       - run: git config --global --add safe.directory /__w/ctags/ctags
