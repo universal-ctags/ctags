@@ -17,6 +17,7 @@ x  external and forward variable declarations [off]
 z  function parameters inside function or prototype definitions [off]
 L  goto labels [off]
 D  parameters inside macro definitions [off]
+Y  unknown identifier [off]
 #
 # list kinds Event
 #
@@ -36,13 +37,14 @@ n  name
 #LETTER NAME       ENABLED REFONLY NROLES MASTER DESCRIPTION
 D       macroparam no      no      0      C      parameters inside macro definitions
 L       label      no      no      0      C      goto labels
+Y       unknown    no      yes     4      C      unknown identifier
 d       macro      yes     no      2      C      macro definitions
 e       enumerator yes     no      0      C      enumerators (values inside an enumeration)
 f       function   yes     no      0      C      function definitions
 g       enum       yes     no      0      C      enumeration names
 h       header     yes     yes     2      C      included header files
 l       local      no      no      0      C      local variables
-m       member     yes     no      0      C      struct, and union members
+m       member     yes     no      1      C      struct, and union members
 p       prototype  no      no      0      C      function prototypes
 s       struct     yes     no      0      C      structure names
 t       typedef    yes     no      0      C      typedefs

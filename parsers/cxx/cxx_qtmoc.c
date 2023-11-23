@@ -86,6 +86,7 @@ static void qtMocMakeTagForProperty (CXXToken * pToken, const char *pszType)
 {
 	tagEntryInfo tag;
 
+	cxxTagUseTokenAsPartOfDefTag(CORK_NIL, pToken);
 	initTagEntry(&tag,
 				 vStringValue(pToken->pszWord),
 				 K_PROPERTY);

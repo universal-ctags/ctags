@@ -1543,6 +1543,7 @@ int cxxParserEmitFunctionTags(
 			0
 		);
 
+	cxxTagUseTokensInRangeAsPartOfDefTags(CORK_NIL,pInfo->pIdentifierStart,pInfo->pIdentifierEnd);
 	cxxTokenChainDestroyRange(pInfo->pIdentifierChain,pInfo->pIdentifierStart,pInfo->pIdentifierEnd);
 
 	CXX_DEBUG_ASSERT(
@@ -1653,7 +1654,7 @@ int cxxParserEmitFunctionTags(
 					CXXToken * pTokenBeforeParenthesis = pInfo->pParenthesis->pPrev;
 					cxxTokenChainTake(pInfo->pParenthesisContainerChain,pInfo->pParenthesis);
 
-					pTypeName = cxxTagCheckAndSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd);
+					pTypeName = cxxTagCheckAndSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd, false);
 
 					cxxTokenChainInsertAfter(
 							pInfo->pParenthesisContainerChain,
@@ -1664,7 +1665,7 @@ int cxxParserEmitFunctionTags(
 					pTypeName = NULL;
 				}
 			} else {
-				pTypeName = cxxTagCheckAndSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd);
+				pTypeName = cxxTagCheckAndSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd, false);
 			}
 		} else {
 			pTypeName = NULL;
@@ -1694,6 +1695,7 @@ int cxxParserEmitFunctionTags(
 						pInfo->pTemplateSpecializationEnd,
 						0
 					);
+				/* TODO */
 
 				// Tricky. We append it to the specialization chain which will
 				// be then used by cxxTagHandleTemplateFileds()
@@ -1919,7 +1921,8 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 
 				pTypeName = cxxTagCheckAndSetTypeField(
 						pTypeStart,
-						pTypeEnd
+						pTypeEnd,
+						false
 					);
 			} else {
 				// The declaration contains only the identifier!

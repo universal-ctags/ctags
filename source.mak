@@ -280,6 +280,7 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_keyword.h \
 	parsers/cxx/cxx_parser_internal.h \
 	parsers/cxx/cxx_parser.h \
+	parsers/cxx/cxx_reftag.h \
 	parsers/cxx/cxx_scope.h \
 	parsers/cxx/cxx_subparser.h \
 	parsers/cxx/cxx_subparser_internal.h \
@@ -339,6 +340,7 @@ PARSER_SRCS =				\
 	parsers/cxx/cxx_parser_using.c		\
 	parsers/cxx/cxx_parser_variable.c	\
 	parsers/cxx/cxx_qtmoc.c		\
+	parsers/cxx/cxx_reftag.c	\
 	parsers/cxx/cxx_scope.c		\
 	parsers/cxx/cxx_subparser.c	\
 	parsers/cxx/cxx_tag.c		\

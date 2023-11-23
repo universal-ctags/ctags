@@ -24,22 +24,37 @@ Automake       p/pseudodir       program            on      directory for PROGRA
 Automake       p/pseudodir       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
+C              Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
+C              Y/unknown         defvar             on      (maybe type) used for defining variables
+C              Y/unknown         ref                off     referenced anyhow
+C              Y/unknown         value              on      used as right side value
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C              d/macro           undef              on      undefined
 C              h/header          local              on      local header
 C              h/header          system             on      system header
+C              m/member          initialized        on      initialized with form '.member = ...'
+C++            Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
+C++            Y/unknown         defvar             on      (maybe type) used for defining variables
+C++            Y/unknown         ref                off     referenced anyhow
+C++            Y/unknown         value              on      used as right side value
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
 C++            h/header          system             on      system header
+C++            m/member          initialized        on      initialized with form '.member = ...'
 CPreProcessor  d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 CPreProcessor  d/macro           undef              on      undefined
 CPreProcessor  h/header          local              on      local header
 CPreProcessor  h/header          system             on      system header
+CUDA           Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
+CUDA           Y/unknown         defvar             on      (maybe type) used for defining variables
+CUDA           Y/unknown         ref                off     referenced anyhow
+CUDA           Y/unknown         value              on      used as right side value
 CUDA           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 CUDA           d/macro           undef              on      undefined
 CUDA           h/header          local              on      local header
 CUDA           h/header          system             on      system header
+CUDA           m/member          initialized        on      initialized with form '.member = ...'
 Cobol          S/sourcefile      copied             on      copied in source file
 CobolFree      S/sourcefile      copied             on      copied in source file
 CobolVariable  S/sourcefile      copied             on      copied in source file
@@ -150,22 +165,37 @@ Automake       p/pseudodir       program            on      directory for PROGRA
 Automake       p/pseudodir       script             on      directory for SCRIPTS primary
 Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
+C              Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
+C              Y/unknown         defvar             on      (maybe type) used for defining variables
+C              Y/unknown         ref                off     referenced anyhow
+C              Y/unknown         value              on      used as right side value
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C              d/macro           undef              on      undefined
 C              h/header          local              on      local header
 C              h/header          system             on      system header
+C              m/member          initialized        on      initialized with form '.member = ...'
+C++            Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
+C++            Y/unknown         defvar             on      (maybe type) used for defining variables
+C++            Y/unknown         ref                off     referenced anyhow
+C++            Y/unknown         value              on      used as right side value
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
 C++            h/header          system             on      system header
+C++            m/member          initialized        on      initialized with form '.member = ...'
 CPreProcessor  d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 CPreProcessor  d/macro           undef              on      undefined
 CPreProcessor  h/header          local              on      local header
 CPreProcessor  h/header          system             on      system header
+CUDA           Y/unknown         applied            on      (maybe macro, function, or member) called or expanded
+CUDA           Y/unknown         defvar             on      (maybe type) used for defining variables
+CUDA           Y/unknown         ref                off     referenced anyhow
+CUDA           Y/unknown         value              on      used as right side value
 CUDA           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 CUDA           d/macro           undef              on      undefined
 CUDA           h/header          local              on      local header
 CUDA           h/header          system             on      system header
+CUDA           m/member          initialized        on      initialized with form '.member = ...'
 Cobol          S/sourcefile      copied             on      copied in source file
 CobolFree      S/sourcefile      copied             on      copied in source file
 CobolVariable  S/sourcefile      copied             on      copied in source file
@@ -254,11 +284,16 @@ Zsh            s/script          loaded             on      loaded
 #
 # C.*
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # all.d
@@ -291,49 +326,74 @@ s/script   loaded on      loaded
 #
 # C.* with disabling all roles of all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       off     local header
+h/header   system      off     system header
+m/member   initialized off     initialized with form '.member = ...'
 
 #
 # C.* with disabling all roles of all kinds of all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       off     local header
+h/header   system      off     system header
+m/member   initialized off     initialized with form '.member = ...'
 
 #
 # C.* with enabling all roles of all kinds in all languages
 # after disabling system role of header kind of C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition on      used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         on      referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   on      used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with enabling all roles in all languages
 # after disabling system role of header kind of C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition on      used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         on      referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   on      used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with disabling all roles in C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       off     local header
+h/header   system      off     system header
+m/member   initialized off     initialized with form '.member = ...'
 
 #
 # Sh.* with disabling all roles in C language
@@ -345,11 +405,16 @@ s/script   loaded    on      loaded
 #
 # C.* with disabling all roles of all kinds in C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       off     local header
+h/header   system      off     system header
+m/member   initialized off     initialized with form '.member = ...'
 
 #
 # Sh.* with disabling all roles of all kinds in C language
@@ -362,11 +427,16 @@ s/script   loaded    on      loaded
 # C.* with enabling all roles in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition on      used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         on      referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   on      used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # Sh.* with enabling all roles in C language
@@ -380,11 +450,16 @@ s/script   loaded    off     loaded
 # C.* with enabling all roles of all kinds in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition on      used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         on      referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   on      used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # Sh.* with enabling all roles of all kinds in C language
@@ -397,11 +472,16 @@ s/script   loaded    off     loaded
 #
 # C.* with disabling all roles of {header} kind in C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       off     local header
+h/header   system      off     system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # Sh.* with disabling all roles of {header} kind in C language
@@ -413,11 +493,16 @@ s/script   loaded    on      loaded
 #
 # C.* with disabling all roles of h kind in C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       off     local header
+h/header   system      off     system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # Sh.* with disabling all roles of h kind in C language
@@ -430,11 +515,16 @@ s/script   loaded    on      loaded
 # C.* with enabling all roles of {header} kind in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized off     initialized with form '.member = ...'
 
 #
 # Sh.* with enabling all roles of {header} kind in C language
@@ -448,11 +538,16 @@ s/script   loaded    off     loaded
 # C.* with enabling all roles of h kind in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized off     initialized with form '.member = ...'
 
 #
 # Sh.* with enabling all roles of h kind in C language
@@ -465,109 +560,169 @@ s/script   loaded    off     loaded
 #
 # C.* with disabling system role of h kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      off     system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with disabling system role of {header} kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      off     system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with enabling system role of h kind after disabling the role
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with enabling system role of {header} kind after disabling the role
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with disabling system and local roles of h kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       off     local header
+h/header   system      off     system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with disabling system and local roles of {header} kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       off     local header
+h/header   system      off     system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with enabling system and local roles of h kind
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized off     initialized with form '.member = ...'
 
 #
 # C.* with enabling system and local roles of {header} kind
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized off     initialized with form '.member = ...'
 
 #
 # C.* with disabling local role of h kind and undef role of d kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       off     local header
+h/header   system      on      system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with enabling all roles of header kinds after disabling all roles of the kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     on      (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      on      (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       on      used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       on      undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized on      initialized with form '.member = ...'
 
 #
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized off     initialized with form '.member = ...'
 
 #
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language (short notation)
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N) NAME        ENABLED DESCRIPTION
+Y/unknown  applied     off     (maybe macro, function, or member) called or expanded
+Y/unknown  defvar      off     (maybe type) used for defining variables
+Y/unknown  ref         off     referenced anyhow
+Y/unknown  value       off     used as right side value
+d/macro    condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro    undef       off     undefined
+h/header   local       on      local header
+h/header   system      on      system header
+m/member   initialized off     initialized with form '.member = ...'

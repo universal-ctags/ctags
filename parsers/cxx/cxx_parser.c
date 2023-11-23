@@ -873,7 +873,7 @@ bool cxxParserParseEnum(void)
 		if(pTypeEnd)
 		{
 			CXX_DEBUG_ASSERT(pTypeBegin,"Type begin should be also set here");
-			pTypeName = cxxTagCheckAndSetTypeField(pTypeBegin,pTypeEnd);
+			pTypeName = cxxTagCheckAndSetTypeField(pTypeBegin,pTypeEnd, false);
 		}
 
 		if(bIsScopedEnum)

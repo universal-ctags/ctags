@@ -35,8 +35,22 @@ enum CXXTagCommonKind
 	CXXTagKindPARAMETER,
 	CXXTagKindLABEL,
 	CXXTagKindMACROPARAM,
+	CXXTagKindUNKNOWN,
 
 	CXXTagCommonKindCount
+};
+
+enum CXXTagUnknownRole
+{
+	CXXTagUnknownRoleREFERENCED,
+	CXXTagUnknownRoleVALUE,
+	CXXTagUnknownRoleDEFVAR,
+	CXXTagUnknownRoleAPPLIED,
+};
+
+enum CXXTagMemberRole
+{
+	CXXTagMemberRoleINITIALIZED,
 };
 
 // Tags specific to the CPP language.
@@ -111,7 +125,8 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken);
 // be destroyed after cxxTagCommit() has been called.
 CXXToken * cxxTagCheckAndSetTypeField(
 		CXXToken * pTypeStart,
-		CXXToken * pTypeEnd
+		CXXToken * pTypeEnd,
+		bool       bVardef
 	);
 
 typedef enum _CXXTagProperty
@@ -212,6 +227,8 @@ typedef enum {
 void cxxTagInitForLanguage(langType eLangType);
 
 // Functions for filling iCorkIndex field of tokens.
+// With specifying CORK_NIL, you can use these functions
+// just for preventing emitting reference tags associated with the token(s).
 void cxxTagUseTokensInRangeAsPartOfDefTags(int iCorkIndex, CXXToken * pFrom, CXXToken * pTo);
 void cxxTagUseTokenAsPartOfDefTag(int iCorkIndex, CXXToken * pToken);
 #endif //!_cxxTag_h_

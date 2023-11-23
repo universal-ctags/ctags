@@ -11,6 +11,7 @@
 
 #include "cxx_debug.h"
 #include "cxx_keyword.h"
+#include "cxx_reftag.h"
 #include "cxx_token.h"
 #include "cxx_token_chain.h"
 
@@ -1214,7 +1215,7 @@ void cxxParserUngetCurrentToken(void)
 //
 // In some special cases this function may parse more than one token,
 // however only a single token will always be returned.
-bool cxxParserParseNextToken(void)
+static bool cxxParserParseNextTokenNoRefTag(void)
 {
 	// The token chain should not be allowed to grow arbitrarily large.
 	// The token structures are quite big and it's easy to grow up to
@@ -1684,4 +1685,12 @@ bool cxxParserParseNextToken(void)
 	t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
 
 	return true;
+}
+
+bool cxxParserParseNextToken(void)
+{
+	bool r = cxxParserParseNextTokenNoRefTag();
+	if(r)
+		cxxReftagEvalNewToken();
+	return r;
 }

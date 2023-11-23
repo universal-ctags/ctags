@@ -433,7 +433,8 @@ skip_to_comma_or_end:
 
 				pTypeName = cxxTagCheckAndSetTypeField(
 							cxxTokenChainFirst(pChain),
-							pComma ? pComma->pPrev : cxxTokenChainLast(pChain)
+							pComma ? pComma->pPrev : cxxTokenChainLast(pChain),
+							false
 						);
 			}
 

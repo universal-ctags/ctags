@@ -825,7 +825,8 @@ void cxxParserEmitTemplateParameterTags(void)
 
 		CXXToken * pTypeToken = cxxTagCheckAndSetTypeField(
 				g_cxx.oTemplateParameters.aTypeStarts[i],
-				g_cxx.oTemplateParameters.aTypeEnds[i]
+				g_cxx.oTemplateParameters.aTypeEnds[i],
+				false
 			);
 
 		cxxTagCommit(NULL);

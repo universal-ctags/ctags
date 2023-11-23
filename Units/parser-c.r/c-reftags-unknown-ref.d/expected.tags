@@ -1,0 +1,13 @@
+x	input.c	/^struct x {$/;"	s	file:	roles:def
+y	input.c	/^  int y;$/;"	m	struct:x	typeref:typename:int	file:	roles:def
+X	input.c	/^enum X {$/;"	g	file:	roles:def
+A	input.c	/^	A, B$/;"	e	enum:X	file:	roles:def
+B	input.c	/^	A, B$/;"	e	enum:X	file:	roles:def
+i	input.c	/^extern int i;$/;"	x	typeref:typename:int	roles:def
+f	input.c	/^int f(int j)$/;"	f	typeref:typename:int	roles:def
+j	input.c	/^int f(int j)$/;"	z	function:f	typeref:typename:int	file:	roles:def
+j	input.c	/^	if (j == 0)$/;"	Y	function:f	roles:ref
+i	input.c	/^	return i + B + j + f(0);$/;"	Y	function:f	roles:ref
+B	input.c	/^	return i + B + j + f(0);$/;"	Y	function:f	roles:ref
+j	input.c	/^	return i + B + j + f(0);$/;"	Y	function:f	roles:ref
+f	input.c	/^	return i + B + j + f(0);$/;"	Y	function:f	roles:applied

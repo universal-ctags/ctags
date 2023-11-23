@@ -12,12 +12,34 @@
 #include "cxx_debug.h"
 #include "cxx_token_chain.h"
 #include "cxx_parser_internal.h"
+#include "cxx_reftag.h"
 
 #include "entry.h"
 #include "../cpreprocessor.h"
 #include "routines.h"
 #include "trashbox.h"
 #include "xtag.h"
+
+#define CXX_COMMON_UNKNOWN_ROLES(__langPrefix) \
+	static roleDefinition __langPrefix##UnknownRoles [] = { \
+		{ false, "ref", "referenced anyhow" }, \
+		{ true,  "value", "used as right side value" }, \
+		{ true,  "defvar", "(maybe type) used for defining variables" }, \
+		{ true,  "applied", "(maybe macro, function, or member) called or expanded" }, \
+	}
+
+CXX_COMMON_UNKNOWN_ROLES(C);
+CXX_COMMON_UNKNOWN_ROLES(CXX);
+CXX_COMMON_UNKNOWN_ROLES(CUDA);
+
+#define CXX_COMMON_MEMBER_ROLES(__langPrefix) \
+	static roleDefinition __langPrefix##MemberRoles [] = { \
+		{ true, "initialized", "initialized with form '.member = ...'" }, \
+	}
+
+CXX_COMMON_MEMBER_ROLES(C);
+CXX_COMMON_MEMBER_ROLES(CXX);
+CXX_COMMON_MEMBER_ROLES(CUDA);
 
 #define CXX_COMMON_MACRO_ROLES(__langPrefix) \
 	static roleDefinition __langPrefix##MacroRoles [] = { \
@@ -51,7 +73,9 @@ CXX_COMMON_HEADER_ROLES(CUDA);
 			.referenceOnly = true,  ATTACH_ROLES(_langPrefix##HeaderRoles), .syncWith = _syncWith \
 	}, \
 	{ false, 'l', "local",      "local variables", .syncWith = _syncWith },   \
-	{ true,  'm', "member",     _szMemberDescription, .syncWith = _syncWith },	\
+	{ true,  'm', "member",     _szMemberDescription, .syncWith = _syncWith,  \
+			.referenceOnly = false, ATTACH_ROLES(_langPrefix##MemberRoles), .syncWith = _syncWith \
+	},\
 	{ false, 'p', "prototype",  "function prototypes", .syncWith = _syncWith },		\
 	{ true,  's', "struct",     "structure names", .syncWith = _syncWith },		\
 	{ true,  't', "typedef",    "typedefs", .syncWith = _syncWith },			\
@@ -60,7 +84,10 @@ CXX_COMMON_HEADER_ROLES(CUDA);
 	{ false, 'x', "externvar",  "external and forward variable declarations", .syncWith = _syncWith }, \
 	{ false, 'z', "parameter",  "function parameters inside function or prototype definitions", .syncWith = _syncWith }, \
 	{ false, 'L', "label",      "goto labels", .syncWith = _syncWith }, \
-	{ false, 'D', "macroparam", "parameters inside macro definitions", .syncWith = _syncWith }
+	{ false, 'D', "macroparam", "parameters inside macro definitions", .syncWith = _syncWith }, \
+	{ false, 'Y', "unknown",    "unknown identifier", \
+			.referenceOnly = true, ATTACH_ROLES(_langPrefix##UnknownRoles), .syncWith = _syncWith \
+	}
 
 static kindDefinition g_aCXXCKinds [] = {
 	/* All other than LANG_AUTO are ignored.
@@ -261,7 +288,12 @@ static tagEntryInfo g_oCXXTag;
 
 void cxxTagUseTokenAsPartOfDefTag(int iCorkIndex, CXXToken * pToken)
 {
-	Assert (pToken->iCorkIndex == CORK_NIL);
+	if (pToken->iCorkIndex != CORK_NIL)
+	{
+		Assert(pToken->bCorkIndexForReftag);
+		pToken->bCorkIndexForReftag = false;
+		markCorkEntryAsPlaceholder(pToken->iCorkIndex, true);
+	}
 	pToken->iCorkIndex = iCorkIndex;
 }
 
@@ -309,6 +341,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 		return NULL;
 	}
 
+	cxxTagUseTokenAsPartOfDefTag(CORK_NIL, pToken);
 	initTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
@@ -505,7 +538,8 @@ static bool cxxTagCheckTypeField(
 
 CXXToken * cxxTagCheckAndSetTypeField(
 		CXXToken * pTypeStart,
-		CXXToken * pTypeEnd
+		CXXToken * pTypeEnd,
+		bool       bVardef
 	)
 {
 	CXX_DEBUG_ASSERT(pTypeStart,"Non null type start is expected here");
@@ -582,6 +616,27 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	{
 		CXX_DEBUG_PRINT("Can't extract type name");
 		return NULL;
+	}
+
+	if (bVardef && pTypeEnd && cxxTokenTypeIs(pTypeEnd, CXXTokenTypeIdentifier) &&
+		cxxTagRoleEnabled(CXXTagKindUNKNOWN, CXXTagUnknownRoleDEFVAR))
+	{
+		CXXToken *t = pTypeEnd;
+		if(t->iCorkIndex != CORK_NIL && t->bCorkIndexForReftag)
+			cxxReftagReset(t->iCorkIndex, CORK_NIL,
+						   CXXTagKindUNKNOWN, CXXTagUnknownRoleDEFVAR, false);
+		else if(t->iCorkIndex == CORK_NIL)
+		{
+			tagEntryInfo oEntry;
+			initRefTagEntry(&oEntry, vStringValue(t->pszWord),
+							CXXTagKindUNKNOWN, CXXTagUnknownRoleDEFVAR);
+			oEntry.lineNumber = t->iLineNumber;
+			oEntry.filePosition = t->oFilePosition;
+			oEntry.isFileScope = false;
+			// TODO: Other scope field must be filled.
+			t->iCorkIndex = makeTagEntry(&oEntry);
+			t->bCorkIndexForReftag = 1;
+		}
 	}
 
 	CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));

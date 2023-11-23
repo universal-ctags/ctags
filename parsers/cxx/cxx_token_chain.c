@@ -488,6 +488,7 @@ CXXTokenChain * cxxTokenChainSplitOnComma(CXXTokenChain * tc)
 				pToken = pToken->pNext;
 
 			pNew = cxxTokenChainExtractRange(pStart,pToken,0);
+			/* TODO */
 			pToken = pToken->pNext; // comma or nothing
 		}
 		if(pNew)
@@ -502,6 +503,7 @@ CXXTokenChain * cxxTokenChainSplitOnComma(CXXTokenChain * tc)
 	{
 		// finished without comma
 		CXXToken * pNew = cxxTokenChainExtractRange(pStart,cxxTokenChainLast(tc),0);
+		/* TODO */
 		if(pNew)
 			cxxTokenChainAppend(pRet,pNew);
 	}

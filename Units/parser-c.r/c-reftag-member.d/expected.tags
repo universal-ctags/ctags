@@ -1,0 +1,6 @@
+ops	input.c	/^static struct ops file_ops = {$/;"	unknown	roles:defvar
+file_ops	input.c	/^static struct ops file_ops = {$/;"	variable	typeref:struct:ops	file:	roles:def
+read	input.c	/^	.read  = file_read_fn,$/;"	member	scope:variable:file_ops	roles:initialized
+file_read_fn	input.c	/^	.read  = file_read_fn,$/;"	unknown	scope:variable:file_ops	roles:value
+write	input.c	/^	.write = file_write_fn,$/;"	member	scope:variable:file_ops	roles:initialized
+file_write_fn	input.c	/^	.write = file_write_fn,$/;"	unknown	scope:variable:file_ops	roles:value

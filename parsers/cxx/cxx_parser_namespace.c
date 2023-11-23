@@ -141,6 +141,7 @@ bool cxxParserParseNamespace(void)
 							pLastIdentifier,
 							CXXTokenChainExtractRangeNoTrailingSpaces
 						);
+					/* TODO */
 
 					cxxTagSetField(
 							CXXTagCPPFieldAliasedName,
