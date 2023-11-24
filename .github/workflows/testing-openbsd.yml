@@ -1,0 +1,50 @@
+name: run units target on OpenBSD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  testing:
+    runs-on: macos-12
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.vagrant.d/boxes
+        key: vagrant-generic-openbsd-7
+        restore-keys: |
+          vagrant-generic-openbsd-7
+
+    - uses: leleliu008/github-actions-vagrant@v2
+      with:
+        mem: 2048
+        box: generic/openbsd7
+        log: warn
+        run: |
+          export AUTOCONF_VERSION=2.69
+          export AUTOMAKE_VERSION=1.16
+              
+          export CFLAGS='-I/usr/local/include -L/usr/local/lib'
+              
+          if [ ! -f /usr/local/lib/libiconv.so ] ; then
+            sudo ln -s /usr/local/lib/libiconv.so.* /usr/local/lib/libiconv.so
+          fi
+              
+          run sudo pkg_add automake%1.16 gmake
+
+          run cc --version
+            
+          run ./autogen.sh
+          run ./configure --prefix=/usr
+          run gmake
+          run sudo gmake install
+          run file /usr/bin/ctags
+          run ctags --version
+          # bugs to fix
+          #run make check CI=gha+vagrant+openbsd
+          run gmake roundtrip CI=gha+vagrant+openbsd

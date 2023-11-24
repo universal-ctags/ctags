@@ -1,0 +1,41 @@
+name: run units target on NetBSD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  testing:
+    runs-on: macos-12
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.vagrant.d/boxes
+        key: vagrant-generic-netbsd-9
+        restore-keys: |
+          vagrant-generic-netbsd-9
+
+    - uses: leleliu008/github-actions-vagrant@v2
+      with:
+        mem: 2048
+        box: generic/netbsd9
+        log: warn
+        run: |
+          run sudo pkgin -y install mozilla-rootcerts automake autoconf pkg-config gmake
+
+          run cc --version
+
+          run ./autogen.sh
+          run ./configure --prefix=/usr
+          run gmake
+          run sudo gmake install
+          run file /usr/bin/ctags
+          run ctags --version
+          # bugs to fix
+          #run make check CI=gha+vagrant+netbsd
+          run gmake roundtrip CI=gha+vagrant+netbsd
