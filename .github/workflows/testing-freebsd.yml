@@ -1,0 +1,46 @@
+name: run units target on FreeBSD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  testing:
+    runs-on: macos-12
+
+    strategy:
+      fail-fast: false
+      matrix:
+        freebsd-version: [12,13]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.vagrant.d/boxes
+        key: vagrant-generic-freebsd-${{ matrix.freebsd-version }}
+        restore-keys: |
+          vagrant-generic-freebsd-${{ matrix.freebsd-version }}
+
+    # https://app.vagrantup.com/boxes/search?utf8=%E2%9C%93&sort=downloads&provider=&q=freebsd
+    # https://github.com/leleliu008/github-actions-vagrant
+    - uses: leleliu008/github-actions-vagrant@v2
+      with:
+        mem: 2048
+        box: generic/freebsd${{ matrix.freebsd-version }}
+        log: warn
+        run: |
+          run pkg install -y automake pkgconf gmake python3
+          run freebsd-version
+          run cc --version
+          run ./autogen.sh
+          run ./configure --prefix=/usr
+          run gmake
+          run gmake install
+          run file ctags
+          run ctags --version
+          run gmake check CI=gha+vagrant+freebsd
+          run gmake roundtrip CI=gha+vagrant+freebsd
