@@ -45,8 +45,10 @@ case $host in
         fi
         ;;
     *freebsd*|*openbsd*)
-        # https://github.com/universal-ctags/ctags/issues/3338
-        export LDFLAGS="$LDFLAGS -L/usr/local/lib"
+        if test "$cross_compiling" = "no" ; then
+            # https://github.com/universal-ctags/ctags/issues/3338
+            export LDFLAGS="$LDFLAGS -L/usr/local/lib"
+        fi
         ;;
 esac
 
