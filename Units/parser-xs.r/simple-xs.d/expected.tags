@@ -1,0 +1,60 @@
+SDBM_File	input.xs	/^MODULE = SDBM_File	PACKAGE = SDBM_File	PREFIX = sdbm_$/;"	m	roles:def
+SDBM_File	input.xs	/^MODULE = SDBM_File	PACKAGE = SDBM_File	PREFIX = sdbm_$/;"	p	module:SDBM_File	roles:def
+sdbm_TIEHASH	input.xs	/^sdbm_TIEHASH(dbtype, filename, flags, mode, pagname=NULL)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:SDBM_File	signature:(char * dbtype,char * filename,int flags,int mode,char * pagname)	roles:def
+TIEHASH	input.xs	/^sdbm_TIEHASH(dbtype, filename, flags, mode, pagname=NULL)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:SDBM_File	signature:(char * dbtype,char * filename,int flags,int mode,char * pagname)	roles:def	extras:noprefix
+sdbm_DESTROY	input.xs	/^sdbm_DESTROY(db)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:void	signature:(SDBM_File db)	roles:def
+DESTROY	input.xs	/^sdbm_DESTROY(db)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:void	signature:(SDBM_File db)	roles:def	extras:noprefix
+sdbm_FETCH	input.xs	/^sdbm_FETCH(db, key)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:datum_value	signature:(SDBM_File db,datum_key key)	roles:def
+FETCH	input.xs	/^sdbm_FETCH(db, key)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:datum_value	signature:(SDBM_File db,datum_key key)	roles:def	extras:noprefix
+sdbm_STORE	input.xs	/^sdbm_STORE(db, key, value, flags = DBM_REPLACE)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:int	signature:(SDBM_File db,datum_key key,datum_value value,int flags)	roles:def
+STORE	input.xs	/^sdbm_STORE(db, key, value, flags = DBM_REPLACE)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:int	signature:(SDBM_File db,datum_key key,datum_value value,int flags)	roles:def	extras:noprefix
+sdbm_DELETE	input.xs	/^sdbm_DELETE(db, key)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:int	signature:(SDBM_File db,datum_key key)	roles:def
+DELETE	input.xs	/^sdbm_DELETE(db, key)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:int	signature:(SDBM_File db,datum_key key)	roles:def	extras:noprefix
+sdbm_EXISTS	input.xs	/^sdbm_EXISTS(db,key)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:int	signature:(SDBM_File db,datum_key key)	roles:def
+EXISTS	input.xs	/^sdbm_EXISTS(db,key)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:int	signature:(SDBM_File db,datum_key key)	roles:def	extras:noprefix
+sdbm_FIRSTKEY	input.xs	/^sdbm_FIRSTKEY(db)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:datum_key	signature:(SDBM_File db)	roles:def
+FIRSTKEY	input.xs	/^sdbm_FIRSTKEY(db)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:datum_key	signature:(SDBM_File db)	roles:def	extras:noprefix
+sdbm_NEXTKEY	input.xs	/^sdbm_NEXTKEY(db, key)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:datum_key	signature:(SDBM_File db)	roles:def
+NEXTKEY	input.xs	/^sdbm_NEXTKEY(db, key)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:datum_key	signature:(SDBM_File db)	roles:def	extras:noprefix
+sdbm_error	input.xs	/^sdbm_error(db)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:int	signature:(SDBM_File db)	roles:def
+error	input.xs	/^sdbm_error(db)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:int	signature:(SDBM_File db)	roles:def	extras:noprefix
+sdbm_clearerr	input.xs	/^	sdbm_clearerr = 1$/;"	a	function:SDBM_File.SDBM_File.sdbm_error	roles:def
+filter_fetch_key	input.xs	/^filter_fetch_key(db, code)$/;"	f	package:SDBM_File.SDBM_File	typeref:typename:SV *	signature:(SDBM_File db,SV * code,SV * RETVAL)	roles:def
+SDBM_File::filter_fetch_key	input.xs	/^	SDBM_File::filter_fetch_key = fetch_key$/;"	a	function:SDBM_File.SDBM_File.filter_fetch_key	roles:def
+SDBM_File::filter_store_key	input.xs	/^	SDBM_File::filter_store_key = store_key$/;"	a	function:SDBM_File.SDBM_File.filter_fetch_key	roles:def
+SDBM_File::filter_fetch_value	input.xs	/^	SDBM_File::filter_fetch_value = fetch_value$/;"	a	function:SDBM_File.SDBM_File.filter_fetch_key	roles:def
+SDBM_File::filter_store_value	input.xs	/^	SDBM_File::filter_store_value = store_value$/;"	a	function:SDBM_File.SDBM_File.filter_fetch_key	roles:def
+SDBM_File	input.xs	/^MODULE = SDBM_File	PACKAGE = SDBM_X	PREFIX = sdbm_X_$/;"	m	roles:def
+SDBM_X	input.xs	/^MODULE = SDBM_File	PACKAGE = SDBM_X	PREFIX = sdbm_X_$/;"	p	module:SDBM_File	roles:def
+constants.xs	input.xs	/^INCLUDE: constants.xs$/;"	M	roles:included	extras:reference
+sdbm_X_DELETE0	input.xs	/^sdbm_X_DELETE0(db, key)$/;"	f	package:SDBM_File.SDBM_X	typeref:typename:int	signature:(SDBM_File db,datum_key key)	roles:def
+DELETE0	input.xs	/^sdbm_X_DELETE0(db, key)$/;"	f	package:SDBM_File.SDBM_X	typeref:typename:int	signature:(SDBM_File db,datum_key key)	roles:def	extras:noprefix
+sdbm_X_DELETE1	input.xs	/^sdbm_X_DELETE1(db, key)$/;"	f	package:SDBM_File.SDBM_X	typeref:typename:int	signature:(SDBM_File db,datum_key key)	roles:def
+DELETE1	input.xs	/^sdbm_X_DELETE1(db, key)$/;"	f	package:SDBM_File.SDBM_X	typeref:typename:int	signature:(SDBM_File db,datum_key key)	roles:def	extras:noprefix
+sin0	input.xs	/^sin0()$/;"	f	package:SDBM_File.SDBM_X	typeref:typename:double	signature:()	roles:def
+sin1	input.xs	/^sin1();$/;"	f	package:SDBM_File.SDBM_X	typeref:typename:double	signature:()	roles:def
+PERL_NO_GET_CONTEXT	input.xs	/^#define PERL_NO_GET_CONTEXT$/;"	d	file:	roles:def	extras:fileScope,guest
+EXTERN.h	input.xs	/^#include "EXTERN.h"/;"	h	roles:local	extras:reference,guest
+perl.h	input.xs	/^#include "perl.h"/;"	h	roles:local	extras:reference,guest
+XSUB.h	input.xs	/^#include "XSUB.h"/;"	h	roles:local	extras:reference,guest
+sdbm.h	input.xs	/^#include "sdbm.h"/;"	h	roles:local	extras:reference,guest
+fetch_key	input.xs	/^#define fetch_key /;"	d	file:	roles:def	extras:fileScope,guest
+store_key	input.xs	/^#define store_key /;"	d	file:	roles:def	extras:fileScope,guest
+fetch_value	input.xs	/^#define fetch_value /;"	d	file:	roles:def	extras:fileScope,guest
+store_value	input.xs	/^#define store_value /;"	d	file:	roles:def	extras:fileScope,guest
+__anoned1397e40108	input.xs	/^typedef struct {$/;"	s	file:	roles:def	extras:fileScope,guest,anonymous
+dbp	input.xs	/^	DBM *	dbp ;$/;"	m	struct:__anoned1397e40108	typeref:typename:DBM *	file:	roles:def	extras:fileScope,guest
+filter	input.xs	/^	SV *    filter[4];$/;"	m	struct:__anoned1397e40108	typeref:typename:SV * [4]	file:	roles:def	extras:fileScope,guest
+filtering	input.xs	/^	int     filtering ;$/;"	m	struct:__anoned1397e40108	typeref:typename:int	file:	roles:def	extras:fileScope,guest
+SDBM_File_type	input.xs	/^	} SDBM_File_type;$/;"	t	typeref:struct:__anoned1397e40108	file:	roles:def	extras:fileScope,guest
+SDBM_File	input.xs	/^typedef SDBM_File_type * SDBM_File ;$/;"	t	typeref:typename:SDBM_File_type *	file:	roles:def	extras:fileScope,guest
+datum_key	input.xs	/^typedef datum datum_key ;$/;"	t	typeref:typename:datum	file:	roles:def	extras:fileScope,guest
+datum_value	input.xs	/^typedef datum datum_value ;$/;"	t	typeref:typename:datum	file:	roles:def	extras:fileScope,guest
+sdbm_FETCH	input.xs	/^#define sdbm_FETCH(/;"	d	file:	signature:(db,key)	roles:def	extras:fileScope,guest
+sdbm_STORE	input.xs	/^#define sdbm_STORE(/;"	d	file:	signature:(db,key,value,flags)	roles:def	extras:fileScope,guest
+sdbm_DELETE	input.xs	/^#define sdbm_DELETE(/;"	d	file:	signature:(db,key)	roles:def	extras:fileScope,guest
+sdbm_EXISTS	input.xs	/^#define sdbm_EXISTS(/;"	d	file:	signature:(db,key)	roles:def	extras:fileScope,guest
+sdbm_FIRSTKEY	input.xs	/^#define sdbm_FIRSTKEY(/;"	d	file:	signature:(db)	roles:def	extras:fileScope,guest
+sdbm_NEXTKEY	input.xs	/^#define sdbm_NEXTKEY(/;"	d	file:	signature:(db,key)	roles:def	extras:fileScope,guest
+X	input.xs	/^#define X "X"/;"	d	file:	roles:def	extras:fileScope,guest
+Y	input.xs	/^#define Y "Y"/;"	d	file:	roles:def	extras:fileScope,guest

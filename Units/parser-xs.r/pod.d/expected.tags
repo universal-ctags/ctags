@@ -1,0 +1,6 @@
+XS::Typemap	input.xs	/^MODULE = XS::Typemap   PACKAGE = XS::Typemap$/;"	m	language:XS
+XS::Typemap	input.xs	/^MODULE = XS::Typemap   PACKAGE = XS::Typemap$/;"	p	language:XS	module:XS::Typemap
+T_SV	input.xs	/^T_SV( sv )$/;"	f	language:XS	package:XS::Typemap.XS::Typemap	typeref:typename:SV *	signature:(SV * sv)
+T_SVREF	input.xs	/^T_SVREF( svref )$/;"	f	language:XS	package:XS::Typemap.XS::Typemap	typeref:typename:SVREF	signature:(SVREF svref)
+intArrayPtr	input.xs	/^intArray * intArrayPtr( int nelem ) {$/;"	f	language:C	typeref:typename:intArray *	signature:(int nelem)
+TYPEMAPS	input.xs	/^=head1 TYPEMAPS$/;"	c	language:Pod

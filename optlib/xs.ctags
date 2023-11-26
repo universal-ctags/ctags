@@ -1,0 +1,221 @@
+#
+# xs.ctags --- interface description file format used to create an extension interface between Perl and C code
+#
+# Copyright (c) 2023, Red Hat, Inc.
+# Copyright (c) 2023, Masatake YAMATO
+#
+# Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+# References:
+#
+# - https://perldoc.perl.org/perlxs
+#
+
+# TODO:
+#
+# - merged form of the description of types and the list of argument names like:
+#
+#     double
+#     sin(double x)
+#
+# - ... in parameter list like:
+#
+#     double
+#     sin(...)
+#
+# - TYPEMAP
+#
+--langdef=XS
+--map-XS=+.xs
+
+#
+# Kind definitions
+#
+
+--kinddef-XS=m,module,modules
+--kinddef-XS=p,package,packages
+--kinddef-XS=f,function,functions
+--kinddef-XS=a,alias,aliases
+--kinddef-XS=M,moduleFile,module files
+--_roledef-XS.{moduleFile}=included,included with INCLUDE keyword
+
+#
+# Extra definitions
+#
+--_extradef-XS=noprefix,include functions name with prefix removed
+--extras-XS=+{noprefix}
+
+#
+# Tables declaration
+#
+
+--_tabledef-XS=init
+--_tabledef-XS=main
+--_tabledef-XS=func
+--_tabledef-XS=keywords
+--_tabledef-XS=fheader
+--_tabledef-XS=fcode
+--_tabledef-XS=freturn
+--_tabledef-XS=alias
+--_tabledef-XS=pod
+
+#
+# Prelude
+#
+
+--_prelude-XS={{
+  /scope false def
+  /xsstart false def
+  /prefix false def
+  /prefix-length 0 def
+  /noprefix? /XS.noprefix _extraenabled def
+  /tag-noprefix false def
+  % [ (x) (y) (z) ] ARRAY2SIGNATURE (x,y,z)
+  /array2signature {
+    mark
+    ?( 3 -1 roll { ?, } forall dup ?, eq {
+      pop
+    } if
+    ?) _buildstring
+  } def
+}}
+
+#
+# Tables definitions
+#
+
+# keywords table
+--_mtable-regex-XS=keywords/(?:REQUIRE|BOOT|CASE|PREINIT|INPUT|INIT|CODE|PPCODE|OUTPUT|CLEANUP|ALIAS|ATTRS|PROTOTYPES|PROTOTYPE|VERSIONCHECK|INCLUDE_COMMAND|SCOPE|INTERFACE|INTERFACE_MACRO|C_ARGS|POSTCALL|OVERLOAD|FALLBACK|EXPORT_XSUB_SYMBOLS)[^\n]*\n//p
+
+# table for returning fron function
+--_mtable-regex-XS=freturn/[^\n]*\n?//p{tleave}{_advanceTo=0start}{scope=pop}{{
+  ] _scopetop {
+    exch array2signature
+    % tag signature
+    dup 3 1 roll
+    % signature tag signature
+    signature:
+    tag-noprefix false eq {
+        % signature
+        pop
+    } {
+        tag-noprefix exch signature:
+        /tag-noprefix false def
+    } ifelse
+  } {
+    pop
+  } ifelse
+}}
+
+# table for pod area
+--_mtable-regex-XS=pod/=cut[^\n]*\n//p{_guest=,,0start}{tleave}
+--_mtable-regex-XS=pod/[^\n]*\n//p
+
+# init table
+--_mtable-regex-XS=init/((?:.*?)[\n]?)[ \t]*(MODULE[ \t]*=)//p{tjump=main}{_guest=C,1start,1end}{_advanceTo=2start}{{
+  /xsstart 2 /start _matchloc def
+}}
+
+# main table
+--_mtable-regex-XS=main/[ \t]*MODULE[ \t]*=[ \t]*([^ \t\n]+)([ \t]*PACKAGE[ \t]*=[ \t]*([^ \t\n]+))?([ \t]*PREFIX[ \t]*=[ \t]*([^ \t\n]+))?[^\n]*\n/\1/m/p{{
+  \3 false ne {
+    % Make a tag for the package and set it to the scope.
+    \3 /package 3 /start _matchloc _tag _commit dup . scope:
+  } {
+    % Make a tag for the module and set it to the scope.
+    .
+  } ifelse
+  /scope exch def
+
+  % Record the prefix.
+  \5 false ne {
+    /prefix \5 def
+    /prefix-length \5 length def
+  } if
+}}
+
+--_mtable-regex-XS=main/[ \t]+[^\n]*\n//p
+--_mtable-extend-XS=main+keywords
+--_mtable-regex-XS=main/INCLUDE:[ \t]*([^|\n]+?)[ \t]*\|?\n/\1/M/p{_role=included}
+--_mtable-regex-XS=main/([A-Za-z_][^\n]*?)[ \t]*\n//p{tenter=func}{{
+  % return type
+  \1 dup _normalize_spaces! _chop_space
+}}
+
+--_mtable-regex-XS=main/=[^\n]+\n//p{tenter=pod}{_guest=Pod,0start,}{_advanceTo=0end}
+
+--_mtable-regex-XS=main/[^\n]*\n//p
+--_mtable-regex-XS=main/()//p{tquit}{{
+  xsstart false ne {
+    (CPreProcessor) xsstart 1 /start _matchloc _makepromise { pop } if
+  } if
+}}
+
+# func table
+--_mtable-extend-XS=func+keywords
+--_mtable-regex-XS=func/#[^\n]*\n//p
+--_mtable-regex-XS=func/([A-Za-z_][a-zA-Z0-9_]*)[ \t]*\([^;\n]*;?\n/\1/f/p{tjump=fheader}{scope=push}{{
+  % function name
+  count 0 gt {
+    noprefix? prefix false ne and {
+      \1 prefix _strstr {
+        0 eq {
+          prefix-length \1 length prefix-length sub 0 string _copyinterval
+          % type name-sans-prefix
+          /function 1 /start _matchloc _tag _commit
+          % for attaching signature later
+          dup /tag-noprefix exch def
+          dup /XS.noprefix _markextra
+          dup scope scope:
+          % type tag
+          1 index
+          % type tag type
+          typeref:
+        } if
+      } {
+        pop
+      } ifelse
+    } if
+    % Fill the scope: field.
+    . scope scope:
+    % if a return type is on the stack, set it to typeref: field.
+    % Should we consdier "struct", "union", and "enum" here?
+    . exch typeref:
+  } if
+  % For gathering signatures
+  [
+}}
+--_mtable-regex-XS=func/[^\n]*\n//p{tleave}
+--_mtable-regex-XS=func/.//p{tleave}
+
+# function header
+--_mtable-regex-XS=fheader/[ \t]+ALIAS:\n//p{tenter=alias}
+--_mtable-regex-XS=fheader/#[^\n]*\n//p
+--_mtable-regex-XS=fheader/[ \t]+(?:REQUIRE|BOOT|CASE|PREINIT|INPUT|INIT|CODE|PPCODE|OUTPUT|CLEANUP|ALIAS|ATTRS|PROTOTYPES|PROTOTYPE|VERSIONCHECK|INCLUDE_COMMAND|SCOPE|INTERFACE|INTERFACE_MACRO|C_ARGS|POSTCALL|OVERLOAD|FALLBACK|EXPORT_XSUB_SYMBOLS)[^\n]*\n//p{tjump=fcode}
+--_mtable-regex-XS=fheader/[ \t]+([^=;\n]*)(=[^;\n]+)?;?\n//p{{
+  \1 dup _normalize_spaces! _chop_space
+}}
+--_mtable-extend-XS=fheader+freturn
+
+# function code
+--_mtable-regex-XS=fcode/#[^\n]*\n//p
+--_mtable-extend-XS=fcode+freturn
+
+# alias
+--_mtable-regex-XS=alias/[ \t]+([^= \t]+)[ \t]*=[^\n]*\n/\1/a/p{scope=ref}
+--_mtable-regex-XS=alias///p{tleave}
