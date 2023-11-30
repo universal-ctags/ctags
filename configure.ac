@@ -687,7 +687,21 @@ AS_IF([test "x$enable_xml" != "xno"], [
 					AC_DEFINE(HAVE_LIBXML)],
 				    [AC_MSG_RESULT([bad])
 				    AC_MSG_WARN([Xpath feature is disabled because the way of handling CRLF in libxml2 is broken.
-See https://gitlab.gnome.org/GNOME/libxml2/-/commit/43b511fa714df875dc4f40d108061eede0d4d76b])]
+See https://gitlab.gnome.org/GNOME/libxml2/-/commit/43b511fa714df875dc4f40d108061eede0d4d76b])],
+				    dnl In a context of cross-compiling: We can not do try-run.
+				    dnl Instead, we check the version number only.
+				    [PKG_CHECK_MODULES(LIBXML12d0, [libxml-2.0 = 2.12.0],
+								   [AC_MSG_WARN([Xpath feature is disabled because the way of handling CRLF in libxml2 2.12.0 may be broken.
+See https://gitlab.gnome.org/GNOME/libxml2/-/commit/43b511fa714df875dc4f40d108061eede0d4d76b])
+								    have_libxml=no],[
+				     PKG_CHECK_MODULES(LIBXML12d1, [libxml-2.0 = 2.12.1],
+								   [AC_MSG_WARN([Xpath feature is disabled because the way of handling CRLF in libxml2 2.12.1 may be broken.
+See https://gitlab.gnome.org/GNOME/libxml2/-/commit/43b511fa714df875dc4f40d108061eede0d4d76b])
+								    have_libxml=no],
+				     dnl The available libxml-2.0 is not 2.12.[01].
+								   [have_libxml=yes
+								    AC_DEFINE(HAVE_LIBXML)
+								   ])])]
 				)],
 				[AS_IF([test "x$enable_xml" = "xyes"], [
 				   AC_MSG_ERROR([libxml2 not found])])])
