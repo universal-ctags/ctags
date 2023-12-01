@@ -1,0 +1,119 @@
+name: cross compile for NetBSD on Ubuntu
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        netbsd-release-version: [9.3]
+
+    runs-on: ubuntu-latest
+
+    env:
+      CC: clang --target=amd64-unknown-netbsd --sysroot=${{ github.workspace }}/amd64-unknown-netbsd-sysroot
+      CFLAGS:  -I${{ github.workspace }}/amd64-unknown-netbsd-3rdroot/include -v -fPIC
+      LDFLAGS: -L${{ github.workspace }}/amd64-unknown-netbsd-3rdroot/lib -Wl,-v
+      PKG_CONFIG_PATH: ${{ github.workspace }}/amd64-unknown-netbsd-3rdroot/lib/pkgconfig
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: universal-ctags/ctags
+
+      - run: sudo apt-get -y update
+      - run: sudo apt-get -y install clang cmake make automake autoconf pkg-config curl file
+
+      - run: install -d amd64-unknown-netbsd-sysroot
+      - run: install -d amd64-unknown-netbsd-3rdroot
+
+      - name: install amd64-unknown-netbsd-sysroot
+        run: |
+          major="$(printf '%s\n' ${{ matrix.netbsd-release-version }} | cut -d. -f1)"
+          minor="$(printf '%s\n' ${{ matrix.netbsd-release-version }} | cut -d. -f2)"
+
+          for item in base comp
+          do
+            FILENAME="$item.tar.xz"
+            curl -LO "https://ftp.netbsd.org/pub/NetBSD/NetBSD-${{ matrix.netbsd-release-version }}/amd64/binary/sets/$FILENAME"
+            tar vxf "$FILENAME" -C amd64-unknown-netbsd-sysroot
+          done
+
+      - name: build zlib
+        run: |
+          install -d src/zlib
+          cd         src/zlib
+          curl -L -o src.tar.gz https://zlib.net/fossils/zlib-1.3.tar.gz
+          tar vxf    src.tar.gz --strip-components=1
+          sed -i 's|/share/pkgconfig|/lib/pkgconfig|' CMakeLists.txt
+          cmake -S . -B build.d -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/amd64-unknown-netbsd-3rdroot -DCMAKE_VERBOSE_MAKEFILE=ON -DENABLE_TESTING=OFF
+          cmake --build build.d
+          cmake --install build.d
+
+      - name: build libiconv
+        run: |
+          install -d src/libiconv
+          cd         src/libiconv
+          curl -L -o src.tar.gz https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz
+          tar vxf    src.tar.gz --strip-components=1
+          ./configure --host=amd64-unknown-netbsd --prefix=${{ github.workspace }}/amd64-unknown-netbsd-3rdroot --enable-extra-encodings --enable-static --disable-shared
+          make V=1
+          make install
+
+      - name: build libxml2
+        run: |
+          install -d src/libxml2
+          cd         src/libxml2
+          curl -L -o src.tar.gz https://download.gnome.org/sources/libxml2/2.11/libxml2-2.11.6.tar.xz
+          tar vxf    src.tar.gz --strip-components=1
+          ./configure --host=amd64-unknown-netbsd --prefix=${{ github.workspace }}/amd64-unknown-netbsd-3rdroot --with-zlib --without-lzma --without-python --without-readline --without-coverage --enable-ipv6 --enable-static --disable-shared LIBS=-liconv
+          make V=1
+          make install
+
+      - name: build libyaml
+        run: |
+          install -d src/libyaml
+          cd         src/libyaml
+          curl -L -o src.tar.gz https://github.com/yaml/libyaml/releases/download/0.2.5/yaml-0.2.5.tar.gz
+          tar vxf    src.tar.gz --strip-components=1
+          ./configure --host=amd64-unknown-netbsd --prefix=${{ github.workspace }}/amd64-unknown-netbsd-3rdroot
+          make V=1
+          make install
+
+      - name: build jansson
+        run: |
+          install -d src/jansson
+          cd         src/jansson
+          curl -L -o src.tar.gz https://github.com/akheron/jansson/releases/download/v2.14/jansson-2.14.tar.gz
+          tar vxf    src.tar.gz --strip-components=1
+          cmake -S . -B build.d -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/amd64-unknown-netbsd-3rdroot -DCMAKE_VERBOSE_MAKEFILE=ON -DENABLE_TESTING=OFF -DJANSSON_BUILD_SHARED_LIBS=OFF -DJANSSON_BUILD_DOCS=OFF -DJANSSON_COVERAGE=OFF -DJANSSON_EXAMPLES=OFF -DJANSSON_WITHOUT_TESTS=ON
+          cmake --build build.d
+          cmake --install build.d
+
+      - name: build libpcre2
+        run: |
+          install -d src/libpcre2
+          cd         src/libpcre2
+          curl -L -o src.tar.gz https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.bz2
+          tar vxf    src.tar.gz --strip-components=1
+          cmake -S . -B build.d -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/amd64-unknown-netbsd-3rdroot -DCMAKE_VERBOSE_MAKEFILE=ON -DENABLE_TESTING=OFF -DJANSSON_BUILD_SHARED_LIBS=OFF -DCMAKE_C_STANDARD=99 -DCMAKE_C_STANDARD_REQUIRED=ON -DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_BUILD_PCRE2_16=ON -DPCRE2_BUILD_PCRE2_32=ON -DPCRE2_BUILD_PCRE2GREP=OFF -DPCRE2_BUILD_TESTS=OFF -DPCRE2_SUPPORT_VALGRIND=OFF -DPCRE2_SUPPORT_UNICODE=ON
+          cmake --build build.d
+          cmake --install build.d
+
+      - run: ./autogen.sh
+      - run: |
+          ./configure --host=amd64-unknown-netbsd --prefix=${{ github.workspace }}/uctags-netbsd-amd64 --enable-static || {
+            cat config.log
+            exit 1
+          }
+      - run: make V=1
+      - run: make install
+
+      - run: readelf -h ctags
+      - run: readelf -d ctags
+      - run: file ctags | grep NetBSD
