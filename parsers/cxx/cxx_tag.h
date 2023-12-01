@@ -207,6 +207,14 @@ typedef enum {
 	CR_HEADER_LOCAL,
 } cHeaderRole;
 
+typedef enum {
+	CXXTagFUNCTIONRoleFOREIGNDECL,
+} CXXTagCFunctionRole;
+
+typedef enum {
+	CXXTagSTRUCTRoleFOREIGNDECL,
+} CXXTagCStructRole;
+
 // Initialize the parser state for the specified language.
 // Must be called before attempting to access the kind options.
 void cxxTagInitForLanguage(langType eLangType);

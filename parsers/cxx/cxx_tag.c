@@ -39,13 +39,31 @@ CXX_COMMON_HEADER_ROLES(C);
 CXX_COMMON_HEADER_ROLES(CXX);
 CXX_COMMON_HEADER_ROLES(CUDA);
 
+/* Currently V parser wants these items. */
+#define RoleTemplateForeignDecl { true, "foreigndecl", "declared in foreign languages" }
 
-#define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription, _syncWith)	\
+#define CXX_COMMON_FUNCTION_ROLES(__langPrefix) \
+	static roleDefinition __langPrefix##FunctionRoles [] = { \
+		RoleTemplateForeignDecl, \
+	}
+
+CXX_COMMON_FUNCTION_ROLES(C);
+
+#define CXX_COMMON_STRUCT_ROLES(__langPrefix) \
+	static roleDefinition __langPrefix##StructRoles [] = { \
+		RoleTemplateForeignDecl, \
+	}
+
+CXX_COMMON_STRUCT_ROLES(C);
+
+
+#define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription, _syncWith, FUNC_ROLES, STRUCT_ROLES) \
 	{ true,  'd', "macro",      "macro definitions", \
 			.referenceOnly = false, ATTACH_ROLES(_langPrefix##MacroRoles), .syncWith = _syncWith \
 	}, \
 	{ true,  'e', "enumerator", "enumerators (values inside an enumeration)", .syncWith = _syncWith }, \
-	{ true,  'f', "function",   "function definitions", .syncWith = _syncWith },		\
+	{ true,  'f', "function",   "function definitions", \
+			.referenceOnly = false, FUNC_ROLES, .syncWith = _syncWith }, \
 	{ true,  'g', "enum",       "enumeration names", .syncWith = _syncWith },		\
 	{ true, 'h', "header",     "included header files", \
 			.referenceOnly = true,  ATTACH_ROLES(_langPrefix##HeaderRoles), .syncWith = _syncWith \
@@ -53,7 +71,8 @@ CXX_COMMON_HEADER_ROLES(CUDA);
 	{ false, 'l', "local",      "local variables", .syncWith = _syncWith },   \
 	{ true,  'm', "member",     _szMemberDescription, .syncWith = _syncWith },	\
 	{ false, 'p', "prototype",  "function prototypes", .syncWith = _syncWith },		\
-	{ true,  's', "struct",     "structure names", .syncWith = _syncWith },		\
+	{ true,  's', "struct",     "structure names", \
+			.referenceOnly = false, STRUCT_ROLES, .syncWith = _syncWith }, \
 	{ true,  't', "typedef",    "typedefs", .syncWith = _syncWith },			\
 	{ true,  'u', "union",      "union names", .syncWith = _syncWith },			\
 	{ true,  'v', "variable",   "variable definitions", .syncWith = _syncWith },		\
@@ -66,11 +85,11 @@ static kindDefinition g_aCXXCKinds [] = {
 	/* All other than LANG_AUTO are ignored.
 	   LANG_IGNORE is specified as a just placeholder for the macro,
 	   and is not needed. */
-	CXX_COMMON_KINDS(C,"struct, and union members", LANG_IGNORE)
+	CXX_COMMON_KINDS(C,"struct, and union members", LANG_IGNORE, ATTACH_ROLES(CFunctionRoles), ATTACH_ROLES(CStructRoles))
 };
 
 static kindDefinition g_aCXXCPPKinds [] = {
-	CXX_COMMON_KINDS(CXX,"class, struct, and union members", LANG_AUTO),
+	CXX_COMMON_KINDS(CXX,"class, struct, and union members", LANG_AUTO, .nRoles = 0, .nRoles = 0),
 	{ true,  'c', "class",      "classes" },
 	{ true,  'n', "namespace",  "namespaces" },
 	{ false, 'A', "alias",      "namespace aliases" },
@@ -80,7 +99,7 @@ static kindDefinition g_aCXXCPPKinds [] = {
 };
 
 static kindDefinition g_aCXXCUDAKinds [] = {
-	CXX_COMMON_KINDS(CUDA,"struct, and union members", LANG_IGNORE)
+	CXX_COMMON_KINDS(CUDA,"struct, and union members", LANG_IGNORE, .nRoles = 0, .nRoles = 0)
 };
 
 static const char * g_aCXXAccessStrings [] = {

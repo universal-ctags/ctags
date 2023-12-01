@@ -1,0 +1,36 @@
+.. _ctags-lang-C(7):
+
+==============================================================
+ctags-lang-C
+==============================================================
+---------------------------------------------------------------------
+Random notes about tagging C source code with Universal Ctags
+---------------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+C ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=C ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-C=+.c ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging C source code.
+
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New role ``foreigndecl`` for ``function`` kind
+
+* New role ``foreigndecl`` for ``struct`` kind
+
+SEE ALSO
+--------
+ctags(1),
+`The new C/C++ parser <https://docs.ctags.io/en/latest/parser-cxx.html>`_ (https://docs.ctags.io/en/latest/parser-cxx.html)
