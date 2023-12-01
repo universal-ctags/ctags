@@ -1,7 +1,9 @@
 main	input.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:17
 a	input.v	/^	a := 1$/;"	v	line:3	fn:main	roles:def
-SYSTEM_INFO	input-1.v	/^struct C.SYSTEM_INFO {$/;"	s	line:1	extern:C	roles:def	end:2
-foo	input-1.v	/^fn C.foo(bar string) i64$/;"	f	line:3	extern:C	typeref:typename:i64	signature:(bar string)	roles:def
+C	input-1.v	/^struct C.SYSTEM_INFO {$/;"	p	line:1	roles:foreignlang	extras:reference
+SYSTEM_INFO	input-1.v	/^struct C.SYSTEM_INFO {$/;"	s	line:1	module:C	roles:def	end:2
+C	input-1.v	/^fn C.foo(bar string) i64$/;"	p	line:3	roles:foreignlang	extras:reference
+foo	input-1.v	/^fn C.foo(bar string) i64$/;"	f	line:3	module:C	typeref:typename:i64	signature:(bar string)	roles:def
 thismodule	input-2.v	/^module thismodule$/;"	p	line:1	roles:def
 that	input-2.v	/^import that.aaa$/;"	p	line:3	roles:imported	extras:reference
 aaa	input-2.v	/^import that.aaa$/;"	p	line:3	module:that	roles:imported	extras:reference
