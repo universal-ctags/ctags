@@ -30,6 +30,9 @@
 #include "param.h"
 #include "selectors.h"
 
+#include "dependency.h"
+#include "cxx/cxx_tag.h"
+
 #define MAX_REPLAYS 3
 #define _NARGS(_1, _2, _3, _4, _5, _6, _7, _8, _9, N, ...) N
 #define nArgs(...) _NARGS (__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1)
@@ -985,6 +988,47 @@ static int makeRefTag (tokenInfo *const token, vString *const name,
 						role, NULL, NULL, NULL);
 }
 
+static void makeTagForeigndeclMaybe (int scope, tokenInfo *const token, kindType kind)
+{
+	tagEntryInfo *scopeEntry = getEntryInCorkQueue (scope);
+
+	if (!scopeEntry)
+		return;
+
+	if (! (scopeEntry->langType == Lang_v &&
+		   scopeEntry->kindIndex == KIND_MODULE &&
+		   isRoleAssigned (scopeEntry, ROLE_FOREIGNLANG_MODULE)))
+		return;
+
+	if (strcmp (scopeEntry->name, "C") == 0)
+	{
+		int fk;
+		int fr;
+
+		if (kind == KIND_STRUCT)
+		{
+			fk = CXXTagKindSTRUCT;
+			fr = CXXTagSTRUCTRoleFOREIGNDECL;
+		}
+		else if (kind == KIND_FUNCTION)
+		{
+			fk = CXXTagKindFUNCTION;
+			fr = CXXTagFUNCTIONRoleFOREIGNDECL;
+		}
+		else
+			return;
+
+		tagEntryInfo foreigndecl;
+		initForeignRefTagEntry (&foreigndecl,
+								vStringValue (token->string),
+								getNamedLanguage ("C", 0),
+								fk, fr);
+		foreigndecl.lineNumber = token->lineNumber;
+		foreigndecl.filePosition = token->filePosition;
+		makeTagEntry (&foreigndecl);
+	}
+}
+
 static tokenType getOpen (tokenType close)
 {
 	switch (close)
@@ -1551,6 +1595,17 @@ static void parseFunction (tokenInfo *const token, int scope,
 				lookupQualifiedName (fnToken, name, scope, NULL) : scope;
 			newScope = makeFnTag (fnToken, name, realKind, realScope,
 								  argList, retType, access);
+			{
+				vString *tmp = fnToken->string;
+				if (name)
+					fnToken->string = name;
+				makeTagForeigndeclMaybe (realScope,
+										 fnToken,
+										 realKind);
+				if (name)
+					fnToken->string = tmp;
+			}
+
 			if (receiver)
 				makeTag (rxToken, NULL, KIND_RECEIVER, newScope);
 		}
@@ -1837,6 +1892,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 			scope = lookupQualifiedName (token, NULL, scope, false);
 			kindType realKind = kind == KIND_NONE? KIND_STRUCT : kind;
 			newScope = makeTagEx (token, NULL, realKind, scope, access);
+			makeTagForeigndeclMaybe (scope, token, realKind);
 			registerEntry (newScope);
 			readToken (token);
 		}
@@ -2961,6 +3017,9 @@ extern parserDefinition *VParser (void)
 	static const char *const extensions[] = { "v", NULL };
 	parserDefinition *def = parserNew ("V");
 	static selectLanguage selectors[] = { selectVOrVerilogByKeywords, NULL };
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_FOREIGNER, "C", NULL },
+	};
 	def->kindTable = VKinds;
 	def->kindCount = ARRAY_SIZE (VKinds);
 	def->extensions = extensions;
@@ -2972,5 +3031,7 @@ extern parserDefinition *VParser (void)
 	def->keywordCount = ARRAY_SIZE (VKeywordTable);
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->requestAutomaticFQTag = true;
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 	return def;
 }

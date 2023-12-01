@@ -2,8 +2,10 @@ main	input.v	/^fn main() {$/;"	f	line:1	language:V	typeref:typename:	signature:(
 a	input.v	/^	a := 1$/;"	v	line:3	language:V	fn:main	roles:def
 C	input-1.v	/^struct C.SYSTEM_INFO {$/;"	p	line:1	language:V	roles:foreignlang	extras:reference
 SYSTEM_INFO	input-1.v	/^struct C.SYSTEM_INFO {$/;"	s	line:1	language:V	module:C	roles:def	end:2
+SYSTEM_INFO	input-1.v	/^struct C.SYSTEM_INFO {$/;"	s	line:1	language:C	roles:foreigndecl	extras:reference
 C	input-1.v	/^fn C.foo(bar string) i64$/;"	p	line:3	language:V	roles:foreignlang	extras:reference
 foo	input-1.v	/^fn C.foo(bar string) i64$/;"	f	line:3	language:V	module:C	typeref:typename:i64	signature:(bar string)	roles:def
+C.foo	input-1.v	/^fn C.foo(bar string) i64$/;"	f	line:3	language:C	roles:foreigndecl	extras:reference
 thismodule	input-2.v	/^module thismodule$/;"	p	line:1	language:V	roles:def
 that	input-2.v	/^import that.aaa$/;"	p	line:3	language:V	roles:imported	extras:reference
 aaa	input-2.v	/^import that.aaa$/;"	p	line:3	language:V	module:that	roles:imported	extras:reference
