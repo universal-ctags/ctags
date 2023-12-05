@@ -45,6 +45,7 @@
 	_isToken (token, false, true, __LINE__, nArgs (__VA_ARGS__), __VA_ARGS__)
 #define expectKeyword(token, ...) \
 	_isToken (token, true, true, __LINE__, nArgs (__VA_ARGS__), __VA_ARGS__)
+#define isOneOf(c, s) (strchr (s, c) != NULL)
 #define isDigit(c) (c >= '0' && c <= '9')
 #define isHexDigit(c) (isDigit (c) || \
 					   (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
@@ -509,14 +510,6 @@ static int peekcFromInputFile ()
 	int c = getcFromInputFile ();
 	ungetcToInputFile (c);
 	return c;
-}
-
-static bool isOneOf (int c, const char *set)
-{
-	for (; *set != '\0'; set++)
-		if (*set == c)
-			return true;
-	return false;
 }
 
 static void skipInputFileTillEOL ()
