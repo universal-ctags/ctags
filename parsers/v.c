@@ -1155,7 +1155,7 @@ static int lookupQualifiedName (tokenInfo *const token, vString *name,
 	Assert (name || !vStringIsEmpty (token->string));
 
 	char *tmp = eStrdup (vStringValue (name? name : token->string));
-	char *part, *next = tmp;
+	char *part = NULL, *next = tmp;
 	bool once = true, ongoing = true, external = false;
 	while (next)
 	{
@@ -1187,7 +1187,8 @@ static int lookupQualifiedName (tokenInfo *const token, vString *name,
 			}
 		}
 	}
-	vStringCopyS (name? name : token->string, part);
+	if (part)
+		vStringCopyS (name? name : token->string, part);
 	eFree (tmp);
 	return scope;
 }
