@@ -2408,9 +2408,11 @@ static bool parseExprCont (tokenInfo *const token, int scope, bool hasErr)
 		{
 			// could be enumerator label
 			tokenInfo *tmpToken = newToken ();
+			bool isLabel;
 			readToken (tmpToken);
+			isLabel = isToken (tmpToken, TOKEN_LABEL);
 			unreadToken (tmpToken);
-			if (isToken (tmpToken, TOKEN_LABEL))
+			if (isLabel)
 				unreadToken (token);
 			else
 				parseChain (token, scope);
