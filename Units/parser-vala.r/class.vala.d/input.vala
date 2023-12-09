@@ -37,4 +37,7 @@ class Person {
          }
       }
    }
+
+   int getLastAge (int n) throws GLib.Error { return d_age - n; }
+
 }

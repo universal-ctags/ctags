@@ -289,7 +289,7 @@ static void readToken (tokenInfo *const token, void *data);
 static void parseNamespace (tokenInfo *const token, int corkIndex);
 static void parseInterface (tokenInfo *const token, int corkIndex);
 static void parseClass (tokenInfo *const token, int kindIndex, int corkIndex);
-static void parseStatement (tokenInfo *const token, int corkIndex);
+static int  parseStatement (tokenInfo *const token, int corkIndex);
 static void parseEnum (tokenInfo *const token, int kindIndex, int elementKindIndex, int corkIndex);
 static void recurseValaTags (tokenInfo *token, int parentIndex);
 
@@ -529,11 +529,12 @@ static tokenInfo *newValaToken (void)
 	return newToken (&valaTokenInfoClass);
 }
 
-static void parseStatement (tokenInfo *const token, int parentIndex)
+static int parseStatement (tokenInfo *const token, int parentIndex)
 {
 	tokenInfo *lastToken = newValaToken ();
 	bool foundSignature = false;
 	tagEntryInfo *e = NULL;
+	int corkIndex = CORK_NIL;
 
 	do
 	{
@@ -545,7 +546,7 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 				tokenSkipOverPair (token);
 			else
 			{
-				int corkIndex = makeSimpleTagFromToken (lastToken, K_METHOD, parentIndex);
+				corkIndex = makeSimpleTagFromToken (lastToken, K_METHOD, parentIndex);
 				e = getEntryInCorkQueue (corkIndex);
 				if (e)
 				{
@@ -573,6 +574,8 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 		e->extensionFields.endLine = token->lineNumber;
 
 	tokenDelete (lastToken);
+
+	return corkIndex;
 }
 
 static void parseEnumBody (tokenInfo *const token, int kindIndex, int corkIndex)
@@ -776,19 +779,36 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		if (!readIdentifierExtended (typerefToken, &typerefIsClass))
 			goto out;
 
+		bool nameFound = false;
 		tokenRead (token);
 		if (tokenIsType (token, IDENTIFIER))
+		{
 			tokenCopy (nameToken, token);
-
-		/* Argument list for a method */
-		tokenRead (token);
-		if (tokenIsTypeVal (token, '(')) {
-			tokenSkipOverPair (token);
-			tokenRead (token);
+			nameFound = true;
 		}
 
-		int kind;
-		if (tokenIsTypeVal (token, ';')
+		int kind = KIND_GHOST_INDEX;
+		int methodIndex = CORK_NIL;
+		tokenRead (token);
+		if (tokenIsTypeVal (token, '('))
+		{
+			if (nameFound)
+			{
+				/* Method */
+				tokenUnread(token);
+				tokenCopy (token, nameToken);
+				methodIndex = parseStatement (token, classCorkIndex);
+				tagEntryInfo *e = getEntryInCorkQueue (methodIndex);
+				if (e && e->kindIndex == K_METHOD)
+					kind = e->kindIndex;
+			}
+			else
+			{
+				tokenSkipOverPair (token);
+				tokenRead (token);
+			}
+		}
+		else if (tokenIsTypeVal (token, ';')
 			|| tokenIsTypeVal (token, '='))
 		{
 			kind = K_FIELD;
@@ -804,7 +824,9 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		else
 			break;				/* Unexpected sequence of token */
 
-		int memberCorkIndex = makeSimpleTagFromToken (nameToken, kind, classCorkIndex);
+		int memberCorkIndex = methodIndex == CORK_NIL
+			? makeSimpleTagFromToken (nameToken, kind, classCorkIndex)
+			: methodIndex;
 		tagEntryInfo *entry = getEntryInCorkQueue (memberCorkIndex);
 
 		/* Fill access field. */
@@ -831,7 +853,8 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 
 		if (kind == K_PROP)
 			tokenSkipOverPair (token);
-		entry->extensionFields.endLine = token->lineNumber;
+		if (kind != K_METHOD)
+			entry->extensionFields.endLine = token->lineNumber;
 	} while (!tokenIsEOF (token));
 
  out:
