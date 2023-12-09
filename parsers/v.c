@@ -3011,8 +3011,13 @@ static void initialize (const langType language)
 {
 	LangV = language;
 
+#ifdef DEBUG
+#define	POOL_N 1
+#else
+#defien POOL_N 16
+#endif
 	TokenPool = objPoolNew (
-		16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
+		POOL_N, newPoolToken, deletePoolToken, clearPoolToken, NULL);
 	addKeywordGroup (&VTypeKeywords, LangV);
 }
 
