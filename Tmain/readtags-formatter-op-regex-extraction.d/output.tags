@@ -1,0 +1,35 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+BPF_PROG_TYPE_CGROUP_DEVICE	input.c	/^	BPF_PROG_TYPE_CGROUP_DEVICE,$/;"	e	scope:enum:bpf_prog_type	file:	nth:15
+BPF_PROG_TYPE_CGROUP_SKB	input.c	/^	BPF_PROG_TYPE_CGROUP_SKB,$/;"	e	scope:enum:bpf_prog_type	file:	nth:8
+BPF_PROG_TYPE_CGROUP_SOCK	input.c	/^	BPF_PROG_TYPE_CGROUP_SOCK,$/;"	e	scope:enum:bpf_prog_type	file:	nth:9
+BPF_PROG_TYPE_CGROUP_SOCKOPT	input.c	/^	BPF_PROG_TYPE_CGROUP_SOCKOPT,$/;"	e	scope:enum:bpf_prog_type	file:	nth:25
+BPF_PROG_TYPE_CGROUP_SOCK_ADDR	input.c	/^	BPF_PROG_TYPE_CGROUP_SOCK_ADDR,$/;"	e	scope:enum:bpf_prog_type	file:	nth:18
+BPF_PROG_TYPE_CGROUP_SYSCTL	input.c	/^	BPF_PROG_TYPE_CGROUP_SYSCTL,$/;"	e	scope:enum:bpf_prog_type	file:	nth:23
+BPF_PROG_TYPE_EXT	input.c	/^	BPF_PROG_TYPE_EXT,$/;"	e	scope:enum:bpf_prog_type	file:	nth:28
+BPF_PROG_TYPE_FLOW_DISSECTOR	input.c	/^	BPF_PROG_TYPE_FLOW_DISSECTOR,$/;"	e	scope:enum:bpf_prog_type	file:	nth:22
+BPF_PROG_TYPE_KPROBE	input.c	/^	BPF_PROG_TYPE_KPROBE,$/;"	e	scope:enum:bpf_prog_type	file:	nth:2
+BPF_PROG_TYPE_LIRC_MODE2	input.c	/^	BPF_PROG_TYPE_LIRC_MODE2,$/;"	e	scope:enum:bpf_prog_type	file:	nth:20
+BPF_PROG_TYPE_LSM	input.c	/^	BPF_PROG_TYPE_LSM,$/;"	e	scope:enum:bpf_prog_type	file:	nth:29
+BPF_PROG_TYPE_LWT_IN	input.c	/^	BPF_PROG_TYPE_LWT_IN,$/;"	e	scope:enum:bpf_prog_type	file:	nth:10
+BPF_PROG_TYPE_LWT_OUT	input.c	/^	BPF_PROG_TYPE_LWT_OUT,$/;"	e	scope:enum:bpf_prog_type	file:	nth:11
+BPF_PROG_TYPE_LWT_SEG6LOCAL	input.c	/^	BPF_PROG_TYPE_LWT_SEG6LOCAL,$/;"	e	scope:enum:bpf_prog_type	file:	nth:19
+BPF_PROG_TYPE_LWT_XMIT	input.c	/^	BPF_PROG_TYPE_LWT_XMIT,$/;"	e	scope:enum:bpf_prog_type	file:	nth:12
+BPF_PROG_TYPE_PERF_EVENT	input.c	/^	BPF_PROG_TYPE_PERF_EVENT,$/;"	e	scope:enum:bpf_prog_type	file:	nth:7
+BPF_PROG_TYPE_RAW_TRACEPOINT	input.c	/^	BPF_PROG_TYPE_RAW_TRACEPOINT,$/;"	e	scope:enum:bpf_prog_type	file:	nth:17
+BPF_PROG_TYPE_RAW_TRACEPOINT_WRITABLE	input.c	/^	BPF_PROG_TYPE_RAW_TRACEPOINT_WRITABLE,$/;"	e	scope:enum:bpf_prog_type	file:	nth:24
+BPF_PROG_TYPE_SCHED_ACT	input.c	/^	BPF_PROG_TYPE_SCHED_ACT,$/;"	e	scope:enum:bpf_prog_type	file:	nth:4
+BPF_PROG_TYPE_SCHED_CLS	input.c	/^	BPF_PROG_TYPE_SCHED_CLS,$/;"	e	scope:enum:bpf_prog_type	file:	nth:3
+BPF_PROG_TYPE_SK_LOOKUP	input.c	/^	BPF_PROG_TYPE_SK_LOOKUP,$/;"	e	scope:enum:bpf_prog_type	file:	nth:30
+BPF_PROG_TYPE_SK_MSG	input.c	/^	BPF_PROG_TYPE_SK_MSG,$/;"	e	scope:enum:bpf_prog_type	file:	nth:16
+BPF_PROG_TYPE_SK_REUSEPORT	input.c	/^	BPF_PROG_TYPE_SK_REUSEPORT,$/;"	e	scope:enum:bpf_prog_type	file:	nth:21
+BPF_PROG_TYPE_SK_SKB	input.c	/^	BPF_PROG_TYPE_SK_SKB,$/;"	e	scope:enum:bpf_prog_type	file:	nth:14
+BPF_PROG_TYPE_SOCKET_FILTER	input.c	/^	BPF_PROG_TYPE_SOCKET_FILTER,$/;"	e	scope:enum:bpf_prog_type	file:	nth:1
+BPF_PROG_TYPE_SOCK_OPS	input.c	/^	BPF_PROG_TYPE_SOCK_OPS,$/;"	e	scope:enum:bpf_prog_type	file:	nth:13
+BPF_PROG_TYPE_STRUCT_OPS	input.c	/^	BPF_PROG_TYPE_STRUCT_OPS,$/;"	e	scope:enum:bpf_prog_type	file:	nth:27
+BPF_PROG_TYPE_SYSCALL	input.c	/^	BPF_PROG_TYPE_SYSCALL, \/* a program that can execute syscalls *\/$/;"	e	scope:enum:bpf_prog_type	file:	nth:31
+BPF_PROG_TYPE_TRACEPOINT	input.c	/^	BPF_PROG_TYPE_TRACEPOINT,$/;"	e	scope:enum:bpf_prog_type	file:	nth:5
+BPF_PROG_TYPE_TRACING	input.c	/^	BPF_PROG_TYPE_TRACING,$/;"	e	scope:enum:bpf_prog_type	file:	nth:26
+BPF_PROG_TYPE_UNSPEC	input.c	/^	BPF_PROG_TYPE_UNSPEC,$/;"	e	scope:enum:bpf_prog_type	file:	nth:0
+BPF_PROG_TYPE_XDP	input.c	/^	BPF_PROG_TYPE_XDP,$/;"	e	scope:enum:bpf_prog_type	file:	nth:6
+bpf_prog_type	input.c	/^enum bpf_prog_type {$/;"	g	file:
