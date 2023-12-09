@@ -281,7 +281,7 @@ def run_shrink(cmdline_template, finput, foutput, lang):
 # otherwise return a list of command line arguments.
 def basename_filter(internal, output_type):
     filters_external = {
-            'ctags': 's%\(^[^\t]\{1,\}\t\)\(/\{0,1\}\([^/\t]\{1,\}/\)*\)%\\1%',
+            'ctags': r's%\(^[^\t]\{1,\}\t\)\(/\{0,1\}\([^/\t]\{1,\}/\)*\)%\\1%',
             # "input" in the expresion is for finding input file names in the TAGS file.
             # RAWOUT.tmp:
             #
@@ -300,9 +300,9 @@ def basename_filter(internal, output_type):
             #
             # FIXME: if "input" is included as a substring of tag entry names, filtering
             # with this expression makes the test fail.
-            'etags': 's%.*\/\(input[-._][[:print:]]\{1,\}\),\([0-9]\{1,\}$\)%\\1,\\2%',
-            'xref': 's%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}[^ ]\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\\1\\3%',
-            'json': 's%\("path": \)"[^"]\{1,\}/\([^/"]\{1,\}\)"%\\1"\\2"%',
+            'etags': r's%.*\/\(input[-._][[:print:]]\{1,\}\),\([0-9]\{1,\}$\)%\\1,\\2%',
+            'xref': r's%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}[^ ]\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\\1\\3%',
+            'json': r's%\("path": \)"[^"]\{1,\}/\([^/"]\{1,\}\)"%\\1"\\2"%',
             }
     filters_internal = {
             'ctags': [r'(^[^\t]+\t)(/?([^/\t]+/)*)', r'\1'],
