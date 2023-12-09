@@ -1175,11 +1175,13 @@ static int lookupQualifiedName (tokenInfo *const token, vString *name,
 			}
 			if (!external && ongoing)
 			{
-				int newScope = anyKindsEntryInScope (
-					scope, part, vLookupKinds, vLookupNumKinds, true);
+				int newScope = CORK_NIL;
 				if (makeRefs)
 					newScope = makeTagFull (token, part, makeRefs->kind, scope,
 											makeRefs->role, NULL, NULL, NULL);
+				if (newScope == CORK_NIL)
+					newScope = anyKindsEntryInScope (
+							scope, part, vLookupKinds, vLookupNumKinds, true);
 				scope = newScope;
 				ongoing = scope != CORK_NIL;
 			}
