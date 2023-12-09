@@ -25,6 +25,8 @@ class Person {
    public string name {get; set;}
    private int d_age;
 
+   static int population;
+
    public int age {
       get { return d_age;}
       set { 

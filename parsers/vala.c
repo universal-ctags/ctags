@@ -271,6 +271,15 @@ enum ValaTokenType {
 	TOKEN_STRING,
 };
 
+typedef enum {
+	F_PROPERTIES,
+} valaField;
+
+static fieldDefinition ValaFields[] = {
+	{ .name = "properties",
+	  .description = "properties (static)",
+	  .enabled = true },
+};
 
 /*
 *   FUNCTION PROTOTYPES
@@ -725,6 +734,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 
 	do
 	{
+		bool seen_static = false;
 		tokenRead (token);
 		if (tokenIsTypeVal (token, '}'))
 			break;
@@ -733,6 +743,12 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 			tokenIsKeyword (token, PRIVATE) || tokenIsKeyword (token, INTERNAL))
 		{
 			visiblity = eStrdup (tokenString (token));
+			tokenRead (token);
+		}
+
+		if (tokenIsKeyword(token, STATIC))
+		{
+			seen_static = true;
 			tokenRead (token);
 		}
 
@@ -799,6 +815,9 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 			 * ctags-7.0.0. */
 			"unknown");
 		entry->extensionFields.typeRef [1] = vStringStrdup(typerefToken->string);
+		/* Fill prototypes field. */
+		if (seen_static)
+			attachParserField(entry, ValaFields[F_PROPERTIES].ftype, "static");
 
 		if (kind == K_PROP)
 			tokenSkipOverPair (token);
@@ -934,6 +953,8 @@ extern parserDefinition* ValaParser (void)
 	def->extensions = extensions;
 	def->keywordTable = ValaKeywordTable;
 	def->keywordCount = ARRAY_SIZE (ValaKeywordTable);
+	def->fieldTable = ValaFields;
+	def->fieldCount = ARRAY_SIZE (ValaFields);
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
 
