@@ -1249,7 +1249,7 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 	token->fullyQualified = true;
 
 	// should end on one of these
-	expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN, TOKEN_KEYWORD) ||
+	if (expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN, TOKEN_KEYWORD))
 		expectKeyword (token, KEYWORD_TYPE,
 					   KEYWORD_map, KEYWORD_chan, KEYWORD_sql);
 
@@ -1456,7 +1456,7 @@ static void parseIf (tokenInfo *const token, int scope)
 				parseIf (token, scope);
 			else
 			{
-				expectToken (token, TOKEN_OPEN_CURLY, TOKEN_KEYWORD) ||
+				if (expectToken (token, TOKEN_OPEN_CURLY, TOKEN_KEYWORD))
 					expectKeyword (token, KEYWORD_if, KEYWORD_Sif);
 				unreadToken (token);
 			}
