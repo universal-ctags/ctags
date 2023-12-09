@@ -737,6 +737,13 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 	char *visiblity = NULL;
 	tokenInfo *typerefToken = newValaToken ();
 	tokenInfo *nameToken = newValaToken ();
+	const char *className = NULL;
+
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (classCorkIndex);
+		if (e)
+			className = e->name;
+	}
 
 	do
 	{
@@ -784,8 +791,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		}
 
 		bool typerefIsClass;
-		if (!readIdentifierExtended (typerefToken, &typerefIsClass))
-			goto out;
+		readIdentifierExtended (typerefToken, &typerefIsClass);
 
 		bool nameFound = false;
 		tokenRead (token);
@@ -793,11 +799,12 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		{
 			tokenCopy (nameToken, token);
 			nameFound = true;
+			tokenRead (token);
 		}
 
 		int kind = KIND_GHOST_INDEX;
 		int methodIndex = CORK_NIL;
-		tokenRead (token);
+		bool is_name_constructor = false;
 		if (tokenIsTypeVal (token, '('))
 		{
 			if (nameFound)
@@ -805,6 +812,17 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 				/* Method */
 				tokenUnread(token);
 				tokenCopy (token, nameToken);
+				methodIndex = parseStatement (token, classCorkIndex);
+				tagEntryInfo *e = getEntryInCorkQueue (methodIndex);
+				if (e && e->kindIndex == K_METHOD)
+					kind = e->kindIndex;
+			}
+			else if (strcmp (vStringValue (typerefToken->string), className) == 0)
+			{
+				/* Constructor */
+				tokenUnread(token);
+				tokenCopy (token, typerefToken);
+				is_name_constructor = true;
 				methodIndex = parseStatement (token, classCorkIndex);
 				tagEntryInfo *e = getEntryInCorkQueue (methodIndex);
 				if (e && e->kindIndex == K_METHOD)
@@ -840,21 +858,24 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		/* Fill access field. */
 		entry->extensionFields.access = visiblity;
 		visiblity = NULL;
-		/* Fill typeref field. */
-		entry->extensionFields.typeRef [0] = eStrdup (
-			typerefIsClass?
-			/* '.' is included in typeref name. Can I expect it as a class?
-			 */
-			"class"
-			:tokenIsType (typerefToken, KEYWORD)?
-			/* "typename" is choice in C++ parser. However, "builtin" may be
-			 * better. See #862. This should be fixed in ctags-6.0.0. */
-			"typename"
-			:
-			/* Till we implement symbol table, we cannot resolve this.
-			 * ctags-7.0.0. */
-			"unknown");
-		entry->extensionFields.typeRef [1] = vStringStrdup(typerefToken->string);
+		if (!is_name_constructor)
+		{
+			/* Fill typeref field. */
+			entry->extensionFields.typeRef [0] = eStrdup (
+				typerefIsClass?
+				/* '.' is included in typeref name. Can I expect it as a class?
+				 */
+				"class"
+				:tokenIsType (typerefToken, KEYWORD)?
+				/* "typename" is choice in C++ parser. However, "builtin" may be
+				 * better. See #862. This should be fixed in ctags-6.0.0. */
+				"typename"
+				:
+				/* Till we implement symbol table, we cannot resolve this.
+				 * ctags-7.0.0. */
+				"unknown");
+			entry->extensionFields.typeRef [1] = vStringStrdup(typerefToken->string);
+		}
 		/* Fill prototypes field. */
 		if (seen_static)
 			attachParserField(entry, ValaFields[F_PROPERTIES].ftype, "static");
@@ -865,7 +886,6 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 			entry->extensionFields.endLine = token->lineNumber;
 	} while (!tokenIsEOF (token));
 
- out:
 	if (visiblity)
 		eFree (visiblity);
 	tokenDelete (typerefToken);

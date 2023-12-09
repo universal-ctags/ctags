@@ -43,3 +43,10 @@ class Person {
    string [] table = {"a", "b"};
    const string [] ctable = {"a", "b"};
 }
+
+public class Car {
+   public int n_seat;
+   public Car () {
+      n_seat = 0;
+   }
+}

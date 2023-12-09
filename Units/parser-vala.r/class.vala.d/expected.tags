@@ -14,3 +14,6 @@ age	input.vala	/^   public int age {$/;"	property	line:30	language:Vala	class:Pe
 getLastAge	input.vala	/^   int getLastAge (int n) throws GLib.Error { return d_age - n; }$/;"	method	line:41	language:Vala	class:Person	typeref:typename:int	signature:(int n)	end:41
 table	input.vala	/^   string [] table = {"a", "b"};$/;"	field	line:43	language:Vala	class:Person	typeref:typename:string	end:43
 ctable	input.vala	/^   const string [] ctable = {"a", "b"};$/;"	field	line:44	language:Vala	class:Person	typeref:typename:string	end:44
+Car	input.vala	/^public class Car {$/;"	class	line:47	language:Vala	end:52
+n_seat	input.vala	/^   public int n_seat;$/;"	field	line:48	language:Vala	class:Car	typeref:typename:int	access:public	end:48
+Car	input.vala	/^   public Car () {$/;"	method	line:49	language:Vala	class:Car	access:public	signature:()	end:51
