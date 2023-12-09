@@ -759,12 +759,23 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 			tokenRead (token);
 		}
 
-		if (tokenIsKeyword(token, STATIC))
+		while (true)
 		{
-			seen_static = true;
-			tokenRead (token);
+			if (tokenIsKeyword(token, STATIC))
+			{
+				seen_static = true;
+				tokenRead (token);
+			}
+			else if (tokenIsKeyword(token, CONST))
+			{
+				/* TODO: we can record "const" to "properties:" field. */
+				tokenRead (token);
+			}
+			else
+				break;
 		}
-		else if (tokenIsKeyword(token, CONSTRUCT))
+
+		if (tokenIsKeyword(token, CONSTRUCT))
 		{
 			tokenRead (token);
 			if (tokenIsTypeVal (token, '{'))
@@ -773,11 +784,6 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 				tokenSkipOverPair (token);
 				continue;
 			}
-		}
-		else if (tokenIsKeyword(token, CONST))
-		{
-			/* TODO: we can record "const" to "properties:" field. */
-			tokenRead (token);
 		}
 
 		if (tokenIsType (token, IDENTIFIER)

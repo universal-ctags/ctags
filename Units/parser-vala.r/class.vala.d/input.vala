@@ -49,4 +49,5 @@ public class Car {
    public Car () {
       n_seat = 0;
    }
+   static const string [] sctable = {"a", "b"};
 }
