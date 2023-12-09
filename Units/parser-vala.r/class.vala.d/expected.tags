@@ -5,7 +5,7 @@ city	input.vala	/^   public string city;$/;"	field	line:17	language:Vala	class:A
 street	input.vala	/^   protected string street;$/;"	field	line:18	language:Vala	class:Address	typeref:typename:string	access:protected	end:18
 building	input.vala	/^   internal int building;$/;"	field	line:19	language:Vala	class:Address	typeref:typename:int	access:internal	end:19
 floor	input.vala	/^   private int floor;$/;"	field	line:20	language:Vala	class:Address	typeref:typename:int	access:private	end:20
-Person	input.vala	/^class Person {$/;"	class	line:23	language:Vala	end:44
+Person	input.vala	/^class Person {$/;"	class	line:23	language:Vala	end:45
 address	input.vala	/^   public Address address {get; set;}$/;"	property	line:24	language:Vala	class:Person	typeref:unknown:Address	access:public	end:24
 name	input.vala	/^   public string name {get; set;}$/;"	property	line:25	language:Vala	class:Person	typeref:typename:string	access:public	end:25
 d_age	input.vala	/^   private int d_age;$/;"	field	line:26	language:Vala	class:Person	typeref:typename:int	access:private	end:26
@@ -13,3 +13,4 @@ population	input.vala	/^   static int population;$/;"	field	line:28	language:Val
 age	input.vala	/^   public int age {$/;"	property	line:30	language:Vala	class:Person	typeref:typename:int	access:public	end:39
 getLastAge	input.vala	/^   int getLastAge (int n) throws GLib.Error { return d_age - n; }$/;"	method	line:41	language:Vala	class:Person	typeref:typename:int	signature:(int n)	end:41
 table	input.vala	/^   string [] table = {"a", "b"};$/;"	field	line:43	language:Vala	class:Person	typeref:typename:string	end:43
+ctable	input.vala	/^   const string [] ctable = {"a", "b"};$/;"	field	line:44	language:Vala	class:Person	typeref:typename:string	end:44

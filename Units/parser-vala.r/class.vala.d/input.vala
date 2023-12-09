@@ -41,4 +41,5 @@ class Person {
    int getLastAge (int n) throws GLib.Error { return d_age - n; }
 
    string [] table = {"a", "b"};
+   const string [] ctable = {"a", "b"};
 }
