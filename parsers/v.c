@@ -1604,8 +1604,8 @@ static void parseFunction (tokenInfo *const token, int scope,
 		else if ((kind == KIND_METHOD || kind == KIND_ALIAS) &&
 				 isToken (token, TOKEN_IDENT))
 		{
-			vStringDelete (token->string);
-			token->string = acc;
+			vStringCopy (token->string, acc);
+			vStringDelete (acc);
 			acc = NULL;
 		}
 		int newScope = CORK_NIL;
