@@ -1829,10 +1829,7 @@ static void parseImport (tokenInfo *const token)
 		{
 			readToken (token);
 			if (expectToken (token, TOKEN_IDENT))
-			{
-				vStringDelete (moduleName);
-				moduleName = vStringNewCopy (token->string);
-			}
+				vStringCopy (moduleName, token->string);
 			readToken (token);
 		}
 		else
