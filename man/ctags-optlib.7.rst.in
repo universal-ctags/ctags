@@ -363,7 +363,6 @@ representation. ``--list-regex-flags`` lists all the flags.
 	specified with the options after running a built-in parser.
 
 ``scope=(ref|push|pop|clear|set|replace)``
-
 	Specify what to do with the internal scope stack.
 
 	A parser programmed with ``--regex-<LANG>`` has a stack (scope
