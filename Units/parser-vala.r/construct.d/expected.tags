@@ -1,0 +1,2 @@
+Abc	input.vala	/^class Abc : Object {$/;"	c
+main	input.vala	/^void main(string[] args) {}$/;"	m

@@ -751,6 +751,16 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 			seen_static = true;
 			tokenRead (token);
 		}
+		else if (tokenIsKeyword(token, CONSTRUCT))
+		{
+			tokenRead (token);
+			if (tokenIsTypeVal (token, '{'))
+			{
+				/* TODO: we can make an anonymous tag for the constructor.  */
+				tokenSkipOverPair (token);
+				continue;
+			}
+		}
 
 		if (tokenIsType (token, IDENTIFIER)
 			|| tokenIsType (token, KEYWORD))
