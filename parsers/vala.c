@@ -766,7 +766,8 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 				seen_static = true;
 				tokenRead (token);
 			}
-			else if (tokenIsKeyword(token, CONST))
+			else if (tokenIsKeyword(token, CONST)
+					 || tokenIsKeyword(token, NEW))
 			{
 				/* TODO: we can record "const" to "properties:" field. */
 				tokenRead (token);
