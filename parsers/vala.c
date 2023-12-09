@@ -704,6 +704,9 @@ static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended
 		else if (tokenIsTypeVal (token, '<'))
 			/* Skip over generic type parameter. */
 			tokenSkipOverPair (token);
+		else if (tokenIsTypeVal (token, '['))
+			/* Skip over array. */
+			tokenSkipOverPair (token);
 		else if (tokenIsType (token, IDENTIFIER))
 		{
 			if (tokenLast (resultToken) == '.')
