@@ -18,7 +18,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-This man page gathers random notes about tagging Markdown documents.
+This man page gathers random notes about tagging Markdown documents [XSYNTAX]_.
 
 VERSIONS
 --------
