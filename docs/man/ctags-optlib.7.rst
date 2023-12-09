@@ -335,54 +335,58 @@ representation. ``--list-regex-flags`` lists all the flags.
 	``scope=...`` flag about how this is useful.
 
 ``postrun``
-	Match the pattern at the end of all the parsing processes,
-	including running build-in parsers, applying
-	``--mline-regex-<LANG>`` patterns, and applying
-	``--_mtable-regex-<LANG>`` patterns. This flag is useful for
-	extending a built-in parser with the ``--regex-<LANG>=`` option.
+	Match the pattern at the end of all the parsing processes, including:
 
-	A built-in parser processes source files line by line provided by
-	the main part of ctags.  The main part of
-	ctags applies ``--regex-<LANG>=`` patterns to a
-	line when providing the line to the built-in parser. Both the
-	built-in parser for ``<LANG>`` and the patterns of
-	``--regex-<LANG>=`` without ``postrun`` run side-by-side.
+	* running the built-in code for ``<LANG>``,
+	* applying ``--mline-regex-<LANG>`` patterns,
+	* applying ``--_mtable-regex-<LANG>`` patterns, and
+	* applying non-``postrun`` ``--regex-<LANG>=`` patterns.
 
-	Thus, ``--regex-<LANG>=`` patterns without ``postrun`` cannot use
-	the tags information finally extracted by the built-in parser for
-	``<LANG>``.  This is where the ``postrun`` comes into play. The
-	main part never applies patterns with ``postrun`` when providing
-	lines to built-in parsers. Instead, it applies the patterns after
-	running the built-in parser.  In other words, it applies the
-	patterns to a source file after providing all the file lines. The
-	patterns can utilize the tags information completely extracted by
-	the built-in parser.
+	This flag is helpful when combined with ``scope=intervaltab``.
+
+	The built-in code processes source files line-by-line delivered by
+	the main part of ctags.  The main part applies
+	non-``postrun`` ``--regex-<LANG>=`` patterns to a line just after
+	delivering the line to the code of built-in code. Thus,
+	non-``postrun`` ``--regex-<LANG>=`` patterns cannot refer to the tags
+	information finally extracted by the built-in code.
+
+	This is where the ``postrun`` comes into play. The main part never
+	applies ``postrun`` ``--regex-<LANG>=`` patterns when delivering
+	lines to the code of built-in code. Instead, it applies the
+	``postrun`` patterns in batch after delivering all lines to the
+	built-in code. The ``postrun`` patterns can refer to the tags
+	information extracted by the built-in code.
 
 	``--mline-regex-<LANG>`` and ``--_mtable-regex-<LANG>`` have no
-	``{postrun}`` flag because the main part always applies the patterns
-	specified with the options after running a built-in parser.
+	``{postrun}`` flag because the main part always applies the
+	patterns specified with the options after running the built-in
+	code for ``<LANG>``.
 
 	See also the description of ``scope=intervaltab`` flag.
 
 ``scope=intervaltab``
-	Use an interval table to fill in the ``scope:`` field.
+	Use the interval table maintaind by the main part of
+	ctags to fill in the ``scope:`` field.
 	This flag is useful for extending a built-in parser with the
-	``--regex-<LANG>=`` option. Use this flag with ``postrun`` flag.
+	``--regex-<LANG>=`` option with ``postrun`` flag.
 
-	The interval table maintained by the main part of
-	ctags holds tag entries with both ``line:`` and
-	``end:`` fields. Tag entries are stored in a table keyed by their
-	``line:`` and ``end:`` field pairs. Therefore, the table can
-	answer the query, "Which tag entry contains this row?"
+	The interval table holds tag entries having both ``line:`` and
+	``end:`` fields. These tag entries are stored in a table keyed by
+	their ``line:`` and ``end:`` field pairs. Therefore, the table can
+	answer queries like, "Is there a tag entry that includes
+	this line?" or "Which tag entry contains this line?"
 
-	The source line where ``--regex-<LANG>`` pattern finds a language
-	object is used to query the table. The tag entry returned by the
-	table is set in the ``scope:`` field of the newly created tag
-	entry for the language object.
+	The source line, where ``postrun`` ``--regex-<LANG>`` pattern finds
+	a language object, can be a key for such queries. The tag
+	entry returned by the table is set in the ``scope:`` field of the
+	newly created tag entry for the language object.
 
 	``postrun`` flag is needed for running the built-in parser that
 	stores tag entries before applying patterns specified with
 	``--regex-<LANG>``.
+
+	See also the example in "`Using the interval table`_".
 
 ``scope=(ref|push|pop|clear|set|replace)``
 	Specify what to do with the internal scope stack.
@@ -561,9 +565,6 @@ with the function like (quoted from linux/mm/vmscan.c):
 			/* ... */
 			pgdat->kswapd = kthread_run(kswapd, pgdat, "kswapd%d", nid);
 			/* ... */
-
-
-
 
 ``kthread-v1.ctags`` illustrates the way to extract the name of kernel threads
 appeared at the third argument of ``kthread_run``.
