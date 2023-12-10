@@ -238,9 +238,12 @@ struct lregexControlBlock {
 	ptrArray *hook_code[SCRIPT_HOOK_MAX];
 
 	langType owner;
-
-	scriptWindow *window;
 };
+
+typedef struct {
+	struct lregexControlBlock *lcb;
+	scriptWindow *window;
+} appData;
 
 /*
 *   DATA DEFINITIONS
@@ -271,6 +274,34 @@ static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb);
 
 static char* make_match_string (scriptWindow *window, int group);
 static matchLoc *make_mloc (scriptWindow *window, int group, bool start);
+
+static struct lregexControlBlock *get_current_lcb(OptVM *vm)
+{
+	appData * d = opt_vm_get_app_data (vm);
+	return d->lcb;
+}
+
+static scriptWindow *get_current_window(OptVM *vm)
+{
+	appData * d = opt_vm_get_app_data (vm);
+	return d->window;
+}
+
+static struct lregexControlBlock *set_current_lcb(OptVM *vm, struct lregexControlBlock *new_lcb)
+{
+	appData * d = opt_vm_get_app_data (vm);
+	struct lregexControlBlock *old_lcb = d->lcb;
+	d->lcb = new_lcb;
+	return old_lcb;
+}
+
+static scriptWindow *set_current_window(OptVM *vm, scriptWindow *new_windown)
+{
+	appData * d = opt_vm_get_app_data (vm);
+	scriptWindow *old_window = d->window;
+	d->window = new_windown;
+	return old_window;
+}
 
 static void deleteTable (void *ptrn)
 {
@@ -2139,15 +2170,15 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 	if (es_null (lcb->local_dict))
 		lcb->local_dict = opt_dict_new (23);
 	opt_vm_dstack_push (optvm, lcb->local_dict);
-	opt_vm_set_app_data (optvm, lcb);
+	set_current_lcb (optvm, lcb);
 	scriptEvalHook (optvm, lcb, SCRIPT_HOOK_PRELUDE);
 }
 
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
 {
 	scriptEvalHook (optvm, lcb, SCRIPT_HOOK_SEQUEL);
-	opt_vm_set_app_data (optvm, NULL);
-	opt_vm_clear (optvm, true);
+	set_current_lcb (optvm, NULL);
+	opt_vm_clear (optvm, false);
 	opt_dict_clear (lcb->local_dict);
 	unsigned long endline = getInputLineNumber ();
 	fillEndLineFieldOfUpperScopes (lcb, endline);
@@ -2601,6 +2632,9 @@ extern void printMultitableRegexFlags (bool withListHeader, bool machinable, con
 extern void freeRegexResources (void)
 {
 	es_object_unref (lregex_dict);
+	void *d = opt_vm_set_app_data(optvm, NULL);
+	if (d)
+		eFree (d);
 	opt_vm_delete (optvm);
 }
 
@@ -3219,14 +3253,16 @@ static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum scri
 
 static void scriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex, scriptWindow *window)
 {
-	lcb->window = window;
+	set_current_lcb (vm, lcb);
+	set_current_window (vm, window);
 	optscriptSetup (vm, lcb->local_dict, corkIndex);
 }
 
 static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb)
 {
 	optscriptTeardown (vm, lcb->local_dict);
-	lcb->window = NULL;
+	set_current_lcb (vm, NULL);
+	set_current_window (vm, NULL);
 }
 
 extern void	addOptscriptToHook (struct lregexControlBlock *lcb, enum scriptHook hook, const char *code)
@@ -3283,8 +3319,8 @@ static EsObject* lrop_make_foreignreftag (OptVM *vm, EsObject *name)
 	}
 	else
 	{
-		struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-		if (lcb->window->patbuf->regptype != REG_PARSER_SINGLE_LINE)
+		scriptWindow *window = get_current_window(vm);
+		if (window->patbuf->regptype != REG_PARSER_SINGLE_LINE)
 			return OPT_ERR_TYPECHECK;
 		if (opt_vm_ostack_count (vm) < 4)
 			return OPT_ERR_UNDERFLOW;
@@ -3478,8 +3514,7 @@ static EsObject* lrop_get_match_loc (OptVM *vm, EsObject *name)
 	if (g < 1)
 		return OPT_ERR_RANGECHECK;
 
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-	scriptWindow *window = lcb->window;
+	scriptWindow *window = get_current_window (vm);
 
 	matchLoc *mloc = make_mloc (window, g, start);
 	if (mloc == NULL)
@@ -3561,8 +3596,7 @@ static EsObject* lrop_get_tag_loc (OptVM *vm, EsObject *name)
 
 static EsObject* lrop_get_match_string_common (OptVM *vm, int i, int npop)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-	scriptWindow *window = lcb->window;
+	scriptWindow *window = get_current_window (vm);
 	const char *cstr = make_match_string (window, i);
 	if (!cstr)
 	{
@@ -3666,7 +3700,7 @@ static EsObject* lrop_set_scope (OptVM *vm, EsObject *name)
 	if (n >= countEntryInCorkQueue())
 		return OPT_ERR_RANGECHECK;
 
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	struct lregexControlBlock *lcb = get_current_lcb (vm);
 	lcb->currentScope = n0;
 
 	opt_vm_ostack_pop (vm);
@@ -3676,7 +3710,7 @@ static EsObject* lrop_set_scope (OptVM *vm, EsObject *name)
 
 static EsObject* lrop_pop_scope (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	struct lregexControlBlock *lcb = get_current_lcb (vm);
 	if (lcb->currentScope != CORK_NIL)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (lcb->currentScope);
@@ -3688,14 +3722,14 @@ static EsObject* lrop_pop_scope (OptVM *vm, EsObject *name)
 
 static EsObject* lrop_clear_scope (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	struct lregexControlBlock *lcb = get_current_lcb (vm);
 	lcb->currentScope = CORK_NIL;
 	return es_false;
 }
 
 static EsObject* lrop_ref0_scope (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	struct lregexControlBlock *lcb = get_current_lcb (vm);
 
 	if (lcb->currentScope == 0)
 	{
@@ -3722,7 +3756,7 @@ static EsObject* lrop_refN_scope (OptVM *vm, EsObject *name)
 
 	int n = es_integer_get(nobj);
 
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	struct lregexControlBlock *lcb = get_current_lcb (vm);
 	int scope = lcb->currentScope;
 
 	while (n--)
@@ -3749,7 +3783,7 @@ static EsObject* lrop_refN_scope (OptVM *vm, EsObject *name)
 
 static EsObject* lrop_get_scope_depth (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	struct lregexControlBlock *lcb = get_current_lcb (vm);
 	int scope = lcb->currentScope;
 
 	while (scope != CORK_NIL)
@@ -3816,8 +3850,8 @@ static struct regexTable *getRegexTableForOptscriptName (struct lregexControlBlo
 
 static EsObject* lrop_tenter_common (OptVM *vm, EsObject *name, enum tableAction action)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-	if (lcb->window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
+	scriptWindow *window = get_current_window (vm);
+	if (window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
 	{
 		error (WARNING, "Use table related operators only with mtable regular expression");
 		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
@@ -3827,11 +3861,12 @@ static EsObject* lrop_tenter_common (OptVM *vm, EsObject *name, enum tableAction
 	if (es_object_get_type (table) != OPT_TYPE_NAME)
 		return OPT_ERR_TYPECHECK;
 
+	struct lregexControlBlock *lcb = get_current_lcb(vm);
 	struct regexTable *t = getRegexTableForOptscriptName (lcb, table);
 	if (t == NULL)
 		return OPTSCRIPT_ERR_UNKNOWNTABLE;
 
-	lcb->window->taction = (struct mTableActionSpec){
+	window->taction = (struct mTableActionSpec){
 		.action             = action,
 		.table              = t,
 		.continuation_table = NULL,
@@ -3848,8 +3883,8 @@ static EsObject* lrop_tenter (OptVM *vm, EsObject *name)
 
 static EsObject* lrop_tenter_with_continuation (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-	if (lcb->window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
+	scriptWindow *window = get_current_window (vm);
+	if (window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
 	{
 		error (WARNING, "Use table related operators only with mtable regular expression");
 		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
@@ -3863,6 +3898,7 @@ static EsObject* lrop_tenter_with_continuation (OptVM *vm, EsObject *name)
 	if (es_object_get_type (cont) != OPT_TYPE_NAME)
 		return OPT_ERR_TYPECHECK;
 
+	struct lregexControlBlock *lcb = get_current_lcb (vm);
 	struct regexTable *t = getRegexTableForOptscriptName (lcb, table);
 	if (t == NULL)
 		return OPTSCRIPT_ERR_UNKNOWNTABLE;
@@ -3870,7 +3906,7 @@ static EsObject* lrop_tenter_with_continuation (OptVM *vm, EsObject *name)
 	if (c == NULL)
 		return OPTSCRIPT_ERR_UNKNOWNTABLE;
 
-	lcb->window->taction = (struct mTableActionSpec){
+	window->taction = (struct mTableActionSpec){
 		.action             = TACTION_ENTER,
 		.table              = t,
 		.continuation_table = c,
@@ -3883,14 +3919,14 @@ static EsObject* lrop_tenter_with_continuation (OptVM *vm, EsObject *name)
 
 static EsObject* lrop_tleave (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-	if (lcb->window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
+	scriptWindow *window = get_current_window (vm);
+	if (window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
 	{
 		error (WARNING, "Use table related operators only with mtable regular expression");
 		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
 	}
 
-	lcb->window->taction.action = TACTION_LEAVE;
+	window->taction.action = TACTION_LEAVE;
 	return es_false;
 }
 
@@ -3906,14 +3942,14 @@ static EsObject* lrop_treset (OptVM *vm, EsObject *name)
 
 static EsObject* lrop_tquit (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-	if (lcb->window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
+	scriptWindow *window = get_current_window (vm);
+	if (window->patbuf->regptype != REG_PARSER_MULTI_TABLE)
 	{
 		error (WARNING, "Use table related operators only with mtable regular expression");
 		return OPTSCRIPT_ERR_NOTMTABLEPTRN;
 	}
 
-	lcb->window->taction.action = TACTION_QUIT;
+	window->taction.action = TACTION_QUIT;
 	return es_false;
 }
 
@@ -3997,8 +4033,8 @@ static EsObject *lrop_markextra (OptVM *vm, EsObject *name)
 
 static EsObject *lrop_advanceto (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-	if (lcb->window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
+	scriptWindow *window = get_current_window (vm);
+	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
 	{
 		error (WARNING, "don't use `%s' operator in --regex-<LANG> option",
 			   es_symbol_get (name));
@@ -4010,8 +4046,8 @@ static EsObject *lrop_advanceto (OptVM *vm, EsObject *name)
 		return OPT_ERR_TYPECHECK;
 
 	matchLoc *loc = es_pointer_get (mlocobj);
-	lcb->window->advanceto = true;
-	lcb->window->advanceto_delta = loc->delta;
+	window->advanceto = true;
+	window->advanceto_delta = loc->delta;
 
 	return es_true;
 }
@@ -4043,8 +4079,8 @@ static EsObject *lrop_markplaceholder (OptVM *vm, EsObject *name)
 
 static EsObject *lrop_makepromise (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
-	if (lcb->window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
+	scriptWindow *window = get_current_window (vm);
+	if (window->patbuf->regptype == REG_PARSER_SINGLE_LINE)
 	{
 		error (WARNING, "don't use `%s' operator in --regex-<LANG> option",
 			   es_symbol_get (name));
@@ -4103,7 +4139,7 @@ static EsObject *lrop_makepromise (OptVM *vm, EsObject *name)
 
 static EsObject *lrop_param (OptVM *vm, EsObject *name)
 {
-	struct lregexControlBlock *lcb = opt_vm_get_app_data (vm);
+	struct lregexControlBlock *lcb = get_current_lcb (vm);
 	EsObject *key = opt_vm_ostack_top (vm);
 	if (es_object_get_type (key) != OPT_TYPE_NAME)
 		return OPT_ERR_TYPECHECK;
@@ -4315,6 +4351,8 @@ extern void initRegexOptscript (void)
 		return;
 
 	optvm = optscriptInit ();
+	appData *d = xCalloc (1, appData);
+	opt_vm_set_app_data (optvm, d);
 	lregex_dict = opt_dict_new (17);
 
 	OPTSCRIPT_ERR_UNKNOWNTABLE = es_error_intern ("unknowntable");
