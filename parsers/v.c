@@ -32,6 +32,7 @@
 
 #include "dependency.h"
 #include "cxx/cxx_tag.h"
+#include "jscript.h"
 
 #define MAX_REPLAYS 3
 #define _NARGS(_1, _2, _3, _4, _5, _6, _7, _8, _9, N, ...) N
@@ -393,7 +394,7 @@ typedef struct {
 #endif
 } parserState;
 
-static langType Lang_v;
+static langType LangV;
 static objPool *TokenPool = NULL;
 static parserState *PS = NULL; // global parser state
 
@@ -794,7 +795,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		} while (more);
 		ungetcToInputFile (c);
 
-		token->keyword = lookupKeyword (vStringValue (token->string), Lang_v);
+		token->keyword = lookupKeyword (vStringValue (token->string), LangV);
 		if (token->keyword != KEYWORD_NONE)
 			token->type = TOKEN_KEYWORD;
 		else
@@ -988,45 +989,62 @@ static int makeRefTag (tokenInfo *const token, vString *const name,
 						role, NULL, NULL, NULL);
 }
 
-static void makeTagForeigndeclMaybe (int scope, tokenInfo *const token, kindType kind)
+static void makeForeignDeclTagMaybe (tokenInfo *const token, vString *const name,
+                                     kindType kind, int scope)
 {
 	tagEntryInfo *scopeEntry = getEntryInCorkQueue (scope);
-
 	if (!scopeEntry)
 		return;
-
-	if (! (scopeEntry->langType == Lang_v &&
+	if (! (scopeEntry->langType == LangV &&
 		   scopeEntry->kindIndex == KIND_MODULE &&
 		   isRoleAssigned (scopeEntry, ROLE_FOREIGNLANG_MODULE)))
 		return;
 
+	int foreignKind, foreignRole;
+	langType lang;
+
 	if (strcmp (scopeEntry->name, "C") == 0)
 	{
-		int fk;
-		int fr;
-
+		lang = getNamedLanguage ("C", 0);
 		if (kind == KIND_STRUCT)
 		{
-			fk = CXXTagKindSTRUCT;
-			fr = CXXTagSTRUCTRoleFOREIGNDECL;
+			foreignKind = CXXTagKindSTRUCT;
+			foreignRole = CXXTagSTRUCTRoleFOREIGNDECL;
 		}
 		else if (kind == KIND_FUNCTION)
 		{
-			fk = CXXTagKindFUNCTION;
-			fr = CXXTagFUNCTIONRoleFOREIGNDECL;
+			foreignKind = CXXTagKindFUNCTION;
+			foreignRole = CXXTagFUNCTIONRoleFOREIGNDECL;
 		}
 		else
 			return;
-
-		tagEntryInfo foreigndecl;
-		initForeignRefTagEntry (&foreigndecl,
-								vStringValue (token->string),
-								getNamedLanguage ("C", 0),
-								fk, fr);
-		foreigndecl.lineNumber = token->lineNumber;
-		foreigndecl.filePosition = token->filePosition;
-		makeTagEntry (&foreigndecl);
 	}
+	else if (strcmp (scopeEntry->name, "JS") == 0)
+	{
+		lang = getNamedLanguage ("JavaScript", 0);
+		if (kind == KIND_FUNCTION)
+		{
+			foreignKind = JSTAG_FUNCTION;
+			foreignRole = JSTAG_FUNCTIONRoleFOREIGNDECL;
+		}
+		else
+			return;
+	}
+	else
+		return;
+
+	if (lang == LANG_IGNORE)
+		return;
+
+	vDebugParserPrintf ("#~ ");
+	tagEntryInfo foreignEntry;
+	const char *const tagName =
+		name? vStringValue (name) : vStringValue (token->string);
+	initForeignRefTagEntry (
+		&foreignEntry, tagName, lang, foreignKind, foreignRole);
+	foreignEntry.lineNumber = token->lineNumber;
+	foreignEntry.filePosition = token->filePosition;
+	makeTagEntry (&foreignEntry);
 }
 
 static tokenType getOpen (tokenType close)
@@ -1595,16 +1613,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 				lookupQualifiedName (fnToken, name, scope, NULL) : scope;
 			newScope = makeFnTag (fnToken, name, realKind, realScope,
 								  argList, retType, access);
-			{
-				vString *tmp = fnToken->string;
-				if (name)
-					fnToken->string = name;
-				makeTagForeigndeclMaybe (realScope,
-										 fnToken,
-										 realKind);
-				if (name)
-					fnToken->string = tmp;
-			}
+			makeForeignDeclTagMaybe (fnToken, name, realKind, realScope);
 
 			if (receiver)
 				makeTag (rxToken, NULL, KIND_RECEIVER, newScope);
@@ -1892,7 +1901,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 			scope = lookupQualifiedName (token, NULL, scope, false);
 			kindType realKind = kind == KIND_NONE? KIND_STRUCT : kind;
 			newScope = makeTagEx (token, NULL, realKind, scope, access);
-			makeTagForeigndeclMaybe (scope, token, realKind);
+			makeForeignDeclTagMaybe (token, NULL, realKind, scope);
 			registerEntry (newScope);
 			readToken (token);
 		}
@@ -2997,11 +3006,11 @@ static void findVTags (void)
 
 static void initialize (const langType language)
 {
-	Lang_v = language;
+	LangV = language;
 
 	TokenPool = objPoolNew (
 		16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
-	addKeywordGroup (&VTypeKeywords, Lang_v);
+	addKeywordGroup (&VTypeKeywords, LangV);
 }
 
 static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
@@ -3019,6 +3028,7 @@ extern parserDefinition *VParser (void)
 	static selectLanguage selectors[] = { selectVOrVerilogByKeywords, NULL };
 	static parserDependency dependencies [] = {
 		[0] = { DEPTYPE_FOREIGNER, "C", NULL },
+		[1] = { DEPTYPE_FOREIGNER, "JavaScript", NULL },
 	};
 	def->kindTable = VKinds;
 	def->kindCount = ARRAY_SIZE (VKinds);

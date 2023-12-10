@@ -1,3 +1,15 @@
-struct C.SYSTEM_INFO {
+module thismodule
+
+import that.aaa
+import that.bbb { Bbb }
+
+struct Foo {
+	a aaa.Aaa
+	b Bbb
 }
-fn C.foo(bar string) i64
+
+fn main() {
+	foo := Foo{}
+	foo.a
+	foo.b
+}
