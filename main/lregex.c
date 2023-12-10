@@ -2147,7 +2147,7 @@ extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
 {
 	scriptEvalHook (optvm, lcb, SCRIPT_HOOK_SEQUEL);
 	opt_vm_set_app_data (optvm, NULL);
-	opt_vm_clear (optvm);
+	opt_vm_clear (optvm, true);
 	opt_dict_clear (lcb->local_dict);
 	unsigned long endline = getInputLineNumber ();
 	fillEndLineFieldOfUpperScopes (lcb, endline);

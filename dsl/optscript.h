@@ -41,7 +41,7 @@ void      opt_vm_print_prompt (OptVM *vm);
 int       opt_vm_help         (OptVM *vm, MIO *out,
 							   struct OptHelpExtender *extop, void *data);
 
-void      opt_vm_clear       (OptVM *vm);
+void      opt_vm_clear       (OptVM *vm, bool clear_app_data);
 void      opt_vm_dstack_push (OptVM *vm, EsObject *dict);
 void      opt_vm_dstack_pop  (OptVM *vm);
 
