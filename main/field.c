@@ -223,7 +223,7 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.dataType           = FIELDTYPE_INTEGER,
 		.getterValueType    = "int",
 		.getValueObject     = getFieldValueForLineCommon,
-		.setterValueType    = "matchloc|int",
+		.setterValueType    = "matchloc|line:int", /* line <= getInputLineNumber(); */
 		.checkValueForSetter= checkFieldValueForLineCommon,
 		.setValueObject     = setFieldValueForLineCommon,
 	},
@@ -1878,7 +1878,7 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 		   we cannot fill tag->filePosition with
 		   getInputFilePositionForLine(); */
 		if (fdef->ftype == FIELD_LINE_NUMBER
-			&& l < getInputLineNumber())
+			&& l > getInputLineNumber())
 			return OPT_ERR_RANGECHECK;
 	}
 	else

@@ -1,3 +1,3 @@
-a	input.unknown	/^def a$/;"	d	line:2
-b	input.unknown	/^def b$/;"	d	line:4
-c	input.unknown	/^def c$/;"	d	line:6
+a	input.unknown	/^#$/;"	d	line:1
+b	input.unknown	/^def a$/;"	d	line:2
+c	input.unknown	/^#$/;"	d	line:3
