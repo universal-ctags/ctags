@@ -667,6 +667,15 @@ static bool recurseValaTags (tokenInfo *token, int parentIndex)
 		parseClass (token, K_STRUCT, parentIndex);
 	else if (tokenIsType (token, IDENTIFIER))
 		parseStatement (token, parentIndex);
+	else if (tokenIsKeyword(token, CONSTRUCT))
+	{
+		tokenRead (token);
+		if (tokenIsTypeVal (token, '{'))
+		{
+			/* TODO: we can make an anonymous tag for the constructor.  */
+			tokenSkipOverPair (token);
+		}
+	}
 	else
 		r = false;
 
@@ -792,15 +801,16 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 				break;
 		}
 
-		if (tokenIsKeyword(token, CONSTRUCT))
+		if (tokenIsKeyword(token, CLASS)
+			|| tokenIsKeyword(token, CONSTRUCT))
 		{
-			tokenRead (token);
-			if (tokenIsTypeVal (token, '{'))
+			recurseValaTags (token, classCorkIndex);
+			if (visiblity)
 			{
-				/* TODO: we can make an anonymous tag for the constructor.  */
-				tokenSkipOverPair (token);
-				continue;
+				eFree (visiblity);
+				visiblity = NULL;
 			}
+			continue;
 		}
 
 		if (tokenIsType (token, IDENTIFIER)

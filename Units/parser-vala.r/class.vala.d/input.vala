@@ -57,4 +57,10 @@ public class Car {
 
     public signal void value_changed (string name, Variant value);
     int addSeat (int n) { return n_seat + n; }
+
+    public class Seat {
+        int x;
+    }
+
+    public int more;
 }
