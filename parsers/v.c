@@ -1732,7 +1732,7 @@ static void parseChanPop (tokenInfo *const token, int scope)
 }
 
 // match: 'match' access* fqident cont '{' [
-//     [[vtype | expr] [',' [vtype | expr]]* | 'else'] block
+//     [[vtype fncall? | expr] [',' [vtype | expr]]* | 'else'] block
 // ]* '}'
 static void parseMatch (tokenInfo *const token, int scope)
 {
@@ -1761,7 +1761,16 @@ static void parseMatch (tokenInfo *const token, int scope)
 				if (isToken (token, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY))
 					break;
 				else if (isInitialType (token))
-					parseVType (token, NULL, scope, false, false);
+				{
+					if (parseVType (token, NULL, scope, false, false))
+					{
+						readToken (token);
+						if (isToken (token, TOKEN_OPEN_PAREN)) // cast
+							parseFnCall (token, scope);
+						else
+							unreadToken (token);
+					}
+				}
 				else if (isKeyword (token, KEYWORD_else))
 				{
 					readToken (token);
