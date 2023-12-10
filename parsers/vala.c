@@ -291,7 +291,7 @@ static void parseInterface (tokenInfo *const token, int corkIndex);
 static void parseClass (tokenInfo *const token, int kindIndex, int corkIndex);
 static int  parseStatement (tokenInfo *const token, int corkIndex);
 static void parseEnum (tokenInfo *const token, int kindIndex, int elementKindIndex, int corkIndex);
-static void recurseValaTags (tokenInfo *token, int parentIndex);
+static bool recurseValaTags (tokenInfo *token, int parentIndex);
 
 
 /*
@@ -647,8 +647,9 @@ static void parseEnum (tokenInfo *const token, int kindIndex, int elementKindInd
 		e->extensionFields.endLine = token->lineNumber;
 }
 
-static void recurseValaTags (tokenInfo *token, int parentIndex)
+static bool recurseValaTags (tokenInfo *token, int parentIndex)
 {
+	bool r = true;
 	/* Skip attributes */
 	if (tokenIsTypeVal (token, '['))
 		tokenSkipOverPair (token);
@@ -666,6 +667,10 @@ static void recurseValaTags (tokenInfo *token, int parentIndex)
 		parseClass (token, K_STRUCT, parentIndex);
 	else if (tokenIsType (token, IDENTIFIER))
 		parseStatement (token, parentIndex);
+	else
+		r = false;
+
+	return r;
 }
 
 static void parseNamespaceBody (tokenInfo *const token, int parentIndex)
