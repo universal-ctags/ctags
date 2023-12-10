@@ -1,0 +1,25 @@
+--sort=no
+--extras=+g
+--fields=+ln{scope}e
+
+--langdef=FOOX
+--map-FOOX=.foox
+
+--kinddef-FOOX=d,def,definitions
+--regex-FOOX=/define +([A-Z]):/\1/d/{{
+	.
+}}
+--regex-FOOX=/^(end0)$//{{
+	dup @1 end:
+}}
+
+--regex-FOOX=/^(end)$//{{
+    dup dup :end {
+        line: dup
+        @1 end:
+    } if
+}}
+
+--langdef=MARK{base=FOOX}
+--kinddef-MARK=m,marker,markers
+--regex-MARK=/^# +MARK:([A-Z])/\1/m/{scope=intervaltab}{postrun}
