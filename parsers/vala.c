@@ -566,7 +566,12 @@ static int parseStatement (tokenInfo *const token, int parentIndex)
 	/* Skip the body of method */
 	if (foundSignature)
 	{
-		if (tokenSkipToType (token, '{'))
+		while (! (tokenIsTypeVal (token, '{')
+				  || tokenIsTypeVal (token, ';')
+				  || tokenIsEOF (token)))
+			tokenRead (token);
+
+		if (tokenIsTypeVal (token, '{'))
 			tokenSkipOverPair (token);
 	}
 
@@ -747,6 +752,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 
 	do
 	{
+		bool seen_signal = false;
 		bool seen_static = false;
 		tokenRead (token);
 		if (tokenIsTypeVal (token, '}'))
@@ -764,6 +770,11 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 			if (tokenIsKeyword(token, STATIC))
 			{
 				seen_static = true;
+				tokenRead (token);
+			}
+			else if (tokenIsKeyword(token, SIGNAL))
+			{
+				seen_signal = true;
 				tokenRead (token);
 			}
 			else if (tokenIsKeyword(token, CONST)
@@ -822,7 +833,11 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 				methodIndex = parseStatement (token, classCorkIndex);
 				tagEntryInfo *e = getEntryInCorkQueue (methodIndex);
 				if (e && e->kindIndex == K_METHOD)
+				{
+					if (seen_signal)
+						e->kindIndex = K_SIGNAL;
 					kind = e->kindIndex;
+				}
 			}
 			else if (strcmp (vStringValue (typerefToken->string), className) == 0)
 			{
@@ -889,7 +904,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 
 		if (kind == K_PROP)
 			tokenSkipOverPair (token);
-		if (kind != K_METHOD)
+		if (kind != K_METHOD && kind != K_SIGNAL)
 			entry->extensionFields.endLine = token->lineNumber;
 	} while (!tokenIsEOF (token));
 
