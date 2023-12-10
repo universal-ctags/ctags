@@ -64,6 +64,7 @@ HTML           J/script          extFile            on      referenced as extern
 HTML           c/class           attribute          on      assigned as attributes
 Java           p/package         imported           on      imported package
 JavaScript     c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JavaScript     f/function        foreigndecl        on      declared in foreign languages
 JavaScript     v/variable        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Julia          Y/unknown         imported           on      loaded by "import"
 Julia          Y/unknown         used               on      loaded by "using"
@@ -195,6 +196,7 @@ HTML           J/script          extFile            on      referenced as extern
 HTML           c/class           attribute          on      assigned as attributes
 Java           p/package         imported           on      imported package
 JavaScript     c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JavaScript     f/function        foreigndecl        on      declared in foreign languages
 JavaScript     v/variable        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Julia          Y/unknown         imported           on      loaded by "import"
 Julia          Y/unknown         used               on      loaded by "using"

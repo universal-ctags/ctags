@@ -173,6 +173,7 @@ validate-input:
 		--categories=$(CATEGORIES) \
 		$${VALIDATORS}"; \
 	$(SHELL) $${c} $(srcdir)/Units $(srcdir)/misc/validators
+
 #
 # Test main part, not parsers
 #
@@ -292,6 +293,7 @@ CPPCHECK_FLAGS  = --enable=all
 cppcheck:
 	cppcheck $(CPPCHECK_DEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_FLAGS) \
 		 $$(git  ls-files | grep '^\(parsers\|main\)/.*\.[ch]' )
+
 #
 # Testing examples in per-language man pages
 #
