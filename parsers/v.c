@@ -431,8 +431,6 @@ static void clearPoolToken (void *data)
 	token->keyword = KEYWORD_NONE;
 	vStringClear (token->string);
 	token->fullyQualified = false;
-	token->lineNumber = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
 	token->captureLen = -1;
 	token->onNewline = false;
 }
