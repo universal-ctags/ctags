@@ -25,6 +25,11 @@ CLASSES
 
 ES6 introduced the ``class`` keyword, but there is still the original method of defining a function and attaching a ``prototype``.  ctags follows the convention that function names that start with a capital letter are class constructors.
 
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New role ``foreigndecl`` for ``function`` kind
+
 SEE ALSO
 --------
 :ref:`ctags(1) <ctags(1)>`, :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`

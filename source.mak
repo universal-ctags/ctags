@@ -290,6 +290,7 @@ PARSER_HEADS = \
 	parsers/bibtex.h \
 	parsers/frontmatter.h \
 	parsers/iniconf.h \
+	parsers/jscript.h \
 	parsers/m4.h \
 	parsers/make.h \
 	parsers/markdown.h \

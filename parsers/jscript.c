@@ -48,6 +48,8 @@
 #include "mbcs.h"
 #include "trace.h"
 
+#include "jscript.h"
+
 /*
  * MACROS
  */
@@ -150,20 +152,6 @@ static objPool *TokenPool = NULL;
 static iconv_t JSUnicodeConverter = (iconv_t) -2;
 #endif
 
-typedef enum {
-	JSTAG_FUNCTION,
-	JSTAG_CLASS,
-	JSTAG_METHOD,
-	JSTAG_PROPERTY,
-	JSTAG_CONSTANT,
-	JSTAG_VARIABLE,
-	JSTAG_GENERATOR,
-	JSTAG_GETTER,
-	JSTAG_SETTER,
-	JSTAG_FIELD,
-	JSTAG_COUNT
-} jsKind;
-
 /*
  * "chain element" role is introduced when adapting the JavaScript parser
  * to corkAPI.
@@ -255,6 +243,11 @@ typedef enum {
 	JS_CLASS_CHAINELT,
 } jsClassRole;
 
+static roleDefinition JsFunctionRoles [] = {
+	/* Currently V parser wants this items. */
+	{ true, "foreigndecl", "declared in foreign languages" },
+};
+
 static roleDefinition JsVariableRoles [] = {
 	{ false, "chainElt", "(EXPERIMENTAL)used as an element in a name chain like a.b.c" },
 };
@@ -264,7 +257,8 @@ static roleDefinition JsClassRoles [] = {
 };
 
 static kindDefinition JsKinds [] = {
-	{ true,  'f', "function",	  "functions"        },
+	{ true,  'f', "function",	  "functions",
+	  .referenceOnly = false, ATTACH_ROLES(JsFunctionRoles) },
 	{ true,  'c', "class",		  "classes",
 	  .referenceOnly = false, ATTACH_ROLES(JsClassRoles)    },
 	{ true,  'm', "method",		  "methods"          },
@@ -3323,6 +3317,9 @@ extern parserDefinition* JavaScriptParser (void)
 	def->keywordCount = ARRAY_SIZE (JsKeywordTable);
 	def->useCork	= CORK_QUEUE|CORK_SYMTAB;
 	def->requestAutomaticFQTag = true;
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 
 	return def;
 }
