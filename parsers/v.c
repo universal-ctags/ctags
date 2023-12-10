@@ -2266,9 +2266,12 @@ static void parseAlias (tokenInfo *const token, vString *const access, int scope
 	PARSER_PROLOGUE ("alias");
 
 	readToken (token);
-	if ((!PS->isBuiltin && expectToken (token, TOKEN_TYPE)) ||
-		(PS->isBuiltin && (expectToken (token, TOKEN_TYPE, TOKEN_KEYWORD) ||
-					   expectKeyword (token, KEYWORD_TYPE))))
+	if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
+		parseFullyQualified (token, false);
+	if ((!PS->isBuiltin && expectToken (token, TOKEN_TYPE, TOKEN_EXTERN)) ||
+		(PS->isBuiltin && (
+			expectToken (token, TOKEN_TYPE, TOKEN_EXTERN, TOKEN_KEYWORD) ||
+			expectKeyword (token, KEYWORD_TYPE))))
 	{
 		int newScope = makeTagEx (token, NULL, KIND_ALIAS, scope, access);
 		registerEntry (newScope);
