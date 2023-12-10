@@ -3,6 +3,6 @@ struct Bar {
     g Foo = Foo{66}
     h string = "hi"
     i int @[required]
-    j int @[required] = 99
-    k string @[json: 'k'] = "j"
+    j int = 99 @[required]
+    k string = "j" @[json: 'k']
 }
