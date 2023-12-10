@@ -211,7 +211,7 @@ main(int argc, char **argv)
 		r = optscript_run (vm, file? NULL: "OPT", &renew);
 		if (renew)
 		{
-			opt_vm_clear (vm);
+			opt_vm_clear (vm, true);
 			opt_vm_dstack_push (vm, dict);
 			renew = false;
 			goto renew;
