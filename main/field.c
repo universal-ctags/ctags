@@ -1875,7 +1875,7 @@ static EsObject* setFieldValueForLineCommon (tagEntryInfo *tag, const fieldDefin
 
 		l = (unsigned int)l0;
 		/* If the new line number is too large,
-		   we cannot fill tag->filePosition wit
+		   we cannot fill tag->filePosition with
 		   getInputFilePositionForLine(); */
 		if (fdef->ftype == FIELD_LINE_NUMBER
 			&& l < getInputLineNumber())
