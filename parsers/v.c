@@ -2036,6 +2036,12 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 							   fieldAccess);
 
 					readToken (token);
+					if (isToken (token, TOKEN_ASSIGN))
+					{
+						readToken (token);
+						if (parseExpression (token, newScope, NULL))
+							readToken (token);
+					}
 					if (isToken (token, TOKEN_AT))
 					{
 						readToken (token);
@@ -2049,12 +2055,6 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 					{
 						skipToToken (TOKEN_CLOSE_SQUARE, NULL);
 						readToken (token);
-					}
-					if (isToken (token, TOKEN_ASSIGN))
-					{
-						readToken (token);
-						if (parseExpression (token, newScope, NULL))
-							readToken (token);
 					}
 				}
 				else
@@ -2977,9 +2977,15 @@ static void parseFile (tokenInfo *const token)
 		readToken (token);
 		skipAccessAndReadToken (token, &access);
 
-		if (isToken (token, TOKEN_OPEN_PAREN, TOKEN_OPEN_CURLY,
-					 TOKEN_OPEN_SQUARE)) // attributes
-			skipToToken (getClose (token->type), NULL);
+		if (isToken (token, TOKEN_AT)) { // attributes
+			readToken (token);
+			if (expectToken (token, TOKEN_OPEN_SQUARE))
+				skipToToken (getClose (token->type), NULL);
+			else
+				unreadToken (token);
+		}
+		else if (isToken (token, TOKEN_OPEN_SQUARE)) // old-style attributes
+			skipToToken (TOKEN_CLOSE_SQUARE, NULL);
 		else if (isKeyword (token, KEYWORD_module))
 			scope = parseModule (token);
 		else if (isKeyword (token, KEYWORD_fn))
@@ -3005,8 +3011,12 @@ static void parseFile (tokenInfo *const token)
 			parseIf (token, scope);
 		else if (isKeyword (token, KEYWORD_asm))
 			parseAsm (token, scope);
-		else
-			expectToken (token, TOKEN_EOF);
+		else if (!isToken (token, TOKEN_EOF))
+		{
+			vDebugUnexpected (token, NULL, 0);
+			if (isToken (token, TOKEN_OPEN_PAREN, TOKEN_OPEN_CURLY))
+				skipToToken (getClose (token->type), NULL);
+		}
 
 		if (access)
 			vStringClear (access);
