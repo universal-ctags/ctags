@@ -988,7 +988,7 @@ static int makeRefTag (tokenInfo *const token, vString *const name,
 }
 
 static void makeForeignDeclTagMaybe (tokenInfo *const token, vString *const name,
-                                     kindType kind, int scope)
+									 kindType kind, int scope)
 {
 	tagEntryInfo *scopeEntry = getEntryInCorkQueue (scope);
 	if (!scopeEntry)
@@ -1465,7 +1465,45 @@ static void parseIf (tokenInfo *const token, int scope)
 	PARSER_EPILOGUE ();
 }
 
-// fndef: 'fn' receiver? [fqident | kwtype] tmpl-args? args vtype? block?
+// ret-vtype: [ '?' ret-vtype-rest | '!' ret-vtype-rest? ]?
+// ret-vtype-rest: ['(' any ')' | vtype ]
+// returns false if token is not matched
+static void parseRetVType (tokenInfo *const token, vString *const capture,
+						   int scope) {
+	PARSER_PROLOGUE ("ret-vtype");
+
+	bool vtypeRequired = false;
+
+	if (isToken (token, TOKEN_EXCLAMATION))
+		readTokenFull (token, capture);
+	else if (isToken (token, TOKEN_QUESTION))
+	{
+		vtypeRequired = true;
+		readTokenFull (token, capture);
+	}
+
+	if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
+	{
+		size_t len = capture? vStringLength (token->string) : 0;
+		parseFullyQualified (token, !!capture);
+		if (capture)
+			vStringCatS (capture, vStringValue (token->string) + len);
+	}
+
+	if (!token->onNewline && isToken (token, TOKEN_OPEN_PAREN))
+		skipToTokenFull (TOKEN_CLOSE_PAREN, capture, token);
+	else if (token->onNewline || !isInitialType (token) ||
+			 !parseVType (token, capture, scope, false, false))
+	{
+		unreadTokenFull (token, capture);
+		if (vtypeRequired)
+			vDebugUnexpected (token, "vtype", 0);
+	}
+
+	PARSER_EPILOGUE ();
+}
+
+// fndef: 'fn' receiver? [fqident | kwtype] tmpl-args? args ret-vtype? block?
 // method: [fqident | kwtype] args vtype?
 // lambda: 'fn' [id | clsr-args]? tmpl-args? args vtype? block fncall?
 // fntype: 'fn' tmpl-args args vtype?
@@ -1586,7 +1624,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 		// return type (unless on next line)
 		if (isInitialType (token) && !token->onNewline)
 		{
-			parseVType (token, acc, scope, false, false);
+			parseRetVType (token, acc, scope);
 			vStringAccumulate (retType, acc);
 			readToken (token);
 		}
@@ -2107,12 +2145,14 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 	PARSER_EPILOGUE ();
 }
 
-// vtype: ['!' | '?' | '[' any ']' | '&']* [
-//    [fqtype | extern] ['[' any ']']? | ['chan' | 'shared'] vtype | kwtype |
-//    'struct' struct | 'map' '[' any* ']' vtype | 'fn' fntype |
-//    '$map' | '$struct' | '$enum' | '$array' | '$sumtype' | '$alias' |
-// ] init?
-// return false if token is rejected
+// vtype: [
+//    '[' any ']' [vtype init?]? | '?' vtype | ['&' | '&&'] vtype init? |
+//    [fqtype | extern] ['[' any ']']? init? | 'fn' fntype |
+//    ['chan' | 'shared'] vtype init? | 'map' '[' any ']' vtype init? |
+//    kwtype | '$map' | '$struct' | '$enum' | '$array' | '$sumtype' | '$alias' |
+//    'struct' struct init? | 'union' union init?
+// ]
+// returns false if token is not matched
 // set letInit false to parse *only* V type (with no {...} initialisation after)
 // set canInit false unless tokens already read which would permit it (e.g., [])
 static bool parseVType (tokenInfo *const token, vString *const capture,
@@ -2131,21 +2171,10 @@ static bool parseVType (tokenInfo *const token, vString *const capture,
 		else
 			unreadTokenFull (token, capture);
 	}
-	else if (isToken (token, TOKEN_EXCLAMATION))
-	{
-		readTokenFull (token, capture);
-		if (!token->onNewline &&
-			parseVType (token, capture, scope, false, false))
-			canInit = true;
-		else
-			unreadTokenFull (token, capture);
-	}
 	else if (isToken (token, TOKEN_QUESTION))
 	{
 		readTokenFull (token, capture);
-		if (isToken (token, TOKEN_OPEN_PAREN))
-			skipToToken (TOKEN_CLOSE_PAREN, capture);
-		else if (!parseVType (token, capture, scope, false, false))
+		if (!parseVType (token, capture, scope, false, false))
 		{
 			vDebugUnexpected (token, "vtype", 0);
 			unreadTokenFull (token, capture);
@@ -2161,9 +2190,8 @@ static bool parseVType (tokenInfo *const token, vString *const capture,
 			vDebugUnexpected (token, "vtype", 0);
 			unreadTokenFull (token, capture);
 		}
-
 	}
-	else if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
+	else if (isToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN))
 	{
 		size_t len = capture? vStringLength (token->string) : 0;
 		parseFullyQualified (token, !!capture);
