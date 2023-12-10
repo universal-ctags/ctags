@@ -183,6 +183,7 @@
 	VeraParser, \
 	VerilogParser, \
 	SystemVerilogParser, \
+	ValaParser, \
 	VhdlParser, \
 	VimParser, \
 	WindResParser, \

@@ -1,0 +1,5 @@
+AXc	input.vala	/^public class AXc {$/;"	c
+a	input.vala	/^       int a;$/;"	f	class:AXc	typeref:typename:int
+BXi	input.vala	/^public interface BXi {$/;"	i
+MyObject	input.vala	/^public class MyObject: AXc, BXi {$/;"	c	inherits:AXc,BXi
+c	input.vala	/^       int c;$/;"	f	class:MyObject	typeref:typename:int

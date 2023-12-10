@@ -1,0 +1,6 @@
+f1	input.vala	/^void f1 () {$/;"	method	line:1	language:Vala	end:3
+f2	input.vala	/^void f2 () {print ("hello");} \/\/ void g3 () {    print ("hello");}$/;"	method	line:7	language:Vala	end:7
+f3	input.vala	/^void f3 () {print ("hello");} void g4 () {    print ("hello");}$/;"	method	line:8	language:Vala	end:8
+g4	input.vala	/^void f3 () {print ("hello");} void g4 () {    print ("hello");}$/;"	method	line:8	language:Vala	end:8
+f4	input.vala	/^void f4 () {print ("hello"); \/\/ void g5 () {    print ("hello");}$/;"	method	line:9	language:Vala	end:11
+g7	input.vala	/^} void g7 () {    print ("hello");} \/\/ void g8 () {} ; void f5 () { print ("hello");} # void g/;"	method	line:11	language:Vala	end:11

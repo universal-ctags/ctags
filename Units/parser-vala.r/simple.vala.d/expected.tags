@@ -1,0 +1,1 @@
+main	input.vala	/^void main(string[] args) {$/;"	method	line:4	language:Vala	end:6

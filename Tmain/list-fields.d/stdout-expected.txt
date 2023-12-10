@@ -62,6 +62,7 @@ z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field outpu
 -	target	yes	Thrift	s--	no	--	the target language specified at "namespace"
 -	throws	yes	Thrift	s--	no	--	throws list of function
 -	architecture	yes	VHDL	s--	no	--	architecture designing the entity
+-	properties	yes	Vala	s--	no	--	properties (static)
 -	parameter	no	Verilog	--b	no	--	parameter whose value can be overridden.
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/

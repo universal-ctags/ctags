@@ -33,6 +33,15 @@ typedef struct sTokenInfo {
 struct tokenTypePair {
 	tokenType start;
 	tokenType end;
+
+	/* If the field is NULL or the value pointed by the field is true,
+	 * tokenSkipOverPair and its variants regard the pair as an active
+	 * pair; they will skip over the pair.
+	 *
+	 * The value pointed by the field is false, they regard the pair
+	 * as an inactive pair; they will not skip over the pair.
+	 */
+	bool *active;
 };
 
 #define TOKEN(X)  ((tokenInfo *)X)
@@ -102,4 +111,14 @@ bool tokenSkipToTypeFull (tokenInfo *token, tokenType t, void *data);
 bool tokenSkipOverPair (tokenInfo *token);
 bool tokenSkipOverPairFull (tokenInfo *token, void *data);
 
+bool tokenSkipToTypes    (tokenInfo *token, const tokenType ts[], size_t count);
+bool tokenSkipToTypesFull (tokenInfo *token, const tokenType ts[], size_t count, void *data);
+bool tokenSkipToTypeOverPairs    (tokenInfo *token, tokenType t);
+bool tokenSkipToTypeOverPairsFull (tokenInfo *token, tokenType t, void *data);
+bool tokenSkipToTypesOverPairs    (tokenInfo *token, const tokenType ts[], size_t count);
+bool tokenSkipToTypesOverPairsFull (tokenInfo *token, const tokenType ts[], size_t count, void *data);
+
+/* Making a tag from a token */
+void initTagEntryFromToken (tagEntryInfo *e, tokenInfo *const token, int kindIndex, int scopeIndex);
+int  makeSimpleTagFromToken (tokenInfo *const token, int kindIndex, int scopeIndex);
 #endif
