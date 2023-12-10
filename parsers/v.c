@@ -688,6 +688,21 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 			token->type = TOKEN_OPERATOR; // == !=
 		else if (c == '=')
 			token->type = TOKEN_ASSIGN; // =
+		else if (getcAndCaptureIfEq ('i', capture, token))
+		{
+			c = getcFromInputFile ();
+			if (isOneOf (c, "ns") && !isSubsequentIdent (peekcFromInputFile ()))
+			{
+				token->type = TOKEN_KEYWORD; // !in !is
+				token->keyword = c == 'n'? KEYWORD_in : KEYWORD_is;
+			}
+			else
+			{
+				ungetcToInputFile (c);
+				ungetcToInputFile ('i');
+				token->type = TOKEN_EXCLAMATION; // !
+			}
+		}
 		else
 			token->type = TOKEN_EXCLAMATION; // !
 	}
@@ -2449,31 +2464,6 @@ static bool parseExprCont (tokenInfo *const token, int scope, bool hasErr)
 		{
 			readToken (token);
 			parseExpression (token, scope, NULL);
-		}
-		else if (isToken (token, TOKEN_EXCLAMATION))
-		{
-			readToken (token);
-			if (expectKeyword (token, KEYWORD_in, KEYWORD_is))
-			{
-				keywordId wasIs = isKeyword(token, KEYWORD_is);
-				readToken (token);
-				if (!isClose (token))
-				{
-					if (wasIs)
-					{
-						if(parseVType (token, NULL, scope, false, false))
-							readToken (token);
-						if (!parseExprCont (token, scope, false))
-							unreadToken (token);
-					}
-					else
-						parseExpression (token, scope, NULL);
-				}
-				else
-					unreadToken (token);
-			}
-			else
-				unreadToken (token);
 		}
 		else if (isToken (token, TOKEN_SLICE))
 		{

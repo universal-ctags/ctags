@@ -36,3 +36,11 @@ main	input-3.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:d
 a	input-3.v	/^        a := 55$/;"	v	line:3	fn:main	roles:def
 main	input-4.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:7
 a	input-4.v	/^    a := 1$/;"	v	line:6	fn:main	roles:def
+main	input-5.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:8
+a	input-5.v	/^		a := 5$/;"	v	line:3	fn:main	roles:def
+a	input-5.v	/^		a := 5$/;"	v	line:6	fn:main	roles:def
+main	input-6.v	/^fn main() {$/;"	f	line:1	typeref:typename:	signature:()	roles:def	end:11
+a	input-6.v	/^		a := 0$/;"	v	line:3	fn:main	roles:def
+b	input-6.v	/^		b := 0$/;"	v	line:5	fn:main	roles:def
+c	input-6.v	/^		c := 0$/;"	v	line:7	fn:main	roles:def
+d	input-6.v	/^		d := 0$/;"	v	line:9	fn:main	roles:def
