@@ -297,9 +297,7 @@ static void parseEnumConstants (int scopeCorkIndex)
 		if (token.type == ';')
 			nextToken ();
 	}
-	tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
-	if (e)
-		e->extensionFields.endLine = getInputLineNumber ();
+	setTagEndLineToCorkEntry (scopeCorkIndex, getInputLineNumber ());
 }
 
 static void parseOneofField (int scopeCorkIndex)
@@ -347,9 +345,7 @@ static void parseOneofFields (int scopeCorkIndex)
 			break;
 	}
 
-	tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
-	if (e)
-		e->extensionFields.endLine = getInputLineNumber ();
+	setTagEndLineToCorkEntry (scopeCorkIndex, getInputLineNumber ());
 }
 
 #define gatherTypeinfo(VSTRING,CONDITION)			\
@@ -642,7 +638,7 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 			if (e)
 			{
 				scopeCorkIndex = e->extensionFields.scopeIndex;
-				e->extensionFields.endLine = getInputLineNumber ();
+				setTagEndLine (e, getInputLineNumber ());
 			}
 		}
 		nextToken ();

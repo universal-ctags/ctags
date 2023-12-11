@@ -466,8 +466,7 @@ static void parseProc (tokenInfo *const token,
 			tagEntryInfo e;
 
 			initTagEntry (&e, last, K_PROCEDURE);
-			e.lineNumber = token->lineNumber;
-			e.filePosition = token->filePosition;
+			updateTagLine (&e, token->lineNumber, token->filePosition);
 
 			int len  = (last - tokenString (token));
 			vString *ns = vStringNew();
@@ -557,7 +556,7 @@ static void parseProc (tokenInfo *const token,
 	tagEntryInfo *e = getEntryInCorkQueue (index);
 	if (e)
 	{
-		e->extensionFields.endLine = token->lineNumber;
+		setTagEndLine (e, token->lineNumber);
 
 		if (signature)
 		{
@@ -569,7 +568,7 @@ static void parseProc (tokenInfo *const token,
 		if (e_fq)
 		{
 			const char *sig = e->extensionFields.signature;
-			e_fq->extensionFields.endLine = token->lineNumber;
+			setTagEndLine (e_fq, token->lineNumber);
 			if (sig)
 				e_fq->extensionFields.signature = eStrdup (sig);
 		}
@@ -639,7 +638,7 @@ static void parseNamespace (tokenInfo *const token,
 		else if (token->type == '}')
 		{
 			if (e)
-				e->extensionFields.endLine = token->lineNumber;
+				setTagEndLine (e, token->lineNumber);
 			break;
 		}
 		else

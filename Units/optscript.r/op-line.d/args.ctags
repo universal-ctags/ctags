@@ -5,5 +5,5 @@
 --kinddef-X=d,def,definitions
 
 --regex-X=/[ \t]*def ([a-z])/\1/d/{exclusive}{{
-	. dup :line 2 mul line:
+	. dup :line 2 idiv line:
 }}

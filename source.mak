@@ -74,6 +74,7 @@ MAIN_PUBLIC_HEADS =		\
 	main/entry.h		\
 	main/field.h		\
 	main/gvars.h		\
+	main/interval_tree_generic.h \
 	main/keyword.h		\
 	main/kind.h		\
 	main/lregex.h		\
@@ -86,6 +87,7 @@ MAIN_PUBLIC_HEADS =		\
 	main/parse.h		\
 	main/promise.h		\
 	main/rbtree.h		\
+	main/rbtree_augmented.h	\
 	main/read.h		\
 	main/selectors.h	\
 	main/strlist.h		\

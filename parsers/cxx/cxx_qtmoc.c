@@ -89,8 +89,7 @@ static void qtMocMakeTagForProperty (CXXToken * pToken, const char *pszType)
 	initTagEntry(&tag,
 				 vStringValue(pToken->pszWord),
 				 K_PROPERTY);
-	tag.lineNumber = pToken->iLineNumber;
-	tag.filePosition = pToken->oFilePosition;
+	updateTagLine (&tag, pToken->iLineNumber, pToken->oFilePosition);
 	tag.isFileScope = false;
 
 	if(!cxxScopeIsGlobal())

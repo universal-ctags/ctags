@@ -182,9 +182,7 @@ static void inputStart (subparser *s)
 static void inputEnd (subparser *s)
 {
 	struct mooseSubparser *moose = (struct mooseSubparser *)s;
-	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
-	if (e)
-		e->extensionFields.endLine = getInputLineNumber ();
+	setTagEndLineToCorkEntry (moose->classCork, getInputLineNumber ());
 
 	vStringDelete (moose->supersOrRoles);
 	moose->supersOrRoles = NULL;
@@ -261,11 +259,7 @@ static void leaveMoose (struct mooseSubparser *moose)
 {
 	moose->notContinuousExtendsLines = true;
 
-	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
-	if (!e)
-		return;
-
-	e->extensionFields.endLine = getInputLineNumber ();
+	setTagEndLineToCorkEntry (moose->classCork, getInputLineNumber ());
 
 	moose->classCork = CORK_NIL;
 	moose->notInMoose = true;
@@ -285,8 +279,7 @@ static void enterMoose (struct mooseSubparser *moose, bool role)
 
 	tagEntryInfo moose_e;
 	initTagEntry (&moose_e, perl_e->name, role? K_ROLE: K_CLASS);
-	moose_e.lineNumber = perl_e->lineNumber;
-	moose_e.filePosition = perl_e->filePosition;
+	updateTagLine(&moose_e, perl_e->lineNumber, perl_e->filePosition);
 	moose->classCork = makeTagEntry (&moose_e);
 	vStringClear (moose->supersOrRoles);
 

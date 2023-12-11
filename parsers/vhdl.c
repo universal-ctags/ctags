@@ -570,8 +570,7 @@ static int makeVhdlTagWithScope (tokenInfo * const token, const vhdlKind kind, i
 	const char *const name = vStringValue (token->string);
 	tagEntryInfo e;
 	initTagEntry (&e, name, kind);
-	e.lineNumber = token->lineNumber;
-	e.filePosition = token->filePosition;
+	updateTagLine (&e, token->lineNumber, token->filePosition);
 	e.extensionFields.scopeIndex = parent;
 	return makeTagEntry (&e);
 }
@@ -605,7 +604,7 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 			if (!isType (token, TOKEN_SEMICOLON))
 				skipToCharacterInInputFile (';');
 			if (ended)
-				e->extensionFields.endLine = getInputLineNumber ();
+				setTagEndLine (e, getInputLineNumber ());
 		}
 		else
 		{
@@ -748,7 +747,7 @@ static void parseModule (tokenInfo * const token, int parent)
 		{
 			tagEntryInfo *e = getEntryInCorkQueue (index);
 			if (e)
-				e->extensionFields.endLine = getInputLineNumber ();
+				setTagEndLine (e, getInputLineNumber ());
 		}
 
 		if (kind == VHDLTAG_ENTITY)
@@ -776,7 +775,7 @@ static void parseRecord (tokenInfo * const token, int parent)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (parent);
 		if (e)
-			e->extensionFields.endLine = getInputLineNumber ();
+			setTagEndLine (e, getInputLineNumber ());
 	}
 
 	deleteToken (name);

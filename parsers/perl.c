@@ -625,9 +625,8 @@ static bool isInHereDoc (struct hereDocMarkerManager *mgr,
 		&& (cp [vStringLength (current->marker)] == '\0'
 			|| (!isIdentifier (cp [vStringLength (current->marker)]))))
 	{
-		tagEntryInfo *tag = getEntryInCorkQueue (current->corkIndex);
-		if (tag)
-			tag->extensionFields.endLine = getInputLineNumber();
+		setTagEndLineToCorkEntry (current->corkIndex, getInputLineNumber());
+
 		mgr->current++;
 		if (mgr->current == ptrArrayCount (mgr->markers))
 		{

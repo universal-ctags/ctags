@@ -622,8 +622,7 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 		tagEntryInfo e;
 		initTagEntry (&e, name, kind);
 
-		e.lineNumber   = token->lineNumber;
-		e.filePosition = token->filePosition;
+		updateTagLine (&e, token->lineNumber, token->filePosition);
 
 		if (vStringLength (token->scope) > 0)
 		{

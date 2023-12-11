@@ -72,8 +72,10 @@ struct sTagEntryInfo {
 	unsigned int isInputFileNameShared: 1; /* shares the value for inputFileName.
 											* Set in the cork queue; don't touch this.*/
 	unsigned int boundaryInfo: 2; /* info about nested input stream */
+	unsigned int inIntevalTab:1;
 
-	unsigned long lineNumber;     /* line number of tag */
+	unsigned long lineNumber;     /* line number of tag;
+									 use updateTagLine() for updating this member. */
 	const char* pattern;	      /* pattern for locating input line
 				       * (may be NULL if not present) *//*  */
 	MIOPos      filePosition;     /* file position of line containing tag */
@@ -123,7 +125,7 @@ struct sTagEntryInfo {
 #ifdef HAVE_LIBXML
 		const char* xpath;
 #endif
-		unsigned long endLine;
+		unsigned long _endLine;	/* Don't set directly. Use setTagEndLine() */
 		time_t epoch;
 #define NO_NTH_FIELD -1
 		short nth;
@@ -244,6 +246,15 @@ int           anyKindsEntryInScopeRecursive (int corkIndex,
 											 const char *name,
 											 const int * kinds, int count,
 											 bool onlyDefinitionTag);
+
+extern void    updateTagLine(tagEntryInfo *tag, unsigned long lineNumber, MIOPos filePosition);
+extern void    setTagEndLine (tagEntryInfo *tag, unsigned long endLine);
+extern void    setTagEndLineToCorkEntry (int corkIndex, unsigned long endLine);
+
+extern int     queryIntervalTabByLine(unsigned long lineNum);
+extern int     queryIntervalTabByRange(unsigned long startLine, unsigned long endLine);
+extern int     queryIntervalTabByCorkEntry(int corkIndex);
+extern bool    removeFromIntervalTabMaybe(int corkIndex);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern void    unmarkTagExtraBit   (tagEntryInfo *const tag, xtagType extra);

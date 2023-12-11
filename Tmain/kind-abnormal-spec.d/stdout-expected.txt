@@ -5,6 +5,7 @@ L  kind with no long name
 N  emit a normal tag
 B  beginning of an area for a guest
 E  end of an area for a guest
+Q  stop the parsing
 d  a kind disabled by default [off]
 e  a kind enabled by default
 r  emit a tag with multi roles
@@ -19,6 +20,7 @@ B       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   
 E       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   end of an area for a guest
 L       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   kind with no long name
 N       nothingSpecial                            yes     no      0      NONE   emit a normal tag
+Q       quit                                      yes     no      0      NONE   stop the parsing
 R       rolesDisabled                             no      yes     2      NONE   emit a tag with multi roles(disabled by default)
 b       broken tag                                yes     no      1      NONE   name with unwanted characters
 d       disabled                                  no      no      2      NONE   a kind disabled by default

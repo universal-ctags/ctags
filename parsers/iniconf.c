@@ -96,9 +96,7 @@ static void makeIniconfTagMaybe (const char *section, const char *key, const cha
 	}
 	else
 	{
-		tagEntryInfo *last = getEntryInCorkQueue (*index);
-		if (last)
-			last->extensionFields.endLine = getInputLineNumber ();
+		setTagEndLineToCorkEntry (*index, getInputLineNumber ());
 
 		initTagEntry (&e, section, K_SECTION);
 		*index = makeTagEntry (&e);

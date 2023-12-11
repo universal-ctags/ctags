@@ -722,6 +722,9 @@
     <ClInclude Include="..\main\inline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\interval_tree_generic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\keyword.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -798,6 +801,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\rbtree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\rbtree_augmented.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\read.h">

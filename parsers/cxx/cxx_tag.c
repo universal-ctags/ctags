@@ -334,8 +334,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 			uKind
 		);
 
-	g_oCXXTag.lineNumber = pToken->iLineNumber;
-	g_oCXXTag.filePosition = pToken->oFilePosition;
+	updateTagLine (&g_oCXXTag, pToken->iLineNumber, pToken->oFilePosition);
 	g_oCXXTag.isFileScope = false;
 
 	if(!cxxScopeIsGlobal())

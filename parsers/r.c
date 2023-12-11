@@ -944,7 +944,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
 	if (tag)
 	{
-		tag->extensionFields.endLine = token->lineNumber;
+		setTagEndLine (tag, token->lineNumber);
 		if (signature)
 		{
 			tag->extensionFields.signature = vStringDeleteUnwrap(signature);
@@ -959,7 +959,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 			foreachEntriesInScope (corkIndex, NULL,
 								   findNonPlaceholder, &any_non_placehoders);
 			if (!any_non_placehoders)
-				markTagAsPlaceholder (tag, true);
+				markTagAsPlaceholder (tag, true); /* TODO: remove from intervaltab */
 		}
 	}
 

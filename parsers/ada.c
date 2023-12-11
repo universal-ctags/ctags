@@ -1504,8 +1504,8 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 
 					/* now set the proper line and file position counts for this
 					 * new token */
-					token->tag.lineNumber = lineNum + filePosIndex;
-					token->tag.filePosition = filePos[filePosIndex];
+					updateTagLine (&token->tag, lineNum + filePosIndex,
+								   filePos[filePosIndex]);
 				}
 				tokenStart = -1;
 			}
@@ -1531,8 +1531,8 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 
 			/* now set the proper line and file position counts for this
 			 * new token */
-			token->tag.lineNumber = lineNum + filePosIndex;
-			token->tag.filePosition = filePos[filePosIndex];
+			updateTagLine (&token->tag, lineNum + filePosIndex,
+						   filePos[filePosIndex]);
 		}
 	}
 
@@ -1939,8 +1939,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				token = newAdaToken (NULL, 0, ADA_KIND_ANONYMOUS, false, parent);
 
 				/* save the correct starting line */
-				token->tag.lineNumber = matchLineNum;
-				token->tag.filePosition = matchFilePos;
+				updateTagLine (&token->tag, matchLineNum, matchFilePos);
 
 				adaParse (ADA_DECLARATIONS, token);
 			}
@@ -1955,8 +1954,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				token = newAdaToken (NULL, 0, ADA_KIND_ANONYMOUS, false, parent);
 
 				/* save the correct starting line */
-				token->tag.lineNumber = matchLineNum;
-				token->tag.filePosition = matchFilePos;
+				updateTagLine (&token->tag, matchLineNum, matchFilePos);
 
 				adaParse (ADA_CODE, token);
 			}
@@ -2037,8 +2035,7 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 									 ADA_KIND_ANONYMOUS, false, parent);
 
 				/* save the correct starting line */
-				token->tag.lineNumber = matchLineNum;
-				token->tag.filePosition = matchFilePos;
+				updateTagLine (&token->tag, matchLineNum, matchFilePos);
 
 				/* parse the loop body */
 				skipWhiteSpace ();

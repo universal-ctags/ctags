@@ -150,9 +150,7 @@ static void parseSubobject (tokenInfo *token, int parent, enum ITclKind kind, ke
 	}
 
 	skipToEndOfTclCmdline (token);
-	tagEntryInfo *e = getEntryInCorkQueue (r);
-	if (e)
-		e->extensionFields.endLine = token->lineNumber;
+	setTagEndLineToCorkEntry (r, token->lineNumber);
 }
 
 

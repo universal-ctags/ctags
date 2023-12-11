@@ -216,9 +216,7 @@ static bool readEnviromentEndNotify (texSubparser *s,
 	if (strcmp (vStringValue (env), "frame") == 0)
 	{
 		struct beamerSubparser *b = (struct beamerSubparser *)s;
-		tagEntryInfo *e = getEntryInCorkQueue (b->lastTitleCorkIndex);
-		if (e)
-			e->extensionFields.endLine = getInputLineNumber ();
+		setTagEndLineToCorkEntry (b->lastTitleCorkIndex, getInputLineNumber ());
 		return true;
 	}
 	return false;

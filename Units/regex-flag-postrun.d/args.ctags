@@ -1,0 +1,7 @@
+--sort=no
+--fields=+ln
+
+--langdef=TESTC{base=C}
+--kinddef-TESTC=d,def,definitions
+--regex-TESTC=/.*def:([0-za-zA-Z]+).*/inline-\1/d/
+--regex-TESTC=/.*def:([0-za-zA-Z]+).*/post-\1/d/{postrun}

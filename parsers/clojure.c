@@ -113,14 +113,7 @@ static int makeNamespaceTag (vString * const name, const char *dbp)
 	dbp = skipMetadata (dbp);
 	functionName (name, dbp);
 	if (vStringLength (name) > 0 && ClojureKinds[K_NAMESPACE].enabled)
-	{
-		tagEntryInfo e;
-		initTagEntry (&e, vStringValue (name), K_NAMESPACE);
-		e.lineNumber = getInputLineNumber ();
-		e.filePosition = getInputFilePosition ();
-
-		return makeTagEntry (&e);
-	}
+		return makeSimpleTag (name, K_NAMESPACE);
 	else
 		return CORK_NIL;
 }
@@ -133,9 +126,6 @@ static void makeFunctionTag (vString * const name, const char *dbp, int scope_in
 	{
 		tagEntryInfo e;
 		initTagEntry (&e, vStringValue (name), K_FUNCTION);
-		e.lineNumber = getInputLineNumber ();
-		e.filePosition = getInputFilePosition ();
-
 		e.extensionFields.scopeIndex =  scope_index;
 		makeTagEntry (&e);
 	}

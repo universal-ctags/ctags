@@ -1,0 +1,4 @@
+X	input.foox	/^end0$/;"	d	line:3	language:FOOX	end:5
+Y	input.foox	/^# MARK:Y$/;"	m	line:2	language:MARK
+Z	input.foox	/^# MARK:Z$/;"	m	line:4	language:MARK	scope:def:X
+A	input.foox	/^# MARK:A$/;"	m	line:6	language:MARK

@@ -47,8 +47,7 @@ makeTagEntryWithNodeNotify (xmlSubparser *s,
 	{
 		tagEntryInfo tag;
 		initTagEntry (&tag, xmlTag->name, K_DEF);
-		tag.filePosition = xmlTag->filePosition;
-		tag.lineNumber = xmlTag->lineNumber;
+		updateTagLine (&tag, xmlTag->lineNumber, xmlTag->filePosition);
 		makeTagEntry (&tag);
 	}
 }

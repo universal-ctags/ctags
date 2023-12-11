@@ -916,8 +916,7 @@ static int makeTag (const tokenInfo *const token,
 		kind  = kindIndexForType(type);
 		initTagEntry (&e, vStringValue (token->name), kind);
 
-		e.lineNumber	= token->lineNumber;
-		e.filePosition	= token->filePosition;
+		updateTagLine (&e, token->lineNumber, token->filePosition);
 		e.isFileScope	= isFileScope;
 		if (e.isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
@@ -2014,9 +2013,7 @@ static void checkStatementEnd (statementInfo *const st, int corkIndex)
 {
 	const tokenInfo *const token = activeToken (st);
 
-	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
-	if (e)
-		e->extensionFields.endLine = token->lineNumber;
+	setTagEndLineToCorkEntry (corkIndex, token->lineNumber);
 
 	if (isType (token, TOKEN_COMMA))
 		reinitStatement (st, true);

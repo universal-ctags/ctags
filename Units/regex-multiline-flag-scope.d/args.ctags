@@ -1,0 +1,6 @@
+--sort=no
+
+--langdef=Foo{base=C}{dedicated}
+--map-Foo=.foo
+--kinddef-Foo=R,reader,read functions
+--mline-regex-Foo=/\n[ \t]+\.read[ \t]+=[ \t]+([a-z_]+_read),\n/\1/R/{scope=intervaltab}{mgroup=1}

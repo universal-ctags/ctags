@@ -334,7 +334,7 @@ static void parseFunction (const unsigned char *line)
 		if (wordMatchLen (line, "endfunction", 4) || wordMatchLen (line, "enddef", 6))
 		{
 			if (e)
-				e->extensionFields.endLine = getInputLineNumber ();
+				setTagEndLine (e, getInputLineNumber ());
 			break;
 		}
 

@@ -44,6 +44,7 @@
 #include "field.h"
 #include "fmt_p.h"
 #include "kind.h"
+#include "interval_tree_generic.h"
 #include "nestlevel.h"
 #include "options_p.h"
 #include "ptag_p.h"
@@ -95,6 +96,7 @@ typedef struct eTagFile {
 	int cork;
 	unsigned int corkFlags;
 	ptrArray *corkQueue;
+	struct rb_root intervaltab;
 
 	bool patternCacheValid;
 } tagFile;
@@ -104,6 +106,8 @@ typedef struct sTagEntryInfoX  {
 	int corkIndex;
 	struct rb_root symtab;
 	struct rb_node symnode;
+	struct rb_node intervalnode;
+	unsigned long __intervalnode_subtree_last;
 } tagEntryInfoX;
 
 /*
@@ -119,6 +123,13 @@ static tagFile TagFile = {
 	NULL,                /* vLine */
 	.cork = false,
 	.corkQueue = NULL,
+	/* .intervaltab = RB_ROOT,
+	 *
+	 * msvc doesn't accept the above expression:
+	 *
+	 *   main\entry.c(128) : error C2099: initializer is not a constant
+	 *
+	 */
 	.patternCacheValid = false,
 };
 
@@ -134,6 +145,13 @@ extern int truncate (const char *path, off_t length);
 #ifdef NEED_PROTO_FTRUNCATE
 extern int ftruncate (int fd, off_t length);
 #endif
+
+#define INTERVAL_START(node) ((node)->slot.lineNumber)
+#define INTERVAL_END(node)   ((node)->slot.extensionFields._endLine)
+
+INTERVAL_TREE_DEFINE(tagEntryInfoX, intervalnode,
+					 unsigned long, __intervalnode_subtree_last,
+					 INTERVAL_START, INTERVAL_END, /*static*/, intervaltab)
 
 /*
 *   FUNCTION DEFINITIONS
@@ -200,7 +218,7 @@ extern void makeFileTag (const char *const fileName)
 		   unnecessary read line loop. */
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
-		tag.extensionFields.endLine = getInputLineNumber ();
+		setTagEndLine(&tag, getInputLineNumber ());
 	}
 
 	if (isFieldEnabled (FIELD_EPOCH))
@@ -1071,6 +1089,8 @@ static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 	tagEntryInfoX *x = xMalloc (1, tagEntryInfoX);
 	x->symtab = RB_ROOT;
 	x->corkIndex = CORK_NIL;
+	memset(&x->intervalnode, 0, sizeof (x->intervalnode));
+	x->__intervalnode_subtree_last = 0;
 	tagEntryInfo  *slot = (tagEntryInfo *)x;
 
 	*slot = *tag;
@@ -1556,7 +1576,80 @@ static int queueTagEntry (const tagEntryInfo *const tag)
 	entry->corkIndex = corkIndex;
 	entry->slot.inCorkQueue = 1;
 
+	/* Don't put FQ tags to interval table.
+	 * About placeholder, a parser should call
+	 * removeFromIntervalTabMaybe() explicitly.
+	 */
+	if (! isTagExtraBitMarked (&entry->slot, XTAG_FILE_NAMES)
+		&& entry->slot.extensionFields._endLine > entry->slot.lineNumber
+		&& !isTagExtraBitMarked (tag, XTAG_QUALIFIED_TAGS))
+	{
+		intervaltab_insert(entry, &TagFile.intervaltab);
+		entry->slot.inIntevalTab = 1;
+	}
 	return corkIndex;
+}
+
+extern void updateTagLine (tagEntryInfo *tag, unsigned long lineNumber,
+						   MIOPos filePosition)
+{
+	tagEntryInfoX *entry = NULL;
+	if (tag->inIntevalTab)
+	{
+		entry = (tagEntryInfoX *)tag;
+		removeFromIntervalTabMaybe (entry->corkIndex);
+	}
+
+	tag->lineNumber = lineNumber;
+	tag->filePosition = filePosition;
+	tag->boundaryInfo = getNestedInputBoundaryInfo (lineNumber);
+
+	if (entry && tag->lineNumber < tag->extensionFields._endLine)
+	{
+		intervaltab_insert(entry, &TagFile.intervaltab);
+		tag->inIntevalTab = 1;
+	}
+}
+
+extern void setTagEndLine(tagEntryInfo *tag, unsigned long endLine)
+{
+	if (endLine != 0 && endLine < tag->lineNumber)
+	{
+		error (WARNING,
+			   "given end line (%lu) for the tag (%s) in the file (%s) is smaller than its tart line: %lu",
+			   tag->lineNumber,
+			   tag->name,
+			   tag->inputFileName,
+			   tag->lineNumber);
+		return;
+	}
+
+	if (isTagExtraBitMarked (tag, XTAG_FILE_NAMES)
+		|| !tag->inCorkQueue
+		|| isTagExtraBitMarked (tag, XTAG_QUALIFIED_TAGS))
+	{
+		tag->extensionFields._endLine = endLine;
+		return;
+	}
+
+	tagEntryInfoX *entry = (tagEntryInfoX *)tag;
+
+	if (tag->inIntevalTab)
+		removeFromIntervalTabMaybe (entry->corkIndex);
+
+	tag->extensionFields._endLine = endLine;
+	if (endLine > tag->lineNumber)
+	{
+		intervaltab_insert(entry, &TagFile.intervaltab);
+		tag->inIntevalTab = 1;
+	}
+}
+
+extern void setTagEndLineToCorkEntry (int corkIndex, unsigned long endLine)
+{
+	tagEntryInfo *entry = getEntryInCorkQueue (corkIndex);
+	if (entry)
+		setTagEndLine (entry, endLine);
 }
 
 extern void setupWriter (void *writerClientData)
@@ -1700,6 +1793,7 @@ extern void corkTagFile (unsigned int corkFlags)
 		TagFile.corkQueue = ptrArrayNew (deleteTagEnry);
 		tagEntryInfo *nil = newNilTagEntry (corkFlags);
 		ptrArrayAdd (TagFile.corkQueue, nil);
+		TagFile.intervaltab = RB_ROOT;
 	}
 }
 
@@ -1888,9 +1982,8 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 extern void setTagPositionFromTag (tagEntryInfo *const dst,
 								   const tagEntryInfo *const src)
 {
-		dst->lineNumber = src->lineNumber;
-		dst->boundaryInfo = src->boundaryInfo;
-		dst->filePosition = src->filePosition;
+	updateTagLine (dst, src->lineNumber, src->filePosition);
+	dst->boundaryInfo = src->boundaryInfo;
 }
 
 static void initTagEntryFull (tagEntryInfo *const e, const char *const name,
@@ -2194,4 +2287,48 @@ static bool markAsPlaceholderRecursively (int index, tagEntryInfo *e, void *data
 extern void markAllEntriesInScopeAsPlaceholder (int index)
 {
 	foreachEntriesInScope (index, NULL, markAsPlaceholderRecursively, NULL);
+}
+
+extern int queryIntervalTabByLine(unsigned long lineNum)
+{
+	return queryIntervalTabByRange(lineNum, lineNum);
+}
+
+extern int queryIntervalTabByRange(unsigned long start, unsigned long end)
+{
+	int index = CORK_NIL;
+
+	tagEntryInfoX *ex = intervaltab_iter_first(&TagFile.intervaltab, start, end);
+	while (ex) {
+		index = ex->corkIndex;
+		ex = intervaltab_iter_next(ex, start, end);
+	}
+	return index;
+}
+
+extern int queryIntervalTabByCorkEntry(int corkIndex)
+{
+	Assert (corkIndex != CORK_NIL);
+
+	tagEntryInfoX *ex = ptrArrayItem (TagFile.corkQueue, corkIndex);
+	tagEntryInfo *e = &ex->slot;
+
+	if (e->extensionFields._endLine == 0)
+		return queryIntervalTabByLine(e->lineNumber);
+	return queryIntervalTabByRange(e->lineNumber, e->extensionFields._endLine);
+}
+
+extern bool removeFromIntervalTabMaybe(int corkIndex)
+{
+	if (corkIndex == CORK_NIL)
+		return false;
+
+	tagEntryInfoX *ex = ptrArrayItem (TagFile.corkQueue, corkIndex);
+	tagEntryInfo *e = &ex->slot;
+	if (!e->inIntevalTab)
+		return false;
+
+	intervaltab_remove(ex, &TagFile.intervaltab);
+	e->inIntevalTab = 0;
+	return true;
 }

@@ -1682,7 +1682,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 			int lineNumber = parseBlock (token, newScope, false);
 			tagEntryInfo *entry = getEntryInCorkQueue (newScope);
 			if (entry)
-				entry->extensionFields.endLine = lineNumber;
+				setTagEndLine (entry, lineNumber);
 			// fncall
 			if (kind == KIND_NONE)
 			{
@@ -2096,7 +2096,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 	{
 		tagEntryInfo *entry = getEntryInCorkQueue (newScope);
 		if (entry)
-			entry->extensionFields.endLine = token->lineNumber;
+			setTagEndLine (entry, token->lineNumber);
 	}
 
 	PARSER_EPILOGUE ();
@@ -2163,7 +2163,7 @@ static void parseEnum (tokenInfo *const token, vString *const access, int scope)
 
 			tagEntryInfo *entry = getEntryInCorkQueue (newScope);
 			if (entry)
-				entry->extensionFields.endLine = token->lineNumber;
+				setTagEndLine (entry, token->lineNumber);
 		}
 	}
 	else

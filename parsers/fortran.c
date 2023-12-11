@@ -623,8 +623,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		if (token->anonymous)
 			markTagExtraBit (&e, XTAG_ANONYMOUS);
 
-		e.lineNumber	= token->lineNumber;
-		e.filePosition	= token->filePosition;
+		updateTagLine (&e, token->lineNumber, token->filePosition);
 		e.isFileScope	= isFileScope (token->tag);
 		if (e.isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);

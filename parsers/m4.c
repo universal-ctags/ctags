@@ -524,9 +524,7 @@ static void parseM4Char (struct m4Ctx *ctx, vString *const token, int c)
 	}
 	else if (c == ')')
 	{
-		tagEntryInfo *e = getEntryInCorkQueue (topIndex(ctx));
-		if (e)
-			e->extensionFields.endLine = getInputLineNumber ();
+		setTagEndLineToCorkEntry (topIndex (ctx),getInputLineNumber ());
 		popIndexSafe (ctx);
 	}
 }

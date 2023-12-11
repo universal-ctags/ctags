@@ -267,7 +267,7 @@ static int makeAsmTag (
 				macro_tag = getEntryInCorkQueue (*macroScope);
 				if (macro_tag)
 				{
-					macro_tag->extensionFields.endLine = getInputLineNumber ();
+					setTagEndLine (macro_tag, getInputLineNumber ());
 					*macroScope = macro_tag->extensionFields.scopeIndex;
 				}
 				break;

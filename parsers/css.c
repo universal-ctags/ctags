@@ -227,8 +227,7 @@ static void findCssTags (void)
 				tagEntryInfo e;
 				initTagEntry (&e, vStringValue (selector), kind);
 
-				e.lineNumber	= lineNumber;
-				e.filePosition	= filePosition;
+				updateTagLine (&e, lineNumber, filePosition);
 
 				makeTagEntry (&e);
 			}

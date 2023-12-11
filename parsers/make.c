@@ -216,9 +216,7 @@ static void endTargets (intArray *targets, unsigned long lnum)
 	for (unsigned int i = 0; i < intArrayCount (targets); i++)
 	{
 		int cork_index = intArrayItem (targets, i);
-		tagEntryInfo *e = getEntryInCorkQueue (cork_index);
-		if (e)
-			e->extensionFields.endLine = lnum;
+		setTagEndLineToCorkEntry (cork_index, lnum);
 	}
 	intArrayClear (targets);
 }
@@ -318,11 +316,8 @@ static void findMakeTags (void)
 			{
 				if ((current_macro != CORK_NIL) && ! strcmp (vStringValue (name), "endef"))
 				{
-					tagEntryInfo *e = getEntryInCorkQueue(current_macro);
-
+					setTagEndLineToCorkEntry (current_macro, getInputLineNumber ());
 					current_macro = CORK_NIL;
-					if (e)
-						e->extensionFields.endLine = getInputLineNumber ();
 				}
 				else if (current_macro != CORK_NIL)
 					skipLine ();

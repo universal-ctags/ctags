@@ -145,7 +145,8 @@ extern bool processLanguageRegexOption (langType language, enum regexParserType 
 extern void notifyLanguageRegexInputStart (langType language);
 extern void notifyLanguageRegexInputEnd (langType language);
 
-extern void matchLanguageRegex (const langType language, const vString* const line);
+extern bool hasLanguagePostRunRegexPatterns (const langType language);
+extern void matchLanguageRegex (const langType language, const vString* const line, bool postrun);
 extern void freeRegexResources (void);
 extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);

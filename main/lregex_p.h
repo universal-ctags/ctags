@@ -89,7 +89,11 @@ extern void addTagMultiTableRegex(struct lregexControlBlock *lcb,
 								  const char* const name, const char* const kinds, const char* const flags,
 								  bool *disabled);
 
-extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const line);
+extern bool lregexControlBlockHasAny(struct lregexControlBlock *lcb);
+
+extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const line, bool postrun);
+extern bool regexIsPostRun (struct lregexControlBlock *lcb);
+
 extern bool doesExpectCorkInRegex (struct lregexControlBlock *lcb);
 extern void addCallbackRegex (struct lregexControlBlock *lcb,
 							  const char* const regex,

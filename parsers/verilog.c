@@ -1015,8 +1015,7 @@ static void createTagFull (tokenInfo *const token, verilogKind kind, int role, t
 		initTagEntry (&tag, vStringValue (token->name), kind);
 	else
 		initRefTagEntry (&tag, vStringValue (token->name), kind, role);
-	tag.lineNumber = token->lineNumber;
-	tag.filePosition = token->filePosition;
+	updateTagLine (&tag, token->lineNumber, token->filePosition);
 
 	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), kind);
 	if (currentContext->kind != K_UNDEFINED)

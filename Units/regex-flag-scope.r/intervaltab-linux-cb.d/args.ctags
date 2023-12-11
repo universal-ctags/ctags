@@ -1,0 +1,10 @@
+--sort=no
+
+--_roledef-C.f=callback,function used as callback function
+--_fielddef-C=method,method name used for calling the callback function
+
+--regex-C=/^[ \t]*\.([a-zA-Z_][a-zA-Z_0-9]*)[ \t]*=[ \t]*([a-zA-Z_][a-zA-Z_0-9]*)[ \t]*,?/\2/{scope=intervaltab}{postrun}{_field=method:\1}
+
+--extras=+{reference}
+--fields=+{roles}{line}{end}
+--fields-C=+{method}

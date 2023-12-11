@@ -423,11 +423,7 @@ void cxxParserSetEndLineForTagInCorkQueue(int iCorkQueueIndex,unsigned long lEnd
 {
 	CXX_DEBUG_ASSERT(iCorkQueueIndex > CORK_NIL,"The cork queue index is not valid");
 
-	tagEntryInfo * tag = getEntryInCorkQueue (iCorkQueueIndex);
-
-	CXX_DEBUG_ASSERT(tag,"No tag entry in the cork queue");
-
-	tag->extensionFields.endLine = lEndLine;
+	setTagEndLineToCorkEntry (iCorkQueueIndex, lEndLine);
 }
 
 //

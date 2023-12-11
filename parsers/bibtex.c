@@ -166,6 +166,20 @@ static void deleteToken (tokenInfo *const token)
 }
 
 /*
+ *	 Tag generation functions
+ */
+static void makeBibTag (tokenInfo *const token, bibKind kind)
+{
+	const char *const name = vStringValue (token->string);
+	tagEntryInfo e;
+	initTagEntry (&e, name, kind);
+
+	updateTagLine (&e, token->lineNumber, token->filePosition);
+
+	makeTagEntry (&e);
+}
+
+/*
  *	 Parsing functions
  */
 
@@ -297,7 +311,7 @@ static bool parseTag (tokenInfo *const token, bool foreignKeyword, int kind)
 			if (vStringLength (currentid) > 0)
 			{
 				vStringCopy (name->string, currentid);
-				makeSimpleTag (name->string, kind);
+				makeBibTag (name, kind);
 			}
 		}
 		else

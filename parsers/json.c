@@ -128,8 +128,7 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 
 	initTagEntry (&e, vStringValue (token->string), kind);
 
-	e.lineNumber	= token->lineNumber;
-	e.filePosition	= token->filePosition;
+	updateTagLine (&e, token->lineNumber, token->filePosition);
 
 	if (vStringLength (token->scope) > 0)
 	{
