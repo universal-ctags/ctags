@@ -1169,8 +1169,8 @@ static int lookupQualifiedName (tokenInfo *const token, vString *name,
 	Assert (!name || vStringLength (name) > 0);
 	Assert (name || !vStringIsEmpty (token->string));
 
-	vString *tmp = vStringNewCopy (name? name : token->string);
-	char *part, *next = vStringValue (tmp);
+	char *tmp = eStrdup (vStringValue (name? name : token->string));
+	char *part = NULL, *next = tmp;
 	bool once = true, ongoing = true, external = false;
 	while (next)
 	{
@@ -1190,18 +1190,21 @@ static int lookupQualifiedName (tokenInfo *const token, vString *name,
 			}
 			if (!external && ongoing)
 			{
-				int newScope = anyKindsEntryInScope (
-					scope, part, vLookupKinds, vLookupNumKinds, true);
+				int newScope = CORK_NIL;
 				if (makeRefs)
 					newScope = makeTagFull (token, part, makeRefs->kind, scope,
 											makeRefs->role, NULL, NULL, NULL);
+				if (newScope == CORK_NIL)
+					newScope = anyKindsEntryInScope (
+							scope, part, vLookupKinds, vLookupNumKinds, true);
 				scope = newScope;
 				ongoing = scope != CORK_NIL;
 			}
 		}
 	}
-	vStringCopyS (name? name : token->string, part);
-	vStringDelete (tmp);
+	if (part)
+		vStringCopyS (name? name : token->string, part);
+	eFree (tmp);
 	return scope;
 }
 
@@ -1261,7 +1264,7 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 	token->fullyQualified = true;
 
 	// should end on one of these
-	expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN, TOKEN_KEYWORD) ||
+	if (expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN, TOKEN_KEYWORD))
 		expectKeyword (token, KEYWORD_TYPE,
 					   KEYWORD_map, KEYWORD_chan, KEYWORD_sql);
 
@@ -1468,7 +1471,7 @@ static void parseIf (tokenInfo *const token, int scope)
 				parseIf (token, scope);
 			else
 			{
-				expectToken (token, TOKEN_OPEN_CURLY, TOKEN_KEYWORD) ||
+				if (expectToken (token, TOKEN_OPEN_CURLY, TOKEN_KEYWORD))
 					expectKeyword (token, KEYWORD_if, KEYWORD_Sif);
 				unreadToken (token);
 			}
@@ -1654,8 +1657,8 @@ static void parseFunction (tokenInfo *const token, int scope,
 		else if ((kind == KIND_METHOD || kind == KIND_ALIAS) &&
 				 isToken (token, TOKEN_IDENT))
 		{
-			vStringDelete (token->string);
-			token->string = acc;
+			vStringCopy (token->string, acc);
+			vStringDelete (acc);
 			acc = NULL;
 		}
 		int newScope = CORK_NIL;
@@ -1888,10 +1891,7 @@ static void parseImport (tokenInfo *const token)
 		{
 			readToken (token);
 			if (expectToken (token, TOKEN_IDENT))
-			{
-				vStringDelete (moduleName);
-				moduleName = vStringNewCopy (token->string);
-			}
+				vStringCopy (moduleName, token->string);
 			readToken (token);
 		}
 		else
@@ -2461,9 +2461,11 @@ static bool parseExprCont (tokenInfo *const token, int scope, bool hasErr)
 		{
 			// could be enumerator label
 			tokenInfo *tmpToken = newToken ();
+			bool isLabel;
 			readToken (tmpToken);
+			isLabel = isToken (tmpToken, TOKEN_LABEL);
 			unreadToken (tmpToken);
-			if (isToken (tmpToken, TOKEN_LABEL))
+			if (isLabel)
 				unreadToken (token);
 			else
 				parseChain (token, scope);
@@ -3048,8 +3050,13 @@ static void initialize (const langType language)
 {
 	LangV = language;
 
+#ifdef DEBUG
+#define	POOL_N 1
+#else
+#defien POOL_N 16
+#endif
 	TokenPool = objPoolNew (
-		16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
+		POOL_N, newPoolToken, deletePoolToken, clearPoolToken, NULL);
 	addKeywordGroup (&VTypeKeywords, LangV);
 }
 

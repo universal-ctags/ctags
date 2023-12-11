@@ -3318,5 +3318,8 @@ extern parserDefinition* JavaScriptParser (void)
 	def->useCork	= CORK_QUEUE|CORK_SYMTAB;
 	def->requestAutomaticFQTag = true;
 
+	def->versionCurrent = 1;
+	def->versionAge = 1;
+
 	return def;
 }
