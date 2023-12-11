@@ -145,6 +145,7 @@ enum {
 	KEYWORD_Salias,
 	KEYWORD_Sstruct,
 	KEYWORD_Senum,
+	KEYWORD_Sfloat,
 	COUNT_KEYWORD,
 	KEYWORD_TYPE,
 };
@@ -210,6 +211,7 @@ static const keywordTable VKeywordTable[COUNT_KEYWORD] = {
 	{"$alias", KEYWORD_Salias},
 	{"$struct", KEYWORD_Sstruct},
 	{"$enum", KEYWORD_Senum},
+	{"$float", KEYWORD_Sfloat,}
 };
 
 typedef enum eTokenType {
@@ -2232,9 +2234,7 @@ static bool parseVType (tokenInfo *const token, vString *const capture,
 				unreadTokenFull (token, capture);
 		}
 	}
-	else if (isKeyword (token, KEYWORD_TYPE, KEYWORD_Smap, KEYWORD_Sstruct,
-						KEYWORD_Senum, KEYWORD_Sarray, KEYWORD_Ssumtype,
-						KEYWORD_Salias, KEYWORD_none))
+	else if (isKeyword (token, KEYWORD_TYPE, KEYWORD_none))
 		;
 	else if (isKeyword (token, KEYWORD_chan, KEYWORD_shared))
 	{
@@ -2485,7 +2485,9 @@ static bool parseExprCont (tokenInfo *const token, int scope, bool hasErr)
 		else if (isKeyword (token, KEYWORD_is, KEYWORD_as))
 		{
 			readToken (token);
-			if (parseVType (token, NULL, scope, false, false))
+			if (isKeyword (token, KEYWORD_Sfloat, KEYWORD_Sarray, KEYWORD_Senum,
+			               KEYWORD_Sstruct, KEYWORD_Smap, KEYWORD_Salias) ||
+				parseVType (token, NULL, scope, false, false))
 				readToken (token);
 			if (!parseExprCont (token, scope, false))
 				unreadToken (token);
