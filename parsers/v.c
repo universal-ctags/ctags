@@ -69,8 +69,8 @@
 #define isClose(t) ( \
 		isToken (t, TOKEN_CLOSE_PAREN, TOKEN_CLOSE_SQUARE, TOKEN_CLOSE_CURLY))
 #define unreadToken(t) (unreadTokenFull (t, NULL))
-#define RED "\033[91m\033[1m"
-#define NORM "\033[0m\n"
+#define RED "\033[1;91m"
+#define NORM "\033[0;97m\n"
 
 #ifdef DEBUG
 #define vDebugPrintf(...) \
@@ -341,7 +341,7 @@ static kindDefinition VKinds[COUNT_KIND] = {
 	{true, 'c', "const", "constants"},
 	//{false, 'z', "param", "function parameters in functions"},
 	{true, 'R', "receiver", "receivers in functions"},
-	//{false, 'c', "closure", "closure parameters in functions"},
+	//{false, 'c', "closure", "closure/lambda parameters in functions"},
 	{true, 'l', "label", "labels"},
 	{true, 's', "struct", "structs"},
 	{true, 'm', "field", "struct/interface members"},
@@ -2609,7 +2609,8 @@ static void parseSql (tokenInfo *const token, int scope)
 //     vtype cont? | kwtype fncall? | immediate cont | 'struct'? init |
 //     lock | sql | lambda | if | match | select | chpop | unsafe |
 //     ['~' | '!' | '?' | '*' | '&' | '+' | '-' | 'spawn' | 'go'] expr |
-//     '[' list ']' '!'? [cont | vtype]? | '[' ']' [vtype fncall?]?
+//     '[' list ']' '!'? [cont | vtype]? | '[' ']' [vtype fncall?]? |
+//     '|' ident [',' ident]* '|' expr
 // ]
 static bool parseExpression (tokenInfo *const token, int scope,
 							 vString *const access)
@@ -2769,6 +2770,24 @@ static bool parseExpression (tokenInfo *const token, int scope,
 			else
 				unreadToken (token);
 		}
+	}
+	else if (isToken (token, TOKEN_PIPE)) // lambda
+	{
+		readToken (token);
+		while (isToken (token, TOKEN_IDENT))
+		{
+			readToken (token);
+			if (!isToken (token, TOKEN_COMMA))
+				break;
+			readToken (token);
+		}
+		if (expectToken (token, TOKEN_PIPE))
+		{
+			readToken (token);
+			parseExpression (token, scope, NULL);
+		}
+		else
+			unreadToken (token);
 	}
 	else
 	{

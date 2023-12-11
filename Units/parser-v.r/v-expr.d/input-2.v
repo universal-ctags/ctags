@@ -15,4 +15,6 @@ fn foo(ch chan int) {
     n := <-ch or {
         println('channel has been closed')
     }
+    foo(|x| x.bob())
+    x := |a, b| a + b
 }

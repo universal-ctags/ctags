@@ -90,5 +90,6 @@ i	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	fn:main	roles:
 j	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	fn:main	access:mut	roles:def
 k	input-2.v	/^    g, h, i, mut j, k := x, x, x, x, x$/;"	v	line:8	fn:main	roles:def
 m	input-2.v	/^    m := chan int{cap: 1}$/;"	v	line:10	fn:main	roles:def
-foo	input-2.v	/^fn foo(ch chan int) {$/;"	f	line:13	typeref:typename:	signature:(ch chan int)	roles:def	end:18
+foo	input-2.v	/^fn foo(ch chan int) {$/;"	f	line:13	typeref:typename:	signature:(ch chan int)	roles:def	end:20
 n	input-2.v	/^    n := <-ch or {$/;"	v	line:15	fn:foo	roles:def
+x	input-2.v	/^    x := |a, b| a + b$/;"	v	line:19	fn:foo	roles:def
