@@ -367,6 +367,7 @@
     <ClCompile Include="..\parsers\ttcn.c" />
     <ClCompile Include="..\parsers\txt2tags.c" />
     <ClCompile Include="..\parsers\typescript.c" />
+    <ClCompile Include="..\parsers\v.c" />
     <ClCompile Include="..\parsers\vera.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />
@@ -462,6 +463,7 @@
     <ClInclude Include="..\parsers\cxx\cxx_token_chain.h" />
     <ClInclude Include="..\parsers\frontmatter.h" />
     <ClInclude Include="..\parsers\iniconf.h" />
+    <ClInclude Include="..\parsers\jscript.h" />
     <ClInclude Include="..\parsers\m4.h" />
     <ClInclude Include="..\parsers\make.h" />
     <ClInclude Include="..\parsers\markdown.h" />

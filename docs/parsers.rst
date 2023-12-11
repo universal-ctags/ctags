@@ -20,5 +20,6 @@ This section deals with individual parser topics.
 	parser-puppetManifest.rst
 	parser-python.rst
 	parser-tcl.rst
+	parser-v.rst
 	parser-vim.rst
 	parser-xslt.rst

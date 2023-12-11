@@ -1,0 +1,13 @@
+main	input.v	/^fn main() {$/;"	f	line:1	language:V	typeref:typename:	signature:()	roles:def	end:17
+a	input.v	/^	a := 1$/;"	v	line:3	language:V	fn:main	roles:def
+thismodule	input-1.v	/^module thismodule$/;"	p	line:1	language:V	roles:def
+that	input-1.v	/^import that.aaa$/;"	p	line:3	language:V	roles:imported	extras:reference
+aaa	input-1.v	/^import that.aaa$/;"	p	line:3	language:V	module:that	roles:imported	extras:reference
+that	input-1.v	/^import that.bbb { Bbb }$/;"	p	line:4	language:V	roles:imported	extras:reference
+bbb	input-1.v	/^import that.bbb { Bbb }$/;"	p	line:4	language:V	module:that	roles:imported	extras:reference
+Bbb	input-1.v	/^import that.bbb { Bbb }$/;"	Y	line:4	language:V	module:that.bbb	roles:imported	extras:reference
+Foo	input-1.v	/^struct Foo {$/;"	s	line:6	language:V	module:thismodule	roles:def	end:9
+a	input-1.v	/^	a aaa.Aaa$/;"	m	line:7	language:V	struct:thismodule.Foo	roles:def
+b	input-1.v	/^	b Bbb$/;"	m	line:8	language:V	struct:thismodule.Foo	roles:def
+main	input-1.v	/^fn main() {$/;"	f	line:11	language:V	module:thismodule	typeref:typename:	signature:()	roles:def	end:15
+foo	input-1.v	/^	foo := Foo{}$/;"	v	line:12	language:V	fn:thismodule.main	roles:def

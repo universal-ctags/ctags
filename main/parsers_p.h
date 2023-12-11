@@ -180,6 +180,7 @@
 	TTCNParser, \
 	Txt2tagsParser, \
 	TypeScriptParser, \
+	VParser, \
 	VeraParser, \
 	VerilogParser, \
 	SystemVerilogParser, \

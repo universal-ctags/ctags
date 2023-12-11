@@ -290,6 +290,7 @@ PARSER_HEADS = \
 	parsers/bibtex.h \
 	parsers/frontmatter.h \
 	parsers/iniconf.h \
+	parsers/jscript.h \
 	parsers/m4.h \
 	parsers/make.h \
 	parsers/markdown.h \
@@ -414,6 +415,7 @@ PARSER_SRCS =				\
 	parsers/ttcn.c			\
 	parsers/txt2tags.c		\
 	parsers/typescript.c		\
+	parsers/v.c			\
 	parsers/vera.c			\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\

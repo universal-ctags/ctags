@@ -39,6 +39,9 @@ static const char *TR_LEX	   = "LEX";
 static const char *TR_FORTH	   = "Forth";
 static const char *TR_FORTRAN  = "Fortran";
 
+static const char *TR_V = "V";
+static const char *TR_VERILOG = "Verilog";
+
 #define startsWith(line,prefix)									\
 	(strncmp(line, prefix, strlen(prefix)) == 0? true: false)
 
@@ -355,6 +358,65 @@ selectFortranOrForthByForthMarker (MIO *input,
 								   unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
 	return selectByLines (input, tasteFortranOrForthLines, TR_FORTRAN, NULL);
+}
+
+struct VOrVerilogScore {
+	int v;
+	int verilog;
+};
+
+static const char *
+tasteVOrVerilogLines (const char *line, void *data)
+{
+	struct VOrVerilogScore *score = (struct VOrVerilogScore *)data;
+
+	while ((*line == ' ')
+		   || (*line == '\t'))
+		line++;
+
+	/* top 10 line-starting words most commonly present in first 150 lines of
+	 * all files in V v0.4 project source code (at time of writing) */
+	if (strncmp(line, "fn", 2) == 0 ||      /* present in 82.8% files */
+		strncmp(line, "return", 6) == 0 ||  /* present in 46.2% files */
+		strncmp(line, "mut", 3) == 0 ||     /* present in 43.7% files */
+		strncmp(line, "println", 7) == 0 || /* present in 38.9% files */
+		strncmp(line, "assert", 6) == 0 ||  /* present in 38.8% files */
+		strncmp(line, "struct", 6) == 0 ||  /* present in 34.5% files */
+		/* "module" is present in 29.6% files, but also ued in verilog */
+		strncmp(line, "import", 6) == 0 ||  /* present in 27.6% files */
+		strncmp(line, "if", 2) == 0 ||      /* present in 24.9% files */
+		strncmp(line, "pub", 3) == 0)       /* present in 24.1% files */
+		score->v++;
+	/* `define, end, begin, and reg  imply Verilog */
+	else if (strncmp(line, "end", 3) == 0
+			 || strncmp(line, "begin", 5) == 0
+			 || strncmp(line, "reg", 3) == 0
+			 || strncmp(line, "wire", 4) == 0
+			 || strncmp(line, "parameter", 9) == 0
+			 || strncmp(line, "`define", 5) == 0)
+		score->verilog++;
+
+	return TR_UNKNOWN;
+}
+
+const char *
+selectVOrVerilogByKeywords (MIO *input,
+							langType *candidates CTAGS_ATTR_UNUSED,
+							unsigned int nCandidates CTAGS_ATTR_UNUSED)
+{
+	struct VOrVerilogScore score = {
+		.v = 0,
+		.verilog = 0,
+	};
+	selectByLines (input, tasteVOrVerilogLines, TR_UNKNOWN, &score);
+
+	int d = score.v - score.verilog;
+	if (d > 0)
+		return TR_V;
+	else if (d < 0)
+		return TR_VERILOG;
+	else
+		return TR_UNKNOWN;
 }
 
 #ifdef HAVE_LIBXML

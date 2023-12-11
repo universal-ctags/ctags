@@ -26,8 +26,10 @@ Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C              d/macro           undef              on      undefined
+C              f/function        foreigndecl        on      declared in foreign languages
 C              h/header          local              on      local header
 C              h/header          system             on      system header
+C              s/struct          foreigndecl        on      declared in foreign languages
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
@@ -62,6 +64,7 @@ HTML           J/script          extFile            on      referenced as extern
 HTML           c/class           attribute          on      assigned as attributes
 Java           p/package         imported           on      imported package
 JavaScript     c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JavaScript     f/function        foreigndecl        on      declared in foreign languages
 JavaScript     v/variable        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Julia          Y/unknown         imported           on      loaded by "import"
 Julia          Y/unknown         used               on      loaded by "using"
@@ -114,6 +117,9 @@ Tex            i/xinput          bibliography       on      bibliography (.bib) 
 Tex            i/xinput          included           on      external input file specified with \include
 Tex            i/xinput          input              on      external input file specified with \input
 Thrift         T/thriftFile      included           on      included file
+V              Y/unknown         imported           on      imported symbol
+V              p/module          foreignlang        on      representing a foreign language (i.e., C, JS...)
+V              p/module          imported           on      imported module
 VHDL           e/entity          desigend           on      designed by an architecture
 Vera           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 Vera           d/macro           undef              on      undefined
@@ -152,8 +158,10 @@ Basic          f/function        decl               on      declared
 Bats           S/script          loaded             on      script loaed with "load" command
 C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C              d/macro           undef              on      undefined
+C              f/function        foreigndecl        on      declared in foreign languages
 C              h/header          local              on      local header
 C              h/header          system             on      system header
+C              s/struct          foreigndecl        on      declared in foreign languages
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
@@ -188,6 +196,7 @@ HTML           J/script          extFile            on      referenced as extern
 HTML           c/class           attribute          on      assigned as attributes
 Java           p/package         imported           on      imported package
 JavaScript     c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JavaScript     f/function        foreigndecl        on      declared in foreign languages
 JavaScript     v/variable        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Julia          Y/unknown         imported           on      loaded by "import"
 Julia          Y/unknown         used               on      loaded by "using"
@@ -240,6 +249,9 @@ Tex            i/xinput          bibliography       on      bibliography (.bib) 
 Tex            i/xinput          included           on      external input file specified with \include
 Tex            i/xinput          input              on      external input file specified with \input
 Thrift         T/thriftFile      included           on      included file
+V              Y/unknown         imported           on      imported symbol
+V              p/module          foreignlang        on      representing a foreign language (i.e., C, JS...)
+V              p/module          imported           on      imported module
 VHDL           e/entity          desigend           on      designed by an architecture
 Vera           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 Vera           d/macro           undef              on      undefined
@@ -254,11 +266,13 @@ Zsh            s/script          loaded             on      loaded
 #
 # C.*
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # all.d
@@ -291,49 +305,59 @@ s/script   loaded on      loaded
 #
 # C.* with disabling all roles of all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       off     local header
+h/header    system      off     system header
+s/struct    foreigndecl off     declared in foreign languages
 
 #
 # C.* with disabling all roles of all kinds of all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       off     local header
+h/header    system      off     system header
+s/struct    foreigndecl off     declared in foreign languages
 
 #
 # C.* with enabling all roles of all kinds in all languages
 # after disabling system role of header kind of C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition on      used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   on      used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with enabling all roles in all languages
 # after disabling system role of header kind of C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition on      used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   on      used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with disabling all roles in C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       off     local header
+h/header    system      off     system header
+s/struct    foreigndecl off     declared in foreign languages
 
 #
 # Sh.* with disabling all roles in C language
@@ -345,11 +369,13 @@ s/script   loaded    on      loaded
 #
 # C.* with disabling all roles of all kinds in C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       off     local header
+h/header    system      off     system header
+s/struct    foreigndecl off     declared in foreign languages
 
 #
 # Sh.* with disabling all roles of all kinds in C language
@@ -362,11 +388,13 @@ s/script   loaded    on      loaded
 # C.* with enabling all roles in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition on      used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   on      used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # Sh.* with enabling all roles in C language
@@ -380,11 +408,13 @@ s/script   loaded    off     loaded
 # C.* with enabling all roles of all kinds in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition on      used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   on      used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # Sh.* with enabling all roles of all kinds in C language
@@ -397,11 +427,13 @@ s/script   loaded    off     loaded
 #
 # C.* with disabling all roles of {header} kind in C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       off     local header
+h/header    system      off     system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # Sh.* with disabling all roles of {header} kind in C language
@@ -413,11 +445,13 @@ s/script   loaded    on      loaded
 #
 # C.* with disabling all roles of h kind in C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       off     local header
+h/header    system      off     system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # Sh.* with disabling all roles of h kind in C language
@@ -430,11 +464,13 @@ s/script   loaded    on      loaded
 # C.* with enabling all roles of {header} kind in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl off     declared in foreign languages
 
 #
 # Sh.* with enabling all roles of {header} kind in C language
@@ -448,11 +484,13 @@ s/script   loaded    off     loaded
 # C.* with enabling all roles of h kind in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl off     declared in foreign languages
 
 #
 # Sh.* with enabling all roles of h kind in C language
@@ -465,109 +503,133 @@ s/script   loaded    off     loaded
 #
 # C.* with disabling system role of h kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      off     system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with disabling system role of {header} kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      off     system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with enabling system role of h kind after disabling the role
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with enabling system role of {header} kind after disabling the role
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with disabling system and local roles of h kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       off     local header
+h/header    system      off     system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with disabling system and local roles of {header} kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     off     local header
-h/header   system    off     system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       off     local header
+h/header    system      off     system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with enabling system and local roles of h kind
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl off     declared in foreign languages
 
 #
 # C.* with enabling system and local roles of {header} kind
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl off     declared in foreign languages
 
 #
 # C.* with disabling local role of h kind and undef role of d kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     off     local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       off     local header
+h/header    system      on      system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with enabling all roles of header kinds after disabling all roles of the kind
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     on      undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       on      undefined
+f/function  foreigndecl on      declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl on      declared in foreign languages
 
 #
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl off     declared in foreign languages
 
 #
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language (short notation)
 #
-#KIND(L/N) NAME      ENABLED DESCRIPTION
-d/macro    condition off     used in part of #if/#ifdef/#elif conditions
-d/macro    undef     off     undefined
-h/header   local     on      local header
-h/header   system    on      system header
+#KIND(L/N)  NAME        ENABLED DESCRIPTION
+d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
+d/macro     undef       off     undefined
+f/function  foreigndecl off     declared in foreign languages
+h/header    local       on      local header
+h/header    system      on      system header
+s/struct    foreigndecl off     declared in foreign languages

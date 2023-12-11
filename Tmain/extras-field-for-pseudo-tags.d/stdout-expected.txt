@@ -23,9 +23,11 @@
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_ROLE_DESCRIPTION!C!function	foreigndecl	/declared in foreign languages/
 !_TAG_ROLE_DESCRIPTION!C!header	local	/local header/
 !_TAG_ROLE_DESCRIPTION!C!header	system	/system header/
 !_TAG_ROLE_DESCRIPTION!C!macro	undef	/undefined/
+!_TAG_ROLE_DESCRIPTION!C!struct	foreigndecl	/declared in foreign languages/
 main	input.c	/^int main (void) { return 0; }$/
 # option:  --format=2
 !_TAG_EXTRA_DESCRIPTION	pseudo	/Include pseudo tags/;"	extras:pseudo
@@ -52,7 +54,9 @@ main	input.c	/^int main (void) { return 0; }$/
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//;"	extras:pseudo
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/;"	extras:pseudo
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/;"	extras:pseudo
+!_TAG_ROLE_DESCRIPTION!C!function	foreigndecl	/declared in foreign languages/;"	extras:pseudo
 !_TAG_ROLE_DESCRIPTION!C!header	local	/local header/;"	extras:pseudo
 !_TAG_ROLE_DESCRIPTION!C!header	system	/system header/;"	extras:pseudo
 !_TAG_ROLE_DESCRIPTION!C!macro	undef	/undefined/;"	extras:pseudo
+!_TAG_ROLE_DESCRIPTION!C!struct	foreigndecl	/declared in foreign languages/;"	extras:pseudo
 main	input.c	/^int main (void) { return 0; }$/

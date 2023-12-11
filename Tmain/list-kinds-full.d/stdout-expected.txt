@@ -3,13 +3,13 @@ D	macroparam	no	no	0	C	parameters inside macro definitions
 L	label	no	no	0	C	goto labels
 d	macro	yes	no	2	C	macro definitions
 e	enumerator	yes	no	0	C	enumerators (values inside an enumeration)
-f	function	yes	no	0	C	function definitions
+f	function	yes	no	1	C	function definitions
 g	enum	yes	no	0	C	enumeration names
 h	header	yes	yes	2	C	included header files
 l	local	no	no	0	C	local variables
 m	member	yes	no	0	C	struct, and union members
 p	prototype	no	no	0	C	function prototypes
-s	struct	yes	no	0	C	structure names
+s	struct	yes	no	1	C	structure names
 t	typedef	yes	no	0	C	typedefs
 u	union	yes	no	0	C	union names
 v	variable	yes	no	0	C	variable definitions
