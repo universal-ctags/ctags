@@ -16,7 +16,7 @@ PACKCC_FILES = misc/packcc/.gitignore   \
 	       \
 	       $(NULL)
 
-EXTRA_DIST   = README.md autogen.sh \
+EXTRA_DIST   = README.md NEWS.rst autogen.sh \
 	       misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
 	       .indent.pro .uncrustify.cfg \

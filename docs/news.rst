@@ -13,4 +13,5 @@ NEWS
 .. toctree::
 	:maxdepth: 1
 
+	version ?.?.? <news/HEAD.rst>
 	version 6.0.0 <news/6-0-0.rst>

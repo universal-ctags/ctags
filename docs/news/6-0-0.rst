@@ -398,7 +398,6 @@ The following parsers have been added:
 * Autoconf
 * Automake
 * AutoIt
-* BibLaTeX *BibTeX based subparser*
 * BibTeX
 * Clojure
 * CMake *optlib*
@@ -414,7 +413,6 @@ The following parsers have been added:
 * Elixir *optlib*
 * Elm *peg/packcc*
 * Falcon
-* Forth *optlib*
 * FrontMatter *only YAML syntax, running as a guest on R?Markdown*
 * FunctionParameters *Perl based subparser*
 * Gdbinit script *optlib*
@@ -456,7 +454,6 @@ The following parsers have been added:
 * PythonLoggingConfig
 * QemuHX *optlib*
 * QtMoc
-* Quarto *Markdown based subparser*
 * R
 * R6Class *R based subparser*
 * Rake *Ruby based subparser*
@@ -477,13 +474,10 @@ The following parsers have been added:
 * SystemVerilog
 * SVG *libxml*
 * TclOO (see :ref:`The new Tcl parser <tcl>`)
-* Terraform (HCL) *optlib*
-* TerraformVariables *optlib*
 * Thrift *peg/packcc*
 * TTCN
 * Txt2tags
 * TypeScript
-* V
 * Varlink *peg/packcc*
 * WindRes
 * XSLT v1.0 *libxml*
