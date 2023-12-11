@@ -146,6 +146,7 @@ enum {
 	KEYWORD_Sstruct,
 	KEYWORD_Senum,
 	KEYWORD_Sfloat,
+	KEYWORD_Sfunction,
 	COUNT_KEYWORD,
 	KEYWORD_TYPE,
 };
@@ -211,7 +212,8 @@ static const keywordTable VKeywordTable[COUNT_KEYWORD] = {
 	{"$alias", KEYWORD_Salias},
 	{"$struct", KEYWORD_Sstruct},
 	{"$enum", KEYWORD_Senum},
-	{"$float", KEYWORD_Sfloat,}
+	{"$float", KEYWORD_Sfloat},
+	{"$function", KEYWORD_Sfunction},
 };
 
 typedef enum eTokenType {
@@ -2413,7 +2415,10 @@ static void parseExprList (tokenInfo *const token, int scope,
 		if (isToken (token, TOKEN_EOF, TOKEN_CLOSE_PAREN, TOKEN_CLOSE_SQUARE,
 					 TOKEN_CLOSE_CURLY))
 			break;
-		parseExpression (token, scope, NULL);
+		if (!isKeyword (token, KEYWORD_Sfloat, KEYWORD_Sarray, KEYWORD_Senum,
+		               KEYWORD_Sstruct, KEYWORD_Smap, KEYWORD_Salias,
+		               KEYWORD_Ssumtype, KEYWORD_Sfunction))
+			parseExpression (token, scope, NULL);
 	}
 	unreadToken (token);
 
@@ -2489,7 +2494,8 @@ static bool parseExprCont (tokenInfo *const token, int scope, bool hasErr)
 		{
 			readToken (token);
 			if (isKeyword (token, KEYWORD_Sfloat, KEYWORD_Sarray, KEYWORD_Senum,
-			               KEYWORD_Sstruct, KEYWORD_Smap, KEYWORD_Salias) ||
+			               KEYWORD_Sstruct, KEYWORD_Smap, KEYWORD_Salias,
+			               KEYWORD_Ssumtype, KEYWORD_Sfunction) ||
 				parseVType (token, NULL, scope, false, false))
 				readToken (token);
 			if (!parseExprCont (token, scope, false))
