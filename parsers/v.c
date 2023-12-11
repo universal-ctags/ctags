@@ -2551,16 +2551,19 @@ static void parseUnsafe (tokenInfo *const token, int scope)
 	PARSER_EPILOGUE ();
 }
 
-// lock: ['lock' | 'rlock'] fqident? block
+// lock: ['lock' | 'rlock'] fqident? [',' fqident]* block
 static void parseLock (tokenInfo *const token, int scope)
 {
 	Assert (isKeyword (token, KEYWORD_lock, KEYWORD_rlock));
 	PARSER_PROLOGUE ("lock");
 
 	readToken (token);
-	if (isToken (token, TOKEN_IDENT, TOKEN_TYPE))
+	while (isToken (token, TOKEN_IDENT, TOKEN_TYPE))
 	{
 		parseFQIdent (token, NULL);
+		readToken (token);
+		if (!isToken (token, TOKEN_COMMA))
+			break;
 		readToken (token);
 	}
 	if (expectToken (token, TOKEN_OPEN_CURLY))
