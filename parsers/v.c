@@ -1264,9 +1264,10 @@ static void parseFullyQualified (tokenInfo *const token, bool captureInToken)
 	token->fullyQualified = true;
 
 	// should end on one of these
-	if (expectToken (token, TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN, TOKEN_KEYWORD))
-		expectKeyword (token, KEYWORD_TYPE,
-					   KEYWORD_map, KEYWORD_chan, KEYWORD_sql);
+	if (!expectToken (token,
+	                  TOKEN_TYPE, TOKEN_IDENT, TOKEN_EXTERN, TOKEN_KEYWORD))
+		expectKeyword (token,
+		               KEYWORD_TYPE, KEYWORD_map, KEYWORD_chan, KEYWORD_sql);
 
 	PARSER_EPILOGUE ();
 }
@@ -1471,7 +1472,7 @@ static void parseIf (tokenInfo *const token, int scope)
 				parseIf (token, scope);
 			else
 			{
-				if (expectToken (token, TOKEN_OPEN_CURLY, TOKEN_KEYWORD))
+				if (!expectToken (token, TOKEN_OPEN_CURLY, TOKEN_KEYWORD))
 					expectKeyword (token, KEYWORD_if, KEYWORD_Sif);
 				unreadToken (token);
 			}
@@ -2334,7 +2335,7 @@ static void parseAlias (tokenInfo *const token, vString *const access, int scope
 }
 
 // list: [
-//     [access* indent [',' access* ident]* [':=' | 'in'] list] |
+//     [access* ident [',' access* ident]* [':=' | 'in'] list] |
 //     [expr? [',' expr]*]
 // ]
 static void parseExprList (tokenInfo *const token, int scope,
@@ -3053,7 +3054,7 @@ static void initialize (const langType language)
 #ifdef DEBUG
 #define	POOL_N 1
 #else
-#defien POOL_N 16
+#define POOL_N 16
 #endif
 	TokenPool = objPoolNew (
 		POOL_N, newPoolToken, deletePoolToken, clearPoolToken, NULL);
