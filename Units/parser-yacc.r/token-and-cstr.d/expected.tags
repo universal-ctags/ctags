@@ -1,0 +1,2 @@
+IDENTIFIER	input.y	/^%token <str> IDENTIFIER "identifier"$/;"	t	typeref:typename:str
+TYPEDEF_NAME	input.y	/^%token <str> TYPEDEF_NAME "typedef-name"$/;"	t	typeref:typename:str

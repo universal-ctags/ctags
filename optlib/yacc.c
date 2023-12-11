@@ -146,7 +146,7 @@ static void initializeYACCParser (const langType language)
 	                               "^\\}",
 	                               "", "", "{tleave}{_guest=,,0end}{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "cString",
-	                               "^[\\\\\"]+",
+	                               "^[^\\\\\"]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "cString",
 	                               "^\\\\.",

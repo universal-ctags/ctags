@@ -101,7 +101,7 @@
 
 --_mtable-regex-YACC=cEpilogue/.+//{_guest=,,0end}
 
---_mtable-regex-YACC=cString/[\\"]+//
+--_mtable-regex-YACC=cString/[^\\"]+//
 --_mtable-regex-YACC=cString/\\.//
 --_mtable-regex-YACC=cString/"//{tleave}
 
