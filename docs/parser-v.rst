@@ -60,6 +60,7 @@ The V Parser reads tokens and parses V grammar in parallel (i.e., it does not
 build an AST).
 
 The individual grammar parsers all follow these simple rules:
+
 - when called, `token` argument already holds the first token which an
   individual grammar parser should recognise
 - on return, individual parser functions read only the tokens they recognises
@@ -93,6 +94,7 @@ When the lexer returns an `IDENT` or `TYPE` and `parseFullyQualified()` is
 subsequently called to consume any additional tokens which may make-up a
 fully-qualified identifier, the provided `token` is also updated to reflect the
 final, fully-qualified identifier, so that:
+
 - token->string is the whole, fully-qualified name of the identifier (e.g.,
   `user.id`)
 - token->type is updated to `IDENT` or `TYPE` to reflect the last part of the
