@@ -4,7 +4,7 @@ FROM=v6.0.0
 pr_title()
 {
 	local N=$1
-	curl https://github.com/universal-ctags/ctags/pull/"$N" | grep '^  <title>' | \
+	curl --no-progress-meter https://github.com/universal-ctags/ctags/pull/"$N" | grep '^  <title>' | \
 		sed -e 's!^[[:space:]]*<title>\(.\+Pull Request #[0-9]*\).*</title>$!* \1!' | \
 		sed -e "s/&#39;/'/g" -e 's/&amp;/\&/g' -e 's/&quot;/"/g' -e 's/&gt;/>/g' -e 's/&lt;/</g'
 }
@@ -12,7 +12,7 @@ pr_title()
 issue_title()
 {
 	local N=$1
-	curl https://github.com/universal-ctags/ctags/issues/"$N" | grep '^  <title>' | \
+	curl --no-progress-meter https://github.com/universal-ctags/ctags/issues/"$N" | grep '^  <title>' | \
 		sed -e 's!^[[:space:]]*<title>\(.\+Issue #[0-9]*\).*</title>$!* \1!' | \
 		sed -e "s/&#39;/'/g" -e 's/&amp;/\&/g' -e 's/&quot;/"/g' -e 's/&gt;/>/g' -e 's/&lt;/</g'
 }
