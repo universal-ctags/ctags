@@ -22,7 +22,7 @@ usage()
     printf "	%s help|--help|-h\n" "$0"
     printf "	%s pr [#]\n" "$0"
     printf "	%s issue [#]\n" "$0"
-    printf "	%s man\n" "$0"		
+    printf "	%s man\n" "$0"
 }
 
 if [[ $# == 0 ]]; then
