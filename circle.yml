@@ -8,10 +8,10 @@ jobs:
   #
   # We assume GNU Make is available.
   #
-   fedora38_gmake:
+   fedora39_gmake:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:38
+       - image: docker.io/fedora:39
      steps:
        - run:
            name: Install Git, Gdb and Procps-NG
@@ -41,10 +41,10 @@ jobs:
              cd docs
              make html
 
-   fedora38_gmake_roundtrip:
+   fedora39_gmake_roundtrip:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:38
+       - image: docker.io/fedora:39
      steps:
        - run:
            name: Install Git and Gdb
@@ -133,10 +133,10 @@ jobs:
            command: |
              MAKE=bmake bmake roundtrip
 
-   fedora38_distcheck:
+   fedora39_distcheck:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:38
+       - image: docker.io/fedora:39
      steps:
        - run:
            name: Install Git, Gdb and Procps-NG
@@ -383,13 +383,13 @@ workflows:
     jobs:
       - ubuntu20_32bit
       - fedora30_bmake
-      - fedora38_distcheck
+      - fedora39_distcheck
       - stream9
       - ubi8
-      - fedora38_gmake
+      - fedora39_gmake
       - fedora33_cross_aarch64
       - centos7_make
       - ubuntu20_mingw
       - fedora30_bmake_roundtrip
-      - fedora38_gmake_roundtrip
+      - fedora39_gmake_roundtrip
       - centos7_make_roundtrip
