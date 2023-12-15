@@ -1,7 +1,7 @@
-.. _ctags-lang-C(7):
+.. _ctags-lang-c(7):
 
 ==============================================================
-ctags-lang-C
+ctags-lang-c
 ==============================================================
 ---------------------------------------------------------------------
 Random notes about tagging C source code with Universal Ctags
@@ -29,6 +29,8 @@ Change since "0.0"
 * New role ``foreigndecl`` for ``function`` kind
 
 * New role ``foreigndecl`` for ``struct`` kind
+
+* New field ``section``
 
 SEE ALSO
 --------
