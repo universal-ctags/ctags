@@ -310,6 +310,10 @@ chkgen_verbose = $(chkgen_verbose_@AM_V@)
 chkgen_verbose_ = $(chkgen_verbose_@AM_DEFAULT_V@)
 chkgen_verbose_0 = @echo CHKGEN "    $@";
 
+cgok             =  echo "<ok>       $@:"
+cgerr            =  echo "<ERROR>    $@:"
+cgskip           =  echo "<skip>     $@:"
+
 recover_side_effects = cg-force-optlib2c-srcs cg-force-txt2cstr-srcs cg-force-man-docs
 
 # OPTLIB2C_SRCS : committed for win32 build
@@ -325,11 +329,11 @@ endif
 check-genfile-optlib2c-srcs: $(recover_side_effects) cg-force-optlib2c-srcs
 if BUILD_IN_GIT_REPO
 	$(chkgen_verbose)if ! git diff --exit-code $(OPTLIB2C_DIR); then \
-		echo "Files under $(OPTLIB2C_DIR) are not up to date." ; \
-		echo "If you change $(OPTLIB2C_DIR)/foo.ctags, don't forget to add $(OPTLIB2C_DIR)/foo.c to your commit." ; \
+		$(cgerr) "Files under $(OPTLIB2C_DIR) are not up to date." ; \
+		$(cgerr) "If you change $(OPTLIB2C_DIR)/foo.ctags, don't forget to add $(OPTLIB2C_DIR)/foo.c to your commit." ; \
 		exit 1 ; \
 	else \
-		echo "Files under $(OPTLIB2C_DIR) are up to date." ; \
+		$(cgok) "Files under $(OPTLIB2C_DIR) are up to date." ; \
 	fi
 endif
 
@@ -346,11 +350,11 @@ endif
 check-genfile-txt2cstr-srcs: $(recover_side_effects) cg-force-txt2cstr-srcs
 if BUILD_IN_GIT_REPO
 	$(chkgen_verbose)if ! git diff --exit-code $(TXT2CSTR_DIR); then \
-		echo "Files under $(TXT2CSTR_DIR) are not up to date." ; \
-		echo "If you change $(TXT2CSTR_DIR)/foo.ps, don't forget to add $(TXT2CSTR_DIR)/foo.c to your commit." ; \
+		$(cgerr) "Files under $(TXT2CSTR_DIR) are not up to date." ; \
+		$(cgerr) "If you change $(TXT2CSTR_DIR)/foo.ps, don't forget to add $(TXT2CSTR_DIR)/foo.c to your commit." ; \
 		exit 1 ; \
 	else \
-		echo "Files under $(TXT2CSTR_DIR) are up to date." ; \
+		$(cgok) "Files under $(TXT2CSTR_DIR) are up to date." ; \
 	fi
 endif
 
@@ -373,11 +377,11 @@ check-genfile-man-docs:  $(recover_side_effects) cg-force-man-docs
 if BUILD_IN_GIT_REPO
 if HAVE_RST2MAN
 	$(chkgen_verbose)if ! git diff --exit-code -- man; then \
-		echo "Files under man/ are not up to date." ; \
-		echo "Please execute 'make -C man man-in' and commit them." ; \
+		$(cgerr) "Files under man/ are not up to date." ; \
+		$(cgerr) "Please execute 'make -C man man-in' and commit them." ; \
 		exit 1 ; \
 	else \
-		echo "Files under man are up to date." ; \
+		$(cgok) "Files under man are up to date." ; \
 	fi
 endif
 endif
@@ -395,11 +399,11 @@ check-genfile-update-docs: cg-force-update-docs $(recover_side_effects)
 if BUILD_IN_GIT_REPO
 if HAVE_RST2MAN
 	$(chkgen_verbose)if ! git diff --exit-code -- docs/man; then \
-		echo "Files under docs/man/ are not up to date." ; \
-		echo "Please execute 'make -C man update-docs' and commit them." ; \
+		$(cgerr) "Files under docs/man/ are not up to date." ; \
+		$(cgerr) "Please execute 'make -C man update-docs' and commit them." ; \
 		exit 1 ; \
 	else \
-		echo "Files under docs/man are up to date." ; \
+		$(cgok) "Files under docs/man are up to date." ; \
 	fi
 endif
 endif
@@ -418,15 +422,15 @@ check-genfile-win32: cg-force-win32 $(recover_side_effects)
 if BUILD_IN_GIT_REPO
 	$(chkgen_verbose)if ! git diff --exit-code -- win32; then \
 		if test "$(SKIP_CHECKGEN_WIN32)" = "yes"; then \
-			echo "Skip checking the files under win32." ; \
+			$(cgskip) "Skip checking the files under win32." ; \
 			exit 0 ; \
 		else \
-			echo "Files under win32/ are not up to date." ; \
-			echo "Please execute 'make -BC win32' and commit them." ; \
+			$(cgerr) "Files under win32/ are not up to date." ; \
+			$(cgerr) "Please execute 'make -BC win32' and commit them." ; \
 			exit 1 ; \
 		fi \
 	else \
-		echo "Files under win32 are up to date." ; \
+		$(cgok) "Files under win32 are up to date." ; \
 	fi
 endif
 
