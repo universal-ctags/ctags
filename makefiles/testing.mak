@@ -434,10 +434,28 @@ if BUILD_IN_GIT_REPO
 	fi
 endif
 
+.PHONY: check-genfile-add-docs-man
+check-genfile-add-docs-man: $(recover_side_effects)
+	$(chkgen_verbose) {\
+		(cd man; git ls-files .) | grep ctags-lang- | sed -e 's/\.in$$//' > TEMP-MAN-LS; \
+		(cd docs/man; git ls-files .) | grep ctags-lang-  > TEMP-DOCS-MAN-LS; \
+		if ! diff TEMP-MAN-LS TEMP-DOCS-MAN-LS; then \
+			$(cgerr) 'See "<" lines above.'; \
+			$(cgerr) 'docs/man/*rst genereated from man/*rst.in are not in the git repo'; \
+			$(cgerr) 'Please add the genereated file to the git repo'; \
+			rm TEMP-MAN-LS TEMP-DOCS-MAN-LS; \
+			exit 1 ; \
+		else \
+			rm TEMP-MAN-LS TEMP-DOCS-MAN-LS; \
+			$(cgok) 'All rst files under docs/man are in our git repo'; \
+		fi; \
+	}
+
 check-genfile: \
 	check-genfile-optlib2c-srcs \
 	check-genfile-txt2cstr-srcs \
 	check-genfile-update-docs \
+	check-genfile-add-docs-man \
 	check-genfile-win32
 
 #
