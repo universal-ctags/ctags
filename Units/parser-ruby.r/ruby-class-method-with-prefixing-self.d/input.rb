@@ -20,4 +20,3 @@ class Integration < ApplicationRecord
     boolean_accessor(name) if attrs[:type] == 'checkbox' && storage != :attribute
   end
 end
-  

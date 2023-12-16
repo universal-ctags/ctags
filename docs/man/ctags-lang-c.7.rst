@@ -3,18 +3,18 @@
 ==============================================================
 ctags-lang-c
 ==============================================================
----------------------------------------------------------------------
+
 Random notes about tagging C source code with Universal Ctags
----------------------------------------------------------------------
-:Version: @VERSION@
+
+:Version: 6.0.0
 :Manual group: Universal Ctags
 :Manual section: 7
 
 SYNOPSIS
 --------
-|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+C ...
-|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=C ...
-|	**@CTAGS_NAME_EXECUTABLE@** ... --map-C=+.c ...
+|	**ctags** ... --languages=+C ...
+|	**ctags** ... --language-force=C ...
+|	**ctags** ... --map-C=+.c ...
 
 DESCRIPTION
 -----------
@@ -34,5 +34,5 @@ Change since "0.0"
 
 SEE ALSO
 --------
-ctags(1),
+:ref:`ctags(1) <ctags(1)>`,
 `The new C/C++ parser <https://docs.ctags.io/en/latest/parser-cxx.html>`_ (https://docs.ctags.io/en/latest/parser-cxx.html)
