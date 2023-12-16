@@ -451,11 +451,23 @@ check-genfile-add-docs-man: $(recover_side_effects)
 		fi; \
 	}
 
+.PHONY: check-genfile-docs-man-pages-rst
+check-genfile-docs-man-pages-rst: $(recover_side_effects)
+	$(chkgen_verbose) for f in $$( (cd docs/man; git ls-files .) | grep ctags-lang- ); do \
+		if ! grep -q $$f docs/man-pages.rst; then \
+			$(cgerr) "$$f is not found in docs/man-pages.rst"; \
+			$(cgerr) "Please add $$f to docs/man-pages.rst"; \
+			exit 1; \
+		fi; \
+	done; \
+	$(cgok) "docs/man-pages.rst includes all ctags-lang-*.rst"
+
 check-genfile: \
 	check-genfile-optlib2c-srcs \
 	check-genfile-txt2cstr-srcs \
 	check-genfile-update-docs \
 	check-genfile-add-docs-man \
+	check-genfile-docs-man-pages-rst \
 	check-genfile-win32
 
 #
