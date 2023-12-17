@@ -64,13 +64,13 @@ Changes about parser specific kinds, roles, fields, and extras
 
   + New extra `linkName`.
 
-* Kconfig
-
-  + New kind `variable`
-
 * JavaScript
 
   + New role `foreigndecl` for `function` kind
+
+* Kconfig
+
+  + New kind `variable`
 
 * Markdown
 
