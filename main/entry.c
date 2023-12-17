@@ -1667,6 +1667,9 @@ static bool isTagWritable (const tagEntryInfo *const tag)
 	if (tag->placeholder)
 		return false;
 
+	if (! isLanguageEnabled(tag->langType) )
+		return false;
+
 	if (! isLanguageKindEnabled(tag->langType, tag->kindIndex))
 		return false;
 
