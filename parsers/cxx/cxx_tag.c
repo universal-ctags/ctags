@@ -118,6 +118,14 @@ static const char * g_aCXXAccessStrings [] = {
 		.name = "macrodef", \
 		.description = "macro definition", \
 			.enabled = false \
+	}, { \
+		.name = "section", \
+		.description = "the place where the object is placed", \
+		.enabled = false \
+	}, { \
+		.name = "alias", \
+		.description = "the name of the alias target specified in __attribute__((alias(...)))", \
+		.enabled = false \
 	}
 
 static fieldDefinition g_aCXXCFields [] = {

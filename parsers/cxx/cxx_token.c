@@ -32,11 +32,13 @@ static CXXToken *createToken(void *createArg CTAGS_ATTR_UNUSED)
 	// is being reused..well.. we always want it
 	t->pszWord = vStringNew();
 	t->iCorkIndex = CORK_NIL;
+	t->pSideChain = NULL;
 	return t;
 }
 
 static void deleteToken(CXXToken *token)
 {
+	cxxTokenChainDestroy(token->pSideChain);
 	vStringDelete(token->pszWord);
 	eFree(token);
 }
@@ -56,6 +58,12 @@ static void clearToken(CXXToken *t)
 	t->pPrev = NULL;
 
 	t->iCorkIndex = CORK_NIL;
+
+	if(t->pSideChain)
+	{
+		cxxTokenChainDestroy(t->pSideChain);
+		t->pSideChain = NULL;
+	}
 }
 
 void cxxTokenAPIInit(void)

@@ -1,10 +1,10 @@
-.. _ctags-lang-c(7):
+.. _ctags-lang-cuda(7):
 
 ==============================================================
-ctags-lang-c
+ctags-lang-cuda
 ==============================================================
 ---------------------------------------------------------------------
-Random notes about tagging C source code with Universal Ctags
+Random notes about tagging CUDA source code with Universal Ctags
 ---------------------------------------------------------------------
 :Version: @VERSION@
 :Manual group: Universal Ctags
@@ -12,23 +12,20 @@ Random notes about tagging C source code with Universal Ctags
 
 SYNOPSIS
 --------
-|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+C ...
-|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=C ...
-|	**@CTAGS_NAME_EXECUTABLE@** ... --map-C=+.c ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+CUDA ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=CUDA ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-CUDA=+.cu  ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-CUDA=+.cuh  ...
 
 DESCRIPTION
 -----------
-This man page gathers random notes about tagging C source code.
+This man page gathers random notes about tagging CUDA source code.
 
 VERSIONS
 --------
 
 Change since "0.0"
 ~~~~~~~~~~~~~~~~~~
-
-* New role ``foreigndecl`` for ``function`` kind
-
-* New role ``foreigndecl`` for ``struct`` kind
 
 * New field ``section``
 

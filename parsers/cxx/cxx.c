@@ -82,6 +82,10 @@ parserDefinition * CParser (void)
 
 	static selectLanguage selectors[] = { selectByObjectiveCKeywords, NULL };
 
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_FOREIGNER, "LdScript", NULL },
+	};
+
 	parserDefinition* def = parserNew("C");
 
 	def->kindTable = cxxTagGetCKindDefinitions();
@@ -93,6 +97,8 @@ parserDefinition * CParser (void)
 	def->initialize = cxxCParserInitialize;
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
 
 	def->versionCurrent = 1;
@@ -114,6 +120,7 @@ parserDefinition * CppParser (void)
 	};
 	static parserDependency dependencies [] = {
 		{ DEPTYPE_KIND_OWNER, "C" },
+		{ DEPTYPE_FOREIGNER, "LdScript", NULL },
 	};
 
 	static selectLanguage selectors[] = { selectByObjectiveCKeywords, NULL };
@@ -132,6 +139,9 @@ parserDefinition * CppParser (void)
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
 	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 
 	return def;
 }
@@ -161,6 +171,9 @@ parserDefinition * CUDAParser (void)
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = NULL;
 	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 
 	return def;
 }

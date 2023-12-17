@@ -15,10 +15,10 @@ New and extended options and their flags
 * ``{postrun}`` and ``{intervaltab}`` flags are added.
   See :ref:`ctags-optlib(1) <ctags-optlib(1)>`.
 
-
-Incompatible changes in command line
+Incompatible changes
 ---------------------------------------------------------------------
-None.
+
+* `section` kind is deleted from Asm parser.
 
 Parser related changes
 ---------------------------------------------------------------------
@@ -46,6 +46,10 @@ Changes about parser specific kinds, roles, fields, and extras
 
 .. See the output of ./misc/news.bash man [v6.0.0]
 
+* Asm
+
+  + `section` kind is deleted.
+
 * AutoIt
 
   + Drop `$` from tags for variables names.
@@ -60,17 +64,40 @@ Changes about parser specific kinds, roles, fields, and extras
   + New role `foreigndecl` for `function` kind
   + New role `foreigndecl` for `struct` kind
 
+
+  + New filed `section`
+
+  + New field `alias`
+
+* C++
+
+  + New filed `section`
+
+  + New field `alias`
+
+* CUDA
+
+  + New field `section`
+
+  + New field `alias`
+
 * Fortran
 
   + New extra `linkName`.
+
+* JavaScript
+
+  + New role `foreigndecl` for `function` kind
 
 * Kconfig
 
   + New kind `variable`
 
-* JavaScript
+* LdScript
 
-  + New role `foreigndecl` for `function` kind
+  + New role `destination` for `inputSection` kind
+
+  + New role `aliased` for `symbol` kind
 
 * Markdown
 

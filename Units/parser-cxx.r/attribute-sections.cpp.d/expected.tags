@@ -1,0 +1,37 @@
+__ksymtab_strings	input.c	/^char f [] __attribute__((section("__ksymtab_strings"), used, aligned(1)));$/;"	i	language:LdScript	roles:destination
+f	input.c	/^char f [] __attribute__((section("__ksymtab_strings"), used, aligned(1)));$/;"	v	language:C	typeref:typename:char[]	roles:def	section:__ksymtab_strings
+DUART_A	input.c	/^struct duart a __attribute__ ((section ("DUART_A"))) = { 0 };$/;"	i	language:LdScript	roles:destination
+a	input.c	/^struct duart a __attribute__ ((section ("DUART_A"))) = { 0 };$/;"	v	language:C	typeref:struct:duart	roles:def	section:DUART_A
+DUART_B	input.c	/^struct duart b __attribute__ ((section ("DUART_B"))) = { 0 };$/;"	i	language:LdScript	roles:destination
+b	input.c	/^struct duart b __attribute__ ((section ("DUART_B"))) = { 0 };$/;"	v	language:C	typeref:struct:duart	roles:def	section:DUART_B
+STACK	input.c	/^char stack[10000] __attribute__ ((section ("STACK"))) = { 0 };$/;"	i	language:LdScript	roles:destination
+stack	input.c	/^char stack[10000] __attribute__ ((section ("STACK"))) = { 0 };$/;"	v	language:C	typeref:typename:char[10000]	roles:def	section:STACK
+INITDATA	input.c	/^int init_data __attribute__ ((section ("INITDATA")));$/;"	i	language:LdScript	roles:destination
+init_data	input.c	/^int init_data __attribute__ ((section ("INITDATA")));$/;"	v	language:C	typeref:typename:int	roles:def	section:INITDATA
+COMMAND_LINE_SIZE	input-0.c	/^#define COMMAND_LINE_SIZE /;"	d	language:C	file:	roles:def	macrodef:127
+__section	input-0.c	/^#define __section(section)              __attribute__((__section_/;"	d	language:C	file:	signature:(section)	roles:def	macrodef:__attribute__((__section__(section)))
+__initdata	input-0.c	/^#define __initdata	/;"	d	language:C	file:	roles:def	macrodef:__section(".init.data")
+.init.data	input-0.c	/^char __initdata b0[COMMAND_LINE_SIZE];$/;"	i	language:LdScript	roles:destination
+b0	input-0.c	/^char __initdata b0[COMMAND_LINE_SIZE];$/;"	v	language:C	typeref:typename:char[127]	roles:def	section:.init.data
+.init.data	input-0.c	/^char b1[COMMAND_LINE_SIZE] __initdata;$/;"	i	language:LdScript	roles:destination
+b1	input-0.c	/^char b1[COMMAND_LINE_SIZE] __initdata;$/;"	v	language:C	typeref:typename:char[127]	roles:def	section:.init.data
+bar0p	input-1.c	/^extern void f0 (void) __attribute__ ((section ("bar0p")));$/;"	i	language:LdScript	roles:destination
+f0	input-1.c	/^extern void f0 (void) __attribute__ ((section ("bar0p")));$/;"	p	language:C	typeref:typename:void	file:	signature:(void)	roles:def	section:bar0p
+bar0	input-1.c	/^{$/;"	i	language:LdScript	roles:destination
+f0	input-1.c	/^void f0 (void) __attribute__ ((section ("bar0")))$/;"	f	language:C	typeref:typename:void	signature:(void)	roles:def	section:bar0
+bar1p	input-1.c	/^extern void __attribute__ ((section ("bar1p")))  f1 (void);$/;"	i	language:LdScript	roles:destination
+f1	input-1.c	/^extern void __attribute__ ((section ("bar1p")))  f1 (void);$/;"	p	language:C	typeref:typename:void	file:	signature:(void)	roles:def	section:bar1p
+bar1	input-1.c	/^{$/;"	i	language:LdScript	roles:destination
+f1	input-1.c	/^void __attribute__ ((section ("bar1"))) f1 (void)$/;"	f	language:C	typeref:typename:void	signature:(void)	roles:def	section:bar1
+bar2p	input-1.c	/^extern __attribute__ ((section ("bar2p"))) void f2 (void);$/;"	i	language:LdScript	roles:destination
+f2	input-1.c	/^extern __attribute__ ((section ("bar2p"))) void f2 (void);$/;"	p	language:C	typeref:typename:void	file:	signature:(void)	roles:def	section:bar2p
+bar2	input-1.c	/^{$/;"	i	language:LdScript	roles:destination
+f2	input-1.c	/^__attribute__ ((section ("bar2"))) void f2 (void)$/;"	f	language:C	typeref:typename:void	signature:(void)	roles:def	section:bar2
+bar3p	input-1.c	/^__attribute__ ((section ("bar3p"))) extern void f3 (void);$/;"	i	language:LdScript	roles:destination
+f3	input-1.c	/^__attribute__ ((section ("bar3p"))) extern void f3 (void);$/;"	p	language:C	typeref:typename:void	file:	signature:(void)	roles:def	section:bar3p
+bar3	input-1.c	/^{$/;"	i	language:LdScript	roles:destination
+f3	input-1.c	/^__attribute__ ((section ("bar3"))) extern void f3 (void)$/;"	f	language:C	typeref:typename:void	signature:(void)	roles:def	section:bar3
+bar4p	input-1.c	/^__attribute__ ((section ("bar4p"))) static void f4 (void);$/;"	i	language:LdScript	roles:destination
+f4	input-1.c	/^__attribute__ ((section ("bar4p"))) static void f4 (void);$/;"	p	language:C	typeref:typename:void	file:	signature:(void)	roles:def	section:bar4p
+bar4	input-1.c	/^{$/;"	i	language:LdScript	roles:destination
+f4	input-1.c	/^__attribute__ ((section ("bar4"))) static void f4 (void)$/;"	f	language:C	typeref:typename:void	file:	signature:(void)	roles:def	section:bar4

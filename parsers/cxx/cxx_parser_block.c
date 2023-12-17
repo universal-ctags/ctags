@@ -15,6 +15,7 @@
 #include "cxx_token_chain.h"
 #include "cxx_scope.h"
 #include "cxx_tag.h"
+#include "cxx_side_chain.h"
 
 #include "parse.h"
 #include "vstring.h"
@@ -269,11 +270,14 @@ static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
 		cppBeginStatement();
 	}
 
+	CXXTokenChain *pSideChain = NULL;
 	for(;;)
 	{
 		if(!cxxParserParseNextToken())
 		{
 found_eof:
+			cxxTokenChainDestroy(pSideChain);
+			pSideChain = NULL;
 
 			if(bExpectClosingBracket)
 			{
@@ -287,6 +291,8 @@ found_eof:
 			CXX_DEBUG_LEAVE_TEXT("EOF in main block");
 			return true; // EOF
 		}
+		cxxSideChainAppendChain(pSideChain,g_cxx.pToken);
+		pSideChain = NULL;
 
 process_token:
 
@@ -300,6 +306,7 @@ process_token:
 			&& cxxScopeGetType() == CXXScopeTypeClass
 			&& cxxSubparserNewIdentifierAsHeadOfMemberNotify(g_cxx.pToken))
 		{
+			pSideChain = cxxSideChainEject(g_cxx.pToken);
 			cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 			continue;
 		}
@@ -561,10 +568,14 @@ process_token:
 					case CXXKeywordEXTERN:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenExtern;
 
+						pSideChain = cxxSideChainEject(g_cxx.pToken);
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 						if(!cxxParserParseNextToken())
 							goto found_eof;
+
+						cxxSideChainAppendChain(pSideChain,g_cxx.pToken);
+						pSideChain = NULL;
 
 						if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeStringConstant))
 						{
@@ -600,6 +611,7 @@ process_token:
 					break;
 					case CXXKeywordSTATIC:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenStatic;
+						pSideChain = cxxSideChainEject(g_cxx.pToken);
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordINLINE:
@@ -608,10 +620,12 @@ process_token:
 					case CXXKeyword__FORCEINLINE:
 					case CXXKeyword__FORCEINLINE__:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenInline;
+						pSideChain = cxxSideChainEject(g_cxx.pToken);
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordEXPLICIT:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenExplicit;
+						pSideChain = cxxSideChainEject(g_cxx.pToken);
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordOPERATOR:
@@ -619,10 +633,12 @@ process_token:
 					break;
 					case CXXKeywordVIRTUAL:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenVirtual;
+						pSideChain = cxxSideChainEject(g_cxx.pToken);
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordMUTABLE:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenMutable;
+						pSideChain = cxxSideChainEject(g_cxx.pToken);
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordFRIEND:

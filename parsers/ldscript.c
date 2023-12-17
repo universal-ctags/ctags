@@ -29,20 +29,24 @@
 
 typedef enum {
 	LD_SCRIPT_SYMBOL_ENTRYPOINT,
+	LD_SCRIPT_SYMBOL_ALIASED,
 } ldScriptSymbolRole;
 
 static roleDefinition LdScriptSymbolRoles [] = {
 	{ true, "entrypoint", "entry points" },
+	{ true, "aliased", "aliased with __attribute__((alias(...))) in C/C++ code" },
 };
 
 typedef enum {
 	LD_SCRIPT_INPUT_SECTION_MAPPED,
 	LD_SCRIPT_INPUT_SECTION_DISCARDED,
+	LD_SCRIPT_INPUT_SECTION_DESTINATION,
 } ldScriptInputSectionRole;
 
 static roleDefinition LdScriptInputSectionRoles [] = {
 	{ true, "mapped",  "mapped to output section" },
 	{ true, "discarded", "discarded when linking" },
+	{ true, "destination", "specified as the destination of code and data" },
 };
 
 typedef enum {
@@ -58,7 +62,7 @@ static kindDefinition LdScriptKinds [] = {
 	  .referenceOnly = false, ATTACH_ROLES(LdScriptSymbolRoles)},
 	{ true, 'v', "version", "versions" },
 	{ true, 'i', "inputSection", "input sections",
-	  .referenceOnly = true, ATTACH_ROLES(LdScriptInputSectionRoles)},
+	  .referenceOnly = false, ATTACH_ROLES(LdScriptInputSectionRoles)},
 };
 
 enum {
@@ -913,6 +917,9 @@ extern parserDefinition* LdScriptParser (void)
 	def->fieldCount = ARRAY_SIZE (LdScriptFields);
 
 	def->useCork    = CORK_QUEUE|CORK_SYMTAB;
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 
 	return def;
 }

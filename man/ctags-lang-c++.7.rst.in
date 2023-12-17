@@ -1,10 +1,10 @@
-.. _ctags-lang-c(7):
+.. _ctags-lang-c++(7):
 
 ==============================================================
-ctags-lang-c
+ctags-lang-c++
 ==============================================================
 ---------------------------------------------------------------------
-Random notes about tagging C source code with Universal Ctags
+Random notes about tagging C++ source code with Universal Ctags
 ---------------------------------------------------------------------
 :Version: @VERSION@
 :Manual group: Universal Ctags
@@ -12,23 +12,23 @@ Random notes about tagging C source code with Universal Ctags
 
 SYNOPSIS
 --------
-|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+C ...
-|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=C ...
-|	**@CTAGS_NAME_EXECUTABLE@** ... --map-C=+.c ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+C++ ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=C++ ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-C++=+.c++  ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-C++=+.cc  ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-C++=+.cpp  ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-C++=+.h  ...
+|   ...
 
 DESCRIPTION
 -----------
-This man page gathers random notes about tagging C source code.
+This man page gathers random notes about tagging C++ source code.
 
 VERSIONS
 --------
 
 Change since "0.0"
 ~~~~~~~~~~~~~~~~~~
-
-* New role ``foreigndecl`` for ``function`` kind
-
-* New role ``foreigndecl`` for ``struct`` kind
 
 * New field ``section``
 

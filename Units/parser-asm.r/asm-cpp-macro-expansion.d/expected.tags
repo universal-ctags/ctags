@@ -1,8 +1,12 @@
 ENTRY	input.S	/^#define ENTRY(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
+main	input.S	/^ENTRY(main):$/;"	s
 main	input.S	/^ENTRY(main):$/;"	l
 ENTRY2	input.S	/^#define ENTRY2(/;"	d	file:	signature:(LABEL,UNUSED)	macrodef:.global LABEL ;LABEL
+loop0	input.S	/^ENTRY2(loop0, "STRING"):$/;"	s
 loop0	input.S	/^ENTRY2(loop0, "STRING"):$/;"	l
+loop1	input.S	/^ENTRY2(loop1, 'c'):$/;"	s
 loop1	input.S	/^ENTRY2(loop1, 'c'):$/;"	l
+loop2	input.S	/^ENTRY2(loop2, ('c')):$/;"	s
 loop2	input.S	/^ENTRY2(loop2, ('c')):$/;"	l
 ASM_NL	input.S	/^#define ASM_NL	/;"	d	file:	macrodef:;
 SYM_ENTRY	input.S	/^#define SYM_ENTRY(/;"	d	file:	signature:(name,linkage,align...)	macrodef:linkage(name) ASM_NL align ASM_NL name:
@@ -12,8 +16,10 @@ asm_exc_nmi	input.S	/^SYM_CODE_START(asm_exc_nmi)$/;"	l
 ENTRY0	input-0.S	/^#define ENTRY0(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
 exit0	input-0.S	/^exit0:$/;"	l
 ENTRY1	input-1.S	/^#define ENTRY1(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
+exit1	input-1.S	/^ENTRY1(exit1):$/;"	s
 exit1	input-1.S	/^ENTRY1(exit1):$/;"	l
 ENTRY2	input-2.S	/^#define ENTRY2(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
+exit2	input-2.S	/^ENTRY2(exit2):$/;"	s
 exit2	input-2.S	/^ENTRY2(exit2):$/;"	l
 ENTRY3	input-3.S	/^#define ENTRY3 /;"	d	file:	macrodef:label3:; nop;.section .entry.text, 
 label3	input-3.S	/^	ENTRY3"a"$/;"	l

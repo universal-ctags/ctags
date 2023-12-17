@@ -1,0 +1,7 @@
+--sort=no
+--kinds-C=+p
+--param-CPreProcessor._expand=1
+--fields-C=+{section}{macrodef}
+--fields=+S
+--fields=+rl
+--extras=+r

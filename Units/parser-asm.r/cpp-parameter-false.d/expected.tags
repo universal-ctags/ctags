@@ -1,1 +1,2 @@
+labelM	input.s	/^	.global labelM$/;"	s
 labelM	input.s	/^labelM:$/;"	l
