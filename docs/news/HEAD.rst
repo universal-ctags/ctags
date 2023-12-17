@@ -15,10 +15,10 @@ New and extended options and their flags
 * ``{postrun}`` and ``{intervaltab}`` flags are added.
   See :ref:`ctags-optlib(1) <ctags-optlib(1)>`.
 
-
-Incompatible changes in command line
+Incompatible changes
 ---------------------------------------------------------------------
-None.
+
+* `section` kind is deleted from Asm parser.
 
 Parser related changes
 ---------------------------------------------------------------------
