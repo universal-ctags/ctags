@@ -39,6 +39,25 @@
 /*
 *   DATA DECLARATIONS
 */
+enum eCppCharacters {
+	/* white space characters */
+	SPACE         = ' ',
+	NEWLINE       = '\n',
+	CRETURN       = '\r',
+	FORMFEED      = '\f',
+	TAB           = '\t',
+	VTAB          = '\v',
+
+	/* some hard to read characters */
+	DOUBLE_QUOTE  = '"',
+	SINGLE_QUOTE  = '\'',
+	BACKSLASH     = '\\',
+
+	/* symbolic representations, above 0xFF not to conflict with any byte */
+	STRING_SYMBOL = CPP_STRING_SYMBOL,
+	CHAR_SYMBOL   = CPP_CHAR_SYMBOL
+};
+
 typedef enum { COMMENT_NONE, COMMENT_C, COMMENT_CPLUS, COMMENT_D } Comment;
 
 enum eCppLimits {

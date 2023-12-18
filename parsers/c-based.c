@@ -2688,7 +2688,7 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 	{
 		parseAtMarkStyleAnnotation (st);
 	}
-	else if (c == STRING_SYMBOL)
+	else if (c == CPP_STRING_SYMBOL)
 	{
 		setToken(st, TOKEN_NONE);
 	}

@@ -1530,7 +1530,7 @@ bool cxxParserParseNextToken(void)
 		return true;
 	}
 #else
-	if(g_cxx.iChar == STRING_SYMBOL)
+	if(g_cxx.iChar == CPP_STRING_SYMBOL)
 	{
 		t->eType = CXXTokenTypeStringConstant;
 		cStringPut(t->pszWord,g_cxx.iChar);
@@ -1576,7 +1576,7 @@ bool cxxParserParseNextToken(void)
 		return true;
 	}
 #else
-	if(g_cxx.iChar == CHAR_SYMBOL)
+	if(g_cxx.iChar == CPP_CHAR_SYMBOL)
 	{
 		t->eType = CXXTokenTypeCharacterConstant;
 		cStringPut(t->pszWord,g_cxx.iChar);
