@@ -44,6 +44,11 @@ enum {
 	KEYWORD_lambda,
 	KEYWORD_pass,
 	KEYWORD_return,
+
+	/* Used only in readTokenFullNoRefTag to represent the identifiers
+	   that should not be tagged as reference tags. */
+	KEYWORD___noreftag_id,
+
 	KEYWORD_REST
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -174,6 +179,7 @@ static const keywordTable PythonKeywordTable[] = {
 	{ "lambda",			KEYWORD_lambda			},
 	{ "pass",			KEYWORD_pass			},
 	{ "return",			KEYWORD_return			},
+	{ "self",			KEYWORD___noreftag_id   },
 };
 
 /* Taken from https://docs.python.org/3/reference/lexical_analysis.html#keywords */
@@ -502,7 +508,7 @@ static void ungetToken (tokenInfo *const token)
 	copyToken (NextToken, token);
 }
 
-static void readTokenFullNoRefTag (tokenInfo *const token, bool inclWhitespaces)
+static void readTokenFullNoRefTag (tokenInfo *const token, bool inclWhitespaces, bool *noReftagId)
 {
 	int c;
 	int n;
@@ -689,11 +695,17 @@ getNextChar:
 			}
 			else
 			{
+				*noReftagId = false;
 				/* FIXME: handle U, B, R and F string prefixes? */
 				readIdentifier (token->string, c);
 				token->keyword = lookupKeyword (vStringValue (token->string), Lang_python);
 				if (token->keyword == KEYWORD_NONE)
 					token->type = TOKEN_IDENTIFIER;
+				else if (token->keyword == KEYWORD___noreftag_id)
+				{
+					token->type = TOKEN_IDENTIFIER;
+					*noReftagId = true;
+				}
 				else
 					token->type = TOKEN_KEYWORD;
 			}
@@ -719,9 +731,11 @@ getNextChar:
 
 static void readTokenFull (tokenInfo *const token, bool inclWhitespaces)
 {
-	readTokenFullNoRefTag (token, inclWhitespaces);
+	bool noReftagId;
+	readTokenFullNoRefTag (token, inclWhitespaces, &noReftagId);
 
 	if (token->type == TOKEN_IDENTIFIER
+		&& (!noReftagId)
 		/* Don't make a ref tag for a number. */
 		&& (vStringLength (token->string) > 0 &&
 			!isdigit ((unsigned char)vStringChar (token->string, 0)))
