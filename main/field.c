@@ -863,7 +863,7 @@ static const char* renderCompactInputLine (vString *b,  const char *const line)
 
 	/*  Write everything up to, but not including, the newline.
 	 */
-	for (const char *p = line; *p != NEWLINE && *p != '\0'; ++p)
+	for (const char *p = line; *p != '\n' && *p != '\0'; ++p)
 	{
 		int c = (unsigned char) *p;
 		if (lineStarted  || ! isspace (c))  /* ignore leading spaces */
@@ -875,11 +875,11 @@ static const char* renderCompactInputLine (vString *b,  const char *const line)
 
 				/*  Consume repeating white space.
 				 */
-				while (next = (unsigned char) *(p+1), isspace (next) && next != NEWLINE)
+				while (next = (unsigned char) *(p+1), isspace (next) && next != '\n')
 					++p;
 				c = ' ';  /* force space character for any white space */
 			}
-			if (c != CRETURN  ||  *(p + 1) != NEWLINE)
+			if (c != '\r'  ||  *(p + 1) != '\n')
 				vStringPut (b, c);
 		}
 	}

@@ -39,6 +39,25 @@
 /*
 *   DATA DECLARATIONS
 */
+enum eCppCharacters {
+	/* white space characters */
+	SPACE         = ' ',
+	NEWLINE       = '\n',
+	CRETURN       = '\r',
+	FORMFEED      = '\f',
+	TAB           = '\t',
+	VTAB          = '\v',
+
+	/* some hard to read characters */
+	DOUBLE_QUOTE  = '"',
+	SINGLE_QUOTE  = '\'',
+	BACKSLASH     = '\\',
+
+	/* symbolic representations, above 0xFF not to conflict with any byte */
+	STRING_SYMBOL = CPP_STRING_SYMBOL,
+	CHAR_SYMBOL   = CPP_CHAR_SYMBOL
+};
+
 typedef enum { COMMENT_NONE, COMMENT_C, COMMENT_CPLUS, COMMENT_D } Comment;
 
 enum eCppLimits {
@@ -1533,7 +1552,7 @@ static void conditionMayPut (vString *condition, int c)
 		vStringPut(condition, c);
 }
 
-extern void cStringPut (vString* string, const int c)
+extern void cppVStringPut (vString* string, const int c)
 {
 	if (c <= 0xff)
 		vStringPut (string, c);
@@ -1953,7 +1972,7 @@ process:
 	if (condition)
 		vStringDelete (condition);
 
-	DebugStatement ( debugPutc (DEBUG_CPP, c); )
+	DebugStatement ( cppDebugPutc (DEBUG_CPP, c); )
 	DebugStatement ( if (c == NEWLINE)
 				debugPrintf (DEBUG_CPP, "%6ld: ", getInputLineNumber () + 1); )
 
@@ -2635,3 +2654,17 @@ extern parserDefinition* CPreProParser (void)
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	return def;
 }
+
+#ifdef DEBUG
+extern void cppDebugPutc (const int level, const int c)
+{
+	if (debug (level)  &&  c != EOF)
+	{
+		     if (c == STRING_SYMBOL)  printf ("\"string\"");
+		else if (c == CHAR_SYMBOL)    printf ("'c'");
+		else                          putchar (c);
+
+		fflush (stdout);
+	}
+}
+#endif

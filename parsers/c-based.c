@@ -1485,7 +1485,7 @@ static void skipToMatch (const char *const pair)
 	while (matchLevel > 0  &&  (c = skipToNonWhite ()) != EOF)
 	{
 		if (CollectingSignature)
-			cStringPut (Signature, c);
+			cppVStringPut (Signature, c);
 
 		if (c == begin)
 		{
@@ -1571,11 +1571,11 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 
 	do
 	{
-		cStringPut (name, c);
+		cppVStringPut (name, c);
 		if (CollectingSignature)
 		{
 			if (!first)
-				cStringPut (Signature, c);
+				cppVStringPut (Signature, c);
 			first = false;
 		}
 		c = cppGetc ();
@@ -1704,7 +1704,7 @@ static void readOperator (statementInfo *const st)
 					vStringPut (name, ' ');
 					whiteSpace = false;
 				}
-				cStringPut (name, c);
+				cppVStringPut (name, c);
 			}
 			c = cppGetc ();
 		} while (! isOneOf (c, "(;")  &&  c != EOF);
@@ -2296,7 +2296,7 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 	{
 		int c = skipToNonWhite ();
 
-		cStringPut (Signature, c);
+		cppVStringPut (Signature, c);
 		switch (c)
 		{
 			case '^':
@@ -2688,7 +2688,7 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 	{
 		parseAtMarkStyleAnnotation (st);
 	}
-	else if (c == STRING_SYMBOL)
+	else if (c == CPP_STRING_SYMBOL)
 	{
 		setToken(st, TOKEN_NONE);
 	}

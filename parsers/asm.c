@@ -399,7 +399,7 @@ static bool collectCppMacroArguments (ptrArray *args)
 			ptrArrayAdd (args, cstr);
 			s = vStringNew ();
 		}
-		else if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
+		else if (c == CPP_STRING_SYMBOL || c == CPP_CHAR_SYMBOL)
 			vStringPut (s, ' ');
 		else
 			vStringPut (s, c);
@@ -425,7 +425,7 @@ static bool expandCppMacro (cppMacroInfo *macroInfo)
 		while (1)
 		{
 			c = cppGetc ();
-			if (c == STRING_SYMBOL || c == CHAR_SYMBOL || !isspace (c))
+			if (c == CPP_STRING_SYMBOL || c == CPP_CHAR_SYMBOL || !isspace (c))
 				break;
 		}
 
@@ -519,7 +519,7 @@ static const unsigned char *readLineViaCpp (const char *commentChars)
  cont:
 	while ((c = cppGetc()) != EOF)
 	{
-		if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
+		if (c == CPP_STRING_SYMBOL || c == CPP_CHAR_SYMBOL)
 		{
 			/* c == CHAR_SYMBOL is subtle condition.
 			 * If the last char of IDENTIFIER is [0-9a-f],

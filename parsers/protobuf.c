@@ -206,7 +206,7 @@ repeat:
 		token.keyword = lookupCaseKeyword (vStringValue (token.value), Lang_protobuf);
 		cppUngetc (c);
 	}
-	else if (expectingStringLiteral && c == STRING_SYMBOL)
+	else if (expectingStringLiteral && c == CPP_STRING_SYMBOL)
 	{
 		token.type = TOKEN_STR;
 		vStringCopy (token.value,

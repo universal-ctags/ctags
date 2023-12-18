@@ -51,10 +51,7 @@ extern void debugPutc (const int level, const int c)
 {
 	if (debug (level)  &&  c != EOF)
 	{
-		     if (c == STRING_SYMBOL)  printf ("\"string\"");
-		else if (c == CHAR_SYMBOL)    printf ("'c'");
-		else                          putchar (c);
-
+		putchar (c);
 		fflush (stdout);
 	}
 }

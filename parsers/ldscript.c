@@ -380,7 +380,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 		if (prefix_count > 0)
 			LDSCRIPT (token)->whitespacePrefixed = true;
 	} while (c == ' ' || c== '\t' || c == '\f' || c == '\r' || c == '\n'
-			 || c == STRING_SYMBOL || c == CHAR_SYMBOL);
+			 || c == CPP_STRING_SYMBOL || c == CPP_CHAR_SYMBOL);
 
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();

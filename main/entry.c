@@ -687,7 +687,7 @@ static size_t appendInputLine (int putc_func (char , void *), const char *const 
 		const int next = *(p + 1);
 		const int c = *p;
 
-		if (c == CRETURN  ||  c == NEWLINE)
+		if (c == '\r'  ||  c == '\n')
 			break;
 
 		if (patternLengthLimit != 0 && length >= patternLengthLimit &&
@@ -701,10 +701,10 @@ static size_t appendInputLine (int putc_func (char , void *), const char *const 
 		}
 		/*  If character is '\', or a terminal '$', then quote it.
 		 */
-		if (c == BACKSLASH  ||  c == (Option.backward ? '?' : '/')  ||
-			(c == '$'  &&  (next == NEWLINE  ||  next == CRETURN)))
+		if (c == '\\'  ||  c == (Option.backward ? '?' : '/')  ||
+			(c == '$'  &&  (next == '\n'  ||  next == '\r')))
 		{
-			putc_func (BACKSLASH, data);
+			putc_func ('\\', data);
 			++length;
 		}
 		putc_func (c, data);
