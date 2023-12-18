@@ -20,8 +20,16 @@
 
 #include <string.h>
 
-/* TODO: Alignment */
-#define NL_SIZE(nls) (sizeof(NestingLevel) + (nls)->userDataSize)
+/* struct alignment trick, copied from GObject's gtype.c, which borrows
+ * 2*szieof(size_t) from glibc */
+#define STRUCT_ALIGNMENT (2 * sizeof (size_t))
+#define ALIGN_STRUCT(offset) ((offset + (STRUCT_ALIGNMENT - 1)) & -STRUCT_ALIGNMENT)
+
+/* account for the user data alignment if we have user data, otherwise allocate
+ * exactly what's needed not to waste memory for unneeded alignment */
+#define NL_SIZE(nls) ((nls)->userDataSize ? (ALIGN_STRUCT (sizeof (NestingLevel)) + ALIGN_STRUCT ((nls)->userDataSize)) : sizeof (NestingLevel))
+#define NL_USER_DATA(nl) ((void *)(((char *) nl) + ALIGN_STRUCT (sizeof (NestingLevel))))
+
 #define NL_NTH(nls,n) (NestingLevel *)(((char *)((nls)->levels)) + ((n) * NL_SIZE (nls)))
 
 /*
@@ -73,7 +81,7 @@ extern NestingLevel * nestingLevelsPush(NestingLevels *nls, int corkIndex)
 
 	nl->corkIndex = corkIndex;
 	if (nls->userDataSize > 0)
-		memset (nl->userData, 0, nls->userDataSize);
+		memset (NL_USER_DATA (nl), 0, ALIGN_STRUCT (nls->userDataSize));
 
 	return nl;
 }
@@ -117,5 +125,5 @@ extern NestingLevel *nestingLevelsGetNthParent (const NestingLevels *nls, int n)
 
 extern void *nestingLevelGetUserData (const NestingLevel *nl)
 {
-	return (void *)nl->userData;
+	return NL_USER_DATA (nl);
 }

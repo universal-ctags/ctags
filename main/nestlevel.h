@@ -26,7 +26,8 @@ typedef struct NestingLevels NestingLevels;
 struct NestingLevel
 {
 	int corkIndex;
-	char userData [];
+	/* user data is allocated at the end of this struct (possibly with some
+	 * offset for alignment), get it with nestingLevelGetUserData() */
 };
 
 struct NestingLevels
