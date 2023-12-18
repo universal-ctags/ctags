@@ -1132,7 +1132,7 @@ static void skipToMatch (const char *const pair)
 	while (matchLevel > 0  &&  (c = skipToNonWhite ()) != EOF)
 	{
 		if (CollectingSignature)
-			vStringPut (Signature, c);
+			cppVStringPut (Signature, c);
 		if (c == begin)
 		{
 			++matchLevel;
@@ -1230,11 +1230,11 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 
 	do
 	{
-		vStringPut (name, c);
+		cppVStringPut (name, c);
 		if (CollectingSignature)
 		{
 			if (!first)
-				vStringPut (Signature, c);
+				cppVStringPut (Signature, c);
 			first = false;
 		}
 		c = cppGetc ();
@@ -1581,7 +1581,7 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 	do
 	{
 		int c = skipToNonWhite ();
-		vStringPut (Signature, c);
+		cppVStringPut (Signature, c);
 
 		switch (c)
 		{
