@@ -1552,7 +1552,7 @@ static void conditionMayPut (vString *condition, int c)
 		vStringPut(condition, c);
 }
 
-extern void cStringPut (vString* string, const int c)
+extern void cppVStringPut (vString* string, const int c)
 {
 	if (c <= 0xff)
 		vStringPut (string, c);

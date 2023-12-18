@@ -1533,7 +1533,7 @@ bool cxxParserParseNextToken(void)
 	if(g_cxx.iChar == CPP_STRING_SYMBOL)
 	{
 		t->eType = CXXTokenTypeStringConstant;
-		cStringPut(t->pszWord,g_cxx.iChar);
+		cppVStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
 		return true;
@@ -1579,7 +1579,7 @@ bool cxxParserParseNextToken(void)
 	if(g_cxx.iChar == CPP_CHAR_SYMBOL)
 	{
 		t->eType = CXXTokenTypeCharacterConstant;
-		cStringPut(t->pszWord,g_cxx.iChar);
+		cppVStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
 		return true;
@@ -1721,7 +1721,7 @@ bool cxxParserParseNextToken(void)
 	}
 
 	t->eType = CXXTokenTypeUnknown;
-	cStringPut(t->pszWord,g_cxx.iChar);
+	cppVStringPut(t->pszWord,g_cxx.iChar);
 	g_cxx.iChar = cppGetc();
 	t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
 
