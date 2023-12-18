@@ -1953,7 +1953,7 @@ process:
 	if (condition)
 		vStringDelete (condition);
 
-	DebugStatement ( debugPutc (DEBUG_CPP, c); )
+	DebugStatement ( cppDebugPutc (DEBUG_CPP, c); )
 	DebugStatement ( if (c == NEWLINE)
 				debugPrintf (DEBUG_CPP, "%6ld: ", getInputLineNumber () + 1); )
 
@@ -2635,3 +2635,17 @@ extern parserDefinition* CPreProParser (void)
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	return def;
 }
+
+#ifdef DEBUG
+extern void cppDebugPutc (const int level, const int c)
+{
+	if (debug (level)  &&  c != EOF)
+	{
+		     if (c == STRING_SYMBOL)  printf ("\"string\"");
+		else if (c == CHAR_SYMBOL)    printf ("'c'");
+		else                          putchar (c);
+
+		fflush (stdout);
+	}
+}
+#endif

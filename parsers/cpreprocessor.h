@@ -13,6 +13,8 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+
+#include "debug.h"
 #include "ptrarray.h"
 #include "types.h"
 #include "vstring.h"
@@ -148,5 +150,9 @@ extern vString * cppBuildMacroReplacement(
 extern void cppBuildMacroReplacementWithPtrArrayAndUngetResult(
 		cppMacroInfo * macro,
 		const ptrArray * args);
+
+#ifdef DEBUG
+extern void cppDebugPutc (const int level, const int c);
+#endif
 
 #endif  /* CTAGS_MAIN_GET_H */
