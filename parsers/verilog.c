@@ -652,7 +652,7 @@ static int verilogSkipOverCComment (void)
 				c = next;
 			else
 			{
-				c = SPACE;	/* replace comment with space */
+				c = ' ';	/* replace comment with space */
 				break;
 			}
 		}
