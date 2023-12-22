@@ -12,34 +12,44 @@ static void initializeRpmMacrosParser (const langType language)
 {
 
 	addLanguageRegexTable (language, "main");
+	addLanguageRegexTable (language, "comment");
 	addLanguageRegexTable (language, "contline");
+	addLanguageRegexTable (language, "mbody");
+	addLanguageRegexTable (language, "mbody0");
 
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^#[^\n]*\n?",
-	                               "", "", "", NULL);
+	                               "^#",
+	                               "", "", "{tenter=comment}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^%([_a-zA-Z0-9]+)(\\([^)]*\\))*[^\n]*([^\n])\n?",
+	                               "^%([_a-zA-Z0-9]+)(\\([^)]*\\))*[^{\n\\\\]*([\n]|[\\\\][\n]|[{]|[\\\\])",
 	                               "\\1", "m", ""
 		"{{\n"
 		"    \\2 false ne {\n"
 		"       . \\2 signature:\n"
 		"    } if\n"
-		"    \\3 (\\\\) eq {\n"
-		"       % push the current tag for attaching end: later\n"
-		"       .\n"
-		"       % Skip next line if \\ is at the enf of the current line.\n"
-		"       /contline _tenter\n"
+		"    \\3 ({) eq {\n"
+		"        .\n"
+		"        /mbody _tenter\n"
+		"    } if\n"
+		"    \\3 (\\\\\\n) eq {\n"
+		"        .\n"
+		"        /contline _tenter\n"
 		"    } if\n"
 		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^.",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "comment",
+	                               "^[^\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "comment",
+	                               "^[\n]",
+	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "contline",
 	                               "^(\n)",
-	                               "", "", ""
+	                               "", "", "{tleave}"
 		"{{\n"
 		"   @1 end:\n"
-		"   _tleave\n"
 		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "contline",
 	                               "^[^\n]*([^\n])\n?",
@@ -50,6 +60,43 @@ static void initializeRpmMacrosParser (const langType language)
 		"       _tleave\n"
 		"    } if\n"
 		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody",
+	                               "^([^\\\\{}#]+)",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody",
+	                               "^#",
+	                               "", "", "{tenter=comment}", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody",
+	                               "^([{])",
+	                               "", "", "{tenter=mbody0}", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody",
+	                               "^([}])",
+	                               "", "", "{tleave}"
+		"{{\n"
+		"    dup :line @1 _matchloc2line eq {\n"
+		"        pop\n"
+		"    } {\n"
+		"        @1 end:\n"
+		"    } ifelse\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody",
+	                               "^\\\\.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody0",
+	                               "^[^\\\\{}#]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody0",
+	                               "^[{]",
+	                               "", "", "{tenter=mbody0}", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody0",
+	                               "^#",
+	                               "", "", "{tenter=comment}", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody0",
+	                               "^\\\\.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "mbody0",
+	                               "^([}])",
+	                               "", "", "{tleave}", NULL);
 }
 
 extern parserDefinition* RpmMacrosParser (void)
