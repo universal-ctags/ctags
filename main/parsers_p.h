@@ -140,6 +140,7 @@
 	PerlParser, \
 	Perl6Parser, \
 	PhpParser, \
+	PkgConfigParser, \
 	PodParser, \
 	PowerShellParser, \
 	ProtobufParser, \

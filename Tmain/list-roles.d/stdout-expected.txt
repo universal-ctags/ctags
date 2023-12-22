@@ -87,6 +87,9 @@ NSIS           i/script          included           on      included with !inclu
 Perl           M/module          unused             on      specified in `no' built-in function
 Perl           M/module          used               on      specified in `use' built-in function
 Perl           h/heredoc         endmarker          on      end marker
+PkgConfig      p/pkg             conflicted         on      confliected
+PkgConfig      p/pkg             provided           on      provided
+PkgConfig      p/pkg             required           on      required
 Protobuf       D/protodef        imported           on      imported
 Protobuf       m/message         extension          on      extending the message
 Python         Y/unknown         imported           on      imported from the other module
@@ -220,6 +223,9 @@ NSIS           i/script          included           on      included with !inclu
 Perl           M/module          unused             on      specified in `no' built-in function
 Perl           M/module          used               on      specified in `use' built-in function
 Perl           h/heredoc         endmarker          on      end marker
+PkgConfig      p/pkg             conflicted         on      confliected
+PkgConfig      p/pkg             provided           on      provided
+PkgConfig      p/pkg             required           on      required
 Protobuf       D/protodef        imported           on      imported
 Protobuf       m/message         extension          on      extending the message
 Python         Y/unknown         imported           on      imported from the other module

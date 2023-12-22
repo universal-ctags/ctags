@@ -1,0 +1,89 @@
+#
+#
+#  Copyright (c) 2023, Red Hat, Inc.
+#  Copyright (c) 2023, Masatake YAMATO
+#
+#  Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+# This module extracts headers of pkg-config file.
+#
+# References:
+# - https://gitlab.freedesktop.org/pkg-config/pkg-config/-/blob/master/pkg-config.1?ref_type=heads
+# - https://people.freedesktop.org/~dbn/pkg-config-guide.html#writing
+# - https://github.com/pkgconf/pkgconf/blob/master/man/pc.5
+#
+--langdef=PkgConfig
+--map-PkgConfig=+.pc
+
+--kinddef-PkgConfig=N,name,display names
+--kinddef-PkgConfig=p,pkg,packages
+--_roledef-PkgConfig.{pkg}=required,required
+--_roledef-PkgConfig.{pkg}=provided,provided
+--_roledef-PkgConfig.{pkg}=conflicted,confliected
+--kinddef-PkgConfig=v,var,variabels
+
+--_extradef-PkgConfig=guessedFromFileName,the guessed package name of the .pc file
+--extras-PkgConfig=+{guessedFromFileName}
+
+--_tabledef-PkgConfig=main
+--_tabledef-PkgConfig=dep
+--_tabledef-PkgConfig=rightside
+
+--_mtable-regex-PkgConfig=main/([-a-zA-Z0-9_.]+)[\t ]*=[^\n]*/\1/v/
+--_mtable-regex-PkgConfig=main/Name:[\t ]*([^\n]+)/\1/N/{{
+    % Name: ... is a display name. Not a package name.
+    . :input
+    ?/ _strrchr {
+        1 add dup
+        . :input length
+        exch sub 0 string _copyinterval
+    } if
+    (.pc) _strrstr {
+        % (pkgname.pc) offset
+        0 exch 0 string _copyinterval /pkg @1 _tag _commit
+        /PkgConfig.guessedFromFileName _markextra
+    } {
+        pop
+    } ifelse
+}}
+--_mtable-regex-PkgConfig=main/Requires(\.private)?:[\t ]*//{tenter=dep}{{
+    /required
+}}
+--_mtable-regex-PkgConfig=main/Provides:[\t ]*//{tenter=dep}{{
+    /provided
+}}
+--_mtable-regex-PkgConfig=main/Conflicts:[\t ]*//{tenter=dep}{{
+    /conflicted
+}}
+--_mtable-regex-PkgConfig=main/[^\n]+|[\n]//
+
+#
+# Dependencies
+#
+--_mtable-regex-PkgConfig=dep/([^[:space:]=<>!]+)[ \t]*/\1/p/{{
+    dup . exch _assignrole
+}}
+--_mtable-regex-PkgConfig=dep/(=|<=?|>=?|!=)[\t ]*//{tenter=rightside}
+--_mtable-regex-PkgConfig=dep/[\n]//{tleave}{{
+    pop
+}}
+--_mtable-regex-PkgConfig=dep/[^\n]//
+
+--_mtable-regex-PkgConfig=rightside/([^[:space:],]+)//
+--_mtable-regex-PkgConfig=rightside/[ \t,]//{tleave}
+--_mtable-regex-PkgConfig=rightside/.//{_advanceTo=0start}{tleave}
