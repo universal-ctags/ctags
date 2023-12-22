@@ -41,6 +41,8 @@ The following parsers have been added:
 
 * TerraformVariables *optlib* by masatake · Pull Request #3684
 
+* PkgConfig *optlib*: new parser
+
 Changes about parser specific kinds, roles, fields, and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

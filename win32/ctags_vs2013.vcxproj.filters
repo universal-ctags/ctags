@@ -264,6 +264,9 @@
     <ClCompile Include="..\optlib\passwd.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\pkgConfig.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\pod.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>

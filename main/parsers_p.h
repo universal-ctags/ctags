@@ -47,8 +47,8 @@
 #endif
 
 #ifdef HAVE_PCRE2
-#define OPTLIB2C_PCRE2_PARSER_LIST             \
-   RDocParser
+#define OPTLIB2C_PCRE2_PARSER_LIST			\
+	RDocParser
 #else
 #define OPTLIB2C_PCRE2_PARSER_LIST
 #endif
@@ -140,6 +140,7 @@
 	PerlParser, \
 	Perl6Parser, \
 	PhpParser, \
+	PkgConfigParser, \
 	PodParser, \
 	PowerShellParser, \
 	ProtobufParser, \

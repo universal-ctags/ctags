@@ -1,0 +1,11 @@
+prefix	input.pc	/^prefix=@CMAKE_INSTALL_PREFIX@$/;"	var	language:PkgConfig	roles:def
+exec_prefix	input.pc	/^exec_prefix=@CMAKE_INSTALL_PREFIX@$/;"	var	language:PkgConfig	roles:def
+libdir	input.pc	/^libdir=@CMAKE_INSTALL_FULL_LIBDIR@$/;"	var	language:PkgConfig	roles:def
+includedir	input.pc	/^includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@$/;"	var	language:PkgConfig	roles:def
+rpmhome	input.pc	/^rpmhome=@RPM_CONFIGDIR@$/;"	var	language:PkgConfig	roles:def
+@CMAKE_PROJECT_NAME@	input.pc	/^Name: @CMAKE_PROJECT_NAME@$/;"	name	language:PkgConfig	roles:def
+input	input.pc	/^Name: @CMAKE_PROJECT_NAME@$/;"	pkg	language:PkgConfig	roles:def	extras:guessedFromFileName
+popt	input.pc	/^Requires: popt$/;"	pkg	language:PkgConfig	roles:required	extras:reference
+@ZSTD_REQUIRES@	input.pc	/^Requires.private: @ZSTD_REQUIRES@$/;"	pkg	language:PkgConfig	roles:required	extras:reference
+xfunc	input.pc	/^Provides: xfunc$/;"	pkg	language:PkgConfig	roles:provided	extras:reference
+apt	input.pc	/^Conflicts: apt$/;"	pkg	language:PkgConfig	roles:conflicted	extras:reference
