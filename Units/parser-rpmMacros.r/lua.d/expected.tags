@@ -1,0 +1,1 @@
+add_sysuser	input.macros	/^%add_sysuser(-) %{lua:$/;"	m	signature:(-)	end:39

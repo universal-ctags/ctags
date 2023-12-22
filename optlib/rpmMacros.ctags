@@ -27,25 +27,50 @@
 --kinddef-RpmMacros=m,macro,macros
 
 --_tabledef-RpmMacros=main
+--_tabledef-RpmMacros=comment
 --_tabledef-RpmMacros=contline
+--_tabledef-RpmMacros=mbody
+--_tabledef-RpmMacros=mbody0
 
---_mtable-regex-RpmMacros=main/^#[^\n]*\n?//
---_mtable-regex-RpmMacros=main/^%([_a-zA-Z0-9]+)(\([^)]*\))*[^\n]*([^\n])\n?/\1/m/{{
+--_mtable-regex-RpmMacros=comment/[^\n]+//
+--_mtable-regex-RpmMacros=comment/[\n]//{tleave}
+
+--_mtable-regex-RpmMacros=mbody0/[^\\{}#]+//
+--_mtable-regex-RpmMacros=mbody0/[{]//{tenter=mbody0}
+--_mtable-regex-RpmMacros=mbody0/#//{tenter=comment}
+--_mtable-regex-RpmMacros=mbody0/\\.//
+--_mtable-regex-RpmMacros=mbody0/([}])//{tleave}
+
+--_mtable-regex-RpmMacros=mbody/([^\\{}#]+)//
+--_mtable-regex-RpmMacros=mbody/#//{tenter=comment}
+--_mtable-regex-RpmMacros=mbody/([{])//{tenter=mbody0}
+--_mtable-regex-RpmMacros=mbody/([}])//{tleave}{{
+    dup :line @1 _matchloc2line eq {
+        pop
+    } {
+        @1 end:
+    } ifelse
+}}
+--_mtable-regex-RpmMacros=mbody/\\.//
+
+--_mtable-regex-RpmMacros=main/#//{tenter=comment}
+--_mtable-regex-RpmMacros=main/%([_a-zA-Z0-9]+)(\([^)]*\))*[^{\n\\]*([\n]|[\\][\n]|[{]|[\\])/\1/m/{{
     \2 false ne {
        . \2 signature:
     } if
-    \3 (\\) eq {
-       % push the current tag for attaching end: later
-       .
-       % Skip next line if \ is at the enf of the current line.
-       /contline _tenter
+    \3 ({) eq {
+        .
+        /mbody _tenter
+    } if
+    \3 (\\\n) eq {
+        .
+        /contline _tenter
     } if
 }}
 --_mtable-regex-RpmMacros=main/.//
 
---_mtable-regex-RpmMacros=contline/(\n)//{{
+--_mtable-regex-RpmMacros=contline/(\n)//{tleave}{{
    @1 end:
-   _tleave
 }}
 --_mtable-regex-RpmMacros=contline/^[^\n]*([^\n])\n?///{{
     \1 (\\) eq not {

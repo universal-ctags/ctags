@@ -1,0 +1,3 @@
+--sort=no
+--fields=+eS
+--map-RpmMacros=+.macros
