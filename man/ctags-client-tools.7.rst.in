@@ -327,28 +327,123 @@ for using notable ones.
 
 REDUNDANT-KINDS
 ---------------
-TBW
+TBW (Write about --fields=+kKzZ)
 
 MULTIPLE-LANGUAGES FOR AN INPUT FILE
 ------------------------------------
 Universal ctags can run multiple parsers.
-That means a parser, which supports multiple parsers, may output tags for
-different languages.  ``language``/``l`` field can be used to show the language
+That means a parser, which supports multiple parsers (**guest parsers** or **sub-parsers**), may output tags for
+different languages.
+
+Guest parsers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A parser can run guest pursers on the areas in a source file.
+
+Consider the following text as a source file ("input.html"):
+
+.. code-block:: html
+
+	<html><head>
+		<script>class MyObject {}</script>
+		<style type="text/css">h1.heading { color: red; }</style>
+	</htad>
+	<h1 class='heading'>title</h1>
+	</html>
+
+If a user doesn't specify any extras, Universal ctags emits:
+
+.. code-block:: console
+
+	$ ctags -o - input.html
+	title	input.html	/^<h1 class='heading'>title<\/h1>$/;"	h
+
+These is no issue here.
+``running guest pursers`` extra is disabled by default.
+
+If a user enables the ``running guest parsers`` extra with specifying
+``--extras=+{guest}`` or ``--extras=+g``, Universal ctags emits:
+
+.. code-block:: console
+
+	$ ctags -o - --extras='{guest}' input.html
+	MyObject	input.html	/class MyObject {}/;"	c
+	h1.heading	input.html	/h1.heading { color: red; }/;"	c
+	title	input.html	/^<h1 class='heading'>title<\/h1>$/;"	h
+
+Universal ctags extracts the language objects for CSS and JavaScript; the HTML
+parser runs JavaScript parser on the area "``<script>...</script>``" area
+and CSS parser on the area "``<style ...> ...</style>``" area.
+
+If a client tool assumes that ctags runs one parser for an input file,
+the tool may tell "MyObject is a class of HTML" and/or "h1.heading is
+a class of HTML" to its users. ``c`` is too few information to
+tell what is "MyObject" and what is "h1.heading" correctly. The
+client tool needs more information.
+
+``language``/``l`` field can be used to show the language
 for each tag.
 
 .. code-block:: console
 
-	$ cat /tmp/foo.html
-	<html>
-	<script>var x = 1</script>
-	<h1>title</h1>
-	</html>
-	$ ./ctags -o - --extras=+g /tmp/foo.html
-	title	/tmp/foo.html	/^  <h1>title<\/h1>$/;"	h
-	x	/tmp/foo.html	/var x = 1/;"	v
-	$ ./ctags -o - --extras=+g --fields=+l /tmp/foo.html
-	title	/tmp/foo.html	/^  <h1>title<\/h1>$/;"	h	language:HTML
-	x	/tmp/foo.html	/var x = 1/;"	v	language:JavaScript
+	$ ctags -o - --extras='{guest}' --fields=+'{language}' input.html
+	MyObject	input.html	/class MyObject {}/;"	c	language:JavaScript
+	h1.heading	input.html	/h1.heading { color: red; }/;"	c	language:CSS
+	title	input.html	/^<h1 class='heading'>title<\/h1>$/;"	h	language:HTML
+
+For some class tools, the ``language:`` field provides enough information.
+Universal ctags can emits more self-descriptive tag file.
+
+
+Enabling ``K`` field with ``--fields=+K`` option, Universal ctags uses
+long-names instead of single-letter to represent kind fields:
+
+.. code-block:: console
+
+	$ ctags -o - --extras='{guest}' --fields=+'{language}K' input.html
+	MyObject	/tmp/input.html	/class MyObject {}/;"	class	language:JavaScript
+	h1.heading	/tmp/input.html	/h1.heading { color: red; }/;"	class	language:CSS
+	title	/tmp/input.html	/^<h1 class='heading'>title<\/h1>$/;"	heading1	language:HTML
+
+The long-name representation makes tag files larger.
+If you want to keep a tag file small, you can make your tool utilize pseudo-tags
+instead of enabling ``K`` field. Universal ctags emits the following line at the
+beginning of a tags file by default:
+
+.. code-block:: console
+
+	$ cat ./tags
+	...
+	!_TAG_KIND_DESCRIPTION!CSS	c,class	/classes/
+	...
+	!_TAG_KIND_DESCRIPTION!HTML	c,class	/classes/
+	!_TAG_KIND_DESCRIPTION!HTML	h,heading1	/H1 headings/
+	...
+	!_TAG_KIND_DESCRIPTION!JavaScript	c,class	/classes/
+	...
+
+From the second field of the output, a tool can know the mapping
+between a single-letter for a kind and a long-name for the kind.
+
+Universal ctags emits pseudo-tags to tag files by default. However, if
+you make ctags emit to standard output with ``-o -`` or ``-f -``
+option, ctags doesn't print pseudo-tags.  ``pseudo``/``p`` extra
+forces emitting.
+
+.. code-block:: console
+
+	$ ctags -o - --extras='{guest}{pseudo}' --fields=+'{language}' input.html
+	...
+	!_TAG_KIND_DESCRIPTION!CSS	c,class	/classes/
+	...
+	!_TAG_KIND_DESCRIPTION!HTML	c,class	/classes/
+	!_TAG_KIND_DESCRIPTION!HTML	h,heading1	/H1 headings/
+	...
+	!_TAG_KIND_DESCRIPTION!JavaScript	c,class	/classes/
+	...
+
+Sub-parsers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TBW
 
 UTILIZING READTAGS
 -----------------------------------
