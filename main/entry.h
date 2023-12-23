@@ -60,7 +60,8 @@ struct sTagEntryInfo {
 						* not printed as a tag entry,
 						* never used as a part of automatically generated FQ tag, and
 						* not printed as a part of scope.
-						See getTagScopeInformation(). */
+						See getTagScopeInformation() and
+						getFullQualifiedScopeNameFromCorkQueue. */
 
 	/*
 	 * the bit fields only the main part can access.
