@@ -9,6 +9,7 @@ DBusIntrospect       XML        base <> sub {bidirectional}
 FunctionParameters   Perl       base <> sub {bidirectional}
 GemSpec              Ruby       base <= sub {dedicated}
 Glade                XML        base <> sub {bidirectional}
+I18nRubyGem          Yaml       base <> sub {bidirectional}
 IPythonCell          Python     base => sub {shared}
 ITcl                 Tcl        base <> sub {bidirectional}
 Maven2               XML        base <> sub {bidirectional}

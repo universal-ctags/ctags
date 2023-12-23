@@ -42,6 +42,7 @@ The following parsers have been added:
 * TerraformVariables *optlib* by masatake · Pull Request #3684
 
 * PkgConfig *optlib*: new parser
+* I18nRubyGem *YAML based subparser* · Close #3533
 
 Changes about parser specific kinds, roles, fields, and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -455,6 +455,8 @@ YAML_SRCS = \
 	\
 	parsers/yamlfrontmatter.c	\
 	\
+	parsers/i18nrubygem.c	\
+	\
 	$(NULL)
 
 PCRE2_HEADS =

@@ -1,0 +1,10 @@
+---
+en:
+  test: 2
+  other: 10
+  animals:
+    dog: dog
+    cat: cat
+  tools:
+    tracer: tracer
+    reporter: reporter
