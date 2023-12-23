@@ -2181,6 +2181,42 @@ extern bool isTagExtra (const tagEntryInfo *const tag)
 	return false;
 }
 
+extern void resetTagCorkState (tagEntryInfo *const tag,
+							   enum resetTagMemberAction xtagAction,
+							   enum resetTagMemberAction parserFieldsAction)
+{
+	tagEntryInfo original = *tag;
+
+	tag->inCorkQueue = 0;
+
+	switch (xtagAction)
+	{
+	case RESET_TAG_MEMBER_COPY:
+		copyExtraDynamic (&original, tag);
+		break;
+	case RESET_TAG_MEMBER_CLEAR:
+		tag->extraDynamic = NULL;
+		break;
+	case RESET_TAG_MEMBER_DONTTOUCH:
+		break;
+	}
+
+	switch (parserFieldsAction)
+	{
+	case RESET_TAG_MEMBER_COPY:
+		tag->usedParserFields = 0;
+		tag->parserFieldsDynamic = NULL;
+		copyParserFields (&original, tag);
+		break;
+	case RESET_TAG_MEMBER_CLEAR:
+		tag->usedParserFields = 0;
+		tag->parserFieldsDynamic = NULL;
+		break;
+	case RESET_TAG_MEMBER_DONTTOUCH:
+		break;
+	}
+}
+
 static void assignRoleFull (tagEntryInfo *const e, int roleIndex, bool assign)
 {
 	if (roleIndex == ROLE_DEFINITION_INDEX)
