@@ -39,7 +39,8 @@
    For implementation changes like bug fixes, increment PATCH. */
 
 #if defined (HAVE_CONFIG_H)
-/* You must update PACKAGE_VERSION in configure.ac, too. */
+/* You must update PACKAGE_VERSION in configure.ac, too.
+ * The --version option of readtags also prints this. */
 # define PROGRAM_VERSION PACKAGE_VERSION
 #else
 # define PROGRAM_VERSION "6.0.0"
