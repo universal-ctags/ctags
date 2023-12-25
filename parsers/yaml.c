@@ -431,7 +431,10 @@ static bool ypathStateStackMatch (struct ypathTypeStack *stack,
 	if (stack == NULL)
 		return false;
 
-	if (stack->key == intArrayItem (code, offset))
+	int expected_key = intArrayItem (code, offset);
+
+	/* KEYWORD_NONE represents '*'. */
+	if (expected_key == KEYWORD_NONE || stack->key == expected_key)
 		return ypathStateStackMatch (stack->next, code, offset + 1);
 	else
 		return false;
