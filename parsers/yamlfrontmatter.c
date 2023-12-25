@@ -37,7 +37,7 @@ struct sYamlFrontMatterSubparser {
 /*
 *   FUNCTION PROTOTYPES
 */
-static bool yamlFrontmattterInitTagEntry (tagEntryInfo *e, char *name, void *data);
+static bool yamlFrontmattterInitTagEntry (tagEntryInfo *e, yamlSubparser *yaml, char *name, void *data);
 
 
 /*
@@ -59,7 +59,8 @@ static tagYpathTable ypathTables [] = {
 *   FUNCTION DEFINITIONS
 */
 
-static bool yamlFrontmattterInitTagEntry (tagEntryInfo *e, char *name, void * data CTAGS_ATTR_UNUSED)
+static bool yamlFrontmattterInitTagEntry (tagEntryInfo *e, yamlSubparser *s CTAGS_ATTR_UNUSED,
+										  char *name, void * data CTAGS_ATTR_UNUSED)
 {
 	initForeignTagEntry (e, name, frontMatterLang, FRONTMATTER_TITLE_KIND);
 	return true;

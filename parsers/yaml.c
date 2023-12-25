@@ -453,7 +453,7 @@ static void ypathHandleToken (yamlSubparser *yaml, yaml_token_t *token, int stat
 			tagEntryInfo tag;
 			bool r = true;
 			if (tables[i].initTagEntry)
-				r = (* tables[i].initTagEntry) (&tag, (char *)token->data.scalar.value,
+				r = (* tables[i].initTagEntry) (&tag, yaml, (char *)token->data.scalar.value,
 												tables[i].data);
 			else
 				initTagEntry (&tag, (char *)token->data.scalar.value, tables[i].kind);

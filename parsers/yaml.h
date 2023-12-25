@@ -60,7 +60,7 @@ typedef struct sTagYpathTable {
 	 * a tagEntry. If it is NULL, initializing the tagEntry in usual way:
 	 * call initTagEntry() defined in the main part with KIND. */
 	int kind;
-	bool (* initTagEntry) (tagEntryInfo *, char *, void *);
+	bool (* initTagEntry) (tagEntryInfo *, yamlSubparser *, char *, void *);
 	void *data;
 	void *code;					/* YAML base parser private */
 } tagYpathTable;
