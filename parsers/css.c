@@ -190,9 +190,7 @@ static void findCssTags (void)
 			vString *selector = vStringNew ();
 			do
 			{
-				if (vStringLength (selector) > 0)
-					vStringPut (selector, ' ');
-				vStringCat (selector, token.string);
+				vStringJoin (selector, ' ', token.string);
 
 				kind = classifySelector (token.string);
 				lineNumber = getInputLineNumber ();

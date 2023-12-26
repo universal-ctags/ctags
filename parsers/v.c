@@ -1135,8 +1135,8 @@ static void skipAccessAndReadToken (tokenInfo *const token, vString **capture)
 		{
 			if (*capture == NULL)
 				*capture = vStringNew ();
-			else if(!vStringIsEmpty(*capture))
-				vStringPut (*capture, ' ');
+			else
+				vStringPutUnlessEmpty(*capture, ' ');
 			vStringCatS (*capture, add);
 		}
 		readToken (token);

@@ -1075,11 +1075,7 @@ static void readIdentifier (tokenInfo *const token)
 
 static void addToScope (tokenInfo* const token, vString* const extra, sqlKind kind)
 {
-	if (vStringLength (token->scope) > 0)
-	{
-		vStringPut (token->scope, '.');
-	}
-	vStringCat (token->scope, extra);
+	vStringJoin (token->scope, '.', extra);
 	token->scopeKind = kind;
 }
 

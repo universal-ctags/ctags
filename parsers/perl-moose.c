@@ -339,8 +339,7 @@ static bool findExtendsClass (const char *line,
 	const char *input = line + matches[2].start;
 	vString *str = moose->supersOrRoles;
 
-	if (vStringLength (str) > 0)
-		vStringPut (str, ',');
+	vStringPutUnlessEmpty (str, ',');
 	parseExtendsClass (input, matches[2].length, str,
 					   &moose->notContinuousExtendsLines);
 

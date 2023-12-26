@@ -205,11 +205,7 @@ static void resetScope (vString *scope, size_t old_len)
 /* Adds a name to the end of the scope string */
 static void addToScope (vString *scope, vString *name)
 {
-    if (vStringLength(scope) > 0)
-    {
-        vStringPut(scope, '.');
-    }
-    vStringCat(scope, name);
+	vStringJoin(scope, '.', name);
 }
 
 /* Reads a character from the file */

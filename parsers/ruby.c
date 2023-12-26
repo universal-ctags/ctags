@@ -332,8 +332,7 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 	{
 		if (unqualified_name > qualified_name)
 		{
-			if (vStringLength (scope) > 0)
-				vStringPut (scope, SCOPE_SEPARATOR);
+			vStringPutUnlessEmpty (scope, SCOPE_SEPARATOR);
 			vStringNCatS (scope, qualified_name,
 						  unqualified_name - qualified_name);
 			/* assume module parent type for a lack of a better option */
