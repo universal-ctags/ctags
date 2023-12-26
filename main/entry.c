@@ -1082,6 +1082,17 @@ static tagEntryInfo *newNilTagEntry (unsigned int corkFlags)
 	return &(x->slot);
 }
 
+static void copyExtraDynamic (const tagEntryInfo *const src, tagEntryInfo *const dst)
+{
+	if (dst->extraDynamic)
+	{
+		unsigned int n = countXtags () - XTAG_COUNT;
+		dst->extraDynamic = xCalloc ((n / 8) + 1, uint8_t);
+		memcpy (dst->extraDynamic, src->extraDynamic, (n / 8) + 1);
+		PARSER_TRASH_BOX(dst->extraDynamic, eFree);
+	}
+}
+
 static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 									const char *shareInputFileName,
 									unsigned int corkFlags)
@@ -1129,12 +1140,9 @@ static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 		slot->extensionFields.xpath = eStrdup (slot->extensionFields.xpath);
 #endif
 
+	copyExtraDynamic (tag, slot);
 	if (slot->extraDynamic)
-	{
-		unsigned int n = countXtags () - XTAG_COUNT;
-		slot->extraDynamic = xCalloc ((n / 8) + 1, uint8_t);
-		memcpy (slot->extraDynamic, tag->extraDynamic, (n / 8) + 1);
-	}
+		PARSER_TRASH_BOX_TAKE_BACK(slot->extraDynamic);
 
 	if (slot->sourceFileName)
 		slot->sourceFileName = eStrdup (slot->sourceFileName);
