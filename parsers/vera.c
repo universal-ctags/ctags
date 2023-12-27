@@ -1273,8 +1273,7 @@ static void setAccess (statementInfo *const st, const accessType access)
 static void addParentClass (statementInfo *const st, tokenInfo *const token)
 {
 	if (vStringLength (token->name) > 0)
-		vStringPutUnlessEmpty (st->parentClasses, ',');
-	vStringCat (st->parentClasses, token->name);
+		vStringJoin (st->parentClasses, ',', token->name);
 }
 
 static void readParents (statementInfo *const st, const int qualifier)
