@@ -29,6 +29,7 @@
 #include "trashbox.h"
 
 
+#ifdef DEBUG
 #define entry(X) [X] = #X
 static const char *tokenTypeName [] = {
     entry (YAML_NO_TOKEN),
@@ -54,6 +55,8 @@ static const char *tokenTypeName [] = {
     entry (YAML_TAG_TOKEN),
     entry (YAML_SCALAR_TOKEN),
 };
+#undef entry
+#endif
 
 static void yamlInit (yaml_parser_t *yaml)
 {
