@@ -1259,9 +1259,7 @@ static bool parseClassOrIface (tokenInfo *const token, const phpKind kind,
 			vString *qualifiedName = vStringNew ();
 
 			readQualifiedName (token, qualifiedName, NULL);
-			if (vStringLength (inheritance) > 0)
-				vStringPut (inheritance, ',');
-			vStringCat (inheritance, qualifiedName);
+			vStringJoin(inheritance, ',', qualifiedName);
 			if (istat == inheritance_extends && !parent)
 				parent = qualifiedName;
 			else

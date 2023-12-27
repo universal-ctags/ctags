@@ -138,4 +138,26 @@ CTAGS_INLINE bool vStringPutWithLimitImpl (vString *const string, const int c,
 	 ? vStringPutWithLimitImpl((s), (unsigned char) (c), (l)) \
 	 : vStringPutWithLimitImpl((s), (c), (l)))
 
+CTAGS_INLINE void vStringAccumulate (vString *accumulator, vString *string)
+{
+	vStringCat (accumulator, string);
+	vStringClear (string);
+}
+
+#define vStringPutUnlessEmpty(s, c)				\
+	do {										\
+		if (!vStringIsEmpty(s))					\
+			vStringPut ((s), (c));				\
+	} while (0)
+
+#define vStringJoin(string, c, s) do {			\
+		vStringPutUnlessEmpty ((string), (c));	\
+		vStringCat((string), (s));				\
+	} while (0)
+
+#define vStringJoinS(string, c, s) do {			\
+		vStringPutUnlessEmpty ((string), (c));	\
+		vStringCatS((string), (s));				\
+	} while (0)
+
 #endif  /* CTAGS_MAIN_VSTRING_H */

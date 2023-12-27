@@ -30,6 +30,7 @@
 #define YAML_PARSER_LIST						\
 	YamlParser,									\
 	AnsiblePlaybookParser, \
+	I18nRubyGemParser, \
 	OpenAPIParser, \
 	YamlFrontMatter
 #else

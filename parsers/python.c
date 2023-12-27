@@ -1696,9 +1696,7 @@ static void findPythonTags (void)
 				readNext = false;
 			else
 			{
-				if (vStringLength (decorators) > 0)
-					vStringPut (decorators, ',');
-				vStringCat (decorators, token->string);
+				vStringJoin(decorators, ',', token->string);
 				readToken (token);
 				readNext = skipOverPair (token, '(', ')', decorators, true);
 			}

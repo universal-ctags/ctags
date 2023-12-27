@@ -91,11 +91,7 @@ static void parseInherit (tokenInfo *token, int r)
 	do {
 		tokenRead (token);
 		if (tokenIsType (token, TCL_IDENTIFIER))
-		{
-			if (vStringLength(inherits) != 0)
-				vStringPut (inherits, ',');
-			vStringCat(inherits, token->string);
-		}
+			vStringJoin(inherits, ',', token->string);
 		else if (tokenIsType(token, TCL_EOL))
 			break;
 		else

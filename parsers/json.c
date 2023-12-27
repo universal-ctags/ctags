@@ -243,9 +243,7 @@ static void pushScope (tokenInfo *const token,
 					   const tokenInfo *const parent,
 					   const jsonKind parentKind)
 {
-	if (vStringLength (token->scope) > 0)
-		vStringPut (token->scope, '.');
-	vStringCat (token->scope, parent->string);
+	vStringJoin(token->scope, '.', parent->string);
 	token->scopeKind = parentKind;
 }
 

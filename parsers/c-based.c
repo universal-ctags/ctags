@@ -2507,11 +2507,7 @@ static void addContext (statementInfo *const st, const tokenInfo* const token)
 {
 	if (isType (token, TOKEN_NAME))
 	{
-		if (vStringLength (st->context->name) > 0)
-		{
-			vStringPut (st->context->name, '.');
-		}
-		vStringCat (st->context->name, token->name);
+		vStringJoin (st->context->name, '.', token->name);
 		st->context->type = TOKEN_NAME;
 	}
 }

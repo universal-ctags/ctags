@@ -1,0 +1,3 @@
+hello	input-0.yml	/^  hello: hello$/;"	k	keyInMiddle:en	extras:subparser
+hello	input-0.yml	/^  hello: hello$/;"	k	keyInMiddle:en	extras:subparser,localeless
+en.hello	input-0.yml	/^  hello: hello$/;"	k	keyInMiddle:en	extras:subparser,localeful

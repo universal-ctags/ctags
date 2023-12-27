@@ -39,8 +39,8 @@
 #define nArgs(...) _NARGS (__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1)
 #define newToken() (objPoolGet (TokenPool))
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
-#define vStringAccumulate(a, s) \
-	do{ if (a && s) { vStringCat (a, s); vStringClear (s); } }while(0)
+#define vStringAccumulateMaybe(a, s) \
+	do{ if (a && s) vStringAccumulate(a, s); }while(0)
 #define isToken(token, ...) \
 	_isToken (token,  false, false, __LINE__, nArgs (__VA_ARGS__), __VA_ARGS__)
 #define expectToken(token, ...) \
@@ -1135,8 +1135,8 @@ static void skipAccessAndReadToken (tokenInfo *const token, vString **capture)
 		{
 			if (*capture == NULL)
 				*capture = vStringNew ();
-			else if(!vStringIsEmpty(*capture))
-				vStringPut (*capture, ' ');
+			else
+				vStringPutUnlessEmpty(*capture, ' ');
 			vStringCatS (*capture, add);
 		}
 		readToken (token);
@@ -1582,7 +1582,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 		}
 		if (expectToken (token, TOKEN_CLOSE_PAREN))
 		{
-			vStringAccumulate (argList, acc);
+			vStringAccumulateMaybe (argList, acc);
 			readToken (token);
 		}
 		else
@@ -1615,7 +1615,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 	{
 		vStringPut (argList, '[');
 		skipToToken (TOKEN_CLOSE_SQUARE, acc);
-		vStringAccumulate (argList, acc);
+		vStringAccumulateMaybe (argList, acc);
 		readToken (token);
 	}
 	// template args
@@ -1625,7 +1625,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 	{
 		vStringPut (argList, '[');
 		skipToToken (TOKEN_CLOSE_SQUARE, acc);
-		vStringAccumulate (argList, acc);
+		vStringAccumulateMaybe (argList, acc);
 		readToken (token);
 	}
 	// args
@@ -1633,7 +1633,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 	{
 		vStringPut (argList, '(');
 		skipToToken (TOKEN_CLOSE_PAREN, acc);
-		vStringAccumulate (argList, acc);
+		vStringAccumulateMaybe (argList, acc);
 		// next token could be ident of next interface method or struct field
 		readTokenFull (token, acc);
 		if (isToken (token, TOKEN_TYPE, TOKEN_IDENT))
@@ -1646,13 +1646,13 @@ static void parseFunction (tokenInfo *const token, int scope,
 		if (isInitialType (token) && !token->onNewline)
 		{
 			parseRetVType (token, acc, scope);
-			vStringAccumulate (retType, acc);
+			vStringAccumulateMaybe (retType, acc);
 			readToken (token);
 		}
 		else if (isToken (token, TOKEN_OPEN_PAREN))
 		{
 			skipToToken (TOKEN_CLOSE_PAREN, acc);
-			vStringAccumulate (retType, acc);
+			vStringAccumulateMaybe (retType, acc);
 			readToken (token);
 		}
 		else if ((kind == KIND_METHOD || kind == KIND_ALIAS) &&

@@ -60,7 +60,8 @@ struct sTagEntryInfo {
 						* not printed as a tag entry,
 						* never used as a part of automatically generated FQ tag, and
 						* not printed as a part of scope.
-						See getTagScopeInformation(). */
+						See getTagScopeInformation() and
+						getFullQualifiedScopeNameFromCorkQueue. */
 
 	/*
 	 * the bit fields only the main part can access.
@@ -262,6 +263,44 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
 /* If any extra bit is on, return true. */
 extern bool isTagExtra (const tagEntryInfo *const tag);
+
+/*
+  In the following frequently used code-pattern:
+
+     tagEntryInfo *original = getEntryInCorkQueue (index);
+     tagEntryInfo xtag = *original;
+	 ... customize XTAG ...
+	 makeTagEntry (&xtag);
+
+   ORIGINAL and XTAG share some memory objects through their members.
+   TagEntryInfo::name is one of obvious ones.
+   When updating the member in the ... customize XTAG ... stage, you will
+   do:
+
+      vStringValue *xtag_name = vStringNewInit (xtags->name);
+	  ... customize XTAG_NAME with vString functions ...
+	  xtag.name = vStringValue (xtag_name);
+	  makeTagEntry (&xtag);
+	  vStringDelete (xtag_name);
+
+   There are some vague ones: extraDynamic and parserFieldsDynamic.
+   resetTagCorkState does:
+
+   - mark the TAG is not in cork queue: set inCorkQueue 0.
+   - copy,  clear, or dont touch the extraDynamic member.
+   - copy,  clear, or dont touch the parserFieldsDynamic member.
+
+*/
+
+enum resetTagMemberAction {
+	RESET_TAG_MEMBER_COPY,
+	RESET_TAG_MEMBER_CLEAR,
+	RESET_TAG_MEMBER_DONTTOUCH,
+};
+
+extern void resetTagCorkState (tagEntryInfo *const tag,
+							   enum resetTagMemberAction xtagAction,
+							   enum resetTagMemberAction parserFieldsAction);
 
 /* Functions for attaching parser specific fields
  *

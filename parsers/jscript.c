@@ -1473,11 +1473,7 @@ static void skipQualifiedIdentifier (tokenInfo *const token)
 
 static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 {
-	if (vStringLength (parent->string) > 0)
-	{
-		vStringPut (parent->string, '.');
-	}
-	vStringCat (parent->string, child->string);
+	vStringJoin (parent->string, '.', child->string);
 }
 
 /*
