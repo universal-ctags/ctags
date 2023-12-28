@@ -101,33 +101,6 @@ static NestingLevels* nesting = NULL;
 static void enterUnnamedScope (void);
 
 /*
-* Returns a string describing the scope in 'nls'.
-* We record the current scope as a list of entered scopes.
-* Scopes corresponding to 'if' statements and the like are
-* represented by empty strings. Scopes corresponding to
-* modules and classes are represented by the name of the
-* module or class.
-*/
-static vString* nestingLevelsToScopeNew (const NestingLevels* nls)
-{
-	int i;
-	unsigned int chunks_output = 0;
-	vString* result = vStringNew ();
-	for (i = 0; i < nls->n; ++i)
-	{
-		NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
-		tagEntryInfo *e = getEntryOfNestingLevel (nl);
-		if (e && (*e->name != '\0') && (!e->placeholder))
-		{
-			if (chunks_output++ > 0)
-				vStringPut (result, SCOPE_SEPARATOR);
-			vStringCatS (result, e->name);
-		}
-	}
-	return result;
-}
-
-/*
 * Attempts to advance 's' past 'literal'.
 * Returns true if it did, false (and leaves 's' where
 * it was) otherwise.

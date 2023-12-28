@@ -17,6 +17,7 @@
 #include "entry.h"
 #include "routines.h"
 #include "nestlevel.h"
+#include "vstring.h"
 
 #include <string.h>
 
@@ -126,4 +127,27 @@ extern NestingLevel *nestingLevelsGetNthParent (const NestingLevels *nls, int n)
 extern void *nestingLevelGetUserData (const NestingLevel *nl)
 {
 	return NL_USER_DATA (nl);
+}
+
+/* (This function comes from ruby.c)
+*
+* Returns a newly allocated vString describing the scope in 'nls'.
+* We record the current scope as a list of entered scopes.
+* Scopes corresponding to 'if' statements and the like are
+* represented by empty strings. Scopes corresponding to
+* modules and classes are represented by the name of the
+* module or class.
+*/
+extern vString* nestingLevelsToScopeNew (const NestingLevels* nls, const char infixSeparator)
+{
+	int i;
+	vString* result = vStringNew ();
+	for (i = 0; i < nls->n; ++i)
+	{
+		NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
+		tagEntryInfo *e = getEntryOfNestingLevel (nl);
+		if (e && (*e->name != '\0') && (!e->placeholder))
+			vStringJoinS (result, infixSeparator, e->name);
+	}
+	return result;
 }

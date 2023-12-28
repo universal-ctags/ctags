@@ -59,4 +59,6 @@ extern NestingLevel *nestingLevelsGetNthParent(const NestingLevels *nls, int n);
 
 extern void *nestingLevelGetUserData (const NestingLevel *nl);
 
+extern vString* nestingLevelsToScopeNew (const NestingLevels* nls, const char infixSeparator);
+
 #endif  /* CTAGS_MAIN_NESTLEVEL_H */
