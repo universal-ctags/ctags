@@ -43,8 +43,8 @@ with "--options=NONE -o - --fields=+E input.yaml"
 	function	input.yaml	/^    function: 関数$/;"	k	keyInMiddle:ja.msg	extras:subparser
 	ja.msg.error	input.yaml	/^    error: エラー$/;"	k	keyInMiddle:ja.msg	extras:subparser,localeful
 	ja.msg.function	input.yaml	/^    function: 関数$/;"	k	keyInMiddle:ja.msg	extras:subparser,localeful
-	msg.error	input.yaml	/^    error: エラー$/;"	k	keyInMiddle:ja	extras:subparser,localeless
-	msg.function	input.yaml	/^    function: 関数$/;"	k	keyInMiddle:ja	extras:subparser,localeless
+	msg.error	input.yaml	/^    error: エラー$/;"	k	locale:ja	extras:subparser,localeless
+	msg.function	input.yaml	/^    function: 関数$/;"	k	locale:ja	extras:subparser,localeless
 
 
 With the options, the parser emits three tag entries for a key:
@@ -66,6 +66,7 @@ default. If you don't need ``localeless`` extra tags, specify
 
 The parser doesn't make tag entries for top-level and mid-level components like
 ``ja`` and ``msg`` by default. If you need them, specify
+``--kinds-I18nRubyGem=+{locale}`` and/or
 ``--kinds-I18nRubyGem=+{keyInMiddle}``.
 
 KNOWN BUGS

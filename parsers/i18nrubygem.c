@@ -39,6 +39,7 @@
 typedef enum {
 	KIND_KEY,
 	KIND_KEY_IN_MIDDLE,
+	KIND_LOCALE,
 } i18nRubyGemKind;
 
 typedef enum {
@@ -70,6 +71,7 @@ static bool i18nRubyGemInitTagEntry(tagEntryInfo *e, yamlSubparser *yaml, char *
 static kindDefinition I18nRubyGemKind [] = {
 	{ true,  'k', "key",         "translation keys at the leafs" },
 	{ false, 'm', "keyInMiddle", "the middle component of keys"  },
+	{ false, 'l', "locale",      "the root element representing a locale"},
 };
 
 static xtagDefinition I18nRubyGemXtagTable [] = {
@@ -123,6 +125,7 @@ static bool isLocaleName (const char *key)
 static bool i18nRubyGemInitTagEntry(tagEntryInfo *e, yamlSubparser *yaml, char *key, void * data CTAGS_ATTR_UNUSED)
 {
 	struct sI18nRubyGemSubparser *i18n = (struct sI18nRubyGemSubparser *)yaml;
+	i18nRubyGemKind kindIndex = KIND_KEY;
 
 	if (i18n->localeFound == LOCALE_NOTYET)
 	{
@@ -130,7 +133,10 @@ static bool i18nRubyGemInitTagEntry(tagEntryInfo *e, yamlSubparser *yaml, char *
 		if (depth == 1)
 		{
 			if (isLocaleName (key))
+			{
+				kindIndex = KIND_LOCALE;
 				i18n->localeFound = LOCALE_FOUND;
+			}
 			else
 				i18n->localeFound = LOCALE_NONE;
 		}
@@ -139,7 +145,7 @@ static bool i18nRubyGemInitTagEntry(tagEntryInfo *e, yamlSubparser *yaml, char *
 	if (i18n->localeFound != LOCALE_FOUND)
 		return false;
 
-	initTagEntry (e, key, KIND_KEY);
+	initTagEntry (e, key, kindIndex);
 	return true;
 }
 
@@ -221,7 +227,7 @@ static void inputEnd (subparser *s)
 		tagEntryInfo *e = getEntryInCorkQueue(intArrayItem(i18n->keys, i));
 		if (e->langType != i18nrubygem)
 			continue;
-		if (e->kindIndex == KIND_KEY_IN_MIDDLE)
+		if (e->kindIndex == KIND_KEY_IN_MIDDLE || e->kindIndex == KIND_LOCALE)
 			continue;
 
 		if (isXtagEnabled (I18nRubyGemXtagTable[X_localeless].xtype))
@@ -267,7 +273,7 @@ static void makeTagEntryNotifyViaYpath (yamlSubparser *s, int corkIndex)
 			e->extensionFields.scopeIndex = i18n->corkIndex;
 
 		tagEntryInfo *parent = getEntryInCorkQueue(i18n->corkIndex);
-		if (parent)
+		if (parent && parent->kindIndex != KIND_LOCALE)
 			parent->kindIndex = KIND_KEY_IN_MIDDLE;
 
 		i18n->depth = currentDepth;

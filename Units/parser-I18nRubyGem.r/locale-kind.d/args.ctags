@@ -1,0 +1,5 @@
+--sort=no
+--language-force=I18nRubyGem
+--fields=+E
+--extras-I18nRubyGem=
+--kinds-I18nRubyGem={locale}
