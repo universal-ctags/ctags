@@ -4716,17 +4716,19 @@ static bool_t generate(context_t *ctx) {
                     "    ctx->level++;\n",
                     ctx->rules.buf[i]->data.rule.name
                 );
-                stream__printf(
-                    &sstream,
-                    "    pcc_value_table__resize(ctx->auxil, &chunk->values, " FMT_LU ");\n",
-                    (ulong_t)ctx->rules.buf[i]->data.rule.vars.len
-                );
-                stream__printf(
-                    &sstream,
-                    "    pcc_capture_table__resize(ctx->auxil, &chunk->capts, " FMT_LU ");\n",
-                    (ulong_t)ctx->rules.buf[i]->data.rule.capts.len
-                );
+                if (ctx->rules.buf[i]->data.rule.capts.len > 0) {
+                    stream__printf(
+                        &sstream,
+                        "    pcc_capture_table__resize(ctx->auxil, &chunk->capts, " FMT_LU ");\n",
+                        (ulong_t)ctx->rules.buf[i]->data.rule.capts.len
+                    );
+                }
                 if (ctx->rules.buf[i]->data.rule.vars.len > 0) {
+                    stream__printf(
+                        &sstream,
+                        "    pcc_value_table__resize(ctx->auxil, &chunk->values, " FMT_LU ");\n",
+                        (ulong_t)ctx->rules.buf[i]->data.rule.vars.len
+                    );
                     stream__puts(
                         &sstream,
                         "    pcc_value_table__clear(ctx->auxil, &chunk->values);\n"
