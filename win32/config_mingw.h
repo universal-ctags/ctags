@@ -506,7 +506,7 @@
 #define PACKAGE_NAME "universal-ctags"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "universal-ctags 6.0.0"
+#define PACKAGE_STRING "universal-ctags 6.1.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "universal-ctags"
@@ -515,7 +515,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "6.0.0"
+#define PACKAGE_VERSION "6.1.0"
 
 /* Define if the pthread_in_use() detection is hard. */
 /* #undef PTHREAD_IN_USE_DETECTION_HARD */
@@ -657,7 +657,7 @@
 /* #undef USE_WINDOWS_THREADS */
 
 /* Package version. */
-#define VERSION "6.0.0"
+#define VERSION "6.1.0"
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wchar_t'. */

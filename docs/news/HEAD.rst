@@ -1,5 +1,5 @@
 ======================================================================
-Changes in ?.?.?
+Changes in 6.1.0
 ======================================================================
 
 This page lists only the most significant changes as remembered.  Use
