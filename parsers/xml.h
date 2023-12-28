@@ -13,7 +13,9 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+
 #include "subparser.h"
+#include "lxpath.h"
 
 /*
 *	 DATA DECLARATIONS

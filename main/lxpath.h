@@ -107,4 +107,6 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 int tableTableIndex,
 			 void *userData);
 
+extern  void updateXMLTagLine (tagEntryInfo *e, xmlNode *node);
+
 #endif  /* CTAGS_LXPATH_PARSE_H */

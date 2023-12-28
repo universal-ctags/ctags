@@ -20,6 +20,7 @@
 	PlistXMLParser, \
 	RelaxNGParser, \
 	SvgParser, \
+	XrcParser, \
 	XmlParser, \
 	XsltParser
 #else

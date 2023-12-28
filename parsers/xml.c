@@ -140,11 +140,10 @@ static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 		initTagEntry (&tag, vStringValue (anon), K_NSPREFIX);
 		markTagExtraBit (&tag, XTAG_ANONYMOUS);
 	}
+
 	/* TODO
-	 * - move this code block to lxpath.c.
 	 * - adjust the line number for nsprefixes forward. */
-	unsigned long lineNumber = XML_GET_LINE (node);
-	updateTagLine (&tag, lineNumber, getInputFilePositionForLine (lineNumber));
+	updateXMLTagLine (&tag, node);
 	char *p = (char *)xmlGetNodePath (node);
 	if (ns->href && *ns->href)
 		attachParserField (&tag, XmlFields [F_NS_URI].ftype, (char *)ns->href);
