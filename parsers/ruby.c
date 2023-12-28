@@ -108,7 +108,7 @@ static void enterUnnamedScope (void);
 * modules and classes are represented by the name of the
 * module or class.
 */
-static vString* nestingLevelsToScope (const NestingLevels* nls)
+static vString* nestingLevelsToScopeNew (const NestingLevels* nls)
 {
 	int i;
 	unsigned int chunks_output = 0;
@@ -320,7 +320,7 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 		return CORK_NIL;
 	}
 
-	scope = nestingLevelsToScope (nesting);
+	scope = nestingLevelsToScopeNew (nesting);
 	lvl = nestingLevelsGetCurrent (nesting);
 	parent = getEntryOfNestingLevel (lvl);
 	if (parent)
