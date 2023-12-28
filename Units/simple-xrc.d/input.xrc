@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Taken from hachoir/wx/resource/hachoir_wx.xrc -->
+<resource>
+  <object class="wxFrame" name="frame_view" subclass="hachoir.wx.frame_view.frame_view_t">
+    <title></title>
+    <object class="wxMenuBar" name="main_menu_bar">
+      <object class="wxMenu" name="file_menu">
+        <label>File</label>
+        <object class="wxMenuItem" name="file_menu_open_file">
+          <label>Open File...</label>
+          <accel>Ctrl-O</accel>
+        </object>
+        <object class="wxMenuItem" name="file_menu_close_window">
+          <label>Close Window</label>
+          <accel>Ctrl-W</accel>
+        </object>
+      </object>
+    </object>
+    <size>800, 600</size>
+    <style>wxDEFAULT_FRAME_STYLE</style>
+    <object class="wxSplitterWindow" name="">
+      <orientation>vertical</orientation>
+      <sashpos>150</sashpos>
+      <style>wxSP_LIVE_UPDATE</style>
+      <object class="wxTreeCtrl" name="tree_view" subclass="hachoir.wx.tree_view.tree_view_t">
+        <style>wxTR_TWIST_BUTTONS|wxTR_SINGLE|wxTR_DEFAULT_STYLE</style>
+      </object>
+      <object class="wxSplitterWindow" name="">
+        <orientation>horizontal</orientation>
+        <object class="wxScrolledWindow" name="hex_view" subclass="hachoir.wx.hex_view.hex_view_t">
+          <style>wxVSCROLL</style>
+          <font>
+            <size>11</size>
+            <family>modern</family>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <face>Monaco</face>
+          </font>
+        </object>
+        <object class="wxListCtrl" name="field_view" subclass="hachoir.wx.field_view.field_view_t">
+          <style>wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VIRTUAL|wxLC_HRULES|wxLC_VRULES</style>
+          <font>
+            <size>11</size>
+            <family>modern</family>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <face>Monaco</face>
+          </font>
+          <tooltip>Right-click for extra fun!</tooltip>
+        </object>
+        <sashpos>200</sashpos>
+        <style>wxSP_LIVE_UPDATE</style>
+      </object>
+    </object>
+  </object>
+  <object class="wxMenu" name="field_menu">
+    <label>Field</label>
+    <object class="wxMenu" name="field_menu_split">
+      <label>Split</label>
+      <object class="wxMenuItem" name="field_menu_split_bytes">
+        <label>Bytes...</label>
+      </object>
+      <object class="wxMenuItem" name="field_menu_split_bits">
+        <label>Bits...</label>
+      </object>
+    </object>
+    <object class="wxMenu" name="field_menu_convert_to_core_type">
+      <label>Convert to Core Type</label>
+    </object>
+    <object class="wxMenuItem" name="field_menu_dump_to_disk">
+      <label>Dump To Disk...</label>
+    </object>
+    <object class="wxMenuItem" name="field_menu_parse_substream">
+      <label>Parse Sub-Stream</label>
+    </object>
+    <object class="wxMenuItem" name="field_menu_open_window_here">
+      <label>Open New Window Here</label>
+    </object>
+    <object class="separator"/>
+    <object class="wxMenu" name="field_menu_address">
+      <label>Address Offset</label>
+      <object class="wxMenuItem" name="field_menu_address_absolute">
+        <label>Absolute</label>
+        <radio>1</radio>
+        <checked>1</checked>
+      </object>
+      <object class="wxMenuItem" name="field_menu_address_relative">
+        <label>Relative</label>
+        <radio>1</radio>
+      </object>
+    </object>
+    <object class="wxMenu" name="field_menu_address_base">
+      <label>Address Base</label>
+      <object class="wxMenuItem" name="field_menu_address_base_hex">
+        <label>Hexadecimal</label>
+        <radio>1</radio>
+        <checked>1</checked>
+      </object>
+      <object class="wxMenuItem" name="field_menu_address_base_dec">
+        <label>Decimal</label>
+        <radio>1</radio>
+      </object>
+    </object>
+  </object>
+</resource>

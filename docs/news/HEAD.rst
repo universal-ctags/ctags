@@ -44,6 +44,8 @@ The following parsers have been added:
 * PkgConfig *optlib*: new parser
 * I18nRubyGem *YAML based subparser* · Close #3533
 
+* XRC *libxml*: new parser
+
 Changes about parser specific kinds, roles, fields, and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -441,6 +441,7 @@ XML_SRCS = \
 	parsers/plist.c			\
 	parsers/relaxng.c		\
 	parsers/xml.c			\
+	parsers/xrc.c			\
 	parsers/xslt.c			\
 	\
 	$(NULL)

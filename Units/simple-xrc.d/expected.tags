@@ -1,0 +1,22 @@
+frame_view	input.xrc	/^  <object class="wxFrame" name="frame_view" subclass="hachoir.wx.frame_view.frame_view_t">$/;"	o
+main_menu_bar	input.xrc	/^    <object class="wxMenuBar" name="main_menu_bar">$/;"	o
+file_menu	input.xrc	/^      <object class="wxMenu" name="file_menu">$/;"	o
+file_menu_open_file	input.xrc	/^        <object class="wxMenuItem" name="file_menu_open_file">$/;"	o
+file_menu_close_window	input.xrc	/^        <object class="wxMenuItem" name="file_menu_close_window">$/;"	o
+tree_view	input.xrc	/^      <object class="wxTreeCtrl" name="tree_view" subclass="hachoir.wx.tree_view.tree_view_t">$/;"	o
+hex_view	input.xrc	/^        <object class="wxScrolledWindow" name="hex_view" subclass="hachoir.wx.hex_view.hex_view_/;"	o
+field_view	input.xrc	/^        <object class="wxListCtrl" name="field_view" subclass="hachoir.wx.field_view.field_view_/;"	o
+field_menu	input.xrc	/^  <object class="wxMenu" name="field_menu">$/;"	o
+field_menu_split	input.xrc	/^    <object class="wxMenu" name="field_menu_split">$/;"	o
+field_menu_split_bytes	input.xrc	/^      <object class="wxMenuItem" name="field_menu_split_bytes">$/;"	o
+field_menu_split_bits	input.xrc	/^      <object class="wxMenuItem" name="field_menu_split_bits">$/;"	o
+field_menu_convert_to_core_type	input.xrc	/^    <object class="wxMenu" name="field_menu_convert_to_core_type">$/;"	o
+field_menu_dump_to_disk	input.xrc	/^    <object class="wxMenuItem" name="field_menu_dump_to_disk">$/;"	o
+field_menu_parse_substream	input.xrc	/^    <object class="wxMenuItem" name="field_menu_parse_substream">$/;"	o
+field_menu_open_window_here	input.xrc	/^    <object class="wxMenuItem" name="field_menu_open_window_here">$/;"	o
+field_menu_address	input.xrc	/^    <object class="wxMenu" name="field_menu_address">$/;"	o
+field_menu_address_absolute	input.xrc	/^      <object class="wxMenuItem" name="field_menu_address_absolute">$/;"	o
+field_menu_address_relative	input.xrc	/^      <object class="wxMenuItem" name="field_menu_address_relative">$/;"	o
+field_menu_address_base	input.xrc	/^    <object class="wxMenu" name="field_menu_address_base">$/;"	o
+field_menu_address_base_hex	input.xrc	/^      <object class="wxMenuItem" name="field_menu_address_base_hex">$/;"	o
+field_menu_address_base_dec	input.xrc	/^      <object class="wxMenuItem" name="field_menu_address_base_dec">$/;"	o

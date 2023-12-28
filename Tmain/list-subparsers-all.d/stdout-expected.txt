@@ -29,5 +29,6 @@ SVG                  XML        base <> sub {bidirectional}
 SystemdUnit          Iniconf    base <= sub {dedicated}
 TclOO                Tcl        base <> sub {bidirectional}
 TeXBeamer            Tex        base <> sub {bidirectional}
+XRC                  XML        base <= sub {dedicated}
 XSLT                 XML        base <> sub {bidirectional}
 YumRepo              Iniconf    base <= sub {dedicated}
