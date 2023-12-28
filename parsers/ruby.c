@@ -101,33 +101,6 @@ static NestingLevels* nesting = NULL;
 static void enterUnnamedScope (void);
 
 /*
-* Returns a string describing the scope in 'nls'.
-* We record the current scope as a list of entered scopes.
-* Scopes corresponding to 'if' statements and the like are
-* represented by empty strings. Scopes corresponding to
-* modules and classes are represented by the name of the
-* module or class.
-*/
-static vString* nestingLevelsToScope (const NestingLevels* nls)
-{
-	int i;
-	unsigned int chunks_output = 0;
-	vString* result = vStringNew ();
-	for (i = 0; i < nls->n; ++i)
-	{
-		NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
-		tagEntryInfo *e = getEntryOfNestingLevel (nl);
-		if (e && (*e->name != '\0') && (!e->placeholder))
-		{
-			if (chunks_output++ > 0)
-				vStringPut (result, SCOPE_SEPARATOR);
-			vStringCatS (result, e->name);
-		}
-	}
-	return result;
-}
-
-/*
 * Attempts to advance 's' past 'literal'.
 * Returns true if it did, false (and leaves 's' where
 * it was) otherwise.
@@ -194,7 +167,7 @@ static bool isWhitespace (int c)
  * Advance 's' while the passed predicate is true. Returns true if
  * advanced by at least one position.
  */
-static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
+static bool advanceWhileFull (const unsigned char** s, bool (*predicate) (int), vString *repr)
 {
 	const unsigned char* original_pos = *s;
 
@@ -205,10 +178,17 @@ static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
 			return *s != original_pos;
 		}
 
+		if (repr)
+			vStringPut (repr, **s);
 		(*s)++;
 	}
 
 	return *s != original_pos;
+}
+
+static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
+{
+	return advanceWhileFull (s, predicate, NULL);
 }
 
 #define canMatchKeyword rubyCanMatchKeyword
@@ -226,10 +206,14 @@ extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal)
  * Extends canMatch. Works similarly, but allows assignment to precede
  * the keyword, as block assignment is a common Ruby idiom.
  */
-#define canMatchKeywordWithAssign rubyCanMatchKeywordWithAssign
-extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* literal)
+#define vStringTruncateMaybe(VS,LEN) if (VS) vStringTruncate ((VS), (LEN))
+
+extern bool canMatchKeywordWithAssignFull (const unsigned char** s, const char* literal, vString *assignee)
 {
 	const unsigned char* original_pos = *s;
+	size_t original_len;
+	if (assignee)
+		original_len = vStringLength  (assignee);
 
 	if (canMatchKeyword (s, literal))
 	{
@@ -238,9 +222,10 @@ extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* 
 
 	advanceWhile (s, isSigilChar);
 
-	if (! advanceWhile (s, isIdentChar))
+	if (! advanceWhileFull (s, isIdentChar, assignee))
 	{
 		*s = original_pos;
+		vStringTruncateMaybe (assignee, original_len);
 		return false;
 	}
 
@@ -249,6 +234,7 @@ extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* 
 	if (! (advanceWhile (s, isOperatorChar) && *(*s - 1) == '='))
 	{
 		*s = original_pos;
+		vStringTruncateMaybe (assignee, original_len);
 		return false;
 	}
 
@@ -260,7 +246,14 @@ extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* 
 	}
 
 	*s = original_pos;
+	vStringTruncateMaybe (assignee, original_len);
 	return false;
+}
+
+#define canMatchKeywordWithAssign rubyCanMatchKeywordWithAssign
+extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* literal)
+{
+	return canMatchKeywordWithAssignFull (s, literal, NULL);
 }
 
 /*
@@ -320,7 +313,7 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 		return CORK_NIL;
 	}
 
-	scope = nestingLevelsToScope (nesting);
+	scope = nestingLevelsToScopeNew (nesting, SCOPE_SEPARATOR);
 	lvl = nestingLevelsGetCurrent (nesting);
 	parent = getEntryOfNestingLevel (lvl);
 	if (parent)
@@ -506,7 +499,30 @@ static rubyKind parseIdentifier (
 			/* Recognize singleton methods. */
 			if (last_char == '.')
 			{
-				vStringClear (name);
+				if (strcmp (vStringValue (name), "self.") == 0)
+					vStringClear (name);
+				else
+				{
+					vString *scope = nestingLevelsToScopeNew (nesting, SCOPE_SEPARATOR);
+					const char *scope_cstr = vStringValue(scope);
+					const char *scope_last = strrchr (scope_cstr, SCOPE_SEPARATOR);
+					size_t scope_slen;
+					if (scope_last)
+					{
+						scope_last++;
+						scope_slen = strlen (scope_last);
+					}
+					else
+					{
+						scope_last = scope_cstr;
+						scope_slen = vStringLength (scope);
+					}
+					if (strncmp (vStringValue (name), scope_last, scope_slen) == 0
+						&& *(vStringValue (name) + scope_slen) == '.')
+							vStringClear (name);
+
+					vStringDelete (scope);
+				}
 				return parseIdentifier (cp, name, K_SINGLETON);
 			}
 		}
@@ -991,6 +1007,7 @@ static void findRubyTags (void)
 	const unsigned char *line;
 	bool inMultiLineComment = false;
 	vString *constant = vStringNew ();
+	vString *leftSide = vStringNew ();
 	bool found_rdoc = false;
 
 	nesting = nestingLevelsNewFull (sizeof (struct blockData), deleteBlockData);
@@ -1073,14 +1090,15 @@ static void findRubyTags (void)
 			readAndEmitTag (&cp, K_MODULE);
 		}
 		else if (canMatchKeywordWithAssign (&cp, "class")
-				 || (canMatchKeywordWithAssign (&cp, "Class.new")))
+				 || (canMatchKeywordWithAssignFull (&cp, "Class.new", leftSide)))
 
 		{
 
 			int r;
 			if (*(cp - 1) != 's') /* clas* != s */
 			{
-				r = emitRubyTagFull(NULL, K_CLASS, true, false);
+				r = emitRubyTagFull(vStringLength (leftSide) > 0? leftSide: NULL, K_CLASS, true, false);
+				vStringClear (leftSide);
 				expect_separator = true;
 			}
 			else
@@ -1091,7 +1109,8 @@ static void findRubyTags (void)
 			if (e)
 			{
 				skipWhitespace (&cp);
-				if (*cp == '<' && *(cp + 1) != '<')
+				if ((*cp == '<' && *(cp + 1) != '<')
+					|| (expect_separator && (*cp == '(')))
 				{
 					cp++;
 					vString *parent = vStringNew ();
@@ -1100,6 +1119,12 @@ static void findRubyTags (void)
 						e->extensionFields.inheritance = vStringDeleteUnwrap (parent);
 					else
 						vStringDelete (parent);
+					if (expect_separator)
+					{
+						skipWhitespace (&cp);
+						if (*cp == ')')
+							cp++;
+					}
 				}
 			}
 		}
@@ -1253,8 +1278,7 @@ static void findRubyTags (void)
 		{
 			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
 			tagEntryInfo *e_scope  = getEntryOfNestingLevel (nl);
-			if (e_scope && e_scope->kindIndex == K_CLASS
-				&& isTagExtraBitMarked (e_scope, XTAG_ANONYMOUS))
+			if (e_scope && e_scope->kindIndex == K_CLASS)
 				/* Class.new() ... was found but "do" or `{' is not
 				 * found at the end; no block is made. Let's
 				 * pop the nesting level push when Class.new()
@@ -1263,6 +1287,7 @@ static void findRubyTags (void)
 		}
 	}
 	nestingLevelsFree (nesting);
+	vStringDelete (leftSide);
 	vStringDelete (constant);
 }
 
