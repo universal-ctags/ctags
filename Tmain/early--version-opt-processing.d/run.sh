@@ -2,22 +2,23 @@
 # License: GPL-2
 
 CTAGS=$1
+BUILDDIR=$2
 
 remove_ctags_d=y
-if [ -d .ctags.d ]; then
+if [ -d $BUILDDIR/.ctags.d ]; then
    remove_ctags_d=n
 fi
 
 defc_ctags=tmain_defc.ctags
-mkdir -p .ctags.d
-echo "--langdef=C" > .ctags.d/"$defc_ctags"
+mkdir -p $BUILDDIR/.ctags.d
+echo "--langdef=C" > $BUILDDIR/.ctags.d/"$defc_ctags"
 
-"${CTAGS}" --version > /dev/null
+(cd $BUILDDIR; "${CTAGS}" --version;) > /dev/null
 status=$?
 
-rm .ctags.d/"$defc_ctags"
+rm $BUILDDIR/.ctags.d/"$defc_ctags"
 if [ "$remove_ctags_d" = y ]; then
-	rmdir .ctags.d
+	rmdir $BUILDDIR/.ctags.d
 fi
 
 exit "$status"
