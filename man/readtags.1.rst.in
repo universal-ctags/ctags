@@ -98,6 +98,9 @@ field. The Output can be tweaked using these options:
 ``-n``, ``--line-number``
 	Also include the line number field when ``-e`` option is give.
 
+``-P``, ``--with-pseudo-tags``
+	List pseudo tags as if ``-D`` option is specified but continues processing without exiting.
+
 About the ``-E`` option: certain characters are escaped in a tags file, to make
 it machine-readable. e.g., ensuring no tabs character appear in fields other
 than the pattern field. By default, readtags translates them to make it
