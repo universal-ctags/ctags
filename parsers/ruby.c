@@ -305,7 +305,7 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 
 	if (!name)
 	{
-		name = anonGenerateNew ("__anon", K_CLASS);
+		name = anonGenerateNew ("__anon", kind == K_UNDEFINED? K_CLASS: kind);
 		anonymous = true;
 	}
 
@@ -413,6 +413,38 @@ extern bool rubyParseString (const unsigned char** cp, unsigned char boundary, v
 	return (p != *cp);
 }
 
+/* If the current scope is A.B, and the name is B.C, B is overlapped.
+ * In that case, the function returns true. Else false.
+ */
+static bool doesNameOverlapCurrentScope (vString *name)
+{
+	bool r = false;
+	vString *scope = nestingLevelsToScopeNew (nesting, SCOPE_SEPARATOR);
+
+	const char *scope_cstr = vStringValue(scope);
+	const char *scope_last = strrchr (scope_cstr, SCOPE_SEPARATOR);
+	size_t scope_last_slen;
+
+	if (scope_last)
+	{
+		scope_last++;
+		scope_last_slen = strlen (scope_last);
+	}
+	else
+	{
+		scope_last = scope_cstr;
+		scope_last_slen = vStringLength (scope);
+	}
+
+	if (strncmp (vStringValue (name), scope_last, scope_last_slen) == 0
+		&& *(vStringValue (name) + scope_last_slen) == '.')
+		r = true;
+
+	vStringDelete (scope);
+
+	return r;
+}
+
 /*
 * Copies the characters forming an identifier from *cp into
 * name, leaving *cp pointing to the character after the identifier.
@@ -499,30 +531,9 @@ static rubyKind parseIdentifier (
 			/* Recognize singleton methods. */
 			if (last_char == '.')
 			{
-				if (strcmp (vStringValue (name), "self.") == 0)
+				if (strcmp (vStringValue (name), "self.") == 0
+					|| doesNameOverlapCurrentScope (name))
 					vStringClear (name);
-				else
-				{
-					vString *scope = nestingLevelsToScopeNew (nesting, SCOPE_SEPARATOR);
-					const char *scope_cstr = vStringValue(scope);
-					const char *scope_last = strrchr (scope_cstr, SCOPE_SEPARATOR);
-					size_t scope_slen;
-					if (scope_last)
-					{
-						scope_last++;
-						scope_slen = strlen (scope_last);
-					}
-					else
-					{
-						scope_last = scope_cstr;
-						scope_slen = vStringLength (scope);
-					}
-					if (strncmp (vStringValue (name), scope_last, scope_slen) == 0
-						&& *(vStringValue (name) + scope_slen) == '.')
-							vStringClear (name);
-
-					vStringDelete (scope);
-				}
 				return parseIdentifier (cp, name, K_SINGLETON);
 			}
 		}
@@ -935,7 +946,7 @@ static int readAndEmitDef (const unsigned char **cp)
 	 *   end
 	 * end
 	 */
-	if (e_scope && e_scope->kindIndex == K_CLASS
+	if (e_scope && (e_scope->kindIndex == K_CLASS || e_scope->kindIndex == K_MODULE)
 		&& (
 			/* Class.new do
 			   ... in this case, an anonymous class is created and
@@ -1085,24 +1096,42 @@ static void findRubyTags (void)
 		* "module M", "class C" and "def m" should only be at the beginning
 		* of a line.
 		*/
-		if (canMatchKeywordWithAssign (&cp, "module"))
+		if (canMatchKeywordWithAssign (&cp, "class")
+			|| canMatchKeywordWithAssign (&cp, "module")
+			|| (canMatchKeywordWithAssignFull (&cp, "Class.new", leftSide))
+			|| (canMatchKeywordWithAssignFull (&cp, "Module.new", leftSide)))
 		{
-			readAndEmitTag (&cp, K_MODULE);
-		}
-		else if (canMatchKeywordWithAssign (&cp, "class")
-				 || (canMatchKeywordWithAssignFull (&cp, "Class.new", leftSide)))
-
-		{
-
 			int r;
-			if (*(cp - 1) != 's') /* clas* != s */
+
+			int kind = K_UNDEFINED;
+			if (*(cp - 1) == 's')
+				/* clas*s* */
+				kind = K_CLASS;
+			else if (*(cp - 1) == 'e')
+				/* *modul*e* */
+				kind = K_MODULE;
+			else if (*(cp - 5) == 's')
 			{
-				r = emitRubyTagFull(vStringLength (leftSide) > 0? leftSide: NULL, K_CLASS, true, false);
-				vStringClear (leftSide);
+				/* Clas*s*.new */
+				kind = K_CLASS;
+				expect_separator = true;
+			}
+			else if (*(cp - 5) == 'e')
+			{
+				/* Modul*e*.new */
+				kind = K_MODULE;
 				expect_separator = true;
 			}
 			else
-				r = readAndEmitTag (&cp, K_CLASS); /* "class" */
+				AssertNotReached();
+
+			if (expect_separator)
+			{
+				r = emitRubyTagFull(vStringLength (leftSide) > 0? leftSide: NULL, kind, true, false);
+				vStringClear (leftSide);
+			}
+			else
+				r = readAndEmitTag (&cp, kind);
 
 			tagEntryInfo *e = getEntryInCorkQueue (r);
 
@@ -1278,11 +1307,12 @@ static void findRubyTags (void)
 		{
 			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
 			tagEntryInfo *e_scope  = getEntryOfNestingLevel (nl);
-			if (e_scope && e_scope->kindIndex == K_CLASS)
+			if (e_scope && (e_scope->kindIndex == K_CLASS
+							|| e_scope->kindIndex == K_MODULE))
 				/* Class.new() ... was found but "do" or `{' is not
 				 * found at the end; no block is made. Let's
 				 * pop the nesting level push when Class.new()
-				 * was found. */
+				 * was found. This is applicable to Module.new. */
 				nestingLevelsPop (nesting);
 		}
 	}
