@@ -1,5 +1,5 @@
 # -*- Autoconf -*-
-AC_INIT(libreadtags, 0.2.1)
+AC_INIT(libreadtags, 0.3.0)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([readtags.c])
 
@@ -32,7 +32,10 @@ AC_PROG_LIBTOOL
 # 2:1:1
 #    no change in public interface.
 #
-AC_SUBST(LT_VERSION, [2:1:1])
+# 2:2:1
+#    no change in public interface.
+#
+AC_SUBST(LT_VERSION, [2:2:1])
 
 AC_ARG_ENABLE([gcov],
 	[AS_HELP_STRING([--enable-gcov],
