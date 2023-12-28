@@ -6,7 +6,7 @@ ctags-lang-asm
 
 Random notes about tagging Assembly language source code with Universal Ctags
 
-:Version: 6.0.0
+:Version: 6.1.0
 :Manual group: Universal Ctags
 :Manual section: 7
 

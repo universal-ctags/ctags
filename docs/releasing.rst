@@ -61,6 +61,8 @@ How to release a new version
 
 #. Revise the version numbers in each parsers and their man pages
 
+#. Revise the version number in writer-json.c
+
 #. Regenerate rst files under ``docs/man``.
 
 #. Put an annotation tag for the version and push it to ``github.com/universal-ctags/ctags``
