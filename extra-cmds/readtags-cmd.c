@@ -567,6 +567,8 @@ static const char *const Usage =
 	"        Also include the line number field when -e option is given.\n"
 	"    -p | --prefix-match\n"
 	"        Perform prefix matching in the NAME action.\n"
+	"    -P | --with-pseudo-tags\n"
+	"        List pseudo tags as if -D option is specified but continues processing without exiting.\n"
 	"    -t TAGFILE | --tag-file TAGFILE\n"
 	"        Use specified tag file (default: \"tags\").\n"
 	"        \"-\" indicates taking tag file data from standard input.\n"
@@ -701,12 +703,14 @@ extern int main (int argc, char **argv)
 			const char *optname = arg + 2;
 			if (strcmp (optname, "debug") == 0)
 				debugMode++;
-			else if (strcmp (optname, "list-pseudo-tags") == 0)
+			else if (strcmp (optname, "list-pseudo-tags") == 0
+					 || strcmp (optname, "with-pseudo-tags") == 0)
 			{
 				if (canon)
 					canon->ptags = 1;
 				listTags (1, &printOpts, NULL);
-				actionSupplied = 1;
+				if (optname[0] == 'l')
+					actionSupplied = 1;
 			}
 			else if (strcmp (optname, "help") == 0)
 				printUsage (stdout, 0);
@@ -854,10 +858,12 @@ extern int main (int argc, char **argv)
 				{
 					case 'd': debugMode++; break;
 					case 'D':
+					case 'P':
 						if (canon)
 							canon->ptags = 1;
 						listTags (1, &printOpts, canon);
-						actionSupplied = 1;
+						if (arg  [j] == 'D')
+							actionSupplied = 1;
 						break;
 					case 'h': printUsage (stdout, 0); break;
 #ifdef READTAGS_DSL
