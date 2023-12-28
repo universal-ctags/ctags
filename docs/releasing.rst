@@ -59,6 +59,10 @@ How to release a new version
 
 	 - BASE
 
+   + ``NEWS.rst``
+
+	 - Changes in ...
+
 #. Revise the version numbers in each parsers and their man pages
 
 #. Revise the version number in writer-json.c
@@ -72,11 +76,12 @@ How to release a new version
 				   $ git tag -a v5.9.0 -m 'Version 5.9.0'
 				   $ git push upstream --tags
 
-#. Make tarbarll
+#. Make tarbarll in a freshly cloned directory
 
    .. code-block:: console
 
 				   $ ./configure
+				   $ make distcheck
 				   $ make clean
 				   $ make dist
 

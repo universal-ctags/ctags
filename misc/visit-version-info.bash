@@ -20,3 +20,4 @@ G win32/ctags.exe.manifest assemblyIdentity
 G win32/config_mvc.h PACKAGE_STRING PACKAGE_VERSION VERSION
 G win32/config_mingw.h PACKAGE_STRING PACKAGE_VERSION VERSION
 G misc/git-tag-maybe.sh BASE
+G NEWS.rst 'Changes in '
