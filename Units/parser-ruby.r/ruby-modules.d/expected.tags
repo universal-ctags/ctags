@@ -1,0 +1,15 @@
+A	input.rb	/^module A$/;"	m
+Fa	input.rb	/^  def self.Fa()$/;"	S	module:A
+B	input.rb	/^module B$/;"	m
+fb	input.rb	/^  def fb()$/;"	f	module:B
+Fb0	input.rb	/^  def B.Fb0()$/;"	S	module:B
+Fb1	input.rb	/^  def self.Fb1()$/;"	S	module:B
+C	input.rb	/^  C = Module.new() do$/;"	m	module:B
+fc0	input.rb	/^    def self.fc0()$/;"	S	module:B.C
+fc1	input.rb	/^    def fc1()$/;"	f	module:B.C
+E	input.rb	/^  E = Module.new()$/;"	m	module:B
+fe	input.rb	/^  def E.fe()$/;"	S	module:B.E
+gb	input.rb	/^  def gb()$/;"	f	module:B
+__anond62b7f6a0102	input.rb	/^  Module.new()$/;"	m	module:B
+X	input.rb	/^class X$/;"	c	mixin:include:B
+Y	input.rb	/^class Y$/;"	c	mixin:extend:A

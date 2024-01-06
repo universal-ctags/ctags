@@ -1,0 +1,3 @@
+B	input.rb	/^module B$/;"	m
+D	input.rb	/^  D =  Module.new() {|m|$/;"	m	module:B
+fd	input.rb	/^    def m.fd()$/;"	f	module:B.D
