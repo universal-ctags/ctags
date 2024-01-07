@@ -1,0 +1,2 @@
+C	input.rb	/^class C$/;"	c	line:1	end:2
+act	input.rb	/^C.define_method :act do$/;"	f	class:C	line:4	end:6

@@ -875,7 +875,32 @@ static void readAttrsAndEmitTags (const unsigned char **cp, bool reader, bool wr
 	vStringDelete (a);
 }
 
-static int readAliasMethodAndEmitTags (const unsigned char **cp)
+/*
+ * The following patterns doen't make a scope:
+ * define_method (:name,...
+ * define_method ("name",...
+ * define_method ('name',...
+ * define_method :name, ...
+ * define_method "name", ...
+ * define_method 'name', ...
+ *
+ * The following patterns make a scope:
+ * define_method (:name) do ...
+ * define_method ("name") do ...
+ * define_method ('name') do ...
+ * define_method :name  do ...
+ * define_method "name" do ...
+ * define_method 'name' do ...
+ *
+ * The following patterns may make a scope:
+ * define_method (:name) ...
+ * define_method ("name") ...
+ * define_method ('name') ...
+ * define_method :name ...
+ * define_method "name" ...
+ * define_method 'name' ...
+ */
+static int readMethodAndEmitTags (const unsigned char **cp, rubyKind kind)
 {
 	int r = CORK_NIL;
 	vString *a = vStringNew ();
@@ -898,7 +923,27 @@ static int readAliasMethodAndEmitTags (const unsigned char **cp)
 	}
 
 	if (vStringLength (a) > 0)
-		r = emitRubyTagFull (a, K_ALIAS, false, false);
+	{
+		bool pushLevel = false;
+		skipWhitespace (cp);
+		if (kind == K_METHOD
+			&& (**cp == ')'
+				 || strncmp((const char *)*cp, "do", 2) == 0)) {
+			if (**cp == ')')
+				++*cp;
+			pushLevel = true;
+		}
+
+		r = emitRubyTagFull (a, kind, pushLevel, false);
+
+		/* If the name doesn't make a scope, fill the end: field of the tag. */
+		if (kind == K_METHOD && !pushLevel)
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (r);
+			if (e)
+				setTagEndLine (e, e->lineNumber);
+		}
+	}
 
 	vStringDelete (a);
 	return r;
@@ -1218,7 +1263,17 @@ static void findRubyTags (void)
 			}
 		}
 		else if (canMatchKeywordWithAssign (&cp, "alias_method"))
-			readAliasMethodAndEmitTags (&cp);
+			readMethodAndEmitTags (&cp, K_ALIAS);
+		else if (canMatchKeywordWithAssign (&cp, "define_method"))
+		{
+			int r = readMethodAndEmitTags (&cp, K_METHOD);
+			/* "define_method(m)" makes a scope.
+			 * In that case, we know we will see '{' or 'do' soon.
+			 */
+			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
+			if (nl && r == nl->corkIndex)
+				expect_separator = true;
+		}
 		else if ((canMatchKeywordWithAssign (&cp, "private")
 				  || canMatchKeywordWithAssign (&cp, "protected")
 				  || canMatchKeywordWithAssign (&cp, "public")
@@ -1266,6 +1321,13 @@ static void findRubyTags (void)
 
 				if (! expect_separator)
 				{
+					/* We saw '{' or 'do' unexpectedly.
+					 * Let's make an placeholder scope for it.
+					 *
+					 * If '{' or 'do' is expected, a scope will be pushed already.
+					 * If they are not expected, a scope is pushed here.
+					 * Either case a scope is pushed. See the code handling "end".
+					 */
 					enterUnnamedScope ();
 					if (subparser && subparser->corkIndex)
 						parasiteToScope (subparser, subparser->corkIndex);
@@ -1307,8 +1369,18 @@ static void findRubyTags (void)
 		{
 			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
 			tagEntryInfo *e_scope  = getEntryOfNestingLevel (nl);
+
 			if (e_scope && (e_scope->kindIndex == K_CLASS
-							|| e_scope->kindIndex == K_MODULE))
+							|| e_scope->kindIndex == K_MODULE
+							/* Though "define_method(m)" is seen, no
+							 * "do" or "{" is found.
+							 *
+							 * If "define_method(m, x)" is seen, neither
+							 * "do" nor "{" is expected; a scope was not
+							 * pushed.
+							 */
+							|| ((e_scope->kindIndex == K_METHOD) &&
+								!e_scope->placeholder)))
 				/* Class.new() ... was found but "do" or `{' is not
 				 * found at the end; no block is made. Let's
 				 * pop the nesting level push when Class.new()
