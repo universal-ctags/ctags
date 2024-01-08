@@ -421,14 +421,8 @@ static int makeZshAutoloadTag(vString *name, const unsigned char ** cp)
 static int makeZshTag (vString *name, const unsigned char ** cp,
 					  int found_kind, int found_role)
 {
-	const unsigned char *p = *cp;
-
 	if (found_kind == K_SCRIPT && found_role == R_ZSH_SCRIPT_AUTOLOADED)
-	{
-		int r = makeZshAutoloadTag(name, &p);
-		*cp = p;
-		return r;
-	}
+		return makeZshAutoloadTag(name, cp);
 
 	return makeShTag (name, cp, found_kind, found_role);
 }
