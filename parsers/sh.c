@@ -360,9 +360,39 @@ static size_t handleShKeyword (int keyword,
 	return vStringLength(token);
 }
 
-static int makeShTag (vString *name, const unsigned char ** cp CTAGS_ATTR_UNUSED,
+static int makeShAliasTag(vString *name, const unsigned char ** cp, const char *options)
+{
+	const unsigned char *p = *cp;
+	int r = CORK_NIL;
+
+	const char *opt = vStringValue (name);
+	if (opt[0] == '-')
+	{
+		if  (strpbrk(opt, options))
+			return CORK_NIL;
+
+		vStringClear(name);
+
+		while (isspace (*p))
+			p++;
+
+		while (*p && isIdentChar (*p))
+			vStringPut (name, *p++);
+	}
+
+	if (!vStringIsEmpty(name) && *p == '=')
+		r = makeSimpleTag (name, K_ALIAS);
+	*cp = p;
+	return r;
+}
+
+static int makeShTag (vString *name, const unsigned char ** cp,
 					  int found_kind, int found_role)
 {
+	if (found_kind == K_ALIAS && found_role == ROLE_DEFINITION_INDEX)
+		/* -p is for printing defined aliases in bash. */
+		return makeShAliasTag (name, cp, "p");
+
 	return makeSimpleRefTag (name, found_kind, found_role);
 }
 
@@ -452,6 +482,10 @@ static int makeZshTag (vString *name, const unsigned char ** cp,
 
 	if (found_kind == K_FUNCTION && found_role == ROLE_DEFINITION_INDEX)
 		return makeZshFunctionTag(name, cp);
+
+	if (found_kind == K_ALIAS && found_role == ROLE_DEFINITION_INDEX)
+		/* -m, -r, and -L are for printing defined aliases. */
+		return makeShAliasTag (name, cp, "mrL");
 
 	return makeShTag (name, cp, found_kind, found_role);
 }
