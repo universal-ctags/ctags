@@ -418,11 +418,40 @@ static int makeZshAutoloadTag(vString *name, const unsigned char ** cp)
 	return r;
 }
 
+static int makeZshFunctionTag(vString *name, const unsigned char ** cp)
+{
+	const unsigned char *p = *cp;
+
+	int r = CORK_NIL;
+
+	if (strcmp(vStringValue(name), "-T") == 0)
+	{
+		vStringClear(name);
+
+		while (isspace (*p))
+			p++;
+
+		while (isBashFunctionChar (*p))
+		{
+			vStringPut (name, *p);
+			++p;
+		}
+	}
+
+	if (!vStringIsEmpty(name))
+		r = makeSimpleTag (name, K_FUNCTION);
+	*cp = p;
+	return r;
+}
+
 static int makeZshTag (vString *name, const unsigned char ** cp,
 					  int found_kind, int found_role)
 {
 	if (found_kind == K_SCRIPT && found_role == R_ZSH_SCRIPT_AUTOLOADED)
 		return makeZshAutoloadTag(name, cp);
+
+	if (found_kind == K_FUNCTION && found_role == ROLE_DEFINITION_INDEX)
+		return makeZshFunctionTag(name, cp);
 
 	return makeShTag (name, cp, found_kind, found_role);
 }
