@@ -69,6 +69,8 @@ How to release a new version
 
 #. Regenerate rst files under ``docs/man``.
 
+#. Add a entry for the new version to ``docs/news.rst``.
+
 #. Put an annotation tag for the version and push it to ``github.com/universal-ctags/ctags``
 
    .. code-block:: console
