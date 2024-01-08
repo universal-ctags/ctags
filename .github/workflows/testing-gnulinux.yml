@@ -25,6 +25,7 @@ jobs:
       # Following cases target ctags without gcov.
       SANDBOX_CASES: sandbox,sandbox-crash,sandbox-default-req,sandbox-unknown-submode
       DEBIAN_FRONTEND: noninteractive
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
     - uses: actions/checkout@v4
