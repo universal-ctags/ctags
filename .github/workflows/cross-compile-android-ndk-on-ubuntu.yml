@@ -32,7 +32,7 @@ jobs:
           TOOLCHAIN_BIN_DIR=$TOOLCHAIN_BASE_DIR/bin
           SYSROOT=$TOOLCHAIN_BASE_DIR/sysroot
 
-          export CC=$TOOLCHAIN_BIN_DIR/armv7a-linux-androideabi21-clang
+          export CC=$TOOLCHAIN_BIN_DIR/armv7a-linux-androideabi24-clang
           export AR=$TOOLCHAIN_BIN_DIR/llvm-ar
           export RANLIB=$TOOLCHAIN_BIN_DIR/llvm-ranlib
 
