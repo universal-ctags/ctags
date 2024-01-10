@@ -1,0 +1,8 @@
+Foo	input.rb	/^class Foo$/;"	c	line:1	end:21
+f0	input.rb	/^  def f0() p :f0 end$/;"	f	line:2	class:Foo	end:2
+f1	input.rb	/^  define_method(:f1, instance_method(:f0))$/;"	f	line:3	class:Foo	end:3
+f2	input.rb	/^  define_method(:f2) {$/;"	f	line:4	class:Foo	end:6
+f3	input.rb	/^  define_method(:f3) do$/;"	f	line:7	class:Foo	end:13
+f30	input.rb	/^    define_method(:f30) do$/;"	f	line:10	method:Foo.f3	end:12
+f4	input.rb	/^  define_method :f4 do$/;"	f	line:14	class:Foo	end:16
+f5	input.rb	/^  define_method 'f5' do$/;"	f	line:18	class:Foo	end:20

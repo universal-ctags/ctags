@@ -1,12 +1,12 @@
-C	input.rb	/^class C$/;"	c
-X	input.rb	/^class X$/;"	c
-method1	input.rb	/^  def method1$/;"	f	class:C
-method2	input.rb	/^  def method2$/;"	f	class:C
-method3	input.rb	/^  def method3$/;"	f	class:C
-method4	input.rb	/^  def method4$/;"	f	class:C
-method5	input.rb	/^  def method5$/;"	f	class:C
-method6	input.rb	/^  def method6$/;"	f	class:C
-method7	input.rb	/^  def method7$/;"	f	class:C
-method8	input.rb	/^  def method8$/;"	f	class:C
-method9	input.rb	/^  def method9$/;"	f	class:C
-method_or_class	input.rb	/^def method_or_class$/;"	f
+method_or_class	input.rb	/^def method_or_class$/;"	f	line:3	end:8
+X	input.rb	/^class X$/;"	c	line:10	end:11
+C	input.rb	/^class C$/;"	c	line:16	end:88
+method1	input.rb	/^  def method1$/;"	f	line:18	class:C	end:22
+method2	input.rb	/^  def method2$/;"	f	line:24	class:C	end:29
+method3	input.rb	/^  def method3$/;"	f	line:31	class:C	end:36
+method4	input.rb	/^  def method4$/;"	f	line:39	class:C	end:44
+method5	input.rb	/^  def method5$/;"	f	line:46	class:C	end:52
+method6	input.rb	/^  def method6$/;"	f	line:54	class:C	end:60
+method7	input.rb	/^  def method7$/;"	f	line:63	class:C	end:69
+method8	input.rb	/^  def method8$/;"	f	line:71	class:C	end:78
+method9	input.rb	/^  def method9$/;"	f	line:80	class:C	end:87
