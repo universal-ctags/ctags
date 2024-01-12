@@ -208,7 +208,7 @@ extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal)
  */
 #define vStringTruncateMaybe(VS,LEN) if (VS) vStringTruncate ((VS), (LEN))
 
-extern bool canMatchKeywordWithAssignFull (const unsigned char** s, const char* literal, vString *assignee)
+static bool canMatchKeywordWithAssignFull (const unsigned char** s, const char* literal, vString *assignee)
 {
 	const unsigned char* original_pos = *s;
 	size_t original_len;
