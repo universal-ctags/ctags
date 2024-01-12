@@ -54,6 +54,7 @@ extern int skipToCharacterInInputFile (int c);
 extern int skipToCharacterInInputFile2 (int c0, int c1);
 extern void ungetcToInputFile (int c);
 extern const unsigned char *readLineFromInputFile (void);
+extern const unsigned char *readLineFromInputFileWithLength (size_t *length);
 
 extern unsigned long getSourceLineNumber (void);
 

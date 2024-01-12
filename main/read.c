@@ -1075,16 +1075,23 @@ extern int skipToCharacterInInputFile2 (int c0, int c1)
  *  the terminating newline. A NULL return value means that all lines in the
  *  file have been read and we are at the end of file.
  */
-extern const unsigned char *readLineFromInputFile (void)
+extern const unsigned char *readLineFromInputFileWithLength (size_t *length)
 {
 	vString* const line = iFileGetLine (true);
 	const unsigned char* result = NULL;
 	if (line != NULL)
 	{
 		result = (const unsigned char*) vStringValue (line);
+		*length = vStringLength (line);
 		DebugStatement ( debugPrintf (DEBUG_READ, "%s\n", result); )
 	}
 	return result;
+}
+
+extern const unsigned char *readLineFromInputFile (void)
+{
+	size_t dummy;
+	return readLineFromInputFileWithLength(&dummy);
 }
 
 /*
