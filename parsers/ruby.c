@@ -105,11 +105,11 @@ static void enterUnnamedScope (void);
 * Returns true if it did, false (and leaves 's' where
 * it was) otherwise.
 */
-static bool canMatch (const unsigned char** s, const char* literal,
-					  bool (*end_check) (int))
+static bool canMatchWithEnd (const unsigned char** s, const unsigned char *end,
+							 const char* literal, bool (*end_check) (int))
 {
 	const int literal_length = strlen (literal);
-	const int s_length = strlen ((const char *)*s);
+	const int s_length = end - *s;
 
 	if (s_length < literal_length)
 		return false;
@@ -126,6 +126,13 @@ static bool canMatch (const unsigned char** s, const char* literal,
 	}
 	*s += literal_length;
 	return true;
+}
+
+static bool canMatch (const unsigned char** s, const char* literal,
+					  bool (*end_check) (int))
+{
+	size_t s_length = strlen ((const char *)*s);
+	return canMatchWithEnd (s, *s + s_length, literal, end_check);
 }
 
 static bool isIdentChar (int c)
@@ -191,7 +198,6 @@ static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
 	return advanceWhileFull (s, predicate, NULL);
 }
 
-#define canMatchKeyword rubyCanMatchKeyword
 extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal)
 {
 	/* Using notIdentCharButColon() here.
@@ -202,20 +208,31 @@ extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal)
 	return canMatch (s, literal, notIdentCharButColon);
 }
 
+extern bool canMatchKeyword (const unsigned char** s, const unsigned char *end, const char* literal)
+{
+	/* Using notIdentCharButColon() here.
+	 *
+	 * A hash can be defined like {for: nil, foo: 0}.
+	 *"for" in the above example is not a keyword.
+	 */
+	return canMatchWithEnd (s, end, literal, notIdentCharButColon);
+}
+
 /*
  * Extends canMatch. Works similarly, but allows assignment to precede
  * the keyword, as block assignment is a common Ruby idiom.
  */
 #define vStringTruncateMaybe(VS,LEN) if (VS) vStringTruncate ((VS), (LEN))
 
-static bool canMatchKeywordWithAssignFull (const unsigned char** s, const char* literal, vString *assignee)
+static bool canMatchKeywordWithAssignFull (const unsigned char** s, const unsigned char *end,
+										   const char* literal, vString *assignee)
 {
 	const unsigned char* original_pos = *s;
 	size_t original_len;
 	if (assignee)
 		original_len = vStringLength  (assignee);
 
-	if (canMatchKeyword (s, literal))
+	if (canMatchKeyword (s, end, literal))
 	{
 		return true;
 	}
@@ -240,7 +257,7 @@ static bool canMatchKeywordWithAssignFull (const unsigned char** s, const char* 
 
 	advanceWhile (s, isWhitespace);
 
-	if (canMatchKeyword (s, literal))
+	if (canMatchKeyword (s, end, literal))
 	{
 		return true;
 	}
@@ -250,10 +267,16 @@ static bool canMatchKeywordWithAssignFull (const unsigned char** s, const char* 
 	return false;
 }
 
-#define canMatchKeywordWithAssign rubyCanMatchKeywordWithAssign
+static bool canMatchKeywordWithAssign (const unsigned char** s, const unsigned char *end,
+									   const char* literal)
+{
+	return canMatchKeywordWithAssignFull (s, end, literal, NULL);
+}
+
 extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* literal)
 {
-	return canMatchKeywordWithAssignFull (s, literal, NULL);
+	size_t s_length = strlen ((const char *)*s);
+	return canMatchKeywordWithAssign (s, *s + s_length, literal);
 }
 
 /*
@@ -1078,10 +1101,12 @@ static void findRubyTags (void)
 	*
 	* if you wished, and this function would fail to recognize anything.
 	*/
-	while ((line = readLineFromInputFile ()) != NULL)
+	size_t llen;
+	while ((line = readLineFromInputFileWithLength (&llen)) != NULL)
 	{
 		rubySubparser *subparser = CORK_NIL;
 		const unsigned char *cp = line;
+		const unsigned char *lend = line + llen;
 		/* if we expect a separator after a while, for, or until statement
 		 * separators are "do", ";" or newline */
 		bool expect_separator = false;
@@ -1098,12 +1123,12 @@ static void findRubyTags (void)
 			}
 		}
 
-		if (canMatch (&cp, "=begin", isWhitespace))
+		if (canMatchWithEnd (&cp, lend, "=begin", isWhitespace))
 		{
 			inMultiLineComment = true;
 			continue;
 		}
-		if (canMatch (&cp, "=end", isWhitespace))
+		if (canMatchWithEnd (&cp, lend, "=end", isWhitespace))
 		{
 			inMultiLineComment = false;
 			continue;
@@ -1123,16 +1148,16 @@ static void findRubyTags (void)
 		*       unless <exp>
 		*/
 
-		if (canMatchKeywordWithAssign (&cp, "for") ||
-			canMatchKeywordWithAssign (&cp, "until") ||
-			canMatchKeywordWithAssign (&cp, "while"))
+		if (canMatchKeywordWithAssign (&cp, lend, "for") ||
+			canMatchKeywordWithAssign (&cp, lend, "until") ||
+			canMatchKeywordWithAssign (&cp, lend, "while"))
 		{
 			expect_separator = true;
 			enterUnnamedScope ();
 		}
-		else if (canMatchKeywordWithAssign (&cp, "case") ||
-				 canMatchKeywordWithAssign (&cp, "if") ||
-				 canMatchKeywordWithAssign (&cp, "unless"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "case") ||
+				 canMatchKeywordWithAssign (&cp, lend, "if") ||
+				 canMatchKeywordWithAssign (&cp, lend, "unless"))
 		{
 			enterUnnamedScope ();
 		}
@@ -1141,10 +1166,10 @@ static void findRubyTags (void)
 		* "module M", "class C" and "def m" should only be at the beginning
 		* of a line.
 		*/
-		if (canMatchKeywordWithAssign (&cp, "class")
-			|| canMatchKeywordWithAssign (&cp, "module")
-			|| (canMatchKeywordWithAssignFull (&cp, "Class.new", leftSide))
-			|| (canMatchKeywordWithAssignFull (&cp, "Module.new", leftSide)))
+		if (canMatchKeywordWithAssign (&cp, lend, "class")
+			|| canMatchKeywordWithAssign (&cp, lend, "module")
+			|| (canMatchKeywordWithAssignFull (&cp, lend, "Class.new", leftSide))
+			|| (canMatchKeywordWithAssignFull (&cp, lend, "Module.new", leftSide)))
 		{
 			int r;
 
@@ -1202,31 +1227,31 @@ static void findRubyTags (void)
 				}
 			}
 		}
-		else if (canMatchKeywordWithAssign (&cp, "include"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "include"))
 		{
 			readAndStoreMixinSpec (&cp, "include");
 		}
-		else if (canMatchKeywordWithAssign (&cp, "prepend"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "prepend"))
 		{
 			readAndStoreMixinSpec (&cp, "prepend");
 		}
-		else if (canMatchKeywordWithAssign (&cp, "extend"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "extend"))
 		{
 			readAndStoreMixinSpec (&cp, "extend");
 		}
-		else if (canMatchKeywordWithAssign (&cp, "def"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "def"))
 		{
 			readAndEmitDef (&cp);
 		}
-		else if (canMatchKeywordWithAssign (&cp, "attr_reader"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "attr_reader"))
 		{
 			readAttrsAndEmitTags (&cp, true, false);
 		}
-		else if (canMatchKeywordWithAssign (&cp, "attr_writer"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "attr_writer"))
 		{
 			readAttrsAndEmitTags (&cp, false, true);
 		}
-		else if (canMatchKeywordWithAssign (&cp, "attr_accessor"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "attr_accessor"))
 		{
 			readAttrsAndEmitTags (&cp, true, true);
 		}
@@ -1235,19 +1260,19 @@ static void findRubyTags (void)
 			emitRubyTag (constant, K_CONST);
 			vStringClear (constant);
 		}
-		else if (canMatchKeywordWithAssign (&cp, "require"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "require"))
 		{
 			readStringAndEmitTag (&cp, K_LIBRARY, RUBY_LIBRARY_REQUIRED);
 		}
-		else if (canMatchKeywordWithAssign (&cp, "require_relative"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "require_relative"))
 		{
 			readStringAndEmitTag (&cp, K_LIBRARY, RUBY_LIBRARY_REQUIRED_REL);
 		}
-		else if (canMatchKeywordWithAssign (&cp, "load"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "load"))
 		{
 			readStringAndEmitTag (&cp, K_LIBRARY, RUBY_LIBRARY_LOADED);
 		}
-		else if (canMatchKeywordWithAssign (&cp, "alias"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "alias"))
 		{
 			if (!readAndEmitTagFull (&cp, K_ALIAS, false, true)
 				&& (*cp == '$'))
@@ -1262,9 +1287,9 @@ static void findRubyTags (void)
 				vStringDelete (alias);
 			}
 		}
-		else if (canMatchKeywordWithAssign (&cp, "alias_method"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "alias_method"))
 			readMethodAndEmitTags (&cp, K_ALIAS);
-		else if (canMatchKeywordWithAssign (&cp, "define_method"))
+		else if (canMatchKeywordWithAssign (&cp, lend, "define_method"))
 		{
 			int r = readMethodAndEmitTags (&cp, K_METHOD);
 			/* "define_method(m)" makes a scope.
@@ -1274,14 +1299,14 @@ static void findRubyTags (void)
 			if (nl && r == nl->corkIndex)
 				expect_separator = true;
 		}
-		else if ((canMatchKeywordWithAssign (&cp, "private")
-				  || canMatchKeywordWithAssign (&cp, "protected")
-				  || canMatchKeywordWithAssign (&cp, "public")
-				  || canMatchKeywordWithAssign (&cp, "private_class_method")
-				  || canMatchKeywordWithAssign (&cp, "public_class_method")))
+		else if ((canMatchKeywordWithAssign (&cp, lend, "private")
+				  || canMatchKeywordWithAssign (&cp, lend, "protected")
+				  || canMatchKeywordWithAssign (&cp, lend, "public")
+				  || canMatchKeywordWithAssign (&cp, lend, "private_class_method")
+				  || canMatchKeywordWithAssign (&cp, lend, "public_class_method")))
 		{
 			skipWhitespace (&cp);
-			if (canMatchKeywordWithAssign (&cp, "def"))
+			if (canMatchKeywordWithAssign (&cp, lend, "def"))
 				readAndEmitDef (&cp);
 			/* TODO: store the method for controlling visibility
 			 * to the "access:" field of the tag.*/
@@ -1310,11 +1335,11 @@ static void findRubyTags (void)
 				*/
 				break;
 			}
-			else if (canMatchKeyword (&cp, "begin"))
+			else if (canMatchKeyword (&cp, lend, "begin"))
 			{
 				enterUnnamedScope ();
 			}
-			else if (canMatchKeyword (&cp, "do") || (*cp == '{'))
+			else if (canMatchKeyword (&cp, lend, "do") || (*cp == '{'))
 			{
 				if (*cp == '{')
 					++cp;
@@ -1335,7 +1360,7 @@ static void findRubyTags (void)
 				else
 					expect_separator = false;
 			}
-			else if ((canMatchKeyword (&cp, "end") || (*cp == '}')) && nesting->n > 0)
+			else if ((canMatchKeyword (&cp, lend, "end") || (*cp == '}')) && nesting->n > 0)
 			{
 				if (*cp == '}')
 					++cp;
