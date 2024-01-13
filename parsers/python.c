@@ -1495,18 +1495,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 
 			if (! nameToken)
 				/* nothing */;
-			else if (token->keyword != KEYWORD_lambda)
-			{
-				int index = makeSimplePythonTag (nameToken, kind);
-				tagEntryInfo *e = getEntryInCorkQueue (index);
-				if (e && *type)
-				{
-					e->extensionFields.typeRef [0] = eStrdup ("typename");
-					e->extensionFields.typeRef [1] = vStringDeleteUnwrap (*type);
-					*type = NULL;
-				}
-			}
-			else
+			else if (token->keyword == KEYWORD_lambda)
 			{
 				tokenInfo *anon  = NULL;
 				vString *arglist = vStringNew ();
@@ -1587,6 +1576,17 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 				else
 					makeFunctionTag (nameToken, arglist, NULL);
 				vStringDelete (arglist);
+			}
+			else
+			{
+				int index = makeSimplePythonTag (nameToken, kind);
+				tagEntryInfo *e = getEntryInCorkQueue (index);
+				if (e && *type)
+				{
+					e->extensionFields.typeRef [0] = eStrdup ("typename");
+					e->extensionFields.typeRef [1] = vStringDeleteUnwrap (*type);
+					*type = NULL;
+				}
 			}
 
 			/* skip until next initializer */
