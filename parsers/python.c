@@ -1443,6 +1443,97 @@ static bool skipVariableTypeAnnotation (tokenInfo *const token, vString *const r
 	return false;
 }
 
+static bool isAtSimpleNamespace (tokenInfo *const token)
+{
+	if (token->type == TOKEN_IDENTIFIER
+		&& vStringEqC (token->string, "SimpleNamespace"))
+	{
+		tokenInfo *backup = newToken();
+
+		copyToken (backup, token);
+		readToken (token);
+		if (token->type != '(')
+		{
+			ungetToken (token);
+			copyToken (token, backup);
+			deleteToken (backup);
+			return false;
+		}
+		deleteToken (backup);
+		return true;
+	}
+
+	if (token->type == TOKEN_IDENTIFIER
+		&& vStringEqC (token->string, "types"))
+	{
+		readQualifiedName(token);
+		if (token->type == TOKEN_IDENTIFIER
+			&& vStringEqC (token->string, ".SimpleNamespace"))
+		{
+			tokenInfo *backup = newToken();
+
+			copyToken (backup, token);
+			readToken (token);
+
+			if (token->type != '(')
+			{
+				ungetToken (token);
+				copyToken (token, backup);
+				deleteToken (backup);
+				return false;
+			}
+			deleteToken (backup);
+			return true;
+		}
+	}
+	return false;
+}
+
+static void parseSimpleNamespace (tokenInfo *const token, int namespaceIndex)
+{
+	TRACE_ENTER();
+
+	nestingLevelsPush (PythonNestingLevels, namespaceIndex);
+	int prevTokenType = token->type;
+	int depth = 1;
+	int lastIndex = CORK_NIL;
+
+	do
+	{
+		if (token->type != TOKEN_WHITESPACE)
+			prevTokenType = token->type;
+
+		readTokenFull (token, true);
+
+		if (token->type == '(' ||
+			token->type == '[' ||
+			token->type == '{')
+			depth ++;
+		else if (token->type == ')' ||
+				 token->type == ']' ||
+				 token->type == '}')
+			depth --;
+		else if (depth == 1 &&
+				 token->type == TOKEN_IDENTIFIER &&
+				 (prevTokenType == '(' || prevTokenType == ','))
+			lastIndex = makeSimplePythonTag (token, K_UNKNOWN);
+		else if (depth == 1 &&
+				 token->keyword == KEYWORD_lambda &&
+				 prevTokenType == '=' &&
+				 lastIndex != CORK_NIL)
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (lastIndex);
+			if (e)
+				e->kindIndex = K_FUNCTION; /* K_METHOD? */
+			lastIndex = CORK_NIL;
+		}
+	}
+	while (token->type != TOKEN_EOF && depth > 0);
+	nestingLevelsPop (PythonNestingLevels);
+
+	TRACE_LEAVE();
+}
+
 static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 {
 	TRACE_ENTER();
@@ -1602,7 +1693,13 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 			else
 			{
 				TRACE_PRINT("name: %s", vStringValue(nameToken->string));
-				int index = makeSimplePythonTag (nameToken, kind);
+				bool isAtSN = isAtSimpleNamespace(token);
+				int index = makeSimplePythonTag (nameToken,
+												 ((kind != K_LOCAL_VARIABLE) && isAtSN)
+												 ? K_NAMESPACE
+												 : kind);
+				if (isAtSN)
+					parseSimpleNamespace(token, index);
 				tagEntryInfo *e = getEntryInCorkQueue (index);
 				if (e && *type)
 				{
