@@ -160,4 +160,8 @@ CTAGS_INLINE void vStringAccumulate (vString *accumulator, vString *string)
 		vStringCatS((string), (s));				\
 	} while (0)
 
+/* If cstrlit is a C string listeral and LTO is enabled,
+ * this macro is efficient */
+#define vStringEqC(vstr, cstrlit) ((vStringLength ((vstr)) == strlen ((cstrlit)) \
+									&& strncmp (vStringValue ((vstr)), (cstrlit), strlen ((cstrlit))) == 0))
 #endif  /* CTAGS_MAIN_VSTRING_H */

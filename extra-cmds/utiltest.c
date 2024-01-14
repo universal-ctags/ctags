@@ -311,6 +311,19 @@ static void test_vstring_truncate_leading(void)
 	vStringDelete (vstr);
 }
 
+static void test_vstring_eqc(void)
+{
+	vString *vstr = vStringNewInit ("abcdefg");
+	TEST_CHECK(vstr != NULL);
+
+	TEST_CHECK(vStringEqC(vstr, "abcdefg"));
+	TEST_CHECK(!vStringEqC(vstr, "abcdefgz"));
+	TEST_CHECK(!vStringEqC(vstr, "abcdef"));
+	TEST_CHECK(!vStringEqC(vstr, ""));
+
+	vStringDelete (vstr);
+}
+
 TEST_LIST = {
    { "fname/absolute",   test_fname_absolute   },
    { "fname/absolute+cache", test_fname_absolute_with_cache },
@@ -321,5 +334,6 @@ TEST_LIST = {
    { "routines/strrstr", test_routines_strrstr },
    { "vstring/ncats",    test_vstring_ncats    },
    { "vstring/truncate_leading", test_vstring_truncate_leading },
+   { "vstring/EqC",      test_vstring_eqc },
    { NULL, NULL }     /* zeroed record marking the end of the list */
 };
