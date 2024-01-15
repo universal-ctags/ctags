@@ -1,0 +1,20 @@
+SA0	input.py	/^SA0 = SimpleNamespace($/;"	I
+SA0a	input.py	/^    SA0a="unknown",$/;"	Y	namespace:SA0	file:
+SA0b	input.py	/^    SA0b="md5",$/;"	Y	namespace:SA0	file:
+sD	input.py	/^sD= {$/;"	v
+SA1	input.py	/^SA1 = SimpleNamespace(SA1a = lambda x:  x + 1, SA1b = 1, **sD)$/;"	I
+SA1a	input.py	/^SA1 = SimpleNamespace(SA1a = lambda x:  x + 1, SA1b = 1, **sD)$/;"	f	namespace:SA1	file:
+SA1b	input.py	/^SA1 = SimpleNamespace(SA1a = lambda x:  x + 1, SA1b = 1, **sD)$/;"	Y	namespace:SA1	file:
+x	input.py	/^x = SimpleNamespace$/;"	v
+y	input.py	/^y = SimpleNamespace.mro()$/;"	v
+f	input.py	/^def f():$/;"	f
+tSA0	input-0.py	/^tSA0 = types.SimpleNamespace($/;"	I
+tSA0a	input-0.py	/^    tSA0a="unknown",$/;"	Y	namespace:tSA0	file:
+tSA0b	input-0.py	/^    tSA0b="md5",$/;"	Y	namespace:tSA0	file:
+tsD	input-0.py	/^tsD= {$/;"	v
+tSA1	input-0.py	/^tSA1 = types.SimpleNamespace(tSA1a = lambda x:  x + 1, tSA1b = 1, **tsD)$/;"	I
+tSA1a	input-0.py	/^tSA1 = types.SimpleNamespace(tSA1a = lambda x:  x + 1, tSA1b = 1, **tsD)$/;"	f	namespace:tSA1	file:
+tSA1b	input-0.py	/^tSA1 = types.SimpleNamespace(tSA1a = lambda x:  x + 1, tSA1b = 1, **tsD)$/;"	Y	namespace:tSA1	file:
+tx	input-0.py	/^tx = types.SimpleNamespace$/;"	v
+ty	input-0.py	/^ty = types.SimpleNamespace.mro()$/;"	v
+tf	input-0.py	/^def tf():$/;"	f
