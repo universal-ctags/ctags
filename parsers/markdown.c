@@ -376,7 +376,11 @@ static void findMarkdownTags (void)
 
 		if (lineNum == 1 || inPreambule)
 		{
-			if (line[pos] == '-' && line[pos + 1] == '-' && line[pos + 2] == '-')
+			if ((line[pos] == '-' && line[pos + 1] == '-' && line[pos + 2] == '-')
+				|| ( /* Yaml uses "..." as the end of a document.
+					  * See https://yaml.org/spec/1.2.2/#22-structures */
+					inPreambule &&
+					(line[pos] == '.' && line[pos + 1] == '.' && line[pos + 2] == '.')))
 			{
 				if (inPreambule)
 				{
