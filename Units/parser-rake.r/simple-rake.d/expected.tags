@@ -13,3 +13,4 @@ samples	input.rake	/^namespace "samples" do$/;"	namespace
 build	input.rake	/^  task :build do$/;"	task	namespace:samples
 samples:build	input.rake	/^  task :build do$/;"	task	namespace:samples
 build	input.rake	/^task build: %w[main:build samples:build]$/;"	task
+warnings	input.rake	/^task(:warnings) do$/;"	task

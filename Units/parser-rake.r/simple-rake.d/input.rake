@@ -51,3 +51,7 @@ namespace "samples" do
 end
 
 task build: %w[main:build samples:build]
+
+task(:warnings) do
+  # Do something
+end
