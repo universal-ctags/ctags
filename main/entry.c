@@ -147,7 +147,7 @@ extern int ftruncate (int fd, off_t length);
 #endif
 
 #define INTERVAL_START(node) ((node)->slot.lineNumber)
-#define INTERVAL_END(node)   ((node)->slot.extensionFields._endLine)
+#define INTERVAL_END(node) (getTagEndLine (&(node)->slot))
 
 INTERVAL_TREE_DEFINE(tagEntryInfoX, intervalnode,
 					 unsigned long, __intervalnode_subtree_last,
@@ -1620,7 +1620,7 @@ static int queueTagEntry (const tagEntryInfo *const tag)
 	 * removeFromIntervalTabMaybe() explicitly.
 	 */
 	if (! isTagExtraBitMarked (&entry->slot, XTAG_FILE_NAMES)
-		&& entry->slot.extensionFields._endLine > entry->slot.lineNumber
+		&& getTagEndLine (&entry->slot) > entry->slot.lineNumber
 		&& !isTagExtraBitMarked (tag, XTAG_QUALIFIED_TAGS))
 	{
 		intervaltab_insert(entry, &TagFile.intervaltab);
@@ -1643,7 +1643,7 @@ extern void updateTagLine (tagEntryInfo *tag, unsigned long lineNumber,
 	tag->filePosition = filePosition;
 	tag->boundaryInfo = getNestedInputBoundaryInfo (lineNumber);
 
-	if (entry && tag->lineNumber < tag->extensionFields._endLine)
+	if (entry && tag->lineNumber < getTagEndLine (tag))
 	{
 		intervaltab_insert(entry, &TagFile.intervaltab);
 		tag->inIntevalTab = 1;
@@ -2418,9 +2418,9 @@ extern int queryIntervalTabByCorkEntry(int corkIndex)
 	tagEntryInfoX *ex = ptrArrayItem (TagFile.corkQueue, corkIndex);
 	tagEntryInfo *e = &ex->slot;
 
-	if (e->extensionFields._endLine == 0)
+	if (getTagEndLine (e) == 0)
 		return queryIntervalTabByLine(e->lineNumber);
-	return queryIntervalTabByRange(e->lineNumber, e->extensionFields._endLine);
+	return queryIntervalTabByRange(e->lineNumber, getTagEndLine (e));
 }
 
 extern bool removeFromIntervalTabMaybe(int corkIndex)
