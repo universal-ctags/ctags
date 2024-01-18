@@ -79,6 +79,12 @@ static vString *readTask (const unsigned char **cp, bool *variable)
 	unsigned char b;
 	const unsigned char *start;
 
+	if (**cp == '(')
+	{
+		++*cp;
+		rubySkipWhitespace (cp);
+	}
+
 	switch (**cp)
 	{
 	case '\'':
@@ -172,11 +178,6 @@ static int parseXTask (rubySubparser *s, struct taskType *xtask, const unsigned 
 	{
 		vString *vstr = NULL;
 		bool variable = false;
-		if (**cp == '(')
-		{
-			++*cp;
-			rubySkipWhitespace (cp);
-		}
 		vstr = readTask (cp, &variable);
 		if (vstr)
 		{
