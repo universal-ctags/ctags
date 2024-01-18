@@ -127,6 +127,9 @@ static bool i18nRubyGemInitTagEntry(tagEntryInfo *e, yamlSubparser *yaml, char *
 	struct sI18nRubyGemSubparser *i18n = (struct sI18nRubyGemSubparser *)yaml;
 	i18nRubyGemKind kindIndex = KIND_KEY;
 
+	if (key[0] == ':')
+		key = key + 1;
+
 	if (i18n->localeFound == LOCALE_NOTYET)
 	{
 		int depth = (int)ypathGetTypeStackDepth(yaml);
