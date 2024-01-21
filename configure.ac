@@ -182,10 +182,6 @@ AC_ARG_ENABLE(readcmd,
 		[do not include readtags command during install])],
 	[], [enable_readcmd=yes])
 
-# AC_ARG_WITH(perl-regex,
-# 	[AS_HELP_STRING([--with-perl-regex],
-# 	    [use Perl pcre interface, if available])])
-
 AC_ARG_ENABLE(etags,
 	[AS_HELP_STRING([--enable-etags],
 		[enable the installation of links for etags])])
