@@ -260,6 +260,7 @@ AC_PROG_CC_C99
 #  Typically, this is immediately after AC_PROG_CC, ...
 gl_EARLY
 
+AC_ARG_VAR(RANLIB,[ranlib command or path])
 AC_PROG_RANLIB
 AC_C_BIGENDIAN
 
@@ -321,7 +322,6 @@ AC_SUBST([BUILD_OBJEXT])
 AC_SUBST([BUILD_EXEEXT])
 
 AC_ARG_VAR(AR,[ar command or path])
-AC_ARG_VAR(RANLIB,[ranlib command or path])
 AC_ARG_VAR(WINDRES,[windres command or path, used with mingw-w64])
 AC_SUBST([WINDRES])
 
