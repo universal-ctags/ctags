@@ -262,6 +262,7 @@ gl_EARLY
 
 AC_ARG_VAR(RANLIB,[ranlib command or path])
 AC_PROG_RANLIB
+PRETTY_ARG_VAR([AR], [ar command or path], [ar])
 AC_C_BIGENDIAN
 
 if test "$cross_compiling" = "yes"; then
@@ -321,13 +322,8 @@ AC_SUBST([LDFLAGS_FOR_BUILD])
 AC_SUBST([BUILD_OBJEXT])
 AC_SUBST([BUILD_EXEEXT])
 
-AC_ARG_VAR(AR,[ar command or path])
 AC_ARG_VAR(WINDRES,[windres command or path, used with mingw-w64])
 AC_SUBST([WINDRES])
-
-if test "x${AR}" = "x" ; then
-    AR=ar
-fi
 
 if test "x${WINDRES}" = "x" ; then
     WINDRES=windres
