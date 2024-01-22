@@ -62,6 +62,8 @@ noinst_LIBRARIES += libutil.a
 
 noinst_PROGRAMS = utiltest
 
+AM_LDFLAGS = $(EXTRA_LDFLAGS)
+
 # packcc always uses native compiler even when cross-compiling.
 # packcc cannot use the standard Automake rule.
 PACKCC_CPPFLAGS_FOR_BUILD  = -fsigned-char

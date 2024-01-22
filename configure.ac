@@ -568,6 +568,49 @@ PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
 PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 	       [-Wall])
 
+PRETTY_ARG_VAR([EXTRA_LDFLAGS], [extra linker flags],
+	       [])
+
+dnl Enable LTO unless debugging is enabled.
+dnl ref. https://stackoverflow.com/questions/40374061/autoconf-recipe-to-use-gcc-ar-and-gcc-ranlib
+use_lto=no
+AS_IF([test "x$cross_compiling" != "xyes"],[
+		AX_CHECK_COMPILE_FLAG(-flto,[use_lto=yes])])
+AS_VAR_IF([use_lto], [yes], [
+	AS_CASE($CC,
+		[gcc|*/gcc],     [AC_CHECK_PROGS([LTO_AR], [gcc-ar ar],   [:])],
+		[clang|*/clang], [AC_CHECK_PROGS([LTO_AR], [clang-ar ar], [:])],
+		[use_lto=no])
+	AC_MSG_CHECKING([the wrapper for ar working with $CC -flto])
+	AS_VAR_IF([LTO_AR], [:], AC_MSG_ERROR([could not find AR tool working with -flto.]))
+	AS_VAR_IF([use_lto], [yes],
+		[AS_CASE($LTO_AR,
+			[*-ar],[AC_MSG_RESULT([$LTO_AR])],
+			[use_lto=no
+			 AC_MSG_RESULT([no suitable AR tool is found; truning off LTO])])],
+		[AC_MSG_RESULT([no suitable AR tool is found; truning off LTO])])
+])
+AS_VAR_IF([use_lto], [yes], [
+	AS_CASE($CC,
+		[gcc|*/gcc],     [AC_CHECK_PROGS([LTO_RANLIB], [gcc-ranlib ranlib],  [:])],
+		[clang|*/clang], [AC_CHECK_PROGS([LTO_RANLIB], [clang-ranlib ranlib], [:])],
+		[use_lto=no])
+	AC_MSG_CHECKING([the wrapper for ranlib working with $CC -flto])
+	AS_VAR_IF([LTO_RANLIB], [:], AC_MSG_ERROR([could not find RANLIB tool working with -flto.]))
+	AS_VAR_IF([use_lto], [yes],
+		[AS_CASE($LTO_RANLIB,
+			[*-ranlib],[AC_MSG_RESULT([$LTO_RANLIB])],
+			[use_lto=no
+			 AC_MSG_RESULT([no suitable ranlib tool is found; truning off LTO])])],
+		[AC_MSG_RESULT([no suitable ranlib is found; truning off LTO])])
+])
+AS_VAR_IF([use_lto], [yes], [
+	AR="$LTO_AR"
+	RANLIB="$LTO_RANLIB"
+	EXTRA_CFLAGS="$EXTRA_CFLAGS -flto"
+	EXTRA_LDFLAGS="$EXTRA_LDFLAGS -flto"
+])
+
 # Checks for function availability
 # -----------------------------------
 
