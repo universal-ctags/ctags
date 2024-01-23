@@ -220,6 +220,10 @@ AC_ARG_ENABLE([static],
 	[AS_HELP_STRING([--enable-static],
 		[enable static linking (mainly for MinGW)])])
 
+AC_ARG_ENABLE([lto],
+	[AS_HELP_STRING([--enable-lto],
+		[enable link time optimization])])
+
 AC_ARG_PROGRAM
 
 # Process configuration options
@@ -571,10 +575,10 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 PRETTY_ARG_VAR([EXTRA_LDFLAGS], [extra linker flags],
 	       [])
 
-dnl Enable LTO unless debugging is enabled.
 dnl ref. https://stackoverflow.com/questions/40374061/autoconf-recipe-to-use-gcc-ar-and-gcc-ranlib
 use_lto=no
-AS_IF([test "x$cross_compiling" != "xyes"],[
+enable_debugging
+AS_IF([test "x$cross_compiling" != "xyes" -a "x$enable_lto" != "xno"],[
 		AX_CHECK_COMPILE_FLAG(-flto,[use_lto=yes])])
 AS_VAR_IF([use_lto], [yes], [
 	AS_CASE($CC,
@@ -609,6 +613,10 @@ AS_VAR_IF([use_lto], [yes], [
 	RANLIB="$LTO_RANLIB"
 	EXTRA_CFLAGS="$EXTRA_CFLAGS -flto"
 	EXTRA_LDFLAGS="$EXTRA_LDFLAGS -flto"
+],[
+	AS_VAR_IF([enable_lto], [yes], [
+		AC_MSG_ERROR([though --enable-lto is specified, the fto feature is not available nor usable.])
+	])
 ])
 
 # Checks for function availability
