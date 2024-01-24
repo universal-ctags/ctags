@@ -182,10 +182,6 @@ AC_ARG_ENABLE(readcmd,
 		[do not include readtags command during install])],
 	[], [enable_readcmd=yes])
 
-# AC_ARG_WITH(perl-regex,
-# 	[AS_HELP_STRING([--with-perl-regex],
-# 	    [use Perl pcre interface, if available])])
-
 AC_ARG_ENABLE(etags,
 	[AS_HELP_STRING([--enable-etags],
 		[enable the installation of links for etags])])
@@ -223,6 +219,10 @@ AC_ARG_ENABLE([debugging],
 AC_ARG_ENABLE([static],
 	[AS_HELP_STRING([--enable-static],
 		[enable static linking (mainly for MinGW)])])
+
+AC_ARG_ENABLE([lto],
+	[AS_HELP_STRING([--enable-lto],
+		[enable link time optimization])])
 
 AC_ARG_PROGRAM
 
@@ -264,7 +264,9 @@ AC_PROG_CC_C99
 #  Typically, this is immediately after AC_PROG_CC, ...
 gl_EARLY
 
+AC_ARG_VAR(RANLIB,[ranlib command or path])
 AC_PROG_RANLIB
+PRETTY_ARG_VAR([AR], [ar command or path], [ar])
 AC_C_BIGENDIAN
 
 if test "$cross_compiling" = "yes"; then
@@ -324,14 +326,8 @@ AC_SUBST([LDFLAGS_FOR_BUILD])
 AC_SUBST([BUILD_OBJEXT])
 AC_SUBST([BUILD_EXEEXT])
 
-AC_ARG_VAR(AR,[ar command or path])
-AC_ARG_VAR(RANLIB,[ranlib command or path])
 AC_ARG_VAR(WINDRES,[windres command or path, used with mingw-w64])
 AC_SUBST([WINDRES])
-
-if test "x${AR}" = "x" ; then
-    AR=ar
-fi
 
 if test "x${WINDRES}" = "x" ; then
     WINDRES=windres
@@ -575,6 +571,53 @@ PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
 	       [-std=gnu99])
 PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 	       [-Wall])
+
+PRETTY_ARG_VAR([EXTRA_LDFLAGS], [extra linker flags],
+	       [])
+
+dnl ref. https://stackoverflow.com/questions/40374061/autoconf-recipe-to-use-gcc-ar-and-gcc-ranlib
+use_lto=no
+enable_debugging
+AS_IF([test "x$cross_compiling" != "xyes" -a "x$enable_lto" != "xno"],[
+		AX_CHECK_COMPILE_FLAG(-flto,[use_lto=yes])])
+AS_VAR_IF([use_lto], [yes], [
+	AS_CASE($CC,
+		[gcc|*/gcc],     [AC_CHECK_PROGS([LTO_AR], [gcc-ar ar],   [:])],
+		[clang|*/clang], [AC_CHECK_PROGS([LTO_AR], [clang-ar ar], [:])],
+		[use_lto=no])
+	AC_MSG_CHECKING([the wrapper for ar working with $CC -flto])
+	AS_VAR_IF([LTO_AR], [:], AC_MSG_ERROR([could not find AR tool working with -flto.]))
+	AS_VAR_IF([use_lto], [yes],
+		[AS_CASE($LTO_AR,
+			[*-ar],[AC_MSG_RESULT([$LTO_AR])],
+			[use_lto=no
+			 AC_MSG_RESULT([no suitable AR tool is found; truning off LTO])])],
+		[AC_MSG_RESULT([no suitable AR tool is found; truning off LTO])])
+])
+AS_VAR_IF([use_lto], [yes], [
+	AS_CASE($CC,
+		[gcc|*/gcc],     [AC_CHECK_PROGS([LTO_RANLIB], [gcc-ranlib ranlib],  [:])],
+		[clang|*/clang], [AC_CHECK_PROGS([LTO_RANLIB], [clang-ranlib ranlib], [:])],
+		[use_lto=no])
+	AC_MSG_CHECKING([the wrapper for ranlib working with $CC -flto])
+	AS_VAR_IF([LTO_RANLIB], [:], AC_MSG_ERROR([could not find RANLIB tool working with -flto.]))
+	AS_VAR_IF([use_lto], [yes],
+		[AS_CASE($LTO_RANLIB,
+			[*-ranlib],[AC_MSG_RESULT([$LTO_RANLIB])],
+			[use_lto=no
+			 AC_MSG_RESULT([no suitable ranlib tool is found; truning off LTO])])],
+		[AC_MSG_RESULT([no suitable ranlib is found; truning off LTO])])
+])
+AS_VAR_IF([use_lto], [yes], [
+	AR="$LTO_AR"
+	RANLIB="$LTO_RANLIB"
+	EXTRA_CFLAGS="$EXTRA_CFLAGS -flto"
+	EXTRA_LDFLAGS="$EXTRA_LDFLAGS -flto"
+],[
+	AS_VAR_IF([enable_lto], [yes], [
+		AC_MSG_ERROR([though --enable-lto is specified, the fto feature is not available nor usable.])
+	])
+])
 
 # Checks for function availability
 # -----------------------------------
