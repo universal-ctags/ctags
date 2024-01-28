@@ -8,6 +8,11 @@
 *
 *   This module contains functions for generating tags for user-defined
 *   functions for the Vim editor.
+*
+*   references:
+*   - https://vim-jp.org/vimdoc-en/
+*   - https://vim-jp.org/vimdoc-ja/
+*
 */
 
 /*
