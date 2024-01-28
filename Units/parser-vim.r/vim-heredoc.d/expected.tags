@@ -1,0 +1,6 @@
+var1	input.vim	/^let var1 =<< trim END$/;"	v	roles:def
+END	input.vim	/^let var1 =<< trim END$/;"	h	roles:def	end:4
+END	input.vim	/^END$/;"	h	roles:endmarker
+var2	input.vim	/^let var2 =<< END$/;"	v	roles:def
+END	input.vim	/^let var2 =<< END$/;"	h	roles:def	end:9
+END	input.vim	/^END$/;"	h	roles:endmarker
