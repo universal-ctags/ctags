@@ -627,6 +627,8 @@ static bool isInHereDoc (struct hereDocMarkerManager *mgr,
 	{
 		setTagEndLineToCorkEntry (current->corkIndex, getInputLineNumber());
 
+		makeSimpleRefTag (current->marker, KIND_PERL_HEREDOCMARKER, R_HEREDOC_ENDLABEL);
+
 		mgr->current++;
 		if (mgr->current == ptrArrayCount (mgr->markers))
 		{
