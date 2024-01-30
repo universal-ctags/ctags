@@ -1,12 +1,19 @@
-myfunc0	input.pl	/^sub myfunc0$/;"	s	line:1
-foo	input.pl	/^   print <<"foo", <<~\\bar; # you can stack them$/;"	h	line:5	end:10
-bar	input.pl	/^   print <<"foo", <<~\\bar; # you can stack them$/;"	h	line:5	end:15
-myfunc3	input.pl	/^sub myfunc3$/;"	s	line:17
-THIS	input.pl	/^   myfunc0(<< "THIS", 23, <<'THAT');$/;"	h	line:21	end:33
-THAT	input.pl	/^   myfunc0(<< "THIS", 23, <<'THAT');$/;"	h	line:21	end:41
-myfunc9	input.pl	/^sub myfunc9$/;"	s	line:42
-AB"CD	input.pl	/^myfunc0(<< "AB\\"CD", << 'EF\\GH');$/;"	h	line:46	end:53
-EF\\GH	input.pl	/^myfunc0(<< "AB\\"CD", << 'EF\\GH');$/;"	h	line:46	end:59
-myfunc12	input.pl	/^sub myfunc12$/;"	s	line:61
-END	input-0.pl	/^(($argc == (1 << 0x1)) or ($argc >= (1<<1) and $opt_write)) or die <<END;$/;"	h	line:2	end:10
-foo	input-0.pl	/^sub foo {$/;"	s	line:12
+myfunc0	input.pl	/^sub myfunc0$/;"	s	line:1	roles:def
+foo	input.pl	/^   print <<"foo", <<~\\bar; # you can stack them$/;"	h	line:5	roles:def	end:10
+bar	input.pl	/^   print <<"foo", <<~\\bar; # you can stack them$/;"	h	line:5	roles:def	end:15
+foo	input.pl	/^foo$/;"	h	line:10	roles:endmarker
+bar	input.pl	/^    bar$/;"	h	line:15	roles:endmarker
+myfunc3	input.pl	/^sub myfunc3$/;"	s	line:17	roles:def
+THIS	input.pl	/^   myfunc0(<< "THIS", 23, <<'THAT');$/;"	h	line:21	roles:def	end:33
+THAT	input.pl	/^   myfunc0(<< "THIS", 23, <<'THAT');$/;"	h	line:21	roles:def	end:41
+THIS	input.pl	/^THIS$/;"	h	line:33	roles:endmarker
+THAT	input.pl	/^THAT$/;"	h	line:41	roles:endmarker
+myfunc9	input.pl	/^sub myfunc9$/;"	s	line:42	roles:def
+AB"CD	input.pl	/^myfunc0(<< "AB\\"CD", << 'EF\\GH');$/;"	h	line:46	roles:def	end:53
+EF\\GH	input.pl	/^myfunc0(<< "AB\\"CD", << 'EF\\GH');$/;"	h	line:46	roles:def	end:59
+AB"CD	input.pl	/^AB"CD$/;"	h	line:53	roles:endmarker
+EF\\GH	input.pl	/^EF\\GH$/;"	h	line:59	roles:endmarker
+myfunc12	input.pl	/^sub myfunc12$/;"	s	line:61	roles:def
+END	input-0.pl	/^(($argc == (1 << 0x1)) or ($argc >= (1<<1) and $opt_write)) or die <<END;$/;"	h	line:2	roles:def	end:10
+END	input-0.pl	/^END$/;"	h	line:10	roles:endmarker
+foo	input-0.pl	/^sub foo {$/;"	s	line:12	roles:def

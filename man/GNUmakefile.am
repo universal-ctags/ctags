@@ -52,6 +52,7 @@ GEN_IN_MAN_FILES = \
 	ctags-lang-tcl.7 \
 	ctags-lang-terraform.7 \
 	ctags-lang-verilog.7 \
+	ctags-lang-vim.7 \
 	\
 	readtags.1 \
 	tags.5 \

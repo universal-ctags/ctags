@@ -41,5 +41,6 @@ Man pages
 	ctags-lang-tcl(7) <man/ctags-lang-tcl.7.rst>
 	ctags-lang-terraform(7) <man/ctags-lang-terraform.7.rst>
 	ctags-lang-verilog(7) <man/ctags-lang-verilog.7.rst>
+	ctags-lang-vim(7) <man/ctags-lang-vim.7.rst>
 
 	readtags(1) <man/readtags.1.rst>

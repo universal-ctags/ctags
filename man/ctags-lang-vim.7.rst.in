@@ -1,0 +1,33 @@
+.. _ctags-lang-vim(7):
+
+==============================================================
+ctags-lang-vim
+==============================================================
+---------------------------------------------------------------------
+Random notes about tagging Vim source code with Universal Ctags
+---------------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+Vim ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=Vim ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Vim=+.vim ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging VIM source code.
+
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New kind ``heredoc``.
+
+SEE ALSO
+--------
+ctags(1)

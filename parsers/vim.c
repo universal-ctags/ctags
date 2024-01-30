@@ -8,6 +8,11 @@
 *
 *   This module contains functions for generating tags for user-defined
 *   functions for the Vim editor.
+*
+*   references:
+*   - https://vim-jp.org/vimdoc-en/
+*   - https://vim-jp.org/vimdoc-ja/
+*
 */
 
 /*
@@ -49,7 +54,16 @@ typedef enum {
 	K_VARIABLE,
 	K_FILENAME,
 	K_CONST,
+	K_HEREDOC,
 } vimKind;
+
+typedef enum {
+	R_HEREDOC_ENDLABEL,
+} vimHeredocRole;
+
+static roleDefinition VimHeredocRoles [] = {
+	{ true, "endmarker", "end marker" },
+};
 
 static kindDefinition VimKinds [] = {
 	{ true,  'a', "augroup",  "autocommand groups" },
@@ -59,6 +73,8 @@ static kindDefinition VimKinds [] = {
 	{ true,  'v', "variable", "variable definitions" },
 	{ true,  'n', "filename", "vimball filename" },
 	{ true,  'C', "constant", "constant definitions" },
+	{ false, 'h', "heredoc",  "marker for here document",
+	  .referenceOnly = false, ATTACH_ROLES (VimHeredocRoles) },
 };
 
 /*
@@ -195,6 +211,11 @@ static bool isMap (const unsigned char *line)
 			wordMatchLen (line, "inoremap", 3) ||
 			wordMatchLen (line, "lnoremap", 2) ||
 			wordMatchLen (line, "cnoremap", 3));
+}
+
+static const unsigned char *readVimLineRaw (void)
+{
+	return readLineFromInputFile ();
 }
 
 static const unsigned char *readVimLine (void)
@@ -497,9 +518,54 @@ cleanUp:
 	return cmdProcessed;
 }
 
-static void parseVariableOrConstant (const unsigned char *line, int infunction, int kindIndex)
+/* =<< trim {endmarker} */
+static int parserHeredocMarker(const unsigned char *cp)
+{
+	while (*cp && isspace (*cp))
+		++cp;
+
+	if (! (cp[0] == '=' && cp[1] == '<' && cp[2] == '<'))
+		return CORK_NIL;
+
+	cp += 3;
+
+	while (*cp && isspace (*cp))
+		++cp;
+
+	if (wordMatchLen (cp, "trim", 4))
+	{
+			cp += 4;
+			while (*cp && isspace (*cp))
+				++cp;
+	}
+
+	if (!('A' <= *cp && *cp <= 'Z'))
+		return CORK_NIL;
+
+	vString *heredoc = vStringNew ();
+	do
+		vStringPut (heredoc, *cp++);
+	while (*cp != '\0' && !isspace (*cp));
+
+	if (vStringIsEmpty (heredoc))
+	{
+		vStringDelete (heredoc);
+		return CORK_NIL;
+	}
+
+	int r = makeSimpleTag (heredoc, K_HEREDOC);
+	vStringDelete (heredoc);
+	return r;
+}
+
+/*
+ * If we have a heredoc end marker at the end of LINE,
+ * parseVariableOrConstant returns the tag cork index for the marker.
+ */
+static int parseVariableOrConstant (const unsigned char *line, int infunction, int kindIndex)
 {
 	vString *name = vStringNew ();
+	int heredoc = CORK_NIL;
 
 	const unsigned char *cp = line;
 	const unsigned char *np = line;
@@ -549,10 +615,14 @@ static void parseVariableOrConstant (const unsigned char *line, int infunction, 
 		} while (isalnum (*cp) || *cp == '_' || *cp == '#' || *cp == ':' || *cp == '$');
 		makeSimpleTag (name, kindIndex);
 		vStringClear (name);
+
+		heredoc = parserHeredocMarker(cp);
 	}
 
 cleanUp:
 	vStringDelete (name);
+
+	return heredoc;
 }
 
 static bool parseMap (const unsigned char *line)
@@ -637,6 +707,7 @@ static bool parseMap (const unsigned char *line)
 static bool parseVimLine (const unsigned char *line, int infunction)
 {
 	bool readNextLine = true;
+	int heredoc = CORK_NIL;
 
 	if (wordMatchLen (line, "command", 3))
 	{
@@ -661,11 +732,29 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 
 	else if (wordMatchLen (line, "let", 3))
 	{
-		parseVariableOrConstant (skipWord (line), infunction, K_VARIABLE);
+		heredoc = parseVariableOrConstant (skipWord (line), infunction, K_VARIABLE);
 	}
 	else if (wordMatchLen (line, "const", 4))
 	{
-		parseVariableOrConstant (skipWord (line), infunction, K_CONST);
+		heredoc = parseVariableOrConstant (skipWord (line), infunction, K_CONST);
+	}
+
+	tagEntryInfo *e;
+	if (heredoc != CORK_NIL && (e = getEntryInCorkQueue (heredoc)))
+	{
+		const unsigned char *line;
+
+		while ((line = readVimLineRaw()) != NULL)
+			if (strcmp (e->name, (const char *)line) == 0)
+			{
+				setTagEndLine (e, getInputLineNumber());
+
+				tagEntryInfo h;
+				initRefTagEntry (&h, e->name, K_HEREDOC, R_HEREDOC_ENDLABEL);
+				makeTagEntry(&h);
+
+				break;
+			}
 	}
 
 	return readNextLine;
@@ -790,5 +879,9 @@ extern parserDefinition *VimParser (void)
 	def->patterns   = patterns;
 	def->parser     = findVimTags;
 	def->useCork    = CORK_QUEUE;
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
+
 	return def;
 }

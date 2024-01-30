@@ -130,6 +130,7 @@ Vera           d/macro           undef              on      undefined
 Vera           h/header          local              on      local header
 Vera           h/header          system             on      system header
 Verilog        m/module          decl               on      declaring instances
+Vim            h/heredoc         endmarker          on      end marker
 Zsh            f/function        autoloaded         on      function name passed to autoload built-in command
 Zsh            h/heredoc         endmarker          on      end marker
 Zsh            s/script          autoloaded         on      autoloaded
@@ -266,6 +267,7 @@ Vera           d/macro           undef              on      undefined
 Vera           h/header          local              on      local header
 Vera           h/header          system             on      system header
 Verilog        m/module          decl               on      declaring instances
+Vim            h/heredoc         endmarker          on      end marker
 Zsh            f/function        autoloaded         on      function name passed to autoload built-in command
 Zsh            h/heredoc         endmarker          on      end marker
 Zsh            s/script          autoloaded         on      autoloaded
