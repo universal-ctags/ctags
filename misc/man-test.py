@@ -206,7 +206,7 @@ def extract_test_cases(f):
                 s = state.start
                 yield test_spec
 
-        m = s == state.start and re.search ('^"(input\.[^"]+)"$', line)
+        m = s == state.start and re.search ('^"(input\\.[^"]+)"$', line)
         if m:
             test_spec ['start_linum'] = linum
             test_spec ['input_file_name'] = m.group(1)
