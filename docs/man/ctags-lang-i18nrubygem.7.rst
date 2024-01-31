@@ -9,6 +9,7 @@ Random notes about tagging input for I18n Ruby Gem with Universal Ctags
 :Version: 6.1.0
 :Manual group: Universal Ctags
 :Manual section: 7
+:Expected feature: yaml
 
 SYNOPSIS
 --------

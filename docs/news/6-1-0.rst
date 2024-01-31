@@ -13,7 +13,7 @@ New and extended options and their flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ``{postrun}`` and ``{intervaltab}`` flags are added.
-  See :ref:`ctags-optlib(1) <ctags-optlib(1)>`.
+  See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 Incompatible changes
 ---------------------------------------------------------------------
@@ -36,8 +36,8 @@ The following parsers have been added:
 * V: new parser by Tim Marston · Pull Request #3871, #3870
 * Terraform: new parser by masatake · Pull Request #3684
 
-  + Terraform (HCL) (*.tf): new parser by  Matt Mrowiec · Pull Request #3683
-  + Terraform (HCL) (*.tf): new parser by Antony Southworth · Pull Request #2952
+  + Terraform (HCL) (\*.tf): new parser by  Matt Mrowiec · Pull Request #3683
+  + Terraform (HCL) (\*.tf): new parser by Antony Southworth · Pull Request #2952
 
 * TerraformVariables *optlib* by masatake · Pull Request #3684
 
@@ -308,7 +308,7 @@ Issues close or partially closed via above pull requests
 * docs(man): write about using multiple parsers for single input file · Issue #3888
 * Write about kind collisions to ctags-faq(7) · Issue #3007
 * create annotation tags instead of lightweight tag · Issue #3767
-* CPreProcessor: Assertion `c >= 0 && c <= 0xff' failed · Issue #3771
+* CPreProcessor: Assertion `'c >= 0 && c <= 0xff'` failed · Issue #3771
 * Convert NEWS.md to NEWS.rst · Issue #3874
 * [Question] Defining new regex-based tags with scope defined by built-in `ctags` kinds · Issue #3637
 * Warning reported when running make units · Issue #3865

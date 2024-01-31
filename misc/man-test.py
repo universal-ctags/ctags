@@ -206,7 +206,7 @@ def extract_test_cases(f):
                 s = state.start
                 yield test_spec
 
-        m = s == state.start and re.search ('^"(input\.[^"]+)"$', line)
+        m = s == state.start and re.search ('^"(input\\.[^"]+)"$', line)
         if m:
             test_spec ['start_linum'] = linum
             test_spec ['input_file_name'] = m.group(1)
@@ -234,12 +234,39 @@ def extract_test_cases(f):
             s = state.tags
             continue
 
+def extract_features (f):
+    for line in  f.readlines():
+        line = line.rstrip('\r\n')
+        m = re.search(':Expected feature:[ \t]*([a-zA-Z0-9-_]+)', line)
+        if m:
+            yield m.group(1)
+        continue
+
+# Taken from misc/units.py
+def has_feature (ctags, feat):
+    ret = subprocess.run([ctags, '--quiet', '--options=NONE',
+                          '--list-features', '--with-list=no'],
+                         stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    if feat in re.sub(r'(?m)^([^ ]+).*$', r'\1',
+                      ret.stdout.decode('utf-8')).splitlines():
+        return True
+    return False
+
+def report_skip(man_file, feat):
+    print ('%s[feat]:%s...skipped' % (man_file, feat))
+
 def man_test (tmpdir, ctags, man_file):
     failures = []
     result = True
     print ('# Run test cases in ' + man_file)
     print ('```')
     with open(man_file, encoding='utf-8') as f:
+        for x in extract_features (f):
+            if not has_feature(ctags, x):
+                report_skip(man_file, x)
+                print ('```')
+                return True
+        f.seek(0)
         for t in extract_test_cases (f):
             t['man_file'] = man_file
             v = verify_test_case (t)

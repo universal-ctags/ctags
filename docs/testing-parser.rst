@@ -710,3 +710,27 @@ Here is an example output of the man-test target.
 NOTE: keep examples in the man pages simple. If you want to test ctags
 complicated (and or subtle) input, use the units target. The main
 purpose of the examples is for explaining the parser.
+
+If your parser depends on a feature, listed in ``"ctags
+--list-features"``, and the ctags executable at the platform doesn't
+have the feature, the man-test for the parser should be skipped.
+
+``:Expected feature: FEAT`` is the notation for declaring a feature
+that needs to run the man-test for the parser. Here is an example:
+
+.. code-block:: ReStructuredText
+
+	.. _ctags-lang-i18nrubgem(7):
+
+	==============================================================
+	ctags-lang-i18nrubgem
+	==============================================================
+	------------------------------------------------------------------------
+	Random notes about tagging input for I18n Ruby Gem with Universal Ctags
+	------------------------------------------------------------------------
+	:Version: @VERSION@
+	:Manual group: Universal Ctags
+	:Manual section: 7
+	:Expected feature: yaml
+
+At the last line, ``yaml`` feature is declared.
