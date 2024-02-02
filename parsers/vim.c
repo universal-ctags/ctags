@@ -726,7 +726,7 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 		parseAutogroup (skipWord (line));
 	}
 
-	else if (wordMatchLen (line, "let", 3))
+	else if (wordMatchLen (line, "let", 3) || (vim9script && wordMatchLen (line, "var", 3)))
 	{
 		heredoc = parseVariableOrConstant (skipWord (line), infunction, K_VARIABLE);
 	}

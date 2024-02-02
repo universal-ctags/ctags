@@ -1,0 +1,4 @@
+cur_menu_name	input.vim	/^var cur_menu_name = ""$/;"	v
+cur_menu_nr	input.vim	/^var cur_menu_nr = 0$/;"	v
+cur_menu_item	input.vim	/^var cur_menu_item = 0$/;"	v
+cur_menu_char	input.vim	/^var cur_menu_char = ""$/;"	v
