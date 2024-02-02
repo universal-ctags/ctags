@@ -730,7 +730,7 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 	{
 		heredoc = parseVariableOrConstant (skipWord (line), infunction, K_VARIABLE);
 	}
-	else if (wordMatchLen (line, "const", 4))
+	else if (wordMatchLen (line, "const", 4) || wordMatchLen (line, "final", 5))
 	{
 		heredoc = parseVariableOrConstant (skipWord (line), infunction, K_CONST);
 	}

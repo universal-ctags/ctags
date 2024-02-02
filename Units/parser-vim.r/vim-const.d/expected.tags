@@ -1,1 +1,3 @@
+matches	input-0.vim	/^final matches = []$/;"	C
+names	input-0.vim	/^const names = ['Betty', 'Peter']$/;"	C
 s:CONSTANT	input.vim	/^const s:CONSTANT = 42$/;"	C
