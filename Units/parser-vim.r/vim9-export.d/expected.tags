@@ -1,0 +1,5 @@
+EXPORTED_CONST	input.vim	/^export const EXPORTED_CONST = 1234$/;"	C
+v	input.vim	/^export var v = 1$/;"	v
+f	input.vim	/^export final f = 2$/;"	C
+c	input.vim	/^export const c = 3$/;"	C
+MyFunc	input.vim	/^export def MyFunc()$/;"	f

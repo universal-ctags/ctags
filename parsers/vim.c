@@ -700,6 +700,14 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 	bool readNextLine = true;
 	int heredoc = CORK_NIL;
 
+	if (vim9script && wordMatchLen (line, "export", 6))
+	{
+		line += 6;
+		while (*line && isspace (*line))
+			++line;
+		/* TODO: export should be stored to a field. */
+	}
+
 	if (wordMatchLen (line, "vim9script", 10))
 	{
 		vim9script = true;
