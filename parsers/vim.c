@@ -84,6 +84,7 @@ static kindDefinition VimKinds [] = {
 /*
  *  DATA DEFINITIONS
  */
+static bool vim9script;
 
 /*
  *  FUNCTION DEFINITIONS
@@ -217,7 +218,7 @@ static const unsigned char *readVimLine (void)
 		while (isspace (*line))
 			++line;
 
-		if ((int) *line == '"')
+		if ((int) *line == (vim9script? '#': '"'))
 			continue;  /* skip comment */
 
 		break;
@@ -699,7 +700,12 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 	bool readNextLine = true;
 	int heredoc = CORK_NIL;
 
-	if (wordMatchLen (line, "command", 3))
+	if (wordMatchLen (line, "vim9script", 10))
+	{
+		vim9script = true;
+	}
+
+	else if (wordMatchLen (line, "command", 3))
 	{
 		readNextLine = parseCommand (line);
 		/* TODO - Handle parseCommand returning false */
@@ -839,6 +845,8 @@ static void findVimTags (void)
 {
 	const unsigned char *line;
 	/* TODO - change this into a structure */
+
+	vim9script = false;
 
 	line = readVimLine ();
 
