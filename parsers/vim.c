@@ -81,19 +81,9 @@ static kindDefinition VimKinds [] = {
  *  DATA DECLARATIONS
  */
 
-#if 0
-typedef enum eException {
-	ExceptionNone, ExceptionEOF
-} exception_t;
-#endif
-
 /*
  *  DATA DEFINITIONS
  */
-
-#if 0
-static jmp_buf Exception;
-#endif
 
 /*
  *  FUNCTION DEFINITIONS
