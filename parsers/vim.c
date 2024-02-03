@@ -239,7 +239,7 @@ static const unsigned char *readVimballLine (void)
 	return line;
 }
 
-static void parserRettype (const unsigned char *cp, tagEntryInfo *e)
+static void parseRettype (const unsigned char *cp, tagEntryInfo *e)
 {
 	while (*cp && isspace (*cp))
 		++cp;
@@ -311,7 +311,7 @@ static vString *parseSignatureAndRettype (const unsigned char *cp,
 			while (*cp && isspace (*cp))
 				++cp;
 			if (*cp == ':')
-				parserRettype (++cp, e);
+				parseRettype (++cp, e);
 		}
 	}
 
@@ -552,7 +552,7 @@ cleanUp:
 }
 
 /* =<< trim {endmarker} */
-static int parserHeredocMarker(const unsigned char *cp)
+static int parseHeredocMarker(const unsigned char *cp)
 {
 	while (*cp && isspace (*cp))
 		++cp;
@@ -652,7 +652,7 @@ static int parseVariableOrConstant (const unsigned char *line, int infunction, i
 			makeSimpleTag (name, kindIndex);
 			vStringClear (name);
 
-			heredoc = parserHeredocMarker(cp);
+			heredoc = parseHeredocMarker(cp);
 		}
 	}
 
