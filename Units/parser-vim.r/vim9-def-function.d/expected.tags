@@ -1,1 +1,2 @@
-Func	input.vim	/^def Func()$/;"	f
+Func	input.vim	/^def Func()$/;"	f	signature:()
+Func2	input.vim	/^def Func2(): number$/;"	f	typeref:typename:number	signature:()

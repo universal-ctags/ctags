@@ -239,9 +239,40 @@ static const unsigned char *readVimballLine (void)
 	return line;
 }
 
-static vString *parseSignature (const unsigned char *cp,
-								tagEntryInfo *e,
-								vString *buf)
+static void parserRettype (const unsigned char *cp, tagEntryInfo *e)
+{
+	while (*cp && isspace (*cp))
+		++cp;
+
+	if (!*cp)
+		return;
+
+	vString *buf = vStringNew ();
+	while (*cp && *cp != '#')
+	{
+		if (isspace (*cp)
+			&& !vStringIsEmpty(buf)
+			&& isspace (vStringLast(buf)))
+		{
+			++cp;
+			continue;
+		}
+		vStringPut (buf, *cp);
+		++cp;
+	}
+
+	if (vStringIsEmpty(buf))
+		return;
+
+	vStringStripTrailing (buf);
+	e->extensionFields.typeRef[0] = eStrdup ("typename");
+	e->extensionFields.typeRef[1] = vStringDeleteUnwrap (buf);
+}
+
+static vString *parseSignatureAndRettype (const unsigned char *cp,
+										  tagEntryInfo *e,
+										  vString *buf,
+										  bool extractRettype)
 {
 	/* TODO capture parameters */
 
@@ -273,12 +304,21 @@ static vString *parseSignature (const unsigned char *cp,
 	{
 		e->extensionFields.signature = vStringDeleteUnwrap (buf);
 		buf = NULL;
+
+		if (extractRettype)
+		{
+			++cp;
+			while (*cp && isspace (*cp))
+				++cp;
+			if (*cp == ':')
+				parserRettype (++cp, e);
+		}
 	}
 
 	return buf;
 }
 
-static void parseFunction (const unsigned char *line)
+static void parseFunction (const unsigned char *line, bool definedWithDEF)
 {
 	vString *name = vStringNew ();
 	vString *signature = NULL;
@@ -323,7 +363,8 @@ static void parseFunction (const unsigned char *line)
 					while (*cp && isspace (*cp))
 						++cp;
 					if (*cp == '(')
-						signature = parseSignature (cp, e, NULL);
+						signature = parseSignatureAndRettype (cp, e, NULL,
+															  definedWithDEF);
 				}
 			}
 		}
@@ -340,7 +381,8 @@ static void parseFunction (const unsigned char *line)
 			/* A backslash at the start of a line stands for a line continuation.
 			 * https://vimhelp.org/repeat.txt.html#line-continuation */
 			if (*cp == '\\')
-				signature = parseSignature (++cp, e, signature);
+				signature = parseSignatureAndRettype (++cp, e, signature,
+													  definedWithDEF);
 		}
 
 		if (wordMatchLen (line, "endfunction", 4) || wordMatchLen (line, "enddef", 6))
@@ -726,7 +768,7 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 
 	else if (wordMatchLen (line, "function", 2) || wordMatchLen (line, "def", 3))
 	{
-		parseFunction (skipWord (line));
+		parseFunction (skipWord (line), vim9script && line[0] == 'd');
 	}
 
 	else if (wordMatchLen (line, "augroup", 3))
