@@ -90,7 +90,7 @@ static bool vim9script;
  *  FUNCTION DEFINITIONS
  */
 
-static bool parseVimLine (const unsigned char *line, int infunction);
+static bool parseVimLine (const unsigned char *line, int parent);
 
 /* This function takes a char pointer, tries to find a scope separator in the
  * string, and if it does, returns a pointer to the character after the colon,
@@ -320,7 +320,7 @@ static vString *parseSignatureAndRettype (const unsigned char *cp,
 	return buf;
 }
 
-static void parseFunction (const unsigned char *line, bool definedWithDEF)
+static void parseFunction (const unsigned char *line, int parent, bool definedWithDEF)
 {
 	vString *name = vStringNew ();
 	vString *signature = NULL;
@@ -360,13 +360,17 @@ static void parseFunction (const unsigned char *line, bool definedWithDEF)
 				vStringClear (name);
 
 				e = getEntryInCorkQueue (index);
-				if (e && isFieldEnabled (FIELD_SIGNATURE))
+				if (e)
 				{
-					while (*cp && isspace (*cp))
-						++cp;
-					if (*cp == '(')
-						signature = parseSignatureAndRettype (cp, e, NULL,
-															  definedWithDEF);
+					e->extensionFields.scopeIndex = parent;
+					if (isFieldEnabled (FIELD_SIGNATURE))
+					{
+						while (*cp && isspace (*cp))
+							++cp;
+						if (*cp == '(')
+							signature = parseSignatureAndRettype (cp, e, NULL,
+																  definedWithDEF);
+					}
 				}
 			}
 		}
@@ -394,7 +398,7 @@ static void parseFunction (const unsigned char *line, bool definedWithDEF)
 			break;
 		}
 
-		parseVimLine (line, true);
+		parseVimLine (line, index);
 	}
 	if (signature)
 		vStringDelete (signature);
@@ -597,7 +601,7 @@ static int parseHeredocMarker(const unsigned char *cp)
  * If we have a heredoc end marker at the end of LINE,
  * parseVariableOrConstant returns the tag cork index for the marker.
  */
-static int parseVariableOrConstant (const unsigned char *line, int infunction, int kindIndex)
+static int parseVariableOrConstant (const unsigned char *line, int parent, int kindIndex)
 {
 	vString *name = vStringNew ();
 	int heredoc = CORK_NIL;
@@ -629,7 +633,7 @@ static int parseVariableOrConstant (const unsigned char *line, int infunction, i
 			goto cleanUp;
 
 		/* Skip non-global vars in functions */
-		if (infunction && (*np != ':' || *cp != 'g'))
+		if (parent != CORK_NIL && (*np != ':' || *cp != 'g'))
 			goto cleanUp;
 
 		/* deal with spaces, $, @ and & */
@@ -756,7 +760,7 @@ static bool parseMap (const unsigned char *line)
 	return true;
 }
 
-static bool parseVimLine (const unsigned char *line, int infunction)
+static bool parseVimLine (const unsigned char *line, int parent)
 {
 	bool readNextLine = true;
 	int heredoc = CORK_NIL;
@@ -787,7 +791,7 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 
 	else if (wordMatchLen (line, "function", 2) || wordMatchLen (line, "def", 3))
 	{
-		parseFunction (skipWord (line), vim9script && line[0] == 'd');
+		parseFunction (skipWord (line), parent, vim9script && line[0] == 'd');
 	}
 
 	else if (wordMatchLen (line, "augroup", 3))
@@ -797,11 +801,11 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 
 	else if (wordMatchLen (line, "let", 3) || (vim9script && wordMatchLen (line, "var", 3)))
 	{
-		heredoc = parseVariableOrConstant (skipWord (line), infunction, K_VARIABLE);
+		heredoc = parseVariableOrConstant (skipWord (line), parent, K_VARIABLE);
 	}
 	else if (wordMatchLen (line, "const", 4) || wordMatchLen (line, "final", 5))
 	{
-		heredoc = parseVariableOrConstant (skipWord (line), infunction, K_CONST);
+		heredoc = parseVariableOrConstant (skipWord (line), parent, K_CONST);
 	}
 
 	tagEntryInfo *e;
@@ -825,13 +829,13 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 	return readNextLine;
 }
 
-static void parseVimFile (const unsigned char *line)
+static void parseVimFile (const unsigned char *line, int parent)
 {
 	bool readNextLine = true;
 
 	while (line != NULL)
 	{
-		readNextLine = parseVimLine (line, false);
+		readNextLine = parseVimLine (line, parent);
 
 		if (readNextLine)
 			line = readVimLine ();
@@ -930,7 +934,7 @@ static void findVimTags (void)
 	}
 	else
 	{
-		parseVimFile (line);
+		parseVimFile (line, CORK_NIL);
 	}
 }
 
