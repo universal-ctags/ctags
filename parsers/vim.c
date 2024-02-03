@@ -239,16 +239,16 @@ static const unsigned char *readVimballLine (void)
 	return line;
 }
 
-static void parseRettype (const unsigned char *cp, tagEntryInfo *e)
+static const unsigned char *parseRettype (const unsigned char *cp, tagEntryInfo *e)
 {
 	while (*cp && isspace (*cp))
 		++cp;
 
 	if (!*cp)
-		return;
+		return cp;
 
 	vString *buf = vStringNew ();
-	while (*cp && *cp != '#')
+	while (*cp && *cp != '#' && *cp != '=')
 	{
 		if (isspace (*cp)
 			&& !vStringIsEmpty(buf)
@@ -262,11 +262,13 @@ static void parseRettype (const unsigned char *cp, tagEntryInfo *e)
 	}
 
 	if (vStringIsEmpty(buf))
-		return;
+		return cp;
 
 	vStringStripTrailing (buf);
 	e->extensionFields.typeRef[0] = eStrdup ("typename");
 	e->extensionFields.typeRef[1] = vStringDeleteUnwrap (buf);
+
+	return cp;
 }
 
 static vString *parseSignatureAndRettype (const unsigned char *cp,
@@ -647,10 +649,23 @@ static int parseVariableOrConstant (const unsigned char *line, int infunction, i
 			++cp;
 		} while (isalnum (*cp) || *cp == '_' || *cp == '#' || *cp == ':' || *cp == '$');
 
+		bool hasType = false;
+		if (*cp && vim9script && !vStringIsEmpty (name) && (vStringLast (name) == ':'))
+		{
+			Assert(line != cp);
+			Assert(*(cp - 1) == ':');
+			vStringChop (name);
+			hasType = true;
+		}
+
 		if (!vStringIsEmpty (name))
 		{
-			makeSimpleTag (name, kindIndex);
+			int r = makeSimpleTag (name, kindIndex);
 			vStringClear (name);
+
+			tagEntryInfo *e;
+			if (hasType && (e = getEntryInCorkQueue (r)))
+				cp = parseRettype (cp, e);
 
 			heredoc = parseHeredocMarker(cp);
 		}
