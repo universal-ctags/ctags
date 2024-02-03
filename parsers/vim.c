@@ -646,10 +646,14 @@ static int parseVariableOrConstant (const unsigned char *line, int infunction, i
 			vStringPut (name, *cp);
 			++cp;
 		} while (isalnum (*cp) || *cp == '_' || *cp == '#' || *cp == ':' || *cp == '$');
-		makeSimpleTag (name, kindIndex);
-		vStringClear (name);
 
-		heredoc = parserHeredocMarker(cp);
+		if (!vStringIsEmpty (name))
+		{
+			makeSimpleTag (name, kindIndex);
+			vStringClear (name);
+
+			heredoc = parserHeredocMarker(cp);
+		}
 	}
 
 cleanUp:
