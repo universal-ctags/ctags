@@ -1,0 +1,2 @@
+target	input.mak	/^target: macro = 1$/;"	t	line:2	end:2
+macro	input.mak	/^target: macro = 1$/;"	m	line:2

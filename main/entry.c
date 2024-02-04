@@ -1625,7 +1625,7 @@ extern void setTagEndLine(tagEntryInfo *tag, unsigned long endLine)
 	{
 		error (WARNING,
 			   "given end line (%lu) for the tag (%s) in the file (%s) is smaller than its start line: %lu",
-			   tag->lineNumber,
+			   endLine,
 			   tag->name,
 			   tag->inputFileName,
 			   tag->lineNumber);

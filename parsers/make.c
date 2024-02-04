@@ -221,6 +221,20 @@ static void endTargets (intArray *targets, unsigned long lnum)
 	intArrayClear (targets);
 }
 
+static bool isTheLastTargetOnTheSameLine (intArray *current_targets,
+										  unsigned long line)
+{
+	if (!intArrayIsEmpty (current_targets))
+	{
+		int r = intArrayLast (current_targets);
+		tagEntryInfo *e = getEntryInCorkQueue (r);
+		if (e && e->lineNumber == line)
+			return true;
+	}
+
+	return false;
+}
+
 static void findMakeTags (void)
 {
 	stringList *identifiers = stringListNew ();
@@ -300,7 +314,10 @@ static void findMakeTags (void)
 			newMacro (stringListItem (identifiers, 0), false, appending);
 
 			in_value = true;
-			endTargets (current_targets, getInputLineNumber () - 1);
+			unsigned long curline = getInputLineNumber ();
+			unsigned long adj = isTheLastTargetOnTheSameLine (current_targets,
+															  curline)? 0: 1;
+			endTargets (current_targets, curline - adj);
 			appending = false;
 		}
 		else if (variable_possible && isIdentifier (c))
