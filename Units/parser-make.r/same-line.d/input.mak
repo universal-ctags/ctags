@@ -1,0 +1,2 @@
+#
+target: macro = 1
