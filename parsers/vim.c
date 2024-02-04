@@ -81,25 +81,16 @@ static kindDefinition VimKinds [] = {
  *  DATA DECLARATIONS
  */
 
-#if 0
-typedef enum eException {
-	ExceptionNone, ExceptionEOF
-} exception_t;
-#endif
-
 /*
  *  DATA DEFINITIONS
  */
-
-#if 0
-static jmp_buf Exception;
-#endif
+static bool vim9script;
 
 /*
  *  FUNCTION DEFINITIONS
  */
 
-static bool parseVimLine (const unsigned char *line, int infunction);
+static bool parseVimLine (const unsigned char *line, int parent);
 
 /* This function takes a char pointer, tries to find a scope separator in the
  * string, and if it does, returns a pointer to the character after the colon,
@@ -227,7 +218,7 @@ static const unsigned char *readVimLine (void)
 		while (isspace (*line))
 			++line;
 
-		if ((int) *line == '"')
+		if ((int) *line == (vim9script? '#': '"'))
 			continue;  /* skip comment */
 
 		break;
@@ -248,9 +239,42 @@ static const unsigned char *readVimballLine (void)
 	return line;
 }
 
-static vString *parseSignature (const unsigned char *cp,
-								tagEntryInfo *e,
-								vString *buf)
+static const unsigned char *parseRettype (const unsigned char *cp, tagEntryInfo *e)
+{
+	while (*cp && isspace (*cp))
+		++cp;
+
+	if (!*cp)
+		return cp;
+
+	vString *buf = vStringNew ();
+	while (*cp && *cp != '#' && *cp != '=')
+	{
+		if (isspace (*cp)
+			&& !vStringIsEmpty(buf)
+			&& isspace (vStringLast(buf)))
+		{
+			++cp;
+			continue;
+		}
+		vStringPut (buf, *cp);
+		++cp;
+	}
+
+	if (vStringIsEmpty(buf))
+		return cp;
+
+	vStringStripTrailing (buf);
+	e->extensionFields.typeRef[0] = eStrdup ("typename");
+	e->extensionFields.typeRef[1] = vStringDeleteUnwrap (buf);
+
+	return cp;
+}
+
+static vString *parseSignatureAndRettype (const unsigned char *cp,
+										  tagEntryInfo *e,
+										  vString *buf,
+										  bool extractRettype)
 {
 	/* TODO capture parameters */
 
@@ -282,12 +306,21 @@ static vString *parseSignature (const unsigned char *cp,
 	{
 		e->extensionFields.signature = vStringDeleteUnwrap (buf);
 		buf = NULL;
+
+		if (extractRettype)
+		{
+			++cp;
+			while (*cp && isspace (*cp))
+				++cp;
+			if (*cp == ':')
+				parseRettype (++cp, e);
+		}
 	}
 
 	return buf;
 }
 
-static void parseFunction (const unsigned char *line)
+static void parseFunction (const unsigned char *line, int parent, bool definedWithDEF)
 {
 	vString *name = vStringNew ();
 	vString *signature = NULL;
@@ -327,12 +360,17 @@ static void parseFunction (const unsigned char *line)
 				vStringClear (name);
 
 				e = getEntryInCorkQueue (index);
-				if (e && isFieldEnabled (FIELD_SIGNATURE))
+				if (e)
 				{
-					while (*cp && isspace (*cp))
-						++cp;
-					if (*cp == '(')
-						signature = parseSignature (cp, e, NULL);
+					e->extensionFields.scopeIndex = parent;
+					if (isFieldEnabled (FIELD_SIGNATURE))
+					{
+						while (*cp && isspace (*cp))
+							++cp;
+						if (*cp == '(')
+							signature = parseSignatureAndRettype (cp, e, NULL,
+																  definedWithDEF);
+					}
 				}
 			}
 		}
@@ -349,7 +387,8 @@ static void parseFunction (const unsigned char *line)
 			/* A backslash at the start of a line stands for a line continuation.
 			 * https://vimhelp.org/repeat.txt.html#line-continuation */
 			if (*cp == '\\')
-				signature = parseSignature (++cp, e, signature);
+				signature = parseSignatureAndRettype (++cp, e, signature,
+													  definedWithDEF);
 		}
 
 		if (wordMatchLen (line, "endfunction", 4) || wordMatchLen (line, "enddef", 6))
@@ -359,7 +398,7 @@ static void parseFunction (const unsigned char *line)
 			break;
 		}
 
-		parseVimLine (line, true);
+		parseVimLine (line, index);
 	}
 	if (signature)
 		vStringDelete (signature);
@@ -519,7 +558,7 @@ cleanUp:
 }
 
 /* =<< trim {endmarker} */
-static int parserHeredocMarker(const unsigned char *cp)
+static int parseHeredocMarker(const unsigned char *cp)
 {
 	while (*cp && isspace (*cp))
 		++cp;
@@ -562,7 +601,7 @@ static int parserHeredocMarker(const unsigned char *cp)
  * If we have a heredoc end marker at the end of LINE,
  * parseVariableOrConstant returns the tag cork index for the marker.
  */
-static int parseVariableOrConstant (const unsigned char *line, int infunction, int kindIndex)
+static int parseVariableOrConstant (const unsigned char *line, int parent, int kindIndex)
 {
 	vString *name = vStringNew ();
 	int heredoc = CORK_NIL;
@@ -594,7 +633,7 @@ static int parseVariableOrConstant (const unsigned char *line, int infunction, i
 			goto cleanUp;
 
 		/* Skip non-global vars in functions */
-		if (infunction && (*np != ':' || *cp != 'g'))
+		if (parent != CORK_NIL && (*np != ':' || *cp != 'g'))
 			goto cleanUp;
 
 		/* deal with spaces, $, @ and & */
@@ -613,10 +652,27 @@ static int parseVariableOrConstant (const unsigned char *line, int infunction, i
 			vStringPut (name, *cp);
 			++cp;
 		} while (isalnum (*cp) || *cp == '_' || *cp == '#' || *cp == ':' || *cp == '$');
-		makeSimpleTag (name, kindIndex);
-		vStringClear (name);
 
-		heredoc = parserHeredocMarker(cp);
+		bool hasType = false;
+		if (*cp && vim9script && !vStringIsEmpty (name) && (vStringLast (name) == ':'))
+		{
+			Assert(line != cp);
+			Assert(*(cp - 1) == ':');
+			vStringChop (name);
+			hasType = true;
+		}
+
+		if (!vStringIsEmpty (name))
+		{
+			int r = makeSimpleTag (name, kindIndex);
+			vStringClear (name);
+
+			tagEntryInfo *e;
+			if (hasType && (e = getEntryInCorkQueue (r)))
+				cp = parseRettype (cp, e);
+
+			heredoc = parseHeredocMarker(cp);
+		}
 	}
 
 cleanUp:
@@ -704,12 +760,25 @@ static bool parseMap (const unsigned char *line)
 	return true;
 }
 
-static bool parseVimLine (const unsigned char *line, int infunction)
+static bool parseVimLine (const unsigned char *line, int parent)
 {
 	bool readNextLine = true;
 	int heredoc = CORK_NIL;
 
-	if (wordMatchLen (line, "command", 3))
+	if (vim9script && wordMatchLen (line, "export", 6))
+	{
+		line += 6;
+		while (*line && isspace (*line))
+			++line;
+		/* TODO: export should be stored to a field. */
+	}
+
+	if (wordMatchLen (line, "vim9script", 10))
+	{
+		vim9script = true;
+	}
+
+	else if (wordMatchLen (line, "command", 3))
 	{
 		readNextLine = parseCommand (line);
 		/* TODO - Handle parseCommand returning false */
@@ -722,7 +791,7 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 
 	else if (wordMatchLen (line, "function", 2) || wordMatchLen (line, "def", 3))
 	{
-		parseFunction (skipWord (line));
+		parseFunction (skipWord (line), parent, vim9script && line[0] == 'd');
 	}
 
 	else if (wordMatchLen (line, "augroup", 3))
@@ -730,13 +799,13 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 		parseAutogroup (skipWord (line));
 	}
 
-	else if (wordMatchLen (line, "let", 3))
+	else if (wordMatchLen (line, "let", 3) || (vim9script && wordMatchLen (line, "var", 3)))
 	{
-		heredoc = parseVariableOrConstant (skipWord (line), infunction, K_VARIABLE);
+		heredoc = parseVariableOrConstant (skipWord (line), parent, K_VARIABLE);
 	}
-	else if (wordMatchLen (line, "const", 4))
+	else if (wordMatchLen (line, "const", 4) || wordMatchLen (line, "final", 5))
 	{
-		heredoc = parseVariableOrConstant (skipWord (line), infunction, K_CONST);
+		heredoc = parseVariableOrConstant (skipWord (line), parent, K_CONST);
 	}
 
 	tagEntryInfo *e;
@@ -760,13 +829,13 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 	return readNextLine;
 }
 
-static void parseVimFile (const unsigned char *line)
+static void parseVimFile (const unsigned char *line, int parent)
 {
 	bool readNextLine = true;
 
 	while (line != NULL)
 	{
-		readNextLine = parseVimLine (line, false);
+		readNextLine = parseVimLine (line, parent);
 
 		if (readNextLine)
 			line = readVimLine ();
@@ -850,6 +919,8 @@ static void findVimTags (void)
 	const unsigned char *line;
 	/* TODO - change this into a structure */
 
+	vim9script = false;
+
 	line = readVimLine ();
 
 	if (line == NULL)
@@ -863,7 +934,7 @@ static void findVimTags (void)
 	}
 	else
 	{
-		parseVimFile (line);
+		parseVimFile (line, CORK_NIL);
 	}
 }
 

@@ -1,1 +1,5 @@
 s:CONSTANT	input.vim	/^const s:CONSTANT = 42$/;"	C
+matches	input-0.vim	/^final matches = []$/;"	C
+names	input-0.vim	/^const names = ['Betty', 'Peter']$/;"	C
+LINK	input-0.vim	/^const LINK: string = '->'$/;"	C	typeref:typename:string
+mylist	input-0.vim	/^final mylist: list<string> = ['foo']$/;"	C	typeref:typename:list<string>
