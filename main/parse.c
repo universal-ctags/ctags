@@ -2868,7 +2868,7 @@ static bool processLangDefineRole(const langType language,
 	while (p != tmp_end)
 	{
 		if (!isalnum ((unsigned char) *p))
-			error (FATAL, "unacceptable char as part of role name in \"--%s\" option: %c",
+			error (FATAL, "unacceptable char as part of role name in \"--%s\" option: '%c'",
 				   option, *p);
 		p++;
 	}
@@ -3553,8 +3553,8 @@ static bool processLangDefineParam (const langType language,
 	for (; p < name_end; p++)
 	{
 		if (!isalnum ((unsigned char) *p) && *p != '_')
-			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
-				   option);
+			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option: '%c'",
+				   option, *p);
 	}
 
 	p++;
@@ -3959,8 +3959,8 @@ static bool processLangDefineExtra (const langType language,
 	for (; p < name_end; p++)
 	{
 		if (!isalnum ((unsigned char) *p))
-			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
-				   option);
+			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option: '%c'",
+				   option, *p);
 	}
 
 	p++;
@@ -4028,8 +4028,8 @@ static bool processLangDefineField (const langType language,
 	for (; p < name_end; p++)
 	{
 		if (!isalpha ((unsigned char) *p))
-			error (FATAL, "unacceptable char as part of field name in \"--%s\" option",
-				   option);
+			error (FATAL, "unacceptable char as part of field name in \"--%s\" option: '%c'",
+				   option, *p);
 	}
 
 	p++;

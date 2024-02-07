@@ -10,8 +10,8 @@ ctags: no extra definition specified in "--_extradef-IMAGINARY" option
 # wrong char in a field name
 ctags: no extra description specified in "--_extradef-IMAGINARY" option
 ctags: no extra description specified in "--_extradef-IMAGINARY" option
-ctags: unacceptable char as part of extra name in "--_extradef-IMAGINARY" option
-ctags: unacceptable char as part of extra name in "--_extradef-IMAGINARY" option
+ctags: unacceptable char as part of extra name in "--_extradef-IMAGINARY" option: ':'
+ctags: unacceptable char as part of extra name in "--_extradef-IMAGINARY" option: ':'
 
 # empty extra name
 ctags: the extra name in "--_extradef-IMAGINARY" option is empty

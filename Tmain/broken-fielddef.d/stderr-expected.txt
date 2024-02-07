@@ -10,8 +10,8 @@ ctags: no field definition specified in "--_fielddef-IMAGINARY" option
 # wrong char in a field name
 ctags: no field description specified in "--_fielddef-IMAGINARY" option
 ctags: no field description specified in "--_fielddef-IMAGINARY" option
-ctags: unacceptable char as part of field name in "--_fielddef-IMAGINARY" option
-ctags: unacceptable char as part of field name in "--_fielddef-IMAGINARY" option
+ctags: unacceptable char as part of field name in "--_fielddef-IMAGINARY" option: ':'
+ctags: unacceptable char as part of field name in "--_fielddef-IMAGINARY" option: ':'
 
 # empty field name
 ctags: the field name in "--_fielddef-IMAGINARY" option is empty
