@@ -96,7 +96,7 @@ struct sFieldDefinition {
 	fieldRenderer renderNoEscaping;
 	bool (* doesContainAnyChar) (const tagEntryInfo *const, const char*, const char *);
 
-	bool (* isValueAvailable) (const tagEntryInfo *const);
+	bool (* isValueAvailable) (const tagEntryInfo *const, const fieldDefinition *);
 
 	const char * getterValueType;
 	struct _EsObject * (* getValueObject) (const tagEntryInfo *, const fieldDefinition *);
