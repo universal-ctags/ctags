@@ -1811,14 +1811,14 @@ mojom-shared.ctags:
 	--kinddef-mojom=f,function,functions
 	--regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2
 
 	$ ctags --options=mojom-shared.ctags --fields=+l -o - input.cc
 	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2
 
 	$ ctags --options=mojom-shared.ctags --fields=+l -o - input.mojom
@@ -1843,12 +1843,12 @@ mojom-dedicated.ctags:
 	--kinddef-mojom=f,function,functions
 	--regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-.. code-block:: ctags
+.. code-block:: console
 
 	$ ctags --options=mojom-dedicated.ctags --fields=+l -o - input.cc
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2-3
 
 	$ ctags --options=mojom-dedicated.ctags --fields=+l -o - input.mojom
@@ -1873,14 +1873,14 @@ mojom-bidirectional.ctags:
 	--kinddef-mojom=f,function,functions
 	--regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2
 
 	$ ctags --options=mojom-bidirectional.ctags --fields=+l -o - input.cc
 	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2-3
 
 	$ ctags --options=mojom-bidirectional.ctags --fields=+l -o - input.mojom
