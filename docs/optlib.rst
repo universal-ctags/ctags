@@ -58,6 +58,10 @@ of long flags. Long flags are specified with surrounding '``{``' and
 
 	See ":ref:`autofqtag`".
 
+``_foreignLanguage=LANG``
+
+	See ":ref:`foreigntag`". Introduced in version 6.1.0.
+
 ``--_list-langdef-flags`` lists the flags that can be used in
 ``--langdef=<LANG>`` option.
 
@@ -321,6 +325,11 @@ Experimental flags
 
 	This flag is for specifying the area on which a guest parser runs,
 	as explained in ":ref:`guest-regex-flag`".
+
+``_language=<LANG>``
+
+	This flag is for emitting a foreign tag. See ":ref:`foreigntag`".
+	Introduced in version 6.1.0.
 
 ``_role``
 
@@ -1887,6 +1896,72 @@ mojom-bidirectional.ctags:
 	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
+
+.. BEGIN: NOT REVIEWED YET
+
+.. _foreigntag:
+
+Making tags of foreign languages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. TESTCASE: Units/foreign-tags.d
+
+In some cases, an object for language X is appears in an input of language Y
+for that you are developing a parser (parser Y). You may want to make a
+tag for the object as a tag for language X, not Y in the parser Y.
+
+From the point of view of the parser Y, the tag is called *foreign tag*.
+
+Consider an imaginary language DocC that is for documenting API of libraries
+written in C language. You are developing an optlib parser for DocC.
+
+input.docC:
+
+.. code-block::
+
+	- function: compress(const char *plain_text, enum algorithm alg) => char *
+	  Compress a C string PLAING_TEXT with the algorithm specified with ALG.
+
+	- function: decompress(const char *compressed_byteseq) => char *
+	  Decompress a byte sequence compressed by compress().
+
+Making tags for ``compress`` and ``decompress`` as language objects of
+DocC is a standard way. Making them as ``function`` kind reference
+tags with ``documented`` role of C language is the way of foreign
+tagging.
+
+.. note:: Foreign tag is rather newer concept in Universal Ctags. It is
+		  not explored well yet.
+
+docc.ctags:
+
+.. code-block:: ctags
+	:linenos:
+
+	--_roledef-C.f=documented,documented in a API document
+
+	--langdef=DocC{_foreignLanguage=C}
+	--map-DocC=.docc
+	--regex-DocC=/^- +function: *([a-zA-Z_][a-zA-Z_0-9]+)\(/\1/f/{_language=C}{_role=documented}
+
+To make foreign tags for C language, we extend the C parser at line 1: adding
+``documented`` role to ``function/f`` kind.
+
+The foreign language must be declared with ``_foreignLanguage`` when
+defining a parser (line 3). When tagging a foreign language object,
+use ``{_language=<LANG>}`` flag (line 4); ctags looks up the
+definitions of the kind for ``f`` and for the role ``documented`` from
+the C parser instead of ``DocD``.
+
+the output for input.docc:
+
+.. code-block:: console
+
+	$ ctags --options=docc.ctags --sort=no--extras=+r --fields=+rlK  -o - input.docc
+	compress	input.docc	/^- function: compress(const char *plain_text, enum algorithm alg) => char *$/;"	function	language:C	roles:documented
+	decompress	input.docc	/^- function: decompress(const char *compressed_byteseq) => char *$/;"	function	language:C	roles:documented
+
+.. END: NOT REVIEWED YET
 
 .. _optlib2c:
 
