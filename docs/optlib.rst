@@ -30,6 +30,39 @@ They will be good examples when you develop your own parsers.
 A optlib parser can be translated into C source code. Your optlib parser can
 thus easily become a built-in parser. See ":ref:`optlib2c`" for details.
 
+.. BEGIN: NOT REVIEWED YET
+
+Language definition flags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``--langdef=<LANG>`` option support additional arguments in the form
+of long flags. Long flags are specified with surrounding '``{``' and
+'``}``'.
+
+``base=LANG``
+
+	See ":ref:`defining-subparsers`".
+
+``bidirectional``, ``dedicated``, and ``shared``
+
+	See ":ref:`optlib_directions`".
+
+``version=CURRENT.AGE``
+
+	Define the generation of the interface of the optlib parser. This flag is
+	meaningful once the optlib parser becomes a part of Universal Ctags.
+	See also the description of ``--version=<language>`` option in
+	:ref:`ctags(1) <ctags(1)>` and ``TAG_PARSER_VERSION`` pseudo tag
+	in :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`.
+
+``_autoFQTag``
+
+	See ":ref:`autofqtag`".
+
+``--_list-langdef-flags`` lists the flags that can be used in
+``--langdef=<LANG>`` option.
+
+.. END: NOT REVIEWED YET
+
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -641,6 +674,8 @@ Overriding the letter for file kind is not allowed in Universal Ctags.
 
 	Don't use ``F`` as a kind letter in your parser. (See issue `#317
 	<https://github.com/universal-ctags/ctags/issues/317>`_ on github)
+
+.. _autofqtag:
 
 Generating fully qualified tags automatically from scope information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
