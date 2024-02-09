@@ -237,22 +237,7 @@ Experimental flags
 	types: basic ``--regex-<LANG>``, multi-line ``--mline-regex-<LANG>``,
 	and the experimental multi-table ``--_mtable-regex-<LANG>`` option.
 
-``_extra``
-
-	This flag indicates the tag should only be generated if the given
-	``extra`` type is enabled, as explained in ":ref:`extras`".
-
-``_field``
-
-	This flag allows a regex match to add additional custom fields to the
-	generated tag entry, as explained in ":ref:`fields`".
-
-``_role``
-
-	This flag allows a regex match to generate a reference tag entry and
-	specify the role of the reference, as explained in ":ref:`roles`".
-
-.. NOT REVIEWED YET
+.. BEGIN: NOT REVIEWED YET
 
 ``_anonymous=PREFIX``
 
@@ -287,6 +272,22 @@ Experimental flags
 		$ u-ctags  --options=foo.ctags -o - /tmp/input.foo
 		Le4679d360100	/tmp/input.foo	/^(let ((f (lambda (x) (+ 1 x))))$/;"	l
 
+.. END: NOT REVIEWED YET
+
+``_extra``
+
+	This flag indicates the tag should only be generated if the given
+	``extra`` type is enabled, as explained in ":ref:`extras`".
+
+``_field``
+
+	This flag allows a regex match to add additional custom fields to the
+	generated tag entry, as explained in ":ref:`fields`".
+
+``_role``
+
+	This flag allows a regex match to generate a reference tag entry and
+	specify the role of the reference, as explained in ":ref:`roles`".
 
 .. _extras:
 
