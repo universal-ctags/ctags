@@ -284,6 +284,11 @@ Experimental flags
 	This flag allows a regex match to add additional custom fields to the
 	generated tag entry, as explained in ":ref:`fields`".
 
+``_guest``
+
+	This flag is for specifying the area on which a guest parser runs,
+	as explained in ":ref:`guest-regex-flag`".
+
 ``_role``
 
 	This flag allows a regex match to generate a reference tag entry and
