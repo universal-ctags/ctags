@@ -1191,6 +1191,9 @@ regex use:
 To explain the above new flags, we'll continue using our example in the
 next section.
 
+``--_list-mtable-regex-flags`` lists the flags that can be used in
+``--_mtable-regex-<LANG>`` option.
+
 Skipping block comments
 ......................................................................
 
