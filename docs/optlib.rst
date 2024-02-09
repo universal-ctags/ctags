@@ -120,11 +120,11 @@ Ctags is built-with ``pcre2`` or not.
 PCRE2 *does* support many "modern" extensions.
 For example this pattern::
 
-       foo.*?bar
+	foo.*?bar
 
 Will match just the first part, ``foobar``, not this entire string,::
 
-       foobar, bar, and even more bar
+	foobar, bar, and even more bar
 
 Regex option argument flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -655,9 +655,9 @@ fully qualified tag. You can customize separators with
 
 input.foo::
 
-  class X
-     var y
-  end
+	class X
+		var y
+	end
 
 foo.ctags:
 
@@ -860,14 +860,14 @@ This example is based on an issue `#219
 	@Subscribe
 	public void catchEvent(SomeEvent e)
 	{
-	   return;
+		return;
 	}
 
 	@Subscribe
 	public void
 	recover(Exception e)
 	{
-	    return;
+		return;
 	}
 
 The above java code is similar to the Java `Spring <https://spring.io>`_
@@ -941,10 +941,10 @@ Multiline pattern flags
 		:emphasize-lines: 5
 
 		# foo.ctags:
-	   	--langdef=foo
-	   	--langmap=foo:.foo
-	   	--kinddef-foo=a,something,something
-	   	--mline-regex-foo=/def *([a-z]+)/\1/a/{mgroup=1}
+		--langdef=foo
+		--langmap=foo:.foo
+		--kinddef-foo=a,something,something
+		--mline-regex-foo=/def *([a-z]+)/\1/a/{mgroup=1}
 
 
 	.. code-block:: ctags
@@ -1672,18 +1672,18 @@ input.c
 
 .. code-block:: C
 
-    static int set_one_prio(struct task_struct *p, int niceval, int error)
-    {
-    }
+	static int set_one_prio(struct task_struct *p, int niceval, int error)
+	{
+	}
 
-    SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
-    {
-	    ...;
-    }
+	SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
+	{
+		/* ...*/;
+	}
 
 .. code-block:: console
 
-    $ ctags  -x --_xformat="%20N %10K %10l"  -o - input.c
+	$ ctags  -x --_xformat="%20N %10K %10l"  -o - input.c
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
@@ -1722,7 +1722,7 @@ In addition you can enable/disable with the subparser usable
 
 .. code-block::console
 
-    $ ctags --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
+	$ ctags --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
