@@ -1,0 +1,2 @@
+The original bug (#3932) was reproduced only when
+--disable-external-sort is set when building ctags.
