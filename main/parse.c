@@ -4148,7 +4148,7 @@ static bool createTagsWithFallback1 (const langType language,
 									 langType *exclusive_subparser)
 {
 	bool tagFileResized = false;
-	unsigned long numTags	= numTagsAdded ();
+	unsigned long numTags;
 	MIOPos tagfpos;
 	int lastPromise = getLastPromise ();
 	unsigned int passCount = 0;
@@ -4170,6 +4170,7 @@ static bool createTagsWithFallback1 (const langType language,
 	if (isXtagEnabled (XTAG_PSEUDO_TAGS))
 		addParserPseudoTags (language);
 	initializeParserStats (parser);
+	numTags = numTagsAdded ();
 	tagFilePosition (&tagfpos);
 
 	anonResetMaybe (parser);
