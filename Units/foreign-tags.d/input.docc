@@ -1,0 +1,5 @@
+- function: compress(const char *plain_text, enum algorithm alg) => char *
+  Compress a C string PLAING_TEXT with the algorithm specified with ALG.
+
+- function: decompress(const char *compressed_byteseq) => char *
+  Decompress a byte sequence compressed by compress().

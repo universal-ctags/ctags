@@ -1,0 +1,2 @@
+compress	input.docc	/^- function: compress(const char *plain_text, enum algorithm alg) => char *$/;"	function	language:C	roles:documented
+decompress	input.docc	/^- function: decompress(const char *compressed_byteseq) => char *$/;"	function	language:C	roles:documented

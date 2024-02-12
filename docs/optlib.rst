@@ -30,6 +30,43 @@ They will be good examples when you develop your own parsers.
 A optlib parser can be translated into C source code. Your optlib parser can
 thus easily become a built-in parser. See ":ref:`optlib2c`" for details.
 
+.. BEGIN: NOT REVIEWED YET
+
+Language definition flags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``--langdef=<LANG>`` option support additional arguments in the form
+of long flags. Long flags are specified with surrounding '``{``' and
+'``}``'.
+
+``base=LANG``
+
+	See ":ref:`defining-subparsers`".
+
+``bidirectional``, ``dedicated``, and ``shared``
+
+	See ":ref:`optlib_directions`".
+
+``version=CURRENT.AGE``
+
+	Define the generation of the interface of the optlib parser. This flag is
+	meaningful once the optlib parser becomes a part of Universal Ctags.
+	See also the description of ``--version=<language>`` option in
+	:ref:`ctags(1) <ctags(1)>` and ``TAG_PARSER_VERSION`` pseudo tag
+	in :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`.
+
+``_autoFQTag``
+
+	See ":ref:`autofqtag`".
+
+``_foreignLanguage=LANG``
+
+	See ":ref:`foreigntag`". Introduced in version 6.1.0.
+
+``--_list-langdef-flags`` lists the flags that can be used in
+``--langdef=<LANG>`` option.
+
+.. END: NOT REVIEWED YET
+
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -120,11 +157,11 @@ Ctags is built-with ``pcre2`` or not.
 PCRE2 *does* support many "modern" extensions.
 For example this pattern::
 
-       foo.*?bar
+	foo.*?bar
 
 Will match just the first part, ``foobar``, not this entire string,::
 
-       foobar, bar, and even more bar
+	foobar, bar, and even more bar
 
 Regex option argument flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,22 +274,7 @@ Experimental flags
 	types: basic ``--regex-<LANG>``, multi-line ``--mline-regex-<LANG>``,
 	and the experimental multi-table ``--_mtable-regex-<LANG>`` option.
 
-``_extra``
-
-	This flag indicates the tag should only be generated if the given
-	``extra`` type is enabled, as explained in ":ref:`extras`".
-
-``_field``
-
-	This flag allows a regex match to add additional custom fields to the
-	generated tag entry, as explained in ":ref:`fields`".
-
-``_role``
-
-	This flag allows a regex match to generate a reference tag entry and
-	specify the role of the reference, as explained in ":ref:`roles`".
-
-.. NOT REVIEWED YET
+.. BEGIN: NOT REVIEWED YET
 
 ``_anonymous=PREFIX``
 
@@ -287,6 +309,32 @@ Experimental flags
 		$ u-ctags  --options=foo.ctags -o - /tmp/input.foo
 		Le4679d360100	/tmp/input.foo	/^(let ((f (lambda (x) (+ 1 x))))$/;"	l
 
+.. END: NOT REVIEWED YET
+
+``_extra``
+
+	This flag indicates the tag should only be generated if the given
+	``extra`` type is enabled, as explained in ":ref:`extras`".
+
+``_field``
+
+	This flag allows a regex match to add additional custom fields to the
+	generated tag entry, as explained in ":ref:`fields`".
+
+``_guest``
+
+	This flag is for specifying the area on which a guest parser runs,
+	as explained in ":ref:`guest-regex-flag`".
+
+``_language=<LANG>``
+
+	This flag is for emitting a foreign tag. See ":ref:`foreigntag`".
+	Introduced in version 6.1.0.
+
+``_role``
+
+	This flag allows a regex match to generate a reference tag entry and
+	specify the role of the reference, as explained in ":ref:`roles`".
 
 .. _extras:
 
@@ -636,6 +684,8 @@ Overriding the letter for file kind is not allowed in Universal Ctags.
 	Don't use ``F`` as a kind letter in your parser. (See issue `#317
 	<https://github.com/universal-ctags/ctags/issues/317>`_ on github)
 
+.. _autofqtag:
+
 Generating fully qualified tags automatically from scope information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -654,9 +704,9 @@ fully qualified tag. You can customize separators with
 
 input.foo::
 
-  class X
-     var y
-  end
+	class X
+		var y
+	end
 
 foo.ctags:
 
@@ -859,14 +909,14 @@ This example is based on an issue `#219
 	@Subscribe
 	public void catchEvent(SomeEvent e)
 	{
-	   return;
+		return;
 	}
 
 	@Subscribe
 	public void
 	recover(Exception e)
 	{
-	    return;
+		return;
 	}
 
 The above java code is similar to the Java `Spring <https://spring.io>`_
@@ -940,10 +990,10 @@ Multiline pattern flags
 		:emphasize-lines: 5
 
 		# foo.ctags:
-	   	--langdef=foo
-	   	--langmap=foo:.foo
-	   	--kinddef-foo=a,something,something
-	   	--mline-regex-foo=/def *([a-z]+)/\1/a/{mgroup=1}
+		--langdef=foo
+		--langmap=foo:.foo
+		--kinddef-foo=a,something,something
+		--mline-regex-foo=/def *([a-z]+)/\1/a/{mgroup=1}
 
 
 	.. code-block:: ctags
@@ -1184,6 +1234,9 @@ regex use:
 
 To explain the above new flags, we'll continue using our example in the
 next section.
+
+``--_list-mtable-regex-flags`` lists the flags that can be used in
+``--_mtable-regex-<LANG>`` option.
 
 Skipping block comments
 ......................................................................
@@ -1671,18 +1724,18 @@ input.c
 
 .. code-block:: C
 
-    static int set_one_prio(struct task_struct *p, int niceval, int error)
-    {
-    }
+	static int set_one_prio(struct task_struct *p, int niceval, int error)
+	{
+	}
 
-    SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
-    {
-	    ...;
-    }
+	SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
+	{
+		/* ...*/;
+	}
 
 .. code-block:: console
 
-    $ ctags  -x --_xformat="%20N %10K %10l"  -o - input.c
+	$ ctags  -x --_xformat="%20N %10K %10l"  -o - input.c
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
@@ -1721,7 +1774,7 @@ In addition you can enable/disable with the subparser usable
 
 .. code-block::console
 
-    $ ctags --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
+	$ ctags --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
 	    set_one_prio   function          C
 	 SYSCALL_DEFINE3   function          C
 
@@ -1767,14 +1820,14 @@ mojom-shared.ctags:
 	--kinddef-mojom=f,function,functions
 	--regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2
 
 	$ ctags --options=mojom-shared.ctags --fields=+l -o - input.cc
 	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2
 
 	$ ctags --options=mojom-shared.ctags --fields=+l -o - input.mojom
@@ -1799,12 +1852,12 @@ mojom-dedicated.ctags:
 	--kinddef-mojom=f,function,functions
 	--regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-.. code-block:: ctags
+.. code-block:: console
 
 	$ ctags --options=mojom-dedicated.ctags --fields=+l -o - input.cc
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2-3
 
 	$ ctags --options=mojom-dedicated.ctags --fields=+l -o - input.mojom
@@ -1829,20 +1882,86 @@ mojom-bidirectional.ctags:
 	--kinddef-mojom=f,function,functions
 	--regex-mojom=/^[ ]+([a-zA-Z]+)\(/\1/f/
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2
 
 	$ ctags --options=mojom-bidirectional.ctags --fields=+l -o - input.cc
 	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
-.. code-block:: ctags
+.. code-block:: console
 	:emphasize-lines: 2-3
 
 	$ ctags --options=mojom-bidirectional.ctags --fields=+l -o - input.mojom
 	ABC	input.cc	/^ ABC();$/;"	f	language:mojom
 	main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
+
+.. BEGIN: NOT REVIEWED YET
+
+.. _foreigntag:
+
+Making tags of foreign languages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. TESTCASE: Units/foreign-tags.d
+
+In some cases, an object for language X is appears in an input of language Y
+for that you are developing a parser (parser Y). You may want to make a
+tag for the object as a tag for language X, not Y in the parser Y.
+
+From the point of view of the parser Y, the tag is called *foreign tag*.
+
+Consider an imaginary language DocC that is for documenting API of libraries
+written in C language. You are developing an optlib parser for DocC.
+
+input.docC:
+
+.. code-block::
+
+	- function: compress(const char *plain_text, enum algorithm alg) => char *
+	  Compress a C string PLAING_TEXT with the algorithm specified with ALG.
+
+	- function: decompress(const char *compressed_byteseq) => char *
+	  Decompress a byte sequence compressed by compress().
+
+Making tags for ``compress`` and ``decompress`` as language objects of
+DocC is a standard way. Making them as ``function`` kind reference
+tags with ``documented`` role of C language is the way of foreign
+tagging.
+
+.. note:: Foreign tag is rather newer concept in Universal Ctags. It is
+		  not explored well yet.
+
+docc.ctags:
+
+.. code-block:: ctags
+	:linenos:
+
+	--_roledef-C.f=documented,documented in a API document
+
+	--langdef=DocC{_foreignLanguage=C}
+	--map-DocC=.docc
+	--regex-DocC=/^- +function: *([a-zA-Z_][a-zA-Z_0-9]+)\(/\1/f/{_language=C}{_role=documented}
+
+To make foreign tags for C language, we extend the C parser at line 1: adding
+``documented`` role to ``function/f`` kind.
+
+The foreign language must be declared with ``_foreignLanguage`` when
+defining a parser (line 3). When tagging a foreign language object,
+use ``{_language=<LANG>}`` flag (line 4); ctags looks up the
+definitions of the kind for ``f`` and for the role ``documented`` from
+the C parser instead of ``DocD``.
+
+the output for input.docc:
+
+.. code-block:: console
+
+	$ ctags --options=docc.ctags --sort=no--extras=+r --fields=+rlK  -o - input.docc
+	compress	input.docc	/^- function: compress(const char *plain_text, enum algorithm alg) => char *$/;"	function	language:C	roles:documented
+	decompress	input.docc	/^- function: decompress(const char *compressed_byteseq) => char *$/;"	function	language:C	roles:documented
+
+.. END: NOT REVIEWED YET
 
 .. _optlib2c:
 

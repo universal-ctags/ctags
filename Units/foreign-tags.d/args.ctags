@@ -1,0 +1,9 @@
+--sort=no
+--extras=+r
+--fields=+rlK
+
+--_roledef-C.f=documented,documented in a API document
+
+--langdef=DocC{_foreignLanguage=C}
+--map-DocC=.docc
+--regex-DocC=/^- +function: *([a-zA-Z_][a-zA-Z_0-9]+)\(/\1/f/{_language=C}{_role=documented}
