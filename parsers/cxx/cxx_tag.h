@@ -165,6 +165,8 @@ typedef enum _CXXTagProperty
 	CXXTagPropertyConstinit = (1 << 20),
 	// thread_local has been seen.
 	CXXTagPropertyThreadLocal = (1 << 21),
+	// export has been seen,
+	CXXTagPropertyExport = (1 << 22),
 } CXXTagProperty;
 
 // Set the modifiers field of the tag.

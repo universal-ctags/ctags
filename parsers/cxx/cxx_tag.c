@@ -112,7 +112,7 @@ static const char * g_aCXXAccessStrings [] = {
 #define CXX_COMMON_FIELDS \
 	{ \
 		.name = "properties", \
-		.description = "properties (static, inline, mutable,...)", \
+		.description = "properties (static, inline, mutable, export,...)", \
 		.enabled = false \
 	}, { \
 		.name = "macrodef", \
@@ -440,6 +440,8 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		ADD_PROPERTY("constinit");
 	if (uProperties & CXXTagPropertyThreadLocal)
 		ADD_PROPERTY("thread_local");
+	if (uProperties & CXXTagPropertyExport)
+		ADD_PROPERTY("export");
 
 	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties),false);
 

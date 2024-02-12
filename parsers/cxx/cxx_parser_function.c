@@ -1761,6 +1761,8 @@ int cxxParserEmitFunctionTags(
 								CXXTagPropertyTemplateSpecialization;
 			if((pInfo->uFlags & CXXFunctionSignatureInfoTemplateSpecialization) || bIsEmptyTemplate)
 				uProperties |= CXXTagPropertyTemplateSpecialization;
+			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+				uProperties |= CXXTagPropertyExport;
 
 			pszProperties = cxxTagSetProperties(uProperties);
 		}

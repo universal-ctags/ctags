@@ -56,6 +56,8 @@ bool cxxParserParseNamespace(void)
 	{
 		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenInline)
 			uProperties |= CXXTagPropertyInline;
+		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+			uProperties |= CXXTagPropertyExport;
 	}
 
 	cxxParserNewStatement(); // always a new statement
