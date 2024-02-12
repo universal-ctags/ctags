@@ -1,0 +1,7 @@
+# --extras-X0=+{iname}
+__def01__	input-0.x1	/^d:def01$/;"	d	language:X0	extras:iname
+def00	input-0.x1	/^D:def00$/;"	d	language:X0
+var0	input-0.x1	/^v:var0$/;"	v	language:X1
+# --extras-X0=-{iname}
+def10	input-1.x1	/^D:def10$/;"	d	language:X0
+var1	input-1.x1	/^v:var1$/;"	v	language:X1
