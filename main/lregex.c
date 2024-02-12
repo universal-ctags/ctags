@@ -1084,9 +1084,12 @@ static void common_flag_extra_long (const char* const s, const char* const v, vo
 		return;
 	}
 
-	cdata->ptrn->xtagType = getXtagTypeForNameAndLanguage (v, cdata->owner);
+	langType lang = (cdata->ptrn->foreign_lang == LANG_IGNORE)
+		? cdata->owner
+		: cdata->ptrn->foreign_lang;
+	cdata->ptrn->xtagType = getXtagTypeForNameAndLanguage (v, lang);
 	if (cdata->ptrn->xtagType == XTAG_UNKNOWN)
-		error (WARNING, "no such extra \"%s\" in %s", v, getLanguageName(cdata->owner));
+		error (WARNING, "no such extra \"%s\" in %s", v, getLanguageName(lang));
 }
 
 
@@ -1271,7 +1274,7 @@ static flagDefinition commonSpecFlagDef[] = {
 	  "\"MESSAGE\"", "print the given MESSAGE at WARNING level"},
 #define EXPERIMENTAL "_"
 	{ '\0',  EXPERIMENTAL "extra", NULL, common_flag_extra_long ,
-	  "EXTRA", "record the tag only when the extra is enabled"},
+	  "EXTRA", "record the tag only when the (foreign) extra is enabled"},
 	{ '\0',  EXPERIMENTAL "field", NULL, common_flag_field_long ,
 	  "FIELD:VALUE", "record the matched string(VALUE) to the (foreign) language specific FIELD of the tag"},
 	{ '\0',  EXPERIMENTAL "role", NULL, common_flag_role_long,

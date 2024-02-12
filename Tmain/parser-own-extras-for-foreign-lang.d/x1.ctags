@@ -1,0 +1,6 @@
+--langdef=X1{_foreignLanguage=X0}
+--map-X1=+.x1
+--kinddef-X1=v,var,variables
+--regex-X1=/D:([a-z0-9]+)$/\1/d/{_language=X0}
+--regex-X1=/d:([a-z0-9]+)$/__\1__/d/{_language=X0}{_extra=iname}
+--regex-X1=/v:([a-z0-9]+)$/\1/v/
