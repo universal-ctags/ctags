@@ -497,8 +497,9 @@ symbol ("$"("\\"{atoz}+|.)"$"|"\\#"|"\\$"|"\\%"|"\\ref")
     ++warn_count;
  }}
 
-<B_ENVIRONMENT>[^\}\n]+ { 
- {
+<B_ENVIRONMENT> {
+
+[^\}\n]+ {
     if (strcmp( yytext, "verbatim" ) == 0 )
 	{
 	 input();

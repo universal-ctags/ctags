@@ -32,6 +32,7 @@ Man pages
 	ctags-lang-julia(7) <man/ctags-lang-julia.7.rst>
 	ctags-lang-kconfig(7) <man/ctags-lang-kconfig.7.rst>
 	ctags-lang-ldscript(7) <man/ctags-lang-ldscript.7.rst>
+	ctags-lang-lex(7) <man/ctags-lang-lex.7.rst>
 	ctags-lang-markdown(7) <man/ctags-lang-markdown.7.rst>
 	ctags-lang-python(7) <man/ctags-lang-python.7.rst>
 	ctags-lang-r(7) <man/ctags-lang-r.7.rst>

@@ -26,7 +26,7 @@
 # - https://github.com/westes/flex/blob/master/doc/flex.texi
 #
 
---langdef=LEX
+--langdef=LEX{version=1.1}
 
 #
 # Map definitions
@@ -43,7 +43,8 @@
 #
 
 --kinddef-LEX=r,regex,named regular expression
---kinddef-LEX=c,cond,start or exclusive condition
+--kinddef-LEX=c,cond,definition of start or exclusive condition
+--_roledef-LEX.{cond}=grouping, conditions used for grouping of start or exclusive condition rules
 
 #
 # Table declarations
@@ -67,8 +68,9 @@
 --_mtable-regex-LEX=codeblock/%\}//{tleave}{_guest=,,0start}
 --_mtable-regex-LEX=codeblock/.//
 
---_mtable-regex-LEX=rulesec/[^%]+//
+--_mtable-regex-LEX=rulesec/[^%<]+//
 --_mtable-regex-LEX=rulesec/%%//{tjump=usercode}{_guest=C,0end,}
+--_mtable-regex-LEX=rulesec/<([_a-zA-Z][_a-zA-Z0-9]*)>[ \t]*\{[ \t]*\n/\1/c/{_role=grouping}
 --_mtable-regex-LEX=rulesec/.//
 
 --_mtable-regex-LEX=usercode/.+//{_guest=,,0end}

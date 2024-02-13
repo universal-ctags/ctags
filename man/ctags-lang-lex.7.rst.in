@@ -1,0 +1,33 @@
+.. _ctags-lang-lex(7):
+
+==============================================================
+ctags-lang-lex
+==============================================================
+---------------------------------------------------------------------
+Random notes about tagging Lex source code with Universal Ctags
+---------------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+LEX ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=LEX ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Lex=+.l ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging LEX source code.
+
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New role ``grouping`` for ``cond`` kind
+
+SEE ALSO
+--------
+ctags(1)
