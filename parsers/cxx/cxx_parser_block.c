@@ -447,6 +447,7 @@ process_token:
 							}
 						}
 					break;
+					break;
 					case CXXKeywordPUBLIC:
 					case CXXKeywordPROTECTED:
 					case CXXKeywordPRIVATE:
@@ -793,7 +794,29 @@ process_token:
 				}
 			break;
 			case CXXTokenTypeIdentifier:
-				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
+				if(
+					/* Accept only "export" as a  preceding token. */
+					(! (g_cxx.uKeywordState & ~CXXParserKeywordStateSeenExport))
+					&& (g_cxx.pToken->pPrev == NULL || cxxTokenIsKeyword(g_cxx.pToken->pPrev, CXXKeywordEXPORT))
+					/* C++ */
+					&& cxxParserCurrentLanguageIsCPP()
+					/* At the toplevel */
+					&& cxxScopeIsGlobal()
+					/* Handle this token as a keyword, not an identifier.  */
+					&& (strcmp(vStringValue(g_cxx.pToken->pszWord), "module") == 0)
+					)
+				{
+					/* "module" introduced in C++20, can be a keyworkd in limited contexts.
+					 * If the parsing is not in the context, the parser should handle it
+					 * as an identifier. */
+					if(!cxxParserParseModule())
+					{
+						CXX_DEBUG_LEAVE_TEXT("Failed to parse module");
+						return false;
+					}
+					break;
+				}
+				else if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
 				{
 					g_cxx.uKeywordState &= ~CXXParserKeywordStateSeenTypedef;
 					if(!cxxParserParseGenericTypedef())

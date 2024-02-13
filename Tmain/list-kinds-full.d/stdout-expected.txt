@@ -19,7 +19,9 @@ z	parameter	no	no	0	C	function parameters inside function or prototype definitio
 A	alias	no	no	0	NONE	namespace aliases
 D	macroparam	no	no	0	C	parameters inside macro definitions
 L	label	no	no	0	C	goto labels
+M	module	yes	no	1	NONE	modules
 N	name	no	no	0	NONE	names imported via using scope::symbol
+P	partition	yes	no	0	NONE	partitions
 U	using	no	no	0	NONE	using namespace statements
 Z	tparam	no	no	0	NONE	template parameters
 c	class	yes	no	0	NONE	classes

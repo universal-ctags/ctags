@@ -29,6 +29,7 @@ C              f/function        foreigndecl        on      declared in foreign 
 C              h/header          local              on      local header
 C              h/header          system             on      system header
 C              s/struct          foreigndecl        on      declared in foreign languages
+C++            M/module          partOwner          on      used for specifying a partition
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
@@ -167,6 +168,7 @@ C              f/function        foreigndecl        on      declared in foreign 
 C              h/header          local              on      local header
 C              h/header          system             on      system header
 C              s/struct          foreigndecl        on      declared in foreign languages
+C++            M/module          partOwner          on      used for specifying a partition
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header

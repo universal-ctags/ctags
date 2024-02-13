@@ -219,6 +219,9 @@ void cxxParserExtractTypedef(
 // cxx_parser_namespace.c
 bool cxxParserParseNamespace(void);
 
+// cxx_parser_module.c
+bool cxxParserParseModule(void);
+
 // cxx_parser.c
 void cxxParserNewStatement(void);
 bool cxxParserSkipToSemicolonOrEOF(void);

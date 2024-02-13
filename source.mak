@@ -337,6 +337,7 @@ PARSER_SRCS =				\
 	parsers/cxx/cxx_parser_block.c		\
 	parsers/cxx/cxx_parser_function.c	\
 	parsers/cxx/cxx_parser_lambda.c		\
+	parsers/cxx/cxx_parser_module.c		\
 	parsers/cxx/cxx_parser_namespace.c	\
 	parsers/cxx/cxx_parser_template.c	\
 	parsers/cxx/cxx_parser_tokenizer.c	\

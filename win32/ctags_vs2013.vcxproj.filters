@@ -381,6 +381,9 @@
     <ClCompile Include="..\parsers\cxx\cxx_parser_lambda.c">
       <Filter>Source Files\parsers\cxx</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_module.c">
+      <Filter>Source Files\parsers\cxx</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\cxx\cxx_parser_namespace.c">
       <Filter>Source Files\parsers\cxx</Filter>
     </ClCompile>

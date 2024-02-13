@@ -47,7 +47,9 @@ enum CXXTagCPPKind
 	CXXTagCPPKindALIAS,
 	CXXTagCPPKindNAME,
 	CXXTagCPPKindUSING,
-	CXXTagCPPKindTEMPLATEPARAM
+	CXXTagCPPKindTEMPLATEPARAM,
+	CXXTagCPPKindMODULE,
+	CXXTagCPPKindPARTITION,
 };
 
 // The fields common to all (sub)languages this parser supports.
@@ -224,6 +226,10 @@ typedef enum {
 typedef enum {
 	CXXTagSTRUCTRoleFOREIGNDECL,
 } CXXTagCStructRole;
+
+typedef enum {
+	CXXTagMODULERolePartOwner,
+} cxxModuleRole;
 
 // Initialize the parser state for the specified language.
 // Must be called before attempting to access the kind options.

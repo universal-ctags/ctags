@@ -83,6 +83,7 @@ typedef enum _CXXKeyword
 	CXXKeywordINLINE,
 	CXXKeywordINT,
 	CXXKeywordLONG,
+	// CXXKeywordMODULE,
 	CXXKeywordMUTABLE,
 	CXXKeywordNAMESPACE,
 	CXXKeywordNEW,

@@ -56,6 +56,10 @@ CXX_COMMON_FUNCTION_ROLES(C);
 
 CXX_COMMON_STRUCT_ROLES(C);
 
+static roleDefinition CXXModuleRoles [] = {
+	{ true, "partOwner", "used for specifying a partition" },
+};
+
 
 #define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription, _syncWith, FUNC_ROLES, STRUCT_ROLES) \
 	{ true,  'd', "macro",      "macro definitions", \
@@ -96,6 +100,9 @@ static kindDefinition g_aCXXCPPKinds [] = {
 	{ false, 'N', "name",       "names imported via using scope::symbol" },
 	{ false, 'U', "using",      "using namespace statements" },
 	{ false, 'Z', "tparam",     "template parameters" },
+	{ true,  'M', "module",     "modules",
+			.referenceOnly = false, ATTACH_ROLES(CXXModuleRoles) },
+	{ true,  'P', "partition",  "partitions" },
 };
 
 static kindDefinition g_aCXXCUDAKinds [] = {
