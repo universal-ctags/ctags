@@ -56,11 +56,14 @@ static void initializeLEXParser (const langType language)
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "rulesec",
-	                               "^[^%]+",
+	                               "^[^%<]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "rulesec",
 	                               "^%%",
 	                               "", "", "{tjump=usercode}{_guest=C,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "rulesec",
+	                               "^<([_a-zA-Z][_a-zA-Z0-9]*)>[ \t]*\\{[ \t]*\n",
+	                               "\\1", "g", "", NULL);
 	addLanguageTagMultiTableRegex (language, "rulesec",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -99,7 +102,10 @@ extern parserDefinition* LEXParser (void)
 		  true, 'r', "regex", "named regular expression",
 		},
 		{
-		  true, 'c', "cond", "start or exclusive condition",
+		  true, 'c', "cond", "definition of start or exclusive condition",
+		},
+		{
+		  true, 'g', "group", "grouping of start or exclusive condition rules",
 		},
 	};
 	static selectLanguage selectors[] = { selectLispOrLEXByLEXMarker, NULL };

@@ -39,6 +39,7 @@ swap_spec	input.l	/^swap_spec em$/;"	r	language:LEX
 font_spec	input.l	/^font_spec (rm|bf|{italic_spec}|tt|{swap_spec}|mediumseries|{normal_spec})$/;"	r	language:LEX
 primitive	input.l	/^primitive \\\\(above|advance|catcode|chardef|closein|closeout|copy|count|countdef|cr|crcr|csname/;"	r	language:LEX
 symbol	input.l	/^symbol ("$"("\\\\"{atoz}+|.)"$"|"\\\\#"|"\\\\$"|"\\\\%"|"\\\\ref")$/;"	r	language:LEX
+B_ENVIRONMENT	input.l	/^<B_ENVIRONMENT> {$/;"	g	language:LEX
 YY_SKIP_YYWRAP	input.l	/^#define YY_SKIP_YYWRAP$/;"	d	language:C	file:
 yywrap	input.l	/^int yywrap() { return 1; }$/;"	f	language:C	typeref:typename:int
 GROUP_STACK_SIZE	input.l	/^#define GROUP_STACK_SIZE /;"	d	language:C	file:
