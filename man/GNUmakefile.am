@@ -43,6 +43,7 @@ GEN_IN_MAN_FILES = \
 	ctags-lang-julia.7 \
 	ctags-lang-kconfig.7 \
 	ctags-lang-ldscript.7 \
+	ctags-lang-lex.7 \
 	ctags-lang-markdown.7 \
 	ctags-lang-python.7 \
 	ctags-lang-r.7 \

@@ -56,11 +56,14 @@ static void initializeLEXParser (const langType language)
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "rulesec",
-	                               "^[^%]+",
+	                               "^[^%<]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "rulesec",
 	                               "^%%",
 	                               "", "", "{tjump=usercode}{_guest=C,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "rulesec",
+	                               "^<([_a-zA-Z][_a-zA-Z0-9]*)>[ \t]*\\{[ \t]*\n",
+	                               "\\1", "c", "{_role=grouping}", NULL);
 	addLanguageTagMultiTableRegex (language, "rulesec",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -94,20 +97,24 @@ extern parserDefinition* LEXParser (void)
 		NULL
 	};
 
+	static roleDefinition LEXCondRoleTable [] = {
+		{ true, "grouping", " conditions used for grouping of start or exclusive condition rules" },
+	};
 	static kindDefinition LEXKindTable [] = {
 		{
 		  true, 'r', "regex", "named regular expression",
 		},
 		{
-		  true, 'c', "cond", "start or exclusive condition",
+		  true, 'c', "cond", "definition of start or exclusive condition",
+		  ATTACH_ROLES(LEXCondRoleTable),
 		},
 	};
 	static selectLanguage selectors[] = { selectLispOrLEXByLEXMarker, NULL };
 
 	parserDefinition* const def = parserNew ("LEX");
 
-	def->versionCurrent= 0;
-	def->versionAge    = 0;
+	def->versionCurrent= 1;
+	def->versionAge    = 1;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
