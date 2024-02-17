@@ -178,6 +178,7 @@ const char* cxxDebugScopeDecode(enum CXXScopeType scope)
 		[CXXScopeTypeVariable] = "variable",
 		[CXXScopeTypePrototype]  = "prototype",
 		[CXXScopeTypeTypedef] = "typedef",
+		[CXXScopeTypeModule] = "module",
 	};
 	if (CXXScopeTypeLAST > scope)
 		return table[scope];

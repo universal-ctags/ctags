@@ -72,9 +72,9 @@ bool cxxParserParseModule(void)
 						 && pSep->pNext && cxxTokenTypeIs(pSep->pNext, CXXTokenTypeIdentifier)
 						 && g_cxx.pToken->pPrev && g_cxx.pToken->pPrev != pSep);
 
-		int iMod = CORK_NIL;
+		CXXToken * pMod = NULL;
 		{
-			CXXToken * pMod = cxxTokenModuleTokenCreate(pModBegin, pSep->pPrev);
+			pMod = cxxTokenModuleTokenCreate(pModBegin, pSep->pPrev);
 			tagEntryInfo * tag = cxxRefTagBegin(CXXTagCPPKindMODULE,
 												bHasPart? CXXTagMODULERolePartOwner: ROLE_DEFINITION_INDEX,
 												pMod);
@@ -82,13 +82,18 @@ bool cxxParserParseModule(void)
 			{
 				vString * pszProperties = (!bHasPart && uProperties) ? cxxTagSetProperties(uProperties) : NULL;
 
-				iMod = cxxTagCommit(NULL);
+				cxxTagCommit(NULL);
+				cxxScopePush(pMod, CXXScopeTypeModule, CXXScopeAccessUnknown);
 				vStringDelete(pszProperties); /* NULL is acceptable. */
 			}
-			cxxTokenDestroy(pMod);
+			else
+			{
+				cxxTokenDestroy(pMod);
+				pMod = NULL;
+			}
 		}
 
-		if (iMod != CORK_NIL && bHasPart)
+		if (pMod && bHasPart)
 		{
 			CXXToken * pPart = cxxTokenModuleTokenCreate(pSep->pNext, g_cxx.pToken->pPrev);
 
@@ -102,6 +107,9 @@ bool cxxParserParseModule(void)
 			}
 			cxxTokenDestroy(pPart);
 		}
+
+		if (pMod)
+			cxxScopePop();
 	}
 
 	cxxTokenChainClear(g_cxx.pTokenChain);
