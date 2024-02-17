@@ -1,0 +1,6 @@
+A	input.cpp	/^export module A; \/\/ declares the primary module interface unit for named module 'A'$/;"	M	properties:export
+hello	input.cpp	/^export char const* hello() { return "hello"; }$/;"	f	typeref:typename:char const *	properties:export
+world	input.cpp	/^char const* world() { return "world"; }$/;"	f	typeref:typename:char const *
+hi	input.cpp	/^export namespace hi$/;"	n	file:	properties:export
+english	input.cpp	/^    char const* english() { return "Hi!"; }$/;"	f	namespace:hi	typeref:typename:char const *
+french	input.cpp	/^    char const* french()  { return "Salut!"; }$/;"	f	namespace:hi	typeref:typename:char const *
