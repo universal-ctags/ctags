@@ -1,0 +1,13 @@
+A	input.cpp	/^export module A;   \/\/ declares the primary module interface unit for named module 'A'$/;"	M	roles:def	properties:export
+A	input-0.cpp	/^module A;          \/\/ declares a module implementation unit for named module 'A'$/;"	M	roles:def
+A.B	input-1.cpp	/^export module A.B; \/\/ declares the primary module interface unit for named module 'A.B'$/;"	M	roles:def	properties:export
+A.B	input-2.cpp	/^module A.B;        \/\/ declares a module implementation unit for named module 'A.B'$/;"	M	roles:def
+moudle	input-4.cpp	/^void moudle (void)$/;"	f	typeref:typename:void	roles:def
+module	input-5.cpp	/^typedef int module;$/;"	t	typeref:typename:int	file:	roles:def
+M	input-5.cpp	/^typedef module M;$/;"	t	typeref:typename:module	file:	roles:def
+module	input-6.cpp	/^struct module$/;"	s	file:	roles:def
+name	input-6.cpp	/^  const char *name;$/;"	m	struct:module	typeref:typename:const char *	file:	roles:def
+C	input-7.cpp	/^export module C;$/;"	M	roles:def	properties:export
+moudle	input-7.cpp	/^void moudle(T x)$/;"	f	typeref:typename:void	roles:def	properties:export
+My.App.ConfigModule	input-8.cpp	/^export module My.App . ConfigModule  [[cats::meow(-1,8, "de"[1])]] ;$/;"	M	roles:def	properties:export
+My.App.AlgoModule	input-9.cpp	/^module My.App . AlgoModule  [[cats::meow(-1,8, "de"[1])]] ;$/;"	M	roles:def
