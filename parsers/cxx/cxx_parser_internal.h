@@ -223,6 +223,7 @@ bool cxxParserParseNamespace(void);
 bool cxxParserParseModule(void);
 
 // cxx_parser.c
+void cxxParserNewStatementFull(bool bExported);
 void cxxParserNewStatement(void);
 bool cxxParserSkipToSemicolonOrEOF(void);
 bool cxxParserParseToEndOfQualifedName(void);

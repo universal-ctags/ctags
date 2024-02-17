@@ -44,8 +44,9 @@ bool g_bFirstRun = true;
 // - Clear the token chain
 // - Reset "seen" keywords
 //
-void cxxParserNewStatement(void)
+void cxxParserNewStatementFull(bool bExported)
 {
+	CXX_DEBUG_PRINT("NEW STATE: %d", bExported);
 	cxxTokenChainClear(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
 	{
@@ -56,11 +57,16 @@ void cxxParserNewStatement(void)
 		// we don't care about stale specializations as they
 		// are destroyed wen the base template prefix is extracted
 	}
-	g_cxx.uKeywordState = 0;
+	g_cxx.uKeywordState = bExported? CXXParserKeywordStateSeenExport: 0;
 
 	// FIXME: this cpp handling of end/statement is kind of broken:
 	//        it works only because the moon is in the correct phase.
 	cppEndStatement();
+}
+
+void cxxParserNewStatement(void)
+{
+	cxxParserNewStatementFull(false);
 }
 
 //

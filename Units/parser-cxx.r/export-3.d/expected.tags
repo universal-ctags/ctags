@@ -1,0 +1,11 @@
+Y	input.cpp	/^export module Y;$/;"	M	properties:export
+Z0	input.cpp	/^  namespace Z0 {$/;"	n	file:	properties:export
+z0	input.cpp	/^    int z0;$/;"	v	namespace:Z0	typeref:typename:int
+X	input.cpp	/^namespace X {$/;"	n	file:
+a	input.cpp	/^  int a;$/;"	v	namespace:X	typeref:typename:int
+x	input.cpp	/^    int x;$/;"	v	namespace:X	typeref:typename:int	properties:export
+f	input.cpp	/^    int f(int i);$/;"	p	namespace:X	typeref:typename:int	file:	properties:export
+b	input.cpp	/^  int b;$/;"	v	namespace:X	typeref:typename:int
+m	input.cpp	/^int m;$/;"	v	typeref:typename:int
+z	input.cpp	/^  int z;$/;"	v	typeref:typename:int	properties:export
+n	input.cpp	/^int n;$/;"	v	typeref:typename:int

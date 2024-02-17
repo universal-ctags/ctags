@@ -28,6 +28,8 @@
 
 #include <string.h>
 
+static bool cxxParserParseBlockFull(bool bExpectClosingBracket, bool bExported);
+
 bool cxxParserParseBlockHandleOpeningBracket(void)
 {
 	CXX_DEBUG_ENTER();
@@ -145,6 +147,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	int iCorkQueueIndexFQ = CORK_NIL;
 
 	CXXFunctionSignatureInfo oInfo;
+	bool bExported = false;
 
 	if(eScopeType != CXXScopeTypeFunction)
 	{
@@ -154,6 +157,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 
 		// FIXME: Handle syntax (5) of list initialization:
 		//        Class::Class() : member { arg1, arg2, ... } {...
+		bExported = (g_cxx.uKeywordState & CXXParserKeywordStateSeenExport);
 	} else {
 		// some kind of other block:
 		// - anonymous block
@@ -163,9 +167,9 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		iScopes = 0;
 	}
 
-	cxxParserNewStatement();
+	cxxParserNewStatementFull(bExported);
 
-	if(!cxxParserParseBlock(true))
+	if(!cxxParserParseBlockFull(true, bExported))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
 		return false;
@@ -254,14 +258,14 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	return true;
 }
 
-static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
+static bool cxxParserParseBlockInternal(bool bExpectClosingBracket, bool bExported)
 {
 	CXX_DEBUG_ENTER();
 
 	//char * szScopeName = cxxScopeGetFullName();
 	//CXX_DEBUG_PRINT("Scope name is '%s'",szScopeName ? szScopeName : "");
 
-	cxxParserNewStatement();
+	cxxParserNewStatementFull(bExported);
 
 	if(bExpectClosingBracket)
 	{
@@ -310,6 +314,9 @@ process_token:
 			cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 			continue;
 		}
+
+		if (bExported)
+			g_cxx.uKeywordState |= CXXParserKeywordStateSeenExport;
 
 		switch(g_cxx.pToken->eType)
 		{
@@ -847,15 +854,20 @@ process_token:
 // When the statement ends without finding any characteristic token the chain
 // is passed to an analysis routine which does a second scan pass.
 //
-bool cxxParserParseBlock(bool bExpectClosingBracket)
+static bool cxxParserParseBlockFull(bool bExpectClosingBracket, bool bExported)
 {
 	cxxSubparserNotifyEnterBlock ();
 
 	cppPushExternalParserBlock();
-	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket);
+	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket, bExported);
 	cppPopExternalParserBlock();
 
 	cxxSubparserNotifyLeaveBlock ();
 
 	return bRet;
+}
+
+bool cxxParserParseBlock(bool bExpectClosingBracket)
+{
+	return cxxParserParseBlockFull(bExpectClosingBracket, false);
 }
