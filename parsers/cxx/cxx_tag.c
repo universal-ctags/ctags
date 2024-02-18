@@ -789,7 +789,7 @@ int cxxTagCommit(int *piCorkQueueIndexFQ)
 		x = vStringNewInit(g_oCXXTag.extensionFields.scopeName);
 	}
 
-	vStringCatS(x,"::");
+	vStringCatS(x, (eScopeType == CXXScopeTypeModule)? ":": "::");
 	vStringCatS(x,g_oCXXTag.name);
 
 	g_oCXXTag.name = vStringValue(x);
