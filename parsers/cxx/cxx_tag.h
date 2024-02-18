@@ -103,6 +103,7 @@ bool cxxTagRoleEnabled(unsigned int uTagKind, int iTagRole);
 // Must be followed by cxxTagCommit() if it returns a non-NULL value.
 // The pToken ownership is NOT transferred.
 tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken);
+tagEntryInfo * cxxRefTagBegin(unsigned int uKind, int iRole, CXXToken * pToken);
 
 // Set the type of the current tag from the specified token sequence
 // (which must belong to the same chain!).
@@ -208,6 +209,11 @@ typedef enum {
 	CR_HEADER_SYSTEM,
 	CR_HEADER_LOCAL,
 } cHeaderRole;
+
+typedef enum {
+	CXXR_HEADER_IMPORTED = CR_HEADER_LOCAL + 1,
+	CXXR_HEADER_EXPORTED
+} cxxHeaderRole;
 
 typedef enum {
 	CXXTagFUNCTIONRoleFOREIGNDECL,

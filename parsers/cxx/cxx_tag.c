@@ -326,7 +326,7 @@ static short cxxTagLookBackLastNth(langType iLangType, int iScopeIndex, unsigned
 	return NO_NTH_FIELD;
 }
 
-tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
+tagEntryInfo * cxxRefTagBegin(unsigned int uKind, int iRole, CXXToken * pToken)
 {
 	kindDefinition * pKindDefinitions = g_cxx.pKindDefinitions;
 
@@ -336,10 +336,11 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 		return NULL;
 	}
 
-	initTagEntry(
+	initRefTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
-			uKind
+			uKind,
+			iRole
 		);
 
 	updateTagLine (&g_oCXXTag, pToken->iLineNumber, pToken->oFilePosition);
@@ -367,6 +368,11 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 	g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[cxxScopeGetAccess()];
 
 	return &g_oCXXTag;
+}
+
+tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
+{
+	return cxxRefTagBegin(uKind, ROLE_DEFINITION_INDEX, pToken);
 }
 
 vString * cxxTagSetProperties(unsigned int uProperties)
