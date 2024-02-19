@@ -1,0 +1,5 @@
+X	input.cpp	/^import X  [[something]];$/;"	M	roles:imported
+import	input.cpp	/^int import;$/;"	v	typeref:typename:int	roles:def
+X.Y	input-0.cpp	/^import X.Y [[something]];$/;"	M	roles:imported
+X	input-2.cpp	/^export import X  [[something]];$/;"	M	roles:imported	properties:export
+X.Y	input-3.cpp	/^export import X.Y [[something]];$/;"	M	roles:imported	properties:export

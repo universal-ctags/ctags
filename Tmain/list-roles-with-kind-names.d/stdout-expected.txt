@@ -1,19 +1,23 @@
 {header}
-#LANGUAGE      KIND(L/N) NAME   ENABLED DESCRIPTION
-C              h/header  local  on      local header
-C              h/header  system on      system header
-C++            h/header  local  on      local header
-C++            h/header  system on      system header
-CPreProcessor  h/header  local  on      local header
-CPreProcessor  h/header  system on      system header
-CUDA           h/header  local  on      local header
-CUDA           h/header  system on      system header
-Vera           h/header  local  on      local header
-Vera           h/header  system on      system header
+#LANGUAGE      KIND(L/N) NAME     ENABLED DESCRIPTION
+C              h/header  local    on      local header
+C              h/header  system   on      system header
+C++            h/header  exported on      exported with "exported imported ..."
+C++            h/header  imported on      imported with "imported ..."
+C++            h/header  local    on      local header
+C++            h/header  system   on      system header
+CPreProcessor  h/header  local    on      local header
+CPreProcessor  h/header  system   on      system header
+CUDA           h/header  local    on      local header
+CUDA           h/header  system   on      system header
+Vera           h/header  local    on      local header
+Vera           h/header  system   on      system header
 {header}I
 #LANGUAGE      KIND(L/N)   NAME      ENABLED DESCRIPTION
 C              h/header    local     on      local header
 C              h/header    system    on      system header
+C++            h/header    exported  on      exported with "exported imported ..."
+C++            h/header    imported  on      imported with "imported ..."
 C++            h/header    local     on      local header
 C++            h/header    system    on      system header
 CPreProcessor  h/header    local     on      local header
@@ -41,6 +45,8 @@ C              h/header    local     on      local header
 C              h/header    system    on      system header
 C++            d/macro     condition off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro     undef     on      undefined
+C++            h/header    exported  on      exported with "exported imported ..."
+C++            h/header    imported  on      imported with "imported ..."
 C++            h/header    local     on      local header
 C++            h/header    system    on      system header
 CPreProcessor  d/macro     condition off     used in part of #if/#ifdef/#elif conditions

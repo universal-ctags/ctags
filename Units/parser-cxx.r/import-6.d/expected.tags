@@ -1,0 +1,4 @@
+a.h	input.cpp	/^import <a.h> [[something]];$/;"	h	roles:system,imported
+b.h	input-0.cpp	/^import "b.h" [[something]];$/;"	h	roles:local,imported
+a.h	input-1.cpp	/^export import <a.h> [[something]];$/;"	h	roles:system,imported,exported
+b.h	input-2.cpp	/^export import "b.h" [[something]];$/;"	h	roles:local,imported,exported

@@ -29,9 +29,13 @@ C              f/function        foreigndecl        on      declared in foreign 
 C              h/header          local              on      local header
 C              h/header          system             on      system header
 C              s/struct          foreigndecl        on      declared in foreign languages
+C++            M/module          imported           on      imported with "imported ..."
 C++            M/module          partOwner          on      used for specifying a partition
+C++            P/partition       imported           on      imported with "imported ..."
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
+C++            h/header          exported           on      exported with "exported imported ..."
+C++            h/header          imported           on      imported with "imported ..."
 C++            h/header          local              on      local header
 C++            h/header          system             on      system header
 CPreProcessor  d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
@@ -168,9 +172,13 @@ C              f/function        foreigndecl        on      declared in foreign 
 C              h/header          local              on      local header
 C              h/header          system             on      system header
 C              s/struct          foreigndecl        on      declared in foreign languages
+C++            M/module          imported           on      imported with "imported ..."
 C++            M/module          partOwner          on      used for specifying a partition
+C++            P/partition       imported           on      imported with "imported ..."
 C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C++            d/macro           undef              on      undefined
+C++            h/header          exported           on      exported with "exported imported ..."
+C++            h/header          imported           on      imported with "imported ..."
 C++            h/header          local              on      local header
 C++            h/header          system             on      system header
 CPreProcessor  d/macro           condition          off     used in part of #if/#ifdef/#elif conditions

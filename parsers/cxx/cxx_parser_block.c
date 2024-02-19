@@ -823,6 +823,21 @@ process_token:
 					}
 					break;
 				}
+				else if(
+					(! (g_cxx.uKeywordState & ~CXXParserKeywordStateSeenExport))
+					&& (g_cxx.pToken->pPrev == NULL || cxxTokenIsKeyword(g_cxx.pToken->pPrev, CXXKeywordEXPORT))
+					&& cxxParserCurrentLanguageIsCPP()
+					&& cxxScopeIsGlobal()
+					&& (strcmp(vStringValue(g_cxx.pToken->pszWord), "import") == 0)
+					)
+				{
+					if(!cxxParserParseImport())
+					{
+						CXX_DEBUG_LEAVE_TEXT("Failed to parse import");
+						return false;
+					}
+					break;
+				}
 				else if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
 				{
 					g_cxx.uKeywordState &= ~CXXParserKeywordStateSeenTypedef;

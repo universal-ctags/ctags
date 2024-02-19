@@ -19,9 +19,9 @@ z	parameter	no	no	0	C	function parameters inside function or prototype definitio
 A	alias	no	no	0	NONE	namespace aliases
 D	macroparam	no	no	0	C	parameters inside macro definitions
 L	label	no	no	0	C	goto labels
-M	module	yes	no	1	NONE	modules
+M	module	yes	no	2	NONE	modules
 N	name	no	no	0	NONE	names imported via using scope::symbol
-P	partition	yes	no	0	NONE	partitions
+P	partition	yes	no	1	NONE	partitions
 U	using	no	no	0	NONE	using namespace statements
 Z	tparam	no	no	0	NONE	template parameters
 c	class	yes	no	0	NONE	classes
@@ -29,7 +29,7 @@ d	macro	yes	no	2	C	macro definitions
 e	enumerator	yes	no	0	C	enumerators (values inside an enumeration)
 f	function	yes	no	0	C	function definitions
 g	enum	yes	no	0	C	enumeration names
-h	header	yes	yes	2	C	included header files
+h	header	yes	yes	4	C	included header files
 l	local	no	no	0	C	local variables
 m	member	yes	no	0	C	class, struct, and union members
 n	namespace	yes	no	0	NONE	namespaces

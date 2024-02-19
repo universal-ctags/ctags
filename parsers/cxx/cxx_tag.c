@@ -36,7 +36,12 @@ CXX_COMMON_MACRO_ROLES(CUDA);
 	}
 
 CXX_COMMON_HEADER_ROLES(C);
-CXX_COMMON_HEADER_ROLES(CXX);
+static roleDefinition CXXHeaderRoles [] = {
+		RoleTemplateSystem,
+		RoleTemplateLocal,
+		{ true, "imported", "imported with \"imported ...\"" },
+		{ true, "exported", "exported with \"exported imported ...\"" },
+};
 CXX_COMMON_HEADER_ROLES(CUDA);
 
 /* Currently V parser wants these items. */
@@ -57,9 +62,14 @@ CXX_COMMON_FUNCTION_ROLES(C);
 CXX_COMMON_STRUCT_ROLES(C);
 
 static roleDefinition CXXModuleRoles [] = {
+
 	{ true, "partOwner", "used for specifying a partition" },
+	{ true, "imported", "imported with \"imported ...\"" },
 };
 
+static roleDefinition CXXPartitionRoles [] = {
+	{ true, "imported", "imported with \"imported ...\"" },
+};
 
 #define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription, _syncWith, FUNC_ROLES, STRUCT_ROLES) \
 	{ true,  'd', "macro",      "macro definitions", \
@@ -102,7 +112,8 @@ static kindDefinition g_aCXXCPPKinds [] = {
 	{ false, 'Z', "tparam",     "template parameters" },
 	{ true,  'M', "module",     "modules",
 			.referenceOnly = false, ATTACH_ROLES(CXXModuleRoles) },
-	{ true,  'P', "partition",  "partitions" },
+	{ true,  'P', "partition",  "partitions",
+			.referenceOnly = false, ATTACH_ROLES(CXXPartitionRoles) },
 };
 
 static kindDefinition g_aCXXCUDAKinds [] = {

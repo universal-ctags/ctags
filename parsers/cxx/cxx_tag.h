@@ -229,7 +229,12 @@ typedef enum {
 
 typedef enum {
 	CXXTagMODULERolePartOwner,
+	CXXTagMODULERoleImported,
 } cxxModuleRole;
+
+typedef enum {
+	CXXTagPARTITIONRoleImported,
+} cxxPartitionRole;
 
 // Initialize the parser state for the specified language.
 // Must be called before attempting to access the kind options.

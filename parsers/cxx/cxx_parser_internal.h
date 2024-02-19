@@ -221,6 +221,7 @@ bool cxxParserParseNamespace(void);
 
 // cxx_parser_module.c
 bool cxxParserParseModule(void);
+bool cxxParserParseImport(void);
 
 // cxx_parser.c
 void cxxParserNewStatementFull(bool bExported);
