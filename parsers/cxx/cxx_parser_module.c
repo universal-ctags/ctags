@@ -80,7 +80,15 @@ bool cxxParserParseModule(void)
 	}
 
 	CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
-	if (cxxTokenTypeIs(pFirst, CXXTokenTypeSingleColon)
+	if (cxxTokenTypeIsOneOf(pFirst, CXXTokenTypeSemicolon | CXXTokenTypeEOF))
+	{
+		CXXToken * pMod = cxxTokenCreateAnonymousIdentifier(CXXTagCPPKindMODULE, "__gmod_");
+		tagEntryInfo * tag = cxxTagBegin(CXXTagCPPKindMODULE,pMod);
+		if (tag)
+			cxxTagCommit(NULL);
+		cxxTokenDestroy(pMod);
+	}
+	else if (cxxTokenTypeIs(pFirst, CXXTokenTypeSingleColon)
 		&& pFirst->pNext && cxxTokenIsKeyword(pFirst->pNext, CXXKeywordPRIVATE))
 	{
 		CXXToken * pPart = pFirst->pNext;

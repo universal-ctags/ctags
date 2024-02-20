@@ -2,6 +2,7 @@ A	input.cpp	/^export module A;   \/\/ declares the primary module interface unit
 A	input-0.cpp	/^module A;          \/\/ declares a module implementation unit for named module 'A'$/;"	M	roles:def
 A.B	input-1.cpp	/^export module A.B; \/\/ declares the primary module interface unit for named module 'A.B'$/;"	M	roles:def	properties:export
 A.B	input-2.cpp	/^module A.B;        \/\/ declares a module implementation unit for named module 'A.B'$/;"	M	roles:def
+module	input-3.cpp	/^int module;$/;"	v	typeref:typename:int	roles:def
 moudle	input-4.cpp	/^void moudle (void)$/;"	f	typeref:typename:void	roles:def
 module	input-5.cpp	/^typedef int module;$/;"	t	typeref:typename:int	file:	roles:def
 M	input-5.cpp	/^typedef module M;$/;"	t	typeref:typename:module	file:	roles:def

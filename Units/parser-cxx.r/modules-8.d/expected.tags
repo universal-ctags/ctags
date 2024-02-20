@@ -1,6 +1,8 @@
+__gmod_a88571800116	input.cpp	/^module;$/;"	M
 A	input.cpp	/^export module A;$/;"	M	properties:export
 private	input.cpp	/^module :private;$/;"	P	module:A
 A:private	input.cpp	/^module :private;$/;"	P	module:A
+__gmod_d9936dbd0116	input-0.cpp	/^module;$/;"	M
 B	input-0.cpp	/^export module B;$/;"	M	properties:export
 private	input-0.cpp	/^module :private;$/;"	P	module:B
 B:private	input-0.cpp	/^module :private;$/;"	P	module:B
