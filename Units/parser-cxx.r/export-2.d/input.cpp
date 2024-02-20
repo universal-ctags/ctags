@@ -13,3 +13,5 @@ export namespace hi
     char const* english() { return "Hi!"; }
     char const* french()  { return "Salut!"; }
 }
+
+export enum x { a = 1 };

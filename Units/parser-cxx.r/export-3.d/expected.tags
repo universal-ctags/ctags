@@ -8,4 +8,6 @@ f	input.cpp	/^    int f(int i);$/;"	p	namespace:X	typeref:typename:int	file:	pro
 b	input.cpp	/^  int b;$/;"	v	namespace:X	typeref:typename:int
 m	input.cpp	/^int m;$/;"	v	typeref:typename:int
 z	input.cpp	/^  int z;$/;"	v	typeref:typename:int	properties:export
+E	input.cpp	/^  enum E { a = 1 };$/;"	g	file:	properties:export
+a	input.cpp	/^  enum E { a = 1 };$/;"	e	enum:E	file:
 n	input.cpp	/^int n;$/;"	v	typeref:typename:int

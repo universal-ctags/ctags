@@ -4,3 +4,5 @@ world	input.cpp	/^char const* world() { return "world"; }$/;"	f	typeref:typename
 hi	input.cpp	/^export namespace hi$/;"	n	file:	properties:export
 english	input.cpp	/^    char const* english() { return "Hi!"; }$/;"	f	namespace:hi	typeref:typename:char const *
 french	input.cpp	/^    char const* french()  { return "Salut!"; }$/;"	f	namespace:hi	typeref:typename:char const *
+x	input.cpp	/^export enum x { a = 1 };$/;"	g	file:	properties:export
+a	input.cpp	/^export enum x { a = 1 };$/;"	e	enum:x	file:

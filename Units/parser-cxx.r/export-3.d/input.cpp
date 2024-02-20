@@ -19,5 +19,6 @@ namespace X {
 int m;
 export {
   int z;
+  enum E { a = 1 };
 }
 int n;

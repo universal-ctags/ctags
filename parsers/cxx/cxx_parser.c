@@ -916,8 +916,15 @@ bool cxxParserParseEnum(void)
 			pTypeName = cxxTagCheckAndSetTypeField(pTypeBegin,pTypeEnd);
 		}
 
+
+		unsigned int uProperties = 0;
 		if(bIsScopedEnum)
-			pszProperties = cxxTagSetProperties(CXXTagPropertyScopedEnum);
+			uProperties |= CXXTagPropertyScopedEnum;
+		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+			uProperties |= CXXTagPropertyExport;
+
+		if(uProperties)
+			pszProperties = cxxTagSetProperties(uProperties);
 
 		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
 		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pEnumName);
