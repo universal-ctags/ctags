@@ -885,7 +885,7 @@ bool cxxParserParseEnum(void)
 		CXX_DEBUG_PRINT("Enum name is %s",vStringValue(pEnumName->pszWord));
 		cxxTokenChainTake(g_cxx.pTokenChain,pEnumName);
 	} else {
-		pEnumName = cxxTokenCreateAnonymousIdentifier(CXXTagKindENUM);
+		pEnumName = cxxTokenCreateAnonymousIdentifier(CXXTagKindENUM, NULL);
 		bAnonymous = true;
 		CXX_DEBUG_PRINT(
 				"Enum name is %s (anonymous)",
@@ -1287,7 +1287,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			);
 		cxxTokenChainTake(g_cxx.pTokenChain,pClassName);
 	} else {
-		pClassName = cxxTokenCreateAnonymousIdentifier(uTagKind);
+		pClassName = cxxTokenCreateAnonymousIdentifier(uTagKind, NULL);
 		bAnonymous = true;
 		CXX_DEBUG_PRINT(
 				"Class/struct/union name is %s (anonymous)",

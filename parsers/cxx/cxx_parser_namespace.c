@@ -280,7 +280,7 @@ bool cxxParserParseNamespace(void)
 		// anonymous namespace
 		CXX_DEBUG_PRINT("Found anonymous namespace start");
 
-		CXXToken * t = cxxTokenCreateAnonymousIdentifier(CXXTagCPPKindNAMESPACE);
+		CXXToken * t = cxxTokenCreateAnonymousIdentifier(CXXTagCPPKindNAMESPACE, NULL);
 		tagEntryInfo * tag = cxxTagBegin(CXXTagCPPKindNAMESPACE,t);
 		if(tag)
 		{
