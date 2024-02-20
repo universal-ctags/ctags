@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build-machine-os: [macos-13, macos-12, macos-11]
+        build-machine-os: [macos-14, macos-13, macos-12, macos-11]
 
     runs-on: ${{ matrix.build-machine-os }}
 
@@ -24,10 +24,7 @@ jobs:
 
       - name: Run ./configure ...
         run: |
-          BUILD_MACHINE_OS_TYPE=$(uname | tr A-Z a-z)
-          BUILD_MACHINE_OS_ARCH=$(uname -m)
-
-          TOOLCHAIN_BASE_DIR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/$BUILD_MACHINE_OS_TYPE-$BUILD_MACHINE_OS_ARCH
+          TOOLCHAIN_BASE_DIR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64
           TOOLCHAIN_BIN_DIR=$TOOLCHAIN_BASE_DIR/bin
           SYSROOT=$TOOLCHAIN_BASE_DIR/sysroot
 
