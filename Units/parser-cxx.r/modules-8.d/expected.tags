@@ -1,0 +1,6 @@
+A	input.cpp	/^export module A;$/;"	M	properties:export
+private	input.cpp	/^module :private;$/;"	P	module:A
+A:private	input.cpp	/^module :private;$/;"	P	module:A
+B	input-0.cpp	/^export module B;$/;"	M	properties:export
+private	input-0.cpp	/^module :private;$/;"	P	module:B
+B:private	input-0.cpp	/^module :private;$/;"	P	module:B

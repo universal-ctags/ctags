@@ -2025,6 +2025,7 @@ rescanReason cxxCppParserMain(const unsigned int passCount)
 	cxxKeywordEnablePublicProtectedPrivate(g_cxx.bConfirmedCPPLanguage);
 
 	rescanReason r = cxxParserMain(passCount);
+	cxxParserDestroyCurrentModuleToken();
 	CXX_DEBUG_LEAVE();
 	return r;
 }

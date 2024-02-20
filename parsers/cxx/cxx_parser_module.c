@@ -24,6 +24,22 @@
 #include "parse.h"
 #include "vstring.h"
 #include "read.h"
+#include "trashbox.h"
+
+static CXXToken * pCurrentModuleToken;
+
+static void cxxParserSetCurrentModuleToken(CXXToken * pMod)
+{
+	if (pCurrentModuleToken)
+		cxxTokenDestroy(pCurrentModuleToken);
+	pCurrentModuleToken = pMod;
+}
+
+void cxxParserDestroyCurrentModuleToken(void)
+{
+	cxxParserSetCurrentModuleToken(NULL);
+}
+
 
 static CXXToken * cxxTokenModuleTokenCreate(CXXToken *pBegin, CXXToken *pEnd)
 {
@@ -63,9 +79,28 @@ bool cxxParserParseModule(void)
 		return false;
 	}
 
-	if (cxxTokenTypeIs(cxxTokenChainFirst(g_cxx.pTokenChain), CXXTokenTypeIdentifier))
+	CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
+	if (cxxTokenTypeIs(pFirst, CXXTokenTypeSingleColon)
+		&& pFirst->pNext && cxxTokenIsKeyword(pFirst->pNext, CXXKeywordPRIVATE))
 	{
-		CXXToken * pModBegin = cxxTokenChainFirst(g_cxx.pTokenChain);
+		CXXToken * pPart = pFirst->pNext;
+		if (pCurrentModuleToken)
+		{
+			CXXToken *pMod = cxxTokenCopy(pCurrentModuleToken);
+			cxxScopePush(pMod, CXXScopeTypeModule, CXXScopeAccessUnknown);
+		}
+
+		tagEntryInfo * tag = cxxTagBegin(CXXTagCPPKindPARTITION,pPart);
+		if (tag)
+			cxxTagCommit(NULL);
+		/* export is never set to the private partition. */
+
+		if (pCurrentModuleToken)
+			cxxScopePop();
+	}
+	else if (cxxTokenTypeIs(pFirst, CXXTokenTypeIdentifier))
+	{
+		CXXToken * pModBegin = pFirst;
 		CXXToken * pSep = cxxTokenChainNextTokenOfType(pModBegin,
 													   CXXTokenTypeSingleColon
 													   | CXXTokenTypeSemicolon
@@ -85,12 +120,13 @@ bool cxxParserParseModule(void)
 				vString * pszProperties = (!bHasPart && uProperties) ? cxxTagSetProperties(uProperties) : NULL;
 
 				cxxTagCommit(NULL);
+				cxxParserSetCurrentModuleToken(cxxTokenCopy(pMod));
 				cxxScopePush(pMod, CXXScopeTypeModule, CXXScopeAccessUnknown);
 				vStringDelete(pszProperties); /* NULL is acceptable. */
 			}
 			else
 			{
-				cxxTokenDestroy(pMod);
+				cxxParserSetCurrentModuleToken(pMod);
 				pMod = NULL;
 			}
 		}
