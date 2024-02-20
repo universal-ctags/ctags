@@ -174,6 +174,10 @@ void cxxParserExtractTypedef(
 		return;
 	}
 
+	unsigned int uProperties = 0;
+	if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+		uProperties |= CXXTagPropertyExport;
+
 	CXXToken * t;
 
 	if(bExpectTerminatorAtEnd)
@@ -442,8 +446,14 @@ skip_to_comma_or_end:
 			if(bGotTemplate)
 				cxxTagHandleTemplateFields();
 
+			vString *pszProperties = NULL;
+			if(uProperties)
+				pszProperties = cxxTagSetProperties(uProperties);
+
 			int iCorkQueueIndex = cxxTagCommit(NULL);
 			cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, t);
+
+			vStringDelete(pszProperties); /* NULL is acceptable. */
 
 			if (
 					bGotTemplate &&

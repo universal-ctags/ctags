@@ -20,5 +20,6 @@ int m;
 export {
   int z;
   enum E { a = 1 };
+  typedef int td;
 }
 int n;

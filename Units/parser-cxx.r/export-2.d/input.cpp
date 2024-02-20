@@ -15,3 +15,5 @@ export namespace hi
 }
 
 export enum x { a = 1 };
+
+export typedef int td;
