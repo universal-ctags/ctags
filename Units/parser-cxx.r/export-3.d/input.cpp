@@ -11,6 +11,10 @@ namespace X {
   export {
     int x;
     int f(int i);
+    union u {
+    int mbr;
+  };
+
   }
   int b;
 };
@@ -21,5 +25,8 @@ export {
   int z;
   enum E { a = 1 };
   typedef int td;
+  class c {
+    int mbr;
+  };
 }
 int n;

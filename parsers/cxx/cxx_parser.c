@@ -1399,9 +1399,18 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 		tag->isFileScope = !isInputHeaderFile();
 
+		unsigned int uProperties = 0;
+		if(uInitialKeywordState & CXXParserKeywordStateSeenExport)
+			uProperties |= CXXTagPropertyExport;
+		vString * pszProperties = NULL;
+
+		if(uProperties)
+			pszProperties = cxxTagSetProperties(uProperties);
+
 		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
 		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pClassName);
 
+		vStringDelete (pszProperties); /* NULL is acceptable. */
 	}
 
 	cxxScopePush(

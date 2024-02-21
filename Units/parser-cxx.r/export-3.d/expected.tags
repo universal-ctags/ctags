@@ -5,10 +5,14 @@ X	input.cpp	/^namespace X {$/;"	n	file:
 a	input.cpp	/^  int a;$/;"	v	namespace:X	typeref:typename:int
 x	input.cpp	/^    int x;$/;"	v	namespace:X	typeref:typename:int	properties:export
 f	input.cpp	/^    int f(int i);$/;"	p	namespace:X	typeref:typename:int	file:	properties:export
+u	input.cpp	/^    union u {$/;"	u	namespace:X	file:	properties:export
+mbr	input.cpp	/^    int mbr;$/;"	m	union:X::u	typeref:typename:int	file:
 b	input.cpp	/^  int b;$/;"	v	namespace:X	typeref:typename:int
 m	input.cpp	/^int m;$/;"	v	typeref:typename:int
 z	input.cpp	/^  int z;$/;"	v	typeref:typename:int	properties:export
 E	input.cpp	/^  enum E { a = 1 };$/;"	g	file:	properties:export
 a	input.cpp	/^  enum E { a = 1 };$/;"	e	enum:E	file:
 td	input.cpp	/^  typedef int td;$/;"	t	typeref:typename:int	file:	properties:export
+c	input.cpp	/^  class c {$/;"	c	file:	properties:export
+mbr	input.cpp	/^    int mbr;$/;"	m	class:c	typeref:typename:int	file:
 n	input.cpp	/^int n;$/;"	v	typeref:typename:int

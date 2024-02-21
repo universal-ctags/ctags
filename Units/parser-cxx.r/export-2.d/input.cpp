@@ -17,3 +17,15 @@ export namespace hi
 export enum x { a = 1 };
 
 export typedef int td;
+
+struct s_ {
+  int mbr;
+};
+
+export struct s {
+  int mbr;
+};
+
+struct s__ {
+  int mbr;
+};
