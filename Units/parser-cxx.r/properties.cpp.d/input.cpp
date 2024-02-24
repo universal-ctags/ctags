@@ -42,3 +42,5 @@ static void f01()
 static inline void f02()
 {
 }
+
+static struct point { float x, y; } p0, p1;
