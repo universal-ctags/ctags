@@ -15,18 +15,15 @@
 # About the language:
 #   - https://developer.hashicorp.com/terraform/language/syntax/configuration
 #
+# There ctags regex were re-implemented into multi-table regex to support
+# multi-line comments and locals blocks 
+#
 # Changed the name from `terraform` to `tf` so vim will recognise it properly based
 # on file extension (*.tf).
 #
-# A notable abscence is `local`, because `locals` are defined inside a block and
-# it's way harder to write a good regex for that.
-#   - https://www.terraform.io/docs/language/values/locals.html
-#
-# Another notable thing is that this parser doesn't skip /* block comments */.
-#
 # .tfvars files relates code are moved to TerraformVariables parser.
 #
---langdef=Terraform
+--langdef=Terraform{version=1.1}
 
 --map-Terraform=+.tf
 
@@ -40,11 +37,36 @@
 --kinddef-Terraform=p,provider,providers
 --kinddef-Terraform=m,module,modules
 --kinddef-Terraform=o,output,output
+--kinddef-Terraform=l,local,locals
 
---regex-Terraform=/^[[:space:]]*(#|\/\/)"//{exclusive}
---regex-Terraform=/^resource[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/r/{exclusive}
---regex-Terraform=/^data[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/d/{exclusive}
---regex-Terraform=/^variable[[:space:]]"([^"]+)"/\1/v/{exclusive}
---regex-Terraform=/^provider[[:space:]]"([^"]+)"/\1/p/{exclusive}
---regex-Terraform=/^module[[:space:]]"([^"]+)"/\1/m/{exclusive}
---regex-Terraform=/^output[[:space:]]"([^"]+)"/\1/o/{exclusive}
+
+--_tabledef-Terraform=toplevel
+--_tabledef-Terraform=comment
+--_tabledef-Terraform=locals
+--_tabledef-Terraform=multicomment
+
+
+--_mtable-regex-Terraform=toplevel/(\#|\/\/)//{tenter=comment}
+--_mtable-regex-Terraform=toplevel/\/\*//{tenter=multicomment}
+--_mtable-regex-Terraform=toplevel/locals[[:space:]]*\{//{tenter=locals}
+--_mtable-regex-Terraform=toplevel/^resource[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/r/
+--_mtable-regex-Terraform=toplevel/^data[[:space:]]"([^"]+)"[[:space:]]"([^"]+)"/\2/d/
+--_mtable-regex-Terraform=toplevel/^variable[[:space:]]"([^"]+)"/\1/v/
+--_mtable-regex-Terraform=toplevel/^provider[[:space:]]"([^"]+)"/\1/p/
+--_mtable-regex-Terraform=toplevel/^module[[:space:]]"([^"]+)"/\1/m/
+--_mtable-regex-Terraform=toplevel/^output[[:space:]]"([^"]+)"/\1/o/
+--_mtable-regex-Terraform=toplevel/.//
+
+--_mtable-regex-Terraform=comment/[^\n]+//
+--_mtable-regex-Terraform=comment/\n//{tleave}
+--_mtable-regex-Terraform=comment/.//
+
+--_mtable-regex-Terraform=multicomment/\*\///{tleave}
+--_mtable-regex-Terraform=multicomment/.//
+
+--_mtable-regex-Terraform=locals/\}//{tleave}
+--_mtable-regex-Terraform=locals/\{//{tenter=locals}
+--_mtable-regex-Terraform=locals/(\#|\/\/)//{tenter=comment}
+--_mtable-regex-Terraform=locals/\/\*//{tenter=multicomment}
+--_mtable-regex-Terraform=locals/([a-z0-9_]+)+[[:space:]]*=[[:space:]]+/\1/l/
+--_mtable-regex-Terraform=locals/.//
