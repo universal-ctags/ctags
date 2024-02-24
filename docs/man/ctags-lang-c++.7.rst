@@ -34,6 +34,13 @@ Change since "0.0"
 
 * New field ``alias``
 
+Change since "1.1"
+~~~~~~~~~~~~~~~~~~
+
+* New kinds ``module`` and ``partition``
+
+* New roles ``imported`` and ``exported`` for ``header`` kind
+
 SEE ALSO
 --------
 :ref:`ctags(1) <ctags(1)>`,
