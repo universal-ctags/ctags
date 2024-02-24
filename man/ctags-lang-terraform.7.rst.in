@@ -34,11 +34,13 @@ to extract variables assigned in variables definitions (`*.tfvars`).
 The TerraformVariables parser extracts variables in `*.tfvars` files
 with ``variable`` kind with ``assigned`` role of ``Terraform`` language.
 
-KNOWN BUGS
-----------
-* The parser doesn't ignore strings inside a block comment (``/* ... */``).
+VERSIONS
+--------
 
-* The parser doesn't extract variables defined with ``locals`` keyword.
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New kind ``local``
 
 SEE ALSO
 --------

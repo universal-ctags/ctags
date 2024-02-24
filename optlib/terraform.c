@@ -8,8 +8,77 @@
 #include "xtag.h"
 
 
-static void initializeTerraformParser (const langType language CTAGS_ATTR_UNUSED)
+static void initializeTerraformParser (const langType language)
 {
+
+	addLanguageRegexTable (language, "toplevel");
+	addLanguageRegexTable (language, "comment");
+	addLanguageRegexTable (language, "locals");
+	addLanguageRegexTable (language, "multicomment");
+
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^(\\#|//)",
+	                               "", "", "{tenter=comment}", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^/\\*",
+	                               "", "", "{tenter=multicomment}", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^locals[[:space:]]*\\{",
+	                               "", "", "{tenter=locals}", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^resource[[:space:]]\"([^\"]+)\"[[:space:]]\"([^\"]+)\"",
+	                               "\\2", "r", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^data[[:space:]]\"([^\"]+)\"[[:space:]]\"([^\"]+)\"",
+	                               "\\2", "d", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^variable[[:space:]]\"([^\"]+)\"",
+	                               "\\1", "v", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^provider[[:space:]]\"([^\"]+)\"",
+	                               "\\1", "p", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^module[[:space:]]\"([^\"]+)\"",
+	                               "\\1", "m", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^output[[:space:]]\"([^\"]+)\"",
+	                               "\\1", "o", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "comment",
+	                               "^[^\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "comment",
+	                               "^\n",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "comment",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "locals",
+	                               "^\\}",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "locals",
+	                               "^\\{",
+	                               "", "", "{tenter=locals}", NULL);
+	addLanguageTagMultiTableRegex (language, "locals",
+	                               "^(\\#|//)",
+	                               "", "", "{tenter=comment}", NULL);
+	addLanguageTagMultiTableRegex (language, "locals",
+	                               "^/\\*",
+	                               "", "", "{tenter=multicomment}", NULL);
+	addLanguageTagMultiTableRegex (language, "locals",
+	                               "^([a-z0-9_]+)+[[:space:]]*=[[:space:]]+",
+	                               "\\1", "l", "", NULL);
+	addLanguageTagMultiTableRegex (language, "locals",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "multicomment",
+	                               "^\\*/",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "multicomment",
+	                               "^.",
+	                               "", "", "", NULL);
 }
 
 extern parserDefinition* TerraformParser (void)
@@ -50,29 +119,15 @@ extern parserDefinition* TerraformParser (void)
 		{
 		  true, 'o', "output", "output",
 		},
+		{
+		  true, 'l', "local", "locals",
+		},
 	};
-	static tagRegexTable TerraformTagRegexTable [] = {
-		{"^[[:space:]]*(#|//)\"", "",
-		"", "{exclusive}", NULL, false},
-		{"^resource[[:space:]]\"([^\"]+)\"[[:space:]]\"([^\"]+)\"", "\\2",
-		"r", "{exclusive}", NULL, false},
-		{"^data[[:space:]]\"([^\"]+)\"[[:space:]]\"([^\"]+)\"", "\\2",
-		"d", "{exclusive}", NULL, false},
-		{"^variable[[:space:]]\"([^\"]+)\"", "\\1",
-		"v", "{exclusive}", NULL, false},
-		{"^provider[[:space:]]\"([^\"]+)\"", "\\1",
-		"p", "{exclusive}", NULL, false},
-		{"^module[[:space:]]\"([^\"]+)\"", "\\1",
-		"m", "{exclusive}", NULL, false},
-		{"^output[[:space:]]\"([^\"]+)\"", "\\1",
-		"o", "{exclusive}", NULL, false},
-	};
-
 
 	parserDefinition* const def = parserNew ("Terraform");
 
-	def->versionCurrent= 0;
-	def->versionAge    = 0;
+	def->versionCurrent= 1;
+	def->versionAge    = 1;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
@@ -80,8 +135,6 @@ extern parserDefinition* TerraformParser (void)
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->kindTable     = TerraformKindTable;
 	def->kindCount     = ARRAY_SIZE(TerraformKindTable);
-	def->tagRegexTable = TerraformTagRegexTable;
-	def->tagRegexCount = ARRAY_SIZE(TerraformTagRegexTable);
 	def->initialize    = initializeTerraformParser;
 
 	return def;
