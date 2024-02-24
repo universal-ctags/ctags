@@ -1,0 +1,5 @@
+T	input.c	/^static struct T {int t;} f1(int i)$/;"	s	file:
+t	input.c	/^static struct T {int t;} f1(int i)$/;"	m	struct:T	typeref:typename:int	file:
+f1	input.c	/^static struct T {int t;} f1(int i)$/;"	f	typeref:struct:T	file:	properties:static
+i	input.c	/^static struct T {int t;} f1(int i)$/;"	z	function:f1	typeref:typename:int	file:
+r	input.c	/^  struct T r = {.t = i};$/;"	l	function:f1	typeref:struct:T	file:

@@ -550,6 +550,25 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 	{
 		CXX_DEBUG_PRINT("Found opening bracket: possibly a function declaration?");
+
+		// Revert keyword states.
+		// Here we assume the following kind of input:
+		//
+		//   static struct S {...} fn (...) { ... }
+		//
+		// To fill properties: field of fn with "static", g_cxx.uKeywordState
+		// must be set here.
+		//
+		// See cxxParserEmitFunctionTags.
+		//
+		// NOTE: C++ doesn't accept such kind of input. So we propagate
+		// the state only meaningful in C languages.
+		g_cxx.uKeywordState |= uKeywordState & (0
+			| CXXParserKeywordStateSeenStatic
+			| CXXParserKeywordStateSeenInline
+			| CXXParserKeywordStateSeenExtern
+			| CXXParserKeywordStateSeenAttributeDeprecated
+			);
 		if(!cxxParserParseBlockHandleOpeningBracket())
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to handle the opening bracket");
