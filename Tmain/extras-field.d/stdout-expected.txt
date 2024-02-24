@@ -1,10 +1,10 @@
 X	input.cpp	/^namespace X {$/;"	n	file:	roles:def	extras:fileScope	end:6
 X::Y	input.cpp	/^  extern class Y {$/;"	c	namespace:X	file:	roles:def	extras:fileScope,qualified	end:5
 X::Y::m	input.cpp	/^    int m;$/;"	m	class:X::Y	typeref:typename:int	file:	roles:def	extras:fileScope,qualified	end:4
-X::v	input.cpp	/^  } v;$/;"	v	namespace:X	typeref:class:X::Y	roles:def	extras:qualified	end:5
+X::v	input.cpp	/^  } v;$/;"	x	namespace:X	typeref:class:X::Y	roles:def	extras:qualified	end:5
 Y	input.cpp	/^  extern class Y {$/;"	c	namespace:X	file:	roles:def	extras:fileScope	end:5
 Z	input.cpp	/^#define Z$/;"	d	file:	roles:def	extras:fileScope	end:1
 Z	input.cpp	/^#undef Z$/;"	d	file:	roles:undef	extras:fileScope,reference
 input.cpp	input.cpp	1;"	F	roles:def	extras:inputFile	end:7
 m	input.cpp	/^    int m;$/;"	m	class:X::Y	typeref:typename:int	file:	roles:def	extras:fileScope	end:4
-v	input.cpp	/^  } v;$/;"	v	namespace:X	typeref:class:X::Y	roles:def	end:5
+v	input.cpp	/^  } v;$/;"	x	namespace:X	typeref:class:X::Y	roles:def	end:5

@@ -574,7 +574,26 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	if(uKeywordState & CXXParserKeywordStateSeenTypedef)
 		cxxParserExtractTypedef(g_cxx.pTokenChain,true,false);
 	else
+	{
+		// Revert keyword states.
+		// Here we assume the following kind of input:
+		//
+		//   static struct S {...} s;
+		//
+		// To fill properties: field of s with "static", g_cxx.uKeywordState
+		// must be set here.
+		g_cxx.uKeywordState |= uKeywordState & (0
+			| CXXParserKeywordStateSeenStatic
+			| CXXParserKeywordStateSeenExtern
+			| CXXParserKeywordStateSeenMutable
+			| CXXParserKeywordStateSeenInline
+			| CXXParserKeywordStateSeenAttributeDeprecated
+			| CXXParserKeywordStateSeenConstexpr
+			| CXXParserKeywordStateSeenConstinit
+			| CXXParserKeywordStateSeenThreadLocal
+			);
 		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
+	}
 
 	CXX_DEBUG_LEAVE();
 	return true;

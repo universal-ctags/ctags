@@ -20,3 +20,8 @@ p01	input.cpp	/^static void p01();$/;"	p	typeref:typename:void	file:	properties:
 p02	input.cpp	/^extern void p02();$/;"	p	typeref:typename:void	file:	properties:extern
 f01	input.cpp	/^static void f01()$/;"	f	typeref:typename:void	file:	properties:static
 f02	input.cpp	/^static inline void f02()$/;"	f	typeref:typename:void	file:	properties:inline,static
+point	input.cpp	/^static struct point { float x, y; } p0, p1;$/;"	s	file:
+x	input.cpp	/^static struct point { float x, y; } p0, p1;$/;"	m	struct:point	typeref:typename:float	file:
+y	input.cpp	/^static struct point { float x, y; } p0, p1;$/;"	m	struct:point	typeref:typename:float	file:
+p0	input.cpp	/^static struct point { float x, y; } p0, p1;$/;"	v	typeref:struct:point	file:	properties:static
+p1	input.cpp	/^static struct point { float x, y; } p0, p1;$/;"	v	typeref:struct:point	file:	properties:static
