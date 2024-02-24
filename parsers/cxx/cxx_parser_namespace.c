@@ -56,6 +56,8 @@ bool cxxParserParseNamespace(void)
 	{
 		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenInline)
 			uProperties |= CXXTagPropertyInline;
+		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+			uProperties |= CXXTagPropertyExport;
 	}
 
 	cxxParserNewStatement(); // always a new statement
@@ -278,7 +280,7 @@ bool cxxParserParseNamespace(void)
 		// anonymous namespace
 		CXX_DEBUG_PRINT("Found anonymous namespace start");
 
-		CXXToken * t = cxxTokenCreateAnonymousIdentifier(CXXTagCPPKindNAMESPACE);
+		CXXToken * t = cxxTokenCreateAnonymousIdentifier(CXXTagCPPKindNAMESPACE, NULL);
 		tagEntryInfo * tag = cxxTagBegin(CXXTagCPPKindNAMESPACE,t);
 		if(tag)
 		{

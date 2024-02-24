@@ -44,8 +44,9 @@ bool g_bFirstRun = true;
 // - Clear the token chain
 // - Reset "seen" keywords
 //
-void cxxParserNewStatement(void)
+void cxxParserNewStatementFull(bool bExported)
 {
+	CXX_DEBUG_PRINT("NEW STATE: %d", bExported);
 	cxxTokenChainClear(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
 	{
@@ -56,11 +57,16 @@ void cxxParserNewStatement(void)
 		// we don't care about stale specializations as they
 		// are destroyed wen the base template prefix is extracted
 	}
-	g_cxx.uKeywordState = 0;
+	g_cxx.uKeywordState = bExported? CXXParserKeywordStateSeenExport: 0;
 
 	// FIXME: this cpp handling of end/statement is kind of broken:
 	//        it works only because the moon is in the correct phase.
 	cppEndStatement();
+}
+
+void cxxParserNewStatement(void)
+{
+	cxxParserNewStatementFull(false);
 }
 
 //
@@ -879,7 +885,7 @@ bool cxxParserParseEnum(void)
 		CXX_DEBUG_PRINT("Enum name is %s",vStringValue(pEnumName->pszWord));
 		cxxTokenChainTake(g_cxx.pTokenChain,pEnumName);
 	} else {
-		pEnumName = cxxTokenCreateAnonymousIdentifier(CXXTagKindENUM);
+		pEnumName = cxxTokenCreateAnonymousIdentifier(CXXTagKindENUM, NULL);
 		bAnonymous = true;
 		CXX_DEBUG_PRINT(
 				"Enum name is %s (anonymous)",
@@ -910,8 +916,15 @@ bool cxxParserParseEnum(void)
 			pTypeName = cxxTagCheckAndSetTypeField(pTypeBegin,pTypeEnd);
 		}
 
+
+		unsigned int uProperties = 0;
 		if(bIsScopedEnum)
-			pszProperties = cxxTagSetProperties(CXXTagPropertyScopedEnum);
+			uProperties |= CXXTagPropertyScopedEnum;
+		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+			uProperties |= CXXTagPropertyExport;
+
+		if(uProperties)
+			pszProperties = cxxTagSetProperties(uProperties);
 
 		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
 		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pEnumName);
@@ -1281,7 +1294,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			);
 		cxxTokenChainTake(g_cxx.pTokenChain,pClassName);
 	} else {
-		pClassName = cxxTokenCreateAnonymousIdentifier(uTagKind);
+		pClassName = cxxTokenCreateAnonymousIdentifier(uTagKind, NULL);
 		bAnonymous = true;
 		CXX_DEBUG_PRINT(
 				"Class/struct/union name is %s (anonymous)",
@@ -1386,9 +1399,18 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 		tag->isFileScope = !isInputHeaderFile();
 
+		unsigned int uProperties = 0;
+		if(uInitialKeywordState & CXXParserKeywordStateSeenExport)
+			uProperties |= CXXTagPropertyExport;
+		vString * pszProperties = NULL;
+
+		if(uProperties)
+			pszProperties = cxxTagSetProperties(uProperties);
+
 		iCorkQueueIndex = cxxTagCommit(&iCorkQueueIndexFQ);
 		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pClassName);
 
+		vStringDelete (pszProperties); /* NULL is acceptable. */
 	}
 
 	cxxScopePush(
@@ -2019,6 +2041,7 @@ rescanReason cxxCppParserMain(const unsigned int passCount)
 	cxxKeywordEnablePublicProtectedPrivate(g_cxx.bConfirmedCPPLanguage);
 
 	rescanReason r = cxxParserMain(passCount);
+	cxxParserDestroyCurrentModuleToken();
 	CXX_DEBUG_LEAVE();
 	return r;
 }

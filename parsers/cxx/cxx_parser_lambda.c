@@ -164,7 +164,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"C++ only");
 
-	CXXToken * pIdentifier = cxxTokenCreateAnonymousIdentifier(CXXTagKindFUNCTION);
+	CXXToken * pIdentifier = cxxTokenCreateAnonymousIdentifier(CXXTagKindFUNCTION, NULL);
 
 	CXXTokenChain * pSave = g_cxx.pTokenChain;
 	CXXTokenChain * pNew = cxxTokenChainCreate();

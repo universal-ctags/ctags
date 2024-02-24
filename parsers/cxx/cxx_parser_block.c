@@ -28,6 +28,8 @@
 
 #include <string.h>
 
+static bool cxxParserParseBlockFull(bool bExpectClosingBracket, bool bExported);
+
 bool cxxParserParseBlockHandleOpeningBracket(void)
 {
 	CXX_DEBUG_ENTER();
@@ -145,6 +147,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	int iCorkQueueIndexFQ = CORK_NIL;
 
 	CXXFunctionSignatureInfo oInfo;
+	bool bExported = false;
 
 	if(eScopeType != CXXScopeTypeFunction)
 	{
@@ -154,6 +157,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 
 		// FIXME: Handle syntax (5) of list initialization:
 		//        Class::Class() : member { arg1, arg2, ... } {...
+		bExported = (g_cxx.uKeywordState & CXXParserKeywordStateSeenExport);
 	} else {
 		// some kind of other block:
 		// - anonymous block
@@ -163,9 +167,9 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		iScopes = 0;
 	}
 
-	cxxParserNewStatement();
+	cxxParserNewStatementFull(bExported);
 
-	if(!cxxParserParseBlock(true))
+	if(!cxxParserParseBlockFull(true, bExported))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
 		return false;
@@ -254,14 +258,14 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	return true;
 }
 
-static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
+static bool cxxParserParseBlockInternal(bool bExpectClosingBracket, bool bExported)
 {
 	CXX_DEBUG_ENTER();
 
 	//char * szScopeName = cxxScopeGetFullName();
 	//CXX_DEBUG_PRINT("Scope name is '%s'",szScopeName ? szScopeName : "");
 
-	cxxParserNewStatement();
+	cxxParserNewStatementFull(bExported);
 
 	if(bExpectClosingBracket)
 	{
@@ -310,6 +314,9 @@ process_token:
 			cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 			continue;
 		}
+
+		if (bExported)
+			g_cxx.uKeywordState |= CXXParserKeywordStateSeenExport;
 
 		switch(g_cxx.pToken->eType)
 		{
@@ -446,6 +453,7 @@ process_token:
 								return false;
 							}
 						}
+					break;
 					break;
 					case CXXKeywordPUBLIC:
 					case CXXKeywordPROTECTED:
@@ -667,6 +675,9 @@ process_token:
 					case CXXKeyword_THREAD_LOCAL:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenThreadLocal;
 					break;
+					case CXXKeywordEXPORT:
+						g_cxx.uKeywordState |= CXXParserKeywordStateSeenExport;
+					break;
 
 					default:
 						if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
@@ -790,7 +801,44 @@ process_token:
 				}
 			break;
 			case CXXTokenTypeIdentifier:
-				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
+				if(
+					/* Accept only "export" as a  preceding token. */
+					(! (g_cxx.uKeywordState & ~CXXParserKeywordStateSeenExport))
+					&& (g_cxx.pToken->pPrev == NULL || cxxTokenIsKeyword(g_cxx.pToken->pPrev, CXXKeywordEXPORT))
+					/* C++ */
+					&& cxxParserCurrentLanguageIsCPP()
+					/* At the toplevel */
+					&& cxxScopeIsGlobal()
+					/* Handle this token as a keyword, not an identifier.  */
+					&& (strcmp(vStringValue(g_cxx.pToken->pszWord), "module") == 0)
+					)
+				{
+					/* "module" introduced in C++20, can be a keyworkd in limited contexts.
+					 * If the parsing is not in the context, the parser should handle it
+					 * as an identifier. */
+					if(!cxxParserParseModule())
+					{
+						CXX_DEBUG_LEAVE_TEXT("Failed to parse module");
+						return false;
+					}
+					break;
+				}
+				else if(
+					(! (g_cxx.uKeywordState & ~CXXParserKeywordStateSeenExport))
+					&& (g_cxx.pToken->pPrev == NULL || cxxTokenIsKeyword(g_cxx.pToken->pPrev, CXXKeywordEXPORT))
+					&& cxxParserCurrentLanguageIsCPP()
+					&& cxxScopeIsGlobal()
+					&& (strcmp(vStringValue(g_cxx.pToken->pszWord), "import") == 0)
+					)
+				{
+					if(!cxxParserParseImport())
+					{
+						CXX_DEBUG_LEAVE_TEXT("Failed to parse import");
+						return false;
+					}
+					break;
+				}
+				else if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
 				{
 					g_cxx.uKeywordState &= ~CXXParserKeywordStateSeenTypedef;
 					if(!cxxParserParseGenericTypedef())
@@ -821,15 +869,20 @@ process_token:
 // When the statement ends without finding any characteristic token the chain
 // is passed to an analysis routine which does a second scan pass.
 //
-bool cxxParserParseBlock(bool bExpectClosingBracket)
+static bool cxxParserParseBlockFull(bool bExpectClosingBracket, bool bExported)
 {
 	cxxSubparserNotifyEnterBlock ();
 
 	cppPushExternalParserBlock();
-	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket);
+	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket, bExported);
 	cppPopExternalParserBlock();
 
 	cxxSubparserNotifyLeaveBlock ();
 
 	return bRet;
+}
+
+bool cxxParserParseBlock(bool bExpectClosingBracket)
+{
+	return cxxParserParseBlockFull(bExpectClosingBracket, false);
 }

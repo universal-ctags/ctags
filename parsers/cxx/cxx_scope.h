@@ -32,6 +32,7 @@ enum CXXScopeType
 	CXXScopeTypeVariable, // template variables, mainly
 	CXXScopeTypePrototype,
 	CXXScopeTypeTypedef,  // template variables used in "using A = B<T>"
+	CXXScopeTypeModule,	  // Just for filling the scope field of partitions
 	CXXScopeTypeLAST
 };
 

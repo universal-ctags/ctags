@@ -219,7 +219,13 @@ void cxxParserExtractTypedef(
 // cxx_parser_namespace.c
 bool cxxParserParseNamespace(void);
 
+// cxx_parser_module.c
+bool cxxParserParseModule(void);
+bool cxxParserParseImport(void);
+void cxxParserDestroyCurrentModuleToken(void);
+
 // cxx_parser.c
+void cxxParserNewStatementFull(bool bExported);
 void cxxParserNewStatement(void);
 bool cxxParserSkipToSemicolonOrEOF(void);
 bool cxxParserParseToEndOfQualifedName(void);
@@ -292,6 +298,8 @@ typedef enum _CXXParserKeywordState
 	CXXParserKeywordStateSeenConstinit = (1 << 15),
 	// "thread_local" has been seen
 	CXXParserKeywordStateSeenThreadLocal = (1 << 16),
+	// "export" has been seen
+	CXXParserKeywordStateSeenExport = (1 << 17),
 } CXXParserKeywordState;
 
 #define CXX_PARSER_MAXIMUM_NESTING_LEVELS 1024

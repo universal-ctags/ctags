@@ -317,7 +317,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"export",
 		CXXLanguageCPP,
-		0
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"extern",
@@ -375,6 +375,13 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
+	/*
+	{
+		"module",
+		CXXLanguageCPP,
+		0
+	},
+	*/
 	{
 		"mutable",
 		CXXLanguageCPP,

@@ -778,6 +778,8 @@ got_identifier:
 				// consteval is not here; it is for functions.
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenThreadLocal)
 					uProperties |= CXXTagPropertyThreadLocal;
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+					uProperties |= CXXTagPropertyExport;
 
 				pszProperties = cxxTagSetProperties(uProperties);
 			}

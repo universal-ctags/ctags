@@ -1,0 +1,13 @@
+My.App.ConfigModule	input.cpp	/^export module My.App . ConfigModule: ConfigData. IniSettings ;$/;"	M	roles:partOwner
+ConfigData.IniSettings	input.cpp	/^export module My.App . ConfigModule: ConfigData. IniSettings ;$/;"	P	scope:module:My.App.ConfigModule	roles:def	properties:export
+My.App.ConfigModule:ConfigData.IniSettings	input.cpp	/^export module My.App . ConfigModule: ConfigData. IniSettings ;$/;"	P	scope:module:My.App.ConfigModule	roles:def	properties:export
+My.App.ConfigModule	input-0.cpp	/^module My.App . ConfigModule: Config.Data. IniSettings ;$/;"	M	roles:partOwner
+Config.Data.IniSettings	input-0.cpp	/^module My.App . ConfigModule: Config.Data. IniSettings ;$/;"	P	scope:module:My.App.ConfigModule	roles:def
+My.App.ConfigModule:Config.Data.IniSettings	input-0.cpp	/^module My.App . ConfigModule: Config.Data. IniSettings ;$/;"	P	scope:module:My.App.ConfigModule	roles:def
+A	input-1.cpp	/^export module A: ConfigData. IniSettings ;$/;"	M	roles:partOwner
+ConfigData.IniSettings	input-1.cpp	/^export module A: ConfigData. IniSettings ;$/;"	P	scope:module:A	roles:def	properties:export
+A:ConfigData.IniSettings	input-1.cpp	/^export module A: ConfigData. IniSettings ;$/;"	P	scope:module:A	roles:def	properties:export
+My.App.ConfigModule	input-2.cpp	/^export module My.App . ConfigModule: B ;$/;"	M	roles:partOwner
+B	input-2.cpp	/^export module My.App . ConfigModule: B ;$/;"	P	scope:module:My.App.ConfigModule	roles:def	properties:export
+My.App.ConfigModule:B	input-2.cpp	/^export module My.App . ConfigModule: B ;$/;"	P	scope:module:My.App.ConfigModule	roles:def	properties:export
+My.App.ConfigModule	input-3.cpp	/^export module My.App . ConfigModule: ;$/;"	M	roles:def	properties:export

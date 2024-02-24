@@ -286,6 +286,7 @@
     <ClCompile Include="..\parsers\cxx\cxx_parser_block.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_function.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_lambda.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_module.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_namespace.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_template.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_tokenizer.c" />

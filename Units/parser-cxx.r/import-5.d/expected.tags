@@ -1,0 +1,30 @@
+X	input.cpp	/^import X:P [[something]];$/;"	M	roles:partOwner
+P	input.cpp	/^import X:P [[something]];$/;"	P	module:X	roles:imported
+X:P	input.cpp	/^import X:P [[something]];$/;"	P	module:X	roles:imported
+X.Y	input-0.cpp	/^import X.Y:P [[something]];$/;"	M	roles:partOwner
+P	input-0.cpp	/^import X.Y:P [[something]];$/;"	P	module:X.Y	roles:imported
+X.Y:P	input-0.cpp	/^import X.Y:P [[something]];$/;"	P	module:X.Y	roles:imported
+X	input-1.cpp	/^import X:P.Q [[something]];$/;"	M	roles:partOwner
+P.Q	input-1.cpp	/^import X:P.Q [[something]];$/;"	P	module:X	roles:imported
+X:P.Q	input-1.cpp	/^import X:P.Q [[something]];$/;"	P	module:X	roles:imported
+X.Y	input-2.cpp	/^import X.Y:P.Q [[something]];$/;"	M	roles:partOwner
+P.Q	input-2.cpp	/^import X.Y:P.Q [[something]];$/;"	P	module:X.Y	roles:imported
+X.Y:P.Q	input-2.cpp	/^import X.Y:P.Q [[something]];$/;"	P	module:X.Y	roles:imported
+X	input-3.cpp	/^export import X:P [[something]];$/;"	M	roles:partOwner
+P	input-3.cpp	/^export import X:P [[something]];$/;"	P	module:X	roles:imported	properties:export
+X:P	input-3.cpp	/^export import X:P [[something]];$/;"	P	module:X	roles:imported	properties:export
+X.Y	input-4.cpp	/^export import X.Y:P [[something]];$/;"	M	roles:partOwner
+P	input-4.cpp	/^export import X.Y:P [[something]];$/;"	P	module:X.Y	roles:imported	properties:export
+X.Y:P	input-4.cpp	/^export import X.Y:P [[something]];$/;"	P	module:X.Y	roles:imported	properties:export
+X	input-5.cpp	/^export import X:P.Q [[something]];$/;"	M	roles:partOwner
+P.Q	input-5.cpp	/^export import X:P.Q [[something]];$/;"	P	module:X	roles:imported	properties:export
+X:P.Q	input-5.cpp	/^export import X:P.Q [[something]];$/;"	P	module:X	roles:imported	properties:export
+X	input-6.cpp	/^export import X:P.Q [[something]];$/;"	M	roles:partOwner
+P.Q	input-6.cpp	/^export import X:P.Q [[something]];$/;"	P	module:X	roles:imported	properties:export
+X:P.Q	input-6.cpp	/^export import X:P.Q [[something]];$/;"	P	module:X	roles:imported	properties:export
+A	input-7.cpp	/^export module A;     \/\/ primary module interface unit$/;"	M	roles:def	properties:export
+B	input-7.cpp	/^export import :B;    \/\/ Hello() is visible when importing 'A'.$/;"	P	module:A	roles:imported	properties:export
+A:B	input-7.cpp	/^export import :B;    \/\/ Hello() is visible when importing 'A'.$/;"	P	module:A	roles:imported	properties:export
+C	input-7.cpp	/^import :C;           \/\/ WorldImpl() is now visible only for 'A.cpp'.$/;"	P	module:A	roles:imported
+A:C	input-7.cpp	/^import :C;           \/\/ WorldImpl() is now visible only for 'A.cpp'.$/;"	P	module:A	roles:imported
+World	input-7.cpp	/^export char const* World()$/;"	f	typeref:typename:char const *	roles:def	properties:export

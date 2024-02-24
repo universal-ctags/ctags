@@ -1761,6 +1761,8 @@ int cxxParserEmitFunctionTags(
 								CXXTagPropertyTemplateSpecialization;
 			if((pInfo->uFlags & CXXFunctionSignatureInfoTemplateSpecialization) || bIsEmptyTemplate)
 				uProperties |= CXXTagPropertyTemplateSpecialization;
+			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+				uProperties |= CXXTagPropertyExport;
 
 			pszProperties = cxxTagSetProperties(uProperties);
 		}
@@ -2234,7 +2236,7 @@ try_again:
 						 *
 						 *   void f(int *);
 						 */
-						pIdentifier = cxxTokenCreateAnonymousIdentifier(CXXTagKindPARAMETER);
+						pIdentifier = cxxTokenCreateAnonymousIdentifier(CXXTagKindPARAMETER, NULL);
 						pIdentifier->iLineNumber = t->pPrev->iLineNumber;
 						pIdentifier->oFilePosition = t->pPrev->oFilePosition;
 						pParamInfo->uAnonymous |= (0x1u << pParamInfo->uCount);
@@ -2278,7 +2280,7 @@ try_again:
 			 *
 			 */
 			CXXToken * pFakeStart = cxxTokenCopy(pStart);
-			CXXToken * pFakeId = cxxTokenCreateAnonymousIdentifier(CXXTagKindPARAMETER);
+			CXXToken * pFakeId = cxxTokenCreateAnonymousIdentifier(CXXTagKindPARAMETER, NULL);
 			pFakeId->iLineNumber = pStart->iLineNumber;
 			pFakeId->oFilePosition = pStart->oFilePosition;
 
