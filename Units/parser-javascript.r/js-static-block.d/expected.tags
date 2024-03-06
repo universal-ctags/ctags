@@ -1,0 +1,7 @@
+a	input.js	/^class a {$/;"	c
+b	input.js	/^    static { class b {} }$/;"	c	class:a
+fld0	input.js	/^    fld0;$/;"	M	class:a
+c	input.js	/^    static { class c {} }$/;"	c	class:a
+fld1	input.js	/^    static fld1;$/;"	M	class:a
+d	input.js	/^    static { class d {} }$/;"	c	class:a
+fld2	input.js	/^    static fld2 = 1;$/;"	M	class:a
