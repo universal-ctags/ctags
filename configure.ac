@@ -442,11 +442,17 @@ elif test -d "c:/"; then
 else
 	tmpdir="/tmp"
 fi
-if test -d $tmpdir ; then
-	AC_MSG_RESULT($tmpdir)
-	AC_DEFINE_UNQUOTED(TMPDIR, "$tmpdir")
+
+if test "$cross_compiling" = yes ; then
+        AC_MSG_RESULT($tmpdir)
+        AC_DEFINE_UNQUOTED(TMPDIR, "$tmpdir")
 else
-	AC_MSG_ERROR($tmpdir does not exist)
+    if test -d $tmpdir ; then
+        AC_MSG_RESULT($tmpdir)
+        AC_DEFINE_UNQUOTED(TMPDIR, "$tmpdir")
+    else
+        AC_MSG_ERROR($tmpdir does not exist)
+    fi
 fi
 
 # Test for case-insensitive filenames
