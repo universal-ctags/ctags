@@ -340,7 +340,8 @@ static void parseFunction (const unsigned char *line, int parent, bool definedWi
 		if (*cp)
 		{
 			cp = skipPrefix (cp, &scope);
-			if (isupper (*cp)  ||
+			if ((definedWithDEF && (*cp == '_' || isalpha (*cp))) ||
+				isupper (*cp)  ||
 					scope == 's'  ||  /* script scope */
 					scope == '<'  ||  /* script scope */
 					scope == 'g'  ||  /* global scope */
