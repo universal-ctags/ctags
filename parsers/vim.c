@@ -55,6 +55,7 @@ typedef enum {
 	K_FILENAME,
 	K_CONST,
 	K_HEREDOC,
+	K_CLASS,
 } vimKind;
 
 typedef enum {
@@ -75,6 +76,7 @@ static kindDefinition VimKinds [] = {
 	{ true,  'C', "constant", "constant definitions" },
 	{ false, 'h', "heredoc",  "marker for here document",
 	  .referenceOnly = false, ATTACH_ROLES (VimHeredocRoles) },
+	{ true,  'k', "class", "vim9script classes" },
 };
 
 /*
@@ -406,6 +408,46 @@ static void parseFunction (const unsigned char *line, int parent, bool definedWi
 	vStringDelete (name);
 }
 
+static void parseClass (const unsigned char *line, int parent)
+{
+	vString *name = vStringNew ();
+	const unsigned char *cp = line;
+	int index = CORK_NIL;
+
+	if (isspace (*cp))
+	{
+		while (*cp && isspace (*cp))
+			++cp;
+
+		while (isalnum (*cp) || *cp == '_')
+		{
+			vStringPut (name, *cp);
+			++cp;
+		}
+		if (!vStringIsEmpty (name))
+		{
+			tagEntryInfo *e;
+
+			index = makeSimpleTag (name, K_CLASS);
+			e = getEntryInCorkQueue (index);
+			if (e)
+				e->extensionFields.scopeIndex = parent;
+			while ((line = readVimLine ()) != NULL)
+			{
+				if (wordMatchLen (line, "endclass", 8))
+				{
+					if (e)
+						setTagEndLine (e, getInputLineNumber ());
+					break;
+				}
+				parseVimLine (line, index);
+			}
+		}
+	}
+
+	vStringDelete (name);
+}
+
 static void parseAutogroup (const unsigned char *line)
 {
 	vString *name = vStringNew ();
@@ -598,6 +640,14 @@ static int parseHeredocMarker(const unsigned char *cp)
 	return r;
 }
 
+static bool isFunction(int index)
+{
+	tagEntryInfo *e = getEntryInCorkQueue(index);
+	if (!e)
+		return false;
+	return (e->kindIndex == K_FUNCTION);
+}
+
 /*
  * If we have a heredoc end marker at the end of LINE,
  * parseVariableOrConstant returns the tag cork index for the marker.
@@ -634,11 +684,13 @@ static int parseVariableOrConstant (const unsigned char *line, int parent, int k
 			goto cleanUp;
 
 		/* Skip non-global vars in functions */
-		if (parent != CORK_NIL && (*np != ':' || *cp != 'g'))
+		bool inFunction = isFunction(parent);
+		if (parent != CORK_NIL && inFunction && (*np != ':' || *cp != 'g'))
 			goto cleanUp;
 
 		/* deal with spaces, $, @ and & */
-		while (*cp && *cp != '$' && !isalnum (*cp))
+		while (*cp && *cp != '$' && !isalnum (*cp)
+			   && !(vim9script && *cp == '_'))
 			++cp;
 
 		if (!*cp)
@@ -668,9 +720,14 @@ static int parseVariableOrConstant (const unsigned char *line, int parent, int k
 			int r = makeSimpleTag (name, kindIndex);
 			vStringClear (name);
 
-			tagEntryInfo *e;
-			if (hasType && (e = getEntryInCorkQueue (r)))
-				cp = parseRettype (cp, e);
+			tagEntryInfo *e = getEntryInCorkQueue (r);
+			if (e)
+			{
+				if (hasType)
+					cp = parseRettype (cp, e);
+				if (!inFunction)
+					e->extensionFields.scopeIndex = parent;
+			}
 
 			heredoc = parseHeredocMarker(cp);
 		}
@@ -836,6 +893,10 @@ static bool parseVimLine (const unsigned char *line, int parent)
 	else if (wordMatchLen (line, "const", 4) || wordMatchLen (line, "final", 5))
 	{
 		heredoc = parseVariableOrConstant (skipWord (line), parent, K_CONST);
+	}
+	else if (vim9script && wordMatchLen (line, "class", 5))
+	{
+		parseClass (skipWord (line), parent);
 	}
 
 	tagEntryInfo *e;

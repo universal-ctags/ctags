@@ -26,7 +26,7 @@ VERSIONS
 Change since "0.0"
 ~~~~~~~~~~~~~~~~~~
 
-* New kind ``heredoc``.
+* New kinds ``heredoc`` and ``class``
 
 SEE ALSO
 --------
