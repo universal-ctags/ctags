@@ -765,12 +765,41 @@ static bool parseVimLine (const unsigned char *line, int parent)
 	bool readNextLine = true;
 	int heredoc = CORK_NIL;
 
-	if (vim9script && wordMatchLen (line, "export", 6))
+	while (true)
 	{
-		line += 6;
-		while (*line && isspace (*line))
-			++line;
-		/* TODO: export should be stored to a field. */
+		if (vim9script && wordMatchLen (line, "export", 6))
+		{
+			line += 6;
+			while (*line && isspace (*line))
+				++line;
+			/* TODO: export should be stored to a field. */
+			continue;
+		}
+		else if (vim9script && wordMatchLen (line, "abstract", 8))
+		{
+			line += 8;
+			while (*line && isspace (*line))
+				++line;
+			/* TODO: abstract should be stored to a field. */
+			continue;
+		}
+		else if (vim9script && wordMatchLen (line, "static", 6))
+		{
+			line += 6;
+			while (*line && isspace (*line))
+				++line;
+			/* TODO: static should be stored to a field. */
+			continue;
+		}
+		else if (vim9script && wordMatchLen (line, "public", 6))
+		{
+			line += 6;
+			while (*line && isspace (*line))
+				++line;
+			/* TODO: public should be stored to a field. */
+			continue;
+		}
+		break;
 	}
 
 	if (wordMatchLen (line, "vim9script", 10))
