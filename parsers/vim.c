@@ -411,7 +411,8 @@ static void parseFunction (const unsigned char *line, int parent, bool definedWi
 	vStringDelete (name);
 }
 
-static void parseClass (const unsigned char *line, int parent, bool isPublic)
+static void parseClass (const unsigned char *line, int parent,
+						bool isPublic, bool isAbstract)
 {
 	vString *name = vStringNew ();
 	const unsigned char *cp = line;
@@ -438,6 +439,8 @@ static void parseClass (const unsigned char *line, int parent, bool isPublic)
 				e->extensionFields.scopeIndex = parent;
 				if (isPublic)
 					e->extensionFields.access = eStrdup ("public");
+				if (isAbstract)
+					e->extensionFields.implementation = eStrdup ("abstract");
 			}
 			while ((line = readVimLine ()) != NULL)
 			{
@@ -833,6 +836,7 @@ static bool parseVimLine (const unsigned char *line, int parent)
 	bool readNextLine = true;
 	int heredoc = CORK_NIL;
 	bool isPublic = false;
+	bool isAbstract = false;
 
 	while (true)
 	{
@@ -849,7 +853,7 @@ static bool parseVimLine (const unsigned char *line, int parent)
 			line += 8;
 			while (*line && isspace (*line))
 				++line;
-			/* TODO: abstract should be stored to a field. */
+			isAbstract = true;
 			continue;
 		}
 		else if (vim9script && wordMatchLen (line, "static", 6))
@@ -907,7 +911,7 @@ static bool parseVimLine (const unsigned char *line, int parent)
 	}
 	else if (vim9script && wordMatchLen (line, "class", 5))
 	{
-		parseClass (skipWord (line), parent, isPublic);
+		parseClass (skipWord (line), parent, isPublic, isAbstract);
 	}
 
 	tagEntryInfo *e;
