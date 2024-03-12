@@ -7,13 +7,13 @@ size	input-0.vim	/^   var size: number$/;"	v	line:5	class:OtherThing	typeref:typ
 totalSize	input-0.vim	/^   static var totalSize: number$/;"	v	line:6	class:OtherThing	typeref:typename:number
 new	input-0.vim	/^   def new(this.size)$/;"	f	line:8	class:OtherThing	signature:(this.size)	end:10
 _sum	input-0.vim	/^   static var _sum: number$/;"	v	line:12	class:OtherThing	typeref:typename:number
-result	input-0.vim	/^   public static var result: number$/;"	v	line:13	class:OtherThing	typeref:typename:number
+result	input-0.vim	/^   public static var result: number$/;"	v	line:13	class:OtherThing	typeref:typename:number	access:public
 ClearTotalSize	input-0.vim	/^   static def ClearTotalSize(): number$/;"	f	line:15	class:OtherThing	typeref:typename:number	signature:()	end:19
 YetOtherThing	input-0.vim	/^class YetOtherThing$/;"	k	line:23	end:30
 _Foo	input-0.vim	/^   static def _Foo()$/;"	f	line:24	class:YetOtherThing	signature:()	end:26
 Bar	input-0.vim	/^   def Bar()$/;"	f	line:27	class:YetOtherThing	signature:()	end:29
 A	input-0.vim	/^class A$/;"	k	line:32	end:37
 v1	input-0.vim	/^   final v1 = [1, 2]               # final object variable$/;"	C	line:33	class:A
-v2	input-0.vim	/^   public final v2 = {x: 1}        # final object variable$/;"	C	line:34	class:A
+v2	input-0.vim	/^   public final v2 = {x: 1}        # final object variable$/;"	C	line:34	class:A	access:public
 v3	input-0.vim	/^   static final v3 = 'abc'         # final class variable$/;"	C	line:35	class:A
-v4	input-0.vim	/^   public static final v4 = 0z10   # final class variable$/;"	C	line:36	class:A
+v4	input-0.vim	/^   public static final v4 = 0z10   # final class variable$/;"	C	line:36	class:A	access:public

@@ -322,7 +322,8 @@ static vString *parseSignatureAndRettype (const unsigned char *cp,
 	return buf;
 }
 
-static void parseFunction (const unsigned char *line, int parent, bool definedWithDEF)
+static void parseFunction (const unsigned char *line, int parent, bool definedWithDEF,
+						   bool isPublic)
 {
 	vString *name = vStringNew ();
 	vString *signature = NULL;
@@ -374,6 +375,8 @@ static void parseFunction (const unsigned char *line, int parent, bool definedWi
 							signature = parseSignatureAndRettype (cp, e, NULL,
 																  definedWithDEF);
 					}
+					if (isPublic)
+						e->extensionFields.access = eStrdup("public");
 				}
 			}
 		}
@@ -408,7 +411,7 @@ static void parseFunction (const unsigned char *line, int parent, bool definedWi
 	vStringDelete (name);
 }
 
-static void parseClass (const unsigned char *line, int parent)
+static void parseClass (const unsigned char *line, int parent, bool isPublic)
 {
 	vString *name = vStringNew ();
 	const unsigned char *cp = line;
@@ -431,7 +434,11 @@ static void parseClass (const unsigned char *line, int parent)
 			index = makeSimpleTag (name, K_CLASS);
 			e = getEntryInCorkQueue (index);
 			if (e)
+			{
 				e->extensionFields.scopeIndex = parent;
+				if (isPublic)
+					e->extensionFields.access = eStrdup ("public");
+			}
 			while ((line = readVimLine ()) != NULL)
 			{
 				if (wordMatchLen (line, "endclass", 8))
@@ -652,7 +659,8 @@ static bool isFunction(int index)
  * If we have a heredoc end marker at the end of LINE,
  * parseVariableOrConstant returns the tag cork index for the marker.
  */
-static int parseVariableOrConstant (const unsigned char *line, int parent, int kindIndex)
+static int parseVariableOrConstant (const unsigned char *line, int parent, int kindIndex,
+									bool isPublic)
 {
 	vString *name = vStringNew ();
 	int heredoc = CORK_NIL;
@@ -727,6 +735,8 @@ static int parseVariableOrConstant (const unsigned char *line, int parent, int k
 					cp = parseRettype (cp, e);
 				if (!inFunction)
 					e->extensionFields.scopeIndex = parent;
+				if (isPublic)
+					e->extensionFields.access = eStrdup("public");
 			}
 
 			heredoc = parseHeredocMarker(cp);
@@ -822,6 +832,7 @@ static bool parseVimLine (const unsigned char *line, int parent)
 {
 	bool readNextLine = true;
 	int heredoc = CORK_NIL;
+	bool isPublic = false;
 
 	while (true)
 	{
@@ -854,7 +865,7 @@ static bool parseVimLine (const unsigned char *line, int parent)
 			line += 6;
 			while (*line && isspace (*line))
 				++line;
-			/* TODO: public should be stored to a field. */
+			isPublic = true;
 			continue;
 		}
 		break;
@@ -878,7 +889,7 @@ static bool parseVimLine (const unsigned char *line, int parent)
 
 	else if (wordMatchLen (line, "function", 2) || wordMatchLen (line, "def", 3))
 	{
-		parseFunction (skipWord (line), parent, vim9script && line[0] == 'd');
+		parseFunction (skipWord (line), parent, vim9script && line[0] == 'd', isPublic);
 	}
 
 	else if (wordMatchLen (line, "augroup", 3))
@@ -888,15 +899,15 @@ static bool parseVimLine (const unsigned char *line, int parent)
 
 	else if (wordMatchLen (line, "let", 3) || (vim9script && wordMatchLen (line, "var", 3)))
 	{
-		heredoc = parseVariableOrConstant (skipWord (line), parent, K_VARIABLE);
+		heredoc = parseVariableOrConstant (skipWord (line), parent, K_VARIABLE, isPublic);
 	}
 	else if (wordMatchLen (line, "const", 4) || wordMatchLen (line, "final", 5))
 	{
-		heredoc = parseVariableOrConstant (skipWord (line), parent, K_CONST);
+		heredoc = parseVariableOrConstant (skipWord (line), parent, K_CONST, isPublic);
 	}
 	else if (vim9script && wordMatchLen (line, "class", 5))
 	{
-		parseClass (skipWord (line), parent);
+		parseClass (skipWord (line), parent, isPublic);
 	}
 
 	tagEntryInfo *e;
