@@ -415,6 +415,7 @@ static void parseClass (const unsigned char *line, int parent,
 						bool isPublic, bool isAbstract)
 {
 	vString *name = vStringNew ();
+	vString *super = NULL;
 	const unsigned char *cp = line;
 	int index = CORK_NIL;
 
@@ -428,6 +429,25 @@ static void parseClass (const unsigned char *line, int parent,
 			vStringPut (name, *cp);
 			++cp;
 		}
+
+		while (*cp && isspace (*cp))
+			++cp;
+
+		if (wordMatchLen (cp, "extends", 7))
+		{
+			cp += 7;
+			while (*cp && isspace (*cp))
+				++cp;
+			super = vStringNew ();
+			while (*cp && (isalnum (*cp) || *cp == '_'
+						   /* ??? */
+						   || *cp == '.'))
+			{
+				vStringPut (super, *cp);
+				cp++;
+			}
+		}
+
 		if (!vStringIsEmpty (name))
 		{
 			tagEntryInfo *e;
@@ -441,6 +461,11 @@ static void parseClass (const unsigned char *line, int parent,
 					e->extensionFields.access = eStrdup ("public");
 				if (isAbstract)
 					e->extensionFields.implementation = eStrdup ("abstract");
+				if (super && !vStringIsEmpty (super))
+				{
+					e->extensionFields.inheritance = vStringDeleteUnwrap(super);
+					super = NULL;
+				}
 			}
 			while ((line = readVimLine ()) != NULL)
 			{
@@ -455,6 +480,7 @@ static void parseClass (const unsigned char *line, int parent,
 		}
 	}
 
+	vStringDelete (super);		/* NULL ia acceptable. */
 	vStringDelete (name);
 }
 

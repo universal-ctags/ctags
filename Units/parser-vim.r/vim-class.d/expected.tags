@@ -20,10 +20,10 @@ v4	input-0.vim	/^   public static final v4 = 0z10   # final class variable$/;"	C
 Shape	input-1.vim	/^abstract class Shape$/;"	k	line:4	implementation:abstract	end:7
 color	input-1.vim	/^   var color = Color.Black$/;"	v	line:5	class:Shape
 thickness	input-1.vim	/^   var thickness = 10$/;"	v	line:6	class:Shape
-Square	input-1.vim	/^class Square extends Shape$/;"	k	line:9	end:14
+Square	input-1.vim	/^class Square extends Shape$/;"	k	line:9	inherits:Shape	end:14
 size	input-1.vim	/^   var size: number$/;"	v	line:10	class:Square	typeref:typename:number
 new	input-1.vim	/^   def new(this.size)$/;"	f	line:12	class:Square	signature:(this.size)	end:13
-Triangle	input-1.vim	/^class Triangle extends Shape$/;"	k	line:16	end:22
+Triangle	input-1.vim	/^class Triangle extends Shape$/;"	k	line:16	inherits:Shape	end:22
 base	input-1.vim	/^   var base: number$/;"	v	line:17	class:Triangle	typeref:typename:number
 height	input-1.vim	/^   var height: number$/;"	v	line:18	class:Triangle	typeref:typename:number
 new	input-1.vim	/^   def new(this.base, this.height)$/;"	f	line:20	class:Triangle	signature:(this.base,this.height)	end:21
