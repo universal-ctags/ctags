@@ -583,7 +583,7 @@ PRETTY_ARG_VAR([EXTRA_LDFLAGS], [extra linker flags],
 
 dnl ref. https://stackoverflow.com/questions/40374061/autoconf-recipe-to-use-gcc-ar-and-gcc-ranlib
 use_lto=no
-enable_debugging
+
 AS_IF([test "x$cross_compiling" != "xyes" -a "x$enable_lto" != "xno"],[
 		AX_CHECK_COMPILE_FLAG(-flto,[use_lto=yes])])
 AS_VAR_IF([use_lto], [yes], [
