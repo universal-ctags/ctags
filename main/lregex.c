@@ -2373,11 +2373,11 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 			   regex,
 			   getLanguageName (lcb->owner));
 
-	const char *option_bsae = (regptype == REG_PARSER_SINGLE_LINE? "regex"        :
+	const char *option_base = (regptype == REG_PARSER_SINGLE_LINE? "regex"        :
 							   regptype == REG_PARSER_MULTI_LINE ? "mline-regex"  :
 							   regptype == REG_PARSER_MULTI_TABLE? "_mtable-regex":
 							   NULL);
-	Assert (option_bsae);
+	Assert (option_base);
 
 	for (const char * p = kindName; *p; p++)
 	{
@@ -2388,7 +2388,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 					   "A kind name doesn't start with an alphabetical character: "
 					   "'%s' in \"--%s-%s\" option",
 					   kindName,
-					   option_bsae,
+					   option_base,
 					   getLanguageName (lcb->owner));
 		}
 		else
@@ -2404,7 +2404,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 					   "Non-alphanumeric char is used in kind name: "
 					   "'%s' in \"--%s-%s\" option",
 					   kindName,
-					   option_bsae,
+					   option_base,
 					   getLanguageName (lcb->owner));
 
 		}
