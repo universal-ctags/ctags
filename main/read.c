@@ -337,6 +337,12 @@ static void allocLineFposMap (inputLineFposMap *lineFposMap)
 	lineFposMap->count = 0;
 }
 
+static void resetLineFposMap (inputLineFposMap *lineFposMap)
+{
+	memset(lineFposMap->pos, 0, sizeof(compoundPos) * lineFposMap->size);
+	lineFposMap->count = 0;
+}
+
 static void appendLineFposMap (inputLineFposMap *lineFposMap, compoundPos *pos,
 							   bool crAdjustment, size_t posInAllLines)
 {
@@ -789,7 +795,7 @@ extern time_t getInputFileMtime (void)
 	return File.mtime;
 }
 
-extern void resetInputFile (const langType language)
+extern void resetInputFile (const langType language, bool resetLineFposMap_)
 {
 	Assert (File.mio);
 
@@ -806,6 +812,9 @@ extern void resetInputFile (const langType language)
 	if (hasLanguageMultilineRegexPatterns (language)
 		|| hasLanguagePostRunRegexPatterns (language))
 		File.allLines = vStringNew ();
+
+	if (resetLineFposMap_)
+		resetLineFposMap(&File.lineFposMap);
 
 	resetLangOnStack (& inputLang, language);
 	File.input.lineNumber = File.input.lineNumberOrigin;
