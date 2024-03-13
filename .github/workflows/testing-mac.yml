@@ -25,9 +25,13 @@ jobs:
     # NOTE: DO NOT try to install python3 package via brew, it has already been included in macos-xx runner images
     # https://github.com/actions/runner-images/blob/macos-13/20231002.1/images/macos/macos-13-Readme.md#python
 
+    # https://github.com/universal-ctags/ctags/pull/3954
+    - if: matrix.os == 'macos-13'
+      run: brew install --overwrite python@3.12
+
     - run: brew install automake pkg-config jansson libyaml pcre2
 
-    - run: pip3 install docutils
+    - run: pip3 install docutils --break-system-packages
 
     - run: cc --version
     - run: make --version
