@@ -4042,7 +4042,7 @@ static rescanReason createTagsForFile (const langType language,
 	parserDefinition *const lang = LanguageTable [language].def;
 	rescanReason rescan = RESCAN_NONE;
 
-	resetInputFile (language);
+	resetInputFile (language, passCount > 1);
 
 	Assert (lang->parser || lang->parser2);
 
