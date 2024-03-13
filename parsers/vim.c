@@ -55,6 +55,7 @@ typedef enum {
 	K_FILENAME,
 	K_CONST,
 	K_HEREDOC,
+	K_CLASS,
 } vimKind;
 
 typedef enum {
@@ -75,6 +76,7 @@ static kindDefinition VimKinds [] = {
 	{ true,  'C', "constant", "constant definitions" },
 	{ false, 'h', "heredoc",  "marker for here document",
 	  .referenceOnly = false, ATTACH_ROLES (VimHeredocRoles) },
+	{ true,  'k', "class", "vim9script classes" },
 };
 
 /*
@@ -320,7 +322,8 @@ static vString *parseSignatureAndRettype (const unsigned char *cp,
 	return buf;
 }
 
-static void parseFunction (const unsigned char *line, int parent, bool definedWithDEF)
+static void parseFunction (const unsigned char *line, int parent, bool definedWithDEF,
+						   bool isPublic)
 {
 	vString *name = vStringNew ();
 	vString *signature = NULL;
@@ -340,7 +343,8 @@ static void parseFunction (const unsigned char *line, int parent, bool definedWi
 		if (*cp)
 		{
 			cp = skipPrefix (cp, &scope);
-			if (isupper (*cp)  ||
+			if ((definedWithDEF && (*cp == '_' || isalpha (*cp))) ||
+				isupper (*cp)  ||
 					scope == 's'  ||  /* script scope */
 					scope == '<'  ||  /* script scope */
 					scope == 'g'  ||  /* global scope */
@@ -371,6 +375,8 @@ static void parseFunction (const unsigned char *line, int parent, bool definedWi
 							signature = parseSignatureAndRettype (cp, e, NULL,
 																  definedWithDEF);
 					}
+					if (isPublic)
+						e->extensionFields.access = eStrdup("public");
 				}
 			}
 		}
@@ -402,6 +408,79 @@ static void parseFunction (const unsigned char *line, int parent, bool definedWi
 	}
 	if (signature)
 		vStringDelete (signature);
+	vStringDelete (name);
+}
+
+static void parseClass (const unsigned char *line, int parent,
+						bool isPublic, bool isAbstract)
+{
+	vString *name = vStringNew ();
+	vString *super = NULL;
+	const unsigned char *cp = line;
+	int index = CORK_NIL;
+
+	if (isspace (*cp))
+	{
+		while (*cp && isspace (*cp))
+			++cp;
+
+		while (isalnum (*cp) || *cp == '_')
+		{
+			vStringPut (name, *cp);
+			++cp;
+		}
+
+		while (*cp && isspace (*cp))
+			++cp;
+
+		if (wordMatchLen (cp, "extends", 7))
+		{
+			cp += 7;
+			while (*cp && isspace (*cp))
+				++cp;
+			super = vStringNew ();
+			while (*cp && (isalnum (*cp) || *cp == '_'
+						   /* ??? */
+						   || *cp == '.'))
+			{
+				vStringPut (super, *cp);
+				cp++;
+			}
+		}
+
+		if (!vStringIsEmpty (name))
+		{
+			tagEntryInfo *e;
+
+			index = makeSimpleTag (name, K_CLASS);
+			e = getEntryInCorkQueue (index);
+			if (e)
+			{
+				e->extensionFields.scopeIndex = parent;
+				if (isPublic)
+					e->extensionFields.access = eStrdup ("public");
+				if (isAbstract)
+					e->extensionFields.implementation = eStrdup ("abstract");
+				if (super && !vStringIsEmpty (super))
+				{
+					e->extensionFields.inheritance = vStringDeleteUnwrap(super);
+					super = NULL;
+				}
+			}
+			while ((line = readVimLine ()) != NULL)
+			{
+				if (wordMatchLen (line, "endclass", 8))
+				{
+					if (e)
+						setTagEndLine (e, getInputLineNumber ());
+					break;
+				}
+				parseVimLine (line, index);
+			}
+		}
+	}
+
+	vStringDelete (super);		/* NULL ia acceptable. */
 	vStringDelete (name);
 }
 
@@ -597,11 +676,20 @@ static int parseHeredocMarker(const unsigned char *cp)
 	return r;
 }
 
+static bool isFunction(int index)
+{
+	tagEntryInfo *e = getEntryInCorkQueue(index);
+	if (!e)
+		return false;
+	return (e->kindIndex == K_FUNCTION);
+}
+
 /*
  * If we have a heredoc end marker at the end of LINE,
  * parseVariableOrConstant returns the tag cork index for the marker.
  */
-static int parseVariableOrConstant (const unsigned char *line, int parent, int kindIndex)
+static int parseVariableOrConstant (const unsigned char *line, int parent, int kindIndex,
+									bool isPublic)
 {
 	vString *name = vStringNew ();
 	int heredoc = CORK_NIL;
@@ -633,11 +721,13 @@ static int parseVariableOrConstant (const unsigned char *line, int parent, int k
 			goto cleanUp;
 
 		/* Skip non-global vars in functions */
-		if (parent != CORK_NIL && (*np != ':' || *cp != 'g'))
+		bool inFunction = isFunction(parent);
+		if (parent != CORK_NIL && inFunction && (*np != ':' || *cp != 'g'))
 			goto cleanUp;
 
 		/* deal with spaces, $, @ and & */
-		while (*cp && *cp != '$' && !isalnum (*cp))
+		while (*cp && *cp != '$' && !isalnum (*cp)
+			   && !(vim9script && *cp == '_'))
 			++cp;
 
 		if (!*cp)
@@ -667,9 +757,16 @@ static int parseVariableOrConstant (const unsigned char *line, int parent, int k
 			int r = makeSimpleTag (name, kindIndex);
 			vStringClear (name);
 
-			tagEntryInfo *e;
-			if (hasType && (e = getEntryInCorkQueue (r)))
-				cp = parseRettype (cp, e);
+			tagEntryInfo *e = getEntryInCorkQueue (r);
+			if (e)
+			{
+				if (hasType)
+					cp = parseRettype (cp, e);
+				if (!inFunction)
+					e->extensionFields.scopeIndex = parent;
+				if (isPublic)
+					e->extensionFields.access = eStrdup("public");
+			}
 
 			heredoc = parseHeredocMarker(cp);
 		}
@@ -764,13 +861,44 @@ static bool parseVimLine (const unsigned char *line, int parent)
 {
 	bool readNextLine = true;
 	int heredoc = CORK_NIL;
+	bool isPublic = false;
+	bool isAbstract = false;
 
-	if (vim9script && wordMatchLen (line, "export", 6))
+	while (true)
 	{
-		line += 6;
-		while (*line && isspace (*line))
-			++line;
-		/* TODO: export should be stored to a field. */
+		if (vim9script && wordMatchLen (line, "export", 6))
+		{
+			line += 6;
+			while (*line && isspace (*line))
+				++line;
+			/* TODO: export should be stored to a field. */
+			continue;
+		}
+		else if (vim9script && wordMatchLen (line, "abstract", 8))
+		{
+			line += 8;
+			while (*line && isspace (*line))
+				++line;
+			isAbstract = true;
+			continue;
+		}
+		else if (vim9script && wordMatchLen (line, "static", 6))
+		{
+			line += 6;
+			while (*line && isspace (*line))
+				++line;
+			/* TODO: static should be stored to a field. */
+			continue;
+		}
+		else if (vim9script && wordMatchLen (line, "public", 6))
+		{
+			line += 6;
+			while (*line && isspace (*line))
+				++line;
+			isPublic = true;
+			continue;
+		}
+		break;
 	}
 
 	if (wordMatchLen (line, "vim9script", 10))
@@ -791,7 +919,7 @@ static bool parseVimLine (const unsigned char *line, int parent)
 
 	else if (wordMatchLen (line, "function", 2) || wordMatchLen (line, "def", 3))
 	{
-		parseFunction (skipWord (line), parent, vim9script && line[0] == 'd');
+		parseFunction (skipWord (line), parent, vim9script && line[0] == 'd', isPublic);
 	}
 
 	else if (wordMatchLen (line, "augroup", 3))
@@ -801,11 +929,15 @@ static bool parseVimLine (const unsigned char *line, int parent)
 
 	else if (wordMatchLen (line, "let", 3) || (vim9script && wordMatchLen (line, "var", 3)))
 	{
-		heredoc = parseVariableOrConstant (skipWord (line), parent, K_VARIABLE);
+		heredoc = parseVariableOrConstant (skipWord (line), parent, K_VARIABLE, isPublic);
 	}
 	else if (wordMatchLen (line, "const", 4) || wordMatchLen (line, "final", 5))
 	{
-		heredoc = parseVariableOrConstant (skipWord (line), parent, K_CONST);
+		heredoc = parseVariableOrConstant (skipWord (line), parent, K_CONST, isPublic);
+	}
+	else if (vim9script && wordMatchLen (line, "class", 5))
+	{
+		parseClass (skipWord (line), parent, isPublic, isAbstract);
 	}
 
 	tagEntryInfo *e;

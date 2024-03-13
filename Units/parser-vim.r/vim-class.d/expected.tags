@@ -1,0 +1,29 @@
+AsyncCmd	input.vim	/^export class AsyncCmd$/;"	k	line:5	end:40
+job	input.vim	/^    var job: job$/;"	v	line:6	class:AsyncCmd	typeref:typename:job
+Stop	input.vim	/^    def Stop(how: string = '')$/;"	f	line:8	class:AsyncCmd	signature:(how: string = '')	end:12
+new	input.vim	/^    def new(cmd: any, CallbackFn: func(list<string>), env: dict<any> = null_dict)$/;"	f	line:14	class:AsyncCmd	signature:(cmd: any,CallbackFn: func(list<string>)	end:39
+OtherThing	input-0.vim	/^class OtherThing$/;"	k	line:4	end:20
+size	input-0.vim	/^   var size: number$/;"	v	line:5	class:OtherThing	typeref:typename:number
+totalSize	input-0.vim	/^   static var totalSize: number$/;"	v	line:6	class:OtherThing	typeref:typename:number
+new	input-0.vim	/^   def new(this.size)$/;"	f	line:8	class:OtherThing	signature:(this.size)	end:10
+_sum	input-0.vim	/^   static var _sum: number$/;"	v	line:12	class:OtherThing	typeref:typename:number
+result	input-0.vim	/^   public static var result: number$/;"	v	line:13	class:OtherThing	typeref:typename:number	access:public
+ClearTotalSize	input-0.vim	/^   static def ClearTotalSize(): number$/;"	f	line:15	class:OtherThing	typeref:typename:number	signature:()	end:19
+YetOtherThing	input-0.vim	/^class YetOtherThing$/;"	k	line:23	end:30
+_Foo	input-0.vim	/^   static def _Foo()$/;"	f	line:24	class:YetOtherThing	signature:()	end:26
+Bar	input-0.vim	/^   def Bar()$/;"	f	line:27	class:YetOtherThing	signature:()	end:29
+A	input-0.vim	/^class A$/;"	k	line:32	end:37
+v1	input-0.vim	/^   final v1 = [1, 2]               # final object variable$/;"	C	line:33	class:A
+v2	input-0.vim	/^   public final v2 = {x: 1}        # final object variable$/;"	C	line:34	class:A	access:public
+v3	input-0.vim	/^   static final v3 = 'abc'         # final class variable$/;"	C	line:35	class:A
+v4	input-0.vim	/^   public static final v4 = 0z10   # final class variable$/;"	C	line:36	class:A	access:public
+Shape	input-1.vim	/^abstract class Shape$/;"	k	line:4	implementation:abstract	end:7
+color	input-1.vim	/^   var color = Color.Black$/;"	v	line:5	class:Shape
+thickness	input-1.vim	/^   var thickness = 10$/;"	v	line:6	class:Shape
+Square	input-1.vim	/^class Square extends Shape$/;"	k	line:9	inherits:Shape	end:14
+size	input-1.vim	/^   var size: number$/;"	v	line:10	class:Square	typeref:typename:number
+new	input-1.vim	/^   def new(this.size)$/;"	f	line:12	class:Square	signature:(this.size)	end:13
+Triangle	input-1.vim	/^class Triangle extends Shape$/;"	k	line:16	inherits:Shape	end:22
+base	input-1.vim	/^   var base: number$/;"	v	line:17	class:Triangle	typeref:typename:number
+height	input-1.vim	/^   var height: number$/;"	v	line:18	class:Triangle	typeref:typename:number
+new	input-1.vim	/^   def new(this.base, this.height)$/;"	f	line:20	class:Triangle	signature:(this.base,this.height)	end:21
