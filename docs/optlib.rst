@@ -461,7 +461,7 @@ When defining a new parser specific field, it is disabled by default. Enable the
 field explicitly to use the field. See ":ref:`Parser specific fields <parser-specific-fields>`"
 about ``--fields-<LANG>`` option.
 
-`passwd` parser is a simple example that uses ``--fields-<LANG>`` option.
+`Passwd` parser is a simple example that uses ``--fields-<LANG>`` option.
 
 
 .. _roles:
