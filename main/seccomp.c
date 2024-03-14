@@ -41,7 +41,9 @@ int installSyscallFilter (void)
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (exit_group), 0);
 
 	// The bowels of stdio want to know the size of a file, even for stdout.
+#if (defined(__SNR_fstat) && __SNR_fstat)
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (fstat), 0);
+#endif
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (fstat64), 0);
 #ifdef __SNR_newfstatat
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (newfstatat), 0);
