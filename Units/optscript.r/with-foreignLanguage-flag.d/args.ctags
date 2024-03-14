@@ -4,6 +4,8 @@
 
 --langdef=XXX{_foreignLanguage=C}
 --map-XXX=.xxx
+--fields=+n
+
 --kinddef-XXX=a,abc,abcx
 --_roledef-XXX.a=assigned,assigned
 
@@ -27,6 +29,11 @@
 --regex-XXX=/\/\*(D)\(\)\*\//\1/f/{_role=arolefortesting}{_language=C}
 --regex-XXX=/\/\*(E)\(\)\*\///{{
     \1 /C /function /arolefortesting _foreignreftag _commit pop
+    1 _matchloc
+}}
+
+--regex-XXX=/\/\*(F)\(\)\*\///{{
+    \1 /C /function 4 -1 roll _foreigntag _commit pop
 }}
 
 --regex-C=/FUNC\(([a-z]*)\);/\1/f/
