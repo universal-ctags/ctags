@@ -11,9 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        tag: ['3.18','3.17','3.16','3.15']
+        tag: ['3.18','3.17','3.16','3.19']
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     container: alpine:${{ matrix.tag }}
 
