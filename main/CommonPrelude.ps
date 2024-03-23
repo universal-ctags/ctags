@@ -202,7 +202,7 @@
 % define @1 ~ @9.
 1 1 9 {
     dup
-    mark (- @) 3 -1 roll ?0 add ( matchloc) _buildstring
+    mark (- @) 3 -1 roll ?0 add ( start:matchloc) _buildstring
     exch dup
     mark (@) 3 -1 roll ?0 add _buildstring cvn
     exch
@@ -212,7 +212,7 @@
 % define 1@ ~ 9@.
 1 1 9 {
     dup
-    mark (- ) 3 -1 roll ?0 add (@ matchloc) _buildstring
+    mark (- ) 3 -1 roll ?0 add (@ end:matchloc) _buildstring
     exch dup
     mark exch ?0 add (@) _buildstring cvn
     exch
