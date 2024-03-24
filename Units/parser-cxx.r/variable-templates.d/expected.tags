@@ -1,0 +1,17 @@
+chip	input.cpp	/^enum chip {$/;"	g	file:
+A6XX	input.cpp	/^	A6XX = 6,$/;"	e	enum:chip	file:
+A7XX	input.cpp	/^	A7XX = 7,$/;"	e	enum:chip	file:
+CMD_REGS	input.cpp	/^template<chip CHIP>  int CMD_REGS[] = {};$/;"	v	typeref:typename:int[]	template:<chip CHIP>
+CHIP	input.cpp	/^template<chip CHIP>  int CMD_REGS[] = {};$/;"	Z	variable:CMD_REGS	typeref:typename:chip
+CMD_REGS	input.cpp	/^template<>           int CMD_REGS<A6XX>[] = {$/;"	v	typeref:typename:int[]	properties:specialization	template:<>	specialization:<A6XX>
+CMD_REGS	input.cpp	/^template<>           int CMD_REGS<A7XX>[][1] = {$/;"	v	typeref:typename:int[][1]	properties:specialization	template:<>	specialization:<A7XX>
+main	input.cpp	/^int main(void)$/;"	f	typeref:typename:int
+is_integral_v	input-0.cpp	/^constexpr bool is_integral_v = false;$/;"	v	typeref:typename:bool	properties:constexpr	template:<class T>
+T	input-0.cpp	/^template <class T>$/;"	Z	variable:is_integral_v	typeref:meta:class
+is_integral_v	input-0.cpp	/^constexpr bool is_integral_v<int> = true;$/;"	v	typeref:typename:bool	properties:specialization,constexpr	template:<>	specialization:<int>
+main	input-0.cpp	/^int main()$/;"	f	typeref:typename:int
+zero	input-1.cpp	/^constexpr T zero = 0;$/;"	v	typeref:typename:T	properties:constexpr	template:<class T>
+T	input-1.cpp	/^template <class T>$/;"	Z	variable:zero	typeref:meta:class
+zero	input-1.cpp	/^constexpr T* zero<T*> = nullptr;$/;"	v	typeref:typename:T *	properties:specialization,constexpr	template:<class T>	specialization:<T*>
+T	input-1.cpp	/^template <class T>$/;"	Z	variable:zero	typeref:meta:class
+main	input-1.cpp	/^int main() {$/;"	f	typeref:typename:int

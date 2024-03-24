@@ -1259,7 +1259,7 @@ next_token:
 					// hmm.. probably a template specialisation
 					pAux = pSmallerThan->pPrev;
 					pInfo->uFlags |= CXXFunctionSignatureInfoScopeTemplateSpecialization;
-				} else if(pAux->eType == CXXTokenTypeAngleBracketChain)
+				} else if(cxxTokenTypeIs(pAux, CXXTokenTypeAngleBracketChain))
 				{
 					// same as above, but already condensed (though it should never happen)
 					if(!pAux->pPrev)

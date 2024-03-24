@@ -155,10 +155,10 @@ void cxxTokenChainAppend(CXXTokenChain * tc,CXXToken * t);
 void cxxTokenChainPrepend(CXXTokenChain * tc,CXXToken * t);
 void cxxTokenChainInsertAfter(CXXTokenChain * tc,CXXToken * before,CXXToken * t);
 
-// Move tokens in DEST at the end of SRC.
+// Move tokens in SRC to the end of DEST.
 // Unlike cxxTokenChainMoveEntries, cxxTokenChainAppendEntries keeps
 // tokens in DEST.
-// DEST becomes empty.
+// SRC becomes empty.
 void cxxTokenChainAppendEntries(CXXTokenChain * src, CXXTokenChain * dest);
 
 #if 0
