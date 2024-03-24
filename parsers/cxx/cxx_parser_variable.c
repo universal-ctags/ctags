@@ -207,7 +207,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				return bGotVariable;
 			}
 
-			if(t->eType == CXXTokenTypeSmallerThanSign)
+			if(cxxTokenTypeIs(t, CXXTokenTypeSmallerThanSign))
 			{
 				// Must be part of template type name (so properly balanced).
 				t = cxxTokenChainSkipToEndOfTemplateAngleBracket(t);
@@ -469,7 +469,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 			break;
 			default:
 				// Must be identifier
-				if(t->pPrev->eType != CXXTokenTypeIdentifier)
+				if(!cxxTokenTypeIs(t->pPrev, CXXTokenTypeIdentifier))
 				{
 					CXX_DEBUG_LEAVE_TEXT("No identifier before the notable token");
 					return bGotVariable;
@@ -511,7 +511,7 @@ got_identifier:
 		CXXToken * pScopeStart = NULL;
 
 		// Skip back to the beginning of the scope, if any
-		while(pTokenBefore->eType == CXXTokenTypeMultipleColons)
+		while(cxxTokenTypeIs(pTokenBefore, CXXTokenTypeMultipleColons))
 		{
 			if(!cxxParserCurrentLanguageIsCPP())
 			{

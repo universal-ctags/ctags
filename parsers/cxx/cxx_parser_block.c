@@ -35,7 +35,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	CXX_DEBUG_ENTER();
 
 	CXX_DEBUG_ASSERT(
-			g_cxx.pToken->eType == CXXTokenTypeOpeningBracket,
+			cxxTokenTypeIs(g_cxx.pToken, CXXTokenTypeOpeningBracket),
 			"This must be called when pointing at an opening bracket!"
 		);
 

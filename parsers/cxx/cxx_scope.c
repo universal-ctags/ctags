@@ -226,7 +226,7 @@ void cxxScopeSetAccess(enum CXXScopeAccess eAccess)
 void cxxScopePushTop(CXXToken * t)
 {
 	CXX_DEBUG_ASSERT(
-			t->eType == CXXTokenTypeIdentifier,
+			cxxTokenTypeIs(t, CXXTokenTypeIdentifier),
 			"The scope name must be an identifier"
 		);
 	CXX_DEBUG_ASSERT(
