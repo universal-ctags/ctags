@@ -5,3 +5,5 @@ limit	input.s	/^limit:	.double 0.29$/;"	label	language:Asm	roles:def
 .inittext	input-0.s	/^	.section ".inittext","ax"$/;"	inputSection	language:LdScript	roles:destination
 intcall	input-0.s	/^	.globl	intcall$/;"	symbol	language:LdScript	inputSection:.inittext	roles:def
 intcall	input-0.s	/^intcall:$/;"	label	language:Asm	roles:def
+define_ftsec	input-1.s	/^.macro define_ftsec name$/;"	macro	language:Asm	roles:def
+.head.text.\\name\\()	input-1.s	/^	.section ".head.text.\\name\\()","ax",@progbits$/;"	inputSection	language:LdScript	roles:destination

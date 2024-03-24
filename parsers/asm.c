@@ -491,6 +491,17 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 	return r;
 }
 
+/* If a section name is built with a macro expansion, the following
+ * strings may appear in parts of the string.
+ * - \param
+ * - \()
+ * - \@
+ */
+static bool isCharInMarcoParamref(char c)
+{
+	return (c == '\\' || c == '(' || c == ')'  || c == '@')? true: false;
+}
+
 static bool isEligibleAsSectionName (const vString *str)
 {
 	char *c = vStringValue(str);
@@ -499,7 +510,8 @@ static bool isEligibleAsSectionName (const vString *str)
 		if (!(isalnum(((unsigned char)*c))
 			  || (*c == '.')
 			  || (*c == '-')
-			  || (*c == '_')))
+			  || (*c == '_')
+			  || isCharInMarcoParamref(*c)))
 			return false;
 		c++;
 	}
