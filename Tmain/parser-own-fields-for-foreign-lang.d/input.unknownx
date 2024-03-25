@@ -1,0 +1,8 @@
+public func foo(n, m);
+protected func bar(n);
+private func baz(n,...);
+X:tagme@iamowner
+Y:iamowner2=tagme2
+Z:tagme-z@iamowner-z
+eset:a
+enoset:b

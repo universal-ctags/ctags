@@ -1,0 +1,39 @@
+--langdef=unknownx{_foreignLanguage=knownz}
+--kinddef-unknownx=f,func,functions
+--map-unknownx=+.unknownx
+
+--_fielddef-unknownx=protection,protections
+--_fielddef-unknownx=signature,signatures
+
+--_prelude-unknownx={{
+   /exported false def
+}}
+
+--regex-unknownx=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
+--regex-unknownx=/^X:([a-z]+)@([a-z]+)/\1/m/{_language=knownz}{_field=owner:\2}
+--regex-unknownx=/^Y:([a-z0-9]+)=([a-z0-9]+)/\2/m/{_field=owner:\1}{_language=knownz}
+--regex-unknownx=/^Z:([-a-z]+)@([-a-z]+)/\1/m/{_language=knownz}{{
+    . \2 knownz.owner:
+    . :knownz.owner {
+        . exch length knownz.len:
+    } if
+    . :knownz.len {
+        1 add
+        . exch knownz.lenplus:
+    } if
+}}
+
+--regex-unknownx=/^eset:([-a-z]+)/\1/m/{_language=knownz}{{
+    /exported . def
+    . true knownz.exported:
+}}
+
+--regex-unknownx=/^enoset:([-a-z]+)/\1/m/{_language=knownz}{{
+    . false knownz.exported:
+    exported :knownz.exported and {
+       mark exported 0 string cvs (_exported) _buildstring
+       /knownz
+       /mark
+       1@ _foreigntag _commit pop
+    } if
+}}

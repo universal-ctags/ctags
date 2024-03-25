@@ -1,0 +1,12 @@
+--langdef=knownz
+--kinddef-knownz=m,mark,makers
+
+--_fielddef-knownz=owner,the owner of the markers{datatype=str}
+
+--_fielddef-knownz=len,the length of owner string{datatype=int}
+--fields-knownz=+{len}
+--_fielddef-knownz=lenplus,the length of owner string + 1{datatype=int}
+--fields-knownz=+{lenplus}
+
+--_fielddef-knownz=exported,whether the marker is exported or not{datatype=bool}
+--fields-knownz=+{exported}

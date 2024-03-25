@@ -3523,8 +3523,8 @@ static bool processLangDefineParam (const langType language,
 	for (; p < name_end; p++)
 	{
 		if (!isalnum ((unsigned char) *p) && *p != '_')
-			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
-				   option);
+			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option: %c",
+				   option, *p);
 	}
 
 	p++;
@@ -3919,8 +3919,8 @@ static bool processLangDefineExtra (const langType language,
 	for (; p < name_end; p++)
 	{
 		if (!isalnum ((unsigned char) *p))
-			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
-				   option);
+			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option: %c",
+				   option, *p);
 	}
 
 	p++;
@@ -3963,6 +3963,39 @@ static void fieldDefinitionDestroy (fieldDefinition *fdef)
 	eFree (fdef);
 }
 
+static void field_def_flag_datatype_long (const char *const optflag CTAGS_ATTR_UNUSED,
+										  const char* const param,
+										  void *data)
+{
+	fieldDefinition *fdef = data;
+	const char *p = param;
+	while (*p)
+	{
+		if (*p == '|')
+			p++;
+
+		const char *q = strpbrk(p, "|,");
+		if (!q)
+			q = p + strlen (p);
+
+		if (strncmp (p, "integer", q - p) == 0
+			|| strncmp (p, "int", q - p) == 0)
+			fdef->dataType |= (FIELDTYPE_INTEGER|FIELDTYPE_SCRIPTABLE);
+		else if (strncmp (p, "string", q - p) == 0
+				 || strncmp (p, "str", q - p) == 0)
+			fdef->dataType |= (FIELDTYPE_STRING|FIELDTYPE_SCRIPTABLE);
+		else if (strncmp (p, "boolean", q - p) == 0
+				 || strncmp (p, "bool", q - p) == 0)
+			fdef->dataType |= (FIELDTYPE_BOOL|FIELDTYPE_SCRIPTABLE);
+		p = q;
+	}
+}
+
+static flagDefinition FieldDefFlagDef [] = {
+	{ '\0', "datatype", NULL, field_def_flag_datatype_long,
+	  "TYPE", "acceaptable datatype of the field (str|bool|int)" },
+};
+
 static bool processLangDefineField (const langType language,
 									const char *const option,
 									const char *const parameter)
@@ -3988,8 +4021,8 @@ static bool processLangDefineField (const langType language,
 	for (; p < name_end; p++)
 	{
 		if (!isalpha ((unsigned char) *p))
-			error (FATAL, "unacceptable char as part of field name in \"--%s\" option",
-				   option);
+			error (FATAL, "unacceptable char as part of field name in \"--%s\" option: %c",
+				   option, *p);
 	}
 
 	p++;
@@ -3999,22 +4032,29 @@ static bool processLangDefineField (const langType language,
 	desc = extractDescriptionAndFlags (p, &flags);
 
 	fdef = xCalloc (1, fieldDefinition);
+
+	fdef->dataType = 0;
+	if (flags)
+		flagsEval (flags, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef), fdef);
+	if (!fdef->dataType)
+		fdef->dataType = FIELDTYPE_STRING;
+
 	fdef->enabled = false;
 	fdef->letter = NUL_FIELD_LETTER;
 	fdef->name = eStrndup(parameter, name_end - parameter);
 	fdef->description = desc;
 	fdef->isValueAvailable = NULL;
-	fdef->getValueObject = NULL;
+	fdef->getValueObject = (fdef->dataType & FIELDTYPE_SCRIPTABLE)
+		? getFieldValueGeneric
+		: NULL;
 	fdef->getterValueType = NULL;
-	fdef->setValueObject = NULL;
+	fdef->setValueObject = (fdef->dataType & FIELDTYPE_SCRIPTABLE)
+		? setFieldValueGeneric
+		: NULL;
 	fdef->setterValueType = NULL;
 	fdef->checkValueForSetter = NULL;
-	fdef->dataType = FIELDTYPE_STRING; /* TODO */
 	fdef->ftype = FIELD_UNKNOWN;
 	DEFAULT_TRASH_BOX(fdef, fieldDefinitionDestroy);
-
-	if (flags)
-		flagsEval (flags, NULL, 0, fdef);
 
 	defineField (fdef, language);
 
@@ -5320,6 +5360,18 @@ extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp)
 	table = flagsColprintTableNew ();
 
 	flagsColprintAddDefinitions (table, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef));
+
+	flagsColprintTablePrint (table, withListHeader, machinable, fp);
+	colprintTableDelete(table);
+}
+
+extern void printFielddefFlags (bool withListHeader, bool machinable, FILE *fp)
+{
+	struct colprintTable * table;
+
+	table = flagsColprintTableNew ();
+
+	flagsColprintAddDefinitions (table, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);
