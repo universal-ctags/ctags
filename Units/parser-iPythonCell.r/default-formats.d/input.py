@@ -1,5 +1,9 @@
 # Derived from https://github.com/universal-ctags/ctags/issues/2978
 # submitted by @gerazov.
+
+# This is the 'percent' notebook format supported by Spyder, VScode,: 
+# https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-percent-format
+
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.io import wavfile
