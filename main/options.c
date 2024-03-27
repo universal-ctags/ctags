@@ -3674,7 +3674,6 @@ static char* prependEnvvar (const char *path, const char* envvar)
 	return full_path;
 }
 
-#ifndef WIN32
 static char *getConfigForXDG (const char *path CTAGS_ATTR_UNUSED,
 							  const char* extra CTAGS_ATTR_UNUSED)
 {
@@ -3684,7 +3683,6 @@ static char *getConfigForXDG (const char *path CTAGS_ATTR_UNUSED,
 
 	return prependEnvvar (".config/ctags", "HOME");
 }
-#endif
 
 #ifdef WIN32
 static char *getConfigAtHomeOnWindows (const char *path,
@@ -3760,14 +3758,12 @@ static struct preloadPathElt preload_path_list [] = {
 		.stage = OptionLoadingStageCustom,
 	},
 #endif
-#ifndef WIN32
 	{
 		.path = NULL,
 		.isDirectory = true,
 		.makePath = getConfigForXDG,
 		.stage = OptionLoadingStageXdg,
 	},
-#endif
 	{
 		.path = ".ctags.d",
 		.isDirectory = true,

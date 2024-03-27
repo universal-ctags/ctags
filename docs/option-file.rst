@@ -42,7 +42,7 @@ See :ref:`option-file_difference` for the differences and their intentions.
 At start-up time, ``ctags`` loads files having :file:`.ctags` as a
 file extension under the following statically defined directories:
 
-#. :file:`$XDG_CONFIG_HOME/ctags/`, or :file:`$HOME/.config/ctags/` if :file:`$XDG_CONFIG_HOME` is not defined (on other than Windows)
+#. :file:`$XDG_CONFIG_HOME/ctags/`, or :file:`$HOME/.config/ctags/` if :file:`$XDG_CONFIG_HOME` is not defined
 #. :file:`$HOME/.ctags.d/`
 #. :file:`$HOMEDRIVE$HOMEPATH/ctags.d/` (on Windows)
 #. :file:`./.ctags.d/`

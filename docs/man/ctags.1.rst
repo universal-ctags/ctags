@@ -2185,7 +2185,6 @@ Preloading option files
 
 ``$XDG_CONFIG_HOME/ctags/*.ctags``, or ``$HOME/.config/ctags/*.ctags`` if
 ``$XDG_CONFIG_HOME`` is not defined
-(on other than MS Windows)
 
 ``$HOME/.ctags.d/*.ctags``
 
@@ -2226,7 +2225,6 @@ Default optlib path list
 
 ``$XDG_CONFIG_HOME/ctags``, or ``$HOME/.config/ctags`` if
 ``$XDG_CONFIG_HOME`` is not defined
-(on other than MS Windows)
 
 ``$HOME/.ctags.d``
 
