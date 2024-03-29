@@ -5110,15 +5110,15 @@ extern void anonHashString (const char *filename, char buf[9])
 	sprintf(buf, "%08x", anonHash((const unsigned char *)filename));
 }
 
-
-extern void anonConcat (vString *buffer, int kind)
+extern void anonConcatFull (vString *buffer, langType lang, int kind)
 {
-	anonGenerate (buffer, NULL, kind);
+	anonGenerateFull (buffer, NULL, lang, kind);
 }
 
-extern void anonGenerate (vString *buffer, const char *prefix, int kind)
+extern void anonGenerateFull (vString *buffer, const char *prefix, langType lang, int kind)
 {
-	parserObject* parser = LanguageTable + getInputLanguage ();
+	Assert(lang != LANG_IGNORE);
+	parserObject* parser = LanguageTable + ((lang == LANG_AUTO)? getInputLanguage (): lang);
 	parser -> anonymousIdentiferId ++;
 
 	char szNum[32];
@@ -5132,14 +5132,13 @@ extern void anonGenerate (vString *buffer, const char *prefix, int kind)
 	vStringCatS(buffer,szNum);
 }
 
-extern vString *anonGenerateNew (const char *prefix, int kind)
+extern vString *anonGenerateNewFull (const char *prefix, langType lang, int kind)
 {
 	vString *buffer = vStringNew ();
 
-	anonGenerate (buffer, prefix, kind);
+	anonGenerateFull (buffer, prefix, lang, kind);
 	return buffer;
 }
-
 
 extern bool applyLanguageParam (const langType language, const char *name, const char *args)
 {
