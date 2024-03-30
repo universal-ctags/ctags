@@ -2168,6 +2168,7 @@ static void pre_lang_def_flag_base_long (const char* const optflag, const char* 
 	langType cpreproc = getNamedLanguage ("CPreProcessor", 0);
 	if (base == cpreproc)
 	{
+		/* See Tmain/optscript-preludes-stack.d */
 		error (WARNING,
 			   "Because of an internal limitation, Making a sub parser based on the CPreProcessor parser is not allowed: %s",
 			   param);
