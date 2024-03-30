@@ -1,0 +1,14 @@
+--sort=no
+--fields=+{extras}{language}
+
+--langdef=Foo{_foreignLanguage=C}
+--map-Foo=.foo
+--kinddef-Foo=a,app,applications
+
+--regex-Foo=/^c:(.)$//{{
+    \1 /C /struct _anongen /C /struct _foreigntag _commit /anonymous _markextra
+}}
+
+--regex-Foo=/^f:(.)$//{{
+    \1 /app _anongen /app _tag _commit /anonymous _markextra
+}}

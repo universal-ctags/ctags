@@ -4304,6 +4304,66 @@ static EsObject *lrop_intervaltab (OptVM *vm, EsObject *name)
 	return false;
 }
 
+static EsObject *lrop_anongen (OptVM *vm, EsObject *name)
+{
+	int n_pop = 2;
+
+	if (opt_vm_ostack_count (vm) < 2)
+		return OPT_ERR_UNDERFLOW;
+
+	EsObject *kind_obj = opt_vm_ostack_top (vm);
+	if (es_object_get_type (kind_obj) != OPT_TYPE_NAME)
+		return OPT_ERR_TYPECHECK;
+	EsObject *kind_sym = es_pointer_get (kind_obj);
+	const char *kind_str = es_symbol_get (kind_sym);
+
+	EsObject *tmp_obj = opt_vm_ostack_peek (vm, 1);
+	langType lang = LANG_IGNORE;
+	EsObject *prefix_obj = es_nil;
+	if (es_object_get_type (tmp_obj) == OPT_TYPE_NAME)
+	{
+		EsObject *lang_sym = es_pointer_get (tmp_obj);
+		const char *lang_str = es_symbol_get (lang_sym);
+		lang = getNamedLanguageOrAlias (lang_str, 0);
+		if (lang == LANG_IGNORE)
+			return OPTSCRIPT_ERR_UNKNOWNLANGUAGE;
+	}
+	else
+	{
+		lang = getInputLanguage ();
+		prefix_obj = tmp_obj;
+	}
+	Assert(lang != LANG_IGNORE);
+	Assert(lang != LANG_AUTO);
+
+	kindDefinition* kind_def = getLanguageKindForName (lang, kind_str);
+	if (!kind_def)
+		return OPTSCRIPT_ERR_UNKNOWNKIND;
+	int kind_index = kind_def->id;
+
+	if (es_null(prefix_obj))
+	{
+		n_pop++;
+		if (opt_vm_ostack_count (vm) < 3)
+			return OPT_ERR_UNDERFLOW;
+		prefix_obj = opt_vm_ostack_peek (vm, 2);
+	}
+	if (es_object_get_type (prefix_obj) != OPT_TYPE_STRING)
+		return OPT_ERR_TYPECHECK;
+	const char *prefix = opt_string_get_cstr (prefix_obj);
+
+	vString *anon_vstr = anonGenerateNewFull (prefix, lang, kind_index);
+	EsObject *anon_obj = opt_string_new_from_cstr (vStringValue(anon_vstr));
+	vStringDelete(anon_vstr);
+
+	for (; n_pop > 0; n_pop--)
+		opt_vm_ostack_pop (vm);
+
+	opt_vm_ostack_push (vm, anon_obj);
+	es_object_unref (anon_obj);
+	return es_false;
+}
+
 static struct optscriptOperatorRegistration lropOperators [] = {
 	{
 		.name     = "_matchstr",
@@ -4487,7 +4547,14 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.arity    = 1,
 		.help_str = "tag:int|tag:tag|matchloc|[line:int]|[startline:int endline:int] _INTERVALTAB parent:int true%"
 		"tag:int|tag:tag|matchloc|[startline:int endline:int] _INTERVALTAB false",
-	}
+	},
+	{
+		.name     = "_anongen",
+		.fn       = lrop_anongen,
+		.arity    = -1,
+		.help_str = "prefix:string kind:name _ANONGEN anon:string%"
+		"prefix:string lang:name kind:name _ANONGEN anon:string%",
+	},
 };
 
 extern void initRegexOptscript (void)

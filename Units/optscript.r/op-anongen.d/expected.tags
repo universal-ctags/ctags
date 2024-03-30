@@ -1,0 +1,2 @@
+15263c7700108	input.foo	/^c:1$/;"	s	language:C	extras:anonymous
+25263c7700100	input.foo	/^f:2$/;"	a	language:Foo	extras:anonymous

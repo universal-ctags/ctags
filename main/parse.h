@@ -201,9 +201,12 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 
 extern void addLanguageOptscriptToHook (langType language, enum scriptHook hook, const char *const src);
 
-extern void anonGenerate (vString *buffer, const char *prefix, int kind);
-extern void anonConcat   (vString *buffer, int kind);
-extern vString *anonGenerateNew (const char *prefix, int kind);
+extern void anonGenerateFull (vString *buffer, const char *prefix, langType lang, int kind);
+#define anonGenerate(B,P,K) anonGenerateFull((B), (P), LANG_AUTO, (K))
+extern void anonConcatFull   (vString *buffer, langType lang, int kind);
+#define anonConcat(B,K) anonConcatFull((B), LANG_AUTO, (K))
+extern vString *anonGenerateNewFull (const char *prefix, langType lang, int kind);
+#define anonGenerateNew(P,K) anonGenerateNewFull((P), LANG_AUTO, (K))
 extern void anonHashString (const char *filename, char buf[9]);
 
 #endif  /* CTAGS_MAIN_PARSE_H */
