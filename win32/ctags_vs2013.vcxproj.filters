@@ -351,6 +351,9 @@
     <ClCompile Include="..\parsers\cobol.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\containerfile.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\cpreprocessor.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>

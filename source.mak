@@ -328,6 +328,7 @@ PARSER_SRCS =				\
 	parsers/clojure.c		\
 	parsers/css.c			\
 	parsers/cobol.c			\
+	parsers/containerfile.c		\
 	parsers/cpreprocessor.c		\
 	parsers/cxx/cxx.c		\
 	parsers/cxx/cxx_debug.c		\

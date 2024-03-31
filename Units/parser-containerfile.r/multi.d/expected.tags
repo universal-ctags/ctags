@@ -1,0 +1,17 @@
+X	input.containerfile	/^#define X /;"	d	line:3	language:CPreProcessor	file:	roles:def
+busybox:latest	input.containerfile	/^FROM busybox:latest AS builder$/;"	i	line:5	language:Containerfile	roles:base
+builder	input.containerfile	/^FROM busybox:latest AS builder$/;"	i	line:5	language:Containerfile	inherits:busybox:latest	roles:def
+BUILD_LOGLEVEL	input.containerfile	/^ENV 'BUILD'"_LOGLEVEL"="5" A=1$/;"	e	line:6	language:Containerfile	image:builder	roles:def
+A	input.containerfile	/^ENV 'BUILD'"_LOGLEVEL"="5" A=1$/;"	e	line:6	language:Containerfile	image:builder	roles:def
+OPENSHIFT_BUILD_NAME	input.containerfile	/^ENV "OPENSHIFT_BUILD_NAME"="mydockertest-1" "OPENSHIFT_BUILD_NAMESPACE"="default"$/;"	e	line:9	language:Containerfile	image:builder	roles:def
+OPENSHIFT_BUILD_NAMESPACE	input.containerfile	/^ENV "OPENSHIFT_BUILD_NAME"="mydockertest-1" "OPENSHIFT_BUILD_NAMESPACE"="default"$/;"	e	line:9	language:Containerfile	image:builder	roles:def
+io.openshift.build.name	input.containerfile	/^LABEL "io.openshift.build.name"="mydockertest-1" "io.openshift.build.namespace"="default"$/;"	l	line:10	language:Containerfile	image:builder	roles:def
+io.openshift.build.namespace	input.containerfile	/^LABEL "io.openshift.build.name"="mydockertest-1" "io.openshift.build.namespace"="default"$/;"	l	line:10	language:Containerfile	image:builder	roles:def
+Y	input.containerfile	/^#define Y /;"	d	line:12	language:CPreProcessor	file:	roles:def
+builder	input.containerfile	/^FROM builder$/;"	i	line:14	language:Containerfile	roles:base
+img7a86bc1d0100	input.containerfile	/^FROM builder$/;"	i	line:14	language:Containerfile	inherits:builder	roles:def
+BUILD_LOGLEVEL	input.containerfile	/^ENV "BUILD_LOGLEVEL"="5"$/;"	e	line:15	language:Containerfile	image:img7a86bc1d0100	roles:def
+Z	input.containerfile	/^#define Z /;"	d	line:18	language:CPreProcessor	file:	roles:def
+builder	input.containerfile	/^FROM builder$/;"	i	line:20	language:Containerfile	roles:base
+img7a86bc1d0200	input.containerfile	/^FROM builder$/;"	i	line:20	language:Containerfile	inherits:builder	roles:def
+BUILD_LOGLEVEL	input.containerfile	/^ENV "BUILD_LOGLEVEL"="5"$/;"	e	line:21	language:Containerfile	image:img7a86bc1d0200	roles:def

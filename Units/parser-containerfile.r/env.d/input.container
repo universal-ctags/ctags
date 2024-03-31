@@ -1,0 +1,18 @@
+# https://docs.docker.jp/engine/reference/builder.html#env
+FROM ubi8:latest
+
+ENV MY_NAME="John Doe"
+ENV MY_DOG=Rex\ The\ Dog
+ENV MY_CAT=fluffy
+ENV MY_X=fluffy MY_Y="a" MY_Z=b
+ENV MY_A=fluffy \
+MY_B="a" \
+MY_C=b
+
+ENV YOUR_A "a"
+ENV YOUR_B "b" \
+    YOUR_C "c" \
+    YOUR_D \
+    YOUR_E
+    
+ENV MY_HOUSE "a" MY_FAMILY "a"

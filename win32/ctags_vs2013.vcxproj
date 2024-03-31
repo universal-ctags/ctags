@@ -276,6 +276,7 @@
     <ClCompile Include="..\parsers\c-based.c" />
     <ClCompile Include="..\parsers\clojure.c" />
     <ClCompile Include="..\parsers\cobol.c" />
+    <ClCompile Include="..\parsers\containerfile.c" />
     <ClCompile Include="..\parsers\cpreprocessor.c" />
     <ClCompile Include="..\parsers\css.c" />
     <ClCompile Include="..\parsers\cxx\cxx.c" />

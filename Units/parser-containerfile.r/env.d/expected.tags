@@ -1,0 +1,16 @@
+img27634bbb0100	input.container	/^FROM ubi8:latest$/;"	i	line:2	inherits:ubi8:latest
+MY_NAME	input.container	/^ENV MY_NAME="John Doe"$/;"	e	line:4	image:img27634bbb0100
+MY_DOG	input.container	/^ENV MY_DOG=Rex\\ The\\ Dog$/;"	e	line:5	image:img27634bbb0100
+MY_CAT	input.container	/^ENV MY_CAT=fluffy$/;"	e	line:6	image:img27634bbb0100
+MY_X	input.container	/^ENV MY_X=fluffy MY_Y="a" MY_Z=b$/;"	e	line:7	image:img27634bbb0100
+MY_Y	input.container	/^ENV MY_X=fluffy MY_Y="a" MY_Z=b$/;"	e	line:7	image:img27634bbb0100
+MY_Z	input.container	/^ENV MY_X=fluffy MY_Y="a" MY_Z=b$/;"	e	line:7	image:img27634bbb0100
+MY_A	input.container	/^ENV MY_A=fluffy \\$/;"	e	line:8	image:img27634bbb0100
+MY_B	input.container	/^MY_B="a" \\$/;"	e	line:9	image:img27634bbb0100
+MY_C	input.container	/^MY_C=b$/;"	e	line:10	image:img27634bbb0100
+YOUR_A	input.container	/^ENV YOUR_A "a"$/;"	e	line:12	image:img27634bbb0100
+YOUR_B	input.container	/^ENV YOUR_B "b" \\$/;"	e	line:13	image:img27634bbb0100
+YOUR_C	input.container	/^    YOUR_C "c" \\$/;"	e	line:14	image:img27634bbb0100
+YOUR_D	input.container	/^    YOUR_D \\$/;"	e	line:15	image:img27634bbb0100
+MY_HOUSE	input.container	/^ENV MY_HOUSE "a" MY_FAMILY "a"$/;"	e	line:18	image:img27634bbb0100
+MY_FAMILY	input.container	/^ENV MY_HOUSE "a" MY_FAMILY "a"$/;"	e	line:18	image:img27634bbb0100

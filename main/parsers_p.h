@@ -84,6 +84,7 @@
 	CobolParser, \
 	CobolFreeParser, \
 	CobolVariableParser, \
+	ContainerfileParser, \
 	CUDAParser, \
 	DParser, \
 	DiffParser, \
