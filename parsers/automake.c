@@ -419,6 +419,8 @@ extern parserDefinition* AutomakeParser (void)
 {
 	static const char *const extensions [] = { "am", NULL };
 	static const char *const patterns [] = { "Makefile.am", "GNUmakefile.am", NULL };
+	static const char *const aliases [] = { "makefile-automake", NULL };
+
 	static struct sAutomakeSubparser automakeSubparser = {
 		.make = {
 			.subparser = {
@@ -444,6 +446,7 @@ extern parserDefinition* AutomakeParser (void)
 	def->kindCount  = ARRAY_SIZE (AutomakeKinds);
 	def->extensions = extensions;
 	def->patterns   = patterns;
+	def->aliases    = aliases;
 	def->parser     = findAutomakeTags;
 	def->xtagTable = AutomakeXtagTable;
 	def->xtagCount = ARRAY_SIZE (AutomakeXtagTable);
