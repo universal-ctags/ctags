@@ -959,9 +959,9 @@ AC_CONFIG_FILES([Makefile gnulib/Makefile man/GNUmakefile])
 AC_OUTPUT
 
 AC_MSG_RESULT([
-##########################################################################
-Now you can run make or gmake, when you run as make, besure it is GNU make.
-##########################################################################
+##############################################################################
+Now you can run make or gmake. When you run as make, make sure it is GNU make.
+##############################################################################
 ])
 
 # vim:ts=4:sw=4:
