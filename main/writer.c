@@ -124,7 +124,7 @@ extern bool writerDoesTreatFieldAsFixed (int fieldType)
 	return false;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSetting)
 {
 	if (writer->overrideFilenameSeparator)
@@ -138,7 +138,7 @@ extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc,
 										const void *data)
 {
 	const char *sep = "slash";
-#ifdef WIN32
+#ifdef _WIN32
 	const optionValues *opt = data;
 	if (getFilenameSeparator (opt->useSlashAsFilenameSeparator)
 		!= FILENAME_SEP_USE_SLASH)

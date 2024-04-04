@@ -54,9 +54,9 @@ struct sTagWriter {
 
 	void (* checkOptions) (tagWriter *writer, bool fieldsWereReset);
 
-#ifdef WIN32
+#ifdef _WIN32
 	enum filenameSepOp (* overrideFilenameSeparator) (enum filenameSepOp currentSetting);
-#endif	/* WIN32 */
+#endif	/* _WIN32 */
 
 	const char *defaultFileName;
 
@@ -100,7 +100,7 @@ extern bool writerDoesTreatFieldAsFixed (int fieldType);
 extern void writerCheckOptions (bool fieldsWereReset);
 extern bool writerPrintPtagByDefault (void);
 
-#ifdef WIN32
+#ifdef _WIN32
 extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSetting);
-#endif	/* WIN32 */
+#endif	/* _WIN32 */
 #endif	/* CTAGS_MAIN_WRITER_PRIVATE_H */

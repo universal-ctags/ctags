@@ -255,7 +255,7 @@ extern vString* stringListFileFinds (
 	unsigned int i;
 	const char * normalized = fileName;
 
-#if defined (WIN32)
+#if defined (_WIN32)
 	vString *tmp = vStringNewInit (fileName);
 	vStringTranslate (tmp, PATH_SEPARATOR, OUTPUT_PATH_SEPARATOR);
 	normalized = vStringValue (tmp);
@@ -267,7 +267,7 @@ extern vString* stringListFileFinds (
 		matched = fileNameMatched (vstr, normalized);
 	}
 
-#if defined (WIN32)
+#if defined (_WIN32)
 	vStringDelete (tmp);
 #endif
 

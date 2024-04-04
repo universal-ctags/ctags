@@ -7,7 +7,7 @@ GNULIB_OBJS = $(MINGW_GNULIB_SRCS:.c=.$(OBJEXT))
 
 CFLAGS = -Wall -std=gnu99
 COMMON_DEFINES =
-DEFINES = -DWIN32 $(COMMON_DEFINES) -DHAVE_CONFIG_H -DHAVE_PACKCC
+DEFINES = $(COMMON_DEFINES) -DHAVE_CONFIG_H -DHAVE_PACKCC
 INCLUDES = -I. -Ignulib -Ilibreadtags -iquote parsers -iquote main -iquote dsl
 CC = gcc
 WINDRES = windres
@@ -115,9 +115,9 @@ $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 	$(V_WINDRES) $(WINDRES) -o $@ -O coff $<
 
 extra-cmds/%.o: extra-cmds/%.c
-	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 $(INCLUDES) -o $@ $<
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) $(INCLUDES) -o $@ $<
 libreadtags/%.o: libreadtags/%.c
-	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Ilibreadtags -o $@ $<
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -Ilibreadtags -o $@ $<
 
 readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(UTIL_OBJS) $(UTIL_HEADS) $(READTAGS_DSL_OBJS) $(READTAGS_DSL_HEADS) $(GNULIB_OBJS) $(MINGW_GNULIB_HEADS)
 	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(UTIL_OBJS) $(READTAGS_DSL_OBJS) $(GNULIB_OBJS) $(LIBS)
