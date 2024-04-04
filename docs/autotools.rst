@@ -71,6 +71,38 @@ To completely change the program's name run the following:
 
 Please remember there is also an 'etags' installed alongside 'ctags' which you may also want to rename as shown above.
 
+Link time optimization
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Link-time optimization (LTO) is an interprocedural optimization (IPO) across
+translation units (module files) for languages that compile on a file-by-file
+basis. This optimization is supported by the compilers, like gcc and clang,
+etc.
+
+LTO is usually beneficial to improving program performance (here refers to ctags).
+We provide the `--enable-lto` option to enable it, as in the following example:
+
+.. code-block:: bash
+
+	$ ./configure --enable-lto
+
+But note that we do not enable LTO by default (for stability reasons), and there
+are certain requirements for using LTO. First, the compiler itself must support
+LTO optimization, and second, it cannot be cross-compilation (like below). When
+the above requirements are met, you need to actively use the `--enable-lto` option
+to truly enable LTO optimization for ctags.
+
+For example:
+
+.. code-block:: bash
+
+	$ ./configure
+
+is equivalent to:
+
+.. code-block:: bash
+
+	$ ./configure --disable-lto
+
 Cross-compilation
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
