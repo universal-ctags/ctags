@@ -121,7 +121,7 @@
 
 /*  Hack for ridiculous practice of Microsoft Visual C++.
  */
-#if defined (WIN32)
+#if defined (_WIN32)
 # if defined (_MSC_VER) || defined (__MINGW32__)
 #  ifndef stat
 #   define stat    _stat
@@ -163,7 +163,7 @@ extern int stat (const char *, struct stat *);
 #ifdef NEED_PROTO_LSTAT
 extern int lstat (const char *, struct stat *);
 #endif
-#if defined (WIN32)
+#if defined (_WIN32)
 # define lstat(fn,buf) stat(fn,buf)
 #endif
 
@@ -204,7 +204,7 @@ extern const char *getExecutablePath (void)
  */
 static bool fnmChEq (int c1, int c2)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	return tolower( c1 ) == tolower( c2 );  /* case-insensitive */
 #else
 	return          c1   ==          c2  ;  /* case-  sensitive */
@@ -890,7 +890,7 @@ extern FILE *tempFileFP (const char *const mode, char **const pName)
 	const char *const pattern = "tags.XXXXXX";
 	const char *tmpdir = NULL;
 	fileStatus *file = eStat (ExecutableProgram);
-# ifdef WIN32
+# ifdef _WIN32
 	tmpdir = getenv ("TMP");
 # else
 	if (! file->isSetuid)
@@ -901,7 +901,7 @@ extern FILE *tempFileFP (const char *const mode, char **const pName)
 	name = xMalloc (strlen (tmpdir) + 1 + strlen (pattern) + 1, char);
 	sprintf (name, "%s%c%s", tmpdir, OUTPUT_PATH_SEPARATOR, pattern);
 	fd = mkstemp (name);
-# ifdef WIN32
+# ifdef _WIN32
 	if (fd == -1)
 	{
 		/* mkstemp() sometimes fails with unknown reasons.
@@ -917,7 +917,7 @@ extern FILE *tempFileFP (const char *const mode, char **const pName)
 	eStatFree (file);
 #elif defined(HAVE_TEMPNAM)
 	const char *tmpdir = NULL;
-# ifdef WIN32
+# ifdef _WIN32
 	tmpdir = getenv ("TMP");
 # endif
 	if (tmpdir == NULL)

@@ -108,7 +108,7 @@ typedef struct sOptionValues {
 	enum interactiveMode { INTERACTIVE_NONE = 0,
 						   INTERACTIVE_DEFAULT,
 						   INTERACTIVE_SANDBOX, } interactive; /* --interactive */
-#ifdef WIN32
+#ifdef _WIN32
 	enum filenameSepOp { FILENAME_SEP_NO_REPLACE = false,
 						 FILENAME_SEP_USE_SLASH  = true,
 						 FILENAME_SEP_UNSET,

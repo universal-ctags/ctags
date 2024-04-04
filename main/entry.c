@@ -75,7 +75,7 @@
 
 /*  Hack for ridiculous practice of Microsoft Visual C++.
  */
-#if defined (WIN32) && defined (_MSC_VER)
+#if defined (_WIN32) && defined (_MSC_VER)
 # define chsize         _chsize
 # define open           _open
 # define close          _close
@@ -1739,7 +1739,7 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 
 	DebugStatement ( debugEntry (tag); )
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (getFilenameSeparator(Option.useSlashAsFilenameSeparator) == FILENAME_SEP_USE_SLASH)
 	{
 		Assert (((const tagEntryInfo *)tag)->inputFileName);

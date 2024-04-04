@@ -175,7 +175,7 @@ optionValues Option = {
 	.maxRecursionDepth = 0xffffffff,
 	.interactive = false,
 	.fieldsReset = false,
-#ifdef WIN32
+#ifdef _WIN32
 	.useSlashAsFilenameSeparator = FILENAME_SEP_UNSET,
 #endif
 #ifdef DEBUG
@@ -344,7 +344,7 @@ static optionDescription LongOptionDescription [] = {
  {0,0,"       Should paths be relative to location of tag file [no; yes when -e]?"},
  {0,0,"       always: be relative even if input files are passed in with absolute paths" },
  {0,0,"       never:  be absolute even if input files are passed in with relative paths" },
-#ifdef WIN32
+#ifdef _WIN32
  {1,0,"  --use-slash-as-filename-separator[=(yes|no)]"},
  {1,0,"       Use slash as filename separator [yes] for u-ctags output format."},
 #endif
@@ -552,7 +552,7 @@ static struct Feature {
 	const char *name;
 	const char *description;
 } Features [] = {
-#ifdef WIN32
+#ifdef _WIN32
 	{"win32", "TO BE WRITTEN"},
 #endif
 	/* Following two features are always available on universal ctags */
@@ -571,7 +571,7 @@ static struct Feature {
 #ifdef CUSTOM_CONFIGURATION_FILE
 	{"custom-conf", "read \"" CUSTOM_CONFIGURATION_FILE "\" as config file"},
 #endif
-#if defined (WIN32)
+#if defined (_WIN32)
 	{"unix-path-separator", "can use '/' as file name separator"},
 #endif
 #ifdef HAVE_ICONV
@@ -1185,7 +1185,7 @@ static void processExcludeOptionCommon (
 	else
 	{
 		vString *const item = vStringNewInit (parameter);
-#if defined (WIN32)
+#if defined (_WIN32)
 		vStringTranslate(item, PATH_SEPARATOR, OUTPUT_PATH_SEPARATOR);
 #endif
 		if (*list == NULL)
@@ -2602,7 +2602,7 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 		const char* fileName = (*list == '@') ? list + 1 : list;
 		addIgnoreListFromFile (lang, fileName);
 	}
-#if defined (WIN32)
+#if defined (_WIN32)
 	else if (isalpha ((unsigned char) list [0])  &&  list [1] == ':')
 		addIgnoreListFromFile (lang, list);
 #endif
@@ -2914,7 +2914,7 @@ static booleanOption BooleanOptions [] = {
 	{ "recurse",        &Option.recurse,                false, STAGE_ANY },
 #endif
 	{ "verbose",        &ctags_verbose,                 false, STAGE_ANY },
-#ifdef WIN32
+#ifdef _WIN32
 	{ "use-slash-as-filename-separator", (bool *)&Option.useSlashAsFilenameSeparator, false, STAGE_ANY },
 #endif
 	{ "with-list-header", &localOption.withListHeader,  true,  STAGE_ANY },
@@ -3684,7 +3684,7 @@ static char *getConfigForXDG (const char *path CTAGS_ATTR_UNUSED,
 	return prependEnvvar (".config/ctags", "HOME");
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 static char *getConfigAtHomeOnWindows (const char *path,
 									   const char* extra CTAGS_ATTR_UNUSED)
 {
@@ -3771,7 +3771,7 @@ static struct preloadPathElt preload_path_list [] = {
 		.extra = "HOME",
 		.stage = OptionLoadingStageHomeDir,
 	},
-#ifdef WIN32
+#ifdef _WIN32
 	{
 		.path = "ctags.d",
 		.isDirectory = true,

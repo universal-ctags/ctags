@@ -68,7 +68,7 @@ extern void catFile (MIO *mio)
 */
 static void appendCstringWithQuotes (vString *dest, const char* cstr)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	vStringCatS (dest, cstr);
 #else
 	vStringPut (dest, '\'');
