@@ -1079,6 +1079,9 @@ static tagEntryInfo *newNilTagEntry (unsigned int corkFlags)
 	x->slot.kindIndex = KIND_FILE_INDEX;
 	x->slot.inputFileName = getInputFileName ();
 	x->slot.inputFileName = eStrdup (x->slot.inputFileName);
+	x->slot.sourceFileName = getSourceFileTagPath();
+	if (x->slot.sourceFileName)
+		x->slot.sourceFileName = eStrdup (x->slot.sourceFileName);
 	return &(x->slot);
 }
 
@@ -1095,6 +1098,7 @@ static void copyExtraDynamic (const tagEntryInfo *const src, tagEntryInfo *const
 
 static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 									const char *shareInputFileName,
+									const char *sharedSourceFileName,
 									unsigned int corkFlags)
 {
 	tagEntryInfoX *x = xMalloc (1, tagEntryInfoX);
@@ -1144,9 +1148,25 @@ static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 	if (slot->extraDynamic)
 		PARSER_TRASH_BOX_TAKE_BACK(slot->extraDynamic);
 
-	if (slot->sourceFileName)
+	if (slot->sourceFileName == NULL)
+		slot->isSourceFileNameShared = 0;
+	else if (strcmp(slot->sourceFileName, sharedSourceFileName) == 0)
+	{
+		/* strcmp() is needed here.
+		 * sharedSourceFileName can be changed during parsing a file.
+		 * So we cannot use the condition like:
+		 *
+		 *    if (slot->sourceFileName == getSourceFileTagPath()) { ... }
+		 *
+		 */
+		slot->sourceFileName = sharedSourceFileName;
+		slot->isSourceFileNameShared = 1;
+	}
+	else
+	{
 		slot->sourceFileName = eStrdup (slot->sourceFileName);
-
+		slot->isSourceFileNameShared = 0;
+	}
 
 	slot->usedParserFields = 0;
 	slot->parserFieldsDynamic = NULL;
@@ -1189,6 +1209,8 @@ static void deleteTagEnry (void *data)
 	if (slot->kindIndex == KIND_FILE_INDEX)
 	{
 		eFree ((char *)slot->inputFileName);
+		if (slot->sourceFileName)
+			eFree ((char *)slot->sourceFileName);
 		goto out;
 	}
 
@@ -1222,7 +1244,7 @@ static void deleteTagEnry (void *data)
 	if (slot->extraDynamic)
 		eFree (slot->extraDynamic);
 
-	if (slot->sourceFileName)
+	if (slot->sourceFileName && !slot->isSourceFileNameShared)
 		eFree ((char *)slot->sourceFileName);
 
 	clearParserFields (slot);
@@ -1563,7 +1585,7 @@ static int queueTagEntry (const tagEntryInfo *const tag)
 
 	int corkIndex;
 	tagEntryInfo * nil = ptrArrayItem (TagFile.corkQueue, 0);
-	tagEntryInfoX * entry = copyTagEntry (tag, nil->inputFileName,
+	tagEntryInfoX * entry = copyTagEntry (tag, nil->inputFileName, nil->sourceFileName,
 										TagFile.corkFlags);
 
 	if (ptrArrayCount (TagFile.corkQueue) == (size_t)INT_MAX)
