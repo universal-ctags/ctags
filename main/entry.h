@@ -72,6 +72,8 @@ struct sTagEntryInfo {
 	unsigned int inCorkQueue:1;
 	unsigned int isInputFileNameShared: 1; /* shares the value for inputFileName.
 											* Set in the cork queue; don't touch this.*/
+	unsigned int isSourceFileNameShared: 1; /* shares the value for sourceFileName.
+											 * Set in the cork queue; don't touch this.*/
 	unsigned int boundaryInfo: 2; /* info about nested input stream */
 	unsigned int inIntevalTab:1;
 
