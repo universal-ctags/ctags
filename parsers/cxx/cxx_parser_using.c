@@ -18,6 +18,7 @@
 #include "parse.h"
 #include "vstring.h"
 #include "read.h"
+#include "trashbox.h"
 
 bool cxxParserParseUsingClause(void)
 {
@@ -117,7 +118,7 @@ bool cxxParserParseUsingClause(void)
 
 		if(g_cxx.pTokenChain->iCount > 0)
 		{
-			tagEntryInfo * tag;
+			tagEntryInfo * tag = NULL;
 
 			if(bUsingNamespace)
 			{
@@ -139,11 +140,28 @@ bool cxxParserParseUsingClause(void)
 
 				t = cxxTokenChainLast(g_cxx.pTokenChain);
 
-				CXX_DEBUG_PRINT(
+				if (cxxTokenTypeIs(t,CXXTokenTypeIdentifier)) {
+					CXX_DEBUG_PRINT(
 						"Found using clause '%s' which imports a name",
 						vStringValue(t->pszWord)
-					);
-				tag = cxxTagBegin(CXXTagCPPKindNAME,t);
+						);
+					tag = cxxTagBegin(CXXTagCPPKindNAME,t);
+				} else {
+					CXXToken * pOp = cxxTokenChainFirstKeyword(
+						g_cxx.pTokenChain,
+						CXXKeywordOPERATOR
+						);
+
+					if (pOp) {
+						vString *pOpStr = cxxTokenChainJoinRange (pOp, t, " ",
+																  CXXTokenChainJoinNoTrailingSpaces);
+						PARSER_TRASH_BOX(pOpStr, vStringDelete);
+						CXXToken * pOpToken = cxxTokenCopy(pOp);
+						PARSER_TRASH_BOX(pOpToken, cxxTokenDestroy);
+						vStringCopy(pOpToken->pszWord, pOpStr);
+						tag = cxxTagBegin(CXXTagCPPKindNAME,pOpToken);
+					}
+				}
 
 				// FIXME: We need something like "nameref:<condensed>" here!
 			}

@@ -1,5 +1,9 @@
 A	input.cpp	/^class A$/;"	class	file:	roles:def
 B	input.cpp	/^class B : public A$/;"	class	file:	roles:def
+operator ()	input.cpp	/^	using A::operator();$/;"	name	class:B	roles:def
+operator ()	input.cpp	/^	void operator ()() {};$/;"	function	class:A	typeref:typename:void	file:	signature:()	roles:def
+operator +	input.cpp	/^	int operator +(int i) { return i; };$/;"	function	class:A	typeref:typename:int	file:	signature:(int i)	roles:def
+operator +	input.cpp	/^	using A::operator+;$/;"	name	class:B	roles:def
 std	input.cpp	/^using namespace std;$/;"	using	file:	roles:def
 string	input.cpp	/^#include <string>/;"	header	roles:system
 string	input.cpp	/^using std::string;$/;"	name	file:	roles:def
