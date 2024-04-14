@@ -2898,7 +2898,11 @@ static code_reach_t generate_quantifying_code(generate_t *gen, const node_t *exp
                 indent += 4;
             }
             stream__write_characters(gen->stream, ' ', indent);
+            stream__puts(gen->stream, "MARK_VAR_AS_USED\n");
+            stream__write_characters(gen->stream, ' ', indent);
             stream__puts(gen->stream, "const size_t p = ctx->cur;\n");
+            stream__write_characters(gen->stream, ' ', indent);
+            stream__puts(gen->stream, "MARK_VAR_AS_USED\n");
             stream__write_characters(gen->stream, ' ', indent);
             stream__puts(gen->stream, "const size_t n = chunk->thunks.len;\n");
             {
@@ -3024,7 +3028,11 @@ static code_reach_t generate_alternative_code(generate_t *gen, const node_array_
         indent += 4;
     }
     stream__write_characters(gen->stream, ' ', indent);
+    stream__puts(gen->stream, "MARK_VAR_AS_USED\n");
+    stream__write_characters(gen->stream, ' ', indent);
     stream__puts(gen->stream, "const size_t p = ctx->cur;\n");
+    stream__write_characters(gen->stream, ' ', indent);
+    stream__puts(gen->stream, "MARK_VAR_AS_USED\n");
     stream__write_characters(gen->stream, ' ', indent);
     stream__puts(gen->stream, "const size_t n = chunk->thunks.len;\n");
     for (i = 0; i < nodes->len; i++) {
@@ -3364,6 +3372,12 @@ static bool_t generate(context_t *ctx) {
             "#define MARK_FUNC_AS_USED __pragma(warning(suppress:4505))\n"
             "#else\n"
             "#define MARK_FUNC_AS_USED __attribute__((__unused__))\n"
+            "#endif\n"
+            "\n"
+            "#ifdef _MSC_VER\n"
+            "#define MARK_VAR_AS_USED __pragma(warning(suppress:4189))\n"
+            "#else\n"
+            "#define MARK_VAR_AS_USED __attribute__((__unused__))\n"
             "#endif\n"
             "\n"
             "#ifndef PCC_BUFFER_MIN_SIZE\n"
