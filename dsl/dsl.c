@@ -201,8 +201,9 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> #f" },
 	{ "nil",    value_nil, NULL, 0, 0UL,
 	  .helpstr = "-> ()" },
-	{ "$",       builtin_entry_ref, NULL, DSL_PATTR_CHECK_ARITY, 1,
-	  .helpstr = "($ <string:field>) -> #f|<string>" },
+	{ "$",       builtin_entry_ref, NULL, DSL_PATTR_CHECK_ARITY_OPT, 1,
+	  .helpstr = "($ <string:field>) -> <string>|#f\n"
+	  "($ <string:field> <any:default>) -> <string>|<any:default>"},
 	{ "$name",           value_name,           NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <string>"},
 	{ "$input",          value_input,          NULL, DSL_PATTR_MEMORABLE, 0UL,
@@ -1037,7 +1038,17 @@ static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env)
 	else if (! es_string_p (key))
 		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("$"));
 	else
-		return dsl_entry_xget_string (env->entry, es_string_get (key));
+	{
+		EsObject *r = dsl_entry_xget_string (env->entry, es_string_get (key));
+		if (es_object_equal (r, es_false))
+		{
+			EsObject *defaultv = es_car(es_cdr(args));
+			if (es_null (defaultv))
+				return r;
+			return defaultv;
+		}
+		return r;
+	}
 }
 
 EsObject* dsl_entry_name (const tagEntry *entry)

@@ -1,0 +1,3 @@
+c noprop
+b inline
+a static
