@@ -25,7 +25,7 @@ jobs:
       # Following cases target ctags without gcov.
       SANDBOX_CASES: sandbox,sandbox-crash,sandbox-default-req,sandbox-unknown-submode
       DEBIAN_FRONTEND: noninteractive
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      #CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
     - uses: actions/checkout@v4
@@ -101,7 +101,7 @@ jobs:
           make -C ${BUILDDIR} tmain UNITS=${SANDBOX_CASES}
           make -C ${BUILDDIR}  clean
         )
-    - name: send coverage info
+    - name: prepare coverage info
       if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-20.04'
       run: |
         # for f in /var/lib/gems/*/gems/lcoveralls-*/lib/lcoveralls/color_formatter.rb; do
@@ -117,4 +117,12 @@ jobs:
         # lcoveralls --root . --retry-count 5 ${BUILDDIR}/coverage.info
 
         # Upload to codecov.
-        bash <(curl -s https://codecov.io/bash) -f ${BUILDDIR}/coverage.info -Z -X gcov -X coveragepy -X search -X xcode -X gcovout -n travis-${{ matrix.os }}
+        #bash <(curl -s https://codecov.io/bash) -f ${BUILDDIR}/coverage.info -Z -X gcov -X coveragepy -X search -X xcode -X gcovout -n travis-${{ matrix.os }}
+
+    - name: send coverage info
+      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-20.04'
+      uses: codecov/codecov-action@v4
+      with:
+        files: ${{ env.BUILDDIR }}/coverage.info
+        name: travis-${{ matrix.os }}
+        token: ${{ secrets.CODECOV_TOKEN }}
