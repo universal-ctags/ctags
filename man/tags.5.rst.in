@@ -450,7 +450,7 @@ command can be used::
 (replace ^I with a real <Tab>).
 
 COMMENT: Universal Ctags running on MS Windows converts the ``\`` separator
-to ``/`` by defualt, and allows the escape sequences even in {tagfile}
+to ``/`` by default, and allows the escape sequences even in {tagfile}
 if a condition is satisfied. See "`Exceptions in Universal Ctags`_" about
 the condition.
 

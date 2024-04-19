@@ -278,7 +278,7 @@ for using notable ones.
 	* If they have been added since last release, increment "{age}".
 	* If they have been removed since last release, set "{age}" to 0.
 
-	This concept is baesd on the versioning in **libtool**
+	This concept is based on the versioning in **libtool**
 	(`7.2 Libtool’s versioning system <https://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning>`_.)
 	In Universal Ctags, we simplified the concept with removing
 	"revision" in the versioning in libtool.

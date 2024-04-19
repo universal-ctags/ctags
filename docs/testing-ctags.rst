@@ -146,7 +146,7 @@ by the compiler. *\*.gcno* files can be removed with ``make clean``.
 After building ctags, you can run run-gcov target.  When running
 *\*.gcda* files.  The target runs ctags with all input files under
 *Units/\*\*/input.\**; and call ``gcov``. Human readable result is
-printed. The detail can be shown in *\*.gcov*. files. *\*.gcda* files
+printed. The detail can be shown in *\*.gcov* files. *\*.gcda* files
 and *\*.gcov* files can be removed with ``make clean-gcov``.
 
 Running cppcheck

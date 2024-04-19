@@ -106,7 +106,7 @@ Building ctags with MSBuild
 
 This supports only Microsoft Visual Studio 2013.
 
-Before starting to build, you need to copy somes file to proper location::
+Before starting to build, you need to copy some files to proper location::
 
         copy win32\config_mvc.h config.h
         copy win32\gnulib_h\langinfo.h gnulib
