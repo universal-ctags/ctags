@@ -79,7 +79,7 @@ How to release a new version
 				   $ git tag -a v5.9.0 -m 'Version 5.9.0'
 				   $ git push upstream --tags
 
-#. Make tarbarll in a freshly cloned directory
+#. Make tarball in a freshly cloned directory
 
    .. code-block:: console
 

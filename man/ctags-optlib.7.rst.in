@@ -366,7 +366,7 @@ representation. ``--list-regex-flags`` lists all the flags.
 	See also the description of ``scope=intervaltab`` flag.
 
 ``scope=intervaltab``
-	Use the interval table maintaind by the main part of
+	Use the interval table maintained by the main part of
 	@CTAGS_NAME_EXECUTABLE@ to fill in the ``scope:`` field.
 	This flag is useful for extending a built-in parser with the
 	``--regex-<LANG>=`` option with ``postrun`` flag.
