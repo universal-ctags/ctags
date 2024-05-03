@@ -739,6 +739,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 		case TAG_PROTOTYPE:
 			if (vStringLength (Signature) > 0)
 				tag->extensionFields.signature = vStringValue (Signature);
+			/* Fallthrough */
 		case TAG_CLASS:
 		case TAG_ENUM:
 		case TAG_ENUMERATOR:
