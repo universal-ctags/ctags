@@ -1981,7 +1981,6 @@ static bool parseMethods (tokenInfo *const token, int class_index,
 	{
 		bool is_setter = false;
 		bool is_getter = false;
-		bool is_static = false;	/* For recognizing static {...} block. */
 
 		if (!dont_read)
 			readToken (token);
@@ -1992,10 +1991,19 @@ static bool parseMethods (tokenInfo *const token, int class_index,
 			goto cleanUp;
 		}
 
+		if (isKeyword (token, KEYWORD_static))
+		{
+			readToken (token);
+			if (isType (token, TOKEN_OPEN_CURLY))
+				/* static initialization block */
+				parseBlock (token, class_index);
+			else
+				dont_read = true;
+			continue;
+		}
+
 		if (isKeyword (token, KEYWORD_async))
 			readToken (token);
-		else if (isKeyword (token, KEYWORD_static))
-			is_static = true;
 		else if (isType (token, TOKEN_KEYWORD) &&
 				 (isKeyword (token, KEYWORD_get) || isKeyword (token, KEYWORD_set)))
 		{
@@ -2025,9 +2033,8 @@ static bool parseMethods (tokenInfo *const token, int class_index,
 			continue;
 		}
 
-		if ((! isType (token, TOKEN_KEYWORD) &&
+		if (! isType (token, TOKEN_KEYWORD) &&
 			 ! isType (token, TOKEN_SEMICOLON))
-			|| is_static)
 		{
 			bool is_generator = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
@@ -2201,15 +2208,6 @@ function:
 				}
 
 				vStringDelete (signature);
-			}
-			else if (is_static)
-			{
-				if (isType (token, TOKEN_OPEN_CURLY))
-					/* static initialization block */
-					parseBlock (token, class_index);
-				else
-					dont_read = true;
-				continue;
 			}
 			else
 			{
