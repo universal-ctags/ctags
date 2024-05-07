@@ -1762,7 +1762,9 @@ static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, co
 	if (isType (name, TOKEN_KEYWORD) &&
 		(isKeyword (name, KEYWORD_get) || isKeyword (name, KEYWORD_set)))
 	{
-		name->type = TOKEN_IDENTIFIER;	// treat as function name
+		// treat as function name
+		name->type = TOKEN_IDENTIFIER;
+		name->keyword = KEYWORD_NONE;
 	}
 
 	if (isType (name, TOKEN_STAR))
@@ -2410,7 +2412,9 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 		if (isType (token, TOKEN_KEYWORD) &&
 			(isKeyword (token, KEYWORD_get) || isKeyword (token, KEYWORD_set)))
 		{
-			token->type = TOKEN_IDENTIFIER;	// treat as function name
+			// treat as function name
+			token->type = TOKEN_IDENTIFIER;
+			token->keyword = KEYWORD_NONE;
 		}
 
 		if (! isType(token, TOKEN_KEYWORD))
