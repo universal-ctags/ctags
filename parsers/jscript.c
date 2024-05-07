@@ -1289,6 +1289,47 @@ getNextChar:
 	LastTokenType = token->type;
 }
 
+/* whether something we consider a keyword (either because it sometimes is or
+ * because of the parser's perks) is actually valid as a function name
+ * See https://tc39.es/ecma262/multipage/ecmascript-language-lexical-grammar.html#sec-keywords-and-reserved-words */
+static bool canBeFunctionName (const tokenInfo *const token, bool strict_mode)
+{
+	switch (token->keyword)
+	{
+		/* non-keywords specific to this parser */
+		case KEYWORD_capital_function:
+		case KEYWORD_capital_object:
+		case KEYWORD_prototype:
+		case KEYWORD_sap:
+		/* syntactic, but not keyword:
+		 *     as async from get meta of set target
+		 * "await" is OK as well */
+		case KEYWORD_async:
+		case KEYWORD_get:
+		case KEYWORD_set:
+			return true;
+
+		/* strict-mode keywords
+		 *     let static implements interface package private protected public
+		 * we need to also include those which are OK as function names
+		 *     yield
+		 */
+		case KEYWORD_let:
+		case KEYWORD_static:
+			return ! strict_mode;
+
+		default:
+			return isType (token, TOKEN_IDENTIFIER);
+	}
+}
+
+static bool canBePropertyName (const tokenInfo *const token)
+{
+	/* property names are pretty relaxed, any non reserved word is OK, even
+	 * strict-mode ones in strict-mode */
+	return canBeFunctionName (token, false);
+}
+
 /* See https://babeljs.io/blog/2018/09/17/decorators */
 static void skipBabelDecorator (tokenInfo *token, bool include_newlines, vString *const repr)
 {
@@ -1760,7 +1801,7 @@ static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, co
 	copyToken (name, token, true);
 	readToken (name);
 	if (isType (name, TOKEN_KEYWORD) &&
-		(isKeyword (name, KEYWORD_get) || isKeyword (name, KEYWORD_set)))
+		canBeFunctionName (name, false /* true if we're in strict mode */))
 	{
 		// treat as function name
 		name->type = TOKEN_IDENTIFIER;
@@ -1988,30 +2029,19 @@ static bool parseMethods (tokenInfo *const token, int class_index,
 			readToken (token);
 		dont_read = false;
 
+start:
 		if (isType (token, TOKEN_CLOSE_CURLY))
 		{
 			goto cleanUp;
 		}
 
-		if (isKeyword (token, KEYWORD_static))
-		{
-			readToken (token);
-			if (isType (token, TOKEN_OPEN_CURLY))
-				/* static initialization block */
-				parseBlock (token, class_index);
-			else
-				dont_read = true;
-			continue;
-		}
-
-		if (isKeyword (token, KEYWORD_async))
-			readToken (token);
-		else if (isType (token, TOKEN_KEYWORD) &&
-				 (isKeyword (token, KEYWORD_get) || isKeyword (token, KEYWORD_set)))
+		if (isType (token, TOKEN_KEYWORD) && canBePropertyName (token))
 		{
 			tokenInfo *saved_token = newToken ();
 			copyToken (saved_token, token, true);
 			readToken (token);
+
+			/* it wasn't actually a keyword after all, make it an identifier */
 			if (isType(token, TOKEN_OPEN_PAREN) || isType(token, TOKEN_COLON))
 			{
 				Assert (NextToken == NULL);
@@ -2021,10 +2051,25 @@ static bool parseMethods (tokenInfo *const token, int class_index,
 				token->type = TOKEN_IDENTIFIER;			/* process as identifier */
 				token->keyword = KEYWORD_NONE;
 			}
+			else if (isKeyword (saved_token, KEYWORD_static) &&
+					 isType (token, TOKEN_OPEN_CURLY))
+			{
+				/* static initialization block */
+				deleteToken (saved_token);
+				parseBlock (token, class_index);
+				continue;
+			}
 			else if (isKeyword (saved_token, KEYWORD_get))
 				is_getter = true;
-			else
+			else if (isKeyword (saved_token, KEYWORD_set))
 				is_setter = true;
+			else if (isKeyword (saved_token, KEYWORD_async) ||
+					 isKeyword (saved_token, KEYWORD_static))
+			{
+				/* can be a qualifier for another "keyword", so start over */
+				deleteToken (saved_token);
+				goto start;
+			}
 
 			deleteToken (saved_token);
 		}
@@ -2409,8 +2454,7 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 		 * Handle CASE 1
 		 */
 		readToken (token);
-		if (isType (token, TOKEN_KEYWORD) &&
-			(isKeyword (token, KEYWORD_get) || isKeyword (token, KEYWORD_set)))
+		if (isType (token, TOKEN_KEYWORD) && canBePropertyName (token))
 		{
 			// treat as function name
 			token->type = TOKEN_IDENTIFIER;

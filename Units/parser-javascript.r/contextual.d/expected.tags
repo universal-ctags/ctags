@@ -1,0 +1,95 @@
+Function	input.js	/^  Function() { return 0x32 }$/;"	m	class:Syn3
+Function	input.js	/^  Function() { return Syn2; },$/;"	m	class:Syn2
+Function	input.js	/^  Function:function() { return Syn1; },$/;"	m	class:Syn1
+Function	input.js	/^function Function() { return 0x103; }$/;"	c
+Object	input.js	/^  Object() { return 0x31 }$/;"	m	class:Syn3
+Object	input.js	/^  Object() { return this; },$/;"	m	class:Syn2
+Object	input.js	/^  Object:function() { return this; },$/;"	m	class:Syn1
+Object	input.js	/^function Object() { return 0x102; }$/;"	c
+Syn1	input.js	/^let Syn1=function(){}$/;"	c
+Syn2	input.js	/^let Syn2=function(){}$/;"	c
+Syn3	input.js	/^class Syn3 {$/;"	c
+as	input.js	/^  as() { return 0x21; }$/;"	m	class:Syn3
+as	input.js	/^  as() { return 0x21; },$/;"	m	class:Syn2
+as	input.js	/^  as:function() { return 0x21; },$/;"	m	class:Syn1
+as	input.js	/^function as() { return 0x21; }$/;"	f
+async	input.js	/^  async() { return 0x20; }$/;"	m	class:Syn3
+async	input.js	/^  async() {$/;"	m	class:Syn2
+async	input.js	/^  async:function() {$/;"	m	class:Syn1
+async	input.js	/^function async() { return 0x22; }$/;"	f
+await	input.js	/^  await() { return 0x01; }$/;"	m	class:Syn3
+await	input.js	/^  await() { return 0x01; },$/;"	m	class:Syn2
+await	input.js	/^  await:function() { return 0x01; },$/;"	m	class:Syn1
+await	input.js	/^function await() { return 0x01; }$/;"	f
+from	input.js	/^  from() { return 0x22; }$/;"	m	class:Syn3
+from	input.js	/^  from() { return 0x22; },$/;"	m	class:Syn2
+from	input.js	/^  from:function() { return 0x22; },$/;"	m	class:Syn1
+from	input.js	/^function from() { return 0x23; }$/;"	f
+get	input.js	/^  get() { return 0x24; }$/;"	m	class:Syn3
+get	input.js	/^  get() {$/;"	m	class:Syn2
+get	input.js	/^  get:function() {$/;"	m	class:Syn1
+get	input.js	/^function get() { return 0x24; }$/;"	f
+implements	input.js	/^  implements() { return 0x13; }$/;"	m	class:Syn3
+implements	input.js	/^  implements() { return 0x13; },$/;"	m	class:Syn2
+implements	input.js	/^  implements:function() { return 0x13; },$/;"	m	class:Syn1
+implements	input.js	/^function implements() { return 0x13; }$/;"	f
+interface	input.js	/^  interface() { return 0x14; }$/;"	m	class:Syn3
+interface	input.js	/^  interface() { return 0x14; },$/;"	m	class:Syn2
+interface	input.js	/^  interface:function() { return 0x14; },$/;"	m	class:Syn1
+interface	input.js	/^function interface() { return 0x14; }$/;"	f
+length	input.js	/^  length:0,$/;"	p	class:Syn1
+length	input.js	/^  length:0,$/;"	p	class:Syn2
+let	input.js	/^  let() { return 0x11; }$/;"	m	class:Syn3
+let	input.js	/^  let() { return 0x11; },$/;"	m	class:Syn2
+let	input.js	/^  let:function() { return 0x11; },$/;"	m	class:Syn1
+let	input.js	/^function let() { return 0x11; }$/;"	f
+meta	input.js	/^  meta() { return 0x23; }$/;"	m	class:Syn3
+meta	input.js	/^  meta() { return 0x23; },$/;"	m	class:Syn2
+meta	input.js	/^  meta:function() { return 0x23; },$/;"	m	class:Syn1
+meta	input.js	/^function meta() { return 0x25; }$/;"	f
+of	input.js	/^  of() { return 0x24; }$/;"	m	class:Syn3
+of	input.js	/^  of() { return 0x24; },$/;"	m	class:Syn2
+of	input.js	/^  of:function() { return 0x24; },$/;"	m	class:Syn1
+of	input.js	/^function of() { return 0x26; }$/;"	f
+package	input.js	/^  package() { return 0x15; }$/;"	m	class:Syn3
+package	input.js	/^  package() { return 0x15; },$/;"	m	class:Syn2
+package	input.js	/^  package:function() { return 0x15; },$/;"	m	class:Syn1
+package	input.js	/^function package() { return 0x15; }$/;"	f
+private	input.js	/^  private() { return 0x16; }$/;"	m	class:Syn3
+private	input.js	/^  private() { return 0x16; },$/;"	m	class:Syn2
+private	input.js	/^  private:function() { return 0x16; },$/;"	m	class:Syn1
+private	input.js	/^function private() { return 0x16; }$/;"	f
+protected	input.js	/^  protected() { return 0x17; }$/;"	m	class:Syn3
+protected	input.js	/^  protected() { return 0x17; },$/;"	m	class:Syn2
+protected	input.js	/^  protected:function() { return 0x17; },$/;"	m	class:Syn1
+protected	input.js	/^function protected() { return 0x17; }$/;"	f
+prototype	input.js	/^  prototype() { return 0x30 }$/;"	m	class:Syn3
+prototype	input.js	/^  prototype() { return this.prototype; },$/;"	m	class:Syn2
+prototype	input.js	/^  prototype:function() { return this.prototype; },$/;"	m	class:Syn1
+prototype	input.js	/^function prototype() { return 0x101; }$/;"	f
+public	input.js	/^  public() { return 0x18; }$/;"	m	class:Syn3
+public	input.js	/^  public() { return 0x18; },$/;"	m	class:Syn2
+public	input.js	/^  public:function() { return 0x18; },$/;"	m	class:Syn1
+public	input.js	/^function public() { return 0x18; }$/;"	f
+s1	input.js	/^let s1 = new Syn1();$/;"	v
+s2	input.js	/^let s2 = new Syn2();$/;"	v
+sap	input.js	/^  sap() { return "sap"; },$/;"	m	class:Syn2
+sap	input.js	/^  sap() { return 0x33 }$/;"	m	class:Syn3
+sap	input.js	/^  sap:function() { return "sap"; },$/;"	m	class:Syn1
+sap	input.js	/^function sap() { return 0x104; }$/;"	f
+set	input.js	/^  set(n) { return 0x25; }$/;"	m	class:Syn3
+set	input.js	/^  set(n) {$/;"	m	class:Syn2
+set	input.js	/^  set:function(n) {$/;"	m	class:Syn1
+set	input.js	/^function set() { return 0x27; }$/;"	f
+static	input.js	/^  static() { return 0x12; }$/;"	m	class:Syn3
+static	input.js	/^  static() { return 0x12; },$/;"	m	class:Syn2
+static	input.js	/^  static:function() { return 0x12; },$/;"	m	class:Syn1
+static	input.js	/^function static() { return 0x12; }$/;"	f
+target	input.js	/^  target() { return 0x25; },$/;"	m	class:Syn2
+target	input.js	/^  target() { return 0x26; }$/;"	m	class:Syn3
+target	input.js	/^  target:function() { return 0x25; },$/;"	m	class:Syn1
+target	input.js	/^function target() { return 0x28; }$/;"	f
+yield	input.js	/^  yield() { return 0x02; }$/;"	m	class:Syn3
+yield	input.js	/^  yield() { return 0x02; },$/;"	m	class:Syn2
+yield	input.js	/^  yield:function() { return 0x02; },$/;"	m	class:Syn1
+yield	input.js	/^function yield() { return 0x02; } \/\/ invalid in strict mode$/;"	f
