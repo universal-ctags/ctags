@@ -1,0 +1,5 @@
+Foo	input.js	/^class Foo {$/;"	c
+async	input.js	/^  async async() {}$/;"	m	class:Foo
+async	input.js	/^  static async async() {}$/;"	m	class:Foo
+static	input.js	/^  static static() {}$/;"	m	class:Foo
+staticProperty	input.js	/^  static staticProperty = 42;$/;"	M	class:Foo
