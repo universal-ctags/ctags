@@ -19,19 +19,19 @@
 
 static tagRegexTable matlabTagRegexTable [] = {
 	/* function [x,y,z] = asdf */
-	{ "^[ \t]*function[ \t]*\\[.*\\][ \t]*=[ \t]*([.a-zA-Z0-9_]+)",
+	{ "^[ \t]*function[ \t]+\\[.*\\][ \t]*=[ \t]*([.a-zA-Z0-9_]+)",
 	  "\\1", "f,function", NULL},
 	/* function x = asdf */
-	{"^[ \t]*function[ \t]*[a-zA-Z0-9_]+[ \t]*=[ \t]*([.a-zA-Z0-9_]+)",
+	{"^[ \t]*function[ \t]+[a-zA-Z0-9_]+[ \t]*=[ \t]*([.a-zA-Z0-9_]+)",
 	 "\\1", "f,function", NULL},
 	/* function asdf */
-	{"^[ \t]*function[ \t]*([.a-zA-Z0-9_]+)[^=]*$", "\\1",
+	{"^[ \t]*function[ \t]+([.a-zA-Z0-9_]+)[^=]*$", "\\1",
 	 "f,function", NULL},
 	/* variables */
 	{"^[ \t]*([a-zA-Z0-9_]+)[ \t]*=[ \t]", "\\1",
 	 "v,variable", NULL},
 	/* class definitions */
-	{"^[ \t]*classdef[ \t]*([a-zA-Z0-9_]+)", "\\1",
+	{"^[ \t]*classdef[ \t]+([a-zA-Z0-9_]+)", "\\1",
 	 "c,class", NULL},
 };
 
