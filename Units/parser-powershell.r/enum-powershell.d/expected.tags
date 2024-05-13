@@ -1,4 +1,12 @@
 EnumName1	input.ps1	/^enum EnumName1 {$/;"	g
+Label11	input.ps1	/^    Label11$/;"	e	enum:EnumName1
+Label12	input.ps1	/^    Label12 = 10$/;"	e	enum:EnumName1
 EnumName2	input.ps1	/^enum EnumName2 {$/;"	g
+Label21	input.ps1	/^    Label21$/;"	e	enum:EnumName2
+Label22	input.ps1	/^    Label22 = 20$/;"	e	enum:EnumName2
 EnumName3	input.ps1	/^Enum EnumName3 {$/;"	g
+Label31	input.ps1	/^    Label31$/;"	e	enum:EnumName3
+Label32	input.ps1	/^    Label32 = 30$/;"	e	enum:EnumName3
 EnumName4	input.ps1	/^[Flags()] enum EnumName4 {$/;"	g
+Label41	input.ps1	/^    Label41$/;"	e	enum:EnumName4
+Label42	input.ps1	/^    Label42 = 40$/;"	e	enum:EnumName4
