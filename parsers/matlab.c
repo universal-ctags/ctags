@@ -24,8 +24,9 @@ static tagRegexTable matlabTagRegexTable [] = {
 	/* function x = asdf */
 	{"^[ \t]*function[ \t]+[a-zA-Z0-9_]+[ \t]*=[ \t]*([.a-zA-Z0-9_]+)",
 	 "\\1", "f,function", NULL},
-	/* function asdf */
-	{"^[ \t]*function[ \t]+([.a-zA-Z0-9_]+)[^=]*$", "\\1",
+	/* function asdf
+	 * function asdf % some comment */
+	{"^[ \t]*function[ \t]+([.a-zA-Z0-9_]+)[^=%]*($|%)", "\\1",
 	 "f,function", NULL},
 	/* variables */
 	{"^[ \t]*([a-zA-Z0-9_]+)[ \t]*=[ \t]", "\\1",
