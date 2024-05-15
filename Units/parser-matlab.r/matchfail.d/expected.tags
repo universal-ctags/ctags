@@ -1,0 +1,6 @@
+func1	input.m	/^function [x,y,z] = func1 $/;"	f
+func2	input.m	/^function x = func2 $/;"	f
+func3	input.m	/^function func3 $/;"	f
+func4	input.m	/^function y = func4(a, b, c)$/;"	f
+func5	input.m	/^function func5   % this comment should be ignored --> X = FAIL5$/;"	f
+functionality	input.m	/^functionality = FAIL6; % this is not a function and should not be parsed$/;"	v
