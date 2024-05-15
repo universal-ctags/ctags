@@ -1,0 +1,34 @@
+.. _ctags-lang-powershell(7):
+
+==============================================================
+ctags-lang-powershell
+==============================================================
+-----------------------------------------------------------------------
+Random notes about tagging PowerShell source code with Universal Ctags
+-----------------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|  **@CTAGS_NAME_EXECUTABLE@** ... --languages=+PowerShell ...
+|  **@CTAGS_NAME_EXECUTABLE@** ... --language-force=PowerShell ...
+|  **@CTAGS_NAME_EXECUTABLE@** ... --map-powershell=+.ps1 ...
+|  **@CTAGS_NAME_EXECUTABLE@** ... --map-powershell=+.psm1 ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging PowerShell source code.
+
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New kind ``enumlabel``
+
+SEE ALSO
+--------
+ctags(1)

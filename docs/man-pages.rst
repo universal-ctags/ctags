@@ -34,6 +34,7 @@ Man pages
 	ctags-lang-ldscript(7) <man/ctags-lang-ldscript.7.rst>
 	ctags-lang-lex(7) <man/ctags-lang-lex.7.rst>
 	ctags-lang-markdown(7) <man/ctags-lang-markdown.7.rst>
+	ctags-lang-powershell(7) <man/ctags-lang-powershell.7.rst>
 	ctags-lang-python(7) <man/ctags-lang-python.7.rst>
 	ctags-lang-r(7) <man/ctags-lang-r.7.rst>
 	ctags-lang-rmarkdown(7) <man/ctags-lang-rmarkdown.7.rst>
