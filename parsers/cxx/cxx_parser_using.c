@@ -24,6 +24,8 @@ bool cxxParserParseUsingClause(void)
 {
 	CXX_DEBUG_ENTER();
 
+	unsigned int uInitialKeywordState = g_cxx.uKeywordState;
+
 	// using-directives for namespaces and using-declarations
 	// for namespace members
 	// using-declarations for class members
@@ -170,7 +172,18 @@ bool cxxParserParseUsingClause(void)
 			{
 				tag->isFileScope = (cxxScopeGetType() == CXXScopeTypeNamespace) &&
 							(!isInputHeaderFile());
+
+				unsigned int uProperties = 0;
+				if(uInitialKeywordState & CXXParserKeywordStateSeenExport)
+					uProperties |= CXXTagPropertyExport;
+				vString * pszProperties = NULL;
+
+				if(uProperties)
+					pszProperties = cxxTagSetProperties(uProperties);
+
 				cxxTagCommit(NULL);
+
+				vStringDelete (pszProperties);
 			}
 		}
 	}
