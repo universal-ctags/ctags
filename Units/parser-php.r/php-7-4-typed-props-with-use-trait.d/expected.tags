@@ -4,4 +4,6 @@ ClassWithNullableIntProperty	input.php	/^class ClassWithNullableIntProperty$/;"	
 id	input.php	/^    public ?int $id;$/;"	v	class:ClassWithNullableIntProperty	typeref:unknown:?int
 ClassWithClassTypeProperty	input.php	/^class ClassWithClassTypeProperty$/;"	c
 id	input.php	/^    public \\stdClass $id;$/;"	v	class:ClassWithClassTypeProperty	typeref:unknown:stdClass
+ClassWithNamespacedClassProperty	input.php	/^class ClassWithNamespacedClassProperty$/;"	c
+id	input.php	/^    public SomeNamespacedClass $id;$/;"	v	class:ClassWithNamespacedClassProperty	typeref:unknown:SomeNamespacedClass
 SomeTrait	input.php	/^trait SomeTrait$/;"	t

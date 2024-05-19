@@ -1,5 +1,7 @@
 <?php
 
+use App\SomeNamespacedClass;
+
 class ClassWithIntProperty
 {
     use SomeTrait;
@@ -19,6 +21,13 @@ class ClassWithClassTypeProperty
     use SomeTrait;
 
     public \stdClass $id;
+}
+
+class ClassWithNamespacedClassProperty
+{
+    use SomeTrait;
+
+    public SomeNamespacedClass $id;
 }
 
 trait SomeTrait
