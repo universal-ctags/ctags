@@ -73,11 +73,19 @@ enum CXXScopeAccess cxxScopeGetAccess(void);
 // Are we in global scope?
 bool cxxScopeIsGlobal(void);
 
+bool cxxScopeIsExported(void);
+
 // Add a token to the scope chain. The token ownership is transferred.
 void cxxScopePush(
 		CXXToken * t,
 		enum CXXScopeType eScopeType,
 		enum CXXScopeAccess eInitialAccess
+	);
+void cxxScopePushExported(
+		CXXToken * t,
+		enum CXXScopeType eScopeType,
+		enum CXXScopeAccess eInitialAccess,
+		bool exported
 	);
 void cxxScopeSetAccess(enum CXXScopeAccess eAccess);
 // Remove the last token from the scope chain
