@@ -1,0 +1,7 @@
+ClassWithIntProperty	input.php	/^class ClassWithIntProperty$/;"	c
+id	input.php	/^    public int $id;$/;"	v	class:ClassWithIntProperty	typeref:unknown:int
+ClassWithNullableIntProperty	input.php	/^class ClassWithNullableIntProperty$/;"	c
+id	input.php	/^    public ?int $id;$/;"	v	class:ClassWithNullableIntProperty	typeref:unknown:?int
+ClassWithClassTypeProperty	input.php	/^class ClassWithClassTypeProperty$/;"	c
+id	input.php	/^    public \\stdClass $id;$/;"	v	class:ClassWithClassTypeProperty	typeref:unknown:stdClass
+SomeTrait	input.php	/^trait SomeTrait$/;"	t
