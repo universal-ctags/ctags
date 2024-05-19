@@ -1,3 +1,4 @@
+SomeNamespacedClass	input.php	/^use App\\SomeNamespacedClass;$/;"	a	typeref:unknown:App\\SomeNamespacedClass
 ClassWithIntProperty	input.php	/^class ClassWithIntProperty$/;"	c
 id	input.php	/^    public int $id;$/;"	v	class:ClassWithIntProperty	typeref:unknown:int
 ClassWithNullableIntProperty	input.php	/^class ClassWithNullableIntProperty$/;"	c
