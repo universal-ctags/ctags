@@ -1,3 +1,0 @@
-SomeTrait	input.php	/^trait SomeTrait$/;"	t
-User	input.php	/^class User$/;"	c
-id	input.php	/^    public int $id;$/;"	v	class:User	typeref:unknown:int
