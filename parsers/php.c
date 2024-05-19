@@ -1759,6 +1759,7 @@ static void enterScope (tokenInfo *const parentToken,
 		   token->type != TOKEN_CLOSE_CURLY)
 	{
 		bool readNext = true;
+		bool clearTypename = true;
 
 		switch (token->type)
 		{
@@ -1817,21 +1818,25 @@ static void enterScope (tokenInfo *const parentToken,
 				vStringClear (typeName);
 				vStringPut (typeName, '?');
 				readNext = true;
+				clearTypename = false;
 				break;
 			case TOKEN_IDENTIFIER:
 				vStringCat (typeName, token->string);
 				readNext = true;
+				clearTypename = false;
 				break;
 			case TOKEN_VARIABLE:
 				readNext = parseVariable (token,
 										  vStringIsEmpty(typeName)
 										  ? NULL
 										  : typeName);
-				vStringClear (typeName);
 				break;
 
 			default: break;
 		}
+
+		if (clearTypename)
+			vStringClear (typeName);
 
 		if (readNext)
 			readToken (token);
