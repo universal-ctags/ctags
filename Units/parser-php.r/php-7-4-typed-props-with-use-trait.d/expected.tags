@@ -1,0 +1,14 @@
+SomeTrait	input.php	/^trait SomeTrait$/;"	t
+someMethod	input.php	/^    public function someMethod() {}$/;"	f	trait:SomeTrait
+SomeOtherTrait	input.php	/^trait SomeOtherTrait$/;"	t
+someOtherMethod	input.php	/^    public function someOtherMethod() {}$/;"	f	trait:SomeOtherTrait
+Test1	input.php	/^class Test1$/;"	c
+id	input.php	/^    public int $id;$/;"	v	class:Test1	typeref:unknown:int
+Test2	input.php	/^class Test2$/;"	c
+id	input.php	/^    public int $id;$/;"	v	class:Test2	typeref:unknown:int
+Test3	input.php	/^class Test3$/;"	c
+id	input.php	/^    public int $id;$/;"	v	class:Test3	typeref:unknown:int
+Test4	input.php	/^class Test4$/;"	c
+id	input.php	/^    public int $id;$/;"	v	class:Test4	typeref:unknown:int
+Test5	input.php	/^class Test5$/;"	c
+id	input.php	/^    public int $id;$/;"	v	class:Test5	typeref:unknown:int
