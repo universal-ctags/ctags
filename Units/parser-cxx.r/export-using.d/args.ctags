@@ -1,0 +1,6 @@
+--sort=no
+--fields=+K
+--kinds-C++=+MtNp
+--fields-C++=+{properties}
+--extras=+r
+--fields=+r
