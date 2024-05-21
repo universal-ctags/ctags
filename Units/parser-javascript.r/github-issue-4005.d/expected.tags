@@ -1,0 +1,2 @@
+test1	input.js	/^test1 = ({}) => {}$/;"	f
+test2	input.js	/^test2 = ({}$/;"	f

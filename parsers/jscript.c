@@ -135,6 +135,7 @@ typedef struct sTokenInfo {
 	MIOPos			filePosition;
 	int				nestLevel;
 	bool			dynamicProp;
+	int				c;
 } tokenInfo;
 
 /*
@@ -367,6 +368,7 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
 	dest->type = src->type;
 	dest->keyword = src->keyword;
 	dest->dynamicProp = src->dynamicProp;
+	dest->c = src->c;
 	vStringCopy(dest->string, src->string);
 	if (include_non_read_info)
 	{
@@ -996,6 +998,32 @@ static void parseTemplateString (vString *const string)
 	while (c != EOF);
 }
 
+static void reprToken (const tokenInfo *const token, vString *const repr)
+{
+	switch (token->type)
+	{
+		case TOKEN_DOTS:
+			vStringCatS (repr, "...");
+			break;
+
+		case TOKEN_STRING:
+		case TOKEN_TEMPLATE_STRING:
+			vStringPut (repr, token->c);
+			vStringCat (repr, token->string);
+			vStringPut (repr, token->c);
+			break;
+
+		case TOKEN_IDENTIFIER:
+		case TOKEN_KEYWORD:
+			vStringCat (repr, token->string);
+			break;
+
+		default:
+			vStringPut (repr, token->c);
+			break;
+	}
+}
+
 static void readTokenFullRaw (tokenInfo *const token, bool include_newlines, vString *const repr)
 {
 	int c;
@@ -1005,9 +1033,12 @@ static void readTokenFullRaw (tokenInfo *const token, bool include_newlines, vSt
 	/* if we've got a token held back, emit it */
 	if (NextToken)
 	{
+		TRACE_PRINT("Emitting held token");
 		copyToken (token, NextToken, false);
 		deleteToken (NextToken);
 		NextToken = NULL;
+		if (repr)
+			reprToken (token, repr);
 		return;
 	}
 
@@ -1029,12 +1060,11 @@ getNextChar:
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
-	if (repr && c != EOF)
-	{
-		if (i > 1)
-			vStringPut (repr, ' ');
-		vStringPut (repr, c);
-	}
+	/* special case to insert a separator */
+	if (repr && c != EOF && i > 1)
+		vStringPut (repr, ' ');
+
+	token->c = c;
 
 	switch (c)
 	{
@@ -1063,14 +1093,6 @@ getNextChar:
 			}
 
 			token->type = TOKEN_DOTS;
-			if (repr)
-			{
-				/* Adding two dots is enough here.
-				 * The first one is already added with
-				 * vStringPut (repr, c).
-				 */
-				vStringCatS (repr, "..");
-			}
 			break;
 		}
 		case ':': token->type = TOKEN_COLON;		break;
@@ -1125,11 +1147,6 @@ getNextChar:
 			parseString (token->string, c);
 			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
-			if (repr)
-			{
-				vStringCat (repr, token->string);
-				vStringPut (repr, c);
-			}
 			break;
 
 		case '`':
@@ -1137,11 +1154,6 @@ getNextChar:
 			parseTemplateString (token->string);
 			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
-			if (repr)
-			{
-				vStringCat (repr, token->string);
-				vStringPut (repr, c);
-			}
 			break;
 
 		case '/':
@@ -1173,8 +1185,6 @@ getNextChar:
 			}
 			else
 			{
-				if (repr) /* remove the / we added */
-					vStringChop(repr);
 				if (d == '*')
 				{
 					skipToCharacterInInputFile2('*', '/');
@@ -1228,8 +1238,6 @@ getNextChar:
 					token->type = TOKEN_IDENTIFIER;
 				else
 					token->type = TOKEN_KEYWORD;
-				if (repr && vStringLength (token->string) > 1)
-					vStringCatS (repr, vStringValue (token->string) + 1);
 			}
 			break;
 	}
@@ -1278,8 +1286,7 @@ getNextChar:
 			token->type = TOKEN_SEMICOLON;
 			token->keyword = KEYWORD_NONE;
 			vStringClear (token->string);
-			if (repr)
-				vStringPut (token->string, '\n');
+			token->c = '\n';
 		}
 
 		#undef IS_STMT_SEPARATOR
@@ -1287,6 +1294,9 @@ getNextChar:
 	}
 
 	LastTokenType = token->type;
+
+	if (repr)
+		reprToken (token, repr);
 }
 
 /* whether something we consider a keyword (either because it sometimes is or
