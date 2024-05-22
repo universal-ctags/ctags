@@ -138,6 +138,10 @@ bool cxxParserParseNamespace(void)
 					// This is highly questionable but well.. it's how old ctags did, so we do.
 					tag->isFileScope = !isInputHeaderFile();
 
+					vString * pszProperties = NULL;
+					if(uProperties)
+						pszProperties = cxxTagSetProperties(uProperties);
+
 					CXXToken * pAliasedName = cxxTokenChainExtractRange(
 							pFirstIdentifier,
 							pLastIdentifier,
@@ -152,6 +156,7 @@ bool cxxParserParseNamespace(void)
 
 					cxxTagCommit(NULL);
 
+					vStringDelete (pszProperties); /* NULL is acceptable.  */
 					cxxTokenDestroy(pAliasedName);
 				}
 

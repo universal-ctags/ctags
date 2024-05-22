@@ -1,0 +1,4 @@
+mylib	input.cpp	/^export module mylib;$/;"	module	properties:export
+X	input.cpp	/^export namespace X {$/;"	namespace	file:	properties:export
+i	input.cpp	/^	 int i;$/;"	variable	namespace:X	typeref:typename:int
+Z	input.cpp	/^export namespace Z = X;$/;"	alias	file:	properties:export	name:X
