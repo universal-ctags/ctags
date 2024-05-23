@@ -1,15 +1,15 @@
 A	input.cpp	/^export module A; \/\/ declares the primary module interface unit for named module 'A'$/;"	M	properties:export
 hello	input.cpp	/^export char const* hello() { return "hello"; }$/;"	f	typeref:typename:char const *	properties:export
 world	input.cpp	/^char const* world() { return "world"; }$/;"	f	typeref:typename:char const *
-hi	input.cpp	/^export namespace hi$/;"	n	file:	properties:export
+hi	input.cpp	/^export namespace hi$/;"	n	properties:export
 english	input.cpp	/^    char const* english() { return "Hi!"; }$/;"	f	namespace:hi	typeref:typename:char const *
 french	input.cpp	/^    char const* french()  { return "Salut!"; }$/;"	f	namespace:hi	typeref:typename:char const *
-x	input.cpp	/^export enum x { a = 1 };$/;"	g	file:	properties:export
-a	input.cpp	/^export enum x { a = 1 };$/;"	e	enum:x	file:
-td	input.cpp	/^export typedef int td;$/;"	t	typeref:typename:int	file:	properties:export
+x	input.cpp	/^export enum x { a = 1 };$/;"	g	properties:export
+a	input.cpp	/^export enum x { a = 1 };$/;"	e	enum:x
+td	input.cpp	/^export typedef int td;$/;"	t	typeref:typename:int	properties:export
 s_	input.cpp	/^struct s_ {$/;"	s	file:
 mbr	input.cpp	/^  int mbr;$/;"	m	struct:s_	typeref:typename:int	file:
-s	input.cpp	/^export struct s {$/;"	s	file:	properties:export
-mbr	input.cpp	/^  int mbr;$/;"	m	struct:s	typeref:typename:int	file:
+s	input.cpp	/^export struct s {$/;"	s	properties:export
+mbr	input.cpp	/^  int mbr;$/;"	m	struct:s	typeref:typename:int
 s__	input.cpp	/^struct s__ {$/;"	s	file:
 mbr	input.cpp	/^  int mbr;$/;"	m	struct:s__	typeref:typename:int	file:

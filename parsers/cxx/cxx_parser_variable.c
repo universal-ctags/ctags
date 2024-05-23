@@ -808,6 +808,8 @@ got_identifier:
 						(
 							(eScopeType == CXXScopeTypeNamespace) &&
 							(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) &&
+							(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)) &&
+							(!cxxScopeIsExported()) &&
 							(!isInputHeaderFile())
 						) ||
 						// locals are always hidden
@@ -815,6 +817,8 @@ got_identifier:
 						(
 							(eScopeType != CXXScopeTypeNamespace) &&
 							(eScopeType != CXXScopeTypeFunction) &&
+							(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)) &&
+							(!cxxScopeIsExported()) &&
 							(!isInputHeaderFile())
 						)
 					);
@@ -875,6 +879,9 @@ got_identifier:
 			)
 		{
 			cxxScopePush(pIdentifier,CXXScopeTypeVariable,CXXScopeAccessPublic);
+			// We don't have to propagate the exported status to language objects
+			// under a variable.
+
 			cxxParserEmitTemplateParameterTags();
 			cxxScopePop();
 		} else {

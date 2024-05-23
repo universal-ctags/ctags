@@ -1,5 +1,5 @@
 Delta	input.cpp	/^export module Delta;$/;"	module	roles:def	properties:export
-Param	input.cpp	/^export using Param = int;$/;"	typedef	typeref:typename:int	file:	roles:def	properties:export
-Param	input.cpp	/^export using ::Param;$/;"	name	file:	roles:def	properties:export
-Param	input.cpp	/^export using ::Param;		\/\/ We can declare an object more than twice.$/;"	name	file:	roles:def	properties:export
-fn	input.cpp	/^export void fn();$/;"	prototype	typeref:typename:void	file:	roles:def	properties:export
+Param	input.cpp	/^export using Param = int;$/;"	typedef	typeref:typename:int	roles:def	properties:export
+Param	input.cpp	/^export using ::Param;$/;"	name	roles:def	properties:export
+Param	input.cpp	/^export using ::Param;		\/\/ We can declare an object more than twice.$/;"	name	roles:def	properties:export
+fn	input.cpp	/^export void fn();$/;"	prototype	typeref:typename:void	roles:def	properties:export

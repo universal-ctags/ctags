@@ -294,6 +294,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 			pParenthesis->pChain->pTail->bFollowedBySpace = false;
 		}
 
+		// We don't have to consider export'ed status here; the input is written in C!
 		tag->isFileScope = (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) &&
 				!isInputHeaderFile();
 
@@ -319,6 +320,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 			vStringValue(pIdentifier->pszWord)
 		);
 
+	// We don't have to propagate export'ed status; the input is written in C!
 	cxxScopePush(pIdentifier,CXXScopeTypeFunction,CXXScopeAccessUnknown);
 
 	// emit parameters
@@ -1626,6 +1628,11 @@ int cxxParserEmitFunctionTags(
 				tag->isFileScope = !isInputHeaderFile();
 			}
 		}
+		// Overwrite the assigned value if the language object is export'ed.
+		tag->isFileScope = ((g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+							|| cxxScopeIsExported())
+			? 0
+			: tag->isFileScope;
 
 		vString * pszSignature = cxxTokenChainJoin(pInfo->pParenthesis->pChain,NULL,0);
 		if(pInfo->pSignatureConst)
