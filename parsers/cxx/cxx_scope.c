@@ -56,6 +56,13 @@ bool cxxScopeIsGlobal(void)
 	return (g_pScope->iCount < 1);
 }
 
+bool cxxScopeIsExported(void)
+{
+	if (g_pScope->pTail)
+		return g_pScope->pTail->bInternalScopeExported;
+	return false;
+}
+
 enum CXXScopeType cxxScopeGetType(void)
 {
 	if(g_pScope->iCount < 1)
@@ -234,6 +241,11 @@ void cxxScopePushTop(CXXToken * t)
 			"The scope name should have a text"
 		);
 
+	// Inherit the export'ed status from the parent scope.
+	// You can override the inherited status with cxxScopePushExported().
+	if (g_pScope->pTail && g_pScope->pTail->bInternalScopeExported)
+		t->bInternalScopeExported = true;
+
 	cxxTokenChainAppend(g_pScope,t);
 	g_bScopeNameDirty = true;
 
@@ -271,6 +283,18 @@ void cxxScopePush(
 	t->uInternalScopeType = (unsigned char)eScopeType;
 	t->uInternalScopeAccess = (unsigned char)eInitialAccess;
 	cxxScopePushTop(t);
+}
+
+void cxxScopePushExported(
+		CXXToken * t,
+		enum CXXScopeType eScopeType,
+		enum CXXScopeAccess eInitialAccess,
+		bool exported
+	)
+{
+	cxxScopePush(t, eScopeType, eInitialAccess);
+	// Overrite the default value inherited from the parent scope.
+	t->bInternalScopeExported = exported;
 }
 
 void cxxScopePop(void)

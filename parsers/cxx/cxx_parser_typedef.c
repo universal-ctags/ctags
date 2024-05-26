@@ -441,7 +441,9 @@ skip_to_comma_or_end:
 						);
 			}
 
-			tag->isFileScope = !isInputHeaderFile();
+			tag->isFileScope = !isInputHeaderFile()
+				&& !(uProperties & CXXTagPropertyExport)
+				&& !cxxScopeIsExported();
 
 			if(bGotTemplate)
 				cxxTagHandleTemplateFields();

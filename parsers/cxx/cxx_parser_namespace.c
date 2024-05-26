@@ -51,12 +51,13 @@ bool cxxParserParseNamespace(void)
 	// namespace;
 
 	unsigned int uProperties = 0;
+	bool bExported = g_cxx.uKeywordState & CXXParserKeywordStateSeenExport;
 
 	if(cxxTagFieldEnabled(CXXTagFieldProperties))
 	{
 		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenInline)
 			uProperties |= CXXTagPropertyInline;
-		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+		if(bExported)
 			uProperties |= CXXTagPropertyExport;
 	}
 
@@ -136,7 +137,11 @@ bool cxxParserParseNamespace(void)
 				if(tag)
 				{
 					// This is highly questionable but well.. it's how old ctags did, so we do.
-					tag->isFileScope = !isInputHeaderFile();
+					tag->isFileScope = !isInputHeaderFile() && !bExported && !cxxScopeIsExported();
+
+					vString * pszProperties = NULL;
+					if(uProperties)
+						pszProperties = cxxTagSetProperties(uProperties);
 
 					CXXToken * pAliasedName = cxxTokenChainExtractRange(
 							pFirstIdentifier,
@@ -152,6 +157,7 @@ bool cxxParserParseNamespace(void)
 
 					cxxTagCommit(NULL);
 
+					vStringDelete (pszProperties); /* NULL is acceptable.  */
 					cxxTokenDestroy(pAliasedName);
 				}
 
@@ -244,7 +250,7 @@ bool cxxParserParseNamespace(void)
 			if(tag)
 			{
 				// This is highly questionable but well.. it's how old ctags did, so we do.
-				tag->isFileScope = !isInputHeaderFile();
+				tag->isFileScope = !isInputHeaderFile() && !bExported && !cxxScopeIsExported();
 
 				vString * pszProperties = uProperties ? cxxTagSetProperties(uProperties) : NULL;
 
@@ -264,10 +270,11 @@ bool cxxParserParseNamespace(void)
 
 			cxxTokenChainTake(g_cxx.pTokenChain,t);
 
-			cxxScopePush(
+			cxxScopePushExported(
 					t,
 					CXXScopeTypeNamespace,
-					CXXScopeAccessUnknown
+					CXXScopeAccessUnknown,
+					bExported
 				);
 
 			iScopeCount++;
@@ -285,6 +292,8 @@ bool cxxParserParseNamespace(void)
 		if(tag)
 		{
 			tag->isFileScope = !isInputHeaderFile();
+			// We don't have to consider "export" keyword here because an object having
+			// no name is not exportable.
 
 			markTagExtraBit (tag, XTAG_ANONYMOUS);
 

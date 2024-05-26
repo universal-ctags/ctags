@@ -64,6 +64,8 @@ static void clearToken(CXXToken *t)
 		cxxTokenChainDestroy(t->pSideChain);
 		t->pSideChain = NULL;
 	}
+
+	t->bInternalScopeExported = 0;
 }
 
 void cxxTokenAPIInit(void)

@@ -74,6 +74,7 @@ typedef struct _CXXToken
 	CXXKeyword eKeyword;
 	CXXTokenChain * pChain; // this is NOT the parent chain!
 	unsigned int bFollowedBySpace: 1;
+	unsigned int bInternalScopeExported: 1;
 
 	int iLineNumber;
 	MIOPos oFilePosition;
@@ -81,9 +82,9 @@ typedef struct _CXXToken
 	struct _CXXToken * pNext;
 	struct _CXXToken * pPrev;
 
-	// These members are used by the scope management functions to store
-	// scope information. Only cxxScope* functions can make sense of it.
-	// In other contexts these are simply left
+	// These (and above) uInternalScope members are used by the scope management
+	// functions to store scope information. Only cxxScope* functions can make
+	// sense of it. In other contexts these are simply left
 	// uninitialized and must be treated as undefined.
 	unsigned char uInternalScopeType;
 	unsigned char uInternalScopeAccess;

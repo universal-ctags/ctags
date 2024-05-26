@@ -899,6 +899,7 @@ bool cxxParserParseEnum(void)
 	int iCorkQueueIndex = CORK_NIL;
 	int iCorkQueueIndexFQ = CORK_NIL;
 
+	bool bEnumExported = false;
 	if(tag)
 	{
 		// FIXME: this is debatable
@@ -921,7 +922,13 @@ bool cxxParserParseEnum(void)
 		if(bIsScopedEnum)
 			uProperties |= CXXTagPropertyScopedEnum;
 		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExport)
+		{
 			uProperties |= CXXTagPropertyExport;
+			bEnumExported = true;
+		}
+		tag->isFileScope = (bEnumExported || cxxScopeIsExported())
+			? 0
+			: tag->isFileScope;
 
 		if(uProperties)
 			pszProperties = cxxTagSetProperties(uProperties);
@@ -936,7 +943,7 @@ bool cxxParserParseEnum(void)
 			cxxTokenDestroy(pTypeName);
 	}
 
-	cxxScopePush(pEnumName,CXXScopeTypeEnum,CXXScopeAccessPublic);
+	cxxScopePushExported(pEnumName,CXXScopeTypeEnum,CXXScopeAccessPublic, bEnumExported);
 	iPushedScopes++;
 
 	vString * pScopeName = cxxScopeGetFullNameAsString();
@@ -968,7 +975,10 @@ bool cxxParserParseEnum(void)
 			tag = cxxTagBegin(CXXTagKindENUMERATOR,pFirst);
 			if(tag)
 			{
-				tag->isFileScope = !isInputHeaderFile();
+				// If the enum is export'ed, we consider that its
+				// enumerators are not limited in a file scope.
+				tag->isFileScope = !isInputHeaderFile() && !cxxScopeIsExported();
+
 				cxxTagCommit(NULL);
 			}
 		}
@@ -1349,6 +1359,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	bool bGotTemplate = g_cxx.pTemplateTokenChain &&
 			(g_cxx.pTemplateTokenChain->iCount > 0) &&
 			cxxParserCurrentLanguageIsCPP();
+	bool bExported = uInitialKeywordState & CXXParserKeywordStateSeenExport;
 
 	if(tag)
 	{
@@ -1400,8 +1411,14 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		tag->isFileScope = !isInputHeaderFile();
 
 		unsigned int uProperties = 0;
-		if(uInitialKeywordState & CXXParserKeywordStateSeenExport)
+		if(bExported)
 			uProperties |= CXXTagPropertyExport;
+		// Overwrite the assigned value if the language object is export'ed
+		// directly or indirectly.
+		tag->isFileScope = (bExported || cxxScopeIsExported())
+			? 0
+			: tag->isFileScope;
+
 		vString * pszProperties = NULL;
 
 		if(uProperties)
@@ -1413,11 +1430,12 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		vStringDelete (pszProperties); /* NULL is acceptable. */
 	}
 
-	cxxScopePush(
+	cxxScopePushExported(
 			pClassName,
 			uScopeType,
 			(uTagKind == CXXTagCPPKindCLASS) ?
-				CXXScopeAccessPrivate : CXXScopeAccessPublic
+				CXXScopeAccessPrivate : CXXScopeAccessPublic,
+			bExported
 		);
 
 	if(

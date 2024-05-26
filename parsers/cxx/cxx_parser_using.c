@@ -173,9 +173,13 @@ bool cxxParserParseUsingClause(void)
 				tag->isFileScope = (cxxScopeGetType() == CXXScopeTypeNamespace) &&
 							(!isInputHeaderFile());
 
+				bool bExported = uInitialKeywordState & CXXParserKeywordStateSeenExport;
 				unsigned int uProperties = 0;
-				if(uInitialKeywordState & CXXParserKeywordStateSeenExport)
+				if(bExported)
 					uProperties |= CXXTagPropertyExport;
+				tag->isFileScope = bExported || cxxScopeIsExported()
+					? 0
+					: tag->isFileScope;
 				vString * pszProperties = NULL;
 
 				if(uProperties)

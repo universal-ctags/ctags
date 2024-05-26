@@ -30,3 +30,4 @@ export {
   };
 }
 int n;
+static int o;
