@@ -2325,8 +2325,13 @@ extern void setTagFilePosition (MIOPos *p, bool truncation)
 
 
 	long t0 = 0;
-	if (truncation)
+	if (truncation) {
 		t0 = mio_tell (TagFile.mio);
+		if (t0 == -1)
+			error (FATAL|PERROR,
+				   "failed to tell the file position of the tag file (t0)\n");
+	}
+
 
 	if (mio_setpos (TagFile.mio, p) == -1)
 		error (FATAL|PERROR,
@@ -2335,6 +2340,10 @@ extern void setTagFilePosition (MIOPos *p, bool truncation)
 	if (truncation)
 	{
 		long t1 = mio_tell (TagFile.mio);
+		if (t1 == -1)
+			error (FATAL|PERROR,
+				   "failed to tell the file position of the tag file (t0)\n");
+
 		if (!mio_try_resize (TagFile.mio, (size_t)t1))
 			error (FATAL|PERROR,
 				   "failed to truncate the tag file %ld -> %ld\n", t0, t1);
