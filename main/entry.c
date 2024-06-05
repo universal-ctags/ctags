@@ -2342,7 +2342,7 @@ extern void setTagFilePosition (MIOPos *p, bool truncation)
 		long t1 = mio_tell (TagFile.mio);
 		if (t1 == -1)
 			error (FATAL|PERROR,
-				   "failed to tell the file position of the tag file (t0)\n");
+				   "failed to tell the file position of the tag file (t1)\n");
 
 		if (!mio_try_resize (TagFile.mio, (size_t)t1))
 			error (FATAL|PERROR,
