@@ -311,6 +311,32 @@ static void findHaskellTags (int is_literate)
 				 strcmp(token, "import") == 0)
 			;
 		else {
+			/*
+			 * "::" can be after [\n][ \t]+
+			 * ------------------------------
+			 * thing
+			 *   :: App m
+			 *   => Int
+			 *   -> m Int
+			 * ------------------------------
+			 * Skip them to find ':'.
+			 */
+			if (arg[0] == '\n' && arg[1] == '\0') {
+				bool indented = false;
+				while (1)
+				{
+					if ((c = getcFromInputFile()) == EOF)
+						return;
+					if (!isspace(c))
+						break;
+					indented = true;
+				}
+				if (indented)
+					arg[0] = c;
+				else
+					ungetcToInputFile(c);
+			}
+
 			if (arg[0] != ':')
 				add_tag(token, K_FUNCTION, name);
 		}

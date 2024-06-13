@@ -1,0 +1,2 @@
+Foo	input.hs	/^module Foo () where$/;"	m
+thing	input.hs	/^thing x = pure x$/;"	f
