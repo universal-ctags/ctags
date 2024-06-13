@@ -27,6 +27,7 @@
 #include "routines.h"
 
 
+#define HASKELL_STRMAXLEN 1000
 /*
 *   DATA DEFINITIONS
 */
@@ -64,7 +65,7 @@ static int get_line(char *buf)
 	do {
 		c = getcFromInputFile();
 		buf[i++] = c;
-	} while (c != EOF && c != '\n' && i < 1000);
+	} while (c != EOF && c != '\n' && i < HASKELL_STRMAXLEN);
 	buf[i] = '\0';
 	return i;
 }
@@ -114,7 +115,7 @@ static int get_token(char *token, int n)
 {
 	int c = getcFromInputFile();
 	int i = n;
-	while (c != EOF && isident(c) && i < 1000) {
+	while (c != EOF && isident(c) && i < HASKELL_STRMAXLEN) {
 		token[i] = c;
 		i++;
 		c = getcFromInputFile();
@@ -136,7 +137,7 @@ static int inside_datatype(vString *name)
 {
 	enum Find_State st = Find_Eq;
 	int c;
-	char token[1001];
+	char token[HASKELL_STRMAXLEN + 1];
 
 	while (1) {
 		if (st == Find_Eq)
@@ -221,7 +222,7 @@ static int inside_datatype(vString *name)
 static void findHaskellTags (int is_literate)
 {
 	vString *name = vStringNew ();
-	char token[1001], arg[1001];
+	char token[HASKELL_STRMAXLEN + 1], arg[HASKELL_STRMAXLEN + 1];
 	int c;
 	int in_tex_lit_code = 0;
 	c = get_next_char();
