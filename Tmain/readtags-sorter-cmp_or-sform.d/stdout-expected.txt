@@ -1,0 +1,4 @@
+bar	input.d/bar.c	/^void bar(void) {}$/;"	kind:f	typeref:typename:void
+bar	input.d/bar.c	/^void bar(void);$/;"	kind:p	file:	typeref:typename:void
+foo	input.d/foo.c	/^void foo(void) {}$/;"	kind:f	typeref:typename:void
+foo	input.d/decl.h	/^void foo(void);$/;"	kind:p	typeref:typename:void
