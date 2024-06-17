@@ -89,8 +89,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(<> <any:a> <any:b>) -> -1|0|1; compare a b. The types of a and b must be the same." },
 	{ "*-",              sorter_proc_flip,         NULL, DSL_PATTR_CHECK_ARITY,     1,
 	  .helpstr = "(*- <interger:n>) -> -<integer:n>; filp the result of comparison." },
-	{ "<or>",            sorter_sform_cmp_or,      NULL, DSL_PATTR_CHECK_ARITY_OPT, 1,
-	  .helpstr = "(<or> <any> ...) -> -1|0|1; evaluate arguments left to right till one of thme returns -1 or 1." },
+	{ "<or>",            sorter_sform_cmp_or,      NULL, DSL_PATTR_SELF_EVAL|DSL_PATTR_CHECK_ARITY_OPT, 1,
+	  .helpstr = "(<or> <any> ...) -> -1|0|1; evaluate arguments left to right till one of them returns -1 or 1." },
 
 	{ "&",               sorter_alt_entry_ref, NULL, DSL_PATTR_CHECK_ARITY_OPT,  1,
 	  .helpstr = "(& <string:field>) -> <string>|#f\n"
