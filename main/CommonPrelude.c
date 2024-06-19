@@ -253,6 +253,12 @@ const char ctagsCommonPrelude []=
 "(name:str language:name kind:name matchloc _FOREIGNTAG tag\n"
 " name:str lang:name kind:name _FOREIGNTAG tag)\n"
 "/_foreigntag {\n"
-"    null _foreignreftag\n"
+"    dup type /nametype eq {\n"
+"        % name:str lang:name kind:name _FOREIGNTAG tag\n"
+"        null _foreignreftag\n"
+"    } {\n"
+"        % name:str language:name kind:name matchloc _FOREIGNTAG tag\n"
+"        null exch _foreignreftag\n"
+"    } ifelse\n"
 "} __bddef\n"
 ;

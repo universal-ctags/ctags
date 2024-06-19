@@ -252,5 +252,11 @@
 (name:str language:name kind:name matchloc _FOREIGNTAG tag
  name:str lang:name kind:name _FOREIGNTAG tag)
 /_foreigntag {
-    null _foreignreftag
+    dup type /nametype eq {
+        % name:str lang:name kind:name _FOREIGNTAG tag
+        null _foreignreftag
+    } {
+        % name:str language:name kind:name matchloc _FOREIGNTAG tag
+        null exch _foreignreftag
+    } ifelse
 } __bddef
