@@ -20,6 +20,7 @@
 
 #include "make.h"
 
+#include "debug.h"
 #include "entry.h"
 #include "kind.h"
 #include "numarray.h"
@@ -30,6 +31,7 @@
 #include "vstring.h"
 #include "xtag.h"
 
+#include "cpreprocessor.h"
 
 /*
 *   DATA DEFINITIONS
@@ -55,6 +57,17 @@ static kindDefinition MakeKinds [] = {
 	  .referenceOnly = true, ATTACH_ROLES(MakeMakefileRoles)},
 };
 
+typedef enum {
+	X_CPP_DEF,
+} makeXtag;
+
+static xtagDefinition MakeXtagTable [] = {
+	{
+		.enabled = false,
+		.name = "CppDef",
+		.description = "Include FOO in -DFOO as as a name of CPreProcessor macro",
+	}
+};
 
 /*
 *   FUNCTION DEFINITIONS
@@ -72,14 +85,25 @@ static int nextChar (void)
 	return c;
 }
 
-static void skipLine (void)
+static void skipLineFull (void (* cb) (int, void *), void *cb_data)
 {
 	int c;
 	do
+	{
 		c = nextChar ();
-	while (c != EOF  &&  c != '\n');
+		if (c == EOF)
+			break;
+		if (cb)
+			cb (c, cb_data);
+	}
+	while (c != '\n');
 	if (c == '\n')
 		ungetcToInputFile (c);
+}
+
+static void skipLine (void)
+{
+	skipLineFull (NULL, NULL);
 }
 
 static int skipToNonWhite (int c)
@@ -244,6 +268,164 @@ static bool isTheLastTargetOnTheSameLine (intArray *current_targets,
 	return false;
 }
 
+/* valueTracker is for extracting FOO in -DFOO. */
+struct valueTracker
+{
+	enum {VT_LOOKING_FOR_D, VT_AFTER_D} state;
+	vString *value;				/* NULL: valueTracker is disabled. */
+	int leftSideIndex;
+	langType cpp;
+};
+
+static vString *extractSignature (const char *input, size_t end)
+{
+	vString *sig = vStringNewInit ("(");
+	char c = 0;
+
+	for (size_t j = 0; j < end; j++)
+	{
+		c = input[j];
+		vStringPut (sig, c);
+		if (c == ')')
+			break;
+	}
+
+	if (c != ')')
+	{
+		/* Incomplete. */
+		vStringDelete (sig);
+		sig = NULL;
+	}
+
+	return sig;
+}
+
+static void valueTrackerEval (struct valueTracker *vt)
+{
+	if (!vt->value)
+		return;
+
+	size_t len = vStringLength (vt->value);
+
+	if ((vt->state == VT_AFTER_D && len > 0) ||
+		((vt->state == VT_LOOKING_FOR_D &&
+		  len > 2 && strncmp("-D", vStringValue (vt->value), 2) == 0)))
+	{
+		vString *d = vStringNew ();
+		vString *sig = NULL;
+		for (size_t i = (vt->state == VT_AFTER_D? 0: 2); i < len; i++)
+		{
+			int c = vStringChar (vt->value, i);
+
+			if (c == '\'' || c == '"')
+				continue;
+			if (isspace(c) || c == '=')
+				break;
+
+			if (c == '(')
+			{
+				Assert(sig == NULL);
+				sig = extractSignature (vStringValue (vt->value) + i + 1, len - i + 1);
+				break;
+			}
+
+			vStringPut (d, c);
+		}
+		if (!vStringIsEmpty (d))
+		{
+			tagEntryInfo e;
+			initForeignTagEntry (&e, vStringValue (d), vt->cpp, CPREPRO_MACRO);
+			markTagExtraBit (&e, MakeXtagTable[X_CPP_DEF].xtype);
+			if (sig)
+				e.extensionFields.signature = vStringValue(sig);
+			makeTagEntry (&e);
+		}
+		vStringDelete (sig);	/* NULL is acceptable. */
+		vStringDelete (d);
+
+		vt->state = VT_LOOKING_FOR_D;
+	}
+	else if (len == 2 && strcmp("-D", vStringValue (vt->value)) == 0)
+		vt->state = VT_AFTER_D;
+}
+
+static void valueTrackerFlush (struct valueTracker *vt)
+{
+	if (!vt->value)
+		return;
+
+	if (vStringIsEmpty (vt->value))
+		return;
+
+	valueTrackerEval (vt);
+	vStringClear (vt->value);
+	vt->state = VT_LOOKING_FOR_D;
+}
+
+static void valueTrackerUpdateLeftSideIndex (struct valueTracker *vt, int corkIndex)
+{
+	if (!vt->value)
+		return;
+
+	if (vt->leftSideIndex != corkIndex)
+	{
+		valueTrackerFlush (vt);
+		vt->leftSideIndex = corkIndex;
+	}
+}
+
+static void valueTrackerPut (struct valueTracker *vt, int c)
+{
+	if (!vt->value)
+		return;
+
+	if (isspace(c))
+	{
+		if (!vStringIsEmpty (vt->value))
+		{
+			valueTrackerEval (vt);
+			vStringClear (vt->value);
+		}
+		return;
+	}
+	vStringPut (vt->value, c);
+}
+
+static void valueTrackerPutAsCallback (int c, void *vt)
+{
+	valueTrackerPut ((struct valueTracker *)vt, c);
+}
+
+static void valueTrackerCat (struct valueTracker *vt, vString *vstr)
+{
+	if (!vt->value)
+		return;
+
+	for (size_t i = 0; i < vStringLength (vstr); i++)
+	{
+		unsigned char c = vStringChar (vstr, i);
+		valueTrackerPut (vt, c);
+	}
+}
+
+static void valueTrackerInit (struct valueTracker *vt)
+{
+	bool enabled = isXtagEnabled (MakeXtagTable[X_CPP_DEF].xtype);
+	vt->state = VT_LOOKING_FOR_D;
+	vt->leftSideIndex = CORK_NIL;
+	vt->value = enabled? vStringNew(): NULL;
+	vt->cpp = enabled? getNamedLanguage ("CPreProcessor", 0): LANG_IGNORE;
+}
+
+static void valueTrackerFini (struct valueTracker *vt)
+{
+	if (!vt->value)
+		return;
+
+	valueTrackerFlush (vt);
+	vStringDelete (vt->value);
+}
+
 /*
  * Naming
  *
@@ -292,6 +474,10 @@ static void findMakeTags0 (void)
 	/* += seen. */
 	bool appending = false;
 
+	/* Gathering uninteresting parts of input to extract -DCPP_MACRO. */
+	struct valueTracker value_tracker;
+	valueTrackerInit (&value_tracker);
+
 	while ((c = nextChar ()) != EOF)
 	{
 		if (newline)
@@ -300,7 +486,12 @@ static void findMakeTags0 (void)
 			{
 				if (c == '\t' || (c = skipToNonWhite (c)) == '#')
 				{
-					skipLine ();  /* skip rule or comment */
+					valueTrackerPut(&value_tracker, c == '\t'? '\t': ' ');
+					/* skip rule or comment */
+					if (c == '#')
+						skipLine ();
+					else
+						skipLineFull (valueTrackerPutAsCallback, &value_tracker);
 					c = nextChar ();
 				}
 				else if (c != '\n')
@@ -314,9 +505,15 @@ static void findMakeTags0 (void)
 			newline = false;
 		}
 		if (c == '\n')
+		{
+			valueTrackerPut (&value_tracker, '\n');
 			newline = true;
+		}
 		else if (isspace (c))
+		{
+			valueTrackerPut (&value_tracker, ' ');
 			continue;
+		}
 		else if (c == '#')
 			skipLine ();
 		else if (macro_possible && (c == '?' || c == '!'))
@@ -344,7 +541,10 @@ static void findMakeTags0 (void)
 				{
 					int r = newTarget (stringListItem (identifiers, i), current_macdef);
 					if (r != CORK_NIL)
+					{
 						intArrayAdd (current_targets, r);
+						valueTrackerUpdateLeftSideIndex (&value_tracker, r);
+					}
 				}
 				stringListClear (identifiers);
 			}
@@ -353,7 +553,8 @@ static void findMakeTags0 (void)
 				 stringListCount (identifiers) > 0
 				 && !in_varmac_value)
 		{
-			newMacro (stringListItem (identifiers, 0), false, appending, current_macdef);
+			int r = newMacro (stringListItem (identifiers, 0), false, appending, current_macdef);
+			valueTrackerUpdateLeftSideIndex (&value_tracker, r);
 			stringListClear (identifiers);
 
 			in_varmac_value = true;
@@ -370,7 +571,10 @@ static void findMakeTags0 (void)
 			stringListAdd (identifiers, name);
 
 			if (in_varmac_value)
+			{
 				valueFound(name);
+				valueTrackerCat (&value_tracker, name);
+			}
 
 			if (stringListCount (identifiers) == 1)
 			{
@@ -381,7 +585,7 @@ static void findMakeTags0 (void)
 					stringListClear (identifiers);
 				}
 				else if (in_varmac_value && current_macdef != CORK_NIL)
-					skipLine ();
+					skipLineFull (valueTrackerPutAsCallback, &value_tracker);
 				else if (! strcmp (vStringValue (name), "define"))
 				{
 					c = skipToNonWhite (nextChar ());
@@ -398,6 +602,7 @@ static void findMakeTags0 (void)
 
 					current_macdef = newMacro (name, true, false, CORK_NIL);
 					stringListClear (identifiers);
+					valueTrackerUpdateLeftSideIndex (&value_tracker, current_macdef);
 				}
 				else if (! strcmp (vStringValue (name), "export")
 						 || ! strcmp (vStringValue (name), "override"))
@@ -413,7 +618,10 @@ static void findMakeTags0 (void)
 						readIdentifier (c, name);
 						vStringStripTrailing (name);
 						if (!vStringIsEmpty (name) && isAcceptableAsInclude(name))
+						{
 							newInclude (name, optional, current_macdef);
+							valueTrackerUpdateLeftSideIndex (&value_tracker, CORK_NIL);
+						}
 
 						/* non-space characters after readIdentifier() may
 						 * be rejected by the function:
@@ -438,10 +646,15 @@ static void findMakeTags0 (void)
 			}
 		}
 		else
+		{
+			valueTrackerPut (&value_tracker, c);
 			macro_possible = false;
+		}
 	}
 
 	endTargets (current_targets, getInputLineNumber ());
+
+	valueTrackerFini (&value_tracker);
 
 	intArrayDelete (current_targets);
 	stringListDelete (identifiers);
@@ -465,12 +678,25 @@ extern parserDefinition* MakefileParser (void)
 		/* the mode name in emacs */
 		"makefile",
 		NULL };
+
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_FOREIGNER, "CPreProcessor", NULL },
+	};
+
 	parserDefinition* const def = parserNew ("Make");
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
+
 	def->kindTable      = MakeKinds;
 	def->kindCount  = ARRAY_SIZE (MakeKinds);
 	def->patterns   = patterns;
 	def->extensions = extensions;
 	def->aliases = aliases;
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
+	def->xtagTable = MakeXtagTable;
+	def->xtagCount = ARRAY_SIZE (MakeXtagTable);
 	def->parser     = findMakeTags;
 	def->useCork = CORK_QUEUE;
 	return def;
