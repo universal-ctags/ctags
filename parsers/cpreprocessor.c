@@ -177,10 +177,6 @@ static roleDefinition CPREPROHeaderRoles [] = {
 };
 
 
-typedef enum {
-	CPREPRO_MACRO, CPREPRO_HEADER, CPREPRO_PARAM,
-} cPreProkind;
-
 static kindDefinition CPreProKinds [] = {
 	{ true,  'd', "macro",      "macro definitions",
 	  .referenceOnly = false, ATTACH_ROLES(CPREPROMacroRoles)},
