@@ -33,6 +33,7 @@ Man pages
 	ctags-lang-kconfig(7) <man/ctags-lang-kconfig.7.rst>
 	ctags-lang-ldscript(7) <man/ctags-lang-ldscript.7.rst>
 	ctags-lang-lex(7) <man/ctags-lang-lex.7.rst>
+	ctags-lang-make(7) <man/ctags-lang-make.7.rst>
 	ctags-lang-markdown(7) <man/ctags-lang-markdown.7.rst>
 	ctags-lang-powershell(7) <man/ctags-lang-powershell.7.rst>
 	ctags-lang-python(7) <man/ctags-lang-python.7.rst>
