@@ -45,6 +45,11 @@ enum {
 	KEYWORD_lambda,
 	KEYWORD_pass,
 	KEYWORD_return,
+
+	/* Used only in readTokenFullNoRefTag to represent the identifiers
+	   that should not be tagged as reference tags. */
+	KEYWORD___noreftag_id,
+
 	KEYWORD_REST
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -97,9 +102,14 @@ typedef enum {
 } pythonModuleRole;
 
 typedef enum {
+	PYTHON_UNKNOWN_REFERENCED,
 	PYTHON_UNKNOWN_IMPORTED,
 	PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
 } pythonUnknownRole;
+
+typedef enum {
+	PYTHON_CLASS_SUPERCLASS,
+} pythonClassRole;
 
 /* Roles related to `import'
  * ==========================
@@ -129,20 +139,26 @@ static roleDefinition PythonModuleRoles [] = {
 };
 
 static roleDefinition PythonUnknownRoles [] = {
+	{ false,"ref", "(EXPERIMENTAL)referenced anyhow" },
 	{ true, "imported",   "imported from the other module" },
 	{ true, "indirectlyImported",
 	  "classes/variables/functions/modules imported in alternative name" },
 };
 
+static roleDefinition PythonClassRoles [] = {
+	{ true, "super", "super class" },
+};
+
 static kindDefinition PythonKinds[COUNT_KIND] = {
-	{true, 'c', "class",    "classes"},
+	{true, 'c', "class",    "classes",
+	 .referenceOnly = false, ATTACH_ROLES(PythonClassRoles) },
 	{true, 'f', "function", "functions"},
 	{true, 'm', "member",   "class members"},
 	{true, 'v', "variable", "variables"},
 	{true, 'I', "namespace", "name referring a module defined in other file"},
 	{true, 'i', "module",    "modules",
 	 .referenceOnly = true,  ATTACH_ROLES(PythonModuleRoles)},
-	{true, 'Y', "unknown",   "name referring a class/variable/function/module defined in other module",
+	{true, 'Y', "unknown",   "unknwon name",
 	 .referenceOnly = false, ATTACH_ROLES(PythonUnknownRoles)},
 	{false, 'z', "parameter", "function parameters" },
 	{false, 'l', "local",    "local variables" },
@@ -164,6 +180,7 @@ static const keywordTable PythonKeywordTable[] = {
 	{ "lambda",			KEYWORD_lambda			},
 	{ "pass",			KEYWORD_pass			},
 	{ "return",			KEYWORD_return			},
+	{ "self",			KEYWORD___noreftag_id   },
 };
 
 /* Taken from https://docs.python.org/3/reference/lexical_analysis.html#keywords */
@@ -202,6 +219,7 @@ typedef struct {
 	int				indent;
 	unsigned long 	lineNumber;
 	MIOPos			filePosition;
+	int				reftag;
 } tokenInfo;
 
 struct pythonNestingLevelUserData {
@@ -245,13 +263,23 @@ static accessType accessFromIdentifier (const vString *const ident,
 		return ACCESS_PROTECTED;
 }
 
-static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token,
+static void useTokenAsPartOfAnotherTag (tokenInfo *const token)
+{
+	if (token->reftag == CORK_NIL)
+		return;
+
+	markCorkEntryAsPlaceholder (token->reftag, true);
+	token->reftag = CORK_NIL;
+}
+
+static void initPythonEntry (tagEntryInfo *const e, tokenInfo *const token,
                              const pythonKind kind)
 {
 	accessType access;
 	int parentKind = -1;
 	NestingLevel *nl;
 
+	useTokenAsPartOfAnotherTag(token);
 	initTagEntry (e, vStringValue (token->string), kind);
 
 	updateTagLine (e, token->lineNumber, token->filePosition);
@@ -284,7 +312,7 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 		e->isFileScope = true;
 }
 
-static int makeClassTag (const tokenInfo *const token,
+static int makeClassTag (tokenInfo *const token,
                          const vString *const inheritance,
                          const vString *const decorators)
 {
@@ -307,7 +335,7 @@ static int makeClassTag (const tokenInfo *const token,
 	return CORK_NIL;
 }
 
-static int makeFunctionTag (const tokenInfo *const token,
+static int makeFunctionTag (tokenInfo *const token,
                             const vString *const arglist,
                             const vString *const decorators)
 {
@@ -331,7 +359,7 @@ static int makeFunctionTag (const tokenInfo *const token,
 	return CORK_NIL;
 }
 
-static int makeSimplePythonTag (const tokenInfo *const token, pythonKind const kind)
+static int makeSimplePythonTag (tokenInfo *const token, pythonKind const kind)
 {
 	if (PythonKinds[kind].enabled)
 	{
@@ -344,7 +372,7 @@ static int makeSimplePythonTag (const tokenInfo *const token, pythonKind const k
 	return CORK_NIL;
 }
 
-static int makeSimplePythonRefTag (const tokenInfo *const token,
+static int makeSimplePythonRefTag (tokenInfo *const token,
                                    const vString *const altName,
                                    pythonKind const kind,
                                    int roleIndex, xtagType xtag)
@@ -354,6 +382,7 @@ static int makeSimplePythonRefTag (const tokenInfo *const token,
 	{
 		tagEntryInfo e;
 
+		useTokenAsPartOfAnotherTag(token);
 		initRefTagEntry (&e, vStringValue (altName ? altName : token->string),
 		                 kind, roleIndex);
 
@@ -392,6 +421,7 @@ static void clearPoolToken (void *data)
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	vStringClear (token->string);
+	token->reftag 		= CORK_NIL;
 }
 
 static void copyToken (tokenInfo *const dest, const tokenInfo *const src)
@@ -402,6 +432,7 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src)
 	dest->keyword = src->keyword;
 	dest->indent = src->indent;
 	vStringCopy(dest->string, src->string);
+	dest->reftag = src->reftag;
 }
 
 /* Skip a single or double quoted string. */
@@ -478,7 +509,7 @@ static void ungetToken (tokenInfo *const token)
 	copyToken (NextToken, token);
 }
 
-static void readTokenFull (tokenInfo *const token, bool inclWhitespaces)
+static void readTokenFullNoRefTag (tokenInfo *const token, bool inclWhitespaces, bool *noReftagId)
 {
 	int c;
 	int n;
@@ -665,11 +696,17 @@ getNextChar:
 			}
 			else
 			{
+				*noReftagId = false;
 				/* FIXME: handle U, B, R and F string prefixes? */
 				readIdentifier (token->string, c);
 				token->keyword = lookupKeyword (vStringValue (token->string), Lang_python);
 				if (token->keyword == KEYWORD_NONE)
 					token->type = TOKEN_IDENTIFIER;
+				else if (token->keyword == KEYWORD___noreftag_id)
+				{
+					token->type = TOKEN_IDENTIFIER;
+					*noReftagId = true;
+				}
 				else
 					token->type = TOKEN_KEYWORD;
 			}
@@ -690,6 +727,38 @@ getNextChar:
 	          token->type == ']'))
 	{
 		TokenContinuationDepth --;
+	}
+}
+
+static void readTokenFull (tokenInfo *const token, bool inclWhitespaces)
+{
+	bool noReftagId;
+	readTokenFullNoRefTag (token, inclWhitespaces, &noReftagId);
+
+	if (token->type == TOKEN_IDENTIFIER
+		&& (!noReftagId)
+		/* Don't make a ref tag for a number. */
+		&& (vStringLength (token->string) > 0 &&
+			!isdigit ((unsigned char)vStringChar (token->string, 0)))
+		&& PythonKinds[K_UNKNOWN].enabled
+		&& PythonUnknownRoles[PYTHON_UNKNOWN_REFERENCED].enabled)
+	{
+		const bool in_subparser = (Lang_python != getInputLanguage ());
+		if (in_subparser)
+			pushLanguage (Lang_python);
+
+		tagEntryInfo e;
+		initRefTagEntry(&e, vStringValue (token->string),
+						K_UNKNOWN, PYTHON_UNKNOWN_REFERENCED);
+		e.lineNumber	= token->lineNumber;
+		e.filePosition	= token->filePosition;
+		NestingLevel *nl = nestingLevelsGetCurrent (PythonNestingLevels);
+		if (nl)
+			e.extensionFields.scopeIndex = nl->corkIndex;
+		token->reftag = makeTagEntry (&e);
+
+		if (in_subparser)
+			popLanguage ();
 	}
 }
 
@@ -787,6 +856,10 @@ static void readQualifiedName (tokenInfo *const nameToken)
 		vString *qualifiedName = vStringNew ();
 		tokenInfo *token = newToken ();
 
+		unsigned long lineNumber = nameToken->lineNumber;
+		MIOPos      filePosition = nameToken->filePosition;
+
+		useTokenAsPartOfAnotherTag (nameToken);
 		while (nameToken->type == TOKEN_IDENTIFIER ||
 		       nameToken->type == '.')
 		{
@@ -794,6 +867,7 @@ static void readQualifiedName (tokenInfo *const nameToken)
 			copyToken (token, nameToken);
 
 			readToken (nameToken);
+			useTokenAsPartOfAnotherTag (nameToken);
 		}
 		/* put the last, non-matching, token back */
 		ungetToken (nameToken);
@@ -804,6 +878,13 @@ static void readQualifiedName (tokenInfo *const nameToken)
 
 		deleteToken (token);
 		vStringDelete (qualifiedName);
+
+		tagEntryInfo e;
+		initRefTagEntry(&e, vStringValue (nameToken->string),
+						K_UNKNOWN, PYTHON_UNKNOWN_REFERENCED);
+		e.lineNumber	= lineNumber;
+		e.filePosition	= filePosition;
+		nameToken->reftag = makeTagEntry (&e);
 	}
 }
 
@@ -986,15 +1067,54 @@ static void deleteTypedParam (struct typedParam *p)
 	eFree (p);
 }
 
-static void parseArglist (tokenInfo *const token, const int kind,
+static void parseInheritanceList (tokenInfo *const token,
+								  vString *const inneritanceList)
+{
+	tokenInfo *lastToken = newToken ();
+
+	do
+	{
+		copyToken (lastToken, token);
+		readTokenFull (token, true);
+		if (lastToken->type == TOKEN_IDENTIFIER
+			&& (token->type == ',' || token->type == ')'))
+		{
+			if (lastToken->reftag == CORK_NIL)
+			{
+				tagEntryInfo e;
+				initRefTagEntry(&e, vStringValue (lastToken->string),
+								K_CLASS, PYTHON_CLASS_SUPERCLASS);
+				e.lineNumber	= lastToken->lineNumber;
+				e.filePosition	= lastToken->filePosition;
+				lastToken->reftag = makeTagEntry (&e);
+			}
+			else
+			{
+				tagEntryInfo *e = getEntryInCorkQueue (lastToken->reftag);
+				if (e)
+				{
+					clearRoles(e);
+					e->kindIndex = K_CLASS;
+					assignRole(e, PYTHON_CLASS_SUPERCLASS);
+				}
+			}
+		}
+		if (token->type != ')')
+			reprCat (inneritanceList, token);
+	}
+	while (token->type != TOKEN_EOF && token->type != ')');
+
+	deleteToken (lastToken);
+}
+
+static void parseArglist (tokenInfo *const token,
 						  vString *const arglist, ptrArray *const parameters)
 {
 	TRACE_ENTER();
 	int prevTokenType = token->type;
 	int depth = 1;
 
-	if (kind != K_CLASS)
-		reprCat (arglist, token);
+	reprCat (arglist, token);
 
 	do
 	{
@@ -1007,8 +1127,7 @@ static void parseArglist (tokenInfo *const token, const int kind,
 		}
 
 		readTokenFull (token, true);
-		if (kind != K_CLASS || token->type != ')' || depth > 1)
-			reprCat (arglist, token);
+		reprCat (arglist, token);
 
 		if (token->type == '(' ||
 			token->type == '[' ||
@@ -1018,7 +1137,7 @@ static void parseArglist (tokenInfo *const token, const int kind,
 				 token->type == ']' ||
 				 token->type == '}')
 			depth --;
-		else if (kind != K_CLASS && depth == 1 &&
+		else if (depth == 1 &&
 				 token->type == TOKEN_IDENTIFIER &&
 				 (prevTokenType == '(' || prevTokenType == ',') &&
 				 PythonKinds[K_PARAMETER].enabled)
@@ -1028,6 +1147,7 @@ static void parseArglist (tokenInfo *const token, const int kind,
 			struct typedParam *parameter;
 
 			parameterName = newToken ();
+			useTokenAsPartOfAnotherTag (token);
 			copyToken (parameterName, token);
 			parameterType = parseParamTypeAnnotation (token, arglist);
 
@@ -1039,8 +1159,8 @@ static void parseArglist (tokenInfo *const token, const int kind,
 	TRACE_LEAVE();
 }
 
-static void parseCArglist (tokenInfo *const token, const int kind,
-						  vString *const arglist, ptrArray *const parameters)
+static void parseCArglist (tokenInfo *const token,
+						   vString *const arglist, ptrArray *const parameters)
 {
 	TRACE_ENTER();
 	int depth = 1;
@@ -1188,12 +1308,14 @@ static bool parseClassOrDef (tokenInfo *const token,
 	if (token->type == '(')
 	{
 		arglist = vStringNew ();
-		parameters = ptrArrayNew ((ptrArrayDeleteFunc)deleteTypedParam);
+		parameters = (kind == K_CLASS)? NULL: ptrArrayNew ((ptrArrayDeleteFunc)deleteTypedParam);
 
-		if (isCDef && kind != K_CLASS)
-			parseCArglist (token, kind, arglist, parameters);
+		if (kind == K_CLASS)
+			parseInheritanceList (token, arglist);
+		else if (isCDef)
+			parseCArglist (token, arglist, parameters);
 		else
-			parseArglist (token, kind, arglist, parameters);
+			parseArglist (token, arglist, parameters);
 	}
 
 	if (kind == K_CLASS)
@@ -1600,7 +1722,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 
 		do
 		{
-			const tokenInfo *const nameToken = nameTokens[i];
+			tokenInfo *const nameToken = nameTokens[i];
 			vString **type = &(nameTypes[i++]);
 
 			readToken (token);
