@@ -336,7 +336,7 @@ static void findMakeTags (void)
 					setTagEndLineToCorkEntry (current_macro, getInputLineNumber ());
 					current_macro = CORK_NIL;
 				}
-				else if (current_macro != CORK_NIL)
+				else if (in_value && current_macro != CORK_NIL)
 					skipLine ();
 				else if (! strcmp (vStringValue (name), "define"))
 				{
