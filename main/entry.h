@@ -327,7 +327,7 @@ extern void resetTagCorkState (tagEntryInfo *const tag,
  * If your parser called one of initTagEntry () family but didn't call
  * makeTagEntry () for a tagEntry yet, use attachParserField ().
  *
- * The parser (== caller) keeps the memory object specified with `value'
+ * The parser (== caller) must keep the memory object specified with `value'
  * till calling makeTagEntry (). The parser must free the memory object
  * after calling makeTagEntry () if it is allocated dynamically in the
  * parser side.
