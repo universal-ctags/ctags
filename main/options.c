@@ -605,6 +605,9 @@ static struct Feature {
 #ifdef HAVE_PACKCC
 	/* The test harnesses use this as hints for skipping test cases */
 	{"packcc", "has peg based parser(s)"},
+#ifdef HAVE_PEGOF
+	{"pegof", "makes peg based parser(s) optimized (experimental)"},
+#endif
 #endif
 	{"optscript", "can use the interpreter"},
 #ifdef HAVE_PCRE2
