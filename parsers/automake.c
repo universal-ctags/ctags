@@ -343,7 +343,7 @@ static void directiveCallback (makeSubparser *make CTAGS_ATTR_UNUSED, char *dire
 }
 
 static void newMacroCallback (makeSubparser *make, char* name, bool with_define_directive,
-							  bool appending)
+							  bool appending, int scopeIndex CTAGS_ATTR_UNUSED)
 {
 	struct sAutomakeSubparser *automake = (struct sAutomakeSubparser *)make;
 

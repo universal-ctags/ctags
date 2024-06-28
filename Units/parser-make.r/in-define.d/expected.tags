@@ -1,3 +1,3 @@
 m	input.mak	/^define m$/;"	m
-x.mak	input.mak	/^include x.mak$/;"	I
-Y	input.mak	/^	Y=1$/;"	m
+x.mak	input.mak	/^include x.mak$/;"	I	macro:m
+Y	input.mak	/^	Y=1$/;"	m	macro:m
