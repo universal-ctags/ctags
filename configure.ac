@@ -401,6 +401,14 @@ fi
 AC_SUBST(RST2MAN_OPTIONS)
 AM_CONDITIONAL([HAS_GNU_SED], [sed --version 2>/dev/null | grep -q GNU])
 
+AC_ARG_WITH([pegof],
+  AS_HELP_STRING([--with-pegof=PATH], [Location of pegof (auto)]),
+  [PEGOF="$withval"],
+  [AC_PATH_PROGS(PEGOF,
+    [pegof],
+    [no])])
+AM_CONDITIONAL([HAVE_PEGOF], [test "x$PEGOF" != "xno"])
+
 # Checks for operating environment
 # --------------------------------
 in_git_repo=no
