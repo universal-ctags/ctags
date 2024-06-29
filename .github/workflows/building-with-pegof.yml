@@ -1,0 +1,71 @@
+name: build ctags with pegof and run units target on GNU/Linux
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  testing:
+
+    strategy:
+      matrix:
+        os: [ubuntu-24.04]
+        compiler: [gcc]
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CC: ${{ matrix.compiler }}
+      BUILDDIR: ${{ matrix.os }}-${{ matrix.compiler }}
+      DEBIAN_FRONTEND: noninteractive
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: update package information
+      run: sudo apt-get -y -o APT::Immediate-Configure=false update
+    - name: install tools that pegof needs
+      run: sudo apt-get -y -o APT::Immediate-Configure=false install cmake g++
+    - name: install tools and libraries  that ctags needs
+      run: sudo apt-get -y -o APT::Immediate-Configure=false install pkg-config automake bash libjansson-dev libyaml-dev libseccomp-dev libxml2-dev gdb python3-docutils libpcre2-dev
+    - name: clone the source tree and build pegof
+      run: |
+        (
+        cd ..
+        git clone https://github.com/dolik-rce/pegof.git --recursive
+        cd pegof
+        cmake -B ./build
+        cmake --build ./build
+        ./build/pegof --version
+        )
+    - name: autogen.sh
+      run: ./autogen.sh
+    - name: report the version of cc
+      run: ${{ matrix.compiler }} --version
+    - name: report the version of make
+      run: make --version
+    - name: configure
+      run: |
+        mkdir -p ${{ matrix.os }}-"$CC"
+        (
+          pegdir=$(pwd)/../pegof
+          cd $BUILDDIR
+          ../configure --enable-debugging --enable-iconv --with-pegof=${pegdir}/build/pegof ${extra_args}
+        )
+    - name: make
+      run: make -C $BUILDDIR -j2
+    - name: test pegof in the feature list
+      run: |
+        (
+          cd $BUILDDIR
+          ./ctags --list-features | grep pegof
+        )
+    - name: make units
+      run: make -C $BUILDDIR units
+    - name: make dist
+      run: make -C $BUILDDIR dist
+      # See EXTRA_DIST in Makefile.am.
+      # Currently we add .pego files.
