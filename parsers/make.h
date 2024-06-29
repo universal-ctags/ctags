@@ -28,7 +28,9 @@ struct sMakeSubparser {
 	void (* newMacroNotify) (makeSubparser *s,
 							 char* name,
 							 bool withDefineDirective,
-							 bool appending);
+							 bool appending,
+							 /* If the macro is found in a define/endef area. */
+							 int scopeIndex);
 };
 
 #endif

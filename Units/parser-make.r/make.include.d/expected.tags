@@ -8,6 +8,7 @@ A	input.mk	/^include A$/;"	I	roles:included
 B	input.mk	/^sinclude B$/;"	I	roles:optional
 C	input.mk	/^-include C$/;"	I	roles:optional
 D	input.mk	/^define D$/;"	m	roles:def	end:11
+E	input.mk	/^include E$/;"	I	macro:D	roles:included
 F	input.mk	/^include F G H$/;"	I	roles:included
 G	input.mk	/^include F G H$/;"	I	roles:included
 H	input.mk	/^include F G H$/;"	I	roles:included

@@ -108,47 +108,53 @@ static bool isSpecialTarget (vString *const name)
 	return true;
 }
 
-static int makeSimpleMakeTag (vString *const name, makeKind kind)
+static int makeSimpleMakeTag (vString *const name, makeKind kind, int scopeIndex)
 {
 	if (!isLanguageEnabled (getInputLanguage ()))
 		return CORK_NIL;
 
-	return makeSimpleTag (name, kind);
+	tagEntryInfo e;
+	initTagEntry (&e, vStringValue (name), kind);
+	e.extensionFields.scopeIndex = scopeIndex;
+	return makeTagEntry (&e);
 }
 
 static void makeSimpleMakeRefTag (const vString* const name, const int kind,
-				  int roleIndex)
+				  int roleIndex, int scopeIndex)
 {
 	if (!isLanguageEnabled (getInputLanguage ()))
 		return;
 
-	makeSimpleRefTag (name, kind, roleIndex);
+	tagEntryInfo e;
+	initRefTagEntry (&e, vStringValue (name), kind, roleIndex);
+	e.extensionFields.scopeIndex = scopeIndex;
+	makeTagEntry (&e);
 }
 
-static int newTarget (vString *const name)
+static int newTarget (vString *const name, int scopeIndex)
 {
 	/* Ignore GNU Make's "special targets". */
 	if  (isSpecialTarget (name))
 	{
 		return CORK_NIL;
 	}
-	return makeSimpleMakeTag (name, K_TARGET);
+	return makeSimpleMakeTag (name, K_TARGET, scopeIndex);
 }
 
-static int newMacro (vString *const name, bool with_define_directive, bool appending)
+static int newMacro (vString *const name, bool with_define_directive, bool appending, int scopeIndex)
 {
 	int r = CORK_NIL;
 	subparser *s;
 
 	if (!appending)
-		r = makeSimpleMakeTag (name, K_MACRO);
+		r = makeSimpleMakeTag (name, K_MACRO, scopeIndex);
 
 	foreachSubparser(s, false)
 	{
 		makeSubparser *m = (makeSubparser *)s;
 		enterSubparser(s);
 		if (m->newMacroNotify)
-			m->newMacroNotify (m, vStringValue(name), with_define_directive, appending);
+			m->newMacroNotify (m, vStringValue(name), with_define_directive, appending, scopeIndex);
 		leaveSubparser();
 	}
 
@@ -181,10 +187,10 @@ static void directiveFound (vString *const name)
 	}
 }
 
-static void newInclude (vString *const name, bool optional)
+static void newInclude (vString *const name, bool optional, int scopeIndex)
 {
 	makeSimpleMakeRefTag (name, K_INCLUDE,
-			      optional? R_INCLUDE_OPTIONAL: R_INCLUDE_GENERIC);
+			      optional? R_INCLUDE_OPTIONAL: R_INCLUDE_GENERIC, scopeIndex);
 }
 
 static bool isAcceptableAsInclude (vString *const name)
@@ -301,7 +307,7 @@ static void findMakeTags (void)
 				unsigned int i;
 				for (i = 0; i < stringListCount (identifiers); i++)
 				{
-					int r = newTarget (stringListItem (identifiers, i));
+					int r = newTarget (stringListItem (identifiers, i), current_macro);
 					if (r != CORK_NIL)
 						intArrayAdd (current_targets, r);
 				}
@@ -311,7 +317,7 @@ static void findMakeTags (void)
 		else if (variable_possible && c == '=' &&
 				 stringListCount (identifiers) == 1)
 		{
-			newMacro (stringListItem (identifiers, 0), false, appending);
+			newMacro (stringListItem (identifiers, 0), false, appending, current_macro);
 
 			in_value = true;
 			unsigned long curline = getInputLineNumber ();
@@ -336,7 +342,7 @@ static void findMakeTags (void)
 					setTagEndLineToCorkEntry (current_macro, getInputLineNumber ());
 					current_macro = CORK_NIL;
 				}
-				else if (current_macro != CORK_NIL)
+				else if (in_value && current_macro != CORK_NIL)
 					skipLine ();
 				else if (! strcmp (vStringValue (name), "define"))
 				{
@@ -352,7 +358,7 @@ static void findMakeTags (void)
 						ungetcToInputFile (c);
 					vStringStripTrailing (name);
 
-					current_macro = newMacro (name, true, false);
+					current_macro = newMacro (name, true, false, CORK_NIL);
 				}
 				else if (! strcmp (vStringValue (name), "export"))
 					stringListClear (identifiers);
@@ -367,7 +373,7 @@ static void findMakeTags (void)
 						readIdentifier (c, name);
 						vStringStripTrailing (name);
 						if (isAcceptableAsInclude(name))
-							newInclude (name, optional);
+							newInclude (name, optional, current_macro);
 
 						/* non-space characters after readIdentifier() may
 						 * be rejected by the function:
