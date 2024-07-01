@@ -1,0 +1,2 @@
+name	input.nix	/^  name = "hello";$/;"	a
+hash	input.nix	/^    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";$/;"	a
