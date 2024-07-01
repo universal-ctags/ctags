@@ -224,56 +224,6 @@ jobs:
            command: |
              make check roundtrip
 
-   centos7_make:
-     working_directory: ~/universal-ctags
-     docker:
-       - image: docker.io/centos:7
-     steps:
-       - run:
-           name: Install Git
-           command: |
-             yum -y install git
-       - checkout
-       - run:
-           name: Install build tools
-           command: |
-              yum -y install python3 gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
-       - run:
-           name: Build
-           command: |
-             bash ./autogen.sh
-             ./configure --enable-debugging
-             make -j 2
-       - run:
-           name: Test
-           command: |
-             make check SKIP_CHECKGEN_WIN32=yes
-
-   centos7_make_roundtrip:
-     working_directory: ~/universal-ctags
-     docker:
-       - image: docker.io/centos:7
-     steps:
-       - run:
-           name: Install Git
-           command: |
-             yum -y install git
-       - checkout
-       - run:
-           name: Install build tools
-           command: |
-              yum -y install gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
-       - run:
-           name: Build
-           command: |
-             bash ./autogen.sh
-             ./configure --enable-debugging
-             make -j 2
-       - run:
-           name: Test
-           command: |
-             make roundtrip
-
    ubuntu20_mingw:
      working_directory: ~/universal-ctags
      docker:
@@ -388,8 +338,6 @@ workflows:
       - ubi8
       - fedora40_gmake
       - fedora33_cross_aarch64
-      - centos7_make
       - ubuntu20_mingw
       - fedora30_bmake_roundtrip
       - fedora40_gmake_roundtrip
-      - centos7_make_roundtrip
