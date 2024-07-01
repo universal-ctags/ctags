@@ -75,6 +75,10 @@
 #define RoleTemplateSystem { true, "system", "system header" }
 #define RoleTemplateLocal  { true, "local", "local header" }
 
+typedef enum {
+	CPREPRO_MACRO, CPREPRO_HEADER, CPREPRO_PARAM,
+} cPreProKind;
+
 /*
 *   FUNCTION PROTOTYPES
 */
