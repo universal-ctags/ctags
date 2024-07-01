@@ -1,0 +1,2 @@
+hash	input.mak	/^hash != printf '\\043'$/;"	m
+file_list	input.mak	/^file_list != find . -name '*.c'$/;"	m
