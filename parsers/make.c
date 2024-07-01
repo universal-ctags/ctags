@@ -5,6 +5,9 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for makefiles.
+*
+*   References:
+*   - https://www.gnu.org/software/make/manual/html_node/index.html
 */
 
 /*
