@@ -275,6 +275,8 @@ PEG_HEADS = $(PEG_INPUT:.peg=.h)
 PEG_EXTRA_HEADS = peg/peg_common.h $(PEG_INPUT:.peg=_pre.h) $(PEG_INPUT:.peg=_post.h)
 PEG_OBJS = $(PEG_SRCS:.c=.$(OBJEXT))
 
+PEGO_INTERMEDIATE = $(PEG_INPUT:.peg=.pego)
+
 PARSER_HEADS = \
 	parsers/autoconf.h \
 	parsers/cpreprocessor.h \
