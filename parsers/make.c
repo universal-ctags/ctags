@@ -284,7 +284,7 @@ static void findMakeTags (void)
 			continue;
 		else if (c == '#')
 			skipLine ();
-		else if (variable_possible && c == '?')
+		else if (variable_possible && (c == '?' || c == '!'))
 		{
 			c = nextChar ();
 			ungetcToInputFile (c);
