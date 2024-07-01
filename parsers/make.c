@@ -360,7 +360,8 @@ static void findMakeTags (void)
 
 					current_macro = newMacro (name, true, false, CORK_NIL);
 				}
-				else if (! strcmp (vStringValue (name), "export"))
+				else if (! strcmp (vStringValue (name), "export")
+						 || ! strcmp (vStringValue (name), "override"))
 					stringListClear (identifiers);
 				else if (! strcmp (vStringValue (name), "include")
 					 || ! strcmp (vStringValue (name), "sinclude")
