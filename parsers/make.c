@@ -376,7 +376,7 @@ static void findMakeTags (void)
 						c = skipToNonWhite (nextChar ());
 						readIdentifier (c, name);
 						vStringStripTrailing (name);
-						if (isAcceptableAsInclude(name))
+						if (!vStringIsEmpty (name) && isAcceptableAsInclude(name))
 							newInclude (name, optional, current_macro);
 
 						/* non-space characters after readIdentifier() may
