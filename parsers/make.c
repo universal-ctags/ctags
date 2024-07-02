@@ -73,16 +73,25 @@ static xtagDefinition MakeXtagTable [] = {
 *   FUNCTION DEFINITIONS
 */
 
-static int nextChar (void)
+static int nextCharFull (void (* cb) (int, void *), void *cb_data)
 {
 	int c = getcFromInputFile ();
+	if (c != EOF && cb)
+		cb (c, cb_data);
 	if (c == '\\')
 	{
 		c = getcFromInputFile ();
+		if (c != EOF && cb)
+			cb (c, cb_data);
 		if (c == '\n')
-			c = nextChar ();
+			c = nextCharFull (cb, cb_data);
 	}
 	return c;
+}
+
+static int nextChar (void)
+{
+	return nextCharFull (NULL, NULL);
 }
 
 static void skipLineFull (void (* cb) (int, void *), void *cb_data)
@@ -227,10 +236,16 @@ static bool isAcceptableAsInclude (vString *const name)
 	return true;
 }
 
-static void readIdentifier (const int first, vString *const id)
+/* Return true if a newline is seen. */
+static void readIdentifierFull (const int first, vString *const id,
+								void (* cb) (int, void *), void *cb_data)
 {
 	int depth = 0;
 	int c = first;
+
+	if (cb)
+		cb (c, cb_data);
+
 	vStringClear (id);
 	while (isIdentifier (c) || (depth > 0 && c != EOF && c != '\n'))
 	{
@@ -239,9 +254,14 @@ static void readIdentifier (const int first, vString *const id)
 		else if (depth > 0 && (c == ')' || c == '}'))
 			depth--;
 		vStringPut (id, c);
-		c = nextChar ();
+		c = nextCharFull (cb, cb_data);
 	}
 	ungetcToInputFile (c);
+}
+
+static void readIdentifier (const int first, vString *const id)
+{
+	readIdentifierFull (first, id, NULL, NULL);
 }
 
 static void endTargets (intArray *targets, unsigned long lnum)
@@ -380,7 +400,7 @@ static void valueTrackerPut (struct valueTracker *vt, int c)
 	if (!vt->value)
 		return;
 
-	if (isspace(c))
+	if (isspace(c) || c == '\\')
 	{
 		if (!vStringIsEmpty (vt->value))
 		{
@@ -395,18 +415,6 @@ static void valueTrackerPut (struct valueTracker *vt, int c)
 static void valueTrackerPutAsCallback (int c, void *vt)
 {
 	valueTrackerPut ((struct valueTracker *)vt, c);
-}
-
-static void valueTrackerCat (struct valueTracker *vt, vString *vstr)
-{
-	if (!vt->value)
-		return;
-
-	for (size_t i = 0; i < vStringLength (vstr); i++)
-	{
-		unsigned char c = vStringChar (vstr, i);
-		valueTrackerPut (vt, c);
-	}
 }
 
 static void valueTrackerInit (struct valueTracker *vt)
@@ -568,14 +576,12 @@ static void findMakeTags0 (void)
 		else if (macro_possible && isIdentifier (c))
 		{
 			vString *name = vStringNew ();
-			readIdentifier (c, name);
+			readIdentifierFull (c, name,
+								valueTrackerPutAsCallback, &value_tracker);
 			stringListAdd (identifiers, name);
 
 			if (in_varmac_value)
-			{
 				valueFound(name);
-				valueTrackerCat (&value_tracker, name);
-			}
 
 			if (stringListCount (identifiers) == 1)
 			{

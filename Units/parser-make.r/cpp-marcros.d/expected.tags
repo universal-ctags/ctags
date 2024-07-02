@@ -45,3 +45,10 @@ MACDEFMAC_BROKEN1	input.mak	/^       MACDEF_CPPFLAGS_BROKEN1 = -D MACDEFMAC_BROK
 MACDEFMAC2	input.mak	/^       MACDEF_CPPFLAGS += -DMACDEFMAC2(X2,Y2,Z2)="f b"$/;"	d	language:CPreProcessor	signature:(X2,Y2,Z2)
 install-man	input-0.mak	/^install-man: $(srctree)\/man\/pfrut.8$/;"	t	language:Make
 install	input-0.mak	/^install:$/;"	t	language:Make
+ACPI_DEBUGGER0	input-1.mak	/^CFLAGS0 += -DACPI_DEBUGGER0\\$/;"	d	language:CPreProcessor
+CFLAGS1	input-1.mak	/^CFLAGS1 ?= -DACPI_DEBUGGER1\\$/;"	m	language:Make
+ACPI_DEBUGGER1	input-1.mak	/^CFLAGS1 ?= -DACPI_DEBUGGER1\\$/;"	d	language:CPreProcessor
+CFLAGS2	input-1.mak	/^CFLAGS2 := -DACPI_DEBUGGER2\\$/;"	m	language:Make
+ACPI_DEBUGGER2	input-1.mak	/^CFLAGS2 := -DACPI_DEBUGGER2\\$/;"	d	language:CPreProcessor
+CFLAGS3	input-1.mak	/^CFLAGS3 = -DACPI_DEBUGGER3\\$/;"	m	language:Make
+ACPI_DEBUGGER3	input-1.mak	/^CFLAGS3 = -DACPI_DEBUGGER3\\$/;"	d	language:CPreProcessor
