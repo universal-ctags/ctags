@@ -331,7 +331,8 @@ static void valueTrackerEval (struct valueTracker *vt)
 
 			vStringPut (d, c);
 		}
-		if (!vStringIsEmpty (d))
+		if (!vStringIsEmpty (d)
+			&& vStringValue(d)[0] != '$' && vStringValue(d)[0] != '-')
 		{
 			tagEntryInfo e;
 			initForeignTagEntry (&e, vStringValue (d), vt->cpp, CPREPRO_MACRO);

@@ -43,3 +43,5 @@ MACDEFMAC_BROKEN0	input.mak	/^       MACDEF_CPPFLAGS_BROKEN0 = -DMACDEFMAC_BROKE
 MACDEF_CPPFLAGS_BROKEN1	input.mak	/^       MACDEF_CPPFLAGS_BROKEN1 = -D MACDEFMAC_BROKEN1(A1,B1,C1$/;"	m	language:Make	macro:macdef
 MACDEFMAC_BROKEN1	input.mak	/^       MACDEF_CPPFLAGS_BROKEN1 = -D MACDEFMAC_BROKEN1(A1,B1,C1$/;"	d	language:CPreProcessor
 MACDEFMAC2	input.mak	/^       MACDEF_CPPFLAGS += -DMACDEFMAC2(X2,Y2,Z2)="f b"$/;"	d	language:CPreProcessor	signature:(X2,Y2,Z2)
+install-man	input-0.mak	/^install-man: $(srctree)\/man\/pfrut.8$/;"	t	language:Make
+install	input-0.mak	/^install:$/;"	t	language:Make
