@@ -53,3 +53,5 @@ ACPI_DEBUGGER2	input-1.mak	/^CFLAGS2 := -DACPI_DEBUGGER2\\$/;"	d	language:CPrePr
 CFLAGS3	input-1.mak	/^CFLAGS3 = -DACPI_DEBUGGER3\\$/;"	m	language:Make
 ACPI_DEBUGGER3	input-1.mak	/^CFLAGS3 = -DACPI_DEBUGGER3\\$/;"	d	language:CPreProcessor
 FOO_$(VAL)	input-2.mak	/^X += -DFOO_$(VAL)$/;"	d	language:CPreProcessor
+ARM_ARCH_SELECTOR	input-2.mak	/^ARM_ARCH_SELECTOR := $(filter -D__LINUX_ARM_ARCH__%, $(KBUILD_CFLAGS))$/;"	m	language:Make
+__LINUX_ARM_ARCH__%	input-2.mak	/^ARM_ARCH_SELECTOR := $(filter -D__LINUX_ARM_ARCH__%, $(KBUILD_CFLAGS))$/;"	d	language:CPreProcessor

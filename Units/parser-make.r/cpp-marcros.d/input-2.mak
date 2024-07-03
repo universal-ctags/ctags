@@ -1,1 +1,2 @@
 X += -DFOO_$(VAL)
+ARM_ARCH_SELECTOR := $(filter -D__LINUX_ARM_ARCH__%, $(KBUILD_CFLAGS))

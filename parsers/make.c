@@ -343,6 +343,12 @@ static void valueTrackerEval (struct valueTracker *vt)
 			if (isspace(c) || c == '=')
 				break;
 
+			/* "," can be a separator.
+			 * -------------------------------------------------
+			 * $(filter -D__LINUX_ARM_ARCH__%, $(KBUILD_CFLAGS)) */
+			if (c == ',')
+				break;
+
 			if (c == '('
 				/* FOO_$(...) isn't a signature. */
 				&& (i - i0 > 1) && (vStringChar (vt->value, i -1) != '$'))
