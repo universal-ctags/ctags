@@ -333,7 +333,8 @@ static void valueTrackerEval (struct valueTracker *vt)
 	{
 		vString *d = vStringNew ();
 		vString *sig = NULL;
-		for (size_t i = (vt->state == VT_AFTER_D? 0: 2); i < len; i++)
+		size_t i0 = (vt->state == VT_AFTER_D? 0: 2);
+		for (size_t i = i0; i < len; i++)
 		{
 			int c = vStringChar (vt->value, i);
 
@@ -342,7 +343,9 @@ static void valueTrackerEval (struct valueTracker *vt)
 			if (isspace(c) || c == '=')
 				break;
 
-			if (c == '(')
+			if (c == '('
+				/* FOO_$(...) isn't a signature. */
+				&& (i - i0 > 1) && (vStringChar (vt->value, i -1) != '$'))
 			{
 				Assert(sig == NULL);
 				sig = extractSignature (vStringValue (vt->value) + i + 1, len - i + 1);

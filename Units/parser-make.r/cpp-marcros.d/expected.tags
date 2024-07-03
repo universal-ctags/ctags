@@ -52,3 +52,4 @@ CFLAGS2	input-1.mak	/^CFLAGS2 := -DACPI_DEBUGGER2\\$/;"	m	language:Make
 ACPI_DEBUGGER2	input-1.mak	/^CFLAGS2 := -DACPI_DEBUGGER2\\$/;"	d	language:CPreProcessor
 CFLAGS3	input-1.mak	/^CFLAGS3 = -DACPI_DEBUGGER3\\$/;"	m	language:Make
 ACPI_DEBUGGER3	input-1.mak	/^CFLAGS3 = -DACPI_DEBUGGER3\\$/;"	d	language:CPreProcessor
+FOO_$(VAL)	input-2.mak	/^X += -DFOO_$(VAL)$/;"	d	language:CPreProcessor
