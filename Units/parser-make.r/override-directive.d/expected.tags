@@ -1,0 +1,3 @@
+RUN_TESTS	input.mak	/^override define RUN_TESTS$/;"	m
+INSTALL_RULE	input.mak	/^override define INSTALL_RULE$/;"	m
+KBUILD_VERBOSE	input.mak	/^override KBUILD_VERBOSE :=$/;"	m

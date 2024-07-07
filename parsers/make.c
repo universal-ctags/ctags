@@ -5,6 +5,9 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for makefiles.
+*
+*   References:
+*   - https://www.gnu.org/software/make/manual/html_node/index.html
 */
 
 /*
@@ -284,7 +287,7 @@ static void findMakeTags (void)
 			continue;
 		else if (c == '#')
 			skipLine ();
-		else if (variable_possible && c == '?')
+		else if (variable_possible && (c == '?' || c == '!'))
 		{
 			c = nextChar ();
 			ungetcToInputFile (c);
@@ -360,7 +363,8 @@ static void findMakeTags (void)
 
 					current_macro = newMacro (name, true, false, CORK_NIL);
 				}
-				else if (! strcmp (vStringValue (name), "export"))
+				else if (! strcmp (vStringValue (name), "export")
+						 || ! strcmp (vStringValue (name), "override"))
 					stringListClear (identifiers);
 				else if (! strcmp (vStringValue (name), "include")
 					 || ! strcmp (vStringValue (name), "sinclude")
@@ -372,7 +376,7 @@ static void findMakeTags (void)
 						c = skipToNonWhite (nextChar ());
 						readIdentifier (c, name);
 						vStringStripTrailing (name);
-						if (isAcceptableAsInclude(name))
+						if (!vStringIsEmpty (name) && isAcceptableAsInclude(name))
 							newInclude (name, optional, current_macro);
 
 						/* non-space characters after readIdentifier() may
