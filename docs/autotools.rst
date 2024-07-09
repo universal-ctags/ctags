@@ -6,7 +6,9 @@ distribution, you can install the tools and libraries that Universal Ctags
 requires (or may use) as packages. See `GNU/Linux distributions`_ about
 the packages.
 
-Like most Autotools-based projects, you need to do::
+Like most Autotools-based projects, you need to do:
+
+.. code-block:: console
 
     $ git clone https://github.com/universal-ctags/ctags.git
     $ cd ctags
@@ -27,7 +29,9 @@ GNU/Linux distributions
 
 Before running ./autogen.sh, install some packages.
 
-On Debian-based systems (including Ubuntu), do::
+On Debian-based systems (including Ubuntu), do:
+
+.. code-block:: console
 
     $ sudo apt install \
         gcc make \
@@ -38,7 +42,9 @@ On Debian-based systems (including Ubuntu), do::
         libyaml-dev \
         libxml2-dev
 
-On Fedora systems, do::
+On Fedora systems, do:
+
+.. code-block:: console
 
     $ sudo dnf install \
         gcc make \
@@ -59,13 +65,13 @@ the name of the created executable.
 
 To add a prefix 'ex' which will result in 'ctags' being renamed to 'exctags':
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure --program-prefix=ex
 
 To completely change the program's name run the following:
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure --program-transform-name='s/ctags/my_ctags/; s/etags/myemacs_tags/'
 
@@ -81,7 +87,7 @@ etc.
 LTO is usually beneficial to improving program performance (here refers to ctags).
 We provide the `--enable-lto` option to enable it, as in the following example:
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure --enable-lto
 
@@ -93,13 +99,13 @@ to truly enable LTO optimization for ctags.
 
 For example:
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure
 
 is equivalent to:
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure --disable-lto
 
@@ -120,7 +126,7 @@ When native-compiling, `FOO_FOR_BUILD` is the same as `FOO`.
 
 Here is an example show you how to use these configure variables:
 
-::
+.. code-block:: console
 
        $ mkdir ./out
        $ configure \
