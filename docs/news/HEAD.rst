@@ -11,6 +11,9 @@ Incompatible changes
 Parser related changes
 ---------------------------------------------------------------------
 
+#4026
+   Integrate `pegof <https://github.com/dolik-rce/pegof>`_ to our build process.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
