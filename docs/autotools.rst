@@ -154,3 +154,43 @@ Here is an example show you how to use these configure variables:
        ctags readtags
 
 Simpler example for `aarch64-linux-gnu` can be found in `circle.yml` in the source tree.
+
+PEG optimization
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Some parsers of Universal Ctags are written in PEG grammar.  The build
+system of Universal Ctags uses `packcc
+<https://github.com/arithy/packcc>`_ for translating the PEG source
+files to C source files. A snapshot version of `packcc` is in the
+source tree of Universal Ctags. The in-tree `packcc` is used when
+building `ctags`. So you don't have to install `packcc`.
+
+`pegof <https://github.com/dolik-rce/pegof>`_ is a PEG grammar
+optimizer (and formatter). You can use `pegof` to build `ctags` though the
+developer says it is not yet stable enough (https://github.com/universal-ctags/ctags/pull/4023).
+
+You may have to build `pegof` first.
+See `Building <https://github.com/dolik-rce/pegof/blob/master/README.md#building>`_ about
+how to build `pegof`. Following the instructions on the page, you may
+see the executable is at `./build/pegof`.
+
+When building ctags, specify the executable to `--with-pegof` option of `./configure`
+script:
+
+.. code-block:: console
+
+   $ ls -d ctags pegof
+   ctags  pegof
+   $ ls -l pegof/build/pegof
+   -rwxr-xr-x. 1 yamato yamato 1894560 Jun 30 03:01 pegof/build/pegof
+   $ cd ctags
+   $ ./configure --with-pegof=../pegof/build/pegof
+   ...
+   $ make
+   ...
+
+If your `ctags` is built with `pegof`, you can verify it with `--list-features` option:
+
+.. code-block:: console
+
+   $ ./ctags --list-features | grep pegof
+   pegof             makes peg based parser(s) optimized (experimental)
