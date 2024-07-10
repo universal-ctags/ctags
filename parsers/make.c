@@ -244,21 +244,53 @@ static bool isTheLastTargetOnTheSameLine (intArray *current_targets,
 	return false;
 }
 
-static void findMakeTags (void)
+/*
+ * Naming
+ *
+ *   X = ...
+ *
+ * We refer to X as a macro or a variable macro (varmac) here.
+ *
+ *   define M
+ *    ...
+ *   endef
+ *
+ * We refer to M as a macro or a macro definition (macdef) here.
+ */
+static void findMakeTags0 (void)
 {
+	/* MAINLY for tracking the candidates of MULTIPLE targets like:
+	 *
+	 * clean distclean install:
+	 *     ...
+	 */
 	stringList *identifiers = stringListNew ();
-	bool newline = true;
-	int  current_macro = CORK_NIL;
-	bool in_value  = false;
-	intArray *current_targets = intArrayNew ();
-	bool variable_possible = true;
-	bool appending = false;
-	int c;
-	subparser *sub;
 
-	sub = getSubparserRunningBaseparser();
-	if (sub)
-		chooseExclusiveSubparser (sub, NULL);
+	/* parsing the right side of =, :=, +=, ?=, !=
+	 *
+	 * Nothing to do with targets or macdefs.
+	 */
+	bool in_varmac_value  = false;
+
+	/* For tracking a tag for a macdef. */
+	int  current_macdef = CORK_NIL;
+
+	/* For tracking tags for (multiple) targets.
+	 */
+	intArray *current_targets = intArrayNew ();
+
+	/* Reading char can be a part of macro name.
+	 * In the other words, we are "not in a recipe". */
+	bool macro_possible = true;
+
+	/* A char just read*/
+	int c;
+
+	/* '\n' seen. */
+	bool newline = true;
+
+	/* += seen. */
+	bool appending = false;
 
 	while ((c = nextChar ()) != EOF)
 	{
@@ -274,11 +306,11 @@ static void findMakeTags (void)
 				else if (c != '\n')
 					endTargets (current_targets, getInputLineNumber () - 1);
 			}
-			else if (in_value)
-				in_value = false;
+			else if (in_varmac_value)
+				in_varmac_value = false;
 
 			stringListClear (identifiers);
-			variable_possible = intArrayIsEmpty (current_targets);
+			macro_possible = intArrayIsEmpty (current_targets);
 			newline = false;
 		}
 		if (c == '\n')
@@ -287,20 +319,20 @@ static void findMakeTags (void)
 			continue;
 		else if (c == '#')
 			skipLine ();
-		else if (variable_possible && (c == '?' || c == '!'))
+		else if (macro_possible && (c == '?' || c == '!'))
 		{
 			c = nextChar ();
 			ungetcToInputFile (c);
-			variable_possible = (c == '=');
+			macro_possible = (c == '=');
 		}
-		else if (variable_possible && c == '+')
+		else if (macro_possible && c == '+')
 		{
 			c = nextChar ();
 			ungetcToInputFile (c);
-			variable_possible = (c == '=');
+			macro_possible = (c == '=');
 			appending = true;
 		}
-		else if ((! in_value) && variable_possible && c == ':' &&
+		else if ((! in_varmac_value) && macro_possible && c == ':' &&
 				 stringListCount (identifiers) > 0)
 		{
 			c = nextChar ();
@@ -310,45 +342,45 @@ static void findMakeTags (void)
 				unsigned int i;
 				for (i = 0; i < stringListCount (identifiers); i++)
 				{
-					int r = newTarget (stringListItem (identifiers, i), current_macro);
+					int r = newTarget (stringListItem (identifiers, i), current_macdef);
 					if (r != CORK_NIL)
 						intArrayAdd (current_targets, r);
 				}
 				stringListClear (identifiers);
 			}
 		}
-		else if (variable_possible && c == '=' &&
+		else if (macro_possible && c == '=' &&
 				 stringListCount (identifiers) > 0
-				 && !in_value)
+				 && !in_varmac_value)
 		{
-			newMacro (stringListItem (identifiers, 0), false, appending, current_macro);
+			newMacro (stringListItem (identifiers, 0), false, appending, current_macdef);
 			stringListClear (identifiers);
 
-			in_value = true;
+			in_varmac_value = true;
 			unsigned long curline = getInputLineNumber ();
 			unsigned long adj = isTheLastTargetOnTheSameLine (current_targets,
 															  curline)? 0: 1;
 			endTargets (current_targets, curline - adj);
 			appending = false;
 		}
-		else if (variable_possible && isIdentifier (c))
+		else if (macro_possible && isIdentifier (c))
 		{
 			vString *name = vStringNew ();
 			readIdentifier (c, name);
 			stringListAdd (identifiers, name);
 
-			if (in_value)
+			if (in_varmac_value)
 				valueFound(name);
 
 			if (stringListCount (identifiers) == 1)
 			{
-				if ((current_macro != CORK_NIL) && ! strcmp (vStringValue (name), "endef"))
+				if ((current_macdef != CORK_NIL) && ! strcmp (vStringValue (name), "endef"))
 				{
-					setTagEndLineToCorkEntry (current_macro, getInputLineNumber ());
-					current_macro = CORK_NIL;
+					setTagEndLineToCorkEntry (current_macdef, getInputLineNumber ());
+					current_macdef = CORK_NIL;
 					stringListClear (identifiers);
 				}
-				else if (in_value && current_macro != CORK_NIL)
+				else if (in_varmac_value && current_macdef != CORK_NIL)
 					skipLine ();
 				else if (! strcmp (vStringValue (name), "define"))
 				{
@@ -364,7 +396,7 @@ static void findMakeTags (void)
 						ungetcToInputFile (c);
 					vStringStripTrailing (name);
 
-					current_macro = newMacro (name, true, false, CORK_NIL);
+					current_macdef = newMacro (name, true, false, CORK_NIL);
 					stringListClear (identifiers);
 				}
 				else if (! strcmp (vStringValue (name), "export")
@@ -381,7 +413,7 @@ static void findMakeTags (void)
 						readIdentifier (c, name);
 						vStringStripTrailing (name);
 						if (!vStringIsEmpty (name) && isAcceptableAsInclude(name))
-							newInclude (name, optional, current_macro);
+							newInclude (name, optional, current_macdef);
 
 						/* non-space characters after readIdentifier() may
 						 * be rejected by the function:
@@ -406,7 +438,7 @@ static void findMakeTags (void)
 			}
 		}
 		else
-			variable_possible = false;
+			macro_possible = false;
 	}
 
 	endTargets (current_targets, getInputLineNumber ());
@@ -415,6 +447,15 @@ static void findMakeTags (void)
 	stringListDelete (identifiers);
 }
 
+static void findMakeTags (void)
+{
+
+	subparser *sub = getSubparserRunningBaseparser();
+	if (sub)
+		chooseExclusiveSubparser (sub, NULL);
+
+	findMakeTags0 ();
+}
 
 extern parserDefinition* MakefileParser (void)
 {
