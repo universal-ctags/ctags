@@ -39,6 +39,11 @@ EXTRA_DIST   = README.md NEWS.rst autogen.sh \
 	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(OPTLIB2C_PCRE2_INPUT) $(TXT2CSTR_INPUT) \
 	       docs Tmain Units m4/gnulib-cache.m4
 
+if HAVE_PEGOF
+# Keeping intermediate files for debugging pegof and u-ctags buildsys.
+EXTRA_DIST   += $(PEGO_INTERMEDIATE)
+endif
+
 CLEANFILES =
 MOSTLYCLEANFILES =
 MAINTAINERCLEANFILES = autom4te.cache
@@ -147,6 +152,9 @@ endif
 if HAVE_STRNLEN
 libctags_a_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
 endif
+if HAVE_PEGOF
+libctags_a_CPPFLAGS += -DHAVE_PEGOF
+endif
 libctags_a_CPPFLAGS+= $(GNULIB_CPPFLAGS)
 libctags_a_CPPFLAGS+= -DHAVE_REPOINFO_H
 
@@ -212,10 +220,27 @@ packcc_verbose = $(packcc_verbose_@AM_V@)
 packcc_verbose_ = $(packcc_verbose_@AM_DEFAULT_V@)
 packcc_verbose_0 = @echo PACKCC "    $@";
 SUFFIXES += .peg
+
+if HAVE_PEGOF
+pegof_verbose = $(pegof_verbose_@AM_V@)
+pegof_verbose_ = $(pegof_verbose_@AM_DEFAULT_V@)
+pegof_verbose_0 = @echo PEGOF "    $@";
+SUFFIXES += .pego
+
+PEGOF_FLAGS = -O all
+.peg.pego:
+	$(pegof_verbose)$(PEGOF) $(PEGOF_FLAGS) -o $(top_builddir)/peg/$(@F) -i "$<"
+.pego.c:
+	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) $(top_builddir)/peg/$(<F)
+.pego.h:
+	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) $(top_builddir)/peg/$(<F)
+else
 .peg.c:
 	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
 .peg.h:
 	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
+endif
+
 # You cannot use $(PACKCC) as a target name here.
 $(PEG_SRCS) $(PEG_HEADS): $(PACKCC) Makefile
 dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)

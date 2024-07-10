@@ -6,7 +6,9 @@ distribution, you can install the tools and libraries that Universal Ctags
 requires (or may use) as packages. See `GNU/Linux distributions`_ about
 the packages.
 
-Like most Autotools-based projects, you need to do::
+Like most Autotools-based projects, you need to do:
+
+.. code-block:: console
 
     $ git clone https://github.com/universal-ctags/ctags.git
     $ cd ctags
@@ -27,7 +29,9 @@ GNU/Linux distributions
 
 Before running ./autogen.sh, install some packages.
 
-On Debian-based systems (including Ubuntu), do::
+On Debian-based systems (including Ubuntu), do:
+
+.. code-block:: console
 
     $ sudo apt install \
         gcc make \
@@ -38,7 +42,9 @@ On Debian-based systems (including Ubuntu), do::
         libyaml-dev \
         libxml2-dev
 
-On Fedora systems, do::
+On Fedora systems, do:
+
+.. code-block:: console
 
     $ sudo dnf install \
         gcc make \
@@ -59,13 +65,13 @@ the name of the created executable.
 
 To add a prefix 'ex' which will result in 'ctags' being renamed to 'exctags':
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure --program-prefix=ex
 
 To completely change the program's name run the following:
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure --program-transform-name='s/ctags/my_ctags/; s/etags/myemacs_tags/'
 
@@ -81,7 +87,7 @@ etc.
 LTO is usually beneficial to improving program performance (here refers to ctags).
 We provide the `--enable-lto` option to enable it, as in the following example:
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure --enable-lto
 
@@ -93,13 +99,13 @@ to truly enable LTO optimization for ctags.
 
 For example:
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure
 
 is equivalent to:
 
-.. code-block:: bash
+.. code-block:: console
 
 	$ ./configure --disable-lto
 
@@ -120,7 +126,7 @@ When native-compiling, `FOO_FOR_BUILD` is the same as `FOO`.
 
 Here is an example show you how to use these configure variables:
 
-::
+.. code-block:: console
 
        $ mkdir ./out
        $ configure \
@@ -148,3 +154,43 @@ Here is an example show you how to use these configure variables:
        ctags readtags
 
 Simpler example for `aarch64-linux-gnu` can be found in `circle.yml` in the source tree.
+
+PEG optimization
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Some parsers of Universal Ctags are written in PEG grammar.  The build
+system of Universal Ctags uses `packcc
+<https://github.com/arithy/packcc>`_ for translating the PEG source
+files to C source files. A snapshot version of `packcc` is in the
+source tree of Universal Ctags. The in-tree `packcc` is used when
+building `ctags`. So you don't have to install `packcc`.
+
+`pegof <https://github.com/dolik-rce/pegof>`_ is a PEG grammar
+optimizer (and formatter). You can use `pegof` to build `ctags` though the
+developer says it is not yet stable enough (https://github.com/universal-ctags/ctags/pull/4023).
+
+You may have to build `pegof` first.
+See `Building <https://github.com/dolik-rce/pegof/blob/master/README.md#building>`_ about
+how to build `pegof`. Following the instructions on the page, you may
+see the executable is at `./build/pegof`.
+
+When building ctags, specify the executable to `--with-pegof` option of `./configure`
+script:
+
+.. code-block:: console
+
+   $ ls -d ctags pegof
+   ctags  pegof
+   $ ls -l pegof/build/pegof
+   -rwxr-xr-x. 1 yamato yamato 1894560 Jun 30 03:01 pegof/build/pegof
+   $ cd ctags
+   $ ./configure --with-pegof=../pegof/build/pegof
+   ...
+   $ make
+   ...
+
+If your `ctags` is built with `pegof`, you can verify it with `--list-features` option:
+
+.. code-block:: console
+
+   $ ./ctags --list-features | grep pegof
+   pegof             makes peg based parser(s) optimized (experimental)
