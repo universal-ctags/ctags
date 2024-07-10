@@ -318,9 +318,11 @@ static void findMakeTags (void)
 			}
 		}
 		else if (variable_possible && c == '=' &&
-				 stringListCount (identifiers) == 1)
+				 stringListCount (identifiers) > 0
+				 && !in_value)
 		{
 			newMacro (stringListItem (identifiers, 0), false, appending, current_macro);
+			stringListClear (identifiers);
 
 			in_value = true;
 			unsigned long curline = getInputLineNumber ();
@@ -344,6 +346,7 @@ static void findMakeTags (void)
 				{
 					setTagEndLineToCorkEntry (current_macro, getInputLineNumber ());
 					current_macro = CORK_NIL;
+					stringListClear (identifiers);
 				}
 				else if (in_value && current_macro != CORK_NIL)
 					skipLine ();
@@ -362,6 +365,7 @@ static void findMakeTags (void)
 					vStringStripTrailing (name);
 
 					current_macro = newMacro (name, true, false, CORK_NIL);
+					stringListClear (identifiers);
 				}
 				else if (! strcmp (vStringValue (name), "export")
 						 || ! strcmp (vStringValue (name), "override"))
@@ -395,6 +399,7 @@ static void findMakeTags (void)
 						if (c == EOF || c == '\n')
 							break;
 					}
+					stringListClear (identifiers);
 				}
 				else
 					directiveFound (name);
