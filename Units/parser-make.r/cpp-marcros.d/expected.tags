@@ -1,0 +1,57 @@
+REALMODE_CFLAGS	input.mak	/^REALMODE_CFLAGS	:= -std=gnu11 -m16 -g -Os -DDISABLE_BRANCH_PROFILING -D__DISABLE_EXPORTS \\$/;"	m	language:Make
+DISABLE_BRANCH_PROFILING	input.mak	/^REALMODE_CFLAGS	:= -std=gnu11 -m16 -g -Os -DDISABLE_BRANCH_PROFILING -D__DISABLE_EXPORTS \\$/;"	d	language:CPreProcessor
+__DISABLE_EXPORTS	input.mak	/^REALMODE_CFLAGS	:= -std=gnu11 -m16 -g -Os -DDISABLE_BRANCH_PROFILING -D__DISABLE_EXPORTS \\$/;"	d	language:CPreProcessor
+MYDEF	input.mak	/^		   -DMYDEF=1 \\$/;"	d	language:CPreProcessor
+MYDEF0	input.mak	/^		   -DMYDEF0   \\$/;"	d	language:CPreProcessor
+MYDEF1	input.mak	/^		   -DMYDEF1=1 \\$/;"	d	language:CPreProcessor
+MYDEF2	input.mak	/^		   -DMYDEF2(X)=X   \\$/;"	d	language:CPreProcessor	signature:(X)
+MYDEF3	input.mak	/^		   -D MYDEF3      \\$/;"	d	language:CPreProcessor
+MYDEF4	input.mak	/^		   -D MYDEF4=1    \\$/;"	d	language:CPreProcessor
+MYDEF5	input.mak	/^		   -D MYDEF5(X)=X \\$/;"	d	language:CPreProcessor	signature:(X)
+MYDEF6	input.mak	/^		   -D'MYDEF6'      \\$/;"	d	language:CPreProcessor
+MYDEF7	input.mak	/^		   -D'MYDEF7=1'    \\$/;"	d	language:CPreProcessor
+MYDEF8	input.mak	/^		   -D'MYDEF8(X)=X' \\$/;"	d	language:CPreProcessor	signature:(X)
+MYDEF9	input.mak	/^		   -D 'MYDEF9'      \\$/;"	d	language:CPreProcessor
+MYDEFa	input.mak	/^		   -D 'MYDEFa=1'    \\$/;"	d	language:CPreProcessor
+MYDEFb	input.mak	/^		   -D 'MYDEFb(X)=X' \\$/;"	d	language:CPreProcessor	signature:(X)
+MYDEFc	input.mak	/^		   -D"MYDEFc"      \\$/;"	d	language:CPreProcessor
+MYDEFd	input.mak	/^		   -D"MYDEFd=1"    \\$/;"	d	language:CPreProcessor
+MYDEFe	input.mak	/^		   -D"MYDEFe(X)=X" \\$/;"	d	language:CPreProcessor	signature:(X)
+MYDEFf	input.mak	/^		   -D "MYDEFf"      \\$/;"	d	language:CPreProcessor
+MYDEFg	input.mak	/^		   -D "MYDEFg=1"    \\$/;"	d	language:CPreProcessor
+MYDEFh	input.mak	/^		   -D "MYDEFh(X)=X" \\$/;"	d	language:CPreProcessor	signature:(X)
+KBUILD_CPPFLAGS	input.mak	/^KBUILD_CPPFLAGS := -D__KERNEL__$/;"	m	language:Make
+__KERNEL__	input.mak	/^KBUILD_CPPFLAGS := -D__KERNEL__$/;"	d	language:CPreProcessor
+KBUILD_RUSTFLAGS	input.mak	/^KBUILD_RUSTFLAGS := $(rust_common_flags) \\$/;"	m	language:Make
+clippy::float_arithmetic	input.mak	/^		    -Dclippy::float_arithmetic$/;"	d	language:CPreProcessor
+KBUILD_AFLAGS_KERNEL	input.mak	/^KBUILD_AFLAGS_KERNEL :=$/;"	m	language:Make
+KBUILD_CFLAGS_KERNEL	input.mak	/^KBUILD_CFLAGS_KERNEL :=$/;"	m	language:Make
+KBUILD_RUSTFLAGS_KERNEL	input.mak	/^KBUILD_RUSTFLAGS_KERNEL :=$/;"	m	language:Make
+KBUILD_AFLAGS_MODULE	input.mak	/^KBUILD_AFLAGS_MODULE  := -DMODULE$/;"	m	language:Make
+MODULE	input.mak	/^KBUILD_AFLAGS_MODULE  := -DMODULE$/;"	d	language:CPreProcessor
+KBUILD_CFLAGS_MODULE	input.mak	/^KBUILD_CFLAGS_MODULE  := -DMODULE$/;"	m	language:Make
+MODULE	input.mak	/^KBUILD_CFLAGS_MODULE  := -DMODULE$/;"	d	language:CPreProcessor
+KBUILD_RUSTFLAGS_MODULE	input.mak	/^KBUILD_RUSTFLAGS_MODULE := --cfg MODULE$/;"	m	language:Make
+all	input.mak	/^all:$/;"	t	language:Make
+FOO	input.mak	/^	$(CC) -DFOO ...$/;"	d	language:CPreProcessor
+macdef	input.mak	/^define macdef$/;"	m	language:Make
+MACDEF_CPPFLAGS	input.mak	/^       MACDEF_CPPFLAGS  = -DMACDEFMAC0(X0,Y0,Z0)$/;"	m	language:Make	macro:macdef
+MACDEFMAC0	input.mak	/^       MACDEF_CPPFLAGS  = -DMACDEFMAC0(X0,Y0,Z0)$/;"	d	language:CPreProcessor	signature:(X0,Y0,Z0)
+MACDEFMAC1	input.mak	/^       MACDEF_CPPFLAGS += -DMACDEFMAC1(X1,Y1,Z1)=X1##Y1##Z1$/;"	d	language:CPreProcessor	signature:(X1,Y1,Z1)
+MACDEF_CPPFLAGS_BROKEN0	input.mak	/^       MACDEF_CPPFLAGS_BROKEN0 = -DMACDEFMAC_BROKEN0(A0,B0,C0$/;"	m	language:Make	macro:macdef
+MACDEFMAC_BROKEN0	input.mak	/^       MACDEF_CPPFLAGS_BROKEN0 = -DMACDEFMAC_BROKEN0(A0,B0,C0$/;"	d	language:CPreProcessor
+MACDEF_CPPFLAGS_BROKEN1	input.mak	/^       MACDEF_CPPFLAGS_BROKEN1 = -D MACDEFMAC_BROKEN1(A1,B1,C1$/;"	m	language:Make	macro:macdef
+MACDEFMAC_BROKEN1	input.mak	/^       MACDEF_CPPFLAGS_BROKEN1 = -D MACDEFMAC_BROKEN1(A1,B1,C1$/;"	d	language:CPreProcessor
+MACDEFMAC2	input.mak	/^       MACDEF_CPPFLAGS += -DMACDEFMAC2(X2,Y2,Z2)="f b"$/;"	d	language:CPreProcessor	signature:(X2,Y2,Z2)
+install-man	input-0.mak	/^install-man: $(srctree)\/man\/pfrut.8$/;"	t	language:Make
+install	input-0.mak	/^install:$/;"	t	language:Make
+ACPI_DEBUGGER0	input-1.mak	/^CFLAGS0 += -DACPI_DEBUGGER0\\$/;"	d	language:CPreProcessor
+CFLAGS1	input-1.mak	/^CFLAGS1 ?= -DACPI_DEBUGGER1\\$/;"	m	language:Make
+ACPI_DEBUGGER1	input-1.mak	/^CFLAGS1 ?= -DACPI_DEBUGGER1\\$/;"	d	language:CPreProcessor
+CFLAGS2	input-1.mak	/^CFLAGS2 := -DACPI_DEBUGGER2\\$/;"	m	language:Make
+ACPI_DEBUGGER2	input-1.mak	/^CFLAGS2 := -DACPI_DEBUGGER2\\$/;"	d	language:CPreProcessor
+CFLAGS3	input-1.mak	/^CFLAGS3 = -DACPI_DEBUGGER3\\$/;"	m	language:Make
+ACPI_DEBUGGER3	input-1.mak	/^CFLAGS3 = -DACPI_DEBUGGER3\\$/;"	d	language:CPreProcessor
+FOO_$(VAL)	input-2.mak	/^X += -DFOO_$(VAL)$/;"	d	language:CPreProcessor
+ARM_ARCH_SELECTOR	input-2.mak	/^ARM_ARCH_SELECTOR := $(filter -D__LINUX_ARM_ARCH__%, $(KBUILD_CFLAGS))$/;"	m	language:Make
+__LINUX_ARM_ARCH__%	input-2.mak	/^ARM_ARCH_SELECTOR := $(filter -D__LINUX_ARM_ARCH__%, $(KBUILD_CFLAGS))$/;"	d	language:CPreProcessor
