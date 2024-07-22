@@ -24,7 +24,7 @@ jobs:
              dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
              dnf -y install jq puppet python3-sphinx
              # These are for input-validation.
-             dnf -y install g++ jq puppet nodejs
+             dnf -y install g++ jq puppet nodejs gcc-gfortran
        - run:
            name: Build
            command: |
