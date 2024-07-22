@@ -31,7 +31,7 @@
 /*
 *   MACROS
 */
-#define isident(c)              (isalnum(c) || (c) == '_')
+#define isident(c)              (isalnum(c) || (c) == '_' || (c) == '$')
 #define isBlank(c)              (bool) (c == ' ' || c == '\t')
 #define isType(token,t)         (bool) ((token)->type == (t))
 #define isKeyword(token,k)      (bool) ((token)->keyword == (k))

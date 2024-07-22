@@ -1,0 +1,4 @@
+name$	input.f	/^      function name$(/;"	f
+name$	input.f	/^      integer name\$$/;"	L	function:name$	file:
+main	input.f	/^      program main$/;"	p
+ret$	input.f	/^      integer ret\$$/;"	v	program:main
