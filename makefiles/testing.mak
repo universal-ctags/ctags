@@ -408,7 +408,7 @@ if HAVE_RST2MAN
 endif
 endif
 
-# win32/ctags_vs2013.vcxproj* : committed for win32 build without POSIX tools
+# win32/{ctags_vs2013.vcxproj*,peg_rule.mak} : committed for win32 build without POSIX tools
 #   regenerate files w/o out-of-source build and w/ GNU make
 .PHONY: cg-force-win32 check-genfile-win32
 cg-force-win32:
