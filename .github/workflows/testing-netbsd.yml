@@ -1,0 +1,44 @@
+name: run units target on NetBSD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        netbsd-version: ['10.0', '9.4', '9.3', '9.2']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cross-platform-actions/action@v0.25.0
+        with:
+          operating_system: netbsd
+          version: ${{ matrix.netbsd-version }}
+          shell: bash
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run sudo pkgin -y install mozilla-rootcerts automake autoconf pkg-config gmake
+
+            run cc --version
+
+            run ./autogen.sh
+            run ./configure --prefix=/usr
+            run gmake
+            run sudo gmake install
+            run file /usr/bin/ctags
+            run ctags --version
+            # bugs to fix
+            #run make check CI=gha+vagrant+netbsd
+            run gmake roundtrip CI=gha+vagrant+netbsd

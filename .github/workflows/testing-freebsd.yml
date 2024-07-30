@@ -1,0 +1,42 @@
+name: run units target on FreeBSD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        freebsd-version: ['14.1', '14.0', '13.3', '13.2']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cross-platform-actions/action@v0.25.0
+        with:
+          operating_system: freebsd
+          version: ${{ matrix.freebsd-version }}
+          shell: bash
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run sudo pkg install -y automake pkgconf gmake python3
+            run freebsd-version
+            run cc --version
+            run ./autogen.sh
+            run ./configure --prefix=/usr
+            run gmake
+            run sudo gmake install
+            run file ctags
+            run ctags --version
+            run gmake check CI=gha+vagrant+freebsd
+            run gmake roundtrip CI=gha+vagrant+freebsd
