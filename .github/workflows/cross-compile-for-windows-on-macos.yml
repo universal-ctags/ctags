@@ -1,4 +1,4 @@
-name: cross compile with mingw-w64 on ubuntu
+name: cross compile for Windows on macOS
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build-machine-os: [ubuntu-22.04, ubuntu-20.04]
+        build-machine-os: [macos-14, macos-13, macos-12]
         target: [i686-w64-mingw32,x86_64-w64-mingw32]
 
     runs-on: ${{ matrix.build-machine-os }}
@@ -19,8 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: sudo apt-get -y -o APT::Immediate-Configure=false update
-      - run: sudo apt-get -y -o APT::Immediate-Configure=false install mingw-w64 gcc make automake autoconf file
+      - run: brew install mingw-w64 make automake autoconf file
 
       - run: ./autogen.sh
 
