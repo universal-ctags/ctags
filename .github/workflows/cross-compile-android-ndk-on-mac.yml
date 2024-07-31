@@ -1,4 +1,4 @@
-name: cross compile with android-ndk on mac
+name: cross compile with android-ndk on macOS
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: brew install gcc make automake autoconf file
+      - run: brew install make automake autoconf file
 
       - run: ./autogen.sh
 
@@ -36,34 +36,13 @@ jobs:
           export CPPFLAGS="--sysroot $SYSROOT -Qunused-arguments"
           export LDFLAGS="--sysroot $SYSROOT"
 
-          TARGET=armv7a-linux-androideabi
-
-          COLOR_PURPLE='\033[0;35m'       # Purple
-          COLOR_GREEN='\033[0;32m'        # Green
-          COLOR_OFF='\033[0m'             # Reset
-
-          echo() {
-            printf "%b\n" "$*"
-          }
-
-          run() {
-            echo "$COLOR_PURPLE==>$COLOR_OFF $COLOR_GREEN$@$COLOR_OFF"
-            eval "$*"
-          }
-
-          run ./configure \
-              --host=$TARGET \
+          ./configure \
+              --host=armv7a-linux-androideabi \
               --disable-iconv \
               --disable-xml \
               --disable-json \
               --disable-yaml \
-              --disable-pcre2 \
-              CC="$CC" \
-              CFLAGS="\"$CFLAGS\"" \
-              CPPFLAGS="\"$CPPFLAGS\"" \
-              LDFLAGS="\"$LDFLAGS\"" \
-              AR=$AR \
-              RANLIB=$RANLIB
+              --disable-pcre2
 
       - run: make V=1
 
