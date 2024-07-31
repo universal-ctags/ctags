@@ -1,4 +1,4 @@
-name: cross compile with android-ndk on macOS
+name: cross compile for Android on macOS
 
 on:
   push:

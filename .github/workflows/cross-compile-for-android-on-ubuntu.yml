@@ -1,4 +1,4 @@
-name: cross compile with android-ndk on ubuntu
+name: cross compile for Android on ubuntu
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: run units target on GNU/Linux
+name: run units target on Ubuntu
 
 on:
   push:
