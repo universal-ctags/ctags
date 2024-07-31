@@ -11,20 +11,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        freebsd-release-version: [13.2]
+        freebsd-release-version: ['14.1', '14.0', '13.3', '13.2', '13.1', '13.0']
+        # https://archive.freebsd.org/old-releases/amd64/
 
     runs-on: ubuntu-latest
 
     env:
       CC: clang --target=amd64-unknown-freebsd --sysroot=${{ github.workspace }}/amd64-unknown-freebsd-sysroot
-      CFLAGS:  -I${{ github.workspace }}/amd64-unknown-freebsd-3rdroot/include -v -fPIC
-      LDFLAGS: -L${{ github.workspace }}/amd64-unknown-freebsd-3rdroot/lib -Wl,-v
+      CFLAGS:  -I${{ github.workspace }}/amd64-unknown-freebsd-3rdroot/include -fPIC
+      LDFLAGS: -L${{ github.workspace }}/amd64-unknown-freebsd-3rdroot/lib
       PKG_CONFIG_PATH: ${{ github.workspace }}/amd64-unknown-freebsd-3rdroot/lib/pkgconfig
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: universal-ctags/ctags
 
       - run: sudo apt-get -y update
       - run: sudo apt-get -y install clang cmake make automake autoconf curl file
