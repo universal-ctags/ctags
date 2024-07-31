@@ -11,20 +11,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        openbsd-release-version: [7.4]
+        openbsd-release-version: ['7.5', '7.4', '7.3']
+        # https://cdn.openbsd.org/pub/OpenBSD/
 
     runs-on: ubuntu-latest
 
     env:
       CC: clang --target=amd64-unknown-openbsd --sysroot=${{ github.workspace }}/amd64-unknown-openbsd-sysroot
-      CFLAGS:  -I${{ github.workspace }}/amd64-unknown-openbsd-3rdroot/include -v -fPIC
-      LDFLAGS: -L${{ github.workspace }}/amd64-unknown-openbsd-3rdroot/lib -Wl,-v
+      CFLAGS:  -I${{ github.workspace }}/amd64-unknown-openbsd-3rdroot/include -fPIC
+      LDFLAGS: -L${{ github.workspace }}/amd64-unknown-openbsd-3rdroot/lib
       PKG_CONFIG_PATH: ${{ github.workspace }}/amd64-unknown-openbsd-3rdroot/lib/pkgconfig
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: universal-ctags/ctags
 
       - run: sudo apt-get -y update
       - run: sudo apt-get -y install clang cmake make automake autoconf pkg-config curl file
