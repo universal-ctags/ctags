@@ -11,20 +11,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        netbsd-release-version: [9.3]
+        netbsd-release-version: ['10.0', '9.4', '9.3', '9.2']
+        # https://ftp.netbsd.org/pub/NetBSD/
 
     runs-on: ubuntu-latest
 
     env:
       CC: clang --target=amd64-unknown-netbsd --sysroot=${{ github.workspace }}/amd64-unknown-netbsd-sysroot
-      CFLAGS:  -I${{ github.workspace }}/amd64-unknown-netbsd-3rdroot/include -v -fPIC
-      LDFLAGS: -L${{ github.workspace }}/amd64-unknown-netbsd-3rdroot/lib -Wl,-v
+      CFLAGS:  -I${{ github.workspace }}/amd64-unknown-netbsd-3rdroot/include -fPIC
+      LDFLAGS: -L${{ github.workspace }}/amd64-unknown-netbsd-3rdroot/lib
       PKG_CONFIG_PATH: ${{ github.workspace }}/amd64-unknown-netbsd-3rdroot/lib/pkgconfig
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: universal-ctags/ctags
 
       - run: sudo apt-get -y update
       - run: sudo apt-get -y install clang cmake make automake autoconf pkg-config curl file
@@ -34,9 +33,6 @@ jobs:
 
       - name: install amd64-unknown-netbsd-sysroot
         run: |
-          major="$(printf '%s\n' ${{ matrix.netbsd-release-version }} | cut -d. -f1)"
-          minor="$(printf '%s\n' ${{ matrix.netbsd-release-version }} | cut -d. -f2)"
-
           for item in base comp
           do
             FILENAME="$item.tar.xz"
