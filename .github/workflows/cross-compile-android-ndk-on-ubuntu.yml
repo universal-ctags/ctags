@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build-machine-os: [ubuntu-22.04, ubuntu-20.04]
+        build-machine-os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04]
 
     runs-on: ${{ matrix.build-machine-os }}
 
@@ -25,10 +25,7 @@ jobs:
 
       - name: Run ./configure ...
         run: |
-          BUILD_MACHINE_OS_TYPE=$(uname | tr A-Z a-z)
-          BUILD_MACHINE_OS_ARCH=$(uname -m)
-
-          TOOLCHAIN_BASE_DIR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/$BUILD_MACHINE_OS_TYPE-$BUILD_MACHINE_OS_ARCH
+          TOOLCHAIN_BASE_DIR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64
           TOOLCHAIN_BIN_DIR=$TOOLCHAIN_BASE_DIR/bin
           SYSROOT=$TOOLCHAIN_BASE_DIR/sysroot
 
@@ -40,34 +37,15 @@ jobs:
           export CPPFLAGS="--sysroot $SYSROOT -Qunused-arguments"
           export LDFLAGS="--sysroot $SYSROOT"
 
-          TARGET=armv7a-linux-androideabi
+          set -ex
 
-          COLOR_PURPLE='\033[0;35m'       # Purple
-          COLOR_GREEN='\033[0;32m'        # Green
-          COLOR_OFF='\033[0m'             # Reset
-
-          echo() {
-            printf "%b\n" "$*"
-          }
-
-          run() {
-            echo "$COLOR_PURPLE==>$COLOR_OFF $COLOR_GREEN$@$COLOR_OFF"
-            eval "$*"
-          }
-
-          run ./configure \
-              --host=$TARGET \
+          ./configure \
+              --host=armv7a-linux-androideabi \
               --disable-iconv \
               --disable-xml \
               --disable-json \
               --disable-yaml \
-              --disable-pcre2 \
-              CC="$CC" \
-              CFLAGS="\"$CFLAGS\"" \
-              CPPFLAGS="\"$CPPFLAGS\"" \
-              LDFLAGS="\"$LDFLAGS\"" \
-              AR=$AR \
-              RANLIB=$RANLIB
+              --disable-pcre2
 
       - run: make V=1
 
