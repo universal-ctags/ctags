@@ -148,7 +148,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 Notation: ``<foo>`` is for a variable string ``foo``, ``[ ... ]`` for optional,
 ``|`` for selection, and ``( ... )`` for grouping.  For example
-``--foo[=(yes|no)]'' means ``--foo``, ``-foo=yes``, or ``-foo=no``.
+``--foo[=(yes|no)]`` means ``--foo``, ``--foo=yes``, or ``--foo=no``.
 
 .. _option_input_output_file:
 
