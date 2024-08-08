@@ -1,0 +1,34 @@
+title	input.toml	/^title = "TOML Example"$/;"	qkey	line:5
+dog."tater.man"	input.toml	/^[dog."tater.man"]$/;"	table	line:7	end:10
+type.name	input.toml	/^type.name = "pug"$/;"	qkey	line:8	table:dog."tater.man"
+x	input.toml	/^x = 1$/;"	qkey	line:9	table:dog."tater.man"
+owner	input.toml	/^[owner]$/;"	table	line:11	end:14
+name	input.toml	/^name = "Tom Preston-Werner"$/;"	qkey	line:12	table:owner
+dob	input.toml	/^dob = 1979-05-27T07:32:00-08:00 # First class dates$/;"	qkey	line:13	table:owner
+database	input.toml	/^[database]$/;"	table	line:15	end:20
+server	input.toml	/^server = "192.168.1.1"$/;"	qkey	line:16	table:database
+ports	input.toml	/^ports = [ 8001, 8001, 8002 ]$/;"	qkey	line:17	table:database
+connection_max	input.toml	/^connection_max = 5000$/;"	qkey	line:18	table:database
+enabled	input.toml	/^enabled = true$/;"	qkey	line:19	table:database
+servers	input.toml	/^[servers]$/;"	table	line:21	end:23
+servers.alpha	input.toml	/^  [servers.alpha]$/;"	table	line:24	end:27
+ip	input.toml	/^  ip = "10.0.0.1"$/;"	qkey	line:25	table:servers.alpha
+dc	input.toml	/^  dc = "eqdc10"$/;"	qkey	line:26	table:servers.alpha
+servers.beta	input.toml	/^  [servers.beta]$/;"	table	line:28	end:31
+ip	input.toml	/^  ip = "10.0.0.2"$/;"	qkey	line:29	table:servers.beta
+dc	input.toml	/^  dc = "eqdc10"$/;"	qkey	line:30	table:servers.beta
+clients	input.toml	/^[clients]$/;"	table	line:32	end:40
+data	input.toml	/^data = [ ["gamma", "delta"], [1, 2] ]$/;"	qkey	line:33	table:clients
+hosts	input.toml	/^hosts = [$/;"	qkey	line:36	table:clients
+products	input.toml	/^[[products]] # 0$/;"	arraytable	line:41	end:44	nth:0
+name	input.toml	/^name = "Hammer"$/;"	qkey	line:42	arraytable:products
+sku	input.toml	/^sku = 738594937$/;"	qkey	line:43	arraytable:products
+products	input.toml	/^[[products]] # 1$/;"	arraytable	line:45	end:46	nth:1
+products	input.toml	/^[[products]] # 2$/;"	arraytable	line:47	end:50	nth:2
+name	input.toml	/^name = "Nail"$/;"	qkey	line:48	arraytable:products
+sku	input.toml	/^sku = 284758393$/;"	qkey	line:49	arraytable:products
+color	input.toml	/^color = "gray"$/;"	qkey	line:50	arraytable:products
+x	input-0.toml	/^[x]$/;"	table	line:1	end:4
+y	input-0.toml	/^y = 1$/;"	qkey	line:2	table:x
+""	input-0.toml	/^"" = 2$/;"	qkey	line:3	table:x
+''	input-0.toml	/^'' = 3$/;"	qkey	line:4	table:x

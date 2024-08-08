@@ -268,6 +268,7 @@ PEG_INPUT = \
        peg/kotlin.peg				\
        peg/thrift.peg				\
        peg/elm.peg					\
+       peg/toml.peg				\
        \
        $(NULL)
 PEG_SRCS = $(PEG_INPUT:.peg=.c)
