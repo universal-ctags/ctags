@@ -2166,9 +2166,21 @@ static void processListMapsOption (
 
 static void processListLanguagesOption (
 		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
+		const char *const parameter)
 {
-	printLanguageList ();
+	enum parserCategory category = PARSER_CATEGORY_NONE;
+
+	if (parameter)
+	{
+		if (strcmp(parameter, "_libxml") == 0)
+			category = PARSER_CATEGORY_LIBXML;
+		else if (strcmp(parameter, "_libyaml") == 0)
+			category = PARSER_CATEGORY_LIBYAML;
+		else if (strcmp(parameter, "_packcc") == 0)
+			category = PARSER_CATEGORY_PACKCC;
+	}
+
+	printLanguageList (category);
 	exit (0);
 }
 

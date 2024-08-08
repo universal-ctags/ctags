@@ -105,6 +105,8 @@ typedef struct sParserObject {
 									  is set here if this parser is OLDLANG.
 									  LANG_IGNORE is set if no being pretended. */
 
+	enum parserCategory category; /* Used when --languages=_CATEGORY is specified. */
+
 } parserObject;
 
 /*
@@ -1971,7 +1973,8 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 }
 
 /* Used in both builtin and optlib parsers. */
-static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
+static void initializeParsingCommon (parserDefinition *def, bool is_builtin,
+									 enum parserCategory category)
 {
 	parserObject *parser;
 
@@ -1983,6 +1986,7 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 	def->id = LanguageCount++;
 	parser = LanguageTable + def->id;
 	parser->def = def;
+	parser->category = category;
 
 	hashTablePutItem (LanguageHTable, def->name, def);
 
@@ -2006,6 +2010,31 @@ static char *acceptableLangName(char *name)
 			return c;
 	}
 	return NULL;
+}
+
+static enum parserCategory getCategoryForParserFunc(parserDefinitionFunc* func)
+{
+	/* Putting a NULL not to make a zero-sized array that some compilers don't support. */
+	parserDefinitionFunc* libxml_fa [] = { NULL, XML_PARSER_LIST };
+	parserDefinitionFunc* libyaml_fa[] = { NULL, YAML_PARSER_LIST };
+	parserDefinitionFunc* packcc_fa[] = { NULL, PEG_PARSER_LIST };
+
+#define RETURN_IF_FOUND(c,C)									\
+	do {														\
+		for (size_t i = 0; i < ARRAY_SIZE(c##_fa); i++)			\
+		{														\
+			if (c##_fa[i] == func)								\
+				return PARSER_CATEGORY_##C;						\
+		}														\
+	} while (0)
+
+	RETURN_IF_FOUND(libxml, LIBXML);
+	RETURN_IF_FOUND(libyaml, LIBYAML);
+	RETURN_IF_FOUND(packcc, PACKCC);
+
+#undef RETURN_IF_FOUND
+
+	return PARSER_CATEGORY_NONE;
 }
 
 extern void initializeParsing (void)
@@ -2032,6 +2061,7 @@ extern void initializeParsing (void)
 	verbose ("Installing parsers: ");
 	for (i = 0  ;  i < builtInCount  ;  ++i)
 	{
+		enum parserCategory category = getCategoryForParserFunc(BuiltInParsers [i]);
 		parserDefinition* const def = (*BuiltInParsers [i]) ();
 		if (def != NULL)
 		{
@@ -2046,7 +2076,7 @@ extern void initializeParsing (void)
 				/* parser definition must define one and only one parsing routine */
 				Assert ((!!def->parser) + (!!def->parser2) == 1);
 
-			initializeParsingCommon (def, true);
+			initializeParsingCommon (def, true, category);
 		}
 	}
 	verbose ("\n");
@@ -2420,7 +2450,7 @@ extern void processLanguageDefineOption (
 	def->versionCurrent = data.versionCurrent;
 	def->versionAge = data.versionAge;
 
-	initializeParsingCommon (def, false);
+	initializeParsingCommon (def, false, PARSER_CATEGORY_NONE);
 	linkDependenciesAtInitializeParsing (def);
 
 	LanguageTable [def->id].currentPatterns = stringListNew ();
@@ -3872,17 +3902,26 @@ static void printLanguage (const langType language, parserDefinition** ltable)
 	printf ("%s%s\n", lang->name, isLanguageEnabled (lang->id) ? "" : " [disabled]");
 }
 
-extern void printLanguageList (void)
+extern void printLanguageList (enum parserCategory category)
 {
 	unsigned int i;
+	unsigned int n;
 	parserDefinition **ltable;
 
 	ltable = xMalloc (LanguageCount, parserDefinition*);
-	for (i = 0 ; i < LanguageCount ; ++i)
-		ltable[i] = LanguageTable[i].def;
-	qsort (ltable, LanguageCount, sizeof (parserDefinition*), compareParsersByName);
+	for (i = 0, n = 0 ; i < LanguageCount ; ++i)
+	{
+		if (category != PARSER_CATEGORY_NONE)
+		{
+			if (LanguageTable[i].category != category)
+				continue;
+		}
+		ltable[n] = LanguageTable[i].def;
+		++n;
+	}
+	qsort (ltable, n, sizeof (parserDefinition*), compareParsersByName);
 
-	for (i = 0  ;  i < LanguageCount  ;  ++i)
+	for (i = 0  ;  i < n  ;  ++i)
 		printLanguage (i, ltable);
 
 	eFree (ltable);
