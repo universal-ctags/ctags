@@ -105,8 +105,8 @@ typedef struct sParserObject {
 									  is set here if this parser is OLDLANG.
 									  LANG_IGNORE is set if no being pretended. */
 
-	enum parserCategory category; /* Used when --languages=_CATEGORY is specified. */
-
+	parserDefinitionFunc *parserDefFunc; /* Used when --languages=_CATEGORY
+											is specified. */
 } parserObject;
 
 /*
@@ -1974,7 +1974,7 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 
 /* Used in both builtin and optlib parsers. */
 static void initializeParsingCommon (parserDefinition *def, bool is_builtin,
-									 enum parserCategory category)
+									 parserDefinitionFunc* parserDefFunc)
 {
 	parserObject *parser;
 
@@ -1986,7 +1986,7 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin,
 	def->id = LanguageCount++;
 	parser = LanguageTable + def->id;
 	parser->def = def;
-	parser->category = category;
+	parser->parserDefFunc = parserDefFunc;
 
 	hashTablePutItem (LanguageHTable, def->name, def);
 
@@ -2061,7 +2061,6 @@ extern void initializeParsing (void)
 	verbose ("Installing parsers: ");
 	for (i = 0  ;  i < builtInCount  ;  ++i)
 	{
-		enum parserCategory category = getCategoryForParserFunc(BuiltInParsers [i]);
 		parserDefinition* const def = (*BuiltInParsers [i]) ();
 		if (def != NULL)
 		{
@@ -2076,7 +2075,7 @@ extern void initializeParsing (void)
 				/* parser definition must define one and only one parsing routine */
 				Assert ((!!def->parser) + (!!def->parser2) == 1);
 
-			initializeParsingCommon (def, true, category);
+			initializeParsingCommon (def, true, BuiltInParsers [i]);
 		}
 	}
 	verbose ("\n");
@@ -2450,7 +2449,7 @@ extern void processLanguageDefineOption (
 	def->versionCurrent = data.versionCurrent;
 	def->versionAge = data.versionAge;
 
-	initializeParsingCommon (def, false, PARSER_CATEGORY_NONE);
+	initializeParsingCommon (def, false, NULL);
 	linkDependenciesAtInitializeParsing (def);
 
 	LanguageTable [def->id].currentPatterns = stringListNew ();
@@ -3911,12 +3910,13 @@ extern void printLanguageList (enum parserCategory category)
 	ltable = xMalloc (LanguageCount, parserDefinition*);
 	for (i = 0, n = 0 ; i < LanguageCount ; ++i)
 	{
+		parserObject *pobj = LanguageTable + i;
 		if (category != PARSER_CATEGORY_NONE)
 		{
-			if (LanguageTable[i].category != category)
+			if (getCategoryForParserFunc(pobj->parserDefFunc) != category)
 				continue;
 		}
-		ltable[n] = LanguageTable[i].def;
+		ltable[n] = pobj->def;
 		++n;
 	}
 	qsort (ltable, n, sizeof (parserDefinition*), compareParsersByName);
