@@ -37,6 +37,14 @@ typedef enum {
 	LMAP_TABLE_OUTPUT = 1 << 2,
 } langmapType;
 
+enum parserCategory
+{
+	PARSER_CATEGORY_NONE,
+	PARSER_CATEGORY_LIBXML,
+	PARSER_CATEGORY_LIBYAML,
+	PARSER_CATEGORY_PACKCC,
+};
+
 /*
 *   FUNCTION PROTOTYPES
 */
@@ -115,7 +123,7 @@ extern void printLanguageRoles (const langType language, const char* letters,
 								bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageAliases (const langType language,
 								  bool withListHeader, bool machinable, FILE *fp);
-extern void printLanguageList (void);
+extern void printLanguageList (enum parserCategory category);
 extern void printLanguageParams (const langType language,
 								 bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageSubparsers (const langType language,

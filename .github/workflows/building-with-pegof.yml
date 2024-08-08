@@ -44,7 +44,8 @@ jobs:
 
       - run: ./ctags --list-features | grep pegof
 
-      - run: make units
+      - run: echo "Targets: $(./ctags --list-languages=_packcc |  tr '\n' ',')"
+      - run: make units LANGUAGES="$(./ctags --list-languages=_packcc |  tr '\n' ',')"
       - run: make dist
         # See EXTRA_DIST in Makefile.am.
         # Currently we add .pego files.
