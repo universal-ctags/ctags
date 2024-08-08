@@ -15,7 +15,7 @@
 */
 #include "general.h"	/* must always come first */
 
-#include "r.h"
+#include "x-r.h"
 #include "kind.h"
 #include "tokeninfo.h"
 #include "parse.h"

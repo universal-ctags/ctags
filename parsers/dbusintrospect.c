@@ -24,7 +24,7 @@
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
-#include "xml.h"
+#include "x-xml.h"
 
 #include <string.h>
 

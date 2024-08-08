@@ -16,7 +16,7 @@
 #include <string.h>
 
 #include "entry.h"
-#include "perl.h"
+#include "x-perl.h"
 #include "promise.h"
 #include "read.h"
 #include "routines.h"

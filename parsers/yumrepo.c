@@ -17,7 +17,7 @@
 #include "general.h"  /* must always come first */
 
 #include "entry.h"
-#include "iniconf.h"
+#include "x-iniconf.h"
 #include "kind.h"
 #include "parse.h"
 #include "read.h"

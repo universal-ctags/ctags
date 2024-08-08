@@ -36,7 +36,7 @@
 #include "trace.h"
 
 #include "dependency.h"
-#include "autoconf.h"
+#include "x-autoconf.h"
 
 typedef enum {
 	K_TAG,

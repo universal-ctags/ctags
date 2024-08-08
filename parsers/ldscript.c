@@ -13,7 +13,7 @@
 #include "tokeninfo.h"
 
 #include "entry.h"
-#include "cpreprocessor.h"
+#include "x-cpreprocessor.h"
 #include "keyword.h"
 #include "parse.h"
 #include "ptrarray.h"

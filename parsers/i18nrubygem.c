@@ -18,7 +18,7 @@
  */
 #include "general.h"	/* must always come first */
 
-#include "yaml.h"
+#include "x-yaml.h"
 
 #include "entry.h"
 #include "keyword.h"

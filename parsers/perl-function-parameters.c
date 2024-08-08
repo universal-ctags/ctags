@@ -19,7 +19,7 @@
 #include "entry.h"
 #include "kind.h"
 #include "parse.h"
-#include "perl.h"
+#include "x-perl.h"
 
 #include <string.h>
 

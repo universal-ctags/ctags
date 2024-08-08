@@ -17,7 +17,7 @@
  */
 #include "general.h"	/* must always come first */
 
-#include "xml.h"
+#include "x-xml.h"
 
 #include "entry.h"
 #include "parse.h"

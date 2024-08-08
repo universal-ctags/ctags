@@ -15,7 +15,7 @@
 
 #include <string.h>
 
-#include "cpreprocessor.h"
+#include "x-cpreprocessor.h"
 #include "debug.h"
 #include "dependency.h"
 #include "entry.h"

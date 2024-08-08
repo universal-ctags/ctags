@@ -11,7 +11,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"
-#include "cpreprocessor.h"
+#include "x-cpreprocessor.h"
 #include "field.h"
 #include "kind.h"
 #include "parse.h"

@@ -33,7 +33,7 @@
 #include "trace.h"
 #include "vstring.h"
 #include "subparser.h"
-#include "r.h"
+#include "x-r.h"
 
 #include <string.h>
 #include <ctype.h>	/* to define isalpha(), isalnum(), isspace() */

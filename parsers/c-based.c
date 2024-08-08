@@ -18,7 +18,7 @@
 
 #include "debug.h"
 #include "entry.h"
-#include "cpreprocessor.h"
+#include "x-cpreprocessor.h"
 #include "keyword.h"
 #include "options.h"
 #include "parse.h"

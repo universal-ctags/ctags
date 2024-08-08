@@ -878,15 +878,6 @@
     <ClInclude Include="..\main\xtag_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\autoconf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\parsers\bibtex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\parsers\cpreprocessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\parsers\cxx\cxx_debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -920,40 +911,49 @@
     <ClInclude Include="..\parsers\cxx\cxx_token_chain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\frontmatter.h">
+    <ClInclude Include="..\parsers\x-autoconf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\iniconf.h">
+    <ClInclude Include="..\parsers\x-bibtex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\jscript.h">
+    <ClInclude Include="..\parsers\x-cpreprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\m4.h">
+    <ClInclude Include="..\parsers\x-frontmatter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\make.h">
+    <ClInclude Include="..\parsers\x-iniconf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\markdown.h">
+    <ClInclude Include="..\parsers\x-jscript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\perl.h">
+    <ClInclude Include="..\parsers\x-m4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\r.h">
+    <ClInclude Include="..\parsers\x-make.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\ruby.h">
+    <ClInclude Include="..\parsers\x-markdown.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\sh.h">
+    <ClInclude Include="..\parsers\x-perl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\tcl.h">
+    <ClInclude Include="..\parsers\x-r.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\tex.h">
+    <ClInclude Include="..\parsers\x-ruby.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parsers\x-sh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parsers\x-tcl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parsers\x-tex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">

@@ -16,7 +16,7 @@
  *   INCLUDE FILES
  */
 #include "general.h"	/* must always come first */
-#include "markdown.h"
+#include "x-markdown.h"
 
 #include "entry.h"
 #include "parse.h"

@@ -453,9 +453,6 @@
     <ClInclude Include="..\main\writer_p.h" />
     <ClInclude Include="..\main\xtag.h" />
     <ClInclude Include="..\main\xtag_p.h" />
-    <ClInclude Include="..\parsers\autoconf.h" />
-    <ClInclude Include="..\parsers\bibtex.h" />
-    <ClInclude Include="..\parsers\cpreprocessor.h" />
     <ClInclude Include="..\parsers\cxx\cxx_debug.h" />
     <ClInclude Include="..\parsers\cxx\cxx_keyword.h" />
     <ClInclude Include="..\parsers\cxx\cxx_parser.h" />
@@ -467,18 +464,21 @@
     <ClInclude Include="..\parsers\cxx\cxx_tag.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token_chain.h" />
-    <ClInclude Include="..\parsers\frontmatter.h" />
-    <ClInclude Include="..\parsers\iniconf.h" />
-    <ClInclude Include="..\parsers\jscript.h" />
-    <ClInclude Include="..\parsers\m4.h" />
-    <ClInclude Include="..\parsers\make.h" />
-    <ClInclude Include="..\parsers\markdown.h" />
-    <ClInclude Include="..\parsers\perl.h" />
-    <ClInclude Include="..\parsers\r.h" />
-    <ClInclude Include="..\parsers\ruby.h" />
-    <ClInclude Include="..\parsers\sh.h" />
-    <ClInclude Include="..\parsers\tcl.h" />
-    <ClInclude Include="..\parsers\tex.h" />
+    <ClInclude Include="..\parsers\x-autoconf.h" />
+    <ClInclude Include="..\parsers\x-bibtex.h" />
+    <ClInclude Include="..\parsers\x-cpreprocessor.h" />
+    <ClInclude Include="..\parsers\x-frontmatter.h" />
+    <ClInclude Include="..\parsers\x-iniconf.h" />
+    <ClInclude Include="..\parsers\x-jscript.h" />
+    <ClInclude Include="..\parsers\x-m4.h" />
+    <ClInclude Include="..\parsers\x-make.h" />
+    <ClInclude Include="..\parsers\x-markdown.h" />
+    <ClInclude Include="..\parsers\x-perl.h" />
+    <ClInclude Include="..\parsers\x-r.h" />
+    <ClInclude Include="..\parsers\x-ruby.h" />
+    <ClInclude Include="..\parsers\x-sh.h" />
+    <ClInclude Include="..\parsers\x-tcl.h" />
+    <ClInclude Include="..\parsers\x-tex.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

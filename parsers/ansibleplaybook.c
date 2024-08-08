@@ -11,7 +11,7 @@
 #include "general.h"	/* must always come first */
 #include "entry.h"
 #include "kind.h"
-#include "yaml.h"
+#include "x-yaml.h"
 #include "parse.h"
 #include "subparser.h"
 

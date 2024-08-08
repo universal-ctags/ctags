@@ -11,8 +11,8 @@
 
 #include <string.h>
 
-#include "autoconf.h"
-#include "m4.h"
+#include "x-autoconf.h"
+#include "x-m4.h"
 
 #include "debug.h"
 #include "entry.h"

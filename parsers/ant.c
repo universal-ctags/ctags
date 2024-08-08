@@ -19,7 +19,7 @@
 #ifdef HAVE_LIBXML
 #include "read.h"
 #include "selectors.h"
-#include "xml.h"
+#include "x-xml.h"
 #endif
 
 #ifdef HAVE_LIBXML

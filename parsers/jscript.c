@@ -48,7 +48,7 @@
 #include "mbcs.h"
 #include "trace.h"
 
-#include "jscript.h"
+#include "x-jscript.h"
 
 /*
  * MACROS
