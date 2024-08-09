@@ -479,6 +479,7 @@
     <ClInclude Include="..\parsers\x-sh.h" />
     <ClInclude Include="..\parsers\x-tcl.h" />
     <ClInclude Include="..\parsers\x-tex.h" />
+    <ClInclude Include="..\parsers\x-toml.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

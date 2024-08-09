@@ -956,6 +956,9 @@
     <ClInclude Include="..\parsers\x-tex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\parsers\x-toml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
