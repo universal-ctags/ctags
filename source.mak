@@ -422,6 +422,7 @@ PARSER_SRCS =				\
 	parsers/tcloo.c			\
 	parsers/tex.c			\
 	parsers/tex-beamer.c		\
+	parsers/cargo.c			\
 	parsers/ttcn.c			\
 	parsers/txt2tags.c		\
 	parsers/typescript.c		\

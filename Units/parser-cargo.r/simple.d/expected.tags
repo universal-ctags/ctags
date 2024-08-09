@@ -1,0 +1,1 @@
+myapp	input.cargo	/^name = "myapp"$/;"	package	language:Cargo
