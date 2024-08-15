@@ -76,11 +76,11 @@ extern parserDefinition* KconfigParser (void)
 		"{{\n"
 		"   .\n"
 		"}}", NULL, false},
-		{"^[ \t]*(bool|boolean|hex|int|string|tristate)\\>", "",
+		{"^[ \t]*(def_)?(bool|boolean|hex|int|string|tristate)\\>", "",
 		"", "{exclusive}"
 		"{{\n"
 		"   count 0 gt {\n"
-		"         \\1 typeref:\n"
+		"         \\2 typeref:\n"
 		"         clear\n"
 		"   } if\n"
 		"}}", NULL, false},

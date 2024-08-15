@@ -56,9 +56,9 @@
 --regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$/\2/c/{scope=ref}{{
    .
 }}
---regex-Kconfig=/^[ \t]*(bool|boolean|hex|int|string|tristate)\>///{exclusive}{{
+--regex-Kconfig=/^[ \t]*(def_)?(bool|boolean|hex|int|string|tristate)\>///{exclusive}{{
    count 0 gt {
-         \1 typeref:
+         \2 typeref:
          clear
    } if
 }}
