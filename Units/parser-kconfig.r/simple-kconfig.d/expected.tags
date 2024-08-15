@@ -115,7 +115,7 @@ net/mptcp/Kconfig	input-3.kconfig	/^source "net\/mptcp\/Kconfig"$/;"	k	menu:Netw
 NETWORK_SECMARK	input-3.kconfig	/^config NETWORK_SECMARK$/;"	c	menu:Networking options	typeref:typename:bool	roles:def
 CONFIG_NETWORK_SECMARK	input-3.kconfig	/^config NETWORK_SECMARK$/;"	c	menu:Networking options	roles:def
 CONFIG_NETWORK_SECMARK_MODULE	input-3.kconfig	/^config NETWORK_SECMARK$/;"	c	menu:Networking options	roles:def
-NET_PTP_CLASSIFY	input-3.kconfig	/^config NET_PTP_CLASSIFY$/;"	c	menu:Networking options	roles:def
+NET_PTP_CLASSIFY	input-3.kconfig	/^config NET_PTP_CLASSIFY$/;"	c	menu:Networking options	typeref:typename:bool	roles:def
 CONFIG_NET_PTP_CLASSIFY	input-3.kconfig	/^config NET_PTP_CLASSIFY$/;"	c	menu:Networking options	roles:def
 CONFIG_NET_PTP_CLASSIFY_MODULE	input-3.kconfig	/^config NET_PTP_CLASSIFY$/;"	c	menu:Networking options	roles:def
 NETWORK_PHY_TIMESTAMPING	input-3.kconfig	/^config NETWORK_PHY_TIMESTAMPING$/;"	c	menu:Networking options	typeref:typename:bool	roles:def
