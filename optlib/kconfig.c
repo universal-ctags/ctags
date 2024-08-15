@@ -72,7 +72,18 @@ extern parserDefinition* KconfigParser (void)
 		{"^[ \t]*#.*$", "",
 		"", "{placeholder}", NULL, false},
 		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$", "\\2",
-		"c", "{scope=ref}", NULL, false},
+		"c", "{scope=ref}"
+		"{{\n"
+		"   .\n"
+		"}}", NULL, false},
+		{"^[ \t]*(bool|boolean|hex|int|string|tristate)\\>", "",
+		"", "{exclusive}"
+		"{{\n"
+		"   count 0 gt {\n"
+		"         \\1 typeref:\n"
+		"         pop\n"
+		"   } if\n"
+		"}}", NULL, false},
 		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$", "CONFIG_\\2",
 		"c", "{scope=ref}{_extra=configPrefixed}", NULL, false},
 		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$", "CONFIG_\\2_MODULE",
