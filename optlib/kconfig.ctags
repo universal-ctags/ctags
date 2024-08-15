@@ -59,7 +59,7 @@
 --regex-Kconfig=/^[ \t]*(bool|boolean|hex|int|string|tristate)\>///{exclusive}{{
    count 0 gt {
          \1 typeref:
-         pop
+         clear
    } if
 }}
 --regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$/CONFIG_\2/c/{scope=ref}{_extra=configPrefixed}

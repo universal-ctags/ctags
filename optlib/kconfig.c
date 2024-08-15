@@ -81,7 +81,7 @@ extern parserDefinition* KconfigParser (void)
 		"{{\n"
 		"   count 0 gt {\n"
 		"         \\1 typeref:\n"
-		"         pop\n"
+		"         clear\n"
 		"   } if\n"
 		"}}", NULL, false},
 		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$", "CONFIG_\\2",
