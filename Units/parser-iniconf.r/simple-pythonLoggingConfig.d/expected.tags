@@ -11,6 +11,8 @@ handler_hand01	input.conf	/^[handler_hand01]$/;"	section	language:Iniconf
 handlers	input.conf	/^[handlers]$/;"	section	language:Iniconf
 handlers	input.conf	/^handlers=hand01$/;"	key	language:Iniconf	section:logger_parser
 handlers	input.conf	/^handlers=hand01$/;"	key	language:Iniconf	section:logger_root
+key-with-dashes	input.conf	/^key-with-dashes=value2$/;"	key	language:Iniconf	section:section.with.dots
+key.with.dots	input.conf	/^key.with.dots=value1$/;"	key	language:Iniconf	section:section.with.dots
 keys	input.conf	/^keys=form01$/;"	key	language:Iniconf	section:formatters
 keys	input.conf	/^keys=hand01$/;"	key	language:Iniconf	section:handlers
 keys	input.conf	/^keys=root,parser$/;"	key	language:Iniconf	section:loggers
@@ -24,3 +26,4 @@ parser	input.conf	/^[logger_parser]$/;"	loggerSection	language:PythonLoggingConf
 propagate	input.conf	/^propagate=1$/;"	key	language:Iniconf	section:logger_parser
 qualname	input.conf	/^qualname=compiler.parser$/;"	key	language:Iniconf	section:logger_parser
 root	input.conf	/^[logger_root]$/;"	loggerSection	language:PythonLoggingConfig
+section.with.dots	input.conf	/^[section.with.dots]$/;"	section	language:Iniconf
