@@ -50,7 +50,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "cpreprocessor.h"
+#include "x-cpreprocessor.h"
 
 #include "entry.h"
 #include "keyword.h"

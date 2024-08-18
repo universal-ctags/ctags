@@ -19,7 +19,7 @@
 #include "read.h"
 #include "routines.h"
 #include "strlist.h"
-#include "xml.h"
+#include "x-xml.h"
 
 
 typedef enum {

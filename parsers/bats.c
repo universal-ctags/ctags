@@ -17,7 +17,7 @@
 #include "entry.h"
 #include "kind.h"
 #include "parse.h"
-#include "sh.h"
+#include "x-sh.h"
 
 #include <ctype.h>
 

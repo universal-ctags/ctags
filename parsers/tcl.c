@@ -21,7 +21,7 @@
 #include "entry.h"
 #include "routines.h"
 #include "ptrarray.h"
-#include "tcl.h"
+#include "x-tcl.h"
 
 #include <string.h>
 

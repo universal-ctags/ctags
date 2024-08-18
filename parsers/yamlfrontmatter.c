@@ -17,8 +17,8 @@
 */
 #include "general.h"	/* must always come first */
 
-#include "frontmatter.h"
-#include "yaml.h"
+#include "x-frontmatter.h"
+#include "x-yaml.h"
 
 #include "entry.h"
 #include "parse.h"

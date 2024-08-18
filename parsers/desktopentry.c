@@ -1,5 +1,5 @@
 /*
- *   pythonLoggingConfig.c
+ *   desktopentry.c
  *
  *   Copyright (c) 2016, Masatake YAMATO <yamato@redhat.com>
  *   Copyright (c) 2016, Red Hat, K.K.
@@ -7,10 +7,10 @@
  *   This source code is released for free distribution under the terms of the
  *   GNU General Public License version 2 or (at your option) any later version.
  *
- *   This module contains functions for generating tags for config files of
- *   python's logging.config module.
+ *   This module contains functions for generating tags for "desktop entries"
+ *   described in:
  *
- *   https://docs.python.org/2/library/logging.config.html
+ *   https://specifications.freedesktop.org/desktop-entry-spec/latest/index.html
  *
  */
 
@@ -20,7 +20,7 @@
 #include "general.h"  /* must always come first */
 
 #include "entry.h"
-#include "x-iniconf.h"
+#include "iniconf.h"
 #include "kind.h"
 #include "parse.h"
 #include "read.h"
@@ -31,21 +31,17 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_LOGGER_SECTION,
-	K_LOGGER_QUALNAME,
-} pythonLoggingConfigKind;
+	K_NAME,
+	K_ACTION,
+} desktopEntryKind;
 
-static kindDefinition PythonLoggingConfigKinds [] = {
-	{ true, 'L', "loggerSection", "logger sections" },
-	{ true, 'q', "qualname",      "logger qualnames" },
+static kindDefinition DesktopEntriyKinds [] = {
+	{ true, 'n', "name",   "names" },
+	{ true, 'a', "action", "actions" },
 };
 
-#define LOGGER_PREFIX "logger_"
-#define LOGGER_LEN (sizeof("logger_") - 1)
-
-struct sPythonLoggingConfigSubparser {
+struct sDesktopEntrySubparser {
 	iniconfSubparser iniconf;
-	int index;
 };
 
 static void newDataCallback (iniconfSubparser *iniconf,
@@ -62,13 +58,13 @@ static void newDataCallback (iniconfSubparser *iniconf,
 				goto out;
 
 			initTagEntry (&e, logger, K_LOGGER_SECTION);
-			((struct sPythonLoggingConfigSubparser *)iniconf)->index = makeTagEntry (&e);
+			((struct sDesktopEntrySubparser *)iniconf)->index = makeTagEntry (&e);
 		}
 		else if (key && (strcmp (key, "qualname") == 0)
 			 && value && value[0] != '\0')
 		{
 			initTagEntry (&e, value, K_LOGGER_QUALNAME);
-			e.extensionFields.scopeIndex = ((struct sPythonLoggingConfigSubparser*)iniconf)->index;
+			e.extensionFields.scopeIndex = ((struct sDesktopEntrySubparser*)iniconf)->index;
 			makeTagEntry (&e);
 		}
 	}
@@ -88,17 +84,17 @@ static bool probeLanguage (const char *section, const char *key CTAGS_ATTR_UNUSE
 
 static void exclusiveSubparserChosenCallback (subparser *s, void *data CTAGS_ATTR_UNUSED)
 {
-	((struct sPythonLoggingConfigSubparser *)s)->index = CORK_NIL;
+	((struct sDesktopEntrySubparser *)s)->index = CORK_NIL;
 }
 
-static void findPythonLoggingConfigTags (void)
+static void findDesktopEntryTags (void)
 {
 	scheduleRunningBaseparser (0);
 }
 
-extern parserDefinition* PythonLoggingConfigParser (void)
+extern parserDefinition* DesktopEntryParser (void)
 {
-	static struct sPythonLoggingConfigSubparser pythonLoggingConfigSubparser = {
+	static struct sDesktopEntrySubparser desktopEntrySubparser = {
 		.iniconf = {
 			.subparser = {
 				.direction = SUBPARSER_BI_DIRECTION,
@@ -109,16 +105,16 @@ extern parserDefinition* PythonLoggingConfigParser (void)
 		},
 	};
 	static parserDependency dependencies [] = {
-		[0] = { DEPTYPE_SUBPARSER, "Iniconf", &pythonLoggingConfigSubparser },
+		[0] = { DEPTYPE_SUBPARSER, "Iniconf", &desktopEntrySubparser },
 	};
 
-	parserDefinition* const def = parserNew ("PythonLoggingConfig");
+	parserDefinition* const def = parserNew ("DesktopEntry");
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 
-	def->kindTable      = PythonLoggingConfigKinds;
-	def->kindCount  = ARRAY_SIZE (PythonLoggingConfigKinds);
-	def->parser     = findPythonLoggingConfigTags;
+	def->kindTable  = DesktopEntryKinds;
+	def->kindCount  = ARRAY_SIZE (DesktopEntryKinds);
+	def->parser     = findDesktopEntryTags;
 	def->useCork    = CORK_QUEUE;
 
 	return def;

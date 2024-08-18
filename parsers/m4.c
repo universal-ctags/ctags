@@ -16,7 +16,7 @@
 #include "entry.h"
 #include "htable.h"
 #include "keyword.h"
-#include "m4.h"
+#include "x-m4.h"
 #include "numarray.h"
 #include "parse.h"
 #include "read.h"

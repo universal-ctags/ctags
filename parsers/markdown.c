@@ -34,7 +34,7 @@
 #include "promise.h"
 #include "htable.h"
 
-#include "markdown.h"
+#include "x-markdown.h"
 
 /*
  *   DATA DEFINITIONS

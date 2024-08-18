@@ -88,7 +88,7 @@ dottedKey <- simpleKey ( dotSep simpleKey )+
 dotSep <- ws '.' ws
 keyvalSep <- ws '=' ws
 
-val <- string / boolean / array / inlineTable / dateTime / float / integer
+val <- <string / boolean / array / inlineTable / dateTime / float / integer> {notifyValue(auxil, $0, $0s);}
 
 ## String
 

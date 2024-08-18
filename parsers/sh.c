@@ -26,7 +26,7 @@
 #include "vstring.h"
 #include "xtag.h"
 
-#include "sh.h"
+#include "x-sh.h"
 
 /*
 *   DATA DEFINITIONS

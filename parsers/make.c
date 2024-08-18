@@ -18,7 +18,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "make.h"
+#include "x-make.h"
 
 #include "debug.h"
 #include "entry.h"
@@ -31,7 +31,7 @@
 #include "vstring.h"
 #include "xtag.h"
 
-#include "cpreprocessor.h"
+#include "x-cpreprocessor.h"
 
 /*
 *   DATA DEFINITIONS

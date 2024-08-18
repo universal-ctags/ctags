@@ -279,8 +279,8 @@ PEG_OBJS = $(PEG_SRCS:.c=.$(OBJEXT))
 PEGO_INTERMEDIATE = $(PEG_INPUT:.peg=.pego)
 
 PARSER_HEADS = \
-	parsers/autoconf.h \
-	parsers/cpreprocessor.h \
+	parsers/x-autoconf.h \
+	parsers/x-cpreprocessor.h \
 	\
 	parsers/cxx/cxx_debug.h \
 	parsers/cxx/cxx_keyword.h \
@@ -294,19 +294,20 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h \
 	\
-	parsers/bibtex.h \
-	parsers/frontmatter.h \
-	parsers/iniconf.h \
-	parsers/jscript.h \
-	parsers/m4.h \
-	parsers/make.h \
-	parsers/markdown.h \
-	parsers/perl.h \
-	parsers/r.h \
-	parsers/ruby.h \
-	parsers/sh.h \
-	parsers/tcl.h \
-	parsers/tex.h \
+	parsers/x-bibtex.h \
+	parsers/x-frontmatter.h \
+	parsers/x-iniconf.h \
+	parsers/x-jscript.h \
+	parsers/x-m4.h \
+	parsers/x-make.h \
+	parsers/x-markdown.h \
+	parsers/x-perl.h \
+	parsers/x-r.h \
+	parsers/x-ruby.h \
+	parsers/x-sh.h \
+	parsers/x-tcl.h \
+	parsers/x-toml.h \
+	parsers/x-tex.h \
 	\
 	$(NULL)
 
@@ -421,6 +422,7 @@ PARSER_SRCS =				\
 	parsers/tcloo.c			\
 	parsers/tex.c			\
 	parsers/tex-beamer.c		\
+	parsers/cargo.c			\
 	parsers/ttcn.c			\
 	parsers/txt2tags.c		\
 	parsers/typescript.c		\
@@ -436,7 +438,7 @@ PARSER_SRCS =				\
 	\
 	$(NULL)
 
-XML_HEADS = parsers/xml.h
+XML_HEADS = parsers/x-xml.h
 XML_SRCS = \
 	parsers/maven2.c		\
 	parsers/dbusintrospect.c	\
@@ -450,7 +452,7 @@ XML_SRCS = \
 	\
 	$(NULL)
 
-YAML_HEADS = parsers/yaml.h
+YAML_HEADS = parsers/x-yaml.h
 YAML_SRCS = \
 	parsers/yaml.c		\
 	\

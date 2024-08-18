@@ -7,7 +7,7 @@
 */
 
 #include "general.h"  /* must always come first */
-#include "tcl.h"
+#include "x-tcl.h"
 #include "entry.h"
 #include "param.h"
 #include "parse.h"

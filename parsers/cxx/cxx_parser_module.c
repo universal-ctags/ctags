@@ -19,7 +19,7 @@
 #include "cxx_token_chain.h"
 #include "cxx_scope.h"
 
-#include "../cpreprocessor.h"
+#include "../x-cpreprocessor.h"
 
 #include "parse.h"
 #include "vstring.h"

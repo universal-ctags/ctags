@@ -29,7 +29,7 @@
 #include "subparser.h"
 #include "vstring.h"
 
-#include "ruby.h"
+#include "x-ruby.h"
 
 /*
 *   DATA DECLARATIONS

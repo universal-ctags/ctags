@@ -14,7 +14,7 @@
  */
 #include "general.h"  /* must always come first */
 
-#include "bibtex.h"
+#include "x-bibtex.h"
 #include "keyword.h"
 #include "parse.h"
 #include "read.h"

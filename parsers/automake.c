@@ -15,7 +15,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "make.h"
+#include "x-make.h"
 
 #include "entry.h"
 #include "htable.h"

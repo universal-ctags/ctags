@@ -20,7 +20,7 @@
 #include "kind.h"
 #include "parse.h"
 #include "read.h"
-#include "tex.h"
+#include "x-tex.h"
 
 #include <string.h>
 

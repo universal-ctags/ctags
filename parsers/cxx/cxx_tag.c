@@ -14,7 +14,7 @@
 #include "cxx_parser_internal.h"
 
 #include "entry.h"
-#include "../cpreprocessor.h"
+#include "../x-cpreprocessor.h"
 #include "routines.h"
 #include "trashbox.h"
 #include "xtag.h"

@@ -16,6 +16,7 @@
 */
 #include "kind.h"
 #include "peg_common.h"
+#include "../parsers/x-toml.h"
 
 #include "htable.h"
 #include "ptrarray.h"
@@ -27,17 +28,6 @@
 /*
 *   DATA DECLARATIONS
 */
-typedef enum {
-	K_KEY,
-	K_TABLE,
-	K_ARRAYTABLE,
-	K_QKEY,
-} tomlKind;
-
-typedef enum {
-	R_KEY_CHAINELT,
-} tomlKeyRole;
-
 static roleDefinition TomlKeyRoles [] = {
 	{ false, "chainElt", "(EXPERIMENTAL)used as an element in a key name chain like a.b.c" },
 };
@@ -69,3 +59,4 @@ static void keyvalStart (struct parserCtx *auxil, long offset);
 static void keyvalKeyEnd (struct parserCtx *auxil);
 static void keyvalValEnd (struct parserCtx *auxil);
 static void queueKey (struct parserCtx *auxil, const char *name);
+static void notifyValue (struct parserCtx *auxil, const char *value, long offset);

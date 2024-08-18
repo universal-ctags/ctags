@@ -63,9 +63,9 @@ static void makeTagsForKeys (struct parserCtx *auxil, unsigned long lineNumber, 
 		tagEntryInfo e;
 		const char *key = ptrArrayItem (auxil->keyQueue, i);
 		if (i == ptrArrayCount (auxil->keyQueue) - 1)
-			initTagEntry (&e, key, K_KEY);
+			initTagEntry (&e, key, TOML_K_KEY);
 		else
-			initRefTagEntry (&e, key, K_KEY, R_KEY_CHAINELT);
+			initRefTagEntry (&e, key, TOML_K_KEY, TOML_R_KEY_CHAINELT);
 		e.lineNumber = lineNumber;
 		e.filePosition = filePosition;
 		e.extensionFields.scopeIndex = last_key_index;
@@ -100,7 +100,7 @@ static void tableKeyEnd (struct parserCtx *auxil)
 	vString *vname = makeVStringFromKeyQueue (auxil->keyQueue);
 	const char *name = vStringValue (vname);
 
-	initTagEntry (&e, name, auxil->isArrayTable? K_ARRAYTABLE: K_TABLE);
+	initTagEntry (&e, name, auxil->isArrayTable? TOML_K_ARRAYTABLE: TOML_K_TABLE);
 	e.lineNumber = lineNumber;
 	e.filePosition = filePosition;
 
@@ -148,7 +148,7 @@ static void keyvalKeyEnd (struct parserCtx *auxil)
 	vString *vname = makeVStringFromKeyQueue (auxil->keyQueue);
 	const char *name = vStringValue (vname);
 
-	initTagEntry (&e, name, K_QKEY);
+	initTagEntry (&e, name, TOML_K_QKEY);
 	e.lineNumber = lineNumber;
 	e.filePosition = filePosition;
 	e.extensionFields.scopeIndex = auxil->lastTableIndex;
@@ -173,6 +173,23 @@ static void queueKey (struct parserCtx *auxil, const char *name)
 	{
 		char *key = eStrdup (name);
 		ptrArrayAdd (auxil->keyQueue, key);
+	}
+}
+
+static void notifyValue (struct parserCtx *auxil, const char *value, long offset)
+{
+	subparser *sub;
+	tomlSubparser *tomlsub = NULL;
+
+	foreachSubparser (sub, false)
+	{
+		tomlsub = (tomlSubparser *)sub;
+		if (tomlsub->valueNotify)
+		{
+			enterSubparser(sub);
+			tomlsub->valueNotify(tomlsub, value, offset, BASE_SCOPE(auxil));
+			leaveSubparser();
+		}
 	}
 }
 

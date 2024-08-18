@@ -22,7 +22,7 @@
 #include "subparser.h"
 #include "trace.h"
 #include "types.h"
-#include "yaml.h"
+#include "x-yaml.h"
 
 #include "numarray.h"
 #include "keyword.h"

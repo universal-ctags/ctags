@@ -16,7 +16,7 @@
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
-#include "xml.h"
+#include "x-xml.h"
 
 typedef enum {
 	K_ELEMENT,

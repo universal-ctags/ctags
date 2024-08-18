@@ -26,7 +26,7 @@
 
 #include "entry.h"
 #include "htable.h"
-#include "iniconf.h"
+#include "x-iniconf.h"
 #include "parse.h"
 #include "read.h"
 #include "subparser.h"

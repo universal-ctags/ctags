@@ -17,7 +17,7 @@
 #include "routines.h"
 #include "selectors.h"
 #include "subparser.h"
-#include "xml.h"
+#include "x-xml.h"
 
 static void makeTagWithNotification (xmlNode *node,
 									 const char *xpath,

@@ -29,7 +29,7 @@
 #include "routines.h"
 #include "vstring.h"
 
-#include "tex.h"
+#include "x-tex.h"
 
 /*
  *	 MACROS
