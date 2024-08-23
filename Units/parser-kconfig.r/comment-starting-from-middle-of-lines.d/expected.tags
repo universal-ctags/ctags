@@ -1,0 +1,6 @@
+A	input.kconfig	/^config A # ...$/;"	c	typeref:typename:bool
+choice987df5010104	input.kconfig	/^choice # ...$/;"	C	end:10
+C	input.kconfig	/^config C # ...$/;"	c	choice:choice987df5010104	typeref:typename:bool
+D	input.kconfig	/^menu "D" # ...$/;"	m	end:17
+E	input.kconfig	/^config E # ...$/;"	c	menu:D	typeref:typename:bool
+F	input.kconfig	/^menuconfig F # ...$/;"	c

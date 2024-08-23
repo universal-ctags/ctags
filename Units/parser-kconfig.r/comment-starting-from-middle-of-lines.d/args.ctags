@@ -1,0 +1,5 @@
+--sort=no
+--map-Kconfig=.kconfig
+--extras-Kconfig=-{configPrefixed}
+--fields=+e
+--extras=+r

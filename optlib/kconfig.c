@@ -71,7 +71,7 @@ extern parserDefinition* KconfigParser (void)
 	static tagRegexTable KconfigTagRegexTable [] = {
 		{"^[ \t]*#.*$", "",
 		"", "{placeholder}", NULL, false},
-		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$", "\\2",
+		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$", "\\2",
 		"c", "{scope=ref}"
 		"{{\n"
 		"   .\n"
@@ -84,23 +84,23 @@ extern parserDefinition* KconfigParser (void)
 		"         clear\n"
 		"   } if\n"
 		"}}", NULL, false},
-		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$", "CONFIG_\\2",
+		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$", "CONFIG_\\2",
 		"c", "{scope=ref}{_extra=configPrefixed}", NULL, false},
-		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$", "CONFIG_\\2_MODULE",
+		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$", "CONFIG_\\2_MODULE",
 		"c", "{scope=ref}{_extra=configPrefixed}{exclusive}", NULL, false},
-		{"^[ \t]*menu[ \t]+\"([^\"]+)\"[ \t]*$", "\\1",
+		{"^[ \t]*menu[ \t]+\"([^\"]+)\"[ \t]*(#.*)?$", "\\1",
 		"m", "{scope=push}{exclusive}", NULL, false},
-		{"^[ \t]*endmenu[ \t]*$", "",
+		{"^[ \t]*endmenu[ \t]*(#.*)?$", "",
 		"", "{scope=pop}{placeholder}{exclusive}", NULL, false},
-		{"^[ \t]*source[ \t]+\"?([^\"]+)\"?[ \t]*$", "\\1",
+		{"^[ \t]*source[ \t]+\"?([^\"]+)\"?[ \t]*(#.*)?$", "\\1",
 		"k", "{_role=source}{exclusive}{scope=ref}", NULL, false},
-		{"^[ \t]*choice[ \t]+([A-Za-z0-9_]+)[ \t]*$", "\\1",
+		{"^[ \t]*choice[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$", "\\1",
 		"C", "{scope=push}{exclusive}", NULL, false},
-		{"^[ \t]*choice[ \t]*$", "",
+		{"^[ \t]*choice[ \t]*(#.*)?$", "",
 		"C", "{_anonymous=choice}{scope=push}{exclusive}", NULL, false},
-		{"^[ \t]*endchoice[ \t]*$", "",
+		{"^[ \t]*endchoice[ \t]*(#.*)?$", "",
 		"", "{scope=pop}{placeholder}{exclusive}", NULL, false},
-		{"^[ \t]*mainmenu[ \t]+\"([^\"]+)\"[ \t]*$", "\\1",
+		{"^[ \t]*mainmenu[ \t]+\"([^\"]+)\"[ \t]*(#.*)?$", "\\1",
 		"M", "{exclusive}", NULL, false},
 		{"^([-a-zA-Z0-9_$]+)[ \t]*:?=", "\\1",
 		"v", "{exclusive}", NULL, false},
