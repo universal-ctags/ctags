@@ -1,0 +1,7 @@
+config A
+	bool
+	help
+	  menu "X" rest
+
+config B
+       bool

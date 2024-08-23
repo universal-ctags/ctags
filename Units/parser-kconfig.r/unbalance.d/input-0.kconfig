@@ -1,0 +1,11 @@
+menu "Y"
+
+config C
+       bool
+       help
+         endmenu - a dummy
+
+config D
+       bool
+
+endmenu
