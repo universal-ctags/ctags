@@ -51,19 +51,19 @@ CONFIG_JFFS2_RTIME_MODULE	input-1.kconfig	/^config JFFS2_RTIME$/;"	c	roles:def
 JFFS2_RUBIN	input-1.kconfig	/^config JFFS2_RUBIN$/;"	c	typeref:typename:bool	roles:def
 CONFIG_JFFS2_RUBIN	input-1.kconfig	/^config JFFS2_RUBIN$/;"	c	roles:def
 CONFIG_JFFS2_RUBIN_MODULE	input-1.kconfig	/^config JFFS2_RUBIN$/;"	c	roles:def
-choicebf6231840104	input-1.kconfig	/^choice$/;"	C	roles:def
-JFFS2_CMODE_NONE	input-1.kconfig	/^config JFFS2_CMODE_NONE$/;"	c	choice:choicebf6231840104	typeref:typename:bool	roles:def
-CONFIG_JFFS2_CMODE_NONE	input-1.kconfig	/^config JFFS2_CMODE_NONE$/;"	c	choice:choicebf6231840104	roles:def
-CONFIG_JFFS2_CMODE_NONE_MODULE	input-1.kconfig	/^config JFFS2_CMODE_NONE$/;"	c	choice:choicebf6231840104	roles:def
-JFFS2_CMODE_PRIORITY	input-1.kconfig	/^config JFFS2_CMODE_PRIORITY$/;"	c	choice:choicebf6231840104	typeref:typename:bool	roles:def
-CONFIG_JFFS2_CMODE_PRIORITY	input-1.kconfig	/^config JFFS2_CMODE_PRIORITY$/;"	c	choice:choicebf6231840104	roles:def
-CONFIG_JFFS2_CMODE_PRIORITY_MODULE	input-1.kconfig	/^config JFFS2_CMODE_PRIORITY$/;"	c	choice:choicebf6231840104	roles:def
-JFFS2_CMODE_SIZE	input-1.kconfig	/^config JFFS2_CMODE_SIZE$/;"	c	choice:choicebf6231840104	typeref:typename:bool	roles:def
-CONFIG_JFFS2_CMODE_SIZE	input-1.kconfig	/^config JFFS2_CMODE_SIZE$/;"	c	choice:choicebf6231840104	roles:def
-CONFIG_JFFS2_CMODE_SIZE_MODULE	input-1.kconfig	/^config JFFS2_CMODE_SIZE$/;"	c	choice:choicebf6231840104	roles:def
-JFFS2_CMODE_FAVOURLZO	input-1.kconfig	/^config JFFS2_CMODE_FAVOURLZO$/;"	c	choice:choicebf6231840104	typeref:typename:bool	roles:def
-CONFIG_JFFS2_CMODE_FAVOURLZO	input-1.kconfig	/^config JFFS2_CMODE_FAVOURLZO$/;"	c	choice:choicebf6231840104	roles:def
-CONFIG_JFFS2_CMODE_FAVOURLZO_MODULE	input-1.kconfig	/^config JFFS2_CMODE_FAVOURLZO$/;"	c	choice:choicebf6231840104	roles:def
+JFFS2 default compression mode	input-1.kconfig	/^	prompt "JFFS2 default compression mode" if JFFS2_COMPRESSION_OPTIONS$/;"	C	roles:def
+JFFS2_CMODE_NONE	input-1.kconfig	/^config JFFS2_CMODE_NONE$/;"	c	choice:JFFS2 default compression mode	typeref:typename:bool	roles:def
+CONFIG_JFFS2_CMODE_NONE	input-1.kconfig	/^config JFFS2_CMODE_NONE$/;"	c	choice:JFFS2 default compression mode	roles:def
+CONFIG_JFFS2_CMODE_NONE_MODULE	input-1.kconfig	/^config JFFS2_CMODE_NONE$/;"	c	choice:JFFS2 default compression mode	roles:def
+JFFS2_CMODE_PRIORITY	input-1.kconfig	/^config JFFS2_CMODE_PRIORITY$/;"	c	choice:JFFS2 default compression mode	typeref:typename:bool	roles:def
+CONFIG_JFFS2_CMODE_PRIORITY	input-1.kconfig	/^config JFFS2_CMODE_PRIORITY$/;"	c	choice:JFFS2 default compression mode	roles:def
+CONFIG_JFFS2_CMODE_PRIORITY_MODULE	input-1.kconfig	/^config JFFS2_CMODE_PRIORITY$/;"	c	choice:JFFS2 default compression mode	roles:def
+JFFS2_CMODE_SIZE	input-1.kconfig	/^config JFFS2_CMODE_SIZE$/;"	c	choice:JFFS2 default compression mode	typeref:typename:bool	roles:def
+CONFIG_JFFS2_CMODE_SIZE	input-1.kconfig	/^config JFFS2_CMODE_SIZE$/;"	c	choice:JFFS2 default compression mode	roles:def
+CONFIG_JFFS2_CMODE_SIZE_MODULE	input-1.kconfig	/^config JFFS2_CMODE_SIZE$/;"	c	choice:JFFS2 default compression mode	roles:def
+JFFS2_CMODE_FAVOURLZO	input-1.kconfig	/^config JFFS2_CMODE_FAVOURLZO$/;"	c	choice:JFFS2 default compression mode	typeref:typename:bool	roles:def
+CONFIG_JFFS2_CMODE_FAVOURLZO	input-1.kconfig	/^config JFFS2_CMODE_FAVOURLZO$/;"	c	choice:JFFS2 default compression mode	roles:def
+CONFIG_JFFS2_CMODE_FAVOURLZO_MODULE	input-1.kconfig	/^config JFFS2_CMODE_FAVOURLZO$/;"	c	choice:JFFS2 default compression mode	roles:def
 HAVE_ARCH_KGDB	input-2.kconfig	/^config HAVE_ARCH_KGDB$/;"	c	typeref:typename:bool	roles:def
 CONFIG_HAVE_ARCH_KGDB	input-2.kconfig	/^config HAVE_ARCH_KGDB$/;"	c	roles:def
 CONFIG_HAVE_ARCH_KGDB_MODULE	input-2.kconfig	/^config HAVE_ARCH_KGDB$/;"	c	roles:def

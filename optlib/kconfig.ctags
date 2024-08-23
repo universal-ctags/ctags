@@ -73,6 +73,31 @@
 
 --regex-Kconfig=/^[ \t]*choice[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$/\1/C/{scope=push}{exclusive}
 --regex-Kconfig=/^[ \t]*choice[ \t]*(#.*)?$//C/{_anonymous=choice}{scope=push}{exclusive}
+--regex-Kconfig=/^[ \t]*prompt[ \t]+"([^"]+)"[ \t]*(#.*|if)?//{exclusive}{{
+   _scopetop {
+      dup :kind /choice eq {
+         dup :extras {
+            /anonymous _amember {
+               % This is an anonymous tag that kind is choice.
+               % Throw it away.
+               _markplaceholder
+               _scopepop
+               % Make a new one with the prompt.
+               \1 /choice @1 _tag _commit _scopepush
+            } {
+               % This is not an anonymous tag.
+               pop
+            } ifelse
+         } {
+            % This is not an extra tag.
+            pop
+         } ifelse
+       } {
+          % This is not a choice.
+          pop
+       } ifelse
+   } if
+}}
 --regex-Kconfig=/^[ \t]*endchoice[ \t]*(#.*)?$//{scope=pop}{placeholder}{exclusive}
 
 --regex-Kconfig=/^[ \t]*mainmenu[ \t]+"([^"]+)"[ \t]*(#.*)?$/\1/M/{exclusive}

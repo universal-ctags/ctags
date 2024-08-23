@@ -98,6 +98,33 @@ extern parserDefinition* KconfigParser (void)
 		"C", "{scope=push}{exclusive}", NULL, false},
 		{"^[ \t]*choice[ \t]*(#.*)?$", "",
 		"C", "{_anonymous=choice}{scope=push}{exclusive}", NULL, false},
+		{"^[ \t]*prompt[ \t]+\"([^\"]+)\"[ \t]*(#.*|if)?", "",
+		"", "{exclusive}"
+		"{{\n"
+		"   _scopetop {\n"
+		"      dup :kind /choice eq {\n"
+		"         dup :extras {\n"
+		"            /anonymous _amember {\n"
+		"               % This is an anonymous tag that kind is choice.\n"
+		"               % Throw it away.\n"
+		"               _markplaceholder\n"
+		"               _scopepop\n"
+		"               % Make a new one with the prompt.\n"
+		"               \\1 /choice @1 _tag _commit _scopepush\n"
+		"            } {\n"
+		"               % This is not an anonymous tag.\n"
+		"               pop\n"
+		"            } ifelse\n"
+		"         } {\n"
+		"            % This is not an extra tag.\n"
+		"            pop\n"
+		"         } ifelse\n"
+		"       } {\n"
+		"          % This is not a choice.\n"
+		"          pop\n"
+		"       } ifelse\n"
+		"   } if\n"
+		"}}", NULL, false},
 		{"^[ \t]*endchoice[ \t]*(#.*)?$", "",
 		"", "{scope=pop}{placeholder}{exclusive}", NULL, false},
 		{"^[ \t]*mainmenu[ \t]+\"([^\"]+)\"[ \t]*(#.*)?$", "\\1",
