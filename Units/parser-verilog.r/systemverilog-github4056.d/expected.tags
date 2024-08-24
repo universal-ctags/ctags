@@ -1,0 +1,31 @@
+my_enum	input.sv	/^} my_enum;$/;"	T
+OTHER_VAL1	input.sv	/^  OTHER_VAL1,$/;"	c	typedef:my_enum
+OTHER_VAL2	input.sv	/^  OTHER_VAL2$/;"	c	typedef:my_enum
+e	input.sv	/^my_enum e;$/;"	r
+O	input.sv	/^class O;$/;"	C
+complex0_s	input.sv	/^  } [1:0] complex0_s, complex1_s;$/;"	S	class:O
+a	input.sv	/^    logic a,b ;$/;"	w	struct:O.complex0_s
+b	input.sv	/^    logic a,b ;$/;"	w	struct:O.complex0_s
+s0	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	struct:O.complex0_s
+s1	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	struct:O.complex0_s
+struct0_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	struct:O.complex0_s
+struct1_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	struct:O.complex0_s
+enum00_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	struct:O.complex0_s
+enum01_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	struct:O.complex0_s
+enum10_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	struct:O.complex0_s
+enum11_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	struct:O.complex0_s
+d	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex0_s
+e	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex0_s
+complex1_s	input.sv	/^  } [1:0] complex0_s, complex1_s;$/;"	S	class:O
+a	input.sv	/^    logic a,b ;$/;"	w	struct:O.complex1_s
+b	input.sv	/^    logic a,b ;$/;"	w	struct:O.complex1_s
+s0	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	struct:O.complex1_s
+s1	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	struct:O.complex1_s
+struct0_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	struct:O.complex1_s
+struct1_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	struct:O.complex1_s
+enum00_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	struct:O.complex1_s
+enum01_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	struct:O.complex1_s
+enum10_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	struct:O.complex1_s
+enum11_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	struct:O.complex1_s
+d	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex1_s
+e	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex1_s
