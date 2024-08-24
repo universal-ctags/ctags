@@ -1,0 +1,4 @@
+my_enum	input.sv	/^} my_enum;$/;"	T
+OTHER_VAL1	input.sv	/^  OTHER_VAL1,$/;"	c	typedef:my_enum
+OTHER_VAL2	input.sv	/^  OTHER_VAL2$/;"	c	typedef:my_enum
+e	input.sv	/^my_enum e;$/;"	r

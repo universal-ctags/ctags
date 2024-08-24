@@ -1614,6 +1614,7 @@ static int pushEnumNames (tokenInfo* token, int c)
 		c = skipWhite (vGetc ());
 		while (c != '}' && c != EOF)
 		{
+			c = skipMacro (c, token);
 			if (!isWordToken (c))
 			{
 				VERBOSE ("Unexpected input: %c\n", c);
