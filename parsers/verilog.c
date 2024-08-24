@@ -1653,6 +1653,9 @@ static int pushMembers (tokenInfo* token, int c)
 		{
 			verilogKind kind = K_UNDEFINED;	// set kind of context for processType()
 			bool not_used;
+			c = skipMacro (c, token);
+			if (c == '}')
+				break;	// end of struct/union
 			if (!isWordToken (c))
 			{
 				VERBOSE ("Unexpected input: %c\n", c);
