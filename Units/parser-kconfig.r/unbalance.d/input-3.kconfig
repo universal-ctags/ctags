@@ -1,0 +1,4 @@
+config H
+       bool
+       help
+         source "V" is a part of a help message.

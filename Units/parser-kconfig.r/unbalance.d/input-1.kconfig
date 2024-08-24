@@ -1,0 +1,8 @@
+config E
+       bool
+       help
+	 choice Z0 or Z1
+
+config F
+       bool
+

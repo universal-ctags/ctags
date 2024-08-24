@@ -1,0 +1,8 @@
+choice W
+	help
+	  endchoice but this is a part of help message
+
+	config G
+	       bool
+
+endchoice
