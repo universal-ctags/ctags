@@ -604,6 +604,5 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	if (Option.printLanguage)
 		return (Option.printLanguage == true)? 0: 1;
 
-	exit (0);
 	return 0;
 }
