@@ -29,14 +29,20 @@ jobs:
               eval "$@"
             }
 
-            run sudo pkg install -y automake pkgconf gmake python3
+            run sudo pkg install -y automake gmake pkgconf jansson libyaml libxml2 libiconv python3
+
             run freebsd-version
             run cc --version
+
             run ./autogen.sh
             run ./configure --prefix=/usr
             run gmake
             run sudo gmake install
-            run file ctags
+
+            run readelf -h ctags
+            run readelf -d ctags
+
             run ctags --version
+
             run gmake check CI=gha+vagrant+freebsd
             run gmake roundtrip CI=gha+vagrant+freebsd
