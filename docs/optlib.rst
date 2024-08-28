@@ -371,6 +371,10 @@ The pattern matching is done only when the ``main`` is enabled.
 	$ ctags --options=python-main.ctags -o - --extras-Python='+{main}' input.py
 	__main__	input.py	/^if __name__ == '__main__':$/;"	f
 
+By default, ctags assumes the extra is a part of the language specified
+with `<LANG>` in ``--regex-<LANG>``. Together with ``{_language=<LANG>}``
+flag, you can switch the language of the extra. See ":ref:`foreigntag`".
+The combination of these flags is new in version 6.2.0.
 
 .. TODO: this "fields" section should probably be moved up this document, as a
 	subsection in the "Regex option argument flags" section
@@ -463,6 +467,10 @@ about ``--fields-<LANG>`` option.
 
 `passwd` parser is a simple example that uses ``--fields-<LANG>`` option.
 
+By default, ctags assumes the field is a part of the language specified
+with `<LANG>` in ``--regex-<LANG>``. Together with ``{_language=<LANG>}``
+flag, you can switch the language of the field. See ":ref:`foreigntag`".
+The combination of these flags is new in version 6.2.0.
 
 .. _roles:
 
@@ -1960,6 +1968,15 @@ the output for input.docc:
 	$ ctags --options=docc.ctags --sort=no--extras=+r --fields=+rlK  -o - input.docc
 	compress	input.docc	/^- function: compress(const char *plain_text, enum algorithm alg) => char *$/;"	function	language:C	roles:documented
 	decompress	input.docc	/^- function: decompress(const char *compressed_byteseq) => char *$/;"	function	language:C	roles:documented
+
+
+.. TESTCASE: Tmain/parser-own-fields-for-foreign-lang.d
+
+``{_language=<LANG>}`` flag affects ``{_field=FIELDNAME:GROUP}`` flag; ctags looks up
+the field defintion in `<LANG>`.
+
+``{_language=<LANG>}`` flag affects ``{_extra=XNAME}`` flag; ctags looks up
+the extra defintion in `<LANG>`.
 
 .. END: NOT REVIEWED YET
 

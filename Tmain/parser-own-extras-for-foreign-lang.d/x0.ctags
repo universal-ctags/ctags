@@ -1,0 +1,3 @@
+--langdef=X0
+--kinddef-X0=d,def,definitions
+--_extradef-X0=iname,internal name like __x__
