@@ -1,0 +1,42 @@
+
+# echo unknown lang
+
+# no option value
+
+# wrong char in a field name
+
+# empty parameter name
+
+# empty description
+
+# no input file
+
+# inject a flag separator
+#NAME  DESCRIPTION
+param  desc
+
+# inject a broken flag separator(1)
+#NAME  DESCRIPTION
+param  desc
+
+# inject a broken flag separator(2)
+#NAME  DESCRIPTION
+param  desc
+
+# use a { in description (1)
+#NAME  DESCRIPTION
+param  desc{
+
+# use a { in description (2)
+#NAME  DESCRIPTION
+param  desc{}
+
+# use a \ in description
+#NAME  DESCRIPTION
+param  desc\backslash
+
+# description started from {
+
+# description started from \{
+#NAME  DESCRIPTION
+param  {

@@ -4402,7 +4402,7 @@ static struct optscriptOperatorRegistration lropOperators [] = {
 		.name     = "_foreignreftag",
 		.fn       = lrop_make_foreignreftag,
 		.arity    = -1,
-		.help_str = "name:str lang:name kind:name role:name matchloc _FOREIGNREFTAG tag%"
+		.help_str = "name:str lang:name kind:name role:name|null matchloc _FOREIGNREFTAG tag%"
 		"name:str lang:name|null kind:name role:name|null _FOREIGNREFTAG tag%",
 	},
 	{
