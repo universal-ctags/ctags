@@ -3553,7 +3553,7 @@ static bool processLangDefineParam (const langType language,
 	for (; p < name_end; p++)
 	{
 		if (!isalnum ((unsigned char) *p) && *p != '_')
-			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option: '%c'",
+			error (FATAL, "unacceptable char as part of parameter name in \"--%s\" option: '%c'",
 				   option, *p);
 	}
 
