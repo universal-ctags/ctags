@@ -8,4 +8,6 @@ C	input.xxx	/^\/*C()*\/$/;"	f	line:7	language:C	roles:arolefortesting
 D	input.xxx	/^\/*D()*\/$/;"	f	line:8	language:C	roles:arolefortesting
 E	input.xxx	/^\/*E()*\/$/;"	f	line:9	language:C	roles:arolefortesting
 F	input.xxx	/^\/*E()*\/$/;"	f	line:9	language:C	roles:def
+G	input.xxx	/^\/*E()*\/$/;"	f	line:9	language:C	roles:arolefortesting
+H	input.xxx	/^\/*E()*\/$/;"	f	line:9	language:C	roles:def
 myfunc	input-0.c	/^FUNC(myfunc);$/;"	f	line:1	language:C	roles:def
