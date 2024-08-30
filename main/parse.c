@@ -3567,10 +3567,8 @@ static bool processLangDefineParam (const langType language,
 	pdef->name = eStrndup (parameter, name_end - parameter);
 	pdef->desc = desc;
 
-#if 0
 	if (flags)
 		flagsEval (flags, NULL, 0, pdef);
-#endif
 
 	parser = LanguageTable + language;
 	defineParam (parser->paramControlBlock, pdef, freePdef);

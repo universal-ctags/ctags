@@ -1,0 +1,46 @@
+
+# echo unknown lang
+ctags: Unknown language "NOSUCHLANG" in "_paramdef-NOSUCHLANG" option
+ctags: Unknown language "NOSUCHLANG" in "_paramdef-NOSUCHLANG" option
+
+# no option value
+ctags: no parameter definition specified in "--_paramdef-IMAGINARY" option
+ctags: no parameter definition specified in "--_paramdef-IMAGINARY" option
+
+# wrong char in a field name
+ctags: no parameter description specified in "--_paramdef-IMAGINARY" option
+ctags: no parameter description specified in "--_paramdef-IMAGINARY" option
+ctags: unacceptable char as part of parameter name in "--_paramdef-IMAGINARY" option: ':'
+ctags: unacceptable char as part of parameter name in "--_paramdef-IMAGINARY" option: ':'
+
+# empty parameter name
+ctags: the parameter name in "--_paramdef-IMAGINARY" option is empty
+ctags: the parameter name in "--_paramdef-IMAGINARY" option is empty
+ctags: the parameter name in "--_paramdef-IMAGINARY" option is empty
+ctags: the parameter name in "--_paramdef-IMAGINARY" option is empty
+
+# empty description
+ctags: no parameter description specified in "--_paramdef-IMAGINARY" option
+ctags: parameter description in "--_paramdef-IMAGINARY" option is empty
+
+# no input file
+ctags: No files specified. Try "ctags --help".
+
+# inject a flag separator
+
+# inject a broken flag separator(1)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
+
+# inject a broken flag separator(2)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
+
+# use a { in description (1)
+
+# use a { in description (2)
+
+# use a \ in description
+
+# description started from {
+ctags: parameter description in "--_paramdef-IMAGINARY" option is empty
+
+# description started from \{
