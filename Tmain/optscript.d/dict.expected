@@ -20,6 +20,8 @@ false
 1
 -dict:1-
 null
+(---- store integers ----)
+45
 (---- using types other than name as key objects ----)
 (3)
 (true)

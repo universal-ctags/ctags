@@ -2064,7 +2064,7 @@ opt_es_hash (const void * const key)
 	const EsObject *k = key;
 
 	if (es_integer_p (key))
-		return hashInthash (key);
+		return es_integer_get (key);
 	else if (es_boolean_p (key))
 		return es_object_equal (key, es_true)? 1: 0;
 
