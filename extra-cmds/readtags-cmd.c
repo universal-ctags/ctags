@@ -350,6 +350,7 @@ static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
 		{
 			fprintf (stderr, "%s: failed to flush a temporarily file for storing data from stdin\n",
 					 ProgramName);
+			fclose (tempFP);
 			exit (1);
 		}
 		fclose (tempFP);
