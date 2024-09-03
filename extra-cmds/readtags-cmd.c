@@ -37,7 +37,17 @@ struct canonWorkArea {
 	bool absoluteOnly;
 };
 
-static const char *TagFileName = "tags";
+typedef struct tagFileX {
+	const char *fileName;
+	tagFile *tagFile;
+	tagFileInfo info;
+} tagFileX;
+
+struct inputSpec {
+	const char *tagFileName;
+	char *tempFileName;
+};
+
 static const char *ProgramName;
 static int debugMode;
 #ifdef READTAGS_DSL
@@ -281,27 +291,21 @@ static int copyFile (FILE *in, FILE *out)
 	return 0;
 }
 
-static void removeTagFile (void)
+static const char *loadCtagsCWD (tagFileX *const fileX, tagEntry *pentry)
 {
-	remove (TagFileName);
-	eFree ((char *)TagFileName);
-}
-
-static const char *loadCtagsCWD (tagFile *const file, tagEntry *pentry)
-{
-	if (tagsFindPseudoTag (file, pentry, "!_TAG_PROC_CWD",
+	if (tagsFindPseudoTag (fileX->tagFile, pentry, "!_TAG_PROC_CWD",
 						   TAG_FULLMATCH) != TagSuccess)
 	{
-		int err = tagsGetErrno (file);
+		int err = tagsGetErrno (fileX->tagFile);
 		if (!err)
 		{
 			fprintf (stderr, "%s: no !_TAG_PROC_CWD in %s\n",
-					 ProgramName, TagFileName);
+					 ProgramName, fileX->fileName);
 			exit (1);
 		}
 
 		fprintf (stderr, "%s: cannot find !_TAG_PROC_CWD in %s: %s\n",
-				 ProgramName, TagFileName, tagsStrerror (err));
+				 ProgramName, fileX->fileName, tagsStrerror (err));
 		exit (1);
 	}
 
@@ -316,17 +320,45 @@ static const char *loadCtagsCWD (tagFile *const file, tagEntry *pentry)
 	return pentry->file;
 }
 
-static struct canonFnameCacheTable *makeCanonFnameCacheTable (tagFile *const file,
+static struct canonFnameCacheTable *makeCanonFnameCacheTable (tagFileX *const fileX,
 															  bool absoluteOnly)
 {
 	tagEntry pentry;
-	const char *cwd = loadCtagsCWD (file, &pentry);
+	const char *cwd = loadCtagsCWD (fileX, &pentry);
 	return canonFnameCacheTableNew (cwd, absoluteOnly);
 }
 
-static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
+static tagFileX *makeTagFileX (const char *const filePath)
 {
-	if (strcmp (filePath, "-") == 0)
+	tagFileX *fileX = eMalloc (sizeof (*fileX));
+	fileX->fileName = eStrdup(filePath);
+	fileX->tagFile = NULL;
+	fileX->info = (tagFileInfo){0};
+	return fileX;
+}
+
+static void deleteTagFileX (tagFileX *fileX)
+{
+	eFree ((void *)fileX->fileName);
+	if (fileX->tagFile)
+		tagsClose (fileX->tagFile);
+	eFree (fileX);
+
+}
+
+static tagFileX *openTagFileX  (tagFileX *fileX)
+{
+	fileX->tagFile = tagsOpen (fileX->fileName, &fileX->info);
+	return fileX;
+}
+
+static tagFileX *openTags (struct inputSpec *inputSpec)
+{
+	tagFileX *fileX;
+
+	if (inputSpec->tempFileName)
+		fileX = makeTagFileX(inputSpec->tempFileName);
+	else if (strcmp (inputSpec->tagFileName, "-") == 0)
 	{
 		char *tempName = NULL;
 		FILE *tempFP = tempFileFP ("w", &tempName);
@@ -337,11 +369,14 @@ static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
 					 ProgramName);
 			exit (1);
 		}
-		TagFileName = tempName;
-		atexit (removeTagFile);
+
+		fileX = makeTagFileX(tempName);
+		inputSpec->tempFileName = tempName; /* Move the ownership. */
+		tempName = NULL;					/* Don't touch this anymore. */
 
 		if (copyFile (stdin, tempFP) < 0)
 		{
+			deleteTagFileX (fileX);
 			fclose (tempFP);
 			exit (1);
 		}
@@ -350,14 +385,17 @@ static tagFile *openTags (const char *const filePath, tagFileInfo *const info)
 		{
 			fprintf (stderr, "%s: failed to flush a temporarily file for storing data from stdin\n",
 					 ProgramName);
+			deleteTagFileX (fileX);
 			fclose (tempFP);
 			exit (1);
 		}
-		fclose (tempFP);
-		return tagsOpen (tempName, info);
-	}
 
-	return tagsOpen (filePath, info);
+		fclose (tempFP);
+	}
+	else
+		fileX = makeTagFileX(inputSpec->tagFileName);
+
+	return openTagFileX (fileX);
 }
 
 static int hasPsuedoTag (tagFile *const file,
@@ -370,38 +408,38 @@ static int hasPsuedoTag (tagFile *const file,
 			&& (strcmp(entry.file, exepectedValueAsInputField) == 0));
 }
 
-static void findTag (const char *const name, readOptions *readOpts,
+static void findTag (struct inputSpec *inputSpec,
+					 const char *const name, readOptions *readOpts,
 					 tagPrintOptions *printOpts, struct canonWorkArea *canon)
 {
-	tagFileInfo info;
 	tagEntry entry;
 	int err = 0;
-	tagFile *const file = openTags (TagFileName, &info);
-	if (file == NULL || !info.status.opened)
+	tagFileX *const fileX = openTags (inputSpec);
+	if (fileX->tagFile == NULL || !fileX->info.status.opened)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
-				 ProgramName, tagsStrerror (info.status.error_number), TagFileName);
-		if (file)
-			tagsClose (file);
+				 ProgramName, tagsStrerror (fileX->info.status.error_number),
+				 fileX->fileName);
+		deleteTagFileX (fileX);
 		exit (1);
 	}
 
 	if (canon && canon->cacheTable == NULL)
-		canon->cacheTable = makeCanonFnameCacheTable (file, canon->absoluteOnly);
+		canon->cacheTable = makeCanonFnameCacheTable (fileX, canon->absoluteOnly);
 
 	if (printOpts->escaping)
 	{
 		printOpts->escapingInputField = false;
-		if (hasPsuedoTag (file, "!_TAG_OUTPUT_MODE", "u-ctags")
-			&& hasPsuedoTag (file, "!_TAG_OUTPUT_FILESEP", "slash"))
+		if (hasPsuedoTag (fileX->tagFile, "!_TAG_OUTPUT_MODE", "u-ctags")
+			&& hasPsuedoTag (fileX->tagFile, "!_TAG_OUTPUT_FILESEP", "slash"))
 			printOpts->escapingInputField = true;
 	}
 
 	if (readOpts->sortOverride)
 	{
-		if (tagsSetSortType (file, readOpts->sortMethod) != TagSuccess)
+		if (tagsSetSortType (fileX->tagFile, readOpts->sortMethod) != TagSuccess)
 		{
-			err = tagsGetErrno (file);
+			err = tagsGetErrno (fileX->tagFile);
 			fprintf (stderr, "%s: cannot set sort type to %d: %s\n",
 					 ProgramName,
 					 readOpts->sortMethod,
@@ -411,59 +449,57 @@ static void findTag (const char *const name, readOptions *readOpts,
 	}
 	if (debugMode)
 		fprintf (stderr, "%s: searching for \"%s\" in \"%s\"\n",
-					 ProgramName, name, TagFileName);
-	if (tagsFind (file, &entry, name, readOpts->matchOpts) == TagSuccess)
-		walkTags (file, &entry, tagsFindNext,
+					 ProgramName, name, fileX->fileName);
+	if (tagsFind (fileX->tagFile, &entry, name, readOpts->matchOpts) == TagSuccess)
+		walkTags (fileX->tagFile, &entry, tagsFindNext,
 #ifdef READTAGS_DSL
 				  Formatter? printTagWithFormatter:
 #endif
 				  printTag, printOpts,
 				  canon);
-	else if ((err = tagsGetErrno (file)) != 0)
+	else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
 	{
 		fprintf (stderr, "%s: error in tagsFind(): %s\n",
 				 ProgramName,
 				 tagsStrerror (err));
 		exit (1);
 	}
-	tagsClose (file);
+	deleteTagFileX (fileX);
 }
 
-static void listTags (bool pseudoTags, tagPrintOptions *printOpts,
+static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOptions *printOpts,
 					  struct canonWorkArea *canon)
 {
-	tagFileInfo info;
 	tagEntry entry;
 	int err = 0;
-	tagFile *const file = openTags (TagFileName, &info);
-	if (file == NULL || !info.status.opened)
+	tagFileX *const fileX = openTags (inputSpec);
+	if (fileX->tagFile == NULL || !fileX->info.status.opened)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
 				 ProgramName,
-				 tagsStrerror (info.status.error_number),
-				 TagFileName);
-		if (file)
-			tagsClose (file);
+				 tagsStrerror (fileX->info.status.error_number),
+				 fileX->fileName);
+		deleteTagFileX (fileX);
 		exit (1);
 	}
 
 	if (canon && canon->cacheTable == NULL)
-		canon->cacheTable = makeCanonFnameCacheTable (file, canon->absoluteOnly);
+		canon->cacheTable = makeCanonFnameCacheTable (fileX, canon->absoluteOnly);
 
 	if (printOpts->escaping)
 	{
 		printOpts->escapingInputField = false;
-		if (hasPsuedoTag (file, "!_TAG_OUTPUT_MODE", "u-ctags")
-			&& hasPsuedoTag (file, "!_TAG_OUTPUT_FILESEP", "slash"))
+		if (hasPsuedoTag (fileX->tagFile, "!_TAG_OUTPUT_MODE", "u-ctags")
+			&& hasPsuedoTag (fileX->tagFile, "!_TAG_OUTPUT_FILESEP", "slash"))
 			printOpts->escapingInputField = true;
 	}
 
 	if (pseudoTags)
 	{
-		if (tagsFirstPseudoTag (file, &entry) == TagSuccess)
-			walkTags (file, &entry, tagsNextPseudoTag, printPseudoTag, printOpts,
+		if (tagsFirstPseudoTag (fileX->tagFile, &entry) == TagSuccess)
+			walkTags (fileX->tagFile, &entry, tagsNextPseudoTag, printPseudoTag, printOpts,
 					  canon);
-		else if ((err = tagsGetErrno (file)) != 0)
+		else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
 		{
 			fprintf (stderr, "%s: error in tagsFirstPseudoTag(): %s\n",
 					 ProgramName,
@@ -473,14 +509,14 @@ static void listTags (bool pseudoTags, tagPrintOptions *printOpts,
 	}
 	else
 	{
-		if (tagsFirst (file, &entry) == TagSuccess)
-			walkTags (file, &entry, tagsNext,
+		if (tagsFirst (fileX->tagFile, &entry) == TagSuccess)
+			walkTags (fileX->tagFile, &entry, tagsNext,
 #ifdef READTAGS_DSL
 					  Formatter? printTagWithFormatter:
 #endif
 					  printTag, printOpts,
 					  canon);
-		else if ((err = tagsGetErrno (file)) != 0)
+		else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
 		{
 			fprintf (stderr, "%s: error in tagsFirst(): %s\n",
 					 ProgramName,
@@ -488,7 +524,7 @@ static void listTags (bool pseudoTags, tagPrintOptions *printOpts,
 			exit (1);
 		}
 	}
-	tagsClose (file);
+	deleteTagFileX (fileX);
 }
 
 static const char *const Usage =
@@ -624,6 +660,10 @@ extern int main (int argc, char **argv)
 
 	tagPrintOptions printOpts = {0};
 	readOptions readOpts = {0};
+	struct inputSpec inputSpec = {
+		.tagFileName = "tags",
+		.tempFileName = NULL,
+	};
 
 	struct canonWorkArea canonWorkArea = {
 		.cacheTable = NULL,
@@ -649,7 +689,7 @@ extern int main (int argc, char **argv)
 		{
 			if (canon)
 				canon->ptags = false;
-			findTag (arg, &readOpts, &printOpts, canon);
+			findTag (&inputSpec, arg, &readOpts, &printOpts, canon);
 			actionSupplied = true;
 		}
 		else if (arg [0] == '-' && arg [1] == '\0')
@@ -664,7 +704,7 @@ extern int main (int argc, char **argv)
 			{
 				if (canon)
 					canon->ptags = true;
-				listTags (true, &printOpts, canon);
+				listTags (&inputSpec, true, &printOpts, canon);
 				if (optname[0] == 'l')
 					actionSupplied = true;
 			}
@@ -712,7 +752,7 @@ extern int main (int argc, char **argv)
 			{
 				if (canon)
 					canon->ptags = false;
-				listTags (false, &printOpts, canon);
+				listTags (&inputSpec, false, &printOpts, canon);
 				actionSupplied = true;
 			}
 			else if (strcmp (optname, "line-number") == 0)
@@ -720,7 +760,7 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "tag-file") == 0)
 			{
 				if (i + 1 < argc)
-					TagFileName = argv [++i];
+					inputSpec.tagFileName = argv [++i];
 				else
 					printUsage (stderr, 1);
 			}
@@ -817,7 +857,7 @@ extern int main (int argc, char **argv)
 					case 'P':
 						if (canon)
 							canon->ptags = true;
-						listTags (true, &printOpts, canon);
+						listTags (&inputSpec, true, &printOpts, canon);
 						if (arg  [j] == 'D')
 							actionSupplied = true;
 						break;
@@ -847,18 +887,18 @@ extern int main (int argc, char **argv)
 					case 'l':
 						if (canon)
 							canon->ptags = false;
-						listTags (false, &printOpts, canon);
+						listTags (&inputSpec, false, &printOpts, canon);
 						actionSupplied = true;
 						break;
 					case 'n': printOpts.lineNumber = true; break;
 					case 't':
 						if (arg [j+1] != '\0')
 						{
-							TagFileName = arg + j + 1;
-							j += strlen (TagFileName);
+							inputSpec.tagFileName = arg + j + 1;
+							j += strlen (inputSpec.tagFileName);
 						}
 						else if (i + 1 < argc)
-							TagFileName = argv [++i];
+							inputSpec.tagFileName = argv [++i];
 						else
 							printUsage(stderr, 1);
 						break;
@@ -930,6 +970,12 @@ extern int main (int argc, char **argv)
 	{
 		if (canon->cacheTable)
 			canonFnameCacheTableDelete (canon->cacheTable);
+	}
+
+	if (inputSpec.tempFileName)
+	{
+		remove (inputSpec.tempFileName);
+		eFree (inputSpec.tempFileName);
 	}
 	return 0;
 }
