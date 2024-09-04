@@ -58,6 +58,8 @@ enum actionType {
 struct actionSpec {
 	unsigned int action;		/* bitset of actionType items */
 	const char *name;			/* for ACTION_FIND */
+	bool canonicalizing;
+	struct canonWorkArea canon;
 };
 
 static const char *ProgramName;
@@ -678,20 +680,13 @@ extern int main (int argc, char **argv)
 	struct actionSpec actionSpec = {
 		.action  = ACTION_NONE,
 		.name = NULL,
+		.canonicalizing = false,
+		.canon = {
+			.cacheTable = NULL,
+			.ptags = false,
+			/* .absoluteOnly = false, */
+		},
 	};
-
-	struct canonWorkArea canonWorkArea = {
-		.cacheTable = NULL,
-		.ptags = false,
-		.absoluteOnly = false,
-	};
-	struct canonWorkArea canonWorkAreaAbsForm = {
-		.cacheTable = NULL,
-		.ptags = false,
-		.absoluteOnly = true,
-	};
-	struct canonWorkArea *canon = NULL;
-
 
 	ProgramName = argv [0];
 	setExecutableName (ProgramName);
@@ -795,9 +790,15 @@ extern int main (int argc, char **argv)
 				}
 			}
 			else if (strcmp (optname, "absolute-input") == 0)
-				canon = &canonWorkAreaAbsForm;
+			{
+				actionSpec.canonicalizing = true;
+				actionSpec.canon.absoluteOnly = true;
+			}
 			else if (strcmp (optname, "canonicalize-input") == 0)
-				canon = &canonWorkArea;
+			{
+				actionSpec.canonicalizing = true;
+				actionSpec.canon.absoluteOnly = false;
+			}
 #ifdef READTAGS_DSL
 			else if (strcmp (optname, "filter") == 0)
 			{
@@ -908,10 +909,12 @@ extern int main (int argc, char **argv)
 							printUsage(stderr, 1);
 						break;
 					case 'A':
-						canon = &canonWorkAreaAbsForm;
+						actionSpec.canonicalizing = true;
+						actionSpec.canon.absoluteOnly = true;
 						break;
 					case 'C':
-						canon = &canonWorkArea;
+						actionSpec.canonicalizing = true;
+						actionSpec.canon.absoluteOnly = false;
 						break;
 #ifdef READTAGS_DSL
 					case 'Q':
@@ -965,18 +968,20 @@ extern int main (int argc, char **argv)
 
 	if (actionSpec.action & ACTION_LIST_PTAGS)
 	{
-		if (canon)
-			canon->ptags = true;
-		listTags (&inputSpec, true, &printOpts, canon);
-		if (canon)
-			canon->ptags = false;
+		if (actionSpec.canonicalizing)
+			actionSpec.canon.ptags = true;
+		listTags (&inputSpec, true, &printOpts,
+				  actionSpec.canonicalizing? &actionSpec.canon: NULL);
+		if (actionSpec.canonicalizing)
+			actionSpec.canon.ptags = false;
 	}
 
 	if (actionSpec.action & ACTION_FIND)
-		findTag (&inputSpec, actionSpec.name, &readOpts, &printOpts, canon);
+		findTag (&inputSpec, actionSpec.name, &readOpts, &printOpts,
+				 actionSpec.canonicalizing? &actionSpec.canon: NULL);
 	else if (actionSpec.action & ACTION_LIST)
-		listTags (&inputSpec, false, &printOpts, canon);
-
+		listTags (&inputSpec, false, &printOpts,
+				  actionSpec.canonicalizing? &actionSpec.canon: NULL);
 
 #ifdef READTAGS_DSL
 	if (Qualifier)
@@ -987,11 +992,8 @@ extern int main (int argc, char **argv)
 		f_destroy (Formatter);
 #endif
 
-	if (canon)
-	{
-		if (canon->cacheTable)
-			canonFnameCacheTableDelete (canon->cacheTable);
-	}
+	if (actionSpec.canon.cacheTable)
+			canonFnameCacheTableDelete (actionSpec.canon.cacheTable);
 
 	if (inputSpec.tempFileName)
 	{
