@@ -18,6 +18,7 @@
 #include "htable.h"
 #include "ptrarray.h"
 #include "fname.h"
+#include "ptrarray.h"
 
 #include <string.h>		/* strerror */
 #include <stdlib.h>		/* exit */
@@ -661,6 +662,27 @@ static void printVersion(void)
 	exit (0);
 }
 
+static void deleteInputSpec (void *data)
+{
+	struct inputSpec *inputSpec = data;
+	if (inputSpec->tempFileName)
+	{
+		remove (inputSpec->tempFileName);
+		eFree (inputSpec->tempFileName);
+	}
+	eFree (data);
+}
+
+static void addInputSpec (ptrArray *inputSpecs, const char *name)
+{
+	struct inputSpec *i = eMalloc (sizeof (struct inputSpec));
+
+	i->tagFileName = name;
+	i->tempFileName = NULL;
+
+	ptrArrayAdd (inputSpecs, i);
+}
+
 extern int main (int argc, char **argv)
 {
 	int i;
@@ -668,10 +690,8 @@ extern int main (int argc, char **argv)
 
 	tagPrintOptions printOpts = {0};
 	readOptions readOpts = {0};
-	struct inputSpec inputSpec = {
-		.tagFileName = "tags",
-		.tempFileName = NULL,
-	};
+	ptrArray *inputSpecs = ptrArrayNew (deleteInputSpec);
+
 	struct actionSpec actionSpec = {
 		.action  = ACTION_NONE,
 		.name = NULL,
@@ -755,7 +775,7 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "tag-file") == 0)
 			{
 				if (i + 1 < argc)
-					inputSpec.tagFileName = argv [++i];
+					addInputSpec (inputSpecs, argv[++i]);
 				else
 					printUsage (stderr, 1);
 			}
@@ -888,11 +908,12 @@ extern int main (int argc, char **argv)
 					case 't':
 						if (arg [j+1] != '\0')
 						{
-							inputSpec.tagFileName = arg + j + 1;
-							j += strlen (inputSpec.tagFileName);
+							const char *tname = arg + j + 1;
+							addInputSpec (inputSpecs, tname);
+							j += strlen (tname);
 						}
 						else if (i + 1 < argc)
-							inputSpec.tagFileName = argv [++i];
+							addInputSpec (inputSpecs, argv [++i]);
 						else
 							printUsage(stderr, 1);
 						break;
@@ -964,24 +985,55 @@ extern int main (int argc, char **argv)
 		exit (1);
 	}
 
+	size_t input_count = ptrArrayCount(inputSpecs);
+#ifndef READTAGS_DSL
+	if (input_count > 0)
+	{
+		/* mk_mingw.mak sets -DREADTAGS_DSL.
+		 * mk_mvc.mak doesn't. */
+		fprintf (stderr,
+				 "Processsing multiple tags is not supported with this (!READTAGS_DSL) build confiugraion.");
+		exit (1);
+	}
+#endif
+
 #ifdef READTAGS_DSL
-	if (Sorter)
+	if (Sorter || input_count  > 0)
 		actionSpec.tagEntryArray = ptrArrayNew ((ptrArrayDeleteFunc)freeCopiedTag);
 #endif
 
-	if (actionSpec.action & ACTION_LIST_PTAGS)
+	if (ptrArrayIsEmpty (inputSpecs))
 	{
-		if (actionSpec.canonicalizing)
-			actionSpec.canon.ptags = true;
-		listTags (&inputSpec, true, &printOpts, &actionSpec);
-		if (actionSpec.canonicalizing)
-			actionSpec.canon.ptags = false;
+		addInputSpec (inputSpecs, "tags");
+		input_count++;
 	}
 
-	if (actionSpec.action & ACTION_FIND)
-		findTag (&inputSpec, actionSpec.name, &readOpts, &printOpts, &actionSpec);
-	else if (actionSpec.action & ACTION_LIST)
-		listTags (&inputSpec, false, &printOpts, &actionSpec);
+	for (unsigned int i = 0; i < input_count; i++)
+	{
+		struct inputSpec *inputSpec = ptrArrayItem (inputSpecs, i);
+
+		if (actionSpec.action & ACTION_LIST_PTAGS)
+		{
+			if (actionSpec.canonicalizing)
+				actionSpec.canon.ptags = true;
+			listTags (inputSpec, true, &printOpts, &actionSpec);
+			if (actionSpec.canonicalizing)
+				actionSpec.canon.ptags = false;
+		}
+
+		if (actionSpec.action & ACTION_FIND)
+			findTag (inputSpec, actionSpec.name, &readOpts, &printOpts, &actionSpec);
+		else if (actionSpec.action & ACTION_LIST)
+			listTags (inputSpec, false, &printOpts, &actionSpec);
+
+		if (actionSpec.canon.cacheTable)
+		{
+			canonFnameCacheTableDelete (actionSpec.canon.cacheTable);
+			actionSpec.canon.cacheTable = NULL;
+		}
+	}
+
+	ptrArrayDelete (inputSpecs);
 
 	if (actionSpec.tagEntryArray)
 	{
@@ -1008,13 +1060,5 @@ extern int main (int argc, char **argv)
 		f_destroy (Formatter);
 #endif
 
-	if (actionSpec.canon.cacheTable)
-			canonFnameCacheTableDelete (actionSpec.canon.cacheTable);
-
-	if (inputSpec.tempFileName)
-	{
-		remove (inputSpec.tempFileName);
-		eFree (inputSpec.tempFileName);
-	}
 	return 0;
 }
