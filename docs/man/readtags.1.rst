@@ -35,7 +35,7 @@ ACTIONS
 	"-" as NAME indicates arguments after this as NAME even if they start with -.
 
 ``-D``, ``--list-pseudo-tags``
-	Equivalent to ``--list-pseudo-tags``.
+	List pseudo tags.
 
 OPTIONS
 -------
