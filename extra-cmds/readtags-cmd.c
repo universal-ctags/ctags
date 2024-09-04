@@ -663,7 +663,7 @@ extern int main (int argc, char **argv)
 			{
 				if (canon)
 					canon->ptags = true;
-				listTags (true, &printOpts, NULL);
+				listTags (true, &printOpts, canon);
 				if (optname[0] == 'l')
 					actionSupplied = true;
 			}

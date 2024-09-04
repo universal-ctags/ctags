@@ -6,6 +6,7 @@
 # drive-letter1.tags -C -l
 !_TAG_PROC_CWD must start with '/': D:/tmp
 # good-ptags.tags -C -D
+# good-ptags.tags -C --list-pseudo-tags
 # good0.tags -A -l
 # good1.tags --absolute-input -l
 # good2.tags -A -l
@@ -14,3 +15,4 @@
 # drive-letter1.tags -A -l
 !_TAG_PROC_CWD must start with '/': D:/tmp
 # good-ptags.tags -A -D
+# good-ptags.tags -A --list-pseudo-tags
