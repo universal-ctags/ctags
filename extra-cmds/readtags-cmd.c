@@ -48,6 +48,18 @@ struct inputSpec {
 	char *tempFileName;
 };
 
+enum actionType {
+		ACTION_NONE,
+		ACTION_FIND = 1 << 0,
+		ACTION_LIST = 1 << 1,
+		ACTION_LIST_PTAGS = 1 << 2,
+};
+
+struct actionSpec {
+	unsigned int action;		/* bitset of actionType items */
+	const char *name;			/* for ACTION_FIND */
+};
+
 static const char *ProgramName;
 static int debugMode;
 #ifdef READTAGS_DSL
@@ -654,7 +666,6 @@ static void printVersion(void)
 
 extern int main (int argc, char **argv)
 {
-	bool actionSupplied = false;
 	int i;
 	bool ignore_prefix = false;
 
@@ -663,6 +674,10 @@ extern int main (int argc, char **argv)
 	struct inputSpec inputSpec = {
 		.tagFileName = "tags",
 		.tempFileName = NULL,
+	};
+	struct actionSpec actionSpec = {
+		.action  = ACTION_NONE,
+		.name = NULL,
 	};
 
 	struct canonWorkArea canonWorkArea = {
@@ -687,10 +702,8 @@ extern int main (int argc, char **argv)
 		const char *const arg = argv [i];
 		if (ignore_prefix || arg [0] != '-')
 		{
-			if (canon)
-				canon->ptags = false;
-			findTag (&inputSpec, arg, &readOpts, &printOpts, canon);
-			actionSupplied = true;
+			actionSpec.action |= ACTION_FIND;
+			actionSpec.name = arg;
 		}
 		else if (arg [0] == '-' && arg [1] == '\0')
 			ignore_prefix = true;
@@ -701,13 +714,7 @@ extern int main (int argc, char **argv)
 				debugMode++;
 			else if (strcmp (optname, "list-pseudo-tags") == 0
 					 || strcmp (optname, "with-pseudo-tags") == 0)
-			{
-				if (canon)
-					canon->ptags = true;
-				listTags (&inputSpec, true, &printOpts, canon);
-				if (optname[0] == 'l')
-					actionSupplied = true;
-			}
+				actionSpec.action |= ACTION_LIST_PTAGS;
 			else if (strcmp (optname, "help") == 0)
 				printUsage (stdout, 0);
 #ifdef READTAGS_DSL
@@ -749,12 +756,7 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "prefix-match") == 0)
 				readOpts.matchOpts |= TAG_PARTIALMATCH;
 			else if (strcmp (optname, "list") == 0)
-			{
-				if (canon)
-					canon->ptags = false;
-				listTags (&inputSpec, false, &printOpts, canon);
-				actionSupplied = true;
-			}
+				actionSpec.action |= ACTION_LIST;
 			else if (strcmp (optname, "line-number") == 0)
 				printOpts.lineNumber = true;
 			else if (strcmp (optname, "tag-file") == 0)
@@ -855,11 +857,7 @@ extern int main (int argc, char **argv)
 					case 'd': debugMode++; break;
 					case 'D':
 					case 'P':
-						if (canon)
-							canon->ptags = true;
-						listTags (&inputSpec, true, &printOpts, canon);
-						if (arg  [j] == 'D')
-							actionSupplied = true;
+						actionSpec.action |= ACTION_LIST_PTAGS;
 						break;
 					case 'h': printUsage (stdout, 0); break;
 #ifdef READTAGS_DSL
@@ -885,10 +883,7 @@ extern int main (int argc, char **argv)
 					case 'i': readOpts.matchOpts |= TAG_IGNORECASE;   break;
 					case 'p': readOpts.matchOpts |= TAG_PARTIALMATCH; break;
 					case 'l':
-						if (canon)
-							canon->ptags = false;
-						listTags (&inputSpec, false, &printOpts, canon);
-						actionSupplied = true;
+						actionSpec.action |= ACTION_LIST;
 						break;
 					case 'n': printOpts.lineNumber = true; break;
 					case 't':
@@ -950,13 +945,39 @@ extern int main (int argc, char **argv)
 			}
 		}
 	}
-	if (! actionSupplied)
+
+
+	if (actionSpec.action == ACTION_NONE)
 	{
 		fprintf (stderr,
 			"%s: no action specified: specify one of NAME, -l or -D\n",
 			ProgramName);
 		exit (1);
 	}
+
+	if ((actionSpec.action & ACTION_FIND) && (actionSpec.action & ACTION_LIST))
+	{
+		fprintf (stderr,
+				 "%s: choose either an action: finding a tag or listing all\n",
+				 ProgramName);
+		exit (1);
+	}
+
+	if (actionSpec.action & ACTION_LIST_PTAGS)
+	{
+		if (canon)
+			canon->ptags = true;
+		listTags (&inputSpec, true, &printOpts, canon);
+		if (canon)
+			canon->ptags = false;
+	}
+
+	if (actionSpec.action & ACTION_FIND)
+		findTag (&inputSpec, actionSpec.name, &readOpts, &printOpts, canon);
+	else if (actionSpec.action & ACTION_LIST)
+		listTags (&inputSpec, false, &printOpts, canon);
+
+
 #ifdef READTAGS_DSL
 	if (Qualifier)
 		q_destroy (Qualifier);
