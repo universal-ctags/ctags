@@ -429,7 +429,7 @@ extern void setCurrentDirectory (void) /* TODO */
 		CurrentDirectory = xMalloc ((size_t) (PATH_MAX + 1), char);
 	buf = getcwd (CurrentDirectory, PATH_MAX);
 	if (buf == NULL)
-		perror ("");
+		error (FATAL | PERROR, "failed in getcwd()");
 	if (! isPathSeparator (CurrentDirectory [strlen (CurrentDirectory) - (size_t) 1]))
 	{
 		sprintf (CurrentDirectory + strlen (CurrentDirectory), "%c",
