@@ -60,6 +60,9 @@ struct actionSpec {
 	const char *name;			/* for ACTION_FIND */
 	bool canonicalizing;
 	struct canonWorkArea canon;
+	ptrArray *tagEntryArray;
+	void (* walkerfn) (const tagEntry *, void *);
+	void *dataForWalkerFn;
 };
 
 static const char *ProgramName;
@@ -179,10 +182,7 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 					  void (* actionfn) (const tagEntry *, void *), void *data,
 					  struct actionSpec *actionSpec)
 {
-	ptrArray *a = NULL;
-
-	if (Sorter)
-		a = ptrArrayNew ((ptrArrayDeleteFunc)freeCopiedTag);
+	ptrArray *a = actionSpec->tagEntryArray;
 
 	do
 	{
@@ -230,14 +230,8 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 
 	if (a)
 	{
-		ptrArraySort (a, compareTagEntry);
-		unsigned int count = ptrArrayCount (a);
-		for (unsigned int i = 0; i < count; i++)
-		{
-			tagEntry *e = ptrArrayItem (a, i);
-			(* actionfn) (e, data);
-		}
-		ptrArrayDelete (a);
+		actionSpec->walkerfn = actionfn;
+		actionSpec->dataForWalkerFn = data;
 	}
 }
 #else
@@ -687,6 +681,9 @@ extern int main (int argc, char **argv)
 			.ptags = false,
 			/* .absoluteOnly = false, */
 		},
+		.tagEntryArray = NULL,
+		.walkerfn = NULL,
+		.dataForWalkerFn = NULL,
 	};
 
 	ProgramName = argv [0];
@@ -967,6 +964,11 @@ extern int main (int argc, char **argv)
 		exit (1);
 	}
 
+#ifdef READTAGS_DSL
+	if (Sorter)
+		actionSpec.tagEntryArray = ptrArrayNew ((ptrArrayDeleteFunc)freeCopiedTag);
+#endif
+
 	if (actionSpec.action & ACTION_LIST_PTAGS)
 	{
 		if (actionSpec.canonicalizing)
@@ -980,6 +982,22 @@ extern int main (int argc, char **argv)
 		findTag (&inputSpec, actionSpec.name, &readOpts, &printOpts, &actionSpec);
 	else if (actionSpec.action & ACTION_LIST)
 		listTags (&inputSpec, false, &printOpts, &actionSpec);
+
+	if (actionSpec.tagEntryArray)
+	{
+#ifdef READTAGS_DSL
+		if (Sorter)
+			ptrArraySort (actionSpec.tagEntryArray, compareTagEntry);
+#endif
+
+		const size_t entry_count = ptrArrayCount(actionSpec.tagEntryArray);
+		for (unsigned int i = 0; i < entry_count; i++)
+		{
+			tagEntry *e = ptrArrayItem (actionSpec.tagEntryArray, i);
+			actionSpec.walkerfn (e, actionSpec.dataForWalkerFn);
+		}
+		ptrArrayDelete (actionSpec.tagEntryArray);
+	}
 
 #ifdef READTAGS_DSL
 	if (Qualifier)
