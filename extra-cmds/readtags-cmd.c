@@ -730,13 +730,13 @@ extern int main (int argc, char **argv)
 					const char *sort_spec = argv [++i];
 					if (strcmp (sort_spec, "0") == 0
 						|| strcmp (sort_spec, "unsorted") == 0)
-						readOpts.sortMethod = 0;
+						readOpts.sortMethod = TAG_UNSORTED;
 					else if (strcmp (sort_spec, "1") == 0
 							 || strcmp (sort_spec, "sorted") == 0)
-						readOpts.sortMethod = 1;
+						readOpts.sortMethod = TAG_SORTED;
 					else if (strcmp (sort_spec, "2") == 0
 							 || strcmp (sort_spec, "foldcase") == 0)
-						readOpts.sortMethod = 2;
+						readOpts.sortMethod = TAG_FOLDSORTED;
 					else
 					{
 						fprintf (stderr, "%s: unknown sort method for --%s option\n",
