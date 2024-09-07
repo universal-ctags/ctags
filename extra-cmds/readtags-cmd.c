@@ -621,11 +621,8 @@ extern int main (int argc, char **argv)
 	int i;
 	bool ignore_prefix = false;
 
-	tagPrintOptions printOpts;
-	readOptions readOpts;
-
-	memset (&printOpts, 0, sizeof (printOpts));
-	memset (&readOpts, 0, sizeof (readOpts));
+	tagPrintOptions printOpts = {0};
+	readOptions readOpts = {0};
 
 	struct canonWorkArea canonWorkArea = {
 		.cacheTable = NULL,
