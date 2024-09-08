@@ -14,6 +14,9 @@ if ! [ -x "${READTAGS}" ]; then
 	skip "no readtags"
 fi
 
+if ! ( "${READTAGS}" -h | grep -q -e -F ); then
+    skip "no formatter function in readtags"
+fi
 
 echo2()
 {
