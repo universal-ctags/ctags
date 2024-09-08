@@ -177,7 +177,7 @@ static int compareTagEntry (const void *a, const void *b)
 static void walkTags (tagFile *const file, tagEntry *first_entry,
 					  tagResult (* nextfn) (tagFile *const, tagEntry *),
 					  void (* actionfn) (const tagEntry *, void *), void *data,
-					  struct canonWorkArea *canon)
+					  struct actionSpec *actionSpec)
 {
 	ptrArray *a = NULL;
 
@@ -188,13 +188,13 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 	{
 		tagEntry *shadow = first_entry;
 		tagEntry  shadowRec;
-		if (canon
-			&& (canon->ptags == false
+		if (actionSpec->canonicalizing
+			&& (actionSpec->canon.ptags == false
 				|| strcmp (first_entry->name, "!_TAG_PROC_CWD") == 0))
 		{
 			shadowRec = *first_entry;
 			shadow = &shadowRec;
-			shadow->file = canonicalizeFileName (canon->cacheTable,
+			shadow->file = canonicalizeFileName (actionSpec->canon.cacheTable,
 												 first_entry->file);
 		}
 
@@ -244,19 +244,19 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 static void walkTags (tagFile *const file, tagEntry *first_entry,
 					  tagResult (* nextfn) (tagFile *const, tagEntry *),
 					  void (* actionfn) (const tagEntry *, void *), void *data,
-					  struct canonWorkArea *canon)
+					  struct actionSpec *actionSpec)
 {
 	do
 	{
 		tagEntry *shadow = first_entry;
 		tagEntry  shadowRec;
-		if (canon
-			&& (canon->ptags == false
+		if (actionSpec->canonicalizing
+			&& (actionSpec->canon.ptags == false
 				|| strcmp (first_entry->name, "!_TAG_PROC_CWD") == 0))
 		{
 			shadow = &shadowRec;
 			shadowRec = *first_entry;
-			shadow->file = canonicalizeFileName (canon->cacheTable,
+			shadow->file = canonicalizeFileName (actionSpec->canon.cacheTable,
 												 first_entry->file);
 		}
 
@@ -424,7 +424,7 @@ static int hasPsuedoTag (tagFile *const file,
 
 static void findTag (struct inputSpec *inputSpec,
 					 const char *const name, readOptions *readOpts,
-					 tagPrintOptions *printOpts, struct canonWorkArea *canon)
+					 tagPrintOptions *printOpts, struct actionSpec *actionSpec)
 {
 	tagEntry entry;
 	int err = 0;
@@ -438,8 +438,8 @@ static void findTag (struct inputSpec *inputSpec,
 		exit (1);
 	}
 
-	if (canon && canon->cacheTable == NULL)
-		canon->cacheTable = makeCanonFnameCacheTable (fileX, canon->absoluteOnly);
+	if (actionSpec->canonicalizing && actionSpec->canon.cacheTable == NULL)
+		actionSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX, actionSpec->canon.absoluteOnly);
 
 	if (printOpts->escaping)
 	{
@@ -470,7 +470,7 @@ static void findTag (struct inputSpec *inputSpec,
 				  Formatter? printTagWithFormatter:
 #endif
 				  printTag, printOpts,
-				  canon);
+				  actionSpec);
 	else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
 	{
 		fprintf (stderr, "%s: error in tagsFind(): %s\n",
@@ -482,7 +482,7 @@ static void findTag (struct inputSpec *inputSpec,
 }
 
 static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOptions *printOpts,
-					  struct canonWorkArea *canon)
+					  struct actionSpec *actionSpec)
 {
 	tagEntry entry;
 	int err = 0;
@@ -497,8 +497,9 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 		exit (1);
 	}
 
-	if (canon && canon->cacheTable == NULL)
-		canon->cacheTable = makeCanonFnameCacheTable (fileX, canon->absoluteOnly);
+	if (actionSpec->canonicalizing && actionSpec->canon.cacheTable == NULL)
+		actionSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX,
+																 actionSpec->canon.absoluteOnly);
 
 	if (printOpts->escaping)
 	{
@@ -512,7 +513,7 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 	{
 		if (tagsFirstPseudoTag (fileX->tagFile, &entry) == TagSuccess)
 			walkTags (fileX->tagFile, &entry, tagsNextPseudoTag, printPseudoTag, printOpts,
-					  canon);
+					  actionSpec);
 		else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
 		{
 			fprintf (stderr, "%s: error in tagsFirstPseudoTag(): %s\n",
@@ -529,7 +530,7 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 					  Formatter? printTagWithFormatter:
 #endif
 					  printTag, printOpts,
-					  canon);
+					  actionSpec);
 		else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
 		{
 			fprintf (stderr, "%s: error in tagsFirst(): %s\n",
@@ -970,18 +971,15 @@ extern int main (int argc, char **argv)
 	{
 		if (actionSpec.canonicalizing)
 			actionSpec.canon.ptags = true;
-		listTags (&inputSpec, true, &printOpts,
-				  actionSpec.canonicalizing? &actionSpec.canon: NULL);
+		listTags (&inputSpec, true, &printOpts, &actionSpec);
 		if (actionSpec.canonicalizing)
 			actionSpec.canon.ptags = false;
 	}
 
 	if (actionSpec.action & ACTION_FIND)
-		findTag (&inputSpec, actionSpec.name, &readOpts, &printOpts,
-				 actionSpec.canonicalizing? &actionSpec.canon: NULL);
+		findTag (&inputSpec, actionSpec.name, &readOpts, &printOpts, &actionSpec);
 	else if (actionSpec.action & ACTION_LIST)
-		listTags (&inputSpec, false, &printOpts,
-				  actionSpec.canonicalizing? &actionSpec.canon: NULL);
+		listTags (&inputSpec, false, &printOpts, &actionSpec);
 
 #ifdef READTAGS_DSL
 	if (Qualifier)
