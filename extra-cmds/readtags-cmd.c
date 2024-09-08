@@ -21,9 +21,10 @@
 #include <string.h>		/* strerror */
 #include <stdlib.h>		/* exit */
 #include <stdio.h>		/* stderr */
+#include <stdbool.h>
 
 typedef struct sReadOption {
-	int sortOverride;
+	bool sortOverride;
 	sortType sortMethod;
 	/* options passed to libreadtags API functions.*/
 	int matchOpts;
@@ -31,7 +32,7 @@ typedef struct sReadOption {
 
 struct canonWorkArea {
 	struct canonFnameCacheTable *cacheTable;
-	int ptags;
+	bool ptags;
 	bool absoluteOnly;
 };
 
@@ -211,7 +212,7 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 		tagEntry *shadow = first_entry;
 		tagEntry  shadowRec;
 		if (canon
-			&& (canon->ptags == 0
+			&& (canon->ptags == false
 				|| strcmp (first_entry->name, "!_TAG_PROC_CWD") == 0))
 		{
 			shadowRec = *first_entry;
@@ -269,7 +270,7 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 		tagEntry *shadow = first_entry;
 		tagEntry  shadowRec;
 		if (canon
-			&& (canon->ptags == 0
+			&& (canon->ptags == false
 				|| strcmp (first_entry->name, "!_TAG_PROC_CWD") == 0))
 		{
 			shadow = &shadowRec;
@@ -350,7 +351,7 @@ static const char *loadCtagsCWD (tagFile *const file, tagEntry *pentry)
 	if (pentry->file[0] != '/')
 	{
 		fputs ("!_TAG_PROC_CWD must start with '/': ", stderr);
-		tagsPrintValue (pentry->file, 1, NULL, stderr);
+		tagsPrintValue (pentry->file, true, NULL, stderr);
 		fputc ('\n', stderr);
 		exit (1);
 	}
@@ -432,10 +433,10 @@ static void findTag (const char *const name, readOptions *readOpts,
 
 	if (printOpts->escaping)
 	{
-		printOpts->escapingInputField = 0;
+		printOpts->escapingInputField = false;
 		if (hasPsuedoTag (file, "!_TAG_OUTPUT_MODE", "u-ctags")
 			&& hasPsuedoTag (file, "!_TAG_OUTPUT_FILESEP", "slash"))
-			printOpts->escapingInputField = 1;
+			printOpts->escapingInputField = true;
 	}
 
 	if (readOpts->sortOverride)
@@ -470,7 +471,7 @@ static void findTag (const char *const name, readOptions *readOpts,
 	tagsClose (file);
 }
 
-static void listTags (int pseudoTags, tagPrintOptions *printOpts,
+static void listTags (bool pseudoTags, tagPrintOptions *printOpts,
 					  struct canonWorkArea *canon)
 {
 	tagFileInfo info;
@@ -493,10 +494,10 @@ static void listTags (int pseudoTags, tagPrintOptions *printOpts,
 
 	if (printOpts->escaping)
 	{
-		printOpts->escapingInputField = 0;
+		printOpts->escapingInputField = false;
 		if (hasPsuedoTag (file, "!_TAG_OUTPUT_MODE", "u-ctags")
 			&& hasPsuedoTag (file, "!_TAG_OUTPUT_FILESEP", "slash"))
-			printOpts->escapingInputField = 1;
+			printOpts->escapingInputField = true;
 	}
 
 	if (pseudoTags)
@@ -659,9 +660,9 @@ static void printVersion(void)
 
 extern int main (int argc, char **argv)
 {
-	int actionSupplied = 0;
+	bool actionSupplied = false;
 	int i;
-	int ignore_prefix = 0;
+	bool ignore_prefix = false;
 
 	tagPrintOptions printOpts;
 	readOptions readOpts;
@@ -671,12 +672,12 @@ extern int main (int argc, char **argv)
 
 	struct canonWorkArea canonWorkArea = {
 		.cacheTable = NULL,
-		.ptags = 0,
+		.ptags = false,
 		.absoluteOnly = false,
 	};
 	struct canonWorkArea canonWorkAreaAbsForm = {
 		.cacheTable = NULL,
-		.ptags = 0,
+		.ptags = false,
 		.absoluteOnly = true,
 	};
 	struct canonWorkArea *canon = NULL;
@@ -692,12 +693,12 @@ extern int main (int argc, char **argv)
 		if (ignore_prefix || arg [0] != '-')
 		{
 			if (canon)
-				canon->ptags = 0;
+				canon->ptags = false;
 			findTag (arg, &readOpts, &printOpts, canon);
-			actionSupplied = 1;
+			actionSupplied = true;
 		}
 		else if (arg [0] == '-' && arg [1] == '\0')
-			ignore_prefix = 1;
+			ignore_prefix = true;
 		else if (arg [0] == '-' && arg [1] == '-')
 		{
 			const char *optname = arg + 2;
@@ -707,10 +708,10 @@ extern int main (int argc, char **argv)
 					 || strcmp (optname, "with-pseudo-tags") == 0)
 			{
 				if (canon)
-					canon->ptags = 1;
-				listTags (1, &printOpts, NULL);
+					canon->ptags = true;
+				listTags (true, &printOpts, NULL);
 				if (optname[0] == 'l')
-					actionSupplied = 1;
+					actionSupplied = true;
 			}
 			else if (strcmp (optname, "help") == 0)
 				printUsage (stdout, 0);
@@ -745,9 +746,9 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "version") == 0)
 				printVersion ();
 			else if (strcmp (optname, "escape-output") == 0)
-				printOpts.escaping = 1;
+				printOpts.escaping = true;
 			else if (strcmp (optname, "extension-fields") == 0)
-				printOpts.extensionFields = 1;
+				printOpts.extensionFields = true;
 			else if (strcmp (optname, "icase-match") == 0)
 				readOpts.matchOpts |= TAG_IGNORECASE;
 			else if (strcmp (optname, "prefix-match") == 0)
@@ -755,12 +756,12 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "list") == 0)
 			{
 				if (canon)
-					canon->ptags = 0;
-				listTags (0, &printOpts, canon);
-				actionSupplied = 1;
+					canon->ptags = false;
+				listTags (false, &printOpts, canon);
+				actionSupplied = true;
 			}
 			else if (strcmp (optname, "line-number") == 0)
-				printOpts.lineNumber = 1;
+				printOpts.lineNumber = true;
 			else if (strcmp (optname, "tag-file") == 0)
 			{
 				if (i + 1 < argc)
@@ -860,10 +861,10 @@ extern int main (int argc, char **argv)
 					case 'D':
 					case 'P':
 						if (canon)
-							canon->ptags = 1;
-						listTags (1, &printOpts, canon);
+							canon->ptags = true;
+						listTags (true, &printOpts, canon);
 						if (arg  [j] == 'D')
-							actionSupplied = 1;
+							actionSupplied = true;
 						break;
 					case 'h': printUsage (stdout, 0); break;
 #ifdef READTAGS_DSL
@@ -884,17 +885,17 @@ extern int main (int argc, char **argv)
 							printUsage(stderr, 1);
 #endif
 					case 'v': printVersion ();
-					case 'E': printOpts.escaping = 1; break;
-					case 'e': printOpts.extensionFields = 1; break;
+					case 'E': printOpts.escaping = true; break;
+					case 'e': printOpts.extensionFields = true; break;
 					case 'i': readOpts.matchOpts |= TAG_IGNORECASE;   break;
 					case 'p': readOpts.matchOpts |= TAG_PARTIALMATCH; break;
 					case 'l':
 						if (canon)
-							canon->ptags = 0;
-						listTags (0, &printOpts, canon);
-						actionSupplied = 1;
+							canon->ptags = false;
+						listTags (false, &printOpts, canon);
+						actionSupplied = true;
 						break;
-					case 'n': printOpts.lineNumber = 1; break;
+					case 'n': printOpts.lineNumber = true; break;
 					case 't':
 						if (arg [j+1] != '\0')
 						{
@@ -907,7 +908,7 @@ extern int main (int argc, char **argv)
 							printUsage(stderr, 1);
 						break;
 					case 's':
-						readOpts.sortOverride = 1;
+						readOpts.sortOverride = true;
 						++j;
 						if (arg [j] == '\0')
 							readOpts.sortMethod = TAG_SORTED;
