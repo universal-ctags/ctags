@@ -11,8 +11,9 @@
 */
 
 #include "printtags.h"
-#include <stdio.h>
 
+#include <stdbool.h>
+#include <stdio.h>
 
 /*
 *   DATA DEFINITIONS
@@ -48,7 +49,7 @@ static void ultostr (char dst [21], unsigned long d)
 	dst [i] = '\0';
 }
 
-static void printValue (const char *val, int printingWithEscaping,
+static void printValue (const char *val, bool printingWithEscaping,
 						int  (* print_str) (const char *, void *),
 						int  (* print_char) (int, void *),
 						void *outfp)
@@ -103,7 +104,7 @@ static void printValue (const char *val, int printingWithEscaping,
 }
 
 extern int tagsPrintValue (const char *val,
-						   int escaping,
+						   bool escaping,
 						   tagPrintProcs *procs,
 						   void *outfp)
 {
@@ -117,11 +118,11 @@ extern int tagsPrintValue (const char *val,
 }
 
 static void tagsPrintTag (const tagEntry *entry,
-						  int printingExtensionFields,
-						  int printingLineNumber,
-						  int printingWithEscaping,
-						  int printInputFieldWithEscaping,
-						  int pseudoTag,
+						  bool printingExtensionFields,
+						  bool printingLineNumber,
+						  bool printingWithEscaping,
+						  bool printInputFieldWithEscaping,
+						  bool pseudoTag,
 						  int  (* print_str) (const char *, void *),
 						  int  (* print_char) (int, void *),
 						  void *outfp)
@@ -217,7 +218,7 @@ extern int tagsPrint (const tagEntry *entry,
 				  opt->lineNumber,
 				  opt->escaping,
 				  opt->escapingInputField,
-				  0,
+				  false,
 				  procs->printStr,
 				  procs->printChar,
 				  outfp);
@@ -235,7 +236,7 @@ extern int tagsPrintPseudoTag (const tagEntry *entry,
 				  opt->lineNumber,
 				  opt->escaping,
 				  opt->escapingInputField,
-				  1,
+				  true,
 				  procs->printStr,
 				  procs->printChar,
 				  outfp);

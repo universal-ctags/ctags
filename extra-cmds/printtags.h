@@ -17,6 +17,7 @@ extern "C" {
 *   INCLUDE FILES
 */
 #include "readtags.h"
+#include <stdbool.h>
 
 /*
 *  DATA DECLARATIONS
@@ -28,10 +29,10 @@ typedef struct {
 } tagPrintProcs;
 
 typedef struct {
-	int extensionFields;
-	int lineNumber;
-	int escaping;
-	int escapingInputField;
+	bool extensionFields;
+	bool lineNumber;
+	bool escaping;
+	bool escapingInputField;
 } tagPrintOptions;
 
 /*
@@ -46,7 +47,7 @@ extern int tagsPrint (const tagEntry *entry,
 extern int tagsPrintPseudoTag (const tagEntry *entry,
 							   tagPrintOptions *opts, tagPrintProcs *procs, void *outfp);
 
-extern int tagsPrintValue (const char *val, int escaping, tagPrintProcs *procs, void *outfp);
+extern int tagsPrintValue (const char *val, bool escaping, tagPrintProcs *procs, void *outfp);
 
 #ifdef __cplusplus
 };
