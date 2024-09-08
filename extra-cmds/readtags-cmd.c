@@ -16,6 +16,7 @@
 
 #include "vstring.h"
 #include "htable.h"
+#include "ptrarray.h"
 #include "fname.h"
 
 #include <string.h>		/* strerror */
@@ -144,57 +145,9 @@ static tagEntry *copyTag (tagEntry *o)
 	return n;
 }
 
-struct tagEntryHolder {
-	tagEntry *e;
-};
-struct tagEntryArray {
-	int count;
-	int length;
-	struct tagEntryHolder *a;
-};
-
-static struct tagEntryArray *tagEntryArrayNew (void)
-{
-	struct tagEntryArray * a = eMalloc (sizeof (struct tagEntryArray));
-
-	a->count = 0;
-	a->length = 1024;
-	a->a = eMalloc(a->length * sizeof (a->a[0]));
-
-	return a;
-}
-
-static void tagEntryArrayPush (struct tagEntryArray *a, tagEntry *e)
-{
-	if (a->count + 1 == a->length)
-	{
-		if (a->length * 2 < a->length) {
-			fprintf(stderr, "too large array allocation");
-			exit(1);
-		}
-
-		struct tagEntryHolder *tmp = eRealloc (a->a, sizeof (a->a[0]) * (a->length * 2));
-		a->a = tmp;
-		a->length *= 2;
-	}
-
-	a->a[a->count++].e = e;
-}
-
-static void tagEntryArrayFree (struct tagEntryArray *a, int freeTags)
-{
-	if (freeTags)
-	{
-		for (int i = 0; i < a->count; i++)
-			freeCopiedTag (a->a[i].e);
-	}
-	free (a->a);
-	free (a);
-}
-
 static int compareTagEntry (const void *a, const void *b)
 {
-	return s_compare (((struct tagEntryHolder *)a)->e, ((struct tagEntryHolder *)b)->e, Sorter);
+	return s_compare (a, b, Sorter);
 }
 
 static void walkTags (tagFile *const file, tagEntry *first_entry,
@@ -202,10 +155,10 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 					  void (* actionfn) (const tagEntry *, void *), void *data,
 					  struct canonWorkArea *canon)
 {
-	struct tagEntryArray *a = NULL;
+	ptrArray *a = NULL;
 
 	if (Sorter)
-		a = tagEntryArrayNew ();
+		a = ptrArrayNew ((ptrArrayDeleteFunc)freeCopiedTag);
 
 	do
 	{
@@ -236,7 +189,7 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 		if (a)
 		{
 			tagEntry *e = copyTag (shadow);
-			tagEntryArrayPush (a, e);
+			ptrArrayAdd (a, e);
 		}
 		else
 			(* actionfn) (shadow, data);
@@ -253,10 +206,14 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 
 	if (a)
 	{
-		qsort (a->a, a->count, sizeof (a->a[0]), compareTagEntry);
-		for (int i = 0; i < a->count; i++)
-			(* actionfn) (a->a[i].e, data);
-		tagEntryArrayFree (a, 1);
+		ptrArraySort (a, compareTagEntry);
+		unsigned int count = ptrArrayCount (a);
+		for (unsigned int i = 0; i < count; i++)
+		{
+			tagEntry *e = ptrArrayItem (a, i);
+			(* actionfn) (e, data);
+		}
+		ptrArrayDelete (a);
 	}
 }
 #else
