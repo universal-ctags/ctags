@@ -410,6 +410,7 @@ extern bool rubySkipWhitespace (const unsigned char** cp)
 	return r;
 }
 
+/* TODO: handle double quote if boundary == '"' */
 static void parseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
 {
 	while (**cp != 0 && **cp != boundary)
