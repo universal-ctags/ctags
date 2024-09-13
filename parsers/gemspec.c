@@ -138,6 +138,19 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 					}
 					vStringDelete (gem);
 				}
+				else if (p [0] == '%')
+				{
+					vString *gem = vStringNew ();
+					p++;
+					if (rubyParsePercentString(&p, gem))
+					{
+						if (role == ROLE_DEFINITION_INDEX)
+							makeSimpleTag (gem, kind);
+						else
+							makeSimpleRefTag (gem, kind, role);
+					}
+					vStringDelete (gem);
+				}
 			}
 		}
 	}
