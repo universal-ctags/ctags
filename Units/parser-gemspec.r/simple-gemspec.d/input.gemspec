@@ -59,4 +59,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency %q!thread_order!, "~> 1.1.0"
   s.add_development_dependency %qadonttagmea, "~> 1.1.0"
   s.add_runtime_dependency %q{strange{name}(just){-}<for>{-}{testing}}.freeze, [">= 1.2.4".freeze, "< 1.4".freeze]
+  s.add_runtime_dependency("net-ssh", ">= 1.0.1")
+  s.add_runtime_dependency(%q<ed25519>.freeze, [">= 1.2.4".freeze, "< 1.4".freeze])
+  s.add_runtime_dependency(%q<strange<name>just-for-testing>.freeze, [">= 1.2.4".freeze, "< 1.4".freeze])
 end

@@ -11,6 +11,9 @@ rr	input.gemspec	/^  s.add_development_dependency %q<rr>,           "~> 1.0.4"$/
 flexmock	input.gemspec	/^  s.add_development_dependency %q flexmock ,     "~> 0.9.0"$/;"	g	roles:develDep
 thread_order	input.gemspec	/^  s.add_development_dependency %q!thread_order!, "~> 1.1.0"$/;"	g	roles:develDep
 strange{name}(just){-}<for>{-}{testing}	input.gemspec	/^  s.add_runtime_dependency %q{strange{name}(just){-}<for>{-}{testing}}.freeze, [">= 1.2.4".freez/;"	g	roles:runtimeDep
+net-ssh	input.gemspec	/^  s.add_runtime_dependency("net-ssh", ">= 1.0.1")$/;"	g	roles:runtimeDep
+ed25519	input.gemspec	/^  s.add_runtime_dependency(%q<ed25519>.freeze, [">= 1.2.4".freeze, "< 1.4".freeze])$/;"	g	roles:runtimeDep
+strange<name>just-for-testing	input.gemspec	/^  s.add_runtime_dependency(%q<strange<name>just-for-testing>.freeze, [">= 1.2.4".freeze, "< 1.4"/;"	g	roles:runtimeDep
 katello/version	input-0.gemspec	/^require "katello\/version"$/;"	L	roles:required
 katello	input-0.gemspec	/^  gem.name        = "katello"$/;"	g	roles:def
 rails	input-0.gemspec	/^  gem.add_dependency "rails"$/;"	g	roles:runtimeDep

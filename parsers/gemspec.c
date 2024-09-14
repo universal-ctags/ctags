@@ -117,9 +117,9 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 		if (p)
 		{
 			rubySkipWhitespace (&p);
-			if ((!is_attr) || *p == '=')
+			if (is_attr == false || *p == '=')
 			{
-				if (is_attr)
+				if (*p == '(' || *p == '=')
 				{
 					p++;
 					rubySkipWhitespace (&p);
