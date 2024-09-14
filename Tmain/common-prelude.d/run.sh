@@ -13,7 +13,7 @@ if ! [ -x "${OPTSCRIPT}" ]; then
 	skip "no optscript"
 fi
 
-rm -f ${BUILDDIR}/*.tmp
+rm -f ${BUILDDIR}/*.{in,out}.tmp
 
 for t in $(ls *.ps); do
 	i=${BUILDDIR}/${t}.in.tmp
