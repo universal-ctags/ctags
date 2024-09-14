@@ -37,6 +37,7 @@ extern bool rubyCanMatchKeyword (const unsigned char** s, const char* literal);
 extern bool rubyCanMatchKeywordWithAssign (const unsigned char** s, const char* literal);
 
 extern bool rubyParseString (const unsigned char** cp, unsigned char boundary, vString* vstr);
+extern bool rubyParsePercentString (const unsigned char** cp, vString* vstr);
 extern bool rubyParseMethodName (const unsigned char **cp, vString* vstr);
 extern bool rubyParseModuleName (const unsigned char **cp, vString* vstr);
 

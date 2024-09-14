@@ -117,9 +117,9 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 		if (p)
 		{
 			rubySkipWhitespace (&p);
-			if ((!is_attr) || *p == '=')
+			if (is_attr == false || *p == '=')
 			{
-				if (is_attr)
+				if (*p == '(' || *p == '=')
 				{
 					p++;
 					rubySkipWhitespace (&p);
@@ -130,6 +130,19 @@ static int lineNotify (rubySubparser *s, const unsigned char **cp)
 					vString *gem = vStringNew ();
 					p++;
 					if (rubyParseString (&p, b, gem))
+					{
+						if (role == ROLE_DEFINITION_INDEX)
+							makeSimpleTag (gem, kind);
+						else
+							makeSimpleRefTag (gem, kind, role);
+					}
+					vStringDelete (gem);
+				}
+				else if (p [0] == '%')
+				{
+					vString *gem = vStringNew ();
+					p++;
+					if (rubyParsePercentString(&p, gem))
 					{
 						if (role == ROLE_DEFINITION_INDEX)
 							makeSimpleTag (gem, kind);

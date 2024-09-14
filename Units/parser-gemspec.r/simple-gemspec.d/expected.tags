@@ -4,12 +4,17 @@ rspec-support	input.gemspec	/^    s.add_runtime_dependency "rspec-support", "= #
 rspec-support	input.gemspec	/^    s.add_runtime_dependency "rspec-support", "~> #{RSpec::Core::Version::STRING.split('.')[0..1/;"	g	roles:runtimeDep
 cucumber	input.gemspec	/^  s.add_development_dependency "cucumber", "~> 1.3"$/;"	g	roles:develDep
 minitest	input.gemspec	/^  s.add_development_dependency "minitest", "~> 5.3"$/;"	g	roles:develDep
-aruba	input.gemspec	/^  s.add_development_dependency "aruba",    "~> 0.14.9"$/;"	g	roles:develDep
-coderay	input.gemspec	/^  s.add_development_dependency "coderay",  "~> 1.1.1"$/;"	g	roles:develDep
-mocha	input.gemspec	/^  s.add_development_dependency "mocha",        "~> 0.13.0"$/;"	g	roles:develDep
-rr	input.gemspec	/^  s.add_development_dependency "rr",           "~> 1.0.4"$/;"	g	roles:develDep
-flexmock	input.gemspec	/^  s.add_development_dependency "flexmock",     "~> 0.9.0"$/;"	g	roles:develDep
-thread_order	input.gemspec	/^  s.add_development_dependency "thread_order", "~> 1.1.0"$/;"	g	roles:develDep
+aruba	input.gemspec	/^  s.add_development_dependency %q{aruba},    "~> 0.14.9"$/;"	g	roles:develDep
+coderay	input.gemspec	/^  s.add_development_dependency %q[coderay],  "~> 1.1.1"$/;"	g	roles:develDep
+mocha	input.gemspec	/^  s.add_development_dependency %q(mocha),        "~> 0.13.0"$/;"	g	roles:develDep
+rr	input.gemspec	/^  s.add_development_dependency %q<rr>,           "~> 1.0.4"$/;"	g	roles:develDep
+flexmock	input.gemspec	/^  s.add_development_dependency %q flexmock ,     "~> 0.9.0"$/;"	g	roles:develDep
+thread_order	input.gemspec	/^  s.add_development_dependency %q!thread_order!, "~> 1.1.0"$/;"	g	roles:develDep
+strange{name}(just){-}<for>{-}{testing}	input.gemspec	/^  s.add_runtime_dependency %q{strange{name}(just){-}<for>{-}{testing}}.freeze, [">= 1.2.4".freez/;"	g	roles:runtimeDep
+net-ssh	input.gemspec	/^  s.add_runtime_dependency("net-ssh", ">= 1.0.1")$/;"	g	roles:runtimeDep
+ed25519	input.gemspec	/^  s.add_runtime_dependency(%q<ed25519>.freeze, [">= 1.2.4".freeze, "< 1.4".freeze])$/;"	g	roles:runtimeDep
+strange<name>just-for-testing	input.gemspec	/^  s.add_runtime_dependency(%q<strange<name>just-for-testing>.freeze, [">= 1.2.4".freeze, "< 1.4"/;"	g	roles:runtimeDep
 katello/version	input-0.gemspec	/^require "katello\/version"$/;"	L	roles:required
 katello	input-0.gemspec	/^  gem.name        = "katello"$/;"	g	roles:def
 rails	input-0.gemspec	/^  gem.add_dependency "rails"$/;"	g	roles:runtimeDep
+G1	input-1.gemspec	/^  gem.name        = %q!G1!$/;"	g	roles:def

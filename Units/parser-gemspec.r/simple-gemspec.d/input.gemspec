@@ -49,12 +49,17 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "cucumber", "~> 1.3"
   s.add_development_dependency "minitest", "~> 5.3"
-  s.add_development_dependency "aruba",    "~> 0.14.9"
+  s.add_development_dependency %q{aruba},    "~> 0.14.9"
 
-  s.add_development_dependency "coderay",  "~> 1.1.1"
+  s.add_development_dependency %q[coderay],  "~> 1.1.1"
 
-  s.add_development_dependency "mocha",        "~> 0.13.0"
-  s.add_development_dependency "rr",           "~> 1.0.4"
-  s.add_development_dependency "flexmock",     "~> 0.9.0"
-  s.add_development_dependency "thread_order", "~> 1.1.0"
+  s.add_development_dependency %q(mocha),        "~> 0.13.0"
+  s.add_development_dependency %q<rr>,           "~> 1.0.4"
+  s.add_development_dependency %q flexmock ,     "~> 0.9.0"
+  s.add_development_dependency %q!thread_order!, "~> 1.1.0"
+  s.add_development_dependency %qadonttagmea, "~> 1.1.0"
+  s.add_runtime_dependency %q{strange{name}(just){-}<for>{-}{testing}}.freeze, [">= 1.2.4".freeze, "< 1.4".freeze]
+  s.add_runtime_dependency("net-ssh", ">= 1.0.1")
+  s.add_runtime_dependency(%q<ed25519>.freeze, [">= 1.2.4".freeze, "< 1.4".freeze])
+  s.add_runtime_dependency(%q<strange<name>just-for-testing>.freeze, [">= 1.2.4".freeze, "< 1.4".freeze])
 end

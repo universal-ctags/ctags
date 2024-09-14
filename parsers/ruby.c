@@ -410,6 +410,7 @@ extern bool rubySkipWhitespace (const unsigned char** cp)
 	return r;
 }
 
+/* TODO: handle double quote if boundary == '"' */
 static void parseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
 {
 	while (**cp != 0 && **cp != boundary)
@@ -429,6 +430,77 @@ extern bool rubyParseString (const unsigned char** cp, unsigned char boundary, v
 	const unsigned char *p = *cp;
 	parseString (cp, boundary, vstr);
 	return (p != *cp);
+}
+
+static bool rubyParsePercent_q (const unsigned char** cp, vString* vstr)
+{
+	const unsigned char *p = *cp;
+	bool recursive;
+	unsigned char boundary[2];
+
+	if (*p == '\0' || isalnum (*p))
+		return false;
+
+	boundary[0] = *p;
+	boundary[1] = *p;
+	recursive = false;
+	switch (*p)
+	{
+	case '{':
+		boundary[1] = '}';
+		recursive = true;
+		break;
+	case '[':
+		boundary[1] = ']';
+		recursive = true;
+		break;
+	case '(':
+		boundary[1] = ')';
+		recursive = true;
+		break;
+	case '<':
+		boundary[1] = '>';
+		recursive = true;
+		break;
+	}
+	p++;
+
+	unsigned int depth = 1;
+	while (*p != '\0')
+	{
+		if (*p == boundary[1])
+		{
+			depth--;
+			if (depth == 0)
+			{
+				*cp = p;
+				return true;
+			}
+		}
+		else if (recursive && boundary[0] == *p)
+			depth++;
+		vStringPut (vstr, *p);
+		p++;
+	}
+	return false;
+}
+
+extern bool rubyParsePercentString (const unsigned char** cp, vString* vstr)
+{
+	const unsigned char *p = *cp;
+
+	switch (*p)
+	{
+	case 'q':
+		++p;
+		if (rubyParsePercent_q(&p, vstr))
+		{
+			*cp = p;
+			return true;
+		}
+		break;
+	}
+	return false;
 }
 
 /* If the current scope is A.B, and the name is B.C, B is overlapped.
