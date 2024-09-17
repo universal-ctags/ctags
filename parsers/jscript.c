@@ -311,7 +311,8 @@ static const keywordTable JsKeywordTable [] = {
 
 /* Recursive functions */
 static void readTokenFull (tokenInfo *const token, bool include_newlines, vString *const repr);
-static void skipArgumentList (tokenInfo *const token, bool include_newlines, vString *const repr);
+static void skipArgumentList (tokenInfo *const token, bool include_newlines);
+static void skipParameterList (tokenInfo *const token, bool include_newlines, vString *const repr);
 static bool parseFunction (tokenInfo *const token, tokenInfo *const name, const bool is_inside_class);
 static bool parseBlock (tokenInfo *const token, int parent_scope);
 static bool parseMethods (tokenInfo *const token, int class_index, const bool is_es6_class);
@@ -523,7 +524,7 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 	{
 		const char *scope_str = getNameStringForCorkIndex (scope);
 		const char *scope_kind_str = getKindStringForCorkIndex (scope);
-		TRACE_PRINT("Emitting tag for symbol '%s' of kind %s with scope '%s:%s'", name, kindName(kind), scope_kind_str, scope_str);
+		TRACE_PRINT("Emitting tag for symbol '%s' of kind '%s' with scope '%s:%s'", name, kindName(kind), scope_kind_str, scope_str);
 	}
 #endif
 
@@ -1347,7 +1348,10 @@ static void skipBabelDecorator (tokenInfo *token, bool include_newlines, vString
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		/*  @(complex ? dec1 : dec2) */
-		skipArgumentList (token, include_newlines, repr);
+		if (repr)
+			skipParameterList (token, include_newlines, repr);
+		else
+			skipArgumentList (token, include_newlines);
 		TRACE_PRINT ("found @(...) style decorator");
 	}
 	else if (isType (token, TOKEN_IDENTIFIER))
@@ -1370,7 +1374,10 @@ static void skipBabelDecorator (tokenInfo *token, bool include_newlines, vString
 				found_period = true;
 			else if (isType (token, TOKEN_OPEN_PAREN))
 			{
-				skipArgumentList (token, include_newlines, repr);
+				if (repr)
+					skipParameterList (token, include_newlines, repr);
+				else
+					skipArgumentList (token, include_newlines);
 				TRACE_PRINT("found @foo(...) style decorator");
 				break;
 			}
@@ -1420,6 +1427,8 @@ static void readToken (tokenInfo *const token)
 
 static int parseMethodsInAnonymousObject (tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	int index = CORK_NIL;
 
 	tokenInfo *const anon_object = newToken ();
@@ -1441,21 +1450,21 @@ static int parseMethodsInAnonymousObject (tokenInfo *const token)
 
 	deleteToken (anon_object);
 
+	TRACE_LEAVE();
 	return index;
 }
 
-static void skipArgumentList (tokenInfo *const token, bool include_newlines, vString *const repr)
+static void skipArgumentList (tokenInfo *const token, bool include_newlines)
 {
+	TRACE_ENTER();
+
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
 	{
 		int nest_level = 1;
-		if (repr)
-			vStringPut (repr, '(');
-
 		tokenType prev_token_type = token->type;
 		while (nest_level > 0 && ! isType (token, TOKEN_EOF))
 		{
-			readTokenFull (token, false, repr);
+			readToken (token);
 			if (isType (token, TOKEN_OPEN_PAREN))
 				nest_level++;
 			else if (isType (token, TOKEN_CLOSE_PAREN))
@@ -1474,6 +1483,31 @@ static void skipArgumentList (tokenInfo *const token, bool include_newlines, vSt
 		}
 		readTokenFull (token, include_newlines, NULL);
 	}
+	TRACE_LEAVE();
+}
+
+static void skipParameterList (tokenInfo *const token, bool include_newlines, vString *const repr)
+{
+	TRACE_ENTER_TEXT("repr = %p", repr);
+
+	Assert (repr);
+	if (isType (token, TOKEN_OPEN_PAREN))	/* parameter? */
+	{
+		int nest_level = 1;
+		if (repr)
+			vStringPut (repr, '(');
+
+		while (nest_level > 0 && ! isType (token, TOKEN_EOF))
+		{
+			readTokenFull (token, false, repr);
+			if (isType (token, TOKEN_OPEN_PAREN))
+				nest_level++;
+			else if (isType (token, TOKEN_CLOSE_PAREN))
+				nest_level--;
+		}
+		readTokenFull (token, include_newlines, NULL);
+	}
+	TRACE_LEAVE();
 }
 
 static void skipArrayList (tokenInfo *const token, bool include_newlines)
@@ -1549,7 +1583,7 @@ static bool findCmdTerm (tokenInfo *const token, bool include_newlines, bool inc
 			readTokenFull (token, include_newlines, NULL);
 		}
 		else if ( isType (token, TOKEN_OPEN_PAREN) )
-			skipArgumentList(token, include_newlines, NULL);
+			skipArgumentList(token, include_newlines);
 		else if ( isType (token, TOKEN_OPEN_SQUARE) )
 			skipArrayList(token, include_newlines);
 		else
@@ -1577,7 +1611,7 @@ static void parseSwitch (tokenInfo *const token)
 
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		skipArgumentList(token, false, NULL);
+		skipArgumentList(token, false);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))
@@ -1616,7 +1650,7 @@ static bool parseLoop (tokenInfo *const token)
 		readToken(token);
 
 		if (isType (token, TOKEN_OPEN_PAREN))
-			skipArgumentList(token, false, NULL);
+			skipArgumentList(token, false);
 
 		if (isType (token, TOKEN_OPEN_CURLY))
 			parseBlock (token, CORK_NIL);
@@ -1640,7 +1674,7 @@ static bool parseLoop (tokenInfo *const token)
 			readToken(token);
 
 			if (isType (token, TOKEN_OPEN_PAREN))
-				skipArgumentList(token, true, NULL);
+				skipArgumentList(token, true);
 
 			if (! isType (token, TOKEN_SEMICOLON))
 			{
@@ -1710,7 +1744,7 @@ static bool parseIf (tokenInfo *const token)
 	}
 
 	if (isType (token, TOKEN_OPEN_PAREN))
-		skipArgumentList(token, false, NULL);
+		skipArgumentList(token, false);
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 		parseBlock (token, CORK_NIL);
@@ -1836,7 +1870,7 @@ static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, co
 		readToken (token);
 
 	if ( isType (token, TOKEN_OPEN_PAREN) )
-		skipArgumentList(token, false, signature);
+		skipParameterList(token, false, signature);
 
 	if ( isType (token, TOKEN_OPEN_CURLY) )
 	{
@@ -2150,13 +2184,45 @@ start:
 
 			is_shorthand = isType (token, TOKEN_OPEN_PAREN);
 			bool can_be_field = isType (token, TOKEN_EQUAL_SIGN);
-			if ( isType (token, TOKEN_COLON) || can_be_field || is_shorthand )
+			/* is_comma is for handling
+			 *
+			 *     { ..., name, ... }
+			 *
+			 * . This is shorthand of
+			 *
+			 *     { ... ,name: name, ... }
+			 *
+			 * .
+			 * In this case, the token variables point to:
+			 *
+			 *     { ..., name, ... }
+			 * name-------^   ^
+			 * token----------+
+			 *
+			 */
+			bool is_comma = ((!is_es6_class && isType (token, TOKEN_CLOSE_CURLY)) || isType (token, TOKEN_COMMA));
+			if ( isType (token, TOKEN_COLON) || is_comma || can_be_field || is_shorthand )
 			{
+				tokenInfo * comma = NULL;
 				if (! is_shorthand)
 				{
-					readToken (token);
-					if (isKeyword (token, KEYWORD_async))
+					if (is_comma)
+					{
+						comma = newToken ();
+						copyToken (comma, token, true);
+						copyToken (token, name, true);
+						/*
+						 *     { ..., name, ... }
+						 * token -----^   ^
+						 * comma ---------+
+						 */
+					}
+					else
+					{
 						readToken (token);
+						if (isKeyword (token, KEYWORD_async))
+							readToken (token);
+					}
 				}
 
 				vString * signature = vStringNew ();
@@ -2176,7 +2242,7 @@ start:
 					}
 					if ( isType (token, TOKEN_OPEN_PAREN) )
 					{
-						skipArgumentList(token, false, signature);
+						skipParameterList(token, false, signature);
 					}
 
 function:
@@ -2225,7 +2291,7 @@ function:
 						else if (isType (token, TOKEN_OPEN_PAREN))
 						{
 							vStringClear (signature);
-							skipArgumentList (token, false, signature);
+							skipParameterList (token, false, signature);
 						}
 						else if (isType (token, TOKEN_OPEN_SQUARE))
 						{
@@ -2248,7 +2314,19 @@ function:
 						else
 						{
 							copyToken (saved_token, token, true);
-							readToken (token);
+							if (comma)
+							{
+								copyToken(token, comma, true);
+								deleteToken (comma);
+								comma = NULL;
+								/*
+								 *     { ..., name, ... }
+								 *                ^
+								 * token ---------+
+								 */
+							}
+							else
+								readToken (token);
 						}
 					}
 					deleteToken (saved_token);
@@ -2265,6 +2343,8 @@ function:
 				}
 
 				vStringDelete (signature);
+				if (comma)
+					deleteToken (comma);
 			}
 			else
 			{
@@ -2491,8 +2571,12 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 				   ! isType (method_body_token, TOKEN_EOF))
 			{
 				if ( isType (method_body_token, TOKEN_OPEN_PAREN) )
-					skipArgumentList(method_body_token, false,
-									 vStringLength (signature) == 0 ? signature : NULL);
+				{
+					if (vStringIsEmpty (signature))
+						skipParameterList(method_body_token, false, signature);
+					else
+						skipArgumentList(method_body_token, false);
+				}
 				else
 				{
 					char* s1 = vStringValue (identifier_token->string);
@@ -2739,7 +2823,7 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 				readToken (token);
 
 			if ( isType (token, TOKEN_OPEN_PAREN) )
-				skipArgumentList(token, true, NULL);
+				skipArgumentList(token, true);
 
 			if (isType (token, TOKEN_SEMICOLON) && token->nestLevel == 0)
 			{
@@ -2782,7 +2866,8 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 
 		if (state->indexForName == CORK_NIL)
 		{
-			state->indexForName = makeJsTag (name, state->isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+			if (!vStringIsEmpty (name->string))
+				state->indexForName = makeJsTag (name, state->isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 			if (isType (token, TOKEN_IDENTIFIER))
 				canbe_arrowfun = true;
 		}
@@ -2849,6 +2934,143 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 
 	TRACE_LEAVE();
 	return true;
+}
+
+static bool parseObjectDestructuring (tokenInfo *const token, bool is_const);
+static bool parseArrayDestructuring (tokenInfo *const token, bool is_const)
+{
+	int nest_level = 1;
+	bool in_left_side = true;
+	bool found = false;
+
+	while (nest_level > 0 && ! isType (token, TOKEN_EOF))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_OPEN_SQUARE))
+		{
+			in_left_side = true;
+			nest_level++;
+		}
+		else if (isType (token, TOKEN_CLOSE_SQUARE))
+		{
+			in_left_side = false;
+			nest_level--;
+		}
+		else if (isType (token, TOKEN_OPEN_CURLY))
+		{
+			in_left_side = false;
+			if (parseObjectDestructuring (token, is_const))
+				found = true;
+		}
+		else if (isType (token, TOKEN_COMMA)
+			 || isType (token, TOKEN_DOTS))
+			in_left_side = true;
+		else if (in_left_side && isType (token, TOKEN_IDENTIFIER))
+		{
+			in_left_side = false;
+			makeJsTag (token,
+				   is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE,
+				   NULL, NULL);
+			found = true;
+		}
+		else if (isType (token, TOKEN_EQUAL_SIGN))
+		{
+			in_left_side = false;
+			/* TODO: SKIP */
+		}
+		else
+			in_left_side = false;
+	}
+
+	return found;
+}
+
+static bool parseObjectDestructuring (tokenInfo *const token, bool is_const)
+{
+	tokenInfo *const name = newToken ();
+	bool found = false;
+
+	/*
+	 * let { k0: v0, k1: v1 = 0, v3 };
+	 *     |	  |  ||	  |  |	  |
+	 *     ^...|..|^...|..|....^.....: start
+	 *     ....^..|....^..|..........: colon
+	 *     .......^.......^..........: emitted (made a tag for an id after colon)
+	 */
+	enum objDestructuringState {
+		OBJ_DESTRUCTURING_START,
+		OBJ_DESTRUCTURING_COLON,
+		OBJ_DESTRUCTURING_EMITTED,
+	} state = OBJ_DESTRUCTURING_START;
+
+	while (! isType (token, TOKEN_EOF))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_OPEN_CURLY))
+		{
+			if (parseObjectDestructuring (token, is_const))
+				found = true;
+			if (state == OBJ_DESTRUCTURING_COLON)
+				state = OBJ_DESTRUCTURING_EMITTED;
+		}
+		else if (isType (token, TOKEN_CLOSE_CURLY))
+		{
+			if (!vStringIsEmpty(name->string))
+			{
+				makeJsTag (name,
+					   is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE,
+					   NULL, NULL);
+				found = true;
+			}
+			break;
+		}
+		else if (isType (token, TOKEN_OPEN_SQUARE))
+		{
+			if (parseArrayDestructuring (token, is_const))
+				found = true;
+			if (state == OBJ_DESTRUCTURING_COLON)
+				state = OBJ_DESTRUCTURING_EMITTED;
+		}
+		else if (isType (token, TOKEN_IDENTIFIER))
+		{
+			if (state == OBJ_DESTRUCTURING_COLON)
+			{
+				makeJsTag (token,
+					   is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE,
+					   NULL, NULL);
+				found = true;
+				state = OBJ_DESTRUCTURING_EMITTED;
+			}
+			else if (state == OBJ_DESTRUCTURING_START
+				 && vStringIsEmpty(name->string))
+				copyToken(name, token, true);
+		}
+		else if (isType (token, TOKEN_COMMA))
+		{
+			if (!vStringIsEmpty(name->string))
+			{
+				makeJsTag (name,
+					   is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE,
+					   NULL, NULL);
+				found = true;
+				vStringClear (name->string);
+			}
+			state = OBJ_DESTRUCTURING_START;
+		}
+		else if (isType (token, TOKEN_COLON))
+		{
+			vStringClear (name->string);
+			state = OBJ_DESTRUCTURING_COLON;
+		}
+		else
+		{
+			if (state == OBJ_DESTRUCTURING_COLON)
+				state = OBJ_DESTRUCTURING_EMITTED;
+		}
+	}
+
+	deleteToken (name);
+	return found;
 }
 
 static bool parseStatement (tokenInfo *const token, bool is_inside_class)
@@ -2918,6 +3140,22 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 			state.isGlobal = true;
 		}
 		readToken(token);
+
+		if (state.isGlobal)
+		{
+			bool found = false;
+			if (isType (token, TOKEN_OPEN_CURLY))
+				found = parseObjectDestructuring (token, state.isConst);
+			else if (isType (token, TOKEN_OPEN_SQUARE))
+				found = parseArrayDestructuring (token, state.isConst);
+
+			if (found)
+			{
+				/* Adjust the context to the code for non-destructing. */
+				found_lhs = true;
+				readToken(token);
+			}
+		}
 	}
 
 nextVar:
@@ -2980,7 +3218,7 @@ nextVar:
 			readTokenFull (token, true, NULL);
 
 		if ( isType (token, TOKEN_OPEN_PAREN) )
-			skipArgumentList(token, false, NULL);
+			skipArgumentList(token, false);
 
 		if ( isType (token, TOKEN_OPEN_SQUARE) )
 			skipArrayList(token, false);
@@ -3008,7 +3246,8 @@ nextVar:
 			 * Handles this syntax:
 			 *     var g_var2;
 			 */
-			state.indexForName = makeJsTag (name, state.isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
+			if (!vStringIsEmpty (name->string))
+				state.indexForName = makeJsTag (name, state.isConst ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 		}
 		/*
 		 * Statement has ended.
@@ -3235,13 +3474,13 @@ static void dumpToken (const tokenInfo *const token)
 
 	if (strcmp(scope_str, "placeholder") == 0)
 	{
-		TRACE_PRINT("%s: %s",
+		TRACE_PRINT("%s: '%s'",
 			tokenTypeName (token->type),
 			vStringValue (token->string));
 	}
 	else
 	{
-		TRACE_PRINT("%s: %s (scope '%s' of kind %s)",
+		TRACE_PRINT("%s: '%s' (scope '%s' of kind '%s')",
 			tokenTypeName (token->type),
 			vStringValue (token->string),
 			scope_str, scope_kind_str);
