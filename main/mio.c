@@ -19,11 +19,10 @@
  */
 
 #include "general.h"  /* must always come first */
+#include "routines.h"
 
 #ifndef READTAGS_DSL
-#include "routines.h"
 #include "debug.h"
-#else
 #endif	/* READTAGS_DSL */
 
 #include "mio.h"
@@ -41,45 +40,6 @@
 #endif
 
 #ifdef READTAGS_DSL
-#define xMalloc(n,Type)    (Type *)eMalloc((size_t)(n) * sizeof (Type))
-#define xRealloc(p,n,Type) (Type *)eRealloc((p), (n) * sizeof (Type))
-
-static void *eMalloc (const size_t size)
-{
-	void *buffer = malloc (size);
-
-	if (buffer == NULL)
-	{
-		fprintf(stderr, "out of memory");
-		abort ();
-	}
-
-	return buffer;
-}
-
-static void *eRealloc (void *const ptr, const size_t size)
-{
-	void *buffer;
-	if (ptr == NULL)
-		buffer = eMalloc (size);
-	else
-	{
-		buffer = realloc (ptr, size);
-		if (buffer == NULL)
-		{
-			fprintf(stderr, "out of memory");
-			abort ();
-		}
-	}
-	return buffer;
-}
-
-static void eFree (void *const ptr)
-{
-	free (ptr);
-}
-#define eFreeNoNullCheck eFree
-
 #  define Assert(c) do {} while(0)
 #  define AssertNotReached() do {} while(0)
 #endif	/* READTAGS_DSL */
