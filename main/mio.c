@@ -20,10 +20,7 @@
 
 #include "general.h"  /* must always come first */
 #include "routines.h"
-
-#ifndef READTAGS_DSL
 #include "debug.h"
-#endif	/* READTAGS_DSL */
 
 #include "mio.h"
 
@@ -38,11 +35,6 @@
 #define MAY_HAVE_FTRUNCATE
 #include <unistd.h>
 #endif
-
-#ifdef READTAGS_DSL
-#  define Assert(c) do {} while(0)
-#  define AssertNotReached() do {} while(0)
-#endif	/* READTAGS_DSL */
 
 /* minimal reallocation chunk size */
 #define MIO_CHUNK_SIZE 4096
