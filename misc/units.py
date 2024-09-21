@@ -232,6 +232,7 @@ def decorate(decorator, msg, colorized):
 def run_result(result_type, msg, output, *args, file=sys.stdout):
     func_dict = {
             'skip': run_result_skip,
+            'internal-error': run_result_internal_error,
             'error': run_result_error,
             'ok': run_result_ok,
             'known_error': run_result_known_error,
@@ -245,6 +246,12 @@ def run_result(result_type, msg, output, *args, file=sys.stdout):
 
 def run_result_skip(msg, f, colorized, *args):
     s = msg + decorate('yellow', 'skipped', colorized)
+    if len(args) > 0:
+        s += ' (' + args[0] + ')'
+    print(s, file=f)
+
+def run_result_internal_error(msg, f, colorized, *args):
+    s = msg + decorate('red', 'INTERNAL-ERROR', colorized)
     if len(args) > 0:
         s += ' (' + args[0] + ')'
     print(s, file=f)
@@ -1056,6 +1063,7 @@ def tmain_sub(test_name, basedir, subdir, build_subdir):
     global TMAIN_FAILED
 
     CODE_FOR_IGNORING_THIS_TMAIN_TEST = 77
+    CODE_FOR_INTERNAL_ERROR_THIS_TMAIN_TEST = 76
 
     os.makedirs(build_subdir, exist_ok=True)
 
@@ -1104,6 +1112,15 @@ def tmain_sub(test_name, basedir, subdir, build_subdir):
 
     if ret.returncode == CODE_FOR_IGNORING_THIS_TMAIN_TEST:
         run_result('skip', '', None, stdout.replace("\n", ''), file=strbuf)
+        print(strbuf.getvalue(), end='')
+        sys.stdout.flush()
+        strbuf.close()
+        return True
+    if ret.returncode == CODE_FOR_INTERNAL_ERROR_THIS_TMAIN_TEST:
+        internal_error_msg = stdout.replace("\n", '')
+        TMAIN_FAILED += [test_name + '/' + 'internal-error: ' + internal_error_msg]
+        TMAIN_STATUS = False
+        run_result('internal-error', '', None, internal_error_msg, file=strbuf)
         print(strbuf.getvalue(), end='')
         sys.stdout.flush()
         strbuf.close()

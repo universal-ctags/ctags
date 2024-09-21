@@ -1,4 +1,11 @@
 __SKIP__=77
+__INTERNAL_ERROR__=76
+
+internal_error()
+{
+	echo "$@"
+	exit ${__INTERNAL_ERROR__}
+}
 
 skip()
 {
