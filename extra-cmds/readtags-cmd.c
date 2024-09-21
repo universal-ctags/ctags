@@ -698,29 +698,19 @@ static void printVersion(void)
 	exit (0);
 }
 
-extern int main (int argc, char **argv)
+static void parseOptions (int argc, char **argv,
+						  struct actionSpec *actionSpec, struct inputSpec *inputSpec,
+						  readOptions *readOpts, tagPrintOptions *printOpts)
 {
 	bool ignore_prefix = false;
 
-	tagPrintOptions printOpts = {0};
-	readOptions readOpts = {0};
-	struct inputSpec inputSpec;
-	struct actionSpec actionSpec;
-
-	initActionSpec (&actionSpec);
-	initInputSpec (&inputSpec);
-
-	ProgramName = argv [0];
-	setExecutableName (ProgramName);
-	if (argc == 1)
-		printUsage(stderr, 1);
 	for (int i = 1  ;  i < argc  ;  ++i)
 	{
 		const char *const arg = argv [i];
 		if (ignore_prefix || arg [0] != '-')
 		{
-			actionSpec.action |= ACTION_FIND;
-			actionSpec.name = arg;
+			actionSpec->action |= ACTION_FIND;
+			actionSpec->name = arg;
 		}
 		else if (arg [0] == '-' && arg [1] == '\0')
 			ignore_prefix = true;
@@ -731,7 +721,7 @@ extern int main (int argc, char **argv)
 				debugMode++;
 			else if (strcmp (optname, "list-pseudo-tags") == 0
 					 || strcmp (optname, "with-pseudo-tags") == 0)
-				actionSpec.action |= ACTION_LIST_PTAGS;
+				actionSpec->action |= ACTION_LIST_PTAGS;
 			else if (strcmp (optname, "help") == 0)
 				printUsage (stdout, 0);
 			else if (strcmp (optname, "help-expression") == 0)
@@ -763,21 +753,21 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "version") == 0)
 				printVersion ();
 			else if (strcmp (optname, "escape-output") == 0)
-				printOpts.escaping = true;
+				printOpts->escaping = true;
 			else if (strcmp (optname, "extension-fields") == 0)
-				printOpts.extensionFields = true;
+				printOpts->extensionFields = true;
 			else if (strcmp (optname, "icase-match") == 0)
-				readOpts.matchOpts |= TAG_IGNORECASE;
+				readOpts->matchOpts |= TAG_IGNORECASE;
 			else if (strcmp (optname, "prefix-match") == 0)
-				readOpts.matchOpts |= TAG_PARTIALMATCH;
+				readOpts->matchOpts |= TAG_PARTIALMATCH;
 			else if (strcmp (optname, "list") == 0)
-				actionSpec.action |= ACTION_LIST;
+				actionSpec->action |= ACTION_LIST;
 			else if (strcmp (optname, "line-number") == 0)
-				printOpts.lineNumber = true;
+				printOpts->lineNumber = true;
 			else if (strcmp (optname, "tag-file") == 0)
 			{
 				if (i + 1 < argc)
-					inputSpec.tagFileName = argv [++i];
+					inputSpec->tagFileName = argv [++i];
 				else
 					printUsage (stderr, 1);
 			}
@@ -788,13 +778,13 @@ extern int main (int argc, char **argv)
 					const char *sort_spec = argv [++i];
 					if (strcmp (sort_spec, "0") == 0
 						|| strcmp (sort_spec, "unsorted") == 0)
-						readOpts.sortMethod = TAG_UNSORTED;
+						readOpts->sortMethod = TAG_UNSORTED;
 					else if (strcmp (sort_spec, "1") == 0
 							 || strcmp (sort_spec, "sorted") == 0)
-						readOpts.sortMethod = TAG_SORTED;
+						readOpts->sortMethod = TAG_SORTED;
 					else if (strcmp (sort_spec, "2") == 0
 							 || strcmp (sort_spec, "foldcase") == 0)
-						readOpts.sortMethod = TAG_FOLDSORTED;
+						readOpts->sortMethod = TAG_FOLDSORTED;
 					else
 					{
 						fprintf (stderr, "%s: unknown sort method for --%s option\n",
@@ -811,20 +801,20 @@ extern int main (int argc, char **argv)
 			}
 			else if (strcmp (optname, "absolute-input") == 0)
 			{
-				actionSpec.canonicalizing = true;
-				actionSpec.canon.absoluteOnly = true;
+				actionSpec->canonicalizing = true;
+				actionSpec->canon.absoluteOnly = true;
 			}
 			else if (strcmp (optname, "canonicalize-input") == 0)
 			{
-				actionSpec.canonicalizing = true;
-				actionSpec.canon.absoluteOnly = false;
+				actionSpec->canonicalizing = true;
+				actionSpec->canon.absoluteOnly = false;
 			}
 			else if (strcmp (optname, "filter") == 0)
 			{
 				if (i + 1 < argc)
-					actionSpec.qualifier = compileExpression (argv[++i],
-															  (void * (*)(EsObject *))q_compile,
-															  optname);
+					actionSpec->qualifier = compileExpression (argv[++i],
+															   (void * (*)(EsObject *))q_compile,
+															   optname);
 				else
 				{
 					fprintf (stderr, "%s: missing filter expression for --%s option\n",
@@ -835,9 +825,9 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "sorter") == 0)
 			{
 				if (i + 1 < argc)
-					actionSpec.sorter = compileExpression (argv[++i],
-														   (void * (*)(EsObject *))s_compile,
-														   optname);
+					actionSpec->sorter = compileExpression (argv[++i],
+															(void * (*)(EsObject *))s_compile,
+															optname);
 				else
 				{
 					fprintf (stderr, "%s: missing sorter expression for --%s option\n",
@@ -848,9 +838,9 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "formatter") == 0)
 			{
 				if (i + 1 < argc)
-					actionSpec.formatter = compileExpression (argv[++i],
-															  (void * (*)(EsObject *))f_compile,
-															  optname);
+					actionSpec->formatter = compileExpression (argv[++i],
+															   (void * (*)(EsObject *))f_compile,
+															   optname);
 				else
 				{
 					fprintf (stderr, "%s: missing formatter expression for --%s option\n",
@@ -873,96 +863,113 @@ extern int main (int argc, char **argv)
 			{
 				switch (arg [j])
 				{
-					case 'd': debugMode++; break;
-					case 'D':
-					case 'P':
-						actionSpec.action |= ACTION_LIST_PTAGS;
-						break;
-					case 'h': printUsage (stdout, 0); break;
-					case 'H':
-						if (i + 1 < argc)
-						{
-							const char *exp_klass = argv [++i];
-							if (strcmp (exp_klass, "filter") == 0)
-								printFilterExpression (stdout, 0);
-							else if (strcmp (exp_klass, "sorter") == 0)
-								printSorterExpression (stdout, 0);
-							else if (strcmp (exp_klass, "formatter") == 0)
-								printFormatterExpression (stdout, 0);
-							else
-								printUsage(stderr, 1);
-						}
+				case 'd': debugMode++; break;
+				case 'D':
+				case 'P':
+					actionSpec->action |= ACTION_LIST_PTAGS;
+					break;
+				case 'h': printUsage (stdout, 0); break;
+				case 'H':
+					if (i + 1 < argc)
+					{
+						const char *exp_klass = argv [++i];
+						if (strcmp (exp_klass, "filter") == 0)
+							printFilterExpression (stdout, 0);
+						else if (strcmp (exp_klass, "sorter") == 0)
+							printSorterExpression (stdout, 0);
+						else if (strcmp (exp_klass, "formatter") == 0)
+							printFormatterExpression (stdout, 0);
 						else
 							printUsage(stderr, 1);
-					case 'v': printVersion ();
-					case 'E': printOpts.escaping = true; break;
-					case 'e': printOpts.extensionFields = true; break;
-					case 'i': readOpts.matchOpts |= TAG_IGNORECASE;   break;
-					case 'p': readOpts.matchOpts |= TAG_PARTIALMATCH; break;
-					case 'l':
-						actionSpec.action |= ACTION_LIST;
-						break;
-					case 'n': printOpts.lineNumber = true; break;
-					case 't':
-						if (arg [j+1] != '\0')
-						{
-							inputSpec.tagFileName = arg + j + 1;
-							j += strlen (inputSpec.tagFileName);
-						}
-						else if (i + 1 < argc)
-							inputSpec.tagFileName = argv [++i];
-						else
-							printUsage(stderr, 1);
-						break;
-					case 's':
-						readOpts.sortOverride = true;
-						++j;
-						if (arg [j] == '\0')
-							readOpts.sortMethod = TAG_SORTED;
-						else if (strchr ("012", arg[j]) != NULL)
-							readOpts.sortMethod = (sortType) (arg[j] - '0');
-						else
-							printUsage(stderr, 1);
-						break;
-					case 'A':
-						actionSpec.canonicalizing = true;
-						actionSpec.canon.absoluteOnly = true;
-						break;
-					case 'C':
-						actionSpec.canonicalizing = true;
-						actionSpec.canon.absoluteOnly = false;
-						break;
-					case 'Q':
-						if (i + 1 == argc)
-							printUsage(stderr, 1);
-						actionSpec.qualifier = compileExpression (argv[++i],
-																  (void * (*)(EsObject *))q_compile,
-																  "filter");
-						break;
-					case 'S':
-						if (i + 1 == argc)
-							printUsage(stderr, 1);
-						actionSpec.sorter = compileExpression (argv[++i],
-															   (void * (*)(EsObject *))s_compile,
-															   "sorter");
-						break;
-					case 'F':
-						if (i + 1 == argc)
-							printUsage(stderr, 1);
-						actionSpec.formatter = compileExpression (argv[++i],
-																  (void * (*)(EsObject *))f_compile,
-																  "formatter");
-						break;
-					default:
-						fprintf (stderr, "%s: unknown option: %c\n",
-									ProgramName, arg[j]);
-						exit (1);
-						break;
+					}
+					else
+						printUsage(stderr, 1);
+				case 'v': printVersion ();
+				case 'E': printOpts->escaping = true; break;
+				case 'e': printOpts->extensionFields = true; break;
+				case 'i': readOpts->matchOpts |= TAG_IGNORECASE;   break;
+				case 'p': readOpts->matchOpts |= TAG_PARTIALMATCH; break;
+				case 'l':
+					actionSpec->action |= ACTION_LIST;
+					break;
+				case 'n': printOpts->lineNumber = true; break;
+				case 't':
+					if (arg [j+1] != '\0')
+					{
+						inputSpec->tagFileName = arg + j + 1;
+						j += strlen (inputSpec->tagFileName);
+					}
+					else if (i + 1 < argc)
+						inputSpec->tagFileName = argv [++i];
+					else
+						printUsage(stderr, 1);
+					break;
+				case 's':
+					readOpts->sortOverride = true;
+					++j;
+					if (arg [j] == '\0')
+						readOpts->sortMethod = TAG_SORTED;
+					else if (strchr ("012", arg[j]) != NULL)
+						readOpts->sortMethod = (sortType) (arg[j] - '0');
+					else
+						printUsage(stderr, 1);
+					break;
+				case 'A':
+					actionSpec->canonicalizing = true;
+					actionSpec->canon.absoluteOnly = true;
+					break;
+				case 'C':
+					actionSpec->canonicalizing = true;
+					actionSpec->canon.absoluteOnly = false;
+					break;
+				case 'Q':
+					if (i + 1 == argc)
+						printUsage(stderr, 1);
+					actionSpec->qualifier = compileExpression (argv[++i],
+															   (void * (*)(EsObject *))q_compile,
+															   "filter");
+					break;
+				case 'S':
+					if (i + 1 == argc)
+						printUsage(stderr, 1);
+					actionSpec->sorter = compileExpression (argv[++i],
+															(void * (*)(EsObject *))s_compile,
+															"sorter");
+					break;
+				case 'F':
+					if (i + 1 == argc)
+						printUsage(stderr, 1);
+					actionSpec->formatter = compileExpression (argv[++i],
+															   (void * (*)(EsObject *))f_compile,
+															   "formatter");
+					break;
+				default:
+					fprintf (stderr, "%s: unknown option: %c\n",
+							 ProgramName, arg[j]);
+					exit (1);
+					break;
 				}
 			}
 		}
 	}
+}
 
+extern int main (int argc, char **argv)
+{
+	tagPrintOptions printOpts = {0};
+	readOptions readOpts = {0};
+	struct inputSpec inputSpec;
+	struct actionSpec actionSpec;
+
+	initActionSpec (&actionSpec);
+	initInputSpec (&inputSpec);
+
+	ProgramName = argv [0];
+	setExecutableName (ProgramName);
+	if (argc == 1)
+		printUsage(stderr, 1);
+
+	parseOptions (argc, argv, &actionSpec, &inputSpec, &readOpts, &printOpts);
 
 	if (actionSpec.action == ACTION_NONE)
 	{
