@@ -11,7 +11,7 @@ OBJEXT = obj
 include source.mak
 
 COMMON_DEFINES =
-DEFINES = $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DHAVE_PACKCC -DREADTAGS_DSL
+DEFINES = $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DHAVE_PACKCC
 INCLUDES = -I. -Ignulib -Imain -Iparsers -Ilibreadtags -Idsl
 OPT = /O2 /WX /Zc:preprocessor
 PACKCC = packcc.exe
