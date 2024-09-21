@@ -10,25 +10,11 @@
 */
 
 #include "general.h"
-#include "htable.h"
 #include "debug.h"
-
-#ifndef MAIN
-#include <stdio.h>
+#include "htable.h"
 #include "routines.h"
-#else
-#include <stdlib.h>
-#ifndef xCalloc
-#define xCalloc(n,Type)    (Type *)calloc((size_t)(n), sizeof (Type))
-#endif
-#ifndef xMalloc
-#define xMalloc(n,Type)    (Type *)malloc((size_t)(n) * sizeof (Type))
-#endif
-#ifndef eFree
-#define eFree(x) free(x)
-#endif
-#endif	/* MAIN */
 
+#include <stdio.h>
 #include <string.h>
 
 
