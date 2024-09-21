@@ -22,6 +22,7 @@ UTIL_PUBLIC_HEADS = \
 	main/numarray.h		\
 	main/ptrarray.h		\
 	main/routines.h		\
+	main/sort_r.h		\
 	main/trashbox.h 	\
 	main/vstring.h		\
 	\

@@ -54,5 +54,7 @@ extern void*ptrArrayRemoveItem (ptrArray* const current, unsigned int indx);
 extern void ptrArrayInsertItem (ptrArray* const current, unsigned int indx, void *ptr);
 
 extern void ptrArraySort (ptrArray *const current, int (*compare)(const void *, const void *));
+extern void ptrArraySortR (ptrArray *const current, int (*compare)(const void *, const void *, void *),
+						   void *userData);
 
 #endif  /* CTAGS_MAIN_PTRARRAY_H */

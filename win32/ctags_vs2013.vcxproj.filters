@@ -839,6 +839,9 @@
     <ClInclude Include="..\main\sort_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\sort_r.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\stats_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -440,6 +440,7 @@
     <ClInclude Include="..\main\script_p.h" />
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort_p.h" />
+    <ClInclude Include="..\main\sort_r.h" />
     <ClInclude Include="..\main\stats_p.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\subparser.h" />
