@@ -19,6 +19,10 @@
 #include "ptrarray.h"
 #include "fname.h"
 
+#include "dsl/qualifier.h"
+#include "dsl/sorter.h"
+#include "dsl/formatter.h"
+
 #include <string.h>		/* strerror */
 #include <stdlib.h>		/* exit */
 #include <stdio.h>		/* stderr */
@@ -63,17 +67,13 @@ struct actionSpec {
 	ptrArray *tagEntryArray;
 	void (* walkerfn) (const tagEntry *, void *);
 	void *dataForWalkerFn;
+	QCode *qualifier;
+	SCode *sorter;
+	FCode *formatter;
 };
 
 static const char *ProgramName;
 static int debugMode;
-
-#include "dsl/qualifier.h"
-static QCode *Qualifier;
-#include "dsl/sorter.h"
-static SCode *Sorter;
-#include "dsl/formatter.h"
-static FCode *Formatter;
 
 static const char* tagsStrerror (int err)
 {
@@ -104,9 +104,10 @@ static void printTag (const tagEntry *entry, void *data)
 	tagsPrint (entry, (tagPrintOptions *)data, NULL, stdout);
 }
 
-static void printTagWithFormatter (const tagEntry *entry, void *unused)
+static void printTagWithFormatter (const tagEntry *entry, void *data)
 {
-	f_print (entry, Formatter, stdout);
+	struct actionSpec *actionSpec = data;
+	f_print (entry, actionSpec->formatter, stdout);
 }
 
 static void printPseudoTag (const tagEntry *entry, void *data)
@@ -168,9 +169,9 @@ static tagEntry *copyTag (tagEntry *o)
 	return n;
 }
 
-static int compareTagEntry (const void *a, const void *b)
+static int compareTagEntry (const void *a, const void *b, void *sorter)
 {
-	return s_compare (a, b, Sorter);
+	return s_compare (a, b, sorter);
 }
 
 static void walkTags (tagFile *const file, tagEntry *first_entry,
@@ -194,9 +195,9 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 												 first_entry->file);
 		}
 
-		if (Qualifier)
+		if (actionSpec->qualifier)
 		{
-			int i = q_is_acceptable (Qualifier, shadow);
+			int i = q_is_acceptable (actionSpec->qualifier, shadow);
 			switch (i)
 			{
 			case Q_REJECT:
@@ -422,8 +423,8 @@ static void findTag (struct inputSpec *inputSpec,
 					 ProgramName, name, fileX->fileName);
 	if (tagsFind (fileX->tagFile, &entry, name, readOpts->matchOpts) == TagSuccess)
 		walkTags (fileX->tagFile, &entry, tagsFindNext,
-				  Formatter? printTagWithFormatter:
-				  printTag, printOpts,
+				  actionSpec->formatter? printTagWithFormatter: printTag,
+				  actionSpec->formatter? (void *)actionSpec: (void *)printOpts,
 				  actionSpec);
 	else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
 	{
@@ -466,7 +467,8 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 	if (pseudoTags)
 	{
 		if (tagsFirstPseudoTag (fileX->tagFile, &entry) == TagSuccess)
-			walkTags (fileX->tagFile, &entry, tagsNextPseudoTag, printPseudoTag, printOpts,
+			walkTags (fileX->tagFile, &entry, tagsNextPseudoTag,
+					  printPseudoTag, printOpts,
 					  actionSpec);
 		else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
 		{
@@ -480,8 +482,8 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 	{
 		if (tagsFirst (fileX->tagFile, &entry) == TagSuccess)
 			walkTags (fileX->tagFile, &entry, tagsNext,
-					  Formatter? printTagWithFormatter:
-					  printTag, printOpts,
+					  actionSpec->formatter? printTagWithFormatter: printTag,
+					  actionSpec->formatter? (void *)actionSpec: (void *)printOpts,
 					  actionSpec);
 		else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
 		{
@@ -634,6 +636,9 @@ extern int main (int argc, char **argv)
 		.tagEntryArray = NULL,
 		.walkerfn = NULL,
 		.dataForWalkerFn = NULL,
+		.qualifier = NULL,
+		.sorter = NULL,
+		.formatter = NULL,
 	};
 
 	ProgramName = argv [0];
@@ -748,9 +753,9 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "filter") == 0)
 			{
 				if (i + 1 < argc)
-					Qualifier = compileExpression (argv[++i],
-												   (void * (*)(EsObject *))q_compile,
-												   optname);
+					actionSpec.qualifier = compileExpression (argv[++i],
+															  (void * (*)(EsObject *))q_compile,
+															  optname);
 				else
 				{
 					fprintf (stderr, "%s: missing filter expression for --%s option\n",
@@ -761,9 +766,9 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "sorter") == 0)
 			{
 				if (i + 1 < argc)
-					Sorter = compileExpression (argv[++i],
-												(void * (*)(EsObject *))s_compile,
-												optname);
+					actionSpec.sorter = compileExpression (argv[++i],
+														   (void * (*)(EsObject *))s_compile,
+														   optname);
 				else
 				{
 					fprintf (stderr, "%s: missing sorter expression for --%s option\n",
@@ -774,9 +779,9 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "formatter") == 0)
 			{
 				if (i + 1 < argc)
-					Formatter = compileExpression (argv[++i],
-												   (void * (*)(EsObject *))f_compile,
-												   optname);
+					actionSpec.formatter = compileExpression (argv[++i],
+															  (void * (*)(EsObject *))f_compile,
+															  optname);
 				else
 				{
 					fprintf (stderr, "%s: missing formatter expression for --%s option\n",
@@ -861,23 +866,23 @@ extern int main (int argc, char **argv)
 					case 'Q':
 						if (i + 1 == argc)
 							printUsage(stderr, 1);
-						Qualifier = compileExpression (argv[++i],
-													   (void * (*)(EsObject *))q_compile,
-													   "filter");
+						actionSpec.qualifier = compileExpression (argv[++i],
+																  (void * (*)(EsObject *))q_compile,
+																  "filter");
 						break;
 					case 'S':
 						if (i + 1 == argc)
 							printUsage(stderr, 1);
-						Sorter = compileExpression (argv[++i],
-													   (void * (*)(EsObject *))s_compile,
-													   "sorter");
+						actionSpec.sorter = compileExpression (argv[++i],
+															   (void * (*)(EsObject *))s_compile,
+															   "sorter");
 						break;
 					case 'F':
 						if (i + 1 == argc)
 							printUsage(stderr, 1);
-						Formatter = compileExpression (argv[++i],
-													   (void * (*)(EsObject *))f_compile,
-													   "formatter");
+						actionSpec.formatter = compileExpression (argv[++i],
+																  (void * (*)(EsObject *))f_compile,
+																  "formatter");
 						break;
 					default:
 						fprintf (stderr, "%s: unknown option: %c\n",
@@ -906,7 +911,7 @@ extern int main (int argc, char **argv)
 		exit (1);
 	}
 
-	if (Sorter)
+	if (actionSpec.sorter)
 		actionSpec.tagEntryArray = ptrArrayNew ((ptrArrayDeleteFunc)freeCopiedTag);
 
 	if (actionSpec.action & ACTION_LIST_PTAGS)
@@ -925,8 +930,8 @@ extern int main (int argc, char **argv)
 
 	if (actionSpec.tagEntryArray)
 	{
-		if (Sorter)
-			ptrArraySort (actionSpec.tagEntryArray, compareTagEntry);
+		if (actionSpec.sorter)
+			ptrArraySortR (actionSpec.tagEntryArray, compareTagEntry, actionSpec.sorter);
 
 		const size_t entry_count = ptrArrayCount(actionSpec.tagEntryArray);
 		for (unsigned int i = 0; i < entry_count; i++)
@@ -937,12 +942,12 @@ extern int main (int argc, char **argv)
 		ptrArrayDelete (actionSpec.tagEntryArray);
 	}
 
-	if (Qualifier)
-		q_destroy (Qualifier);
-	if (Sorter)
-		s_destroy (Sorter);
-	if (Formatter)
-		f_destroy (Formatter);
+	if (actionSpec.qualifier)
+		q_destroy (actionSpec.qualifier);
+	if (actionSpec.sorter)
+		s_destroy (actionSpec.sorter);
+	if (actionSpec.formatter)
+		f_destroy (actionSpec.formatter);
 
 	if (actionSpec.canon.cacheTable)
 			canonFnameCacheTableDelete (actionSpec.canon.cacheTable);
