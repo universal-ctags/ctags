@@ -14,10 +14,6 @@ if ! [ -x "${READTAGS}" ]; then
 	skip "no readtags"
 fi
 
-if ! ( "${READTAGS}" -h | grep -q -e -Q ); then
-    skip "no qualifier function in readtags"
-fi
-
 # ?a
 # 97
 # (format "%c" 96)

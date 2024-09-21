@@ -14,10 +14,6 @@ if ! [ -x "${READTAGS}" ]; then
     skip "no readtags"
 fi
 
-if ! ( "${READTAGS}" -h | grep -q -e -S ); then
-    skip "no qualifier function in readtags"
-fi
-
 ${V} ${READTAGS} -e -t output.tags \
 	 -Q '(if (prefix? $name "a") #f ((string->regexp (string-append (regexp-quote $name) ".?")) $name))' \
 	 -l

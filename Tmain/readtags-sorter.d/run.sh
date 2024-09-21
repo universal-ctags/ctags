@@ -14,11 +14,6 @@ if ! [ -x "${READTAGS}" ]; then
 	skip "no readtags"
 fi
 
-if ! ( "${READTAGS}" -h | grep -q -e -S ); then
-	skip "no sorter function in readtags"
-fi
-
-
 echo '!_INPUT_ORDER' &&
 ${READTAGS} -t output.tags -ne -S '(<or> (<> $input &input) (<> $line &line) (<> $name &name))' -l &&
 
