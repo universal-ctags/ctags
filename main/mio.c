@@ -18,20 +18,12 @@
  *
  */
 
-#ifndef READTAGS_DSL
 #include "general.h"  /* must always come first */
 
+#ifndef READTAGS_DSL
 #include "routines.h"
 #include "debug.h"
 #else
-
-#if defined (HAVE_CONFIG_H)
-#include <config.h>
-#endif
-
-#ifdef HAVE_STDBOOL_H
-#include <stdbool.h>
-#endif
 #endif	/* READTAGS_DSL */
 
 #include "mio.h"
