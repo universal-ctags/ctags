@@ -37,7 +37,6 @@ typedef struct sReadOption {
 
 struct canonWorkArea {
 	struct canonFnameCacheTable *cacheTable;
-	bool absoluteOnly;
 };
 
 typedef struct tagFileX {
@@ -62,6 +61,7 @@ struct actionSpec {
 	unsigned int action;		/* bitset of actionType items */
 	const char *name;			/* for ACTION_FIND */
 	bool canonicalizing;
+	bool absoluteOnly;
 	struct canonWorkArea canon;
 	ptrArray *tagEntryArray;
 	void (* walkerfn) (const tagEntry *, void *);
@@ -395,7 +395,7 @@ static void findTag (struct inputSpec *inputSpec,
 	}
 
 	if (actionSpec->canonicalizing && actionSpec->canon.cacheTable == NULL)
-		actionSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX, actionSpec->canon.absoluteOnly);
+		actionSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX, actionSpec->absoluteOnly);
 
 	if (printOpts->escaping)
 	{
@@ -453,7 +453,7 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 
 	if (actionSpec->canonicalizing && actionSpec->canon.cacheTable == NULL)
 		actionSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX,
-																 actionSpec->canon.absoluteOnly);
+																 actionSpec->absoluteOnly);
 
 	if (printOpts->escaping)
 	{
@@ -793,12 +793,12 @@ static void parseOptions (int argc, char **argv,
 			else if (strcmp (optname, "absolute-input") == 0)
 			{
 				actionSpec->canonicalizing = true;
-				actionSpec->canon.absoluteOnly = true;
+				actionSpec->absoluteOnly = true;
 			}
 			else if (strcmp (optname, "canonicalize-input") == 0)
 			{
 				actionSpec->canonicalizing = true;
-				actionSpec->canon.absoluteOnly = false;
+				actionSpec->absoluteOnly = false;
 			}
 			else if (strcmp (optname, "filter") == 0)
 			{
@@ -907,11 +907,11 @@ static void parseOptions (int argc, char **argv,
 					break;
 				case 'A':
 					actionSpec->canonicalizing = true;
-					actionSpec->canon.absoluteOnly = true;
+					actionSpec->absoluteOnly = true;
 					break;
 				case 'C':
 					actionSpec->canonicalizing = true;
-					actionSpec->canon.absoluteOnly = false;
+					actionSpec->absoluteOnly = false;
 					break;
 				case 'Q':
 					if (i + 1 == argc)
