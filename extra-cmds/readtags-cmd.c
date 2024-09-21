@@ -700,7 +700,6 @@ static void printVersion(void)
 
 extern int main (int argc, char **argv)
 {
-	int i;
 	bool ignore_prefix = false;
 
 	tagPrintOptions printOpts = {0};
@@ -715,7 +714,7 @@ extern int main (int argc, char **argv)
 	setExecutableName (ProgramName);
 	if (argc == 1)
 		printUsage(stderr, 1);
-	for (i = 1  ;  i < argc  ;  ++i)
+	for (int i = 1  ;  i < argc  ;  ++i)
 	{
 		const char *const arg = argv [i];
 		if (ignore_prefix || arg [0] != '-')
