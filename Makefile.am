@@ -94,7 +94,7 @@ endif
 readtags_CFLAGS = $(EXTRA_CFLAGS) $(WARNING_CFLAGS) $(COVERAGE_CFLAGS)
 dist_readtags_SOURCES = $(READTAGS_SRCS) $(READTAGS_HEADS)
 readtags_CPPFLAGS += $(GNULIB_CPPFLAGS)
-readtags_CPPFLAGS += -DREADTAGS_DSL -I$(srcdir)/dsl
+readtags_CPPFLAGS += -I$(srcdir)/dsl
 readtags_LDADD  =
 readtags_LDADD += $(GNULIB_LIBS)
 readtags_LDADD += libutil.a

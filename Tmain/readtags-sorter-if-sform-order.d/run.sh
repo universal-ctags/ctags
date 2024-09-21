@@ -14,8 +14,4 @@ if ! [ -x "${READTAGS}" ]; then
 	skip "no readtags"
 fi
 
-if ! ( "${READTAGS}" -h | grep -q -e -S ); then
-	skip "no sorter function in readtags"
-fi
-
 ${READTAGS} -t output.tags -ne -Q '(if $extras (print $extras) #f)' -l

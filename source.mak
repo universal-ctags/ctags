@@ -11,9 +11,6 @@ REPOINFO_HEADS = main/repoinfo.h
 REPOINFO_SRCS  = main/repoinfo.c
 REPOINFO_OBJS  = $(REPOINFO_SRCS:.c=.$(OBJEXT))
 
-MIO_HEADS = main/mio.h
-MIO_SRCS  = main/mio.c
-
 UTIL_PUBLIC_HEADS = \
 	main/general.h		\
 	\
@@ -21,6 +18,7 @@ UTIL_PUBLIC_HEADS = \
 	main/gcc-attr.h		\
 	main/htable.h		\
 	main/inline.h		\
+	main/mio.h		\
 	main/numarray.h		\
 	main/ptrarray.h		\
 	main/routines.h		\
@@ -44,6 +42,7 @@ UTIL_SRCS = \
 	main/fname.c		\
 	main/htable.c		\
 	main/numarray.c		\
+	main/mio.c		\
 	main/ptrarray.c		\
 	main/routines.c		\
 	main/trashbox.c		\
@@ -55,14 +54,10 @@ UTIL_OBJS = $(UTIL_SRCS:.c=.$(OBJEXT))
 UTILTEST_HEADS = \
 	extra-cmds/acutest.h \
 	\
-	$(MIO_HEADS) \
-	\
 	$(NULL)
 UTILTEST_SRCS  = \
 	extra-cmds/utiltest.c \
 	extra-cmds/readtags-stub.c \
-	\
-	$(MIO_SRCS) \
 	\
 	$(NULL)
 UTILTEST_OBJS = $(UTILTEST_SRCS:.c=.$(OBJEXT))
@@ -143,8 +138,6 @@ LIB_HEADS =			\
 	$(MAIN_PUBLIC_HEADS)	\
 	$(LIB_PRIVATE_HEADS)	\
 	\
-	$(MIO_HEADS)		\
-	\
 	$(NULL)
 
 LIB_SRCS =			\
@@ -196,7 +189,6 @@ LIB_SRCS =			\
 	$(TXT2CSTR_SRCS) \
 	\
 	$(REPOINFO_SRCS) \
-	$(MIO_SRCS)      \
 	\
 	$(NULL)
 
@@ -492,8 +484,6 @@ READTAGS_DSL_HEADS = \
 	dsl/qualifier.h \
 	dsl/sorter.h \
 	\
-	$(MIO_HEADS) \
-	\
 	$(NULL)
 
 READTAGS_DSL_SRCS = \
@@ -502,8 +492,6 @@ READTAGS_DSL_SRCS = \
 	dsl/formatter.c \
 	dsl/qualifier.c \
 	dsl/sorter.c \
-	\
-	$(MIO_SRCS) \
 	\
 	$(NULL)
 READTAGS_DSL_OBJS = $(READTAGS_DSL_SRCS:.c=.$(OBJEXT))

@@ -67,14 +67,13 @@ struct actionSpec {
 
 static const char *ProgramName;
 static int debugMode;
-#ifdef READTAGS_DSL
+
 #include "dsl/qualifier.h"
 static QCode *Qualifier;
 #include "dsl/sorter.h"
 static SCode *Sorter;
 #include "dsl/formatter.h"
 static FCode *Formatter;
-#endif
 
 static const char* tagsStrerror (int err)
 {
@@ -105,19 +104,16 @@ static void printTag (const tagEntry *entry, void *data)
 	tagsPrint (entry, (tagPrintOptions *)data, NULL, stdout);
 }
 
-#ifdef READTAGS_DSL
 static void printTagWithFormatter (const tagEntry *entry, void *unused)
 {
 	f_print (entry, Formatter, stdout);
 }
-#endif
 
 static void printPseudoTag (const tagEntry *entry, void *data)
 {
 	tagsPrintPseudoTag (entry, (tagPrintOptions *)data, NULL, stdout);
 }
 
-#ifdef READTAGS_DSL
 static void freeCopiedTag (tagEntry *e)
 {
 	free ((void *)e->name);
@@ -234,40 +230,6 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 		actionSpec->dataForWalkerFn = data;
 	}
 }
-#else
-static void walkTags (tagFile *const file, tagEntry *first_entry,
-					  tagResult (* nextfn) (tagFile *const, tagEntry *),
-					  void (* actionfn) (const tagEntry *, void *), void *data,
-					  struct actionSpec *actionSpec)
-{
-	do
-	{
-		tagEntry *shadow = first_entry;
-		tagEntry  shadowRec;
-		if (actionSpec->canonicalizing
-			&& (actionSpec->canon.ptags == false
-				|| strcmp (first_entry->name, "!_TAG_PROC_CWD") == 0))
-		{
-			shadow = &shadowRec;
-			shadowRec = *first_entry;
-			shadow->file = canonicalizeFileName (actionSpec->canon.cacheTable,
-												 first_entry->file);
-		}
-
-		(* actionfn) (shadow, data);
-	}
-	while ( (*nextfn) (file, first_entry) == TagSuccess);
-
-	int err = tagsGetErrno (file);
-	if (err != 0)
-	{
-		fprintf (stderr, "%s: error in walkTags(): %s\n",
-				 ProgramName,
-				 tagsStrerror (err));
-		exit (1);
-	}
-}
-#endif
 
 static int copyFile (FILE *in, FILE *out)
 {
@@ -460,9 +422,7 @@ static void findTag (struct inputSpec *inputSpec,
 					 ProgramName, name, fileX->fileName);
 	if (tagsFind (fileX->tagFile, &entry, name, readOpts->matchOpts) == TagSuccess)
 		walkTags (fileX->tagFile, &entry, tagsFindNext,
-#ifdef READTAGS_DSL
 				  Formatter? printTagWithFormatter:
-#endif
 				  printTag, printOpts,
 				  actionSpec);
 	else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
@@ -520,9 +480,7 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 	{
 		if (tagsFirst (fileX->tagFile, &entry) == TagSuccess)
 			walkTags (fileX->tagFile, &entry, tagsNext,
-#ifdef READTAGS_DSL
 					  Formatter? printTagWithFormatter:
-#endif
 					  printTag, printOpts,
 					  actionSpec);
 		else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
@@ -541,11 +499,9 @@ static const char *const Usage =
 	"Usage: \n"
 	"    %s -h | --help\n"
 	"        Print this help message.\n"
-#ifdef READTAGS_DSL
 	"    %s -H POSTPROCESSOR | --help-expression POSTPROCESSOR\n"
 	"        Print available terms that can be used in POSTPROCESSOR expression.\n"
 	"        POSTPROCESSOR: filter sorter formatter\n"
-#endif
 	"    %s -v | --version\n"
 	"        Print the version identifier.\n"
 	"    %s [OPTIONS] ACTION\n"
@@ -583,28 +539,23 @@ static const char *const Usage =
 	"        Reduct '..' and '.' in input fields.\n"
 	"    -A | --absolute-input\n"
 	"        Do the same as -C but use absolute path form\n"
-#ifdef READTAGS_DSL
 	"    -F EXP | --formatter EXP\n"
 	"        Format the tags listed by ACTION with EXP when printing.\n"
 	"    -Q EXP | --filter EXP\n"
 	"        Filter the tags listed by ACTION with EXP before printing.\n"
 	"    -S EXP | --sorter EXP\n"
 	"        Sort the tags listed by ACTION with EXP before printing.\n"
-#endif
 	;
 
 static void printUsage(FILE* stream, int exitCode)
 {
 	fprintf (stream, Usage, ProgramName,
-#ifdef READTAGS_DSL
 			 ProgramName,
-#endif
 			 ProgramName,
 			 ProgramName);
 	exit (exitCode);
 }
 
-#ifdef READTAGS_DSL
 static void printFilterExpression (FILE *stream, int exitCode)
 {
 	fprintf (stream, "Filter expression: \n");
@@ -651,7 +602,6 @@ static void *compileExpression(const char* exp, void * (*compiler) (EsObject *),
 	es_object_unref (sexp);
 	return code;
 }
-#endif
 
 static void printVersion(void)
 {
@@ -710,7 +660,6 @@ extern int main (int argc, char **argv)
 				actionSpec.action |= ACTION_LIST_PTAGS;
 			else if (strcmp (optname, "help") == 0)
 				printUsage (stdout, 0);
-#ifdef READTAGS_DSL
 			else if (strcmp (optname, "help-expression") == 0)
 			{
 				if (i + 1 < argc)
@@ -737,7 +686,6 @@ extern int main (int argc, char **argv)
 					exit (1);
 				}
 			}
-#endif
 			else if (strcmp (optname, "version") == 0)
 				printVersion ();
 			else if (strcmp (optname, "escape-output") == 0)
@@ -797,7 +745,6 @@ extern int main (int argc, char **argv)
 				actionSpec.canonicalizing = true;
 				actionSpec.canon.absoluteOnly = false;
 			}
-#ifdef READTAGS_DSL
 			else if (strcmp (optname, "filter") == 0)
 			{
 				if (i + 1 < argc)
@@ -837,7 +784,6 @@ extern int main (int argc, char **argv)
 					exit (1);
 				}
 			}
-#endif
 			else
 			{
 				fprintf (stderr, "%s: unknown long options: --%s\n",
@@ -859,7 +805,6 @@ extern int main (int argc, char **argv)
 						actionSpec.action |= ACTION_LIST_PTAGS;
 						break;
 					case 'h': printUsage (stdout, 0); break;
-#ifdef READTAGS_DSL
 					case 'H':
 						if (i + 1 < argc)
 						{
@@ -875,7 +820,6 @@ extern int main (int argc, char **argv)
 						}
 						else
 							printUsage(stderr, 1);
-#endif
 					case 'v': printVersion ();
 					case 'E': printOpts.escaping = true; break;
 					case 'e': printOpts.extensionFields = true; break;
@@ -914,7 +858,6 @@ extern int main (int argc, char **argv)
 						actionSpec.canonicalizing = true;
 						actionSpec.canon.absoluteOnly = false;
 						break;
-#ifdef READTAGS_DSL
 					case 'Q':
 						if (i + 1 == argc)
 							printUsage(stderr, 1);
@@ -936,7 +879,6 @@ extern int main (int argc, char **argv)
 													   (void * (*)(EsObject *))f_compile,
 													   "formatter");
 						break;
-#endif
 					default:
 						fprintf (stderr, "%s: unknown option: %c\n",
 									ProgramName, arg[j]);
@@ -964,10 +906,8 @@ extern int main (int argc, char **argv)
 		exit (1);
 	}
 
-#ifdef READTAGS_DSL
 	if (Sorter)
 		actionSpec.tagEntryArray = ptrArrayNew ((ptrArrayDeleteFunc)freeCopiedTag);
-#endif
 
 	if (actionSpec.action & ACTION_LIST_PTAGS)
 	{
@@ -985,10 +925,8 @@ extern int main (int argc, char **argv)
 
 	if (actionSpec.tagEntryArray)
 	{
-#ifdef READTAGS_DSL
 		if (Sorter)
 			ptrArraySort (actionSpec.tagEntryArray, compareTagEntry);
-#endif
 
 		const size_t entry_count = ptrArrayCount(actionSpec.tagEntryArray);
 		for (unsigned int i = 0; i < entry_count; i++)
@@ -999,14 +937,12 @@ extern int main (int argc, char **argv)
 		ptrArrayDelete (actionSpec.tagEntryArray);
 	}
 
-#ifdef READTAGS_DSL
 	if (Qualifier)
 		q_destroy (Qualifier);
 	if (Sorter)
 		s_destroy (Sorter);
 	if (Formatter)
 		f_destroy (Formatter);
-#endif
 
 	if (actionSpec.canon.cacheTable)
 			canonFnameCacheTableDelete (actionSpec.canon.cacheTable);

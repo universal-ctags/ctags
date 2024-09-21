@@ -18,21 +18,9 @@
  *
  */
 
-#ifndef READTAGS_DSL
 #include "general.h"  /* must always come first */
-
 #include "routines.h"
 #include "debug.h"
-#else
-
-#if defined (HAVE_CONFIG_H)
-#include <config.h>
-#endif
-
-#ifdef HAVE_STDBOOL_H
-#include <stdbool.h>
-#endif
-#endif	/* READTAGS_DSL */
 
 #include "mio.h"
 
@@ -47,50 +35,6 @@
 #define MAY_HAVE_FTRUNCATE
 #include <unistd.h>
 #endif
-
-#ifdef READTAGS_DSL
-#define xMalloc(n,Type)    (Type *)eMalloc((size_t)(n) * sizeof (Type))
-#define xRealloc(p,n,Type) (Type *)eRealloc((p), (n) * sizeof (Type))
-
-static void *eMalloc (const size_t size)
-{
-	void *buffer = malloc (size);
-
-	if (buffer == NULL)
-	{
-		fprintf(stderr, "out of memory");
-		abort ();
-	}
-
-	return buffer;
-}
-
-static void *eRealloc (void *const ptr, const size_t size)
-{
-	void *buffer;
-	if (ptr == NULL)
-		buffer = eMalloc (size);
-	else
-	{
-		buffer = realloc (ptr, size);
-		if (buffer == NULL)
-		{
-			fprintf(stderr, "out of memory");
-			abort ();
-		}
-	}
-	return buffer;
-}
-
-static void eFree (void *const ptr)
-{
-	free (ptr);
-}
-#define eFreeNoNullCheck eFree
-
-#  define Assert(c) do {} while(0)
-#  define AssertNotReached() do {} while(0)
-#endif	/* READTAGS_DSL */
 
 /* minimal reallocation chunk size */
 #define MIO_CHUNK_SIZE 4096

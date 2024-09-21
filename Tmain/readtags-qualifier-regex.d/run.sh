@@ -14,10 +14,6 @@ if ! [ -x "${READTAGS}" ]; then
     skip "no readtags"
 fi
 
-if ! ( "${READTAGS}" -h | grep -q -e -Q ); then
-    skip "no qualifier function in readtags"
-fi
-
 echo '# case sensitive'
 ${V} ${READTAGS} -t output.tags -Q '(and $signature (#/char,.*,char|int,.*,int/ $signature))' -en -l
 

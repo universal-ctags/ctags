@@ -13,10 +13,6 @@ if ! [ -x "${READTAGS}" ]; then
 	skip "no readtags"
 fi
 
-if ! ( "${READTAGS}" -h | grep -q -e -Q ); then
-    skip "no qualifier function in readtags"
-fi
-
 echo '!_ -Q #t point3d'
 ${V} ${READTAGS} -t output.tags -Q '#t' point3d
 

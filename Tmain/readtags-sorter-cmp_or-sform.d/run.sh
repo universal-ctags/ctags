@@ -14,10 +14,6 @@ if ! [ -x "${READTAGS}" ]; then
 	skip "no readtags"
 fi
 
-if ! ( "${READTAGS}" -h | grep -q -e -S ); then
-	skip "no sorter function in readtags"
-fi
-
 ERRLOG=/tmp/ctags-Tmain-$$
 ${READTAGS} -et output.tags -S '
 (<or> (<> $name &name)
