@@ -605,26 +605,44 @@ static void *compileExpression(const char* exp, void * (*compiler) (EsObject *),
 	return code;
 }
 
-static void printVersion(void)
+static void run (struct actionSpec *actionSpec, struct inputSpec *inputSpec,
+				 readOptions *readOpts, tagPrintOptions *printOpts)
 {
-	/* readtags uses code of ctags via libutil.
-	 * So we here use the versoin of ctags as the version of readtags. */
-	puts(PROGRAM_VERSION);
-	exit (0);
+	if (actionSpec->sorter)
+		actionSpec->tagEntryArray = ptrArrayNew ((ptrArrayDeleteFunc)freeCopiedTag);
+
+	if (actionSpec->action & ACTION_LIST_PTAGS)
+	{
+		if (actionSpec->canonicalizing)
+			actionSpec->canon.ptags = true;
+		listTags (inputSpec, true, printOpts, actionSpec);
+		if (actionSpec->canonicalizing)
+			actionSpec->canon.ptags = false;
+	}
+
+	if (actionSpec->action & ACTION_FIND)
+		findTag (inputSpec, actionSpec->name, readOpts, printOpts, actionSpec);
+	else if (actionSpec->action & ACTION_LIST)
+		listTags (inputSpec, false, printOpts, actionSpec);
+
+	if (actionSpec->tagEntryArray)
+	{
+		if (actionSpec->sorter)
+			ptrArraySortR (actionSpec->tagEntryArray, compareTagEntry, actionSpec->sorter);
+
+		const size_t entry_count = ptrArrayCount(actionSpec->tagEntryArray);
+		for (unsigned int i = 0; i < entry_count; i++)
+		{
+			tagEntry *e = ptrArrayItem (actionSpec->tagEntryArray, i);
+			actionSpec->walkerfn (e, actionSpec->dataForWalkerFn);
+		}
+		ptrArrayDelete (actionSpec->tagEntryArray);
+	}
 }
 
-extern int main (int argc, char **argv)
+static void initActionSpec (struct actionSpec *actionSpec)
 {
-	int i;
-	bool ignore_prefix = false;
-
-	tagPrintOptions printOpts = {0};
-	readOptions readOpts = {0};
-	struct inputSpec inputSpec = {
-		.tagFileName = "tags",
-		.tempFileName = NULL,
-	};
-	struct actionSpec actionSpec = {
+	*actionSpec = (struct actionSpec) {
 		.action  = ACTION_NONE,
 		.name = NULL,
 		.canonicalizing = false,
@@ -640,6 +658,58 @@ extern int main (int argc, char **argv)
 		.sorter = NULL,
 		.formatter = NULL,
 	};
+}
+
+static void finiActionSpec (struct actionSpec *actionSpec)
+{
+	if (actionSpec->qualifier)
+		q_destroy (actionSpec->qualifier);
+	if (actionSpec->sorter)
+		s_destroy (actionSpec->sorter);
+	if (actionSpec->formatter)
+		f_destroy (actionSpec->formatter);
+
+	if (actionSpec->canon.cacheTable)
+		canonFnameCacheTableDelete (actionSpec->canon.cacheTable);
+}
+
+static void initInputSpec (struct inputSpec *inputSpec)
+{
+	*inputSpec = (struct inputSpec) {
+		.tagFileName = "tags",
+		.tempFileName = NULL,
+	};
+}
+
+static void finiInputSpec (struct inputSpec *inputSpec)
+{
+	if (inputSpec->tempFileName)
+	{
+		remove (inputSpec->tempFileName);
+		eFree (inputSpec->tempFileName);
+	}
+}
+
+static void printVersion(void)
+{
+	/* readtags uses code of ctags via libutil.
+	 * So we here use the versoin of ctags as the version of readtags. */
+	puts(PROGRAM_VERSION);
+	exit (0);
+}
+
+extern int main (int argc, char **argv)
+{
+	int i;
+	bool ignore_prefix = false;
+
+	tagPrintOptions printOpts = {0};
+	readOptions readOpts = {0};
+	struct inputSpec inputSpec;
+	struct actionSpec actionSpec;
+
+	initActionSpec (&actionSpec);
+	initInputSpec (&inputSpec);
 
 	ProgramName = argv [0];
 	setExecutableName (ProgramName);
@@ -911,51 +981,10 @@ extern int main (int argc, char **argv)
 		exit (1);
 	}
 
-	if (actionSpec.sorter)
-		actionSpec.tagEntryArray = ptrArrayNew ((ptrArrayDeleteFunc)freeCopiedTag);
+	run (&actionSpec, &inputSpec, &readOpts, &printOpts);
 
-	if (actionSpec.action & ACTION_LIST_PTAGS)
-	{
-		if (actionSpec.canonicalizing)
-			actionSpec.canon.ptags = true;
-		listTags (&inputSpec, true, &printOpts, &actionSpec);
-		if (actionSpec.canonicalizing)
-			actionSpec.canon.ptags = false;
-	}
+	finiActionSpec(&actionSpec);
+	finiInputSpec(&inputSpec);
 
-	if (actionSpec.action & ACTION_FIND)
-		findTag (&inputSpec, actionSpec.name, &readOpts, &printOpts, &actionSpec);
-	else if (actionSpec.action & ACTION_LIST)
-		listTags (&inputSpec, false, &printOpts, &actionSpec);
-
-	if (actionSpec.tagEntryArray)
-	{
-		if (actionSpec.sorter)
-			ptrArraySortR (actionSpec.tagEntryArray, compareTagEntry, actionSpec.sorter);
-
-		const size_t entry_count = ptrArrayCount(actionSpec.tagEntryArray);
-		for (unsigned int i = 0; i < entry_count; i++)
-		{
-			tagEntry *e = ptrArrayItem (actionSpec.tagEntryArray, i);
-			actionSpec.walkerfn (e, actionSpec.dataForWalkerFn);
-		}
-		ptrArrayDelete (actionSpec.tagEntryArray);
-	}
-
-	if (actionSpec.qualifier)
-		q_destroy (actionSpec.qualifier);
-	if (actionSpec.sorter)
-		s_destroy (actionSpec.sorter);
-	if (actionSpec.formatter)
-		f_destroy (actionSpec.formatter);
-
-	if (actionSpec.canon.cacheTable)
-			canonFnameCacheTableDelete (actionSpec.canon.cacheTable);
-
-	if (inputSpec.tempFileName)
-	{
-		remove (inputSpec.tempFileName);
-		eFree (inputSpec.tempFileName);
-	}
 	return 0;
 }
