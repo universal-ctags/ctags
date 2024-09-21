@@ -43,11 +43,13 @@ typedef struct tagFileX {
 	const char *fileName;
 	tagFile *tagFile;
 	tagFileInfo info;
+	struct canonWorkArea *canon;
 } tagFileX;
 
 struct inputSpec {
 	const char *tagFileName;
 	char *tempFileName;
+	struct canonWorkArea canon;
 };
 
 enum actionType {
@@ -62,7 +64,6 @@ struct actionSpec {
 	const char *name;			/* for ACTION_FIND */
 	bool canonicalizing;
 	bool absoluteOnly;
-	struct canonWorkArea canon;
 	ptrArray *tagEntryArray;
 	void (* walkerfn) (const tagEntry *, void *);
 	void *dataForWalkerFn;
@@ -173,11 +174,17 @@ static int compareTagEntry (const void *a, const void *b, void *sorter)
 	return s_compare (a, b, sorter);
 }
 
-static void walkTags (tagFile *const file, tagEntry *first_entry, bool on_ptags,
+static const char *canonicalizeFileNameX(tagFileX *const filex, const char *input)
+{
+	return canonicalizeFileName (filex->canon->cacheTable, input);
+}
+
+static void walkTags (tagFileX *const filex, tagEntry *first_entry, bool on_ptags,
 					  tagResult (* nextfn) (tagFile *const, tagEntry *),
 					  void (* actionfn) (const tagEntry *, void *), void *data,
 					  struct actionSpec *actionSpec)
 {
+	tagFile *const file = filex->tagFile;
 	ptrArray *a = actionSpec->tagEntryArray;
 
 	do
@@ -190,8 +197,7 @@ static void walkTags (tagFile *const file, tagEntry *first_entry, bool on_ptags,
 		{
 			shadowRec = *first_entry;
 			shadow = &shadowRec;
-			shadow->file = canonicalizeFileName (actionSpec->canon.cacheTable,
-												 first_entry->file);
+			shadow->file = canonicalizeFileNameX (filex, first_entry->file);
 		}
 
 		if (actionSpec->qualifier)
@@ -304,6 +310,7 @@ static tagFileX *makeTagFileX (const char *const filePath)
 	fileX->fileName = eStrdup(filePath);
 	fileX->tagFile = NULL;
 	fileX->info = (tagFileInfo){0};
+	fileX->canon = NULL;
 	return fileX;
 }
 
@@ -394,8 +401,13 @@ static void findTag (struct inputSpec *inputSpec,
 		exit (1);
 	}
 
-	if (actionSpec->canonicalizing && actionSpec->canon.cacheTable == NULL)
-		actionSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX, actionSpec->absoluteOnly);
+	if (actionSpec->canonicalizing)
+	{
+		if (inputSpec->canon.cacheTable == NULL)
+			inputSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX,
+																	actionSpec->absoluteOnly);
+		fileX->canon = &inputSpec->canon;
+	}
 
 	if (printOpts->escaping)
 	{
@@ -421,7 +433,7 @@ static void findTag (struct inputSpec *inputSpec,
 		fprintf (stderr, "%s: searching for \"%s\" in \"%s\"\n",
 					 ProgramName, name, fileX->fileName);
 	if (tagsFind (fileX->tagFile, &entry, name, readOpts->matchOpts) == TagSuccess)
-		walkTags (fileX->tagFile, &entry, false, tagsFindNext,
+		walkTags (fileX, &entry, false, tagsFindNext,
 				  actionSpec->formatter? printTagWithFormatter: printTag,
 				  actionSpec->formatter? (void *)actionSpec: (void *)printOpts,
 				  actionSpec);
@@ -451,9 +463,13 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 		exit (1);
 	}
 
-	if (actionSpec->canonicalizing && actionSpec->canon.cacheTable == NULL)
-		actionSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX,
-																 actionSpec->absoluteOnly);
+	if (actionSpec->canonicalizing)
+	{
+		if (inputSpec->canon.cacheTable == NULL)
+			inputSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX,
+																	actionSpec->absoluteOnly);
+		fileX->canon = &inputSpec->canon;
+	}
 
 	if (printOpts->escaping)
 	{
@@ -466,7 +482,7 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 	if (pseudoTags)
 	{
 		if (tagsFirstPseudoTag (fileX->tagFile, &entry) == TagSuccess)
-			walkTags (fileX->tagFile, &entry, true, tagsNextPseudoTag,
+			walkTags (fileX, &entry, true, tagsNextPseudoTag,
 					  printPseudoTag, printOpts,
 					  actionSpec);
 		else if ((err = tagsGetErrno (fileX->tagFile)) != 0)
@@ -480,7 +496,7 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 	else
 	{
 		if (tagsFirst (fileX->tagFile, &entry) == TagSuccess)
-			walkTags (fileX->tagFile, &entry, false, tagsNext,
+			walkTags (fileX, &entry, false, tagsNext,
 					  actionSpec->formatter? printTagWithFormatter: printTag,
 					  actionSpec->formatter? (void *)actionSpec: (void *)printOpts,
 					  actionSpec);
@@ -639,9 +655,6 @@ static void initActionSpec (struct actionSpec *actionSpec)
 		.action  = ACTION_NONE,
 		.name = NULL,
 		.canonicalizing = false,
-		.canon = {
-			.cacheTable = NULL,
-		},
 		.tagEntryArray = NULL,
 		.walkerfn = NULL,
 		.dataForWalkerFn = NULL,
@@ -659,9 +672,11 @@ static void finiActionSpec (struct actionSpec *actionSpec)
 		s_destroy (actionSpec->sorter);
 	if (actionSpec->formatter)
 		f_destroy (actionSpec->formatter);
+}
 
-	if (actionSpec->canon.cacheTable)
-		canonFnameCacheTableDelete (actionSpec->canon.cacheTable);
+static void initCanonWorkArea (struct canonWorkArea *canon)
+{
+	canon->cacheTable = NULL;
 }
 
 static void initInputSpec (struct inputSpec *inputSpec)
@@ -670,6 +685,7 @@ static void initInputSpec (struct inputSpec *inputSpec)
 		.tagFileName = "tags",
 		.tempFileName = NULL,
 	};
+	initCanonWorkArea (&inputSpec->canon);
 }
 
 static void finiInputSpec (struct inputSpec *inputSpec)
@@ -679,6 +695,10 @@ static void finiInputSpec (struct inputSpec *inputSpec)
 		remove (inputSpec->tempFileName);
 		eFree (inputSpec->tempFileName);
 	}
+
+	if (inputSpec->canon.cacheTable)
+		canonFnameCacheTableDelete (inputSpec->canon.cacheTable);
+
 }
 
 static void printVersion(void)
