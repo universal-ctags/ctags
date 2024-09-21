@@ -57,6 +57,17 @@ skip_if_user_has_dot_ctags_d()
 	fi
 }
 
+skip_if_no_readtags()
+{
+	if [ -z "${1}" ]; then
+		internal_error 'skip_if_no_readtags(): missing "$1"'
+	fi
+
+	if ! [ -x "${1}" ]; then
+		skip "no readtags"
+	fi
+}
+
 exit_if_win32()
 {
 	is_feature_available $1 '!' win32

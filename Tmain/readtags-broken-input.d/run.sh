@@ -9,9 +9,7 @@ V=
 
 . ../utils.sh
 
-if ! [ -x "${READTAGS}" ]; then
-	skip "no readtags"
-fi
+skip_if_no_readtags "$READTAGS"
 
 for i in 1 2 3 4 5 6; do
 	${V} ${READTAGS} -t ./target.tags - greet${i} > /dev/null || exit 1

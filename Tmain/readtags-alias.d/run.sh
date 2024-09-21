@@ -9,9 +9,7 @@ V=
 
 . ../utils.sh
 
-if ! [ -x "${READTAGS}" ]; then
-	skip "no readtags"
-fi
+skip_if_no_readtags "$READTAGS"
 
 echo '!_ -Q #t point3d'
 ${V} ${READTAGS} -t output.tags -Q '#t' point3d

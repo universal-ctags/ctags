@@ -10,8 +10,6 @@ READTAGS=$3
 #V="valgrind --leak-check=full -v"
 V=
 
-if ! [ -x "${READTAGS}" ]; then
-	skip "no readtags"
-fi
+skip_if_no_readtags "$READTAGS"
 
 ${READTAGS} -t output.tags -ne -Q '(if $extras (print $extras) #f)' -l
