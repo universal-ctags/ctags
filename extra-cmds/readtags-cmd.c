@@ -16,6 +16,7 @@
 
 #include "vstring.h"
 #include "htable.h"
+#include "intern.h"
 #include "ptrarray.h"
 #include "fname.h"
 
@@ -119,14 +120,16 @@ static void printPseudoTag (const tagEntry *entry, void *data)
 static void freeCopiedTag (tagEntry *e)
 {
 	free ((void *)e->name);
-	free ((void *)e->file);
+	/* Don't free. The value is interned. */
+	e->file = NULL;
 	if (e->address.pattern)
 		free ((void *)e->address.pattern);
-	if (e->kind)
-		free ((void *)e->kind);
+	/* Don't free. The value is interned. */
+	e->kind = NULL;
 	for (unsigned short c = 0; c < e->fields.count; c++)
 	{
-		free ((void *)e->fields.list[c].key);
+		/* Don't free. The value is interned. */
+		e->fields.list[c].key = NULL;
 		free ((void *)e->fields.list[c].value);
 	}
 	if (e->fields.count)
@@ -143,7 +146,7 @@ static tagEntry *copyTag (tagEntry *o)
 	n->name = eStrdup (o->name);
 
 	if (o->file)
-		n->file = eStrdup (o->file);
+		n->file = intern (o->file);
 
 	if (o->address.pattern)
 		n->address.pattern = eStrdup (o->address.pattern);
@@ -151,7 +154,7 @@ static tagEntry *copyTag (tagEntry *o)
 	n->address.lineNumber = o->address.lineNumber;
 
 	if (o->kind)
-		n->kind = eStrdup (o->kind);
+		n->kind = intern (o->kind);
 
 	n->fileScope = o->fileScope;
 	n->fields.count = o->fields.count;
@@ -163,7 +166,7 @@ static tagEntry *copyTag (tagEntry *o)
 
 	for (unsigned short c = 0; c < o->fields.count; c++)
 	{
-		n->fields.list[c].key = eStrdup (o->fields.list[c].key);
+		n->fields.list[c].key = intern (o->fields.list[c].key);
 		n->fields.list[c].value = eStrdup (o->fields.list[c].value);
 	}
 
