@@ -18,6 +18,7 @@ UTIL_PUBLIC_HEADS = \
 	main/gcc-attr.h		\
 	main/htable.h		\
 	main/inline.h		\
+	main/intern.h		\
 	main/mio.h		\
 	main/numarray.h		\
 	main/ptrarray.h		\
@@ -42,6 +43,7 @@ UTIL_HEADS = \
 UTIL_SRCS = \
 	main/fname.c		\
 	main/htable.c		\
+	main/intern.c		\
 	main/numarray.c		\
 	main/mio.c		\
 	main/ptrarray.c		\

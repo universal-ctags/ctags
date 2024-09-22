@@ -108,6 +108,9 @@
     <ClCompile Include="..\main\htable.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\intern.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\keyword.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
@@ -732,6 +735,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\inline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\intern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\interval_tree_generic.h">
