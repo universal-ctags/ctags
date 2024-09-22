@@ -50,6 +50,7 @@ struct inputSpec {
 	const char *tagFileName;
 	char *tempFileName;
 	struct canonWorkArea canon;
+	tagFileX *fileX;
 };
 
 enum actionType {
@@ -410,15 +411,7 @@ static void findTag (struct inputSpec *inputSpec,
 {
 	tagEntry entry;
 	int err = 0;
-	tagFileX *const fileX = openTags (inputSpec);
-	if (fileX->tagFile == NULL || !fileX->info.status.opened)
-	{
-		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
-				 ProgramName, tagsStrerror (fileX->info.status.error_number),
-				 fileX->fileName);
-		deleteTagFileX (fileX);
-		exit (1);
-	}
+	tagFileX *const fileX = inputSpec->fileX;
 
 	if (actionSpec->canonicalizing)
 		fileX->canon = prepareCanonFnameCacheTable (&inputSpec->canon,
@@ -459,7 +452,6 @@ static void findTag (struct inputSpec *inputSpec,
 				 tagsStrerror (err));
 		exit (1);
 	}
-	deleteTagFileX (fileX);
 }
 
 static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOptions *printOpts,
@@ -467,16 +459,7 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 {
 	tagEntry entry;
 	int err = 0;
-	tagFileX *const fileX = openTags (inputSpec);
-	if (fileX->tagFile == NULL || !fileX->info.status.opened)
-	{
-		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
-				 ProgramName,
-				 tagsStrerror (fileX->info.status.error_number),
-				 fileX->fileName);
-		deleteTagFileX (fileX);
-		exit (1);
-	}
+	tagFileX *const fileX = inputSpec->fileX;
 
 	if (actionSpec->canonicalizing)
 		fileX->canon = prepareCanonFnameCacheTable (&inputSpec->canon,
@@ -519,7 +502,6 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 			exit (1);
 		}
 	}
-	deleteTagFileX (fileX);
 }
 
 static const char *const Usage =
@@ -631,12 +613,28 @@ static void *compileExpression(const char* exp, void * (*compiler) (EsObject *),
 	return code;
 }
 
+static tagFileX *openTagsX (struct inputSpec *inputSpec)
+{
+	tagFileX *const fileX = openTags (inputSpec);
+
+	if (fileX->tagFile == NULL || !fileX->info.status.opened)
+	{
+		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
+				 ProgramName, tagsStrerror (fileX->info.status.error_number),
+				 fileX->fileName);
+		deleteTagFileX (fileX);
+		exit (1);
+	}
+	return fileX;
+}
+
 static void run (struct actionSpec *actionSpec, struct inputSpec *inputSpec,
 				 readOptions *readOpts, tagPrintOptions *printOpts)
 {
 	if (actionSpec->sorter)
 		actionSpec->tagEntryArray = ptrArrayNew ((ptrArrayDeleteFunc)freeCopiedTag);
 
+	inputSpec->fileX = openTagsX (inputSpec);
 	if (actionSpec->action & ACTION_LIST_PTAGS)
 		listTags (inputSpec, true, printOpts, actionSpec);
 
@@ -695,12 +693,16 @@ static void initInputSpec (struct inputSpec *inputSpec)
 	*inputSpec = (struct inputSpec) {
 		.tagFileName = "tags",
 		.tempFileName = NULL,
+		.fileX = NULL,
 	};
 	initCanonWorkArea (&inputSpec->canon);
 }
 
 static void finiInputSpec (struct inputSpec *inputSpec)
 {
+	if (inputSpec->fileX)
+		deleteTagFileX (inputSpec->fileX);
+
 	if (inputSpec->tempFileName)
 	{
 		remove (inputSpec->tempFileName);
