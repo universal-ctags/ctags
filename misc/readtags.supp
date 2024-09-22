@@ -1,0 +1,93 @@
+# Usage: valgrind --suppressions=readtags.supp  --leak-check=full --show-leak-kinds=all ./readtags ...  > /dev/null
+# The output with --gen-suppressions=all option can be used as a base for writing a suppress file.
+{
+   <intern>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:eMalloc
+   fun:intern
+   ...
+}
+{
+   <es:obarray_intern/strdup>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:strdup
+   fun:es_obarray_intern
+   fun:fill_list
+   fun:es_read_from_string
+   fun:compileExpression
+   fun:parseOptions
+   fun:main
+}
+{
+   <es:obarray_intern/object_new>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:es_object_new
+   fun:es_obarray_intern
+   fun:fill_list
+   fun:es_read_from_string
+   fun:compileExpression
+   fun:parseOptions
+   fun:main
+}
+{
+   <es:dsl_define/strdup>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:strdup
+   fun:es_obarray_intern
+   fun:dsl_define
+   fun:dsl_init
+   fun:initialize
+   ...
+}
+{
+   <es:dsl_define/es_object_new>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:es_object_new
+   fun:es_obarray_intern
+   fun:dsl_define
+   fun:dsl_init
+   fun:initialize
+   ...
+}
+{
+   <es:dsl_define/calloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:dsl_define
+   fun:dsl_init
+   fun:initialize
+   ...
+}
+{
+   <es_boolean_new>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:es_object_new
+   fun:es_boolean_new
+   ...
+}
+{
+   <sorter/predefinition:es_integer_new>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:es_object_new
+   fun:es_integer_new
+   fun:initialize
+   fun:s_compile
+   fun:compileExpression
+   fun:parseOptions
+   fun:main
+}
