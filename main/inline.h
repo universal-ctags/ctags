@@ -27,4 +27,6 @@
 # define CTAGS_INLINE static
 #endif
 
+#define READTAGS_INLINE CTAGS_INLINE
+
 #endif /* CTAGS_MAIN_INLINE_H */
