@@ -260,6 +260,7 @@ AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
 
 AC_PROG_CC
 AC_PROG_CC_C99
+AC_C_INLINE
 # For gnulib.
 #  Typically, this is immediately after AC_PROG_CC, ...
 gl_EARLY

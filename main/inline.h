@@ -11,7 +11,11 @@
 #ifndef CTAGS_MAIN_INLINE_H
 #define CTAGS_MAIN_INLINE_H
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#ifdef HAVE_CONFIG_H
+// AC_C_INLINE defines inline. The definition is in config.h.
+#include "config.h"
+# define CTAGS_INLINE static inline
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 # define CTAGS_INLINE static inline
 #elif defined(_MSC_VER)
 # define CTAGS_INLINE static __inline
