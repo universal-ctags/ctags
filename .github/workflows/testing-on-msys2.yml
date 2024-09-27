@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        msystem: [MINGW32, MINGW64, CLANG32, CLANG64]
+        msystem: [MINGW32, MINGW64, CLANG64]
 
     defaults:
       run:
