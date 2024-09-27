@@ -25,7 +25,14 @@ jobs:
         msystem: ${{ matrix.msystem }}
         update: true
         install: automake autoconf make dos2unix
-        pacboy: toolchain:p python-sphinx:p jansson:p libxml2:p libyaml:p pcre2:p
+        pacboy: toolchain:p python-sphinx:p libxml2:p libyaml:p pcre2:p
+
+    # no mingw-w64-clang-i686-jansson
+    - if: ${{ matrix.msystem == 'CLANG32' }}
+      run: mingw-w64-i686-jansson
+
+    - if: ${{ matrix.msystem != 'CLANG32' }}
+      run: pacboy -S jansson:p
 
     - run: git config --global core.autocrlf input
       shell: bash
