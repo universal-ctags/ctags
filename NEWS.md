@@ -1,3 +1,29 @@
+# Version XXX
+
+- imporve performance; put inline keyword on a hot spot function.
+
+	- before this change
+
+		```
+		$ /bin/time ./readtags -t ~/.citre/kernel82.tags -l > /dev/null
+		9.59user 0.42system 0:10.06elapsed 99%CPU (0avgtext+0avgdata 2819340maxresident)k
+		0inputs+0outputs (0major+44149minor)pagefaults 0swaps
+		```
+
+	- after this change
+
+		```
+		$ /bin/time ./readtags -t ~/.citre/kernel82.tags -l > /dev/null
+		7.82user 0.43system 0:08.30elapsed 99%CPU (0avgtext+0avgdata 2819688maxresident)k
+		0inputs+0outputs (0major+44138minor)pagefaults 0swaps
+		```
+
+# Version 0.4.0
+
+- support cmake as a build system (ParticleG <particle_g@outlook.com>)
+
+- add libreadtags-uninstalled.pc.in.
+
 # Version 0.3.0
 
 - fix calls to ctype functions (Colomban Wendling <ban@herbesfolles.org>)
