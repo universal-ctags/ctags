@@ -1,9 +1,43 @@
 version: 2
 jobs:
-  fedora31:
+  fedora40_cmake:
     working_directory: ~/libreadtags
     docker:
-      - image: docker.io/fedora:31
+      - image: docker.io/fedora:40
+    steps:
+      - run:
+          name: Install Git
+          command: |
+            yum -y install git
+      - checkout
+      - run:
+          name: Install build tools
+          command: |
+            yum -y install gcc cmake
+      - run:
+          name: Build
+          command: |
+            mkdir build
+            cmake -DCMAKE_BUILD_TYPE=Release -DLIBREADTAGS_BUILD_SHARED=ON -S . -B build
+            cmake --build build --target readtags
+      - run:
+          name: Build test cases
+          command: |
+            cmake --build build
+      - run:
+          name: Run the test cases
+          command: |
+            ctest --test-dir build || cat build/Testing/Temporary/LastTest.log
+      - run:
+          name: Install
+          command: |
+            cmake --build build --target install
+            test -e /usr/local/include/readtags.h
+            test -e /usr/local/lib/libreadtags.so
+  fedora40_autotools:
+    working_directory: ~/libreadtags
+    docker:
+      - image: docker.io/fedora:40
     steps:
       - run:
           name: Install Git
@@ -24,10 +58,10 @@ jobs:
           name: Test
           command: |
             make check VERBOSE=1
-  fedora31_distcheck:
+  fedora40_distcheck:
     working_directory: ~/libreadtags
     docker:
-      - image: docker.io/fedora:31
+      - image: docker.io/fedora:40
     steps:
       - run:
           name: Install Git
@@ -51,5 +85,6 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - fedora31
-      - fedora31_distcheck
+      - fedora40_cmake
+      - fedora40_autotools
+      - fedora40_distcheck
