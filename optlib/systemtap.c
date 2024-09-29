@@ -181,8 +181,13 @@ static void initializeSystemTapParser (const langType language)
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "func",
-	                               "^([[:alpha:]_][[:alnum:]_]*)(:[[:alpha:]_][[:alnum:]_]*)?[[:space:]]*\\(",
-	                               "\\1", "f", "{tenter=funcSig,funcBody}{scope=push}", NULL);
+	                               "^([[:alpha:]_][[:alnum:]_]*)(:([[:alpha:]_][[:alnum:]_]*))?[[:space:]]*\\(",
+	                               "\\1", "f", "{tenter=funcSig,funcBody}{scope=push}"
+		"{{\n"
+		"  \\3 false ne {\n"
+		"     . \\3 typeref:\n"
+		"  } if\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "funcSig",
 	                               "^[^)/]+",
 	                               "", "", "", NULL);
