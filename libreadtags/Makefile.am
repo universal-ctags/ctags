@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 AM_CFLAGS=-Wall
 
-EXTRA_DIST = README.md NEWS.md
+EXTRA_DIST = README.md NEWS.md CMakeLists.txt test_inline.c
 
 lib_LTLIBRARIES    = libreadtags.la
 libreadtags_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION)

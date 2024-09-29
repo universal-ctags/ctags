@@ -116,8 +116,8 @@ $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 
 extra-cmds/%.o: extra-cmds/%.c
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) $(INCLUDES) -o $@ $<
-libreadtags/%.o: libreadtags/%.c
-	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -Ilibreadtags -o $@ $<
+libreadtags/%.o: libreadtags/%.c $(UTIL_HEADS)
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -Ilibreadtags $(INCLUDES) -DHAVE_CTAGS_INLINE_H -o $@ $<
 
 readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(UTIL_OBJS) $(UTIL_HEADS) $(READTAGS_DSL_OBJS) $(READTAGS_DSL_HEADS) $(GNULIB_OBJS) $(MINGW_GNULIB_HEADS)
 	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(UTIL_OBJS) $(READTAGS_DSL_OBJS) $(GNULIB_OBJS) $(LIBS)

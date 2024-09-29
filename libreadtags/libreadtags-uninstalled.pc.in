@@ -1,0 +1,14 @@
+abs_top_srcdir=@abs_top_srcdir@
+abs_top_builddir=@abs_top_builddir@
+
+prefix=
+exec_prefix=
+libdir=${abs_top_builddir}
+includedir=${abs_top_builddir}
+
+Name: libreadtags Uninstalled
+Description: a library for looking up tag entries in tag files (Uninstalled)
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} -lreadtags
+Cflags: -I${includedir}

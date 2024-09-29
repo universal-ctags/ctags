@@ -64,7 +64,7 @@ PDBFLAG =
 {extra-cmds}.c{extra-cmds}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foextra-cmds\ /c $<
 {libreadtags}.c{libreadtags}.obj::
-	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Folibreadtags\ /c $<
+	$(CC) $(OPT) $(DEFINES) -DHAVE_CTAGS_INLINE_H $(INCLUDES) /Folibreadtags\ /c $<
 {dsl}.c{dsl}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fodsl\ /c $<
 {win32\mkstemp}.c{win32\mkstemp}.obj::
