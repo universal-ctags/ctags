@@ -147,10 +147,14 @@
 # func
 #
 
-# TODO: return type should be recorded to typeref field
---_mtable-regex-SystemTap=func/([[:alpha:]_][[:alnum:]_]*)(:[[:alpha:]_][[:alnum:]_]*)?[[:space:]]*\(/\1/f/{tenter=funcSig,funcBody}{scope=push}
+--_mtable-regex-SystemTap=func/([[:alpha:]_][[:alnum:]_]*)(:([[:alpha:]_][[:alnum:]_]*))?[[:space:]]*\(/\1/f/{tenter=funcSig,funcBody}{scope=push}{{
+  \3 false ne {
+     . \3 typeref:
+  } if
+}}
 
 # TODO: capture parameters
+# TODO: fill the signature field of the current function.
 --_mtable-regex-SystemTap=funcSig/[^)\/]+//
 --_mtable-regex-SystemTap=funcSig/\)(:[0-9]+)?//{tleave}
 --_mtable-extend-SystemTap=funcSig+comment

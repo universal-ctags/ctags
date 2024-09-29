@@ -1,29 +1,29 @@
-tcp_get_info_rto	input.stp	/^function tcp_get_info_rto:long(sock:long)$/;"	f	line:33	roles:def	end:44
-tcp_get_info_snd_cwnd	input.stp	/^function tcp_get_info_snd_cwnd:long(sock:long)$/;"	f	line:50	roles:def	end:60
-tcp_ts_get_info_state	input.stp	/^function tcp_ts_get_info_state:long(sock:long)$/;"	f	line:78	roles:def	end:83
-__tcp_sock_dport	input.stp	/^function __tcp_sock_dport:long (sock:long)$/;"	f	line:86	roles:def	end:93
-__get_skb_tcphdr_new	input.stp	/^@__private30 function __get_skb_tcphdr_new:long(skb:long)$/;"	f	line:96	roles:def	end:107
-__get_skb_tcphdr	input.stp	/^function __get_skb_tcphdr:long(skb:long)$/;"	f	line:110	roles:def	end:118
-__tcp_skb_urg	input.stp	/^function __tcp_skb_urg:long (tcphdr:long)$/;"	f	line:121	roles:def	end:124
-__tcp_skb_ack	input.stp	/^function __tcp_skb_ack:long (tcphdr:long)$/;"	f	line:127	roles:def	end:130
-__tcp_skb_psh	input.stp	/^function __tcp_skb_psh:long (tcphdr:long)$/;"	f	line:133	roles:def	end:136
-__tcp_skb_rst	input.stp	/^function __tcp_skb_rst:long (tcphdr:long)$/;"	f	line:139	roles:def	end:142
-__tcp_skb_syn	input.stp	/^function __tcp_skb_syn:long (tcphdr:long)$/;"	f	line:145	roles:def	end:148
-__tcp_skb_fin	input.stp	/^function __tcp_skb_fin:long (tcphdr:long)$/;"	f	line:151	roles:def	end:154
-__tcp_skb_sport	input.stp	/^function __tcp_skb_sport:long (tcphdr:long)$/;"	f	line:157	roles:def	end:160
-__tcp_skb_dport	input.stp	/^function __tcp_skb_dport:long (tcphdr:long){$/;"	f	line:163	roles:def	end:165
-__tcp_sock_sport	input.stp	/^function __tcp_sock_sport:long (sock:long)$/;"	f	line:168	roles:def	end:174
+tcp_get_info_rto	input.stp	/^function tcp_get_info_rto:long(sock:long)$/;"	f	line:33	typeref:typename:long	roles:def	end:44
+tcp_get_info_snd_cwnd	input.stp	/^function tcp_get_info_snd_cwnd:long(sock:long)$/;"	f	line:50	typeref:typename:long	roles:def	end:60
+tcp_ts_get_info_state	input.stp	/^function tcp_ts_get_info_state:long(sock:long)$/;"	f	line:78	typeref:typename:long	roles:def	end:83
+__tcp_sock_dport	input.stp	/^function __tcp_sock_dport:long (sock:long)$/;"	f	line:86	typeref:typename:long	roles:def	end:93
+__get_skb_tcphdr_new	input.stp	/^@__private30 function __get_skb_tcphdr_new:long(skb:long)$/;"	f	line:96	typeref:typename:long	roles:def	end:107
+__get_skb_tcphdr	input.stp	/^function __get_skb_tcphdr:long(skb:long)$/;"	f	line:110	typeref:typename:long	roles:def	end:118
+__tcp_skb_urg	input.stp	/^function __tcp_skb_urg:long (tcphdr:long)$/;"	f	line:121	typeref:typename:long	roles:def	end:124
+__tcp_skb_ack	input.stp	/^function __tcp_skb_ack:long (tcphdr:long)$/;"	f	line:127	typeref:typename:long	roles:def	end:130
+__tcp_skb_psh	input.stp	/^function __tcp_skb_psh:long (tcphdr:long)$/;"	f	line:133	typeref:typename:long	roles:def	end:136
+__tcp_skb_rst	input.stp	/^function __tcp_skb_rst:long (tcphdr:long)$/;"	f	line:139	typeref:typename:long	roles:def	end:142
+__tcp_skb_syn	input.stp	/^function __tcp_skb_syn:long (tcphdr:long)$/;"	f	line:145	typeref:typename:long	roles:def	end:148
+__tcp_skb_fin	input.stp	/^function __tcp_skb_fin:long (tcphdr:long)$/;"	f	line:151	typeref:typename:long	roles:def	end:154
+__tcp_skb_sport	input.stp	/^function __tcp_skb_sport:long (tcphdr:long)$/;"	f	line:157	typeref:typename:long	roles:def	end:160
+__tcp_skb_dport	input.stp	/^function __tcp_skb_dport:long (tcphdr:long){$/;"	f	line:163	typeref:typename:long	roles:def	end:165
+__tcp_sock_sport	input.stp	/^function __tcp_sock_sport:long (sock:long)$/;"	f	line:168	typeref:typename:long	roles:def	end:174
 sockstate	input.stp	/^@__private30 global sockstate[12]$/;"	v	line:176	roles:def
 init	input.stp	/^probe init {$/;"	p	line:177	roles:attached	end:190
-tcp_sockstate_str	input.stp	/^function tcp_sockstate_str:string (state:long) {$/;"	f	line:192	roles:def	end:194
-tcp_ts_get_info_snd_ssthresh	input.stp	/^function tcp_ts_get_info_snd_ssthresh:long(sock:long)$/;"	f	line:199	roles:def	end:209
-tcp_ts_get_info_rcv_mss	input.stp	/^function tcp_ts_get_info_rcv_mss:long(sock:long)$/;"	f	line:213	roles:def	end:224
+tcp_sockstate_str	input.stp	/^function tcp_sockstate_str:string (state:long) {$/;"	f	line:192	typeref:typename:string	roles:def	end:194
+tcp_ts_get_info_snd_ssthresh	input.stp	/^function tcp_ts_get_info_snd_ssthresh:long(sock:long)$/;"	f	line:199	typeref:typename:long	roles:def	end:209
+tcp_ts_get_info_rcv_mss	input.stp	/^function tcp_ts_get_info_rcv_mss:long(sock:long)$/;"	f	line:213	typeref:typename:long	roles:def	end:224
 __sockopt	input.stp	/^@__private30 global __sockopt[18]$/;"	v	line:248	roles:def
 init	input.stp	/^probe init {$/;"	p	line:249	roles:attached	end:279
-tcp_sockopt_str	input.stp	/^function tcp_sockopt_str:string (optname:long)$/;"	f	line:281	roles:def	end:285
+tcp_sockopt_str	input.stp	/^function tcp_sockopt_str:string (optname:long)$/;"	f	line:281	typeref:typename:string	roles:def	end:285
 __ipv6_sockopt	input.stp	/^@__private30 global __ipv6_sockopt[55]$/;"	v	line:349	roles:def
 init	input.stp	/^probe init {$/;"	p	line:350	roles:attached	end:465
-tcp_ipv6_sockopt_str	input.stp	/^function tcp_ipv6_sockopt_str:string (optname:long)$/;"	f	line:467	roles:def	end:471
+tcp_ipv6_sockopt_str	input.stp	/^function tcp_ipv6_sockopt_str:string (optname:long)$/;"	f	line:467	typeref:typename:string	roles:def	end:471
 tcp.sendmsg	input.stp	/^probe tcp.sendmsg = kernel.function("tcp_sendmsg") {$/;"	p	line:483	roles:def	end:488
 tcp.sendmsg.return	input.stp	/^probe tcp.sendmsg.return = kernel.function("tcp_sendmsg").return {$/;"	p	line:498	roles:def	end:501
 tcp.recvmsg	input.stp	/^probe tcp.recvmsg = kernel.function("tcp_recvmsg") {$/;"	p	line:516	roles:def	end:525
