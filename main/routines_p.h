@@ -86,6 +86,7 @@ extern void setCurrentDirectory (void);
 extern fileStatus *eStat (const char *const fileName);
 extern void eStatFree (fileStatus *status);
 extern bool doesFileExist (const char *const fileName);
+extern bool doesDirectoryExist (const char *const fileName);
 extern bool doesExecutableExist (const char *const fileName);
 extern bool isRecursiveLink (const char* const dirName);
 extern bool isSameFile (const char *const name1, const char *const name2);

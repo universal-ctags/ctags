@@ -422,8 +422,17 @@ extern void openTagFile (void)
 	else
 	{
 		bool fileExists;
+		bool directoryExists;
 
 		TagFile.name = eStrdup (Option.tagFileName);
+
+		directoryExists = doesDirectoryExist (TagFile.name);
+		if (directoryExists)
+			error (FATAL,
+				   "\"%s\" already exists as a directory; I cannot write tag entries there.\n"
+				   "Remove the directory or specify a file name with -o <tagfile> option.",
+				   TagFile.name);
+
 		fileExists = doesFileExist (TagFile.name);
 		if (fileExists  &&  ! isTagFile (TagFile.name))
 			error (FATAL,

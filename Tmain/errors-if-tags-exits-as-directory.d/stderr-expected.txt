@@ -1,0 +1,2 @@
+ctags: "tags" already exists as a directory; I cannot write tag entries there.
+Remove the directory or specify a file name with -o <tagfile> option.
