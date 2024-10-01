@@ -80,6 +80,7 @@ static void basePopKind (struct parserBaseCtx *auxil, bool popScopeToo)
     }
 }
 
+CTAGS_ATTR_UNUSED
 static int basePeekKind (struct parserBaseCtx *auxil)
 {
     return intArrayLast (auxil->kind_stack);

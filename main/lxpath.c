@@ -170,8 +170,12 @@ static xmlDocPtr makeXMLDoc (void)
 	if (data)
 	{
 		xmlSetGenericErrorFunc (NULL, suppressWarning);
+#ifdef IS_xmlLineNumbersDefault_DEPRECATED
+		doc = xmlReadMemory((const char *)data, size, NULL, NULL, 0);
+#else
 		xmlLineNumbersDefault (1);
 		doc = xmlParseMemory((const char*)data, size);
+#endif
 	}
 
 	return doc;

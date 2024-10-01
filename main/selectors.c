@@ -438,8 +438,13 @@ xmlParseMIO (MIO *input)
 	Assert (buf);
 
 	xmlSetGenericErrorFunc (NULL, suppressWarning);
+#ifdef IS_xmlLineNumbersDefault_DEPRECATED
+	return xmlReadMemory((const char *)buf, len, NULL, NULL, 0);
+#else
 	xmlLineNumbersDefault (1);
 	return xmlParseMemory((const char *)buf, len);
+#endif
+
 }
 
 static bool
