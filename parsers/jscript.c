@@ -1018,6 +1018,9 @@ static void reprToken (const tokenInfo *const token, vString *const repr)
 			vStringCat (repr, token->string);
 			break;
 
+		case TOKEN_EOF:
+			break;
+
 		default:
 			vStringPut (repr, token->c);
 			break;
