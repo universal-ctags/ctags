@@ -1382,7 +1382,7 @@ static int skipToEndOfString (bool ignoreBackslash)
 		else if (c == DOUBLE_QUOTE)
 			break;
 		else
-			vStringPutWithLimit (Cpp.charOrStringContents, c, 1024);
+			(void)vStringPutWithLimit (Cpp.charOrStringContents, c, 1024);
 	}
 	return STRING_SYMBOL;  /* symbolic representation of string */
 }
@@ -1478,7 +1478,7 @@ static int skipToEndOfChar (void)
 			if (count == 1  &&  strchr ("DHOB", toupper (c)) != NULL)
 			{
 				veraBase = c;
-				vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
+				(void)vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
 			}
 			else if (veraBase != '\0'  &&  ! isalnum (c))
 			{
@@ -1486,10 +1486,10 @@ static int skipToEndOfChar (void)
 				break;
 			}
 			else
-				vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
+				(void)vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
 		}
 		else
-			vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
+			(void)vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
 	}
 	return CHAR_SYMBOL;  /* symbolic representation of character */
 }
