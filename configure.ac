@@ -778,6 +778,32 @@ if test "${enable_static}" = "yes"; then
 	fi
 fi
 
+dnl https://stackoverflow.com/questions/40798571/autoconf-detect-deprecated-functions-in-glibc
+AH_TEMPLATE([IS_xmlLineNumbersDefault_DEPRECATED],
+	[Define this value if xmlLineNumbersDefault is marked as a deprecated function.])
+AS_VAR_IF([have_libxml], [yes], [
+	CC_CHECK_WERROR
+	AS_VAR_IF([cc_cv_werror],[x],[],[
+		have_deprecated_attr=
+		CC_CHECK_CFLAGS_APPEND([-Wdeprecated-declarations], [have_deprecated_attr=yes])
+		AS_VAR_IF([have_deprecated_attr], [yes], [
+			SAVE_CFLAGS=$CFLAGS
+			CFLAGS="$CFLAGS $LIBXML_CFLAGS $cc_cv_werror -Wdeprecated-declarations"
+			AC_MSG_CHECKING([whether xmlLineNumbersDefault is deprecated])
+			AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+				#include <libxml/parser.h>
+			],[
+				int main (void) {xmlLineNumbersDefault (1); return 0;}
+			])],[is_xmlLineNumbersDefault_deprecated=no],[is_xmlLineNumbersDefault_deprecated=yes])
+			CFLAGS=$SAVE_CFLAGS
+			AC_MSG_RESULT($is_xmlLineNumbersDefault_deprecated)
+			AS_VAR_IF([is_xmlLineNumbersDefault_deprecated],[yes],[
+				AC_DEFINE(IS_xmlLineNumbersDefault_DEPRECATED)
+			])
+		])
+	])
+])
+
 AC_ARG_ENABLE([json],
 	[AS_HELP_STRING([--disable-json],
 		[disable json support])])
