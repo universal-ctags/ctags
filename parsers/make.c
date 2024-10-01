@@ -409,7 +409,7 @@ static void valueTrackerPut (struct valueTracker *vt, int c)
 	if (!vt->value)
 		return;
 
-	if (isspace(c) || c == '\\')
+	if (isspace(c) || c == '\\'  || c == EOF)
 	{
 		if (!vStringIsEmpty (vt->value))
 		{
