@@ -480,6 +480,12 @@ extern void eStatFree (fileStatus *status)
 	}
 }
 
+extern bool doesDirectoryExist (const char *const fileName)
+{
+	fileStatus *status = eStat (fileName);
+	return status->exists && status->isDirectory;
+}
+
 extern bool doesFileExist (const char *const fileName)
 {
 	fileStatus *status = eStat (fileName);
