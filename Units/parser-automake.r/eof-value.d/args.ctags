@@ -1,0 +1,6 @@
+--kinds-all'
+--fields=*
+--fields-all=*
+--extras=*
+--extras-all=*
+--roles-all.*=*
