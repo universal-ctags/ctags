@@ -55,7 +55,7 @@ jobs:
         run: |
           install -d src/libiconv
           cd         src/libiconv
-          curl -L -o src.tar.gz https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz
+          curl -L -o src.tar.gz https://distfiles.macports.org/libiconv/libiconv-1.17.tar.gz
           tar vxf    src.tar.gz --strip-components=1
           ./configure --host=amd64-unknown-netbsd --prefix=${{ github.workspace }}/amd64-unknown-netbsd-3rdroot --enable-extra-encodings --enable-static --disable-shared
           make V=1
