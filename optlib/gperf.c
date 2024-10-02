@@ -69,6 +69,9 @@ static void initializeGPerfParser (const langType language)
 	                               "^%%",
 	                               "", "", "{tjump=functions}{_guest=C,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "keywordsec",
+	                               "^#[^\n]*\n?",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "keywordsec",
 	                               "^([^\n,]+)[^\n]*\n?",
 	                               "\\1", "k", "", NULL);
 	addLanguageTagMultiTableRegex (language, "keywordsec",
