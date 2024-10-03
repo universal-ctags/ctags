@@ -261,7 +261,8 @@ static void scanString (lexerState *lexer)
 			advanceAndStoreChar(lexer);
 		advanceAndStoreChar(lexer);
 	}
-	advanceAndStoreChar(lexer);
+	if (lexer->cur_c != EOF)
+		advanceAndStoreChar(lexer);
 }
 
 /* Raw strings look like this: r"" or r##""## where the number of
