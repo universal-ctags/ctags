@@ -385,6 +385,25 @@ static int hasPsuedoTag (tagFile *const file,
 			&& (strcmp(entry.file, exepectedValueAsInputField) == 0));
 }
 
+struct canonWorkArea *prepareCanonFnameCacheTable (struct canonWorkArea *canon,
+												   tagFileX *const fileX,
+												   bool absoluteOnly)
+{
+	if (canon->cacheTable == NULL)
+		canon->cacheTable = makeCanonFnameCacheTable (fileX, absoluteOnly);
+
+	return canon;
+}
+
+static void dropCanonFnameCacheTableMaybe (struct canonWorkArea *canon)
+{
+	if (canon->cacheTable)
+	{
+		canonFnameCacheTableDelete (canon->cacheTable);
+		canon->cacheTable = NULL;
+	}
+}
+
 static void findTag (struct inputSpec *inputSpec,
 					 const char *const name, readOptions *readOpts,
 					 tagPrintOptions *printOpts, struct actionSpec *actionSpec)
@@ -402,12 +421,8 @@ static void findTag (struct inputSpec *inputSpec,
 	}
 
 	if (actionSpec->canonicalizing)
-	{
-		if (inputSpec->canon.cacheTable == NULL)
-			inputSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX,
-																	actionSpec->absoluteOnly);
-		fileX->canon = &inputSpec->canon;
-	}
+		fileX->canon = prepareCanonFnameCacheTable (&inputSpec->canon,
+													fileX, actionSpec->absoluteOnly);
 
 	if (printOpts->escaping)
 	{
@@ -464,12 +479,8 @@ static void listTags (struct inputSpec* inputSpec, bool pseudoTags, tagPrintOpti
 	}
 
 	if (actionSpec->canonicalizing)
-	{
-		if (inputSpec->canon.cacheTable == NULL)
-			inputSpec->canon.cacheTable = makeCanonFnameCacheTable (fileX,
-																	actionSpec->absoluteOnly);
-		fileX->canon = &inputSpec->canon;
-	}
+		fileX->canon = prepareCanonFnameCacheTable (&inputSpec->canon,
+													fileX, actionSpec->absoluteOnly);
 
 	if (printOpts->escaping)
 	{
@@ -696,9 +707,7 @@ static void finiInputSpec (struct inputSpec *inputSpec)
 		eFree (inputSpec->tempFileName);
 	}
 
-	if (inputSpec->canon.cacheTable)
-		canonFnameCacheTableDelete (inputSpec->canon.cacheTable);
-
+	dropCanonFnameCacheTableMaybe (&inputSpec->canon);
 }
 
 static void printVersion(void)
