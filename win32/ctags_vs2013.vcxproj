@@ -195,6 +195,7 @@
     <ClCompile Include="..\main\fmt.c" />
     <ClCompile Include="..\main\fname.c" />
     <ClCompile Include="..\main\htable.c" />
+    <ClCompile Include="..\main\intern.c" />
     <ClCompile Include="..\main\keyword.c" />
     <ClCompile Include="..\main\kind.c" />
     <ClCompile Include="..\main\lregex-default.c" />
@@ -405,6 +406,7 @@
     <ClInclude Include="..\main\gvars.h" />
     <ClInclude Include="..\main\htable.h" />
     <ClInclude Include="..\main\inline.h" />
+    <ClInclude Include="..\main\intern.h" />
     <ClInclude Include="..\main\interval_tree_generic.h" />
     <ClInclude Include="..\main\keyword.h" />
     <ClInclude Include="..\main\keyword_p.h" />
@@ -440,6 +442,7 @@
     <ClInclude Include="..\main\script_p.h" />
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort_p.h" />
+    <ClInclude Include="..\main\sort_r.h" />
     <ClInclude Include="..\main\stats_p.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\subparser.h" />

@@ -10,9 +10,7 @@ V=
 
 . ../utils.sh
 
-if ! [ -x "${READTAGS}" ]; then
-	skip "no readtags"
-fi
+skip_if_no_readtags "$READTAGS"
 
 f=${BUILDDIR}/tmp-readtags-error-no-input-$$
 rm -f "$f"

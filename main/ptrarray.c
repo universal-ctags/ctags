@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "ptrarray.h"
 #include "routines.h"
+#include "sort_r.h"
 
 /*
 *   DATA DECLARATIONS
@@ -241,10 +242,10 @@ extern void ptrArrayInsertItem (ptrArray* const current, unsigned int indx, void
 	++current->count;
 }
 
-static int (*ptrArraySortCompareVar)(const void *, const void *);
-
-static int ptrArraySortCompare(const void *a0, const void *b0)
+static int ptrArraySortCompare(const void *a0, const void *b0, void *compare_fn)
 {
+	int (*ptrArraySortCompareVar)(const void *, const void *) = compare_fn;
+
 	void *const *a = (void *const *)a0;
 	void *const *b = (void *const *)b0;
 
@@ -253,6 +254,31 @@ static int ptrArraySortCompare(const void *a0, const void *b0)
 
 extern void ptrArraySort (ptrArray *const current, int (*compare)(const void *, const void *))
 {
-	ptrArraySortCompareVar = compare;
-	qsort (current->array, current->count, sizeof (void *), ptrArraySortCompare);
+	sort_r (current->array, current->count, sizeof (void *), ptrArraySortCompare, compare);
+}
+
+struct ptrArraySortRData
+{
+	int (*compare_fn)(const void *, const void *, void *);
+	void *userData;
+};
+
+static int ptrArraySortCompareR (const void *a0, const void *b0, void *data)
+{
+	struct ptrArraySortRData *rdata = data;
+
+	void *const *a = (void *const *)a0;
+	void *const *b = (void *const *)b0;
+
+	return rdata->compare_fn (*a, *b, rdata->userData);
+}
+
+extern void ptrArraySortR (ptrArray *const current, int (*compare)(const void *, const void *, void *),
+						   void *userData)
+{
+	struct ptrArraySortRData data = {
+		.compare_fn = compare,
+		.userData = userData,
+	};
+	sort_r (current->array, current->count, sizeof (void *), ptrArraySortCompareR, &data);
 }

@@ -9,9 +9,7 @@ V=
 
 . ../utils.sh
 
-if ! [ -x "${READTAGS}" ]; then
-	skip "no readtags"
-fi
+skip_if_no_readtags "$READTAGS"
 
 # {regular|pseudo}-{field}-{char0{char1}*}.tags
 for t in INIT									\

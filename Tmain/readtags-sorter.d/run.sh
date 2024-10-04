@@ -10,9 +10,7 @@ READTAGS=$3
 #V="valgrind --leak-check=full -v"
 V=
 
-if ! [ -x "${READTAGS}" ]; then
-	skip "no readtags"
-fi
+skip_if_no_readtags "$READTAGS"
 
 echo '!_INPUT_ORDER' &&
 ${READTAGS} -t output.tags -ne -S '(<or> (<> $input &input) (<> $line &line) (<> $name &name))' -l &&

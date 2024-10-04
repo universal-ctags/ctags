@@ -10,9 +10,7 @@ READTAGS=$3
 #V="valgrind --leak-check=full -v"
 V=
 
-if ! [ -x "${READTAGS}" ]; then
-    skip "no readtags"
-fi
+skip_if_no_readtags "$READTAGS"
 
 echo '# case sensitive'
 ${V} ${READTAGS} -t output.tags -Q '(and $signature (#/char,.*,char|int,.*,int/ $signature))' -en -l

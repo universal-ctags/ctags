@@ -1,4 +1,11 @@
 __SKIP__=77
+__INTERNAL_ERROR__=76
+
+internal_error()
+{
+	echo "$@"
+	exit ${__INTERNAL_ERROR__}
+}
 
 skip()
 {
@@ -47,6 +54,17 @@ skip_if_user_has_dot_ctags_d()
 {
 	if [ -d ~/.ctags.d ]; then
 		skip "this test case doesn't work well if you have ~/.ctags.d"
+	fi
+}
+
+skip_if_no_readtags()
+{
+	if [ -z "${1}" ]; then
+		internal_error 'skip_if_no_readtags(): missing "$1"'
+	fi
+
+	if ! [ -x "${1}" ]; then
+		skip "no readtags"
 	fi
 }
 

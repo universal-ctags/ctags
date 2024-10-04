@@ -10,6 +10,7 @@
 #include "acutest.h"
 #include "fname.h"
 #include "htable.h"
+#include "intern.h"
 #include "numarray.h"
 #include "routines.h"
 #include "vstring.h"
@@ -235,6 +236,23 @@ static void test_htable_grow(void)
 	hashTableDelete(htable);
 }
 
+static void test_intern(void)
+{
+	const char *str = "asdfasfaskeopsdfksd";
+	const char *symbol0 = intern(str);
+	const char *symbol1, *symbol2, *symbol3;
+
+	char *tmp = strdup (str);
+	symbol1 = intern (tmp);
+	free (tmp);
+	symbol2 = intern (symbol0);
+	symbol3 = intern (symbol1);
+
+	TEST_CHECK (symbol0 == symbol1);
+	TEST_CHECK (symbol1 == symbol2);
+	TEST_CHECK (symbol2 == symbol3);
+}
+
 static void test_numarray(void)
 {
 	intArray *a = intArrayNew ();
@@ -330,6 +348,7 @@ TEST_LIST = {
    { "fname/relative",   test_fname_relative   },
    { "htable/update",    test_htable_update    },
    { "htable/grow",      test_htable_grow      },
+   { "intern",           test_intern           },
    { "numarray",         test_numarray         },
    { "routines/strrstr", test_routines_strrstr },
    { "vstring/ncats",    test_vstring_ncats    },

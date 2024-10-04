@@ -10,9 +10,7 @@ READTAGS=$3
 #V="valgrind --leak-check=full -v"
 V=
 
-if ! [ -x "${READTAGS}" ]; then
-	skip "no readtags"
-fi
+skip_if_no_readtags "$READTAGS"
 
 ${V} ${READTAGS} -e -t forward.tags -l &&
 ${V} ${READTAGS} -e -t backward.tags -l
