@@ -24,7 +24,7 @@
 
 #include <string.h>
 
-#define UINFO(c) (((c) < 0x80 && (c) >= 0) ? g_aCharTable[c].uType : 0)
+#define UINFO(c) (((c) < 0x80 && (c) >= 0) ? g_aCharTable[c].uType : (CXXCharTypeStartOfIdentifier | CXXCharTypePartOfIdentifier))
 
 static void cxxParserSkipToNonWhiteSpace(void)
 {
