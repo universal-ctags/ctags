@@ -159,6 +159,28 @@ void callWithSavingPosition (MIO *mio,
 	mio_setpos (mio, &origin);
 }
 
+CTAGS_INLINE
+void mio_tell_cb (MIO *mio, void *data)
+{
+	int *r = data;
+	*r = mio_tell (mio);
+}
+
+struct mioGetposCallbackData {
+	MIOPos *pos;
+	long   offset;
+};
+
+CTAGS_INLINE
+void mio_getpos_cb (MIO *mio, void *data)
+{
+	struct mioGetposCallbackData *cb_data = data;
+
+	if (cb_data->offset)
+		mio_seek (mio, cb_data->offset, SEEK_CUR);
+	mio_getpos (mio, cb_data->pos);
+}
+
 /* args (startLine): [absolute]
    args (startColumn): [buggy]
    args (endLine): [absolute]
@@ -177,6 +199,65 @@ void getAreaInfo (unsigned long *startLine,
 		*endLine = File.areaInfo.endLine;
 	if (endColumn)
 		*endColumn = File.areaInfo.endColumn;
+}
+
+CTAGS_INLINE
+void callAtAreaStart (MIO *mio,
+					  void (* fn) (MIO *, void*),
+					  void *data)
+{
+	unsigned long startLine;
+	long startColumn;
+
+	getAreaInfo (&startLine, &startColumn, NULL, NULL);
+	MIOPos start = getInputFilePositionForLine (startLine);
+	mio_setpos (mio, &start);
+	mio_seek (mio, startColumn, SEEK_CUR);
+	fn (mio, data);
+}
+
+CTAGS_INLINE
+void tellAreaStartOffset (MIO *mio, void *data)
+{
+	callAtAreaStart (mio, mio_tell_cb, data);
+}
+
+CTAGS_INLINE
+void tellAreaStartPosition (MIO *mio, void *data)
+{
+	callAtAreaStart (mio, mio_getpos_cb, data);
+}
+
+/* return: [absolute] */
+CTAGS_INLINE
+long getCurrentAreaOffset (void)
+{
+	if (!isAreaStacked ())
+		return 0;
+
+	int r = 0;
+	callWithSavingPosition (BackupFile.mio,
+							tellAreaStartOffset,
+							&r);
+	return r;
+}
+
+CTAGS_INLINE
+void getCurrentAreaPositionWithOffset (MIOPos *pos, long offset)
+{
+	if (!isAreaStacked ())
+	{
+		*pos = File.filePosition.pos;
+		return;
+	}
+
+	struct mioGetposCallbackData data = {
+		.pos = pos,
+		.offset = offset,
+	};
+	callWithSavingPosition (BackupFile.mio,
+							tellAreaStartPosition,
+							&data);
 }
 
 extern int getInputColumnNumber (void)
@@ -239,11 +320,50 @@ extern int getInputColumnNumber (void)
 	}
 	else if (File.input.lineNumber)
 	{
-		/* When EOF is saw, currentLine is set to NULL.
-		 * So the way to calculate the offset at the end of file is tricky.
+		/* currentLine is set to NULL but File.input.lineNumber is not zero.
+		 * This implies EOF is saw.
+		 * The way to calculate the offset at the end of file is tricky.
+		 *
+		 * input file ---> +-----------------+
+		 *                 |                 |
+		 *                 |   [.............|
+		 *                 |.................|
+		 *                 |.....Z]          |
+		 *                 <-dz->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * We must calculate dz but we cannot use File.currentLine.
+		 *
+		 * input file ---> +-----------------+
+		 *                 |<========== O ===|
+		 *                 |==>[<============|
+		 *                 |======= P =======|
+		 *                 |====>Z]          |
+		 *                 <-dz->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * O => getCurrentAreaOffset ()
+		 * P => mio_tell (File.mio) - (File.bomFound? 3: 0)
+		 *
+		 * input file ---> +-----------------+
+		 *                 |<================|
+		 *                 |===[====Q========|
+		 *                 |=================|
+		 *                 |====>Z]          |
+		 *                 <-dz->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * Q => getInputFileOffsetForLine(File.input.lineNumber)
+		 *
+		 * dz = O + P - Q
 		 */
-		ret = (mio_tell (File.mio) - (File.bomFound? 3: 0))
-			- getInputFileOffsetForLine(File.input.lineNumber);
+		ret = getCurrentAreaOffset ()
+			+ mio_tell (File.mio) - (File.bomFound? 3: 0)
+			- getInputFileOffsetForLine(File.input.lineNumber)
+			- File.ungetchIdx;
 	}
 	else
 	{
