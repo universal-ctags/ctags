@@ -159,25 +159,138 @@ void callWithSavingPosition (MIO *mio,
 	mio_setpos (mio, &origin);
 }
 
+CTAGS_INLINE
+void mio_tell_cb (MIO *mio, void *data)
+{
+	int *r = data;
+	*r = mio_tell (mio);
+}
+
+struct mioGetposCallbackData {
+	MIOPos *pos;
+	long   offset;
+};
+
+CTAGS_INLINE
+void mio_getpos_cb (MIO *mio, void *data)
+{
+	struct mioGetposCallbackData *cb_data = data;
+
+	if (cb_data->offset)
+		mio_seek (mio, cb_data->offset, SEEK_CUR);
+	mio_getpos (mio, cb_data->pos);
+}
+
+CTAGS_INLINE
+void getNestedInputStreamInfo (unsigned long *startLine,
+							   long *startCharOffset,
+							   unsigned long *endLine,
+							   long *endCharOffset)
+{
+	if (startLine)
+		*startLine = File.nestedInputStreamInfo.startLine;
+	if (startCharOffset)
+		*startCharOffset = File.nestedInputStreamInfo.startCharOffset;
+	if (endLine)
+		*endLine = File.nestedInputStreamInfo.endLine;
+	if (endCharOffset)
+		*endCharOffset = File.nestedInputStreamInfo.endCharOffset;
+}
+
+CTAGS_INLINE
+void callAtNestedInputStreamStart (MIO *mio,
+								   void (* fn) (MIO *, void*),
+								   void *data)
+{
+	unsigned long startLine;
+	long startCharOffset;
+
+	getNestedInputStreamInfo (&startLine, &startCharOffset, NULL, NULL);
+	MIOPos start = getInputFilePositionForLine (startLine);
+	mio_setpos (mio, &start);
+	mio_seek (mio, startCharOffset, SEEK_CUR);
+	fn (mio, data);
+}
+
+CTAGS_INLINE
+void tellNestInputStreamStartOffset (MIO *mio, void *data)
+{
+	callAtNestedInputStreamStart (mio, mio_tell_cb, data);
+}
+
+CTAGS_INLINE
+void tellNestInputStreamStartPosition (MIO *mio, void *data)
+{
+	callAtNestedInputStreamStart (mio, mio_getpos_cb, data);
+}
+
+CTAGS_INLINE
+long getCurrentAreaOffset (void)
+{
+	if (!doesParserRunAsGuest ())
+		return 0;
+
+	int r = 0;
+	callWithSavingPosition (BackupFile.mio,
+							tellNestInputStreamStartOffset,
+							&r);
+	return r;
+}
+
+CTAGS_INLINE
+void getCurrentAreaPositionWithOffset (MIOPos *pos, long offset)
+{
+	if (!doesParserRunAsGuest ())
+	{
+		*pos = File.filePosition.pos;
+		return;
+	}
+
+	struct mioGetposCallbackData data = {
+		.pos = pos,
+		.offset = offset,
+	};
+	callWithSavingPosition (BackupFile.mio,
+							tellNestInputStreamStartPosition,
+							&data);
+}
+
 extern int getInputLineOffset (void)
 {
-	unsigned char *base = (unsigned char *) vStringValue (File.line);
 	int ret;
 
 	if (File.currentLine)
-		ret = File.currentLine - base - File.ungetchIdx;
+	{
+		long guest_area_offset = 0;
+		if (doesParserRunAsGuest ())
+		{
+			unsigned long startLine;
+			long startCharOffset;
+			getNestedInputStreamInfo (&startLine, &startCharOffset, NULL, NULL);
+			if (startLine == File.input.lineNumber)
+			{
+				/* We are at the start line of the Guest area. */
+				guest_area_offset = startCharOffset;
+			}
+		}
+
+		unsigned char *base = (unsigned char *) vStringValue (File.line);
+		ret = guest_area_offset + File.currentLine - base - File.ungetchIdx;
+	}
 	else if (File.input.lineNumber)
 	{
 		/* When EOF is saw, currentLine is set to NULL.
 		 * So the way to calculate the offset at the end of file is tricky.
 		 */
-		ret = (mio_tell (File.mio) - (File.bomFound? 3: 0))
-			- getInputFileOffsetForLine(File.input.lineNumber);
+		long guest_area_offset = getCurrentAreaOffset ();
+		return (guest_area_offset + mio_tell (File.mio) - (File.bomFound? 3: 0))
+			- getInputFileOffsetForLine(File.input.lineNumber) - File.ungetchIdx ;
 	}
 	else
 	{
 		/* At the first line of file. */
-		ret = mio_tell (File.mio) - (File.bomFound? 3: 0);
+		long guest_area_offset = getCurrentAreaOffset ();
+		ret = guest_area_offset + mio_tell (File.mio) - (File.bomFound? 3: 0);
 	}
 
 	return ret >= 0 ? ret : 0;
