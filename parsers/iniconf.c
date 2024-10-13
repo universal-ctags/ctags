@@ -130,7 +130,8 @@ static void findIniconfTags (void)
 		if (*cp == '[')
 		{
 			++cp;
-			while (*cp != '\0' && *cp != ']')
+			/* look for the final ] to support TOML [[arrays.of.tables]] */
+			while (*cp != '\0' && (*cp != ']' || *(cp+1) == ']'))
 			{
 				vStringPut (name, *cp);
 				++cp;
