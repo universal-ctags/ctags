@@ -1,3 +1,5 @@
+"key in double quotes"	input.conf	/^"key in double quotes" = 1$/;"	key	language:Iniconf	section:[toml_array_of_tables]
+'key in single quotes'	input.conf	/^'key in single quotes' = 2$/;"	key	language:Iniconf	section:[toml_array_of_tables]
 [toml_array_of_tables]	input.conf	/^[[toml_array_of_tables]]$/;"	section	language:Iniconf
 args	input.conf	/^args=(sys.stdout,)$/;"	key	language:Iniconf	section:handler_hand01
 class	input.conf	/^class=StreamHandler$/;"	key	language:Iniconf	section:handler_hand01

@@ -34,8 +34,9 @@
 
 static bool isIdentifier (int c)
 {
-    /* allow whitespace within keys and sections */
-    return (bool)(isalnum (c) || isspace (c) || c == '_' || c == '-' || c == '.');
+	/* allow whitespace within keys and sections */
+	return (bool)(isalnum (c) || isspace (c) || c == '_' || c == '-' ||
+		c == '.' || c == '"' || c == '\'');  /* for TOML */
 }
 
 static bool isValue (int c)
