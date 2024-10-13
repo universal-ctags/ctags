@@ -130,7 +130,7 @@ static void findIniconfTags (void)
 		if (*cp == '[')
 		{
 			++cp;
-			while (*cp != '\0' && *cp != ']')
+			while (*cp != '\0' && (*cp != ']' || *(cp+1) == ']'))
 			{
 				vStringPut (name, *cp);
 				++cp;
