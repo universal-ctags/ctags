@@ -32,10 +32,13 @@
 #include "subparser.h"
 #include "vstring.h"
 
+#define TOML_QUOTED_KEY_CHAR(c) ( (c) == '"' || (c) == '\'' )
+
 static bool isIdentifier (int c)
 {
-    /* allow whitespace within keys and sections */
-    return (bool)(isalnum (c) || isspace (c) || c == '_' || c == '-' || c == '.');
+	/* allow whitespace within keys and sections */
+	return (bool)(isalnum (c) || isspace (c) || c == '_' || c == '-' || c == '.'
+		|| TOML_QUOTED_KEY_CHAR(c));
 }
 
 static bool isValue (int c)
