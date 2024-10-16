@@ -1,0 +1,31 @@
+# -*- Meson -*-
+# Partially taken from meson.build in the source tree of systemd.
+#
+foreach tuple : [['system-alloc-uid-min', 'SYS_UID_MIN', 1],  # Also see login.defs(5).
+                 ['system-uid-max',       'SYS_UID_MAX', 999],
+                 ['system-alloc-gid-min', 'SYS_GID_MIN', 1],
+                 ['system-gid-max',       'SYS_GID_MAX', 999]]
+        v = get_option(tuple[0])
+        if v <= 0
+                v = run_command(
+                        awk,
+                        '/^\s*@0@\s+/ { uid=$2 } END { print uid }'.format(tuple[1]),
+                        '/etc/login.defs',
+                        check : false).stdout().strip()
+                if v == ''
+                        v = tuple[2]
+                else
+                        v = v.to_int()
+                endif
+        endif
+        conf.set(tuple[0].underscorify().to_upper(), v)
+endforeach
+if conf.get('SYSTEM_ALLOC_UID_MIN') >= conf.get('SYSTEM_UID_MAX')
+        error('Invalid uid allocation range')
+endif
+if conf.get('SYSTEM_ALLOC_GID_MIN') >= conf.get('SYSTEM_GID_MAX')
+        error('Invalid gid allocation range')
+endif
+
+dynamic_uid_min = get_option('dynamic-uid-min')
+v_eof=

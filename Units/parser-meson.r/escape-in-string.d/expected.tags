@@ -1,0 +1,6 @@
+v	input.meson	/^        v = get_option(tuple[0])$/;"	V	roles:def
+v	input.meson	/^                v = run_command($/;"	V	roles:def
+v	input.meson	/^                        v = tuple[2]$/;"	V	roles:def
+v	input.meson	/^                        v = v.to_int()$/;"	V	roles:def
+dynamic_uid_min	input.meson	/^dynamic_uid_min = get_option('dynamic-uid-min')$/;"	V	roles:def
+v_eof	input.meson	/^v_eof=$/;"	V	roles:def
