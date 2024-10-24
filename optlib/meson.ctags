@@ -66,7 +66,7 @@
 --_mtable-regex-Meson=common/(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\3/B/{tenter=skipToArgEnd}
 --_mtable-regex-Meson=common/custom_target[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/c/{tenter=skipToArgEnd}
 --_mtable-regex-Meson=common/(alias|run)_target[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\2/r/{tenter=skipToArgEnd}
---_mtable-regex-Meson=common/bench_mark[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/b/{tenter=skipToArgEnd}
+--_mtable-regex-Meson=common/benchmark[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/b/{tenter=skipToArgEnd}
 --_mtable-regex-Meson=common/import[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/m/{tenter=skipToArgEnd}{_role=imported}
 
 --_mtable-extend-Meson=skipPair+common

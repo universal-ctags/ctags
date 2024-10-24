@@ -1,0 +1,19 @@
+# -*- Meson -*-
+# Derrived from test/dbus/meson.build of dbus-broker
+test_kwargs = {
+        'dependencies': [dep_test],
+        'install': use_tests,
+        'install_dir': conf.get('testdir') / 'dbus',
+}
+
+bench_connect = executable('bench-connect', sources: ['bench-connect.c'], kwargs: test_kwargs)
+bench_message = executable('bench-message', sources: ['bench-message.c'], kwargs: test_kwargs)
+
+suites = [
+        { 'suite': 'dbus-broker', 'env': ['DBUS_BROKER_TEST_BROKER=' + exe_dbus_broker.full_path()]},
+]
+
+foreach suite : suites
+        benchmark('Connection', bench_connect, timeout: 60, kwargs: suite)
+        benchmark('Message passing', bench_message, timeout: 120, kwargs: suite)
+endforeach
