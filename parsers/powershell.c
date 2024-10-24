@@ -9,6 +9,10 @@
 *
 *   This module contains code for generating tags for Windows PowerShell scripts
 *   (https://en.wikipedia.org/wiki/PowerShell).
+*
+*   References:
+*   - https://learn.microsoft.com/en-us/powershell/scripting/developer/windows-powershell-reference
+*   - https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-01
 */
 
 /*
