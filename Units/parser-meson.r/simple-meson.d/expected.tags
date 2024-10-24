@@ -31,3 +31,7 @@ bench-message	input-5.meson	/^bench_message = executable('bench-message', source
 suites	input-5.meson	/^suites = [$/;"	variable
 Connection	input-5.meson	/^        benchmark('Connection', bench_connect, timeout: 60, kwargs: suite)$/;"	benchmark
 Message passing	input-5.meson	/^        benchmark('Message passing', bench_message, timeout: 120, kwargs: suite)$/;"	benchmark
+gi_docgen	input-6.meson	/^gi_docgen = find_program('gi-docgen')$/;"	variable
+gck	input-6.meson	/^subdir('gck')$/;"	subdir
+gcr	input-6.meson	/^subdir('gcr')$/;"	subdir
+docs	input-6.meson	/^alias_target('docs',$/;"	run

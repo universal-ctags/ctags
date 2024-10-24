@@ -1,0 +1,13 @@
+# -*- Meson -*- 
+# Taken from docs/meson.build of gcr
+#
+gi_docgen = find_program('gi-docgen')
+
+subdir('gck')
+subdir('gcr')
+
+# Create a pseudo target that build all docs at once
+alias_target('docs',
+  gck_docs,
+  gcr_docs,
+)
