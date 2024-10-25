@@ -23,3 +23,15 @@ outfile	input-3.meson	/^outfile = 'output.bin'$/;"	variable
 mytarget	input-3.meson	/^mytarget = custom_target('targetname',$/;"	variable
 targetname	input-3.meson	/^mytarget = custom_target('targetname',$/;"	custom
 inspector	input-4.meson	/^run_target('inspector',$/;"	run
+test_kwargs	input-5.meson	/^test_kwargs = {$/;"	variable
+bench_connect	input-5.meson	/^bench_connect = executable('bench-connect', sources: ['bench-connect.c'], kwargs: test_kwargs)$/;"	variable
+bench-connect	input-5.meson	/^bench_connect = executable('bench-connect', sources: ['bench-connect.c'], kwargs: test_kwargs)$/;"	build
+bench_message	input-5.meson	/^bench_message = executable('bench-message', sources: ['bench-message.c'], kwargs: test_kwargs)$/;"	variable
+bench-message	input-5.meson	/^bench_message = executable('bench-message', sources: ['bench-message.c'], kwargs: test_kwargs)$/;"	build
+suites	input-5.meson	/^suites = [$/;"	variable
+Connection	input-5.meson	/^        benchmark('Connection', bench_connect, timeout: 60, kwargs: suite)$/;"	benchmark
+Message passing	input-5.meson	/^        benchmark('Message passing', bench_message, timeout: 120, kwargs: suite)$/;"	benchmark
+gi_docgen	input-6.meson	/^gi_docgen = find_program('gi-docgen')$/;"	variable
+gck	input-6.meson	/^subdir('gck')$/;"	subdir
+gcr	input-6.meson	/^subdir('gcr')$/;"	subdir
+docs	input-6.meson	/^alias_target('docs',$/;"	run
