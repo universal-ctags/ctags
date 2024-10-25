@@ -29,7 +29,8 @@ jobs:
               eval "$@"
             }
 
-            run sudo pkgin -y install automake autoconf gmake pkg-config jansson libyaml libxml2 libiconv
+            # DO NOT try to install libxml2, because it has already been pre-installed
+            run sudo pkgin -y install automake autoconf gmake pkg-config jansson libyaml libiconv
 
             run cc --version
 
