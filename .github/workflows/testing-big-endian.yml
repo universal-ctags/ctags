@@ -103,4 +103,4 @@ jobs:
 
       # https://github.com/multiarch/qemu-user-static
       - run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-      - run: docker run -v $PWD:$PWD -w $PWD s390x/ubuntu bash run.sh
+      - run: docker run -v $PWD:$PWD -w $PWD s390x/ubuntu:23.04 bash run.sh
