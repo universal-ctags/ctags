@@ -59,8 +59,8 @@ static void initializeMesonParser (const langType language)
 	                               "^test[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\1", "t", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^([a-zA-Z_][a-zA-Z_0-9]*)[ \t\n]*=[ \t\n]*",
-	                               "\\1", "V", "", NULL);
+	                               "^([a-zA-Z_][a-zA-Z_0-9]*)[ \t\n]*=([^=]|$)",
+	                               "\\1", "V", "{_advanceTo=2start}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -74,14 +74,17 @@ static void initializeMesonParser (const langType language)
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "string",
-	                               "^\\\\'",
+	                               "^[^\\\\']+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "string",
-	                               "^[^\\\\']+",
+	                               "^\\\\.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "string",
 	                               "^'",
 	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "string",
+	                               "^.",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "comment",
 	                               "^[^\n]+",
 	                               "", "", "", NULL);
