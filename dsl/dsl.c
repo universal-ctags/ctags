@@ -860,6 +860,8 @@ static EsObject* caseop (EsObject *o, int (*op)(int))
 	{
 		const char *s = es_string_get (o);
 		char *r = strdup (s);
+		if (r == NULL)
+			return ES_ERROR_MEMORY;
 
 		for (char *tmp = r; *tmp != '\0'; tmp++)
 			*tmp = op ((unsigned char) *tmp);
