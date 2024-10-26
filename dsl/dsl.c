@@ -165,7 +165,7 @@ static DSLProcBind pbinds [] = {
 	{ "suffix?", builtin_suffix, NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(suffix? <string:target> <string:suffix>) -> <boolean>" },
 	{ "substr?", builtin_substr, NULL, DSL_PATTR_CHECK_ARITY, 2,
-	  .helpstr = "(substr? <string:target> string:substr>) -> <boolean>" },
+	  .helpstr = "(substr? <string:target> <string:substr>) -> <boolean>" },
 	{ "member",  builtin_member, NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(member <any> <list>) -> #f|<list>" },
 	{ "downcase", builtin_downcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
