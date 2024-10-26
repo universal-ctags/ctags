@@ -74,6 +74,7 @@ static EsObject* builtin_substr (EsObject *args, DSLEnv *env);
 static EsObject* builtin_member (EsObject *args, DSLEnv *env);
 static EsObject* builtin_downcase (EsObject *args, DSLEnv *env);
 static EsObject* builtin_upcase (EsObject *args, DSLEnv *env);
+static EsObject* builtin_tr (EsObject *args, DSLEnv *env);
 static EsObject* builtin_length (EsObject *args, DSLEnv *env);
 static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env);
 static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env);
@@ -165,13 +166,15 @@ static DSLProcBind pbinds [] = {
 	{ "suffix?", builtin_suffix, NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(suffix? <string:target> <string:suffix>) -> <boolean>" },
 	{ "substr?", builtin_substr, NULL, DSL_PATTR_CHECK_ARITY, 2,
-	  .helpstr = "(substr? <string:target> string:substr>) -> <boolean>" },
+	  .helpstr = "(substr? <string:target> <string:substr>) -> <boolean>" },
 	{ "member",  builtin_member, NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(member <any> <list>) -> #f|<list>" },
 	{ "downcase", builtin_downcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(downcase <string>|<list>) -> <string>|<list>" },
 	{ "upcase", builtin_upcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(upcase <string>|<list>) -> <string>|<list>" },
+	{ "tr",      builtin_tr,     NULL, DSL_PATTR_CHECK_ARITY, 2,
+	  .helpstr = "(tr <string:target> <string:c0c1>) -> <string>" },
 	{ "length",  builtin_length, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(length <string>) -> <integer>" },
 	{ "+",               builtin_add,          NULL, DSL_PATTR_CHECK_ARITY, 2,
@@ -860,6 +863,8 @@ static EsObject* caseop (EsObject *o, int (*op)(int))
 	{
 		const char *s = es_string_get (o);
 		char *r = strdup (s);
+		if (r == NULL)
+			return ES_ERROR_MEMORY;
 
 		for (char *tmp = r; *tmp != '\0'; tmp++)
 			*tmp = op ((unsigned char) *tmp);
@@ -918,6 +923,48 @@ static EsObject* builtin_upcase (EsObject *args, DSLEnv *env)
 	EsObject *o = es_car(args);
 	return builtin_caseop0 (o, upcase);
 }
+
+static EsObject* tr(const char *target, char from, char to)
+{
+	char *r = strdup(target);
+	if (r == NULL)
+		return ES_ERROR_MEMORY;
+
+	for (char *tmp = r; *tmp != '\0'; tmp++)
+	{
+		if (*tmp == from)
+			*tmp = to;
+	}
+
+	EsObject *q = es_object_autounref (es_string_new (r));
+	free (r);
+	return q;
+}
+
+static EsObject* builtin_tr (EsObject *args, DSLEnv *env)
+{
+	EsObject *o_target = es_car(args);
+	EsObject *o_c0c1 = es_car(es_cdr(args));
+
+	if (!es_string_p (o_target))
+		return o_target;
+
+	if (!es_string_p (o_c0c1))
+		dsl_throw (STRING_REQUIRED, es_symbol_intern ("tr"));
+
+	const char *cstr_target = es_string_get (o_target);
+	const char *cstr_c0c1 = es_string_get (o_c0c1);
+
+	if (cstr_target[0] == '\0')
+		return o_target;
+
+	size_t len_c0c1 = strlen (cstr_c0c1);
+	if (len_c0c1 != 2)
+		dsl_throw (UNEXPECTED_STRING_LENGTH, es_symbol_intern ("tr"));
+
+	return tr (cstr_target, cstr_c0c1[0], cstr_c0c1[1]);
+}
+
 
 static EsObject* builtin_length (EsObject *args, DSLEnv *env)
 {
