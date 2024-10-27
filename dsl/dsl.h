@@ -72,6 +72,7 @@ typedef struct sDSLCode DSLCode;
 #define DSL_ERR_WRONG_TYPE_ARGUMENT (es_error_intern("wrong-type-argument"))
 #define DSL_ERR_NO_ALT_ENTRY        (es_error_intern("the-alternative-entry-unavailable"))
 #define DSL_ERR_WRONG_REGEX_GROUP   (es_error_intern("wrong-regex-group"))
+#define DSL_ERR_UNEXPECTED_STRING_LENGTH (es_error_intern("unexpected-string-length"))
 
 /*
  * MACROS
