@@ -1,0 +1,41 @@
+table	input.toml	/^[table]$/;"	section	language:Iniconf
+key	input.toml	/^key = "value"$/;"	key	language:Iniconf	section:table
+bare_key	input.toml	/^bare_key = "value"$/;"	key	language:Iniconf	section:table
+bare-key	input.toml	/^bare-key = "value"$/;"	key	language:Iniconf	section:table
+1234	input.toml	/^1234 = "value"$/;"	key	language:Iniconf	section:table
+"127.0.0.1"	input.toml	/^"127.0.0.1" = "value"$/;"	key	language:Iniconf	section:table
+"character encoding"	input.toml	/^"character encoding" = "value"$/;"	key	language:Iniconf	section:table
+'key2'	input.toml	/^'key2' = "value"$/;"	key	language:Iniconf	section:table
+'quoted "value"'	input.toml	/^'quoted "value"' = "value"$/;"	key	language:Iniconf	section:table
+name	input.toml	/^name = "Orange"$/;"	key	language:Iniconf	section:table
+physical.color	input.toml	/^physical.color = "orange"$/;"	key	language:Iniconf	section:table
+physical.shape	input.toml	/^physical.shape = "round"$/;"	key	language:Iniconf	section:table
+site."google.com"	input.toml	/^site."google.com" = true$/;"	key	language:Iniconf	section:table
+str1	input.toml	/^str1 = """$/;"	key	language:Iniconf	section:table
+str1	input.toml	/^str1 = "The quick brown fox jumps over the lazy dog."$/;"	key	language:Iniconf	section:table
+str2	input.toml	/^str2 = """$/;"	key	language:Iniconf	section:table
+str3	input.toml	/^str3 = """\\$/;"	key	language:Iniconf	section:table
+regex2	input.toml	/^regex2 = '''I [dw]on't need \\d{2} apples'''$/;"	key	language:Iniconf	section:table
+lines	input.toml	/^lines  = '''$/;"	key	language:Iniconf	section:table
+contributors	input.toml	/^contributors = [$/;"	key	language:Iniconf	section:table
+integers2	input.toml	/^integers2 = [$/;"	key	language:Iniconf	section:table
+integers3	input.toml	/^integers3 = [$/;"	key	language:Iniconf	section:table
+table-1	input.toml	/^[table-1]$/;"	section	language:Iniconf
+key1	input.toml	/^key1 = "some string"$/;"	key	language:Iniconf	section:table-1
+key2	input.toml	/^key2 = 123$/;"	key	language:Iniconf	section:table-1
+table-2	input.toml	/^[table-2]$/;"	section	language:Iniconf
+key1	input.toml	/^key1 = "another string"$/;"	key	language:Iniconf	section:table-2
+key2	input.toml	/^key2 = 456$/;"	key	language:Iniconf	section:table-2
+dog."tater.man"	input.toml	/^[dog."tater.man"]$/;"	section	language:Iniconf
+type.name	input.toml	/^type.name = "pug"$/;"	key	language:Iniconf	section:dog."tater.man"
+a.b.c	input.toml	/^[a.b.c]            # this is best practice$/;"	section	language:Iniconf
+\x20d.e.f 	input.toml	/^[ d.e.f ]          # same as [d.e.f]$/;"	section	language:Iniconf
+\x20g .  h  . i 	input.toml	/^[ g .  h  . i ]    # same as [g.h.i]$/;"	section	language:Iniconf
+[products]	input.toml	/^[[products]]$/;"	section	language:Iniconf
+name	input.toml	/^name = "Hammer"$/;"	key	language:Iniconf	section:[products]
+sku	input.toml	/^sku = 738594937$/;"	key	language:Iniconf	section:[products]
+[products]	input.toml	/^[[products]]  # empty table within the array$/;"	section	language:Iniconf
+[products]	input.toml	/^[[products]]$/;"	section	language:Iniconf
+name	input.toml	/^name = "Nail"$/;"	key	language:Iniconf	section:[products]
+sku	input.toml	/^sku = 284758393$/;"	key	language:Iniconf	section:[products]
+points	input.toml	/^points = [ { x = 1, y = 2, z = 3 },$/;"	key	language:Iniconf	section:[products]

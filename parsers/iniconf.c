@@ -32,10 +32,13 @@
 #include "subparser.h"
 #include "vstring.h"
 
+#define TOML_QUOTED_KEY_CHAR(c) ( (c) == '"' || (c) == '\'' )
+
 static bool isIdentifier (int c)
 {
-    /* allow whitespace within keys and sections */
-    return (bool)(isalnum (c) || isspace (c) || c == '_' || c == '-' || c == '.');
+	/* allow whitespace within keys and sections */
+	return (bool)(isalnum (c) || isspace (c) || c == '_' || c == '-' || c == '.'
+		|| TOML_QUOTED_KEY_CHAR(c));
 }
 
 static bool isValue (int c)
@@ -130,7 +133,8 @@ static void findIniconfTags (void)
 		if (*cp == '[')
 		{
 			++cp;
-			while (*cp != '\0' && *cp != ']')
+			/* look for the final ] to support TOML [[arrays.of.tables]] */
+			while (*cp != '\0' && (*cp != ']' || *(cp+1) == ']'))
 			{
 				vStringPut (name, *cp);
 				++cp;
