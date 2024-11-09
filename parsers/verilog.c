@@ -324,7 +324,7 @@ static const struct keywordGroup verilogKeywords = {
 		"scalared", "showcancelled", "signed", "small", "specify",
 		"specparam", "strong0", "strong1", "supply0", "supply1", "table",
 		"task", "time", "tran", "tranif0", "tranif1", "tri", "tri0", "tri1",
-		"triand", "trior", "trireg", "unsigned1", "use", "uwire", "vectored",
+		"triand", "trior", "trireg", "unsigned", "use", "uwire", "vectored",
 		"wait", "wand", "weak0", "weak1", "while", "wire", "wor", "xnor", "xor",
 		NULL
 	},
