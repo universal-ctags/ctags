@@ -35,6 +35,7 @@
 #include "selectors.h"
 #include "xtag.h"
 #include "ptrarray.h"
+#include "numarray.h"
 
 /*
  *	 MACROS
@@ -965,11 +966,12 @@ static int dropEndContext (tokenInfo *const token, int c)
 		{
 			dropContext ();
 			c = skipBlockName (token ,c);
-			if (currentContext->classScope)
+			while (currentContext->classScope)
 			{
 				verbose ("Dropping local context %s\n", vStringValue (currentContext->name));
 				currentContext = popToken (currentContext);
 			}
+			currentContext->virtual = false;
 		}
 		vStringDelete (endTokenName);
 	}
@@ -1163,6 +1165,30 @@ static int skipParameterAssignment (int c)
 	return c;
 }
 
+// Using LRM Annex A Formal syntax, The declaration of function and task can be combined
+// to describe as follows (always ignore parameter_value_assignment in the class_scope):
+// --------------------------------------------------------------------------------------------------
+//                                    |  class_scope  |               |  class_scope  |
+// [ function | task ] [ lifetime ] [ { class_name :: } return_type ] { class_name :: } function_name
+//                                  |       return_type field       | |     function_name field     |
+// --------------------------------------------------------------------------------------------------
+// tokenNameSaved : Store All word tokens after the [ function | task ] keyword except those in `#()`
+//                  If there is [ dynamic_override_specifiers ] before [ lifetime ], will also be stored
+//                      dynamic_override_specifiers ::= [ : initial | : extends ] [ : final ]
+// doubleColonPos : Record the position of `::` inserted into tokenNameSaved Array
+// return the index of first class_name in tokenNameSaved Array (return -1 if not exist)
+// NOTE: return_type field is ignored, only the class_scope of function_name field is concerned
+static int getFirstClassNameIndex (const ptrArray *const tokenNameSaved, const intArray *const doubleColonPos)
+{
+	const int colonsCount = intArrayCount (doubleColonPos);
+	if (colonsCount == 0 || intArrayLast (doubleColonPos) != (ptrArrayCount (tokenNameSaved) - 1))
+		return -1;
+	int curColon = colonsCount - 1;
+	while (curColon > 0 && intArrayItem (doubleColonPos, curColon) - intArrayItem (doubleColonPos, curColon - 1) == 1)
+		curColon--;
+	return intArrayItem (doubleColonPos, curColon) - 1;
+}
+
 // Functions are treated differently because they may also include the type of the return value.
 // Tasks are treated in the same way, although not having a return value.
 //
@@ -1171,27 +1197,44 @@ static int skipParameterAssignment (int c)
 static int processFunction (tokenInfo *const token, int c)
 {
 	verilogKind kind = token->kind;	// K_FUNCTION or K_TASK
+	ptrArray *tokenNameSaved = ptrArrayNew ((ptrArrayDeleteFunc)vStringDelete);
+	intArray *doubleColonPos = intArrayNew ();
+	int firstClassNameIndex;	// class_scope of function name
 
 	/* Search for function name
 	 * Last identifier found before a '(' or a ';' is the function name */
 	while (c != '(' && c != ';' && c != EOF)
 	{
 		if (isWordToken (c))
+		{
 			c = readWordToken (token, c);
+			ptrArrayAdd (tokenNameSaved, vStringNewCopy (token->name));
+		}
 		else
 			c = skipWhite (vGetc ());
 		/* skip parameter assignment of a class type
 		 *	ex. function uvm_port_base #(IF) get_if(int index=0); */
 		c = skipParameterAssignment (c);
 
-		/* Identify class type prefixes and create respective context*/
-		if (isInputLanguage (Lang_systemverilog) && isDoubleColon(c))
+		/* Record the position where the class resolution `::` appears */
+		if (isInputLanguage (Lang_systemverilog) && isDoubleColon (c))
+			intArrayAdd (doubleColonPos, ptrArrayCount (tokenNameSaved));
+	}
+
+	/* If the function's class_scope is found, then create respective context */
+	firstClassNameIndex = getFirstClassNameIndex (tokenNameSaved, doubleColonPos);
+	if (firstClassNameIndex >= 0)
+		for (int i = firstClassNameIndex; i < ptrArrayCount (tokenNameSaved) - 1; i++)
 		{
-			verbose ("Found function declaration with class type %s\n", vStringValue (token->name));
-			createContext (K_CLASS, token->name);
+			vString *className = ptrArrayItem (tokenNameSaved, i);
+			verbose ("Found function declaration with class type %s\n", vStringValue (className));
+			createContext (K_CLASS, className);
 			currentContext->classScope = true;
 		}
-	}
+
+	ptrArrayDelete (tokenNameSaved);
+	intArrayDelete (doubleColonPos);
+
 	verbose ("Found function: %s\n", vStringValue (token->name));
 	createTag (token, kind);
 

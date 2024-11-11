@@ -1,0 +1,92 @@
+new_test_case	input.sv	/^package new_test_case; \/\/ for better readability$/;"	K
+test_func_A	input.sv	/^  function signed test_func_A();$/;"	f	package:new_test_case
+test_task_A	input.sv	/^  task test_task_A; endtask$/;"	t	package:new_test_case
+test_func_B	input.sv	/^  function not_care_class test_func_B();$/;"	f	package:new_test_case
+test_func_C	input.sv	/^  function not_care_class#(int) test_func_C  ();$/;"	f	package:new_test_case
+test_func_D	input.sv	/^  function not_care_class #(int) test_func_D (   );$/;"	f	package:new_test_case
+test_func_E	input.sv	/^  function not_care_class #( .T(int) ) test_func_E();$/;"	f	package:new_test_case
+test_func_F	input.sv	/^  function unsigned [7:0] class_scope::test_func_F();$/;"	f	class:new_test_case.class_scope
+test_func_G	input.sv	/^  function not_care_class class_scope::test_func_G();$/;"	f	class:new_test_case.class_scope
+test_func_H	input.sv	/^  function not_care_class#(IF) class_scope::test_func_H();$/;"	f	class:new_test_case.class_scope
+test_func_I	input.sv	/^  function not_care_class  #(IF)  class_scope::test_func_I;$/;"	f	class:new_test_case.class_scope
+test_func_J	input.sv	/^  function not_care_class#(.T(real), .size(4)) class_scope::test_func_J;$/;"	f	class:new_test_case.class_scope
+new	input.sv	/^  function class_scope::new;$/;"	f	class:new_test_case.class_scope
+test_task_B	input.sv	/^  task class_scope::test_task_B ()  ;$/;"	t	class:new_test_case.class_scope
+test_func_K	input.sv	/^  function not_care_class::TYPE test_func_K ();$/;"	f	package:new_test_case
+test_func_L	input.sv	/^  function automatic bit signed [15:0] test_func_L();$/;"	f	package:new_test_case
+test_func_M	input.sv	/^  function not_care_class#(bit [2:0]) :: TYPE test_func_M;$/;"	f	package:new_test_case
+test_func_N	input.sv	/^  function not_care_class  #(.T(bit [2:0]))::TYPE test_func_N;$/;"	f	package:new_test_case
+test_func_O	input.sv	/^  function not_care_class # (100)  ::TYPE test_func_O  ()  ;$/;"	f	package:new_test_case
+test_var_A	input.sv	/^  int test_var_A = 100;$/;"	r	package:new_test_case
+test_func_P	input.sv	/^  function static bit test_func_P; endfunction$/;"	f	package:new_test_case
+new	input.sv	/^  function new; endfunction$/;"	f	package:new_test_case
+test_task_C	input.sv	/^  task test_task_C; endtask$/;"	t	package:new_test_case
+test_func_Q	input.sv	/^  function not_care_class :: TYPE scope::test_func_Q;$/;"	f	class:new_test_case.scope
+test_func_R	input.sv	/^  function void test_func_R ();$/;"	f	package:new_test_case
+test_func_S	input.sv	/^  function not_care_class#(shortint)::TYPE scope::test_func_S (  );$/;"	f	class:new_test_case.scope
+test_func_T	input.sv	/^  function not_care_class # ( .IF( IF ) )::TYPE scope:: test_func_T;$/;"	f	class:new_test_case.scope
+test_var_B	input.sv	/^  longint test_var_B = 1024;$/;"	r	package:new_test_case
+test_task_D	input.sv	/^  task test_task_D (  );$/;"	t	package:new_test_case
+test_func_U	input.sv	/^  function void test_func_U; endfunction$/;"	f	package:new_test_case
+new	input.sv	/^  function scope::new ();$/;"	f	class:new_test_case.scope
+test_task_E	input.sv	/^  task scope:: test_task_E;$/;"	t	class:new_test_case.scope
+LOW	input.sv	/^  localparam LOW = 8;$/;"	c	package:new_test_case
+HIGH	input.sv	/^  localparam HIGH = 15;$/;"	c	package:new_test_case
+test_func_V	input.sv	/^  function automatic logic [ LOW : HIGH ] test_func_V ();$/;"	f	package:new_test_case
+test_func_W	input.sv	/^  function automatic int signed [LOW-1:HIGH-1] test_func_W;$/;"	f	package:new_test_case
+test_func_EA	input.sv	/^  function automatic A:: B#(IF) ::TYPE test_func_EA ();$/;"	f	package:new_test_case
+test_func_EB	input.sv	/^  function automatic unsigned [ LOW -1: HIGH -1] scope:: test_func_EB;$/;"	f	class:new_test_case.scope
+test_wrong_task	input.sv	/^  task static A :: B :: C # (.T (int)) :: test_wrong_task ();$/;"	t	class:new_test_case.A.B.C
+test_wrong_function	input.sv	/^  function static A::B::TYPE scope # ( .T (IF) ) :: test_wrong_function;$/;"	f	class:new_test_case.scope
+test_specifier_A	input.sv	/^  function :initial void test_specifier_A (); endfunction$/;"	f	package:new_test_case
+test_specifier_B	input.sv	/^  function :extends void test_specifier_B (); endfunction$/;"	f	package:new_test_case
+test_specifier_C	input.sv	/^  function :final   void test_specifier_C (); endfunction$/;"	f	package:new_test_case
+test_specifier_D	input.sv	/^  function : initial : final void test_specifier_D (); endfunction$/;"	f	package:new_test_case
+test_specifier_E	input.sv	/^  function : extends : final void test_specifier_E (); endfunction$/;"	f	package:new_test_case
+test_specifier_F	input.sv	/^  function : final : initial void test_specifier_F (); endfunction$/;"	f	package:new_test_case
+test_specifier_G	input.sv	/^  function : final : extends void test_specifier_G (); endfunction$/;"	f	package:new_test_case
+test_specifier_H	input.sv	/^  virtual function : initial A :: B :: TYPE test_specifier_H ();$/;"	f	package:new_test_case
+test_specifier_I	input.sv	/^  virtual function :extends :final A::B::C A::B::test_specifier_I;$/;"	f	class:new_test_case.A.B
+test_specifier_J	input.sv	/^  task :initial :final A :: B :: test_specifier_J ;$/;"	t	class:new_test_case.A.B
+test_specifier_K	input.sv	/^  task :final : extends A #(IF)::B ::test_specifier_K () ;$/;"	t	class:new_test_case.A.B
+new	input.sv	/^  function corner_A::corner_B :: new (  );$/;"	f	class:new_test_case.corner_A.corner_B
+test_func_XA	input.sv	/^  function A::B::C::D #(int) corner_A:: test_func_XA();$/;"	f	class:new_test_case.corner_A
+test_func_XB	input.sv	/^  function void corner_A # ( .T(real) ) :: test_func_XB;$/;"	f	class:new_test_case.corner_A
+test_func_XC	input.sv	/^  function A # ( IF ) :: B :: C corner_A :: test_func_XC ();$/;"	f	class:new_test_case.corner_A
+test_func_XD	input.sv	/^  function A :: B # ( 100 )::C::D#(int) test_func_XD;$/;"	f	package:new_test_case
+test_task_F	input.sv	/^  task A::B::C::test_task_F ;$/;"	t	class:new_test_case.A.B.C
+test_func_Y	input.sv	/^  function void test_func_Y ( int Y_in_A, int Y_in_B );$/;"	f	package:new_test_case
+Y_in_A	input.sv	/^  function void test_func_Y ( int Y_in_A, int Y_in_B );$/;"	p	function:new_test_case.test_func_Y
+Y_in_B	input.sv	/^  function void test_func_Y ( int Y_in_A, int Y_in_B );$/;"	p	function:new_test_case.test_func_Y
+test_task_G	input.sv	/^  task A #(real):: B#(IF)::C#( .size(64) ) :: D :: test_task_G ();$/;"	t	class:new_test_case.A.B.C.D
+test_var_C	input.sv	/^  int test_var_C = 1024;$/;"	r	package:new_test_case
+test_func_Z	input.sv	/^  function logic [LOW:HIGH] test_func_Z ();$/;"	f	package:new_test_case
+test_class	input.sv	/^  class test_class;$/;"	C	package:new_test_case
+test_func_EC	input.sv	/^    static function A::B::C::D test_func_EC () ;$/;"	f	class:new_test_case.test_class
+test_task_EB	input.sv	/^  static task test_class::test_task_EB ; endtask$/;"	t	class:new_test_case.test_class
+test_func_ED	input.sv	/^  static function A:: B ::C::D  test_class :: test_func_ED;$/;"	f	class:new_test_case.test_class
+uvm_component	input.sv	/^virtual class uvm_component extends uvm_report_object;$/;"	C
+config_mode_t	input.sv	/^  typedef bit [1:0] config_mode_t;$/;"	T	class:uvm_component
+test_ok	input.sv	/^function void uvm_component::test_ok();$/;"	f	class:uvm_component
+return_scope_res	input.sv	/^function uvm_component::config_mode_t uvm_component::return_scope_res();$/;"	f	class:uvm_component
+test_scope_variable	input.sv	/^int test_scope_variable;$/;"	r
+m_set_cl_msg_args	input.sv	/^function void uvm_component::m_set_cl_msg_args();$/;"	f	class:uvm_component
+m_set_cl_verb	input.sv	/^function void uvm_component::m_set_cl_verb; return; endfunction$/;"	f	class:uvm_component
+m_set_cl_action	input.sv	/^function void uvm_component::m_set_cl_action; return; endfunction$/;"	f	class:uvm_component
+m_set_cl_sev	input.sv	/^function void uvm_component::m_set_cl_sev; return; endfunction$/;"	f	class:uvm_component
+test_case_A	input.sv	/^package test_case_A;$/;"	K
+test_ok	input.sv	/^  function void test_ok;$/;"	f	package:test_case_A
+oops	input.sv	/^  function extern_class::data_type oops();$/;"	f	package:test_case_A
+OOPS	input.sv	/^  function extern_class#(int)::data_type OOPS();$/;"	f	package:test_case_A
+still_ok	input.sv	/^  function void still_ok();$/;"	f	package:test_case_A
+test_case_B	input.sv	/^package test_case_B;$/;"	K
+foo	input.sv	/^  function void foo; \/\/ OK$/;"	f	package:test_case_B
+test_ok	input.sv	/^  function uvm_queue#(uvm_callback) test_ok(uvm_object obj);$/;"	f	package:test_case_B
+obj	input.sv	/^  function uvm_queue#(uvm_callback) test_ok(uvm_object obj);$/;"	p	function:test_case_B.test_ok
+TEST_OK	input.sv	/^  function uvm_queue #(uvm_callback) TEST_OK(uvm_object obj);$/;"	f	package:test_case_B
+obj	input.sv	/^  function uvm_queue #(uvm_callback) TEST_OK(uvm_object obj);$/;"	p	function:test_case_B.TEST_OK
+bar	input.sv	/^  function void bar(); \/\/ OK$/;"	f	package:test_case_B
+oops	input.sv	/^  function uvm_queue #(uvm_callback)::data_type oops(uvm_object obj);$/;"	f	package:test_case_B
+obj	input.sv	/^  function uvm_queue #(uvm_callback)::data_type oops(uvm_object obj);$/;"	p	function:test_case_B.oops
+test_scope_var	input.sv	/^    int test_scope_var = 1;$/;"	r	function:test_case_B.oops
+still_ok	input.sv	/^  function void still_ok();$/;"	f	package:test_case_B
