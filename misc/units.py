@@ -362,7 +362,7 @@ def prepare_bundles(frm, to, obundles):
 
 def anon_normalize_sub(internal, ctags, input_actual, *args):
     # TODO: "Units" should not be hardcoded.
-    input_expected = './Units' + re.sub(r'^.*?/Units', r'', input_actual, 1)
+    input_expected = './Units' + re.sub(r'^.*?/Units', r'', input_actual, count=1)
 
     ret = subprocess.run([CTAGS, '--quiet', '--options=NONE', '--_anonhash=' + input_actual],
             stdout=subprocess.PIPE)
