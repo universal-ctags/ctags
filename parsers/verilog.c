@@ -768,13 +768,24 @@ static int skipToSemiColon (int c)
 	return c;	// ';' or EOF
 }
 
+static bool isEscapedCharacter (int c)
+{
+	if (c != '\\')
+		return false;
+	c = vGetc ();
+	if (c == '"')
+		return true;
+	else
+		return false;
+}
+
 static int skipString (int c)
 {
 	if (c == '"')
 	{
 		do
 			c = vGetc ();
-		while (c != '"' && c != EOF);
+		while (isEscapedCharacter(c) || (c != '"' && c != EOF));
 	}
 	c = skipWhite (vGetc ());
 	return c;
