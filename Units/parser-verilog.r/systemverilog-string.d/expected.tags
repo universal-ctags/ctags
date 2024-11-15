@@ -1,0 +1,37 @@
+test_string	input.sv	/^package test_string;$/;"	K
+test_var_a	input.sv	/^  int    test_var_a = 1'b1;$/;"	r	package:test_string
+test_str_a	input.sv	/^  string test_str_a = "Hello World!\\n";$/;"	r	package:test_string
+test_var_b	input.sv	/^  int    test_var_b = 100;$/;"	r	package:test_string
+test_str_b	input.sv	/^  string test_str_b = "\\"";$/;"	r	package:test_string
+test_var_c	input.sv	/^  int    test_var_c = -1;$/;"	r	package:test_string
+test_str_c	input.sv	/^  string test_str_c = "\\b \\n \\t \\\\ \\" \\v \\f \\a \\0 \\1 \\11 \\377 \\x0 \\x01 \\xff \\e"/;"	r	package:test_string
+test_var_d	input.sv	/^  int    test_var_d = 1024;$/;"	r	package:test_string
+test_str_d	input.sv	/^  string test_str_d = "\\"\\\\\\"";$/;"	r	package:test_string
+test_var_e	input.sv	/^  int    test_var_e = -1;$/;"	r	package:test_string
+test_str_e	input.sv	/^  string test_str_e = "\\\\";$/;"	r	package:test_string
+test_str_f	input.sv	/^  string test_str_f = "\\\\\\\\\\\\\\\\";$/;"	r	package:test_string
+test_str_g	input.sv	/^  string test_str_g = "\\"\\"\\"";$/;"	r	package:test_string
+test_str_h	input.sv	/^  string test_str_h = "\\"\\"\\"\\"";$/;"	r	package:test_string
+test_str_i	input.sv	/^  string test_str_i = "\\\\\\\\\\\\\\"";$/;"	r	package:test_string
+test_str_j	input.sv	/^  string test_str_j = "\\"\\\\\\\\\\\\";$/;"	r	package:test_string
+test_str_k	input.sv	/^  string test_str_k = "\\0\\188\\xf\\"\\\\\\"\\\\\\"\\\\";$/;"	r	package:test_string
+test_str_l	input.sv	/^  localparam byte test_str_l = "\\\\" ;$/;"	c	package:test_string
+test_str_m	input.sv	/^  localparam byte test_str_m = "\\"" ;$/;"	c	package:test_string
+test_str_n	input.sv	/^  parameter string test_str_n = "\\t\\n\\\\\\"\\v\\f";$/;"	c	package:test_string
+test_struct_str	input.sv	/^  } test_struct_str;$/;"	S	package:test_string
+name	input.sv	/^    string name = "Hello \\" World!";$/;"	w	struct:test_string.test_struct_str
+addr	input.sv	/^    bit [23:0] addr;$/;"	w	struct:test_string.test_struct_str
+test_typedef_str	input.sv	/^  } test_typedef_str;$/;"	T	package:test_string
+name	input.sv	/^    string name = "\\0\\\\\\"\\\\";$/;"	w	typedef:test_string.test_typedef_str
+addr	input.sv	/^    bit [23:0] addr;$/;"	w	typedef:test_string.test_typedef_str
+type_id	input.sv	/^    string type_id = "\\a\\t\\0\\xddVerilog\\"";$/;"	w	typedef:test_string.test_typedef_str
+test_func_port	input.sv	/^  function void test_func_port (string test_str_port = "\\\\\\"", int test_var_port=1);$/;"	f	package:test_string
+test_str_port	input.sv	/^  function void test_func_port (string test_str_port = "\\\\\\"", int test_var_port=1);$/;"	p	function:test_string.test_func_port
+test_var_port	input.sv	/^  function void test_func_port (string test_str_port = "\\\\\\"", int test_var_port=1);$/;"	p	function:test_string.test_func_port
+test_task_port	input.sv	/^  task test_task_port  (int test_int_port, string test_str_port="\\"\\\\", byte test_byte_port =/;"	t	package:test_string
+test_int_port	input.sv	/^  task test_task_port  (int test_int_port, string test_str_port="\\"\\\\", byte test_byte_port =/;"	p	task:test_string.test_task_port
+test_str_port	input.sv	/^  task test_task_port  (int test_int_port, string test_str_port="\\"\\\\", byte test_byte_port =/;"	p	task:test_string.test_task_port
+test_byte_port	input.sv	/^  task test_task_port  (int test_int_port, string test_str_port="\\"\\\\", byte test_byte_port =/;"	p	task:test_string.test_task_port
+test_ending_var	input.sv	/^  bit [7:0] test_ending_var;$/;"	r	package:test_string
+test_ending_str	input.sv	/^  string test_ending_str = "'\\"'END;'";$/;"	r	package:test_string
+test_ending	input.sv	/^  function void test_ending(); endfunction$/;"	f	package:test_string
