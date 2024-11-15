@@ -137,3 +137,7 @@ complex_class.get_next	input.sv	/^  function LinkedPacket get_next();$/;"	f	clas
 auto_class	input.sv	/^class automatic auto_class;$/;"	C
 a	input.sv	/^  logic a;$/;"	r	class:auto_class
 auto_class.a	input.sv	/^  logic a;$/;"	r	class:auto_class
+test_final_specifier_A	input.sv	/^class :final test_final_specifier_A;$/;"	C
+test_class	input.sv	/^class test_class;$/;"	C
+test_final_specifier_B	input.sv	/^virtual class :final test_final_specifier_B;$/;"	C
+TopPacket	input.sv	/^class : final TopPacket extends LinkedPacket;$/;"	C	inherits:LinkedPacket

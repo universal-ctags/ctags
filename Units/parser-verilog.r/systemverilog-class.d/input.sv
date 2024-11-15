@@ -91,3 +91,21 @@ endclass
 class automatic auto_class;
   logic a;
 endclass : auto_class
+
+class :final test_final_specifier_A;
+  // The final specifier, preceded by a colon, when applied to classes:
+  // specifies that a class shall not be extended.
+endclass
+
+class test_class;
+endclass
+
+virtual class :final test_final_specifier_B;
+  // The final specifier, preceded by a colon, when applied to classes:
+  // specifies that a class shall not be extended.
+endclass
+
+class : final TopPacket extends LinkedPacket;
+  // The final specifier, preceded by a colon, when applied to classes:
+  // specifies that a class shall not be extended.
+endclass
