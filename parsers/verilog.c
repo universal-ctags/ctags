@@ -1409,18 +1409,24 @@ static int processParameterList (tokenInfo *token, int c)
 	return c;
 }
 
-// [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
+// LRM IEEE Std 1800-2017 and previous versions
+//  [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
+// LRM IEEE Std 1800-2023 ( Fixed )
+//  [ virtual ] class [ : final ] class_identifier [ parameter_port_list ]
 //	   [ extends class_type [ ( list_of_arguments ) ] ] [ implements < interface_class_type > ] ;
 // interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
 static int processClass (tokenInfo *const token, int c, verilogKind kind)
 {
 	tokenInfo *classToken;
 
+	if (kind == K_CLASS && c == ':')
+		c = skipWhite (vGetc ());
+
 	/* Get identifiers */
 	while (isWordToken (c))
 	{
 		c = readWordToken (token, c);
-		// skip static or automatic
+		// skip static or automatic or final
 		if (token->kind != K_IGNORE)
 			break;
 	}
