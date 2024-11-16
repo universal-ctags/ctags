@@ -7,14 +7,14 @@ x	input.sv	/^    int x = C::p;  \/\/ C::p disambiguates p$/;"	r	task:C.t
 C	input.sv	/^class C #($/;"	C
 p	input.sv	/^    int p = 1,$/;"	c	class:C	parameter:
 T	input.sv	/^    type T = int$/;"	c	class:C	parameter:
-f	input.sv	/^function C::T C::f();$/;"	f	class:C.C
-C	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	C	class:C
-DECODE_W	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	c	class:C.C	parameter:
-ENCODE_W	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	c	class:C.C	parameter:
-ENCODER_f	input.sv	/^  static function logic [ENCODE_W-1:0] ENCODER_f$/;"	f	class:C.C
-DecodeIn	input.sv	/^      (input logic [DECODE_W-1:0] DecodeIn);$/;"	p	function:C.C.ENCODER_f
-DECODER_f	input.sv	/^  static function logic [DECODE_W-1:0] DECODER_f$/;"	f	class:C.C
-EncodeIn	input.sv	/^      (input logic [ENCODE_W-1:0] EncodeIn);$/;"	p	function:C.C.DECODER_f
+f	input.sv	/^function C::T C::f();$/;"	f	class:C
+C	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	C
+DECODE_W	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	c	class:C	parameter:
+ENCODE_W	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	c	class:C	parameter:
+ENCODER_f	input.sv	/^  static function logic [ENCODE_W-1:0] ENCODER_f$/;"	f	class:C
+DecodeIn	input.sv	/^      (input logic [DECODE_W-1:0] DecodeIn);$/;"	p	function:C.ENCODER_f
+DECODER_f	input.sv	/^  static function logic [DECODE_W-1:0] DECODER_f$/;"	f	class:C
+EncodeIn	input.sv	/^      (input logic [ENCODE_W-1:0] EncodeIn);$/;"	p	function:C.DECODER_f
 PutImp	input.sv	/^interface class PutImp #(type PUT_T = logic);$/;"	l
 PUT_T	input.sv	/^interface class PutImp #(type PUT_T = logic);$/;"	c	ifclass:PutImp	parameter:
 GetImp	input.sv	/^interface class GetImp #(type GET_T = logic);$/;"	l
