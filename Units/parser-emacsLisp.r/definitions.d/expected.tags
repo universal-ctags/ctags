@@ -1,6 +1,6 @@
 a0	input.el	/^(defun a0 (n) (+ 1 n))$/;"	function
 b0	input.el	/^(defvar b0 3)$/;"	variable
-c0	input.el	/^(defconstant c0 5)$/;"	unknown
+c0	input.el	/^(defconstant c0 5)$/;"	unknown	definer:defconstant
 defunknown0	input.el	/^(defmacro defunknown0 (s)$/;"	macro
 defunknown1	input.el	/^(defmacro* defunknown1 (s)$/;"	macro
 e0	input.el	/^(defalias 'e0 'a0)$/;"	alias

@@ -12,6 +12,8 @@
 */
 #include "general.h"  /* must always come first */
 
+#include "entry.h"
+#include "field.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -52,6 +54,16 @@ static kindDefinition LispKinds [] = {
 };
 
 typedef enum {
+	F_DEFINER,
+} lispField;
+
+static fieldDefinition LispFields[] = {
+	{ .name = "definer",
+	  .description = "the name of the function or macro that defines the unknown/Y-kind object",
+	  .enabled = true },
+};
+
+typedef enum {
 	eK_UNKNOWN,
 	eK_FUNCTION,
 	eK_VARIABLE,
@@ -70,6 +82,16 @@ typedef enum {
 	eK_FACE,
 	eK_THEME,
 } emacsLispKind;
+
+typedef enum {
+	eF_DEFINER,
+} emacsLispField;
+
+static fieldDefinition EmacsLispFields[] = {
+	{ .name = "definer",
+	  .description = "the name of the function or macro that defines the unknown/Y-kind object",
+	  .enabled = true },
+};
 
 /* Following macro/builtin doesn't define a name appeared
  * at car. So this parser doesn't handle it well.
@@ -321,7 +343,9 @@ static int  elisp_hint2kind (const vString *const hint)
 static void L_getit (vString *const name, const unsigned char *dbp,
 					 bool case_insensitive,
 					 int (*hint2kind) (const vString *),
-					 const vString *const kind_hint)
+					 const vString *const kind_hint,
+					 int unknown_kind,
+					 fieldDefinition *definer_field)
 {
 	const unsigned char *p;
 
@@ -345,8 +369,21 @@ static void L_getit (vString *const name, const unsigned char *dbp,
 	if (vStringLength (name) > 0)
 	{
 		int kind = hint2kind (kind_hint);
+		const char *definer = NULL;
+
+		if (kind == unknown_kind)
+		{
+			definer = vStringValue(kind_hint);
+			if (definer[0] == '(')
+				definer++;
+		}
+
 		if (kind != KIND_GHOST_INDEX)
-			makeSimpleTag (name, kind);
+		{
+			int index = makeSimpleTag (name, kind);
+			if (definer_field && definer_field->enabled && definer && index != CORK_NIL)
+				attachParserFieldToCorkEntry (index, definer_field->ftype, definer);
+		}
 	}
 	vStringClear (name);
 }
@@ -355,7 +392,9 @@ static void L_getit (vString *const name, const unsigned char *dbp,
  */
 static void findLispTagsCommon (bool case_insensitive,
 								bool has_namespace,
-								int (*hint2kind) (const vString *))
+								int (*hint2kind) (const vString *),
+								int unknown_kind,
+								fieldDefinition *definer_field)
 {
 	vString *name = vStringNew ();
 	vString *kind_hint = vStringNew ();
@@ -377,7 +416,8 @@ static void findLispTagsCommon (bool case_insensitive,
 				}
 				while (isspace (*p))
 					p++;
-				L_getit (name, p, case_insensitive, hint2kind, kind_hint);
+				L_getit (name, p, case_insensitive, hint2kind, kind_hint,
+						 unknown_kind, definer_field);
 			}
 			else if (has_namespace)
 			{
@@ -402,7 +442,8 @@ static void findLispTagsCommon (bool case_insensitive,
 						}
 						while (isspace (*p))
 							p++;
-						L_getit (name, p, case_insensitive, hint2kind, kind_hint);
+						L_getit (name, p, case_insensitive, hint2kind, kind_hint,
+								 unknown_kind, definer_field);
 					}
 				}
 			}
@@ -414,12 +455,14 @@ static void findLispTagsCommon (bool case_insensitive,
 
 static void findLispTags (void)
 {
-	findLispTagsCommon (true, true, lisp_hint2kind);
+	findLispTagsCommon (true, true, lisp_hint2kind,
+						K_UNKNOWN, LispFields + F_DEFINER);
 }
 
 static void findEmacsLispTags (void)
 {
-	findLispTagsCommon (false, false, elisp_hint2kind);
+	findLispTagsCommon (false, false, elisp_hint2kind,
+						eK_UNKNOWN, EmacsLispFields + eF_DEFINER);
 }
 
 extern parserDefinition* LispParser (void)
@@ -436,10 +479,15 @@ extern parserDefinition* LispParser (void)
 	parserDefinition* def = parserNew ("Lisp");
 	def->kindTable      = LispKinds;
 	def->kindCount  = ARRAY_SIZE (LispKinds);
+	def->fieldTable = LispFields;
+	def->fieldCount = ARRAY_SIZE (LispFields);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findLispTags;
 	def->selectLanguage = selectors;
+	def->useCork = CORK_QUEUE;
+	def->versionCurrent = 0;
+	def->versionAge = 1;
 	return def;
 }
 
@@ -455,8 +503,13 @@ extern parserDefinition* EmacsLispParser (void)
 	parserDefinition* def = parserNew ("EmacsLisp");
 	def->kindTable      = EmacsLispKinds;
 	def->kindCount  = ARRAY_SIZE (EmacsLispKinds);
+	def->fieldTable = EmacsLispFields;
+	def->fieldCount = ARRAY_SIZE (EmacsLispFields);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findEmacsLispTags;
+	def->useCork = CORK_QUEUE;
+	def->versionCurrent = 0;
+	def->versionAge = 1;
 	return def;
 }
