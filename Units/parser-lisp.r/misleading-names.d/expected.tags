@@ -1,0 +1,2 @@
+a	input.lisp	/^(defvar a)$/;"	v
+b	input.lisp	/^(defvar b)$/;"	v

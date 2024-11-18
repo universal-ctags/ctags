@@ -97,10 +97,19 @@ static kindDefinition EmacsLispKinds [] = {
 static int L_isdef (const unsigned char *strp, bool case_insensitive)
 {
 	bool cis = case_insensitive; /* Renaming for making code short */
+	bool is_def = ( (strp [1] == 'd' || (cis && strp [1] == 'D'))
+					&& (strp [2] == 'e' || (cis && strp [2] == 'E'))
+					&& (strp [3] == 'f' || (cis && strp [3] == 'F')));
 
-	return ( (strp [1] == 'd' || (cis && strp [1] == 'D'))
-		  && (strp [2] == 'e' || (cis && strp [2] == 'E'))
-		  && (strp [3] == 'f' || (cis && strp [3] == 'F')));
+	/* Ignore def"ault" */
+	if (is_def
+		&& (strp [4] == 'a' || (cis && strp [4] == 'A'))
+		&& (strp [5] == 'u' || (cis && strp [5] == 'U'))
+		&& (strp [6] == 'l' || (cis && strp [6] == 'L'))
+		&& (strp [7] == 't' || (cis && strp [7] == 'T')))
+		return false;
+
+	return is_def;
 }
 
 static int L_isquote (const unsigned char *strp, bool case_insensitive)
