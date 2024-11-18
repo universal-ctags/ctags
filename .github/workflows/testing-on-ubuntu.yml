@@ -102,7 +102,7 @@ jobs:
         (cd ${BUILDDIR}; lcov -c -b . -d . -o coverage.info)
     - name: send coverage info
       if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-20.04'
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         files: ${{ env.BUILDDIR }}/coverage.info
         name: travis-${{ matrix.os }}
