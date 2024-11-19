@@ -147,6 +147,17 @@ static int L_isquote (const unsigned char *strp, bool case_insensitive)
 		  && isspace (*(++strp)));
 }
 
+static int L_issetf (const unsigned char *strp, bool case_insensitive)
+{
+	bool cis = case_insensitive; /* Renaming for making code short */
+
+	return ( (*(++strp) == 's' || (cis && *strp == 'S'))
+		  && (*(++strp) == 'e' || (cis && *strp == 'E'))
+		  && (*(++strp) == 't' || (cis && *strp == 'T'))
+		  && (*(++strp) == 'f' || (cis && *strp == 'F'))
+		  && isspace (*(++strp)));
+}
+
 static int  lisp_hint2kind (const vString *const hint)
 {
 	int k = K_UNKNOWN;
@@ -319,6 +330,12 @@ static void L_getit (vString *const name, const unsigned char *dbp,
 	else if (*dbp == '(' && L_isquote (dbp, case_insensitive))  /* Skip "(quote " */
 	{
 		dbp += 7;
+		while (isspace (*dbp))
+			dbp++;
+	}
+	else if (*dbp == '(' && L_issetf (dbp, case_insensitive)) /* Skip "(setf " */
+	{
+		dbp += 6;
 		while (isspace (*dbp))
 			dbp++;
 	}

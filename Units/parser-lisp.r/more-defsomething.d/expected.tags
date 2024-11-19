@@ -6,3 +6,6 @@ browser-schemes	input.lisp	/^(defgeneric browser-schemes (browser)$/;"	kind:gene
 %buffer	input.lisp	/^(defparameter %buffer nil)$/;"	kind:parameter
 :nyxt/renderer/gtk	input.lisp	/^(nyxt:define-package :nyxt\/renderer\/gtk$/;"	kind:unknown
 renderer-history-entry	input.lisp	/^(defstruct renderer-history-entry$/;"	kind:struct
+local-p	input.lisp	/^(defmethod (setf local-p) (value (scheme gtk-scheme))$/;"	kind:method
+local-pp	input.lisp	/^(defmethod (setf  local-pp) (a0))$/;"	kind:method
+local-ppp	input.lisp	/^(defmethod (SETF   local-ppp) (a1))$/;"	kind:method

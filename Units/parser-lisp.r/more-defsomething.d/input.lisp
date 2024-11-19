@@ -58,3 +58,12 @@ content. In case something goes wrong, runs `error-callback'.")
   original-url
   gtk-object)
 
+
+(defmethod (setf local-p) (value (scheme gtk-scheme))
+  (when value
+    (webkit:webkit-security-manager-register-uri-scheme-as-local (manager scheme)
+                                                                 (name scheme)))
+  (setf (slot-value scheme 'local-p) value))
+
+(defmethod (setf  local-pp) (a0))
+(defmethod (SETF   local-ppp) (a1))
