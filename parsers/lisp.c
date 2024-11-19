@@ -109,6 +109,17 @@ static int L_isdef (const unsigned char *strp, bool case_insensitive)
 		&& (strp [7] == 't' || (cis && strp [7] == 'T')))
 		return false;
 
+	/* Ignore def"inition" */
+	if (is_def
+		&& (strp  [4] == 'i' || (cis && strp  [4] == 'I'))
+		&& (strp  [5] == 'n' || (cis && strp  [5] == 'N'))
+		&& (strp  [6] == 'i' || (cis && strp  [6] == 'I'))
+		&& (strp  [7] == 't' || (cis && strp  [7] == 'T'))
+		&& (strp  [8] == 'i' || (cis && strp  [8] == 'I'))
+		&& (strp  [9] == 'o' || (cis && strp  [9] == 'O'))
+		&& (strp [10] == 'n' || (cis && strp [10] == 'N')))
+		return false;
+
 	return is_def;
 }
 
