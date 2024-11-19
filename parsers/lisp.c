@@ -29,6 +29,12 @@ typedef enum {
 	K_VARIABLE,
 	K_MACRO,
 	K_CONST,
+	K_TYPE,
+	K_CLASS,
+	K_STRUCT,
+	K_METHOD,
+	K_GENERIC,
+	K_PARAMETER,
 } lispKind;
 
 static kindDefinition LispKinds [] = {
@@ -37,6 +43,12 @@ static kindDefinition LispKinds [] = {
 	{ true, 'v', "variable", "variables" },
 	{ true, 'm', "macro", "macros" },
 	{ true, 'c', "const", "constants" },
+	{ true, 't', "type", "types" },
+	{ true, 'C', "class", "classes" },
+	{ true, 's', "struct", "structs" },
+	{ true, 'M', "method", "methods" },
+	{ true, 'G', "generic", "generics" },
+	{ true, 'p', "parameter", "parameters" },
 };
 
 typedef enum {
@@ -154,15 +166,39 @@ static int  lisp_hint2kind (const vString *const hint)
 		if (EQN("DEFVAR"))
 			k = K_VARIABLE;
 		break;
+	case 4:
+		n = 4;
+		if (EQN("DEFTYPE"))
+			k = K_TYPE;
+		break;
 	case 5:
 		n = 5;
 		if (EQN("DEFMACRO"))
 			k = K_MACRO;
+		else if (EQN("DEFCLASS"))
+			k = K_CLASS;
+		break;
+	case 6:
+		n = 6;
+		if (EQN("DEFSTRUCT"))
+			k = K_STRUCT;
+		else if (EQN("DEFMETHOD"))
+			k = K_METHOD;
+		break;
+	case 7:
+		n = 7;
+		if (EQN("DEFGENERIC"))
+			k = K_GENERIC;
 		break;
 	case 8:
 		n = 8;
 		if (EQN("DEFCONSTANT"))
 			k = K_CONST;
+		break;
+	case 9:
+		n = 9;
+		if (EQN("DEFPARAMETER"))
+			k = K_PARAMETER;
 		break;
 	}
 #undef EQN

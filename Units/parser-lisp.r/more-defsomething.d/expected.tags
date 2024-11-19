@@ -1,0 +1,8 @@
+url	input.lisp	/^(defmethod url ((url quri:uri))$/;"	kind:method
+url-designator	input.lisp	/^(deftype url-designator ()$/;"	kind:type
+renderer-scheme	input.lisp	/^(defclass renderer-scheme ()$/;"	kind:class
+scheme	input.lisp	/^(define-class scheme (renderer-scheme)$/;"	kind:unknown
+browser-schemes	input.lisp	/^(defgeneric browser-schemes (browser)$/;"	kind:generic
+%buffer	input.lisp	/^(defparameter %buffer nil)$/;"	kind:parameter
+:nyxt/renderer/gtk	input.lisp	/^(nyxt:define-package :nyxt\/renderer\/gtk$/;"	kind:unknown
+renderer-history-entry	input.lisp	/^(defstruct renderer-history-entry$/;"	kind:struct
