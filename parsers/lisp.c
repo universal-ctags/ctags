@@ -5,6 +5,11 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for LISP files.
+*
+*   References:
+*
+*   - [Lisp] https://www.lispworks.com/documentation/HyperSpec/Front/index.htm
+*   - [EmacsLisp] https://www.gnu.org/software/emacs/manual/html_node/elisp/index.html
 */
 
 /*
