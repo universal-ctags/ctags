@@ -125,6 +125,12 @@ static kindDefinition EmacsLispKinds [] = {
 	{ true, 'T', "theme", "custom themes" },
 };
 
+struct lispDialect {
+	int (* definer2kind) (const vString *const hint);
+	int unknown_kind;
+	fieldDefinition *definer_field;
+};
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -325,10 +331,8 @@ static int  elisp_hint2kind (const vString *const hint)
 
 static void L_getit (vString *const name, const unsigned char *dbp,
 					 bool case_insensitive,
-					 int (*hint2kind) (const vString *),
-					 const vString *const kind_hint,
-					 int unknown_kind,
-					 fieldDefinition *definer_field)
+					 struct lispDialect *dialect,
+					 vString *kind_hint)
 {
 	const unsigned char *p;
 
@@ -351,10 +355,10 @@ static void L_getit (vString *const name, const unsigned char *dbp,
 
 	if (vStringLength (name) > 0)
 	{
-		int kind = hint2kind (kind_hint);
+		int kind =  dialect->definer2kind(kind_hint);
 		const char *definer = NULL;
 
-		if (kind == unknown_kind)
+		if (kind == dialect->unknown_kind)
 		{
 			definer = vStringValue(kind_hint);
 			if (definer[0] == '(')
@@ -364,8 +368,9 @@ static void L_getit (vString *const name, const unsigned char *dbp,
 		if (kind != KIND_GHOST_INDEX)
 		{
 			int index = makeSimpleTag (name, kind);
-			if (definer_field && definer_field->enabled && definer && index != CORK_NIL)
-				attachParserFieldToCorkEntry (index, definer_field->ftype, definer);
+			if (dialect->definer_field && dialect->definer_field->enabled
+				&& definer && index != CORK_NIL)
+				attachParserFieldToCorkEntry (index, dialect->definer_field->ftype, definer);
 		}
 	}
 	vStringClear (name);
@@ -375,9 +380,7 @@ static void L_getit (vString *const name, const unsigned char *dbp,
  */
 static void findLispTagsCommon (bool case_insensitive,
 								bool has_namespace,
-								int (*hint2kind) (const vString *),
-								int unknown_kind,
-								fieldDefinition *definer_field)
+								struct lispDialect *dialect)
 {
 	vString *name = vStringNew ();
 	vString *kind_hint = vStringNew ();
@@ -399,8 +402,7 @@ static void findLispTagsCommon (bool case_insensitive,
 				}
 				while (isspace (*p))
 					p++;
-				L_getit (name, p, case_insensitive, hint2kind, kind_hint,
-						 unknown_kind, definer_field);
+				L_getit (name, p, case_insensitive, dialect, kind_hint);
 			}
 			else if (has_namespace)
 			{
@@ -425,8 +427,7 @@ static void findLispTagsCommon (bool case_insensitive,
 						}
 						while (isspace (*p))
 							p++;
-						L_getit (name, p, case_insensitive, hint2kind, kind_hint,
-								 unknown_kind, definer_field);
+						L_getit (name, p, case_insensitive, dialect, kind_hint);
 					}
 				}
 			}
@@ -438,14 +439,24 @@ static void findLispTagsCommon (bool case_insensitive,
 
 static void findLispTags (void)
 {
-	findLispTagsCommon (true, true, lisp_hint2kind,
-						K_UNKNOWN, LispFields + F_DEFINER);
+	struct lispDialect lisp_dialect = {
+		.definer2kind = lisp_hint2kind,
+		.unknown_kind = K_UNKNOWN,
+		.definer_field = LispFields + F_DEFINER,
+	};
+
+	findLispTagsCommon (true, true, &lisp_dialect);
 }
 
 static void findEmacsLispTags (void)
 {
-	findLispTagsCommon (false, false, elisp_hint2kind,
-						eK_UNKNOWN, EmacsLispFields + eF_DEFINER);
+	struct lispDialect elisp_dialect = {
+		.definer2kind = elisp_hint2kind,
+		.unknown_kind = eK_UNKNOWN,
+		.definer_field = EmacsLispFields + eF_DEFINER,
+	};
+
+	findLispTagsCommon (false, false, &elisp_dialect);
 }
 
 extern parserDefinition* LispParser (void)
