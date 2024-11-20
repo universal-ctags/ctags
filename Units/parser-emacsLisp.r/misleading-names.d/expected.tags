@@ -1,0 +1,2 @@
+a	input.el	/^(defvar a)$/;"	v
+b	input.el	/^(defvar b)$/;"	v
