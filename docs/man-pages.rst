@@ -23,6 +23,7 @@ Man pages
 	ctags-lang-c++(7) <man/ctags-lang-c++.7.rst>
 	ctags-lang-cuda(7) <man/ctags-lang-cuda.7.rst>
 	ctags-lang-elm(7) <man/ctags-lang-elm.7.rst>
+	ctags-lang-emacslisp(7) <man/ctags-lang-emacslisp.7.rst>
 	ctags-lang-fortran(7) <man/ctags-lang-fortran.7.rst>
 	ctags-lang-gdscript(7) <man/ctags-lang-gdscript.7.rst>
 	ctags-lang-i18nrubygem(7) <man/ctags-lang-i18nrubygem.7.rst>
@@ -33,6 +34,7 @@ Man pages
 	ctags-lang-kconfig(7) <man/ctags-lang-kconfig.7.rst>
 	ctags-lang-ldscript(7) <man/ctags-lang-ldscript.7.rst>
 	ctags-lang-lex(7) <man/ctags-lang-lex.7.rst>
+	ctags-lang-lisp(7) <man/ctags-lang-lisp.7.rst>
 	ctags-lang-make(7) <man/ctags-lang-make.7.rst>
 	ctags-lang-markdown(7) <man/ctags-lang-markdown.7.rst>
 	ctags-lang-powershell(7) <man/ctags-lang-powershell.7.rst>
