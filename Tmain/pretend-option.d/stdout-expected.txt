@@ -3,3 +3,9 @@ f  functions
 v  variables
 m  macros
 c  constants
+t  types
+C  classes
+s  structs
+M  methods
+G  generics
+p  parameters

@@ -29,7 +29,7 @@ jobs:
     - if: matrix.os == 'macos-13'
       run: brew install --overwrite python@3.12
 
-    - run: brew install automake pkg-config jansson libyaml pcre2
+    - run: brew install automake jansson libyaml pcre2
 
     - run: pip3 install docutils --break-system-packages
 

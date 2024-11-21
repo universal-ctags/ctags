@@ -26,12 +26,14 @@ x       UCTAGSxpath          no      NONE             s--    no    -- xpath for 
 -       UCTAGSproperties     no      CUDA             s--    no    -- properties (static, inline, mutable, export,...)
 -       UCTAGSsection        no      CUDA             s--    no    -- the place where the object is placed
 -       UCTAGSmoduleName     yes     Elm              s--    no    -- actual name of renamed module
+-       UCTAGSdefiner        yes     EmacsLisp        s--    no    -- the name of the function or macro that defines the unknown/Y-kind object
 -       UCTAGSannotations    yes     GDScript         s--    no    -- annotations on functions and variables
 -       UCTAGShowImported    no      Go               s--    no    -- how the package is imported ("inline" for `.' or "init" for `_')
 -       UCTAGSpackage        yes     Go               s--    no    -- the real package specified by the package name
 -       UCTAGSpackageName    yes     Go               s--    no    -- the name for referring the package
 -       UCTAGSimplements     yes     Inko             s--    no    -- Trait being implemented
 -       UCTAGSassignment     yes     LdScript         s--    no    -- how a value is assigned to the symbol
+-       UCTAGSdefiner        yes     Lisp             s--    no    -- the name of the function or macro that defines the unknown/Y-kind object
 -       UCTAGSsectionMarker  no      Markdown         s--    no    -- character used for declaring section(#, ##, =, or -)
 -       UCTAGSwrapping       yes     Moose            s--    no    -- how a wrapper wrapping the method (around, after, or before)
 -       UCTAGSlangid         yes     NSIS             s--    no    -- language identifier specified in (License)LangString commands
