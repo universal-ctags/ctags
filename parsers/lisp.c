@@ -131,6 +131,7 @@ struct lispDialect {
 	unsigned char namespace_sep;
 	int unknown_kind;
 	fieldDefinition *definer_field;
+	bool skip_initial_spaces;
 	bool (* is_def) (struct lispDialect *, const unsigned char *);
 	int (* get_it) (struct lispDialect *,
 					vString *const, const unsigned char *, vString *);
@@ -394,6 +395,12 @@ static void findLispTagsCommon (struct lispDialect *dialect)
 
 	while ((p = readLineFromInputFile ()) != NULL)
 	{
+		if (dialect->skip_initial_spaces)
+		{
+			while (isspace ((unsigned char) *p))
+				p++;
+		}
+
 		if (*p == '(')
 		{
 			if (dialect->is_def (dialect, p))
@@ -450,6 +457,7 @@ static void findLispTags (void)
 		.namespace_sep = ':',
 		.unknown_kind = K_UNKNOWN,
 		.definer_field = LispFields + F_DEFINER,
+		.skip_initial_spaces = false,
 		.is_def = lisp_is_def,
 		.get_it = lisp_get_it,
 	};
@@ -465,6 +473,7 @@ static void findEmacsLispTags (void)
 		.namespace_sep = 0,
 		.unknown_kind = eK_UNKNOWN,
 		.definer_field = EmacsLispFields + eF_DEFINER,
+		.skip_initial_spaces = false,
 		.is_def = lisp_is_def,
 		.get_it = lisp_get_it,
 	};
