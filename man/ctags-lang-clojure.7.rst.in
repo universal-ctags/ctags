@@ -1,0 +1,37 @@
+.. _ctags-lang-clojure(7):
+
+==============================================================
+ctags-lang-clojure
+==============================================================
+---------------------------------------------------------------------
+Random notes about tagging Clojure source code with Universal Ctags
+---------------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+Clojure ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=Clojure ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Clojure=+.clj ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Clojure=+.cljs ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Clojure=+.cljc ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging Clojure source code.
+
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* Add ``unknown`` kind.
+
+* Add ``definer`` field.
+
+SEE ALSO
+--------
+ctags(1)

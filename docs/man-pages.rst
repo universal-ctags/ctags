@@ -21,6 +21,7 @@ Man pages
 	ctags-lang-automake(7) <man/ctags-lang-automake.7.rst>
 	ctags-lang-c(7) <man/ctags-lang-c.7.rst>
 	ctags-lang-c++(7) <man/ctags-lang-c++.7.rst>
+	ctags-lang-clojure(7) <man/ctags-lang-clojure.7.rst>
 	ctags-lang-cuda(7) <man/ctags-lang-cuda.7.rst>
 	ctags-lang-elm(7) <man/ctags-lang-elm.7.rst>
 	ctags-lang-emacslisp(7) <man/ctags-lang-emacslisp.7.rst>

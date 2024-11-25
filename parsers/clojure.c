@@ -7,74 +7,88 @@
  *   This module contains code for generating tags for the Clojure language.
  */
 
-#include "general.h"
 
+/*
+*   INCLUDE FILES
+*/
+#include "general.h"  /* must always come first */
+
+#include "entry.h"
+#include "parse.h"
+
+#include "x-lisp.h"
+
+#include <ctype.h>
 #include <string.h>
 
-#include "parse.h"
-#include "read.h"
-#include "routines.h"
-#include "vstring.h"
-#include "entry.h"
-
+/*
+*   DATA DEFINITIONS
+*/
 typedef enum {
+	K_UNKNOWN,
 	K_FUNCTION,
 	K_NAMESPACE
 } clojureKind;
 
-static kindDefinition ClojureKinds[] = {
-	{true, 'f', "function", "functions"},
-	{true, 'n', "namespace", "namespaces"}
+typedef enum {
+	F_DEFINER,
+} clojureField;
+
+static fieldDefinition ClojureFields[] = {
+	{ .name = "definer",
+	  .description = "the name of the function or macro that defines the unknown/Y-kind object",
+	  .enabled = true },
 };
 
-static int isNamespace (const char *strp)
+static kindDefinition ClojureKinds[] = {
+	{ true, 'Y', "unknown", "unknown type of definitions" },
+	{ true, 'f', "function", "functions" },
+	{ true, 'n', "namespace", "namespaces" },
+};
+
+/*
+*   FUNCTION DEFINITIONS
+*/
+static bool clojure_is_def (struct lispDialect *dialect CTAGS_ATTR_UNUSED, const unsigned char *strp)
 {
-	return strncmp (++strp, "ns", 2) == 0 && isspace ((unsigned char) strp[2]);
+	if (strp [1] == 'n' && strp [2] == 's' && isspace (strp [3]))
+		return true;
+
+	if (strp [1] == 'd' && strp [2] == 'e' && strp [3] == 'f' && strp [4] == 'n'
+		&& isspace (strp [5]))
+		return true;
+
+	return false;
 }
 
-static int isCoreNamespace (const char *strp)
+static int  clojure_hint2kind (const vString *const hint, const char *namespace)
 {
-	return strncmp (++strp, "clojure.core/ns", 15) == 0 &&
-	       isspace ((unsigned char) strp[15]);
-}
+	int k = K_UNKNOWN;
+	int n = vStringLength (hint) - 4;
+	unsigned int offset = 1;
 
-static int isFunction (const char *strp)
-{
-	return (strncmp (++strp, "defn", 4) == 0 &&
-	        isspace ((unsigned char) strp[4]));
-}
-
-static int isCoreFunction (const char *strp)
-{
-	return (strncmp (++strp, "clojure.core/defn", 17) == 0 &&
-	        isspace ((unsigned char) strp[17]));
-}
-
-static int isQuote (const char *strp)
-{
-	return strncmp (++strp, "quote", 5) == 0 &&
-	       isspace ((unsigned char) strp[5]);
-}
-
-static void functionName (vString * const name, const char *dbp)
-{
-	const char *p;
-
-	if (*dbp == '\'')
-		dbp++;
-	else if (*dbp == '(' && isQuote (dbp))
+	if (strcmp (namespace, "clojure.core/") == 0)
 	{
-		dbp += 7;
-		while (isspace ((unsigned char) *dbp))
-			dbp++;
+		offset = 0;
+		n++;
 	}
 
-	for (p = dbp; *p != '\0' && *p != '(' && !isspace ((unsigned char) *p)
-		 && *p != ')'; p++)
-		vStringPut (name, *p);
+	if (strncmp (vStringValue (hint) + offset, "ns", 2) == 0)
+		return K_NAMESPACE;
+
+#define EQN(X) strncmp(vStringValue (hint) + offset + 3, &X[3], n) == 0
+	switch (n)
+	{
+	case 1:
+		if (EQN("defn"))
+			k = K_FUNCTION;
+		break;
+	}
+#undef EQN
+	return k;
 }
 
-const char* skipMetadata (const char *dbp)
+const unsigned char* clojure_skip_metadata (const unsigned char *dbp)
 {
 	while (1)
 	{
@@ -108,65 +122,40 @@ const char* skipMetadata (const char *dbp)
 	return dbp;
 }
 
-static int makeNamespaceTag (vString * const name, const char *dbp)
+static int clojure_get_it (struct lispDialect *dialect,
+						   vString *const name, const unsigned char *dbp, vString *kind_hint,
+						   const char *namespace)
 {
-	dbp = skipMetadata (dbp);
-	functionName (name, dbp);
-	if (vStringLength (name) > 0 && ClojureKinds[K_NAMESPACE].enabled)
-		return makeSimpleTag (name, K_NAMESPACE);
-	else
+	dbp = clojure_skip_metadata (dbp);
+	int index = lispGetIt (dialect, name, dbp, kind_hint, namespace);
+	tagEntryInfo *e = getEntryInCorkQueue (index);
+
+	if (!e)
 		return CORK_NIL;
-}
 
-static void makeFunctionTag (vString * const name, const char *dbp, int scope_index)
-{
-	dbp = skipMetadata (dbp);
-	functionName (name, dbp);
-	if (vStringLength (name) > 0 && ClojureKinds[K_FUNCTION].enabled)
-	{
-		tagEntryInfo e;
-		initTagEntry (&e, vStringValue (name), K_FUNCTION);
-		e.extensionFields.scopeIndex =  scope_index;
-		makeTagEntry (&e);
-	}
-}
+	if (e->kindIndex == K_NAMESPACE)
+		dialect->scope = index;
+	else
+		e->extensionFields.scopeIndex = dialect->scope;
 
-static void skipToSymbol (const char **p)
-{
-	while (**p != '\0' && !isspace ((unsigned char) **p))
-		*p = *p + 1;
-	while (isspace ((unsigned char) **p))
-		*p = *p + 1;
+	return index;
 }
 
 static void findClojureTags (void)
 {
-	vString *name = vStringNew ();
-	const char *p;
-	int scope_index = CORK_NIL;
+	struct lispDialect clojure_dialect = {
+		.definer2kind = clojure_hint2kind,
+		.case_insensitive = false,
+		.namespace_sep = '/',
+		.unknown_kind = K_UNKNOWN,
+		.definer_field = ClojureFields + F_DEFINER,
+		.skip_initial_spaces = true,
+		.is_def = clojure_is_def,
+		.get_it = clojure_get_it,
+		.scope = CORK_NIL,
+	};
 
-	while ((p = (char *)readLineFromInputFile ()) != NULL)
-	{
-		vStringClear (name);
-
-		while (isspace ((unsigned char) *p))
-			p++;
-
-		if (*p == '(')
-		{
-			if (isNamespace (p) || isCoreNamespace (p))
-			{
-				skipToSymbol (&p);
-				scope_index = makeNamespaceTag (name, p);
-			}
-			else if (isFunction (p) || isCoreFunction (p))
-			{
-				skipToSymbol (&p);
-				makeFunctionTag (name, p, scope_index);
-			}
-		}
-	}
-	vStringDelete (name);
+	findLispTagsCommon (&clojure_dialect);
 }
 
 extern parserDefinition *ClojureParser (void)
@@ -185,5 +174,7 @@ extern parserDefinition *ClojureParser (void)
 	def->aliases = aliases;
 	def->parser = findClojureTags;
 	def->useCork = CORK_QUEUE;
+	def->versionCurrent = 0;
+	def->versionAge = 1;
 	return def;
 }

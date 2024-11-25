@@ -32,6 +32,7 @@ GEN_IN_MAN_FILES = \
 	ctags-lang-automake.7 \
 	ctags-lang-c.7 \
 	ctags-lang-c++.7 \
+	ctags-lang-clojure.7 \
 	ctags-lang-cuda.7 \
 	ctags-lang-elm.7 \
 	ctags-lang-emacslisp.7 \
