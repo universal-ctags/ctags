@@ -18,12 +18,13 @@
 #include "general.h"  /* must always come first */
 
 #include "entry.h"
-#include "field.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
 #include "vstring.h"
+
+#include "x-lisp.h"
 
 #include <string.h>
 
@@ -123,19 +124,6 @@ static kindDefinition EmacsLispKinds [] = {
 	{ true, 'G', "group", "customization groups" },
 	{ true, 'H', "face", "customizable faces" }, /* 'F' is reserved by ctags */
 	{ true, 'T', "theme", "custom themes" },
-};
-
-struct lispDialect {
-	int (* definer2kind) (const vString *const hint, const char *namespace);
-	bool case_insensitive;
-	unsigned char namespace_sep;
-	int unknown_kind;
-	fieldDefinition *definer_field;
-	bool skip_initial_spaces;
-	bool (* is_def) (struct lispDialect *, const unsigned char *);
-	int (* get_it) (struct lispDialect *,
-					vString *const, const unsigned char *, vString *,
-					const char *);
 };
 
 /*
@@ -388,7 +376,7 @@ static int lisp_get_it (struct lispDialect *dialect,
 
 /* Algorithm adapted from from GNU etags.
  */
-static void findLispTagsCommon (struct lispDialect *dialect)
+void findLispTagsCommon (struct lispDialect *dialect)
 {
 	vString *name = vStringNew ();
 	vString *kind_hint = vStringNew ();
