@@ -128,7 +128,7 @@ static kindDefinition EmacsLispKinds [] = {
 struct lispDialect {
 	int (* definer2kind) (const vString *const hint);
 	bool case_insensitive;
-	bool has_namespace;
+	unsigned char namespace_sep;
 	int unknown_kind;
 	fieldDefinition *definer_field;
 };
@@ -403,17 +403,17 @@ static void findLispTagsCommon (struct lispDialect *dialect)
 					p++;
 				L_getit (name, p, dialect, kind_hint);
 			}
-			else if (dialect->has_namespace)
+			else if (dialect->namespace_sep != 0)
 			{
 				do
 					p++;
 				while (*p != '\0' && !isspace (*p)
-						&& *p != ':' && *p != '(' && *p != ')');
-				if (*p == ':')
+						&& *p != dialect->namespace_sep && *p != '(' && *p != ')');
+				if (*p == dialect->namespace_sep)
 				{
 					do
 						p++;
-					while (*p == ':');
+					while (*p == dialect->namespace_sep);
 
 					if (L_isdef (p - 1, dialect->case_insensitive))
 					{
@@ -441,7 +441,7 @@ static void findLispTags (void)
 	struct lispDialect lisp_dialect = {
 		.definer2kind = lisp_hint2kind,
 		.case_insensitive = true,
-		.has_namespace = true,
+		.namespace_sep = ':',
 		.unknown_kind = K_UNKNOWN,
 		.definer_field = LispFields + F_DEFINER,
 	};
@@ -454,7 +454,7 @@ static void findEmacsLispTags (void)
 	struct lispDialect elisp_dialect = {
 		.definer2kind = elisp_hint2kind,
 		.case_insensitive = false,
-		.has_namespace = false,
+		.namespace_sep = 0,
 		.unknown_kind = eK_UNKNOWN,
 		.definer_field = EmacsLispFields + eF_DEFINER,
 	};
