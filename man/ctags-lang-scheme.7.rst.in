@@ -1,0 +1,41 @@
+.. _ctags-lang-scheme(7):
+
+==============================================================
+ctags-lang-scheme
+==============================================================
+---------------------------------------------------------------------
+Random notes about tagging Scheme source code with Universal Ctags
+---------------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+Scheme ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=Scheme ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Scheme=+.SCM ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Scheme=+.SM ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Scheme=+.sch ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Scheme=+.scheme ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Scheme=+.scm ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Scheme=+.sm ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Scheme=+.rkt ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging Scheme source code.
+
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* Add ``unknown`` kind.
+
+* Add ``definer`` field.
+
+SEE ALSO
+--------
+ctags(1)

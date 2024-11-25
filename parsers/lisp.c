@@ -134,7 +134,7 @@ static kindDefinition EmacsLispKinds [] = {
  * lisp tag functions
  *  look for (def or (DEF, quote or QUOTE
  */
-static bool lisp_is_def (struct lispDialect *dialect, const unsigned char *strp)
+bool lispIsDef (struct lispDialect *dialect, const unsigned char *strp)
 {
 	bool cis = dialect->case_insensitive; /* Renaming for making code short */
 	bool is_def = ( (strp [1] == 'd' || (cis && strp [1] == 'D'))
@@ -480,7 +480,7 @@ static void findLispTags (void)
 		.definer_field = LispFields + F_DEFINER,
 		.skip_initial_spaces = false,
 		.lambda_syntax_sugar = false,
-		.is_def = lisp_is_def,
+		.is_def = lispIsDef,
 		.get_it = lispGetIt,
 		.scope = CORK_NIL,
 	};
@@ -498,7 +498,7 @@ static void findEmacsLispTags (void)
 		.definer_field = EmacsLispFields + eF_DEFINER,
 		.skip_initial_spaces = false,
 		.lambda_syntax_sugar = false,
-		.is_def = lisp_is_def,
+		.is_def = lispIsDef,
 		.get_it = lispGetIt,
 		.scope = CORK_NIL,
 	};

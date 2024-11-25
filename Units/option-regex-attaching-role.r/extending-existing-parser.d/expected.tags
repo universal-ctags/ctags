@@ -1,4 +1,4 @@
-foo	input.scm	/^(define-module foo$/;"	function	language:Scheme	roles:def
+foo	input.scm	/^(define-module foo$/;"	unknown	language:Scheme	roles:def	definer:DEFINE-MODULE
 foobar	input.scm	/^(define (foobar)$/;"	function	language:Scheme	roles:def
 foo	input.scm	/^(define-module foo$/;"	module	language:myGauche	roles:def
 bar	input.scm	/^  (use bar)$/;"	module	language:myGauche	scope:module:foo	roles:used
