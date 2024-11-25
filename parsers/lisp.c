@@ -131,6 +131,7 @@ struct lispDialect {
 	unsigned char namespace_sep;
 	int unknown_kind;
 	fieldDefinition *definer_field;
+	bool (* is_def) (struct lispDialect *, const unsigned char *);
 };
 
 /*
@@ -141,9 +142,9 @@ struct lispDialect {
  * lisp tag functions
  *  look for (def or (DEF, quote or QUOTE
  */
-static int L_isdef (const unsigned char *strp, bool case_insensitive)
+static bool lisp_is_def (struct lispDialect *dialect, const unsigned char *strp)
 {
-	bool cis = case_insensitive; /* Renaming for making code short */
+	bool cis = dialect->case_insensitive; /* Renaming for making code short */
 	bool is_def = ( (strp [1] == 'd' || (cis && strp [1] == 'D'))
 					&& (strp [2] == 'e' || (cis && strp [2] == 'E'))
 					&& (strp [3] == 'f' || (cis && strp [3] == 'F')));
@@ -390,7 +391,7 @@ static void findLispTagsCommon (struct lispDialect *dialect)
 	{
 		if (*p == '(')
 		{
-			if (L_isdef (p, dialect->case_insensitive))
+			if (dialect->is_def (dialect, p))
 			{
 				vStringClear (kind_hint);
 				while (*p != '\0' && !isspace (*p))
@@ -415,7 +416,7 @@ static void findLispTagsCommon (struct lispDialect *dialect)
 						p++;
 					while (*p == dialect->namespace_sep);
 
-					if (L_isdef (p - 1, dialect->case_insensitive))
+					if (dialect->is_def (dialect, p - 1))
 					{
 						vStringClear (kind_hint);
 						while (*p != '\0' && !isspace (*p))
@@ -444,6 +445,7 @@ static void findLispTags (void)
 		.namespace_sep = ':',
 		.unknown_kind = K_UNKNOWN,
 		.definer_field = LispFields + F_DEFINER,
+		.is_def = lisp_is_def,
 	};
 
 	findLispTagsCommon (&lisp_dialect);
@@ -457,6 +459,7 @@ static void findEmacsLispTags (void)
 		.namespace_sep = 0,
 		.unknown_kind = eK_UNKNOWN,
 		.definer_field = EmacsLispFields + eF_DEFINER,
+		.is_def = lisp_is_def,
 	};
 
 	findLispTagsCommon (&elisp_dialect);
