@@ -132,8 +132,8 @@ struct lispDialect {
 	int unknown_kind;
 	fieldDefinition *definer_field;
 	bool (* is_def) (struct lispDialect *, const unsigned char *);
-	void (* get_it) (struct lispDialect *,
-					 vString *const, const unsigned char *, vString *);
+	int (* get_it) (struct lispDialect *,
+					vString *const, const unsigned char *, vString *);
 };
 
 /*
@@ -335,9 +335,10 @@ static int  elisp_hint2kind (const vString *const hint)
 }
 
 
-static void lisp_get_it (struct lispDialect *dialect,
-						 vString *const name, const unsigned char *dbp, vString *kind_hint)
+static int lisp_get_it (struct lispDialect *dialect,
+						vString *const name, const unsigned char *dbp, vString *kind_hint)
 {
+	int index = CORK_NIL;
 	const unsigned char *p;
 
 	if (*dbp == '\'')  /* Skip prefix quote */
@@ -371,13 +372,15 @@ static void lisp_get_it (struct lispDialect *dialect,
 
 		if (kind != KIND_GHOST_INDEX)
 		{
-			int index = makeSimpleTag (name, kind);
+			index = makeSimpleTag (name, kind);
 			if (dialect->definer_field && dialect->definer_field->enabled
 				&& definer && index != CORK_NIL)
 				attachParserFieldToCorkEntry (index, dialect->definer_field->ftype, definer);
 		}
 	}
 	vStringClear (name);
+
+	return index;
 }
 
 /* Algorithm adapted from from GNU etags.
