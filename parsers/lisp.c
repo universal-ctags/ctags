@@ -379,11 +379,12 @@ void findLispTagsCommon (struct lispDialect *dialect)
 {
 	vString *name = vStringNew ();
 	vString *kind_hint = vStringNew ();
-	const unsigned char* p;
+	const unsigned char* line;
 
-
-	while ((p = readLineFromInputFile ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
+		const unsigned char *p = line;
+
 		if (dialect->skip_initial_spaces)
 		{
 			while (isspace ((unsigned char) *p))
@@ -401,8 +402,30 @@ void findLispTagsCommon (struct lispDialect *dialect)
 								dialect->case_insensitive? toupper(*p): *p);
 					p++;
 				}
-				while (isspace (*p))
-					p++;
+
+
+				if (dialect->lambda_syntax_sugar)
+				{
+					/* Skip over open parens and white space:
+					   (def ((foo
+					   -----^^
+					 */
+					do {
+						while (*p != '\0' && (isspace (*p) || *p == '('))
+							p++;
+						if (*p == '\0')
+							p = line = readLineFromInputFile ();
+						else
+							break;
+					} while (line);
+					if (line == NULL)
+						break;
+				}
+				else
+				{
+					while (isspace (*p))
+						p++;
+				}
 				dialect->get_it(dialect, name, p, kind_hint, "");
 			}
 			else if (dialect->namespace_sep != 0)
@@ -456,6 +479,7 @@ static void findLispTags (void)
 		.unknown_kind = K_UNKNOWN,
 		.definer_field = LispFields + F_DEFINER,
 		.skip_initial_spaces = false,
+		.lambda_syntax_sugar = false,
 		.is_def = lisp_is_def,
 		.get_it = lispGetIt,
 		.scope = CORK_NIL,
@@ -473,6 +497,7 @@ static void findEmacsLispTags (void)
 		.unknown_kind = eK_UNKNOWN,
 		.definer_field = EmacsLispFields + eF_DEFINER,
 		.skip_initial_spaces = false,
+		.lambda_syntax_sugar = false,
 		.is_def = lisp_is_def,
 		.get_it = lispGetIt,
 		.scope = CORK_NIL,
