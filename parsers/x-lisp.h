@@ -21,6 +21,7 @@ struct lispDialect {
 	int unknown_kind;
 	fieldDefinition *definer_field;
 	bool skip_initial_spaces;
+	bool lambda_syntax_sugar;
 	bool (* is_def) (struct lispDialect *, const unsigned char *);
 	int (* get_it) (struct lispDialect *,
 					vString *const, const unsigned char *, vString *,
