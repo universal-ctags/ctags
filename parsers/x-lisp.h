@@ -34,5 +34,6 @@ void findLispTagsCommon (struct lispDialect *dialect);
 int lispGetIt (struct lispDialect *dialect,
 			   vString *const name, const unsigned char *dbp, vString *kind_hint,
 			   const char *namespace);
+bool lispIsDef (struct lispDialect *dialect, const unsigned char *strp);
 
 #endif	/* CTAGS_LISP_H */
