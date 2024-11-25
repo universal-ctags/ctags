@@ -476,6 +476,7 @@
     <ClInclude Include="..\parsers\x-frontmatter.h" />
     <ClInclude Include="..\parsers\x-iniconf.h" />
     <ClInclude Include="..\parsers\x-jscript.h" />
+    <ClInclude Include="..\parsers\x-lisp.h" />
     <ClInclude Include="..\parsers\x-m4.h" />
     <ClInclude Include="..\parsers\x-make.h" />
     <ClInclude Include="..\parsers\x-markdown.h" />

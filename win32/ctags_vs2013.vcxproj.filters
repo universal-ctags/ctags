@@ -947,6 +947,9 @@
     <ClInclude Include="..\parsers\x-jscript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\parsers\x-lisp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\parsers\x-m4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
