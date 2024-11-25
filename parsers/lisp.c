@@ -127,6 +127,8 @@ static kindDefinition EmacsLispKinds [] = {
 
 struct lispDialect {
 	int (* definer2kind) (const vString *const hint);
+	bool case_insensitive;
+	bool has_namespace;
 	int unknown_kind;
 	fieldDefinition *definer_field;
 };
@@ -330,7 +332,6 @@ static int  elisp_hint2kind (const vString *const hint)
 }
 
 static void L_getit (vString *const name, const unsigned char *dbp,
-					 bool case_insensitive,
 					 struct lispDialect *dialect,
 					 vString *kind_hint)
 {
@@ -338,13 +339,13 @@ static void L_getit (vString *const name, const unsigned char *dbp,
 
 	if (*dbp == '\'')  /* Skip prefix quote */
 		dbp++;
-	else if (*dbp == '(' && L_isquote (dbp, case_insensitive))  /* Skip "(quote " */
+	else if (*dbp == '(' && L_isquote (dbp, dialect->case_insensitive))  /* Skip "(quote " */
 	{
 		dbp += 7;
 		while (isspace (*dbp))
 			dbp++;
 	}
-	else if (*dbp == '(' && L_issetf (dbp, case_insensitive)) /* Skip "(setf " */
+	else if (*dbp == '(' && L_issetf (dbp, dialect->case_insensitive)) /* Skip "(setf " */
 	{
 		dbp += 6;
 		while (isspace (*dbp))
@@ -378,9 +379,7 @@ static void L_getit (vString *const name, const unsigned char *dbp,
 
 /* Algorithm adapted from from GNU etags.
  */
-static void findLispTagsCommon (bool case_insensitive,
-								bool has_namespace,
-								struct lispDialect *dialect)
+static void findLispTagsCommon (struct lispDialect *dialect)
 {
 	vString *name = vStringNew ();
 	vString *kind_hint = vStringNew ();
@@ -391,20 +390,20 @@ static void findLispTagsCommon (bool case_insensitive,
 	{
 		if (*p == '(')
 		{
-			if (L_isdef (p, case_insensitive))
+			if (L_isdef (p, dialect->case_insensitive))
 			{
 				vStringClear (kind_hint);
 				while (*p != '\0' && !isspace (*p))
 				{
 					vStringPut (kind_hint,
-								case_insensitive? toupper(*p): *p);
+								dialect->case_insensitive? toupper(*p): *p);
 					p++;
 				}
 				while (isspace (*p))
 					p++;
-				L_getit (name, p, case_insensitive, dialect, kind_hint);
+				L_getit (name, p, dialect, kind_hint);
 			}
-			else if (has_namespace)
+			else if (dialect->has_namespace)
 			{
 				do
 					p++;
@@ -416,18 +415,18 @@ static void findLispTagsCommon (bool case_insensitive,
 						p++;
 					while (*p == ':');
 
-					if (L_isdef (p - 1, case_insensitive))
+					if (L_isdef (p - 1, dialect->case_insensitive))
 					{
 						vStringClear (kind_hint);
 						while (*p != '\0' && !isspace (*p))
 						{
 							vStringPut (kind_hint,
-										case_insensitive? toupper(*p): *p);
+										dialect->case_insensitive? toupper(*p): *p);
 							p++;
 						}
 						while (isspace (*p))
 							p++;
-						L_getit (name, p, case_insensitive, dialect, kind_hint);
+						L_getit (name, p, dialect, kind_hint);
 					}
 				}
 			}
@@ -441,22 +440,26 @@ static void findLispTags (void)
 {
 	struct lispDialect lisp_dialect = {
 		.definer2kind = lisp_hint2kind,
+		.case_insensitive = true,
+		.has_namespace = true,
 		.unknown_kind = K_UNKNOWN,
 		.definer_field = LispFields + F_DEFINER,
 	};
 
-	findLispTagsCommon (true, true, &lisp_dialect);
+	findLispTagsCommon (&lisp_dialect);
 }
 
 static void findEmacsLispTags (void)
 {
 	struct lispDialect elisp_dialect = {
 		.definer2kind = elisp_hint2kind,
+		.case_insensitive = false,
+		.has_namespace = false,
 		.unknown_kind = eK_UNKNOWN,
 		.definer_field = EmacsLispFields + eF_DEFINER,
 	};
 
-	findLispTagsCommon (false, false, &elisp_dialect);
+	findLispTagsCommon (&elisp_dialect);
 }
 
 extern parserDefinition* LispParser (void)
