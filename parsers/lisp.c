@@ -132,6 +132,8 @@ struct lispDialect {
 	int unknown_kind;
 	fieldDefinition *definer_field;
 	bool (* is_def) (struct lispDialect *, const unsigned char *);
+	void (* get_it) (struct lispDialect *,
+					 vString *const, const unsigned char *, vString *);
 };
 
 /*
@@ -332,9 +334,9 @@ static int  elisp_hint2kind (const vString *const hint)
 	return k;
 }
 
-static void L_getit (vString *const name, const unsigned char *dbp,
-					 struct lispDialect *dialect,
-					 vString *kind_hint)
+
+static void lisp_get_it (struct lispDialect *dialect,
+						 vString *const name, const unsigned char *dbp, vString *kind_hint)
 {
 	const unsigned char *p;
 
@@ -402,7 +404,7 @@ static void findLispTagsCommon (struct lispDialect *dialect)
 				}
 				while (isspace (*p))
 					p++;
-				L_getit (name, p, dialect, kind_hint);
+				dialect->get_it(dialect, name, p, kind_hint);
 			}
 			else if (dialect->namespace_sep != 0)
 			{
@@ -427,7 +429,7 @@ static void findLispTagsCommon (struct lispDialect *dialect)
 						}
 						while (isspace (*p))
 							p++;
-						L_getit (name, p, dialect, kind_hint);
+						dialect->get_it(dialect, name, p, kind_hint);
 					}
 				}
 			}
@@ -446,6 +448,7 @@ static void findLispTags (void)
 		.unknown_kind = K_UNKNOWN,
 		.definer_field = LispFields + F_DEFINER,
 		.is_def = lisp_is_def,
+		.get_it = lisp_get_it,
 	};
 
 	findLispTagsCommon (&lisp_dialect);
@@ -460,6 +463,7 @@ static void findEmacsLispTags (void)
 		.unknown_kind = eK_UNKNOWN,
 		.definer_field = EmacsLispFields + eF_DEFINER,
 		.is_def = lisp_is_def,
+		.get_it = lisp_get_it,
 	};
 
 	findLispTagsCommon (&elisp_dialect);
