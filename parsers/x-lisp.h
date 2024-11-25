@@ -25,8 +25,13 @@ struct lispDialect {
 	int (* get_it) (struct lispDialect *,
 					vString *const, const unsigned char *, vString *,
 					const char *);
+	int scope;
 };
 
 void findLispTagsCommon (struct lispDialect *dialect);
+
+int lispGetIt (struct lispDialect *dialect,
+			   vString *const name, const unsigned char *dbp, vString *kind_hint,
+			   const char *namespace);
 
 #endif	/* CTAGS_LISP_H */

@@ -324,10 +324,9 @@ static int  elisp_hint2kind (const vString *const hint, const char *namespace CT
 	return k;
 }
 
-
-static int lisp_get_it (struct lispDialect *dialect,
-						vString *const name, const unsigned char *dbp, vString *kind_hint,
-						const char *namespace)
+ int lispGetIt (struct lispDialect *dialect,
+				vString *const name, const unsigned char *dbp, vString *kind_hint,
+				const char *namespace)
 {
 	int index = CORK_NIL;
 	const unsigned char *p;
@@ -458,7 +457,8 @@ static void findLispTags (void)
 		.definer_field = LispFields + F_DEFINER,
 		.skip_initial_spaces = false,
 		.is_def = lisp_is_def,
-		.get_it = lisp_get_it,
+		.get_it = lispGetIt,
+		.scope = CORK_NIL,
 	};
 
 	findLispTagsCommon (&lisp_dialect);
@@ -474,11 +474,13 @@ static void findEmacsLispTags (void)
 		.definer_field = EmacsLispFields + eF_DEFINER,
 		.skip_initial_spaces = false,
 		.is_def = lisp_is_def,
-		.get_it = lisp_get_it,
+		.get_it = lispGetIt,
+		.scope = CORK_NIL,
 	};
 
 	findLispTagsCommon (&elisp_dialect);
 }
+
 
 extern parserDefinition* LispParser (void)
 {
