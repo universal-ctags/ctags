@@ -705,10 +705,10 @@ static int vGetc (void)
 	return _vGetc (false);
 }
 
-// Is the first charactor in an identifier? [a-zA-Z_`]
+// Is the first character in an identifier? [a-zA-Z_`\\]
 static bool isWordToken (const int c)
 {
-	return (isalpha (c) || c == '_' || c == '`');
+	return (isalpha (c) || c == '_' || c == '`' || c == '\\');
 }
 
 // Is a charactor in an identifier? [a-zA-Z0-9_`$]
@@ -873,12 +873,26 @@ static int _readWordToken (tokenInfo *const token, int c, bool skip)
 	Assert (isWordToken (c));
 
 	clearToken (token);
-	do
+	if (c == '\\')
 	{
-		vStringPut (token->name, c);
-		c = vGetc ();
-	} while (isIdentifierCharacter (c));
-	_updateKind (token);
+		// Escaped identifier (may be empty)
+		c = vGetc (); // skip leading '\'
+		while (isgraph (c))
+		{
+			vStringPut (token->name, c);
+			c = vGetc ();
+		}
+		token->kind = K_IDENTIFIER;
+	}
+	else
+	{
+		do
+		{
+			vStringPut (token->name, c);
+			c = vGetc ();
+		} while (isIdentifierCharacter (c));
+		_updateKind (token);
+	}
 
 	if (skip)
 		return skipWhite (c);
