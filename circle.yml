@@ -187,7 +187,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-              yum -y --enablerepo=baseos --enablerepo=appstream --enablerepo=crb install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
+              yum -y --enablerepo=baseos --enablerepo=appstream --enablerepo=crb install python3 gcc automake autoconf pkgconfig make jansson-devel libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
        - run:
            name: Build
            command: |
