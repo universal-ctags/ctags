@@ -35,3 +35,47 @@ jobs:
       - run: ctags --version
       - run: make check V=1
       - run: make roundtrip
+
+
+  chroot_qemu:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-arch: [aarch64, ppc64le, riscv64, s390x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: |
+          cat > run.sh <<EOF
+          set -ex
+
+          run() {
+            printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "\$*"
+            eval "\$@"
+          }
+
+          run apk add libc-dev gcc make automake autoconf pkgconf python3 diffutils pcre2-dev jansson-dev yaml-dev libxml2-dev
+
+          run ./autogen.sh
+          run ./configure --enable-debugging
+          run make
+
+          run readelf -h ctags
+          run readelf -d ctags
+
+          run ./ctags --version
+
+          run make check V=1
+          run make roundtrip
+          run make tmain CI=1 CTAGS_DEP= READTAGS_DEP= OPTSCRIPT_DEP=
+          run make units CI=1 CTAGS_DEP=
+          EOF
+
+      - run: curl -LO https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/master/alpine-chroot-install
+      - run: chmod +x alpine-chroot-install
+      - run: sudo ./alpine-chroot-install -d /alpine -a ${{ matrix.target-arch }} -p wget -p g++
+      - run: /alpine/enter-chroot sh run.sh
