@@ -3,7 +3,7 @@ XXX	input.sv	/^`define XXX          foo$/;"	d
 xxx_begin	input.sv	/^`define xxx_begin$/;"	d
 xxx_end	input.sv	/^`define xxx_end$/;"	d
 `XXX	input.sv	/^module `XXX ();$/;"	m
-add_t	input.sv	/^`define add_t(f) f``_t$/;"	d	module:`XXX
+add_t	input.sv	/^`define add_t(f) f``_t$/;"	d
 `XXX_TOP	input.sv	/^module `XXX_TOP();$/;"	m
 foo	input.sv	/^class foo;$/;"	C
 new	input.sv	/^  function new(string name="...");$/;"	f	class:foo
