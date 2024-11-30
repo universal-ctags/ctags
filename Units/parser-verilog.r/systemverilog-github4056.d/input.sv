@@ -30,3 +30,21 @@ class O;
   `include "test1.txt"
   } [1:0] complex0_s, complex1_s;
 endclass
+
+// https://github.com/universal-ctags/ctags/issues/
+typedef enum logic {
+    xxx,
+    yyy
+`ifdef foo
+    ,
+    zzz = 'x
+`endif
+} ifdef1_e;
+
+typedef enum logic {
+    aaa,
+    bbb
+`ifdef bar
+    ,ccc
+`endif
+} ifdef2_e;

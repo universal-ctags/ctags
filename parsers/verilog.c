@@ -1694,6 +1694,7 @@ static int pushEnumNames (tokenInfo* token, int c)
 			if (c == '=')
 				c = skipExpression (vGetc ());
 
+			c = skipMacro (c, token);
 			/* Skip comma */
 			if (c == ',')
 				c = skipWhite (vGetc ());

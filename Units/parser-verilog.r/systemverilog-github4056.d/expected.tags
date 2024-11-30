@@ -29,3 +29,11 @@ enum10_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	
 enum11_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	struct:O.complex1_s
 d	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex1_s
 e	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex1_s
+ifdef1_e	input.sv	/^} ifdef1_e;$/;"	T
+xxx	input.sv	/^    xxx,$/;"	c	typedef:ifdef1_e
+yyy	input.sv	/^    yyy$/;"	c	typedef:ifdef1_e
+zzz	input.sv	/^    zzz = 'x$/;"	c	typedef:ifdef1_e
+ifdef2_e	input.sv	/^} ifdef2_e;$/;"	T
+aaa	input.sv	/^    aaa,$/;"	c	typedef:ifdef2_e
+bbb	input.sv	/^    bbb$/;"	c	typedef:ifdef2_e
+ccc	input.sv	/^    ,ccc$/;"	c	typedef:ifdef2_e
