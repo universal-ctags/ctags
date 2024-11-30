@@ -1031,7 +1031,8 @@ static void createTagFull (tokenInfo *const token, verilogKind kind, int role, t
 	updateTagLine (&tag, token->lineNumber, token->filePosition);
 
 	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), kind);
-	if (currentContext->kind != K_UNDEFINED)
+	if (currentContext->kind != K_UNDEFINED
+		&& kind != K_DEFINE)	// a define macro should not be scoped. #4127
 	{
 		verbose (" to context %s\n", vStringValue (currentContext->name));
 		currentContext->lastKind = kind;

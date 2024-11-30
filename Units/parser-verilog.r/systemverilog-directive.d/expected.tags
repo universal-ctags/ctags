@@ -1,21 +1,21 @@
 directive	input.sv	/^module directive;$/;"	m
-D	input.sv	/^`define D(x,y) initial $display("start", x , y, "end");$/;"	d	module:directive
-MACRO1	input.sv	/^`define MACRO1(a=5,b="B",c) $display(a,,b,,c);$/;"	d	module:directive
-MACRO2	input.sv	/^`define MACRO2(a=5, b, c="C") $display(a,,b,,c);$/;"	d	module:directive
-MACRO3	input.sv	/^`define MACRO3(a=5, b=0, c="C") $display(a,,b,,c);$/;"	d	module:directive
-wordsize	input.sv	/^`define wordsize 8$/;"	d	module:directive
+D	input.sv	/^`define D(x,y) initial $display("start", x , y, "end");$/;"	d
+MACRO1	input.sv	/^`define MACRO1(a=5,b="B",c) $display(a,,b,,c);$/;"	d
+MACRO2	input.sv	/^`define MACRO2(a=5, b, c="C") $display(a,,b,,c);$/;"	d
+MACRO3	input.sv	/^`define MACRO3(a=5, b=0, c="C") $display(a,,b,,c);$/;"	d
+wordsize	input.sv	/^`define wordsize 8$/;"	d
 data	input.sv	/^logic [1:`wordsize] data;$/;"	r	module:directive
-var_nand	input.sv	/^`define var_nand(dly) nand #dly$/;"	d	module:directive
-max	input.sv	/^`define max(a,b)((a) > (b) ? (a) : (b))$/;"	d	module:directive
-TOP	input.sv	/^`define TOP(a,b) a + b$/;"	d	module:directive
+var_nand	input.sv	/^`define var_nand(dly) nand #dly$/;"	d
+max	input.sv	/^`define max(a,b)((a) > (b) ? (a) : (b))$/;"	d
+TOP	input.sv	/^`define TOP(a,b) a + b$/;"	d
 main	input.sv	/^module main;$/;"	m
-HI	input.sv	/^`define HI Hello$/;"	d	module:main
-LO	input.sv	/^`define LO "`HI, world"$/;"	d	module:main
-H	input.sv	/^`define H(x) "Hello, x"$/;"	d	module:main
+HI	input.sv	/^`define HI Hello$/;"	d
+LO	input.sv	/^`define LO "`HI, world"$/;"	d
+H	input.sv	/^`define H(x) "Hello, x"$/;"	d
 directive2	input.sv	/^module directive2;$/;"	m
-msg	input.sv	/^`define msg(x,y) `"x: `\\`"y`\\`"`"$/;"	d	module:directive2
-append	input.sv	/^`define append(f) f``_master$/;"	d	module:directive2
-home	input.sv	/^`define home(filename) `"\/home\/mydir\/filename`"$/;"	d	module:directive2
+msg	input.sv	/^`define msg(x,y) `"x: `\\`"y`\\`"`"$/;"	d
+append	input.sv	/^`define append(f) f``_master$/;"	d
+home	input.sv	/^`define home(filename) `"\/home\/mydir\/filename`"$/;"	d
 and_op	input.sv	/^module and_op (a, b, c);$/;"	m
 a	input.sv	/^    output a;$/;"	p	module:and_op
 b	input.sv	/^    input b, c;$/;"	p	module:and_op
@@ -23,10 +23,10 @@ c	input.sv	/^    input b, c;$/;"	p	module:and_op
 a	input.sv	/^        wire a = b & c;$/;"	n	module:and_op
 test	input.sv	/^module test(out);$/;"	m
 out	input.sv	/^    output out;$/;"	p	module:test
-wow	input.sv	/^    `define wow$/;"	d	module:test
-nest_one	input.sv	/^    `define nest_one$/;"	d	module:test
-second_nest	input.sv	/^    `define second_nest$/;"	d	module:test
-nest_two	input.sv	/^    `define nest_two$/;"	d	module:test
+wow	input.sv	/^    `define wow$/;"	d
+nest_one	input.sv	/^    `define nest_one$/;"	d
+second_nest	input.sv	/^    `define second_nest$/;"	d
+nest_two	input.sv	/^    `define nest_two$/;"	d
 test	input.sv	/^module test;$/;"	m
 ifdef_in_port	input.sv	/^module ifdef_in_port ($/;"	m
 a	input.sv	/^    input logic a,$/;"	p	module:ifdef_in_port
@@ -37,9 +37,9 @@ c	input.sv	/^    input logic c$/;"	p	module:ifdef_in_port
 user_t	input.sv	/^typedef logic user_t;$/;"	T
 define_in_port	input.sv	/^module define_in_port ($/;"	m
 a	input.sv	/^    input user_t a,$/;"	p	module:define_in_port
-FOO	input.sv	/^`define FOO$/;"	d	module:define_in_port
+FOO	input.sv	/^`define FOO$/;"	d
 b	input.sv	/^    input user_t b,$/;"	p	module:define_in_port
-BAR	input.sv	/^`define BAR$/;"	d	module:define_in_port
+BAR	input.sv	/^`define BAR$/;"	d
 c1	input.sv	/^        input user_t c1,$/;"	p	module:define_in_port
 c2	input.sv	/^        input user_t c2,$/;"	p	module:define_in_port
 c3	input.sv	/^        input user_t c3,c4,$/;"	p	module:define_in_port
@@ -47,9 +47,9 @@ c4	input.sv	/^        input user_t c3,c4,$/;"	p	module:define_in_port
 d1	input.sv	/^        output user_t d1 ,$/;"	p	module:define_in_port
 d2	input.sv	/^        output user_t d2$/;"	p	module:define_in_port
 define_in_port_messy	input.sv	/^module define_in_port_messy ($/;"	m
-FOO	input.sv	/^`define FOO$/;"	d	module:define_in_port_messy
+FOO	input.sv	/^`define FOO$/;"	d
 a	input.sv	/^    input user_t a$/;"	p	module:define_in_port_messy
-BAR	input.sv	/^`define BAR$/;"	d	module:define_in_port_messy
+BAR	input.sv	/^`define BAR$/;"	d
 b	input.sv	/^    ,input user_t b$/;"	p	module:define_in_port_messy
 c1	input.sv	/^        ,input user_t c1$/;"	p	module:define_in_port_messy
 c2	input.sv	/^        ,input user_t c2$/;"	p	module:define_in_port_messy
@@ -60,6 +60,6 @@ d2	input.sv	/^        , output user_t d2$/;"	p	module:define_in_port_messy
 MY_DEFINE	input.sv	/^`define MY_DEFINE$/;"	d
 assert_clk	input.sv	/^`define assert_clk(arg, __clk=clk, __rst_n=rst_n) \\$/;"	d
 forSkipMacro	input.sv	/^module forSkipMacro;$/;"	m
-add_t	input.sv	/^`define add_t(f) f``_t$/;"	d	module:forSkipMacro
+add_t	input.sv	/^`define add_t(f) f``_t$/;"	d
 `add_t	input.sv	/^    var `add_t(foo) = '0;$/;"	r	module:forSkipMacro
-macro	input.sv	/^`define macro$/;"	d	module:forSkipMacro
+macro	input.sv	/^`define macro$/;"	d
