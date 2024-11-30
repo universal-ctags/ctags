@@ -471,7 +471,11 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
         output_lang_extras = ' (multi inputs)'
 
     if not shutil.which(ffilter):
-        ffilter = 'cat'
+        if os.name == 'nt':
+            if not os.path.isfile(ffilter):
+                ffilter = 'cat'
+        else:
+            ffilter = 'cat'
 
     ostderr = o + '/' + _STDERR_OUTPUT_NAME
     orawout = o + '/RAWOUT.tmp'
@@ -1285,7 +1289,7 @@ def prepare_environment():
     os.environ['MSYS2_ARG_CONV_EXCL'] = '--regex-;--_scopesep;--exclude;--exclude-exception'
 
     _PREPERE_ENV = """LC_ALL="C"; export LC_ALL
-MSYS2_ARG_CONV_EXCL='--regex-;--_scopesep;--exclude;--exclude-exception' export MSYS2_ARG_CONV_EXCL
+MSYS2_ARG_CONV_EXCL='--regex-;--_scopesep;--exclude;--exclude-exception'; export MSYS2_ARG_CONV_EXCL
 """
 
 # enable ANSI escape sequences on Windows 10 1511 (10.0.10586) or later
