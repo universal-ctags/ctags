@@ -224,31 +224,6 @@ jobs:
            command: |
              make check roundtrip
 
-   ubi8:
-     working_directory: ~/universal-ctags
-     docker:
-       - image: registry.access.redhat.com/ubi8:latest
-     steps:
-       - run:
-           name: Install Git
-           command: |
-             yum -y install git
-       - checkout
-       - run:
-           name: Install build tools
-           command: |
-              yum -y --enablerepo=ubi-8-appstream-rpms --enablerepo=ubi-8-baseos-rpms --enablerepo=ubi-8-codeready-builder-rpms install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
-       - run:
-           name: Build
-           command: |
-             bash ./autogen.sh
-             ./configure --enable-debugging
-             make -j 2
-       - run:
-           name: Test
-           command: |
-             make check roundtrip
-
    ubuntu20_mingw:
      working_directory: ~/universal-ctags
      docker:
@@ -361,7 +336,6 @@ workflows:
       - fedora41_distcheck
       - stream10
       - stream9
-      - ubi8
       - fedora41_gmake
       - fedora33_cross_aarch64
       - ubuntu20_mingw
