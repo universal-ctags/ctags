@@ -8,10 +8,10 @@ jobs:
   #
   # We assume GNU Make is available.
   #
-   fedora40_gmake:
+   fedora41_gmake:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:40
+       - image: docker.io/fedora:41
      steps:
        - run:
            name: Install Git, Gdb and Procps-NG
@@ -41,10 +41,10 @@ jobs:
              cd docs
              make html
 
-   fedora40_gmake_roundtrip:
+   fedora41_gmake_roundtrip:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:40
+       - image: docker.io/fedora:41
      steps:
        - run:
            name: Install Git and Gdb
@@ -133,10 +133,10 @@ jobs:
            command: |
              MAKE=bmake bmake roundtrip
 
-   fedora40_distcheck:
+   fedora41_distcheck:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:40
+       - image: docker.io/fedora:41
      steps:
        - run:
            name: Install Git, Gdb and Procps-NG
@@ -174,6 +174,31 @@ jobs:
              make distcheck GIT_DIR=__NO_GIT__
              rmdir __NO_GIT__
 
+   stream10:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: quay.io/centos/centos:stream10
+     steps:
+       - run:
+           name: Install Git
+           command: |
+             dnf -y --enablerepo=baseos --enablerepo=appstream --enablerepo=crb install git
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+              dnf -y --enablerepo=baseos --enablerepo=appstream --enablerepo=crb install python3 gcc automake autoconf pkgconfig make jansson-devel libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
+       - run:
+           name: Build
+           command: |
+             bash ./autogen.sh
+             ./configure --enable-debugging
+             make -j 2
+       - run:
+           name: Test
+           command: |
+             make check roundtrip
+
    stream9:
      working_directory: ~/universal-ctags
      docker:
@@ -187,32 +212,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-              yum -y --enablerepo=baseos --enablerepo=appstream --enablerepo=crb install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
-       - run:
-           name: Build
-           command: |
-             bash ./autogen.sh
-             ./configure --enable-debugging
-             make -j 2
-       - run:
-           name: Test
-           command: |
-             make check roundtrip
-
-   ubi8:
-     working_directory: ~/universal-ctags
-     docker:
-       - image: registry.access.redhat.com/ubi8:latest
-     steps:
-       - run:
-           name: Install Git
-           command: |
-             yum -y install git
-       - checkout
-       - run:
-           name: Install build tools
-           command: |
-              yum -y --enablerepo=ubi-8-appstream-rpms --enablerepo=ubi-8-baseos-rpms --enablerepo=ubi-8-codeready-builder-rpms install python3 gcc automake autoconf pkgconfig make libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
+              yum -y --enablerepo=baseos --enablerepo=appstream --enablerepo=crb install python3 gcc automake autoconf pkgconfig make jansson-devel libxml2-devel libyaml-devel pcre2-devel findutils diffutils sudo
        - run:
            name: Build
            command: |
@@ -333,11 +333,11 @@ workflows:
     jobs:
       - ubuntu20_32bit
       - fedora30_bmake
-      - fedora40_distcheck
+      - fedora41_distcheck
+      - stream10
       - stream9
-      - ubi8
-      - fedora40_gmake
+      - fedora41_gmake
       - fedora33_cross_aarch64
       - ubuntu20_mingw
       - fedora30_bmake_roundtrip
-      - fedora40_gmake_roundtrip
+      - fedora41_gmake_roundtrip
