@@ -1,0 +1,11 @@
+a	input.ps1	/^function a$/;"	f
+b	input.ps1	/^function b$/;"	f
+c	input-0.ps1	/^function c$/;"	f
+d	input-0.ps1	/^function d$/;"	f
+e	input-1.ps1	/^function e$/;"	f
+f	input-2.ps1	/^function f$/;"	f
+g	input-3.ps1	/^function g$/;"	f
+h	input-4.ps1	/^function h$/;"	f
+i	input-5.ps1	/^function i$/;"	f
+j	input-6.ps1	/^function j$/;"	f
+k	input-6.ps1	/^function k$/;"	f
