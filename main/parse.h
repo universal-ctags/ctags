@@ -112,7 +112,12 @@ struct sParserDefinition {
 	unsigned int method;           /* see METHOD_ definitions above */
 	unsigned int useCork;          /* bit fields of corkUsage */
 	bool useMemoryStreamInput;
-	bool allowNullTag;
+	bool allowNullTag;             /* allow the parser emit tags with empty
+									  strings. If you want to emit a few
+									  specified tags with empty strings,
+									  you don't need this parser-global
+									  allowNullTag; set tagEntryInfo::allowNullTag
+									  instead. */
 	bool requestAutomaticFQTag;
 	tagRegexTable *tagRegexTable;
 	unsigned int tagRegexCount;
