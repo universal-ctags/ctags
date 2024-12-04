@@ -1938,7 +1938,7 @@ extern int makeTagEntry (tagEntryInfo *const tag)
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
 	{
-		if (!doesInputLanguageAllowNullTag())
+		if (! tag->allowNullTag)
 			error (NOTICE, "ignoring null tag in %s(line: %lu, language: %s)",
 				   getInputFileName (), tag->lineNumber,
 				   getLanguageName (tag->langType));
@@ -2082,6 +2082,8 @@ static void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 
 	if (isParserMarkedNoEmission ())
 		e->placeholder = 1;
+
+	e->allowNullTag = doesLanguageAllowNullTag (e->langType);
 }
 
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
