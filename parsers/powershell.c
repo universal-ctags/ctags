@@ -9,6 +9,10 @@
 *
 *   This module contains code for generating tags for Windows PowerShell scripts
 *   (https://en.wikipedia.org/wiki/PowerShell).
+*
+*   References:
+*   - https://learn.microsoft.com/en-us/powershell/scripting/developer/windows-powershell-reference
+*   - https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-01
 */
 
 /*
@@ -102,6 +106,7 @@ typedef struct {
 	unsigned long	lineNumber;
 	MIOPos			filePosition;
 	int				parentKind; /* KIND_GHOST_INDEX if none */
+	bool            herestring;	/* Meaningful only when type is TOKEN_STRING. */
 } tokenInfo;
 
 
@@ -258,6 +263,43 @@ static void parseString (vString *const string, const int delimiter)
 	}
 }
 
+static bool parseHereString (vString *const string, const int delimiter)
+{
+	enum phs_state {
+		PHS_INIT,
+		PHS_NEWLINE0,
+		PHS_QUOTE,
+		PHS_AT,
+		PHS_NEWLINE1,
+		PHS_END = PHS_NEWLINE1
+	} s = PHS_INIT;
+
+	while (s != PHS_END)
+	{
+		int c = getcFromInputFile ();
+
+		if (c == EOF)
+			return false;
+
+		vStringPut (string, c);
+
+		if (s == PHS_INIT && c == '\n')
+			s = PHS_NEWLINE0;
+		else if (s == PHS_NEWLINE0 && c == delimiter)
+			s = PHS_QUOTE;
+		else if (s == PHS_QUOTE && c == '@')
+			s = PHS_AT;
+		else if (s == PHS_AT && c == '\n')
+			s = PHS_NEWLINE1;
+		else
+			s = PHS_INIT;
+	}
+
+	Assert (vStringLength (string) >= 4);
+	vStringTruncate (string, vStringLength (string) - 4);
+	return true;
+}
+
 /* parse a identifier that may contain scopes, such as function names and
  * variable names.
  *
@@ -356,8 +398,33 @@ getNextChar:
 			parseString (token->string, c);
 			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
+			token->herestring = false;
 			break;
 
+		case '@':
+		{
+			int d = getcFromInputFile ();
+			if (d == '\'' || d == '"')
+			{
+				bool is_herestr;
+				token->type = TOKEN_STRING;
+				is_herestr = parseHereString (token->string, d);
+				token->lineNumber = getInputLineNumber ();
+				token->filePosition = getInputFilePosition ();
+				if (is_herestr)
+					token->herestring = true;
+				else
+					token->type = TOKEN_UNDEFINED;
+			}
+			else if (d == EOF)
+				token->type = TOKEN_UNDEFINED;
+			else
+			{
+				ungetcToInputFile (d);
+				token->type = TOKEN_UNDEFINED;
+			}
+			break;
+		}
 		case '<':
 		{
 			int d = getcFromInputFile ();
