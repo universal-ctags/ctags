@@ -164,7 +164,7 @@ typedef bool (* entryForeachFunc) (int corkIndex,
 /*
 *   FUNCTION PROTOTYPES
 */
-extern int makeTagEntry (const tagEntryInfo *const tag);
+extern int makeTagEntry (tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  int kindIndex);
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
