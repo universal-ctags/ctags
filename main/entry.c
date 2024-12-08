@@ -1762,7 +1762,7 @@ static void buildFqTagCache (tagEntryInfo *const tag)
 	getTagScopeInformation (tag, NULL, NULL);
 }
 
-static void writeTagEntry (const tagEntryInfo *const tag)
+static void writeTagEntry (tagEntryInfo *const tag)
 {
 	int length = 0;
 
@@ -1773,8 +1773,8 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 #ifdef _WIN32
 	if (getFilenameSeparator(Option.useSlashAsFilenameSeparator) == FILENAME_SEP_USE_SLASH)
 	{
-		Assert (((const tagEntryInfo *)tag)->inputFileName);
-		char *c = (char *)(((tagEntryInfo *const)tag)->inputFileName);
+		Assert (tag->inputFileName);
+		char *c = (char *)(tag->inputFileName);
 		while (*c)
 		{
 			if (*c == PATH_SEPARATOR)
@@ -1791,7 +1791,7 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 		&& !tag->skipAutoFQEmission)
 	{
 		/* const is discarded to update the cache field of TAG. */
-		buildFqTagCache ( (tagEntryInfo *const)tag);
+		buildFqTagCache (tag);
 	}
 
 	length = writerWriteTag (TagFile.mio, tag);
@@ -1926,7 +1926,7 @@ extern int makePlaceholder (const char *const name)
 	return makeTagEntry (&e);
 }
 
-extern int makeTagEntry (const tagEntryInfo *const tag)
+extern int makeTagEntry (tagEntryInfo *const tag)
 {
 	int r = CORK_NIL;
 	Assert (tag->name != NULL);
