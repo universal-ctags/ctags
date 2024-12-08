@@ -55,6 +55,7 @@ tagWriter uCtagsWriter = {
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
 	.checkOptions = checkCtagsOptions,
+	.canPrintNullTag = false,
 #ifdef _WIN32
 	.overrideFilenameSeparator = overrideFilenameSeparator,
 #endif
@@ -96,6 +97,7 @@ tagWriter eCtagsWriter = {
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
 	.checkOptions = checkCtagsOptions,
+	.canPrintNullTag = false,
 	.defaultFileName = CTAGS_FILE,
 };
 

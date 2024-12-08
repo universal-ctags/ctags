@@ -5,6 +5,16 @@ Changes in 6.?.0
 New and extended options and their flags
 ---------------------------------------------------------------------
 
+``nulltag``/``z`` extra
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Universal Ctags now supports tags (*null tags*) having empty strings as their names.
+See :ref:`extras` in :ref:`ctags(1) <ctags(1)>`.
+
+.. note::
+
+   * ``libreadtags`` and ``readtags`` do not support the null tags yet.
+   * ``json`` and ``xref`` output formats support the null tags.
+
 Incompatible changes
 ---------------------------------------------------------------------
 

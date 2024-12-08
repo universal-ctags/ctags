@@ -1835,6 +1835,8 @@ roles of tags to include in the output file for a particular language.
 Inquire the output of "``ctags --list-roles``" for the list of
 roles.
 
+.. _extras:
+
 Extras
 ~~~~~~
 
@@ -1926,6 +1928,24 @@ The meaning of major extras is as follows (long-name flag/one-letter flag):
 	ctags to create the extra tags for any source files.
 
 	The etags mode enables the ``Unknown`` parser implicitly.
+
+``nulltag``/``z``
+	Include tags (*null tags*) having empty strings as their names.
+	Generally speaking, trying to make a null tag is a sign of a parser bug
+	or broken input. ctags warns such trying or throws the
+	null tag away. To suppress the warnings, use ``--quiet`` option.
+
+	On the other hand, null tags are valid in some languages.
+	Consider ``{"":  val}`` in a JavaScript sourece code. The empty string is
+	valid as a key. If a parser intentionally makes a null tag (a valid null tag),
+	ctags doesn't warn but discard it by default.
+
+	The discards are due because some output formats may not consider null tags.
+
+	With ``nulltag``/``z`` extra, you can force ctags to emit the nulltags. This extra
+	is effective only if the output format supports null tags.
+
+	(since version 6.2.0)
 
 ``pseudo``/``p``
 	Include pseudo-tags. Enabled by default unless the tag file is

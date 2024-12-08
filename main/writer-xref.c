@@ -37,6 +37,7 @@ tagWriter xrefWriter = {
 	.postWriteEntry = NULL,
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = NULL,
+	.canPrintNullTag = true,
 	.defaultFileName = NULL,
 };
 
