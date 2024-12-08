@@ -1770,6 +1770,15 @@ static void writeTagEntry (tagEntryInfo *const tag)
 
 	DebugStatement ( debugEntry (tag); )
 
+	if (isTagExtraBitMarked(tag, XTAG_NULLTAG))
+	{
+		if (!writerCanPrintNullTag())
+			return;
+
+		if (!isXtagEnabled(XTAG_NULLTAG))
+			return;
+	}
+
 #ifdef _WIN32
 	if (getFilenameSeparator(Option.useSlashAsFilenameSeparator) == FILENAME_SEP_USE_SLASH)
 	{
@@ -1939,10 +1948,17 @@ extern int makeTagEntry (tagEntryInfo *const tag)
 	if (tag->name [0] == '\0' && (!tag->placeholder))
 	{
 		if (! tag->allowNullTag)
+		{
 			error (NOTICE, "ignoring null tag in %s(line: %lu, language: %s)",
 				   getInputFileName (), tag->lineNumber,
 				   getLanguageName (tag->langType));
-		goto out;
+			goto out;
+		}
+
+		/* writeTagEntry decides whether ctags emits this tag or not.
+		 * At this point, we just mark the tag as a null tag. */
+		if (! tag->placeholder)
+			markTagExtraBit(tag, XTAG_NULLTAG);
 	}
 
 	if (TagFile.cork)
