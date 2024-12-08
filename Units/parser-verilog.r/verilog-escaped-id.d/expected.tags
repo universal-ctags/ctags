@@ -1,0 +1,11 @@
+themodule#(x=42)	input.v	/^module \\themodule#(x=42) ($/;"	m
+clk,rst,	input.v	/^    input wire \\clk,rst, , \\d ,$/;"	p	module:themodule#(x=42)
+d	input.v	/^    input wire \\clk,rst, , \\d ,$/;"	p	module:themodule#(x=42)
+1+1=2	input.v	/^    output reg \\1+1=2$/;"	p	module:themodule#(x=42)
+\\	input.v	/^localparam \\\\ = 1;$/;"	c	module:themodule#(x=42)
+\\\\	input.v	/^localparam \\\\\\ = \\\\ ;$/;"	c	module:themodule#(x=42)
+r\\n	input.v	/^localparam \\r\\n = \\\\\\ ;$/;"	c	module:themodule#(x=42)
+\\r\\n	input.v	/^localparam \\\\r\\n = \\r\\n ;$/;"	c	module:themodule#(x=42)
+\\\\r\\n	input.v	/^localparam \\\\\\r\\n = \\\\r\\n ;$/;"	c	module:themodule#(x=42)
+end	input.v	/^always @(posedge \\clk,rst, ) begin : \\end$/;"	b	module:themodule#(x=42)
+\\end	input.v	/^    if (\\\\\\r\\n ) begin : \\\\end$/;"	b	block:themodule#(x=42).end
