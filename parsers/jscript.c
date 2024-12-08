@@ -480,7 +480,7 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 
 static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 							vString *const signature, vString *const inheritance,
-							bool anonymous)
+							bool anonymous, bool nulltag)
 {
 	int index = CORK_NIL;
 	const char *name = vStringValue (token->string);
@@ -550,6 +550,9 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 	if (anonymous)
 		markTagExtraBit (&e, XTAG_ANONYMOUS);
 
+	if (nulltag)
+		e.allowNullTag = 1;
+
 	index = makeTagEntry (&e);
 	/* We shold remove This condition. We should fix the callers passing
 	 * an empty name instead. makeTagEntry() returns CORK_NIL if the tag
@@ -563,13 +566,19 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 static int makeJsTag (const tokenInfo *const token, const jsKind kind,
 					   vString *const signature, vString *const inheritance)
 {
-	return makeJsTagCommon (token, kind, signature, inheritance, false);
+	return makeJsTagCommon (token, kind, signature, inheritance, false, false);
+}
+
+static int makeJsNullTag (const tokenInfo *const token, const jsKind kind,
+						  vString *const signature, vString *const inheritance)
+{
+	return makeJsTagCommon (token, kind, signature, inheritance, false, true);
 }
 
 static int makeClassTagCommon (tokenInfo *const token, vString *const signature,
 						  vString *const inheritance, bool anonymous)
 {
-	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance, anonymous);
+	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance, anonymous, false);
 }
 
 static int makeClassTag (tokenInfo *const token, vString *const signature,
@@ -582,7 +591,7 @@ static int makeFunctionTagCommon (tokenInfo *const token, vString *const signatu
 								  bool generator, bool anonymous)
 {
 	return makeJsTagCommon (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL,
-							anonymous);
+							anonymous, false);
 }
 
 static int makeFunctionTag (tokenInfo *const token, vString *const signature, bool generator)
@@ -1430,7 +1439,7 @@ static int parseMethodsInAnonymousObject (tokenInfo *const token)
 	anonGenerate (anon_object->string, "anonymousObject", JSTAG_VARIABLE);
 	anon_object->type = TOKEN_IDENTIFIER;
 
-	index = makeJsTagCommon (anon_object, JSTAG_VARIABLE, NULL, NULL, true);
+	index = makeJsTagCommon (anon_object, JSTAG_VARIABLE, NULL, NULL, true, false);
 	if (! parseMethods (token, index, false))
 	{
 		/* If no method is found, the anonymous object
@@ -2257,7 +2266,12 @@ function:
 					deleteToken (saved_token);
 
 					has_methods = true;
-					index_for_name = makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
+					/* property names can be empty strings such as { "": true },
+					 * use a special function for generating tags for those */
+					if (name->string->length == 0)
+						index_for_name =  makeJsNullTag (name, JSTAG_PROPERTY, NULL, NULL);
+					else
+						index_for_name = makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 					if (p != CORK_NIL)
 						moveChildren (p, index_for_name);
 				}
@@ -2341,7 +2355,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *target_name)
 	TRACE_PRINT("Emitting tag for class '%s'", vStringValue(target_name->string));
 
 	int r = makeJsTagCommon (target_name, JSTAG_CLASS, NULL, inheritance,
-							 (is_anonymous && (target_name == class_name)));
+							 (is_anonymous && (target_name == class_name)), false);
 
 	if (! is_anonymous && target_name != class_name)
 	{
@@ -2675,7 +2689,7 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		if ( parseMethods(token, p, false) )
 		{
 			jsKind kind = state->foundThis || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
-			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, anon_object);
+			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, anon_object, false);
 			moveChildren (p, state->indexForName);
 		}
 		else if ( token->nestLevel == 0 && state->isGlobal )
@@ -2722,7 +2736,7 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		 */
 		if ( ( token->nestLevel == 0 && state->isGlobal ) || kind == JSTAG_PROPERTY )
 		{
-			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, false);
+			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, false, false);
 		}
 	}
 	else if (isKeyword (token, KEYWORD_new))

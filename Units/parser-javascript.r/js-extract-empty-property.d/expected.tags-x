@@ -1,0 +1,2 @@
+                 property      1 input.js var variable = { "": "value" };
+variable         variable      1 input.js var variable = { "": "value" };
