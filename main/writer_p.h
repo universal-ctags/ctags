@@ -54,6 +54,8 @@ struct sTagWriter {
 
 	void (* checkOptions) (tagWriter *writer, bool fieldsWereReset);
 
+	bool canPrintNullTag;
+
 #ifdef _WIN32
 	enum filenameSepOp (* overrideFilenameSeparator) (enum filenameSepOp currentSetting);
 #endif	/* _WIN32 */
@@ -95,6 +97,7 @@ extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc, langType language CTAGS_
 extern bool ptagMakeCtagsOutputExcmd (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED, const void *data);
 
 extern bool writerCanPrintPtag (void);
+extern bool writerCanPrintNullTag (void);
 extern bool writerDoesTreatFieldAsFixed (int fieldType);
 
 extern void writerCheckOptions (bool fieldsWereReset);

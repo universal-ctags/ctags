@@ -313,6 +313,7 @@ tagWriter jsonWriter = {
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
 	.defaultFileName = "-",
+	.canPrintNullTag = false,
 };
 
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED,
