@@ -2256,10 +2256,15 @@ function:
 					}
 					deleteToken (saved_token);
 
-					has_methods = true;
-					index_for_name = makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
-					if (p != CORK_NIL)
-						moveChildren (p, index_for_name);
+					/* property names can be empty strings such as { "": true },
+					 * don't generate tags for those */
+					if (name->string->length > 0)
+					{
+						has_methods = true;
+						index_for_name = makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
+						if (p != CORK_NIL)
+							moveChildren (p, index_for_name);
+					}
 				}
 				else if (can_be_field)
 				{
