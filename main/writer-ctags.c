@@ -55,6 +55,7 @@ tagWriter uCtagsWriter = {
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
 	.checkOptions = checkCtagsOptions,
+	.canPrintNullTag = true,
 #ifdef _WIN32
 	.overrideFilenameSeparator = overrideFilenameSeparator,
 #endif
