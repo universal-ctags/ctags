@@ -23,11 +23,8 @@ Supported *format* are ``u-ctags``, ``e-ctags``, ``etags``, ``xref``, and ``json
 
 ``etags``
 	Output format for Emacs etags.
-	``--output-format=etags`` can be abbreviated as ``-e``.
 
-	See `emacs git
-	<https://git.savannah.gnu.org/cgit/emacs.git/tree/etc/ETAGS.EBNF>`_ for
-	details.
+	See the description of ``-e`` option in :ref:`ctags(1) <ctags(1)>`.
 
 ``xref``
 	A tabular, human-readable cross reference (xref) format.

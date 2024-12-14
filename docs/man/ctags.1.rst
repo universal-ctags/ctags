@@ -2273,6 +2273,8 @@ The official Universal Ctags web site at: https://ctags.io/
 Also ``ex(1)``, ``vi(1)``, ``elvis(1)``, or, better yet, ``vim(1)``, the official editor of ctags.
 For more information on ``vim(1)``, see the Vim web site at: https://www.vim.org/
 
+About the file format for ``TAGS``, see `emacs git
+<https://git.savannah.gnu.org/cgit/emacs.git/tree/etc/ETAGS.EBNF>`_.
 
 AUTHOR
 ------
