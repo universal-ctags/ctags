@@ -38,7 +38,7 @@ Supported *format* are ``u-ctags``, ``e-ctags``, ``etags``, ``xref``, and ``json
 ``json``
 	JSON format.
 
-	See section :ref:`output-json` for details.
+	See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`.
 
 *********
 
@@ -47,4 +47,3 @@ Supported *format* are ``u-ctags``, ``e-ctags``, ``etags``, ``xref``, and ``json
 
 	output-tags.rst
 	output-xref.rst
-	output-json.rst
