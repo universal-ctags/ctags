@@ -47,6 +47,7 @@ struct rejection {
 };
 
 tagWriter uCtagsWriter = {
+	.oformat = "u-ctags",
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
 	.printPtagByDefault = true,
@@ -89,6 +90,7 @@ static enum filenameSepOp overrideFilenameSeparator (enum filenameSepOp currentS
 #endif
 
 tagWriter eCtagsWriter = {
+	.oformat = "e-ctags",
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
 	.printPtagByDefault = true,

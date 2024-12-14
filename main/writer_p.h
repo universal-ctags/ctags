@@ -20,6 +20,8 @@
    preWriteEntry, postWriteEntry should free it. */
 
 typedef enum eWriterType {
+	WRITER_UNAVAILABLE = -2,	/* Defined but no implementation. */
+	WRITER_UNKNOWN = -1,
 	WRITER_DEFAULT,
 	WRITER_U_CTAGS = WRITER_DEFAULT,
 	WRITER_E_CTAGS,
@@ -33,6 +35,8 @@ typedef enum eWriterType {
 struct sTagWriter;
 typedef struct sTagWriter tagWriter;
 struct sTagWriter {
+	const char *oformat;		/* name used in CLI: --output-format=
+								 * NULL is acceptable.*/
 	int (* writeEntry) (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag,
 						void *clientData);
 	int (* writePtagEntry) (tagWriter *writer, MIO * mio, const ptagDesc *desc,
@@ -102,6 +106,8 @@ extern bool writerDoesTreatFieldAsFixed (int fieldType);
 
 extern void writerCheckOptions (bool fieldsWereReset);
 extern bool writerPrintPtagByDefault (void);
+
+extern writerType getWrierForOutputFormat (const char *oformat);
 
 #ifdef _WIN32
 extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSetting);

@@ -14,6 +14,8 @@
 #include "options_p.h"
 #include "writer_p.h"
 
+#include <string.h>
+
 extern tagWriter uCtagsWriter;
 extern tagWriter eCtagsWriter;
 extern tagWriter etagsWriter;
@@ -190,4 +192,23 @@ extern void writerCheckOptions (bool fieldsWereReset)
 extern bool writerPrintPtagByDefault (void)
 {
 	return writer->printPtagByDefault;
+}
+
+extern writerType getWrierForOutputFormat (const char *oformat)
+{
+	for (int i = 0; i < WRITER_CUSTOM; i++)
+	{
+		if (writerTable[i]->oformat == NULL)
+			continue;
+
+		if (strcmp(writerTable[i]->oformat, oformat) == 0)
+		{
+			if (writerTable[i]->writeEntry == NULL)
+				return WRITER_UNAVAILABLE;
+			else
+				return i;
+		}
+	}
+
+	return WRITER_UNKNOWN;
 }

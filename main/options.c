@@ -2406,20 +2406,42 @@ static void processOutputFormat (const char *const option CTAGS_ATTR_UNUSED,
 	if (parameter [0] == '\0')
 		error (FATAL, "no output format name supplied for \"%s\"", option);
 
-	if (strcmp (parameter, "u-ctags") == 0)
-		;
-	else if (strcmp (parameter, "e-ctags") == 0)
-		setTagWriter (WRITER_E_CTAGS, NULL);
-	else if (strcmp (parameter, "etags") == 0)
+	writerType t = getWrierForOutputFormat (parameter);
+	if (t == WRITER_DEFAULT)
+		return;
+
+	switch (t)
+	{
+	case WRITER_UNAVAILABLE:
+		error (FATAL,
+			   "the output format \"%s\" is not available on this platform",
+			   parameter);
+		break;
+	case WRITER_UNKNOWN:
+		error (FATAL, "unknown output format name supplied for \"%s=%s\"",
+			   option, parameter);
+		break;
+
+	case WRITER_U_CTAGS:
+	case WRITER_E_CTAGS:
+		setTagWriter (t, NULL);
+		break;
+	case WRITER_ETAGS:
 		setEtagsMode ();
-	else if (strcmp (parameter, "xref") == 0)
+		break;
+	case WRITER_XREF:
 		setXrefMode ();
+		break;
 #ifdef HAVE_JANSSON
-	else if (strcmp (parameter, "json") == 0)
+	case WRITER_JSON:
 		setJsonMode ();
+		break;
 #endif
-	else
-		error (FATAL, "unknown output format name supplied for \"%s=%s\"", option, parameter);
+	case WRITER_CUSTOM:
+	case WRITER_COUNT:			/* Suppress warnings that gcc reports */
+		AssertNotReached ();
+		break;
+	}
 }
 
 static void processPseudoTags (const char *const option CTAGS_ATTR_UNUSED,

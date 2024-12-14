@@ -30,6 +30,7 @@ static int writeXrefPtagEntry (tagWriter *writer, MIO * mio, const ptagDesc *des
 							   void *clientData);
 
 tagWriter xrefWriter = {
+	.oformat = "xref",
 	.writeEntry = writeXrefEntry,
 	.writePtagEntry = writeXrefPtagEntry,
 	.printPtagByDefault = false,
