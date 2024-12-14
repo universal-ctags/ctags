@@ -36,7 +36,14 @@ jobs:
           for item in base comp
           do
             FILENAME="$item.tar.xz"
-            curl -LO "https://ftp.netbsd.org/pub/NetBSD/NetBSD-${{ matrix.netbsd-release-version }}/amd64/binary/sets/$FILENAME"
+
+            if [ "${{ matrix.netbsd-release-version }}" = '9.2' ] ; then
+              SERVER_URL='https://archive.netbsd.org/pub/NetBSD-archive'
+            else
+              SERVER_URL='https://ftp.netbsd.org/pub/NetBSD'
+            fi
+
+            curl -LO "$SERVER_URL/NetBSD-${{ matrix.netbsd-release-version }}/amd64/binary/sets/$FILENAME"
             tar vxf "$FILENAME" -C amd64-unknown-netbsd-sysroot
           done
 
