@@ -5,6 +5,10 @@ Changes in 6.?.0
 New and extended options and their flags
 ---------------------------------------------------------------------
 
+``--list-output-formats`` option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+See :ref:`option_listing` in :ref:`ctags(1) <ctags(1)>`.
+
 ``nulltag``/``z`` extra
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Universal Ctags now supports tags (*null tags*) having empty strings as their names.

@@ -318,6 +318,8 @@ Output Format Options
 	the ctags executable is built with ``libjansson``.
 	See ctags-json-output(5) for more about ``json`` format.
 
+	See also ``--list-output-formats``.
+
 ``-e``
 	Same as ``--output-format=etags``.
 	Enable etags mode, which will create a tag file for use with the Emacs
@@ -1236,6 +1238,14 @@ Listing Options
 	definition.
 	See ctags-optlib(7).
 
+``--list-output-formats``
+	Lists the output formats that can be used in ``--output-format`` option.
+
+	``NULLTAG`` column represetns whether the format supports *null tags* or
+	not. See ``nulltag``/``z`` in "`Extras`_" about the null tags.
+
+	(since verison 6.2.0)
+
 ``--list-params[=(<language>|all)]``
 	Lists the parameters for either the specified *<language>* or ``all``
 	languages, and then exits.
@@ -1943,7 +1953,8 @@ The meaning of major extras is as follows (long-name flag/one-letter flag):
 	The discards are due because some output formats may not consider null tags.
 
 	With ``nulltag``/``z`` extra, you can force ctags to emit the nulltags. This extra
-	is effective only if the output format supports null tags.
+	is effective only if the output format supports null tags. ``--list-output-formats``
+	option tells you which output formats support null tags.
 
 	(since version 6.2.0)
 

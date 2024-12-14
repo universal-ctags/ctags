@@ -9,6 +9,7 @@
 
 #include "general.h"
 
+#include "colprint_p.h"
 #include "debug.h"
 #include "entry_p.h"
 #include "options_p.h"
@@ -211,4 +212,45 @@ extern writerType getWrierForOutputFormat (const char *oformat)
 	}
 
 	return WRITER_UNKNOWN;
+}
+
+#define WRITER_COL_OFORMAT 0
+#define WRITER_COL_AVAILABLE 1
+#define WRITER_COL_NULLTAG 2
+
+static int writerColprintCompareLines (struct colprintLine *a , struct colprintLine *b)
+{
+	const char *a_oformat  = colprintLineGetColumn (a, WRITER_COL_OFORMAT);
+	const char *b_oformat  = colprintLineGetColumn (b, WRITER_COL_OFORMAT);
+
+	return strcmp(a_oformat, b_oformat);
+}
+
+extern struct colprintTable * writerColprintTableNew (void)
+{
+	return colprintTableNew ("L:OFORMAT", "R:DEFAULT", "R:AVAILABLE", "R:NULLTAG", NULL);
+}
+
+extern void printOutputFormats (bool withListHeader, bool machinable, FILE *fp)
+{
+	struct colprintTable * table = writerColprintTableNew ();
+
+	for (int i = 0; i < WRITER_COUNT; i++)
+	{
+		if (!writerTable[i])
+			continue;
+		if (!writerTable[i]->oformat)
+			continue;
+
+		struct colprintLine * line = colprintTableGetNewLine (table);
+		colprintLineAppendColumnCString (line, writerTable[i]->oformat);
+
+		colprintLineAppendColumnBool (line, i == WRITER_DEFAULT);
+		colprintLineAppendColumnBool (line, writerTable[i]->writeEntry? true: false);
+		colprintLineAppendColumnBool (line, writerTable[i]->canPrintNullTag);
+	}
+
+	colprintTableSort (table, writerColprintCompareLines);
+	colprintTablePrint (table, 0, withListHeader, machinable, fp);
+	colprintTableDelete (table);
 }

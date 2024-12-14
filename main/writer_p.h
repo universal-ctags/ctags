@@ -108,6 +108,7 @@ extern void writerCheckOptions (bool fieldsWereReset);
 extern bool writerPrintPtagByDefault (void);
 
 extern writerType getWrierForOutputFormat (const char *oformat);
+extern void printOutputFormats (bool withListHeader, bool machinable, FILE *fp);
 
 #ifdef _WIN32
 extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSetting);

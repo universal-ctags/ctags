@@ -440,6 +440,8 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"       Output list of language mappings (both extensions and patterns)."},
  {1,0,"  --list-mline-regex-flags"},
  {1,0,"       Output list of flags which can be used in a multiline regex parser definition."},
+ {1,0,"  --list-output-formats"},
+ {1,0,"       Output list of output formats."},
  {1,0,"  --list-params[=(<language>|all)]"},
  {1,0,"       Output list of language parameters. This works with --machinable."},
  {0,0,"  --list-pseudo-tags"},
@@ -2314,6 +2316,13 @@ static void processListOperators (const char *const option CTAGS_ATTR_UNUSED,
 	exit (0);
 }
 
+static void processListOutputFormatsOption(const char *const option CTAGS_ATTR_UNUSED,
+										   const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	printOutputFormats (localOption.withListHeader, localOption.machinable, stdout);
+	exit (0);
+}
+
 static void freeSearchPathList (searchPathList** pathList)
 {
 	stringListClear (*pathList);
@@ -2899,6 +2908,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-map-extensions",    processListMapExtensionsOption, true,   STAGE_ANY },
 	{ "list-map-patterns",      processListMapPatternsOption,   true,   STAGE_ANY },
 	{ "list-mline-regex-flags", processListMultilineRegexFlagsOptions, true, STAGE_ANY },
+	{ "list-output-formats",    processListOutputFormatsOption, true,   STAGE_ANY },
 	{ "list-params",            processListParametersOption,    true,   STAGE_ANY },
 	{ "list-pseudo-tags",       processListPseudoTagsOptions,   true,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   true,   STAGE_ANY },
