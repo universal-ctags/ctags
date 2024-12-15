@@ -13,12 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        freebsd-version: ['14.1', '14.0', '13.3', '13.2']
+        freebsd-version: ['14.2', '14.1', '14.0', '13.4', '13.3', '13.2']
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cross-platform-actions/action@v0.25.0
+      - uses: cross-platform-actions/action@v0.26.0
         with:
           operating_system: freebsd
           version: ${{ matrix.freebsd-version }}

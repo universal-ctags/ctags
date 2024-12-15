@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        freebsd-release-version: ['14.1', '14.0', '13.3', '13.2', '13.1', '13.0']
+        freebsd-release-version: ['14.2', '14.1', '14.0', '13.4', '13.3', '13.2', '13.1', '13.0']
         # https://archive.freebsd.org/old-releases/amd64/
 
     runs-on: ubuntu-latest
