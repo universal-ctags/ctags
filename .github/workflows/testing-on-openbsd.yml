@@ -13,12 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        openbsd-version: ['7.5', '7.4', '7.3', '7.2']
+        openbsd-version: ['7.6', '7.5', '7.4', '7.3', '7.2']
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cross-platform-actions/action@v0.25.0
+      - uses: cross-platform-actions/action@v0.26.0
         with:
           operating_system: openbsd
           version: ${{ matrix.openbsd-version }}
