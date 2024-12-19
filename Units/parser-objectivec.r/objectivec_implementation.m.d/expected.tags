@@ -2,15 +2,15 @@ Extension	input.m	/^@implementation NSString (Extension)$/;"	C	implementation:NS
 FileTree	input.m	/^@implementation FileTree$/;"	I
 FolderTree	input.m	/^@implementation FolderTree$/;"	I
 NSString	input.m	/^@implementation NSString (Extension)$/;"	I	category:Extension
-addChild:	input.m	/^{$/;"	m	implementation:FolderTree
-createFileList:atPlace:	input.m	/^{$/;"	c	implementation:FolderTree
-createLayoutTree	input.m	/^{$/;"	m	implementation:FileTree
-createLayoutTree	input.m	/^{$/;"	m	implementation:FolderTree
-dealloc	input.m	/^{$/;"	m	implementation:FileTree
-dealloc	input.m	/^{$/;"	m	implementation:FolderTree
-doSomething	input.m	/^{$/;"	m	implementation:NSString	category:Extension
-getDiskSize	input.m	/^{$/;"	m	implementation:FileTree
-initWithName:andSize:atPlace:	input.m	/^{$/;"	m	implementation:FileTree
-initWithName:atPlace:	input.m	/^{$/;"	m	implementation:FileTree
-initWithName:atPlace:	input.m	/^{$/;"	m	implementation:FolderTree
-populateChildList:	input.m	/^{$/;"	m	implementation:FolderTree
+addChild:	input.m	/^- (FolderTree*)addChild:(FileTree*)subTree$/;"	m	implementation:FolderTree
+createFileList:atPlace:	input.m	/^+ (void) createFileList: (NSString*)root atPlace:(FolderTree*)parentFolder$/;"	c	implementation:FolderTree
+createLayoutTree	input.m	/^- (LayoutTree*)createLayoutTree$/;"	m	implementation:FileTree
+createLayoutTree	input.m	/^- (LayoutTree*)createLayoutTree$/;"	m	implementation:FolderTree
+dealloc	input.m	/^- (void)dealloc$/;"	m	implementation:FileTree
+dealloc	input.m	/^- (void)dealloc$/;"	m	implementation:FolderTree
+doSomething	input.m	/^- (void)doSomething$/;"	m	implementation:NSString	category:Extension
+getDiskSize	input.m	/^- (FileSize)getDiskSize$/;"	m	implementation:FileTree
+initWithName:andSize:atPlace:	input.m	/^- (id)initWithName:(NSString*)treeName$/;"	m	implementation:FileTree
+initWithName:atPlace:	input.m	/^- (id)initWithName:(NSString*)treeName$/;"	m	implementation:FileTree
+initWithName:atPlace:	input.m	/^- (id)initWithName:(NSString*)treeName$/;"	m	implementation:FolderTree
+populateChildList:	input.m	/^- (void) populateChildList:(NSString*)root$/;"	m	implementation:FolderTree

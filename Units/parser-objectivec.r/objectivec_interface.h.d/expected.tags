@@ -27,9 +27,9 @@ doSomething34	input.h	/^- (void)doSomething34;$/;"	kind:method	line:74	language:
 doSomething5	input.h	/^- (void)doSomething5;$/;"	kind:method	line:78	language:ObjectiveC	interface:MyString	signature:()	roles:def
 doSomething67	input.h	/^- (void)doSomething67;$/;"	kind:method	line:82	language:ObjectiveC	interface:YourString	signature:()	roles:def
 getDiskSize	input.h	/^- (FileSize)getDiskSize;$/;"	kind:method	line:48	language:ObjectiveC	interface:FileTree	signature:()	roles:def
-initWithName:andSize:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:41	language:ObjectiveC	interface:FileTree	signature:(NSString*,uint64_t,FolderTree*)	roles:def
-initWithName:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:44	language:ObjectiveC	interface:FileTree	signature:(NSString*,FolderTree*)	roles:def
-initWithName:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:57	language:ObjectiveC	interface:FolderTree	signature:(NSString*,FolderTree*)	roles:def
+initWithName:andSize:atPlace:	input.h	/^- (id)initWithName:(NSString*)treeName$/;"	kind:method	line:39	language:ObjectiveC	interface:FileTree	signature:(NSString*,uint64_t,FolderTree*)	roles:def
+initWithName:atPlace:	input.h	/^- (id)initWithName:(NSString*)treeName$/;"	kind:method	line:43	language:ObjectiveC	interface:FileTree	signature:(NSString*,FolderTree*)	roles:def
+initWithName:atPlace:	input.h	/^- (id)initWithName:(NSString*)treeName$/;"	kind:method	line:56	language:ObjectiveC	interface:FolderTree	signature:(NSString*,FolderTree*)	roles:def
 name	input.h	/^	NSString	*name;$/;"	kind:field	line:34	language:ObjectiveC	interface:FileTree	roles:def
 parent	input.h	/^    FolderTree  *parent[THISISNOTATAG];$/;"	kind:field	line:36	language:ObjectiveC	interface:FileTree	roles:def
 populateChildList:	input.h	/^- (void) populateChildList:(NSString*)root;$/;"	kind:method	line:61	language:ObjectiveC	interface:FolderTree	signature:(NSString*)	roles:def

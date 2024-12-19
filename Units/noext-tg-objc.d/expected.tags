@@ -1,17 +1,17 @@
 FileTree	input.nolang	/^@implementation FileTree$/;"	I
 FolderTree	input.nolang	/^@implementation FolderTree$/;"	I
 MyClass	input.nolang	/^@implementation MyClass$/;"	I
-addChild:	input.nolang	/^{$/;"	m	implementation:FolderTree
-createFileList:atPlace:	input.nolang	/^{$/;"	c	implementation:FolderTree
-createLayoutTree	input.nolang	/^{$/;"	m	implementation:FileTree
-createLayoutTree	input.nolang	/^{$/;"	m	implementation:FolderTree
-dealloc	input.nolang	/^{$/;"	m	implementation:FileTree
-dealloc	input.nolang	/^{$/;"	m	implementation:FolderTree
-getDiskSize	input.nolang	/^{$/;"	m	implementation:FileTree
-initWithName:andSize:atPlace:	input.nolang	/^{$/;"	m	implementation:FileTree
-initWithName:atPlace:	input.nolang	/^{$/;"	m	implementation:FileTree
-initWithName:atPlace:	input.nolang	/^{$/;"	m	implementation:FolderTree
+addChild:	input.nolang	/^- (FolderTree*)addChild:(FileTree*)subTree$/;"	m	implementation:FolderTree
+createFileList:atPlace:	input.nolang	/^+ (void) createFileList: (NSString*)root atPlace:(FolderTree*)parentFolder$/;"	c	implementation:FolderTree
+createLayoutTree	input.nolang	/^- (LayoutTree*)createLayoutTree$/;"	m	implementation:FileTree
+createLayoutTree	input.nolang	/^- (LayoutTree*)createLayoutTree$/;"	m	implementation:FolderTree
+dealloc	input.nolang	/^- (void)dealloc$/;"	m	implementation:FileTree
+dealloc	input.nolang	/^- (void)dealloc$/;"	m	implementation:FolderTree
+getDiskSize	input.nolang	/^- (FileSize)getDiskSize$/;"	m	implementation:FileTree
+initWithName:andSize:atPlace:	input.nolang	/^- (id)initWithName:(NSString*)treeName$/;"	m	implementation:FileTree
+initWithName:atPlace:	input.nolang	/^- (id)initWithName:(NSString*)treeName$/;"	m	implementation:FileTree
+initWithName:atPlace:	input.nolang	/^- (id)initWithName:(NSString*)treeName$/;"	m	implementation:FolderTree
 main	input.nolang	/^int main(int argc, char** argv)$/;"	f
 myClassMethod:with:	input.nolang	/^+ (void)myClassMethod:(int)arg1 with:(id)arg2;$/;"	c	implementation:MyClass
 myInstanceMethod:with:	input.nolang	/^- (void)myInstanceMethod:(int)arg1 with:(id)arg2;$/;"	m	implementation:MyClass
-populateChildList:	input.nolang	/^{$/;"	m	implementation:FolderTree
+populateChildList:	input.nolang	/^- (void) populateChildList:(NSString*)root$/;"	m	implementation:FolderTree
