@@ -536,6 +536,16 @@ static int addTag (vString * const ident, int kind)
 	return makeTagEntry (&toCreate);
 }
 
+static int objcAddTag (objcString * const ident, int kind)
+{
+	int q = addTag (ident->name, kind);
+	tagEntryInfo *e = getEntryInCorkQueue (q);
+	if (e)
+		updateTagLine (e, ident->ln, ident->pos);
+
+	return q;
+}
+
 static objcToken waitedToken, fallBackToken;
 
 /* Ignore everything till waitedToken and jump to comeAfter.
@@ -759,11 +769,11 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 		/* method name is not simple */
 		if (!objcStringIsEmpty (fullMethodName))
 		{
-			index = addTag (fullMethodName->name, methodKind);
+			index = objcAddTag (fullMethodName, methodKind);
 			objcStringClear (fullMethodName);
 		}
 		else
-			index = addTag (prevIdent->name, methodKind);
+			index = objcAddTag (prevIdent, methodKind);
 
 		toDoNext = nextAction;
 		parseImplemMethods (ident, what, ln, pos);

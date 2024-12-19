@@ -16,6 +16,6 @@ doVoidPtr:andWith:	input.m	/^- (void*)doVoidPtr: idarg1 andWith: (id**) idarg2Pt
 doVoidPtr:andWithStruct:	input.m	/^- (void*)doVoidPtr: idarg1 andWithStruct: (struct foo *) idarg2PtrExplicit;$/;"	m	interface:X	signature:(id,struct foo*)
 doVoidUInt:andWithStruct:	input.m	/^- (void*)doVoidUInt: (unsigned int) idarg1 andWithStruct: (struct foo *) idarg2PtrExplicit;$/;"	m	interface:X	signature:(unsigned int,struct foo*)
 X	input.m	/^@implementation X$/;"	I
-doNothing	input.m	/^{$/;"	m	implementation:X	signature:()
-doNothing:	input.m	/^{$/;"	m	implementation:X	signature:(id)
-doVoidUInt:andWithStruct:	input.m	/^{$/;"	m	implementation:X	signature:(unsigned int,struct foo*)
+doNothing	input.m	/^- doNothing$/;"	m	implementation:X	signature:()
+doNothing:	input.m	/^- doNothing: idarg$/;"	m	implementation:X	signature:(id)
+doVoidUInt:andWithStruct:	input.m	/^- (void*)doVoidUInt: (unsigned int) idarg1 andWithStruct: (struct foo *) idarg2PtrExplicit$/;"	m	implementation:X	signature:(unsigned int,struct foo*)
