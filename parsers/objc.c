@@ -163,6 +163,12 @@ typedef struct _lexingState {
 	MIOPos pos;				/* file pos, just for making tags, not used in parsing1 */
 } lexingState;
 
+typedef struct _objcString {
+	vString *name;
+	unsigned long ln;
+	MIOPos pos;
+} objcString;
+
 /*//////////////////////////////////////////////////////////////////////
 //// Lexing                                     */
 static bool isNum (char c)
@@ -611,8 +617,8 @@ static void parseFields (vString * const ident, objcToken what)
 static objcKind methodKind;
 
 
-static vString *fullMethodName;
-static vString *prevIdent;
+static objcString *fullMethodName;
+static objcString *prevIdent;
 static vString *signature;
 
 static void tillTokenWithCapturingSignature (vString * const ident, objcToken what)
@@ -635,6 +641,52 @@ static void tillTokenWithCapturingSignature (vString * const ident, objcToken wh
 	}
 }
 
+static objcString *objcStringNew (void)
+{
+	objcString *o = xCalloc(1, objcString);
+	o->name = vStringNew ();
+	return o;
+}
+
+static void objcStringDelete (objcString *o)
+{
+	vStringDelete (o->name);
+	eFree (o);
+}
+
+static bool objcStringIsEmpty (const objcString *o)
+{
+	return vStringIsEmpty (o->name);
+}
+
+static void objcStringClear (objcString *o)
+{
+	vStringClear (o->name);
+}
+
+static void objcStringCat (objcString *string, const objcString *s)
+{
+	bool was_empty = objcStringIsEmpty (string);
+
+	vStringCat (string->name, s->name);
+	if (was_empty)
+	{
+		string->ln = s->ln;
+		string->pos = s->pos;
+	}
+}
+
+#define objcStringPut(S, C) vStringPut(S->name, C)
+
+static void objcStringCopy (objcString *string, vString *s)
+{
+	vStringCopy (string->name, s);
+#if 0
+	string->ln = ;
+	string->pos = ;
+#endif
+}
+
 static void parseMethodsNameCommon (vString * const ident, objcToken what,
 									parseNext reEnter,
 									parseNext nextAction)
@@ -648,22 +700,22 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 		comeAfter = reEnter;
 		waitedToken = Tok_PARR;
 
-		if (! (vStringIsEmpty(prevIdent)
-			   && vStringIsEmpty(fullMethodName)))
+		if (! (objcStringIsEmpty(prevIdent)
+			   && objcStringIsEmpty(fullMethodName)))
 			toDoNext = &tillTokenWithCapturingSignature;
 		break;
 
 	case Tok_dpoint:
-		vStringCat (fullMethodName, prevIdent); /* TODO */
-		vStringPut (fullMethodName, ':');
-		vStringClear (prevIdent);
+		objcStringCat (fullMethodName, prevIdent); /* TODO */
+		objcStringPut (fullMethodName, ':');
+		objcStringClear (prevIdent);
 
 		if (vStringLength (signature) > 1)
 			vStringPut (signature, ',');
 		break;
 
 	case ObjcIDENTIFIER:
-		if (((!vStringIsEmpty (prevIdent))
+		if (((!objcStringIsEmpty (prevIdent))
 			 /* "- initWithObject: o0 withAnotherObject: o1;"
 				Overwriting the last value of prevIdent ("o0");
 				a parameter name ("o0") was stored to prevIdent,
@@ -679,28 +731,28 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 				   In this case no overwriting happens.
 				   However, "id" for "object" is part
 				   of signature. */
-				vStringIsEmpty (prevIdent)
-				&& (!vStringIsEmpty (fullMethodName))
+				objcStringIsEmpty (prevIdent)
+				&& (!objcStringIsEmpty (fullMethodName))
 				&& vStringLast (signature) == '('))
 			vStringCatS (signature, "id");
 
-		vStringCopy (prevIdent, ident); /* TODO */
+		objcStringCopy (prevIdent, ident); /* TODO */
 		break;
 
 	case Tok_CurlL:
 	case Tok_semi:
 		/* method name is not simple */
-		if (!vStringIsEmpty (fullMethodName))
+		if (!objcStringIsEmpty (fullMethodName))
 		{
-			index = addTag (fullMethodName, methodKind);
-			vStringClear (fullMethodName);
+			index = addTag (fullMethodName->name, methodKind);
+			objcStringClear (fullMethodName);
 		}
 		else
-			index = addTag (prevIdent, methodKind);
+			index = addTag (prevIdent->name, methodKind);
 
 		toDoNext = nextAction;
 		parseImplemMethods (ident, what);
-		vStringClear (prevIdent);
+		objcStringClear (prevIdent);
 
 		tagEntryInfo *e = getEntryInCorkQueue (index);
 		if (e)
@@ -1284,8 +1336,8 @@ static void findObjcTags (void)
 
 	parentName = vStringNew ();
 	tempName = vStringNew ();
-	fullMethodName = vStringNew ();
-	prevIdent = vStringNew ();
+	fullMethodName = objcStringNew ();
+	prevIdent = objcStringNew ();
 	signature = vStringNewInit ("(");
 
 	/* (Re-)initialize state variables, this might be a second file */
@@ -1313,8 +1365,8 @@ static void findObjcTags (void)
 	vStringDelete (name);
 	vStringDelete (parentName);
 	vStringDelete (tempName);
-	vStringDelete (fullMethodName);
-	vStringDelete (prevIdent);
+	objcStringDelete (fullMethodName);
+	objcStringDelete (prevIdent);
 	vStringDelete (signature);
 	signature = NULL;
 	parentName = NULL;
