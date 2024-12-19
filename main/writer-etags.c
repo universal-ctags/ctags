@@ -35,6 +35,7 @@ static bool  endEtagsFile   (tagWriter *writer, MIO * mio, const char* filename,
 							 void *clientData CTAGS_ATTR_UNUSED);
 
 tagWriter etagsWriter = {
+	.oformat = "etags",
 	.writeEntry = writeEtagsEntry,
 	.writePtagEntry = NULL,
 	.preWriteEntry = beginEtagsFile,

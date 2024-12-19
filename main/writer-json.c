@@ -55,6 +55,7 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 				void *clientData);
 
 tagWriter jsonWriter = {
+	.oformat = "json",
 	.writeEntry = writeJsonEntry,
 	.writePtagEntry = writeJsonPtagEntry,
 	.printPtagByDefault = true,
@@ -62,6 +63,7 @@ tagWriter jsonWriter = {
 	.postWriteEntry = NULL,
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = NULL,
+	.canPrintNullTag = true,
 	.defaultFileName = NULL,
 };
 
@@ -308,11 +310,13 @@ extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, langType language CTAGS_A
 #else /* HAVE_JANSSON */
 
 tagWriter jsonWriter = {
+	.oformat = "json",
 	.writeEntry = NULL,
 	.writePtagEntry = NULL,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
 	.defaultFileName = "-",
+	.canPrintNullTag = false,
 };
 
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED,

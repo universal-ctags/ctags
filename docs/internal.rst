@@ -964,6 +964,26 @@ Refer `peg/valink.peg
 <https://github.com/universal-ctags/ctags/blob/master/peg/varlink.peg>`_ as a
 sample of a parser using PackCC.
 
+Null tags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*Null tag* is a tag having an empty string as its name.
+
+Universal Ctags supports null tags cautiously.
+See the description for ``nulltag``/``z`` extra in :ref:`ctags(1) <ctags(1)>`.
+
+If you want to make a null tag, set 1 to ``allowNullTag`` of
+``tagEtnryInfo`` before calling ``makeTagEntry``.  ``makeTagEntry``
+evaluates the member. The following pseudo code doesn't work:
+
+.. code-block:: C
+
+   tagEntryInfo e;
+   /* ... */
+   int corkIndex = makeTagEntry (&e);
+   /* ... */
+   tagEntryInfo *p = getEntryInCorkQueue (corkIndex);
+   p->allowNullTag = 1;
+
 Automatic parser guessing (TBW)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

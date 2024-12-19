@@ -20,6 +20,8 @@
    preWriteEntry, postWriteEntry should free it. */
 
 typedef enum eWriterType {
+	WRITER_UNAVAILABLE = -2,	/* Defined but no implementation. */
+	WRITER_UNKNOWN = -1,
 	WRITER_DEFAULT,
 	WRITER_U_CTAGS = WRITER_DEFAULT,
 	WRITER_E_CTAGS,
@@ -33,6 +35,8 @@ typedef enum eWriterType {
 struct sTagWriter;
 typedef struct sTagWriter tagWriter;
 struct sTagWriter {
+	const char *oformat;		/* name used in CLI: --output-format=
+								 * NULL is acceptable.*/
 	int (* writeEntry) (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag,
 						void *clientData);
 	int (* writePtagEntry) (tagWriter *writer, MIO * mio, const ptagDesc *desc,
@@ -53,6 +57,8 @@ struct sTagWriter {
 	bool (* treatFieldAsFixed) (int fieldType);
 
 	void (* checkOptions) (tagWriter *writer, bool fieldsWereReset);
+
+	bool canPrintNullTag;
 
 #ifdef _WIN32
 	enum filenameSepOp (* overrideFilenameSeparator) (enum filenameSepOp currentSetting);
@@ -95,10 +101,14 @@ extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc, langType language CTAGS_
 extern bool ptagMakeCtagsOutputExcmd (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED, const void *data);
 
 extern bool writerCanPrintPtag (void);
+extern bool writerCanPrintNullTag (void);
 extern bool writerDoesTreatFieldAsFixed (int fieldType);
 
 extern void writerCheckOptions (bool fieldsWereReset);
 extern bool writerPrintPtagByDefault (void);
+
+extern writerType getWrierForOutputFormat (const char *oformat);
+extern void printOutputFormats (bool withListHeader, bool machinable, FILE *fp);
 
 #ifdef _WIN32
 extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSetting);

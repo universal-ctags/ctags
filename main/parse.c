@@ -5550,6 +5550,8 @@ typedef enum {
 	K_ROLES_DISABLED,
 	K_FIELD_TESTING,
 	K_TRIGGER_NOTICE,
+	K_EMIT_NULL_TAG,
+	K_DONT_EMIT_NULL_TAG,
 	KIND_COUNT
 } CTST_Kind;
 
@@ -5631,6 +5633,8 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesDisabledKindRoles)},
 	{true,  'f', "fieldMaker", "tag for testing field:" },
 	{true,  'n', "triggerNotice", "trigger notice output"},
+	{true,  'z', "emitNullTag", "emit a tag having an empty string"},
+	{true,  'Z', "dontEmitNullTag", "don't emit a tag having an empty string"},
 };
 
 typedef enum {
@@ -5819,6 +5823,16 @@ static void createCTSTTags (void)
 					}
 					case K_TRIGGER_NOTICE:
 						notice ("notice output for testing: %s", CTST_Kinds [i].name);
+						break;
+					case K_EMIT_NULL_TAG:
+						initTagEntry (&e, "", i);
+						e.allowNullTag = 1;
+						makeTagEntry (&e);
+						break;
+					case K_DONT_EMIT_NULL_TAG:
+						initTagEntry (&e, "", i);
+						e.allowNullTag = 0;
+						makeTagEntry (&e);
 						break;
 				}
 

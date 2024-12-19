@@ -261,11 +261,6 @@ extern unsigned int countInputLanguageRoles (int kindIndex)
 	return countLanguageRoles (getInputLanguage (), kindIndex);
 }
 
-extern bool doesInputLanguageAllowNullTag (void)
-{
-	return doesLanguageAllowNullTag (getInputLanguage ());
-}
-
 extern bool doesInputLanguageRequestAutomaticFQTag (const tagEntryInfo *e)
 {
 	return doesLanguageRequestAutomaticFQTag (e->langType);
