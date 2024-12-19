@@ -8,5 +8,5 @@
              x ObjectiveC:function(f) input.m 18 - static int x(void)
              y ObjectiveC:function(f) input.m 23 - int y(void)
              B ObjectiveC:implementation(I) input.m 28 - @implementation B
-       aMethod ObjectiveC:method(m) input.m 30 - {
-   doSomething ObjectiveC:method(m) input.m 34 - {
+       aMethod ObjectiveC:method(m) input.m 29 - - aMethod
+   doSomething ObjectiveC:method(m) input.m 33 - - doSomething
