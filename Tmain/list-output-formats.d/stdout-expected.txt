@@ -1,0 +1,5 @@
+#OFORMAT	DEFAULT	AVAILABLE	NULLTAG
+e-ctags	no	yes	no
+etags	no	yes	no
+u-ctags	yes	yes	no
+xref	no	yes	yes

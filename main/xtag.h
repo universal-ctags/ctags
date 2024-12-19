@@ -34,6 +34,7 @@ typedef enum eXtagType { /* extra tag content control */
 	XTAG_TAGS_GENERATED_BY_GUEST_PARSERS = XTAG_GUEST, /* Geany uses the old name */
 	XTAG_SUBPARSER,
 	XTAG_ANONYMOUS,
+	XTAG_NULLTAG,
 
 	XTAG_COUNT
 } xtagType;
@@ -42,7 +43,7 @@ struct sXtagDefinition {
 	bool enabled;
 	/* letter, and ftype are initialized in the main part,
 	   not in a parser. */
-#define NUL_XTAG_LETTER '\0'
+#define NUL_XTAG_LETTER '\0'	/* Nothing todo with NULLTAG. */
 	unsigned char letter;
 	const char* name;	 /* used in extra: field */
 	const char* description;  /* displayed in --list-extra output */
