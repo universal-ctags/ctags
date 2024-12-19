@@ -159,6 +159,8 @@ static langType Lang_ObjectiveC;
 typedef struct _lexingState {
 	vString *name;	/* current parsed identifier/operator */
 	const unsigned char *cp;	/* position in stream */
+	unsigned long ln;			/* line number, just for making tags, not used in parsing */
+	MIOPos pos;				/* file pos, just for making tags, not used in parsing1 */
 } lexingState;
 
 /*//////////////////////////////////////////////////////////////////////
@@ -231,6 +233,13 @@ static void readCString (lexingState * st)
 	st->cp = c;
 }
 
+static void updateLine (lexingState * st)
+{
+	st->cp = readLineFromInputFile ();
+	st->ln = getInputLineNumber ();
+	st->pos = getInputFilePosition ();
+}
+
 static void eatComment (lexingState * st)
 {
 	bool unfinished = true;
@@ -243,7 +252,7 @@ static void eatComment (lexingState * st)
 		 * so we have to reload a line... */
 		if (c == NULL || *c == '\0')
 		{
-			st->cp = readLineFromInputFile ();
+			updateLine (st);
 			/* WOOPS... no more input...
 			 * we return, next lexing read
 			 * will be null and ok */
@@ -307,7 +316,7 @@ static objcKeyword lex (lexingState * st)
 	/* handling data input here */
 	while (st->cp == NULL || st->cp[0] == '\0')
 	{
-		st->cp = readLineFromInputFile ();
+		updateLine (st);
 		if (st->cp == NULL)
 			return Tok_EOF;
 
@@ -645,7 +654,7 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 		break;
 
 	case Tok_dpoint:
-		vStringCat (fullMethodName, prevIdent);
+		vStringCat (fullMethodName, prevIdent); /* TODO */
 		vStringPut (fullMethodName, ':');
 		vStringClear (prevIdent);
 
@@ -675,7 +684,7 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 				&& vStringLast (signature) == '('))
 			vStringCatS (signature, "id");
 
-		vStringCopy (prevIdent, ident);
+		vStringCopy (prevIdent, ident); /* TODO */
 		break;
 
 	case Tok_CurlL:
@@ -1291,7 +1300,7 @@ static void findObjcTags (void)
 	ignorePreprocStuff_escaped = false;
 
 	st.name = vStringNew ();
-	st.cp = readLineFromInputFile ();
+	updateLine(&st);
 	toDoNext = &globalScope;
 	tok = lex (&st);
 	while (tok != Tok_EOF)
