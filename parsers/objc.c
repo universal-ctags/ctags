@@ -451,7 +451,8 @@ static objcKeyword lex (lexingState * st)
 
 /*//////////////////////////////////////////////////////////////////////
 //// Parsing                                    */
-typedef void (*parseNext) (vString * const ident, objcToken what);
+typedef void (*parseNext) (vString * const ident, objcToken what,
+						   unsigned long ln, MIOPos pos);
 
 /********** Helpers */
 /* This variable hold the 'parser' which is going to
@@ -469,9 +470,9 @@ static parseNext fallback;
 
 
 /********** Grammar */
-static void globalScope (vString * const ident, objcToken what);
-static void parseMethods (vString * const ident, objcToken what);
-static void parseImplemMethods (vString * const ident, objcToken what);
+static void globalScope (vString * const ident, objcToken what, unsigned long ln, MIOPos pos);
+static void parseMethods (vString * const ident, objcToken what, unsigned long ln, MIOPos pos);
+static void parseImplemMethods (vString * const ident, objcToken what, unsigned long ln, MIOPos pos);
 static vString *tempName = NULL;
 static vString *parentName = NULL;
 static objcKind parentType = K_INTERFACE;
@@ -540,13 +541,15 @@ static objcToken waitedToken, fallBackToken;
 /* Ignore everything till waitedToken and jump to comeAfter.
  * If the "end" keyword is encountered break, doesn't remember
  * why though. */
-static void tillToken (vString * const ident CTAGS_ATTR_UNUSED, objcToken what)
+static void tillToken (vString * const ident CTAGS_ATTR_UNUSED, objcToken what,
+					   unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	if (what == waitedToken)
 		toDoNext = comeAfter;
 }
 
-static void tillTokenOrFallBack (vString * const ident CTAGS_ATTR_UNUSED, objcToken what)
+static void tillTokenOrFallBack (vString * const ident CTAGS_ATTR_UNUSED, objcToken what,
+								 unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	if (what == waitedToken)
 		toDoNext = comeAfter;
@@ -557,7 +560,8 @@ static void tillTokenOrFallBack (vString * const ident CTAGS_ATTR_UNUSED, objcTo
 }
 
 static int ignoreBalanced_count = 0;
-static void ignoreBalanced (vString * const ident CTAGS_ATTR_UNUSED, objcToken what)
+static void ignoreBalanced (vString * const ident CTAGS_ATTR_UNUSED, objcToken what,
+							unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 
 	switch (what)
@@ -583,7 +587,8 @@ static void ignoreBalanced (vString * const ident CTAGS_ATTR_UNUSED, objcToken w
 		toDoNext = comeAfter;
 }
 
-static void parseFields (vString * const ident, objcToken what)
+static void parseFields (vString * const ident, objcToken what,
+						 unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -621,9 +626,10 @@ static objcString *fullMethodName;
 static objcString *prevIdent;
 static vString *signature;
 
-static void tillTokenWithCapturingSignature (vString * const ident, objcToken what)
+static void tillTokenWithCapturingSignature (vString * const ident, objcToken what,
+											 unsigned long ln, MIOPos pos)
 {
-	tillToken (ident, what);
+	tillToken (ident, what, ln, pos);
 
 	if (what != waitedToken)
 	{
@@ -676,20 +682,29 @@ static void objcStringCat (objcString *string, const objcString *s)
 	}
 }
 
-#define objcStringPut(S, C) vStringPut(S->name, C)
+#define objcStringPut(S, C, LN, POS) do			\
+	{											\
+		vStringPut(S->name, C);					\
+		if (vStringLength(S->name) == 1)		\
+		{										\
+			S->ln = LN;							\
+			S->pos = POS;						\
+		}										\
+	}											\
+	while (0)
 
-static void objcStringCopy (objcString *string, vString *s)
+static void objcStringCopy (objcString *string, vString *s,
+							unsigned long ln, MIOPos pos)
 {
 	vStringCopy (string->name, s);
-#if 0
-	string->ln = ;
-	string->pos = ;
-#endif
+	string->ln = ln;
+	string->pos = pos;
 }
 
 static void parseMethodsNameCommon (vString * const ident, objcToken what,
 									parseNext reEnter,
-									parseNext nextAction)
+									parseNext nextAction,
+									unsigned long ln, MIOPos pos)
 {
 	int index;
 
@@ -706,8 +721,8 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 		break;
 
 	case Tok_dpoint:
-		objcStringCat (fullMethodName, prevIdent); /* TODO */
-		objcStringPut (fullMethodName, ':');
+		objcStringCat (fullMethodName, prevIdent);
+		objcStringPut (fullMethodName, ':', ln, pos);
 		objcStringClear (prevIdent);
 
 		if (vStringLength (signature) > 1)
@@ -736,7 +751,7 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 				&& vStringLast (signature) == '('))
 			vStringCatS (signature, "id");
 
-		objcStringCopy (prevIdent, ident); /* TODO */
+		objcStringCopy (prevIdent, ident, ln, pos);
 		break;
 
 	case Tok_CurlL:
@@ -751,7 +766,7 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 			index = addTag (prevIdent->name, methodKind);
 
 		toDoNext = nextAction;
-		parseImplemMethods (ident, what);
+		parseImplemMethods (ident, what, ln, pos);
 		objcStringClear (prevIdent);
 
 		tagEntryInfo *e = getEntryInCorkQueue (index);
@@ -779,17 +794,20 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 	}
 }
 
-static void parseMethodsName (vString * const ident, objcToken what)
+static void parseMethodsName (vString * const ident, objcToken what,
+							  unsigned long ln, MIOPos pos)
 {
-	parseMethodsNameCommon (ident, what, parseMethodsName, parseMethods);
+	parseMethodsNameCommon (ident, what, parseMethodsName, parseMethods, ln ,pos);
 }
 
-static void parseMethodsImplemName (vString * const ident, objcToken what)
+static void parseMethodsImplemName (vString * const ident, objcToken what,
+									unsigned long ln, MIOPos pos)
 {
-	parseMethodsNameCommon (ident, what, parseMethodsImplemName, parseImplemMethods);
+	parseMethodsNameCommon (ident, what, parseMethodsImplemName, parseImplemMethods, ln, pos);
 }
 
-static void parseCategory (vString * const ident, objcToken what)
+static void parseCategory (vString * const ident, objcToken what,
+						   unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	if (what == ObjcIDENTIFIER)
 	{
@@ -810,7 +828,8 @@ static void parseCategory (vString * const ident, objcToken what)
 	}
 }
 
-static void parseImplemMethods (vString * const ident, objcToken what)
+static void parseImplemMethods (vString * const ident, objcToken what,
+								unsigned long ln, MIOPos pos)
 {
 	switch (what)
 	{
@@ -832,7 +851,7 @@ static void parseImplemMethods (vString * const ident, objcToken what)
 
 	case Tok_CurlL:	/* { */
 		toDoNext = &ignoreBalanced;
-		ignoreBalanced (ident, what);
+		ignoreBalanced (ident, what, ln, pos);
 		comeAfter = &parseImplemMethods;
 		break;
 
@@ -845,7 +864,8 @@ static void parseImplemMethods (vString * const ident, objcToken what)
 	}
 }
 
-static void parseProperty (vString * const ident, objcToken what)
+static void parseProperty (vString * const ident, objcToken what,
+						   unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -872,7 +892,8 @@ static void parseProperty (vString * const ident, objcToken what)
 	}
 }
 
-static void parseInterfaceSuperclass (vString * const ident, objcToken what)
+static void parseInterfaceSuperclass (vString * const ident, objcToken what,
+									  unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	tagEntryInfo *e = getEntryInCorkQueue (parentCorkIndex);
 	if (what == ObjcIDENTIFIER && e)
@@ -881,7 +902,8 @@ static void parseInterfaceSuperclass (vString * const ident, objcToken what)
 	toDoNext = &parseMethods;
 }
 
-static void parseInterfaceProtocolList (vString * const ident, objcToken what)
+static void parseInterfaceProtocolList (vString * const ident, objcToken what,
+										unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	static vString *protocol_list;
 
@@ -915,7 +937,8 @@ static void parseInterfaceProtocolList (vString * const ident, objcToken what)
 	}
 }
 
-static void parseMethods (vString * const ident CTAGS_ATTR_UNUSED, objcToken what)
+static void parseMethods (vString * const ident CTAGS_ATTR_UNUSED, objcToken what,
+						  unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -961,7 +984,8 @@ static void parseMethods (vString * const ident CTAGS_ATTR_UNUSED, objcToken wha
 }
 
 
-static void parseProtocol (vString * const ident, objcToken what)
+static void parseProtocol (vString * const ident, objcToken what,
+						   unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	if (what == ObjcIDENTIFIER)
 	{
@@ -971,7 +995,8 @@ static void parseProtocol (vString * const ident, objcToken what)
 	toDoNext = &parseMethods;
 }
 
-static void parseImplementation (vString * const ident, objcToken what)
+static void parseImplementation (vString * const ident, objcToken what,
+								 unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	if (what == ObjcIDENTIFIER)
 	{
@@ -981,7 +1006,8 @@ static void parseImplementation (vString * const ident, objcToken what)
 	toDoNext = &parseImplemMethods;
 }
 
-static void parseInterface (vString * const ident, objcToken what)
+static void parseInterface (vString * const ident, objcToken what,
+							unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	if (what == ObjcIDENTIFIER)
 	{
@@ -992,7 +1018,8 @@ static void parseInterface (vString * const ident, objcToken what)
 	toDoNext = &parseMethods;
 }
 
-static void parseStructMembers (vString * const ident, objcToken what)
+static void parseStructMembers (vString * const ident, objcToken what,
+								unsigned long ln, MIOPos pos)
 {
 	static parseNext prev = NULL;
 
@@ -1022,7 +1049,7 @@ static void parseStructMembers (vString * const ident, objcToken what)
 		toDoNext = &ignoreBalanced;
 		prev = comeAfter;
 		comeAfter = &parseStructMembers;
-		ignoreBalanced (ident, what);
+		ignoreBalanced (ident, what, ln, pos);
 		break;
 
 	case Tok_CurlR:
@@ -1037,7 +1064,8 @@ static void parseStructMembers (vString * const ident, objcToken what)
 
 /* Called just after the struct keyword */
 static bool parseStruct_gotName = false;
-static void parseStruct (vString * const ident, objcToken what)
+static void parseStruct (vString * const ident, objcToken what,
+						 unsigned long ln, MIOPos pos)
 {
 	switch (what)
 	{
@@ -1053,7 +1081,7 @@ static void parseStruct (vString * const ident, objcToken what)
 			parseStruct_gotName = false;
 			popEnclosingContext ();
 			toDoNext = comeAfter;
-			comeAfter (ident, what);
+			comeAfter (ident, what, ln, pos);
 		}
 		break;
 
@@ -1068,7 +1096,7 @@ static void parseStruct (vString * const ident, objcToken what)
 			popEnclosingContext ();
 
 		toDoNext = comeAfter;
-		comeAfter (ident, what);
+		comeAfter (ident, what, ln, pos);
 		break;
 
 	default:
@@ -1079,7 +1107,8 @@ static void parseStruct (vString * const ident, objcToken what)
 
 /* Parse enumeration members, ignoring potential initialization */
 static parseNext parseEnumFields_prev = NULL;
-static void parseEnumFields (vString * const ident, objcToken what)
+static void parseEnumFields (vString * const ident, objcToken what,
+							 unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	if (parseEnumFields_prev != NULL)
 	{
@@ -1113,7 +1142,8 @@ static void parseEnumFields (vString * const ident, objcToken what)
 
 /* parse enum ... { ... */
 static bool parseEnum_named = false;
-static void parseEnum (vString * const ident, objcToken what)
+static void parseEnum (vString * const ident, objcToken what,
+					   unsigned long ln, MIOPos pos)
 {
 	switch (what)
 	{
@@ -1129,7 +1159,7 @@ static void parseEnum (vString * const ident, objcToken what)
 			parseEnum_named = false;
 			popEnclosingContext ();
 			toDoNext = comeAfter;
-			comeAfter (ident, what);
+			comeAfter (ident, what, ln, pos);
 		}
 		break;
 
@@ -1142,7 +1172,7 @@ static void parseEnum (vString * const ident, objcToken what)
 		if (parseEnum_named)
 			popEnclosingContext ();
 		toDoNext = comeAfter;
-		comeAfter (ident, what);
+		comeAfter (ident, what, ln, pos);
 		break;
 
 	default:
@@ -1156,7 +1186,8 @@ static void parseEnum (vString * const ident, objcToken what)
  * ignoring the defined type but in the case of struct,
  * in which case struct are parsed.
  */
-static void parseTypedef (vString * const ident, objcToken what)
+static void parseTypedef (vString * const ident, objcToken what,
+						  unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -1187,7 +1218,8 @@ static void parseTypedef (vString * const ident, objcToken what)
 }
 
 static bool ignorePreprocStuff_escaped = false;
-static void ignorePreprocStuff (vString * const ident CTAGS_ATTR_UNUSED, objcToken what)
+static void ignorePreprocStuff (vString * const ident CTAGS_ATTR_UNUSED, objcToken what,
+								unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -1212,7 +1244,8 @@ static void ignorePreprocStuff (vString * const ident CTAGS_ATTR_UNUSED, objcTok
 	}
 }
 
-static void parseMacroName (vString * const ident, objcToken what)
+static void parseMacroName (vString * const ident, objcToken what,
+							unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	if (what == ObjcIDENTIFIER)
 		addTag (ident, K_MACRO);
@@ -1220,7 +1253,8 @@ static void parseMacroName (vString * const ident, objcToken what)
 	toDoNext = &ignorePreprocStuff;
 }
 
-static void parsePreproc (vString * const ident, objcToken what)
+static void parsePreproc (vString * const ident, objcToken what,
+						  unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -1237,13 +1271,15 @@ static void parsePreproc (vString * const ident, objcToken what)
 	}
 }
 
-static void skipCurlL (vString * const ident, objcToken what)
+static void skipCurlL (vString * const ident, objcToken what,
+					   unsigned long ln CTAGS_ATTR_UNUSED, MIOPos pos CTAGS_ATTR_UNUSED)
 {
 	if (what == Tok_CurlL)
 		toDoNext = comeAfter;
 }
 
-static void parseCPlusPlusCLinkage (vString * const ident, objcToken what)
+static void parseCPlusPlusCLinkage (vString * const ident, objcToken what,
+									unsigned long ln, MIOPos pos)
 {
 	toDoNext = comeAfter;
 
@@ -1252,12 +1288,13 @@ static void parseCPlusPlusCLinkage (vString * const ident, objcToken what)
 		toDoNext = skipCurlL;
 	else
 		/* Force handle this ident in globalScope */
-		globalScope (ident, what);
+		globalScope (ident, what, ln, pos);
 }
 
 /* Handle the "strong" top levels, all 'big' declarations
  * happen here */
-static void globalScope (vString * const ident, objcToken what)
+static void globalScope (vString * const ident, objcToken what,
+						 unsigned long ln, MIOPos pos)
 {
 	switch (what)
 	{
@@ -1283,7 +1320,7 @@ static void globalScope (vString * const ident, objcToken what)
 		vStringClear (tempName);
 		comeAfter = &globalScope;
 		toDoNext = &ignoreBalanced;
-		ignoreBalanced (ident, what);
+		ignoreBalanced (ident, what, ln, pos);
 		break;
 
 	case ObjcINTERFACE:
@@ -1306,7 +1343,7 @@ static void globalScope (vString * const ident, objcToken what)
 	case Tok_CurlL:
 		comeAfter = &globalScope;
 		toDoNext = &ignoreBalanced;
-		ignoreBalanced (ident, what);
+		ignoreBalanced (ident, what, ln, pos);
 		break;
 
 	case ObjcEXTERN:
@@ -1357,7 +1394,7 @@ static void findObjcTags (void)
 	tok = lex (&st);
 	while (tok != Tok_EOF)
 	{
-		(*toDoNext) (st.name, tok);
+		(*toDoNext) (st.name, tok, st.ln, st.pos);
 		tok = lex (&st);
 	}
 	vStringDelete(st.name);
