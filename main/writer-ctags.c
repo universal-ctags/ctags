@@ -95,8 +95,8 @@ tagWriter eCtagsWriter = {
 	.postWriteEntry = endECTagsFile,
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
-	.defaultFileName = CTAGS_FILE,
 	.checkOptions = checkCtagsOptions,
+	.defaultFileName = CTAGS_FILE,
 };
 
 static bool hasTagEntryTabOrNewlineChar (const tagEntryInfo * const tag)
