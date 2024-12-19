@@ -469,7 +469,7 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 {
 	initTagEntry (tag, vStringValue (name), kind);
 
-	if (vStringLength (parentName) > 0)
+	if (!vStringIsEmpty (parentName))
 	{
 		tag->extensionFields.scopeKindIndex = parentType;
 		tag->extensionFields.scopeName = vStringValue (parentName);
@@ -614,7 +614,7 @@ static void tillTokenWithCapturingSignature (vString * const ident, objcToken wh
 	{
 		if (what == Tok_Asterisk)
 			vStringPut (signature, '*');
-		else if (vStringLength (ident) > 0)
+		else if (!vStringIsEmpty (ident))
 		{
 			if (! (vStringLast (signature) == ','
 				   || vStringLast (signature) == '('
@@ -639,8 +639,8 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 		comeAfter = reEnter;
 		waitedToken = Tok_PARR;
 
-		if (! (vStringLength(prevIdent) == 0
-			   && vStringLength(fullMethodName) == 0))
+		if (! (vStringIsEmpty(prevIdent)
+			   && vStringIsEmpty(fullMethodName)))
 			toDoNext = &tillTokenWithCapturingSignature;
 		break;
 
@@ -654,7 +654,7 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 		break;
 
 	case ObjcIDENTIFIER:
-		if ((vStringLength (prevIdent) > 0
+		if (((!vStringIsEmpty (prevIdent))
 			 /* "- initWithObject: o0 withAnotherObject: o1;"
 				Overwriting the last value of prevIdent ("o0");
 				a parameter name ("o0") was stored to prevIdent,
@@ -670,8 +670,8 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 				   In this case no overwriting happens.
 				   However, "id" for "object" is part
 				   of signature. */
-				vStringLength (prevIdent) == 0
-				&& vStringLength (fullMethodName) > 0
+				vStringIsEmpty (prevIdent)
+				&& (!vStringIsEmpty (fullMethodName))
 				&& vStringLast (signature) == '('))
 			vStringCatS (signature, "id");
 
@@ -681,7 +681,7 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 	case Tok_CurlL:
 	case Tok_semi:
 		/* method name is not simple */
-		if (vStringLength (fullMethodName) != '\0')
+		if (!vStringIsEmpty (fullMethodName))
 		{
 			index = addTag (fullMethodName, methodKind);
 			vStringClear (fullMethodName);
