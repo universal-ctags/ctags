@@ -69,3 +69,12 @@ anonymousObjectf91d7bd30105	input-2.js	/^f({x, y, z})$/;"	v
 x	input-2.js	/^f({x, y, z})$/;"	p	variable:anonymousObjectf91d7bd30105
 y	input-2.js	/^f({x, y, z})$/;"	p	variable:anonymousObjectf91d7bd30105
 z	input-2.js	/^f({x, y, z})$/;"	p	variable:anonymousObjectf91d7bd30105
+key0	input-3.js	/^let key0 = 'z';$/;"	v
+foo	input-3.js	/^let {[key0]: foo} = {z: 'alpha'};$/;"	v
+z	input-3.js	/^let {[key0]: foo} = {z: 'alpha'};$/;"	p	variable:anonymousObjectf91e08340105
+anonymousObjectf91e08340105	input-3.js	/^let {[key0]: foo} = {z: 'alpha'};$/;"	v
+key1	input-3.js	/^let key1 = 'x';$/;"	v
+bar	input-3.js	/^let {[key0]: bar = 'X', [key1]: baz} = {x: 'beta'};$/;"	v
+baz	input-3.js	/^let {[key0]: bar = 'X', [key1]: baz} = {x: 'beta'};$/;"	v
+x	input-3.js	/^let {[key0]: bar = 'X', [key1]: baz} = {x: 'beta'};$/;"	p	variable:anonymousObjectf91e08340205
+anonymousObjectf91e08340205	input-3.js	/^let {[key0]: bar = 'X', [key1]: baz} = {x: 'beta'};$/;"	v

@@ -3044,10 +3044,31 @@ static bool parseObjectDestructuring (tokenInfo *const token, bool is_const)
 		}
 		else if (isType (token, TOKEN_OPEN_SQUARE))
 		{
-			if (parseArrayDestructuring (token, is_const))
-				found = true;
-			if (state == OBJ_DESTRUCTURING_COLON)
-				state = OBJ_DESTRUCTURING_TAGGED;
+			if (state == OBJ_DESTRUCTURING_START)
+			{
+				/*
+				 *       @   >     @   >
+				 * let { [k0]: v0, [k1]: v1 = 0, v3 };
+				 *     ^.....|...^.....|.......^.....: start
+				 *           ^.........^.............: colon
+				 *
+				 * We are at '@' in this context.
+				 * Let's skip to '>'.
+				 */
+				skipArrayList(token, true);
+				if (isType (token, TOKEN_COLON))
+				{
+					vStringClear (name->string);
+					state = OBJ_DESTRUCTURING_COLON;
+				}
+			}
+			else
+			{
+				if (parseArrayDestructuring (token, is_const))
+					found = true;
+				if (state == OBJ_DESTRUCTURING_COLON)
+					state = OBJ_DESTRUCTURING_TAGGED;
+			}
 		}
 		else if (isType (token, TOKEN_IDENTIFIER))
 		{
