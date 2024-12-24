@@ -318,6 +318,8 @@ Output Format Options
 	the ctags executable is built with ``libjansson``.
 	See :ref:`ctags-json-output(5) <ctags-json-output(5)>` for more about ``json`` format.
 
+	See also ``--list-output-formats``.
+
 ``-e``
 	Same as ``--output-format=etags``.
 	Enable etags mode, which will create a tag file for use with the Emacs
@@ -1236,6 +1238,14 @@ Listing Options
 	definition.
 	See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
+``--list-output-formats``
+	Lists the output formats that can be used in ``--output-format`` option.
+
+	``NULLTAG`` column represetns whether the format supports *null tags* or
+	not. See ``nulltag``/``z`` in "`Extras`_" about the null tags.
+
+	(since verison 6.2.0)
+
 ``--list-params[=(<language>|all)]``
 	Lists the parameters for either the specified *<language>* or ``all``
 	languages, and then exits.
@@ -1835,6 +1845,8 @@ roles of tags to include in the output file for a particular language.
 Inquire the output of "``ctags --list-roles``" for the list of
 roles.
 
+.. _extras:
+
 Extras
 ~~~~~~
 
@@ -1926,6 +1938,25 @@ The meaning of major extras is as follows (long-name flag/one-letter flag):
 	ctags to create the extra tags for any source files.
 
 	The etags mode enables the ``Unknown`` parser implicitly.
+
+``nulltag``/``z``
+	Include tags (*null tags*) having empty strings as their names.
+	Generally speaking, trying to make a null tag is a sign of a parser bug
+	or broken input. ctags warns such trying or throws the
+	null tag away. To suppress the warnings, use ``--quiet`` option.
+
+	On the other hand, null tags are valid in some languages.
+	Consider ``{"":  val}`` in a JavaScript sourece code. The empty string is
+	valid as a key. If a parser intentionally makes a null tag (a valid null tag),
+	ctags doesn't warn but discard it by default.
+
+	The discards are due because some output formats may not consider null tags.
+
+	With ``nulltag``/``z`` extra, you can force ctags to emit the nulltags. This extra
+	is effective only if the output format supports null tags. ``--list-output-formats``
+	option tells you which output formats support null tags.
+
+	(since version 6.2.0)
 
 ``pseudo``/``p``
 	Include pseudo-tags. Enabled by default unless the tag file is
@@ -2273,6 +2304,8 @@ The official Universal Ctags web site at: https://ctags.io/
 Also ``ex(1)``, ``vi(1)``, ``elvis(1)``, or, better yet, ``vim(1)``, the official editor of ctags.
 For more information on ``vim(1)``, see the Vim web site at: https://www.vim.org/
 
+About the file format for ``TAGS``, see `emacs git
+<https://git.savannah.gnu.org/cgit/emacs.git/tree/etc/ETAGS.EBNF>`_.
 
 AUTHOR
 ------

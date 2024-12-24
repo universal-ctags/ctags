@@ -47,6 +47,7 @@ struct rejection {
 };
 
 tagWriter uCtagsWriter = {
+	.oformat = "u-ctags",
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
 	.printPtagByDefault = true,
@@ -55,6 +56,7 @@ tagWriter uCtagsWriter = {
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
 	.checkOptions = checkCtagsOptions,
+	.canPrintNullTag = false,
 #ifdef _WIN32
 	.overrideFilenameSeparator = overrideFilenameSeparator,
 #endif
@@ -88,6 +90,7 @@ static enum filenameSepOp overrideFilenameSeparator (enum filenameSepOp currentS
 #endif
 
 tagWriter eCtagsWriter = {
+	.oformat = "e-ctags",
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
 	.printPtagByDefault = true,
@@ -95,8 +98,9 @@ tagWriter eCtagsWriter = {
 	.postWriteEntry = endECTagsFile,
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
-	.defaultFileName = CTAGS_FILE,
 	.checkOptions = checkCtagsOptions,
+	.canPrintNullTag = false,
+	.defaultFileName = CTAGS_FILE,
 };
 
 static bool hasTagEntryTabOrNewlineChar (const tagEntryInfo * const tag)

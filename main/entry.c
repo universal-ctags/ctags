@@ -1762,7 +1762,7 @@ static void buildFqTagCache (tagEntryInfo *const tag)
 	getTagScopeInformation (tag, NULL, NULL);
 }
 
-static void writeTagEntry (const tagEntryInfo *const tag)
+static void writeTagEntry (tagEntryInfo *const tag)
 {
 	int length = 0;
 
@@ -1770,11 +1770,20 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 
 	DebugStatement ( debugEntry (tag); )
 
+	if (isTagExtraBitMarked(tag, XTAG_NULLTAG))
+	{
+		if (!writerCanPrintNullTag())
+			return;
+
+		if (!isXtagEnabled(XTAG_NULLTAG))
+			return;
+	}
+
 #ifdef _WIN32
 	if (getFilenameSeparator(Option.useSlashAsFilenameSeparator) == FILENAME_SEP_USE_SLASH)
 	{
-		Assert (((const tagEntryInfo *)tag)->inputFileName);
-		char *c = (char *)(((tagEntryInfo *const)tag)->inputFileName);
+		Assert (tag->inputFileName);
+		char *c = (char *)(tag->inputFileName);
 		while (*c)
 		{
 			if (*c == PATH_SEPARATOR)
@@ -1791,7 +1800,7 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 		&& !tag->skipAutoFQEmission)
 	{
 		/* const is discarded to update the cache field of TAG. */
-		buildFqTagCache ( (tagEntryInfo *const)tag);
+		buildFqTagCache (tag);
 	}
 
 	length = writerWriteTag (TagFile.mio, tag);
@@ -1926,7 +1935,7 @@ extern int makePlaceholder (const char *const name)
 	return makeTagEntry (&e);
 }
 
-extern int makeTagEntry (const tagEntryInfo *const tag)
+extern int makeTagEntry (tagEntryInfo *const tag)
 {
 	int r = CORK_NIL;
 	Assert (tag->name != NULL);
@@ -1938,11 +1947,18 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
 	{
-		if (!doesInputLanguageAllowNullTag())
+		if (! tag->allowNullTag)
+		{
 			error (NOTICE, "ignoring null tag in %s(line: %lu, language: %s)",
 				   getInputFileName (), tag->lineNumber,
 				   getLanguageName (tag->langType));
-		goto out;
+			goto out;
+		}
+
+		/* writeTagEntry decides whether ctags emits this tag or not.
+		 * At this point, we just mark the tag as a null tag. */
+		if (! tag->placeholder)
+			markTagExtraBit(tag, XTAG_NULLTAG);
 	}
 
 	if (TagFile.cork)
@@ -2082,6 +2098,8 @@ static void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 
 	if (isParserMarkedNoEmission ())
 		e->placeholder = 1;
+
+	e->allowNullTag = doesLanguageAllowNullTag (e->langType);
 }
 
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,

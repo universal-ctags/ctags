@@ -1,0 +1,17 @@
+# no extra (xref)
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: ignoring null tag in input.cst(line: 1, language: CTagsSelfTest)
+# drop '0' extra (xref)
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: ignoring null tag in input.cst(line: 1, language: CTagsSelfTest)
+# drop '{nulltag}' extra (xref)
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: ignoring null tag in input.cst(line: 1, language: CTagsSelfTest)
+# with --extras=+0 ($fmt)
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: ignoring null tag in input.cst(line: 1, language: CTagsSelfTest)
+                 emitNullTag    2 input.cst        z
+# with --extras=+{nulltag}' (xref)
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: ignoring null tag in input.cst(line: 1, language: CTagsSelfTest)
+                 emitNullTag    2 input.cst        z

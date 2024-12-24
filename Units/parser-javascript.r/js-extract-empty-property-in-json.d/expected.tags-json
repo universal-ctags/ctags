@@ -1,0 +1,2 @@
+{"_type": "tag", "name": "", "path": "input.js", "pattern": "/^var variable = { \"\": \"value\" };$/", "kind": "property", "scope": "variable", "scopeKind": "variable", "extras": "nulltag"}
+{"_type": "tag", "name": "variable", "path": "input.js", "pattern": "/^var variable = { \"\": \"value\" };$/", "kind": "variable"}

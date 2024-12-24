@@ -76,6 +76,13 @@ struct sTagEntryInfo {
 											 * Set in the cork queue; don't touch this.*/
 	unsigned int boundaryInfo: 2; /* info about nested input stream */
 	unsigned int inIntevalTab:1;
+	unsigned int allowNullTag:1;	/* allow a tag with an empty string.
+									 * To allow your parser to emit null tags without
+									 * setting this per-entry allowNullTag,
+									 * set parserDefinition::allowNullTag instead.
+									 *
+									 * Set this member before calling makeTagEntry.
+									 */
 
 	unsigned long lineNumber;     /* line number of tag;
 									 use updateTagLine() for updating this member. */
@@ -164,7 +171,7 @@ typedef bool (* entryForeachFunc) (int corkIndex,
 /*
 *   FUNCTION PROTOTYPES
 */
-extern int makeTagEntry (const tagEntryInfo *const tag);
+extern int makeTagEntry (tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  int kindIndex);
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,

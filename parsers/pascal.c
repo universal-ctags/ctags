@@ -59,7 +59,7 @@ static void createPascalTag (
 		initTagEntry (tag, NULL, KIND_GHOST_INDEX);
 }
 
-static void makePascalTag (const tagEntryInfo* const tag)
+static void makePascalTag (tagEntryInfo* const tag)
 {
 	if (tag->name != NULL)
 		makeTagEntry (tag);

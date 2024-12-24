@@ -99,7 +99,7 @@ struct sParserDefinition {
 	unsigned int    versionCurrent;
 	unsigned int    versionAge;
 
-	kindDefinition* kindTable;	   /* tag kinds handled by parser */
+	kindDefinition* kindTable;     /* tag kinds handled by parser */
 	unsigned int kindCount;        /* size of `kinds' list */
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
@@ -109,10 +109,15 @@ struct sParserDefinition {
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
-	unsigned int method;           /* See METHOD_ definitions above */
-	unsigned int useCork;		   /* bit fields of corkUsage */
+	unsigned int method;           /* see METHOD_ definitions above */
+	unsigned int useCork;          /* bit fields of corkUsage */
 	bool useMemoryStreamInput;
-	bool allowNullTag;
+	bool allowNullTag;             /* allow the parser emit tags with empty
+									  strings. If you want to emit a few
+									  specified tags with empty strings,
+									  you don't need this parser-global
+									  allowNullTag; set tagEntryInfo::allowNullTag
+									  instead. */
 	bool requestAutomaticFQTag;
 	tagRegexTable *tagRegexTable;
 	unsigned int tagRegexCount;
