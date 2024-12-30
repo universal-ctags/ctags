@@ -130,7 +130,7 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 
 	updateTagLine (&e, token->lineNumber, token->filePosition);
 
-	if (vStringLength (token->scope) > 0)
+	if (!vStringIsEmpty (token->scope))
 	{
 		Assert (token->scopeKind > TAG_NONE && token->scopeKind < TAG_COUNT);
 
