@@ -1,0 +1,5 @@
+c	input.json	/^      "c": "hello {{.Name}}"$/;"	s	object:welcome.x
+welcome.x.c	input.json	/^      "c": "hello {{.Name}}"$/;"	s	object:welcome.x
+x	input.json	/^    "x": {$/;"	o	object:welcome
+welcome.x	input.json	/^    "x": {$/;"	o	object:welcome
+welcome	input.json	/^  "welcome": {$/;"	o

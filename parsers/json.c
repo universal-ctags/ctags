@@ -139,6 +139,17 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 	}
 
 	makeTagEntry (&e);
+
+	if (!vStringIsEmpty (token->scope) && isXtagEnabled (XTAG_QUALIFIED_TAGS))
+	{
+		vString *qname = vStringNewCopy(token->scope);
+		vStringPut(qname, '.');
+		vStringCat(qname, token->string);
+		e.name = vStringValue(qname);
+		markTagExtraBit(&e, XTAG_QUALIFIED_TAGS);
+		makeTagEntry (&e);
+		vStringDelete (qname);
+	}
 }
 
 #define DEPTH_LIMIT 512
