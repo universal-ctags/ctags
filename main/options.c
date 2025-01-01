@@ -280,7 +280,7 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {1,1,"  --_xformat=<field_format>"},
  {1,1,"       Specify custom format for tabular cross reference (-x)."},
- {1,1,"       Fields can be specified with letter listed in --list-fields."},
+ {1,1,"       Fields can be specified with letter listed in --list-fields. [%-16N %-10K %4n %-16F %C]"},
  {1,1,"       e.g. --_xformat=%10N %10l:%K @ %-20F:%-20n"},
  {1,0,""},
  {1,0,"Language Selection and Mapping Options"},
