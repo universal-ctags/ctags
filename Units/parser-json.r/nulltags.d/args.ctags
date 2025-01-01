@@ -1,0 +1,3 @@
+--sort=no
+--extras=+{nulltag}
+--_xformat=%-16N %-10K %4n/%-4{end} %C %{scopeKind}:%{scope}
