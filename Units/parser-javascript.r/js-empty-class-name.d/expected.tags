@@ -1,2 +1,3 @@
+prop	input.js	/^var {prop} = { prop: "value" };$/;"	v
 prop	input.js	/^var {prop} = { prop: "value" };$/;"	p	variable:anonymousObject4ca5b60a0105
 anonymousObject4ca5b60a0105	input.js	/^var {prop} = { prop: "value" };$/;"	v
