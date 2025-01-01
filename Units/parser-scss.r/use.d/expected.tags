@@ -1,0 +1,7 @@
+X/y	input.scss	/^@use "X\/y";$/;"	M	roles:used
+y	input.scss	/^@use "X\/y";$/;"	n	roles:def
+Z	input.scss	/^@use "Z";$/;"	M	roles:used
+Z	input.scss	/^@use "Z";$/;"	n	roles:def
+A	input.scss	/^@use "A" as NS;$/;"	M	roles:used
+NS	input.scss	/^@use "A" as NS;$/;"	n	roles:def
+B/	input.scss	/^@use "B\/";$/;"	M	roles:used
