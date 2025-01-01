@@ -450,13 +450,42 @@ static void collectSignature (const tokenInfo *const token, collector * col)
 	vStringCat (col->str, token->string);
 }
 
+static void tokenReadQuotedIdentifier (tokenInfo *const token)
+{
+	token->type  = TOKEN_TCL_IDENTIFIER;
+	vStringClear (token->string);
+	unsigned int depth = 1;
+	while (depth > 0)
+	{
+		int c = getcFromInputFile ();
+		switch (c)
+		{
+		case EOF:
+			return;
+		case '{':
+			depth++;
+			tokenPutc (token, c);
+			break;
+		case '}':
+			if (depth != 1)
+				tokenPutc (token, c);
+			depth--;
+			break;
+		default:
+			vStringPut (token->string, c);
+		}
+	}
+}
+
 static void parseProc (tokenInfo *const token,
-					   int parent)
+					   int parent, bool quoted)
 {
 	int index = CORK_NIL;
 	int index_fq = CORK_NIL;
-
-	tokenRead (token);
+	if (quoted)
+		tokenReadQuotedIdentifier (token);
+	else
+		tokenRead (token);
 
 	if (tokenIsType(token, TCL_IDENTIFIER))
 	{
@@ -494,6 +523,8 @@ static void parseProc (tokenInfo *const token,
 				e.extensionFields.scopeName = vStringValue (ns);
 			}
 
+			if (*e.name == '\0')
+				e.allowNullTag = 1;
 			e.skipAutoFQEmission = 1;
 			index = makeTagEntry (&e);
 
@@ -517,12 +548,23 @@ static void parseProc (tokenInfo *const token,
 		}
 		else
 		{
-			tagEntryInfo *ep;
-			index = makeSimpleTag (token->string, K_PROCEDURE);
-			ep = getEntryInCorkQueue (index);
-			if (ep)
-				ep->extensionFields.scopeIndex = parent;
+			tagEntryInfo e;
+			initTagEntry (&e, tokenString (token), K_PROCEDURE);
+			if (quoted)
+			{
+				e.lineNumber = token->lineNumber;
+				e.filePosition = token->filePosition;
+				if (vStringIsEmpty (token->string))
+					e.allowNullTag = 1;
+			}
+			e.extensionFields.scopeIndex = parent;
+			index = makeTagEntry (&e);
 		}
+	}
+	else if (!quoted && token->type == '{')
+	{
+		parseProc(token, parent, true);
+		return;
 	}
 
 	vString *signature = NULL;
@@ -628,7 +670,7 @@ static void parseNamespace (tokenInfo *const token,
 		if (tokenIsKeyword (token, NAMESPACE))
 			parseNamespace (token, index);
 		else if (tokenIsKeyword (token, PROC))
-			parseProc (token, index);
+			parseProc (token, index, false);
 		else if (tokenIsType (token, TCL_IDENTIFIER))
 		{
 			int r = notifyCommand (token, index);
@@ -677,7 +719,7 @@ static void findTclTags (void)
 		if (tokenIsKeyword (token, NAMESPACE))
 			parseNamespace (token, CORK_NIL);
 		else if (tokenIsKeyword (token, PROC))
-			parseProc (token, CORK_NIL);
+			parseProc (token, CORK_NIL, false);
 		else if (tokenIsKeyword (token, PACKAGE))
 			parsePackage (token);
 		else if (tokenIsType (token, TCL_IDENTIFIER))

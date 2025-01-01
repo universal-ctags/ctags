@@ -1,0 +1,12 @@
+                 procedure     1 input.tcl proc {} {} {return Empty } :
+aaa              procedure     2 input.tcl proc aaa {} {return Normal} :
+a                procedure     4 input.tcl proc {a} {} {return Braced} :
+ns1              namespace     6 input.tcl namespace eval ns1 { :
+                 procedure     7 input.tcl proc {} {} {return Empty } namespace:::ns1
+bbb              procedure     8 input.tcl proc bbb {} {return Normal} namespace:::ns1
+b                procedure     9 input.tcl proc {b} {} {return Braced} namespace:::ns1
+ns2              namespace    12 input.tcl namespace eval ns2 :
+                 procedure    13 input.tcl proc ns2:: {} {return Empty } namespace:ns2
+ccc              procedure    14 input.tcl proc ns2::ccc {} {return Normal} namespace:ns2
+c                procedure    15 input.tcl proc {ns2::c} {} {return Braced} namespace:ns2
+                 procedure    17 input.tcl proc :: {} {return "Empty at Root NS"} :
