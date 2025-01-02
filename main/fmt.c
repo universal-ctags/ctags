@@ -55,7 +55,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 {
 	int i;
 	int width = fspec->field.width;
-	int ftype;
+	fieldType ftype;
 	const char* str = NULL;
 
 	ftype = fspec->field.ftype;
