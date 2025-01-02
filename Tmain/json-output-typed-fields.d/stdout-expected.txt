@@ -1,4 +1,9 @@
 {"_type": "tag", "name": "atag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker"}
 {"_type": "tag", "name": "btag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "bField": true}
-{"_type": "tag", "name": "ctag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sbField": "val"}
-{"_type": "tag", "name": "dtag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sbField": false}
+{"_type": "tag", "name": "ctag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "bField": true}
+{"_type": "tag", "name": "dtag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sbField": "val"}
+{"_type": "tag", "name": "etag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sbField": false}
+{"_type": "tag", "name": "TITLE", "path": "input.rst", "pattern": "/^TITLE$/", "kind": "title", "overline": true}
+{"_type": "tag", "name": "section", "path": "input.rst", "pattern": "/^section$/", "kind": "subtitle", "scope": "TITLE", "scopeKind": "title"}
+{"_type": "tag", "name": "global", "path": "input.c", "pattern": "/^int global;$/", "typeref": "typename:int", "kind": "variable"}
+{"_type": "tag", "name": "local", "path": "input.c", "pattern": "/^static int local;$/", "file": true, "typeref": "typename:int", "kind": "variable"}

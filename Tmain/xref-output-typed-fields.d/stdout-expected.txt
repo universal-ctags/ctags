@@ -1,4 +1,12 @@
+# input.ctst
 atag -> b=,sb=
 btag -> b=bField,sb=
-ctag -> b=,sb=val
-dtag -> b=,sb=-
+ctag -> b=bField,sb=
+dtag -> b=,sb=val
+etag -> b=,sb=-
+# input.rst
+TITLE -> overline
+section -> 
+# input.c
+global -> -
+local -> file

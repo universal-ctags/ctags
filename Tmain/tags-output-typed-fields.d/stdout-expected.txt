@@ -1,4 +1,9 @@
 atag	input.ctst	/^f$/;"	f
 btag	input.ctst	/^f$/;"	f	bField:
-ctag	input.ctst	/^f$/;"	f	sbField:val
-dtag	input.ctst	/^f$/;"	f	sbField:
+ctag	input.ctst	/^f$/;"	f	bField:any-C-string-is-interpreted-as-true
+dtag	input.ctst	/^f$/;"	f	sbField:val
+etag	input.ctst	/^f$/;"	f	sbField:
+TITLE	input.rst	/^TITLE$/;"	H	overline:
+section	input.rst	/^section$/;"	h	title:TITLE
+global	input.c	/^int global;$/;"	v	typeref:typename:int
+local	input.c	/^static int local;$/;"	v	typeref:typename:int	file:
