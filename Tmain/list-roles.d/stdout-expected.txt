@@ -111,6 +111,7 @@ RpmSpec        p/patch           decl               on      declared for applyin
 Ruby           L/library         loaded             on      loaded by "load" method
 Ruby           L/library         required           on      loaded by "require" method
 Ruby           L/library         requiredRel        on      loaded by "require_relative" method
+SCSS           M/module          used               on      used
 Sh             h/heredoc         endmarker          on      end marker
 Sh             s/script          loaded             on      loaded
 SystemTap      p/probe           attached           on      attached by code for probing
@@ -255,6 +256,7 @@ RpmSpec        p/patch           decl               on      declared for applyin
 Ruby           L/library         loaded             on      loaded by "load" method
 Ruby           L/library         required           on      loaded by "require" method
 Ruby           L/library         requiredRel        on      loaded by "require_relative" method
+SCSS           M/module          used               on      used
 Sh             h/heredoc         endmarker          on      end marker
 Sh             s/script          loaded             on      loaded
 SystemTap      p/probe           attached           on      attached by code for probing

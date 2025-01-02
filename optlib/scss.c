@@ -50,6 +50,32 @@ static void initializeSCSSParser (const langType language)
 	                               "^@for[ \t]+\\$([A-Za-z0-9_-]+)[ \t]from[ \t]+.*[ \t]+(to|through)[ \t]+[^{]+",
 	                               "\\1", "v", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^@use[ \t]+\"([^\"]+)\"([ \t]+as[ \t]+([A-Za-z0-9_-]+))?",
+	                               "\\1", "M", "{_role=used}"
+		"{{\n"
+		"   \\2 false eq {\n"
+		"      \\1 (/) _strrstr {\n"
+		"         % Extract the last component in the module name:\n"
+		"         % module-name offset\n"
+		"         1 add dup \\1 length exch sub\n"
+		"         % module-name offset' count\n"
+		"         0 string\n"
+		"         % module-name offset' count namespace-string\n"
+		"         _copyinterval\n"
+		"         dup length 0 gt {\n"
+		"            /namespace @1 _tag _commit pop\n"
+		"         } {\n"
+		"            clear\n"
+		"         } ifelse\n"
+		"      } {\n"
+		"         % Extract the module name as a namespace.\n"
+		"         \\1 /namespace @1 _tag _commit pop\n"
+		"      } ifelse\n"
+		"   } {\n"
+		"      \\3 /namespace @3 _tag _commit pop\n"
+		"   } ifelse\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^@[^\n]+\n?",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
@@ -171,6 +197,9 @@ extern parserDefinition* SCSSParser (void)
 		NULL
 	};
 
+	static roleDefinition SCSSModuleRoleTable [] = {
+		{ true, "used", "used" },
+	};
 	static kindDefinition SCSSKindTable [] = {
 		{
 		  true, 'm', "mixin", "mixins",
@@ -193,17 +222,25 @@ extern parserDefinition* SCSSParser (void)
 		{
 		  true, 'z', "parameter", "function parameters",
 		},
+		{
+		  true, 'n', "namespace", "namespaces",
+		},
+		{
+		  true, 'M', "module", "modules",
+		  ATTACH_ROLES(SCSSModuleRoleTable),
+		},
 	};
 
 	parserDefinition* const def = parserNew ("SCSS");
 
-	def->versionCurrent= 0;
-	def->versionAge    = 0;
+	def->versionCurrent= 1;
+	def->versionAge    = 1;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->useCork       = CORK_QUEUE;
 	def->kindTable     = SCSSKindTable;
 	def->kindCount     = ARRAY_SIZE(SCSSKindTable);
 	def->initialize    = initializeSCSSParser;

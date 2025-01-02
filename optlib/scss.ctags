@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
---langdef=SCSS
+--langdef=SCSS{version=1.1}
 --map-SCSS=+.scss
 
 --kinddef-SCSS=m,mixin,mixins
@@ -32,6 +32,9 @@
 --kinddef-SCSS=i,id,identities
 # --kinddef-SCSS=p,pseudo,pseudos
 --kinddef-SCSS=z,parameter,function parameters
+--kinddef-SCSS=n,namespace,namespaces
+--kinddef-SCSS=M,module,modules
+--_roledef-SCSS.{module}=used,used
 
 --_tabledef-SCSS=toplevel
 --_tabledef-SCSS=comment
@@ -51,6 +54,29 @@
 --_mtable-regex-SCSS=toplevel/@function[ \t]+([A-Za-z0-9_-]+)/\1/f/{tenter=args}
 --_mtable-regex-SCSS=toplevel/@each[ \t]+\$([A-Za-z0-9_-]+)[ \t]in[ \t]+/\1/v/
 --_mtable-regex-SCSS=toplevel/@for[ \t]+\$([A-Za-z0-9_-]+)[ \t]from[ \t]+.*[ \t]+(to|through)[ \t]+[^{]+/\1/v/
+--_mtable-regex-SCSS=toplevel/@use[ \t]+"([^"]+)"([ \t]+as[ \t]+([A-Za-z0-9_-]+))?/\1/M/{_role=used}{{
+   \2 false eq {
+      \1 (/) _strrstr {
+         % Extract the last component in the module name:
+         % module-name offset
+         1 add dup \1 length exch sub
+         % module-name offset' count
+         0 string
+         % module-name offset' count namespace-string
+         _copyinterval
+         dup length 0 gt {
+            /namespace @1 _tag _commit pop
+         } {
+            clear
+         } ifelse
+      } {
+         % Extract the module name as a namespace.
+         \1 /namespace @1 _tag _commit pop
+      } ifelse
+   } {
+      \3 /namespace @3 _tag _commit pop
+   } ifelse
+}}
 --_mtable-regex-SCSS=toplevel/@[^\n]+\n?//
 --_mtable-regex-SCSS=toplevel/:[^{;]+;\n?//
 --_mtable-regex-SCSS=toplevel/:[^\n;{]+\n//
