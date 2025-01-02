@@ -10,4 +10,10 @@ if is_feature_available "${CTAGS}" json; then
 	${CTAGS} --quiet --options=NONE -o - \
 			 --output-format=json \
 			 --language-force=CTagsSelfTest input.ctst
+	${CTAGS} --quiet --options=NONE -o - \
+			 --output-format=json \
+			 --fields-RestructuredText=+'{overline}' input.rst
+	${CTAGS} --quiet --options=NONE -o - \
+			 --output-format=json \
+			 input.c
 fi

@@ -2,3 +2,7 @@ atag	input.ctst	/^f$/;"	f	bField:
 btag	input.ctst	/^f$/;"	f
 ctag	input.ctst	/^f$/;"	f	sbField:val
 dtag	input.ctst	/^f$/;"	f	sbField:
+TITLE	input.rst	/^TITLE$/;"	H	overline:
+section	input.rst	/^section$/;"	h	title:TITLE
+global	input.c	/^int global;$/;"	v	typeref:typename:int
+local	input.c	/^static int local;$/;"	v	typeref:typename:int	file:

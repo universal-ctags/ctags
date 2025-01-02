@@ -77,6 +77,17 @@ typedef enum eFieldDataType {
 
 	/* used in --list-fields */
 	FIELDTYPE_END_MARKER = 1 << 3,
+
+	/* If you want to allow a parser code written in optscript
+	 * to access the field, append FIELDTYPE_SCRIPTABLE to
+	 * dataType field of your fieldDefinition.
+	 *
+	 * From a optlib parser, pass {datatype=TYPE} flag to
+	 * --_fielddef-<LANV>=... option. Just specifying a
+	 * type is enough; FIELDTYPE_SCRIPTABLE is automatically
+	 * append the filed definition. If you don't pass the
+	 * flag explicitly, FIELDTYPE_SCRIPTABLE is not set. */
+	FIELDTYPE_SCRIPTABLE = FIELDTYPE_END_MARKER,
 } fieldDataType;
 
 typedef const char* (*fieldRenderer)(const tagEntryInfo *const,
@@ -96,7 +107,7 @@ struct sFieldDefinition {
 	fieldRenderer renderNoEscaping;
 	bool (* doesContainAnyChar) (const tagEntryInfo *const, const char*, const char *);
 
-	bool (* isValueAvailable) (const tagEntryInfo *const);
+	bool (* isValueAvailable) (const tagEntryInfo *const, const fieldDefinition *);
 
 	const char * getterValueType;
 	struct _EsObject * (* getValueObject) (const tagEntryInfo *, const fieldDefinition *);
@@ -118,5 +129,8 @@ struct sFieldDefinition {
 */
 
 extern bool isFieldEnabled (fieldType type);
+
+extern struct _EsObject* getFieldValueGeneric (const tagEntryInfo *tag, const fieldDefinition *fdef);
+extern struct _EsObject* setFieldValueGeneric (tagEntryInfo *tag, const fieldDefinition *fdef, const struct _EsObject *obj);
 
 #endif	/* CTAGS_MAIN_FIELD_H */
