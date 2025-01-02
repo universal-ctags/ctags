@@ -1,0 +1,118 @@
+### ctags
+string => string	input.testlang	/^string => string$/;"	o	str:str
+string => integer	input.testlang	/^string => integer$/;"	o
+string => bool	input.testlang	/^string => bool$/;"	o
+string => strbool	input.testlang	/^string => strbool$/;"	o	strbool:str
+int => string	input.testlang	/^int => string$/;"	o
+int => integer	input.testlang	/^int => integer$/;"	o	int:17
+int => bool	input.testlang	/^int => bool$/;"	o
+int => strbool	input.testlang	/^int => strbool$/;"	o
+true => string	input.testlang	/^true => string$/;"	o
+true => integer	input.testlang	/^true => integer$/;"	o
+true => bool	input.testlang	/^true => bool$/;"	o	bool:
+true => strbool	input.testlang	/^true => strbool$/;"	o
+false => string	input.testlang	/^false => string$/;"	o
+false => integer	input.testlang	/^false => integer$/;"	o
+false => bool	input.testlang	/^false => bool$/;"	o
+false => strbool	input.testlang	/^false => strbool$/;"	o	strbool:
+array => string	input.testlang	/^array => string$/;"	o
+array => integer	input.testlang	/^array => integer$/;"	o
+array => bool	input.testlang	/^array => bool$/;"	o
+array => strbool	input.testlang	/^array => strbool$/;"	o
+empty string => string	input.testlang	/^empty string => string$/;"	o	str:
+empty string => integer	input.testlang	/^empty string => integer$/;"	o
+empty string => bool	input.testlang	/^empty string => bool$/;"	o
+empty string => strbool	input.testlang	/^empty string => strbool$/;"	o	strbool:
+int =>	input.testlang	/^int =>$/;"	o
+bool =>	input.testlang	/^bool =>$/;"	o
+strbool =>	input.testlang	/^strbool =>$/;"	o
+true => bool, false => true	input.testlang	/^true => bool, false => true$/;"	o	bool:
+### xref
+string => string :: str:str int: bool:- strbool:
+string => integer :: str: int: bool:- strbool:
+string => bool   :: str: int: bool:- strbool:
+string => strbool :: str: int: bool:- strbool:str
+int => string    :: str: int: bool:- strbool:
+int => integer   :: str: int:17 bool:- strbool:
+int => bool      :: str: int: bool:- strbool:
+int => strbool   :: str: int: bool:- strbool:
+true => string   :: str: int: bool:- strbool:
+true => integer  :: str: int: bool:- strbool:
+true => bool     :: str: int: bool:bool strbool:
+true => strbool  :: str: int: bool:- strbool:
+false => string  :: str: int: bool:- strbool:
+false => integer :: str: int: bool:- strbool:
+false => bool    :: str: int: bool:- strbool:
+false => strbool :: str: int: bool:- strbool:-
+array => string  :: str: int: bool:- strbool:
+array => integer :: str: int: bool:- strbool:
+array => bool    :: str: int: bool:- strbool:
+array => strbool :: str: int: bool:- strbool:
+empty string => string :: str: int: bool:- strbool:
+empty string => integer :: str: int: bool:- strbool:
+empty string => bool :: str: int: bool:- strbool:
+empty string => strbool :: str: int: bool:- strbool:-
+int =>           :: str: int: bool:- strbool:
+bool =>          :: str: int: bool:- strbool:
+strbool =>       :: str: int: bool:- strbool:
+true => bool, false => true :: str: int: bool:bool strbool:
+### json
+{"_type": "tag", "name": "string => string", "path": "input.testlang", "pattern": "/^string => string$/", "kind": "object", "str": "str"}
+{"_type": "tag", "name": "string => integer", "path": "input.testlang", "pattern": "/^string => integer$/", "kind": "object"}
+{"_type": "tag", "name": "string => bool", "path": "input.testlang", "pattern": "/^string => bool$/", "kind": "object"}
+{"_type": "tag", "name": "string => strbool", "path": "input.testlang", "pattern": "/^string => strbool$/", "kind": "object", "strbool": "str"}
+{"_type": "tag", "name": "int => string", "path": "input.testlang", "pattern": "/^int => string$/", "kind": "object"}
+{"_type": "tag", "name": "int => integer", "path": "input.testlang", "pattern": "/^int => integer$/", "kind": "object", "int": 17}
+{"_type": "tag", "name": "int => bool", "path": "input.testlang", "pattern": "/^int => bool$/", "kind": "object"}
+{"_type": "tag", "name": "int => strbool", "path": "input.testlang", "pattern": "/^int => strbool$/", "kind": "object"}
+{"_type": "tag", "name": "true => string", "path": "input.testlang", "pattern": "/^true => string$/", "kind": "object"}
+{"_type": "tag", "name": "true => integer", "path": "input.testlang", "pattern": "/^true => integer$/", "kind": "object"}
+{"_type": "tag", "name": "true => bool", "path": "input.testlang", "pattern": "/^true => bool$/", "kind": "object", "bool": true}
+{"_type": "tag", "name": "true => strbool", "path": "input.testlang", "pattern": "/^true => strbool$/", "kind": "object"}
+{"_type": "tag", "name": "false => string", "path": "input.testlang", "pattern": "/^false => string$/", "kind": "object"}
+{"_type": "tag", "name": "false => integer", "path": "input.testlang", "pattern": "/^false => integer$/", "kind": "object"}
+{"_type": "tag", "name": "false => bool", "path": "input.testlang", "pattern": "/^false => bool$/", "kind": "object"}
+{"_type": "tag", "name": "false => strbool", "path": "input.testlang", "pattern": "/^false => strbool$/", "kind": "object", "strbool": false}
+{"_type": "tag", "name": "array => string", "path": "input.testlang", "pattern": "/^array => string$/", "kind": "object"}
+{"_type": "tag", "name": "array => integer", "path": "input.testlang", "pattern": "/^array => integer$/", "kind": "object"}
+{"_type": "tag", "name": "array => bool", "path": "input.testlang", "pattern": "/^array => bool$/", "kind": "object"}
+{"_type": "tag", "name": "array => strbool", "path": "input.testlang", "pattern": "/^array => strbool$/", "kind": "object"}
+{"_type": "tag", "name": "empty string => string", "path": "input.testlang", "pattern": "/^empty string => string$/", "kind": "object", "str": ""}
+{"_type": "tag", "name": "empty string => integer", "path": "input.testlang", "pattern": "/^empty string => integer$/", "kind": "object"}
+{"_type": "tag", "name": "empty string => bool", "path": "input.testlang", "pattern": "/^empty string => bool$/", "kind": "object"}
+{"_type": "tag", "name": "empty string => strbool", "path": "input.testlang", "pattern": "/^empty string => strbool$/", "kind": "object", "strbool": false}
+{"_type": "tag", "name": "int =>", "path": "input.testlang", "pattern": "/^int =>$/", "kind": "object"}
+{"_type": "tag", "name": "bool =>", "path": "input.testlang", "pattern": "/^bool =>$/", "kind": "object"}
+{"_type": "tag", "name": "strbool =>", "path": "input.testlang", "pattern": "/^strbool =>$/", "kind": "object"}
+{"_type": "tag", "name": "true => bool, false => true", "path": "input.testlang", "pattern": "/^true => bool, false => true$/", "kind": "object", "bool": true}
+### etags
+
+input.testlang,1095
+string => stringstring => string1,0
+string => integerstring => integer2,17
+string => boolstring => bool3,35
+string => strboolstring => strbool4,50
+int => stringint => string5,68
+int => integerint => integer6,82
+int => boolint => bool7,97
+int => strboolint => strbool8,109
+true => stringtrue => string9,124
+true => integertrue => integer10,139
+true => booltrue => bool11,155
+true => strbooltrue => strbool12,168
+false => stringfalse => string13,184
+false => integerfalse => integer14,200
+false => boolfalse => bool15,217
+false => strboolfalse => strbool16,231
+array => stringarray => string17,248
+array => integerarray => integer18,264
+array => boolarray => bool19,281
+array => strboolarray => strbool20,295
+empty string => stringempty string => string22,313
+empty string => integerempty string => integer23,336
+empty string => boolempty string => bool24,360
+empty string => strboolempty string => strbool25,381
+int =>int =>27,406
+bool =>bool =>28,413
+strbool =>strbool =>29,421
+true => bool, false => truetrue => bool, false => true31,433
