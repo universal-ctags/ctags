@@ -348,7 +348,7 @@ extern void resetTagCorkState (tagEntryInfo *const tag,
  * If VALUE points "" (empty C string), the json writer prints it as
  * false, and the xref writer prints it as -.
  * If VALUE points a non-empty C string, Both json writer and xref
- * writer print it as-is.
+ * writers print it as-is.
  *
  * For FIELDTYPE_BOOL
  * The json writer always prints true.
