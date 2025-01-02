@@ -58,7 +58,7 @@
 --_mtable-regex-SCSS=toplevel/@function[ \t]+([A-Za-z0-9_-]+)/\1/f/{tenter=args}
 --_mtable-regex-SCSS=toplevel/@each[ \t]+\$([A-Za-z0-9_-]+)[ \t]in[ \t]+/\1/v/
 --_mtable-regex-SCSS=toplevel/@for[ \t]+\$([A-Za-z0-9_-]+)[ \t]from[ \t]+.*[ \t]+(to|through)[ \t]+[^{]+/\1/v/
---_mtable-regex-SCSS=toplevel/@use[ \t]+"([^"]+)"([ \t]+as[ \t]+([A-Za-z0-9_-]+))?/\1/M/{_role=used}{{
+--_mtable-regex-SCSS=toplevel/@use[ \t]+["']([^"']+)["']([ \t]+as[ \t]+([A-Za-z0-9_-]+))?/\1/M/{_role=used}{{
    \2 false eq {
       \1 (/) _strrstr {
          % Extract the last component in the module name:

@@ -50,7 +50,7 @@ static void initializeSCSSParser (const langType language)
 	                               "^@for[ \t]+\\$([A-Za-z0-9_-]+)[ \t]from[ \t]+.*[ \t]+(to|through)[ \t]+[^{]+",
 	                               "\\1", "v", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^@use[ \t]+\"([^\"]+)\"([ \t]+as[ \t]+([A-Za-z0-9_-]+))?",
+	                               "^@use[ \t]+[\"']([^\"']+)[\"']([ \t]+as[ \t]+([A-Za-z0-9_-]+))?",
 	                               "\\1", "M", "{_role=used}"
 		"{{\n"
 		"   \\2 false eq {\n"
