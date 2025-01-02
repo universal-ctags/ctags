@@ -103,6 +103,8 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 			}
 			else if (dt & FIELDTYPE_BOOL)
 				str = getFieldName (f->ftype);
+			else if (dt & FIELDTYPE_INTEGER)
+				str = renderField (f->ftype, tag, findex);
 			else
 			{
 				/* Not implemented */
