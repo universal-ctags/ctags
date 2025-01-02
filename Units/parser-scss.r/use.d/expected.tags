@@ -7,3 +7,4 @@ NS	input.scss	/^@use "A" as NS;$/;"	n	roles:def
 B/	input.scss	/^@use "B\/";$/;"	M	roles:used
 C/d/e	input.scss	/^@use 'C\/d\/e';$/;"	M	roles:used
 e	input.scss	/^@use 'C\/d\/e';$/;"	n	roles:def
+P/q	input.scss	/^@use 'P\/q' as *;$/;"	M	roles:used

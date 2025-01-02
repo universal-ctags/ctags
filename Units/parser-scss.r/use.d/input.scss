@@ -3,3 +3,4 @@
 @use "A" as NS;
 @use "B/";
 @use 'C/d/e';
+@use 'P/q' as *;
