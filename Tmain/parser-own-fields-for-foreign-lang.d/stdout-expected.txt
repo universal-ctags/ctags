@@ -1,5 +1,20 @@
+# output: tags
+foo	input.unknownx	/^public func foo(n, m);$/;"	f	language:unknownx	protection:public 	signature:(n, m)
 bar	input.unknownx	/^protected func bar(n);$/;"	f	language:unknownx	protection:protected 	signature:(n)
 baz	input.unknownx	/^private func baz(n,...);$/;"	f	language:unknownx	protection:private 	signature:(n,...)
-foo	input.unknownx	/^public func foo(n, m);$/;"	f	language:unknownx	protection:public 	signature:(n, m)
 tagme	input.unknownx	/^X:tagme@iamowner$/;"	m	language:knownz	owner:iamowner
 tagme2	input.unknownx	/^Y:iamowner2=tagme2$/;"	m	language:knownz	owner:iamowner2
+tagme-z	input.unknownx	/^Z:tagme-z@iamowner-z$/;"	m	language:knownz	owner:iamowner-z	len:10	lenplus:11
+a	input.unknownx	/^eset:a$/;"	m	language:knownz	exported:
+b	input.unknownx	/^enoset:b$/;"	m	language:knownz
+7_exported	input.unknownx	/^enoset:b$/;"	m	language:knownz
+# output: xref
+foo unknownx / owner:,len:,lenplus:,exported:- / public (n, m)
+bar unknownx / owner:,len:,lenplus:,exported:- / protected (n)
+baz unknownx / owner:,len:,lenplus:,exported:- / private (n,...)
+tagme knownz / owner:iamowner,len:,lenplus:,exported:- / 
+tagme2 knownz / owner:iamowner2,len:,lenplus:,exported:- / 
+tagme-z knownz / owner:iamowner-z,len:10,lenplus:11,exported:- / 
+a knownz / owner:,len:,lenplus:,exported:exported / 
+b knownz / owner:,len:,lenplus:,exported:- / 
+7_exported knownz / owner:,len:,lenplus:,exported:- / 
