@@ -3858,17 +3858,18 @@ static EsObject* lrop_get_scope_depth (OptVM *vm, EsObject *name)
 {
 	struct lregexControlBlock *lcb = get_current_lcb (vm);
 	int scope = lcb->currentScope;
+	int depth = 0;
 
 	while (scope != CORK_NIL)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (scope);
 		if (!e)
 			break;
-
+		depth++;
 		scope = e->extensionFields.scopeIndex;
 	}
 
-	EsObject *q = es_integer_new (scope);
+	EsObject *q = es_integer_new (depth);
 	if (es_error_p(q))
 		return q;
 

@@ -1,0 +1,56 @@
+--langdef=UnknownX
+--kinddef-UnknownX=s,section,sections
+--kinddef-UnknownX=t,subsection,subsections
+--kinddef-UnknownX=u,subsubsection,subsubsections
+
+--regex-UnknownX=/^\* (.*)$/\1/s/{{
+   /section-enter = _scopedepth =
+   . _scopeset
+   _scopetop {
+      (scopetop: OK) =
+      . eq {
+         (scopeNth0: OK) =
+      } {
+         (scopeNth0: FAILED) =
+      } ifelse
+   } {
+      (scopetop: FAILED) =
+   } ifelse
+   /section-leave = _scopedepth =
+}}
+
+--regex-UnknownX=/^\+ (.*)$/\1/t/{{
+   /subsection-enter = _scopedepth =
+   _scopedepth 3 eq {
+      _scopepop
+   } if
+   _scopedepth 2 eq {
+      0 _scopeNth _scopetop {
+        (scopetop: OK) =
+        eq {
+           (scopeNth0: OK) =
+        } {
+           (scopeNth0: FAILED) =
+        } ifelse
+      } {
+         (scopetop: FAILED) =
+      } ifelse
+      _scopepop
+   } if
+   . _scopepush
+   1 _scopeNth . :scope eq {
+      (scopeNth1: OK) =
+   } {
+      (scopeNth1: FAILED) =
+   } ifelse
+   /subsection-leave = _scopedepth =
+}}
+
+--regex-UnknownX=/^\- (.*)$/\1/u/{{
+   /subsubsection-enter = _scopedepth =
+   _scopedepth 3 eq {
+      _scopepop
+   } if
+   . _scopepush
+   /subsubsection-leave = _scopedepth =
+}}

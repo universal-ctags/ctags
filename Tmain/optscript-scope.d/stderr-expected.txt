@@ -1,0 +1,56 @@
+section-enter
+0
+scopetop: OK
+scopeNth0: OK
+section-leave
+1
+subsection-enter
+1
+scopeNth1: OK
+subsection-leave
+2
+subsection-enter
+2
+scopetop: OK
+scopeNth0: OK
+scopeNth1: OK
+subsection-leave
+2
+subsubsection-enter
+2
+subsubsection-leave
+3
+subsubsection-enter
+3
+subsubsection-leave
+3
+subsection-enter
+3
+scopetop: OK
+scopeNth0: OK
+scopeNth1: OK
+subsection-leave
+2
+subsubsection-enter
+2
+subsubsection-leave
+3
+section-enter
+3
+scopetop: OK
+scopeNth0: OK
+section-leave
+1
+subsection-enter
+1
+scopeNth1: OK
+subsection-leave
+2
+subsubsection-enter
+2
+subsubsection-leave
+3
+subsubsection-enter
+3
+subsubsection-leave
+3
