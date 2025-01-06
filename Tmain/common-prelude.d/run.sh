@@ -23,7 +23,7 @@ for t in $(ls *.ps); do
     printf "%s" "${t}..."
 
 	{
-		${CTAGS} --_dump-prelude
+		${CTAGS} --quiet --options=NONE --_dump-prelude
 		echo
 		cat $t
 	} > $i

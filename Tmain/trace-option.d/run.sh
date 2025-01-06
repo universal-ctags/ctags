@@ -9,5 +9,5 @@ CTAGS=$1
 is_feature_available $CTAGS debug
 
 # For comparison the output and the expectation, sed removes signature parts from the output.
-$CTAGS --_trace=CTagsSelfTest --language-force=CTagsSelfTest ./input.unknown
+$CTAGS --quiet --options=NONE --_trace=CTagsSelfTest --language-force=CTagsSelfTest ./input.unknown
 exit $?

@@ -52,5 +52,5 @@ run()
 	return $s
 }
 
-run $O0 ".c file" && run $O1 ".h file" && run $O2 ".m file" -G
+run $O0 ".c file" --quiet --options=NONE && run $O1 ".h file" --quiet --options=NONE  && run $O2 ".m file" --quiet --options=NONE -G
 exit $?

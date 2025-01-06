@@ -16,7 +16,7 @@ exit_if_win32 "$CTAGS"
 etags=$BUILDDIR/etags
 cp $1 $etags
 
-$etags --_force-quit
+$etags --quiet --options=NONE --_force-quit
 r=$?
 
 rm $etags
