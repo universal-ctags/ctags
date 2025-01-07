@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target-arch: [aarch64, ppc64le, riscv64, s390x]
+        target-arch: [loongarch64, aarch64, ppc64le, riscv64, s390x]
 
     steps:
       - uses: actions/checkout@v4
