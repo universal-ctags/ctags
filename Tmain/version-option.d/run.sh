@@ -3,4 +3,4 @@
 
 CTAGS="$1"
 
-$CTAGS --version=C
+$CTAGS --quiet --options=NONE --version=C

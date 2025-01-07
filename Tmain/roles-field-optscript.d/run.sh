@@ -2,4 +2,4 @@
 # License: GPL-2
 CTAGS=$1
 
-${CTAGS} --quiet --options=foo.ctags -o - input.foo | grep -v '^a'
+${CTAGS} --quiet --options=NONE --options=foo.ctags -o - input.foo | grep -v '^a'
