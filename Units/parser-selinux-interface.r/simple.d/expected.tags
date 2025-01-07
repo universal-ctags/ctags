@@ -1,0 +1,3 @@
+su_restricted_domain_template	input.if	/^template(`su_restricted_domain_template', `$/;"	t	end:140
+su_role_template	input.if	/^template(`su_role_template',`$/;"	t	end:202
+su_exec	input.if	/^interface(`su_exec',`$/;"	i	end:221

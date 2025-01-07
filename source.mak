@@ -408,6 +408,7 @@ PARSER_SRCS =				\
 	parsers/ruby.c			\
 	parsers/rust.c			\
 	parsers/scheme.c		\
+	parsers/selinux-interface.c	\
 	parsers/sh.c			\
 	parsers/slang.c			\
 	parsers/sml.c			\

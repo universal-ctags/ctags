@@ -603,6 +603,9 @@
     <ClCompile Include="..\parsers\scheme.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\selinux-interface.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\sh.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>

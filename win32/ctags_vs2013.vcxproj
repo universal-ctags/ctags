@@ -360,6 +360,7 @@
     <ClCompile Include="..\parsers\ruby.c" />
     <ClCompile Include="..\parsers\rust.c" />
     <ClCompile Include="..\parsers\scheme.c" />
+    <ClCompile Include="..\parsers\selinux-interface.c" />
     <ClCompile Include="..\parsers\sh.c" />
     <ClCompile Include="..\parsers\slang.c" />
     <ClCompile Include="..\parsers\sml.c" />

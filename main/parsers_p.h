@@ -170,6 +170,7 @@
 	S4ClassParser, \
 	SchemeParser, \
 	SCSSParser, \
+	SELinuxInterfaceParser, \
 	ShParser, \
 	SlangParser, \
 	SmlParser, \

@@ -26,6 +26,7 @@ RSpec                Ruby       base => sub {shared}
 Rake                 Ruby       base <= sub {dedicated}
 RelaxNG              XML        base <> sub {bidirectional}
 S4Class              R          base <> sub {bidirectional}
+SELinuxInterface     M4         base <= sub {dedicated}
 SVG                  XML        base <> sub {bidirectional}
 SystemdUnit          Iniconf    base <= sub {dedicated}
 TclOO                Tcl        base <> sub {bidirectional}

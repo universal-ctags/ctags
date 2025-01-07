@@ -33,6 +33,7 @@ New parsers
 
 * TOML *peg/packcc*
 * Cargo *TOML based subparser*
+* SELinuxIntefae *M4 based subparser*
 
 Changes about parser specific kinds, roles, fields, and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
