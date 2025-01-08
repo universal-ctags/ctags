@@ -243,6 +243,7 @@ OPTLIB2C_INPUT = \
 	optlib/puppetManifest.ctags		\
 	optlib/qemuhx.ctags			\
 	optlib/rpmMacros.ctags			\
+	optlib/selinux-type-enforcement.ctags	\
 	optlib/scss.ctags			\
 	optlib/systemtap.ctags			\
 	optlib/terraform.ctags			\

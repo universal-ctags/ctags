@@ -1,0 +1,88 @@
+#
+#  Copyright (c) 2025 Red Hat, Inc.
+#  Copyright (c) 2025 Masatake YAMATO
+#
+#  This source code is released for free distribution under the terms of the
+#  GNU General Public License version 2 or (at your opinion) any later version.
+#
+#  This module contains functions for generating tags for *.te files in SELinux policy definitions:
+#
+#  https://github.com/SELinuxProject/selinux-notebook/blob/main/src/kernel_policy_language.md#kernel-policy-language
+#
+--langdef=SELinuxTypeEnforcement
+--map-SELinuxTypeEnforcement=+.te
+
+--kinddef-SELinuxTypeEnforcement=m,module,policy modules
+--kinddef-SELinuxTypeEnforcement=t,type,types
+--kinddef-SELinuxTypeEnforcement=a,alias,type aliases
+--kinddef-SELinuxTypeEnforcement=T,attr,type attributes
+--kinddef-SELinuxTypeEnforcement=r,role,roles
+--kinddef-SELinuxTypeEnforcement=R,rattr,role attributes
+--kinddef-SELinuxTypeEnforcement=b,tunable,tunables
+--kinddef-SELinuxTypeEnforcement=u,user,users
+# TODO: sensitivity, category, sid, class
+
+--_tabledef-SELinuxTypeEnforcement=main
+--_tabledef-SELinuxTypeEnforcement=typedef
+--_tabledef-SELinuxTypeEnforcement=alias
+--_tabledef-SELinuxTypeEnforcement=compoundalias
+--_tabledef-SELinuxTypeEnforcement=lit
+
+#
+# main
+#
+--_mtable-regex-SELinuxTypeEnforcement=main/#[^\n]*//
+--_mtable-regex-SELinuxTypeEnforcement=main/[[:space:]]+//
+--_mtable-regex-SELinuxTypeEnforcement=main/`//{tenter=lit}
+--_mtable-regex-SELinuxTypeEnforcement=main/[^pmtarbgu[:space:]][a-zA-Z0-9_]*//
+
+--_mtable-regex-SELinuxTypeEnforcement=main/policy_module\([[:blank:]]*([^,[:space:]\)]+)[^\)]*\)/\1/m/
+--_mtable-regex-SELinuxTypeEnforcement=main/module[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/m/
+
+ --_mtable-regex-SELinuxTypeEnforcement=main/type[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*/\1/t/{tenter=typedef}
+--_mtable-regex-SELinuxTypeEnforcement=main/typealias[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*//{tenter=typedef}
+--_mtable-regex-SELinuxTypeEnforcement=main/attribute[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/T/
+
+--_mtable-regex-SELinuxTypeEnforcement=main/role[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/r/
+--_mtable-regex-SELinuxTypeEnforcement=main/attribute_role[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/R/
+
+--_mtable-regex-SELinuxTypeEnforcement=main/bool[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/b/
+--_mtable-regex-SELinuxTypeEnforcement=main/gen_(tunable|bool)\([[:blank:]]*([^,[:space:]\)]+)[^\)]*\)/\2/b/
+
+--_mtable-regex-SELinuxTypeEnforcement=main/user[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/u/
+--_mtable-regex-SELinuxTypeEnforcement=main/gen_user\([[:blank:]]*([^,[:space:]\)]+)[^\)]*\)/\1/u/
+
+--_mtable-regex-SELinuxTypeEnforcement=main/.//
+
+#
+# typedef
+#
+--_mtable-regex-SELinuxTypeEnforcement=typedef/[[:space:]]+//
+--_mtable-regex-SELinuxTypeEnforcement=typedef/alias[[:space:]]+//{tenter=alias}
+--_mtable-regex-SELinuxTypeEnforcement=typedef/;//{tleave}
+--_mtable-regex-SELinuxTypeEnforcement=typedef/.//
+
+#
+# alias
+#
+--_mtable-regex-SELinuxTypeEnforcement=alias/[[:space:]]+//
+--_mtable-regex-SELinuxTypeEnforcement=alias/([a-zA-Z0-9_]+)[[:space:]]*/\1/a/{tleave}
+--_mtable-regex-SELinuxTypeEnforcement=alias/\{[[:space:]]*//{tenter=compoundalias}
+--_mtable-regex-SELinuxTypeEnforcement=alias/\}[[:space:]]*//{tleave}
+--_mtable-regex-SELinuxTypeEnforcement=alias/.//
+
+#
+# compoundalias
+#
+--_mtable-regex-SELinuxTypeEnforcement=compoundalias/[[:space:]]+//
+--_mtable-regex-SELinuxTypeEnforcement=compoundalias/([a-zA-Z0-9_]+)[[:space:]]*/\1/a/
+--_mtable-regex-SELinuxTypeEnforcement=compoundalias/\}[[:space:]]*//{tleave}{_advanceTo=0start}
+--_mtable-regex-SELinuxTypeEnforcement=compoundalias/.//
+
+#
+# lit
+#
+--_mtable-regex-SELinuxTypeEnforcement=lit/[^'`]+//
+--_mtable-regex-SELinuxTypeEnforcement=lit/'//{tleave}
+--_mtable-regex-SELinuxTypeEnforcement=lit/`//{tenter=lit}
+--_mtable-regex-SELinuxTypeEnforcement=lit/.//

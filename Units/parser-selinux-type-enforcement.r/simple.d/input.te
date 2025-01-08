@@ -1,0 +1,58 @@
+#
+# Derrived from policy/modules/contrib/dbus.te
+#
+policy_module(dbus, 1.19.0)
+
+gen_require(`
+	class dbus all_dbus_perms;
+')
+
+##############################
+#
+# Delcarations
+#
+
+attribute dbusd_unconfined;
+attribute system_bus_type;
+
+type dbusd_etc_t;
+files_config_file(dbusd_etc_t)
+
+type dbusd_exec_t;
+corecmd_executable_file(dbusd_exec_t)
+typealias dbusd_exec_t alias system_dbusd_exec_t;
+
+type session_dbusd_tmp_t;
+typealias session_dbusd_tmp_t alias { user_dbusd_tmp_t staff_dbusd_tmp_t sysadm_dbusd_tmp_t };
+typealias session_dbusd_tmp_t alias { auditadm_dbusd_tmp_t secadm_dbusd_tmp_t };
+userdom_user_tmp_file(session_dbusd_tmp_t)
+
+# ...
+
+########################################
+#
+# system_bus_type rules
+#
+role system_r types system_bus_type;
+dontaudit system_bus_type self:capability net_admin;
+
+# The next one should not be tagged.
+gen_require(`
+    type ssh_keygen_t;
+')
+
+
+type git_sys_content_t alias git_system_content_t;
+type kmod_t alias { update_modules_t depmod_t insmod_t };
+
+role system_r types anaconda_t;
+attribute_role install_roles;
+roleattribute system_r install_roles;
+
+gen_tunable(antivirus_can_scan_system, false)
+gen_bool(secure_mode_insmod, false)
+
+bool allow_daemons_use_tty true;
+
+gen_user(xguest_u, user, xguest_r, s0, s0)
+user sysadm_u roles { sysadm_r } level s0 range s0-s15:c0.c255;

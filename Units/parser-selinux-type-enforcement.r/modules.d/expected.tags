@@ -1,0 +1,2 @@
+bind	input.te	/^module bind 1.0.0;$/;"	m
+bootloader	input-0.te	/^policy_module(bootloader, 1.14.0)$/;"	m

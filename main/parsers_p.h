@@ -171,6 +171,7 @@
 	SchemeParser, \
 	SCSSParser, \
 	SELinuxInterfaceParser, \
+	SELinuxTypeEnforcementParser, \
 	ShParser, \
 	SlangParser, \
 	SmlParser, \
