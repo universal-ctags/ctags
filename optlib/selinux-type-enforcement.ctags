@@ -22,6 +22,8 @@
 --kinddef-SELinuxTypeEnforcement=u,user,users
 # TODO: sensitivity, category, sid, class
 
+--_roledef-SELinuxTypeEnforcement.{type}=aliased,aliased
+
 --_tabledef-SELinuxTypeEnforcement=main
 --_tabledef-SELinuxTypeEnforcement=typedef
 --_tabledef-SELinuxTypeEnforcement=alias
@@ -39,8 +41,12 @@
 --_mtable-regex-SELinuxTypeEnforcement=main/policy_module\([[:blank:]]*([^,[:space:]\)]+)[^\)]*\)/\1/m/
 --_mtable-regex-SELinuxTypeEnforcement=main/module[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/m/
 
- --_mtable-regex-SELinuxTypeEnforcement=main/type[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*/\1/t/{tenter=typedef}
---_mtable-regex-SELinuxTypeEnforcement=main/typealias[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*//{tenter=typedef}
+--_mtable-regex-SELinuxTypeEnforcement=main/type[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*/\1/t/{tenter=typedef}{{
+   .
+}}
+--_mtable-regex-SELinuxTypeEnforcement=main/typealias[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*/\1/t/{_role=aliased}{tenter=typedef}{{
+   .
+}}
 --_mtable-regex-SELinuxTypeEnforcement=main/attribute[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/T/
 
 --_mtable-regex-SELinuxTypeEnforcement=main/role[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/r/
@@ -59,14 +65,18 @@
 #
 --_mtable-regex-SELinuxTypeEnforcement=typedef/[[:space:]]+//
 --_mtable-regex-SELinuxTypeEnforcement=typedef/alias[[:space:]]+//{tenter=alias}
---_mtable-regex-SELinuxTypeEnforcement=typedef/;//{tleave}
+--_mtable-regex-SELinuxTypeEnforcement=typedef/;//{tleave}{{
+   pop
+}}
 --_mtable-regex-SELinuxTypeEnforcement=typedef/.//
 
 #
 # alias
 #
 --_mtable-regex-SELinuxTypeEnforcement=alias/[[:space:]]+//
---_mtable-regex-SELinuxTypeEnforcement=alias/([a-zA-Z0-9_]+)[[:space:]]*/\1/a/{tleave}
+--_mtable-regex-SELinuxTypeEnforcement=alias/([a-zA-Z0-9_]+)[[:space:]]*/\1/a/{tleave}{{
+   dup :name . exch [ (type) 3 -1 roll ] typeref:
+}}
 --_mtable-regex-SELinuxTypeEnforcement=alias/\{[[:space:]]*//{tenter=compoundalias}
 --_mtable-regex-SELinuxTypeEnforcement=alias/\}[[:space:]]*//{tleave}
 --_mtable-regex-SELinuxTypeEnforcement=alias/.//
@@ -75,7 +85,9 @@
 # compoundalias
 #
 --_mtable-regex-SELinuxTypeEnforcement=compoundalias/[[:space:]]+//
---_mtable-regex-SELinuxTypeEnforcement=compoundalias/([a-zA-Z0-9_]+)[[:space:]]*/\1/a/
+--_mtable-regex-SELinuxTypeEnforcement=compoundalias/([a-zA-Z0-9_]+)[[:space:]]*/\1/a/{{
+   dup :name . exch [ (type) 3 -1 roll ] typeref:
+}}
 --_mtable-regex-SELinuxTypeEnforcement=compoundalias/\}[[:space:]]*//{tleave}{_advanceTo=0start}
 --_mtable-regex-SELinuxTypeEnforcement=compoundalias/.//
 

@@ -37,10 +37,16 @@ static void initializeSELinuxTypeEnforcementParser (const langType language)
 	                               "\\1", "m", "", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^type[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*",
-	                               "\\1", "t", "{tenter=typedef}", NULL);
+	                               "\\1", "t", "{tenter=typedef}"
+		"{{\n"
+		"   .\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^typealias[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*",
-	                               "", "", "{tenter=typedef}", NULL);
+	                               "\\1", "t", "{_role=aliased}{tenter=typedef}"
+		"{{\n"
+		"   .\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^attribute[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;",
 	                               "\\1", "T", "", NULL);
@@ -73,7 +79,10 @@ static void initializeSELinuxTypeEnforcementParser (const langType language)
 	                               "", "", "{tenter=alias}", NULL);
 	addLanguageTagMultiTableRegex (language, "typedef",
 	                               "^;",
-	                               "", "", "{tleave}", NULL);
+	                               "", "", "{tleave}"
+		"{{\n"
+		"   pop\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "typedef",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -82,7 +91,10 @@ static void initializeSELinuxTypeEnforcementParser (const langType language)
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "alias",
 	                               "^([a-zA-Z0-9_]+)[[:space:]]*",
-	                               "\\1", "a", "{tleave}", NULL);
+	                               "\\1", "a", "{tleave}"
+		"{{\n"
+		"   dup :name . exch [ (type) 3 -1 roll ] typeref:\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "alias",
 	                               "^\\{[[:space:]]*",
 	                               "", "", "{tenter=compoundalias}", NULL);
@@ -97,7 +109,10 @@ static void initializeSELinuxTypeEnforcementParser (const langType language)
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "compoundalias",
 	                               "^([a-zA-Z0-9_]+)[[:space:]]*",
-	                               "\\1", "a", "", NULL);
+	                               "\\1", "a", ""
+		"{{\n"
+		"   dup :name . exch [ (type) 3 -1 roll ] typeref:\n"
+		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "compoundalias",
 	                               "^\\}[[:space:]]*",
 	                               "", "", "{tleave}{_advanceTo=0start}", NULL);
@@ -133,12 +148,16 @@ extern parserDefinition* SELinuxTypeEnforcementParser (void)
 		NULL
 	};
 
+	static roleDefinition SELinuxTypeEnforcementTypeRoleTable [] = {
+		{ true, "aliased", "aliased" },
+	};
 	static kindDefinition SELinuxTypeEnforcementKindTable [] = {
 		{
 		  true, 'm', "module", "policy modules",
 		},
 		{
 		  true, 't', "type", "types",
+		  ATTACH_ROLES(SELinuxTypeEnforcementTypeRoleTable),
 		},
 		{
 		  true, 'a', "alias", "type aliases",
@@ -169,6 +188,7 @@ extern parserDefinition* SELinuxTypeEnforcementParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->useCork       = CORK_QUEUE;
 	def->kindTable     = SELinuxTypeEnforcementKindTable;
 	def->kindCount     = ARRAY_SIZE(SELinuxTypeEnforcementKindTable);
 	def->initialize    = initializeSELinuxTypeEnforcementParser;

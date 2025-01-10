@@ -3,20 +3,20 @@ dbusd_unconfined	input.te	/^attribute dbusd_unconfined;$/;"	T
 system_bus_type	input.te	/^attribute system_bus_type;$/;"	T
 dbusd_etc_t	input.te	/^type dbusd_etc_t;$/;"	t
 dbusd_exec_t	input.te	/^type dbusd_exec_t;$/;"	t
-system_dbusd_exec_t	input.te	/^typealias dbusd_exec_t alias system_dbusd_exec_t;$/;"	a
+system_dbusd_exec_t	input.te	/^typealias dbusd_exec_t alias system_dbusd_exec_t;$/;"	a	typeref:type:dbusd_exec_t
 session_dbusd_tmp_t	input.te	/^type session_dbusd_tmp_t;$/;"	t
-user_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { user_dbusd_tmp_t staff_dbusd_tmp_t sysadm_dbusd_tmp_t };$/;"	a
-staff_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { user_dbusd_tmp_t staff_dbusd_tmp_t sysadm_dbusd_tmp_t };$/;"	a
-sysadm_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { user_dbusd_tmp_t staff_dbusd_tmp_t sysadm_dbusd_tmp_t };$/;"	a
-auditadm_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { auditadm_dbusd_tmp_t secadm_dbusd_tmp_t };$/;"	a
-secadm_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { auditadm_dbusd_tmp_t secadm_dbusd_tmp_t };$/;"	a
+user_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { user_dbusd_tmp_t staff_dbusd_tmp_t sysadm_dbusd_tmp_t };$/;"	a	typeref:type:session_dbusd_tmp_t
+staff_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { user_dbusd_tmp_t staff_dbusd_tmp_t sysadm_dbusd_tmp_t };$/;"	a	typeref:type:session_dbusd_tmp_t
+sysadm_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { user_dbusd_tmp_t staff_dbusd_tmp_t sysadm_dbusd_tmp_t };$/;"	a	typeref:type:session_dbusd_tmp_t
+auditadm_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { auditadm_dbusd_tmp_t secadm_dbusd_tmp_t };$/;"	a	typeref:type:session_dbusd_tmp_t
+secadm_dbusd_tmp_t	input.te	/^typealias session_dbusd_tmp_t alias { auditadm_dbusd_tmp_t secadm_dbusd_tmp_t };$/;"	a	typeref:type:session_dbusd_tmp_t
 system_r	input.te	/^role system_r types system_bus_type;$/;"	r
 git_sys_content_t	input.te	/^type git_sys_content_t alias git_system_content_t;$/;"	t
-git_system_content_t	input.te	/^type git_sys_content_t alias git_system_content_t;$/;"	a
+git_system_content_t	input.te	/^type git_sys_content_t alias git_system_content_t;$/;"	a	typeref:type:git_sys_content_t
 kmod_t	input.te	/^type kmod_t alias { update_modules_t depmod_t insmod_t };$/;"	t
-update_modules_t	input.te	/^type kmod_t alias { update_modules_t depmod_t insmod_t };$/;"	a
-depmod_t	input.te	/^type kmod_t alias { update_modules_t depmod_t insmod_t };$/;"	a
-insmod_t	input.te	/^type kmod_t alias { update_modules_t depmod_t insmod_t };$/;"	a
+update_modules_t	input.te	/^type kmod_t alias { update_modules_t depmod_t insmod_t };$/;"	a	typeref:type:kmod_t
+depmod_t	input.te	/^type kmod_t alias { update_modules_t depmod_t insmod_t };$/;"	a	typeref:type:kmod_t
+insmod_t	input.te	/^type kmod_t alias { update_modules_t depmod_t insmod_t };$/;"	a	typeref:type:kmod_t
 system_r	input.te	/^role system_r types anaconda_t;$/;"	r
 install_roles	input.te	/^attribute_role install_roles;$/;"	R
 antivirus_can_scan_system	input.te	/^gen_tunable(antivirus_can_scan_system, false)$/;"	b
