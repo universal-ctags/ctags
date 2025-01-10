@@ -353,11 +353,15 @@ extern void resetTagCorkState (tagEntryInfo *const tag,
  * For FIELDTYPE_BOOL
  * The json writer always prints true.
  * The xref writer always prints the name of field.
- * Set "" explicitly though the value pointed by VALUE is not referred,
- *
+ * Set "" as VALUE explicitly though the value is not referred,
+ * If the value is not attached, the field is treated as holding false.
+ * The json writer prints nothing for the field holding false.
+ * The xref writer prints - for the field holding false.
  *
  * The other data type and the combination of types are not implemented yet.
  *
+ * In the current implementation, there is no way to update the value for a give
+ * field or detach the value from a given field.
  */
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
