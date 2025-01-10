@@ -341,23 +341,8 @@ extern void resetTagCorkState (tagEntryInfo *const tag,
  *
  * Interpretation of VALUE
  * -----------------------
- * For FIELDTYPE_STRING:
- * Both json writer and xref writer print it as-is.
- *
- * For FIELDTYPE_STRING|FIELDTYPE_BOOL:
- * If VALUE points "" (empty C string), the json writer prints it as
- * false, and the xref writer prints it as -.
- * If VALUE points a non-empty C string, Both json writer and xref
- * writers print it as-is.
- *
- * For FIELDTYPE_BOOL
- * The json writer always prints true.
- * The xref writer always prints the name of field.
- * Set "" explicitly though the value pointed by VALUE is not referred,
- *
- *
- * The other data type and the combination of types are not implemented yet.
- *
+ * The VALUE is interpreted very differently depending on the output
+ * format: ctags, xref, and json. See field.h.
  */
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);

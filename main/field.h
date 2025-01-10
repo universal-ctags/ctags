@@ -78,6 +78,30 @@ typedef enum eFieldDataType {
 	/* used in --list-fields */
 	FIELDTYPE_END_MARKER = 1 << 3,
 } fieldDataType;
+/* Interpretation of VALUE of field
+ *
+ * With attachParserField() declared in entry.h, you can set a C string
+ * as a VALUE for the specified field.
+ *
+ * The VALUE is interpreted very differently depending on the output
+ * format: ctags, xref, and json. See field.h.
+ *
+ * For FIELDTYPE_STRING:
+ * Both json writer and xref writer print it as-is.
+ *
+ * For FIELDTYPE_STRING|FIELDTYPE_BOOL:
+ * If VALUE points "" (empty C string), the json writer prints it as
+ * false, and the xref writer prints it as -.
+ * If VALUE points a non-empty C string, Both json writer and xref
+ * writers print it as-is.
+ *
+ * For FIELDTYPE_BOOL
+ * The json writer always prints true.
+ * The xref writer always prints the name of field.
+ * Set "" explicitly though the value pointed by VALUE is not referred,
+ *
+ * The other data type and the combination of types are not implemented yet.
+ */
 
 typedef const char* (*fieldRenderer)(const tagEntryInfo *const,
 									 const char *,
