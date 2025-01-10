@@ -1,0 +1,2 @@
+# https://github.com/SELinuxProject/selinux-notebook/blob/main/src/modular_policy_statements.md#modular-policy-support-statements
+module bind 1.0.0;

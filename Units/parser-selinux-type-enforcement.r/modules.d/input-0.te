@@ -1,0 +1,2 @@
+# selinux-policy-0113b35519369e628e7fcd87af000cfcd4b1fa6c/policy/modules/admin/bootloader.te
+policy_module(bootloader, 1.14.0)

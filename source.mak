@@ -243,6 +243,7 @@ OPTLIB2C_INPUT = \
 	optlib/puppetManifest.ctags		\
 	optlib/qemuhx.ctags			\
 	optlib/rpmMacros.ctags			\
+	optlib/selinux-type-enforcement.ctags	\
 	optlib/scss.ctags			\
 	optlib/systemtap.ctags			\
 	optlib/terraform.ctags			\
@@ -408,6 +409,7 @@ PARSER_SRCS =				\
 	parsers/ruby.c			\
 	parsers/rust.c			\
 	parsers/scheme.c		\
+	parsers/selinux-interface.c	\
 	parsers/sh.c			\
 	parsers/slang.c			\
 	parsers/sml.c			\
