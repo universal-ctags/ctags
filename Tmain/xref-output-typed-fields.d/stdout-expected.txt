@@ -1,4 +1,4 @@
-atag -> b=bField,sb=
-btag -> b=,sb=
+atag -> b=,sb=
+btag -> b=bField,sb=
 ctag -> b=,sb=val
 dtag -> b=,sb=-

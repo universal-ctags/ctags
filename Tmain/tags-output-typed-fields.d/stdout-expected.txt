@@ -1,4 +1,4 @@
-atag	input.ctst	/^f$/;"	f	bField:
-btag	input.ctst	/^f$/;"	f
+atag	input.ctst	/^f$/;"	f
+btag	input.ctst	/^f$/;"	f	bField:
 ctag	input.ctst	/^f$/;"	f	sbField:val
 dtag	input.ctst	/^f$/;"	f	sbField:
