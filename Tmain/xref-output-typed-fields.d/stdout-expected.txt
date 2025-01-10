@@ -1,12 +1,12 @@
 # input.ctst
-atag -> b=,sb=
+atag -> b=-,sb=
 btag -> b=bField,sb=
 ctag -> b=bField,sb=
-dtag -> b=,sb=val
-etag -> b=,sb=-
+dtag -> b=-,sb=val
+etag -> b=-,sb=-
 # input.rst
 TITLE -> overline
-section -> 
+section -> -
 # input.c
 global -> -
 local -> file
