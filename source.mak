@@ -294,6 +294,7 @@ PARSER_HEADS = \
 	parsers/x-frontmatter.h \
 	parsers/x-iniconf.h \
 	parsers/x-jscript.h \
+	parsers/x-lisp.h \
 	parsers/x-m4.h \
 	parsers/x-make.h \
 	parsers/x-markdown.h \

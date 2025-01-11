@@ -21,6 +21,7 @@ Man pages
 	ctags-lang-automake(7) <man/ctags-lang-automake.7.rst>
 	ctags-lang-c(7) <man/ctags-lang-c.7.rst>
 	ctags-lang-c++(7) <man/ctags-lang-c++.7.rst>
+	ctags-lang-clojure(7) <man/ctags-lang-clojure.7.rst>
 	ctags-lang-cuda(7) <man/ctags-lang-cuda.7.rst>
 	ctags-lang-elm(7) <man/ctags-lang-elm.7.rst>
 	ctags-lang-emacslisp(7) <man/ctags-lang-emacslisp.7.rst>
@@ -41,6 +42,7 @@ Man pages
 	ctags-lang-python(7) <man/ctags-lang-python.7.rst>
 	ctags-lang-r(7) <man/ctags-lang-r.7.rst>
 	ctags-lang-rmarkdown(7) <man/ctags-lang-rmarkdown.7.rst>
+	ctags-lang-scheme(7) <man/ctags-lang-scheme.7.rst>
 	ctags-lang-scss(7) <man/ctags-lang-scss.7.rst>
 	ctags-lang-sql(7) <man/ctags-lang-sql.7.rst>
 	ctags-lang-systemtap(7) <man/ctags-lang-systemtap.7.rst>

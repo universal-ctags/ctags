@@ -13,21 +13,34 @@
 */
 #include "general.h"  /* must always come first */
 
-#include <string.h>
-
+#include "entry.h"
 #include "parse.h"
-#include "read.h"
-#include "routines.h"
-#include "vstring.h"
+
+#include "x-lisp.h"
+
+#include <ctype.h>
+#include <string.h>
 
 /*
 *   DATA DEFINITIONS
 */
 typedef enum {
+	K_UNKNOWN,
 	K_FUNCTION, K_SET
 } schemeKind;
 
+typedef enum {
+	F_DEFINER,
+} schemeField;
+
+static fieldDefinition SchemeFields[] = {
+	{ .name = "definer",
+	  .description = "the name of the function or macro that defines the unknown/Y-kind object",
+	  .enabled = true },
+};
+
 static kindDefinition SchemeKinds [] = {
+	{ true, 'Y', "unknown", "unknown type of definitions" },
 	{ true, 'f', "function", "functions" },
 	{ true, 's', "set",      "sets" }
 };
@@ -36,76 +49,60 @@ static kindDefinition SchemeKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
-/* Algorithm adapted from from GNU etags.
- * Scheme tag functions
- * look for (def... xyzzy
- * look for (def... (xyzzy
- * look for (def ... ((... (xyzzy ....
- * look for (set! xyzzy
- */
-static void readIdentifier (vString *const name, const unsigned char *cp)
+/*
+*   FUNCTION DEFINITIONS
+*/
+static bool scheme_is_def (struct lispDialect *dialect, const unsigned char *strp)
 {
-	const unsigned char *p;
-	vStringClear (name);
-	/* Go till you get to white space or a syntactic break */
-	for (p = cp; *p != '\0' && *p != '(' && *p != ')' && !isspace (*p); p++)
-		vStringPut (name, *p);
+	bool cis = dialect->case_insensitive; /* Renaming for making code short */
+
+	bool is_set = ( (strp [1] == 's' || (cis && strp [1] == 'S'))
+					&& (strp [2] == 'e' || (cis && strp [2] == 'E'))
+					&& (strp [3] == 't' || (cis && strp [3] == 'T'))
+					&& (strp [4] == '!'));
+	if (is_set)
+		return true;
+
+	return lispIsDef (dialect, strp);
+}
+
+static int  scheme_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
+{
+	int k = K_UNKNOWN;
+	int n = vStringLength (hint) - 4;
+
+	if (strncmp (vStringValue (hint) + 1, "SET!", 4) == 0)
+		return K_SET;
+
+	/* 4 means strlen("(def"). */
+#define EQN(X) strncmp(vStringValue (hint) + 4, &X[3], n) == 0
+	switch (n)
+	{
+	case 3:
+		if (EQN("DEFINE"))
+			k = K_FUNCTION;
+		break;
+
+	}
+	return k;
 }
 
 static void findSchemeTags (void)
 {
-	vString *name = vStringNew ();
-	const unsigned char *line;
+	struct lispDialect scheme_dialect = {
+		.definer2kind = scheme_hint2kind,
+		.case_insensitive = true,
+		.namespace_sep = 0,
+		.unknown_kind = K_UNKNOWN,
+		.definer_field = SchemeFields + F_DEFINER,
+		.skip_initial_spaces = false,
+		.lambda_syntax_sugar = true,
+		.is_def = scheme_is_def,
+		.get_it = lispGetIt,
+		.scope = CORK_NIL,
+	};
 
-	while ((line = readLineFromInputFile ()) != NULL)
-	{
-		const unsigned char *cp = line;
-
-		if (cp [0] == '(' &&
-			(cp [1] == 'D' || cp [1] == 'd') &&
-			(cp [2] == 'E' || cp [2] == 'e') &&
-			(cp [3] == 'F' || cp [3] == 'f'))
-		{
-			while (*cp != '\0'  &&  !isspace (*cp))
-				cp++;
-			/* Skip over open parens and white space */
-			do {
-				while (*cp != '\0' && (isspace (*cp) || *cp == '('))
-					cp++;
-				if (*cp == '\0')
-					cp = line = readLineFromInputFile ();
-				else
-					break;
-			} while (line);
-			if (line == NULL)
-				break;
-			readIdentifier (name, cp);
-			makeSimpleTag (name, K_FUNCTION);
-		}
-		if (cp [0] == '(' &&
-			(cp [1] == 'S' || cp [1] == 's') &&
-			(cp [2] == 'E' || cp [2] == 'e') &&
-			(cp [3] == 'T' || cp [3] == 't') &&
-			(cp [4] == '!') &&
-			(isspace (cp [5]) || cp[5] == '\0'))
-		{
-			cp += 5;
-			/* Skip over white space */
-			do {
-				while (*cp != '\0' && isspace (*cp))
-					cp++;
-				if (*cp == '\0')
-					cp = line = readLineFromInputFile ();
-				else
-					break;
-			} while (line);
-			if (line == NULL)
-				break;
-			readIdentifier (name, cp);
-			makeSimpleTag (name, K_SET);
-		}
-	}
-	vStringDelete (name);
+	findLispTagsCommon (&scheme_dialect);
 }
 
 extern parserDefinition* SchemeParser (void)
@@ -119,8 +116,13 @@ extern parserDefinition* SchemeParser (void)
 	parserDefinition* def = parserNew ("Scheme");
 	def->kindTable      = SchemeKinds;
 	def->kindCount  = ARRAY_SIZE (SchemeKinds);
+	def->fieldTable = SchemeFields;
+	def->fieldCount = ARRAY_SIZE (SchemeFields);
 	def->extensions = extensions;
 	def->aliases    = aliases;
 	def->parser     = findSchemeTags;
+	def->useCork = CORK_QUEUE;
+	def->versionCurrent = 0;
+	def->versionAge = 1;
 	return def;
 }
