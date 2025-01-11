@@ -74,11 +74,20 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 				break;
 		}
 
-		if (f == NULL || findex == tag->usedParserFields)
+		if ( /* No parser specific field is attached. */
+			f == NULL
+			/* Any parser specific fields attached to the tag doesn't compatible
+			 * with the spec specified in the format string. */
+			||  findex == tag->usedParserFields)
 		{
-			/* The condtion is redundant for suppressing the warning. */
 			str = "";
+
+			unsigned int dt = getFieldDataType (ftype);
+			if ((dt & FIELDTYPE_STRING) == 0
+				&& (dt & FIELDTYPE_BOOL))
+				str = FIELD_NULL_LETTER_STRING;
 		}
+
 		else if (isFieldEnabled (f->ftype))
 		{
 			unsigned int dt = getFieldDataType (f->ftype);

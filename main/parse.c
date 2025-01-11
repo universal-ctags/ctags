@@ -5640,6 +5640,7 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 typedef enum {
 	F_BOOLEAN_FIELD,
 	F_BOOLEAN_AND_STRING_FIELD,
+	F_STRING_FIELD,
 	COUNT_FIELD
 } CTSTField;
 
@@ -5652,6 +5653,11 @@ static fieldDefinition CTSTFields[COUNT_FIELD] = {
 	{ .name = "sbField",
 	  .description = "field for testing string|boolean type",
 	  .dataType = FIELDTYPE_STRING|FIELDTYPE_BOOL,
+	  .enabled = true,
+	},
+	{ .name = "sField",
+	  .description = "field for testing string type",
+	  .dataType = FIELDTYPE_STRING,
 	  .enabled = true,
 	},
 };
@@ -5799,12 +5805,18 @@ static void createCTSTTags (void)
 
 						name [0] = c++;
 						initTagEntry (&e, name, i);
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
 						attachParserField (&e,
 										   CTSTFields[F_BOOLEAN_FIELD].ftype, "");
 						makeTagEntry (&e);
 
 						name [0] = c++;
 						initTagEntry (&e, name, i);
+						attachParserField (&e,
+										   CTSTFields[F_BOOLEAN_FIELD].ftype, "any-C-string-is-interpreted-as-true");
 						makeTagEntry (&e);
 
 						name [0] = c++;
@@ -5817,6 +5829,18 @@ static void createCTSTTags (void)
 						initTagEntry (&e, name, i);
 						attachParserField (&e,
 										   CTSTFields[F_BOOLEAN_AND_STRING_FIELD].ftype, "");
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						attachParserField (&e,
+										   CTSTFields[F_STRING_FIELD].ftype, "val");
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						attachParserField (&e,
+										   CTSTFields[F_STRING_FIELD].ftype, "");
 						makeTagEntry (&e);
 
 						break;

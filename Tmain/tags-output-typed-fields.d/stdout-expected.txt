@@ -1,0 +1,11 @@
+atag	input.ctst	/^f$/;"	f
+btag	input.ctst	/^f$/;"	f	bField:
+ctag	input.ctst	/^f$/;"	f	bField:
+dtag	input.ctst	/^f$/;"	f	sbField:val
+etag	input.ctst	/^f$/;"	f	sbField:
+ftag	input.ctst	/^f$/;"	f	sField:val
+gtag	input.ctst	/^f$/;"	f	sField:
+TITLE	input.rst	/^TITLE$/;"	H	overline:
+section	input.rst	/^section$/;"	h	title:TITLE
+global	input.c	/^int global;$/;"	v	typeref:typename:int
+local	input.c	/^static int local;$/;"	v	typeref:typename:int	file:
