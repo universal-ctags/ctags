@@ -343,6 +343,13 @@ extern void resetTagCorkState (tagEntryInfo *const tag,
  * -----------------------
  * The VALUE is interpreted very differently depending on the output
  * format: ctags, xref, and json. See field.h.
+ *
+ * WARNING: updating the VALUE
+ * ---------------------------
+ * In the current implementation, there is no way to update the value
+ * for a given field or detach the value from the given field.
+ * For the same combination of TAG and FTYPE, you can call the
+ * attachParser* function only once.
  */
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
