@@ -86,21 +86,104 @@ typedef enum eFieldDataType {
  * The VALUE is interpreted very differently depending on the output
  * format: ctags, xref, and json. See field.h.
  *
- * For FIELDTYPE_STRING:
- * Both json writer and xref writer print it as-is.
+ * For FIELDTYPE_STRING
+ * --------------------
+ * Consider if you set "str" to the field "foo":
  *
- * For FIELDTYPE_STRING|FIELDTYPE_BOOL:
- * If VALUE points "" (empty C string), the json writer prints it as
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | foo:str
+ *   xref | str
+ *   json | "foo": "str"
+ *
+ * Consider if you set "" to the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | foo:
+ *   xref | (nothing)
+ *   json | "foo": ""
+ *
+ * Consider if you don't set the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | (nothing)
+ *   xref | (nothing)
+ *   json | (nothing)
+ *
+ *
+ * For FIELDTYPE_STRING|FIELDTYPE_BOOL
+ * -----------------------------------
+ * If the value points "" (empty C string), the json writer prints it as
  * false, and the xref writer prints it as -.
- * If VALUE points a non-empty C string, Both json writer and xref
+ * THEREFORE, in the xref format, there is no way to distinguish the
+ * output for the value "" and "-". Both are printed as "-".
+ * If the value points a non-empty C string, Both json writer and xref
  * writers print it as-is.
  *
+ * Consider if you set "str" to the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | foo:str
+ *   xref | str
+ *   json | "foo": "str"
+ *
+ * Consider if you set "" to the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | foo:
+ *   xref | - (as specified as FIELD_NULL_LETTER_CHAR/FIELD_NULL_LETTER_STRING)
+ *   json | "foo": false
+ *
+ * Consider if you don't set the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | (nothing)
+ *   xref | (nothing)
+ *   json | (nothing)
+ *
+ *
  * For FIELDTYPE_BOOL
- * The json writer always prints true.
- * The xref writer always prints the name of field.
- * Set "" explicitly though the value pointed by VALUE is not referred,
+ * ------------------
+ * Either VALUE points "" (empty C string) or a non-epmty C string,
+ * the json writer always prints true. In the same condition, the xref
+ * writer always prints the name of field.
+ *
+ * If a value is not set, the field is treated as holding false.
+ * The json writer prints nothing for the field holding false.
+ * The xref writer prints - for the field holding false.
+
+ * Consider if you set "str" to the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | foo:
+ *   xref | foo
+ *   json | "foo": true
+ *
+ * Consider if you set "" to the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | foo:
+ *   xref | foo
+ *   json | "foo": true
+ *
+ * Consider if you don't set the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | (nothing)
+ *   xref | - (as specified as FIELD_NULL_LETTER_CHAR/FIELD_NULL_LETTER_STRING)
+ *   json | (nothing)
+ *
  *
  * The other data type and the combination of types are not implemented yet.
+ *
  */
 
 typedef const char* (*fieldRenderer)(const tagEntryInfo *const,
