@@ -213,9 +213,14 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 		if (! isFieldEnabled (ftype))
 			continue;
 
+		unsigned int dt = getFieldDataType (ftype);
+		const char *val = ((dt & FIELDTYPE_STRING) == 0
+							&& (dt & FIELDTYPE_BOOL))
+			? ""
+			: escapeFieldValueFull (writer, tag, ftype, i);
+
 		length += mio_printf(mio, "\t%s:%s",
-							 getFieldName (ftype),
-							 escapeFieldValueFull (writer, tag, ftype, i));
+							 getFieldName (ftype), val);
 	}
 	return length;
 }
