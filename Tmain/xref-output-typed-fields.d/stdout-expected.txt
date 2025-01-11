@@ -1,9 +1,11 @@
 # input.ctst
-atag -> b=-,sb=
-btag -> b=bField,sb=
-ctag -> b=bField,sb=
-dtag -> b=-,sb=val
-etag -> b=-,sb=-
+atag -> b=-,sb=,s=
+btag -> b=bField,sb=,s=
+ctag -> b=bField,sb=,s=
+dtag -> b=-,sb=val,s=
+etag -> b=-,sb=-,s=
+ftag -> b=-,sb=,s=val
+gtag -> b=-,sb=,s=
 # input.rst
 TITLE -> overline
 section -> -

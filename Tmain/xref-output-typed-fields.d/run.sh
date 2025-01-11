@@ -5,7 +5,7 @@ CTAGS=$1
 
 echo '# input.ctst'
 ${CTAGS} --quiet --options=NONE -o - \
-		 --output-format=xref --_xformat='%{name} -> b=%{CTagsSelfTest.bField},sb=%{CTagsSelfTest.sbField}' \
+		 --output-format=xref --_xformat='%{name} -> b=%{CTagsSelfTest.bField},sb=%{CTagsSelfTest.sbField},s=%{CTagsSelfTest.sField}' \
 		 --language-force=CTagsSelfTest input.ctst
 
 echo '# input.rst'

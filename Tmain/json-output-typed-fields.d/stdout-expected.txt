@@ -3,6 +3,8 @@
 {"_type": "tag", "name": "ctag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "bField": true}
 {"_type": "tag", "name": "dtag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sbField": "val"}
 {"_type": "tag", "name": "etag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sbField": false}
+{"_type": "tag", "name": "ftag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sField": "val"}
+{"_type": "tag", "name": "gtag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sField": ""}
 {"_type": "tag", "name": "TITLE", "path": "input.rst", "pattern": "/^TITLE$/", "kind": "title", "overline": true}
 {"_type": "tag", "name": "section", "path": "input.rst", "pattern": "/^section$/", "kind": "subtitle", "scope": "TITLE", "scopeKind": "title"}
 {"_type": "tag", "name": "global", "path": "input.c", "pattern": "/^int global;$/", "typeref": "typename:int", "kind": "variable"}
