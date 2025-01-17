@@ -182,6 +182,45 @@ typedef enum eFieldDataType {
  *   json | (nothing)
  *
  *
+ * For FIELDTYPE_INTEGER
+ * ---------------------
+ * If the value points "" (empty C string), the all writers print it as
+ * 0. If the value points a string which cannot be converted to an integer with
+ * strtol(3), the all writers print it as 1.
+ *
+ * Consider if you set "99" to the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | foo:99
+ *   xref | 99
+ *   json | "foo": 99
+ *
+ * Consider if you set "str" to the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | foo:1
+ *   xref | 1
+ *   json | "foo": 1
+ *
+ * Consider if you set "" to the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | foo:0
+ *   xref | 0
+ *   json | "foo": 0
+ *
+ * Consider if you don't set the field "foo":
+ *
+ * WRITER | OUTPUT
+ * -------+-----------
+ *  ctags | (nothing)
+ *   xref | (nothing)
+ *   json | (nothing)
+ *
+ *
  * The other data type and the combination of types are not implemented yet.
  *
  */
