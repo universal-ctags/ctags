@@ -5,6 +5,10 @@ dtag	input.ctst	/^f$/;"	f	sbField:val
 etag	input.ctst	/^f$/;"	f	sbField:
 ftag	input.ctst	/^f$/;"	f	sField:val
 gtag	input.ctst	/^f$/;"	f	sField:
+htag	input.ctst	/^f$/;"	f	iField:23
+itag	input.ctst	/^f$/;"	f	iField:-3
+jtag	input.ctst	/^f$/;"	f	iField:1
+ktag	input.ctst	/^f$/;"	f	iField:0
 TITLE	input.rst	/^TITLE$/;"	H	overline:
 section	input.rst	/^section$/;"	h	title:TITLE
 global	input.c	/^int global;$/;"	v	typeref:typename:int

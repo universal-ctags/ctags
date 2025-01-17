@@ -162,9 +162,13 @@ static void addParserFields (json_t *response, const tagEntryInfo *const tag)
 		}
 		else if (dt & FIELDTYPE_INTEGER)
 		{
-			/* NOT IMPLEMENTED YET */
-			AssertNotReached ();
-			o = json_null ();
+			const char *str = escapeFieldValueRaw (tag, ftype, i);
+			long tmp;
+
+			if (strToLong (str, 10, &tmp))
+				o = json_integer (tmp);
+			else
+				o = json_integer(str[0] == '\0'? 0: 1);
 		}
 		else if (dt & FIELDTYPE_BOOL)
 			o = json_true ();

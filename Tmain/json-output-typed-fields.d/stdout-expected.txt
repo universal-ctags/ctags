@@ -5,6 +5,10 @@
 {"_type": "tag", "name": "etag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sbField": false}
 {"_type": "tag", "name": "ftag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sField": "val"}
 {"_type": "tag", "name": "gtag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sField": ""}
+{"_type": "tag", "name": "htag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "iField": 23}
+{"_type": "tag", "name": "itag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "iField": -3}
+{"_type": "tag", "name": "jtag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "iField": 1}
+{"_type": "tag", "name": "ktag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "iField": 0}
 {"_type": "tag", "name": "TITLE", "path": "input.rst", "pattern": "/^TITLE$/", "kind": "title", "overline": true}
 {"_type": "tag", "name": "section", "path": "input.rst", "pattern": "/^section$/", "kind": "subtitle", "scope": "TITLE", "scopeKind": "title"}
 {"_type": "tag", "name": "global", "path": "input.c", "pattern": "/^int global;$/", "typeref": "typename:int", "kind": "variable"}

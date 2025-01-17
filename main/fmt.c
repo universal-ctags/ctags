@@ -95,12 +95,18 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 			{
 				str = renderField (f->ftype, tag, findex);
 				if ((dt & FIELDTYPE_BOOL) && str[0] == '\0')
-				{
 					str = FIELD_NULL_LETTER_STRING;
-				}
 			}
 			else if (dt & FIELDTYPE_BOOL)
 				str = getFieldName (f->ftype);
+			else if (dt & FIELDTYPE_INTEGER)
+			{
+				long unused;
+
+				str = renderField (f->ftype, tag, findex);
+				if (!strToLong (str, 10, &unused))
+					str = (str[0] == '\0'? "0": "1");
+			}
 			else
 			{
 				/* Not implemented */
