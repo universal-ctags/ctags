@@ -5641,6 +5641,7 @@ typedef enum {
 	F_BOOLEAN_FIELD,
 	F_BOOLEAN_AND_STRING_FIELD,
 	F_STRING_FIELD,
+	F_INTEGER_FIELD,
 	COUNT_FIELD
 } CTSTField;
 
@@ -5658,6 +5659,11 @@ static fieldDefinition CTSTFields[COUNT_FIELD] = {
 	{ .name = "sField",
 	  .description = "field for testing string type",
 	  .dataType = FIELDTYPE_STRING,
+	  .enabled = true,
+	},
+	{ .name = "iField",
+	  .description = "field for testing integer type",
+	  .dataType = FIELDTYPE_INTEGER,
 	  .enabled = true,
 	},
 };
@@ -5841,6 +5847,30 @@ static void createCTSTTags (void)
 						initTagEntry (&e, name, i);
 						attachParserField (&e,
 										   CTSTFields[F_STRING_FIELD].ftype, "");
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						attachParserField (&e,
+										   CTSTFields[F_INTEGER_FIELD].ftype, "23");
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						attachParserField (&e,
+										   CTSTFields[F_INTEGER_FIELD].ftype, "-3");
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						attachParserField (&e,
+										   CTSTFields[F_INTEGER_FIELD].ftype, "poison");
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						attachParserField (&e,
+										   CTSTFields[F_INTEGER_FIELD].ftype, "");
 						makeTagEntry (&e);
 
 						break;
