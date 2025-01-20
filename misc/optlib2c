@@ -88,7 +88,7 @@ my $options =
 	   $_[0]->{'versionCurrent'} = 0;
 	   $_[0]->{'versionAge'} = 0;
 	   $_[0]->{'foreignLanguages'} = [];
-	   parse_flags ($rest, $_[0], $langdef_flags,);
+	   parse_flags ($rest, $_[0], $langdef_flags);
 
 	   return 1;
        } ],
