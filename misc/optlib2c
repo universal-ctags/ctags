@@ -58,6 +58,36 @@ my $langdef_flags =
        } ],
     ];
 
+my $fielddef_flags =
+    [
+     [ qr/\{datatype=([^\}]+)\}/, sub {
+	 my $datatype = "";
+
+	 if ($1 eq 'str')
+	 {
+	     $datatype .= "FIELDTYPE_STRING";
+	 }
+	 elsif ($1 eq 'int')
+	 {
+	     $datatype .= "FIELDTYPE_INTEGER";
+	 }
+	 elsif ($1 eq 'bool')
+	 {
+	     $datatype .= "FIELDTYPE_BOOL";
+	 }
+	 elsif (($1 eq 'bool+str') || ($1 eq 'str+bool'))
+	 {
+	     $datatype .= "FIELDTYPE_STRING|FIELDTYPE_BOOL";
+	 }
+	 else
+	 {
+	     die "Unknown datatype specification: \"{datatype=$1}\" in \"--_fielddef-<LANG>=...\"";
+	 }
+
+	 $_[0]->{'datatype'} = $datatype;
+       } ],
+    ];
+
 my $options =
     [
      [ qr/^--options=(.*)/, sub {
@@ -135,7 +165,7 @@ my $options =
 	 push @{$_[0]->{'extradefs'}}, { name => $name, desc => $desc };
 	 return 1;
        } ],
-     [ qr/^--_fielddef-(.*)=([^,]+),([^\{]+)/, sub {
+     [ qr/^--_fielddef-(.*)=([^,]+),([^\{]+)(.*)/, sub {
 	 die "Don't use --_fielddef-<LANG>=+ option before defining the language"
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding a field is allowed only to the language specified with --langdef: $1"
@@ -143,10 +173,14 @@ my $options =
 
 	 my $name = $2;
 	 my $desc = $3;
+	 my $rest = $4;
 	 die "unacceptable character is used for field name: $name"
 	     unless ($name =~ /^[a-zA-Z]+$/);
 
-	 push @{$_[0]->{'fielddefs'}}, { name => $name, desc => $desc };
+	 my $fdef = { name => $name, desc => $desc };
+	 push @{$_[0]->{'fielddefs'}}, $fdef;
+	 parse_flags ($rest, $fdef, $fielddef_flags);
+
 	 return 1;
        } ],
      [ qr/^--_roledef-([^.]*)\.(?:([a-zA-Z])|\{([a-zA-Z][a-zA-Z0-9]*)\})=([a-zA-Z0-9]+),([^\{]+)/, sub {
@@ -1062,6 +1096,13 @@ EOF
 		  .enabled     = $enabled,
 		  .name        = "$_->{'name'}",
 		  .description = "$desc",
+EOF
+      if (defined $_->{'datatype'}) {
+	  print <<EOF;
+		  .dataType = $_->{'datatype'},
+EOF
+      }
+      print <<EOF;
 		},
 EOF
     }

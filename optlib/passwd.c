@@ -37,11 +37,13 @@ extern parserDefinition* PasswdParser (void)
 		  .enabled     = true,
 		  .name        = "home",
 		  .description = "home directory",
+		  .dataType = FIELDTYPE_STRING,
 		},
 		{
 		  .enabled     = true,
 		  .name        = "shell",
 		  .description = "login shell",
+		  .dataType = FIELDTYPE_STRING,
 		},
 	};
 	static tagRegexTable PasswdTagRegexTable [] = {

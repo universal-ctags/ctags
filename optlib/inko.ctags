@@ -29,7 +29,7 @@
 --kinddef-Inko=c,constant,Constant definition
 --kinddef-Inko=r,reopen,Reopen class
 
---_fielddef-Inko=implements,Trait being implemented
+--_fielddef-Inko=implements,Trait being implemented{datatype=str}
 
 --fields-Inko=+{implements}
 
