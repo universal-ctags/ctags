@@ -1,0 +1,17 @@
+str:s0
+str:s1
+str:s2
+
+int:i0
+int:i1
+int:i2
+int:i3
+int:i4
+
+bool:b0
+bool:b1
+bool:b2
+
+strbool:sb0
+strbool:sb1
+strbool:sb2

@@ -1970,7 +1970,7 @@ the output for input.docc:
 	decompress	input.docc	/^- function: decompress(const char *compressed_byteseq) => char *$/;"	function	language:C	roles:documented
 
 
-.. TESTCASE: Tmain/parser-own-fields-for-foreign-lang.d
+.. TESTCASE: Tmain/parser-specific-fields-for-foreign-lang.d
 
 ``{_language=<LANG>}`` flag affects ``{_field=FIELDNAME:GROUP}`` flag; ctags looks up
 the field defintion in `<LANG>`.

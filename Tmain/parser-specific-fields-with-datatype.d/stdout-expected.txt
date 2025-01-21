@@ -1,0 +1,14 @@
+s0	input.testlang	/^str:s0$/;"	o	str:string
+s1	input.testlang	/^str:s1$/;"	o	str:
+s2	input.testlang	/^str:s2$/;"	o
+i0	input.testlang	/^int:i0$/;"	o	int:10
+i1	input.testlang	/^int:i1$/;"	o	int:-1
+i2	input.testlang	/^int:i2$/;"	o	int:1
+i3	input.testlang	/^int:i3$/;"	o	int:0
+i4	input.testlang	/^int:i4$/;"	o
+b0	input.testlang	/^bool:b0$/;"	o	bool:
+b1	input.testlang	/^bool:b1$/;"	o	bool:
+b2	input.testlang	/^bool:b2$/;"	o
+sb0	input.testlang	/^strbool:sb0$/;"	o	strbool:abc
+sb1	input.testlang	/^strbool:sb1$/;"	o	strbool:
+sb2	input.testlang	/^strbool:sb2$/;"	o
