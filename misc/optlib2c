@@ -75,9 +75,13 @@ my $fielddef_flags =
 	 {
 	     $datatype .= "FIELDTYPE_BOOL";
 	 }
-	 elsif (($1 eq 'bool+str') || ($1 eq 'str+bool'))
+	 elsif ($1 eq 'str+bool')
 	 {
 	     $datatype .= "FIELDTYPE_STRING|FIELDTYPE_BOOL";
+	 }
+	 elsif ($1 eq 'bool+str')
+	 {
+	     die "\"{datatype=$1}\": use str+bool instead of bool+str";
 	 }
 	 else
 	 {
