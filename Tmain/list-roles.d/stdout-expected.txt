@@ -2,292 +2,294 @@
 #
 #
 #
-#LANGUAGE      KIND(L/N)         NAME               ENABLED DESCRIPTION
-Ada            p/package         subunit            on      package name referenced in separate()
-AutoIt         S/script          local              on      local include
-AutoIt         S/script          system             on      system include
-Autoconf       e/optenable       cmdline            on      specified in a configure command line
-Autoconf       w/optwith         cmdline            on      specified in a configure command line
-Automake       c/condition       branched           on      used for branching
-Automake       d/directory       data               on      directory for DATA primary
-Automake       d/directory       library            on      directory for LIBRARIES primary
-Automake       d/directory       ltlibrary          on      directory for LTLIBRARIES primary
-Automake       d/directory       man                on      directory for MANS primary
-Automake       d/directory       program            on      directory for PROGRAMS primary
-Automake       d/directory       script             on      directory for SCRIPTS primary
-Automake       p/pseudodir       data               on      directory for DATA primary
-Automake       p/pseudodir       library            on      directory for LIBRARIES primary
-Automake       p/pseudodir       ltlibrary          on      directory for LTLIBRARIES primary
-Automake       p/pseudodir       man                on      directory for MANS primary
-Automake       p/pseudodir       program            on      directory for PROGRAMS primary
-Automake       p/pseudodir       script             on      directory for SCRIPTS primary
-Basic          f/function        decl               on      declared
-Bats           S/script          loaded             on      script loaed with "load" command
-C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-C              d/macro           undef              on      undefined
-C              f/function        foreigndecl        on      declared in foreign languages
-C              h/header          local              on      local header
-C              h/header          system             on      system header
-C              s/struct          foreigndecl        on      declared in foreign languages
-C++            M/module          imported           on      imported with "imported ..."
-C++            M/module          partOwner          on      used for specifying a partition
-C++            P/partition       imported           on      imported with "imported ..."
-C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-C++            d/macro           undef              on      undefined
-C++            h/header          exported           on      exported with "exported imported ..."
-C++            h/header          imported           on      imported with "imported ..."
-C++            h/header          local              on      local header
-C++            h/header          system             on      system header
-CPreProcessor  d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-CPreProcessor  d/macro           undef              on      undefined
-CPreProcessor  h/header          local              on      local header
-CPreProcessor  h/header          system             on      system header
-CUDA           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-CUDA           d/macro           undef              on      undefined
-CUDA           h/header          local              on      local header
-CUDA           h/header          system             on      system header
-Cobol          S/sourcefile      copied             on      copied in source file
-CobolFree      S/sourcefile      copied             on      copied in source file
-CobolVariable  S/sourcefile      copied             on      copied in source file
-DTD            e/element         attOwner           on      attributes owner
-DTD            p/parameterEntity condition          on      conditions
-DTD            p/parameterEntity elementName        on      element names
-DTD            p/parameterEntity partOfAttDef       on      part of attribute definition
-Elm            c/constructor     exposed            on      item exposed from a module
-Elm            f/function        exposed            on      item exposed from a module
-Elm            m/module          imported           on      module imported
-Elm            t/type            exposed            on      item exposed from a module
-Flex           I/import          import             on      imports
-GDScript       c/class           extended           on      used as a base class for extending
-GemSpec        g/gem             develDep           on      specifying development dependency
-GemSpec        g/gem             runtimeDep         on      specifying runtime dependency
-Go             Y/unknown         receiverType       on      receiver type
-Go             p/package         imported           on      imported package
-HTML           C/stylesheet      extFile            on      referenced as external files
-HTML           J/script          extFile            on      referenced as external files
-HTML           c/class           attribute          on      assigned as attributes
-Java           p/package         imported           on      imported package
-JavaScript     c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
-JavaScript     f/function        foreigndecl        on      declared in foreign languages
-JavaScript     v/variable        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
-Julia          Y/unknown         imported           on      loaded by "import"
-Julia          Y/unknown         used               on      loaded by "using"
-Julia          n/module          imported           on      loaded by "import"
-Julia          n/module          namespace          on      only some symbols in it are imported
-Julia          n/module          used               on      loaded by "using"
-Kconfig        k/kconfig         source             on      kconfig file loaded with source directive
-LEX            c/cond            grouping           on       conditions used for grouping of start or exclusive condition rules
-LdScript       i/inputSection    destination        on      specified as the destination of code and data
-LdScript       i/inputSection    discarded          on      discarded when linking
-LdScript       i/inputSection    mapped             on      mapped to output section
-LdScript       s/symbol          aliased            on      aliased with __attribute__((alias(...))) in C/C++ code
-LdScript       s/symbol          entrypoint         on      entry points
-Lua            Y/unknown         referenced         off     referenced somehow
-M4             I/macrofile       included           on      included macro
-M4             I/macrofile       sincluded          on      silently included macro
-M4             d/macro           undef              on      undefined
-Make           I/makefile        included           on      included
-Make           I/makefile        optional           on      optionally included
-Meson          m/module          imported           on      imported
-NSIS           i/script          included           on      included with !include
-Perl           M/module          unused             on      specified in `no' built-in function
-Perl           M/module          used               on      specified in `use' built-in function
-Perl           h/heredoc         endmarker          on      end marker
-PkgConfig      p/pkg             conflicted         on      confliected
-PkgConfig      p/pkg             provided           on      provided
-PkgConfig      p/pkg             required           on      required
-Protobuf       D/protodef        imported           on      imported
-Protobuf       m/message         extension          on      extending the message
-Python         Y/unknown         imported           on      imported from the other module
-Python         Y/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
-Python         i/module          imported           on      imported modules
-Python         i/module          indirectlyImported on      module imported in alternative name
-Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
-R              l/library         library            on      library attached by library function
-R              l/library         require            on      library attached by require function
-R              s/source          source             on      source loaded by source fucntion
-RpmSpec        m/macro           undef              on      undefined
-RpmSpec        p/patch           decl               on      declared for applying later
-Ruby           L/library         loaded             on      loaded by "load" method
-Ruby           L/library         required           on      loaded by "require" method
-Ruby           L/library         requiredRel        on      loaded by "require_relative" method
-SCSS           M/module          used               on      used
-Sh             h/heredoc         endmarker          on      end marker
-Sh             s/script          loaded             on      loaded
-SystemTap      p/probe           attached           on      attached by code for probing
-SystemVerilog  m/module          decl               on      declaring instances
-SystemdUnit    u/unit            After              on      referred in After key
-SystemdUnit    u/unit            Before             on      referred in Before key
-SystemdUnit    u/unit            RequiredBy         on      referred in RequiredBy key
-SystemdUnit    u/unit            Requires           on      referred in Requires key
-SystemdUnit    u/unit            WantedBy           on      referred in WantedBy key
-SystemdUnit    u/unit            Wants              on      referred in Wants key
-TOML           k/key             chainElt           off     (EXPERIMENTAL)used as an element in a key name chain like a.b.c
-Terraform      v/variable        assigned           on      assigned in Variable Definitions (.tfvars) files
-Tex            e/environment     used               off     environment usage introduced by \begin{MyEnv}
-Tex            i/xinput          bibliography       on      bibliography (.bib) file
-Tex            i/xinput          included           on      external input file specified with \include
-Tex            i/xinput          input              on      external input file specified with \input
-Thrift         T/thriftFile      included           on      included file
-V              Y/unknown         imported           on      imported symbol
-V              p/module          foreignlang        on      representing a foreign language (i.e., C, JS...)
-V              p/module          imported           on      imported module
-VHDL           e/entity          desigend           on      designed by an architecture
-Vera           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-Vera           d/macro           undef              on      undefined
-Vera           h/header          local              on      local header
-Vera           h/header          system             on      system header
-Verilog        m/module          decl               on      declaring instances
-Vim            h/heredoc         endmarker          on      end marker
-Zsh            f/function        autoloaded         on      function name passed to autoload built-in command
-Zsh            h/heredoc         endmarker          on      end marker
-Zsh            s/script          autoloaded         on      autoloaded
-Zsh            s/script          loaded             on      loaded
+#LANGUAGE               KIND(L/N)         NAME               ENABLED DESCRIPTION
+Ada                     p/package         subunit            on      package name referenced in separate()
+AutoIt                  S/script          local              on      local include
+AutoIt                  S/script          system             on      system include
+Autoconf                e/optenable       cmdline            on      specified in a configure command line
+Autoconf                w/optwith         cmdline            on      specified in a configure command line
+Automake                c/condition       branched           on      used for branching
+Automake                d/directory       data               on      directory for DATA primary
+Automake                d/directory       library            on      directory for LIBRARIES primary
+Automake                d/directory       ltlibrary          on      directory for LTLIBRARIES primary
+Automake                d/directory       man                on      directory for MANS primary
+Automake                d/directory       program            on      directory for PROGRAMS primary
+Automake                d/directory       script             on      directory for SCRIPTS primary
+Automake                p/pseudodir       data               on      directory for DATA primary
+Automake                p/pseudodir       library            on      directory for LIBRARIES primary
+Automake                p/pseudodir       ltlibrary          on      directory for LTLIBRARIES primary
+Automake                p/pseudodir       man                on      directory for MANS primary
+Automake                p/pseudodir       program            on      directory for PROGRAMS primary
+Automake                p/pseudodir       script             on      directory for SCRIPTS primary
+Basic                   f/function        decl               on      declared
+Bats                    S/script          loaded             on      script loaed with "load" command
+C                       d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+C                       d/macro           undef              on      undefined
+C                       f/function        foreigndecl        on      declared in foreign languages
+C                       h/header          local              on      local header
+C                       h/header          system             on      system header
+C                       s/struct          foreigndecl        on      declared in foreign languages
+C++                     M/module          imported           on      imported with "imported ..."
+C++                     M/module          partOwner          on      used for specifying a partition
+C++                     P/partition       imported           on      imported with "imported ..."
+C++                     d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+C++                     d/macro           undef              on      undefined
+C++                     h/header          exported           on      exported with "exported imported ..."
+C++                     h/header          imported           on      imported with "imported ..."
+C++                     h/header          local              on      local header
+C++                     h/header          system             on      system header
+CPreProcessor           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+CPreProcessor           d/macro           undef              on      undefined
+CPreProcessor           h/header          local              on      local header
+CPreProcessor           h/header          system             on      system header
+CUDA                    d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+CUDA                    d/macro           undef              on      undefined
+CUDA                    h/header          local              on      local header
+CUDA                    h/header          system             on      system header
+Cobol                   S/sourcefile      copied             on      copied in source file
+CobolFree               S/sourcefile      copied             on      copied in source file
+CobolVariable           S/sourcefile      copied             on      copied in source file
+DTD                     e/element         attOwner           on      attributes owner
+DTD                     p/parameterEntity condition          on      conditions
+DTD                     p/parameterEntity elementName        on      element names
+DTD                     p/parameterEntity partOfAttDef       on      part of attribute definition
+Elm                     c/constructor     exposed            on      item exposed from a module
+Elm                     f/function        exposed            on      item exposed from a module
+Elm                     m/module          imported           on      module imported
+Elm                     t/type            exposed            on      item exposed from a module
+Flex                    I/import          import             on      imports
+GDScript                c/class           extended           on      used as a base class for extending
+GemSpec                 g/gem             develDep           on      specifying development dependency
+GemSpec                 g/gem             runtimeDep         on      specifying runtime dependency
+Go                      Y/unknown         receiverType       on      receiver type
+Go                      p/package         imported           on      imported package
+HTML                    C/stylesheet      extFile            on      referenced as external files
+HTML                    J/script          extFile            on      referenced as external files
+HTML                    c/class           attribute          on      assigned as attributes
+Java                    p/package         imported           on      imported package
+JavaScript              c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JavaScript              f/function        foreigndecl        on      declared in foreign languages
+JavaScript              v/variable        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+Julia                   Y/unknown         imported           on      loaded by "import"
+Julia                   Y/unknown         used               on      loaded by "using"
+Julia                   n/module          imported           on      loaded by "import"
+Julia                   n/module          namespace          on      only some symbols in it are imported
+Julia                   n/module          used               on      loaded by "using"
+Kconfig                 k/kconfig         source             on      kconfig file loaded with source directive
+LEX                     c/cond            grouping           on       conditions used for grouping of start or exclusive condition rules
+LdScript                i/inputSection    destination        on      specified as the destination of code and data
+LdScript                i/inputSection    discarded          on      discarded when linking
+LdScript                i/inputSection    mapped             on      mapped to output section
+LdScript                s/symbol          aliased            on      aliased with __attribute__((alias(...))) in C/C++ code
+LdScript                s/symbol          entrypoint         on      entry points
+Lua                     Y/unknown         referenced         off     referenced somehow
+M4                      I/macrofile       included           on      included macro
+M4                      I/macrofile       sincluded          on      silently included macro
+M4                      d/macro           undef              on      undefined
+Make                    I/makefile        included           on      included
+Make                    I/makefile        optional           on      optionally included
+Meson                   m/module          imported           on      imported
+NSIS                    i/script          included           on      included with !include
+Perl                    M/module          unused             on      specified in `no' built-in function
+Perl                    M/module          used               on      specified in `use' built-in function
+Perl                    h/heredoc         endmarker          on      end marker
+PkgConfig               p/pkg             conflicted         on      confliected
+PkgConfig               p/pkg             provided           on      provided
+PkgConfig               p/pkg             required           on      required
+Protobuf                D/protodef        imported           on      imported
+Protobuf                m/message         extension          on      extending the message
+Python                  Y/unknown         imported           on      imported from the other module
+Python                  Y/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
+Python                  i/module          imported           on      imported modules
+Python                  i/module          indirectlyImported on      module imported in alternative name
+Python                  i/module          namespace          on      namespace from where classes/variables/functions are imported
+R                       l/library         library            on      library attached by library function
+R                       l/library         require            on      library attached by require function
+R                       s/source          source             on      source loaded by source fucntion
+RpmSpec                 m/macro           undef              on      undefined
+RpmSpec                 p/patch           decl               on      declared for applying later
+Ruby                    L/library         loaded             on      loaded by "load" method
+Ruby                    L/library         required           on      loaded by "require" method
+Ruby                    L/library         requiredRel        on      loaded by "require_relative" method
+SCSS                    M/module          used               on      used
+SELinuxTypeEnforcement  t/type            aliased            on      aliased
+Sh                      h/heredoc         endmarker          on      end marker
+Sh                      s/script          loaded             on      loaded
+SystemTap               p/probe           attached           on      attached by code for probing
+SystemVerilog           m/module          decl               on      declaring instances
+SystemdUnit             u/unit            After              on      referred in After key
+SystemdUnit             u/unit            Before             on      referred in Before key
+SystemdUnit             u/unit            RequiredBy         on      referred in RequiredBy key
+SystemdUnit             u/unit            Requires           on      referred in Requires key
+SystemdUnit             u/unit            WantedBy           on      referred in WantedBy key
+SystemdUnit             u/unit            Wants              on      referred in Wants key
+TOML                    k/key             chainElt           off     (EXPERIMENTAL)used as an element in a key name chain like a.b.c
+Terraform               v/variable        assigned           on      assigned in Variable Definitions (.tfvars) files
+Tex                     e/environment     used               off     environment usage introduced by \begin{MyEnv}
+Tex                     i/xinput          bibliography       on      bibliography (.bib) file
+Tex                     i/xinput          included           on      external input file specified with \include
+Tex                     i/xinput          input              on      external input file specified with \input
+Thrift                  T/thriftFile      included           on      included file
+V                       Y/unknown         imported           on      imported symbol
+V                       p/module          foreignlang        on      representing a foreign language (i.e., C, JS...)
+V                       p/module          imported           on      imported module
+VHDL                    e/entity          desigend           on      designed by an architecture
+Vera                    d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+Vera                    d/macro           undef              on      undefined
+Vera                    h/header          local              on      local header
+Vera                    h/header          system             on      system header
+Verilog                 m/module          decl               on      declaring instances
+Vim                     h/heredoc         endmarker          on      end marker
+Zsh                     f/function        autoloaded         on      function name passed to autoload built-in command
+Zsh                     h/heredoc         endmarker          on      end marker
+Zsh                     s/script          autoloaded         on      autoloaded
+Zsh                     s/script          loaded             on      loaded
 
 #
 # all.*
 #
-#LANGUAGE      KIND(L/N)         NAME               ENABLED DESCRIPTION
-Ada            p/package         subunit            on      package name referenced in separate()
-AutoIt         S/script          local              on      local include
-AutoIt         S/script          system             on      system include
-Autoconf       e/optenable       cmdline            on      specified in a configure command line
-Autoconf       w/optwith         cmdline            on      specified in a configure command line
-Automake       c/condition       branched           on      used for branching
-Automake       d/directory       data               on      directory for DATA primary
-Automake       d/directory       library            on      directory for LIBRARIES primary
-Automake       d/directory       ltlibrary          on      directory for LTLIBRARIES primary
-Automake       d/directory       man                on      directory for MANS primary
-Automake       d/directory       program            on      directory for PROGRAMS primary
-Automake       d/directory       script             on      directory for SCRIPTS primary
-Automake       p/pseudodir       data               on      directory for DATA primary
-Automake       p/pseudodir       library            on      directory for LIBRARIES primary
-Automake       p/pseudodir       ltlibrary          on      directory for LTLIBRARIES primary
-Automake       p/pseudodir       man                on      directory for MANS primary
-Automake       p/pseudodir       program            on      directory for PROGRAMS primary
-Automake       p/pseudodir       script             on      directory for SCRIPTS primary
-Basic          f/function        decl               on      declared
-Bats           S/script          loaded             on      script loaed with "load" command
-C              d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-C              d/macro           undef              on      undefined
-C              f/function        foreigndecl        on      declared in foreign languages
-C              h/header          local              on      local header
-C              h/header          system             on      system header
-C              s/struct          foreigndecl        on      declared in foreign languages
-C++            M/module          imported           on      imported with "imported ..."
-C++            M/module          partOwner          on      used for specifying a partition
-C++            P/partition       imported           on      imported with "imported ..."
-C++            d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-C++            d/macro           undef              on      undefined
-C++            h/header          exported           on      exported with "exported imported ..."
-C++            h/header          imported           on      imported with "imported ..."
-C++            h/header          local              on      local header
-C++            h/header          system             on      system header
-CPreProcessor  d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-CPreProcessor  d/macro           undef              on      undefined
-CPreProcessor  h/header          local              on      local header
-CPreProcessor  h/header          system             on      system header
-CUDA           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-CUDA           d/macro           undef              on      undefined
-CUDA           h/header          local              on      local header
-CUDA           h/header          system             on      system header
-Cobol          S/sourcefile      copied             on      copied in source file
-CobolFree      S/sourcefile      copied             on      copied in source file
-CobolVariable  S/sourcefile      copied             on      copied in source file
-DTD            e/element         attOwner           on      attributes owner
-DTD            p/parameterEntity condition          on      conditions
-DTD            p/parameterEntity elementName        on      element names
-DTD            p/parameterEntity partOfAttDef       on      part of attribute definition
-Elm            c/constructor     exposed            on      item exposed from a module
-Elm            f/function        exposed            on      item exposed from a module
-Elm            m/module          imported           on      module imported
-Elm            t/type            exposed            on      item exposed from a module
-Flex           I/import          import             on      imports
-GDScript       c/class           extended           on      used as a base class for extending
-GemSpec        g/gem             develDep           on      specifying development dependency
-GemSpec        g/gem             runtimeDep         on      specifying runtime dependency
-Go             Y/unknown         receiverType       on      receiver type
-Go             p/package         imported           on      imported package
-HTML           C/stylesheet      extFile            on      referenced as external files
-HTML           J/script          extFile            on      referenced as external files
-HTML           c/class           attribute          on      assigned as attributes
-Java           p/package         imported           on      imported package
-JavaScript     c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
-JavaScript     f/function        foreigndecl        on      declared in foreign languages
-JavaScript     v/variable        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
-Julia          Y/unknown         imported           on      loaded by "import"
-Julia          Y/unknown         used               on      loaded by "using"
-Julia          n/module          imported           on      loaded by "import"
-Julia          n/module          namespace          on      only some symbols in it are imported
-Julia          n/module          used               on      loaded by "using"
-Kconfig        k/kconfig         source             on      kconfig file loaded with source directive
-LEX            c/cond            grouping           on       conditions used for grouping of start or exclusive condition rules
-LdScript       i/inputSection    destination        on      specified as the destination of code and data
-LdScript       i/inputSection    discarded          on      discarded when linking
-LdScript       i/inputSection    mapped             on      mapped to output section
-LdScript       s/symbol          aliased            on      aliased with __attribute__((alias(...))) in C/C++ code
-LdScript       s/symbol          entrypoint         on      entry points
-Lua            Y/unknown         referenced         off     referenced somehow
-M4             I/macrofile       included           on      included macro
-M4             I/macrofile       sincluded          on      silently included macro
-M4             d/macro           undef              on      undefined
-Make           I/makefile        included           on      included
-Make           I/makefile        optional           on      optionally included
-Meson          m/module          imported           on      imported
-NSIS           i/script          included           on      included with !include
-Perl           M/module          unused             on      specified in `no' built-in function
-Perl           M/module          used               on      specified in `use' built-in function
-Perl           h/heredoc         endmarker          on      end marker
-PkgConfig      p/pkg             conflicted         on      confliected
-PkgConfig      p/pkg             provided           on      provided
-PkgConfig      p/pkg             required           on      required
-Protobuf       D/protodef        imported           on      imported
-Protobuf       m/message         extension          on      extending the message
-Python         Y/unknown         imported           on      imported from the other module
-Python         Y/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
-Python         i/module          imported           on      imported modules
-Python         i/module          indirectlyImported on      module imported in alternative name
-Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
-R              l/library         library            on      library attached by library function
-R              l/library         require            on      library attached by require function
-R              s/source          source             on      source loaded by source fucntion
-RpmSpec        m/macro           undef              on      undefined
-RpmSpec        p/patch           decl               on      declared for applying later
-Ruby           L/library         loaded             on      loaded by "load" method
-Ruby           L/library         required           on      loaded by "require" method
-Ruby           L/library         requiredRel        on      loaded by "require_relative" method
-SCSS           M/module          used               on      used
-Sh             h/heredoc         endmarker          on      end marker
-Sh             s/script          loaded             on      loaded
-SystemTap      p/probe           attached           on      attached by code for probing
-SystemVerilog  m/module          decl               on      declaring instances
-SystemdUnit    u/unit            After              on      referred in After key
-SystemdUnit    u/unit            Before             on      referred in Before key
-SystemdUnit    u/unit            RequiredBy         on      referred in RequiredBy key
-SystemdUnit    u/unit            Requires           on      referred in Requires key
-SystemdUnit    u/unit            WantedBy           on      referred in WantedBy key
-SystemdUnit    u/unit            Wants              on      referred in Wants key
-TOML           k/key             chainElt           off     (EXPERIMENTAL)used as an element in a key name chain like a.b.c
-Terraform      v/variable        assigned           on      assigned in Variable Definitions (.tfvars) files
-Tex            e/environment     used               off     environment usage introduced by \begin{MyEnv}
-Tex            i/xinput          bibliography       on      bibliography (.bib) file
-Tex            i/xinput          included           on      external input file specified with \include
-Tex            i/xinput          input              on      external input file specified with \input
-Thrift         T/thriftFile      included           on      included file
-V              Y/unknown         imported           on      imported symbol
-V              p/module          foreignlang        on      representing a foreign language (i.e., C, JS...)
-V              p/module          imported           on      imported module
-VHDL           e/entity          desigend           on      designed by an architecture
-Vera           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
-Vera           d/macro           undef              on      undefined
-Vera           h/header          local              on      local header
-Vera           h/header          system             on      system header
-Verilog        m/module          decl               on      declaring instances
-Vim            h/heredoc         endmarker          on      end marker
-Zsh            f/function        autoloaded         on      function name passed to autoload built-in command
-Zsh            h/heredoc         endmarker          on      end marker
-Zsh            s/script          autoloaded         on      autoloaded
-Zsh            s/script          loaded             on      loaded
+#LANGUAGE               KIND(L/N)         NAME               ENABLED DESCRIPTION
+Ada                     p/package         subunit            on      package name referenced in separate()
+AutoIt                  S/script          local              on      local include
+AutoIt                  S/script          system             on      system include
+Autoconf                e/optenable       cmdline            on      specified in a configure command line
+Autoconf                w/optwith         cmdline            on      specified in a configure command line
+Automake                c/condition       branched           on      used for branching
+Automake                d/directory       data               on      directory for DATA primary
+Automake                d/directory       library            on      directory for LIBRARIES primary
+Automake                d/directory       ltlibrary          on      directory for LTLIBRARIES primary
+Automake                d/directory       man                on      directory for MANS primary
+Automake                d/directory       program            on      directory for PROGRAMS primary
+Automake                d/directory       script             on      directory for SCRIPTS primary
+Automake                p/pseudodir       data               on      directory for DATA primary
+Automake                p/pseudodir       library            on      directory for LIBRARIES primary
+Automake                p/pseudodir       ltlibrary          on      directory for LTLIBRARIES primary
+Automake                p/pseudodir       man                on      directory for MANS primary
+Automake                p/pseudodir       program            on      directory for PROGRAMS primary
+Automake                p/pseudodir       script             on      directory for SCRIPTS primary
+Basic                   f/function        decl               on      declared
+Bats                    S/script          loaded             on      script loaed with "load" command
+C                       d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+C                       d/macro           undef              on      undefined
+C                       f/function        foreigndecl        on      declared in foreign languages
+C                       h/header          local              on      local header
+C                       h/header          system             on      system header
+C                       s/struct          foreigndecl        on      declared in foreign languages
+C++                     M/module          imported           on      imported with "imported ..."
+C++                     M/module          partOwner          on      used for specifying a partition
+C++                     P/partition       imported           on      imported with "imported ..."
+C++                     d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+C++                     d/macro           undef              on      undefined
+C++                     h/header          exported           on      exported with "exported imported ..."
+C++                     h/header          imported           on      imported with "imported ..."
+C++                     h/header          local              on      local header
+C++                     h/header          system             on      system header
+CPreProcessor           d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+CPreProcessor           d/macro           undef              on      undefined
+CPreProcessor           h/header          local              on      local header
+CPreProcessor           h/header          system             on      system header
+CUDA                    d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+CUDA                    d/macro           undef              on      undefined
+CUDA                    h/header          local              on      local header
+CUDA                    h/header          system             on      system header
+Cobol                   S/sourcefile      copied             on      copied in source file
+CobolFree               S/sourcefile      copied             on      copied in source file
+CobolVariable           S/sourcefile      copied             on      copied in source file
+DTD                     e/element         attOwner           on      attributes owner
+DTD                     p/parameterEntity condition          on      conditions
+DTD                     p/parameterEntity elementName        on      element names
+DTD                     p/parameterEntity partOfAttDef       on      part of attribute definition
+Elm                     c/constructor     exposed            on      item exposed from a module
+Elm                     f/function        exposed            on      item exposed from a module
+Elm                     m/module          imported           on      module imported
+Elm                     t/type            exposed            on      item exposed from a module
+Flex                    I/import          import             on      imports
+GDScript                c/class           extended           on      used as a base class for extending
+GemSpec                 g/gem             develDep           on      specifying development dependency
+GemSpec                 g/gem             runtimeDep         on      specifying runtime dependency
+Go                      Y/unknown         receiverType       on      receiver type
+Go                      p/package         imported           on      imported package
+HTML                    C/stylesheet      extFile            on      referenced as external files
+HTML                    J/script          extFile            on      referenced as external files
+HTML                    c/class           attribute          on      assigned as attributes
+Java                    p/package         imported           on      imported package
+JavaScript              c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JavaScript              f/function        foreigndecl        on      declared in foreign languages
+JavaScript              v/variable        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+Julia                   Y/unknown         imported           on      loaded by "import"
+Julia                   Y/unknown         used               on      loaded by "using"
+Julia                   n/module          imported           on      loaded by "import"
+Julia                   n/module          namespace          on      only some symbols in it are imported
+Julia                   n/module          used               on      loaded by "using"
+Kconfig                 k/kconfig         source             on      kconfig file loaded with source directive
+LEX                     c/cond            grouping           on       conditions used for grouping of start or exclusive condition rules
+LdScript                i/inputSection    destination        on      specified as the destination of code and data
+LdScript                i/inputSection    discarded          on      discarded when linking
+LdScript                i/inputSection    mapped             on      mapped to output section
+LdScript                s/symbol          aliased            on      aliased with __attribute__((alias(...))) in C/C++ code
+LdScript                s/symbol          entrypoint         on      entry points
+Lua                     Y/unknown         referenced         off     referenced somehow
+M4                      I/macrofile       included           on      included macro
+M4                      I/macrofile       sincluded          on      silently included macro
+M4                      d/macro           undef              on      undefined
+Make                    I/makefile        included           on      included
+Make                    I/makefile        optional           on      optionally included
+Meson                   m/module          imported           on      imported
+NSIS                    i/script          included           on      included with !include
+Perl                    M/module          unused             on      specified in `no' built-in function
+Perl                    M/module          used               on      specified in `use' built-in function
+Perl                    h/heredoc         endmarker          on      end marker
+PkgConfig               p/pkg             conflicted         on      confliected
+PkgConfig               p/pkg             provided           on      provided
+PkgConfig               p/pkg             required           on      required
+Protobuf                D/protodef        imported           on      imported
+Protobuf                m/message         extension          on      extending the message
+Python                  Y/unknown         imported           on      imported from the other module
+Python                  Y/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
+Python                  i/module          imported           on      imported modules
+Python                  i/module          indirectlyImported on      module imported in alternative name
+Python                  i/module          namespace          on      namespace from where classes/variables/functions are imported
+R                       l/library         library            on      library attached by library function
+R                       l/library         require            on      library attached by require function
+R                       s/source          source             on      source loaded by source fucntion
+RpmSpec                 m/macro           undef              on      undefined
+RpmSpec                 p/patch           decl               on      declared for applying later
+Ruby                    L/library         loaded             on      loaded by "load" method
+Ruby                    L/library         required           on      loaded by "require" method
+Ruby                    L/library         requiredRel        on      loaded by "require_relative" method
+SCSS                    M/module          used               on      used
+SELinuxTypeEnforcement  t/type            aliased            on      aliased
+Sh                      h/heredoc         endmarker          on      end marker
+Sh                      s/script          loaded             on      loaded
+SystemTap               p/probe           attached           on      attached by code for probing
+SystemVerilog           m/module          decl               on      declaring instances
+SystemdUnit             u/unit            After              on      referred in After key
+SystemdUnit             u/unit            Before             on      referred in Before key
+SystemdUnit             u/unit            RequiredBy         on      referred in RequiredBy key
+SystemdUnit             u/unit            Requires           on      referred in Requires key
+SystemdUnit             u/unit            WantedBy           on      referred in WantedBy key
+SystemdUnit             u/unit            Wants              on      referred in Wants key
+TOML                    k/key             chainElt           off     (EXPERIMENTAL)used as an element in a key name chain like a.b.c
+Terraform               v/variable        assigned           on      assigned in Variable Definitions (.tfvars) files
+Tex                     e/environment     used               off     environment usage introduced by \begin{MyEnv}
+Tex                     i/xinput          bibliography       on      bibliography (.bib) file
+Tex                     i/xinput          included           on      external input file specified with \include
+Tex                     i/xinput          input              on      external input file specified with \input
+Thrift                  T/thriftFile      included           on      included file
+V                       Y/unknown         imported           on      imported symbol
+V                       p/module          foreignlang        on      representing a foreign language (i.e., C, JS...)
+V                       p/module          imported           on      imported module
+VHDL                    e/entity          desigend           on      designed by an architecture
+Vera                    d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
+Vera                    d/macro           undef              on      undefined
+Vera                    h/header          local              on      local header
+Vera                    h/header          system             on      system header
+Verilog                 m/module          decl               on      declaring instances
+Vim                     h/heredoc         endmarker          on      end marker
+Zsh                     f/function        autoloaded         on      function name passed to autoload built-in command
+Zsh                     h/heredoc         endmarker          on      end marker
+Zsh                     s/script          autoloaded         on      autoloaded
+Zsh                     s/script          loaded             on      loaded
 
 #
 # C.*
