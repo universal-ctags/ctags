@@ -215,12 +215,12 @@ static int externalParserBlockNestLevel;
  */
 static bool BraceFormat = false;
 
-void cppPushExternalParserBlock(void)
+extern void cppPushExternalParserBlock(void)
 {
 	externalParserBlockNestLevel++;
 }
 
-void cppPopExternalParserBlock(void)
+extern void cppPopExternalParserBlock(void)
 {
 	externalParserBlockNestLevel--;
 }
@@ -527,13 +527,13 @@ extern void cppUngetc (const int c)
 	Cpp.ungetDataSize++;
 }
 
-int cppUngetBufferSize(void)
+extern int cppUngetBufferSize(void)
 {
 	return Cpp.ungetBufferSize;
 }
 
 /*  This puts an entire string back into the input queue for the input File. */
-void cppUngetString(const char * string,int len)
+extern void cppUngetString(const char * string,int len)
 {
 	if(!string)
 		return;
@@ -1346,7 +1346,7 @@ static int skipOverDComment (void)
 	return c;
 }
 
-const vString * cppGetLastCharOrStringContents (void)
+extern const vString * cppGetLastCharOrStringContents (void)
 {
 	CXX_DEBUG_ASSERT(Cpp.charOrStringContents,"Shouldn't be called when CPP is not initialized");
 	return Cpp.charOrStringContents;
