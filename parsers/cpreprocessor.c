@@ -508,15 +508,15 @@ extern void cppEndStatement (void)
 */
 
 /*  This puts a character back into the input queue for the input File. */
-extern void cppUngetc (const int c)
+static void ungetBufferUngetc (ungetBuffer *ungetBuffer, const int c, vString *charOrStringContents)
 {
 	if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
 	{
-		Assert(Cpp.charOrStringContents != NULL);
+		Assert(charOrStringContents != NULL);
 		cppUngetc(c == STRING_SYMBOL ? '"' : '\'');
-		cppUngetString(vStringValue(Cpp.charOrStringContents), vStringLength(Cpp.charOrStringContents));
+		cppUngetString(vStringValue(charOrStringContents), vStringLength(charOrStringContents));
 		cppUngetc(c == STRING_SYMBOL ? '"' : '\'');
-		vStringClear(Cpp.charOrStringContents);
+		vStringClear(charOrStringContents);
 		return;
 	}
 	else if (c == EOF)
@@ -524,98 +524,132 @@ extern void cppUngetc (const int c)
 		return;
 	}
 
-	if(!Cpp.ungetBuffer.pointer)
+	if(!ungetBuffer->pointer)
 	{
 		// no unget data
-		if(!Cpp.ungetBuffer.buffer)
+		if(!ungetBuffer->buffer)
 		{
-			Cpp.ungetBuffer.buffer = (int *)eMalloc(8 * sizeof(int));
-			Cpp.ungetBuffer.size = 8;
+			ungetBuffer->buffer = (int *)eMalloc(8 * sizeof(int));
+			ungetBuffer->size = 8;
 		}
-		Assert(Cpp.ungetBuffer.size > 0);
-		Cpp.ungetBuffer.pointer = Cpp.ungetBuffer.buffer + Cpp.ungetBuffer.size - 1;
-		*(Cpp.ungetBuffer.pointer) = c;
-		Cpp.ungetBuffer.dataSize = 1;
+		Assert(ungetBuffer->size > 0);
+		ungetBuffer->pointer = ungetBuffer->buffer + ungetBuffer->size - 1;
+		*(ungetBuffer->pointer) = c;
+		ungetBuffer->dataSize = 1;
 		return;
 	}
 
 	// Already have some unget data in the buffer. Must prepend.
-	Assert(Cpp.ungetBuffer.buffer);
-	Assert(Cpp.ungetBuffer.size > 0);
-	Assert(Cpp.ungetBuffer.dataSize > 0);
-	Assert(Cpp.ungetBuffer.pointer >= Cpp.ungetBuffer.buffer);
+	Assert(ungetBuffer->buffer);
+	Assert(ungetBuffer->size > 0);
+	Assert(ungetBuffer->dataSize > 0);
+	Assert(ungetBuffer->pointer >= ungetBuffer->buffer);
 
-	if(Cpp.ungetBuffer.pointer == Cpp.ungetBuffer.buffer)
+	if(ungetBuffer->pointer == ungetBuffer->buffer)
 	{
-		Cpp.ungetBuffer.size += 8;
-		int * tmp = (int *)eMalloc(Cpp.ungetBuffer.size * sizeof(int));
-		memcpy(tmp+8,Cpp.ungetBuffer.pointer,Cpp.ungetBuffer.dataSize * sizeof(int));
-		eFree(Cpp.ungetBuffer.buffer);
-		Cpp.ungetBuffer.buffer = tmp;
-		Cpp.ungetBuffer.pointer = tmp + 7;
+		ungetBuffer->size += 8;
+		int * tmp = (int *)eMalloc(ungetBuffer->size * sizeof(int));
+		memcpy(tmp+8,ungetBuffer->pointer,ungetBuffer->dataSize * sizeof(int));
+		eFree(ungetBuffer->buffer);
+		ungetBuffer->buffer = tmp;
+		ungetBuffer->pointer = tmp + 7;
 	} else {
-		Cpp.ungetBuffer.pointer--;
+		ungetBuffer->pointer--;
 	}
 
-	*(Cpp.ungetBuffer.pointer) = c;
-	Cpp.ungetBuffer.dataSize++;
+	*(ungetBuffer->pointer) = c;
+	ungetBuffer->dataSize++;
 }
 
-extern int cppUngetBufferSize(void)
+static int ungetBufferSize (ungetBuffer *ungetBuffer)
 {
-	return Cpp.ungetBuffer.size;
+	return ungetBuffer->size;
 }
 
-/*  This puts an entire string back into the input queue for the input File. */
-extern void cppUngetString(const char * string,int len)
+static void ungetBufferUngetString(ungetBuffer *ungetBuffer, const char * string, int len)
 {
 	if(!string)
 		return;
 	if(len < 1)
 		return;
 
-	if(!Cpp.ungetBuffer.pointer)
+	if(!ungetBuffer->pointer)
 	{
 		// no unget data
-		if(!Cpp.ungetBuffer.buffer)
+		if(!ungetBuffer->buffer)
 		{
-			Cpp.ungetBuffer.size = 8 + len;
-			Cpp.ungetBuffer.buffer = (int *)eMalloc(Cpp.ungetBuffer.size * sizeof(int));
-		} else if(Cpp.ungetBuffer.size < len)
+			ungetBuffer->size = 8 + len;
+			ungetBuffer->buffer = (int *)eMalloc(ungetBuffer->size * sizeof(int));
+		} else if(ungetBuffer->size < len)
 		{
-			Cpp.ungetBuffer.size = 8 + len;
-			Cpp.ungetBuffer.buffer = (int *)eRealloc(Cpp.ungetBuffer.buffer,Cpp.ungetBuffer.size * sizeof(int));
+			ungetBuffer->size = 8 + len;
+			ungetBuffer->buffer = (int *)eRealloc(ungetBuffer->buffer,ungetBuffer->size * sizeof(int));
 		}
-		Cpp.ungetBuffer.pointer = Cpp.ungetBuffer.buffer + Cpp.ungetBuffer.size - len;
+		ungetBuffer->pointer = ungetBuffer->buffer + ungetBuffer->size - len;
 	} else {
 		// Already have some unget data in the buffer. Must prepend.
-		Assert(Cpp.ungetBuffer.buffer);
-		Assert(Cpp.ungetBuffer.size > 0);
-		Assert(Cpp.ungetBuffer.dataSize > 0);
-		Assert(Cpp.ungetBuffer.pointer >= Cpp.ungetBuffer.buffer);
+		Assert(ungetBuffer->buffer);
+		Assert(ungetBuffer->size > 0);
+		Assert(ungetBuffer->dataSize > 0);
+		Assert(ungetBuffer->pointer >= ungetBuffer->buffer);
 
-		if(Cpp.ungetBuffer.size < (Cpp.ungetBuffer.dataSize + len))
+		if(ungetBuffer->size < (ungetBuffer->dataSize + len))
 		{
-			Cpp.ungetBuffer.size = 8 + len + Cpp.ungetBuffer.dataSize;
-			int * tmp = (int *)eMalloc(Cpp.ungetBuffer.size * sizeof(int));
-			memcpy(tmp + 8 + len,Cpp.ungetBuffer.pointer,Cpp.ungetBuffer.dataSize * sizeof(int));
-			eFree(Cpp.ungetBuffer.buffer);
-			Cpp.ungetBuffer.buffer = tmp;
-			Cpp.ungetBuffer.pointer = tmp + 8;
+			ungetBuffer->size = 8 + len + ungetBuffer->dataSize;
+			int * tmp = (int *)eMalloc(ungetBuffer->size * sizeof(int));
+			memcpy(tmp + 8 + len,ungetBuffer->pointer,ungetBuffer->dataSize * sizeof(int));
+			eFree(ungetBuffer->buffer);
+			ungetBuffer->buffer = tmp;
+			ungetBuffer->pointer = tmp + 8;
 		} else {
-			Cpp.ungetBuffer.pointer -= len;
-			Assert(Cpp.ungetBuffer.pointer >= Cpp.ungetBuffer.buffer);
+			ungetBuffer->pointer -= len;
+			Assert(ungetBuffer->pointer >= ungetBuffer->buffer);
 		}
 	}
 
-	int * p = Cpp.ungetBuffer.pointer;
+	int * p = ungetBuffer->pointer;
 	const char * s = string;
 	const char * e = string + len;
 
 	while(s < e)
 		*p++ = *s++;
 
-	Cpp.ungetBuffer.dataSize += len;
+	ungetBuffer->dataSize += len;
+}
+
+static int ungetBufferGetcFromUngetBuffer (ungetBuffer *ungetBuffer)
+{
+	if(ungetBuffer->pointer)
+	{
+		Assert(ungetBuffer->buffer);
+		Assert(ungetBuffer->size > 0);
+		Assert(ungetBuffer->dataSize > 0);
+
+		int c = *(ungetBuffer->pointer);
+		ungetBuffer->dataSize--;
+		if(ungetBuffer->dataSize > 0)
+			ungetBuffer->pointer++;
+		else
+			ungetBuffer->pointer = NULL;
+		return c;
+	}
+	return EOF;
+}
+
+extern void cppUngetc (const int c)
+{
+	ungetBufferUngetc (&Cpp.ungetBuffer , c, Cpp.charOrStringContents);
+}
+
+extern int cppUngetBufferSize(void)
+{
+	return ungetBufferSize (&Cpp.ungetBuffer);
+}
+
+/*  This puts an entire string back into the input queue for the input File. */
+extern void cppUngetString(const char * string, int len)
+{
+	ungetBufferUngetString (&Cpp.ungetBuffer, string, len);
 }
 
 extern void cppUngetMacroTokens (cppMacroTokens *tokens)
@@ -641,20 +675,11 @@ extern void cppUngetMacroTokens (cppMacroTokens *tokens)
 
 static int cppGetcFromUngetBufferOrFile(void)
 {
-	if(Cpp.ungetBuffer.pointer)
-	{
-		Assert(Cpp.ungetBuffer.buffer);
-		Assert(Cpp.ungetBuffer.size > 0);
-		Assert(Cpp.ungetBuffer.dataSize > 0);
-
-		int c = *(Cpp.ungetBuffer.pointer);
-		Cpp.ungetBuffer.dataSize--;
-		if(Cpp.ungetBuffer.dataSize > 0)
-			Cpp.ungetBuffer.pointer++;
-		else
-			Cpp.ungetBuffer.pointer = NULL;
+	int c = ungetBufferGetcFromUngetBuffer (&Cpp.ungetBuffer);
+	if (c != EOF)
 		return c;
-	}
+
+	/* Or */
 
 	if (Cpp.macroInUse)
 		cppClearMacroInUse (&Cpp.macroInUse);
