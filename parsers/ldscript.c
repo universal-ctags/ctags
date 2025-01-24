@@ -269,9 +269,19 @@ static bool collectMacroArguments (ptrArray *args)
 	tokenInfo *const t = newLdScriptToken ();
 	int depth = 1;
 
+	unsigned long ln = getInputLineNumber ();
+	MIOPos pos = getInputFilePosition ();
+	/* Above initial values for ln and pos are not used: just
+	   for suppressing compiler warnings. */
+
 	do
 	{
 		tokenRead (t);
+		if (s && vStringLength (s) == 0)
+		{
+			ln = t->lineNumber;
+			pos = t->filePosition;
+		}
 
 		if (tokenIsType (t, EOF))
 			break;
@@ -280,8 +290,9 @@ static bool collectMacroArguments (ptrArray *args)
 			depth--;
 			if (depth == 0)
 			{
-				char *cstr = vStringDeleteUnwrap (s);
-				ptrArrayAdd (args, cstr);
+				cppMacroArg *a = cppMacroArgNew (vStringDeleteUnwrap (s), true,
+												 ln, pos);
+				ptrArrayAdd (args, a);
 				s = NULL;
 			}
 			else
@@ -294,8 +305,9 @@ static bool collectMacroArguments (ptrArray *args)
 		}
 		else if (tokenIsTypeVal (t, ','))
 		{
-			char *cstr = vStringDeleteUnwrap (s);
-			ptrArrayAdd (args, cstr);
+			cppMacroArg *a = cppMacroArgNew (vStringDeleteUnwrap (s), true,
+											 ln, pos);
+			ptrArrayAdd (args, a);
 			s = vStringNew ();
 		}
 		else
@@ -317,7 +329,8 @@ static bool collectMacroArguments (ptrArray *args)
 	return (depth > 0)? false: true;
 }
 
-static bool expandCppMacro (cppMacroInfo *macroInfo)
+static bool expandCppMacro (cppMacroInfo *macroInfo,
+							unsigned long lineNumber, MIOPos filePosition)
 {
 	ptrArray *args = NULL;
 
@@ -335,7 +348,7 @@ static bool expandCppMacro (cppMacroInfo *macroInfo)
 			return false;
 		}
 
-		args = ptrArrayNew (eFree);
+		args = ptrArrayNew (cppMacroArgDelete);
 		if (!collectMacroArguments (args))
 		{
 			ptrArrayDelete (args);
@@ -354,7 +367,11 @@ static bool expandCppMacro (cppMacroInfo *macroInfo)
 	}
 #endif
 
-	cppBuildMacroReplacementWithPtrArrayAndUngetResult (macroInfo, args);
+	{
+		cppMacroTokens *tokens = cppExpandMacro (macroInfo, args,
+												 lineNumber, filePosition);
+		cppUngetMacroTokens (tokens);
+	}
 
 	ptrArrayDelete (args);		/* NULL is acceptable. */
 	return true;
@@ -378,7 +395,7 @@ static void processCppMacroX (tokenInfo *const token)
 			TRACE_PRINT ("Overly uesd macro %s<%p> useCount: %d (> %d)",
 						 vStringValue (token->string), macroInfo, macroInfo->useCount,
 						 CPP_MAXIMUM_MACRO_USE_COUNT);
-		else if (expandCppMacro (macroInfo))
+		else if (expandCppMacro (macroInfo, token->lineNumber, token->filePosition))
 			readToken (token, NULL);
 	}
 }

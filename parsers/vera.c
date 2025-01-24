@@ -1178,7 +1178,7 @@ static void analyzeIdentifier (tokenInfo *const token)
 
 	// C: check for ignored token
 	// (FIXME: java doesn't support -I... but maybe it should?)
-	const cppMacroInfo * macro = cppFindMacro(name);
+	cppMacroInfo * macro = cppFindMacro(name);
 
 	if(macro)
 	{
@@ -1194,7 +1194,7 @@ static void analyzeIdentifier (tokenInfo *const token)
 		if(macro->replacements)
 		{
 			// There is a replacement: analyze it
-			replacement = cppBuildMacroReplacement(macro,NULL,0);
+			replacement = cppExpandMacroAsNewString(macro,NULL);
 			name = replacement ? vStringValue(replacement) : NULL;
 		} else {
 			// There is no replacement: just ignore

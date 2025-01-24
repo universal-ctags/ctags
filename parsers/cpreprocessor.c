@@ -164,6 +164,19 @@ struct sCppMacroReplacementPartInfo {
 	struct sCppMacroReplacementPartInfo * next;
 };
 
+struct sCppMacroArg {
+	const char *str;
+	unsigned long lineNumber;
+	MIOPos filePosition;
+	bool free_str;
+};
+
+struct sCppMacroTokens {
+	/* TODO */
+	vString *vstr;
+	cppMacroInfo *macro;
+};
+
 typedef enum {
 	CPREPRO_MACRO_KIND_UNDEF_ROLE,
 	CPREPRO_MACRO_KIND_CONDITION_ROLE,
@@ -593,8 +606,10 @@ extern void cppUngetString(const char * string,int len)
 	Cpp.ungetDataSize += len;
 }
 
-extern void cppUngetStringBuiltByMacro(const char * string,int len, cppMacroInfo *macro)
+extern void cppUngetMacroTokens (cppMacroTokens *tokens)
 {
+	cppMacroInfo *macro = tokens->macro;
+
 	if (macro->useCount == 0)
 	{
 		cppMacroInfo *m = Cpp.macroInUse;
@@ -606,7 +621,10 @@ extern void cppUngetStringBuiltByMacro(const char * string,int len, cppMacroInfo
 	CXX_DEBUG_PRINT("Macro <%p> increment useCount: %d->%d", macro,
 					(macro->useCount - 1), macro->useCount);
 
-	cppUngetString (string, len);
+	cppUngetString (vStringValue (tokens->vstr),
+					vStringLength (tokens->vstr));
+	vStringDelete (tokens->vstr);
+	eFree (tokens);
 }
 
 static int cppGetcFromUngetBufferOrFile(void)
@@ -2087,19 +2105,50 @@ extern cppMacroInfo * cppFindMacro (const char *const name)
 	return NULL;
 }
 
-extern vString * cppBuildMacroReplacement(
-		const cppMacroInfo * macro,
-		const char ** parameters, /* may be NULL */
-		int parameterCount
-	)
+extern cppMacroArg *cppMacroArgNew (const char *str, bool free_str_when_deleting,
+									unsigned long lineNumber, MIOPos filePosition)
+{
+	cppMacroArg *a = xMalloc (1, cppMacroArg);
+
+	a->str = str;
+	a->free_str = free_str_when_deleting;
+	a->lineNumber = lineNumber;
+	a->filePosition = filePosition;
+
+	return a;
+}
+
+extern void cppMacroArgDelete (void *macroArg)
+{
+	cppMacroArg *a = (cppMacroArg *)macroArg;
+	if (a->free_str)
+		eFree ((void *)a->str);
+	a->str = NULL;
+	eFree (macroArg);
+}
+
+extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro,
+									   const ptrArray *args,
+									   unsigned long lineNumber CTAGS_ATTR_UNUSED,
+									   MIOPos filePosition CTAGS_ATTR_UNUSED)
 {
 	if(!macro)
 		return NULL;
 
+	if(cppUngetBufferSize () >= CPP_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
+	{
+		CXX_DEBUG_PRINT ("Ungetbuffer overflow when processing \"%s\": %d",
+						 macro->name, cppUngetBufferSize());
+		return NULL;
+	}
+
 	if(!macro->replacements)
 		return NULL;
 
-	vString * ret = vStringNew();
+	vString * vstr = vStringNew();
+	cppMacroTokens *tokens = xMalloc (1, cppMacroTokens);
+	tokens->vstr = vstr;
+	tokens->macro = macro;
 
 	cppMacroReplacementPartInfo * r = macro->replacements;
 
@@ -2108,79 +2157,58 @@ extern vString * cppBuildMacroReplacement(
 		if(r->parameterIndex < 0)
 		{
 			if(r->constant)
-				vStringCat(ret,r->constant);
+				vStringCat(vstr,r->constant);
 		} else {
-			if(parameters && (r->parameterIndex < parameterCount))
+			if(args && (r->parameterIndex < ptrArrayCount (args)))
 			{
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY)
-					vStringPut(ret,'"');
+					vStringPut(vstr,'"');
 
-				vStringCatS(ret,parameters[r->parameterIndex]);
+				cppMacroArg *a;
+
+				a = ptrArrayItem (args, r->parameterIndex);
+				vStringCatS(vstr, a->str);
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_VARARGS)
 				{
 					int idx = r->parameterIndex + 1;
-					while(idx < parameterCount)
+					while(idx < ptrArrayCount (args))
 					{
-						vStringPut(ret,',');
-						vStringCatS(ret,parameters[idx]);
+						vStringPut(vstr,',');
+						a = ptrArrayItem (args, idx);
+						vStringCatS(vstr, a->str);
 						idx++;
 					}
 				}
 
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY)
-					vStringPut(ret,'"');
+					vStringPut(vstr,'"');
 			}
 		}
 
 		r = r->next;
 	}
 
-	return ret;
+	return tokens;
 }
 
-extern void cppBuildMacroReplacementWithPtrArrayAndUngetResult(
-		cppMacroInfo * macro,
-		const ptrArray * args)
+#ifdef DEBUG
+extern
+#else
+static
+#endif
+vString *cppFlattenMacroTokensToNewString (cppMacroTokens *tokens)
 {
-	vString * replacement = NULL;
+	return vStringNewCopy (tokens->vstr);
+}
 
-	// Detect other cases of nasty macro expansion that cause
-	// the unget buffer to grow fast (but the token chain to grow slowly)
-	//    -D'p=a' -D'a=p+p'
-	if ((cppUngetBufferSize() < CPP_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
-		&& macro->replacements)
-	{
-		int argc = 0;
-		const char ** argv = NULL;
-
-		if (args)
-		{
-			argc = ptrArrayCount (args);
-			argv = (const char **)eMalloc (sizeof(char *) * argc);
-			for (int i = 0; i < argc; i++)
-			{
-				TRACE_PRINT("Arg[%d] for %s<%p>: %s",
-							i, macro->name, macro, ptrArrayItem (args, i));
-				argv[i] = ptrArrayItem (args, i);
-			}
-		}
-
-		replacement = cppBuildMacroReplacement(macro, argv, argc);
-
-		if (argv)
-			eFree ((void *)argv);
-	}
-
-	if (replacement)
-	{
-		cppUngetStringBuiltByMacro(vStringValue(replacement), vStringLength(replacement),
-								   macro);
-		TRACE_PRINT("Replacement for %s<%p>: %s", macro->name, macro, vStringValue (replacement));
-		vStringDelete (replacement);
-	}
-	else
-		TRACE_PRINT("Replacement for %s<%p>: ", macro->name, macro);
-
+extern vString *cppExpandMacroAsNewString(cppMacroInfo * macro, const ptrArray *args)
+{
+	cppMacroTokens * tokens = cppExpandMacro (macro, args,
+											  getInputLineNumber (),
+											  getInputFilePosition ());
+	if (!tokens)
+		return NULL;
+	return cppFlattenMacroTokensToNewString (tokens);
 }
 
 static void saveIgnoreToken(const char * ignoreToken)
