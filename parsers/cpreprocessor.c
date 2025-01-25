@@ -119,7 +119,7 @@ typedef struct sCppState {
 	langType lang;
 	langType clientLang;
 
-	ungetBuffer  ungetBuffer;
+	ungetBuffer  *ungetBuffer;
 
 	/* the contents of the last SYMBOL_CHAR or SYMBOL_STRING */
 	vString * charOrStringContents;
@@ -257,12 +257,7 @@ extern void cppPopExternalParserBlock(void)
 static cppState Cpp = {
 	.lang = LANG_IGNORE,
 	.clientLang = LANG_IGNORE,
-	.ungetBuffer = {
-		.buffer = NULL,
-		.size = 0,
-		.pointer = NULL,
-		.dataSize = 0,
-	},
+	.ungetBuffer = NULL,
 	.charOrStringContents = NULL,
 	.resolveRequired = false,
 	.hasAtLiteralStrings = false,
@@ -316,6 +311,25 @@ extern unsigned int cppGetDirectiveNestLevel (void)
 	return Cpp.directive.nestLevel;
 }
 
+static ungetBuffer *ungetBufferNew  (void)
+{
+	return xCalloc (1, ungetBuffer);
+}
+
+static void ungetBufferDelete (ungetBuffer *ub)
+{
+	if (!ub)
+		return;
+
+	if (ub->buffer)
+	{
+		eFree (ub->buffer);
+		ub->buffer = NULL;
+	}
+
+	eFree (ub);
+}
+
 static void cppInitCommon(langType clientLang,
 		     const bool state, const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
@@ -343,12 +357,7 @@ static void cppInitCommon(langType clientLang,
 	}
 
 	Cpp.clientLang = clientLang;
-	Cpp.ungetBuffer = (ungetBuffer) {
-		.buffer = NULL,
-		.size = 0,
-		.pointer = NULL,
-		.dataSize = 0,
-	};
+	Cpp.ungetBuffer = ungetBufferNew ();
 
 	CXX_DEBUG_ASSERT(!Cpp.charOrStringContents,"This string should be null when CPP is not initialized");
 	Cpp.charOrStringContents = vStringNew();
@@ -467,11 +476,8 @@ extern void cppTerminate (void)
 		Cpp.directive.name = NULL;
 	}
 
-	if(Cpp.ungetBuffer.buffer)
-	{
-		eFree(Cpp.ungetBuffer.buffer);
-		Cpp.ungetBuffer.buffer = NULL;
-	}
+	ungetBufferDelete (Cpp.ungetBuffer); /* NULL is acceptable */
+	Cpp.ungetBuffer = NULL;
 
 	if(Cpp.charOrStringContents)
 	{
@@ -638,18 +644,18 @@ static int ungetBufferGetcFromUngetBuffer (ungetBuffer *ungetBuffer)
 
 extern void cppUngetc (const int c)
 {
-	ungetBufferUngetc (&Cpp.ungetBuffer , c, Cpp.charOrStringContents);
+	ungetBufferUngetc (Cpp.ungetBuffer , c, Cpp.charOrStringContents);
 }
 
 extern int cppUngetBufferSize(void)
 {
-	return ungetBufferSize (&Cpp.ungetBuffer);
+	return ungetBufferSize (Cpp.ungetBuffer);
 }
 
 /*  This puts an entire string back into the input queue for the input File. */
 extern void cppUngetString(const char * string, int len)
 {
-	ungetBufferUngetString (&Cpp.ungetBuffer, string, len);
+	ungetBufferUngetString (Cpp.ungetBuffer, string, len);
 }
 
 extern void cppUngetMacroTokens (cppMacroTokens *tokens)
@@ -675,7 +681,7 @@ extern void cppUngetMacroTokens (cppMacroTokens *tokens)
 
 static int cppGetcFromUngetBufferOrFile(void)
 {
-	int c = ungetBufferGetcFromUngetBuffer (&Cpp.ungetBuffer);
+	int c = ungetBufferGetcFromUngetBuffer (Cpp.ungetBuffer);
 	if (c != EOF)
 		return c;
 
