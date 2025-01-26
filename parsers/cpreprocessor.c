@@ -357,7 +357,7 @@ static void cppInitCommon(langType clientLang,
 	}
 
 	Cpp.clientLang = clientLang;
-	Cpp.ungetBuffer = ungetBufferNew ();
+	Cpp.ungetBuffer = NULL;
 
 	CXX_DEBUG_ASSERT(!Cpp.charOrStringContents,"This string should be null when CPP is not initialized");
 	Cpp.charOrStringContents = vStringNew();
@@ -644,17 +644,23 @@ static int ungetBufferGetcFromUngetBuffer (ungetBuffer *ungetBuffer)
 
 extern void cppUngetc (const int c)
 {
+	if (Cpp.ungetBuffer == NULL)
+		Cpp.ungetBuffer = ungetBufferNew ();
 	ungetBufferUngetc (Cpp.ungetBuffer , c, Cpp.charOrStringContents);
 }
 
 extern int cppUngetBufferSize(void)
 {
+	if (Cpp.ungetBuffer == NULL)
+		return 0;
 	return ungetBufferSize (Cpp.ungetBuffer);
 }
 
 /*  This puts an entire string back into the input queue for the input File. */
 extern void cppUngetString(const char * string, int len)
 {
+	if (Cpp.ungetBuffer == NULL)
+		Cpp.ungetBuffer = ungetBufferNew ();
 	ungetBufferUngetString (Cpp.ungetBuffer, string, len);
 }
 
@@ -681,9 +687,12 @@ extern void cppUngetMacroTokens (cppMacroTokens *tokens)
 
 static int cppGetcFromUngetBufferOrFile(void)
 {
-	int c = ungetBufferGetcFromUngetBuffer (Cpp.ungetBuffer);
-	if (c != EOF)
-		return c;
+	if (Cpp.ungetBuffer)
+	{
+		int c = ungetBufferGetcFromUngetBuffer (Cpp.ungetBuffer);
+		if (c != EOF)
+			return c;
+	}
 
 	/* Or */
 
