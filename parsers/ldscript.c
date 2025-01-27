@@ -394,8 +394,8 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	} while (c == ' ' || c== '\t' || c == '\f' || c == '\r' || c == '\n'
 			 || c == CPP_STRING_SYMBOL || c == CPP_CHAR_SYMBOL);
 
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
+	token->lineNumber   = cppGetInputLineNumber ();
+	token->filePosition = cppGetInputFilePosition ();
 
 	switch (c)
 	{
@@ -834,7 +834,12 @@ static void parseVersions (tokenInfo *const token)
 		if (token->type == '{')
 		{
 			vString *anonver = anonGenerateNew ("ver", K_VERSION);
-			makeSimpleTag (anonver, K_VERSION);
+			{
+				tagEntryInfo e;
+				initTagEntry (&e, vStringValue (anonver), K_VERSION);
+				updateTagLine (&e, token->lineNumber, token->filePosition);
+				makeTagEntry (&e);
+			}
 			vStringDelete(anonver);
 			tokenUnread (token);
 			tokenSkipOverPair (curly);
