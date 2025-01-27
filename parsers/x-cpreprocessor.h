@@ -201,6 +201,9 @@ extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro, const ptrArray *arg
 									   unsigned long lineNumber, MIOPos filePosition);
 extern vString *cppExpandMacroAsNewString (cppMacroInfo * macro, const ptrArray *args);
 
+extern unsigned long cppGetInputLineNumber (void);
+extern MIOPos cppGetInputFilePosition (void);
+
 #ifdef DEBUG
 extern vString *cppFlattenMacroTokensToNewString (cppMacroTokens *tokens);
 extern void cppDebugPutc (const int level, const int c);
