@@ -1292,8 +1292,8 @@ bool cxxParserParseNextToken(void)
 	cppBeginStatement();
 
 	// This must be done after getting char from input
-	t->iLineNumber = getInputLineNumber();
-	t->oFilePosition = getInputFilePosition();
+	t->iLineNumber = cppGetInputLineNumber();
+	t->oFilePosition = cppGetInputFilePosition();
 
 	if(g_cxx.iChar == EOF)
 	{

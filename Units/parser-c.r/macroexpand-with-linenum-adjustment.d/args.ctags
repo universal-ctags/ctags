@@ -1,0 +1,6 @@
+--sort=no
+--fields=+ne
+-D SYSCALL_DEFINE3(name,...)=long name(__VA_ARGS__)
+--param-CPreProcessor._expand=1
+--fields=+{signature}
+--fields-C=+{macrodef}

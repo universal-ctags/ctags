@@ -13,6 +13,7 @@
 #include "vstring.h"
 #include "read.h"
 #include "objpool.h"
+#include "../x-cpreprocessor.h"
 
 #include "cxx_token_chain.h"
 #include "cxx_debug.h"
@@ -158,8 +159,8 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(unsigned int uTagKind, const char *
 	anonGenerate (t->pszWord, szPrefix? szPrefix: "__anon", uTagKind);
 	t->eType = CXXTokenTypeIdentifier;
 	t->bFollowedBySpace = true;
-	t->iLineNumber = getInputLineNumber();
-	t->oFilePosition = getInputFilePosition();
+	t->iLineNumber = cppGetInputLineNumber();
+	t->oFilePosition = cppGetInputFilePosition();
 
 	return t;
 }
