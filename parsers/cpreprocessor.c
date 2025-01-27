@@ -120,6 +120,7 @@ typedef struct sCppState {
 	langType clientLang;
 
 	ungetBuffer  *ungetBuffer;
+	ptrArray *ungetBufferStack;
 
 	/* the contents of the last SYMBOL_CHAR or SYMBOL_STRING */
 	vString * charOrStringContents;
@@ -178,10 +179,15 @@ struct sCppMacroArg {
 };
 
 struct sCppMacroTokens {
-	/* TODO */
-	vString *vstr;
+	ptrArray *tarray;
 	cppMacroInfo *macro;
 };
+
+typedef struct sCppMacroToken {
+	const char *str;
+	unsigned long lineNumber;
+	MIOPos filePosition;
+} cppMacroToken;
 
 typedef enum {
 	CPREPRO_MACRO_KIND_UNDEF_ROLE,
@@ -258,6 +264,7 @@ static cppState Cpp = {
 	.lang = LANG_IGNORE,
 	.clientLang = LANG_IGNORE,
 	.ungetBuffer = NULL,
+	.ungetBufferStack = NULL,
 	.charOrStringContents = NULL,
 	.resolveRequired = false,
 	.hasAtLiteralStrings = false,
@@ -296,6 +303,8 @@ static cppState Cpp = {
 
 static hashTable *makeMacroTable (void);
 static cppMacroInfo * saveMacro(hashTable *table, const char * macro);
+
+static void cppMacroTokensDelete (cppMacroTokens *tokens);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -358,6 +367,7 @@ static void cppInitCommon(langType clientLang,
 
 	Cpp.clientLang = clientLang;
 	Cpp.ungetBuffer = NULL;
+	Cpp.ungetBufferStack = ptrArrayNew ((ptrArrayDeleteFunc)ungetBufferDelete);
 
 	CXX_DEBUG_ASSERT(!Cpp.charOrStringContents,"This string should be null when CPP is not initialized");
 	Cpp.charOrStringContents = vStringNew();
@@ -478,6 +488,8 @@ extern void cppTerminate (void)
 
 	ungetBufferDelete (Cpp.ungetBuffer); /* NULL is acceptable */
 	Cpp.ungetBuffer = NULL;
+	ptrArrayDelete (Cpp.ungetBufferStack);
+	Cpp.ungetBufferStack = NULL;
 
 	if(Cpp.charOrStringContents)
 	{
@@ -653,7 +665,14 @@ extern int cppUngetBufferSize(void)
 {
 	if (Cpp.ungetBuffer == NULL)
 		return 0;
-	return ungetBufferSize (Cpp.ungetBuffer);
+
+	int size = ungetBufferSize (Cpp.ungetBuffer);
+	for (size_t i = 0; i < ptrArrayCount (Cpp.ungetBufferStack); i++)
+	{
+		ungetBuffer *ub = ptrArrayItem (Cpp.ungetBufferStack, i);
+		i += ungetBufferSize (ub);
+	}
+	return size;
 }
 
 /*  This puts an entire string back into the input queue for the input File. */
@@ -679,19 +698,48 @@ extern void cppUngetMacroTokens (cppMacroTokens *tokens)
 	CXX_DEBUG_PRINT("Macro <%p> increment useCount: %d->%d", macro,
 					(macro->useCount - 1), macro->useCount);
 
-	cppUngetString (vStringValue (tokens->vstr),
-					vStringLength (tokens->vstr));
-	vStringDelete (tokens->vstr);
-	eFree (tokens);
+	ptrArray *a = tokens->tarray;
+	if (ptrArrayIsEmpty (a))
+	{
+		cppMacroTokensDelete (tokens);
+		return;
+	}
+
+	if (Cpp.ungetBuffer)
+	{
+		ptrArrayAdd(Cpp.ungetBufferStack, Cpp.ungetBuffer);
+		Cpp.ungetBuffer = NULL;
+	}
+
+	for(size_t i = ptrArrayCount (a); i > 0; i--)
+	{
+		cppMacroToken *t = ptrArrayItem (a, i - 1);
+		ungetBuffer *ub = ungetBufferNew();
+		ungetBufferUngetString (ub, t->str, strlen (t->str));
+		ptrArrayAdd(Cpp.ungetBufferStack, ub);
+	}
+
+	if (!ptrArrayIsEmpty (Cpp.ungetBufferStack))
+		Cpp.ungetBuffer = ptrArrayRemoveLast (Cpp.ungetBufferStack);
+	cppMacroTokensDelete (tokens);
 }
 
 static int cppGetcFromUngetBufferOrFile(void)
 {
+ retry:
 	if (Cpp.ungetBuffer)
 	{
 		int c = ungetBufferGetcFromUngetBuffer (Cpp.ungetBuffer);
 		if (c != EOF)
 			return c;
+
+		ungetBufferDelete (Cpp.ungetBuffer);
+		Cpp.ungetBuffer = NULL;
+		if (!ptrArrayIsEmpty (Cpp.ungetBufferStack))
+		{
+			Cpp.ungetBuffer = ptrArrayRemoveLast (Cpp.ungetBufferStack);
+			goto retry;
+		}
 	}
 
 	/* Or */
@@ -2179,10 +2227,47 @@ extern void cppMacroArgDelete (void *macroArg)
 	eFree (macroArg);
 }
 
+static cppMacroToken *cppMacroTokenNew(unsigned long lineNumber, MIOPos filePosition)
+{
+	cppMacroToken *t = xMalloc (1, cppMacroToken);
+	t->str = NULL;
+	t->lineNumber = lineNumber;
+	t->filePosition = filePosition;
+	return t;
+}
+
+static void cppMacroTokenDelete (cppMacroToken *t)
+{
+	if (t->str)
+		eFree ((void *)t->str);
+	t->str = NULL;
+	eFree (t);
+}
+
+static cppMacroTokens *cppMacroTokensNew (cppMacroInfo * macro)
+{
+	cppMacroTokens *r = xMalloc (1, cppMacroTokens);
+
+	r->tarray = ptrArrayNew ((ptrArrayDeleteFunc)cppMacroTokenDelete);
+	r->macro = macro;
+
+	return r;
+}
+
+static void cppMacroTokensDelete (cppMacroTokens *tokens)
+{
+	if (tokens)
+	{
+		ptrArrayDelete (tokens->tarray);
+		tokens->tarray = NULL;
+		eFree (tokens);
+	}
+}
+
 extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro,
 									   const ptrArray *args,
-									   unsigned long lineNumber CTAGS_ATTR_UNUSED,
-									   MIOPos filePosition CTAGS_ATTR_UNUSED)
+									   unsigned long lineNumber,
+									   MIOPos filePosition)
 {
 	if(!macro)
 		return NULL;
@@ -2197,11 +2282,11 @@ extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro,
 	if(!macro->replacements)
 		return NULL;
 
-	vString * vstr = vStringNew();
-	cppMacroTokens *tokens = xMalloc (1, cppMacroTokens);
-	tokens->vstr = vstr;
-	tokens->macro = macro;
+	cppMacroTokens *tokens = cppMacroTokensNew (macro);
+	cppMacroToken *t = cppMacroTokenNew(lineNumber, filePosition);
+	ptrArrayAdd (tokens->tarray, t);
 
+	vString * vstr = vStringNew();
 	cppMacroReplacementPartInfo * r = macro->replacements;
 
 	while(r)
@@ -2209,24 +2294,41 @@ extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro,
 		if(r->parameterIndex < 0)
 		{
 			if(r->constant)
-				vStringCat(vstr,r->constant);
+			{
+				/* We assume the constant parts of the macro definition are
+				 * at the beginning of the current macro expansion. */
+				t->str = vStringDeleteUnwrap (vstr);
+
+				t = cppMacroTokenNew(lineNumber, filePosition);
+				ptrArrayAdd (tokens->tarray, t);
+
+				vstr = vStringNewCopy (r->constant);
+			}
 		} else {
 			if(args && (r->parameterIndex < ptrArrayCount (args)))
 			{
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY)
 					vStringPut(vstr,'"');
+				t->str = vStringDeleteUnwrap (vstr);
 
-				cppMacroArg *a;
+				cppMacroArg *a = ptrArrayItem (args, r->parameterIndex);
+				t = cppMacroTokenNew(a->lineNumber, a->filePosition);
+				ptrArrayAdd (tokens->tarray, t);
 
-				a = ptrArrayItem (args, r->parameterIndex);
-				vStringCatS(vstr, a->str);
+				vstr = vStringNewInit(a->str);
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_VARARGS)
 				{
 					int idx = r->parameterIndex + 1;
 					while(idx < ptrArrayCount (args))
 					{
 						vStringPut(vstr,',');
+						t->str = vStringDeleteUnwrap (vstr);
+
 						a = ptrArrayItem (args, idx);
+						t = cppMacroTokenNew(a->lineNumber, a->filePosition);
+						ptrArrayAdd (tokens->tarray, t);
+						vstr = vStringNew();
+
 						vStringCatS(vstr, a->str);
 						idx++;
 					}
@@ -2240,6 +2342,9 @@ extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro,
 		r = r->next;
 	}
 
+	if (t->str == NULL)
+		t->str = vStringDeleteUnwrap (vstr);
+
 	return tokens;
 }
 
@@ -2250,7 +2355,15 @@ static
 #endif
 vString *cppFlattenMacroTokensToNewString (cppMacroTokens *tokens)
 {
-	return vStringNewCopy (tokens->vstr);
+	vString *vstr = vStringNew ();
+
+	for (size_t i = 0; i < ptrArrayCount (tokens->tarray); i++)
+	{
+		cppMacroToken *t = ptrArrayItem (tokens->tarray, i);
+		vStringCatS (vstr, t->str);
+	}
+
+	return vstr;
 }
 
 extern vString *cppExpandMacroAsNewString(cppMacroInfo * macro, const ptrArray *args)
@@ -2260,7 +2373,10 @@ extern vString *cppExpandMacroAsNewString(cppMacroInfo * macro, const ptrArray *
 											  getInputFilePosition ());
 	if (!tokens)
 		return NULL;
-	return cppFlattenMacroTokensToNewString (tokens);
+
+	vString *vstr = cppFlattenMacroTokensToNewString (tokens);
+	cppMacroTokensDelete (tokens);
+	return vstr;
 }
 
 static void saveIgnoreToken(const char * ignoreToken)
