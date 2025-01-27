@@ -19,7 +19,12 @@
 
 SECTIONS
 {
-	INIT_TEXT_SECTION(PAGE_SIZE,(.text.startup),(.init.text .init.text.*))
+	INIT_TEXT_SECTION(PAGE_SIZE
+	,
+	(.text.startup)
+	,
+	(.init.text .init.text.*)
+	)
 #ifdef CONFIG_X86_64
 	:init
 #endif

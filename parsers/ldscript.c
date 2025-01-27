@@ -269,8 +269,8 @@ static bool collectMacroArguments (ptrArray *args)
 	tokenInfo *const t = newLdScriptToken ();
 	int depth = 1;
 
-	unsigned long ln = getInputLineNumber ();
-	MIOPos pos = getInputFilePosition ();
+	unsigned long ln = cppGetInputLineNumber ();
+	MIOPos pos = cppGetInputFilePosition ();
 	/* Above initial values for ln and pos are not used: just
 	   for suppressing compiler warnings. */
 
@@ -418,8 +418,8 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	} while (c == ' ' || c== '\t' || c == '\f' || c == '\r' || c == '\n'
 			 || c == CPP_STRING_SYMBOL || c == CPP_CHAR_SYMBOL);
 
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
+	token->lineNumber   = cppGetInputLineNumber ();
+	token->filePosition = cppGetInputFilePosition ();
 
 	switch (c)
 	{
@@ -846,7 +846,12 @@ static void parseVersions (tokenInfo *const token)
 		if (token->type == '{')
 		{
 			vString *anonver = anonGenerateNew ("ver", K_VERSION);
-			makeSimpleTag (anonver, K_VERSION);
+			{
+				tagEntryInfo e;
+				initTagEntry (&e, vStringValue (anonver), K_VERSION);
+				updateTagLine (&e, token->lineNumber, token->filePosition);
+				makeTagEntry (&e);
+			}
 			vStringDelete(anonver);
 			tokenUnread (token);
 			tokenSkipOverPair (curly);

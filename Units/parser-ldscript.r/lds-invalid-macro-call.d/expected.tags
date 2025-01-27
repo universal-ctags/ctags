@@ -1,0 +1,2 @@
+S	input.lds.S	/^#define S(A) A: AT(ADDR(.altinstr_aux) - LOAD_OFFSE/;"	d	line:1	file:	signature:(A)	roles:def	macrodef:A: AT(ADDR(.altinstr_aux) - LOAD_OFFSET) { *(A) }
+_etext	input.lds.S	/^	_etext = .;$/;"	s	line:7	roles:def
