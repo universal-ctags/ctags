@@ -113,6 +113,9 @@ typedef struct sUngetBuffer {
 						   middle of the buffer */
 	int dataSize;		/* the number of valid unget characters
 						   in the buffer */
+	unsigned long lineNumber;
+	MIOPos filePosition;
+	cppMacroInfo *macro;
 } ungetBuffer;
 
 typedef struct sCppState {
@@ -310,9 +313,15 @@ extern unsigned int cppGetDirectiveNestLevel (void)
 	return Cpp.directive.nestLevel;
 }
 
-static ungetBuffer *ungetBufferNew  (void)
+static ungetBuffer *ungetBufferNew  (unsigned long lineNumber,
+									 MIOPos filePosition,
+									 cppMacroInfo *macro)
 {
-	return xCalloc (1, ungetBuffer);
+	ungetBuffer *ub = xCalloc (1, ungetBuffer);
+	ub->lineNumber = lineNumber;
+	ub->filePosition = filePosition;
+	ub->macro = macro;
+	return ub;
 }
 
 static void ungetBufferDelete (ungetBuffer *ub)
@@ -647,7 +656,9 @@ static int ungetBufferGetcFromUngetBuffer (ungetBuffer *ungetBuffer)
 extern void cppUngetc (const int c)
 {
 	if (Cpp.ungetBuffer == NULL)
-		Cpp.ungetBuffer = ungetBufferNew ();
+		Cpp.ungetBuffer = ungetBufferNew (getInputLineNumber(),
+										  getInputFilePosition(),
+										  NULL);
 	ungetBufferUngetc (Cpp.ungetBuffer , c, Cpp.charOrStringContents);
 }
 
@@ -669,7 +680,9 @@ extern int cppUngetBufferSize(void)
 extern void cppUngetString(const char * string, int len)
 {
 	if (Cpp.ungetBuffer == NULL)
-		Cpp.ungetBuffer = ungetBufferNew ();
+		Cpp.ungetBuffer = ungetBufferNew (getInputLineNumber(),
+										  getInputFilePosition(),
+										  NULL);
 	ungetBufferUngetString (Cpp.ungetBuffer, string, len);
 }
 
@@ -704,7 +717,8 @@ extern void cppUngetMacroTokens (cppMacroTokens *tokens)
 	for(size_t i = ptrArrayCount (a); i > 0; i--)
 	{
 		cppMacroToken *t = ptrArrayItem (a, i - 1);
-		ungetBuffer *ub = ungetBufferNew();
+		ungetBuffer *ub = ungetBufferNew(t->lineNumber, t->filePosition,
+										 macro);
 		ungetBufferUngetString (ub, t->str, strlen (t->str));
 		ptrArrayAdd(Cpp.ungetBufferStack, ub);
 	}
@@ -737,6 +751,20 @@ static int cppGetcFromUngetBufferOrFile(void)
 	if (Cpp.macroInUse)
 		cppClearMacroInUse (&Cpp.macroInUse);
 	return getcFromInputFile();
+}
+
+extern unsigned long cppGetInputLineNumber (void)
+{
+	if (Cpp.ungetBuffer)
+		return Cpp.ungetBuffer->lineNumber;
+	return getInputLineNumber();
+}
+
+extern MIOPos cppGetInputFilePosition (void)
+{
+	if (Cpp.ungetBuffer)
+		return Cpp.ungetBuffer->filePosition;
+	return getInputFilePosition();
 }
 
 
@@ -1025,17 +1053,18 @@ static int makeParamTag (vString *name, short nth, bool placeholder)
 
 	if (standing_alone)
 		pushLanguage (Cpp.lang);
-	int r = makeSimpleTag (name, Cpp.macroParamKindIndex);
+
+	tagEntryInfo e;
+	initTagEntry (&e, vStringValue (name), Cpp.macroParamKindIndex);
+	updateTagLine (&e, cppGetInputLineNumber (), cppGetInputFilePosition ());
+	e.extensionFields.nth = nth;
+	if (placeholder)
+		markTagAsPlaceholder (&e, placeholder);
+	int r = makeTagEntry(&e);
+
 	if (standing_alone)
 		popLanguage ();
 
-	tagEntryInfo *e = getEntryInCorkQueue (r);
-	if (e)
-	{
-		e->extensionFields.nth = nth;
-		if (placeholder)
-			markTagAsPlaceholder (e, placeholder);
-	}
 	return r;
 }
 
@@ -1080,8 +1109,8 @@ static int directiveDefine (const int c, bool undef)
 		readIdentifier (c, Cpp.directive.name);
 		if (! isIgnore ())
 		{
-			unsigned long 	lineNumber = getInputLineNumber ();
-			MIOPos filePosition = getInputFilePosition ();
+			unsigned long 	lineNumber = cppGetInputLineNumber ();
+			MIOPos filePosition = cppGetInputFilePosition ();
 			int p = cppGetcFromUngetBufferOrFile ();
 			short nth = 0;
 
@@ -1253,7 +1282,7 @@ static bool directiveIf (const int c, enum eIfSubstate if_substate)
 	{
 		conditionalInfo *ifdef = currentConditional ();
 		ifdef->asmArea.ifSubstate = if_substate;
-		ifdef->asmArea.line = getInputLineNumber();
+		ifdef->asmArea.line = cppGetInputLineNumber ();
 	}
 
 	Cpp.directive.state = DRCTV_NONE;
@@ -1291,7 +1320,7 @@ static void promiseOrPrepareAsm (conditionalInfo *ifdef, enum eIfSubstate curren
 			&& (currentState == IF_ENDIF)))
 	{
 		unsigned long start = ifdef->asmArea.line + 1;
-		unsigned long end = getInputLineNumber ();
+		unsigned long end = cppGetInputLineNumber ();
 
 		if (start < end)
 			makePromise ("Asm", start, 0, end, 0, start);
@@ -1305,7 +1334,7 @@ static void promiseOrPrepareAsm (conditionalInfo *ifdef, enum eIfSubstate curren
 		else if (currentState == IF_ELSE)
 		{
 			ifdef->asmArea.ifSubstate = IF_ELSE;
-			ifdef->asmArea.line = getInputLineNumber ();
+			ifdef->asmArea.line = cppGetInputLineNumber ();
 		}
 	}
 }
@@ -1660,7 +1689,11 @@ static vString * conditionMayFlush (vString* condition, bool del)
 		if (standing_alone)
 			pushLanguage (Cpp.lang);
 
-		makeSimpleRefTag (condition, Cpp.defineMacroKindIndex, Cpp.macroConditionRoleIndex);
+		tagEntryInfo e;
+		initRefTagEntry (&e, vStringValue (condition),
+						 Cpp.defineMacroKindIndex, Cpp.macroConditionRoleIndex);
+		updateTagLine (&e, cppGetInputLineNumber (), cppGetInputFilePosition ());
+		makeTagEntry (&e);
 
 		if (standing_alone)
 			popLanguage ();
@@ -1736,7 +1769,7 @@ process:
 				if (macroCorkIndex != CORK_NIL)
 				{
 					attachFields (macroCorkIndex,
-								  getInputLineNumber(),
+								  cppGetInputLineNumber(),
 								  macrodef? vStringValue (macrodef): NULL);
 					macroCorkIndex = CORK_NIL;
 				}
@@ -1760,7 +1793,7 @@ process:
 					if (macroCorkIndex != CORK_NIL)
 					{
 						attachFields (macroCorkIndex,
-									  getInputLineNumber(),
+									  cppGetInputLineNumber(),
 									  macrodef? vStringValue (macrodef): NULL);
 						macroCorkIndex = CORK_NIL;
 					}
@@ -2108,7 +2141,7 @@ process:
 
 	DebugStatement ( cppDebugPutc (DEBUG_CPP, c); )
 	DebugStatement ( if (c == NEWLINE)
-				debugPrintf (DEBUG_CPP, "%6ld: ", getInputLineNumber () + 1); )
+				debugPrintf (DEBUG_CPP, "%6ld: ", cppGetInputLineNumber () + 1); )
 
 	return c;
 }
@@ -2343,8 +2376,8 @@ vString *cppFlattenMacroTokensToNewString (cppMacroTokens *tokens)
 extern vString *cppExpandMacroAsNewString(cppMacroInfo * macro, const ptrArray *args)
 {
 	cppMacroTokens * tokens = cppExpandMacro (macro, args,
-											  getInputLineNumber (),
-											  getInputFilePosition ());
+											  cppGetInputLineNumber (),
+											  cppGetInputFilePosition ());
 	if (!tokens)
 		return NULL;
 
