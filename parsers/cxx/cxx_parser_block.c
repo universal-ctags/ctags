@@ -181,7 +181,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		return true;
 	}
 
-	unsigned long uEndPosition = getInputLineNumber();
+	unsigned long uEndPosition = cppGetInputLineNumber();
 
 	// If the function contained a "try" keyword before the opening bracket
 	// then it's likely to be a function-try-block and should be followed by a catch
@@ -238,7 +238,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 			if(!cxxParserParseBlock(true))
 				return false;
 
- 			uEndPosition = getInputLineNumber();
+			uEndPosition = cppGetInputLineNumber();
  		}
  	}
 
