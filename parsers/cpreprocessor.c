@@ -985,7 +985,28 @@ static int directiveDefine (const int c, bool undef)
 
 					if (vStringLength (param) > 0)
 					{
-						int r = makeParamTag (param, nth++, vStringChar(param, 0) == '.');
+						bool gnuext_placeholder = false;
+						if (vStringLength (param) > 3
+							&& strcmp(vStringValue (param) + vStringLength (param) - 3,
+									  "...")  == 0)
+						{
+							/* args... in GNU cpp extension
+							 *
+							 * #define debug(format, args...) fprintf (stderr, format, args)
+							 *
+							 * In this case, args should be tagged. However the signature field
+							 * for debug must be "(format,args...)".
+							 */
+							vString *nodots = vStringNewNInit (vStringValue (param),
+															   vStringLength (param) - 3);
+							makeParamTag (nodots, nth, false);
+							vStringDelete (nodots);
+							gnuext_placeholder = true;
+						}
+
+						int r = makeParamTag (param, nth++,
+											  vStringChar(param, 0) == '.'
+											  || gnuext_placeholder);
 						intArrayAdd (params, r);
 						vStringClear (param);
 					}
@@ -2410,13 +2431,25 @@ static cppMacroInfo * saveMacro(hashTable *table, const char * macro)
 
 					if(
 							(
+								/* #define debug(format, ...) fprintf (stderr, format, __VA_ARGS__) */
 								bIsVarArg &&
 								(paramLen == 3) &&
 								(strncmp(paramBegin[i],"...",3) == 0)
 							) || (
+								/* #define debug(MSG) fputs(MSG, stderr) */
 								(!bIsVarArg) &&
 								(paramLen == tokenLen) &&
 								(strncmp(paramBegin[i],tokenBegin,paramLen) == 0)
+							) || (
+								/* GNU cpp extension:
+								 * #define debug(format, args...) fprintf (stderr, format, args)
+								 */
+								(!bIsVarArg) &&
+								(paramLen == tokenLen + 3) &&
+								(strncmp(paramBegin[i] + tokenLen, "...", 3) == 0) &&
+								(strncmp(paramBegin[i], tokenBegin, tokenLen) == 0) &&
+								/* Let's have a side effect */
+								(bIsVarArg = true)
 							)
 						)
 					{

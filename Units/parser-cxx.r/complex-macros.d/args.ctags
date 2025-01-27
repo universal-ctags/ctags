@@ -7,6 +7,7 @@
 -D DECLARE_FUNCTION_2(_ret,_name)=_ret _name();
 -D DECLARE_FUNCTION_3(_ret,_name,...)=_ret _name(__VA_ARGS__);
 -D DEPRECATED(...)=__VA_ARGS__ __attribute__((deprecated))
+-D ENUM_GNUX(n,e...)=enum n { e }
 -D DECLARE_TWO_VERSIONS_OF_FUNCTIONS(_prefix1,_prefix2)=DECLARE_FUNCTION_2(int,_prefix1 ## a) DECLARE_FUNCTION_2(int,_prefix2 ## a)
 -D STRINGIFY(token)=#token
 -D IMPLEMENT_FUNCTIONS(_prefix)=void _prefix ## a(){ }; void _prefix ## b(){ };

@@ -27,6 +27,10 @@ DECLARE_FUNCTION_3(int,p3,int a,int b);
 
 DEPRECATED(int p4());
 
+#define ENUM_GNUX(n,e...) enum n { e }
+
+ENUM_GNUX(color, red, blue, green);
+
 // Recursive macro expansion
 
 #define DECLARE_TWO_VERSIONS_OF_FUNCTIONS(_prefix1,_prefix2) \
