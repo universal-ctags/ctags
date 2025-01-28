@@ -15,6 +15,13 @@ a	input.cpp	/^DECLARE_FUNCTION_3(int,p3,int a,int b);$/;"	z	prototype:p3	typeref
 b	input.cpp	/^DECLARE_FUNCTION_3(int,p3,int a,int b);$/;"	z	prototype:p3	typeref:typename:int	file:
 DEPRECATED	input.cpp	/^#define DEPRECATED(/;"	d	file:	signature:(...)
 p4	input.cpp	/^DEPRECATED(int p4());$/;"	p	typeref:typename:int	file:	signature:()	properties:deprecated
+n	input.cpp	/^#define ENUM_GNUX(n,e...) enum n { e }$/;"	D	macro:ENUM_GNUX
+e	input.cpp	/^#define ENUM_GNUX(n,e...) enum n { e }$/;"	D	macro:ENUM_GNUX
+ENUM_GNUX	input.cpp	/^#define ENUM_GNUX(/;"	d	file:	signature:(n,e...)
+color	input.cpp	/^ENUM_GNUX(color, red, blue, green);$/;"	g	file:
+red	input.cpp	/^ENUM_GNUX(color, red, blue, green);$/;"	e	enum:color	file:
+blue	input.cpp	/^ENUM_GNUX(color, red, blue, green);$/;"	e	enum:color	file:
+green	input.cpp	/^ENUM_GNUX(color, red, blue, green);$/;"	e	enum:color	file:
 _prefix1	input.cpp	/^#define DECLARE_TWO_VERSIONS_OF_FUNCTIONS(_prefix1,_prefix2) \\$/;"	D	macro:DECLARE_TWO_VERSIONS_OF_FUNCTIONS
 _prefix2	input.cpp	/^#define DECLARE_TWO_VERSIONS_OF_FUNCTIONS(_prefix1,_prefix2) \\$/;"	D	macro:DECLARE_TWO_VERSIONS_OF_FUNCTIONS
 DECLARE_TWO_VERSIONS_OF_FUNCTIONS	input.cpp	/^#define DECLARE_TWO_VERSIONS_OF_FUNCTIONS(/;"	d	file:	signature:(_prefix1,_prefix2)
