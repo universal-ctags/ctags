@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        netbsd-release-version: ['10.0', '9.4', '9.3', '9.2']
+        netbsd-release-version: ['10.1', '10.0', '9.4', '9.3', '9.2']
         # https://ftp.netbsd.org/pub/NetBSD/
 
     runs-on: ubuntu-latest
