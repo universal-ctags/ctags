@@ -20,7 +20,7 @@
 
 typedef struct sHashEntry hentry;
 struct sHashEntry {
-	void *key;
+	const void *key;
 	void *value;
 	unsigned int hash;
 	hentry *next;
@@ -45,7 +45,7 @@ struct chainTracker {
 	hashTableEqualFunc equalfn;
 };
 
-static hentry* entry_new (void *key, void *value, unsigned int hash, hentry* next)
+static hentry* entry_new (const void *key, void *value, unsigned int hash, hentry* next)
 {
 	hentry* entry = xMalloc (1, hentry);
 
@@ -64,7 +64,7 @@ static void entry_reset  (hentry* entry,
 						  hashTableDeleteFunc valfreefn)
 {
 	if (keyfreefn)
-		keyfreefn (entry->key);
+		keyfreefn ((void *)entry->key);
 	if (valfreefn)
 		valfreefn (entry->value);
 
@@ -237,7 +237,7 @@ extern void       hashTableClear (hashTable *htable)
 	}
 }
 
-static void       hashTablePutItem00    (hashTable *htable, void *key, void *value, unsigned int h)
+static void       hashTablePutItem00    (hashTable *htable, const void *key, void *value, unsigned int h)
 {
 	unsigned int i = h % htable->size;
 	htable->table[i] = entry_new(key, value, h, htable->table[i]);
@@ -295,7 +295,7 @@ static void       hashTableGrow        (hashTable *htable)
 	eFree (old_table);
 }
 
-static void       hashTablePutItem0    (hashTable *htable, void *key, void *value, unsigned int h)
+static void       hashTablePutItem0    (hashTable *htable, const void *key, void *value, unsigned int h)
 {
 	if (((double)htable->count / (double)htable->size) < 0.8)
 	{
@@ -307,7 +307,7 @@ static void       hashTablePutItem0    (hashTable *htable, void *key, void *valu
 	hashTablePutItem00 (htable, key, value, h);
 }
 
-extern void       hashTablePutItem    (hashTable *htable, void *key, void *value)
+extern void       hashTablePutItem    (hashTable *htable, const void *key, void *value)
 {
 	hashTablePutItem0 (htable, key, value, htable->hashfn (key));
 }

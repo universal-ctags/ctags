@@ -66,7 +66,7 @@ extern void hashTableSetValueForUnknownKey (hashTable *htable,
 
 extern void       hashTableDelete      (hashTable *htable);
 extern void       hashTableClear       (hashTable *htable);
-extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
+extern void       hashTablePutItem     (hashTable *htable, const void *key, void *value);
 extern void*      hashTableGetItem     (hashTable *htable, const void * key);
 extern bool    hashTableHasItem     (hashTable * htable, const void * key);
 extern bool    hashTableDeleteItem  (hashTable *htable, const void *key);
