@@ -357,10 +357,6 @@ static const unsigned char *readOperator (
 	return cp;
 }
 
-// We stop applying macro replacements if the unget buffer gets too big
-// as it is a sign of recursive macro expansion
-#define ASM_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
-
 // We stop applying macro replacements if a macro is used so many
 // times in a recursive macro expansion.
 #define ASM_PARSER_MAXIMUM_MACRO_USE_COUNT 8
