@@ -49,6 +49,7 @@ GEN_IN_MAN_FILES = \
 	ctags-lang-lisp.7 \
 	ctags-lang-make.7 \
 	ctags-lang-markdown.7 \
+	ctags-lang-meson.7 \
 	ctags-lang-powershell.7 \
 	ctags-lang-python.7 \
 	ctags-lang-r.7 \

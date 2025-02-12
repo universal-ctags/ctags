@@ -1,0 +1,30 @@
+.. _ctags-lang-meson(7):
+
+==============================================================
+ctags-lang-meson
+==============================================================
+-----------------------------------------------------------------------
+Random notes about tagging Meson build scripts with Universal Ctags
+-----------------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal Ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+Meson ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=Meson ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Meson=+(meson.build) ...
+
+DESCRIPTION
+-----------
+This man page gathers random notes about tagging Meson build scripts.
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New kinds ``cfgdata`` and ``cfgvar``
+
+SEE ALSO
+--------
+ctags(1), ctags-client-tools(7)
