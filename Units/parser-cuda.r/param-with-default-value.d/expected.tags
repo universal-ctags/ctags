@@ -1,0 +1,4 @@
+foo1	input.cuh	/^float foo1(int a)$/;"	f	typeref:typename:float	signature:(int a)
+foo2	input.cuh	/^bool foo2(float* pointer = NULL)$/;"	f	typeref:typename:bool	signature:(float * pointer=NULL)
+foo2_alt	input.cuh	/^bool foo2_alt(float* pointer)$/;"	f	typeref:typename:bool	signature:(float * pointer)
+foo3	input.cuh	/^bool foo3(const int a, float b, double c)$/;"	f	typeref:typename:bool	signature:(const int a,float b,double c)
