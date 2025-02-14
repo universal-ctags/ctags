@@ -38,6 +38,7 @@ Man pages
 	ctags-lang-lisp(7) <man/ctags-lang-lisp.7.rst>
 	ctags-lang-make(7) <man/ctags-lang-make.7.rst>
 	ctags-lang-markdown(7) <man/ctags-lang-markdown.7.rst>
+	ctags-lang-meson(7) <man/ctags-lang-meson.7.rst>
 	ctags-lang-powershell(7) <man/ctags-lang-powershell.7.rst>
 	ctags-lang-python(7) <man/ctags-lang-python.7.rst>
 	ctags-lang-r(7) <man/ctags-lang-r.7.rst>
