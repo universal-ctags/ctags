@@ -2006,7 +2006,7 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 
 	CXXToken * t = cxxTokenChainAt(tc,1);
 
-	bool bIsCPP = cxxParserCurrentLanguageIsCPP();
+	bool bIsC = ! (cxxParserCurrentLanguageIsCPP() || cxxParserCurrentLanguageIsCUDA());
 
 	for(;;)
 	{
@@ -2319,7 +2319,7 @@ try_again:
 		}
 
 		// assignment.
-		if(!bIsCPP)
+		if(bIsC)
 		{
 			CXX_DEBUG_LEAVE_TEXT(
 					"Found assignment, this doesn't look like valid C function parameter list"
