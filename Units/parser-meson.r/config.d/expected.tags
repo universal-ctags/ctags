@@ -1,0 +1,17 @@
+systemd	input.meson	/^project('systemd', 'c',$/;"	project
+project_major_version	input.meson	/^project_major_version = meson.project_version().split('.')[0].split('~')[0]$/;"	variable
+project_minor_version	input.meson	/^        project_minor_version = meson.project_version().split('.')[-1].split('~')[0]$/;"	variable
+project_minor_version	input.meson	/^        project_minor_version = '0'$/;"	variable
+libsystemd_version	input.meson	/^libsystemd_version = '0.39.0'$/;"	variable
+libudev_version	input.meson	/^libudev_version = '1.7.9'$/;"	variable
+conf	input.meson	/^conf = configuration_data()$/;"	cfgdata
+PROJECT_URL	input.meson	/^conf.set_quoted('PROJECT_URL', 'https:\/\/systemd.io\/')$/;"	cfgvar	cfgdata:conf
+PROJECT_VERSION	input.meson	/^conf.set('PROJECT_VERSION', project_major_version,$/;"	cfgvar	cfgdata:conf
+PROJECT_VERSION_FULL	input.meson	/^conf.set_quoted('PROJECT_VERSION_FULL', meson.project_version(), description : 'Full project ver/;"	cfgvar	cfgdata:conf
+conf2	input.meson	/^conf2 = configuration_data()$/;"	cfgdata
+PROJECT_URL_ALT	input.meson	/^conf2.set_quoted('PROJECT_URL_ALT', 'https:\/\/systemd.io\/')$/;"	cfgvar	cfgdata:conf2
+project_source_root	input.meson	/^project_source_root = meson.current_source_dir()$/;"	variable
+project_build_root	input.meson	/^project_build_root = meson.current_build_dir()$/;"	variable
+relative_source_path	input.meson	/^relative_source_path = run_command('realpath',$/;"	variable
+RELATIVE_SOURCE_PATH	input.meson	/^conf.set_quoted('RELATIVE_SOURCE_PATH', relative_source_path)$/;"	cfgvar	cfgdata:conf
+BUILD_MODE_DEVELOPER	input.meson	/^conf.set10('BUILD_MODE_DEVELOPER', get_option('mode') == 'developer',$/;"	cfgvar	cfgdata:conf

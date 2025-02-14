@@ -1,0 +1,50 @@
+#
+# Taken from meson.build of systemd
+#
+
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+project('systemd', 'c',
+        version : files('meson.version'),
+        license : 'LGPLv2+',
+        default_options: [
+                'c_std=gnu11',
+                'prefix=/usr',
+                'sysconfdir=/etc',
+                'localstatedir=/var',
+                'warning_level=2',
+        ],
+        meson_version : '>= 0.60.0',
+       )
+
+project_major_version = meson.project_version().split('.')[0].split('~')[0]
+if meson.project_version().contains('.')
+        project_minor_version = meson.project_version().split('.')[-1].split('~')[0]
+else
+        project_minor_version = '0'
+endif
+
+libsystemd_version = '0.39.0'
+libudev_version = '1.7.9'
+
+conf = configuration_data()
+conf.set_quoted('PROJECT_URL', 'https://systemd.io/')
+conf.set('PROJECT_VERSION', project_major_version,
+         description : 'Numerical project version (used where a simple number is expected)')
+conf.set_quoted('PROJECT_VERSION_FULL', meson.project_version(), description : 'Full project version')
+
+conf2 = configuration_data()
+conf2.set_quoted('PROJECT_URL_ALT', 'https://systemd.io/')
+
+# This is to be used instead of meson.source_root(), as the latter will return
+# the wrong result when systemd is being built as a meson subproject
+project_source_root = meson.current_source_dir()
+project_build_root = meson.current_build_dir()
+relative_source_path = run_command('realpath',
+                                   '--relative-to=@0@'.format(project_build_root),
+                                   project_source_root,
+                                   check : true).stdout().strip()
+conf.set_quoted('RELATIVE_SOURCE_PATH', relative_source_path)
+
+conf.set10('BUILD_MODE_DEVELOPER', get_option('mode') == 'developer',
+           description : 'tailor build to development or release builds')
