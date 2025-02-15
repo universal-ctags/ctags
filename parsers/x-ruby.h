@@ -22,6 +22,17 @@
 
 typedef struct sRubySubparser rubySubparser;
 
+typedef enum {
+	RUBY_CLASS_KIND,
+	RUBY_METHOD_KIND,
+	RUBY_MODULE_KIND,
+	RUBY_SINGLETON_KIND,
+	RUBY_CONST_KIND,
+	RUBY_ACCESSOR_KIND,
+	RUBY_ALIAS_KIND,
+	RUBY_LIBRARY_KIND,
+} rubyKind;
+
 struct sRubySubparser {
 	subparser subparser;
 	/* Returning other than CORK_NIL means the string is consumed. */
