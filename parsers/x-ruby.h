@@ -25,7 +25,7 @@ typedef struct sRubySubparser rubySubparser;
 struct sRubySubparser {
 	subparser subparser;
 	/* Returning other than CORK_NIL means the string is consumed. */
-	int (* lineNotify) (rubySubparser *s, const unsigned char **cp);
+	int (* lineNotify) (rubySubparser *s, const unsigned char **cp, int corkIndex);
 	void (* enterBlockNotify) (rubySubparser *s, int corkIndex);
 	void (* leaveBlockNotify) (rubySubparser *s, int corkIndex);
 	/* Privately used in Ruby parser side. */

@@ -195,7 +195,7 @@ static int parseXTask (rubySubparser *s, struct taskType *xtask, const unsigned 
 	return CORK_NIL;
 }
 
-static int lineNotify (rubySubparser *s, const unsigned char **cp)
+static int lineNotify (rubySubparser *s, const unsigned char **cp, int corkIndex CTAGS_ATTR_UNUSED)
 {
 	struct taskType taskTypes [] = {
 		{ "task",       K_TASK      },
