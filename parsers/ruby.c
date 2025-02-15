@@ -1128,6 +1128,7 @@ static rubySubparser *notifyLine (const unsigned char **cp)
 {
 	subparser *sub;
 	rubySubparser *rubysub = NULL;
+	NestingLevel *nl = nestingLevelsGetCurrent (nesting);
 
 	foreachSubparser (sub, false)
 	{
@@ -1138,7 +1139,6 @@ static rubySubparser *notifyLine (const unsigned char **cp)
 		{
 			enterSubparser(sub);
 			const unsigned char *base = *cp;
-			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
 			rubysub->corkIndex = rubysub->lineNotify(rubysub, cp, nl? nl->corkIndex: CORK_NIL);
 			leaveSubparser();
 			if (rubysub->corkIndex != CORK_NIL)
