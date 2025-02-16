@@ -135,7 +135,7 @@ struct sTagEntryInfo {
 #ifdef HAVE_LIBXML
 		const char* xpath;
 #endif
-		unsigned long _endLine;	/* Don't set directly. Use setTagEndLine() */
+		unsigned long _endLine;	/* Don't set directly. Use setTagEndLine() and getTagEndLine() */
 		time_t epoch;
 #define NO_NTH_FIELD -1
 		short nth;
@@ -260,6 +260,7 @@ int           anyKindsEntryInScopeRecursive (int corkIndex,
 extern void    updateTagLine(tagEntryInfo *tag, unsigned long lineNumber, MIOPos filePosition);
 extern void    setTagEndLine (tagEntryInfo *tag, unsigned long endLine);
 extern void    setTagEndLineToCorkEntry (int corkIndex, unsigned long endLine);
+#define getTagEndLine(tag) ((tag)->extensionFields._endLine)
 
 extern int     queryIntervalTabByLine(unsigned long lineNum);
 extern int     queryIntervalTabByRange(unsigned long startLine, unsigned long endLine);

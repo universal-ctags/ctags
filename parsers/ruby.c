@@ -34,17 +34,15 @@
 /*
 *   DATA DECLARATIONS
 */
-typedef enum {
-	K_UNDEFINED = -1,
-	K_CLASS,
-	K_METHOD,
-	K_MODULE,
-	K_SINGLETON,
-	K_CONST,
-	K_ACCESSOR,
-	K_ALIAS,
-	K_LIBRARY,
-} rubyKind;
+#define K_UNDEFINED -1
+#define K_CLASS     RUBY_CLASS_KIND
+#define K_METHOD    RUBY_METHOD_KIND
+#define K_MODULE    RUBY_MODULE_KIND
+#define K_SINGLETON RUBY_SINGLETON_KIND
+#define K_CONST     RUBY_CONST_KIND
+#define K_ACCESSOR  RUBY_ACCESSOR_KIND
+#define K_ALIAS     RUBY_ALIAS_KIND
+#define K_LIBRARY   RUBY_LIBRARY_KIND
 
 typedef enum {
 	RUBY_LIBRARY_REQUIRED,
@@ -876,7 +874,7 @@ static void deleteBlockData (NestingLevel *nl, void *data CTAGS_ATTR_UNUSED)
 		&& (sub_e = getEntryInCorkQueue (bdata->subparserCorkIndex)))
 	{
 		setTagEndLine (sub_e, getInputLineNumber ());
-		if (bdata->subparser)
+		if (bdata->subparser && bdata->subparser->leaveBlockNotify)
 			bdata->subparser->leaveBlockNotify (bdata->subparser,
 												bdata->subparserCorkIndex);
 	}
@@ -1130,6 +1128,7 @@ static rubySubparser *notifyLine (const unsigned char **cp)
 {
 	subparser *sub;
 	rubySubparser *rubysub = NULL;
+	NestingLevel *nl = nestingLevelsGetCurrent (nesting);
 
 	foreachSubparser (sub, false)
 	{
@@ -1140,7 +1139,7 @@ static rubySubparser *notifyLine (const unsigned char **cp)
 		{
 			enterSubparser(sub);
 			const unsigned char *base = *cp;
-			rubysub->corkIndex = rubysub->lineNotify(rubysub, cp);
+			rubysub->corkIndex = rubysub->lineNotify(rubysub, cp, nl? nl->corkIndex: CORK_NIL);
 			leaveSubparser();
 			if (rubysub->corkIndex != CORK_NIL)
 				break;

@@ -76,7 +76,7 @@ static void findGemSpecTags (void)
 	scheduleRunningBaseparser (0);
 }
 
-static int lineNotify (rubySubparser *s, const unsigned char **cp)
+static int lineNotify (rubySubparser *s, const unsigned char **cp, int corkIndex CTAGS_ATTR_UNUSED)
 {
 	struct sGemSpecSubparser *gemspec = (struct sGemSpecSubparser *)s;
 	const unsigned char *p = *cp;

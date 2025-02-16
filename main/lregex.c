@@ -1698,7 +1698,7 @@ static void fillEndLineFieldOfUpperScopes (struct lregexControlBlock *lcb, unsig
 	int n = lcb->currentScope;
 
 	while ((entry = getEntryInCorkQueue (n))
-		   && (entry->extensionFields._endLine == 0))
+		   && (getTagEndLine (entry) == 0))
 	{
 		setTagEndLine (entry, endline);
 		n = entry->extensionFields.scopeIndex;
@@ -1763,7 +1763,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	{
 		tagEntryInfo *entry = getEntryInCorkQueue (lcb->currentScope);
 
-		if (entry && (entry->extensionFields._endLine == 0))
+		if (entry && (getTagEndLine (entry) == 0))
 		{
 			setTagEndLine (entry, getInputLineNumberInRegPType(patbuf->regptype, offset));
 
@@ -1774,8 +1774,8 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 			 * the new scope. There is a gap. We must adjust the "end:" field here.
 			 */
 			if ((patbuf->scopeActions & SCOPE_REF_AFTER_POP) &&
-				entry->extensionFields._endLine > 1)
-				setTagEndLine (entry, entry->extensionFields._endLine - 1);
+				getTagEndLine (entry) > 1)
+				setTagEndLine (entry, getTagEndLine (entry) - 1);
 		}
 
 		lcb->currentScope = entry? entry->extensionFields.scopeIndex: CORK_NIL;
@@ -4252,11 +4252,11 @@ static EsObject *lrop_intervaltab (OptVM *vm, EsObject *name)
 	else if (es_object_get_type (nobj) == OPT_TYPE_TAG)
 	{
 		tagEntryInfo *e = es_pointer_get (nobj);
-		if (e->extensionFields._endLine)
-			parent =  queryIntervalTabByRange(e->lineNumber,
-											  e->extensionFields._endLine);
-		else
+		if (getTagEndLine (e) == 0)
 			parent = queryIntervalTabByLine(e->lineNumber);
+		else
+			parent = queryIntervalTabByRange(e->lineNumber,
+											 getTagEndLine(e));
 	}
 	else if (es_object_get_type (nobj) == OPT_TYPE_MATCHLOC)
 	{
