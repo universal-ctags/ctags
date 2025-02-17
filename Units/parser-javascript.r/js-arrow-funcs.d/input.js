@@ -26,6 +26,10 @@ let f6 = (x,y,...z) => {
     console.log('hello');
 }
 
+// Make this input acceptable as the input for nodejs.
+var a = {}
+var b = {}
+
 a.f7 = x => {
     console.log('hello');
 }
