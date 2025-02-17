@@ -474,6 +474,7 @@
     <ClInclude Include="..\parsers\x-bibtex.h" />
     <ClInclude Include="..\parsers\x-cpreprocessor.h" />
     <ClInclude Include="..\parsers\x-frontmatter.h" />
+    <ClInclude Include="..\parsers\x-html.h" />
     <ClInclude Include="..\parsers\x-iniconf.h" />
     <ClInclude Include="..\parsers\x-jscript.h" />
     <ClInclude Include="..\parsers\x-lisp.h" />
