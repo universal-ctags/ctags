@@ -438,7 +438,7 @@ void cxxParserSetEndLineForTagInCorkQueue(int iCorkQueueIndex,unsigned long lEnd
 //
 void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 {
-	cxxParserSetEndLineForTagInCorkQueue(iCorkQueueIndex,getInputLineNumber());
+	cxxParserSetEndLineForTagInCorkQueue(iCorkQueueIndex, cppGetInputLineNumber());
 }
 
 
@@ -494,8 +494,8 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 			szTypeName
 		);
 
-	MIOPos oFilePosition = getInputFilePosition();
-	int iFileLine = getInputLineNumber();
+	MIOPos oFilePosition = cppGetInputFilePosition();
+	int iFileLine = cppGetInputLineNumber();
 	int eMaybeTokenTypeOpeningBracket = (g_cxx.bConfirmedCPPLanguage
 										 ? 0
 										 : CXXTokenTypeOpeningBracket);

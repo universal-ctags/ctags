@@ -1161,7 +1161,9 @@ static bool cxxParserParseNextTokenSkipMacroParenthesis(CXXToken ** ppChain)
 
 static void cxxParserParseNextTokenApplyReplacement(
 		cppMacroInfo * pInfo,
-		CXXToken * pParameterChainToken
+		CXXToken * pParameterChainToken,
+		int iMacroLineNumber,
+		MIOPos oMacroFilePosition
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -1174,9 +1176,8 @@ static void cxxParserParseNextTokenApplyReplacement(
 		CXX_DEBUG_ASSERT(!pParameterChainToken,"This shouldn't have been extracted");
 	}
 
-	CXXTokenChain * pParameters = NULL;
-	const char ** aParameters = NULL;
-	int iParameterCount = 0;
+	CXXTokenChain *pParameters = NULL;
+	ptrArray *pMacroArgs = NULL;
 
 	if(pInfo->hasParameterList && pParameterChainToken && (pParameterChainToken->pChain->iCount >= 3))
 	{
@@ -1188,31 +1189,36 @@ static void cxxParserParseNextTokenApplyReplacement(
 				pParameterChainToken->pChain
 			);
 
-		aParameters = (const char **)eMalloc(sizeof(const char *) * pParameters->iCount);
+		pMacroArgs = ptrArrayNew(cppMacroArgDelete);
+
 		CXXToken * pParam = cxxTokenChainFirst(pParameters);
 		while(pParam)
 		{
-			aParameters[iParameterCount] = vStringValue(pParam->pszWord);
-			iParameterCount++;
+			cppMacroArg *pArg = cppMacroArgNew(vStringValue(pParam->pszWord),
+											   false,
+											   pParam->iLineNumber,
+											   pParam->oFilePosition);
+			ptrArrayAdd(pMacroArgs, pArg);
 			pParam = pParam->pNext;
 		}
-
-		CXX_DEBUG_ASSERT(iParameterCount == pParameters->iCount,"Bad number of parameters found");
 	}
 
-	vString * pReplacement = cppBuildMacroReplacement(pInfo,aParameters,iParameterCount);
-
+	cppMacroTokens *pMacroTokens = cppExpandMacro(pInfo, pMacroArgs,
+												  (unsigned long)iMacroLineNumber,
+												  oMacroFilePosition);
+	ptrArrayDelete(pMacroArgs);	// NULL is acceptable.
 	if(pParameters)
-	{
 		cxxTokenChainDestroy(pParameters);
-		eFree((char**)aParameters);
+
+#ifdef CXX_DO_DEBUGGING
+	{
+		vString *pReplacement = cppFlattenMacroTokensToNewString (pMacroTokens);
+		CXX_DEBUG_PRINT("Applying complex replacement '%s'", vStringValue(pReplacement));
+		vStringDelete (pReplacement);
 	}
+#endif
 
-	CXX_DEBUG_PRINT("Applying complex replacement '%s'",vStringValue(pReplacement));
-
-	cppUngetStringBuiltByMacro(vStringValue(pReplacement),vStringLength(pReplacement), pInfo);
-
-	vStringDelete(pReplacement);
+	cppUngetMacroTokens(pMacroTokens);
 
 	CXX_DEBUG_LEAVE();
 }
@@ -1294,8 +1300,8 @@ bool cxxParserParseNextToken(void)
 	cppBeginStatement();
 
 	// This must be done after getting char from input
-	t->iLineNumber = getInputLineNumber();
-	t->oFilePosition = getInputFilePosition();
+	t->iLineNumber = cppGetInputLineNumber();
+	t->oFilePosition = cppGetInputFilePosition();
 
 	if(g_cxx.iChar == EOF)
 	{
@@ -1379,6 +1385,8 @@ bool cxxParserParseNextToken(void)
 		} else {
 
 			cppMacroInfo * pMacro = cppFindMacro(vStringValue(t->pszWord));
+			int iMacroLineNumber = t->iLineNumber;
+			MIOPos oMacroFilePosition = t->oFilePosition;
 
 #ifdef DEBUG
 			if(pMacro && (pMacro->useCount >= CXX_PARSER_MAXIMUM_MACRO_USE_COUNT))
@@ -1434,7 +1442,9 @@ bool cxxParserParseNextToken(void)
 						// unget the replacement
 						cxxParserParseNextTokenApplyReplacement(
 								pMacro,
-								pParameterChain
+								pParameterChain,
+								iMacroLineNumber,
+								oMacroFilePosition
 							);
 
 						g_cxx.iChar = cppGetc();

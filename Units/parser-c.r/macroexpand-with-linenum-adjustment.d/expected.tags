@@ -1,0 +1,3 @@
+faccessat	input.c	/^SYSCALL_DEFINE3(faccessat, int, dfd, const char __user *, filename, int, mode)$/;"	f	line:1	typeref:typename:long
+fchmodat	input.c	/^SYSCALL_DEFINE3(fchmodat, int, dfd, const char __user *, filename,$/;"	f	line:6	typeref:typename:long
+mysyscall	input.c	/^	mysyscall, int, dfd,$/;"	f	line:16	typeref:typename:long

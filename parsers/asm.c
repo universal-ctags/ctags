@@ -357,10 +357,6 @@ static const unsigned char *readOperator (
 	return cp;
 }
 
-// We stop applying macro replacements if the unget buffer gets too big
-// as it is a sign of recursive macro expansion
-#define ASM_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
-
 // We stop applying macro replacements if a macro is used so many
 // times in a recursive macro expansion.
 #define ASM_PARSER_MAXIMUM_MACRO_USE_COUNT 8
@@ -369,11 +365,17 @@ static bool collectCppMacroArguments (ptrArray *args)
 {
 	vString *s = vStringNew ();
 	int c;
+	unsigned long ln;
+	MIOPos pos;
 	int depth = 1;
 
 	do
 	{
 		c = cppGetc ();
+		/* TODO/FIXME */
+		ln = getInputLineNumber ();
+		pos = getInputFilePosition ();
+
 		if (c == EOF || c == '\n')
 			break;
 		else if (c == ')')
@@ -381,8 +383,9 @@ static bool collectCppMacroArguments (ptrArray *args)
 			depth--;
 			if (depth == 0)
 			{
-				char *cstr = vStringDeleteUnwrap (s);
-				ptrArrayAdd (args, cstr);
+				cppMacroArg *a = cppMacroArgNew (vStringDeleteUnwrap (s), true,
+												 ln, pos);
+				ptrArrayAdd (args, a);
 				s = NULL;
 			}
 			else
@@ -395,8 +398,9 @@ static bool collectCppMacroArguments (ptrArray *args)
 		}
 		else if (c == ',')
 		{
-			char *cstr = vStringDeleteUnwrap (s);
-			ptrArrayAdd (args, cstr);
+			cppMacroArg *a = cppMacroArgNew (vStringDeleteUnwrap (s), true,
+											 ln, pos);
+			ptrArrayAdd (args, a);
 			s = vStringNew ();
 		}
 		else if (c == CPP_STRING_SYMBOL || c == CPP_CHAR_SYMBOL)
@@ -414,7 +418,8 @@ static bool collectCppMacroArguments (ptrArray *args)
 	return (depth > 0)? false: true;
 }
 
-static bool expandCppMacro (cppMacroInfo *macroInfo)
+static bool expandCppMacro (cppMacroInfo *macroInfo,
+							unsigned long lineNumber, MIOPos filePosition)
 {
 	ptrArray *args = NULL;
 
@@ -435,7 +440,7 @@ static bool expandCppMacro (cppMacroInfo *macroInfo)
 			return false;
 		}
 
-		args = ptrArrayNew (eFree);
+		args = ptrArrayNew (cppMacroArgDelete);
 		if (!collectCppMacroArguments (args))
 		{
 			/* The input stream is already corrupted.
@@ -445,7 +450,11 @@ static bool expandCppMacro (cppMacroInfo *macroInfo)
 		}
 	}
 
-	cppBuildMacroReplacementWithPtrArrayAndUngetResult(macroInfo, args);
+	{
+		cppMacroTokens *tokens = cppExpandMacro (macroInfo, args,
+												 lineNumber, filePosition);
+		cppUngetMacroTokens (tokens);
+	}
 
 	ptrArrayDelete (args);		/* NULL is acceptable. */
 	return true;
@@ -479,7 +488,8 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 	TRACE_PRINT("Macro expansion: %s<%p>%s", macroInfo->name,
 				macroInfo, macroInfo->hasParameterList? "(...)": "");
 
-	r = expandCppMacro (macroInfo);
+	r = expandCppMacro (macroInfo,
+						getInputLineNumber (), getInputFilePosition ());
 
  out:
 	if (r)
