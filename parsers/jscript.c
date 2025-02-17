@@ -2908,6 +2908,13 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 				state->indexForName = makeFunctionTag (name, sig, false);
 			else
 				convertToFunction (state->indexForName, vStringValue (sig));
+
+			readToken (token);
+			if (isType (token, TOKEN_OPEN_CURLY))
+				parseBlock (token, state->indexForName);
+
+			if (isType (token, TOKEN_CLOSE_CURLY))
+				state->isTerminated = false;
 		}
 		vStringDelete (sig);
 	}
@@ -2942,6 +2949,9 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 
 				vStringDelete (sig);
 				sig = NULL;
+				readToken (token);
+				if (isType (token, TOKEN_OPEN_CURLY))
+					parseBlock (token, state->indexForName);
 			}
 		}
 		if (isType (token, TOKEN_CLOSE_CURLY))
