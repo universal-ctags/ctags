@@ -2908,6 +2908,12 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 				state->indexForName = makeFunctionTag (name, sig, false);
 			else
 				convertToFunction (state->indexForName, vStringValue (sig));
+
+			readToken (token);
+			if (isType (token, TOKEN_OPEN_CURLY))
+				parseBlock (token, state->indexForName);
+			else if (! isType (token, TOKEN_SEMICOLON))
+				state->isTerminated = false;
 		}
 		vStringDelete (sig);
 	}
@@ -2942,6 +2948,15 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 
 				vStringDelete (sig);
 				sig = NULL;
+				readToken (token);
+				if (isType (token, TOKEN_OPEN_CURLY))
+				{
+					parseBlock (token, state->indexForName);
+					/* here we're at the close curly but it's part of the arrow
+					 * function body, so skip over not to confuse further code */
+					readTokenFull(token, true, NULL);
+					state->isTerminated = isType (token, TOKEN_SEMICOLON);
+				}
 			}
 		}
 		if (isType (token, TOKEN_CLOSE_CURLY))
