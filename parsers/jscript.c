@@ -1050,6 +1050,7 @@ static void readTokenFullRaw (tokenInfo *const token, bool include_newlines, vSt
 		copyToken (token, NextToken, false);
 		deleteToken (NextToken);
 		NextToken = NULL;
+		LastTokenType = token->type;
 		if (repr)
 			reprToken (token, repr);
 		return;
