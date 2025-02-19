@@ -478,7 +478,7 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 	if (!macroInfo)
 		goto out;
 
-	if(macroInfo && (macroInfo->useCount >= ASM_PARSER_MAXIMUM_MACRO_USE_COUNT))
+	if (macroInfo->useCount >= ASM_PARSER_MAXIMUM_MACRO_USE_COUNT)
 		goto out;
 
 	if (lastChar != EOF)
