@@ -154,6 +154,15 @@ typedef struct sCppState {
 
 } cppState;
 
+#define CPP_MACRO_REPLACEMENT_FLAG_VARARGS 1
+#define CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY 2
+
+struct sCppMacroReplacementPartInfo {
+	int parameterIndex; /* -1 if this part is a constant */
+	int flags;
+	vString * constant; /* not NULL only if parameterIndex != -1 */
+	struct sCppMacroReplacementPartInfo * next;
+};
 
 typedef enum {
 	CPREPRO_MACRO_KIND_UNDEF_ROLE,

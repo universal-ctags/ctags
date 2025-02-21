@@ -119,15 +119,10 @@ extern void cppVStringPut (vString * string, const int c);
 extern void cppPushExternalParserBlock(void);
 extern void cppPopExternalParserBlock(void);
 
-#define CPP_MACRO_REPLACEMENT_FLAG_VARARGS 1
-#define CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY 2
-
-typedef struct sCppMacroReplacementPartInfo {
-	int parameterIndex; /* -1 if this part is a constant */
-	int flags;
-	vString * constant; /* not NULL only if parameterIndex != -1 */
-	struct sCppMacroReplacementPartInfo * next;
-} cppMacroReplacementPartInfo;
+/*
+ * Macro expander related declarations
+ */
+typedef struct sCppMacroReplacementPartInfo cppMacroReplacementPartInfo;
 
 typedef struct sCppMacroInfo {
 	char *name;			/* the name of macro. Useful for debugging. */
