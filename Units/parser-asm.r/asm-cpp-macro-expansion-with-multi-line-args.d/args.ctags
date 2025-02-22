@@ -1,0 +1,7 @@
+--sort=no
+--param-Asm.useCPreProcessor=1
+--param-CPreProcessor._expand=1
+--fields=+{signature}
+--fields-CPreProcessor=+{macrodef}
+--param-Asm.commentCharsAtBOL=#
+--param-Asm.extraLinesepChars=;

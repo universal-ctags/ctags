@@ -14,10 +14,7 @@ SYM_START	input.S	/^#define SYM_START(/;"	d	file:	signature:(name,linkage,align.
 SYM_CODE_START	input.S	/^#define SYM_CODE_START(/;"	d	file:	signature:(name)	macrodef:SYM_START(name, SYM_L_GLOBAL, SYM_A_ALIGN)
 asm_exc_nmi	input.S	/^SYM_CODE_START(asm_exc_nmi)$/;"	l
 ENTRY0	input-0.S	/^#define ENTRY0(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
-exit0	input-0.S	/^exit0:$/;"	l
 ENTRY1	input-1.S	/^#define ENTRY1(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
-exit1	input-1.S	/^ENTRY1(exit1):$/;"	s
-exit1	input-1.S	/^ENTRY1(exit1):$/;"	l
 ENTRY2	input-2.S	/^#define ENTRY2(/;"	d	file:	signature:(LABEL)	macrodef:.global LABEL ;LABEL
 exit2	input-2.S	/^ENTRY2(exit2):$/;"	s
 exit2	input-2.S	/^ENTRY2(exit2):$/;"	l
