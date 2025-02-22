@@ -1244,14 +1244,6 @@ void cxxParserUngetCurrentToken(void)
 
 #define CXX_PARSER_MAXIMUM_TOKEN_CHAIN_SIZE 16384
 
-// We stop applying macro replacements if the unget buffer gets too big
-// as it is a sign of recursive macro expansion
-#define CXX_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
-
-// We stop applying macro replacements if a macro is used so many
-// times in a recursive macro expansion.
-#define CXX_PARSER_MAXIMUM_MACRO_USE_COUNT 8
-
 // Returns false if it finds an EOF. Returns true otherwise.
 //
 // In some special cases this function may parse more than one token,
@@ -1381,17 +1373,17 @@ bool cxxParserParseNextToken(void)
 			cppMacroInfo * pMacro = cppFindMacro(vStringValue(t->pszWord));
 
 #ifdef DEBUG
-			if(pMacro && (pMacro->useCount >= CXX_PARSER_MAXIMUM_MACRO_USE_COUNT))
+			if(pMacro && (pMacro->useCount >= CPP_MAXIMUM_MACRO_USE_COUNT))
 			{
 				/* If the macro is overly used, report it here. */
 				CXX_DEBUG_PRINT("Overly uesd macro %s <%p> useCount: %d (> %d)",
 								pMacro->name,
 								pMacro, pMacro->useCount,
-								CXX_PARSER_MAXIMUM_MACRO_USE_COUNT);
+								CPP_MAXIMUM_MACRO_USE_COUNT);
 			}
 #endif
 
-			if(pMacro && (pMacro->useCount < CXX_PARSER_MAXIMUM_MACRO_USE_COUNT))
+			if(pMacro && (pMacro->useCount < CPP_MAXIMUM_MACRO_USE_COUNT))
 			{
 				CXX_DEBUG_PRINT("Macro %s <%p> useCount: %d", pMacro->name,
 								pMacro, pMacro->useCount);
@@ -1426,7 +1418,7 @@ bool cxxParserParseNextToken(void)
 						// Detect other cases of nasty macro expansion that cause
 						// the unget buffer to grow fast (but the token chain to grow slowly)
 						//    -D'p=a' -D'a=p+p'
-						(cppUngetBufferSize() < CXX_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
+						(cppUngetBufferSize() < CPP_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
 					)
 					{
 						// unget last char

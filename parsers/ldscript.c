@@ -263,10 +263,6 @@ static int readPrefixedToken (tokenInfo *const token, int type)
 	return n;
 }
 
-// We stop applying macro replacements if a macro is used so many
-// times in a recursive macro expansion.
-#define LD_SCRIPT_PARSER_MAXIMUM_MACRO_USE_COUNT 8
-
 static bool collectMacroArguments (ptrArray *args)
 {
 	vString *s = vStringNew ();
@@ -578,10 +574,10 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 				{
 					TRACE_PRINT("Macro expansion: %s<%p>%s", vStringValue (token->string),
 								macroInfo, macroInfo->hasParameterList? "(...)": "");
-					if (!(macroInfo->useCount < LD_SCRIPT_PARSER_MAXIMUM_MACRO_USE_COUNT))
+					if (!(macroInfo->useCount < CPP_MAXIMUM_MACRO_USE_COUNT))
 						TRACE_PRINT ("Overly uesd macro %s<%p> useCount: %d (> %d)",
 									 vStringValue (token->string), macroInfo, macroInfo->useCount,
-									 LD_SCRIPT_PARSER_MAXIMUM_MACRO_USE_COUNT);
+									 CPP_MAXIMUM_MACRO_USE_COUNT);
 					else if (expandCppMacro (macroInfo))
 						readToken (token, NULL);
 				}

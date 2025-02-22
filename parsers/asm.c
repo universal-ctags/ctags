@@ -357,10 +357,6 @@ static const unsigned char *readOperator (
 	return cp;
 }
 
-// We stop applying macro replacements if a macro is used so many
-// times in a recursive macro expansion.
-#define ASM_PARSER_MAXIMUM_MACRO_USE_COUNT 8
-
 static bool collectCppMacroArguments (ptrArray *args)
 {
 	vString *s = vStringNew ();
@@ -474,7 +470,7 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 	if (!macroInfo)
 		goto out;
 
-	if (macroInfo->useCount >= ASM_PARSER_MAXIMUM_MACRO_USE_COUNT)
+	if (macroInfo->useCount >= CPP_MAXIMUM_MACRO_USE_COUNT)
 		goto out;
 
 	if (lastChar != EOF)

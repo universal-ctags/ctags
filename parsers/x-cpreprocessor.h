@@ -122,6 +122,15 @@ extern void cppPopExternalParserBlock(void);
 /*
  * Macro expander related declarations
  */
+
+/* We stop applying macro replacements if the unget buffer gets too big
+   as it is a sign of recursive macro expansion */
+#define CPP_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
+
+/* We stop applying macro replacements if a macro is used so many
+   times in a recursive macro expansion. */
+#define CPP_MAXIMUM_MACRO_USE_COUNT 8
+
 typedef struct sCppMacroReplacementPartInfo cppMacroReplacementPartInfo;
 
 typedef struct sCppMacroInfo {
