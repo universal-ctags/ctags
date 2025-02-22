@@ -464,6 +464,13 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 {
 	TRACE_ENTER();
 
+	if (cppUngetBufferSize() >= CPP_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
+	{
+		TRACE_LEAVE_TEXT ("Ungetbuffer overflow when processing \"%s\": %d",
+						  vStringValue (identifier), cppUngetBufferSize());
+		return false;
+	}
+
 	bool r = false;
 	cppMacroInfo *macroInfo = cppFindMacro (vStringValue (identifier));
 
