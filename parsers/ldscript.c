@@ -360,6 +360,29 @@ static bool expandCppMacro (cppMacroInfo *macroInfo)
 	return true;
 }
 
+static void processCppMacroX (tokenInfo *const token)
+{
+	if (cppUngetBufferSize() >= CPP_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
+	{
+		TRACE_PRINT ("Ungetbuffer overflow when processing \"%s\": %d",
+					 vStringValue (token->string), cppUngetBufferSize());
+		return;
+	}
+
+	cppMacroInfo *macroInfo = cppFindMacro (vStringValue (token->string));
+	if (macroInfo)
+	{
+		TRACE_PRINT("Macro expansion: %s<%p>%s", vStringValue (token->string),
+					macroInfo, macroInfo->hasParameterList? "(...)": "");
+		if (!(macroInfo->useCount < CPP_MAXIMUM_MACRO_USE_COUNT))
+			TRACE_PRINT ("Overly uesd macro %s<%p> useCount: %d (> %d)",
+						 vStringValue (token->string), macroInfo, macroInfo->useCount,
+						 CPP_MAXIMUM_MACRO_USE_COUNT);
+		else if (expandCppMacro (macroInfo))
+			readToken (token, NULL);
+	}
+}
+
 static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 {
 	int c, c0, c1;
@@ -568,19 +591,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 			if (token->keyword == KEYWORD_NONE)
 			{
 				token->type = TOKEN_IDENTIFIER;
-
-				cppMacroInfo *macroInfo = cppFindMacro (vStringValue (token->string));
-				if (macroInfo)
-				{
-					TRACE_PRINT("Macro expansion: %s<%p>%s", vStringValue (token->string),
-								macroInfo, macroInfo->hasParameterList? "(...)": "");
-					if (!(macroInfo->useCount < CPP_MAXIMUM_MACRO_USE_COUNT))
-						TRACE_PRINT ("Overly uesd macro %s<%p> useCount: %d (> %d)",
-									 vStringValue (token->string), macroInfo, macroInfo->useCount,
-									 CPP_MAXIMUM_MACRO_USE_COUNT);
-					else if (expandCppMacro (macroInfo))
-						readToken (token, NULL);
-				}
+				processCppMacroX (token);
 			}
 			else
 				token->type = TOKEN_KEYWORD;
