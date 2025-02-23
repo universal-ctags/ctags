@@ -15,6 +15,7 @@
 #include "general.h"  /* must always come first */
 
 #include "debug.h"
+#include "mio.h"
 #include "ptrarray.h"
 #include "types.h"
 #include "vstring.h"
@@ -119,15 +120,19 @@ extern void cppVStringPut (vString * string, const int c);
 extern void cppPushExternalParserBlock(void);
 extern void cppPopExternalParserBlock(void);
 
-#define CPP_MACRO_REPLACEMENT_FLAG_VARARGS 1
-#define CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY 2
+/*
+ * Macro expander related declarations
+ */
 
-typedef struct sCppMacroReplacementPartInfo {
-	int parameterIndex; /* -1 if this part is a constant */
-	int flags;
-	vString * constant; /* not NULL only if parameterIndex != -1 */
-	struct sCppMacroReplacementPartInfo * next;
-} cppMacroReplacementPartInfo;
+/* We stop applying macro replacements if the unget buffer gets too big
+   as it is a sign of recursive macro expansion */
+#define CPP_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
+
+/* We stop applying macro replacements if a macro is used so many
+   times in a recursive macro expansion. */
+#define CPP_MAXIMUM_MACRO_USE_COUNT 8
+
+typedef struct sCppMacroReplacementPartInfo cppMacroReplacementPartInfo;
 
 typedef struct sCppMacroInfo {
 	char *name;			/* the name of macro. Useful for debugging. */
@@ -137,28 +142,70 @@ typedef struct sCppMacroInfo {
 	struct sCppMacroInfo * next;
 } cppMacroInfo;
 
+struct sCppMacroTokens;
+typedef struct sCppMacroTokens cppMacroTokens;
+
+struct sCppMacroArg;
+typedef struct sCppMacroArg cppMacroArg;
+
+/* Expanding macros
+ * ================
+ *
+ * Build a replacement tokens for the specified macro.
+ * If the macro has parameters, they will be used.
+ * Parameters not found in the list will be assumed to be empty.
+ * May return NULL or equivalently an empty replacement tokens.
+ *
+ * Data types
+ * ----------
+ * + cppFindMacro:
+ *   Macro definition.
+ * + cppMacroArg:
+ *   Argument passed to a macro.
+ * + cppMacroTokens:
+ *   The result of macro expansion. You can push back this object
+ *   to the input stream.
+ *
+ * Functions
+ * ---------
+ * + cppFindMacro()
+ * Find a macro definition for a given macro.
+ * Macros defined with -D option are stored to a database behind this function.
+ *
+ * + cppMacroArgNew()
+ * Make an object representing a macro argument.
+ * STR passed to cppMacroArgNew is freed when deleting it with
+ * cppMacroArgDelete() if FREE_STR_WHEN_DELETING is true.
+ *
+ * + cppExpandMacro()
+ * Expand the macro with arguments.
+ * MACRO is a cppMacroInfo object returned from cppFindMacro.
+ * ARGS is a ptrArray containing cppMacroArg objects.
+ * LINENUMBER and FILEPOSITION are the place where the macro is expanded.
+ * Pass the returned value to cppUngetMacroTokens.
+ * cppExpandMacro allocates the cppMacroTokens. It is deleted in
+ * cppExpandMacro().
+ *
+ * + cppExpandMacroAsNewString()
+ * A wrapper of cppExpandMacro. This function returns
+ * a vString instead of returning a cppMacroTokens object.
+ *
+ */
 extern cppMacroInfo * cppFindMacro (const char *const name);
-extern void cppUngetStringBuiltByMacro (const char * string,int len, cppMacroInfo *macro);
+extern void cppUngetMacroTokens (cppMacroTokens *tokens);
 
-/*
-* Build a replacement string for the specified macro.
-* If the macro has parameters, they will be used.
-* Parameters not found in the list will be assumed to be empty.
-* May return NULL or equivalently an empty replacement string.
-*/
-extern vString * cppBuildMacroReplacement(
-		const cppMacroInfo * macro,
-		const char ** parameters, /* may be NULL */
-		int parameterCount
-	);
+extern cppMacroArg *cppMacroArgNew (const char *str, bool free_str_when_deleting,
+									unsigned long lineNumber, MIOPos filePosition);
+extern void cppMacroArgDelete (void *macroArg);
+extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro, const ptrArray *args,
+									   unsigned long lineNumber, MIOPos filePosition);
+extern vString *cppExpandMacroAsNewString (cppMacroInfo * macro, const ptrArray *args);
 
-/* Do the same as cppBuildMacroReplacement with ptrArray<const char*>,
- * and unget the result of expansion to input cpp stream. */
-extern void cppBuildMacroReplacementWithPtrArrayAndUngetResult(
-		cppMacroInfo * macro,
-		const ptrArray * args);
+extern unsigned long cppGetInputLineNumber (void);
+extern MIOPos cppGetInputFilePosition (void);
 
 #ifdef DEBUG
+extern vString *cppFlattenMacroTokensToNewString (cppMacroTokens *tokens);
 extern void cppDebugPutc (const int level, const int c);
 #endif
 

@@ -1,0 +1,8 @@
+faccessat	input.c	/^SYSCALL_DEFINE3(faccessat, int, dfd, const char __user *, filename, int, mode)$/;"	f	line:1	typeref:typename:long	signature:(int,dfd,const char __user *,filename,int,mode)	end:4
+fchmodat	input.c	/^SYSCALL_DEFINE3(fchmodat, int, dfd, const char __user *, filename,$/;"	f	line:6	typeref:typename:long	signature:(int,dfd,const char __user *,filename,umode_t,mode)	end:10
+mysyscall	input.c	/^	mysyscall, int, dfd,$/;"	f	line:16	typeref:typename:long	signature:(int,dfd,const char __user *,filename,umode_t,mode)	end:21
+INJECT_MEMBERS	input.c	/^#define INJECT_MEMBERS(/;"	d	line:23	file:	signature:(m0,m1)	end:26	macrodef:int m0; int padding; int m1
+P	input.c	/^struct P {$/;"	s	line:28	file:	end:33
+x	input.c	/^		x$/;"	m	line:30	struct:P	typeref:typename:int	file:
+padding	input.c	/^	INJECT_MEMBERS($/;"	m	line:29	struct:P	typeref:typename:int	file:	end:29
+y	input.c	/^		y);$/;"	m	line:32	struct:P	typeref:typename:int	file:	end:32

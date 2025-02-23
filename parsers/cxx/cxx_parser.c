@@ -429,6 +429,20 @@ void cxxParserSetEndLineForTagInCorkQueue(int iCorkQueueIndex,unsigned long lEnd
 {
 	CXX_DEBUG_ASSERT(iCorkQueueIndex > CORK_NIL,"The cork queue index is not valid");
 
+	tagEntryInfo *pTag = getEntryInCorkQueue (iCorkQueueIndex);
+	if (pTag)
+	{
+		/* When processing the input data in unget-buffer,
+		 * lineNumber > endLine can happen. */
+		if (pTag->lineNumber > lEndLine) {
+			CXX_DEBUG_PRINT ("Reset endline for \"%s\" starting from %ld (%ld => 0)",
+							 pTag->name,
+							 pTag->lineNumber,
+							 lEndLine);
+			lEndLine = 0;
+
+		}
+	}
 	setTagEndLineToCorkEntry (iCorkQueueIndex, lEndLine);
 }
 
@@ -438,7 +452,7 @@ void cxxParserSetEndLineForTagInCorkQueue(int iCorkQueueIndex,unsigned long lEnd
 //
 void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 {
-	cxxParserSetEndLineForTagInCorkQueue(iCorkQueueIndex,getInputLineNumber());
+	cxxParserSetEndLineForTagInCorkQueue(iCorkQueueIndex, cppGetInputLineNumber());
 }
 
 
@@ -494,8 +508,8 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 			szTypeName
 		);
 
-	MIOPos oFilePosition = getInputFilePosition();
-	int iFileLine = getInputLineNumber();
+	MIOPos oFilePosition = cppGetInputFilePosition();
+	int iFileLine = cppGetInputLineNumber();
 	int eMaybeTokenTypeOpeningBracket = (g_cxx.bConfirmedCPPLanguage
 										 ? 0
 										 : CXXTokenTypeOpeningBracket);

@@ -208,7 +208,7 @@ static bool isDefineOperator (const vString *const operator)
 	return result;
 }
 
-static int makeTagForLdScript (const char * name, int kind, int *scope)
+static int makeTagForLdScript (const char * name, int kind, int *scope, bool useCpp)
 {
 	tagEntryInfo e;
 	static langType lang = LANG_AUTO;
@@ -228,6 +228,8 @@ static int makeTagForLdScript (const char * name, int kind, int *scope)
 
 		initForeignTagEntry(&e, name, lang, kdef->id);
 		e.extensionFields.scopeIndex = *scope;
+		if (useCpp)
+			updateTagLine (&e, cppGetInputLineNumber (), cppGetInputFilePosition());
 		return makeTagEntry (&e);
 	}
 	else
@@ -245,9 +247,22 @@ static int makeTagForLdScript (const char * name, int kind, int *scope)
 			return CORK_NIL;
 
 		initForeignRefTagEntry(&e, name, lang, kdef->id, rdef->id);
+		if (useCpp)
+			updateTagLine (&e, cppGetInputLineNumber (), cppGetInputFilePosition());
 		*scope = makeTagEntry (&e);
 		return *scope;
 	}
+}
+
+static int makeAsmSimpleTag (const vString *const name,
+							 AsmKind kind,
+							 bool useCpp)
+{
+	tagEntryInfo e;
+	initTagEntry (&e, vStringValue (name), kind);
+	if (useCpp)
+		updateTagLine (&e, cppGetInputLineNumber (), cppGetInputFilePosition());
+	return makeTagEntry (&e);
 }
 
 static int makeAsmTag (
@@ -257,7 +272,8 @@ static int makeAsmTag (
 		const bool nameFollows,
 		const bool directive,
 		int *sectionScope,
-		int *macroScope)
+		int *macroScope,
+		bool useCpp)
 {
 	int r = CORK_NIL;
 
@@ -269,19 +285,19 @@ static int makeAsmTag (
 		if (found)
 		{
 			if (kind > K_NONE)
-				r = makeSimpleTag (name, kind);
+				r = makeAsmSimpleTag (name, kind, useCpp);
 		}
 		else if (isDefineOperator (operator))
 		{
 			if (! nameFollows)
-				r = makeSimpleTag (name, K_DEFINE);
+				r = makeAsmSimpleTag (name, K_DEFINE, useCpp);
 		}
 		else if (labelCandidate)
 		{
 			operatorKind (name, &found);
 			if (! found)
 			{
-				r = makeSimpleTag (name, K_LABEL);
+				r = makeAsmSimpleTag (name, K_LABEL, useCpp);
 			}
 		}
 		else if (directive)
@@ -295,7 +311,7 @@ static int makeAsmTag (
 			case K_NONE:
 				break;
 			case K_MACRO:
-				r = makeSimpleTag (operator, kind_for_directive);
+				r = makeAsmSimpleTag (operator, kind_for_directive, useCpp);
 				macro_tag = getEntryInCorkQueue (r);
 				if (macro_tag)
 				{
@@ -308,17 +324,18 @@ static int makeAsmTag (
 				macro_tag = getEntryInCorkQueue (*macroScope);
 				if (macro_tag)
 				{
-					setTagEndLine (macro_tag, getInputLineNumber ());
+					setTagEndLine (macro_tag,
+								   useCpp? cppGetInputLineNumber (): getInputLineNumber ());
 					*macroScope = macro_tag->extensionFields.scopeIndex;
 				}
 				break;
 			case K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL:
 			case K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION:
 				r = makeTagForLdScript (vStringValue (operator),
-										kind_for_directive, sectionScope);
+										kind_for_directive, sectionScope, useCpp);
 				break;
 			default:
-				r = makeSimpleTag (operator, kind_for_directive);
+				r = makeAsmSimpleTag (operator, kind_for_directive, useCpp);
 				break;
 			}
 		}
@@ -357,23 +374,23 @@ static const unsigned char *readOperator (
 	return cp;
 }
 
-// We stop applying macro replacements if the unget buffer gets too big
-// as it is a sign of recursive macro expansion
-#define ASM_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
-
-// We stop applying macro replacements if a macro is used so many
-// times in a recursive macro expansion.
-#define ASM_PARSER_MAXIMUM_MACRO_USE_COUNT 8
-
 static bool collectCppMacroArguments (ptrArray *args)
 {
 	vString *s = vStringNew ();
 	int c;
+	unsigned long ln = cppGetInputLineNumber ();
+	MIOPos pos = cppGetInputFilePosition ();
 	int depth = 1;
 
 	do
 	{
+		if (s && vStringLength (s) == 1)
+		{
+			ln = cppGetInputLineNumber ();
+			pos = cppGetInputFilePosition ();
+		}
 		c = cppGetc ();
+
 		if (c == EOF)
 			break;
 		else if (c == ')')
@@ -382,8 +399,9 @@ static bool collectCppMacroArguments (ptrArray *args)
 			if (depth == 0)
 			{
 				vStringStripTrailing(s);
-				char *cstr = vStringDeleteUnwrap (s);
-				ptrArrayAdd (args, cstr);
+				cppMacroArg *a = cppMacroArgNew (vStringDeleteUnwrap (s), true,
+												 ln, pos);
+				ptrArrayAdd (args, a);
 				s = NULL;
 			}
 			else
@@ -397,8 +415,9 @@ static bool collectCppMacroArguments (ptrArray *args)
 		else if (c == ',')
 		{
 			vStringStripTrailing(s);
-			char *cstr = vStringDeleteUnwrap (s);
-			ptrArrayAdd (args, cstr);
+			cppMacroArg *a = cppMacroArgNew (vStringDeleteUnwrap (s), true,
+											 ln, pos);
+			ptrArrayAdd (args, a);
 			s = vStringNew ();
 		}
 		else if (c == CPP_STRING_SYMBOL || c == CPP_CHAR_SYMBOL)
@@ -422,7 +441,8 @@ static bool collectCppMacroArguments (ptrArray *args)
 	return (depth > 0)? false: true;
 }
 
-static bool expandCppMacro (cppMacroInfo *macroInfo)
+static bool expandCppMacro (cppMacroInfo *macroInfo,
+							unsigned long lineNumber, MIOPos filePosition)
 {
 	ptrArray *args = NULL;
 
@@ -443,7 +463,7 @@ static bool expandCppMacro (cppMacroInfo *macroInfo)
 			return false;
 		}
 
-		args = ptrArrayNew (eFree);
+		args = ptrArrayNew (cppMacroArgDelete);
 		if (!collectCppMacroArguments (args))
 		{
 			/* The input stream is already corrupted.
@@ -453,7 +473,11 @@ static bool expandCppMacro (cppMacroInfo *macroInfo)
 		}
 	}
 
-	cppBuildMacroReplacementWithPtrArrayAndUngetResult(macroInfo, args);
+	{
+		cppMacroTokens *tokens = cppExpandMacro (macroInfo, args,
+												 lineNumber, filePosition);
+		cppUngetMacroTokens (tokens);
+	}
 
 	ptrArrayDelete (args);		/* NULL is acceptable. */
 	return true;
@@ -472,13 +496,20 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 {
 	TRACE_ENTER();
 
+	if (cppUngetBufferSize() >= CPP_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
+	{
+		TRACE_LEAVE_TEXT ("Ungetbuffer overflow when processing \"%s\": %d",
+						  vStringValue (identifier), cppUngetBufferSize());
+		return false;
+	}
+
 	bool r = false;
 	cppMacroInfo *macroInfo = cppFindMacro (vStringValue (identifier));
 
 	if (!macroInfo)
 		goto out;
 
-	if(macroInfo && (macroInfo->useCount >= ASM_PARSER_MAXIMUM_MACRO_USE_COUNT))
+	if (macroInfo->useCount >= CPP_MAXIMUM_MACRO_USE_COUNT)
 		goto out;
 
 	if (lastChar != EOF)
@@ -487,7 +518,8 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 	TRACE_PRINT("Macro expansion: %s<%p>%s", macroInfo->name,
 				macroInfo, macroInfo->hasParameterList? "(...)": "");
 
-	r = expandCppMacro (macroInfo);
+	r = expandCppMacro (macroInfo,
+						cppGetInputLineNumber (), cppGetInputFilePosition ());
 
  out:
 	if (r)
@@ -665,7 +697,8 @@ static const unsigned char *asmReadLineFromInputFile (const char *commentChars, 
 		return readLineNoCpp (commentChars);
 }
 
-static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned char *cp)
+static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned char *cp,
+								  bool useCpp)
 {
 	vString *name = vStringNew ();
 	vString *signature = vStringNew ();
@@ -688,7 +721,7 @@ static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned cha
 			break;
 
 		{
-			int r = makeSimpleTag (name, K_PARAM);
+			int r = makeAsmSimpleTag (name, K_PARAM, useCpp);
 			e = getEntryInCorkQueue (r);
 			if (e)
 			{
@@ -830,11 +863,11 @@ static void findAsmTagsCommon (bool useCpp)
 			nameFollows = true;
 		}
 		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive,
-							&sectionScope, &macroScope);
+							&sectionScope, &macroScope, useCpp);
 		tagEntryInfo *e = getEntryInCorkQueue (r);
 		if (e && e->langType == Lang_asm
 			&& e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))
-			readMacroParameters (r, e, cp);
+			readMacroParameters (r, e, cp, useCpp);
 	}
 
 	if (useCpp)

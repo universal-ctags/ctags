@@ -1,0 +1,7 @@
+ENTRY	input.S	/^#define ENTRY(/;"	d	line:1	file:	signature:(SYMBOL,LABEL)	macrodef:.global SYMBOL ;LABEL: nop
+E	input.S	/^ENTRY($/;"	s	line:6
+F	input.S	/^	F)$/;"	l	line:7
+G	input.S	/^ENTRY($/;"	s	line:10
+H	input.S	/^	)$/;"	l	line:11
+I	input.S	/^ENTRY($/;"	s	line:15
+J	input.S	/^	)$/;"	l	line:16

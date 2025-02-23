@@ -106,14 +106,24 @@ enum eState {
 
 /*  Defines the current state of the pre-processor.
  */
+typedef struct sUngetBuffer {
+	int *buffer;		/* memory buffer for unget characters */
+	int size;		/* the current unget buffer size */
+	int *pointer;		/* the current unget char: points in the
+						   middle of the buffer */
+	int dataSize;		/* the number of valid unget characters
+						   in the buffer */
+	unsigned long lineNumber;
+	MIOPos filePosition;
+	cppMacroInfo *macro;
+} ungetBuffer;
+
 typedef struct sCppState {
 	langType lang;
 	langType clientLang;
 
-	int * ungetBuffer;       /* memory buffer for unget characters */
-	int ungetBufferSize;      /* the current unget buffer size */
-	int * ungetPointer;      /* the current unget char: points in the middle of the buffer */
-	int ungetDataSize;        /* the number of valid unget characters in the buffer */
+	ungetBuffer  *ungetBuffer;
+	ptrArray *ungetBufferStack;
 
 	/* the contents of the last SYMBOL_CHAR or SYMBOL_STRING */
 	vString * charOrStringContents;
@@ -154,6 +164,33 @@ typedef struct sCppState {
 
 } cppState;
 
+#define CPP_MACRO_REPLACEMENT_FLAG_VARARGS 1
+#define CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY 2
+
+struct sCppMacroReplacementPartInfo {
+	int parameterIndex; /* -1 if this part is a constant */
+	int flags;
+	vString * constant; /* not NULL only if parameterIndex != -1 */
+	struct sCppMacroReplacementPartInfo * next;
+};
+
+struct sCppMacroArg {
+	const char *str;
+	unsigned long lineNumber;
+	MIOPos filePosition;
+	bool free_str;
+};
+
+struct sCppMacroTokens {
+	ptrArray *tarray;
+	cppMacroInfo *macro;
+};
+
+typedef struct sCppMacroToken {
+	const char *str;
+	unsigned long lineNumber;
+	MIOPos filePosition;
+} cppMacroToken;
 
 typedef enum {
 	CPREPRO_MACRO_KIND_UNDEF_ROLE,
@@ -230,9 +267,7 @@ static cppState Cpp = {
 	.lang = LANG_IGNORE,
 	.clientLang = LANG_IGNORE,
 	.ungetBuffer = NULL,
-	.ungetBufferSize = 0,
-	.ungetPointer = NULL,
-	.ungetDataSize = 0,
+	.ungetBufferStack = NULL,
 	.charOrStringContents = NULL,
 	.resolveRequired = false,
 	.hasAtLiteralStrings = false,
@@ -272,6 +307,8 @@ static cppState Cpp = {
 static hashTable *makeMacroTable (void);
 static cppMacroInfo * saveMacro(hashTable *table, const char * macro);
 
+static void cppMacroTokensDelete (cppMacroTokens *tokens);
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -284,6 +321,31 @@ extern bool cppIsBraceFormat (void)
 extern unsigned int cppGetDirectiveNestLevel (void)
 {
 	return Cpp.directive.nestLevel;
+}
+
+static ungetBuffer *ungetBufferNew  (unsigned long lineNumber,
+									 MIOPos filePosition,
+									 cppMacroInfo *macro)
+{
+	ungetBuffer *ub = xCalloc (1, ungetBuffer);
+	ub->lineNumber = lineNumber;
+	ub->filePosition = filePosition;
+	ub->macro = macro;
+	return ub;
+}
+
+static void ungetBufferDelete (ungetBuffer *ub)
+{
+	if (!ub)
+		return;
+
+	if (ub->buffer)
+	{
+		eFree (ub->buffer);
+		ub->buffer = NULL;
+	}
+
+	eFree (ub);
 }
 
 static void cppInitCommon(langType clientLang,
@@ -314,7 +376,7 @@ static void cppInitCommon(langType clientLang,
 
 	Cpp.clientLang = clientLang;
 	Cpp.ungetBuffer = NULL;
-	Cpp.ungetPointer = NULL;
+	Cpp.ungetBufferStack = ptrArrayNew ((ptrArrayDeleteFunc)ungetBufferDelete);
 
 	CXX_DEBUG_ASSERT(!Cpp.charOrStringContents,"This string should be null when CPP is not initialized");
 	Cpp.charOrStringContents = vStringNew();
@@ -433,11 +495,10 @@ extern void cppTerminate (void)
 		Cpp.directive.name = NULL;
 	}
 
-	if(Cpp.ungetBuffer)
-	{
-		eFree(Cpp.ungetBuffer);
-		Cpp.ungetBuffer = NULL;
-	}
+	ungetBufferDelete (Cpp.ungetBuffer); /* NULL is acceptable */
+	Cpp.ungetBuffer = NULL;
+	ptrArrayDelete (Cpp.ungetBufferStack);
+	Cpp.ungetBufferStack = NULL;
 
 	if(Cpp.charOrStringContents)
 	{
@@ -474,15 +535,15 @@ extern void cppEndStatement (void)
 */
 
 /*  This puts a character back into the input queue for the input File. */
-extern void cppUngetc (const int c)
+static void ungetBufferUngetc (ungetBuffer *ungetBuffer, const int c, vString *charOrStringContents)
 {
 	if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
 	{
-		Assert(Cpp.charOrStringContents != NULL);
+		Assert(charOrStringContents != NULL);
 		cppUngetc(c == STRING_SYMBOL ? '"' : '\'');
-		cppUngetString(vStringValue(Cpp.charOrStringContents), vStringLength(Cpp.charOrStringContents));
+		cppUngetString(vStringValue(charOrStringContents), vStringLength(charOrStringContents));
 		cppUngetc(c == STRING_SYMBOL ? '"' : '\'');
-		vStringClear(Cpp.charOrStringContents);
+		vStringClear(charOrStringContents);
 		return;
 	}
 	else if (c == EOF)
@@ -490,102 +551,155 @@ extern void cppUngetc (const int c)
 		return;
 	}
 
-	if(!Cpp.ungetPointer)
+	if(!ungetBuffer->pointer)
 	{
 		// no unget data
-		if(!Cpp.ungetBuffer)
+		if(!ungetBuffer->buffer)
 		{
-			Cpp.ungetBuffer = (int *)eMalloc(8 * sizeof(int));
-			Cpp.ungetBufferSize = 8;
+			ungetBuffer->buffer = (int *)eMalloc(8 * sizeof(int));
+			ungetBuffer->size = 8;
 		}
-		Assert(Cpp.ungetBufferSize > 0);
-		Cpp.ungetPointer = Cpp.ungetBuffer + Cpp.ungetBufferSize - 1;
-		*(Cpp.ungetPointer) = c;
-		Cpp.ungetDataSize = 1;
+		Assert(ungetBuffer->size > 0);
+		ungetBuffer->pointer = ungetBuffer->buffer + ungetBuffer->size - 1;
+		*(ungetBuffer->pointer) = c;
+		ungetBuffer->dataSize = 1;
 		return;
 	}
 
 	// Already have some unget data in the buffer. Must prepend.
-	Assert(Cpp.ungetBuffer);
-	Assert(Cpp.ungetBufferSize > 0);
-	Assert(Cpp.ungetDataSize > 0);
-	Assert(Cpp.ungetPointer >= Cpp.ungetBuffer);
+	Assert(ungetBuffer->buffer);
+	Assert(ungetBuffer->size > 0);
+	Assert(ungetBuffer->dataSize > 0);
+	Assert(ungetBuffer->pointer >= ungetBuffer->buffer);
 
-	if(Cpp.ungetPointer == Cpp.ungetBuffer)
+	if(ungetBuffer->pointer == ungetBuffer->buffer)
 	{
-		Cpp.ungetBufferSize += 8;
-		int * tmp = (int *)eMalloc(Cpp.ungetBufferSize * sizeof(int));
-		memcpy(tmp+8,Cpp.ungetPointer,Cpp.ungetDataSize * sizeof(int));
-		eFree(Cpp.ungetBuffer);
-		Cpp.ungetBuffer = tmp;
-		Cpp.ungetPointer = tmp + 7;
+		ungetBuffer->size += 8;
+		int * tmp = (int *)eMalloc(ungetBuffer->size * sizeof(int));
+		memcpy(tmp+8,ungetBuffer->pointer,ungetBuffer->dataSize * sizeof(int));
+		eFree(ungetBuffer->buffer);
+		ungetBuffer->buffer = tmp;
+		ungetBuffer->pointer = tmp + 7;
 	} else {
-		Cpp.ungetPointer--;
+		ungetBuffer->pointer--;
 	}
 
-	*(Cpp.ungetPointer) = c;
-	Cpp.ungetDataSize++;
+	*(ungetBuffer->pointer) = c;
+	ungetBuffer->dataSize++;
 }
 
-extern int cppUngetBufferSize(void)
+static int ungetBufferSize (ungetBuffer *ungetBuffer)
 {
-	return Cpp.ungetBufferSize;
+	return ungetBuffer->size;
 }
 
-/*  This puts an entire string back into the input queue for the input File. */
-extern void cppUngetString(const char * string,int len)
+static void ungetBufferUngetString(ungetBuffer *ungetBuffer, const char * string, int len)
 {
 	if(!string)
 		return;
 	if(len < 1)
 		return;
 
-	if(!Cpp.ungetPointer)
+	if(!ungetBuffer->pointer)
 	{
 		// no unget data
-		if(!Cpp.ungetBuffer)
+		if(!ungetBuffer->buffer)
 		{
-			Cpp.ungetBufferSize = 8 + len;
-			Cpp.ungetBuffer = (int *)eMalloc(Cpp.ungetBufferSize * sizeof(int));
-		} else if(Cpp.ungetBufferSize < len)
+			ungetBuffer->size = 8 + len;
+			ungetBuffer->buffer = (int *)eMalloc(ungetBuffer->size * sizeof(int));
+		} else if(ungetBuffer->size < len)
 		{
-			Cpp.ungetBufferSize = 8 + len;
-			Cpp.ungetBuffer = (int *)eRealloc(Cpp.ungetBuffer,Cpp.ungetBufferSize * sizeof(int));
+			ungetBuffer->size = 8 + len;
+			ungetBuffer->buffer = (int *)eRealloc(ungetBuffer->buffer,ungetBuffer->size * sizeof(int));
 		}
-		Cpp.ungetPointer = Cpp.ungetBuffer + Cpp.ungetBufferSize - len;
+		ungetBuffer->pointer = ungetBuffer->buffer + ungetBuffer->size - len;
 	} else {
 		// Already have some unget data in the buffer. Must prepend.
-		Assert(Cpp.ungetBuffer);
-		Assert(Cpp.ungetBufferSize > 0);
-		Assert(Cpp.ungetDataSize > 0);
-		Assert(Cpp.ungetPointer >= Cpp.ungetBuffer);
+		Assert(ungetBuffer->buffer);
+		Assert(ungetBuffer->size > 0);
+		Assert(ungetBuffer->dataSize > 0);
+		Assert(ungetBuffer->pointer >= ungetBuffer->buffer);
 
-		if(Cpp.ungetBufferSize < (Cpp.ungetDataSize + len))
+		if(ungetBuffer->size < (ungetBuffer->dataSize + len))
 		{
-			Cpp.ungetBufferSize = 8 + len + Cpp.ungetDataSize;
-			int * tmp = (int *)eMalloc(Cpp.ungetBufferSize * sizeof(int));
-			memcpy(tmp + 8 + len,Cpp.ungetPointer,Cpp.ungetDataSize * sizeof(int));
-			eFree(Cpp.ungetBuffer);
-			Cpp.ungetBuffer = tmp;
-			Cpp.ungetPointer = tmp + 8;
+			ungetBuffer->size = 8 + len + ungetBuffer->dataSize;
+			int * tmp = (int *)eMalloc(ungetBuffer->size * sizeof(int));
+			memcpy(tmp + 8 + len,ungetBuffer->pointer,ungetBuffer->dataSize * sizeof(int));
+			eFree(ungetBuffer->buffer);
+			ungetBuffer->buffer = tmp;
+			ungetBuffer->pointer = tmp + 8;
 		} else {
-			Cpp.ungetPointer -= len;
-			Assert(Cpp.ungetPointer >= Cpp.ungetBuffer);
+			ungetBuffer->pointer -= len;
+			Assert(ungetBuffer->pointer >= ungetBuffer->buffer);
 		}
 	}
 
-	int * p = Cpp.ungetPointer;
+	int * p = ungetBuffer->pointer;
 	const char * s = string;
 	const char * e = string + len;
 
 	while(s < e)
 		*p++ = *s++;
 
-	Cpp.ungetDataSize += len;
+	ungetBuffer->dataSize += len;
 }
 
-extern void cppUngetStringBuiltByMacro(const char * string,int len, cppMacroInfo *macro)
+static int ungetBufferGetcFromUngetBuffer (ungetBuffer *ungetBuffer)
 {
+	if(ungetBuffer->pointer)
+	{
+		Assert(ungetBuffer->buffer);
+		Assert(ungetBuffer->size > 0);
+		Assert(ungetBuffer->dataSize > 0);
+
+		int c = *(ungetBuffer->pointer);
+		ungetBuffer->dataSize--;
+		if(ungetBuffer->dataSize > 0)
+			ungetBuffer->pointer++;
+		else
+			ungetBuffer->pointer = NULL;
+		return c;
+	}
+	return EOF;
+}
+
+extern void cppUngetc (const int c)
+{
+	if (Cpp.ungetBuffer == NULL)
+		Cpp.ungetBuffer = ungetBufferNew (getInputLineNumber(),
+										  getInputFilePosition(),
+										  NULL);
+	ungetBufferUngetc (Cpp.ungetBuffer , c, Cpp.charOrStringContents);
+}
+
+extern int cppUngetBufferSize(void)
+{
+	if (Cpp.ungetBuffer == NULL)
+		return 0;
+
+	int size = ungetBufferSize (Cpp.ungetBuffer);
+	for (size_t i = 0; i < ptrArrayCount (Cpp.ungetBufferStack); i++)
+	{
+		ungetBuffer *ub = ptrArrayItem (Cpp.ungetBufferStack, i);
+		i += ungetBufferSize (ub);
+	}
+	return size;
+}
+
+/*  This puts an entire string back into the input queue for the input File. */
+extern void cppUngetString(const char * string, int len)
+{
+	if (Cpp.ungetBuffer == NULL)
+		Cpp.ungetBuffer = ungetBufferNew (getInputLineNumber(),
+										  getInputFilePosition(),
+										  NULL);
+	ungetBufferUngetString (Cpp.ungetBuffer, string, len);
+}
+
+extern void cppUngetMacroTokens (cppMacroTokens *tokens)
+{
+	cppMacroInfo *macro = tokens->macro;
+
 	if (macro->useCount == 0)
 	{
 		cppMacroInfo *m = Cpp.macroInUse;
@@ -597,29 +711,70 @@ extern void cppUngetStringBuiltByMacro(const char * string,int len, cppMacroInfo
 	CXX_DEBUG_PRINT("Macro <%p> increment useCount: %d->%d", macro,
 					(macro->useCount - 1), macro->useCount);
 
-	cppUngetString (string, len);
+	ptrArray *a = tokens->tarray;
+	if (ptrArrayIsEmpty (a))
+	{
+		cppMacroTokensDelete (tokens);
+		return;
+	}
+
+	if (Cpp.ungetBuffer)
+	{
+		ptrArrayAdd(Cpp.ungetBufferStack, Cpp.ungetBuffer);
+		Cpp.ungetBuffer = NULL;
+	}
+
+	for(size_t i = ptrArrayCount (a); i > 0; i--)
+	{
+		cppMacroToken *t = ptrArrayItem (a, i - 1);
+		ungetBuffer *ub = ungetBufferNew(t->lineNumber, t->filePosition,
+										 macro);
+		ungetBufferUngetString (ub, t->str, strlen (t->str));
+		ptrArrayAdd(Cpp.ungetBufferStack, ub);
+	}
+
+	if (!ptrArrayIsEmpty (Cpp.ungetBufferStack))
+		Cpp.ungetBuffer = ptrArrayRemoveLast (Cpp.ungetBufferStack);
+	cppMacroTokensDelete (tokens);
 }
 
 static int cppGetcFromUngetBufferOrFile(void)
 {
-	if(Cpp.ungetPointer)
+ retry:
+	if (Cpp.ungetBuffer)
 	{
-		Assert(Cpp.ungetBuffer);
-		Assert(Cpp.ungetBufferSize > 0);
-		Assert(Cpp.ungetDataSize > 0);
+		int c = ungetBufferGetcFromUngetBuffer (Cpp.ungetBuffer);
+		if (c != EOF)
+			return c;
 
-		int c = *(Cpp.ungetPointer);
-		Cpp.ungetDataSize--;
-		if(Cpp.ungetDataSize > 0)
-			Cpp.ungetPointer++;
-		else
-			Cpp.ungetPointer = NULL;
-		return c;
+		ungetBufferDelete (Cpp.ungetBuffer);
+		Cpp.ungetBuffer = NULL;
+		if (!ptrArrayIsEmpty (Cpp.ungetBufferStack))
+		{
+			Cpp.ungetBuffer = ptrArrayRemoveLast (Cpp.ungetBufferStack);
+			goto retry;
+		}
 	}
+
+	/* Or */
 
 	if (Cpp.macroInUse)
 		cppClearMacroInUse (&Cpp.macroInUse);
 	return getcFromInputFile();
+}
+
+extern unsigned long cppGetInputLineNumber (void)
+{
+	if (Cpp.ungetBuffer)
+		return Cpp.ungetBuffer->lineNumber;
+	return getInputLineNumber();
+}
+
+extern MIOPos cppGetInputFilePosition (void)
+{
+	if (Cpp.ungetBuffer)
+		return Cpp.ungetBuffer->filePosition;
+	return getInputFilePosition();
 }
 
 
@@ -908,17 +1063,18 @@ static int makeParamTag (vString *name, short nth, bool placeholder)
 
 	if (standing_alone)
 		pushLanguage (Cpp.lang);
-	int r = makeSimpleTag (name, Cpp.macroParamKindIndex);
+
+	tagEntryInfo e;
+	initTagEntry (&e, vStringValue (name), Cpp.macroParamKindIndex);
+	updateTagLine (&e, cppGetInputLineNumber (), cppGetInputFilePosition ());
+	e.extensionFields.nth = nth;
+	if (placeholder)
+		markTagAsPlaceholder (&e, placeholder);
+	int r = makeTagEntry(&e);
+
 	if (standing_alone)
 		popLanguage ();
 
-	tagEntryInfo *e = getEntryInCorkQueue (r);
-	if (e)
-	{
-		e->extensionFields.nth = nth;
-		if (placeholder)
-			markTagAsPlaceholder (e, placeholder);
-	}
 	return r;
 }
 
@@ -963,8 +1119,8 @@ static int directiveDefine (const int c, bool undef)
 		readIdentifier (c, Cpp.directive.name);
 		if (! isIgnore ())
 		{
-			unsigned long 	lineNumber = getInputLineNumber ();
-			MIOPos filePosition = getInputFilePosition ();
+			unsigned long 	lineNumber = cppGetInputLineNumber ();
+			MIOPos filePosition = cppGetInputFilePosition ();
 			int p = cppGetcFromUngetBufferOrFile ();
 			short nth = 0;
 
@@ -1136,7 +1292,7 @@ static bool directiveIf (const int c, enum eIfSubstate if_substate)
 	{
 		conditionalInfo *ifdef = currentConditional ();
 		ifdef->asmArea.ifSubstate = if_substate;
-		ifdef->asmArea.line = getInputLineNumber();
+		ifdef->asmArea.line = cppGetInputLineNumber ();
 	}
 
 	Cpp.directive.state = DRCTV_NONE;
@@ -1174,7 +1330,7 @@ static void promiseOrPrepareAsm (conditionalInfo *ifdef, enum eIfSubstate curren
 			&& (currentState == IF_ENDIF)))
 	{
 		unsigned long start = ifdef->asmArea.line + 1;
-		unsigned long end = getInputLineNumber ();
+		unsigned long end = cppGetInputLineNumber ();
 
 		if (start < end)
 			makePromise ("Asm", start, 0, end, 0, start);
@@ -1188,7 +1344,7 @@ static void promiseOrPrepareAsm (conditionalInfo *ifdef, enum eIfSubstate curren
 		else if (currentState == IF_ELSE)
 		{
 			ifdef->asmArea.ifSubstate = IF_ELSE;
-			ifdef->asmArea.line = getInputLineNumber ();
+			ifdef->asmArea.line = cppGetInputLineNumber ();
 		}
 	}
 }
@@ -1543,7 +1699,11 @@ static vString * conditionMayFlush (vString* condition, bool del)
 		if (standing_alone)
 			pushLanguage (Cpp.lang);
 
-		makeSimpleRefTag (condition, Cpp.defineMacroKindIndex, Cpp.macroConditionRoleIndex);
+		tagEntryInfo e;
+		initRefTagEntry (&e, vStringValue (condition),
+						 Cpp.defineMacroKindIndex, Cpp.macroConditionRoleIndex);
+		updateTagLine (&e, cppGetInputLineNumber (), cppGetInputFilePosition ());
+		makeTagEntry (&e);
 
 		if (standing_alone)
 			popLanguage ();
@@ -1619,7 +1779,7 @@ process:
 				if (macroCorkIndex != CORK_NIL)
 				{
 					attachFields (macroCorkIndex,
-								  getInputLineNumber(),
+								  cppGetInputLineNumber(),
 								  macrodef? vStringValue (macrodef): NULL);
 					macroCorkIndex = CORK_NIL;
 				}
@@ -1643,7 +1803,7 @@ process:
 					if (macroCorkIndex != CORK_NIL)
 					{
 						attachFields (macroCorkIndex,
-									  getInputLineNumber(),
+									  cppGetInputLineNumber(),
 									  macrodef? vStringValue (macrodef): NULL);
 						macroCorkIndex = CORK_NIL;
 					}
@@ -1991,7 +2151,7 @@ process:
 
 	DebugStatement ( cppDebugPutc (DEBUG_CPP, c); )
 	DebugStatement ( if (c == NEWLINE)
-				debugPrintf (DEBUG_CPP, "%6ld: ", getInputLineNumber () + 1); )
+				debugPrintf (DEBUG_CPP, "%6ld: ", cppGetInputLineNumber () + 1); )
 
 	return c;
 }
@@ -2078,20 +2238,88 @@ extern cppMacroInfo * cppFindMacro (const char *const name)
 	return NULL;
 }
 
-extern vString * cppBuildMacroReplacement(
-		const cppMacroInfo * macro,
-		const char ** parameters, /* may be NULL */
-		int parameterCount
-	)
+extern cppMacroArg *cppMacroArgNew (const char *str, bool free_str_when_deleting,
+									unsigned long lineNumber, MIOPos filePosition)
+{
+	cppMacroArg *a = xMalloc (1, cppMacroArg);
+
+	a->str = str;
+	a->free_str = free_str_when_deleting;
+	a->lineNumber = lineNumber;
+	a->filePosition = filePosition;
+
+	return a;
+}
+
+extern void cppMacroArgDelete (void *macroArg)
+{
+	cppMacroArg *a = (cppMacroArg *)macroArg;
+	if (a->free_str)
+		eFree ((void *)a->str);
+	a->str = NULL;
+	eFree (macroArg);
+}
+
+static cppMacroToken *cppMacroTokenNew(unsigned long lineNumber, MIOPos filePosition)
+{
+	cppMacroToken *t = xMalloc (1, cppMacroToken);
+	t->str = NULL;
+	t->lineNumber = lineNumber;
+	t->filePosition = filePosition;
+	return t;
+}
+
+static void cppMacroTokenDelete (cppMacroToken *t)
+{
+	if (t->str)
+		eFree ((void *)t->str);
+	t->str = NULL;
+	eFree (t);
+}
+
+static cppMacroTokens *cppMacroTokensNew (cppMacroInfo * macro)
+{
+	cppMacroTokens *r = xMalloc (1, cppMacroTokens);
+
+	r->tarray = ptrArrayNew ((ptrArrayDeleteFunc)cppMacroTokenDelete);
+	r->macro = macro;
+
+	return r;
+}
+
+static void cppMacroTokensDelete (cppMacroTokens *tokens)
+{
+	if (tokens)
+	{
+		ptrArrayDelete (tokens->tarray);
+		tokens->tarray = NULL;
+		eFree (tokens);
+	}
+}
+
+extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro,
+									   const ptrArray *args,
+									   unsigned long lineNumber,
+									   MIOPos filePosition)
 {
 	if(!macro)
 		return NULL;
 
+	if(cppUngetBufferSize () >= CPP_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
+	{
+		CXX_DEBUG_PRINT ("Ungetbuffer overflow when processing \"%s\": %d",
+						 macro->name, cppUngetBufferSize());
+		return NULL;
+	}
+
 	if(!macro->replacements)
 		return NULL;
 
-	vString * ret = vStringNew();
+	cppMacroTokens *tokens = cppMacroTokensNew (macro);
+	cppMacroToken *t = cppMacroTokenNew(lineNumber, filePosition);
+	ptrArrayAdd (tokens->tarray, t);
 
+	vString * vstr = vStringNew();
 	cppMacroReplacementPartInfo * r = macro->replacements;
 
 	while(r)
@@ -2099,83 +2327,89 @@ extern vString * cppBuildMacroReplacement(
 		if(r->parameterIndex < 0)
 		{
 			if(r->constant)
-				vStringCat(ret,r->constant);
+			{
+				/* We assume the constant parts of the macro definition are
+				 * at the beginning of the current macro expansion. */
+				t->str = vStringDeleteUnwrap (vstr);
+
+				t = cppMacroTokenNew(lineNumber, filePosition);
+				ptrArrayAdd (tokens->tarray, t);
+
+				vstr = vStringNewCopy (r->constant);
+			}
 		} else {
-			if(parameters && (r->parameterIndex < parameterCount))
+			if(args && (r->parameterIndex < ptrArrayCount (args)))
 			{
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY)
-					vStringPut(ret,'"');
+					vStringPut(vstr,'"');
+				t->str = vStringDeleteUnwrap (vstr);
 
-				vStringCatS(ret,parameters[r->parameterIndex]);
+				cppMacroArg *a = ptrArrayItem (args, r->parameterIndex);
+				t = cppMacroTokenNew(a->lineNumber, a->filePosition);
+				ptrArrayAdd (tokens->tarray, t);
+
+				vstr = vStringNewInit(a->str);
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_VARARGS)
 				{
 					int idx = r->parameterIndex + 1;
-					while(idx < parameterCount)
+					while(idx < ptrArrayCount (args))
 					{
-						vStringPut(ret,',');
-						vStringCatS(ret,parameters[idx]);
+						vStringPut(vstr,',');
+						t->str = vStringDeleteUnwrap (vstr);
+
+						a = ptrArrayItem (args, idx);
+						t = cppMacroTokenNew(a->lineNumber, a->filePosition);
+						ptrArrayAdd (tokens->tarray, t);
+						vstr = vStringNew();
+
+						vStringCatS(vstr, a->str);
 						idx++;
 					}
 				}
 
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY)
-					vStringPut(ret,'"');
+					vStringPut(vstr,'"');
 			}
 		}
 
 		r = r->next;
 	}
 
-	return ret;
+	if (t->str == NULL)
+		t->str = vStringDeleteUnwrap (vstr);
+
+	return tokens;
 }
 
-// We stop applying macro replacements if the unget buffer gets too big
-// as it is a sign of recursive macro expansion
-#define CPP_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS 65536
-
-extern void cppBuildMacroReplacementWithPtrArrayAndUngetResult(
-		cppMacroInfo * macro,
-		const ptrArray * args)
+#ifdef DEBUG
+extern
+#else
+static
+#endif
+vString *cppFlattenMacroTokensToNewString (cppMacroTokens *tokens)
 {
-	vString * replacement = NULL;
+	vString *vstr = vStringNew ();
 
-	// Detect other cases of nasty macro expansion that cause
-	// the unget buffer to grow fast (but the token chain to grow slowly)
-	//    -D'p=a' -D'a=p+p'
-	if ((cppUngetBufferSize() < CPP_PARSER_MAXIMUM_UNGET_BUFFER_SIZE_FOR_MACRO_REPLACEMENTS)
-		&& macro->replacements)
+	for (size_t i = 0; i < ptrArrayCount (tokens->tarray); i++)
 	{
-		int argc = 0;
-		const char ** argv = NULL;
-
-		if (args)
-		{
-			argc = ptrArrayCount (args);
-			argv = (const char **)eMalloc (sizeof(char *) * argc);
-			for (int i = 0; i < argc; i++)
-			{
-				TRACE_PRINT("Arg[%d] for %s<%p>: %s",
-							i, macro->name, macro, ptrArrayItem (args, i));
-				argv[i] = ptrArrayItem (args, i);
-			}
-		}
-
-		replacement = cppBuildMacroReplacement(macro, argv, argc);
-
-		if (argv)
-			eFree ((void *)argv);
+		cppMacroToken *t = ptrArrayItem (tokens->tarray, i);
+		vStringCatS (vstr, t->str);
 	}
 
-	if (replacement)
-	{
-		cppUngetStringBuiltByMacro(vStringValue(replacement), vStringLength(replacement),
-								   macro);
-		TRACE_PRINT("Replacement for %s<%p>: %s", macro->name, macro, vStringValue (replacement));
-		vStringDelete (replacement);
-	}
-	else
-		TRACE_PRINT("Replacement for %s<%p>: ", macro->name, macro);
+	return vstr;
+}
 
+extern vString *cppExpandMacroAsNewString(cppMacroInfo * macro, const ptrArray *args)
+{
+	cppMacroTokens * tokens = cppExpandMacro (macro, args,
+											  cppGetInputLineNumber (),
+											  cppGetInputFilePosition ());
+	if (!tokens)
+		return NULL;
+
+	vString *vstr = cppFlattenMacroTokensToNewString (tokens);
+	cppMacroTokensDelete (tokens);
+	return vstr;
 }
 
 static void saveIgnoreToken(const char * ignoreToken)
