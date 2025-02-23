@@ -374,13 +374,14 @@ static bool collectCppMacroArguments (ptrArray *args)
 	do
 	{
 		c = cppGetc ();
-		if (c == EOF || c == '\n')
+		if (c == EOF)
 			break;
 		else if (c == ')')
 		{
 			depth--;
 			if (depth == 0)
 			{
+				vStringStripTrailing(s);
 				char *cstr = vStringDeleteUnwrap (s);
 				ptrArrayAdd (args, cstr);
 				s = NULL;
@@ -395,12 +396,19 @@ static bool collectCppMacroArguments (ptrArray *args)
 		}
 		else if (c == ',')
 		{
+			vStringStripTrailing(s);
 			char *cstr = vStringDeleteUnwrap (s);
 			ptrArrayAdd (args, cstr);
 			s = vStringNew ();
 		}
 		else if (c == CPP_STRING_SYMBOL || c == CPP_CHAR_SYMBOL)
 			vStringPut (s, ' ');
+		else if (isspace(c))
+		{
+			if (!vStringIsEmpty (s) &&
+				!isspace ((unsigned char)vStringLast (s)))
+				vStringPut (s, ' ');
+		}
 		else
 			vStringPut (s, c);
 	}
