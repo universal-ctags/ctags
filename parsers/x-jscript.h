@@ -29,4 +29,7 @@ typedef enum {
 	JSTAG_FUNCTIONRoleFOREIGNDECL
 } JSTAGFunctionRole;
 
+/* Skip over { ... } */
+void javaScriptSkipObjectExpression (void);
+
 #endif

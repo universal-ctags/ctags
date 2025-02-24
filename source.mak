@@ -292,6 +292,7 @@ PARSER_HEADS = \
 	\
 	parsers/x-bibtex.h \
 	parsers/x-frontmatter.h \
+	parsers/x-html.h \
 	parsers/x-iniconf.h \
 	parsers/x-jscript.h \
 	parsers/x-lisp.h \

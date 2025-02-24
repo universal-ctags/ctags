@@ -13,6 +13,9 @@
  *     http://www.permadi.com/tutorial/jsFunc/
  * Another good reference:
  *     http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Guide
+ * About JSX:
+ *     https://facebook.github.io/jsx/
+ *
  */
 
 /*
@@ -36,6 +39,7 @@
 
 #include <string.h>
 #include "debug.h"
+#include "dependency.h"
 #include "entry.h"
 #include "keyword.h"
 #include "numarray.h"
@@ -48,6 +52,7 @@
 #include "mbcs.h"
 #include "trace.h"
 
+#include "x-html.h"
 #include "x-jscript.h"
 
 /*
@@ -123,6 +128,7 @@ typedef enum eTokenType {
 	TOKEN_ATMARK,
 	TOKEN_BINARY_OPERATOR,
 	TOKEN_ARROW,
+	TOKEN_JSX,					/* <TAG> ... </TAG> or <TAG/> */
 	TOKEN_DOTS,					/* ... */
 } tokenType;
 
@@ -1037,6 +1043,47 @@ static void reprToken (const tokenInfo *const token, vString *const repr)
 	}
 }
 
+static bool doesExpectBinaryOperator (tokenType lastTokenType)
+{
+	switch (lastTokenType)
+	{
+		case TOKEN_CHARACTER:
+		case TOKEN_IDENTIFIER:
+		case TOKEN_STRING:
+		case TOKEN_TEMPLATE_STRING:
+		case TOKEN_CLOSE_CURLY:
+		case TOKEN_CLOSE_PAREN:
+		case TOKEN_CLOSE_SQUARE:
+			return true;
+		default:
+			return false;
+	}
+}
+
+static void parseHTML (bool skip)
+{
+	int entries0 = countEntryInCorkQueue ();
+
+	ungetcToInputFile ('<');
+	htmlParseJSXElement ();
+
+	int entries1 = countEntryInCorkQueue ();
+	if (entries1 > entries0)
+	{
+		for (int i = (int)entries0; i < entries1; i++)
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (i);
+			if (!e)
+				continue;
+
+			if (skip)
+				markTagAsPlaceholder (e, true);
+			else
+				markTagExtraBit (e, XTAG_GUEST);
+		}
+	}
+}
+
 static void readTokenFullRaw (tokenInfo *const token, bool include_newlines, vString *const repr)
 {
 	int c;
@@ -1148,11 +1195,23 @@ getNextChar:
 		case '%':
 		case '?':
 		case '>':
-		case '<':
 		case '^':
 		case '|':
 		case '&':
 			token->type = TOKEN_BINARY_OPERATOR;
+			break;
+
+		case '<':
+			if (doesExpectBinaryOperator (LastTokenType))
+				token->type = TOKEN_BINARY_OPERATOR;
+			else
+			{
+				bool skip = !isXtagEnabled (XTAG_GUEST);
+				token->type = TOKEN_JSX;
+				token->lineNumber = getInputLineNumber ();
+				token->filePosition = getInputFilePosition ();
+				parseHTML (skip);
+			}
 			break;
 
 		case '\'':
@@ -3667,6 +3726,12 @@ extern parserDefinition* JavaScriptParser (void)
 											 * https://github.com/plv8/plv8 */
 											"v8",
 											NULL };
+
+	/* Fore initialize HTML parser to handle JSX elements. */
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_FOREIGNER, "HTML", NULL },
+	};
+
 	parserDefinition *const def = parserNew ("JavaScript");
 	def->extensions = extensions;
 	def->aliases = aliases;
@@ -3683,8 +3748,59 @@ extern parserDefinition* JavaScriptParser (void)
 	def->useCork	= CORK_QUEUE|CORK_SYMTAB;
 	def->requestAutomaticFQTag = true;
 
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
+
 	def->versionCurrent = 1;
 	def->versionAge = 1;
 
 	return def;
+}
+
+extern void javaScriptSkipObjectExpression (void)
+{
+	pushLanguage (Lang_js);
+
+	int c = getcFromInputFile ();
+	if (c == '{')
+	{
+		tokenInfo *originalNexToken = NextToken;
+		tokenType originalLastTokenType = LastTokenType;
+#ifdef HAVE_ICONV
+		iconv_t originalJSUnicodeConverter = JSUnicodeConverter;
+#endif
+
+		int depth = 1;
+		tokenInfo *const token = newToken ();
+
+		NextToken = NULL;
+		LastTokenType = TOKEN_UNDEFINED;
+
+		do
+		{
+			readToken (token);
+			if (isType (token, TOKEN_OPEN_CURLY))
+				depth++;
+			else if (isType (token, TOKEN_CLOSE_CURLY))
+				depth--;
+		}
+		while (! isType (token, TOKEN_EOF) && depth > 0);
+
+		deleteToken (token);
+
+#ifdef HAVE_ICONV
+		if (JSUnicodeConverter != (iconv_t) -2 && /* not created */
+			JSUnicodeConverter != (iconv_t) -1 /* creation failed */)
+			iconv_close (JSUnicodeConverter);
+
+		JSUnicodeConverter = originalJSUnicodeConverter;
+#endif
+
+		NextToken = originalNexToken;
+		LastTokenType = originalLastTokenType;
+	}
+	else if (c != EOF)
+		ungetcToInputFile (c);
+
+	popLanguage ();
 }

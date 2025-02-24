@@ -941,6 +941,9 @@
     <ClInclude Include="..\parsers\x-frontmatter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\parsers\x-html.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\parsers\x-iniconf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
