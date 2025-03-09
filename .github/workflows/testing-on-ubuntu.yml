@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04]
+        os: [ubuntu-24.04, ubuntu-22.04]
         compiler: [gcc, clang]
 
     runs-on: ${{ matrix.os }}
@@ -41,7 +41,7 @@ jobs:
         type clang > /dev/null && clang --version | head -1 | grep -q 14 \
         || sudo apt-get -y -o APT::Immediate-Configure=false install valgrind
     - name: install lcov
-      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-20.04'
+      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-22.04'
       run: sudo apt-get -y -o APT::Immediate-Configure=false install lcov
     - name: autogen.sh
       run: ./autogen.sh
@@ -54,7 +54,7 @@ jobs:
         mkdir -p ${{ matrix.os }}-"$CC"
         (
           cd $BUILDDIR
-          if [ ${{ matrix.compiler }} = 'gcc' -a ${{ matrix.os }} = 'ubuntu-20.04' ]; then
+          if [ ${{ matrix.compiler }} = 'gcc' -a ${{ matrix.os }} = 'ubuntu-22.04' ]; then
               extra_args=--enable-coverage-gcov
           fi
           ../configure --enable-debugging --enable-iconv ${extra_args}
@@ -96,11 +96,11 @@ jobs:
           make -C ${BUILDDIR}  clean
         )
     - name: prepare coverage info
-      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-20.04'
+      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-22.04'
       run: |
         (cd ${BUILDDIR}; lcov -c -b . -d . -o coverage.info)
     - name: send coverage info
-      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-20.04'
+      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-22.04'
       uses: codecov/codecov-action@v5
       with:
         files: ${{ env.BUILDDIR }}/coverage.info

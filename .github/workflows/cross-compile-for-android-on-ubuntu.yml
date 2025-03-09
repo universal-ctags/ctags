@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build-machine-os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04]
+        build-machine-os: [ubuntu-24.04, ubuntu-22.04]
 
     runs-on: ${{ matrix.build-machine-os }}
 
