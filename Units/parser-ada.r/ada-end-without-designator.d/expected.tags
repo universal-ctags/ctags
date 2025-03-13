@@ -1,0 +1,5 @@
+Truc	input.adb	/^procedure Truc is$/;"	r
+Some_Function	input.adb	/^  function Some_Function return Boolean is$/;"	r	subprogram:Truc	file:
+Inner_Function_Without_End_Label	input.adb	/^    function Inner_Function_Without_End_Label return Boolean is$/;"	r	subprogram:Some_Function	file:
+Result	input.adb	/^    Result : constant Boolean := Inner_Function_Without_End_Label;$/;"	n	subprogram:Some_Function	file:
+Smurf	input.adb	/^  function Smurf return Integer is$/;"	r	subprogram:Truc	file:

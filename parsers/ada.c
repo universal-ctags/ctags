@@ -1997,6 +1997,15 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 					freeAdaTokenList (&genericParamsRoot.children);
 					return token;
 				}
+				else if (parent->kind == ADA_KIND_SUBPROGRAM && adaCmp (";"))
+				{
+					/* The designator after end is optional in subprogram body.
+					 * https://cui.unige.ch/isi/bnf/Ada95/subprogram_body.html */
+
+					/* return the token */
+					freeAdaTokenList (&genericParamsRoot.children);
+					return token;
+				}
 				else if (adaKeywordCmp (ADA_KEYWORD_LOOP))
 				{
 					/* a loop with an identifier has this syntax:
