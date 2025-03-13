@@ -106,6 +106,7 @@
 #include "routines.h"   /* for generic malloc/realloc/free routines */
 #include "debug.h"      /* for Assert */
 #include "xtag.h"
+#include "trace.h"
 
 
 static bool eof_reached;
@@ -342,6 +343,14 @@ static void skipPastWord (void);
 
 typedef bool (* skipCompFn) (void *data);
 static void skipPastLambda (skipCompFn cmpfn, void *data);
+
+#ifdef DO_TRACING
+static void dumpLine (void);
+static void dumpMode (adaParseMode mode);
+static void dumpToken (adaTokenInfo *token);
+static void dumpTokenList (adaTokenList *list);
+static void dumpKind (adaKind kind);
+#endif
 
 struct cmpKeywordOrWordDataElt
 {
@@ -1974,6 +1983,12 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				 * sort of block construct we were processing and we must
 				 * return */
 				skipWhiteSpace ();
+
+#ifdef DO_TRACING
+				dumpTokenList (&genericParamsRoot.children);
+				dumpToken (parent);
+#endif
+
 				if (adaCmp (parent->name))
 				{
 					skipPast (";");
@@ -2346,6 +2361,72 @@ static void storeAdaTags (adaTokenInfo *token, const char *parentScope)
 		eFree ((void *) currentScope);
 	}
 }
+
+#ifdef DO_TRACING
+CTAGS_ATTR_UNUSED
+static void dumpLine (void)
+{
+	fprintf (stderr, "line: %s\n", line? &line[pos]: "");
+}
+
+CTAGS_ATTR_UNUSED
+static void dumpMode (adaParseMode mode)
+{
+#define caseMode(M) case ADA_##M: fprintf (stderr, "mode: %s\n", STRINGIFY (M)); break
+	switch (mode) {
+		caseMode (ROOT);
+		caseMode (DECLARATIONS);
+		caseMode (CODE);
+		caseMode (EXCEPTIONS);
+		caseMode (GENERIC);
+#undef caseMode
+	default: fputs("mode: UNKNOWN\n", stderr); break;
+	};
+}
+
+CTAGS_ATTR_UNUSED
+static void dumpTokenList (adaTokenList *list)
+{
+	fprintf (stderr, "list: [%p\n", list);
+
+	if (list != NULL)
+	{
+		fprintf (stderr, "numTokens: %d\n", list->numTokens);
+
+		adaTokenInfo *tmp = list->head;
+		while (tmp)
+		{
+			dumpToken (tmp);
+			tmp = tmp->next;
+		}
+	}
+
+	fprintf (stderr, "%p]\n", list);
+}
+
+CTAGS_ATTR_UNUSED
+static void dumpToken (adaTokenInfo *token)
+{
+	fprintf (stderr, "token: [%p\n", token);
+	if (token != NULL)
+	{
+		if (token->name != NULL)
+			fprintf (stderr, "name: %s\n", token->name);
+		dumpKind (token->kind);
+		dumpTokenList (&token->children);
+	}
+	fprintf (stderr, "%p]\n", token);
+}
+
+CTAGS_ATTR_UNUSED
+static void dumpKind (adaKind kind)
+{
+	fprintf (stderr, "kind: %s\n",
+				 (0 <= kind && kind < ADA_KIND_COUNT)
+				 ? AdaKinds[kind].name
+				 : "?");
+}
+#endif
 
 /* main parse function */
 static void findAdaTags (void)
