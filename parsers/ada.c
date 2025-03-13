@@ -89,6 +89,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
+ * References:
+ * - https://ada-lang.io/docs/arm
+ * - https://www.adahome.com/rm95/
+ * - https://cui.unige.ch/isi/bnf/Ada95/BNFindex.html
  */
 
 #include "general.h"    /* always include first */
