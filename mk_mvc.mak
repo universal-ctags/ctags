@@ -14,6 +14,7 @@ COMMON_DEFINES =
 DEFINES = $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DHAVE_PACKCC
 INCLUDES = -I. -Ignulib -Imain -Iparsers -Ilibreadtags -Idsl
 OPT = /O2 /WX /Zc:preprocessor
+LOPT = /FORCE:MULTIPLE
 PACKCC = packcc.exe
 GNULIB_OBJS = $(MVC_GNULIB_SRCS:.c=.obj)
 WIN32_OBJS = $(WIN32_SRCS:.c=.obj)
@@ -83,22 +84,22 @@ all: copy_gnulib_heads $(PACKCC) ctags.exe readtags.exe optscript.exe utiltest.e
 ctags: ctags.exe
 
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(MVC_GNULIB_HEADS) $(WIN32_HEADS) $(REPOINFO_HEADS)
-	$(CC) $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LIBS) $(PDBFLAG)
+	$(CC) $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LOPT) $(LIBS) $(PDBFLAG)
 
 readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(UTIL_OBJS) $(UTIL_HEADS) $(READTAGS_DSL_OBJS) $(READTAGS_DSL_HEADS) $(GNULIB_OBJS) $(MVC_GNULIB_HEADS) $(WIN32_HEADS) $(WIN32_OBJS)
-	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) $(READTAGS_DSL_OBJS) $(UTIL_OBJS) $(GNULIB_OBJS) $(WIN32_OBJS) /link setargv.obj $(PDBFLAG)
+	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) $(READTAGS_DSL_OBJS) $(UTIL_OBJS) $(GNULIB_OBJS) $(WIN32_OBJS) /link setargv.obj $(LOPT) $(PDBFLAG)
 
 optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
-	$(CC) $(OPT) /Fe$@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) /link setargv.obj $(LIBS)
+	$(CC) $(OPT) /Fe$@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) /link setargv.obj $(LOPT) $(LIBS)
 
 utiltest.exe: $(UTIL_OBJS) $(UTIL_HEADS) $(UTILTEST_OBJS) $(UTILTEST_HEADS) $(WIN32_HEADS)
-	$(CC) $(OPT) /Fe$@ $(UTIL_OBJS) $(UTILTEST_OBJS) $(WIN32_OBJS) /link setargv.obj
+	$(CC) $(OPT) /Fe$@ $(UTIL_OBJS) $(UTILTEST_OBJS) $(WIN32_OBJS) /link setargv.obj $(LOPT)
 
 $(PACKCC_OBJ): $(PACKCC_SRC)
 	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(COMMON_DEFINES) $(PACKCC_SRC)
 
 $(PACKCC): $(PACKCC_OBJ)
-	$(CC) $(OPT) /Fe$@ $(PACKCC_OBJ) /link setargv.obj $(PDBFLAG)
+	$(CC) $(OPT) /Fe$@ $(PACKCC_OBJ) /link setargv.obj $(LOPT) $(PDBFLAG)
 
 main\repoinfo.obj: main\repoinfo.c main\repoinfo.h
 
