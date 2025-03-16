@@ -1,0 +1,50 @@
+name: upload coverage report to codecov.io
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  coverage:
+
+    runs-on: ubuntu-22.04
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+
+      CC: gcc
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - run: sudo apt-get -y -o APT::Immediate-Configure=false update
+    - run: sudo apt-get -y -o APT::Immediate-Configure=false install bash pkg-config automake gcc gdb lcov libseccomp-dev libjansson-dev libyaml-dev libxml2-dev libpcre2-dev
+
+    - run: gcc --version
+    - run: make --version
+
+    - run: ./autogen.sh
+
+    - run: mkdir -p build.d
+
+    - run: cd build.d && ../configure --enable-debugging --enable-coverage-gcov
+    - run: cd build.d && make -j2
+
+    - run: cd build.d && ./ctags --list-features
+    - run: cd build.d && ./ctags --help
+    - run: cd build.d && ./ctags --version
+
+    - run: cd build.d && make check
+    - run: cd build.d && make roundtrip
+
+    - run: cd build.d && lcov -c -b . -d . -o coverage.info
+
+    - uses: codecov/codecov-action@v5
+      with:
+        files: build.d/coverage.info
+        name: travis-ubuntu-latest
+        token: ${{ secrets.CODECOV_TOKEN }}
