@@ -17,92 +17,61 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     env:
-      CC: ${{ matrix.compiler }}
-      BUILDDIR: ${{ matrix.os }}-${{ matrix.compiler }}
-
-      # Our sandbox doesn't work with gcov.
-      # Following cases target ctags without gcov.
-      SANDBOX_CASES: sandbox,sandbox-crash,sandbox-default-req,sandbox-unknown-submode
       DEBIAN_FRONTEND: noninteractive
+
+      CC: ${{ matrix.compiler }}
 
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: update package information
-      run: sudo apt-get -y -o APT::Immediate-Configure=false update
-    - name: install tools and libraries
-      run: sudo apt-get -y -o APT::Immediate-Configure=false install pkg-config automake bash libjansson-dev libyaml-dev libseccomp-dev libxml2-dev gdb python3-docutils libpcre2-dev
-    - name: install valgrind
-      if: matrix.compiler == 'clang' && matrix.os == 'ubuntu-22.04'
-      # valgrind doesn't work well with an executable built with clang 14.
-      # https://forum.manjaro.org/t/valgrind-fails-possibly-corrupted-debuginfo-file/118156
+
+    - run: sudo apt-get -y -o APT::Immediate-Configure=false update
+    - run: sudo apt-get -y -o APT::Immediate-Configure=false install pkg-config automake ${{ matrix.compiler }} gdb bash python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev libpcre2-dev
+
+    # valgrind doesn't work well with an executable built with clang 14.
+    # https://forum.manjaro.org/t/valgrind-fails-possibly-corrupted-debuginfo-file/118156
+    - if: matrix.compiler == 'clang' && matrix.os == 'ubuntu-22.04'
       run: |
         type clang > /dev/null && clang --version | head -1 | grep -q 14 \
         || sudo apt-get -y -o APT::Immediate-Configure=false install valgrind
-    - name: install lcov
-      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-22.04'
-      run: sudo apt-get -y -o APT::Immediate-Configure=false install lcov
-    - name: autogen.sh
-      run: ./autogen.sh
-    - name: report the version of cc
-      run: ${{ matrix.compiler }} --version
-    - name: report the version of make
-      run: make --version
-    - name: configure
-      run: |
-        mkdir -p ${{ matrix.os }}-"$CC"
-        (
-          cd $BUILDDIR
-          if [ ${{ matrix.compiler }} = 'gcc' -a ${{ matrix.os }} = 'ubuntu-22.04' ]; then
-              extra_args=--enable-coverage-gcov
-          fi
-          ../configure --enable-debugging --enable-iconv ${extra_args}
-        )
-    - name: make
-      run: make -C $BUILDDIR -j2
-    - name: report features
-      run: |
-        (
-          cd $BUILDDIR
-          ./ctags --list-features
-        )
-    - name: make check
-      run: make -C $BUILDDIR check
-    - name: make roundtrip
-      run: make -C $BUILDDIR roundtrip
-    - name: make dist
-      run: make -C $BUILDDIR dist
-    - name: make for testing ctags in sandbox
-      run: |
-        (
-          cd $BUILDDIR
-          tar zxf universal-ctags*tar.gz
-          (
-            cd universal-ctags*[0-9]
-            mkdir -p ${BUILDDIR}
-            (
-                cd ${BUILDDIR}
-                ../configure --enable-debugging --enable-iconv
-            )
-            make -C ${BUILDDIR} -j2
-          )
-        )
-    - name: make tmain in sandbox
-      run: |
-        (
-          cd $BUILDDIR/universal-ctags*[0-9]
-          make -C ${BUILDDIR} tmain UNITS=${SANDBOX_CASES}
-          make -C ${BUILDDIR}  clean
-        )
-    - name: prepare coverage info
-      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-22.04'
-      run: |
-        (cd ${BUILDDIR}; lcov -c -b . -d . -o coverage.info)
-    - name: send coverage info
-      if: matrix.compiler == 'gcc' && matrix.os == 'ubuntu-22.04'
-      uses: codecov/codecov-action@v5
-      with:
-        files: ${{ env.BUILDDIR }}/coverage.info
-        name: travis-${{ matrix.os }}
-        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - run: ${{ matrix.compiler }} --version
+    - run: make --version
+
+    - run: ./autogen.sh
+
+    - run: mkdir -p build.d
+
+    - run: cd build.d && ../configure --enable-debugging --enable-iconv
+
+    - run: make -C build.d -j2
+
+    - run: cd build.d && ./ctags --list-features
+    - run: cd build.d && ./ctags --help
+    - run: cd build.d && ./ctags --version
+
+    - run: make -C build.d check
+    - run: make -C build.d roundtrip
+    - run: make -C build.d dist
+
+    #############################################################################
+
+    - run: mkdir -p dist-src
+
+    - run: tar xf build.d/universal-ctags*tar.gz -C dist-src --strip-components=1
+
+    - run: mkdir -p build2.d
+
+    - run: cd build2.d && ../dist-src/configure --enable-debugging
+
+    - run: cd build2.d && make -j2
+
+    - run: cd build2.d && ./ctags --list-features
+    - run: cd build2.d && ./ctags --help
+    - run: cd build2.d && ./ctags --version
+
+      # Our sandbox doesn't work with gcov.
+      # Following cases target ctags without gcov.
+    - run: cd build2.d && make tmain UNITS=sandbox,sandbox-crash,sandbox-default-req,sandbox-unknown-submode
+    - run: cd build2.d && make clean
