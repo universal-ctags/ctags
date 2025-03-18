@@ -81,7 +81,8 @@ int  makePromise   (const char *parser,
 			|| (startLine == endLine && startCharOffset >= endCharOffset)))
 		return -1;
 
-	verbose("makePromise: %s start(line: %lu, offset: %ld, srcline: %lu), end(line: %lu, offset: %ld)\n",
+	verbose("makePromise: %s > %s start(line: %lu, offset: %ld, srcline: %lu), end(line: %lu, offset: %ld)\n",
+			getInputLanguageName (),
 			parser? parser: "*", startLine, startCharOffset, sourceLineOffset,
 			endLine, endCharOffset);
 
