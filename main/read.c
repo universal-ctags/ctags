@@ -147,6 +147,18 @@ extern unsigned long getInputLineNumber (void)
 	return File.input.lineNumber;
 }
 
+CTAGS_INLINE
+void callWithSavingPosition (MIO *mio,
+							 void (* fn) (MIO *, void *),
+							 void *data)
+{
+	MIOPos origin;
+
+	mio_getpos (mio, &origin);
+	fn (mio, data);
+	mio_setpos (mio, &origin);
+}
+
 extern int getInputLineOffset (void)
 {
 	unsigned char *base = (unsigned char *) vStringValue (File.line);
@@ -1127,23 +1139,40 @@ extern char *readLineRaw (vString *const vLine, MIO *const mio)
 /*  Places into the line buffer the contents of the line referenced by
  *  "location".
  */
-extern char *readLineFromBypass (
-		vString *const vLine, MIOPos location, long *const pSeekValue)
-{
-	MIOPos orignalPosition;
+struct readLineRawCbData {
+	MIOPos location;
+	long *offset;
+	vString *vLine;
 	char *result;
+};
+static void readLineRawCb (MIO *mio, void *data)
+{
+	struct readLineRawCbData *cb_data = data;
 
-	mio_getpos (File.mio, &orignalPosition);
-	mio_setpos (File.mio, &location);
-	mio_clearerr (File.mio);
-	if (pSeekValue != NULL)
-		*pSeekValue = mio_tell (File.mio);
-	result = readLineRaw (vLine, File.mio);
-	mio_setpos (File.mio, &orignalPosition);
+	mio_setpos (mio, &cb_data->location);
+	mio_clearerr (mio);
+	if (cb_data->offset)
+		*cb_data->offset = mio_tell (mio);
+
 	/* If the file is empty, we can't get the line
 	   for location 0. readLineFromBypass doesn't know
 	   what itself should do; just report it to the caller. */
-	return result;
+	cb_data->result = readLineRaw (cb_data->vLine, mio);
+}
+
+extern char *readLineFromBypass (
+		vString *const vLine, MIOPos location, long *const pSeekValue)
+{
+	struct readLineRawCbData data = {
+		.location = location,
+		.offset = pSeekValue,
+		.vLine = vLine,
+		.result = NULL,
+	};
+
+	callWithSavingPosition (File.mio, readLineRawCb, &data);
+
+	return data.result;
 }
 
 extern void   pushNarrowedInputStream (
