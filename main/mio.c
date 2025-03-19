@@ -1262,7 +1262,7 @@ int mio_setpos (MIO *mio, MIOPos *pos)
 #ifdef MIO_DEBUG
 	if (pos->tag != mio)
 	{
-		g_critical ("mio_setpos((MIO*)%p, (MIOPos*)%p): "
+		error (FATAL, "mio_setpos((MIO*)%p, (MIOPos*)%p): "
 					"Given MIOPos was not set by a previous call to mio_getpos() "
 					"on the same MIO object, which means there is a bug in "
 					"someone's code.",
