@@ -1985,8 +1985,11 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				skipWhiteSpace ();
 
 #ifdef DO_TRACING
-				dumpTokenList (&genericParamsRoot.children);
-				dumpToken (parent);
+				if (isLanguageTraced (getInputLanguage ()))
+				{
+					dumpTokenList (&genericParamsRoot.children);
+					dumpToken (parent);
+				}
 #endif
 
 				if (adaCmp (parent->name))
