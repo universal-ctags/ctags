@@ -1205,6 +1205,8 @@ int mio_getpos (MIO *mio, MIOPos *pos)
 {
 	int rv = -1;
 
+	memset (pos, 0, sizeof (*pos));
+
 	pos->type = mio->type;
 	if (mio->type == MIO_TYPE_FILE)
 		rv = fgetpos (mio->impl.file.fp, &pos->impl.file);
