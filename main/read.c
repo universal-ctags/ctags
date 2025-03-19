@@ -203,6 +203,13 @@ static compoundPos* getInputFileCompoundPosForLine (unsigned int line)
 
 extern MIOPos getInputFilePositionForLine (unsigned int line)
 {
+	if (line == 1 && File.lineFposMap.count == 0)
+	{
+		/* Any line is not read yet. */
+		MIOPos pos;
+		mio_getpos (File.mio, &pos);
+		return pos;
+	}
 	compoundPos *cpos = getInputFileCompoundPosForLine (line);
 	return cpos->pos;
 }
