@@ -9,4 +9,4 @@ foo	input.rmd	/^foo <- function () {$/;"	function	line:9	language:R	extras:guest
 y	input.rmd	/^    y <- 2$/;"	functionVar	line:10	language:R	function:foo	extras:guest	end:10
 X	input.rmd	/^X <- func()$/;"	globalVar	line:14	language:R	extras:guest	end:14
 f	input.rmd	/^def f():$/;"	function	line:25	language:Python	extras:guest	end:27
-example for u-ctags	input.rmd	/^title: example for u-ctags$/;"	title	line:2	language:FrontMatter	extras:subparser
+example for u-ctags	input.rmd	/^title: example for u-ctags/;"	title	line:2	language:FrontMatter	extras:guest,subparser

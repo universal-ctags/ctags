@@ -181,11 +181,10 @@ void mio_getpos_cb (MIO *mio, void *data)
 	mio_getpos (mio, cb_data->pos);
 }
 
-CTAGS_INLINE
-void getNestedInputStreamInfo (unsigned long *startLine,
-							   long *startCharOffset,
-							   unsigned long *endLine,
-							   long *endCharOffset)
+extern void getNestedInputStreamInfo (unsigned long *startLine,
+									  long *startCharOffset,
+									  unsigned long *endLine,
+									  long *endCharOffset)
 {
 	if (startLine)
 		*startLine = File.nestedInputStreamInfo.startLine;
@@ -196,6 +195,16 @@ void getNestedInputStreamInfo (unsigned long *startLine,
 	if (endCharOffset)
 		*endCharOffset = File.nestedInputStreamInfo.endCharOffset;
 }
+
+extern unsigned long getCurrentAreaStartLine (void)
+{
+	unsigned long startLine = 0;
+
+	if (doesParserRunAsGuest())
+		getNestedInputStreamInfo (&startLine, NULL, NULL, NULL);
+	return startLine;
+}
+
 
 CTAGS_INLINE
 void callAtNestedInputStreamStart (MIO *mio,
@@ -345,6 +354,29 @@ extern long getInputFileOffsetForLine (unsigned int line)
 	long r = cpos->offset - (File.bomFound? 3: 0) - cpos->crAdjustment;
 	Assert (r >= 0);
 	return r;
+}
+
+static void tellAbsolutePosition (MIO *mio, void *data)
+{
+	struct mioGetposCallbackData *cb_data = data;
+
+	mio_seek (mio, cb_data->offset, SEEK_SET);
+	mio_getpos (mio, cb_data->pos);
+}
+
+extern MIOPos getInputFilePositionForOffset (long offset)
+{
+	MIOPos pos;
+	struct mioGetposCallbackData data = {
+		.pos = &pos,
+		.offset = offset,
+	};
+
+	callWithSavingPosition (File.mio,
+							tellAbsolutePosition,
+							&data);
+
+	return pos;
 }
 
 extern langType getInputLanguage (void)
