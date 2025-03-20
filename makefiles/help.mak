@@ -36,6 +36,7 @@ help:
 	@echo "UNITS=<case>[,<case>]             - Only run tests named Units/[category.r/]/<case>.d in units target"
 	@echo "                                                         Tmain/<case>.d in tmain target"
 	@echo "PMAP=<newlang>/<oldlang>[,...]    - Make <newlang> parser pretend <oldlang> (units target only)"
+	@echo "THREADS=<n>                       - Use <n> threads to run test cases in units and tmain targets"
 	@echo ""
 	@echo "Input validation target:"
 	@echo ""
