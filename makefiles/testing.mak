@@ -140,6 +140,9 @@ units: $(CTAGS_DEP)
 		PROG=$(SHELL);		\
 		SCRIPT=$(srcdir)/misc/units;	\
 	fi;	\
+	if ! test x$(THREADS) = x; then \
+		THREADS_OPT=--threads=$(THREADS); \
+	fi; \
 	mkdir -p $${builddir}/Units && \
 	\
 	c="$${SCRIPT} run \
@@ -151,6 +154,7 @@ units: $(CTAGS_DEP)
 		$${VALGRIND} --run-shrink \
 		--with-timeout=`expr $(TIMEOUT) '*' 10`\
 		$${SHELL_OPT} \
+		$${THREADS_OPT} \
 		$${SHOW_DIFF_OUTPUT}"; \
 		 $${PROG} $${c} $(srcdir)/Units $${builddir}/Units
 
@@ -204,6 +208,9 @@ tmain: $(CTAGS_DEP) $(READTAGS_DEP) $(OPTSCRIPT_DEP)
 		PROG=$(SHELL);		\
 		SCRIPT=$(srcdir)/misc/units;	\
 	fi;	\
+	if ! test x$(THREADS) = x; then \
+		THREADS_OPT=--threads=$(THREADS); \
+	fi; \
 	mkdir -p $${builddir}/Tmain && \
 	\
 	c="$${SCRIPT} tmain \
@@ -211,6 +218,7 @@ tmain: $(CTAGS_DEP) $(READTAGS_DEP) $(OPTSCRIPT_DEP)
 		--units=$(UNITS) \
 		$${VALGRIND} \
 		$${SHELL_OPT} \
+		$${THREADS_OPT} \
 		$${SHOW_DIFF_OUTPUT}"; \
 		$${PROG} $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
