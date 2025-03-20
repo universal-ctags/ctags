@@ -582,7 +582,7 @@ static struct Feature {
 	{"iconv", "can convert input/output encodings"},
 #endif
 #ifdef DEBUG
-	{"debug", "TO BE WRITTEN"},
+	{"debug", "built with debugging features"},
 #endif
 #if defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 	{"option-directory", "TO BE WRITTEN"},
