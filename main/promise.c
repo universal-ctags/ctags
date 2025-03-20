@@ -16,6 +16,7 @@
 #include "promise_p.h"
 #include "ptrarray.h"
 #include "debug.h"
+#include "read.h"
 #include "read_p.h"
 #include "trashbox.h"
 #include "xtag.h"
@@ -110,11 +111,24 @@ int  makePromise   (const char *parser,
 	p = promises + promise_count;
 	p->parent_promise = current_promise;
 	p->lang = lang;
-	p->startLine = startLine;
-	p->startCharOffset = startCharOffset;
-	p->endLine = endLine;
-	p->endCharOffset = endCharOffset;
-	p->sourceLineOffset = sourceLineOffset;
+
+	if (is_thin_stream_spec && doesParserRunAsGuest())
+	{
+		getNestedInputStreamInfo (&p->startLine,
+								  &p->startCharOffset,
+								  &p->endLine,
+								  &p->endCharOffset);
+		p->sourceLineOffset = p->startLine;
+	}
+	else
+	{
+		p->startLine = startLine;
+		p->startCharOffset = startCharOffset;
+		p->endLine = endLine;
+		p->endCharOffset = endCharOffset;
+		p->sourceLineOffset = sourceLineOffset;
+	}
+
 	p->modifiers = NULL;
 
 	r = promise_count;
