@@ -616,7 +616,7 @@ static void resizeTagFile (const long newSize)
 # endif
 #endif
 	if (result == -1)
-		fprintf (stderr, "Cannot shorten tag file: errno = %d\n", errno);
+		error (WARNING, "Cannot shorten tag file: errno = %d\n", errno);
 }
 
 static void writeEtagsIncludes (MIO *const mio)

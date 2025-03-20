@@ -1205,6 +1205,8 @@ int mio_getpos (MIO *mio, MIOPos *pos)
 {
 	int rv = -1;
 
+	memset (pos, 0, sizeof (*pos));
+
 	pos->type = mio->type;
 	if (mio->type == MIO_TYPE_FILE)
 		rv = fgetpos (mio->impl.file.fp, &pos->impl.file);
@@ -1260,11 +1262,11 @@ int mio_setpos (MIO *mio, MIOPos *pos)
 #ifdef MIO_DEBUG
 	if (pos->tag != mio)
 	{
-		g_critical ("mio_setpos((MIO*)%p, (MIOPos*)%p): "
+		error (FATAL, "mio_setpos((MIO*)%p, (MIOPos*)%p, (MIOPos->tag): %p: "
 					"Given MIOPos was not set by a previous call to mio_getpos() "
 					"on the same MIO object, which means there is a bug in "
 					"someone's code.",
-					(void *)mio, (void *)pos);
+					(void *)mio, (void *)pos, (void *)pos->tag);
 		errno = EINVAL;
 		return -1;
 	}

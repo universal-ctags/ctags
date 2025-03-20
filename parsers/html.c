@@ -525,7 +525,7 @@ static void skipOtherScriptContent (const int delimiter)
 
 	const long startSourceLineNumber = getSourceLineNumber ();
 	const long startLineNumber = getInputLineNumber ();
-	const long startLineOffset = getInputLineOffset () - 2;
+	const long startLineOffset = getInputLineOffset () - 2; /* strlen ("<?") */
 
 	vString *script_name = vStringNew ();
 	bool reading_script_name = true;

@@ -21,6 +21,11 @@
 #ifndef MIO_H
 #define MIO_H
 
+#ifdef DEBUG
+/* If we use autoconf, DEBUG is set via configure. See DEBUG_CPPFLAGS in Makefile */
+#define MIO_DEBUG 1
+#endif
+
 #ifndef QUALIFIER
 #include "general.h"  /* must always come first */
 #else
