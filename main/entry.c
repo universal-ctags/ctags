@@ -2082,7 +2082,7 @@ static void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 
 	e->extensionFields.nth = NO_NTH_FIELD;
 
-	if (doesParserRunAsGuest ())
+	if (isAreaStacked ())
 		markTagExtraBit (e, XTAG_GUEST);
 	if (doesSubparserRun ())
 		markTagExtraBit (e, XTAG_SUBPARSER);

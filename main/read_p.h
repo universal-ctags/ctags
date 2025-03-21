@@ -40,7 +40,6 @@ extern unsigned int countInputLanguageKinds (void);
 extern unsigned int countInputLanguageRoles (int kindIndex);
 
 extern bool doesInputLanguageRequestAutomaticFQTag (const tagEntryInfo *e);
-extern bool doesParserRunAsGuest (void);
 extern bool doesSubparserRun (void);
 extern langType getLanguageForBaseParser (void);
 
@@ -74,6 +73,8 @@ extern void   pushArea (
 				       unsigned long sourceLineOffset,
 				       int promise);
 extern void   popArea  (void);
+
+extern bool isAreaStacked (void);
 
 #define THIN_AREA_SPEC 0, 0, 0, 0, 0
 extern bool isThinAreaSpec (unsigned long startLine, long startCharOffset,
