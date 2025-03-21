@@ -1125,23 +1125,23 @@ extern char *readLineRaw (vString *const vLine, MIO *const mio)
 }
 
 /*  Places into the line buffer the contents of the line referenced by
- *  "location".
+ *  "pos".
  */
 extern char *readLineFromBypass (
-		vString *const vLine, MIOPos location, long *const pSeekValue)
+		vString *const vLine, MIOPos pos, long *const offset)
 {
-	MIOPos orignalPosition;
+	MIOPos origin;
 	char *result;
 
-	mio_getpos (File.mio, &orignalPosition);
-	mio_setpos (File.mio, &location);
+	mio_getpos (File.mio, &origin);
+	mio_setpos (File.mio, &pos);
 	mio_clearerr (File.mio);
-	if (pSeekValue != NULL)
-		*pSeekValue = mio_tell (File.mio);
+	if (offset != NULL)
+		*offset = mio_tell (File.mio);
 	result = readLineRaw (vLine, File.mio);
-	mio_setpos (File.mio, &orignalPosition);
+	mio_setpos (File.mio, &origin);
 	/* If the file is empty, we can't get the line
-	   for location 0. readLineFromBypass doesn't know
+	   for position 0. readLineFromBypass doesn't know
 	   what itself should do; just report it to the caller. */
 	return result;
 }

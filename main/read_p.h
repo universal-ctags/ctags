@@ -64,8 +64,9 @@ extern langType getSourceLanguage (void);
 
 extern time_t getInputFileMtime (void);
 
-/* Bypass: reading from fp in inputFile WITHOUT updating fields in input fields */
-extern char *readLineFromBypass (vString *const vLine, MIOPos location, long *const pSeekValue);
+/* Bypass : read a line at POS from the current area WITHOUT updating the state of the area.
+ * If OFFSET is not NULL, the function sets the offset value for POS. */
+extern char *readLineFromBypass (vString *const vLine, MIOPos pos, long *const offset);
 extern void   pushArea (
 				       bool useMemoryStreamInput,
 				       unsigned long startLine, long startCharOffset,
