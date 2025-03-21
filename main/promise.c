@@ -71,12 +71,12 @@ int  makePromise   (const char *parser,
 	int r;
 	langType lang = LANG_IGNORE;
 
-	const bool is_thin_stream_spec =
-		isThinStreamSpec(startLine, startCharOffset,
-						 endLine, endCharOffset,
-						 sourceLineOffset);
+	const bool is_thin_area_spec =
+		isThinAreaSpec(startLine, startCharOffset,
+					   endLine, endCharOffset,
+					   sourceLineOffset);
 
-	if (!is_thin_stream_spec
+	if (!is_thin_area_spec
 		&& (startLine > endLine
 			|| (startLine == endLine && startCharOffset >= endCharOffset)))
 		return -1;
@@ -86,7 +86,7 @@ int  makePromise   (const char *parser,
 			parser? parser: "*", startLine, startCharOffset, sourceLineOffset,
 			endLine, endCharOffset);
 
-	if ((!is_thin_stream_spec)
+	if ((!is_thin_area_spec)
 		&& ( !isXtagEnabled (XTAG_GUEST)))
 		return -1;
 
@@ -181,13 +181,13 @@ bool forcePromises (void)
 		struct promise *p = promises + i;
 
 		if (p->lang != LANG_IGNORE && isLanguageEnabled (p->lang))
-			tagFileResized = runParserInNarrowedInputStream (p->lang,
-															 p->startLine,
-															 p->startCharOffset,
-															 p->endLine,
-															 p->endCharOffset,
-															 p->sourceLineOffset,
-															 i)
+			tagFileResized = runParserInArea (p->lang,
+											  p->startLine,
+											  p->startCharOffset,
+											  p->endLine,
+											  p->endCharOffset,
+											  p->sourceLineOffset,
+											  i)
 				? true
 				: tagFileResized;
 	}

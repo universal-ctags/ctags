@@ -941,7 +941,7 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	}
 
 	length += putc_func(searchChar, output);
-	if ((tag->boundaryInfo & INPUT_BOUNDARY_START) == 0)
+	if ((tag->boundaryInfo & AREA_BOUNDARY_START) == 0)
 		length += putc_func('^', output);
 	length += appendInputLine (putc_func, line, Option.patternLengthLimit,
 							   output, &omitted);
@@ -1641,7 +1641,7 @@ extern void updateTagLine (tagEntryInfo *tag, unsigned long lineNumber,
 
 	tag->lineNumber = lineNumber;
 	tag->filePosition = filePosition;
-	tag->boundaryInfo = getNestedInputBoundaryInfo (lineNumber);
+	tag->boundaryInfo = getAreaBoundaryInfo (lineNumber);
 
 	if (entry && tag->lineNumber < getTagEndLine (tag))
 	{
@@ -2062,7 +2062,7 @@ static void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	memset (e, 0, sizeof (tagEntryInfo));
 	e->lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 	e->lineNumber      = lineNumber;
-	e->boundaryInfo    = getNestedInputBoundaryInfo (lineNumber);
+	e->boundaryInfo    = getAreaBoundaryInfo (lineNumber);
 	e->langType        = langType_;
 	e->filePosition    = filePosition;
 	e->inputFileName   = inputFileName;

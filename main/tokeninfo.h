@@ -55,7 +55,7 @@ struct tokenInfoClass {
 	ptrArray *backlog;
 
 	/* read_counter is incremented every time when reading a
-	 * new token from the input stream unless the new token is EOF.
+	 * new token from the input area unless the new token is EOF.
 	 *
 	 * When filling a tokenInfo from an entry in the backlog, we don't
 	 * regard it as "reading a new token".

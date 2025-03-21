@@ -74,7 +74,7 @@ struct sTagEntryInfo {
 											* Set in the cork queue; don't touch this.*/
 	unsigned int isSourceFileNameShared: 1; /* shares the value for sourceFileName.
 											 * Set in the cork queue; don't touch this.*/
-	unsigned int boundaryInfo: 2; /* info about nested input stream */
+	unsigned int boundaryInfo: 2; /* info about the stacked input area */
 	unsigned int inIntevalTab:1;
 	unsigned int allowNullTag:1;	/* allow a tag with an empty string.
 									 * To allow your parser to emit null tags without

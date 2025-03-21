@@ -4289,15 +4289,15 @@ static bool createTagsWithFallback1 (const langType language,
 	return tagFileResized;
 }
 
-extern bool runParserInNarrowedInputStream (const langType language,
-					       unsigned long startLine, long startCharOffset,
-					       unsigned long endLine, long endCharOffset,
-					       unsigned long sourceLineOffset,
-					       int promise)
+extern bool runParserInArea (const langType language,
+							 unsigned long startLine, long startCharOffset,
+							 unsigned long endLine, long endCharOffset,
+							 unsigned long sourceLineOffset,
+							 int promise)
 {
 	bool tagFileResized;
 
-	verbose ("runParserInNarrowedInputStream: %s; "
+	verbose ("runParserInArea: %s; "
 			 "file: %s, "
 			 "start(line: %lu, offset: %ld, srcline: %lu)"
 			 " - "
@@ -4307,14 +4307,13 @@ extern bool runParserInNarrowedInputStream (const langType language,
 			 startLine, startCharOffset, sourceLineOffset,
 			 endLine, endCharOffset);
 
-	pushNarrowedInputStream (
-				 doesParserRequireMemoryStream (language),
-				 startLine, startCharOffset,
-				 endLine, endCharOffset,
-				 sourceLineOffset,
-				 promise);
+	pushArea (doesParserRequireMemoryStream (language),
+			  startLine, startCharOffset,
+			  endLine, endCharOffset,
+			  sourceLineOffset,
+			  promise);
 	tagFileResized = createTagsWithFallback1 (language, NULL);
-	popNarrowedInputStream  ();
+	popArea  ();
 	return tagFileResized;
 
 }
@@ -5308,7 +5307,7 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 	}
 
 
-	makePromise(base_name, THIN_STREAM_SPEC);
+	makePromise(base_name, THIN_AREA_SPEC);
 }
 
 extern bool isParserMarkedNoEmission (void)

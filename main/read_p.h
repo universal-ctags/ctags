@@ -22,9 +22,9 @@
 *   DATA DECLARATIONS
 */
 
-enum nestedInputBoundaryFlag {
-	INPUT_BOUNDARY_START = 1UL << 0,
-	INPUT_BOUNDARY_END   = 1UL << 1,
+enum areaBoundaryFlag {
+	AREA_BOUNDARY_START = 1UL << 0,
+	AREA_BOUNDARY_END   = 1UL << 1,
 };
 
 /*
@@ -58,7 +58,7 @@ extern void resetInputFile (const langType language, bool resetLineFposMap_);
 extern void closeInputFile (void);
 extern void *getInputFileUserData(void);
 
-extern unsigned int getNestedInputBoundaryInfo (unsigned long lineNumber);
+extern unsigned int getAreaBoundaryInfo (unsigned long lineNumber);
 
 extern const char *getSourceFileTagPath (void);
 extern langType getSourceLanguage (void);
@@ -67,17 +67,17 @@ extern time_t getInputFileMtime (void);
 
 /* Bypass: reading from fp in inputFile WITHOUT updating fields in input fields */
 extern char *readLineFromBypass (vString *const vLine, MIOPos location, long *const pSeekValue);
-extern void   pushNarrowedInputStream (
+extern void   pushArea (
 				       bool useMemoryStreamInput,
 				       unsigned long startLine, long startCharOffset,
 				       unsigned long endLine, long endCharOffset,
 				       unsigned long sourceLineOffset,
 				       int promise);
-extern void   popNarrowedInputStream  (void);
+extern void   popArea  (void);
 
-#define THIN_STREAM_SPEC 0, 0, 0, 0, 0
-extern bool isThinStreamSpec(unsigned long startLine, long startCharOffset,
-							 unsigned long endLine, long endCharOffset,
-							 unsigned long sourceLineOffset);
+#define THIN_AREA_SPEC 0, 0, 0, 0, 0
+extern bool isThinAreaSpec (unsigned long startLine, long startCharOffset,
+							unsigned long endLine, long endCharOffset,
+							unsigned long sourceLineOffset);
 
 #endif  /* CTAGS_MAIN_READ_PRIVATE_H */
