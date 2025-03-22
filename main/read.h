@@ -33,13 +33,71 @@
 *   FUNCTION PROTOTYPES
 */
 
+/* Usually, a parser runs on an input file.
+ * However, when running a guest, the parser runs on an area.
+ *
+ * input file ---> +----------------------+
+ *                 |                      |
+ *                 |  [...................|
+ *                 |....... area .........|
+ *                 |......................|
+ *                 |......]               |
+ *                 |                      |
+ *                 |                      |
+ *                 |                      |
+ *                 |                      |
+ *                 +----------------------+
+ *
+ * We have many functions for getting locaitons.
+ *
+ * We have three data types repesenting a locaiton: line number,
+ * position, and offset.
+ *
+ * When dealing with a location, the coordination becomes an issue: a
+ * location in an input file or a location in an area.
+ *
+ * To make the following explanation simple, we generalize the term
+ * "area". For a non-guest (host) parser, the area is the same as the input
+ * file. So both host and guest parsers can call functions getting a location
+ * in a area.
+ *
+ * input file ---> +----------------------+
+ *                 |......................|
+ *                 |......................|
+ *                 |......................|
+ *                 |......................|
+ *                 |........ area ........|
+ *                 |......................|
+ *                 |......................|
+ *                 |......................|
+ *                 |......................|
+ *                 +----------------------+
+ *
+ * We have had many bugs caused by misunderstanding coordination.
+ * So we put marks [input file], [area] or [buggy] for the declarations
+ * of functions getting a location.
+ *
+ * A function marked [buggy] may return [input file] or [area].
+ * We should remove [buggy] by improving the code.
+ *
+ * Just marking the functions is not enough. The mark is for the
+ * value returned from the functions. Some functions take location
+ * values as arguments. So we have to put marks on such arguments.
+ */
+
 /* InputFile: reading from fp in inputFile with updating fields in input fields */
+
+/* [input file] */
 extern unsigned long getInputLineNumber (void);
+
+/* [input file]
+ * offset: [input file]
+ */
 extern unsigned long getInputLineNumberForFileOffset(long offset);
 extern int getInputLineOffset (void);
 extern const char *getInputFileName (void);
-extern MIOPos getInputFilePosition (void);
-extern MIOPos getInputFilePositionForLine (unsigned int line);
+extern MIOPos getInputFilePosition (void); /* TODO */
+extern MIOPos getInputFilePositionForLine (unsigned int line); /* TODO */
 extern langType getInputLanguage (void);
 extern bool isInputLanguage (langType lang);
 extern bool isInputHeaderFile (void);
