@@ -19,6 +19,12 @@
 
 #define EOL_CHAR_OFFSET -1
 
+/* args (startLine): [absolute]
+ * args (startCharOffset): [buggy]
+ * args (endLine): [absolute]
+ * args (endCharOffset): [absolute]
+ * args (sourceLineOffset): [buggy]
+ */
 /* parser can be NULL; give a name with promiseUpdateLanguage()
  * when the name can be determined. */
 int  makePromise   (const char *parser,
