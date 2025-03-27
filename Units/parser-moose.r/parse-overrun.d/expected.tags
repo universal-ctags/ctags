@@ -1,0 +1,6 @@
+Throwable::Error	input.pm	/^package Throwable::Error;$/;"	kind:package	language:Perl
+Throwable::Error	input.pm	/^package Throwable::Error;$/;"	kind:class	language:Moose
+message	input.pm	/^has message => ($/;"	kind:attribute	language:Moose	scope:class:Throwable::Error
+as_string	input.pm	/^sub as_string {$/;"	kind:subroutine	language:Perl
+as_string	input.pm	/^sub as_string {$/;"	kind:method	language:Moose	scope:class:Throwable::Error
+BUILDARGS	input.pm	/^around BUILDARGS => sub {$/;"	kind:wrapper	language:Moose	scope:class:Throwable::Error	wrapping:around
