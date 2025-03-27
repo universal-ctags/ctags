@@ -395,7 +395,7 @@ PARSER_SRCS =				\
 	parsers/powershell.c		\
 	parsers/protobuf.c		\
 	parsers/python.c		\
-	parsers/pythonloggingconfig.c	\
+	parsers/python-logging-config.c	\
 	parsers/quarto.c		\
 	parsers/r-r6class.c		\
 	parsers/r-s4class.c		\
