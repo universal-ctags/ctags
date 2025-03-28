@@ -26,8 +26,21 @@
 
 extern  void updateXMLTagLine (tagEntryInfo *e, xmlNode *node)
 {
-	unsigned long lineNumber = XML_GET_LINE (node);
-	updateTagLine (e, lineNumber, getInputFilePositionForLine (lineNumber));
+	unsigned long area_start_ln = getCurrentAreaStartLine();
+	unsigned long ln = (area_start_ln? area_start_ln - 1: 0) + XML_GET_LINE (node);
+	MIOPos rela_pos;
+
+	if (area_start_ln > 0)
+	{
+		long abs_offset = getInputFileOffsetForLine (ln);
+		long area_start_offset = getInputFileOffsetForLine (area_start_ln);
+		long rela_offset = abs_offset - area_start_offset;
+		rela_pos = getInputFilePositionForOffset (rela_offset);
+	}
+	else
+		rela_pos = getInputFilePositionForLine (ln);
+
+	updateTagLine (e, ln, rela_pos);
 }
 
 static void simpleXpathMakeTag (xmlNode *node,

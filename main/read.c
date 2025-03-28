@@ -147,25 +147,159 @@ extern unsigned long getInputLineNumber (void)
 	return File.input.lineNumber;
 }
 
+CTAGS_INLINE
+void callWithSavingPosition (MIO *mio,
+							 void (* fn) (MIO *, void *),
+							 void *data)
+{
+	MIOPos origin;
+
+	mio_getpos (mio, &origin);
+	fn (mio, data);
+	mio_setpos (mio, &origin);
+}
+
+CTAGS_INLINE
+void mio_tell_cb (MIO *mio, void *data)
+{
+	int *r = data;
+	*r = mio_tell (mio);
+}
+
+struct mioGetposCallbackData {
+	MIOPos *pos;
+	long   offset;
+};
+
+CTAGS_INLINE
+void mio_getpos_cb (MIO *mio, void *data)
+{
+	struct mioGetposCallbackData *cb_data = data;
+
+	if (cb_data->offset)
+		mio_seek (mio, cb_data->offset, SEEK_CUR);
+	mio_getpos (mio, cb_data->pos);
+}
+
+extern void getNestedInputStreamInfo (unsigned long *startLine,
+									  long *startCharOffset,
+									  unsigned long *endLine,
+									  long *endCharOffset)
+{
+	if (startLine)
+		*startLine = File.nestedInputStreamInfo.startLine;
+	if (startCharOffset)
+		*startCharOffset = File.nestedInputStreamInfo.startCharOffset;
+	if (endLine)
+		*endLine = File.nestedInputStreamInfo.endLine;
+	if (endCharOffset)
+		*endCharOffset = File.nestedInputStreamInfo.endCharOffset;
+}
+
+extern unsigned long getCurrentAreaStartLine (void)
+{
+	unsigned long startLine = 0;
+
+	if (doesParserRunAsGuest())
+		getNestedInputStreamInfo (&startLine, NULL, NULL, NULL);
+	return startLine;
+}
+
+
+CTAGS_INLINE
+void callAtNestedInputStreamStart (MIO *mio,
+								   void (* fn) (MIO *, void*),
+								   void *data)
+{
+	unsigned long startLine;
+	long startCharOffset;
+
+	getNestedInputStreamInfo (&startLine, &startCharOffset, NULL, NULL);
+	MIOPos start = getInputFilePositionForLine (startLine);
+	mio_setpos (mio, &start);
+	mio_seek (mio, startCharOffset, SEEK_CUR);
+	fn (mio, data);
+}
+
+CTAGS_INLINE
+void tellNestInputStreamStartOffset (MIO *mio, void *data)
+{
+	callAtNestedInputStreamStart (mio, mio_tell_cb, data);
+}
+
+CTAGS_INLINE
+void tellNestInputStreamStartPosition (MIO *mio, void *data)
+{
+	callAtNestedInputStreamStart (mio, mio_getpos_cb, data);
+}
+
+CTAGS_INLINE
+long getCurrentAreaOffset (void)
+{
+	if (!doesParserRunAsGuest ())
+		return 0;
+
+	int r = 0;
+	callWithSavingPosition (BackupFile.mio,
+							tellNestInputStreamStartOffset,
+							&r);
+	return r;
+}
+
+CTAGS_INLINE
+void getCurrentAreaPositionWithOffset (MIOPos *pos, long offset)
+{
+	if (!doesParserRunAsGuest ())
+	{
+		*pos = File.filePosition.pos;
+		return;
+	}
+
+	struct mioGetposCallbackData data = {
+		.pos = pos,
+		.offset = offset,
+	};
+	callWithSavingPosition (BackupFile.mio,
+							tellNestInputStreamStartPosition,
+							&data);
+}
+
 extern int getInputLineOffset (void)
 {
-	unsigned char *base = (unsigned char *) vStringValue (File.line);
 	int ret;
 
 	if (File.currentLine)
-		ret = File.currentLine - base - File.ungetchIdx;
+	{
+		long guest_area_offset = 0;
+		if (doesParserRunAsGuest ())
+		{
+			unsigned long startLine;
+			long startCharOffset;
+			getNestedInputStreamInfo (&startLine, &startCharOffset, NULL, NULL);
+			if (startLine == File.input.lineNumber)
+			{
+				/* We are at the start line of the Guest area. */
+				guest_area_offset = startCharOffset;
+			}
+		}
+
+		unsigned char *base = (unsigned char *) vStringValue (File.line);
+		ret = guest_area_offset + File.currentLine - base - File.ungetchIdx;
+	}
 	else if (File.input.lineNumber)
 	{
 		/* When EOF is saw, currentLine is set to NULL.
 		 * So the way to calculate the offset at the end of file is tricky.
 		 */
-		ret = (mio_tell (File.mio) - (File.bomFound? 3: 0))
-			- getInputFileOffsetForLine(File.input.lineNumber);
+		long guest_area_offset = getCurrentAreaOffset ();
+		return (guest_area_offset + mio_tell (File.mio) - (File.bomFound? 3: 0))
+			- getInputFileOffsetForLine(File.input.lineNumber) - File.ungetchIdx ;
 	}
 	else
 	{
 		/* At the first line of file. */
-		ret = mio_tell (File.mio) - (File.bomFound? 3: 0);
+		long guest_area_offset = getCurrentAreaOffset ();
+		ret = guest_area_offset + mio_tell (File.mio) - (File.bomFound? 3: 0);
 	}
 
 	return ret >= 0 ? ret : 0;
@@ -220,6 +354,29 @@ extern long getInputFileOffsetForLine (unsigned int line)
 	long r = cpos->offset - (File.bomFound? 3: 0) - cpos->crAdjustment;
 	Assert (r >= 0);
 	return r;
+}
+
+static void tellAbsolutePosition (MIO *mio, void *data)
+{
+	struct mioGetposCallbackData *cb_data = data;
+
+	mio_seek (mio, cb_data->offset, SEEK_SET);
+	mio_getpos (mio, cb_data->pos);
+}
+
+extern MIOPos getInputFilePositionForOffset (long offset)
+{
+	MIOPos pos;
+	struct mioGetposCallbackData data = {
+		.pos = &pos,
+		.offset = offset,
+	};
+
+	callWithSavingPosition (File.mio,
+							tellAbsolutePosition,
+							&data);
+
+	return pos;
 }
 
 extern langType getInputLanguage (void)
@@ -1127,23 +1284,40 @@ extern char *readLineRaw (vString *const vLine, MIO *const mio)
 /*  Places into the line buffer the contents of the line referenced by
  *  "location".
  */
-extern char *readLineFromBypass (
-		vString *const vLine, MIOPos location, long *const pSeekValue)
-{
-	MIOPos orignalPosition;
+struct readLineRawCbData {
+	MIOPos location;
+	long *offset;
+	vString *vLine;
 	char *result;
+};
+static void readLineRawCb (MIO *mio, void *data)
+{
+	struct readLineRawCbData *cb_data = data;
 
-	mio_getpos (File.mio, &orignalPosition);
-	mio_setpos (File.mio, &location);
-	mio_clearerr (File.mio);
-	if (pSeekValue != NULL)
-		*pSeekValue = mio_tell (File.mio);
-	result = readLineRaw (vLine, File.mio);
-	mio_setpos (File.mio, &orignalPosition);
+	mio_setpos (mio, &cb_data->location);
+	mio_clearerr (mio);
+	if (cb_data->offset)
+		*cb_data->offset = mio_tell (mio);
+
 	/* If the file is empty, we can't get the line
 	   for location 0. readLineFromBypass doesn't know
 	   what itself should do; just report it to the caller. */
-	return result;
+	cb_data->result = readLineRaw (cb_data->vLine, mio);
+}
+
+extern char *readLineFromBypass (
+		vString *const vLine, MIOPos location, long *const pSeekValue)
+{
+	struct readLineRawCbData data = {
+		.location = location,
+		.offset = pSeekValue,
+		.vLine = vLine,
+		.result = NULL,
+	};
+
+	callWithSavingPosition (File.mio, readLineRawCb, &data);
+
+	return data.result;
 }
 
 extern void   pushNarrowedInputStream (

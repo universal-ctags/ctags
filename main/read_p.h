@@ -34,8 +34,6 @@ enum nestedInputBoundaryFlag {
 extern const char *getInputLanguageName (void);
 extern const char *getInputFileTagPath (void);
 
-extern long getInputFileOffsetForLine (unsigned int line);
-
 extern unsigned int countInputLanguageKinds (void);
 extern unsigned int countInputLanguageRoles (int kindIndex);
 
@@ -79,5 +77,10 @@ extern void   popNarrowedInputStream  (void);
 extern bool isThinStreamSpec(unsigned long startLine, long startCharOffset,
 							 unsigned long endLine, long endCharOffset,
 							 unsigned long sourceLineOffset);
+
+extern void getNestedInputStreamInfo (unsigned long *startLine,
+									  long *startCharOffset,
+									  unsigned long *endLine,
+									  long *endCharOffset);
 
 #endif  /* CTAGS_MAIN_READ_PRIVATE_H */

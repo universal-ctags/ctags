@@ -78,12 +78,26 @@ static void yamlFini (yaml_parser_t *yaml)
 
 extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asEndPosition)
 {
-	unsigned int ln = token->start_mark.line + 1;
+	unsigned long area_start_ln = getCurrentAreaStartLine();
+	unsigned long ln = (area_start_ln? area_start_ln - 1: 0) + token->start_mark.line + 1;
 
 	if (asEndPosition)
 		setTagEndLine (tag, ln);
 	else
-		updateTagLine (tag, ln, getInputFilePositionForLine (ln));
+	{
+		MIOPos rela_pos;
+
+		if (area_start_ln > 0)
+		{
+			long abs_offset = getInputFileOffsetForLine (ln);
+			long area_start_offset = getInputFileOffsetForLine (area_start_ln);
+			long rela_offset = abs_offset - area_start_offset;
+			rela_pos = getInputFilePositionForOffset (rela_offset);
+		}
+		else
+			rela_pos = getInputFilePositionForLine (ln);
+		updateTagLine (tag, ln, rela_pos);
+	}
 }
 
 enum YamlKind {
