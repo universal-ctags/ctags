@@ -186,6 +186,7 @@ static void inputEnd (subparser *s)
 
 	vStringDelete (moose->supersOrRoles);
 	moose->supersOrRoles = NULL;
+	moose->notInMoose = true;
 }
 
 static void makeTagEntryNotify (subparser *s, const tagEntryInfo *tag, int corkIndex)

@@ -1,0 +1,5 @@
+--sort=no
+--extras=+{subparser}
+# If guest is turned on, the crash isn't reproduced.
+--extras=-{guest}
+--fields=+lKzZ
