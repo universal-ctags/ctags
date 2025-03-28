@@ -1,0 +1,7 @@
+ctags: Warning: regcomp: Invalid preceding regular expression
+ctags: Warning: pattern: [
+]if\s+__name__\s*==\s*("__main__"|'__main__')\s*:(?:\s*#[^
+]*)?
+
+ctags: Warning: language: Python[0]
+ctags: Warning: Failed in compiling the regex pattern with "default" regex engine

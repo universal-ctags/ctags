@@ -2352,6 +2352,10 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 		else
 			error (WARNING, "language: %s[%u]", getLanguageName (lcb->owner),
 				   ptrArrayCount (lcb->entries[regptype]));
+
+		struct flagDefsDescriptor desc = choose_backend (flags, regptype, false);
+		error (WARNING, "Failed in compiling the regex pattern with \"%s\" regex engine",
+			   desc.backend->name);
 		return NULL;
 	}
 
@@ -2461,6 +2465,9 @@ extern void addTagMultiLineRegex (struct lregexControlBlock *lcb, const char* co
 {
 	regexPattern *ptrn = addTagRegexInternal (lcb, TABLE_INDEX_UNUSED,
 											  REG_PARSER_MULTI_LINE, regex, name, kinds, flags, disabled);
+	if (!ptrn)
+		return;
+
 	if (ptrn->mgroup.forLineNumberDetermination == NO_MULTILINE)
 	{
 		if (hasNameSlot(ptrn))
@@ -2563,6 +2570,9 @@ static void addTagRegexOption (struct lregexControlBlock *lcb,
 	{
 		regexPattern *ptrn = addTagRegexInternal (lcb, table_index, regptype, regex_pat, name, kinds, flags,
 												  NULL);
+		if (!ptrn)
+			goto out;
+
 		if (regptype == REG_PARSER_MULTI_LINE
 			&& ptrn->mgroup.forLineNumberDetermination == NO_MULTILINE)
 		{
@@ -2574,6 +2584,7 @@ static void addTagRegexOption (struct lregexControlBlock *lcb,
 		}
 	}
 
+ out:
 	eFree (regex_pat);
 }
 
