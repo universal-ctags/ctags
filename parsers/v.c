@@ -397,6 +397,9 @@ typedef struct {
 } parserState;
 
 static langType LangV;
+static langType Lang_c;
+static langType Lang_javascript;
+
 static objPool *TokenPool = NULL;
 static parserState *PS = NULL; // global parser state
 
@@ -1020,7 +1023,7 @@ static void makeForeignDeclTagMaybe (tokenInfo *const token, vString *const name
 
 	if (strcmp (scopeEntry->name, "C") == 0)
 	{
-		lang = getNamedLanguage ("C", 0);
+		lang = Lang_c;
 		if (kind == KIND_STRUCT)
 		{
 			foreignKind = CXXTagKindSTRUCT;
@@ -1036,7 +1039,7 @@ static void makeForeignDeclTagMaybe (tokenInfo *const token, vString *const name
 	}
 	else if (strcmp (scopeEntry->name, "JS") == 0)
 	{
-		lang = getNamedLanguage ("JavaScript", 0);
+		lang = Lang_javascript;
 		if (kind == KIND_FUNCTION)
 		{
 			foreignKind = JSTAG_FUNCTION;
@@ -3075,8 +3078,8 @@ extern parserDefinition *VParser (void)
 	parserDefinition *def = parserNew ("V");
 	static selectLanguage selectors[] = { selectVOrVerilogByKeywords, NULL };
 	static parserDependency dependencies [] = {
-		[0] = { DEPTYPE_FOREIGNER, "C", NULL },
-		[1] = { DEPTYPE_FOREIGNER, "JavaScript", NULL },
+		[0] = { DEPTYPE_FOREIGNER, "C", &Lang_c },
+		[1] = { DEPTYPE_FOREIGNER, "JavaScript", &Lang_javascript },
 	};
 	def->kindTable = VKinds;
 	def->kindCount = ARRAY_SIZE (VKinds);

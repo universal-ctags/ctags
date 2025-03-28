@@ -93,6 +93,7 @@ struct rpmSpecCtx {
 	bool in_configure;
 } rpmSpecCtx;
 
+static langType Lang_autoconf;
 
 static bool is_line_continued(const char *line)
 {
@@ -150,7 +151,7 @@ static void scan_configure_options (const char *line)
 
 				initForeignRefTagEntry (&e,
 										vStringValue (name),
-										getNamedLanguage ("Autoconf", 0),
+										Lang_autoconf,
 										prefix->kindIndex,
 										prefix->roleIndex);
 				makeTagEntry (&e);
@@ -392,7 +393,7 @@ extern parserDefinition* RpmSpecParser (void)
 	parserDefinition* const def = parserNew ("RpmSpec");
 
 	static parserDependency dependencies [] = {
-		[0] = { DEPTYPE_FOREIGNER, "Autoconf", NULL },
+		[0] = { DEPTYPE_FOREIGNER, "Autoconf", &Lang_autoconf },
 	};
 
 	def->kindTable = RpmSpecKinds;

@@ -69,6 +69,7 @@ static xtagDefinition MakeXtagTable [] = {
 	}
 };
 
+static langType Lang_cpreprocessor;
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -432,7 +433,7 @@ static void valueTrackerInit (struct valueTracker *vt)
 	vt->state = VT_LOOKING_FOR_D;
 	vt->leftSideIndex = CORK_NIL;
 	vt->value = enabled? vStringNew(): NULL;
-	vt->cpp = enabled? getNamedLanguage ("CPreProcessor", 0): LANG_IGNORE;
+	vt->cpp = enabled? Lang_cpreprocessor: LANG_IGNORE;
 }
 
 static void valueTrackerFini (struct valueTracker *vt)
@@ -696,7 +697,7 @@ extern parserDefinition* MakefileParser (void)
 		NULL };
 
 	static parserDependency dependencies [] = {
-		[0] = { DEPTYPE_FOREIGNER, "CPreProcessor", NULL },
+		[0] = { DEPTYPE_FOREIGNER, "CPreProcessor", &Lang_cpreprocessor },
 	};
 
 	parserDefinition* const def = parserNew ("Make");

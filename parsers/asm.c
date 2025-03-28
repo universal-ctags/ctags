@@ -81,6 +81,7 @@ static fieldDefinition AsmFields[] = {
 *   DATA DEFINITIONS
 */
 static langType Lang_asm;
+static langType Lang_ldscript;
 
 static kindDefinition AsmKinds [] = {
 	{ true, 'd', "define", "defines" },
@@ -211,22 +212,16 @@ static bool isDefineOperator (const vString *const operator)
 static int makeTagForLdScript (const char * name, int kind, int *scope, bool useCpp)
 {
 	tagEntryInfo e;
-	static langType lang = LANG_AUTO;
-
-	if(lang == LANG_AUTO)
-		lang = getNamedLanguage("LdScript", 0);
-	if(lang == LANG_IGNORE)
-		return CORK_NIL;
 
 	if (kind == K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL)
 	{
 		static kindDefinition * kdef = NULL;
 		if(kdef == NULL)
-			kdef = getLanguageKindForName (lang, "symbol");
+			kdef = getLanguageKindForName (Lang_ldscript, "symbol");
 		if(kdef == NULL)
 			return CORK_NIL;
 
-		initForeignTagEntry(&e, name, lang, kdef->id);
+		initForeignTagEntry(&e, name, Lang_ldscript, kdef->id);
 		e.extensionFields.scopeIndex = *scope;
 		if (useCpp)
 			updateTagLine (&e, cppGetInputLineNumber (), cppGetInputFilePosition());
@@ -236,17 +231,17 @@ static int makeTagForLdScript (const char * name, int kind, int *scope, bool use
 	{
 		static kindDefinition * kdef = NULL;
 		if(kdef == NULL)
-			kdef = getLanguageKindForName (lang, "inputSection");
+			kdef = getLanguageKindForName (Lang_ldscript, "inputSection");
 		if(kdef == NULL)
 			return CORK_NIL;
 
 		static roleDefinition *rdef = NULL;
 		if(rdef == NULL)
-			rdef = getLanguageRoleForName (lang, kdef->id, "destination");
+			rdef = getLanguageRoleForName (Lang_ldscript, kdef->id, "destination");
 		if (rdef == NULL)
 			return CORK_NIL;
 
-		initForeignRefTagEntry(&e, name, lang, kdef->id, rdef->id);
+		initForeignRefTagEntry(&e, name, Lang_ldscript, kdef->id, rdef->id);
 		if (useCpp)
 			updateTagLine (&e, cppGetInputLineNumber (), cppGetInputFilePosition());
 		*scope = makeTagEntry (&e);
@@ -967,7 +962,7 @@ extern parserDefinition* AsmParser (void)
 	static selectLanguage selectors[] = { selectByArrowOfR, NULL };
 
 	static parserDependency dependencies [] = {
-		{ DEPTYPE_FOREIGNER, "LdScript", NULL },
+		{ DEPTYPE_FOREIGNER, "LdScript", &Lang_ldscript },
 	};
 
 	parserDefinition* def = parserNew ("Asm");
