@@ -17,6 +17,7 @@ Maven2               XML        base <> sub {bidirectional}
 Moose                Perl       base <> sub {bidirectional}
 OpenAPI              Yaml       base <> sub {bidirectional}
 PlistXML             XML        base <> sub {bidirectional}
+PythonEntryPoints    Iniconf    base <= sub {dedicated}
 PythonLoggingConfig  Iniconf    base <> sub {bidirectional}
 QtMoc                C++        base <> sub {bidirectional}
 Quarto               Markdown   base <= sub {dedicated}

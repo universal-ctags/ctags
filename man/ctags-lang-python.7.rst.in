@@ -281,6 +281,20 @@ of its return value. If we consider "id_t" is a function, its ``typeref:`` field
 should have "typename:int". However, for filling ``typeref:`` with "typename:int",
 ctags has to analyze "Callable[[int], int]" deeper. We don't want to do so.
 
+VERSIONS
+--------
+
+Change since "0.0"
+~~~~~~~~~~~~~~~~~~
+
+* New role ``entryPoint`` for ``module`` kind
+
+  PythonEntryPoints parser emits tag entries having this role.
+
+* New role ``entryPoint`` for  ``function`` kind
+
+  PythonEntryPoints parser emits tag entries having this role.
+
 SEE ALSO
 --------
 ctags(1), ctags-client-tools(7), ctags-lang-iPythonCell(7)

@@ -1,0 +1,12 @@
+# Taken from hachoir-3.3.0.dist-info/entry_points.txt
+[console_scripts]
+hachoir-grep = hachoir.grep:main
+hachoir-metadata = hachoir.metadata.main:main
+hachoir-strip = hachoir.strip:main
+hachoir-urwid = hachoir.urwid:main
+
+extra0 = a.b.c
+broken =
+
+[gui_scripts]
+hachoir-wx = hachoir.wx.main:main

@@ -86,7 +86,7 @@
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "C", "path": "1.1", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Go", "path": "0.0", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Man", "path": "0.0", "pattern": "current.age"}
-{"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Python", "path": "0.0", "pattern": "current.age"}
+{"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Python", "path": "0.1", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PATTERN_LENGTH_LIMIT", "path": "96", "pattern": "0 for no limit"}
 {"_type": "ptag", "name": "TAG_PROGRAM_AUTHOR", "path": "Universal Ctags Team", "pattern": ""}
 {"_type": "ptag", "name": "TAG_PROGRAM_NAME", "path": "Universal Ctags", "pattern": "Derived from Exuberant Ctags"}
@@ -98,6 +98,8 @@
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "struct", "path": "foreigndecl", "pattern": "declared in foreign languages"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Go", "kindName": "package", "path": "imported", "pattern": "imported package"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Go", "kindName": "unknown", "path": "receiverType", "pattern": "receiver type"}
+{"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "function", "path": "entryPoint", "pattern": "specified as an entry point"}
+{"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "module", "path": "entryPoint", "pattern": "specified as a module of an entry point"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "module", "path": "imported", "pattern": "imported modules"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "module", "path": "indirectlyImported", "pattern": "module imported in alternative name"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "Python", "kindName": "module", "path": "namespace", "pattern": "namespace from where classes/variables/functions are imported"}

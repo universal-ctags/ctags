@@ -100,6 +100,8 @@ Protobuf                D/protodef        imported           on      imported
 Protobuf                m/message         extension          on      extending the message
 Python                  Y/unknown         imported           on      imported from the other module
 Python                  Y/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
+Python                  f/function        entryPoint         on      specified as an entry point
+Python                  i/module          entryPoint         on      specified as a module of an entry point
 Python                  i/module          imported           on      imported modules
 Python                  i/module          indirectlyImported on      module imported in alternative name
 Python                  i/module          namespace          on      namespace from where classes/variables/functions are imported
@@ -246,6 +248,8 @@ Protobuf                D/protodef        imported           on      imported
 Protobuf                m/message         extension          on      extending the message
 Python                  Y/unknown         imported           on      imported from the other module
 Python                  Y/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
+Python                  f/function        entryPoint         on      specified as an entry point
+Python                  i/module          entryPoint         on      specified as a module of an entry point
 Python                  i/module          imported           on      imported modules
 Python                  i/module          indirectlyImported on      module imported in alternative name
 Python                  i/module          namespace          on      namespace from where classes/variables/functions are imported

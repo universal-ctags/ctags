@@ -109,6 +109,8 @@ static roleDefinition PythonModuleRoles [] = {
 	  "namespace from where classes/variables/functions are imported" },
 	{ true, "indirectlyImported",
 	  "module imported in alternative name" },
+	{ true, "entryPoint",
+	  "specified as a module of an entry point" },
 };
 
 static roleDefinition PythonUnknownRoles [] = {
@@ -117,9 +119,15 @@ static roleDefinition PythonUnknownRoles [] = {
 	  "classes/variables/functions/modules imported in alternative name" },
 };
 
+static roleDefinition PythonFunctionRoles [] = {
+	{ true, "entryPoint",
+	  "specified as an entry point" },
+};
+
 static kindDefinition PythonKinds[PYTHON_COUNT_KIND] = {
 	{true, 'c', "class",    "classes"},
-	{true, 'f', "function", "functions"},
+	{true, 'f', "function", "functions",
+	 .referenceOnly = false, ATTACH_ROLES(PythonFunctionRoles) },
 	{true, 'm', "member",   "class members"},
 	{true, 'v', "variable", "variables"},
 	{true, 'I', "namespace", "name referring a module defined in other file"},
@@ -1866,5 +1874,7 @@ extern parserDefinition* PythonParser (void)
 	def->fieldCount = ARRAY_SIZE (PythonFields);
 	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
+	def->versionCurrent = 0;
+	def->versionAge = 1;
 	return def;
 }

@@ -555,6 +555,9 @@
     <ClCompile Include="..\parsers\protobuf.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\python-entry-points.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\python-logging-config.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>

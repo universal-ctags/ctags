@@ -1,0 +1,4 @@
+--sort=no
+--map-PythonEntryPoints=+.pythonentrypoints
+--fields=+lKzZr
+--extras=+{subparser}r

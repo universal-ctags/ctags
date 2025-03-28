@@ -344,6 +344,7 @@
     <ClCompile Include="..\parsers\php.c" />
     <ClCompile Include="..\parsers\powershell.c" />
     <ClCompile Include="..\parsers\protobuf.c" />
+    <ClCompile Include="..\parsers\python-entry-points.c" />
     <ClCompile Include="..\parsers\python-logging-config.c" />
     <ClCompile Include="..\parsers\python.c" />
     <ClCompile Include="..\parsers\quarto.c" />
