@@ -20,6 +20,7 @@
 #include "dependency.h"
 #include "entry.h"
 #include "keyword.h"
+#include "numarray.h"
 #include "param.h"
 #include "parse.h"
 #include "read.h"
@@ -32,6 +33,8 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
+	K_PSUEDO_FOREIGN_LD_SCRIPT_POP_SECTION = -6,
+	K_PSUEDO_FOREIGN_LD_SCRIPT_PUSH_SECTION = -5,
 	K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL = -4,
 	K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION = -3,
 	K_PSUEDO_MACRO_END = -2,
@@ -53,7 +56,9 @@ typedef enum {
 	OP_GLOBAL,
 	OP_LABEL,
 	OP_MACRO,
+	OP_POPSECTION,
 	OP_PROC,
+	OP_PUSHSECTION,
 	OP_RECORD,
 	OP_SECTIONS,
 	OP_SECTION,
@@ -110,6 +115,8 @@ static const keywordTable AsmKeywords [] = {
 
 	/* These are used in GNU as. */
 	{ "section",  OP_SECTION     },
+	{ "pushsection", OP_PUSHSECTION  },
+	{ "popsection", OP_POPSECTION  },
 	{ "equiv",    OP_EQU         },
 	{ "eqv",      OP_EQU         },
 
@@ -131,7 +138,9 @@ static const opKind OpKinds [] = {
 	{ OP_GLOBAL,      K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL },
 	{ OP_LABEL,       K_LABEL  },
 	{ OP_MACRO,       K_MACRO  },
+	{ OP_POPSECTION,  K_PSUEDO_FOREIGN_LD_SCRIPT_POP_SECTION },
 	{ OP_PROC,        K_LABEL  },
+	{ OP_PUSHSECTION, K_PSUEDO_FOREIGN_LD_SCRIPT_PUSH_SECTION },
 	{ OP_RECORD,      K_TYPE   },
 	{ OP_SECTIONS,    K_NONE   },
 	{ OP_SECTION,     K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION },
@@ -272,6 +281,7 @@ static int makeAsmTag (
 		const bool nameFollows,
 		const bool directive,
 		int *sectionScope,
+		intArray *sectionScopeStack,
 		int *macroScope,
 		bool useCpp)
 {
@@ -329,10 +339,25 @@ static int makeAsmTag (
 					*macroScope = macro_tag->extensionFields.scopeIndex;
 				}
 				break;
+			case K_PSUEDO_FOREIGN_LD_SCRIPT_POP_SECTION:
+				if (intArrayCount (sectionScopeStack) > 0)
+				{
+					int top = intArrayRemoveLast (sectionScopeStack);
+					tagEntryInfo *section_tag = getEntryInCorkQueue (top);
+					if (section_tag)
+						setTagEndLine (section_tag,
+									   useCpp? cppGetInputLineNumber (): getInputLineNumber ());
+					if (intArrayCount (sectionScopeStack) > 0)
+						*sectionScope = intArrayLast (sectionScopeStack);
+				}
+				break;
+			case K_PSUEDO_FOREIGN_LD_SCRIPT_PUSH_SECTION:
 			case K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL:
 			case K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION:
 				r = makeTagForLdScript (vStringValue (operator),
 										kind_for_directive, sectionScope, useCpp);
+				if (kind_for_directive == K_PSUEDO_FOREIGN_LD_SCRIPT_PUSH_SECTION)
+					intArrayAdd (sectionScopeStack, *sectionScope);
 				break;
 			default:
 				r = makeAsmSimpleTag (operator, kind_for_directive, useCpp);
@@ -603,9 +628,11 @@ static const unsigned char *readLineViaCpp (const char *commentChars)
 				if (str)
 				{
 					const char *section = strrstr (vStringValue (line), ".section");
+					if (!section)
+						section = strrstr (vStringValue (line), ".pushsection");
 					if (section && isEligibleAsSectionName(str))
 					{
-						section += strlen(".section");
+						section += (section[1] == 's')? strlen(".section"): strlen(".pushsection");
 						while (isspace((unsigned char)*section))
 							section++;
 						if (*section == '\0')
@@ -799,6 +826,7 @@ static void findAsmTagsCommon (bool useCpp)
 
 	int sectionScope = CORK_NIL;
 	int macroScope = CORK_NIL;
+	intArray *sectionScopeStack = intArrayNew ();
 
 	 while ((line = asmReadLineFromInputFile (commentCharsInMOL, useCpp)) != NULL)
 	 {
@@ -863,7 +891,7 @@ static void findAsmTagsCommon (bool useCpp)
 			nameFollows = true;
 		}
 		int r = makeAsmTag (name, operator, labelCandidate, nameFollows, directive,
-							&sectionScope, &macroScope, useCpp);
+							&sectionScope, sectionScopeStack, &macroScope, useCpp);
 		tagEntryInfo *e = getEntryInCorkQueue (r);
 		if (e && e->langType == Lang_asm
 			&& e->kindIndex == K_MACRO && isRoleAssigned(e, ROLE_DEFINITION_INDEX))
@@ -873,6 +901,7 @@ static void findAsmTagsCommon (bool useCpp)
 	if (useCpp)
 		cppTerminate ();
 
+	intArrayDelete (sectionScopeStack);
 	vStringDelete (name);
 	vStringDelete (operator);
 }
