@@ -482,6 +482,7 @@
     <ClInclude Include="..\parsers\x-make.h" />
     <ClInclude Include="..\parsers\x-markdown.h" />
     <ClInclude Include="..\parsers\x-perl.h" />
+    <ClInclude Include="..\parsers\x-python.h" />
     <ClInclude Include="..\parsers\x-r.h" />
     <ClInclude Include="..\parsers\x-ruby.h" />
     <ClInclude Include="..\parsers\x-sh.h" />

@@ -300,6 +300,7 @@ PARSER_HEADS = \
 	parsers/x-make.h \
 	parsers/x-markdown.h \
 	parsers/x-perl.h \
+	parsers/x-python.h \
 	parsers/x-r.h \
 	parsers/x-ruby.h \
 	parsers/x-sh.h \

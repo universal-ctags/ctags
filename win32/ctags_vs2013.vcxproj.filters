@@ -965,6 +965,9 @@
     <ClInclude Include="..\parsers\x-perl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\parsers\x-python.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\parsers\x-r.h">
       <Filter>Header Files</Filter>
     </ClInclude>
