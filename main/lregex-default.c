@@ -35,6 +35,7 @@ static void set_icase_flag (int *flags);
 *    DATA DEFINITIONS
 */
 static struct regexBackend defaultRegexBackend = {
+	.name = "default",
 	.fdefs = NULL,
 	.fdef_count = 0,
 	.set_icase_flag = set_icase_flag,

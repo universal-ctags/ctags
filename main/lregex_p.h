@@ -49,6 +49,7 @@ typedef struct sRegexCompiledCode {
 } regexCompiledCode;
 
 struct regexBackend {
+	const char *name;
 	flagDefinition *fdefs;
 	unsigned int fdef_count;
 

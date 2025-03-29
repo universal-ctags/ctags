@@ -1,0 +1,3 @@
+# Though this pattern uses pcre2 extension, {pcre2} flag is not given.
+# This caused a crash.
+--mline-regex-Python=/[\n]if\s+__name__\s*==\s*("__main__"|'__main__')\s*:(?:\s*#[^\n]*)?\n//f/{mgroup=1}{_anonymous=main}
