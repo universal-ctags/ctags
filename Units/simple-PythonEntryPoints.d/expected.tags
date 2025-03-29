@@ -1,0 +1,27 @@
+console_scripts	input.pythonentrypoints	/^[console_scripts]$/;"	kind:section	language:Iniconf	roles:def
+hachoir-grep	input.pythonentrypoints	/^hachoir-grep = hachoir.grep:main$/;"	kind:key	language:Iniconf	scope:section:console_scripts	roles:def
+hachoir-grep	input.pythonentrypoints	/^hachoir-grep = hachoir.grep:main$/;"	kind:console	language:PythonEntryPoints	roles:def
+hachoir.grep	input.pythonentrypoints	/^hachoir-grep = hachoir.grep:main$/;"	kind:module	language:Python	roles:entryPoint
+main	input.pythonentrypoints	/^hachoir-grep = hachoir.grep:main$/;"	kind:function	language:Python	scope:module:hachoir.grep	roles:entryPoint
+hachoir-metadata	input.pythonentrypoints	/^hachoir-metadata = hachoir.metadata.main:main$/;"	kind:key	language:Iniconf	scope:section:console_scripts	roles:def
+hachoir-metadata	input.pythonentrypoints	/^hachoir-metadata = hachoir.metadata.main:main$/;"	kind:console	language:PythonEntryPoints	roles:def
+hachoir.metadata.main	input.pythonentrypoints	/^hachoir-metadata = hachoir.metadata.main:main$/;"	kind:module	language:Python	roles:entryPoint
+main	input.pythonentrypoints	/^hachoir-metadata = hachoir.metadata.main:main$/;"	kind:function	language:Python	scope:module:hachoir.metadata.main	roles:entryPoint
+hachoir-strip	input.pythonentrypoints	/^hachoir-strip = hachoir.strip:main$/;"	kind:key	language:Iniconf	scope:section:console_scripts	roles:def
+hachoir-strip	input.pythonentrypoints	/^hachoir-strip = hachoir.strip:main$/;"	kind:console	language:PythonEntryPoints	roles:def
+hachoir.strip	input.pythonentrypoints	/^hachoir-strip = hachoir.strip:main$/;"	kind:module	language:Python	roles:entryPoint
+main	input.pythonentrypoints	/^hachoir-strip = hachoir.strip:main$/;"	kind:function	language:Python	scope:module:hachoir.strip	roles:entryPoint
+hachoir-urwid	input.pythonentrypoints	/^hachoir-urwid = hachoir.urwid:main$/;"	kind:key	language:Iniconf	scope:section:console_scripts	roles:def
+hachoir-urwid	input.pythonentrypoints	/^hachoir-urwid = hachoir.urwid:main$/;"	kind:console	language:PythonEntryPoints	roles:def
+hachoir.urwid	input.pythonentrypoints	/^hachoir-urwid = hachoir.urwid:main$/;"	kind:module	language:Python	roles:entryPoint
+main	input.pythonentrypoints	/^hachoir-urwid = hachoir.urwid:main$/;"	kind:function	language:Python	scope:module:hachoir.urwid	roles:entryPoint
+extra0	input.pythonentrypoints	/^extra0 = a.b.c$/;"	kind:key	language:Iniconf	scope:section:console_scripts	roles:def
+extra0	input.pythonentrypoints	/^extra0 = a.b.c$/;"	kind:console	language:PythonEntryPoints	roles:def
+a.b.c	input.pythonentrypoints	/^extra0 = a.b.c$/;"	kind:module	language:Python	roles:entryPoint
+broken	input.pythonentrypoints	/^broken =$/;"	kind:key	language:Iniconf	scope:section:console_scripts	roles:def
+broken	input.pythonentrypoints	/^broken =$/;"	kind:console	language:PythonEntryPoints	roles:def
+gui_scripts	input.pythonentrypoints	/^[gui_scripts]$/;"	kind:section	language:Iniconf	roles:def
+hachoir-wx	input.pythonentrypoints	/^hachoir-wx = hachoir.wx.main:main$/;"	kind:key	language:Iniconf	scope:section:gui_scripts	roles:def
+hachoir-wx	input.pythonentrypoints	/^hachoir-wx = hachoir.wx.main:main$/;"	kind:gui	language:PythonEntryPoints	roles:def
+hachoir.wx.main	input.pythonentrypoints	/^hachoir-wx = hachoir.wx.main:main$/;"	kind:module	language:Python	roles:entryPoint
+main	input.pythonentrypoints	/^hachoir-wx = hachoir.wx.main:main$/;"	kind:function	language:Python	scope:module:hachoir.wx.main	roles:entryPoint

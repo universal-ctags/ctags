@@ -126,6 +126,8 @@ extern void initializeDependencies (parserDefinition *parser,
 			baseParser = getNamedLanguage (d->upperParser, 0);
 			Assert (baseParser != LANG_IGNORE);
 			initializeParser (baseParser);
+			if (d->type == DEPTYPE_FOREIGNER && d->data)
+				*((langType *)d->data) = baseParser;
 		}
 	}
 }

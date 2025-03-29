@@ -44,7 +44,7 @@ static bool yamlFrontmattterInitTagEntry (tagEntryInfo *e, yamlSubparser *yaml, 
 *   DATA DEFINITIONS
 */
 
-static langType frontMatterLang;
+static langType Lang_frontmatter;
 
 static tagYpathTable ypathTables [] = {
 	{
@@ -62,18 +62,13 @@ static tagYpathTable ypathTables [] = {
 static bool yamlFrontmattterInitTagEntry (tagEntryInfo *e, yamlSubparser *s CTAGS_ATTR_UNUSED,
 										  char *name, void * data CTAGS_ATTR_UNUSED)
 {
-	initForeignTagEntry (e, name, frontMatterLang, FRONTMATTER_TITLE_KIND);
+	initForeignTagEntry (e, name, Lang_frontmatter, FRONTMATTER_TITLE_KIND);
 	return true;
 }
 
 static void findYamlFrontMatterTags (void)
 {
 	scheduleRunningBaseparser (0);
-}
-
-static void yamlFrontMatterInitialize (langType language)
-{
-	frontMatterLang = getNamedLanguage ("FrontMatter", 0);
 }
 
 extern parserDefinition* YamlFrontMatter (void)
@@ -89,7 +84,7 @@ extern parserDefinition* YamlFrontMatter (void)
 	};
 	static parserDependency dependencies [] = {
 		{ DEPTYPE_SUBPARSER, "Yaml", &yamlfrontmatterSubparser },
-		{ DEPTYPE_FOREIGNER, "FrontMatter", NULL },
+		{ DEPTYPE_FOREIGNER, "FrontMatter", &Lang_frontmatter },
 	};
 
 	parserDefinition* const def = parserNew ("YamlFrontMatter");
@@ -100,7 +95,6 @@ extern parserDefinition* YamlFrontMatter (void)
 	def->kindTable	= NULL;
 	def->kindCount = 0;
 	def->parser	= findYamlFrontMatterTags;
-	def->initialize = yamlFrontMatterInitialize;
 
 	/* This parser runs ONLY as a part of FrontMatter parser.
 	 * User may not want to enable/disable this parser directly. */

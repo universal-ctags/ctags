@@ -344,8 +344,9 @@
     <ClCompile Include="..\parsers\php.c" />
     <ClCompile Include="..\parsers\powershell.c" />
     <ClCompile Include="..\parsers\protobuf.c" />
+    <ClCompile Include="..\parsers\python-entry-points.c" />
+    <ClCompile Include="..\parsers\python-logging-config.c" />
     <ClCompile Include="..\parsers\python.c" />
-    <ClCompile Include="..\parsers\pythonloggingconfig.c" />
     <ClCompile Include="..\parsers\quarto.c" />
     <ClCompile Include="..\parsers\r-r6class.c" />
     <ClCompile Include="..\parsers\r-s4class.c" />
@@ -482,6 +483,7 @@
     <ClInclude Include="..\parsers\x-make.h" />
     <ClInclude Include="..\parsers\x-markdown.h" />
     <ClInclude Include="..\parsers\x-perl.h" />
+    <ClInclude Include="..\parsers\x-python.h" />
     <ClInclude Include="..\parsers\x-r.h" />
     <ClInclude Include="..\parsers\x-ruby.h" />
     <ClInclude Include="..\parsers\x-sh.h" />

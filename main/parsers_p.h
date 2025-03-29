@@ -150,6 +150,7 @@
 	ProtobufParser, \
 	PuppetManifestParser, \
 	PythonParser, \
+	PythonEntryPointsParser, \
 	PythonLoggingConfigParser, \
 	QemuHXParser, \
 	QtMocParser, \

@@ -26,6 +26,8 @@
 #include "ptrarray.h"
 #include "trace.h"
 
+#include "x-python.h"
+
 #define isIdentifierChar(c) \
 	(isalnum (c) || (c) == '_' || (c) >= 0x80)
 #define newToken() (objPoolGet (TokenPool))
@@ -78,25 +80,6 @@ static fieldDefinition PythonFields[COUNT_FIELD] = {
 };
 
 typedef enum {
-	K_CLASS,
-	K_FUNCTION,
-	K_METHOD,
-	K_VARIABLE,
-	K_NAMESPACE,
-	K_MODULE,
-	K_UNKNOWN,
-	K_PARAMETER,
-	K_LOCAL_VARIABLE,
-	COUNT_KIND
-} pythonKind;
-
-typedef enum {
-	PYTHON_MODULE_IMPORTED,
-	PYTHON_MODULE_NAMESPACE,
-	PYTHON_MODULE_INDIRECTLY_IMPORTED,
-} pythonModuleRole;
-
-typedef enum {
 	PYTHON_UNKNOWN_IMPORTED,
 	PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
 } pythonUnknownRole;
@@ -126,6 +109,8 @@ static roleDefinition PythonModuleRoles [] = {
 	  "namespace from where classes/variables/functions are imported" },
 	{ true, "indirectlyImported",
 	  "module imported in alternative name" },
+	{ true, "entryPoint",
+	  "specified as a module of an entry point" },
 };
 
 static roleDefinition PythonUnknownRoles [] = {
@@ -134,9 +119,15 @@ static roleDefinition PythonUnknownRoles [] = {
 	  "classes/variables/functions/modules imported in alternative name" },
 };
 
-static kindDefinition PythonKinds[COUNT_KIND] = {
+static roleDefinition PythonFunctionRoles [] = {
+	{ true, "entryPoint",
+	  "specified as an entry point" },
+};
+
+static kindDefinition PythonKinds[PYTHON_COUNT_KIND] = {
 	{true, 'c', "class",    "classes"},
-	{true, 'f', "function", "functions"},
+	{true, 'f', "function", "functions",
+	 .referenceOnly = false, ATTACH_ROLES(PythonFunctionRoles) },
 	{true, 'm', "member",   "class members"},
 	{true, 'v', "variable", "variables"},
 	{true, 'I', "namespace", "name referring a module defined in other file"},
@@ -228,17 +219,17 @@ static accessType accessFromIdentifier (const vString *const ident,
 	const size_t len = vStringLength (ident);
 
 	/* inside a function/method, private */
-	if (parentKind != -1 && parentKind != K_CLASS)
+	if (parentKind != -1 && parentKind != PYTHON_CLASS_KIND)
 		return ACCESS_PRIVATE;
 	/* not starting with "_", public */
 	else if (len < 1 || p[0] != '_')
 		return ACCESS_PUBLIC;
 	/* "__...__": magic methods */
-	else if (kind == K_FUNCTION && parentKind == K_CLASS &&
+	else if (kind == PYTHON_FUNCTION_KIND && parentKind == PYTHON_CLASS_KIND &&
 	         len > 3 && p[1] == '_' && p[len - 2] == '_' && p[len - 1] == '_')
 		return ACCESS_PUBLIC;
 	/* "__...": name mangling */
-	else if (parentKind == K_CLASS && len > 1 && p[1] == '_')
+	else if (parentKind == PYTHON_CLASS_KIND && len > 1 && p[1] == '_')
 		return ACCESS_PRIVATE;
 	/* "_...": suggested as non-public, but easily accessible */
 	else
@@ -272,8 +263,8 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 			parentKind = nlEntry->kindIndex;
 
 			/* functions directly inside classes are methods, fix it up */
-			if (kind == K_FUNCTION && parentKind == K_CLASS)
-				e->kindIndex = K_METHOD;
+			if (kind == PYTHON_FUNCTION_KIND && parentKind == PYTHON_CLASS_KIND)
+				e->kindIndex = PYTHON_METHOD_KIND;
 		}
 	}
 
@@ -288,11 +279,11 @@ static int makeClassTag (const tokenInfo *const token,
                          const vString *const inheritance,
                          const vString *const decorators)
 {
-	if (PythonKinds[K_CLASS].enabled)
+	if (PythonKinds[PYTHON_CLASS_KIND].enabled)
 	{
 		tagEntryInfo e;
 
-		initPythonEntry (&e, token, K_CLASS);
+		initPythonEntry (&e, token, PYTHON_CLASS_KIND);
 
 		e.extensionFields.inheritance = inheritance ? vStringValue (inheritance) : "";
 		if (decorators && vStringLength (decorators) > 0)
@@ -311,11 +302,11 @@ static int makeFunctionTag (const tokenInfo *const token,
                             const vString *const arglist,
                             const vString *const decorators)
 {
-	if (PythonKinds[K_FUNCTION].enabled)
+	if (PythonKinds[PYTHON_FUNCTION_KIND].enabled)
 	{
 		tagEntryInfo e;
 
-		initPythonEntry (&e, token, K_FUNCTION);
+		initPythonEntry (&e, token, PYTHON_FUNCTION_KIND);
 
 		if (arglist)
 			e.extensionFields.signature = vStringValue (arglist);
@@ -821,7 +812,7 @@ static bool readCDefName (tokenInfo *const token, pythonKind *kind)
 
 	if (token->keyword == KEYWORD_class)
 	{
-		*kind = K_CLASS;
+		*kind = PYTHON_CLASS_KIND;
 		readToken (token);
 	}
 	else
@@ -852,7 +843,7 @@ static bool readCDefName (tokenInfo *const token, pythonKind *kind)
 				readToken (token);
 				if (token->type == '(')
 				{ /* okay, we really found a function, use this */
-					*kind = K_FUNCTION;
+					*kind = PYTHON_FUNCTION_KIND;
 					ungetToken (token);
 					copyToken (token, candidate);
 					break;
@@ -993,7 +984,7 @@ static void parseArglist (tokenInfo *const token, const int kind,
 	int prevTokenType = token->type;
 	int depth = 1;
 
-	if (kind != K_CLASS)
+	if (kind != PYTHON_CLASS_KIND)
 		reprCat (arglist, token);
 
 	do
@@ -1007,7 +998,7 @@ static void parseArglist (tokenInfo *const token, const int kind,
 		}
 
 		readTokenFull (token, true);
-		if (kind != K_CLASS || token->type != ')' || depth > 1)
+		if (kind != PYTHON_CLASS_KIND || token->type != ')' || depth > 1)
 			reprCat (arglist, token);
 
 		if (token->type == '(' ||
@@ -1018,10 +1009,10 @@ static void parseArglist (tokenInfo *const token, const int kind,
 				 token->type == ']' ||
 				 token->type == '}')
 			depth --;
-		else if (kind != K_CLASS && depth == 1 &&
+		else if (kind != PYTHON_CLASS_KIND && depth == 1 &&
 				 token->type == TOKEN_IDENTIFIER &&
 				 (prevTokenType == '(' || prevTokenType == ',') &&
-				 PythonKinds[K_PARAMETER].enabled)
+				 PythonKinds[PYTHON_PARAMETER_KIND].enabled)
 		{
 			tokenInfo *parameterName;
 			vString *parameterType;
@@ -1190,13 +1181,13 @@ static bool parseClassOrDef (tokenInfo *const token,
 		arglist = vStringNew ();
 		parameters = ptrArrayNew ((ptrArrayDeleteFunc)deleteTypedParam);
 
-		if (isCDef && kind != K_CLASS)
+		if (isCDef && kind != PYTHON_CLASS_KIND)
 			parseCArglist (token, kind, arglist, parameters);
 		else
 			parseArglist (token, kind, arglist, parameters);
 	}
 
-	if (kind == K_CLASS)
+	if (kind == PYTHON_CLASS_KIND)
 		corkIndex = makeClassTag (name, arglist, decorators);
 	else
 		corkIndex = makeFunctionTag (name, arglist, decorators);
@@ -1214,7 +1205,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 		for (i = 0; i < ptrArrayCount (parameters); i++)
 		{
 			struct typedParam *parameter = ptrArrayItem (parameters, i);
-			int paramCorkIndex = makeSimplePythonTag (parameter->token, K_PARAMETER);
+			int paramCorkIndex = makeSimplePythonTag (parameter->token, PYTHON_PARAMETER_KIND);
 			tagEntryInfo *e = getEntryInCorkQueue (paramCorkIndex);
 			if (e && parameter->type)
 			{
@@ -1228,7 +1219,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 
 	tagEntryInfo *e;
 	vString *t;
-	if (kind != K_CLASS
+	if (kind != PYTHON_CLASS_KIND
 		&& (e = getEntryInCorkQueue (corkIndex))
 		&& (t = parseReturnTypeAnnotation (token)))
 	{
@@ -1266,7 +1257,7 @@ static bool parseImport (tokenInfo *const token)
 			/* from X import ...
 			 * --------------------
 			 * X = (kind:module, role:namespace) */
-			moduleIndex = makeSimplePythonRefTag (fromModule, NULL, K_MODULE,
+			moduleIndex = makeSimplePythonRefTag (fromModule, NULL, PYTHON_MODULE_KIND,
 												  PYTHON_MODULE_NAMESPACE,
 												  XTAG_UNKNOWN);
 		}
@@ -1304,7 +1295,7 @@ static bool parseImport (tokenInfo *const token)
 							int index;
 
 							/* Y */
-							index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+							index = makeSimplePythonRefTag (name, NULL, PYTHON_UNKNOWN_KIND,
 															PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
 															XTAG_UNKNOWN);
 							/* fill the scope field for Y */
@@ -1313,11 +1304,11 @@ static bool parseImport (tokenInfo *const token)
 								e->extensionFields.scopeIndex = moduleIndex;
 
 							/* Z */
-							index = makeSimplePythonTag (token, K_UNKNOWN);
+							index = makeSimplePythonTag (token, PYTHON_UNKNOWN_KIND);
 							/* fill the nameref filed for Y */
 							if (PythonFields[F_NAMEREF].enabled)
 							{
-								vString *nameref = vStringNewInit (PythonKinds [K_UNKNOWN].name);
+								vString *nameref = vStringNewInit (PythonKinds [PYTHON_UNKNOWN_KIND].name);
 								vStringPut (nameref, ':');
 								vStringCat (nameref, name->string);
 								attachParserFieldToCorkEntry (index, PythonFields[F_NAMEREF].ftype,
@@ -1332,15 +1323,15 @@ static bool parseImport (tokenInfo *const token)
 							 * x = (kind:module, role:indirectlyImported)
 							 * Y = (kind:namespace, nameref:module:x)*/
 							/* x */
-							makeSimplePythonRefTag (name, NULL, K_MODULE,
+							makeSimplePythonRefTag (name, NULL, PYTHON_MODULE_KIND,
 							                        PYTHON_MODULE_INDIRECTLY_IMPORTED,
 							                        XTAG_UNKNOWN);
 							/* Y */
-							int index = makeSimplePythonTag (token, K_NAMESPACE);
+							int index = makeSimplePythonTag (token, PYTHON_NAMESPACE_KIND);
 							/* fill the nameref filed for Y */
 							if (PythonFields[F_NAMEREF].enabled)
 							{
-								vString *nameref = vStringNewInit (PythonKinds [K_MODULE].name);
+								vString *nameref = vStringNewInit (PythonKinds [PYTHON_MODULE_KIND].name);
 								vStringPut (nameref, ':');
 								vStringCat (nameref, name->string);
 								attachParserFieldToCorkEntry (index, PythonFields[F_NAMEREF].ftype,
@@ -1362,7 +1353,7 @@ static bool parseImport (tokenInfo *const token)
 						   x = (kind:module,  role:namespace),
 						   Y = (kind:unknown, role:imported, scope:module:x) */
 						/* Y */
-						int index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+						int index = makeSimplePythonRefTag (name, NULL, PYTHON_UNKNOWN_KIND,
 															PYTHON_UNKNOWN_IMPORTED,
 															XTAG_UNKNOWN);
 						/* fill the scope field for Y */
@@ -1375,7 +1366,7 @@ static bool parseImport (tokenInfo *const token)
 						/* import X
 						   --------------
 						   X = (kind:module, role:imported) */
-						makeSimplePythonRefTag (name, NULL, K_MODULE,
+						makeSimplePythonRefTag (name, NULL, PYTHON_MODULE_KIND,
 						                        PYTHON_MODULE_IMPORTED,
 						                        XTAG_UNKNOWN);
 					}
@@ -1516,7 +1507,7 @@ static void parseSimpleNamespace (tokenInfo *const token, int namespaceIndex)
 		else if (depth == 1 &&
 				 token->type == TOKEN_IDENTIFIER &&
 				 (prevTokenType == '(' || prevTokenType == ','))
-			lastIndex = makeSimplePythonTag (token, K_UNKNOWN);
+			lastIndex = makeSimplePythonTag (token, PYTHON_UNKNOWN_KIND);
 		else if (depth == 1 &&
 				 token->keyword == KEYWORD_lambda &&
 				 prevTokenType == '=' &&
@@ -1524,7 +1515,7 @@ static void parseSimpleNamespace (tokenInfo *const token, int namespaceIndex)
 		{
 			tagEntryInfo *e = getEntryInCorkQueue (lastIndex);
 			if (e)
-				e->kindIndex = K_FUNCTION; /* K_METHOD? */
+				e->kindIndex = PYTHON_FUNCTION_KIND; /* PYTHON_METHOD_KIND? */
 			lastIndex = CORK_NIL;
 		}
 	}
@@ -1664,7 +1655,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 					 */
 					int vindex = makeSimplePythonTag (nameToken, kind);
 					vStringClear (anon->string);
-					anonGenerate (anon->string, "anonFunc", K_FUNCTION);
+					anonGenerate (anon->string, "anonFunc", PYTHON_FUNCTION_KIND);
 					int findex = makeFunctionTag (anon, arglist, NULL);
 					tagEntryInfo *fe = getEntryInCorkQueue (findex);
 					if (fe)
@@ -1676,7 +1667,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 						ve->extensionFields.typeRef [0] = eStrdup ("typename");
 						ve->extensionFields.typeRef [1] = vStringDeleteUnwrap (*type);
 						*type = NULL;
-						vString *nameref = vStringNewInit (PythonKinds [K_FUNCTION].name);
+						vString *nameref = vStringNewInit (PythonKinds [PYTHON_FUNCTION_KIND].name);
 						vStringPut (nameref, ':');
 						vStringCat (nameref, anon->string);
 						attachParserField (ve, PythonFields[F_NAMEREF].ftype,
@@ -1695,8 +1686,8 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 				TRACE_PRINT("name: %s", vStringValue(nameToken->string));
 				bool isAtSN = isAtSimpleNamespace(token);
 				int index = makeSimplePythonTag (nameToken,
-												 ((kind != K_LOCAL_VARIABLE) && isAtSN)
-												 ? K_NAMESPACE
+												 ((kind != PYTHON_LOCAL_VARIABLE_KIND) && isAtSN)
+												 ? PYTHON_NAMESPACE_KIND
 												 : kind);
 				if (isAtSN)
 					parseSimpleNamespace(token, index);
@@ -1781,14 +1772,14 @@ static void findPythonTags (void)
 		else if (token->keyword == KEYWORD_class ||
 		         token->keyword == KEYWORD_def)
 		{
-			pythonKind kind = token->keyword == KEYWORD_class ? K_CLASS : K_FUNCTION;
+			pythonKind kind = token->keyword == KEYWORD_class ? PYTHON_CLASS_KIND : PYTHON_FUNCTION_KIND;
 
 			readNext = parseClassOrDef (token, decorators, kind, false);
 		}
 		else if (token->keyword == KEYWORD_cdef ||
 		         token->keyword == KEYWORD_cpdef)
 		{
-			readNext = parseClassOrDef (token, decorators, K_FUNCTION, true);
+			readNext = parseClassOrDef (token, decorators, PYTHON_FUNCTION_KIND, true);
 		}
 		else if (token->keyword == KEYWORD_from ||
 		         token->keyword == KEYWORD_import)
@@ -1803,10 +1794,10 @@ static void findPythonTags (void)
 		{
 			NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
 			tagEntryInfo *lvEntry = getEntryOfNestingLevel (lv);
-			pythonKind kind = K_VARIABLE;
+			pythonKind kind = PYTHON_VARIABLE_KIND;
 
-			if (lvEntry && lvEntry->kindIndex != K_CLASS)
-				kind = K_LOCAL_VARIABLE;
+			if (lvEntry && lvEntry->kindIndex != PYTHON_CLASS_KIND)
+				kind = PYTHON_LOCAL_VARIABLE_KIND;
 
 			readNext = parseVariable (token, kind);
 		}
@@ -1883,5 +1874,7 @@ extern parserDefinition* PythonParser (void)
 	def->fieldCount = ARRAY_SIZE (PythonFields);
 	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
+	def->versionCurrent = 0;
+	def->versionAge = 1;
 	return def;
 }

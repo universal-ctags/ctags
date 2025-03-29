@@ -300,6 +300,7 @@ PARSER_HEADS = \
 	parsers/x-make.h \
 	parsers/x-markdown.h \
 	parsers/x-perl.h \
+	parsers/x-python.h \
 	parsers/x-r.h \
 	parsers/x-ruby.h \
 	parsers/x-sh.h \
@@ -395,7 +396,8 @@ PARSER_SRCS =				\
 	parsers/powershell.c		\
 	parsers/protobuf.c		\
 	parsers/python.c		\
-	parsers/pythonloggingconfig.c	\
+	parsers/python-entry-points.c	\
+	parsers/python-logging-config.c	\
 	parsers/quarto.c		\
 	parsers/r-r6class.c		\
 	parsers/r-s4class.c		\

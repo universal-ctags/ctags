@@ -1,5 +1,5 @@
 /*
- *   pythonLoggingConfig.c
+ *   python-logging-config.c
  *
  *   Copyright (c) 2016, Masatake YAMATO <yamato@redhat.com>
  *   Copyright (c) 2016, Red Hat, K.K.

@@ -555,10 +555,13 @@
     <ClCompile Include="..\parsers\protobuf.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\python.c">
+    <ClCompile Include="..\parsers\python-entry-points.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\pythonloggingconfig.c">
+    <ClCompile Include="..\parsers\python-logging-config.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\python.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\quarto.c">
@@ -963,6 +966,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\x-perl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parsers\x-python.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\x-r.h">
