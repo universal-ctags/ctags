@@ -380,6 +380,12 @@ typedef struct _CXXParserState
 	// This usually happens only with erroneous macro usage or broken input.
 	int iNestingLevels;
 
+	// The parser parsers CXX11Attribute ([[...]]).
+	// The function parsing CXX11Attribute doesn't consider
+	// CXX11Attributes nest like: [[[]]].
+	// bInCXX11Attribute guards the function being called recursively.
+	bool bInCXX11Attribute;
+
 } CXXParserState;
 
 

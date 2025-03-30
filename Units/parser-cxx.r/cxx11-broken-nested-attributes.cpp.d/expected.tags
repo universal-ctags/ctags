@@ -1,0 +1,2 @@
+i	input.cxx	/^int i;$/;"	v	typeref:typename:int
+j	input-0.cxx	/^[[)int j;$/;"	v	typeref:typename:int
