@@ -2013,6 +2013,8 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 
 	g_cxx.iNestingLevels = 0;
 
+	g_cxx.bInCXX11Attribute = false;
+
 	bool bRet = cxxParserParseBlock(false);
 
 	cppTerminate ();

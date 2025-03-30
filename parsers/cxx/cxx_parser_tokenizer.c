@@ -1042,6 +1042,8 @@ static bool cxxParserParseNextTokenCondenseCXX11Attribute(void)
 			"This function should be called only after we have parsed ["
 		);
 
+	g_cxx.bInCXX11Attribute = true;
+
 	// Input stream: [[...
 	//   If the syntax is correct then this is an attribute sequence [[foo]]
 	//
@@ -1071,6 +1073,7 @@ static bool cxxParserParseNextTokenCondenseCXX11Attribute(void)
 		// Kill the token chain
 		cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
+		g_cxx.bInCXX11Attribute = false;
 		return cxxParserParseNextToken();
 	}
 
@@ -1098,6 +1101,7 @@ static bool cxxParserParseNextTokenCondenseCXX11Attribute(void)
 	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 	// And finally extract yet another token.
+	g_cxx.bInCXX11Attribute = false;
 	bool bRet = cxxParserParseNextToken();
 
 	CXX_DEBUG_LEAVE();
@@ -1684,7 +1688,7 @@ bool cxxParserParseNextToken(void)
 					} while(cppIsspace(g_cxx.iChar));
 				}
 
-				if(g_cxx.iChar == '[')
+				if(g_cxx.iChar == '[' && !g_cxx.bInCXX11Attribute)
 					return cxxParserParseNextTokenCondenseCXX11Attribute();
 			break;
 			default:
