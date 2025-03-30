@@ -1,4 +1,4 @@
-// Tkane from https://en.cppreference.com/w/cpp/language/attributes
+// Taken from https://en.cppreference.com/w/cpp/language/attributes
 [[gnu::always_inline]] [[gnu::hot]] [[gnu::const]] [[nodiscard]]
 inline int f(); // declare f with four attributes
 
