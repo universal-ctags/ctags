@@ -117,6 +117,11 @@ typedef struct sInputFile {
 	time_t mtime;
 } inputFile;
 
+enum areaCoord {
+	AREA_COORD_ABS,
+	AREA_COORD_CURRENT,
+};
+
 static inputLangInfo inputLang;
 static langType sourceLang;
 
@@ -130,6 +135,7 @@ static void     langStackPush (langStack *langStack, langType type);
 static langType langStackPop  (langStack *langStack);
 static void     langStackClear(langStack *langStack);
 
+static MIOPos getInputFilePositionForLineFull (unsigned int line, enum areaCoord areaCoord);
 
 /*
 *   DATA DEFINITIONS
@@ -215,7 +221,8 @@ void callAtAreaStart (MIO *mio,
 	long startColumn;
 
 	getAreaInfo (&startLine, &startColumn, NULL, NULL);
-	MIOPos start = getInputFilePositionForLine (startLine);
+	MIOPos start = getInputFilePositionForLineFull (startLine, AREA_COORD_ABS);
+
 	mio_setpos (mio, &start);
 	mio_seek (mio, startColumn, SEEK_CUR);
 	fn (mio, data);
@@ -416,17 +423,37 @@ static compoundPos* getInputFileCompoundPosForLine (unsigned int line)
 	return File.lineFposMap.pos + index;
 }
 
-extern MIOPos getInputFilePositionForLine (unsigned int line)
+static MIOPos getInputFilePositionForLineFull (unsigned int line, enum areaCoord areaCoord)
 {
 	if (line == 1 && File.lineFposMap.count == 0)
 	{
 		/* Any line is not read yet. */
 		MIOPos pos;
+
+		/* TODO: current coord.*/
 		mio_getpos (File.mio, &pos);
 		return pos;
 	}
-	compoundPos *cpos = getInputFileCompoundPosForLine (line);
-	return cpos->pos;
+
+	if (isAreaStacked() && (areaCoord == AREA_COORD_CURRENT))
+	{
+		unsigned long area_start_ln = getCurrentAreaStartLine();
+		long abs_offset = getInputFileOffsetForLine (line);
+		long area_start_offset = getInputFileOffsetForLine (area_start_ln);
+		long rela_offset = abs_offset - area_start_offset;
+		MIOPos rela_pos = getInputFilePositionForOffset (rela_offset);
+		return rela_pos;
+	}
+	else
+	{
+		compoundPos *cpos = getInputFileCompoundPosForLine (line);
+		return cpos->pos;
+	}
+}
+
+extern MIOPos getInputFilePositionForLine (unsigned int line)
+{
+	return getInputFilePositionForLineFull (line, AREA_COORD_CURRENT);
 }
 
 
