@@ -1,0 +1,9 @@
+f	input.sh	/^f()$/;"	f	line:1	language:Sh
+EOFA	input.sh	/^cat > foo.xml <<EOFA$/;"	h	line:6	language:Sh	end:15
+g	input.sh	/^g()$/;"	f	line:17	language:Sh
+nsb0d066450101	input.sh	/^       >$/;"	n	line:10	language:XML	uri:https://ctags.io/root
+abc	input.sh	/^       >$/;"	n	line:10	language:XML	uri:https://ctags.io/nosuchthing
+unused	input.sh	/^       >$/;"	n	line:10	language:XML	uri:https://ctags.io/unused
+efg	input.sh	/^<abc:UnKnownTag id="a" xmlns:efg="https:\/\/ctags.io\/nosuchthing2">$/;"	n	line:11	language:XML	uri:https://ctags.io/nosuchthing2
+a	input.sh	/^<abc:UnKnownTag id="a" xmlns:efg="https:\/\/ctags.io\/nosuchthing2">$/;"	i	line:11	language:XML
+b	input.sh	/^  <efg:UnKnownTag2 id="b"\/>$/;"	i	line:12	language:XML
