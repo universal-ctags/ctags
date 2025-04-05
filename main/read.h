@@ -132,9 +132,19 @@ extern int getInputColumnNumber (void);
 /* return: [buggy] */
 extern MIOPos getInputFilePosition (void);
 
+/* return: [buggy] */
+extern MIOPos getInputFilePosition (void);
+
 /* return: [buggy],
  * args (line): [buggy] */
 extern MIOPos getInputFilePositionForLine (unsigned int line);
+
+/* return: [buggy],
+ * args (offset): [buggy] */
+extern MIOPos getInputFilePositionForOffset (long offset);
+
+/* return: [absolute] */
+extern unsigned long getCurrentAreaStartLine (void);
 
 extern const char *getInputFileName (void);
 extern langType getInputLanguage (void);

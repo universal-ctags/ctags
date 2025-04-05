@@ -16,6 +16,7 @@
 #include "promise_p.h"
 #include "ptrarray.h"
 #include "debug.h"
+#include "read.h"
 #include "read_p.h"
 #include "trashbox.h"
 #include "xtag.h"
@@ -110,11 +111,24 @@ int  makePromise   (const char *parser,
 	p = promises + promise_count;
 	p->parent_promise = current_promise;
 	p->lang = lang;
-	p->startLine = startLine;
-	p->startColumn = startColumn;
-	p->endLine = endLine;
-	p->endColumn = endColumn;
-	p->sourceLineOffset = sourceLineOffset;
+
+	if (is_thin_area_spec && isAreaStacked())
+	{
+		getAreaInfo (&p->startLine,
+					 &p->startColumn,
+					 &p->endLine,
+					 &p->endColumn);
+		p->sourceLineOffset = p->startLine;
+	}
+	else
+	{
+		p->startLine = startLine;
+		p->startColumn = startColumn;
+		p->endLine = endLine;
+		p->endColumn = endColumn;
+		p->sourceLineOffset = sourceLineOffset;
+	}
+
 	p->modifiers = NULL;
 
 	r = promise_count;
