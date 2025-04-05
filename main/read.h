@@ -98,6 +98,7 @@ extern int getInputLineOffset (void);
 extern const char *getInputFileName (void);
 extern MIOPos getInputFilePosition (void); /* TODO */
 extern MIOPos getInputFilePositionForLine (unsigned int line); /* TODO */
+extern MIOPos getInputFilePositionForOffset (long offset);	   /* TODO */
 extern langType getInputLanguage (void);
 extern bool isInputLanguage (langType lang);
 extern bool isInputHeaderFile (void);
@@ -121,5 +122,7 @@ extern char *readLineRaw (vString *const vLine, MIO *const mio);
 
 extern void     pushLanguage(const langType language);
 extern langType popLanguage (void);
+
+extern unsigned long getCurrentAreaStartLine (void);
 
 #endif  /* CTAGS_MAIN_READ_H */
