@@ -118,6 +118,11 @@ typedef struct sInputFile {
 	time_t mtime;
 } inputFile;
 
+enum areaCoord {
+	AREA_COORD_ABS,
+	AREA_COORD_CURRENT,
+};
+
 static inputLangInfo inputLang;
 static langType sourceLang;
 
@@ -131,6 +136,8 @@ static void     langStackPush (langStack *langStack, langType type);
 static langType langStackPop  (langStack *langStack);
 static void     langStackClear(langStack *langStack);
 
+static MIOPos getInputFilePositionForLineFull (unsigned int line, enum areaCoord areaCoord);
+static MIOPos getInputFilePositionForFileOffset (long offset);
 
 /*
 *   DATA DEFINITIONS
@@ -356,17 +363,46 @@ static compoundPos* getInputFileCompoundPosForLine (unsigned int line)
 	return File.lineFposMap.pos + index;
 }
 
-extern MIOPos getInputFilePositionForLine (unsigned int line)
+
+/* case areaCoord == AREA_COORD_CURRENT:
+ *    return: [current],
+ *    args (line): [absolute]
+ *
+ * case areaCoord == AREA_COORD_ABS:
+ *    return: [absolute],
+ *    args (line): [absolute]
+ */
+static MIOPos getInputFilePositionForLineFull (unsigned int line, enum areaCoord posAreaCoord)
 {
 	if (line == 1 && File.lineFposMap.count == 0)
 	{
 		/* Any line is not read yet. */
 		MIOPos pos;
-		mio_getpos (File.mio, &pos);
+
+		if (isAreaStacked() && (posAreaCoord == AREA_COORD_ABS))
+			mio_getpos (BackupFile.mio, &pos);
+		else
+			mio_getpos (File.mio, &pos);
 		return pos;
 	}
+
+	if (isAreaStacked() && (posAreaCoord == AREA_COORD_CURRENT))
+	{
+		unsigned long area_start_ln = getAreaStartLineNumber ();
+		long abs_offset = getInputFileOffsetForLine (line);
+		long area_start_offset = getInputFileOffsetForLine (area_start_ln);
+		long rela_offset = abs_offset - area_start_offset;
+		MIOPos rela_pos = getInputFilePositionForFileOffset (rela_offset);
+		return rela_pos;
+	}
+
 	compoundPos *cpos = getInputFileCompoundPosForLine (line);
 	return cpos->pos;
+}
+
+extern MIOPos getInputFilePositionForLine (unsigned int line)
+{
+	return getInputFilePositionForLineFull (line, AREA_COORD_CURRENT);
 }
 
 
@@ -376,6 +412,36 @@ extern long getInputFileOffsetForLine (unsigned int line)
 	long r = cpos->offset - (File.bomFound? 3: 0) - cpos->crAdjustment;
 	Assert (r >= 0);
 	return r;
+}
+
+struct mioGetposCallbackData {
+	MIOPos *pos;
+	long   offset;
+};
+
+static void tellAbsolutePosition (MIO *mio, void *data)
+{
+	struct mioGetposCallbackData *cb_data = data;
+
+	mio_seek (mio, cb_data->offset, SEEK_SET);
+	mio_getpos (mio, cb_data->pos);
+}
+
+/* return: [current],
+ * args (offset): [current] */
+static MIOPos getInputFilePositionForFileOffset (long offset)
+{
+	MIOPos pos;
+	struct mioGetposCallbackData data = {
+		.pos = &pos,
+		.offset = offset,
+	};
+
+	callWithSavingPosition (File.mio,
+							tellAbsolutePosition,
+							&data);
+
+	return pos;
 }
 
 extern langType getInputLanguage (void)
