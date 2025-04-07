@@ -34,7 +34,7 @@ enum areaBoundaryFlag {
 extern const char *getInputLanguageName (void);
 extern const char *getInputFileTagPath (void);
 
-extern long getInputFileOffsetForLine (unsigned int line);
+extern long getInputFileOffsetForLine (unsigned int line); /* TODO */
 
 extern unsigned int countInputLanguageKinds (void);
 extern unsigned int countInputLanguageRoles (int kindIndex);
@@ -81,5 +81,10 @@ extern bool isAreaStacked (void);
 extern bool isThinAreaSpec (unsigned long startLine, long startCharOffset,
 							unsigned long endLine, long endCharOffset,
 							unsigned long sourceLineOffset);
+
+extern void getAreaInfo (unsigned long *startLine,
+						 long *startCharOffset,
+						 unsigned long *endLine,
+						 long *endCharOffset);
 
 #endif  /* CTAGS_MAIN_READ_PRIVATE_H */
