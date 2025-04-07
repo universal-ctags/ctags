@@ -59,8 +59,8 @@ typedef struct sInputFileInfo {
 	unsigned long lineNumber;/* line number in the input file */
 	unsigned long lineNumberOrigin; /* The value set to `lineNumber'
 					   when `resetInputFile' is called
-					   on the input stream.
-					   This is needed for nested stream. */
+					   on the area.
+					   This is needed for stacked area. */
 	bool isHeader;           /* is input file a header file? */
 } inputFileInfo;
 
@@ -78,12 +78,12 @@ typedef struct sInputLineFposMap {
 	unsigned int size;
 } inputLineFposMap;
 
-typedef struct sNestedInputStreamInfo {
+typedef struct sAreaInfo {
 	unsigned long startLine;
 	long startCharOffset;
 	unsigned long endLine;
 	long endCharOffset;
-} nestedInputStreamInfo;
+} areaInfo;
 
 typedef struct sInputFile {
 	vString    *path;          /* path of input file (if any) */
@@ -102,7 +102,7 @@ typedef struct sInputFile {
 	inputFileInfo input; /* name, lineNumber */
 	inputFileInfo source;
 
-	nestedInputStreamInfo nestedInputStreamInfo;
+	areaInfo areaInfo;
 
 	/* sourceTagPathHolder is a kind of trash box.
 	   The buffer pointed by tagPath field of source field can
@@ -135,7 +135,7 @@ static void     langStackClear(langStack *langStack);
 *   DATA DEFINITIONS
 */
 static inputFile File;  /* static read through functions */
-static inputFile BackupFile;	/* File is copied here when a nested parser is pushed */
+static inputFile BackupFile;	/* File is copied here when a guest parser is pushed */
 static compoundPos StartOfLine;  /* holds deferred position of start of line */
 
 /*
@@ -1125,28 +1125,28 @@ extern char *readLineRaw (vString *const vLine, MIO *const mio)
 }
 
 /*  Places into the line buffer the contents of the line referenced by
- *  "location".
+ *  "pos".
  */
 extern char *readLineFromBypass (
-		vString *const vLine, MIOPos location, long *const pSeekValue)
+		vString *const vLine, MIOPos pos, long *const offset)
 {
-	MIOPos orignalPosition;
+	MIOPos origin;
 	char *result;
 
-	mio_getpos (File.mio, &orignalPosition);
-	mio_setpos (File.mio, &location);
+	mio_getpos (File.mio, &origin);
+	mio_setpos (File.mio, &pos);
 	mio_clearerr (File.mio);
-	if (pSeekValue != NULL)
-		*pSeekValue = mio_tell (File.mio);
+	if (offset != NULL)
+		*offset = mio_tell (File.mio);
 	result = readLineRaw (vLine, File.mio);
-	mio_setpos (File.mio, &orignalPosition);
+	mio_setpos (File.mio, &origin);
 	/* If the file is empty, we can't get the line
-	   for location 0. readLineFromBypass doesn't know
+	   for position 0. readLineFromBypass doesn't know
 	   what itself should do; just report it to the caller. */
 	return result;
 }
 
-extern void   pushNarrowedInputStream (
+extern void   pushArea (
 				       bool useMemoryStreamInput,
 				       unsigned long startLine, long startCharOffset,
 				       unsigned long endLine, long endCharOffset,
@@ -1158,19 +1158,19 @@ extern void   pushNarrowedInputStream (
 	MIOPos tmp;
 	MIO *subio;
 
-	if (isThinStreamSpec (startLine, startCharOffset,
-						  endLine, endCharOffset,
-						  sourceLineOffset))
+	if (isThinAreaSpec (startLine, startCharOffset,
+						endLine, endCharOffset,
+						sourceLineOffset))
 	{
 		if ((!useMemoryStreamInput
 			 || mio_memory_get_data (File.mio, NULL)))
 		{
 			File.thinDepth++;
-			verbose ("push thin stream (%d)\n", File.thinDepth);
+			verbose ("push thin area (%d)\n", File.thinDepth);
 			return;
 		}
-		error(WARNING, "INTERNAL ERROR: though pushing thin MEMORY stream, "
-			  "underlying input stream is a FILE stream: %s@%s",
+		error(WARNING, "INTERNAL ERROR: though pushing MEMORY based thin area, "
+			  "underlying area is a FILE base: %s@%s",
 			  vStringValue (File.input.name), vStringValue (File.input.tagPath));
 		AssertNotReached ();
 	}
@@ -1217,42 +1217,41 @@ extern void   pushNarrowedInputStream (
 
 	File.mio = subio;
 	File.bomFound = false;
-	File.nestedInputStreamInfo.startLine = startLine;
-	File.nestedInputStreamInfo.startCharOffset = startCharOffset;
-	File.nestedInputStreamInfo.endLine = endLine;
-	File.nestedInputStreamInfo.endCharOffset = endCharOffset;
+	File.areaInfo.startLine = startLine;
+	File.areaInfo.startCharOffset = startCharOffset;
+	File.areaInfo.endLine = endLine;
+	File.areaInfo.endCharOffset = endCharOffset;
 
 	File.input.lineNumberOrigin = ((startLine == 0)? 0: startLine - 1);
 	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
 }
 
-extern bool doesParserRunAsGuest (void)
+extern bool isAreaStacked (void)
 {
-	return !(File.nestedInputStreamInfo.startLine == 0
-			 && File.nestedInputStreamInfo.startCharOffset == 0
-			 && File.nestedInputStreamInfo.endLine == 0
-			 && File.nestedInputStreamInfo.endCharOffset == 0);
+	return !(File.areaInfo.startLine == 0
+			 && File.areaInfo.startCharOffset == 0
+			 && File.areaInfo.endLine == 0
+			 && File.areaInfo.endCharOffset == 0);
 }
 
-extern unsigned int getNestedInputBoundaryInfo (unsigned long lineNumber)
+extern unsigned int getAreaBoundaryInfo (unsigned long lineNumber)
 {
 	unsigned int info;
 
-	if (!doesParserRunAsGuest())
-		/* Not in a nested input stream  */
+	if (!isAreaStacked())
 		return 0;
 
 	info = 0;
-	if (File.nestedInputStreamInfo.startLine == lineNumber
-	    && File.nestedInputStreamInfo.startCharOffset != 0)
-		info |= INPUT_BOUNDARY_START;
-	if (File.nestedInputStreamInfo.endLine == lineNumber
-	    && File.nestedInputStreamInfo.endCharOffset != 0)
-		info |= INPUT_BOUNDARY_END;
+	if (File.areaInfo.startLine == lineNumber
+	    && File.areaInfo.startCharOffset != 0)
+		info |= AREA_BOUNDARY_START;
+	if (File.areaInfo.endLine == lineNumber
+	    && File.areaInfo.endCharOffset != 0)
+		info |= AREA_BOUNDARY_END;
 
 	return info;
 }
-extern void   popNarrowedInputStream  (void)
+extern void   popArea  (void)
 {
 	if (File.thinDepth)
 	{
@@ -1321,9 +1320,9 @@ static langType langStackPop  (langStack *langStack)
 	return langStack->languages [ -- langStack->count ];
 }
 
-extern bool isThinStreamSpec(unsigned long startLine, long startCharOffset,
-							 unsigned long endLine, long endCharOffset,
-							 unsigned long sourceLineOffset)
+extern bool isThinAreaSpec (unsigned long startLine, long startCharOffset,
+							unsigned long endLine, long endCharOffset,
+							unsigned long sourceLineOffset)
 {
 	return (startLine == 0 &&
 			startCharOffset == 0 &&

@@ -137,11 +137,11 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio, void *client
 extern bool parseRawBuffer(const char *fileName, unsigned char *buffer,
 			    size_t bufferSize, const langType language, void *clientData);
 
-extern bool runParserInNarrowedInputStream (const langType language,
-					       unsigned long startLine, long startCharOffset,
-					       unsigned long endLine, long endCharOffset,
-					       unsigned long sourceLineOffset,
-					       int promise);
+extern bool runParserInArea (const langType language,
+							 unsigned long startLine, long startCharOffset,
+							 unsigned long endLine, long endCharOffset,
+							 unsigned long sourceLineOffset,
+							 int promise);
 
 #ifdef HAVE_ICONV
 extern void freeEncodingResources (void);
