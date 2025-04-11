@@ -2291,12 +2291,11 @@ static cppMacroTokens *cppMacroTokensNew (cppMacroInfo * macro)
 
 static void cppMacroTokensDelete (cppMacroTokens *tokens)
 {
-	if (tokens)
-	{
-		ptrArrayDelete (tokens->tarray);
-		tokens->tarray = NULL;
-		eFree (tokens);
-	}
+	Assert (tokens);
+
+	ptrArrayDelete (tokens->tarray);
+	tokens->tarray = NULL;
+	eFree (tokens);
 }
 
 extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro,
