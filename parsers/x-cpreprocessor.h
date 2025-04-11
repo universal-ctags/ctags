@@ -184,7 +184,6 @@ typedef struct sCppMacroArg cppMacroArg;
  * LINENUMBER and FILEPOSITION are the place where the macro is expanded.
  * Pass the returned value to cppUngetMacroTokens.
  * cppExpandMacro allocates the cppMacroTokens. It is deleted in
- * cppExpandMacro().
  *
  * + cppExpandMacroAsNewString()
  * A wrapper of cppExpandMacro. This function returns
