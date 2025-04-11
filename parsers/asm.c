@@ -518,6 +518,9 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 	TRACE_PRINT("Macro expansion: %s<%p>%s", macroInfo->name,
 				macroInfo, macroInfo->hasParameterList? "(...)": "");
 
+	if (!macroInfo->replacements)
+		goto out;
+
 	r = expandCppMacro (macroInfo,
 						cppGetInputLineNumber (), cppGetInputFilePosition ());
 
