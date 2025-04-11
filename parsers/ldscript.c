@@ -391,7 +391,7 @@ static void processCppMacroX (tokenInfo *const token)
 	{
 		TRACE_PRINT("Macro expansion: %s<%p>%s", vStringValue (token->string),
 					macroInfo, macroInfo->hasParameterList? "(...)": "");
-		if (!(macroInfo->useCount < CPP_MAXIMUM_MACRO_USE_COUNT))
+		if (macroInfo->useCount >= CPP_MAXIMUM_MACRO_USE_COUNT)
 			TRACE_PRINT ("Overly uesd macro %s<%p> useCount: %d (> %d)",
 						 vStringValue (token->string), macroInfo, macroInfo->useCount,
 						 CPP_MAXIMUM_MACRO_USE_COUNT);
