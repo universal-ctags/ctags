@@ -505,13 +505,21 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 		goto out;
 
 	if (macroInfo->useCount >= CPP_MAXIMUM_MACRO_USE_COUNT)
+	{
+		TRACE_PRINT ("Overly uesd macro %s<%p> useCount: %d (> %d)",
+					 vStringValue (identifier), macroInfo, macroInfo->useCount,
+					 CPP_MAXIMUM_MACRO_USE_COUNT);
 		goto out;
+	}
 
 	if (lastChar != EOF)
 		cppUngetc (lastChar);
 
 	TRACE_PRINT("Macro expansion: %s<%p>%s", macroInfo->name,
 				macroInfo, macroInfo->hasParameterList? "(...)": "");
+
+	if (!macroInfo->replacements)
+		goto out;
 
 	r = expandCppMacro (macroInfo,
 						cppGetInputLineNumber (), cppGetInputFilePosition ());

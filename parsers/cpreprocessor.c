@@ -698,6 +698,8 @@ extern void cppUngetString(const char * string, int len)
 
 extern void cppUngetMacroTokens (cppMacroTokens *tokens)
 {
+	Assert (tokens);
+
 	cppMacroInfo *macro = tokens->macro;
 
 	if (macro->useCount == 0)
@@ -2289,12 +2291,11 @@ static cppMacroTokens *cppMacroTokensNew (cppMacroInfo * macro)
 
 static void cppMacroTokensDelete (cppMacroTokens *tokens)
 {
-	if (tokens)
-	{
-		ptrArrayDelete (tokens->tarray);
-		tokens->tarray = NULL;
-		eFree (tokens);
-	}
+	Assert (tokens);
+
+	ptrArrayDelete (tokens->tarray);
+	tokens->tarray = NULL;
+	eFree (tokens);
 }
 
 extern cppMacroTokens *cppExpandMacro (cppMacroInfo * macro,
@@ -2388,6 +2389,8 @@ static
 #endif
 vString *cppFlattenMacroTokensToNewString (cppMacroTokens *tokens)
 {
+	Assert (tokens);
+
 	vString *vstr = vStringNew ();
 
 	for (size_t i = 0; i < ptrArrayCount (tokens->tarray); i++)
