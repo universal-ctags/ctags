@@ -80,9 +80,9 @@ typedef struct sInputLineFposMap {
 
 typedef struct sAreaInfo {
 	unsigned long startLine;
-	long startCharOffset;
+	long startColumn;
 	unsigned long endLine;
-	long endCharOffset;
+	long endColumn;
 } areaInfo;
 
 typedef struct sInputFile {
@@ -159,7 +159,7 @@ void callWithSavingPosition (MIO *mio,
 	mio_setpos (mio, &origin);
 }
 
-extern int getInputLineOffset (void)
+extern int getInputColumnNumber (void)
 {
 	unsigned char *base = (unsigned char *) vStringValue (File.line);
 	int ret;
@@ -225,6 +225,7 @@ extern MIOPos getInputFilePositionForLine (unsigned int line)
 	compoundPos *cpos = getInputFileCompoundPosForLine (line);
 	return cpos->pos;
 }
+
 
 extern long getInputFileOffsetForLine (unsigned int line)
 {
@@ -1178,8 +1179,8 @@ extern char *readLineFromBypass (
 
 extern void   pushArea (
 				       bool useMemoryStreamInput,
-				       unsigned long startLine, long startCharOffset,
-				       unsigned long endLine, long endCharOffset,
+				       unsigned long startLine, long startColumn,
+				       unsigned long endLine, long endColumn,
 				       unsigned long sourceLineOffset,
 				       int promise)
 {
@@ -1188,8 +1189,8 @@ extern void   pushArea (
 	MIOPos tmp;
 	MIO *subio;
 
-	if (isThinAreaSpec (startLine, startCharOffset,
-						endLine, endCharOffset,
+	if (isThinAreaSpec (startLine, startColumn,
+						endLine, endColumn,
 						sourceLineOffset))
 	{
 		if ((!useMemoryStreamInput
@@ -1210,22 +1211,22 @@ extern void   pushArea (
 
 	tmp = getInputFilePositionForLine (startLine);
 	mio_setpos (File.mio, &tmp);
-	mio_seek (File.mio, startCharOffset, SEEK_CUR);
+	mio_seek (File.mio, startColumn, SEEK_CUR);
 	p = mio_tell (File.mio);
 
 	tmp = getInputFilePositionForLine (endLine);
 	mio_setpos (File.mio, &tmp);
-	if (endCharOffset == EOL_CHAR_OFFSET)
+	if (endColumn == EOL_COLUMN)
 	{
 		long line_start = mio_tell (File.mio);
 		vString *tmpstr = vStringNew ();
 		readLine (tmpstr, File.mio);
-		endCharOffset = mio_tell (File.mio) - line_start;
+		endColumn = mio_tell (File.mio) - line_start;
 		vStringDelete (tmpstr);
-		Assert (endCharOffset >= 0);
+		Assert (endColumn >= 0);
 	}
 	else
-		mio_seek (File.mio, endCharOffset, SEEK_CUR);
+		mio_seek (File.mio, endColumn, SEEK_CUR);
 	q = mio_tell (File.mio);
 
 	mio_setpos (File.mio, &original);
@@ -1238,8 +1239,8 @@ extern void   pushArea (
 		error (FATAL, "memory for mio may be exhausted");
 
 	runModifiers (promise,
-				  startLine, startCharOffset,
-				  endLine, endCharOffset,
+				  startLine, startColumn,
+				  endLine, endColumn,
 				  mio_memory_get_data (subio, NULL),
 				  size);
 
@@ -1248,9 +1249,9 @@ extern void   pushArea (
 	File.mio = subio;
 	File.bomFound = false;
 	File.areaInfo.startLine = startLine;
-	File.areaInfo.startCharOffset = startCharOffset;
+	File.areaInfo.startColumn = startColumn;
 	File.areaInfo.endLine = endLine;
-	File.areaInfo.endCharOffset = endCharOffset;
+	File.areaInfo.endColumn = endColumn;
 
 	File.input.lineNumberOrigin = ((startLine == 0)? 0: startLine - 1);
 	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
@@ -1259,9 +1260,9 @@ extern void   pushArea (
 extern bool isAreaStacked (void)
 {
 	return !(File.areaInfo.startLine == 0
-			 && File.areaInfo.startCharOffset == 0
+			 && File.areaInfo.startColumn == 0
 			 && File.areaInfo.endLine == 0
-			 && File.areaInfo.endCharOffset == 0);
+			 && File.areaInfo.endColumn == 0);
 }
 
 extern unsigned int getAreaBoundaryInfo (unsigned long lineNumber)
@@ -1273,10 +1274,10 @@ extern unsigned int getAreaBoundaryInfo (unsigned long lineNumber)
 
 	info = 0;
 	if (File.areaInfo.startLine == lineNumber
-	    && File.areaInfo.startCharOffset != 0)
+	    && File.areaInfo.startColumn != 0)
 		info |= AREA_BOUNDARY_START;
 	if (File.areaInfo.endLine == lineNumber
-	    && File.areaInfo.endCharOffset != 0)
+	    && File.areaInfo.endColumn != 0)
 		info |= AREA_BOUNDARY_END;
 
 	return info;
@@ -1350,14 +1351,14 @@ static langType langStackPop  (langStack *langStack)
 	return langStack->languages [ -- langStack->count ];
 }
 
-extern bool isThinAreaSpec (unsigned long startLine, long startCharOffset,
-							unsigned long endLine, long endCharOffset,
+extern bool isThinAreaSpec (unsigned long startLine, long startColumn,
+							unsigned long endLine, long endColumn,
 							unsigned long sourceLineOffset)
 {
 	return (startLine == 0 &&
-			startCharOffset == 0 &&
+			startColumn == 0 &&
 			endLine == 0 &&
-			endCharOffset == 0 &&
+			endColumn == 0 &&
 			sourceLineOffset == 0);
 }
 

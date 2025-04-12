@@ -119,8 +119,15 @@ extern unsigned long getInputLineNumber (void);
  * args (offset): [buggy] */
 extern unsigned long getInputLineNumberForFileOffset(long offset);
 
-/* return: [buggy] */
-extern int getInputLineOffset (void);
+/* Get the column number, the byte offset of the input from the
+ * begging of the line.
+ *
+ * This function works only if the parser uses getcFromInputFile().
+ * This function doesn't work if the parser uses readLineFromInputFile().
+ *
+ * return: [buggy]
+ */
+extern int getInputColumnNumber (void);
 
 /* return: [buggy] */
 extern MIOPos getInputFilePosition (void);

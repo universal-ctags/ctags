@@ -17,19 +17,19 @@
 #include "parse.h"
 #include "numarray.h"
 
-#define EOL_CHAR_OFFSET -1
+#define EOL_COLUMN -1
 
 /* args (startLine): [absolute]
- * args (startCharOffset): [buggy]
+ * args (startColumn): [buggy]
  * args (endLine): [absolute]
- * args (endCharOffset): [absolute]
+ * args (endColumn): [absolute]
  * args (sourceLineOffset): [buggy]
  */
 /* parser can be NULL; give a name with promiseUpdateLanguage()
  * when the name can be determined. */
 int  makePromise   (const char *parser,
-		    unsigned long startLine, long startCharOffset,
-		    unsigned long endLine, long endCharOffset,
+		    unsigned long startLine, long startColumn,
+		    unsigned long endLine, long endColumn,
 		    unsigned long sourceLineOffset);
 
 /* Fill the line with white spaces.
