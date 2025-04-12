@@ -932,17 +932,17 @@ getNextChar:
 	{
 		unsigned long startSourceLineNumber = getSourceLineNumber ();
 		unsigned long startLineNumber = getInputLineNumber ();
-		int startLineOffset = getInputLineOffset ();
+		int startColumnNumber = getInputColumnNumber ();
 
 		c = findPhpStart ();
 		if (c != EOF)
 			InPhp = true;
 
 		unsigned long endLineNumber = getInputLineNumber ();
-		int endLineOffset = getInputLineOffset ();
+		int endColumnNumber = getInputColumnNumber ();
 
-		makePromise ("HTML", startLineNumber, startLineOffset,
-					 endLineNumber, endLineOffset, startSourceLineNumber);
+		makePromise ("HTML", startLineNumber, startColumnNumber,
+					 endLineNumber, endColumnNumber, startSourceLineNumber);
 	}
 	else
 		c = getcFromInputFile ();

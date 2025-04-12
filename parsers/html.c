@@ -445,7 +445,7 @@ static void appendText (vString *text, vString *appendedText)
 	}
 }
 
-static bool readTagContent (tokenInfo *token, vString *text, long *line, long *lineOffset, int depth, bool asJSX)
+static bool readTagContent (tokenInfo *token, vString *text, long *line, long *column, int depth, bool asJSX)
 {
 	TRACE_ENTER();
 
@@ -457,7 +457,7 @@ static bool readTagContent (tokenInfo *token, vString *text, long *line, long *l
 	do
 	{
 		*line = getInputLineNumber ();
-		*lineOffset = getInputLineOffset ();
+		*column = getInputColumnNumber ();
 		readToken (token, false, asJSX);
 		type = token->type;
 		if (type == TOKEN_OPEN_TAG_START)
@@ -475,7 +475,7 @@ static bool readTagContent (tokenInfo *token, vString *text, long *line, long *l
 	return type == TOKEN_CLOSE_TAG_START;
 }
 
-static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
+static bool skipScriptContent (tokenInfo *token, long *line, long *column)
 {
 	TRACE_ENTER();
 
@@ -483,14 +483,14 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 	bool found_script = false;
 
 	long line_tmp[2] = {0};
-	long lineOffset_tmp[2] = {0};
+	long column_tmp[2] = {0};
 
 	tokenType type;
 
 	do
 	{
 		line_tmp[0] = getInputLineNumber ();
-		lineOffset_tmp[0] = getInputLineOffset ();
+		column_tmp[0] = getInputColumnNumber ();
 
 		readTokenInScript (token);
 		type = token->type;
@@ -499,7 +499,7 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 		{
 			found_start = true;
 			line_tmp[1] = line_tmp[0];
-			lineOffset_tmp[1] = lineOffset_tmp[0];
+			column_tmp[1] = column_tmp[0];
 		}
 		else if (found_start
 				 && type == TOKEN_NAME
@@ -507,7 +507,7 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 		{
 			found_script = true;
 			*line = line_tmp[1];
-			*lineOffset = lineOffset_tmp[1];
+			*column = column_tmp[1];
 		}
 		else
 			found_start = false;
@@ -525,7 +525,7 @@ static void skipOtherScriptContent (const int delimiter)
 
 	const long startSourceLineNumber = getSourceLineNumber ();
 	const long startLineNumber = getInputLineNumber ();
-	const long startLineOffset = getInputLineOffset () - 2; /* strlen ("<?") */
+	const long startColumn = getInputColumnNumber () - 2; /* strlen ("<?") */
 
 	vString *script_name = vStringNew ();
 	bool reading_script_name = true;
@@ -557,8 +557,8 @@ static void skipOtherScriptContent (const int delimiter)
 
 	if (strcasecmp ("php", vStringValue (script_name)) == 0
 		|| strcmp ("=", vStringValue (script_name)) == 0)
-		makePromise ("PHP", startLineNumber, startLineOffset,
-					 getInputLineNumber (), getInputLineOffset (),
+		makePromise ("PHP", startLineNumber, startColumn,
+					 getInputLineNumber (), getInputColumnNumber (),
 					 startSourceLineNumber);
 
 	vStringDelete (script_name);
@@ -724,22 +724,22 @@ static void readTag (tokenInfo *token, vString *text, int depth, bool asJSX)
 		{
 			long startSourceLineNumber = getSourceLineNumber ();
 			long startLineNumber = getInputLineNumber ();
-			long startLineOffset = getInputLineOffset ();
+			long startColumn = getInputColumnNumber ();
 			long endLineNumber;
-			long endLineOffset;
+			long endColumn;
 			bool tag_start2;
 
 			if (startTag == KEYWORD_script)
 			{
-				bool script = skipScriptContent (token, &endLineNumber, &endLineOffset);
+				bool script = skipScriptContent (token, &endLineNumber, &endColumn);
 				if (script)
-					makePromise ("JavaScript", startLineNumber, startLineOffset,
-								 endLineNumber, endLineOffset, startSourceLineNumber);
+					makePromise ("JavaScript", startLineNumber, startColumn,
+								 endLineNumber, endColumn, startSourceLineNumber);
 				readToken (token, true, asJSX);
 				goto out;
 			}
 
-			tag_start2 = readTagContent (token, text, &endLineNumber, &endLineOffset, depth, asJSX);
+			tag_start2 = readTagContent (token, text, &endLineNumber, &endColumn, depth, asJSX);
 			if (tag_start2)
 			{
 				readToken (token, true, asJSX);
@@ -776,8 +776,8 @@ static void readTag (tokenInfo *token, vString *text, int depth, bool asJSX)
 				{
 					keywordId endTag = lookupKeyword (vStringValue (token->string), Lang_html);
 					if (startTag == endTag)
-						makePromise ("CSS", startLineNumber, startLineOffset,
-									 endLineNumber, endLineOffset, startSourceLineNumber);
+						makePromise ("CSS", startLineNumber, startColumn,
+									 endLineNumber, endColumn, startSourceLineNumber);
 				}
 
 				readToken (token, true, asJSX);

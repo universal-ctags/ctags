@@ -77,15 +77,15 @@ extern time_t getInputFileMtime (void);
 extern char *readLineFromBypass (vString *const vLine, MIOPos pos, long *const offset);
 
 /* args (startLine): [absolute]
- * args (startCharOffset): [buggy]
+ * args (startColumn): [buggy]
  * args (endLine): [absolute]
- * args (endCharOffset): [absolute]
+ * args (endColumn): [absolute]
  * args (sourceLineOffset): [buggy]
  */
 extern void   pushArea (
 				       bool useMemoryStreamInput,
-				       unsigned long startLine, long startCharOffset,
-				       unsigned long endLine, long endCharOffset,
+				       unsigned long startLine, long startColumn,
+				       unsigned long endLine, long endColumn,
 				       unsigned long sourceLineOffset,
 				       int promise);
 extern void   popArea  (void);
@@ -97,8 +97,8 @@ extern bool isAreaStacked (void);
  * args (sourceLineOffset): [buggy]
  */
 #define THIN_AREA_SPEC 0, 0, 0, 0, 0
-extern bool isThinAreaSpec (unsigned long startLine, long startCharOffset,
-							unsigned long endLine, long endCharOffset,
+extern bool isThinAreaSpec (unsigned long startLine, long startColumn,
+							unsigned long endLine, long endColumn,
 							unsigned long sourceLineOffset);
 
 #endif  /* CTAGS_MAIN_READ_PRIVATE_H */
