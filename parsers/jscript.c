@@ -1203,7 +1203,29 @@ getNextChar:
 
 		case '<':
 			if (doesExpectBinaryOperator (LastTokenType))
+			{
 				token->type = TOKEN_BINARY_OPERATOR;
+				/*
+				 * Skip '<<', '<<=', and '<='.
+				 *
+				 * '<<' must be handled here.
+				 * If '<<' is read as two tokens, '<'
+				 * and '<', the parser treats the second one
+				 * as the start of JSX_TOKEN.
+				 *
+				 * Handling '<=' and '<<=' here is just for minor
+				 * optimization.
+				 */
+				int d = getcFromInputFile ();
+				if (d == '<')
+				{
+					d = getcFromInputFile ();
+					if (d != '=')
+						ungetcToInputFile (d);
+				}
+				else if (d != '=')
+					ungetcToInputFile (d);
+			}
 			else
 			{
 				bool skip = !isXtagEnabled (XTAG_GUEST);
