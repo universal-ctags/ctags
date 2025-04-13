@@ -3811,8 +3811,16 @@ extern void javaScriptSkipObjectExpression (void)
 		deleteToken (token);
 
 #ifdef HAVE_ICONV
-		if (JSUnicodeConverter != (iconv_t) -2 && /* not created */
-			JSUnicodeConverter != (iconv_t) -1 /* creation failed */)
+		if (
+			/* not created */
+			JSUnicodeConverter != (iconv_t) -2 &&
+			/* creation failed */
+			JSUnicodeConverter != (iconv_t) -1 &&
+			/* The convert was created before entering this function
+			 * and no new converter is created in this function (and
+			 * functions called from this functions). */
+			JSUnicodeConverter != originalJSUnicodeConverter
+			)
 			iconv_close (JSUnicodeConverter);
 
 		JSUnicodeConverter = originalJSUnicodeConverter;
