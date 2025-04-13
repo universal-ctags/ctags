@@ -159,6 +159,26 @@ void callWithSavingPosition (MIO *mio,
 	mio_setpos (mio, &origin);
 }
 
+/* args (startLine): [absolute]
+   args (startColumn): [buggy]
+   args (endLine): [absolute]
+   args (endColumn): [absolute] */
+CTAGS_INLINE
+void getAreaInfo (unsigned long *startLine,
+				  long *startColumn,
+				  unsigned long *endLine,
+				  long *endColumn)
+{
+	if (startLine)
+		*startLine = File.areaInfo.startLine;
+	if (startColumn)
+		*startColumn = File.areaInfo.startColumn;
+	if (endLine)
+		*endLine = File.areaInfo.endLine;
+	if (endColumn)
+		*endColumn = File.areaInfo.endColumn;
+}
+
 extern int getInputColumnNumber (void)
 {
 	unsigned char *base = (unsigned char *) vStringValue (File.line);
@@ -176,8 +196,15 @@ extern int getInputColumnNumber (void)
 	}
 	else
 	{
-		/* At the first line of file. */
-		ret = mio_tell (File.mio) - (File.bomFound? 3: 0);
+		/* Read nothing yet. */
+		long guest_area_column = 0;
+		if (isAreaStacked ())
+		{
+			unsigned long startLine CTAGS_ATTR_UNUSED;
+			getAreaInfo (&startLine, &guest_area_column, NULL, NULL);
+			Assert (startLine == 1);
+		}
+		ret = guest_area_column;
 	}
 
 	return ret >= 0 ? ret : 0;
