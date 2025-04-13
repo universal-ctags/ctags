@@ -1203,7 +1203,29 @@ getNextChar:
 
 		case '<':
 			if (doesExpectBinaryOperator (LastTokenType))
+			{
 				token->type = TOKEN_BINARY_OPERATOR;
+				/*
+				 * Skip '<<', '<<=', and '<='.
+				 *
+				 * '<<' must be handled here.
+				 * If '<<' is read as two tokens, '<'
+				 * and '<', the parser treats the second one
+				 * as the start of JSX_TOKEN.
+				 *
+				 * Handling '<=' and '<<=' here is just for minor
+				 * optimization.
+				 */
+				int d = getcFromInputFile ();
+				if (d == '<')
+				{
+					d = getcFromInputFile ();
+					if (d != '=')
+						ungetcToInputFile (d);
+				}
+				else if (d != '=')
+					ungetcToInputFile (d);
+			}
 			else
 			{
 				bool skip = !isXtagEnabled (XTAG_GUEST);
@@ -3789,8 +3811,16 @@ extern void javaScriptSkipObjectExpression (void)
 		deleteToken (token);
 
 #ifdef HAVE_ICONV
-		if (JSUnicodeConverter != (iconv_t) -2 && /* not created */
-			JSUnicodeConverter != (iconv_t) -1 /* creation failed */)
+		if (
+			/* not created */
+			JSUnicodeConverter != (iconv_t) -2 &&
+			/* creation failed */
+			JSUnicodeConverter != (iconv_t) -1 &&
+			/* The convert was created before entering this function
+			 * and no new converter is created in this function (and
+			 * functions called from this functions). */
+			JSUnicodeConverter != originalJSUnicodeConverter
+			)
 			iconv_close (JSUnicodeConverter);
 
 		JSUnicodeConverter = originalJSUnicodeConverter;
