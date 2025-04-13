@@ -80,9 +80,9 @@ typedef struct sInputLineFposMap {
 
 typedef struct sAreaInfo {
 	unsigned long startLine;
-	long startCharOffset;
+	long startColumn;
 	unsigned long endLine;
-	long endCharOffset;
+	long endColumn;
 } areaInfo;
 
 typedef struct sInputFile {
@@ -117,6 +117,11 @@ typedef struct sInputFile {
 	time_t mtime;
 } inputFile;
 
+enum areaCoord {
+	AREA_COORD_ABS,
+	AREA_COORD_CURRENT,
+};
+
 static inputLangInfo inputLang;
 static langType sourceLang;
 
@@ -130,6 +135,7 @@ static void     langStackPush (langStack *langStack, langType type);
 static langType langStackPop  (langStack *langStack);
 static void     langStackClear(langStack *langStack);
 
+static MIOPos getInputFilePositionForLineFull (unsigned int line, enum areaCoord areaCoord);
 
 /*
 *   DATA DEFINITIONS
@@ -147,25 +153,241 @@ extern unsigned long getInputLineNumber (void)
 	return File.input.lineNumber;
 }
 
-extern int getInputLineOffset (void)
+CTAGS_INLINE
+void callWithSavingPosition (MIO *mio,
+							 void (* fn) (MIO *, void *),
+							 void *data)
 {
-	unsigned char *base = (unsigned char *) vStringValue (File.line);
+	MIOPos origin;
+
+	mio_getpos (mio, &origin);
+	fn (mio, data);
+	mio_setpos (mio, &origin);
+}
+
+CTAGS_INLINE
+void mio_tell_cb (MIO *mio, void *data)
+{
+	int *r = data;
+	*r = mio_tell (mio);
+}
+
+struct mioGetposCallbackData {
+	MIOPos *pos;
+	long   offset;
+};
+
+CTAGS_INLINE
+void mio_getpos_cb (MIO *mio, void *data)
+{
+	struct mioGetposCallbackData *cb_data = data;
+
+	if (cb_data->offset)
+		mio_seek (mio, cb_data->offset, SEEK_CUR);
+	mio_getpos (mio, cb_data->pos);
+}
+
+extern void getAreaInfo (unsigned long *startLine,
+						 long *startColumn,
+						 unsigned long *endLine,
+						 long *endColumn)
+{
+	if (startLine)
+		*startLine = File.areaInfo.startLine;
+	if (startColumn)
+		*startColumn = File.areaInfo.startColumn;
+	if (endLine)
+		*endLine = File.areaInfo.endLine;
+	if (endColumn)
+		*endColumn = File.areaInfo.endColumn;
+}
+
+extern unsigned long getCurrentAreaStartLine (void)
+{
+	unsigned long startLine = 0;
+
+	if (isAreaStacked())
+		getAreaInfo (&startLine, NULL, NULL, NULL);
+	return startLine;
+}
+
+
+CTAGS_INLINE
+void callAtAreaStart (MIO *mio,
+					  void (* fn) (MIO *, void*),
+					  void *data)
+{
+	unsigned long startLine;
+	long startColumn;
+
+	getAreaInfo (&startLine, &startColumn, NULL, NULL);
+	MIOPos start = getInputFilePositionForLineFull (startLine, AREA_COORD_ABS);
+
+	mio_setpos (mio, &start);
+	mio_seek (mio, startColumn, SEEK_CUR);
+	fn (mio, data);
+}
+
+CTAGS_INLINE
+void tellAreaStartOffset (MIO *mio, void *data)
+{
+	callAtAreaStart (mio, mio_tell_cb, data);
+}
+
+CTAGS_INLINE
+void tellAreaStartPosition (MIO *mio, void *data)
+{
+	callAtAreaStart (mio, mio_getpos_cb, data);
+}
+
+/* return: [absolute] */
+CTAGS_INLINE
+long getCurrentAreaOffset (void)
+{
+	if (!isAreaStacked ())
+		return 0;
+
+	int r = 0;
+	callWithSavingPosition (BackupFile.mio,
+							tellAreaStartOffset,
+							&r);
+	return r;
+}
+
+CTAGS_INLINE
+void getCurrentAreaPositionWithOffset (MIOPos *pos, long offset)
+{
+	if (!isAreaStacked ())
+	{
+		*pos = File.filePosition.pos;
+		return;
+	}
+
+	struct mioGetposCallbackData data = {
+		.pos = pos,
+		.offset = offset,
+	};
+	callWithSavingPosition (BackupFile.mio,
+							tellAreaStartPosition,
+							&data);
+}
+
+extern int getInputColumnNumber (void)
+{
 	int ret;
 
+	/* input file ---> +-----------------+
+	 *                 |                 |
+	 *                 |   [.....X.......|
+	 *                 |.................|
+	 *                 |.....Y]          |
+	 *                 |                 |
+	 *                 +-----------------+
+	 */
+
 	if (File.currentLine)
-		ret = File.currentLine - base - File.ungetchIdx;
+	{
+
+
+		unsigned char *base = (unsigned char *) vStringValue (File.line);
+		long column_in_current_coord = File.currentLine - base - File.ungetchIdx;
+
+		/* input file ---> +-----------------+
+		 *                 |                 |
+		 *                 |   [.....X.......|
+		 *                 <---dx--->
+		 *                 |.................|
+		 *                 |.....Y..]        |
+		 *                 <-dy->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * dy => column_in_current_coord.
+		 *
+		 * dx = x1 + x2:
+		 *
+		 *                 <x1><-x2->
+		 *                 |   [.....X.......|
+		 *                 <---dx--->
+		 *
+		 * x1 => guest_area_column.
+		 * x2 => column_in_current_coord.
+		 */
+
+		long guest_area_column = 0;
+		if (isAreaStacked ())
+		{
+			/* X or Y */
+			unsigned long startLine;
+			long startColumn;
+			getAreaInfo (&startLine, &startColumn, NULL, NULL);
+			if (startLine == File.input.lineNumber)
+			{
+				/* We are at the start line of the guest area (X). */
+				guest_area_column = startColumn;
+			}
+		}
+
+		ret = guest_area_column + column_in_current_coord;
+	}
 	else if (File.input.lineNumber)
 	{
-		/* When EOF is saw, currentLine is set to NULL.
-		 * So the way to calculate the offset at the end of file is tricky.
+		/* currentLine is set to NULL but File.input.lineNumber is not zero.
+		 * This implies EOF is saw.
+		 * The way to calculate the offset at the end of file is tricky.
+		 *
+		 * input file ---> +-----------------+
+		 *                 |                 |
+		 *                 |   [.............|
+		 *                 |.................|
+		 *                 |.....Z]          |
+		 *                 <-dz->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * We must calculate dz but we cannot use File.currentLine.
+		 *
+		 * input file ---> +-----------------+
+		 *                 |<========== O ===|
+		 *                 |==>[<============|
+		 *                 |======= P =======|
+		 *                 |====>Z]          |
+		 *                 <-dz->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * O => getCurrentAreaOffset ()
+		 * P => mio_tell (File.mio) - (File.bomFound? 3: 0)
+		 *
+		 * input file ---> +-----------------+
+		 *                 |<================|
+		 *                 |===[====Q========|
+		 *                 |=================|
+		 *                 |====>Z]          |
+		 *                 <-dz->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * Q => getInputFileOffsetForLine(File.input.lineNumber)
+		 *
+		 * dz = O + P - Q
 		 */
-		ret = (mio_tell (File.mio) - (File.bomFound? 3: 0))
-			- getInputFileOffsetForLine(File.input.lineNumber);
+		ret = getCurrentAreaOffset ()
+			+ mio_tell (File.mio) - (File.bomFound? 3: 0)
+			- getInputFileOffsetForLine(File.input.lineNumber)
+			- File.ungetchIdx;
 	}
 	else
 	{
-		/* At the first line of file. */
-		ret = mio_tell (File.mio) - (File.bomFound? 3: 0);
+		/* Read nothing yet. */
+		long guest_area_column = 0;
+		if (isAreaStacked ())
+		{
+			unsigned long startLine CTAGS_ATTR_UNUSED;
+			getAreaInfo (&startLine, &guest_area_column, NULL, NULL);
+			Assert (startLine == 1);
+		}
+		ret = guest_area_column;
 	}
 
 	return ret >= 0 ? ret : 0;
@@ -201,18 +423,39 @@ static compoundPos* getInputFileCompoundPosForLine (unsigned int line)
 	return File.lineFposMap.pos + index;
 }
 
-extern MIOPos getInputFilePositionForLine (unsigned int line)
+static MIOPos getInputFilePositionForLineFull (unsigned int line, enum areaCoord areaCoord)
 {
 	if (line == 1 && File.lineFposMap.count == 0)
 	{
 		/* Any line is not read yet. */
 		MIOPos pos;
+
+		/* TODO: current coord.*/
 		mio_getpos (File.mio, &pos);
 		return pos;
 	}
-	compoundPos *cpos = getInputFileCompoundPosForLine (line);
-	return cpos->pos;
+
+	if (isAreaStacked() && (areaCoord == AREA_COORD_CURRENT))
+	{
+		unsigned long area_start_ln = getCurrentAreaStartLine();
+		long abs_offset = getInputFileOffsetForLine (line);
+		long area_start_offset = getInputFileOffsetForLine (area_start_ln);
+		long rela_offset = abs_offset - area_start_offset;
+		MIOPos rela_pos = getInputFilePositionForOffset (rela_offset);
+		return rela_pos;
+	}
+	else
+	{
+		compoundPos *cpos = getInputFileCompoundPosForLine (line);
+		return cpos->pos;
+	}
 }
+
+extern MIOPos getInputFilePositionForLine (unsigned int line)
+{
+	return getInputFilePositionForLineFull (line, AREA_COORD_CURRENT);
+}
+
 
 extern long getInputFileOffsetForLine (unsigned int line)
 {
@@ -220,6 +463,29 @@ extern long getInputFileOffsetForLine (unsigned int line)
 	long r = cpos->offset - (File.bomFound? 3: 0) - cpos->crAdjustment;
 	Assert (r >= 0);
 	return r;
+}
+
+static void tellAbsolutePosition (MIO *mio, void *data)
+{
+	struct mioGetposCallbackData *cb_data = data;
+
+	mio_seek (mio, cb_data->offset, SEEK_SET);
+	mio_getpos (mio, cb_data->pos);
+}
+
+extern MIOPos getInputFilePositionForOffset (long offset)
+{
+	MIOPos pos;
+	struct mioGetposCallbackData data = {
+		.pos = &pos,
+		.offset = offset,
+	};
+
+	callWithSavingPosition (File.mio,
+							tellAbsolutePosition,
+							&data);
+
+	return pos;
 }
 
 extern langType getInputLanguage (void)
@@ -1127,29 +1393,47 @@ extern char *readLineRaw (vString *const vLine, MIO *const mio)
 /*  Places into the line buffer the contents of the line referenced by
  *  "pos".
  */
-extern char *readLineFromBypass (
-		vString *const vLine, MIOPos pos, long *const offset)
-{
-	MIOPos origin;
+struct readLineRawCbData {
+	MIOPos pos;
+	long *offset;
+	vString *vLine;
 	char *result;
+};
 
-	mio_getpos (File.mio, &origin);
-	mio_setpos (File.mio, &pos);
-	mio_clearerr (File.mio);
-	if (offset != NULL)
-		*offset = mio_tell (File.mio);
-	result = readLineRaw (vLine, File.mio);
-	mio_setpos (File.mio, &origin);
+static void readLineRawCb (MIO *mio, void *data)
+{
+	struct readLineRawCbData *cb_data = data;
+
+	mio_setpos (mio, &cb_data->pos);
+	mio_clearerr (mio);
+	if (cb_data->offset)
+		*cb_data->offset = mio_tell (mio);
+
 	/* If the file is empty, we can't get the line
 	   for position 0. readLineFromBypass doesn't know
 	   what itself should do; just report it to the caller. */
-	return result;
+	cb_data->result = readLineRaw (cb_data->vLine, mio);
+}
+
+extern char *readLineFromBypass (
+		vString *const vLine, MIOPos pos, long *const offset)
+{
+	struct readLineRawCbData data = {
+		.pos = pos,
+		.offset = offset,
+		.vLine = vLine,
+		.result = NULL,
+	};
+
+	callWithSavingPosition (File.mio, readLineRawCb, &data);
+
+	return data.result;
 }
 
 extern void   pushArea (
 				       bool useMemoryStreamInput,
-				       unsigned long startLine, long startCharOffset,
-				       unsigned long endLine, long endCharOffset,
+				       unsigned long startLine, long startColumn,
+				       unsigned long endLine, long endColumn,
 				       unsigned long sourceLineOffset,
 				       int promise)
 {
@@ -1158,8 +1442,8 @@ extern void   pushArea (
 	MIOPos tmp;
 	MIO *subio;
 
-	if (isThinAreaSpec (startLine, startCharOffset,
-						endLine, endCharOffset,
+	if (isThinAreaSpec (startLine, startColumn,
+						endLine, endColumn,
 						sourceLineOffset))
 	{
 		if ((!useMemoryStreamInput
@@ -1180,22 +1464,22 @@ extern void   pushArea (
 
 	tmp = getInputFilePositionForLine (startLine);
 	mio_setpos (File.mio, &tmp);
-	mio_seek (File.mio, startCharOffset, SEEK_CUR);
+	mio_seek (File.mio, startColumn, SEEK_CUR);
 	p = mio_tell (File.mio);
 
 	tmp = getInputFilePositionForLine (endLine);
 	mio_setpos (File.mio, &tmp);
-	if (endCharOffset == EOL_CHAR_OFFSET)
+	if (endColumn == EOL_COLUMN)
 	{
 		long line_start = mio_tell (File.mio);
 		vString *tmpstr = vStringNew ();
 		readLine (tmpstr, File.mio);
-		endCharOffset = mio_tell (File.mio) - line_start;
+		endColumn = mio_tell (File.mio) - line_start;
 		vStringDelete (tmpstr);
-		Assert (endCharOffset >= 0);
+		Assert (endColumn >= 0);
 	}
 	else
-		mio_seek (File.mio, endCharOffset, SEEK_CUR);
+		mio_seek (File.mio, endColumn, SEEK_CUR);
 	q = mio_tell (File.mio);
 
 	mio_setpos (File.mio, &original);
@@ -1208,8 +1492,8 @@ extern void   pushArea (
 		error (FATAL, "memory for mio may be exhausted");
 
 	runModifiers (promise,
-				  startLine, startCharOffset,
-				  endLine, endCharOffset,
+				  startLine, startColumn,
+				  endLine, endColumn,
 				  mio_memory_get_data (subio, NULL),
 				  size);
 
@@ -1218,9 +1502,9 @@ extern void   pushArea (
 	File.mio = subio;
 	File.bomFound = false;
 	File.areaInfo.startLine = startLine;
-	File.areaInfo.startCharOffset = startCharOffset;
+	File.areaInfo.startColumn = startColumn;
 	File.areaInfo.endLine = endLine;
-	File.areaInfo.endCharOffset = endCharOffset;
+	File.areaInfo.endColumn = endColumn;
 
 	File.input.lineNumberOrigin = ((startLine == 0)? 0: startLine - 1);
 	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
@@ -1229,9 +1513,9 @@ extern void   pushArea (
 extern bool isAreaStacked (void)
 {
 	return !(File.areaInfo.startLine == 0
-			 && File.areaInfo.startCharOffset == 0
+			 && File.areaInfo.startColumn == 0
 			 && File.areaInfo.endLine == 0
-			 && File.areaInfo.endCharOffset == 0);
+			 && File.areaInfo.endColumn == 0);
 }
 
 extern unsigned int getAreaBoundaryInfo (unsigned long lineNumber)
@@ -1243,10 +1527,10 @@ extern unsigned int getAreaBoundaryInfo (unsigned long lineNumber)
 
 	info = 0;
 	if (File.areaInfo.startLine == lineNumber
-	    && File.areaInfo.startCharOffset != 0)
+	    && File.areaInfo.startColumn != 0)
 		info |= AREA_BOUNDARY_START;
 	if (File.areaInfo.endLine == lineNumber
-	    && File.areaInfo.endCharOffset != 0)
+	    && File.areaInfo.endColumn != 0)
 		info |= AREA_BOUNDARY_END;
 
 	return info;
@@ -1320,14 +1604,14 @@ static langType langStackPop  (langStack *langStack)
 	return langStack->languages [ -- langStack->count ];
 }
 
-extern bool isThinAreaSpec (unsigned long startLine, long startCharOffset,
-							unsigned long endLine, long endCharOffset,
+extern bool isThinAreaSpec (unsigned long startLine, long startColumn,
+							unsigned long endLine, long endColumn,
 							unsigned long sourceLineOffset)
 {
 	return (startLine == 0 &&
-			startCharOffset == 0 &&
+			startColumn == 0 &&
 			endLine == 0 &&
-			endCharOffset == 0 &&
+			endColumn == 0 &&
 			sourceLineOffset == 0);
 }
 

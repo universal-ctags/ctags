@@ -371,7 +371,7 @@ static void findFyppTags (void)
 	{
 		promise = makePromise (vStringValue(fyppGuestParser),
 							   1, 0,
-							   getInputLineNumber(), EOL_CHAR_OFFSET,
+							   getInputLineNumber(), EOL_COLUMN,
 							   0);
 		if (promise >= 0)
 			promiseAttachLineFiller (promise, parseCtx.fypp_lines);
