@@ -181,11 +181,60 @@ void getAreaInfo (unsigned long *startLine,
 
 extern int getInputColumnNumber (void)
 {
-	unsigned char *base = (unsigned char *) vStringValue (File.line);
 	int ret;
 
+	/* input file ---> +-----------------+
+	 *                 |                 |
+	 *                 |   [.....X.......|
+	 *                 |.................|
+	 *                 |.....Y]          |
+	 *                 |                 |
+	 *                 +-----------------+
+	 */
+
 	if (File.currentLine)
-		ret = File.currentLine - base - File.ungetchIdx;
+	{
+		unsigned char *base = (unsigned char *) vStringValue (File.line);
+		long column_in_current_coord = File.currentLine - base - File.ungetchIdx;
+
+		/* input file ---> +-----------------+
+		 *                 |                 |
+		 *                 |   [.....X.......|
+		 *                 <---dx--->
+		 *                 |.................|
+		 *                 |.....Y..]        |
+		 *                 <-dy->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * dy => column_in_current_coord.
+		 *
+		 * dx = x1 + x2:
+		 *
+		 *                 <x1><-x2->
+		 *                 |   [.....X.......|
+		 *                 <---dx--->
+		 *
+		 * x1 => guest_area_column.
+		 * x2 => column_in_current_coord.
+		 */
+
+		long guest_area_column = 0;
+		if (isAreaStacked ())
+		{
+			/* X or Y */
+			unsigned long startLine;
+			long startColumn;
+			getAreaInfo (&startLine, &startColumn, NULL, NULL);
+			if (startLine == File.input.lineNumber)
+			{
+				/* We are at the start line of the guest area (X). */
+				guest_area_column = startColumn;
+			}
+		}
+
+		ret = guest_area_column + column_in_current_coord;
+	}
 	else if (File.input.lineNumber)
 	{
 		/* When EOF is saw, currentLine is set to NULL.
