@@ -1678,18 +1678,40 @@ static void processHelpFullOption (
 
 #ifdef HAVE_JANSSON
 static void processInteractiveOption (
-		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const option,
 		const char *const parameter)
 {
+	void (* loop) (cookedArgs *args, void *user) = interactiveLoop;
 	static struct interactiveModeArgs args;
 
 	args.sandbox = false;
+	args.fname = NULL;
 
 	if (parameter && (strcmp (parameter, "sandbox") == 0))
 		Option.interactive = INTERACTIVE_MODE|INTERACTIVE_WITH_SANDBOX;
 	else if (parameter == NULL || *parameter == '\0'
 			 || (parameter && strcmp (parameter, "default") == 0))
 		Option.interactive = INTERACTIVE_MODE;
+	else
+	{
+		const char * p = parameter;
+		if (p && (strncmp (p, "sandbox,", strlen ("sandbox,")) == 0))
+		{
+			Option.interactive = INTERACTIVE_MODE|INTERACTIVE_WITH_SANDBOX;
+			p += strlen ("sandbox,");
+		}
+
+		if (p && (strncmp (p, "oneshot:", strlen ("oneshot:")) == 0))
+		{
+			const char *fname = p + strlen ("oneshot:");
+
+			if (fname[0] == '\0')
+				error (FATAL, "--%s option requires a non-empty <filename>", option);
+
+			Option.interactive |= INTERACTIVE_MODE|INTERACTIVE_ONESHOT;
+			args.fname = fname;
+		}
+	}
 
 	if (! (Option.interactive & INTERACTIVE_MODE))
 		error (FATAL, "Unknown option argument \"%s\" for --%s option",
@@ -1706,9 +1728,15 @@ static void processInteractiveOption (
 		args.sandbox = true;
 	}
 
+	if (Option.interactive & INTERACTIVE_ONESHOT)
+	{
+		Assert (args.fname);
+		loop = interactiveOneshot;
+	}
+
 	Option.sorted = SO_UNSORTED;
-	setMainLoop (interactiveLoop, &args);
 	setJsonMode (true);
+	setMainLoop (loop, &args);
 }
 #endif
 
@@ -2680,6 +2708,11 @@ static bool inSandbox (void)
 	return (Option.interactive & INTERACTIVE_WITH_SANDBOX);
 }
 
+static bool inOneshotMode (void)
+{
+	return (Option.interactive & INTERACTIVE_ONESHOT);
+}
+
 static void processSortOption (
 		const char *const option, const char *const parameter)
 {
@@ -2687,7 +2720,7 @@ static void processSortOption (
 		Option.sorted = SO_UNSORTED;
 	else if (isTrue (parameter))
 	{
-		if (inSandbox ())
+		if (inSandbox () && !inOneshotMode ())
 			error (FATAL, "cannot sort in sandbox");
 		Option.sorted = SO_SORTED;
 	}
@@ -2695,7 +2728,7 @@ static void processSortOption (
 			strcasecmp (parameter, "fold") == 0 ||
 			strcasecmp (parameter, "foldcase") == 0)
 	{
-		if (inSandbox ())
+		if (inSandbox () && !inOneshotMode ())
 			error (FATAL, "cannot sort in sandbox");
 		Option.sorted = SO_FOLDSORTED;
 	}

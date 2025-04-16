@@ -17,6 +17,7 @@
 struct interactiveModeArgs
 {
 	bool sandbox;
+	const char *fname;			/* --_interactive=oneshot:FNAME */
 };
 
 #ifdef HAVE_JANSSON
@@ -25,6 +26,7 @@ bool jsonErrorPrinter (const errorSelection selection, const char *const format,
 					  void *data);
 #endif
 
+void interactiveOneshot (cookedArgs *args, void *user);
 int installSyscallFilter (void);
 
 #endif  /* CTAGS_MAIN_INTERACTIVE_H */

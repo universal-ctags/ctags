@@ -485,6 +485,35 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 }
 #endif
 
+static void oneshotCommon (const char *fname)
+{
+	openTagFile ();
+
+	MIO *mio = mio_new_memory (NULL, 0, eRealloc, eFreeNoNullCheck);
+	int c;
+	while ((c = getchar()) != EOF)
+		mio_putc (mio, c);
+	mio_seek (mio, 0, SEEK_SET);
+
+	parseFileWithMio (fname, mio, NULL);
+
+	mio_unref (mio);
+
+	closeTagFile (false);
+}
+
+extern void interactiveOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
+{
+	struct interactiveModeArgs *iargs = user;
+
+	Assert (iargs->fname);
+
+	if (iargs->sandbox)
+		prepareSandbox ();
+
+	oneshotCommon (iargs->fname);
+}
+
 static bool isSafeVar (const char* var)
 {
 	const char *safe_vars[] = {
