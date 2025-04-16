@@ -397,13 +397,6 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 	struct interactiveModeArgs *iargs = user;
 
 	if (iargs->sandbox) {
-		/* As of jansson 2.6, the object hashing is seeded off
-		   of /dev/urandom, so trigger the hash seeding
-		   before installing the syscall filter.
-		*/
-		json_t * tmp = json_object ();
-		json_decref (tmp);
-
 		if (installSyscallFilter ()) {
 			error (FATAL, "install_syscall_filter failed");
 			/* The explicit exit call is needed because

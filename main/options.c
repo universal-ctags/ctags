@@ -882,8 +882,11 @@ static void setXrefMode (void)
 }
 
 #ifdef HAVE_JANSSON
-static void setJsonMode (void)
+static void setJsonMode (bool useJsonEvenInErrorReporting)
 {
+	if (useJsonEvenInErrorReporting)
+		setErrorPrinter (jsonErrorPrinter, NULL);
+
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
 	enablePtag (PTAG_OUTPUT_MODE, false);
 	enablePtag (PTAG_FILE_FORMAT, false);
@@ -1712,9 +1715,7 @@ static void processInteractiveOption (
 
 	Option.sorted = SO_UNSORTED;
 	setMainLoop (interactiveLoop, &args);
-	setErrorPrinter (jsonErrorPrinter, NULL);
-	setTagWriter (WRITER_JSON, NULL);
-	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
+	setJsonMode (true);
 }
 #endif
 
@@ -2601,7 +2602,7 @@ static void processOutputFormat (const char *const option CTAGS_ATTR_UNUSED,
 		break;
 #ifdef HAVE_JANSSON
 	case WRITER_JSON:
-		setJsonMode ();
+		setJsonMode (false);
 		break;
 #endif
 	case WRITER_CUSTOM:

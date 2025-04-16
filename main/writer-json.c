@@ -73,6 +73,16 @@ tagWriter jsonWriter = {
 static void initJsonWriter (void)
 {
 	json_set_alloc_funcs (eMalloc, eFree);
+
+#ifdef HAVE_SECCOMP
+	/* The sandbox feature requires this step. */
+	/* As of jansson 2.6, the object hashing is seeded off
+	   of /dev/urandom, so trigger the hash seeding
+	   before installing the syscall filter.
+	*/
+	json_t * tmp = json_object ();
+	json_decref (tmp);
+#endif
 }
 
 static const char* escapeFieldValueRaw (const tagEntryInfo * tag, fieldType ftype, int fieldIndex)
