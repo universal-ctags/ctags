@@ -2526,6 +2526,10 @@ static void parseTrigger (tokenInfo *const token)
 	 *	   create trigger "owner"."tr4" begin end;
 	 *	   create trigger "tr5" not valid;
 	 *	   create trigger "tr6" begin end;
+	 *
+	 * (PostgreSQL)
+	 *	   create trigger trigger ... on table ... execute procedure fn();
+	 *
 	 */
 
 	readIdentifier (name);
@@ -2556,6 +2560,7 @@ static void parseTrigger (tokenInfo *const token)
 
 		while (! isKeyword (token, KEYWORD_begin) &&
 			   ! isKeyword (token, KEYWORD_call) &&
+			   ! isKeyword (token, KEYWORD_procedure) &&
 			   ! isCmdTerm (token) &&
 			   ! isType (token, TOKEN_EOF))
 		{
@@ -2571,7 +2576,8 @@ static void parseTrigger (tokenInfo *const token)
 		}
 
 		if (isKeyword (token, KEYWORD_begin) ||
-			isKeyword (token, KEYWORD_call))
+			isKeyword (token, KEYWORD_call)  ||
+			isKeyword (token, KEYWORD_procedure))
 		{
 			addToScope(name, table->string, SQLTAG_TABLE);
 			makeSqlTag (name, SQLTAG_TRIGGER);
