@@ -67,8 +67,8 @@
 #include "writer_p.h"
 #include "xtag_p.h"
 
-#ifdef HAVE_JANSSON
 #include "interactive_p.h"
+#ifdef HAVE_JANSSON
 #include <jansson.h>
 #include <errno.h>
 #endif
@@ -391,20 +391,24 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 #undef timeStamp
 }
 
+static void prepareSandbox (void)
+{
+	if (installSyscallFilter ()) {
+		error (FATAL, "install_syscall_filter failed");
+		/* The explicit exit call is needed because
+		   "error (FATAL,..." just prints a message in
+		   interactive mode. */
+		exit (1);
+	}
+}
+
 #ifdef HAVE_JANSSON
 void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 {
 	struct interactiveModeArgs *iargs = user;
 
-	if (iargs->sandbox) {
-		if (installSyscallFilter ()) {
-			error (FATAL, "install_syscall_filter failed");
-			/* The explicit exit call is needed because
-			   "error (FATAL,..." just prints a message in
-			   interactive mode. */
-			exit (1);
-		}
-	}
+	if (iargs->sandbox)
+		prepareSandbox ();
 
 	char buffer[1024];
 	json_t *request;

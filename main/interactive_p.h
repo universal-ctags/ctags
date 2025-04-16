@@ -19,9 +19,12 @@ struct interactiveModeArgs
 	bool sandbox;
 };
 
+#ifdef HAVE_JANSSON
 void interactiveLoop (cookedArgs *args, void *user);
 bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
 					  void *data);
+#endif
+
 int installSyscallFilter (void);
 
 #endif  /* CTAGS_MAIN_INTERACTIVE_H */
