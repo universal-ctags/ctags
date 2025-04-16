@@ -4811,7 +4811,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio,
 	{
 		Assert(isLanguageEnabled (language));
 
-		if (Option.filter && ! Option.interactive)
+		if (Option.filter && ! (Option.interactive & INTERACTIVE_MODE))
 			openTagFile ();
 
 #ifdef HAVE_ICONV
@@ -4819,7 +4819,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio,
 		openConverter (getLanguageEncoding (language), Option.outputEncoding);
 #endif
 		tagFileResized = parseMio (fileName, language, req.mio, req.mtime, true, clientData);
-		if (Option.filter && ! Option.interactive)
+		if (Option.filter && ! (Option.interactive & INTERACTIVE_MODE))
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);
 

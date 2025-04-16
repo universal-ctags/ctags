@@ -176,7 +176,7 @@ optionValues Option = {
 	.patternLengthLimit = 96,
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
-	.interactive = false,
+	.interactive = INTERACTIVE_NONE,
 	.fieldsReset = false,
 #ifdef _WIN32
 	.useSlashAsFilenameSeparator = FILENAME_SEP_UNSET,
@@ -743,7 +743,7 @@ extern void freeList (stringList** const pList)
 
 extern void setDefaultTagFileName (void)
 {
-	if (Option.filter || Option.interactive)
+	if (Option.filter || (Option.interactive & INTERACTIVE_MODE))
 		return;
 
 	if (Option.tagFileName == NULL)
@@ -1683,17 +1683,17 @@ static void processInteractiveOption (
 
 	if (parameter && (strcmp (parameter, "sandbox") == 0))
 	{
-		Option.interactive = INTERACTIVE_SANDBOX;
+		Option.interactive = INTERACTIVE_MODE|INTERACTIVE_WITH_SANDBOX;
 		args.sandbox = true;
 	}
 	else if (parameter && (strcmp (parameter, "default") == 0))
 	{
-		Option.interactive = INTERACTIVE_DEFAULT;
+		Option.interactive = INTERACTIVE_MODE;
 		args.sandbox = false;
 	}
 	else if ((!parameter) || *parameter == '\0')
 	{
-		Option.interactive = INTERACTIVE_DEFAULT;
+		Option.interactive = INTERACTIVE_MODE;
 		args.sandbox = false;
 	}
 	else
@@ -2685,7 +2685,7 @@ static void processPseudoTags (const char *const option CTAGS_ATTR_UNUSED,
 
 static bool inSandbox (void)
 {
-	return (Option.interactive == INTERACTIVE_SANDBOX);
+	return (Option.interactive & INTERACTIVE_WITH_SANDBOX);
 }
 
 static void processSortOption (
@@ -4191,7 +4191,7 @@ extern bool isDestinationStdout (void)
 {
 	bool toStdout = false;
 
-	if (Option.filter || Option.interactive ||
+	if (Option.filter || (Option.interactive & INTERACTIVE_MODE) ||
 		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
 						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
 		)))

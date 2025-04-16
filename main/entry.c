@@ -409,7 +409,7 @@ extern void openTagFile (void)
 	 */
 	if (TagsToStdout)
 	{
-		if (Option.interactive == INTERACTIVE_SANDBOX)
+		if (Option.interactive & INTERACTIVE_WITH_SANDBOX)
 		{
 			TagFile.mio = mio_new_memory (NULL, 0, eRealloc, eFreeNoNullCheck);
 			TagFile.name = NULL;
