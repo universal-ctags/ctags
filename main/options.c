@@ -2683,17 +2683,30 @@ static void processPseudoTags (const char *const option CTAGS_ATTR_UNUSED,
 	vStringDelete (str);
 }
 
+static bool inSandbox (void)
+{
+	return (Option.interactive == INTERACTIVE_SANDBOX);
+}
+
 static void processSortOption (
 		const char *const option, const char *const parameter)
 {
 	if (isFalse (parameter))
 		Option.sorted = SO_UNSORTED;
 	else if (isTrue (parameter))
+	{
+		if (inSandbox ())
+			error (FATAL, "cannot sort in sandbox");
 		Option.sorted = SO_SORTED;
+	}
 	else if (strcasecmp (parameter, "f") == 0 ||
 			strcasecmp (parameter, "fold") == 0 ||
 			strcasecmp (parameter, "foldcase") == 0)
+	{
+		if (inSandbox ())
+			error (FATAL, "cannot sort in sandbox");
 		Option.sorted = SO_FOLDSORTED;
+	}
 	else
 		error (FATAL, "Invalid value for \"%s\" option", option);
 }
@@ -4167,11 +4180,6 @@ static void processDumpPreludeOption (const char *const option CTAGS_ATTR_UNUSED
 	extern const char ctagsCommonPrelude[];
 	fprintf(stdout, "%s\n", ctagsCommonPrelude);
 	exit (0);
-}
-
-extern bool inSandbox (void)
-{
-	return (Option.interactive == INTERACTIVE_SANDBOX);
 }
 
 extern bool canUseLineNumberAsLocator (void)
