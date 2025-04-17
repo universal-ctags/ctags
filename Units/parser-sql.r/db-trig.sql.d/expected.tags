@@ -1,3 +1,4 @@
+evr_update_trigger_katello_rpms	input-0.sql	/^CREATE TRIGGER evr_update_trigger_katello_rpms$/;"	T	table:katello_rpms
 flag	input.sql	/^        flag number := 0;$/;"	l	trigger:restrict_login
 restrict_login	input.sql	/^create or replace trigger restrict_login$/;"	T	table:database
 startup_db	input.sql	/^CREATE OR REPLACE TRIGGER startup_db$/;"	T	table:database
