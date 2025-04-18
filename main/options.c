@@ -1215,12 +1215,12 @@ static void processExcludeExceptionOption (
 }
 
 extern bool isExcludedFile (const char* const name,
-							bool falseIfExceptionsAreDefeind)
+							bool falseIfExceptionsAreDefined)
 {
 	const char* base = baseFilename (name);
 	bool result = false;
 
-	if (falseIfExceptionsAreDefeind
+	if (falseIfExceptionsAreDefined
 		&& ExcludedException != NULL
 		&& stringListCount (ExcludedException) > 0)
 		return false;
