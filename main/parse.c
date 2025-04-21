@@ -4108,7 +4108,7 @@ static rescanReason createTagsForFile (const langType language,
 	parserDefinition *const lang = LanguageTable [language].def;
 	rescanReason rescan = RESCAN_NONE;
 
-	resetInputFile (language, passCount > 1);
+	resetInputFile (language, passCount > 1 && !isAreaStacked ());
 
 	Assert (lang->parser || lang->parser2);
 
