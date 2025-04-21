@@ -1,0 +1,1 @@
+foo	input.md	/^int foo(void) {$/;"	f	typeref:typename:int
