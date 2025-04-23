@@ -17,7 +17,6 @@
  *
  * 1. Capturing required and provide packages as reference tags
  * 2. Capturing bz numbers and package versions in %changelog section
- * 3. Capturing %configure --enable-FOO --with-BAR
  */
 #include "general.h"  /* must always come first */
 
