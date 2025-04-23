@@ -311,17 +311,40 @@ static bool found_package_cb (const char *line,
 			      unsigned int count,
 			      void *userData)
 {
-	if (count > 0)
-	{
-		vString *name = vStringNew ();
-		tagEntryInfo tag;
+	if (count == 0)
+		return true;
 
-		vStringNCopyS (name, line + matches[2].start, matches[2].length);
-		initTagEntry (&tag, vStringValue (name), K_PACKAGE);
-		tag.extensionFields.scopeIndex = ((struct rpmSpecCtx *)userData)->package_index;
-		makeTagEntry (&tag);
-		vStringDelete (name);
-	}
+	/* ---
+	 * NAME: foo
+	 * %package bar
+	 * ---
+	 * In this case, emit foo-bar as a FQ tag.
+	 *
+	 * ---
+	 * NAME: foo
+	 * %package -n baz
+	 * ---
+	 * In this case, don't emit FQ tag.
+	 */
+	bool fq = true;
+
+	/* strlen("-n") => 2 */
+	if (matches[1].length > 2)
+		fq = false;
+
+	vString *name = vStringNew ();
+	tagEntryInfo tag;
+
+	vStringNCopyS (name, line + matches[2].start, matches[2].length);
+	initTagEntry (&tag, vStringValue (name), K_PACKAGE);
+	tag.extensionFields.scopeIndex = ((struct rpmSpecCtx *)userData)->package_index;
+
+	if (!fq)
+		tag.skipAutoFQEmission = 1;
+
+	makeTagEntry (&tag);
+	vStringDelete (name);
+
 	return true;
 }
 
