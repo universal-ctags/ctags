@@ -20,7 +20,6 @@ install_post	input.spec	/^%define install_post \\$/;"	kind:macro	line:31	roles:d
 docs	input.spec	/^%package docs$/;"	kind:package	line:40	package:ctags	roles:def
 ctags-docs	input.spec	/^%package docs$/;"	kind:package	line:40	package:ctags	roles:def
 universal-ctags-devel	input.spec	/^%package -n universal-ctags-devel$/;"	kind:package	line:44	package:ctags	roles:def
-ctags-universal-ctags-devel	input.spec	/^%package -n universal-ctags-devel$/;"	kind:package	line:44	package:ctags	roles:def
 libxml	input.spec	/^%configure --with-libxml=%{YES} --with-libyml=%{YES}\\$/;"	kind:optwith	line:52	roles:cmdline
 libyml	input.spec	/^%configure --with-libxml=%{YES} --with-libyml=%{YES}\\$/;"	kind:optwith	line:52	roles:cmdline
 foo	input.spec	/^	   --without-foo --enable-bar \\$/;"	kind:optwith	line:53	roles:cmdline
