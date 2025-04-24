@@ -10,6 +10,7 @@
 *   References:
 *   	- https://rpm-software-management.github.io/rpm/manual/macros.html
 *   	- https://rpm-software-management.github.io/rpm/manual/spec.html
+*   	- http://ftp.rpm.org/api/4.4.2.2/dependencies.html
 */
 
 /*
