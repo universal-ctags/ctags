@@ -652,7 +652,7 @@ static int ungetBufferGetcFromUngetBuffer (ungetBuffer *ungetBuffer)
 		Assert(ungetBuffer->size > 0);
 		Assert(ungetBuffer->dataSize > 0);
 
-		int c = *(ungetBuffer->pointer);
+		unsigned char c = *(ungetBuffer->pointer);
 		ungetBuffer->dataSize--;
 		if(ungetBuffer->dataSize > 0)
 			ungetBuffer->pointer++;
