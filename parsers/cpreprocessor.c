@@ -551,6 +551,9 @@ static void ungetBufferUngetc (ungetBuffer *ungetBuffer, const int c, vString *c
 		return;
 	}
 
+	Assert((unsigned int)c <= 0xff);
+	unsigned char u = (unsigned char)c;
+
 	if(!ungetBuffer->pointer)
 	{
 		// no unget data
@@ -561,7 +564,7 @@ static void ungetBufferUngetc (ungetBuffer *ungetBuffer, const int c, vString *c
 		}
 		Assert(ungetBuffer->size > 0);
 		ungetBuffer->pointer = ungetBuffer->buffer + ungetBuffer->size - 1;
-		*(ungetBuffer->pointer) = c;
+		*(ungetBuffer->pointer) = u;
 		ungetBuffer->dataSize = 1;
 		return;
 	}
@@ -584,7 +587,7 @@ static void ungetBufferUngetc (ungetBuffer *ungetBuffer, const int c, vString *c
 		ungetBuffer->pointer--;
 	}
 
-	*(ungetBuffer->pointer) = c;
+	*(ungetBuffer->pointer) = u;
 	ungetBuffer->dataSize++;
 }
 
@@ -639,7 +642,7 @@ static void ungetBufferUngetString(ungetBuffer *ungetBuffer, const char * string
 	const char * e = string + len;
 
 	while(s < e)
-		*p++ = *s++;
+		*p++ = (unsigned char)(*s++);
 
 	ungetBuffer->dataSize += len;
 }
@@ -652,7 +655,12 @@ static int ungetBufferGetcFromUngetBuffer (ungetBuffer *ungetBuffer)
 		Assert(ungetBuffer->size > 0);
 		Assert(ungetBuffer->dataSize > 0);
 
-		unsigned char c = *(ungetBuffer->pointer);
+		int c = *(ungetBuffer->pointer);
+
+		/* We allow putting only non-negative values to
+		 * the ungetc-buffer. */
+		Assert(c >= 0);
+
 		ungetBuffer->dataSize--;
 		if(ungetBuffer->dataSize > 0)
 			ungetBuffer->pointer++;
