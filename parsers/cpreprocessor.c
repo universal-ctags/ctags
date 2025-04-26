@@ -107,9 +107,9 @@ enum eState {
 /*  Defines the current state of the pre-processor.
  */
 typedef struct sUngetBuffer {
-	int *buffer;		/* memory buffer for unget characters */
+	unsigned char *buffer;	  /* memory buffer for unget characters */
 	int size;		/* the current unget buffer size */
-	int *pointer;		/* the current unget char: points in the
+	unsigned char *pointer;	  /* the current unget char: points in the
 						   middle of the buffer */
 	int dataSize;		/* the number of valid unget characters
 						   in the buffer */
@@ -551,17 +551,20 @@ static void ungetBufferUngetc (ungetBuffer *ungetBuffer, const int c, vString *c
 		return;
 	}
 
+	Assert((unsigned int)c <= 0xff);
+	unsigned char u = (unsigned char)c;
+
 	if(!ungetBuffer->pointer)
 	{
 		// no unget data
 		if(!ungetBuffer->buffer)
 		{
-			ungetBuffer->buffer = (int *)eMalloc(8 * sizeof(int));
+			ungetBuffer->buffer = eMalloc(8 * sizeof(*(ungetBuffer->buffer)));
 			ungetBuffer->size = 8;
 		}
 		Assert(ungetBuffer->size > 0);
 		ungetBuffer->pointer = ungetBuffer->buffer + ungetBuffer->size - 1;
-		*(ungetBuffer->pointer) = c;
+		*(ungetBuffer->pointer) = u;
 		ungetBuffer->dataSize = 1;
 		return;
 	}
@@ -575,8 +578,8 @@ static void ungetBufferUngetc (ungetBuffer *ungetBuffer, const int c, vString *c
 	if(ungetBuffer->pointer == ungetBuffer->buffer)
 	{
 		ungetBuffer->size += 8;
-		int * tmp = (int *)eMalloc(ungetBuffer->size * sizeof(int));
-		memcpy(tmp+8,ungetBuffer->pointer,ungetBuffer->dataSize * sizeof(int));
+		unsigned char * tmp = eMalloc(ungetBuffer->size * sizeof(*(ungetBuffer->buffer)));
+		memcpy(tmp+8,ungetBuffer->pointer,ungetBuffer->dataSize * sizeof(*(ungetBuffer->buffer)));
 		eFree(ungetBuffer->buffer);
 		ungetBuffer->buffer = tmp;
 		ungetBuffer->pointer = tmp + 7;
@@ -584,7 +587,7 @@ static void ungetBufferUngetc (ungetBuffer *ungetBuffer, const int c, vString *c
 		ungetBuffer->pointer--;
 	}
 
-	*(ungetBuffer->pointer) = c;
+	*(ungetBuffer->pointer) = u;
 	ungetBuffer->dataSize++;
 }
 
@@ -606,11 +609,12 @@ static void ungetBufferUngetString(ungetBuffer *ungetBuffer, const char * string
 		if(!ungetBuffer->buffer)
 		{
 			ungetBuffer->size = 8 + len;
-			ungetBuffer->buffer = (int *)eMalloc(ungetBuffer->size * sizeof(int));
+			ungetBuffer->buffer = eMalloc(ungetBuffer->size * sizeof(*(ungetBuffer->buffer)));
 		} else if(ungetBuffer->size < len)
 		{
 			ungetBuffer->size = 8 + len;
-			ungetBuffer->buffer = (int *)eRealloc(ungetBuffer->buffer,ungetBuffer->size * sizeof(int));
+			ungetBuffer->buffer = eRealloc(ungetBuffer->buffer,
+										   ungetBuffer->size * sizeof(*(ungetBuffer->buffer)));
 		}
 		ungetBuffer->pointer = ungetBuffer->buffer + ungetBuffer->size - len;
 	} else {
@@ -623,8 +627,8 @@ static void ungetBufferUngetString(ungetBuffer *ungetBuffer, const char * string
 		if(ungetBuffer->size < (ungetBuffer->dataSize + len))
 		{
 			ungetBuffer->size = 8 + len + ungetBuffer->dataSize;
-			int * tmp = (int *)eMalloc(ungetBuffer->size * sizeof(int));
-			memcpy(tmp + 8 + len,ungetBuffer->pointer,ungetBuffer->dataSize * sizeof(int));
+			unsigned char * tmp = eMalloc(ungetBuffer->size * sizeof(*(ungetBuffer->buffer)));
+			memcpy(tmp + 8 + len,ungetBuffer->pointer,ungetBuffer->dataSize * sizeof(*(ungetBuffer->buffer)));
 			eFree(ungetBuffer->buffer);
 			ungetBuffer->buffer = tmp;
 			ungetBuffer->pointer = tmp + 8;
@@ -634,12 +638,12 @@ static void ungetBufferUngetString(ungetBuffer *ungetBuffer, const char * string
 		}
 	}
 
-	int * p = ungetBuffer->pointer;
+	unsigned char* p = ungetBuffer->pointer;
 	const char * s = string;
 	const char * e = string + len;
 
 	while(s < e)
-		*p++ = *s++;
+		*p++ = (unsigned char)(*s++);
 
 	ungetBuffer->dataSize += len;
 }
