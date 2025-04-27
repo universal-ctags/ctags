@@ -13,7 +13,7 @@ include source.mak
 COMMON_DEFINES =
 DEFINES = $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DHAVE_PACKCC
 INCLUDES = -I. -Ignulib -Imain -Iparsers -Ilibreadtags -Idsl
-OPT = /O2 /WX /Zc:preprocessor /source-charset:utf-8
+OPT = /O2 /WX /Zc:preprocessor /wd4819
 LOPT = /FORCE:MULTIPLE
 PACKCC = packcc.exe
 GNULIB_OBJS = $(MVC_GNULIB_SRCS:.c=.obj)
