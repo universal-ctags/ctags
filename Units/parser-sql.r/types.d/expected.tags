@@ -1,0 +1,20 @@
+compfoo	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	k
+f1	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	E	type:compfoo
+f2	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	E	type:compfoo
+getfoo	input.sql	/^CREATE FUNCTION getfoo() RETURNS SETOF compfoo AS $\$$/;"	f	typeref:typename:SETOF compfoo
+bug_status	input.sql	/^CREATE TYPE bug_status AS ENUM ('new', 'open', 'closed');$/;"	k
+bug	input.sql	/^CREATE TABLE bug ($/;"	t
+id	input.sql	/^    id serial,$/;"	E	table:bug
+description	input.sql	/^    description text,$/;"	E	table:bug
+status	input.sql	/^    status bug_status$/;"	E	table:bug
+float8_range	input.sql	/^CREATE TYPE float8_range AS RANGE (subtype = float8, subtype_diff = float8mi);$/;"	k
+my_box_in_function	input.sql	/^CREATE FUNCTION my_box_in_function(cstring) RETURNS box AS $\$$/;"	f	typeref:typename:box
+my_box_out_function	input.sql	/^CREATE FUNCTION my_box_out_function(box) RETURNS cstring AS $\$$/;"	f	typeref:typename:cstring
+box	input.sql	/^CREATE TYPE box ($/;"	k
+myboxes	input.sql	/^CREATE TABLE myboxes ($/;"	t
+id	input.sql	/^    id integer,$/;"	E	table:myboxes
+description	input.sql	/^    description box$/;"	E	table:myboxes
+bigobj	input.sql	/^CREATE TYPE bigobj ($/;"	k
+big_objs	input.sql	/^CREATE TABLE big_objs ($/;"	t
+id	input.sql	/^    id integer,$/;"	E	table:big_objs
+obj	input.sql	/^    obj bigobj$/;"	E	table:big_objs

@@ -1,3 +1,10 @@
+evr_array_item	input.sql	/^create type evr_array_item as ($/;"	r
+n	input.sql	/^  n       NUMERIC,$/;"	E	record:evr_array_item
+s	input.sql	/^  s       TEXT$/;"	E	record:evr_array_item
+evr_t	input.sql	/^create type evr_t as ($/;"	r
+epoch	input.sql	/^  epoch INT,$/;"	E	record:evr_t
+version	input.sql	/^  version evr_array_item[],$/;"	E	record:evr_t
+release	input.sql	/^  release evr_array_item[]$/;"	E	record:evr_t
 evr_trigger	input.sql	/^CREATE FUNCTION evr_trigger() RETURNS trigger AS $\$$/;"	f	typeref:typename:trigger	signature:()
 empty	input.sql	/^create or replace FUNCTION empty(t TEXT)$/;"	f	typeref:typename:BOOLEAN	signature:(t TEXT)
 isalpha	input.sql	/^create or replace FUNCTION isalpha(ch CHAR)$/;"	f	typeref:typename:BOOLEAN	signature:(ch CHAR)
