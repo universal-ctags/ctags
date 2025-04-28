@@ -115,8 +115,8 @@
 /* return: [absolute] */
 extern unsigned long getInputLineNumber (void);
 
-/* return: [buggy],
- * args (offset): [buggy] */
+/* return: [absolute],
+ * args (offset): [absolute] */
 extern unsigned long getInputLineNumberForFileOffset(long offset);
 
 /* Get the column number, the byte offset of the input from the
@@ -129,11 +129,11 @@ extern unsigned long getInputLineNumberForFileOffset(long offset);
  */
 extern int getInputColumnNumber (void);
 
-/* return: [buggy] */
+/* return: [current] */
 extern MIOPos getInputFilePosition (void);
 
-/* return: [buggy],
- * args (line): [buggy] */
+/* return: [current],
+ * args (line): [absolute] */
 extern MIOPos getInputFilePositionForLine (unsigned int line);
 
 /* return: [absolute]

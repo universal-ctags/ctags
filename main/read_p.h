@@ -34,8 +34,8 @@ enum areaBoundaryFlag {
 extern const char *getInputLanguageName (void);
 extern const char *getInputFileTagPath (void);
 
-/* return: [buggy],
- * args (line): [buggy] */
+/* return: [absolute],
+ * args (line): [absolute] */
 extern long getInputFileOffsetForLine (unsigned int line);
 
 extern unsigned int countInputLanguageKinds (void);
@@ -60,7 +60,7 @@ extern void closeInputFile (void);
 extern void *getInputFileUserData(void);
 
 
-/* args (line): [buggy] */
+/* args (line): [absolute] */
 extern unsigned int getAreaBoundaryInfo (unsigned long lineNumber);
 
 extern const char *getSourceFileTagPath (void);
