@@ -180,6 +180,26 @@ void getAreaInfo (unsigned long *startLine,
 		*endColumn = File.areaInfo.endColumn;
 }
 
+/* return: [absolute]
+ * If the area is not stacked, return 0.
+ * If the area is stacked, the line number of the start of the current
+ * area in the absolute coordinate system.
+ */
+static unsigned long getAreaStartLineNumber (void)
+{
+	unsigned long startLine = 0;
+
+	if (isAreaStacked())
+		getAreaInfo (&startLine, NULL, NULL, NULL);
+	return startLine;
+}
+
+extern unsigned long translateLineNumber (unsigned long line)
+{
+	unsigned long area_start_line = getAreaStartLineNumber ();
+	return (area_start_line? area_start_line - 1: 0) + line;
+}
+
 /* return: [absolute] */
 CTAGS_INLINE
 long getAreaStartOffset (void)

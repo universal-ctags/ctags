@@ -136,6 +136,13 @@ extern MIOPos getInputFilePosition (void);
  * args (line): [buggy] */
 extern MIOPos getInputFilePositionForLine (unsigned int line);
 
+/* return: [absolute]
+ * args (line): [current]
+ *
+ * LINE argument is assumed 1 based.
+ */
+extern unsigned long translateLineNumber (unsigned long line);
+
 extern const char *getInputFileName (void);
 extern langType getInputLanguage (void);
 extern bool isInputLanguage (langType lang);
