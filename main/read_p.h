@@ -101,4 +101,13 @@ extern bool isThinAreaSpec (unsigned long startLine, long startColumn,
 							unsigned long endLine, long endColumn,
 							unsigned long sourceLineOffset);
 
+/* args (startLine): [absolute]
+   args (startColumn): [buggy]
+   args (endLine): [absolute]
+   args (endColumn): [absolute] */
+extern void getAreaInfo (unsigned long *startLine,
+						 long *startColumn,
+						 unsigned long *endLine,
+						 long *endColumn);
+
 #endif  /* CTAGS_MAIN_READ_PRIVATE_H */

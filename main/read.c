@@ -171,11 +171,10 @@ void callWithSavingPosition (MIO *mio,
    args (startColumn): [buggy]
    args (endLine): [absolute]
    args (endColumn): [absolute] */
-CTAGS_INLINE
-void getAreaInfo (unsigned long *startLine,
-				  long *startColumn,
-				  unsigned long *endLine,
-				  long *endColumn)
+extern void getAreaInfo (unsigned long *startLine,
+						 long *startColumn,
+						 unsigned long *endLine,
+						 long *endColumn)
 {
 	if (startLine)
 		*startLine = File.areaInfo.startLine;
