@@ -562,7 +562,7 @@ static void readTokenFull (tokenInfo *const token, vString *capture)
 		copyToken (token, PS->replays[PS->numReplays].token);
 		deleteToken (PS->replays[PS->numReplays].token);
 		vDebugParserPrintf (
-			"˅%s%s%s%s%s ", token->id > 1? "[" : "", tokenNames[token->type],
+			"v%s%s%s%s%s ", token->id > 1? "[" : "", tokenNames[token->type],
 			!vStringIsEmpty (token->string)? ":" : "",
 			vStringValue (token->string), token->id > 1? "]" : "");
 		if (capture)
@@ -869,7 +869,7 @@ static void unreadTokenFull (tokenInfo *const token, vString *const acc)
 		for (int i = 0; i < PS->numReplays; i++)
 			Assert (token->id != PS->replays[i].token->id);
 	);
-	vDebugParserPrintf ("˄ ");
+	vDebugParserPrintf ("^ ");
 
 	PS->replays[PS->numReplays].token = dupToken (token);
 	if (acc)
