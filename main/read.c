@@ -213,6 +213,11 @@ long getAreaStartOffset (void)
 	return File.areaInfo.startOffset;
 }
 
+extern long translateFileOffset (unsigned long offset)
+{
+	return getAreaStartOffset () + offset;
+}
+
 extern int getInputColumnNumber (void)
 {
 	int ret;
