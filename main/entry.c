@@ -1660,6 +1660,20 @@ extern void setTagEndLine(tagEntryInfo *tag, unsigned long endLine)
 			   tag->name,
 			   tag->inputFileName,
 			   tag->lineNumber);
+#if 0
+		Assert ((endLine == 0 || endLine >= tag->lineNumber));
+		/*
+		 * If we enable this assertion, (option based) user parsers can
+		 * crash. No user wants this behavior even if the one pass
+		 * --enable-debuggng to configre when building; jut warning
+		 * is enough.
+		 *
+		 * Till implementing the way to detect whether a builtin parser
+		 * calls this setTagEndLine() or a user parser callit, we canot
+		 * enable this assertion. The assertion should be enabled for
+		 * builtin parsers.
+		 */
+#endif
 		return;
 	}
 

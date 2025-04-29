@@ -65,7 +65,8 @@ Include <- <( "include" / "cpp_include" )> _ <Literal> EOS {
         {
             tagEntryInfo e;
             initForeignRefTagEntry (&e, vStringValue(f), getNamedLanguage ("C++", 0), CXXTagKindINCLUDE, CR_HEADER_LOCAL);
-            e.lineNumber = getInputLineNumberForFileOffset ($2s);
+            long abs_offset = translateFileOffset ($2s);
+            e.lineNumber = getInputLineNumberForFileOffset (abs_offset);
             e.filePosition = getInputFilePositionForLine (e.lineNumber);
             makeTagEntry (&e);
         }

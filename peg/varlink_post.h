@@ -58,7 +58,8 @@ static int makeVarlinkTag (struct parserCtx *auxil, const char *name, long offse
 	tagEntryInfo e;
 	int k = PEEK_KIND (auxil);
 	initTagEntry(&e, name, k);
-	unsigned long lineNumber = getInputLineNumberForFileOffset (offset);
+	long abs_offset = translateFileOffset (offset);
+	unsigned long lineNumber = getInputLineNumberForFileOffset (abs_offset);
 	updateTagLine (&e, lineNumber, getInputFilePositionForLine (lineNumber));
 	e.extensionFields.scopeIndex = BASE_SCOPE (auxil);
 	return makeTagEntry (&e);

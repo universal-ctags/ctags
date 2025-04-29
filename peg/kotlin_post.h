@@ -43,7 +43,8 @@ static void makeKotlinTag (struct parserCtx *auxil, const char *name, long offse
         stripped = eStrndup (name + 1, len);
         initTagEntry(&e, stripped, k);
     }
-    unsigned long lineNumber = getInputLineNumberForFileOffset (offset);
+    long abs_offset = translateFileOffset (offset);
+    unsigned long lineNumber = getInputLineNumberForFileOffset (abs_offset);
     updateTagLine (&e, lineNumber, getInputFilePositionForLine (lineNumber));
     e.extensionFields.scopeIndex = BASE_SCOPE(auxil);
     int scope_index = makeTagEntry (&e);
@@ -60,7 +61,7 @@ static void reportFailure(struct parserCtx *auxil, long offset)
 {
     if(auxil->fail_offset < 0)
     {
-        auxil->fail_offset = offset;
+        auxil->fail_offset = translateFileOffset (offset);
     }
 }
 
@@ -68,8 +69,9 @@ static void resetFailure(struct parserCtx *auxil, long offset)
 {
     if(auxil->fail_offset >= 0)
     {
+        long abs_offset = translateFileOffset (offset);
         unsigned long startLine = getInputLineNumberForFileOffset(auxil->fail_offset);
-        unsigned long endLine = getInputLineNumberForFileOffset(offset-1);
+        unsigned long endLine = getInputLineNumberForFileOffset(abs_offset-1);
         if (startLine == endLine)
         {
             TRACE_PRINT("Failed to parse '%s' at line %lu!\n", getInputFileName(), startLine);
