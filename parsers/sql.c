@@ -881,18 +881,54 @@ getNextChar:
 	switch (c)
 	{
 		case EOF: token->type = TOKEN_EOF;				break;
-		case '(': token->type = TOKEN_OPEN_PAREN;		break;
-		case ')': token->type = TOKEN_CLOSE_PAREN;		break;
-		case ':': token->type = TOKEN_COLON;			break;
-		case ';': token->type = TOKEN_SEMICOLON;		break;
-		case '.': token->type = TOKEN_PERIOD;			break;
-		case ',': token->type = TOKEN_COMMA;			break;
-		case '{': token->type = TOKEN_OPEN_CURLY;		break;
-		case '}': token->type = TOKEN_CLOSE_CURLY;		break;
-		case '~': token->type = TOKEN_TILDE;			break;
-		case '[': token->type = TOKEN_OPEN_SQUARE;		break;
-		case ']': token->type = TOKEN_CLOSE_SQUARE;		break;
-		case '=': token->type = TOKEN_EQUAL;			break;
+		case '(':
+				  token->type = TOKEN_OPEN_PAREN;
+				  vStringPut (token->string, c);
+				  break;
+		case ')':
+				  token->type = TOKEN_CLOSE_PAREN;
+				  vStringPut (token->string, c);
+				  break;
+		case ':':
+				  token->type = TOKEN_COLON;
+				  vStringPut (token->string, c);
+				  break;
+		case ';':
+				  token->type = TOKEN_SEMICOLON;
+				  vStringPut (token->string, c);
+				  break;
+		case '.':
+				  token->type = TOKEN_PERIOD;
+				  vStringPut (token->string, c);
+				  break;
+		case ',':
+				  token->type = TOKEN_COMMA;
+				  vStringPut (token->string, c);
+				  break;
+		case '{':
+				  token->type = TOKEN_OPEN_CURLY;
+				  vStringPut (token->string, c);
+				  break;
+		case '}':
+				  token->type = TOKEN_CLOSE_CURLY;
+				  vStringPut (token->string, c);
+				  break;
+		case '~':
+				  token->type = TOKEN_TILDE;
+				  vStringPut (token->string, c);
+				  break;
+		case '[':
+				  token->type = TOKEN_OPEN_SQUARE;
+				  vStringPut (token->string, c);
+				  break;
+		case ']':
+				  token->type = TOKEN_CLOSE_SQUARE;
+				  vStringPut (token->string, c);
+				  break;
+		case '=':
+				  token->type = TOKEN_EQUAL;
+				  vStringPut (token->string, c);
+				  break;
 
 		case '\'':
 		case '"':
@@ -914,8 +950,10 @@ getNextChar:
 				  }
 				  else
 				  {
+					  vStringPut (token->string, c);
 					  if (!isspace (c))
 						  ungetcToInputFile (c);
+					  vStringPut (token->string, c);
 					  token->type = TOKEN_OPERATOR;
 				  }
 				  break;
@@ -924,9 +962,11 @@ getNextChar:
 		case '>':
 				  {
 					  const int initial = c;
+					  vStringPut (token->string, c);
 					  int d = getcFromInputFile ();
 					  if (d == initial)
 					  {
+						  vStringPut (token->string, d);
 						  if (initial == '<')
 							  token->type = TOKEN_BLOCK_LABEL_BEGIN;
 						  else
@@ -942,8 +982,11 @@ getNextChar:
 
 		case '\\':
 				  c = getcFromInputFile ();
+				  vStringPut (token->string, c);
 				  if (c != '\\'  && c != '"'  && c != '\''  &&  !isspace (c))
 					  ungetcToInputFile (c);
+				  else
+					  vStringPut (token->string, c);
 				  token->type = TOKEN_CHARACTER;
 				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
@@ -955,6 +998,7 @@ getNextChar:
 					  if ((d != '*') &&		/* is this the start of a comment? */
 						  (d != '/'))		/* is a one line comment? */
 					  {
+						  vStringPut (token->string, c);
 						  token->type = TOKEN_FORWARD_SLASH;
 						  ungetcToInputFile (d);
 					  }
@@ -976,6 +1020,7 @@ getNextChar:
 
 		case '$':
 				  {
+					  /* Too complicated: we will not puts $ to token->string. */
 					  tokenType t;
 					  if (skippingPreproc)
 					  {
@@ -1011,7 +1056,10 @@ getNextChar:
 
 		default:
 				  if (! isIdentChar1 (c))
+				  {
+					  vStringPut (token->string, c);
 					  token->type = TOKEN_UNDEFINED;
+				  }
 				  else
 				  {
 					  parseIdentifier (token->string, c);
