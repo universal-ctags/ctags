@@ -79,6 +79,7 @@ typedef struct sInputLineFposMap {
 } inputLineFposMap;
 
 typedef struct sAreaInfo {
+	long startOffset;
 	unsigned long startLine;
 	long startColumn;
 	unsigned long endLine;
@@ -179,6 +180,13 @@ void getAreaInfo (unsigned long *startLine,
 		*endColumn = File.areaInfo.endColumn;
 }
 
+/* return: [absolute] */
+CTAGS_INLINE
+long getAreaStartOffset (void)
+{
+	return File.areaInfo.startOffset;
+}
+
 extern int getInputColumnNumber (void)
 {
 	int ret;
@@ -237,11 +245,50 @@ extern int getInputColumnNumber (void)
 	}
 	else if (File.input.lineNumber)
 	{
-		/* When EOF is saw, currentLine is set to NULL.
-		 * So the way to calculate the offset at the end of file is tricky.
+		/* currentLine is set to NULL but File.input.lineNumber is not zero.
+		 * This implies the parser saw EOF.
+		 * The way to calculate the offset at the end of file is tricky.
+		 *
+		 * input file ---> +-----------------+
+		 *                 |                 |
+		 *                 |   [.............|
+		 *                 |.................|
+		 *                 |.....Z]          |
+		 *                 <-dz->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * We must calculate dz but we cannot use File.currentLine.
+		 *
+		 * input file ---> +-----------------+
+		 *                 |<========== O ===|
+		 *                 |==>[<============|
+		 *                 |======= P =======|
+		 *                 |====>Z]          |
+		 *                 <-dz->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * O => getAreaStartOffset ()
+		 * P => mio_tell (File.mio) - (File.bomFound? 3: 0)
+		 *
+		 * input file ---> +-----------------+
+		 *                 |<================|
+		 *                 |===[====Q========|
+		 *                 |=================|
+		 *                 |====>Z]          |
+		 *                 <-dz->
+		 *                 |                 |
+		 *                 +-----------------+
+		 *
+		 * Q => getInputFileOffsetForLine(File.input.lineNumber)
+		 *
+		 * dz = O + P - Q
 		 */
-		ret = (mio_tell (File.mio) - (File.bomFound? 3: 0))
-			- getInputFileOffsetForLine(File.input.lineNumber);
+		ret = getAreaStartOffset ()
+			+ mio_tell (File.mio) - (File.bomFound? 3: 0)
+			- getInputFileOffsetForLine(File.input.lineNumber)
+			- File.ungetchIdx;
 	}
 	else
 	{
@@ -1324,6 +1371,7 @@ extern void   pushArea (
 
 	File.mio = subio;
 	File.bomFound = false;
+	File.areaInfo.startOffset = p;
 	File.areaInfo.startLine = startLine;
 	File.areaInfo.startColumn = startColumn;
 	File.areaInfo.endLine = endLine;

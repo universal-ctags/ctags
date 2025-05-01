@@ -125,7 +125,7 @@ extern unsigned long getInputLineNumberForFileOffset(long offset);
  * This function works only if the parser uses getcFromInputFile().
  * This function doesn't work if the parser uses readLineFromInputFile().
  *
- * return: [buggy]
+ * return: [absolute]
  */
 extern int getInputColumnNumber (void);
 
