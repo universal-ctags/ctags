@@ -557,7 +557,7 @@ static bool isCmdTerm (tokenInfo *const token)
 			isKeyword (token, KEYWORD_go));
 }
 
-static bool isMatchedEnd(tokenInfo *const token, int nest_lvl)
+static bool isMatchedEnd (tokenInfo *const token, int nest_lvl)
 {
 	bool terminated = false;
 	/*
@@ -721,7 +721,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
-static bool isCCFlag(const char *str)
+static bool isCCFlag (const char *str)
 {
 	return (anyKindEntryInScope(CORK_NIL, str, SQLTAG_PLSQL_CCFLAGS, false) != 0);
 }
@@ -1132,7 +1132,7 @@ static void findCmdTerm (tokenInfo *const token, const bool check_first)
 			 ! isType (token, TOKEN_EOF));
 }
 
-static void skipToMatched(tokenInfo *const token)
+static void skipToMatched (tokenInfo *const token)
 {
 	int nest_level = 0;
 	tokenType open_token;
@@ -1210,7 +1210,7 @@ static void skipArgumentList (tokenInfo *const token)
 	}
 }
 
-static langType getNamedLanguageFromToken(tokenInfo *const token)
+static langType getNamedLanguageFromToken (tokenInfo *const token)
 {
 	langType lang = LANG_IGNORE;
 
@@ -2278,9 +2278,9 @@ static void parseColumnsAndAliases (tokenInfo *const token)
  * https://www.postgresql.org/docs/current/sql-createtable.html
  * https://sqlite.org/lang_createtable.html
  */
-static bool parseIdAfterIfNotExists(tokenInfo *const name,
-									tokenInfo *const token,
-									bool authorization_following)
+static bool parseIdAfterIfNotExists (tokenInfo *const name,
+									 tokenInfo *const token,
+									 bool authorization_following)
 {
 	if (isKeyword (name, KEYWORD_if)
 		&& (isType (token, TOKEN_IDENTIFIER)
