@@ -19,6 +19,7 @@
 #endif
 #include <string.h>
 
+#include "collector.h"
 #include "debug.h"
 #include "entry.h"
 #include "keyword.h"
@@ -614,8 +615,12 @@ static void deleteToken (tokenInfo *const token)
  *	 Tag generation functions
  */
 
-static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
+static int makeSqlTagFull (tokenInfo *const token, const sqlKind kind, int *fqIndex)
 {
+	int r = CORK_NIL;
+	if (fqIndex)
+		*fqIndex = CORK_NIL;
+
 	if (SqlKinds [kind].enabled)
 	{
 		const char *const name = vStringValue (token->string);
@@ -632,6 +637,7 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 
 			if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
 			{
+				int r_fq;
 				vString *fulltag;
 				tagEntryInfo xe = e;
 
@@ -640,13 +646,22 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 				vStringCat (fulltag, token->string);
 				xe.name = vStringValue (fulltag);
 				markTagExtraBit (&xe, XTAG_QUALIFIED_TAGS);
-				makeTagEntry (&xe);
+				r_fq = makeTagEntry (&xe);
+				if (fqIndex)
+					*fqIndex = r_fq;
 				vStringDelete (fulltag);
 			}
 		}
 
-		makeTagEntry (&e);
+		r = makeTagEntry (&e);
 	}
+
+	return r;
+}
+
+static int makeSqlTag (tokenInfo *const token, const sqlKind kind)
+{
+	return makeSqlTagFull (token, kind, NULL);
 }
 
 /*
@@ -1191,7 +1206,56 @@ static void findCmdTerm (tokenInfo *const token, const bool check_first)
 			 ! isType (token, TOKEN_EOF));
 }
 
-static void skipToMatched (tokenInfo *const token)
+static void collectorAppend (collector *collector, tokenInfo *const token)
+{
+	if (vStringIsEmpty (token->string))
+		return;
+
+
+	int lastType = collector->xdata;
+	collectorStamp (collector, token->type);
+
+	vString *str;
+	vString *strrepr = NULL;
+	if (isType (token, TOKEN_STRING))
+	{
+		/* Rebuild the original text on the source input. */
+		strrepr = vStringNew ();
+
+		vStringPut (strrepr, '\'');
+		for (size_t i = 0; i < vStringLength (token->string); i++)
+		{
+			char c = vStringChar (token->string, i);
+			if (c == '\'')
+				vStringCatS (strrepr, "''");
+			else
+				vStringPut (strrepr, c);
+		}
+		vStringPut (strrepr, '\'');
+
+		str = strrepr;
+	}
+	else
+		str = token->string;
+
+	if (isType (token, TOKEN_COMMA)
+		|| isType (token, TOKEN_OPEN_PAREN)
+		|| isType (token, TOKEN_OPEN_SQUARE) || isType (token, TOKEN_OPEN_CURLY)
+		|| isType (token, TOKEN_CLOSE_PAREN)
+		|| isType (token, TOKEN_CLOSE_SQUARE) || isType (token, TOKEN_CLOSE_CURLY)
+		|| isType (token, TOKEN_PERIOD) || isType (token, TOKEN_COLON)
+		|| lastType == TOKEN_OPEN_PAREN
+		|| lastType == TOKEN_OPEN_SQUARE || lastType == TOKEN_OPEN_CURLY
+		|| lastType == TOKEN_PERIOD || lastType == TOKEN_COLON
+		|| (lastType == TOKEN_UNDEFINED && isType (token, TOKEN_UNDEFINED)))
+		collectorCat (collector, str);
+	else
+		collectorJoin (collector, ' ', str);
+
+	vStringDelete (strrepr);		/* NULL is acceptable. */
+}
+
+static void skipToMatchedFull (tokenInfo *const token, collector *collector)
 {
 	int nest_level = 0;
 	tokenType open_token;
@@ -1227,6 +1291,8 @@ static void skipToMatched (tokenInfo *const token)
 		while (nest_level > 0 && !isType (token, TOKEN_EOF))
 		{
 			readToken (token);
+			if (collector)
+				collectorAppend (collector, token);
 			if (isType (token, open_token))
 			{
 				nest_level++;
@@ -1243,6 +1309,11 @@ static void skipToMatched (tokenInfo *const token)
 	}
 }
 
+static void skipToMatched (tokenInfo *const token)
+{
+	skipToMatchedFull (token, NULL);
+}
+
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 {
 	dest->lineNumber = src->lineNumber;
@@ -1254,7 +1325,7 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 	dest->scopeKind = src->scopeKind;
 }
 
-static void skipArgumentList (tokenInfo *const token)
+static void skipArgumentListFull (tokenInfo *const token, collector *collector)
 {
 	/*
 	 * Other databases can have arguments with fully declared
@@ -1265,8 +1336,20 @@ static void skipArgumentList (tokenInfo *const token)
 
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
 	{
-		skipToMatched (token);
+		if (collector)
+			collectorAppend (collector, token);
+		skipToMatchedFull (token, collector);
 	}
+}
+
+static void collectParameterList (tokenInfo *const token, collector *collector)
+{
+	skipArgumentListFull (token, collector);
+}
+
+static void skipArgumentList (tokenInfo *const token)
+{
+	skipArgumentListFull (token, NULL);
 }
 
 static langType getNamedLanguageFromToken (tokenInfo *const token)
@@ -1291,11 +1374,25 @@ static langType getNamedLanguageFromToken (tokenInfo *const token)
 	return lang;
 }
 
+static void fillExtensionFields (tagEntryInfo *e, collector *signature, collector *typeref)
+{
+	if (signature->repr)
+		e->extensionFields.signature =  collectorStrdup (signature);
+	if (typeref->repr)
+	{
+		e->extensionFields.typeRef[0] = eStrdup ("typename");
+		e->extensionFields.typeRef[1] = collectorStrdup (typeref);
+	}
+}
+
 static void parseSubProgram (tokenInfo *const token)
 {
 	tokenInfo *const name  = newToken ();
 	vString * saveScope = vStringNew ();
 	sqlKind saveScopeKind;
+
+	collector signature = { .repr = 0 };
+	collector typeref = { .repr = 0 };
 
 	/*
 	 * This must handle both prototypes and the body of
@@ -1346,6 +1443,10 @@ static void parseSubProgram (tokenInfo *const token)
 	 *         demo_pkg.test_var
 	 *         demo_pkg.test_func
 	 *         demo_pkg.more.test_func2
+	 *
+	 *  ---
+	 *  PostgreSQL 18devel Documentation/36.5. Query Language (SQL) Functions
+	 *         https://www.postgresql.org/docs/devel/xfunc-sql.html
 	 */
 	const sqlKind kind = isKeyword (token, KEYWORD_function) ?
 		SQLTAG_FUNCTION : SQLTAG_PROCEDURE;
@@ -1379,7 +1480,8 @@ static void parseSubProgram (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		/* Reads to the next token after the TOKEN_CLOSE_PAREN */
-		skipArgumentList(token);
+		collectorInit (&signature, TOKEN_EOF);
+		collectParameterList (token, &signature);
 	}
 
 	if (kind == SQLTAG_FUNCTION)
@@ -1389,16 +1491,31 @@ static void parseSubProgram (tokenInfo *const token)
 		{
 			/* Read datatype */
 			readToken (token);
+			collectorInit (&typeref, TOKEN_EOF);
+			collectorCat (&typeref, token->string);
+
 			/*
 			 * Read token after which could be the
 			 * command terminator if a prototype
 			 * or an open parenthesis
 			 */
 			readToken (token);
+			while (isType (token, TOKEN_IDENTIFIER)
+				   || isType (token, TOKEN_PERIOD))
+			{
+				collectorAppend (&typeref, token);
+				readToken (token);
+			}
+
 			if (isType (token, TOKEN_OPEN_PAREN))
 			{
-				/* Reads to the next token after the TOKEN_CLOSE_PAREN */
-				skipArgumentList(token);
+				/* Reads to the next token after the TOKEN_CLOSE_PAREN. */
+				collectParameterList (token, &typeref);
+			}
+			else if (isType (token, TOKEN_OPEN_SQUARE))
+			{
+				collectorAppend (&typeref, token);
+				skipToMatchedFull (token, &typeref);
 			}
 		}
 	}
@@ -1468,7 +1585,16 @@ static void parseSubProgram (tokenInfo *const token)
 				isType (name, TOKEN_STRING) ||
 				isType (name, TOKEN_KEYWORD))
 			{
-				makeSqlTag (name, kind);
+				int fq = CORK_NIL;
+				int r = makeSqlTagFull (name, kind, &fq);
+
+				tagEntryInfo *e;
+				e = getEntryInCorkQueue (r);
+				if (e)
+					fillExtensionFields (e, &signature, &typeref);
+				e = getEntryInCorkQueue (fq);
+				if (e)
+					fillExtensionFields (e, &signature, &typeref);
 			}
 
 			parseBlockFull (token, true, lang);
@@ -1478,6 +1604,10 @@ static void parseSubProgram (tokenInfo *const token)
 	}
 	vStringCopy(token->scope, saveScope);
 	token->scopeKind = saveScopeKind;
+	if (typeref.repr)
+		collectorFini (&typeref);	/* NULL is acceptable. */
+	if (signature.repr)
+		collectorFini (&signature);	/* NULL is acceptable. */
 	deleteToken (name);
 	vStringDelete(saveScope);
 }

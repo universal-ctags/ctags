@@ -68,7 +68,7 @@ with "--options=NONE -o - --sort=no --extras=+{guest} input.sql"
 
 .. code-block:: tags
 
-	fun1	input.sql	/^CREATE OR REPLACE FUNCTION fun1() RETURNS VARCHAR AS '$/;"	f
+	fun1	input.sql	/^CREATE OR REPLACE FUNCTION fun1() RETURNS VARCHAR AS '$/;"	f	typeref:typename:VARCHAR
 	test1_var1	input.sql	/^	test1_var1 VARCHAR(64) := $$ABC$$;$/;"	v
 	test1_var2	input.sql	/^	test1_var2 VARCHAR(64) := $xyz$XYZ$xyz$;$/;"	v
 	test1_var3	input.sql	/^	test1_var3     INTEGER := 1;$/;"	v
@@ -94,7 +94,7 @@ with "--options=NONE -o - --sort=no --extras=+{guest} input.sql"
 
 .. code-block:: tags
 
-	fun2	input.sql	/^CREATE OR REPLACE FUNCTION fun2() RETURNS VARCHAR LANGUAGE plpgsql AS $\$$/;"	f
+	fun2	input.sql	/^CREATE OR REPLACE FUNCTION fun2() RETURNS VARCHAR LANGUAGE plpgsql AS $\$$/;"	f	typeref:typename:VARCHAR
 	test2_var1	input.sql	/^	test2_var1 VARCHAR(64) := 'ABC2';$/;"	v
 	test2_var2	input.sql	/^	test2_var2 VARCHAR(64) := 'XYZ2';$/;"	v
 	test2_var3	input.sql	/^	test2_var3        INTEGER := 2;$/;"	v

@@ -1,7 +1,7 @@
 demo_pkg	input.sql	/^create or replace package body demo_pkg is$/;"	P
-demo_pkg.test_func1	input.sql	/^function test_func1 return INTEGER$/;"	f	package:demo_pkg
-test_func1	input.sql	/^function test_func1 return INTEGER$/;"	f	package:demo_pkg
-demo_pkg.test_func2	input.sql	/^function test_func2 return INTEGER$/;"	f	package:demo_pkg
-test_func2	input.sql	/^function test_func2 return INTEGER$/;"	f	package:demo_pkg
-demo_pkg.test_func5	input.sql	/^function test_func5 return INTEGER$/;"	f	package:demo_pkg
-test_func5	input.sql	/^function test_func5 return INTEGER$/;"	f	package:demo_pkg
+demo_pkg.test_func1	input.sql	/^function test_func1 return INTEGER$/;"	f	package:demo_pkg	typeref:typename:INTEGER
+test_func1	input.sql	/^function test_func1 return INTEGER$/;"	f	package:demo_pkg	typeref:typename:INTEGER
+demo_pkg.test_func2	input.sql	/^function test_func2 return INTEGER$/;"	f	package:demo_pkg	typeref:typename:INTEGER
+test_func2	input.sql	/^function test_func2 return INTEGER$/;"	f	package:demo_pkg	typeref:typename:INTEGER
+demo_pkg.test_func5	input.sql	/^function test_func5 return INTEGER$/;"	f	package:demo_pkg	typeref:typename:INTEGER
+test_func5	input.sql	/^function test_func5 return INTEGER$/;"	f	package:demo_pkg	typeref:typename:INTEGER

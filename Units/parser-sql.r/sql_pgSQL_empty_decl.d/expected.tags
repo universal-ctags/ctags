@@ -1,2 +1,2 @@
-X	input.sql	/^CREATE FUNCTION X RETURNS void AS $\$$/;"	f
-Y	input.sql	/^CREATE OR REPLACE FUNCTION Y(i integer) RETURNS integer AS $\$$/;"	f
+X	input.sql	/^CREATE FUNCTION X RETURNS void AS $\$$/;"	f	typeref:typename:void
+Y	input.sql	/^CREATE OR REPLACE FUNCTION Y(i integer) RETURNS integer AS $\$$/;"	f	typeref:typename:integer
