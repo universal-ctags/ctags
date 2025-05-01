@@ -688,6 +688,17 @@ static void parseString (vString *const string, const int delimiter, int *promis
 		*/
 		else if (c == delimiter)
 		{
+			if (c == '\'')
+			{
+				int d = getcFromInputFile ();
+				if (d == '\'')
+				{
+					vStringPut (string, c);
+					continue;
+				}
+				ungetcToInputFile(d);
+			}
+
 			if (promise)
 			{
 				ungetcToInputFile(c);
