@@ -1278,15 +1278,15 @@ static void parseSubProgram (tokenInfo *const token)
 	 *	   END;
 	 *
 	 * Note, a Package adds scope to the items within.
-     *     create or replace package demo_pkg is
-     *         test_var number;
-     *         function test_func return varchar2;
-     *         function more.test_func2 return varchar2;
-     *     end demo_pkg;
+	 *     create or replace package demo_pkg is
+	 *         test_var number;
+	 *         function test_func return varchar2;
+	 *         function more.test_func2 return varchar2;
+	 *     end demo_pkg;
 	 * So the tags generated here, contain the package name:
-     *         demo_pkg.test_var
-     *         demo_pkg.test_func
-     *         demo_pkg.more.test_func2
+	 *         demo_pkg.test_var
+	 *         demo_pkg.test_func
+	 *         demo_pkg.more.test_func2
 	 */
 	const sqlKind kind = isKeyword (token, KEYWORD_function) ?
 		SQLTAG_FUNCTION : SQLTAG_PROCEDURE;
