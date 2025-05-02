@@ -14,6 +14,7 @@ REPOINFO_OBJS  = $(REPOINFO_SRCS:.c=.$(OBJEXT))
 UTIL_PUBLIC_HEADS = \
 	main/general.h		\
 	\
+	main/collector.h	\
 	main/fname.h		\
 	main/gcc-attr.h		\
 	main/htable.h		\
@@ -41,6 +42,7 @@ UTIL_HEADS = \
 	$(NULL)
 
 UTIL_SRCS = \
+	main/collector.c	\
 	main/fname.c		\
 	main/htable.c		\
 	main/intern.c		\

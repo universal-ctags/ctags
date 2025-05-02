@@ -75,6 +75,9 @@
     <ClCompile Include="..\main\cmd.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\collector.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\colprint.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
@@ -687,6 +690,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\args_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\collector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\colprint_p.h">
