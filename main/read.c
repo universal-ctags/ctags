@@ -138,6 +138,7 @@ static void     langStackClear(langStack *langStack);
 
 static MIOPos getInputFilePositionForLineFull (unsigned int line, enum areaCoord areaCoord);
 static MIOPos getInputFilePositionForFileOffset (long offset);
+static unsigned long getAreaStartLineNumber (void);
 
 /*
 *   DATA DEFINITIONS
@@ -152,6 +153,8 @@ static compoundPos StartOfLine;  /* holds deferred position of start of line */
 
 extern unsigned long getInputLineNumber (void)
 {
+	if (!File.currentLine && File.input.lineNumber == 1 && isAreaStacked ())
+		return getAreaStartLineNumber ();
 	return File.input.lineNumber;
 }
 
@@ -316,9 +319,10 @@ extern int getInputColumnNumber (void)
 		 *
 		 * dz = O + P - Q
 		 */
+		unsigned long ln = getInputLineNumber ();
 		ret = getAreaStartOffset ()
 			+ mio_tell (File.mio) - (File.bomFound? 3: 0)
-			- getInputFileOffsetForLine(File.input.lineNumber)
+			- getInputFileOffsetForLine(ln)
 			- File.ungetchIdx;
 	}
 	else
@@ -1062,7 +1066,7 @@ extern void closeInputFile (void)
 		if (Option.printTotals)
 		{
 			fileStatus *status = eStat (vStringValue (File.input.name));
-			addTotals (0, File.input.lineNumber - 1L, status->size);
+			addTotals (0, getInputLineNumber () - 1L, status->size);
 		}
 		mio_unref (File.mio);
 		File.mio = NULL;
@@ -1087,8 +1091,8 @@ static void fileNewline (bool crAdjustment, size_t posInAllLines)
 
 	File.input.lineNumber++;
 	File.source.lineNumber++;
-	DebugStatement ( if (Option.breakLine == File.input.lineNumber) lineBreak (); )
-	DebugStatement ( debugPrintf (DEBUG_RAW, "%6ld: ", File.input.lineNumber); )
+	DebugStatement ( if (Option.breakLine == getInputLineNumber ()) lineBreak (); )
+	DebugStatement ( debugPrintf (DEBUG_RAW, "%6ld: ", getInputLineNumber ()); )
 }
 
 extern void ungetcToInputFile (int c)
