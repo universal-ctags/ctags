@@ -1,0 +1,2 @@
+Taken from https://github.com/BurntSushi/toml/raw/refs/heads/master/internal/toml-test/tests/invalid/encoding/bad-utf8-at-end.toml
+With this input, the TOML parser entered an infinite loop.
