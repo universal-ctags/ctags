@@ -13,12 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        openbsd-version: ['7.6', '7.5', '7.4', '7.3', '7.2']
+        openbsd-version: ['7.7', '7.6', '7.5', '7.4', '7.3', '7.2']
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cross-platform-actions/action@v0.27.0
+      - uses: cross-platform-actions/action@master
         with:
           operating_system: openbsd
           version: ${{ matrix.openbsd-version }}
@@ -35,7 +35,7 @@ jobs:
             export  CFLAGS='-I/usr/local/include'
             export LDFLAGS='-L/usr/local/lib'
 
-            run sudo pkg_add automake%1.16 gmake pkgconf jansson libyaml libxml libiconv
+            run sudo pkg_add autoconf%2.69 automake%1.16 gmake pkgconf jansson libyaml libxml libiconv
 
             run cc --version
 

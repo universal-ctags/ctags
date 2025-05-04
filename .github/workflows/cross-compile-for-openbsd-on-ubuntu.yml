@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        openbsd-release-version: ['7.6']
+        openbsd-release-version: ['7.7', '7.6']
         # https://cdn.openbsd.org/pub/OpenBSD/
 
     runs-on: ubuntu-latest
