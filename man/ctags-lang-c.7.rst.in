@@ -23,16 +23,9 @@ This man page gathers random notes about tagging C source code.
 VERSIONS
 --------
 
-Change since "0.0"
-~~~~~~~~~~~~~~~~~~
+See the output of
 
-* New role ``foreigndecl`` for ``function`` kind
-
-* New role ``foreigndecl`` for ``struct`` kind
-
-* New field ``section``
-
-* New field ``alias``
+| **@CTAGS_NAME_EXECUTABLE@** --describe-language=C
 
 SEE ALSO
 --------
