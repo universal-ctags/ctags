@@ -1874,7 +1874,7 @@ extern parserDefinition* PythonParser (void)
 	def->fieldCount = ARRAY_SIZE (PythonFields);
 	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
-	def->versionCurrent = 0;
+	def->versionCurrent = 1;
 	def->versionAge = 1;
 	return def;
 }
