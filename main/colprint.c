@@ -276,7 +276,7 @@ void colprintLineAppendColumnInt  (struct colprintLine *line, unsigned int colum
 {
 	char buf[12];
 
-	snprintf(buf, 12, "%u", column);
+	snprintf(buf, sizeof(buf), "%u", column);
 	colprintLineAppendColumnCString	(line, buf);
 }
 

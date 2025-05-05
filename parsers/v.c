@@ -960,8 +960,7 @@ static int makeTagFull (tokenInfo *const token, const char *name,
 		return CORK_NIL; // ignore _
 	initRefTagEntry (&e, tagName, kind, role);
 
-	e.lineNumber = token->lineNumber;
-	e.filePosition = token->filePosition;
+	updateTagLine (&e, token->lineNumber, token->filePosition);
 	if (argList && !vStringIsEmpty (argList))
 		e.extensionFields.signature = vStringValue (argList);
 	if (access && *access != '\0')
@@ -1060,8 +1059,7 @@ static void makeForeignDeclTagMaybe (tokenInfo *const token, vString *const name
 		name? vStringValue (name) : vStringValue (token->string);
 	initForeignRefTagEntry (
 		&foreignEntry, tagName, lang, foreignKind, foreignRole);
-	foreignEntry.lineNumber = token->lineNumber;
-	foreignEntry.filePosition = token->filePosition;
+	updateTagLine(&foreignEntry, token->lineNumber, token->filePosition);
 	makeTagEntry (&foreignEntry);
 }
 

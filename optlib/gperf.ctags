@@ -102,7 +102,7 @@
 
 #
 # keywordsec:
-# - extrac keywords defined in %% ... %%
+# - extract keywords defined in %% ... %%
 #
 --_mtable-regex-GPerf=keywordsec/%%//{tjump=functions}{_guest=C,0end,}
 --_mtable-regex-GPerf=keywordsec/^#[^\n]*\n?//

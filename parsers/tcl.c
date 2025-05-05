@@ -552,8 +552,7 @@ static void parseProc (tokenInfo *const token,
 			initTagEntry (&e, tokenString (token), K_PROCEDURE);
 			if (quoted)
 			{
-				e.lineNumber = token->lineNumber;
-				e.filePosition = token->filePosition;
+				updateTagLine(&e, token->lineNumber, token->filePosition);
 				if (vStringIsEmpty (token->string))
 					e.allowNullTag = 1;
 			}
