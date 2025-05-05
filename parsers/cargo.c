@@ -71,8 +71,7 @@ static void valueCallback (tomlSubparser *sub, const char *value, long offset, i
 				vStringChop (package);
 
 			initTagEntry (&pe, vStringValue (package), K_PACKAGE);
-			pe.lineNumber = lineNumber;
-			pe.filePosition = filePosition;
+			updateTagLine (&pe, lineNumber, filePosition);
 
 			makeTagEntry (&pe);
 
