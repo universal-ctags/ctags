@@ -1,2 +1,3 @@
 --sort=no
 --fields=+S
+--extras=+g

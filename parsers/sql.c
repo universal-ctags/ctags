@@ -1356,7 +1356,11 @@ static langType getNamedLanguageFromToken (tokenInfo *const token)
 {
 	langType lang = LANG_IGNORE;
 
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER)
+		/* https://www.postgresql.org/docs/current/sql-createprocedure.html
+		   ... Enclosing the name in single quotes is deprecated and requires matching
+		   case. ...*/
+		|| isType (token, TOKEN_STRING))
 	{
 		if (vStringLength (token->string) > 2
 			&& vStringValue (token->string) [0] == 'p'
