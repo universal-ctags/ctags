@@ -191,7 +191,7 @@ false   <- '\u0066' '\u0061' '\u006C' '\u0073' '\u0065'
 dateTime      <- offsetDateTime / localDateTime / localDate / localTime
 
 dateFullyear  <- DIGIT DIGIT DIGIT DIGIT
-dateMonth     <- DIGIT DIGIT DIGIT DIGIT
+dateMonth     <- DIGIT DIGIT
 dateMday      <- DIGIT DIGIT
 timeDelim     <- [tT] / '\u0020'
 timeHour      <- DIGIT DIGIT
