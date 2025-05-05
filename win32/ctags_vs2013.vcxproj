@@ -184,6 +184,7 @@
     <ClCompile Include="..\main\CommonPrelude.c" />
     <ClCompile Include="..\main\args.c" />
     <ClCompile Include="..\main\cmd.c" />
+    <ClCompile Include="..\main\collector.c" />
     <ClCompile Include="..\main\colprint.c" />
     <ClCompile Include="..\main\debug.c" />
     <ClCompile Include="..\main\dependency.c" />
@@ -390,6 +391,7 @@
     <ClInclude Include="..\gnulib\fnmatch.h" />
     <ClInclude Include="..\gnulib\regex.h" />
     <ClInclude Include="..\main\args_p.h" />
+    <ClInclude Include="..\main\collector.h" />
     <ClInclude Include="..\main\colprint_p.h" />
     <ClInclude Include="..\main\ctags.h" />
     <ClInclude Include="..\main\debug.h" />
