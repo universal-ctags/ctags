@@ -1983,6 +1983,12 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin,
 	else
 		verbose ("Add optlib parser: %s\n", def->name);
 
+	if (! (def->versionCurrent >= def->versionAge))
+		error (WARNING, "versionCurrent (%u) must be either equal to or greater than versionAge (%u): %s",
+			   def->versionCurrent, def->versionAge, def->name);
+	if (is_builtin)
+		Assert (def->versionCurrent >= def->versionAge);
+
 	def->id = LanguageCount++;
 	parser = LanguageTable + def->id;
 	parser->def = def;
