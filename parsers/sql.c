@@ -30,6 +30,9 @@
 #include "xtag.h"
 #include "promise.h"
 
+#include "dependency.h"
+#include "cxx/cxx_tag.h"
+
 /*
  *	On-line "Oracle Database PL/SQL Language Reference":
  *	http://download.oracle.com/docs/cd/B28359_01/appdev.111/b28370/toc.htm
@@ -504,6 +507,8 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	[KEYWORD_with]          = {1 & 1&1&1&1 & 1&1 & 1},
 	[KEYWORD_without]       = {0 & 0&1&1&0 & 0&0 & 0},
 };
+
+static langType Lang_c;
 
 /*
  *	 FUNCTION DECLARATIONS
@@ -2207,6 +2212,16 @@ static void parseBlock (tokenInfo *const token, const bool local)
 	parseBlockFull (token, local, LANG_IGNORE);
 }
 
+static void makeSqlTagForInternalFunction (tokenInfo *const token)
+{
+	tagEntryInfo foreignEntry;
+	initForeignRefTagEntry (
+		&foreignEntry, vStringValue (token->string), Lang_c,
+		CXXTagKindFUNCTION, CXXTagFUNCTIONRoleFOREIGNCALL);
+	updateTagLine (&foreignEntry, token->lineNumber, token->filePosition);
+	makeTagEntry (&foreignEntry);
+}
+
 static void parseBlockFull (tokenInfo *const token, const bool local, langType lang)
 {
 	int promise = -1;
@@ -2226,6 +2241,9 @@ static void parseBlockFull (tokenInfo *const token, const bool local, langType l
 			promise = token->promise;
 			token->promise = -1;
 
+			tokenInfo *const body = newToken ();
+			copyToken (body, token);
+
 			readToken (token);
 			while (! isCmdTerm (token)
 				   && !isType (token, TOKEN_EOF))
@@ -2237,10 +2255,16 @@ static void parseBlockFull (tokenInfo *const token, const bool local, langType l
 					lang = getNamedLanguageFromToken (token);
 					if (lang != LANG_IGNORE)
 						readToken (token);
+					else if (vStringEqC (token->string, "internal"))
+					{
+						makeSqlTagForInternalFunction (body);
+						readToken (token);
+					}
 				}
 				else
 					readToken (token);
 			}
+			deleteToken (body);
 
 			if (promise != -1 && lang != LANG_IGNORE)
 				promiseUpdateLanguage(promise, lang);
@@ -3388,6 +3412,10 @@ extern parserDefinition* SqlParser (void)
 	static const char *const extensions [] = { "sql", NULL };
 	static const char *const aliases [] = {"pgsql", NULL };
 	parserDefinition* def = parserNew ("SQL");
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_FOREIGNER, "C",  &Lang_c },
+	};
+
 	def->kindTable	= SqlKinds;
 	def->kindCount	= ARRAY_SIZE (SqlKinds);
 	def->extensions = extensions;
@@ -3397,5 +3425,7 @@ extern parserDefinition* SqlParser (void)
 	def->keywordTable = SqlKeywordTable;
 	def->keywordCount = ARRAY_SIZE (SqlKeywordTable);
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 	return def;
 }
