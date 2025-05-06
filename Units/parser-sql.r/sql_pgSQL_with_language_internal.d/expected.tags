@@ -1,0 +1,4 @@
+isnlt	input.sql	/^CREATE FUNCTION isnlt(ean13, ean13)$/;"	f	language:SQL	typeref:typename:boolean	signature:(ean13, ean13)	roles:def
+int8lt	input.sql	/^        AS 'int8lt'$/;"	f	language:C	roles:foreigncall
+isnle	input.sql	/^CREATE FUNCTION isnle(ean13, ean13)$/;"	f	language:SQL	typeref:typename:boolean	signature:(ean13, ean13)	roles:def
+int8le	input.sql	/^        AS 'int8le'$/;"	f	language:C	roles:foreigncall
