@@ -670,7 +670,7 @@ static int makeSqlTag (tokenInfo *const token, const sqlKind kind)
 
 static void parseString (vString *const string, const int delimiter, int *promise)
 {
-	int offset[2];
+	int column[2];
 	unsigned long linenum[3];
 	enum { START, END, SOURCE };
 
@@ -683,7 +683,7 @@ static void parseString (vString *const string, const int delimiter, int *promis
 	{
 		c0 = getcFromInputFile ();
 		linenum[START] = getInputLineNumber ();
-		offset[START]  = getInputLineOffset ();
+		column[START]  = getInputColumnNumber ();
 		linenum[SOURCE] = getSourceLineNumber ();
 		ungetcToInputFile(c0);
 	}
@@ -718,11 +718,11 @@ static void parseString (vString *const string, const int delimiter, int *promis
 			{
 				ungetcToInputFile(c);
 				linenum[END] = getInputLineNumber ();
-				offset[END]  = getInputLineOffset ();
+				column[END]  = getInputColumnNumber ();
 				(void)getcFromInputFile ();
 				*promise = makePromise (NULL,
-										linenum [START], offset [START],
-										linenum [END], offset [END],
+										linenum [START], column [START],
+										linenum [END], column [END],
 										linenum [SOURCE]);
 			}
 			end = true;
@@ -765,7 +765,7 @@ static bool isCCFlag (const char *str)
  */
 static tokenType parseDollarQuote (vString *const string, const int delimiter, int *promise)
 {
-	int offset[2];
+	int column[2];
 	unsigned long linenum[3];
 	enum { START, END, SOURCE };
 
@@ -812,7 +812,7 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter, i
 	if (promise)
 	{
 		linenum[START] = getInputLineNumber ();
-		offset[START]  = getInputLineOffset ();
+		column[START]  = getInputColumnNumber ();
 		linenum[SOURCE] = getSourceLineNumber ();
 	}
 
@@ -859,12 +859,12 @@ static tokenType parseDollarQuote (vString *const string, const int delimiter, i
 				if (promise)
 				{
 					linenum[END] = getInputLineNumber ();
-					offset[END]  = getInputLineOffset ();
-					if (offset[END] > len)
-						offset[END] -= len;
+					column[END]  = getInputColumnNumber ();
+					if (column[END] > len)
+						column[END] -= len;
 					*promise = makePromise (NULL,
-											linenum [START], offset [START],
-											linenum [END], offset [END],
+											linenum [START], column [START],
+											linenum [END], column [END],
 											linenum [SOURCE]);
 				}
 				break;

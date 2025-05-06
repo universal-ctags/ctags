@@ -1,0 +1,5 @@
+EOF	input.sh	/^cat > input.php <<'EOF'$/;"	h	line:1	end:5
+draw	input.sh	/^<html><head><title>X<\/title><?php function draw($x) {echo "$x";} ?><\/head><body><h1>Y<\/h1><\//;"	f	line:2
+X	input.sh	/^<html><head><title>X<\/title>/;"	j	line:2
+Y	input.sh	/<\/head><body><h1>Y<\/h1><\/body>$/;"	h	line:2
+Z	input.sh	/^<h1>Z<\/h1><\/body>$/;"	h	line:3

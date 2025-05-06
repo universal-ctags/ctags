@@ -1,0 +1,15 @@
+f	input.sh	/^f()$/;"	f	line:1	language:Sh
+EOFA	input.sh	/^cat > foo.xml <<EOFA$/;"	h	line:6	language:Sh	end:15
+g	input.sh	/^g()$/;"	f	line:17	language:Sh
+nsb0d066450101	input.sh	/^       >$/;"	n	line:10	language:XML	uri:https://ctags.io/root
+abc	input.sh	/^       >$/;"	n	line:10	language:XML	uri:https://ctags.io/nosuchthing
+unused	input.sh	/^       >$/;"	n	line:10	language:XML	uri:https://ctags.io/unused
+efg	input.sh	/^<abc:UnKnownTag id="a" xmlns:efg="https:\/\/ctags.io\/nosuchthing2">$/;"	n	line:11	language:XML	uri:https://ctags.io/nosuchthing2
+a	input.sh	/^<abc:UnKnownTag id="a" xmlns:efg="https:\/\/ctags.io\/nosuchthing2">$/;"	i	line:11	language:XML
+b	input.sh	/^  <efg:UnKnownTag2 id="b"\/>$/;"	i	line:12	language:XML
+h	input-0.sh	/^h()$/;"	f	line:1	language:Sh
+EOFB	input-0.sh	/^cat > bar.rmd <<EOFB$/;"	h	line:6	language:Sh	end:18
+i	input-0.sh	/^i()$/;"	f	line:20	language:Sh
+title: example for u-ctags	input-0.sh	/^title: example for u-ctags$/;"	s	line:8	language:Markdown	end:9
+S1	input-0.sh	/^# S1$/;"	c	line:10	language:Markdown	end:13
+S2	input-0.sh	/^# S2$/;"	c	line:14	language:Markdown	end:17

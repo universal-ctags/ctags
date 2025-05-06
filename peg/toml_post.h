@@ -27,7 +27,7 @@ static void markTableEnd (struct parserCtx *auxil, long offset)
 
 	unsigned long lineNumber = (offset == -1)
 		? getInputLineNumber()
-		: getInputLineNumberForFileOffset (offset);
+		: getInputLineNumberForFileOffset (translateFileOffset (offset));
 
 	setTagEndLine(e, ((offset != -1 && lineNumber > 1)
 					  ? lineNumber - 1
@@ -94,7 +94,8 @@ static void tableKeyStart (struct parserCtx *auxil, bool isArrayTable, long offs
 static void tableKeyEnd (struct parserCtx *auxil)
 {
 	tagEntryInfo e;
-	unsigned long lineNumber = getInputLineNumberForFileOffset(auxil->keyOffset);
+	long abs_offset = translateFileOffset (auxil->keyOffset);
+	unsigned long lineNumber = getInputLineNumberForFileOffset (abs_offset);
 	MIOPos filePosition = getInputFilePositionForLine (lineNumber);
 
 	vString *vname = makeVStringFromKeyQueue (auxil->keyQueue);
@@ -142,7 +143,8 @@ static void keyvalStart (struct parserCtx *auxil, long offset)
 static void keyvalKeyEnd (struct parserCtx *auxil)
 {
 	tagEntryInfo e;
-	unsigned long lineNumber = getInputLineNumberForFileOffset(auxil->keyOffset);
+	long abs_offset = translateFileOffset (auxil->keyOffset);
+	unsigned long lineNumber = getInputLineNumberForFileOffset (abs_offset);
 	MIOPos filePosition = getInputFilePositionForLine (lineNumber);
 
 	vString *vname = makeVStringFromKeyQueue (auxil->keyQueue);

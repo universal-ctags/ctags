@@ -17,9 +17,15 @@
 bool forcePromises (void);
 void breakPromisesAfter (int promise);
 int getLastPromise (void);
+
+/* args (startLine): [buggy]
+ * args (startColumn): [buggy]
+ * args (endLine): [buggy]
+ * args (endColumn): [buggy]
+ */
 void runModifiers (int promise,
-				   unsigned long startLine, long startCharOffset,
-				   unsigned long endLine, long endCharOffset,
+				   unsigned long startLine, long startColumn,
+				   unsigned long endLine, long endColumn,
 				   unsigned char *input,
 				   size_t size);
 

@@ -37,7 +37,8 @@ static int makeElmTag (struct parserCtx *auxil, const char *name, long offset, i
 		initRefTagEntry (&e, name, kind, role);
 	}
 
-	unsigned long lineNumber = getInputLineNumberForFileOffset (offset);
+	long abs_offset = translateFileOffset (offset);
+	unsigned long lineNumber = getInputLineNumberForFileOffset (abs_offset);
 	updateTagLine (&e, lineNumber, getInputFilePositionForLine (lineNumber));
 	e.extensionFields.scopeIndex = BASE_SCOPE (auxil);
 	int scope_index = makeTagEntry (&e);

@@ -26,8 +26,10 @@
 
 extern  void updateXMLTagLine (tagEntryInfo *e, xmlNode *node)
 {
-	unsigned long lineNumber = XML_GET_LINE (node);
-	updateTagLine (e, lineNumber, getInputFilePositionForLine (lineNumber));
+	unsigned long abs_line = translateLineNumber (XML_GET_LINE (node));
+	MIOPos rela_pos = getInputFilePositionForLine (abs_line);
+
+	updateTagLine (e, abs_line, rela_pos);
 }
 
 static void simpleXpathMakeTag (xmlNode *node,

@@ -1,0 +1,4 @@
+g	input.md	/^[g]$/;"	t	line:2	end:3
+a	input.md	/^  a = "\/"$/;"	K	line:3	table:g
+m	input.md	/^[m]$/;"	t	line:4	end:5
+b	input.md	/^  b = ""$/;"	K	line:5	table:m

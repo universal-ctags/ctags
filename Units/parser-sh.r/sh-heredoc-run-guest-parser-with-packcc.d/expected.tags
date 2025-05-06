@@ -1,0 +1,6 @@
+j	input.sh	/^j()$/;"	f	line:1	language:Sh
+EOFC	input.sh	/^cat > baz.md <<EOFC$/;"	h	line:6	language:Sh	end:13
+k	input.sh	/^k()$/;"	f	line:15	language:Sh
+T	input.sh	/^## T$/;"	s	line:7	language:Markdown	end:12
+o	input.sh	/^[o]$/;"	t	line:10	language:TOML	end:10
+d	input.sh	/^[d]$/;"	t	line:11	language:TOML	end:11
