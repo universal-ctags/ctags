@@ -72,6 +72,7 @@ static EsObject* builtin_prefix (EsObject *args, DSLEnv *env);
 static EsObject* builtin_suffix (EsObject *args, DSLEnv *env);
 static EsObject* builtin_substr (EsObject *args, DSLEnv *env);
 static EsObject* builtin_member (EsObject *args, DSLEnv *env);
+static EsObject* builtin_list (EsObject *args, DSLEnv *env);
 static EsObject* builtin_downcase (EsObject *args, DSLEnv *env);
 static EsObject* builtin_upcase (EsObject *args, DSLEnv *env);
 static EsObject* builtin_tr (EsObject *args, DSLEnv *env);
@@ -169,6 +170,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(substr? <string:target> <string:substr>) -> <boolean>" },
 	{ "member",  builtin_member, NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(member <any> <list>) -> #f|<list>" },
+	{ "list",    builtin_list, NULL, 0, 0UL,
+	  .helpstr = "(list <any> ...) -> (<any> ...)" },
 	{ "downcase", builtin_downcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(downcase <string>|<list>) -> <string>|<list>" },
 	{ "upcase", builtin_upcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
@@ -855,6 +858,11 @@ static EsObject* builtin_member (EsObject *args, DSLEnv *env)
 	}
 
 	return es_false;
+}
+
+static EsObject* builtin_list (EsObject* args, DSLEnv *env)
+{
+	return args;
 }
 
 static EsObject* caseop (EsObject *o, int (*op)(int))

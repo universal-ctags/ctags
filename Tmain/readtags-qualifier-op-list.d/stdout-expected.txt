@@ -1,0 +1,17 @@
+-Q '(not (member $kind (list "m" "z" "p" "f" "s")))'
+x	input.c	/^int x;$/;"	kind:v	typeref:typename:int
+0
+-Q '(member $kind (list "z" "p"))'
+c	input.c	/^int g (int c)$/;"	kind:z	file:	function:g	typeref:typename:int
+f	input.c	/^extern int f (void);$/;"	kind:p	file:	typeref:typename:int
+0
+-S (<or> (if (and (member $kind (list "s" "v")) (member &kind (list "s" "v"))) (<> $name &name) 0) (<> &name $name))
+s	input.c	/^struct s {$/;"	kind:s	file:
+x	input.c	/^int x;$/;"	kind:v	typeref:typename:int
+k	input.c	/^	int i, j, k;$/;"	kind:m	file:	struct:s	typeref:typename:int
+j	input.c	/^	int i, j, k;$/;"	kind:m	file:	struct:s	typeref:typename:int
+i	input.c	/^	int i, j, k;$/;"	kind:m	file:	struct:s	typeref:typename:int
+g	input.c	/^int g (int c)$/;"	kind:f	typeref:typename:int
+f	input.c	/^extern int f (void);$/;"	kind:p	file:	typeref:typename:int
+c	input.c	/^int g (int c)$/;"	kind:z	file:	function:g	typeref:typename:int
+0

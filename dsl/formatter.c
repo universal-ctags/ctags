@@ -17,20 +17,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-static EsObject* formatter_proc_list (EsObject* args, DSLEnv *env);
-
 /*
  * DATA DEFINITIONS
  */
+#if 0
 static DSLProcBind pbinds [] = {
-	{ "list", formatter_proc_list, NULL, 0, 0UL,
-	  .helpstr = "(list <any> ...) -> (<any> ...)" },
 };
-
-static EsObject* formatter_proc_list (EsObject* args, DSLEnv *env)
-{
-	return args;
-}
+#endif
 
 /*
  * Procs
@@ -42,7 +35,7 @@ static int initialize (void)
 	if (initialized)
 		return 1;
 
-	if (!dsl_init (DSL_FORMATTER, pbinds, sizeof(pbinds)/sizeof(pbinds [0])))
+	if (!dsl_init (DSL_FORMATTER, NULL, 0))
 	{
 		fprintf(stderr, "MEMORY EXHAUSTED\n");
 		return 0;
