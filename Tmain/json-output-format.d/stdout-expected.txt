@@ -86,7 +86,7 @@
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "C", "path": "1.1", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Go", "path": "0.0", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Man", "path": "0.0", "pattern": "current.age"}
-{"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Python", "path": "0.1", "pattern": "current.age"}
+{"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Python", "path": "1.1", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PATTERN_LENGTH_LIMIT", "path": "96", "pattern": "0 for no limit"}
 {"_type": "ptag", "name": "TAG_PROGRAM_AUTHOR", "path": "Universal Ctags Team", "pattern": ""}
 {"_type": "ptag", "name": "TAG_PROGRAM_NAME", "path": "Universal Ctags", "pattern": "Derived from Exuberant Ctags"}

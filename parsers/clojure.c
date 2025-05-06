@@ -174,7 +174,7 @@ extern parserDefinition *ClojureParser (void)
 	def->aliases = aliases;
 	def->parser = findClojureTags;
 	def->useCork = CORK_QUEUE;
-	def->versionCurrent = 0;
+	def->versionCurrent = 1;
 	def->versionAge = 1;
 	return def;
 }

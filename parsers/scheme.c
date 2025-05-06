@@ -122,7 +122,7 @@ extern parserDefinition* SchemeParser (void)
 	def->aliases    = aliases;
 	def->parser     = findSchemeTags;
 	def->useCork = CORK_QUEUE;
-	def->versionCurrent = 0;
+	def->versionCurrent = 1;
 	def->versionAge = 1;
 	return def;
 }

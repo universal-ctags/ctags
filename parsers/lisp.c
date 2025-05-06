@@ -528,7 +528,7 @@ extern parserDefinition* LispParser (void)
 	def->parser     = findLispTags;
 	def->selectLanguage = selectors;
 	def->useCork = CORK_QUEUE;
-	def->versionCurrent = 0;
+	def->versionCurrent = 1;
 	def->versionAge = 1;
 	return def;
 }
@@ -551,7 +551,7 @@ extern parserDefinition* EmacsLispParser (void)
 	def->aliases = aliases;
 	def->parser     = findEmacsLispTags;
 	def->useCork = CORK_QUEUE;
-	def->versionCurrent = 0;
+	def->versionCurrent = 1;
 	def->versionAge = 1;
 	return def;
 }
