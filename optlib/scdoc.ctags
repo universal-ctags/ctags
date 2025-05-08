@@ -1,0 +1,92 @@
+#
+#  Copyright (c) 2025, Red Hat, Inc.
+#  Copyright (c) 2025, Masatake YAMATO
+#
+#  Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+# Reference:
+#  https://git.sr.ht/~sircmpwn/scdoc
+#  https://git.sr.ht/~sircmpwn/scdoc/tree/master/item/scdoc.5.scd
+#
+--langdef=Scdoc
+--map-Scdoc=+.scd
+
+--kinddef-Scdoc=t,title,titles
+--kinddef-Scdoc=s,section,sections
+--kinddef-Scdoc=S,subsection,sub sections
+
+--_scopesep-Scdoc=*/*:""
+
+--_tabledef-Scdoc=init
+--_tabledef-Scdoc=main
+--_tabledef-Scdoc=section
+--_tabledef-Scdoc=fini
+--_tabledef-Scdoc=comment
+--_tabledef-Scdoc=skipline
+
+--_sequel-Scdoc={{
+    clear
+}}
+
+#
+# comment
+#
+--_mtable-regex-Scdoc=comment/;([^\n]*[\n]|[^\n]+)//
+
+#
+# skipline
+#
+--_mtable-regex-Scdoc=skipline/[^\n]*\n//
+--_mtable-regex-Scdoc=skipline/[^\n]+//
+
+#
+# init
+#
+--_mtable-extend-Scdoc=init+comment
+--_mtable-regex-Scdoc=init/([^\( ]+)\([^\n]*[\n]?/\1/t/{scope=push}{tenter=main}{{
+   .
+}}
+--_mtable-extend-Scdoc=init+skipline
+
+#
+# main
+#
+--_mtable-regex-Scdoc=main/##([^\n]*\n|[^\n]+)//
+--_mtable-regex-Scdoc=main/#[ \t]*([^\n]+)[ ]*[\n]?/\1/s/{scope=push}{tenter=section}{{
+   count 2 eq { @1 _matchloc2line 1 sub end: } if
+   .
+}}
+--_mtable-extend-Scdoc=main+skipline
+# EOF
+--_mtable-regex-Scdoc=main/()//{scope=pop}{_advanceTo=0start}{tleave}
+
+#
+# section
+#
+--_mtable-regex-Scdoc=section/##[ \t]*([^\n]+)[ ]*[\n]?/\1/S/{scope=ref}{{
+   count 3 eq { @1 _matchloc2line 1 sub end: } if
+   .
+}}
+--_mtable-regex-Scdoc=section/#[ \t]*([^\n]+)[ ]*[\n]?//{scope=pop}{_advanceTo=0start}{tleave}{{
+   count 3 eq { @1 _matchloc2line 1 sub end: } if
+}}
+--_mtable-extend-Scdoc=section+skipline
+# EOF
+--_mtable-regex-Scdoc=section/()//{scope=pop}{_advanceTo=0start}{tleave}{{
+   count 3 eq { @1 _matchloc2line end: } if
+}}

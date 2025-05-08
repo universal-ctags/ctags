@@ -1,0 +1,17 @@
+SCDOC	input.scd	/^SCDOC(5)$/;"	t	line:1	end:213
+NAME	input.scd	/^# NAME$/;"	s	line:3	title:SCDOC	end:6
+SYNTAX	input.scd	/^# SYNTAX$/;"	s	line:7	title:SCDOC	end:200
+Preamble	input.scd	/^## Preamble$/;"	S	line:11	section:SCDOC""SYNTAX	end:23
+Section headers	input.scd	/^## Section headers$/;"	S	line:24	section:SCDOC""SYNTAX	end:33
+Paragraphs	input.scd	/^## Paragraphs$/;"	S	line:34	section:SCDOC""SYNTAX	end:37
+Line breaks	input.scd	/^## Line breaks$/;"	S	line:38	section:SCDOC""SYNTAX	end:44
+Formatting	input.scd	/^## Formatting$/;"	S	line:45	section:SCDOC""SYNTAX	end:49
+Indentation	input.scd	/^## Indentation$/;"	S	line:50	section:SCDOC""SYNTAX	end:61
+Lists	input.scd	/^## Lists$/;"	S	line:62	section:SCDOC""SYNTAX	end:98
+Numbered lists	input.scd	/^## Numbered lists$/;"	S	line:99	section:SCDOC""SYNTAX	end:115
+Tables	input.scd	/^## Tables$/;"	S	line:116	section:SCDOC""SYNTAX	end:173
+Literal text	input.scd	/^## Literal text$/;"	S	line:174	section:SCDOC""SYNTAX	end:192
+Comments	input.scd	/^## Comments$/;"	S	line:193	section:SCDOC""SYNTAX	end:200
+CONVENTIONS	input.scd	/^# CONVENTIONS$/;"	s	line:201	title:SCDOC	end:204
+SEE ALSO	input.scd	/^# SEE ALSO$/;"	s	line:205	title:SCDOC	end:208
+AUTHORS	input.scd	/^# AUTHORS$/;"	s	line:209	title:SCDOC	end:213

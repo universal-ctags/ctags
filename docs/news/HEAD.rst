@@ -45,6 +45,7 @@ New parsers
 * SELinuxIntefae *M4 based subparser*
 * SELinuxTypeEnforcement *optlib*
 * PythonEntryPoints *subparser*
+* Scdoc *optlib*
 
 Changes about parser specific kinds, roles, fields, and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
