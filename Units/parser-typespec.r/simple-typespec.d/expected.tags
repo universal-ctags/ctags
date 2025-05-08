@@ -1,0 +1,11 @@
+Name.Space	input.tsp	/^namespace Name.Space;$/;"	n
+Versions	input.tsp	/^enum Versions {$/;"	g
+OpA	input.tsp	/^op OpA<T extends TypeSpec.Reflection.Model> is OpB<$/;"	o
+InterfaceA	input.tsp	/^interface InterfaceA extends InterfaceB {$/;"	i
+opA	input.tsp	/^  opA is OpA<{$/;"	p
+opB	input.tsp	/^    opB: url;$/;"	p
+UnionA	input.tsp	/^union UnionA {$/;"	u
+ModelA	input.tsp	/^model ModelA {$/;"	m
+contentA	input.tsp	/^  contentA: ModelB;$/;"	p
+contentB	input.tsp	/^  contentB?: boolean;$/;"	p
+AliasA	input.tsp	/^alias AliasA<$/;"	a
