@@ -310,7 +310,6 @@ static roleDefinition VUnknownRoles [COUNT_UNKNOWN_ROLE] = {
 };
 
 typedef enum {
-	KIND_NONE = -1,
 	KIND_FUNCTION,
 	KIND_MODULE,
 	KIND_VARIABLE,
@@ -1538,7 +1537,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 						vString *const access, kindType kind)
 {
 	Assert (kind == KIND_FUNCTION || kind == KIND_METHOD ||
-			kind == KIND_ALIAS || kind == KIND_NONE);
+			kind == KIND_ALIAS || kind == KIND_GHOST_INDEX);
 	Assert (kind == KIND_METHOD || isKeyword (token, KEYWORD_fn));
 	PARSER_PROLOGUE (kind == KIND_FUNCTION? "fndef" :
 					 (kind == KIND_METHOD? "method" :
@@ -1590,7 +1589,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 			skipToToken (TOKEN_CLOSE_PAREN, NULL);
 	}
 	// name
-	if ((kind == KIND_NONE && (
+	if ((kind == KIND_GHOST_INDEX && (
 			 isToken (token, TOKEN_IDENT, TOKEN_TYPE) ||
 			 isKeyword (token, KEYWORD_TYPE))) ||
 		(kind == KIND_FUNCTION && (
@@ -1611,7 +1610,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 		readToken (token);
 	}
 	// closure args
-	if (kind == KIND_NONE && name == NULL &&
+	if (kind == KIND_GHOST_INDEX && name == NULL &&
 		isToken (token, TOKEN_OPEN_SQUARE))
 	{
 		vStringPut (argList, '[');
@@ -1621,7 +1620,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 	}
 	// template args
 	if ((kind == KIND_FUNCTION ||
-		 (kind == KIND_NONE && name == NULL)) &&
+		 (kind == KIND_GHOST_INDEX && name == NULL)) &&
 		isToken (token, TOKEN_OPEN_SQUARE))
 	{
 		vStringPut (argList, '[');
@@ -1666,7 +1665,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 		int newScope = CORK_NIL;
 		if (name || kind == KIND_METHOD)
 		{
-			kindType realKind = kind == KIND_NONE? KIND_FUNCTION : kind;
+			kindType realKind = kind == KIND_GHOST_INDEX? KIND_FUNCTION : kind;
 			int realScope = name?
 				lookupQualifiedName (fnToken, name, scope, NULL) : scope;
 			newScope = makeFnTag (fnToken, name, realKind, realScope,
@@ -1677,7 +1676,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 				makeTag (rxToken, NULL, KIND_RECEIVER, newScope);
 		}
 		// block
-		if ((kind == KIND_NONE && expectToken (token, TOKEN_OPEN_CURLY)) ||
+		if ((kind == KIND_GHOST_INDEX && expectToken (token, TOKEN_OPEN_CURLY)) ||
 			(kind == KIND_FUNCTION && isToken (token, TOKEN_OPEN_CURLY)))
 		{
 			int lineNumber = parseBlock (token, newScope, false);
@@ -1685,7 +1684,7 @@ static void parseFunction (tokenInfo *const token, int scope,
 			if (entry)
 				setTagEndLine (entry, lineNumber);
 			// fncall
-			if (kind == KIND_NONE)
+			if (kind == KIND_GHOST_INDEX)
 			{
 				readToken (token);
 				if (isToken (token, TOKEN_OPEN_PAREN))
@@ -1944,7 +1943,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 		(kind == KIND_STRUCT && isKeyword (token, KEYWORD_struct)) ||
 		(kind == KIND_INTERFACE && isKeyword (token, KEYWORD_interface)) ||
 		(kind == KIND_UNION && isKeyword (token, KEYWORD_union)) ||
-		(kind == KIND_NONE && isKeyword (token, KEYWORD_struct, KEYWORD_union)));
+		(kind == KIND_GHOST_INDEX && isKeyword (token, KEYWORD_struct, KEYWORD_union)));
 	PARSER_PROLOGUE (kind == KIND_INTERFACE? "iface" :
 					 (kind == KIND_UNION? "union" :
 					  (kind == KIND_STRUCT? "struct" : "anon")));
@@ -1956,14 +1955,14 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 	if ((kind == KIND_STRUCT || kind == KIND_INTERFACE) && PS->isBuiltin &&
 		scope == CORK_NIL && isKeyword (token, KEYWORD_TYPE, KEYWORD_map))
 		readToken (token);
-	else if ((kind != KIND_NONE && expectToken (token, TOKEN_TYPE)) ||
-			 (kind == KIND_NONE && isToken (token, TOKEN_TYPE)))
+	else if ((kind != KIND_GHOST_INDEX && expectToken (token, TOKEN_TYPE)) ||
+			 (kind == KIND_GHOST_INDEX && isToken (token, TOKEN_TYPE)))
 	{
 		parseFullyQualified (token, true);
 		if (expectToken (token, TOKEN_TYPE, TOKEN_EXTERN))
 		{
 			scope = lookupQualifiedName (token, NULL, scope, false);
-			kindType realKind = kind == KIND_NONE? KIND_STRUCT : kind;
+			kindType realKind = kind == KIND_GHOST_INDEX? KIND_STRUCT : kind;
 			newScope = makeTagEx (token, NULL, realKind, scope, access);
 			makeForeignDeclTagMaybe (token, NULL, realKind, scope);
 			registerEntry (newScope);
@@ -2093,7 +2092,7 @@ static void parseStruct (tokenInfo *const token, vString *const access,
 		vStringDelete (fieldAccess);
 	}
 
-	if (kind != KIND_NONE)
+	if (kind != KIND_GHOST_INDEX)
 	{
 		tagEntryInfo *entry = getEntryInCorkQueue (newScope);
 		if (entry)
@@ -2264,7 +2263,7 @@ static bool parseVType (tokenInfo *const token, vString *const capture,
 	}
 	else if (isKeyword (token, KEYWORD_struct, KEYWORD_union))
 	{
-		parseStruct (token, NULL, scope, KIND_NONE);
+		parseStruct (token, NULL, scope, KIND_GHOST_INDEX);
 		canInit = true;
 	}
 	else if (isKeyword (token, KEYWORD_fn) && !token->onNewline)
@@ -2663,7 +2662,7 @@ static bool parseExpression (tokenInfo *const token, int scope,
 	else if (isKeyword (token, KEYWORD_sql))
 		parseSql (token, scope);
 	else if (isKeyword (token, KEYWORD_fn))
-		parseFunction (token, scope, NULL, KIND_NONE);
+		parseFunction (token, scope, NULL, KIND_GHOST_INDEX);
 	else if (isKeyword (token, KEYWORD_if, KEYWORD_Sif))
 		parseIf (token, scope);
 	else if (isKeyword (token, KEYWORD_match))
