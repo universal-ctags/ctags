@@ -28,4 +28,5 @@
 
 --regex-hello=/^end//{{
 	(hello) pstack
+	clear
 }}

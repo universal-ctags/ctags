@@ -2242,6 +2242,12 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
 {
 	scriptEvalHook (optvm, lcb, SCRIPT_HOOK_SEQUEL);
+	unsigned int garbage;
+	if ((garbage = opt_vm_ostack_count (optvm)) > 0)
+		error (WARNING, "[%s] %u objects are left on the operand stack: %s",
+			   getLanguageName (lcb->owner), garbage,
+			   getInputFileName ());
+
 	set_current_lcb (optvm, NULL);
 	opt_vm_clear (optvm, false);
 	opt_dict_clear (lcb->local_dict);
