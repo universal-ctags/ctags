@@ -1098,7 +1098,6 @@ Listing Options
 		How this field can be accessed from optscript code.
 		This field is for Universal Ctags developers.
 
-
 	DESCRIPTION
 		Human readable description for the field.
 
