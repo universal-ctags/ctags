@@ -8,10 +8,10 @@ jobs:
   #
   # We assume GNU Make is available.
   #
-   fedora41_gmake:
+   fedora42_gmake:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:41
+       - image: docker.io/fedora:42
      steps:
        - run:
            name: Install Git, Gdb and Procps-NG
@@ -21,7 +21,7 @@ jobs:
        - run:
            name: Install tools for building ctags and validating test input files
            command: |
-             dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
+             dnf -y install awk gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
              dnf -y install jq puppet python3-sphinx
              # These are for input-validation.
              dnf -y install g++ jq puppet nodejs gcc-gfortran gcc-gnat
@@ -44,10 +44,10 @@ jobs:
              cd docs
              make html
 
-   fedora41_gmake_roundtrip:
+   fedora42_gmake_roundtrip:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:41
+       - image: docker.io/fedora:42
      steps:
        - run:
            name: Install Git and Gdb
@@ -57,7 +57,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-             dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
+             dnf -y install awk gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
              dnf -y install jq puppet
        - run:
            name: Build
@@ -136,10 +136,10 @@ jobs:
            command: |
              MAKE=bmake bmake roundtrip
 
-   fedora41_distcheck:
+   fedora42_distcheck:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:41
+       - image: docker.io/fedora:42
      steps:
        - run:
            name: Install Git, Gdb and Procps-NG
@@ -149,7 +149,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-             dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo pcre2-devel
+             dnf -y install awk gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo pcre2-devel
              dnf -y install jq puppet python3-docutils
        - run:
            name: Run autogen.sh
@@ -336,11 +336,11 @@ workflows:
     jobs:
       - ubuntu20_32bit
       - fedora30_bmake
-      - fedora41_distcheck
+      - fedora42_distcheck
       - stream10
       - stream9
-      - fedora41_gmake
+      - fedora42_gmake
       - fedora33_cross_aarch64
       - ubuntu20_mingw
       - fedora30_bmake_roundtrip
-      - fedora41_gmake_roundtrip
+      - fedora42_gmake_roundtrip
