@@ -84,7 +84,7 @@ typedef enum eFieldDataType {
  * as a VALUE for the specified field.
  *
  * The VALUE is interpreted very differently depending on the output
- * format: ctags, xref, and json. See field.h.
+ * format: ctags, xref, and json.
  *
  * For FIELDTYPE_STRING
  * --------------------
@@ -115,12 +115,11 @@ typedef enum eFieldDataType {
  *
  * For FIELDTYPE_STRING|FIELDTYPE_BOOL
  * -----------------------------------
- * If the value points "" (empty C string), the json writer prints it as
- * false, and the xref writer prints it as -.
- * THEREFORE, in the xref format, there is no way to distinguish the
- * output for the value "" and "-". Both are printed as "-".
- * If the value points a non-empty C string, Both json writer and xref
- * writers print it as-is.
+ * If a field holds "" (empty C string), the json writer prints it as
+ * false, and the xref writer prints it as -.  In the xref format,
+ * there is no way to distinguish the output for the value "" and
+ * "-". Both are printed as "-".  If the value is a non-empty C
+ * string, Both json writer and xref writer print it as-is.
  *
  * Consider if you set "str" to the field "foo":
  *
@@ -149,11 +148,11 @@ typedef enum eFieldDataType {
  *
  * For FIELDTYPE_BOOL
  * ------------------
- * Either VALUE points "" (empty C string) or a non-epmty C string,
- * the json writer always prints true. In the same condition, the xref
- * writer always prints the name of field.
+ * Whether a field holds "" (an empty C string) or a non-epmty C string,
+ * the json writer prints it as true. In the same condition, the xref
+ * writer prints the name of the field.
  *
- * If a value is not set, the field is treated as holding false.
+ * If a value is not set, the field is treated as if it holds false.
  * The json writer prints nothing for the field holding false.
  * The xref writer prints - for the field holding false.
 
@@ -184,9 +183,9 @@ typedef enum eFieldDataType {
  *
  * For FIELDTYPE_INTEGER
  * ---------------------
- * If the value points "" (empty C string), the all writers print it as
- * 0. If the value points a string which cannot be converted to an integer with
- * strtol(3), the all writers print it as 1.
+ * If a field holds "" (an empty C string), the all writers print it as
+ * 0. If a field holds a string that strtol(3) cannot convert to an integer,
+ * all the writers print it as 1.
  *
  * Consider if you set "99" to the field "foo":
  *
@@ -221,7 +220,7 @@ typedef enum eFieldDataType {
  *   json | (nothing)
  *
  *
- * The other data type and the combination of types are not implemented yet.
+ * The other data types and the combinations of types are not implemented yet.
  *
  */
 
