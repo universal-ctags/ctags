@@ -225,6 +225,7 @@ static void initializeManParser (const langType language)
 extern parserDefinition* ManParser (void)
 {
 	static const char *const extensions [] = {
+		"man",
 		"1",
 		"2",
 		"3",
