@@ -126,6 +126,7 @@ struct sParserDefinition {
 	tagXpathTableTable *tagXpathTableTable;
 	unsigned int tagXpathTableCount;
 	bool invisible;
+	bool enabled;	       /* currently enabled? */
 	fieldDefinition *fieldTable;
 	unsigned int fieldCount;
 	xtagDefinition *xtagTable;
@@ -149,7 +150,6 @@ struct sParserDefinition {
 
 	/* used internally */
 	langType id;		    /* id assigned to language */
-	unsigned int enabled:1;	       /* currently enabled? */
 	unsigned int traced:1;
 };
 
