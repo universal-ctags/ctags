@@ -1,3 +1,5 @@
+--languages=+TOML
+
 --sort=no
 --fields=+ne
 --extras=+g

@@ -243,7 +243,9 @@ extern parserDefinition* TomlParser (void)
 	def->extensions = extensions;
 	def->parser     = findTomlTags;
 	def->useCork    = true;
-	def->enabled    = true;
 	def->requestAutomaticFQTag = false;
+
+	def->enabled    = false;	/* This parser is broken. */
+
 	return def;
 }

@@ -40,11 +40,16 @@ Parser related changes
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* TOML *peg/packcc*
-* Cargo *TOML based subparser*
 * SELinuxIntefae *M4 based subparser*
 * SELinuxTypeEnforcement *optlib*
 * PythonEntryPoints *subparser*
+
+.. note:: We added a TOML as a new parser in this version. However,
+		  after adding it, we learned its implementation didn't work
+		  entirely. So we deleted the TOML parser, and Cargo subparser
+		  runs on the TOML parser from this "New parsers" list.
+		  See `TOML: infinite loop <https://github.com/universal-ctags/ctags/issues/4096>`__
+		  about how it doesn't work.
 
 Changes about parser specific kinds, roles, fields, and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
