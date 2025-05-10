@@ -1,0 +1,4 @@
+foo	input.scd	/^foo(1)$/;"	t	line:1	end:10
+a	input.scd	/^# a$/;"	s	line:6	title:foo	end:7
+c	input.scd	/^# c$/;"	s	line:8	title:foo	end:10
+b	input.scd	/^## b$/;"	S	line:10	section:foo""c	end:10

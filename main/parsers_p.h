@@ -176,6 +176,7 @@
 	ShParser, \
 	SlangParser, \
 	SmlParser, \
+	ScdocParser, \
 	SqlParser, \
 	SystemdUnitParser, \
 	SystemTapParser, \

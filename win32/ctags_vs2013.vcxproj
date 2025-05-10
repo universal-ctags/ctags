@@ -254,6 +254,7 @@
     <ClCompile Include="..\optlib\puppetManifest.c" />
     <ClCompile Include="..\optlib\qemuhx.c" />
     <ClCompile Include="..\optlib\rpmMacros.c" />
+    <ClCompile Include="..\optlib\scdoc.c" />
     <ClCompile Include="..\optlib\scss.c" />
     <ClCompile Include="..\optlib\selinux-type-enforcement.c" />
     <ClCompile Include="..\optlib\systemtap.c" />

@@ -246,6 +246,7 @@ OPTLIB2C_INPUT = \
 	optlib/qemuhx.ctags			\
 	optlib/rpmMacros.ctags			\
 	optlib/selinux-type-enforcement.ctags	\
+	optlib/scdoc.ctags			\
 	optlib/scss.ctags			\
 	optlib/systemtap.ctags			\
 	optlib/terraform.ctags			\

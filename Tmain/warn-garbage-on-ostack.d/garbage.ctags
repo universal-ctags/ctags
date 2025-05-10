@@ -1,0 +1,7 @@
+--langdef=Garbage
+--map-Garbage=.garbage
+
+--regex-Garbage=/a//{{
+  /garbage0
+  (garbage1)
+}}
