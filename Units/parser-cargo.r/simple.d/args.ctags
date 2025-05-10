@@ -1,4 +1,6 @@
 --languages=-TOML
+--languages=+Cargo
+
 --map-Cargo=.cargo
 --sort=no
 --fields=+lK

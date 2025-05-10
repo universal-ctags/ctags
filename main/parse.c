@@ -1813,6 +1813,22 @@ extern void enableLanguage (const langType language, const bool state)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	LanguageTable [language].def->enabled = state;
+
+	static bool warned_toml;
+	static bool warned_cargo;
+
+	/* See #4096 */
+	if (!warned_toml && strcmp (LanguageTable [language].def->name, "TOML") == 0)
+	{
+		warned_toml = true;
+		error (WARNING, "The current implementation of the TOML parser is broken.");
+	}
+
+	if (!warned_cargo && strcmp (LanguageTable [language].def->name, "Cargo") == 0)
+	{
+		warned_cargo = true;
+		error (WARNING, "Enabling Cargo subparser may enable TOML parser.");
+	}
 }
 
 #ifdef DO_TRACING

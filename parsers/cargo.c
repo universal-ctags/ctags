@@ -136,5 +136,8 @@ extern parserDefinition* CargoParser (void)
 	def->patterns   = patterns;
 	def->parser     = findCargoTags;
 	def->useCork    = CORK_QUEUE;
+
+	def->enabled = false;		/* The base parser, TOML parser doesn't work well. */
+
 	return def;
 }

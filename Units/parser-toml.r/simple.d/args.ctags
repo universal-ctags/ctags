@@ -1,2 +1,4 @@
+--languages=+TOML
+
 --sort=no
 --fields=+K{nth}{end}{line}
