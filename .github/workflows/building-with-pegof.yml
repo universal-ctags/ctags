@@ -45,8 +45,8 @@ jobs:
       - run: ./ctags --list-features | grep pegof
 
       - run: |
-          echo "Targets: $(./ctags --list-languages=_packcc |  tr '\n' ',')"
-      - run: make units LANGUAGES="$(./ctags --list-languages=_packcc |  tr '\n' ',')"
+          echo "Targets: $(./ctags --list-languages=_packcc |  while read LANG REST; do echo "$LANG"; done | tr '\n' ',')"
+      - run: make units LANGUAGES="$(./ctags --list-languages=_packcc |  while read LANG REST; do echo "$LANG"; done | tr '\n' ',')"
       - run: make dist
         # See EXTRA_DIST in Makefile.am.
         # Currently we add .pego files.
