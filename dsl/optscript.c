@@ -271,6 +271,8 @@ static EsObject* op__print_objdict_rec (OptVM *vm, EsObject *name);
 static EsObject* op__print_objdict     (OptVM *vm, EsObject *name);
 static EsObject* op__print_object      (OptVM *vm, EsObject *name);
 static EsObject* op__print             (OptVM *vm, EsObject *name);
+static EsObject* op__print_object_nonl (OptVM *vm, EsObject *name);
+static EsObject* op__print_nonl        (OptVM *vm, EsObject *name);
 static EsObject* op__make_array        (OptVM *vm, EsObject *name);
 static EsObject* op__make_dict         (OptVM *vm, EsObject *name);
 
@@ -473,6 +475,9 @@ opt_init (void)
 	defOP (opt_system_dict, op__print_objdict,    "===",  1,  "any === -");
 	defOP (opt_system_dict, op__print_object,     "==",   1,  "any == -");
 	defOP (opt_system_dict, op__print,            "=",    1,  "any = -");
+
+	defOP (opt_system_dict, op__print_object_nonl,"==+",  1,  "any ==+ -");
+	defOP (opt_system_dict, op__print_nonl,       "=+",   1,  "any =+ -");
 
 	defOP (opt_system_dict, op_mark,           "<<",  0,  "- << mark");
 	defOP (opt_system_dict, op_mark,           "[",   0,  "- [ mark");
@@ -2419,21 +2424,23 @@ mark_es_equal (const void *a, const void *b)
 /*
  * Operator implementations
  */
-#define GEN_PRINTER(NAME, BODY)								\
+#define GEN_PRINTER(NAME, BODY,NL)							\
 	static EsObject*										\
 	NAME(OptVM *vm, EsObject *name)							\
 	{														\
 		EsObject * elt = ptrArrayRemoveLast (vm->ostack);	\
 		BODY;												\
-		mio_putc (vm->out, '\n');							\
+		if (NL) mio_putc (vm->out, '\n');					\
 		es_object_unref (elt);								\
 		return es_false;									\
 	}
 
-GEN_PRINTER(op__print_objdict_rec, vm_print_full (vm, elt, false, 10))
-GEN_PRINTER(op__print_objdict,     vm_print_full (vm, elt, false, 1))
-GEN_PRINTER(op__print_object,      vm_print_full (vm, elt, false, 0))
-GEN_PRINTER(op__print,             vm_print_full (vm, elt, true,  0))
+GEN_PRINTER(op__print_objdict_rec, vm_print_full (vm, elt, false, 10), true)
+GEN_PRINTER(op__print_objdict,     vm_print_full (vm, elt, false, 1),  true)
+GEN_PRINTER(op__print_object,      vm_print_full (vm, elt, false, 0),  true)
+GEN_PRINTER(op__print,             vm_print_full (vm, elt, true,  0),  true)
+GEN_PRINTER(op__print_object_nonl, vm_print_full (vm, elt, false, 0),  false)
+GEN_PRINTER(op__print_nonl,        vm_print_full (vm, elt, true,  0),  false)
 
 static EsObject*
 op__make_array (OptVM *vm, EsObject *name)
