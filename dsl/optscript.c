@@ -472,7 +472,7 @@ opt_init (void)
 	defOP (opt_system_dict, op__print_objdict_rec,"====", 1,  "any === -");
 	defOP (opt_system_dict, op__print_objdict,    "===",  1,  "any === -");
 	defOP (opt_system_dict, op__print_object,     "==",   1,  "any == -");
-	defOP (opt_system_dict, op__print,            "=",    1,  "any == -");
+	defOP (opt_system_dict, op__print,            "=",    1,  "any = -");
 
 	defOP (opt_system_dict, op_mark,           "<<",  0,  "- << mark");
 	defOP (opt_system_dict, op_mark,           "[",   0,  "- [ mark");
