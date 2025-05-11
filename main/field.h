@@ -336,16 +336,16 @@ struct sFieldDefinition {
 
 	bool (* isValueAvailable) (const tagEntryInfo *const, const fieldDefinition *);
 
-	const char * getterValueType;
+	const char * getterValueType; /* used in --_list-operators */
 	struct _EsObject * (* getValueObject) (const tagEntryInfo *, const fieldDefinition *);
-	const char * setterValueType;
+	const char * setterValueType; /* used in --_list-operators */
 
 	/* Return es_false if passed value is acceptable.
 	   Return an error object is unacceptable. */
 	struct _EsObject * (* checkValueForSetter) (const fieldDefinition *, const struct _EsObject *);
 	struct _EsObject * (* setValueObject) (tagEntryInfo *, const fieldDefinition *, const struct _EsObject *);
 
-	fieldDataType dataType; /* used in json output */
+	fieldDataType dataType; /* used in json output. See OP column in --list-fields. */
 
 	unsigned int ftype;	/* Given from the main part */
 };
