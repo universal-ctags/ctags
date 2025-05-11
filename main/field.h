@@ -77,6 +77,17 @@ typedef enum eFieldDataType {
 
 	/* used in --list-fields */
 	FIELDTYPE_END_MARKER = 1 << 3,
+
+	/* If you want to allow a field to be accessed from code
+	 * written in optscript, append FIELDTYPE_SCRIPTABLE to
+	 * dataType member of the field's fieldDefinition.
+	 *
+	 * For the field defined in optlib, set {datatype=TYPE} flag to
+	 * --_fielddef-<LANG>=... option. Just specifying a type is
+	 * enough; FIELDTYPE_SCRIPTABLE is automatically append to the
+	 * filed definition. If you don't set the flag explicitly,
+	 * FIELDTYPE_SCRIPTABLE is not appended. */
+	FIELDTYPE_SCRIPTABLE = FIELDTYPE_END_MARKER,
 } fieldDataType;
 /* Interpretation of VALUE of field
  *
@@ -84,133 +95,203 @@ typedef enum eFieldDataType {
  * as a VALUE for the specified field.
  *
  * The VALUE is interpreted very differently depending on the output
- * format: ctags, xref, and json. See field.h.
+ * format: ctags, xref, and json.
  *
  * For FIELDTYPE_STRING
- * --------------------
+ * =====================================================================
+ *
+ * output and getter
+ * ---------------------------------------------------------------------
+ *
  * Consider if you set "str" to the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | foo:str
  *   xref | str
  *   json | "foo": "str"
+ * -------+-------------
+ *   :foo | (foo) => (foo) true
  *
  * Consider if you set "" to the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | foo:
  *   xref | (nothing)
  *   json | "foo": ""
+ * -------+-------------
+ *   :foo | () => () true
  *
  * Consider if you don't set the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | (nothing)
  *   xref | (nothing)
  *   json | (nothing)
+ * -------+-------------
+ *   :foo | null => false
+ *
+ * setter
+ * ---------------------------------------------------------------------
+ *
+ *     stack | C sting stored to the field
+ * ----------+----------------------------
+ *   . (str) | "str"
+ *      . () | ""
+ *  . object | ERROR:typecheck
  *
  *
  * For FIELDTYPE_STRING|FIELDTYPE_BOOL
- * -----------------------------------
- * If the value points "" (empty C string), the json writer prints it as
- * false, and the xref writer prints it as -.
- * THEREFORE, in the xref format, there is no way to distinguish the
- * output for the value "" and "-". Both are printed as "-".
- * If the value points a non-empty C string, Both json writer and xref
- * writers print it as-is.
+ * =====================================================================
+ *
+ * output and getter
+ * ---------------------------------------------------------------------
+ *
+ * If a field holds "" (empty C string), the json writer prints it as
+ * false, and the xref writer prints it as -.  In the xref format,
+ * there is no way to distinguish the output for the value "" and
+ * "-". Both are printed as "-".  If the value is a non-empty C
+ * string, Both json writer and xref writer print it as-is.
  *
  * Consider if you set "str" to the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | foo:str
  *   xref | str
  *   json | "foo": "str"
+ * -------+-------------
+ *   :foo | (str) => (str) true
  *
  * Consider if you set "" to the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | foo:
  *   xref | - (as specified as FIELD_NULL_LETTER_CHAR/FIELD_NULL_LETTER_STRING)
  *   json | "foo": false
+ * -------+-------------
+ *   :foo | false => false true
  *
  * Consider if you don't set the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | (nothing)
  *   xref | (nothing)
  *   json | (nothing)
+ * -------+-------------
+ *   :foo | null => false
+ *
+ * setter
+ * ---------------------------------------------------------------------
+ *
+ *     stack | C sting stored to the field
+ * ----------+----------------------------
+ *   . (str) | "str"
+ *      . () | ""
+ *   . false | ""
+ *    . true | ERROR:typecheck
+ *  . object | ERROR:typecheck
  *
  *
  * For FIELDTYPE_BOOL
- * ------------------
- * Either VALUE points "" (empty C string) or a non-epmty C string,
- * the json writer always prints true. In the same condition, the xref
- * writer always prints the name of field.
+ * =====================================================================
  *
- * If a value is not set, the field is treated as holding false.
+ * output and getter
+ * ---------------------------------------------------------------------
+ *
+ * Whether a field holds "" (an empty C string) or a non-epmty C string,
+ * the json writer prints it as true. In the same condition, the xref
+ * writer prints the name of the field.
+ *
+ * If a value is not set, the field is treated as if it holds false.
  * The json writer prints nothing for the field holding false.
  * The xref writer prints - for the field holding false.
 
  * Consider if you set "str" to the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | foo:
  *   xref | foo
  *   json | "foo": true
+ * -------+-------------
+ *   :foo | true => true true
  *
  * Consider if you set "" to the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | foo:
  *   xref | foo
  *   json | "foo": true
+ * -------+-------------
+ *   :foo | true => true true
  *
  * Consider if you don't set the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | (nothing)
  *   xref | - (as specified as FIELD_NULL_LETTER_CHAR/FIELD_NULL_LETTER_STRING)
  *   json | (nothing)
+ * -------+-------------
+ *   :foo | null => false
+ *
+ * setter
+ * ---------------------------------------------------------------------
+ *
+ *     stack | C sting stored to the field
+ * ----------+----------------------------
+ *   . false | do nothing if the field was not set.
+ *           | ERROR:fieldreset if the field was already set.
+ *           |                  This is a limit of current implementation.
+ *    . true | ""
+ *  . object | ERROR:typecheck
  *
  *
  * For FIELDTYPE_INTEGER
- * ---------------------
- * If the value points "" (empty C string), the all writers print it as
- * 0. If the value points a string which cannot be converted to an integer with
- * strtol(3), the all writers print it as 1.
+ * =====================================================================
+ *
+ * output and getter
+ * ---------------------------------------------------------------------
+ *
+ * If a field holds "" (an empty C string), the all writers print it as
+ * 0. If a field holds a string that strtol(3) cannot convert to an integer,
+ * all the writers print it as 1.
  *
  * Consider if you set "99" to the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | foo:99
  *   xref | 99
  *   json | "foo": 99
- *
+ * -------+-------------
+ *   :foo | 99 => 99 true
+
  * Consider if you set "str" to the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | foo:1
  *   xref | 1
  *   json | "foo": 1
- *
+ * -------+-------------
+ *   :foo | 1 => 1 true
+
  * Consider if you set "" to the field "foo":
  *
  * WRITER | OUTPUT
- * -------+-----------
+ * -------+-------------
  *  ctags | foo:0
  *   xref | 0
  *   json | "foo": 0
+ * -------+-------------
+ *   :foo | 0 => 0 true
  *
  * Consider if you don't set the field "foo":
  *
@@ -219,9 +300,20 @@ typedef enum eFieldDataType {
  *  ctags | (nothing)
  *   xref | (nothing)
  *   json | (nothing)
+ * -------+-------------
+ *   :foo | null => false
+ *
+ * setter
+ * ---------------------------------------------------------------------
+ *
+ *     stack | C sting stored to the field
+ * ----------+----------------------------
+ *     . int | int
+ *       . 1 | "1" (as an example)
+ *  . object | ERROR:typecheck
  *
  *
- * The other data type and the combination of types are not implemented yet.
+ * The other data types and the combinations of types are not implemented yet.
  *
  */
 
@@ -244,16 +336,16 @@ struct sFieldDefinition {
 
 	bool (* isValueAvailable) (const tagEntryInfo *const, const fieldDefinition *);
 
-	const char * getterValueType;
+	const char * getterValueType; /* used in --_list-operators */
 	struct _EsObject * (* getValueObject) (const tagEntryInfo *, const fieldDefinition *);
-	const char * setterValueType;
+	const char * setterValueType; /* used in --_list-operators */
 
 	/* Return es_false if passed value is acceptable.
 	   Return an error object is unacceptable. */
 	struct _EsObject * (* checkValueForSetter) (const fieldDefinition *, const struct _EsObject *);
 	struct _EsObject * (* setValueObject) (tagEntryInfo *, const fieldDefinition *, const struct _EsObject *);
 
-	fieldDataType dataType; /* used in json output */
+	fieldDataType dataType; /* used in json output. See OP column in --list-fields. */
 
 	unsigned int ftype;	/* Given from the main part */
 };
@@ -264,5 +356,9 @@ struct sFieldDefinition {
 */
 
 extern bool isFieldEnabled (fieldType type);
+
+extern bool isValueAvailableGeneric (const tagEntryInfo *const tag, const fieldDefinition *fdef);
+extern struct _EsObject* getFieldValueGeneric (const tagEntryInfo *tag, const fieldDefinition *fdef);
+extern struct _EsObject* setFieldValueGeneric (tagEntryInfo *tag, const fieldDefinition *fdef, const struct _EsObject *obj);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

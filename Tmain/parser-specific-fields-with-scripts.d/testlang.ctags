@@ -1,0 +1,175 @@
+--sort=no
+
+--langdef=Testlang
+--map-Testlang=+.testlang
+
+--_paramdef-Testlang=dp,enable debug printing
+
+--kinddef-Testlang=o,object,objects
+
+--_fielddef-Testlang=str,String{datatype=str}
+--fields-Testlang=+{str}
+--_fielddef-Testlang=int,Integer{datatype=int}
+--fields-Testlang=+{int}
+--_fielddef-Testlang=bool,Boolean{datatype=bool}
+--fields-Testlang=+{bool}
+--_fielddef-Testlang=strbool,String or Boolean{datatype=str+bool}
+--fields-Testlang=+{strbool}
+
+--_prelude-Testlang={{
+   /dp _param {
+      pop
+      /q {=} def
+      /qq {==} def
+      /qa {=+} def
+      /qqa {==+} def
+   } {
+      /q {pop} def
+      /qq {pop} def
+      /qa {pop} def
+      /qqa {pop} def
+   } ifelse
+
+   /T { mark \1 (...) _buildstring qa } def
+   /pval {
+      dup type qqa (/) qa qq
+   } def
+   /Tstr { T . exch { Testlang.str: }
+      stopped { clear (XERR ) qa _errorname q }
+              { (OK ) qa . :Testlang.str {pval}  {/noval qq} ifelse} ifelse
+   } def
+   /Tint { T . exch { Testlang.int: }
+      stopped { clear (XERR ) qa _errorname q }
+              { (OK ) qa . :Testlang.int {pval}  {/noval qq} ifelse } ifelse
+   } def
+   /Tbool { T . exch { Testlang.bool: }
+      stopped { clear (XERR ) qa _errorname q }
+              { (OK ) qa . :Testlang.bool {pval} {/noval qq} ifelse } ifelse
+   } def
+   /Tstrbool { T . exch { Testlang.strbool: }
+      stopped { clear (XERR ) qa _errorname q }
+              { (OK ) qa . :Testlang.strbool {pval} {/noval qq} ifelse } ifelse
+   } def
+   /verifygetter {
+      stopped { clear (XERR ) qa _errorname q }
+              { (OK ) qa {pval} {/noval qq} ifelse } ifelse
+   } def
+}}
+
+--regex-Testlang=/^(string => string)$/\1/o/{{
+   (str) Tstr
+}}
+
+--regex-Testlang=/^(string => integer)$/\1/o/{{
+   (str) Tint
+}}
+
+--regex-Testlang=/^(string => bool)$/\1/o/{{
+   (str) Tbool
+}}
+
+--regex-Testlang=/^(string => strbool)$/\1/o/{{
+   (str) Tstrbool
+}}
+
+--regex-Testlang=/^(int => string)$/\1/o/{{
+   17 Tstr
+}}
+
+--regex-Testlang=/^(int => integer)$/\1/o/{{
+   17 Tint
+}}
+
+--regex-Testlang=/^(int => bool)$/\1/o/{{
+   17 Tbool
+}}
+
+--regex-Testlang=/^(int => strbool)$/\1/o/{{
+   17 Tstrbool
+}}
+
+--regex-Testlang=/^(true => string)$/\1/o/{{
+   true Tstr
+}}
+
+--regex-Testlang=/^(true => integer)$/\1/o/{{
+   true Tint
+}}
+
+--regex-Testlang=/^(true => bool)$/\1/o/{{
+   true Tbool
+}}
+
+--regex-Testlang=/^(true => strbool)$/\1/o/{{
+   true Tstrbool
+}}
+
+--regex-Testlang=/^(false => string)$/\1/o/{{
+   false Tstr
+}}
+
+--regex-Testlang=/^(false => integer)$/\1/o/{{
+   false Tint
+}}
+
+--regex-Testlang=/^(false => bool)$/\1/o/{{
+   false Tbool
+}}
+
+--regex-Testlang=/^(false => strbool)$/\1/o/{{
+   false Tstrbool
+}}
+
+--regex-Testlang=/^(array => string)$/\1/o/{{
+   [ 1 2 3 ] Tstr
+}}
+
+--regex-Testlang=/^(array => integer)$/\1/o/{{
+   [ 1 2 3 ] Tint
+}}
+
+--regex-Testlang=/^(array => bool)$/\1/o/{{
+   [ 1 2 3 ] Tbool
+}}
+
+--regex-Testlang=/^(array => strbool)$/\1/o/{{
+   [ 1 2 3 ] Tstrbool
+}}
+
+--regex-Testlang=/^(empty string => string)$/\1/o/{{
+   () Tstr
+}}
+
+--regex-Testlang=/^(empty string => integer)$/\1/o/{{
+   () Tint
+}}
+
+--regex-Testlang=/^(empty string => bool)$/\1/o/{{
+   () Tbool
+}}
+
+--regex-Testlang=/^(empty string => strbool)$/\1/o/{{
+   () Tstrbool
+}}
+
+--regex-Testlang=/^(string =>)$/\1/o/{{
+   { T . :Testlang.str } verifygetter
+}}
+
+--regex-Testlang=/^(int =>)$/\1/o/{{
+   { T . :Testlang.int } verifygetter
+}}
+
+--regex-Testlang=/^(bool =>)$/\1/o/{{
+   { T . :Testlang.bool } verifygetter
+}}
+
+--regex-Testlang=/^(strbool =>)$/\1/o/{{
+   { T . :Testlang.strbool } verifygetter
+}}
+
+--regex-Testlang=/^(true => bool, false => true)$/\1/o/{{
+   T
+   . true Testlang.bool:
+   { . false Testlang.bool: } stopped { clear (XERR ) qa _errorname q } if
+}}

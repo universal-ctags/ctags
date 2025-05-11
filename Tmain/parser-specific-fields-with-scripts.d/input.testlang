@@ -1,0 +1,31 @@
+string => string
+string => integer
+string => bool
+string => strbool
+int => string
+int => integer
+int => bool
+int => strbool
+true => string
+true => integer
+true => bool
+true => strbool
+false => string
+false => integer
+false => bool
+false => strbool
+array => string
+array => integer
+array => bool
+array => strbool
+
+empty string => string
+empty string => integer
+empty string => bool
+empty string => strbool
+
+int =>
+bool =>
+strbool =>
+
+true => bool, false => true
