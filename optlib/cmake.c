@@ -19,6 +19,7 @@ static void initializeCMakeParser (const langType language)
 	addLanguageRegexTable (language, "target");
 	addLanguageRegexTable (language, "option");
 	addLanguageRegexTable (language, "project");
+	addLanguageRegexTable (language, "include");
 	addLanguageRegexTable (language, "commentBegin");
 	addLanguageRegexTable (language, "commentMultiline");
 	addLanguageRegexTable (language, "skipComment");
@@ -29,7 +30,7 @@ static void initializeCMakeParser (const langType language)
 	addLanguageRegexTable (language, "inVariable");
 
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^[^sSfFmMaAoOpP# \t\n][^ #\t\n]*[ \t\n]+",
+	                               "^[^sSfFmMaAoOpPiI# \t\n][^ #\t\n]*[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^#",
@@ -52,6 +53,9 @@ static void initializeCMakeParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^project[ \t]*\\(",
 	                               "", "", "{icase}{tenter=project}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^include[ \t]*\\(",
+	                               "", "", "{icase}{tenter=include}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^[^ \t\n]+[ \t\n]*",
 	                               "", "", "", NULL);
@@ -131,6 +135,15 @@ static void initializeCMakeParser (const langType language)
 	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "project",
+	                               "^#",
+	                               "", "", "{tenter=commentBegin}", NULL);
+	addLanguageTagMultiTableRegex (language, "include",
+	                               "^([^# \t\n\\)]+)([# \t\n\\)])",
+	                               "\\1", "M", "{_role=included}{tleave}{_advanceTo=2start}", NULL);
+	addLanguageTagMultiTableRegex (language, "include",
+	                               "^[ \t\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "include",
 	                               "^#",
 	                               "", "", "{tenter=commentBegin}", NULL);
 	addLanguageTagMultiTableRegex (language, "commentBegin",
@@ -217,6 +230,12 @@ extern parserDefinition* CMakeParser (void)
 		NULL
 	};
 
+	static roleDefinition CMakeModuleRoleTable [] = {
+		{
+		  true, "included", "load with \"include\" command",
+		  .version = 1,
+		},
+	};
 	static kindDefinition CMakeKindTable [] = {
 		{
 		  true, 'f', "function", "functions",
@@ -236,12 +255,17 @@ extern parserDefinition* CMakeParser (void)
 		{
 		  true, 'p', "project", "projects",
 		},
+		{
+		  true, 'M', "module", "modules",
+		  ATTACH_ROLES(CMakeModuleRoleTable),
+		  .version = 1,
+		},
 	};
 
 	parserDefinition* const def = parserNew ("CMake");
 
-	def->versionCurrent= 0;
-	def->versionAge    = 0;
+	def->versionCurrent= 1;
+	def->versionAge    = 1;
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;

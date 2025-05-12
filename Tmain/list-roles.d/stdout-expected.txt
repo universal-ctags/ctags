@@ -39,6 +39,7 @@ C++                     h/header          exported           on        2 exporte
 C++                     h/header          imported           on        2 imported with "imported ..."
 C++                     h/header          local              on        0 local header
 C++                     h/header          system             on        0 system header
+CMake                   M/module          included           on        1 load with "include" command
 CPreProcessor           d/macro           condition          off       0 used in part of #if/#ifdef/#elif conditions
 CPreProcessor           d/macro           undef              on        0 undefined
 CPreProcessor           h/header          local              on        0 local header
@@ -199,6 +200,7 @@ C++                     h/header          exported           on        2 exporte
 C++                     h/header          imported           on        2 imported with "imported ..."
 C++                     h/header          local              on        0 local header
 C++                     h/header          system             on        0 system header
+CMake                   M/module          included           on        1 load with "include" command
 CPreProcessor           d/macro           condition          off       0 used in part of #if/#ifdef/#elif conditions
 CPreProcessor           d/macro           undef              on        0 undefined
 CPreProcessor           h/header          local              on        0 local header
