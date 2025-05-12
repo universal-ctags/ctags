@@ -31,11 +31,12 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
-	LMAP_PATTERN   = 1 << 0,
-	LMAP_EXTENSION = 1 << 1,
-	LMAP_ALL       = LMAP_PATTERN | LMAP_EXTENSION,
-	LMAP_TABLE_OUTPUT = 1 << 2,
-	LMAP_NO_LANG_PREFIX = 1 << 3,
+	LMAP_REXPR     = 1 << 0,
+	LMAP_PATTERN   = 1 << 1,
+	LMAP_EXTENSION = 1 << 2,
+	LMAP_ALL       = LMAP_PATTERN | LMAP_EXTENSION | LMAP_REXPR,
+	LMAP_TABLE_OUTPUT = 1 << 3,
+	LMAP_NO_LANG_PREFIX = 1 << 4,
 } langmapType;
 
 enum parserCategory
@@ -102,6 +103,9 @@ extern void addLanguageExtensionMap (const langType language, const char* extens
 				     bool exclusiveInAllLanguages);
 extern bool removeLanguagePatternMap (const langType language, const char *const pattern);
 extern void addLanguagePatternMap (const langType language, const char* ptrn,
+				   bool exclusiveInAllLanguages);
+extern bool removeLanguageRexprMap (const langType language, const char *const rexpr, bool iCase);
+extern void addLanguageRexprMap (const langType language, const char* rexpr, bool iCase,
 				   bool exclusiveInAllLanguages);
 
 extern void installLanguageAliasesDefault (const langType language);
