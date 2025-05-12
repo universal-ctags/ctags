@@ -217,6 +217,7 @@
     <ClCompile Include="..\main\rbtree.c" />
     <ClCompile Include="..\main\read.c" />
     <ClCompile Include="..\main\repoinfo.c" />
+    <ClCompile Include="..\main\rexprcode.c" />
     <ClCompile Include="..\main\routines.c" />
     <ClCompile Include="..\main\script.c" />
     <ClCompile Include="..\main\selectors.c" />
@@ -449,6 +450,7 @@
     <ClInclude Include="..\main\rbtree_augmented.h" />
     <ClInclude Include="..\main\read.h" />
     <ClInclude Include="..\main\read_p.h" />
+    <ClInclude Include="..\main\rexprcode_p.h" />
     <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\routines_p.h" />
     <ClInclude Include="..\main\script_p.h" />

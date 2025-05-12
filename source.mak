@@ -126,6 +126,7 @@ LIB_PRIVATE_HEADS =		\
 	main/promise_p.h	\
 	main/ptag_p.h		\
 	main/read_p.h		\
+	main/rexprcode_p.h	\
 	main/script_p.h		\
 	main/sort_p.h		\
 	main/stats_p.h		\
@@ -174,6 +175,7 @@ LIB_SRCS =			\
 	main/ptag.c			\
 	main/rbtree.c			\
 	main/read.c			\
+	main/rexprcode.c		\
 	main/script.c			\
 	main/seccomp.c			\
 	main/selectors.c		\
