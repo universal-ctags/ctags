@@ -113,6 +113,14 @@ extern parserDefinition* RpmMacrosParser (void)
 		NULL
 	};
 
+	static const struct rExprSrc rexprs [] = {
+		{
+		  .expr = "(.*/)?macros\\.d/macros\\.([^/]+)$",
+		  .iCase = false,
+		},
+		REXPR_LAST_ENTRY
+	};
+
 	static kindDefinition RpmMacrosKindTable [] = {
 		{
 		  true, 'm', "macro", "macros",
@@ -126,6 +134,7 @@ extern parserDefinition* RpmMacrosParser (void)
 	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
+	def->rexprs        = rexprs;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->useCork       = CORK_QUEUE;
