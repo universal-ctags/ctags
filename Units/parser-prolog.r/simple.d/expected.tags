@@ -1,0 +1,22 @@
+mother_child	input.pl	/^mother_child(trude, sally).$/;"	p	arity:0
+mother_child/0	input.pl	/^mother_child(trude, sally).$/;"	p
+father_child	input.pl	/^father_child(tom, sally).$/;"	p	arity:0
+father_child/0	input.pl	/^father_child(tom, sally).$/;"	p
+father_child	input.pl	/^father_child(tom, erica).$/;"	p	arity:0
+father_child/0	input.pl	/^father_child(tom, erica).$/;"	p
+father_child	input.pl	/^father_child(mike, tom).$/;"	p	arity:0
+father_child/0	input.pl	/^father_child(mike, tom).$/;"	p
+sibling	input.pl	/^sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).$/;"	p	arity:2
+X	input.pl	/^sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).$/;"	v	predicate:sibling
+Y	input.pl	/^sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).$/;"	v	predicate:sibling
+sibling/2	input.pl	/^sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).$/;"	p
+parent_child	input.pl	/^parent_child(X, Y) :- father_child(X, Y).$/;"	p	arity:2
+X	input.pl	/^parent_child(X, Y) :- father_child(X, Y).$/;"	v	predicate:parent_child
+Y	input.pl	/^parent_child(X, Y) :- father_child(X, Y).$/;"	v	predicate:parent_child
+parent_child/2	input.pl	/^parent_child(X, Y) :- father_child(X, Y).$/;"	p
+parent_child	input.pl	/^parent_child(X, Y) :- mother_child(X, Y).$/;"	p	arity:2
+X	input.pl	/^parent_child(X, Y) :- mother_child(X, Y).$/;"	v	predicate:parent_child
+Y	input.pl	/^parent_child(X, Y) :- mother_child(X, Y).$/;"	v	predicate:parent_child
+parent_child/2	input.pl	/^parent_child(X, Y) :- mother_child(X, Y).$/;"	p
+not_dummy	input.pl	/^not_dummy().$/;"	p	arity:0
+not_dummy/0	input.pl	/^not_dummy().$/;"	p

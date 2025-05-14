@@ -251,6 +251,7 @@
     <ClCompile Include="..\optlib\passwd.c" />
     <ClCompile Include="..\optlib\pkgConfig.c" />
     <ClCompile Include="..\optlib\pod.c" />
+    <ClCompile Include="..\optlib\prolog.c" />
     <ClCompile Include="..\optlib\puppetManifest.c" />
     <ClCompile Include="..\optlib\qemuhx.c" />
     <ClCompile Include="..\optlib\rpmMacros.c" />

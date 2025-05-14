@@ -1019,8 +1019,10 @@ extern parserDefinition* PerlParser (void)
 		/* cperl is an Emacs' editing mode for Perl source code  */
 		"cperl",
 		NULL };
-	static selectLanguage selectors [] = { selectByPickingPerlVersion,
-					       NULL };
+	static selectLanguage selectors [] = {
+		selectPerlOrPrologByDistinctiveToken,
+		selectByPickingPerlVersion,
+		NULL };
 	parserDefinition* def = parserNew ("Perl");
 	def->kindTable      = PerlKinds;
 	def->kindCount  = ARRAY_SIZE (PerlKinds);

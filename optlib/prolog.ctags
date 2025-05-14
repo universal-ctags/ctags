@@ -1,0 +1,223 @@
+#
+#  Copyright (c) 2025, Masatake YAMATO
+#
+#  This source code is released for free distribution under the terms of the
+#  GNU General Public License version 2 or (at your opinion) any later version.
+#
+# References:
+#   - https://www.swi-prolog.org/pldoc/man?section=syntax
+#   - https://sicstus.sics.se/sicstus/docs/3.7.1/html/sicstus_45.html
+
+#
+# TODO:
+#
+# - count arity in more precise way
+# - extract modules
+# - handle symbols started from _
+# - fill end: field
+#
+
+#
+--langdef=Prolog
+--map-Prolog=+.pl
+
+###
+# Alias definitions for utilizing shebang lines to select this parser
+#
+
+# https://www.swi-prolog.org/pldoc/man?section=plscript
+--alias-Prolog=+swipl
+
+# http://www.gprolog.org/manual/html_node/gprolog007.html
+--alias-Prolog=+gprolog
+
+# https://sicstus.sics.se/sicstus/docs/latest4/pdf/sicstus.pdf
+# I could not find the description about '#!'
+# --alias-Prolog=+sicstus
+
+# https://github.com/search?q=repo%3Avscosta%2Fyap%20%20%22%23!%22&type=code
+# I cound find many code examples using '#!'.
+--alias-Prolog=+yap
+
+# https://sourceforge.net/p/eclipse-clp/git/ci/patches_5_10/tree/
+# I cound not find any code examples using '#!'.
+# --alias-Prolog=+eclipse
+
+# https://sourceforge.net/p/xsb/code/ci/git-origin/tree/
+# I cound not find any code examples using '#!'.
+--alias-Prolog=+xsb
+
+###
+# selector
+#
+--__selector-Prolog=selectPerlOrPrologByDistinctiveToken
+
+###
+# extra definitions
+#
+--_extradef-Prolog=arityAppended,Include predicates with their arises
+--extras-Prolog=+{arityAppended}
+
+###
+# field definitions
+#
+--_fielddef-Prolog=arity,arity of predicate{datatype=int}
+--fields-Prolog=+{arity}
+
+###
+# kind definitions
+#
+--kinddef-Prolog=p,predicate,predicates
+--kinddef-Prolog=z,variable,variables
+--kinds-Prolog=-z
+
+###
+# table declarations
+#
+--_tabledef-Prolog=main
+--_tabledef-Prolog=args
+--_tabledef-Prolog=impl
+--_tabledef-Prolog=comment
+--_tabledef-Prolog=comment_multiline
+--_tabledef-Prolog=comment_oneline
+--_tabledef-Prolog=any
+--_tabledef-Prolog=ignoreWhiteSpace
+--_tabledef-Prolog=skipstr1
+--_tabledef-Prolog=skipstr2
+--_tabledef-Prolog=strextract
+--_tabledef-Prolog=skipparen
+
+###
+# utilities
+#
+--_mtable-regex-Prolog=any/.//
+--_mtable-regex-Prolog=ignoreWhiteSpace/[ \t\n]+//
+
+###
+# string
+#
+--_mtable-regex-Prolog=strextract/([^']*')/'\1/p/{scope=push}{tleave}{{
+   _scopedepth 1 gt {
+      _scopepop
+      . _markplaceholder
+   } if
+}}
+--_mtable-regex-Prolog=strextract///{tleave}
+
+###
+# comment
+#
+--_mtable-regex-Prolog=comment/\/\*//{tenter=comment_multiline}
+--_mtable-regex-Prolog=comment/\%//{tenter=comment_oneline}
+
+--_mtable-regex-Prolog=comment_multiline/\*\///{tleave}
+--_mtable-extend-Prolog=comment_multiline+any
+
+--_mtable-regex-Prolog=comment_oneline/[\n]//{tleave}
+--_mtable-extend-Prolog=comment_oneline+any
+
+###
+# skip
+#
+--_mtable-regex-Prolog=skipstr1/[^']*'//{tleave}
+--_mtable-regex-Prolog=skipstr1///{tleave}
+--_mtable-regex-Prolog=skipstr2/[^"]*"//{tleave}
+--_mtable-regex-Prolog=skipstr2///{tleave}
+
+--_mtable-regex-Prolog=skipparen/[^%\(\)\/0]'"+//
+--_mtable-extend-Prolog=skipparen+comment
+
+--_mtable-regex-Prolog=skipparen/0'.//
+--_mtable-regex-Prolog=skipparen/'//{tenter=skipstr1}
+--_mtable-regex-Prolog=skipparen/"//{tenter=skipstr2}
+--_mtable-regex-Prolog=skipparen/\(//{tenter=skipparen}
+--_mtable-regex-Prolog=skipparen/\)//{tleave}
+
+###
+# main
+#
+--_mtable-extend-Prolog=main+comment
+--_mtable-extend-Prolog=main+ignoreWhiteSpace
+--_mtable-regex-Prolog=main/([a-zA-Z_][:a-zA-Z_0-9]*)/\1/p/{scope=push}{{
+   _scopedepth 1 gt {
+      _scopepop
+      . _markplaceholder
+   } if
+}}
+--_mtable-regex-Prolog=main/'//{tenter=strextract}
+
+--_mtable-regex-Prolog=main/(\()//{tenter=args}{{
+   % For counting arity
+   0
+   % pstack (----) = _scopetop { dup :line =+ (/) =+ @1 _matchloc2line = :name = } if (====) =
+}}
+--_mtable-regex-Prolog=main/\.//{scope=pop}{{
+   _scopetop {
+      % If a clause has no head, no arity value is on the stack.
+      count 2 ge {
+         % arity:int arity:int predicate:tag
+         exch Prolog.arity:
+      } {
+         pop
+      } ifelse
+   } if
+}}
+--_mtable-regex-Prolog=main/:-//{tenter=impl}
+--_mtable-extend-Prolog=main+any
+
+###
+# args
+#
+--_mtable-extend-Prolog=args+comment
+--_mtable-extend-Prolog=args+ignoreWhiteSpace
+--_mtable-regex-Prolog=args/0'.//
+--_mtable-regex-Prolog=args/'//{tenter=skipstr1}
+--_mtable-regex-Prolog=args/"//{tenter=skipstr2}
+--_mtable-regex-Prolog=args/\)//{tleave}{{
+  /Prolog.arityAppended _extraenabled {
+       % arity:int arity:int
+     dup 0 string cvs
+     % arity:int arity:string
+     _scopetop {
+        % arity:int arity:string predicate:tag
+        dup :name
+        % arity:int arity:string predicate:tag name:string
+        3 -1 roll
+        % arity:int predicate:tag name:string arity:string
+        [ 3 1 roll
+        % arity:int predicate:tag [ name:string arity:string
+        (/) exch
+        % arity:int predicate:tag [ name:string (/) arity:string
+        _buildstring exch
+        % arity:int name-wit-arity:string predicate:tag
+        dup :kind exch
+        % arity:int name-wit-arity:string kind predicate:tag
+        _tagloc
+        % arity:int name-wit-arity:string kind loc
+        _tag _commit /Prolog.arityAppended _markextra
+        % arity:int
+     } if
+  } if
+}}
+--_mtable-regex-Prolog=args/[a-z]+//
+--_mtable-regex-Prolog=args/,//
+--_mtable-regex-Prolog=args/([A-Z][A-Za-z]*)/\1/v/{scope=ref}{{
+   1 add
+}}
+--_mtable-extend-Prolog=args+any
+
+###
+# impl
+#
+--_mtable-extend-Prolog=impl+comment
+--_mtable-extend-Prolog=impl+ignoreWhiteSpace
+--_mtable-regex-Prolog=impl/0'.//
+--_mtable-regex-Prolog=impl/'//{tenter=skipstr1}
+--_mtable-regex-Prolog=impl/"//{tenter=skipstr2}
+--_mtable-regex-Prolog=impl/\(//{tenter=skipparen}
+
+# If . is found, push back it. So the upper table (main) can handle it.
+--_mtable-regex-Prolog=impl/=\.\.//
+--_mtable-regex-Prolog=impl/[0-9]+\.[0-9]+//
+--_mtable-regex-Prolog=impl/\.//{tleave}{_advanceTo=0start}
+--_mtable-extend-Prolog=impl+any

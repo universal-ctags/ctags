@@ -242,6 +242,7 @@ OPTLIB2C_INPUT = \
 	optlib/passwd.ctags			\
 	optlib/pkgConfig.ctags			\
 	optlib/pod.ctags			\
+	optlib/prolog.ctags			\
 	optlib/puppetManifest.ctags		\
 	optlib/qemuhx.ctags			\
 	optlib/rpmMacros.ctags			\
