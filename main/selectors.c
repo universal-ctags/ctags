@@ -21,6 +21,7 @@
 #include "mio.h"
 
 static const char *TR_UNKNOWN = NULL;
+static const char *TR_BREAK   = "/BREAK/";
 static const char *TR_PERL5	  = "Perl";
 static const char *TR_PERL6	  = "Perl6";
 
@@ -53,6 +54,8 @@ static const char *selectByLines (MIO *input,
 	char line[0x800];
 	while (mio_gets(input, line, sizeof(line))) {
 		const char *lang = lineTaster (line, userData);
+		if (lang == TR_BREAK)
+			return defaultLang;
 		if (lang)
 			return lang;
 	}
