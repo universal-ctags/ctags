@@ -564,6 +564,9 @@
     <ClCompile Include="..\parsers\powershell.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\prolog.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\protobuf.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>

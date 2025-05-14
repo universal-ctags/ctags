@@ -43,6 +43,8 @@ static const char *TR_FORTRAN  = "Fortran";
 static const char *TR_V = "V";
 static const char *TR_VERILOG = "Verilog";
 
+static const char *TR_PROLOG = "Prolog";
+
 #define startsWith(line,prefix)									\
 	(strncmp(line, prefix, strlen(prefix)) == 0? true: false)
 
@@ -418,6 +420,64 @@ selectVOrVerilogByKeywords (MIO *input,
 		return TR_V;
 	else if (d < 0)
 		return TR_VERILOG;
+	else
+		return TR_UNKNOWN;
+}
+
+struct PerlOrPrologScore {
+	int perl;
+	int prolog;
+	unsigned int linum;
+};
+
+static const char *
+tastePerlOrPrologLines (const char *line, void *data)
+{
+	struct PerlOrPrologScore *score = (struct PerlOrPrologScore *)data;
+
+	score->linum++;
+
+	if (score->linum > 16)
+		return TR_BREAK;
+
+	if (line[0] == '#' && line[1] != '!')
+	{
+		/* This is not a shebang: the comment line of perl */
+		score->perl++;
+	}
+	else if (line[0] == '%')
+	{
+		score->prolog++;
+	}
+	else if (startsWith (line, "use "))
+	{
+		score->perl++;
+	}
+	else if (startsWith (line, ":-"))
+		score->prolog += 2;
+	else if (strstr (line, ":-"))
+		score->prolog++;
+	else if (strstr (line, "/*"))
+		score->prolog++;
+
+	return TR_UNKNOWN;
+}
+
+const char *
+selectPerlOrPrologByDistinctiveToken (struct _MIO *input, langType *candidates, unsigned int nCandidates)
+{
+	struct PerlOrPrologScore score = {
+		.perl = 0,
+		.prolog = 0,
+		.linum = 0,
+	};
+	selectByLines (input, tastePerlOrPrologLines, TR_UNKNOWN, &score);
+
+	int d = score.perl - score.prolog;
+	if (d > 0)
+		return TR_PERL5;
+	else if (d < 0)
+		return TR_PROLOG;
 	else
 		return TR_UNKNOWN;
 }

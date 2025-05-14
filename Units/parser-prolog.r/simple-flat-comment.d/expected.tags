@@ -1,0 +1,28 @@
+mother_child	input.pl	/^mother_child(trude, sally).$/;"	predicate	line:2	arity:2
+mother_child/2	input.pl	/^mother_child(trude, sally).$/;"	predicate	line:2	extras:arityAppended	arity:2
+father_child	input.pl	/^father_child(tom, sally).$/;"	predicate	line:4	arity:2
+father_child/2	input.pl	/^father_child(tom, sally).$/;"	predicate	line:4	extras:arityAppended	arity:2
+father_child	input.pl	/^father_child(tom, erica).$/;"	predicate	line:5	arity:2
+father_child/2	input.pl	/^father_child(tom, erica).$/;"	predicate	line:5	extras:arityAppended	arity:2
+father_child	input.pl	/^father_child(mike, tom).$/;"	predicate	line:6	arity:2
+father_child/2	input.pl	/^father_child(mike, tom).$/;"	predicate	line:6	extras:arityAppended	arity:2
+sibling	input.pl	/^sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).$/;"	predicate	line:8	arity:2
+sibling/2	input.pl	/^sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).$/;"	predicate	line:8	extras:arityAppended	arity:2
+parent_child	input.pl	/^parent_child(X, Y) :- father_child(X, Y).$/;"	predicate	line:10	arity:2
+parent_child/2	input.pl	/^parent_child(X, Y) :- father_child(X, Y).$/;"	predicate	line:10	extras:arityAppended	arity:2
+parent_child	input.pl	/^parent_child(X, Y) :- mother_child(X, Y).$/;"	predicate	line:11	arity:2
+parent_child/2	input.pl	/^parent_child(X, Y) :- mother_child(X, Y).$/;"	predicate	line:11	extras:arityAppended	arity:2
+not_dummy	input.pl	/^not_dummy.$/;"	predicate	line:16	arity:0
+not_dummy/0	input.pl	/^not_dummy.$/;"	predicate	line:16	extras:arityAppended	arity:0
+'quoted predicate'	input.pl	/^'quoted predicate'($/;"	predicate	line:18	arity:1
+'quoted predicate'/1	input.pl	/^'quoted predicate'($/;"	predicate	line:18	extras:arityAppended	arity:1
+rel	input.pl	/^rel(X,Y,Z) :- Z =:= X + Y + 0.25.$/;"	predicate	line:23	arity:3
+rel/3	input.pl	/^rel(X,Y,Z) :- Z =:= X + Y + 0.25.$/;"	predicate	line:23	extras:arityAppended	arity:3
+rel	input.pl	/^rel(X,Y) :- Y =:= X + 0.25.$/;"	predicate	line:24	arity:2
+rel/2	input.pl	/^rel(X,Y) :- Y =:= X + 0.25.$/;"	predicate	line:24	extras:arityAppended	arity:2
+rel	input.pl	/^rel(X) :- X =:= 100_000.$/;"	predicate	line:25	arity:1
+rel/1	input.pl	/^rel(X) :- X =:= 100_000.$/;"	predicate	line:25	extras:arityAppended	arity:1
+rel0	input.pl	/^rel0(X) :- X =:= 100_000 0.$/;"	predicate	line:27	arity:1
+rel0/1	input.pl	/^rel0(X) :- X =:= 100_000 0.$/;"	predicate	line:27	extras:arityAppended	arity:1
+rel0	input.pl	/^rel0(X, 100_000_11, Y) :- X =:= Y.$/;"	predicate	line:28	arity:3
+rel0/3	input.pl	/^rel0(X, 100_000_11, Y) :- X =:= Y.$/;"	predicate	line:28	extras:arityAppended	arity:3

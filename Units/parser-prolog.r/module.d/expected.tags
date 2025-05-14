@@ -1,0 +1,33 @@
+clpq	input.pl	/^:- module(clpq,$/;"	module	line:42
+portray_message	input.pl	/^user:portray_message(warning,import(_,_,clpq,private)).$/;"	predicate	line:67	module:user	end:67	arity:2
+user:portray_message	input.pl	/^user:portray_message(warning,import(_,_,clpq,private)).$/;"	predicate	line:67	module:user	extras:qualified	end:67	arity:2
+portray_message/2	input.pl	/^user:portray_message(warning,import(_,_,clpq,private)).$/;"	predicate	line:67	module:user	extras:arityAppended	end:67	arity:2
+user:portray_message/2	input.pl	/^user:portray_message(warning,import(_,_,clpq,private)).$/;"	predicate	line:67	module:user	extras:qualified,arityAppended	end:67	arity:2
+message	input.pl	/^prolog:message(query(YesNo,Bindings)) --> !,$/;"	grammar	line:93	module:prolog	end:96	arity:1
+prolog:message	input.pl	/^prolog:message(query(YesNo,Bindings)) --> !,$/;"	grammar	line:93	module:prolog	extras:qualified	end:96	arity:1
+message/1	input.pl	/^prolog:message(query(YesNo,Bindings)) --> !,$/;"	grammar	line:93	module:prolog	extras:arityAppended	end:96	arity:1
+prolog:message/1	input.pl	/^prolog:message(query(YesNo,Bindings)) --> !,$/;"	grammar	line:93	module:prolog	extras:qualified,arityAppended	end:96	arity:1
+dump_toplevel_bindings	input.pl	/^dump_toplevel_bindings(Bindings,Constraints) :-$/;"	predicate	line:98	module:clpq	end:100	arity:2
+clpq:dump_toplevel_bindings	input.pl	/^dump_toplevel_bindings(Bindings,Constraints) :-$/;"	predicate	line:98	module:clpq	extras:qualified	end:100	arity:2
+dump_toplevel_bindings/2	input.pl	/^dump_toplevel_bindings(Bindings,Constraints) :-$/;"	predicate	line:98	module:clpq	extras:arityAppended	end:100	arity:2
+clpq:dump_toplevel_bindings/2	input.pl	/^dump_toplevel_bindings(Bindings,Constraints) :-$/;"	predicate	line:98	module:clpq	extras:qualified,arityAppended	end:100	arity:2
+dump_vars_names	input.pl	/^dump_vars_names([],_,[],[]).$/;"	predicate	line:102	module:clpq	end:102	arity:4
+clpq:dump_vars_names	input.pl	/^dump_vars_names([],_,[],[]).$/;"	predicate	line:102	module:clpq	extras:qualified	end:102	arity:4
+dump_vars_names/4	input.pl	/^dump_vars_names([],_,[],[]).$/;"	predicate	line:102	module:clpq	extras:arityAppended	end:102	arity:4
+clpq:dump_vars_names/4	input.pl	/^dump_vars_names([],_,[],[]).$/;"	predicate	line:102	module:clpq	extras:qualified,arityAppended	end:102	arity:4
+dump_vars_names	input.pl	/^dump_vars_names([Name=Term|Rest],Seen,Vars,Names) :-$/;"	predicate	line:103	module:clpq	end:116	arity:4
+clpq:dump_vars_names	input.pl	/^dump_vars_names([Name=Term|Rest],Seen,Vars,Names) :-$/;"	predicate	line:103	module:clpq	extras:qualified	end:116	arity:4
+dump_vars_names/4	input.pl	/^dump_vars_names([Name=Term|Rest],Seen,Vars,Names) :-$/;"	predicate	line:103	module:clpq	extras:arityAppended	end:116	arity:4
+clpq:dump_vars_names/4	input.pl	/^dump_vars_names([Name=Term|Rest],Seen,Vars,Names) :-$/;"	predicate	line:103	module:clpq	extras:qualified,arityAppended	end:116	arity:4
+dump_format	input.pl	/^dump_format([]) --> [].$/;"	grammar	line:118	module:clpq	end:118	arity:1
+clpq:dump_format	input.pl	/^dump_format([]) --> [].$/;"	grammar	line:118	module:clpq	extras:qualified	end:118	arity:1
+dump_format/1	input.pl	/^dump_format([]) --> [].$/;"	grammar	line:118	module:clpq	extras:arityAppended	end:118	arity:1
+clpq:dump_format/1	input.pl	/^dump_format([]) --> [].$/;"	grammar	line:118	module:clpq	extras:qualified,arityAppended	end:118	arity:1
+dump_format	input.pl	/^dump_format([X|Xs]) -->$/;"	grammar	line:119	module:clpq	end:121	arity:1
+clpq:dump_format	input.pl	/^dump_format([X|Xs]) -->$/;"	grammar	line:119	module:clpq	extras:qualified	end:121	arity:1
+dump_format/1	input.pl	/^dump_format([X|Xs]) -->$/;"	grammar	line:119	module:clpq	extras:arityAppended	end:121	arity:1
+clpq:dump_format/1	input.pl	/^dump_format([X|Xs]) -->$/;"	grammar	line:119	module:clpq	extras:qualified,arityAppended	end:121	arity:1
+memberchk_eq	input.pl	/^memberchk_eq(X,[Y|Ys]) :-$/;"	predicate	line:123	module:clpq	end:127	arity:2
+clpq:memberchk_eq	input.pl	/^memberchk_eq(X,[Y|Ys]) :-$/;"	predicate	line:123	module:clpq	extras:qualified	end:127	arity:2
+memberchk_eq/2	input.pl	/^memberchk_eq(X,[Y|Ys]) :-$/;"	predicate	line:123	module:clpq	extras:arityAppended	end:127	arity:2
+clpq:memberchk_eq/2	input.pl	/^memberchk_eq(X,[Y|Ys]) :-$/;"	predicate	line:123	module:clpq	extras:qualified,arityAppended	end:127	arity:2

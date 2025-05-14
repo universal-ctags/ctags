@@ -1,0 +1,18 @@
+server	input.pl	/^server :-$/;"	predicate	line:27	end:28	arity:0
+server/0	input.pl	/^server :-$/;"	predicate	line:27	extras:arityAppended	end:28	arity:0
+server	input.pl	/^server(Port, Options) :-$/;"	predicate	line:30	end:35	arity:2
+server/2	input.pl	/^server(Port, Options) :-$/;"	predicate	line:30	extras:arityAppended	end:35	arity:2
+reply	input.pl	/^reply(Request) :-$/;"	predicate	line:37	end:39	arity:1
+reply/1	input.pl	/^reply(Request) :-$/;"	predicate	line:37	extras:arityAppended	end:39	arity:1
+reply	input.pl	/^reply(\/, _Request) :-$/;"	predicate	line:41	end:45	arity:2
+reply/2	input.pl	/^reply(\/, _Request) :-$/;"	predicate	line:41	extras:arityAppended	end:45	arity:2
+reply	input.pl	/^reply('\/calc', Request) :-$/;"	predicate	line:47	end:56	arity:2
+reply/2	input.pl	/^reply('\/calc', Request) :-$/;"	predicate	line:47	extras:arityAppended	end:56	arity:2
+page	input.pl	/^page(Formula) :-$/;"	predicate	line:59	end:74	arity:1
+page/1	input.pl	/^page(Formula) :-$/;"	predicate	line:59	extras:arityAppended	end:74	arity:1
+formula	input.pl	/^formula(Formula) -->$/;"	grammar	line:76	end:80	arity:1
+formula/1	input.pl	/^formula(Formula) -->$/;"	grammar	line:76	extras:arityAppended	end:80	arity:1
+ops	input.pl	/^ops -->$/;"	grammar	line:82	end:88	arity:0
+ops/0	input.pl	/^ops -->$/;"	grammar	line:82	extras:arityAppended	end:88	arity:0
+reply_page	input.pl	/^reply_page(Title, Content) :-$/;"	predicate	line:90	end:93	arity:2
+reply_page/2	input.pl	/^reply_page(Title, Content) :-$/;"	predicate	line:90	extras:arityAppended	end:93	arity:2

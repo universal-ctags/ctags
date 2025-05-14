@@ -39,4 +39,7 @@ selectByXpathFileSpec (struct _MIO *input, langType *candidates, unsigned int nC
 const char *
 selectFortranOrForthByForthMarker (struct _MIO *input, langType *candidates, unsigned int nCandidates);
 
+const char *
+selectPerlOrPrologByDistinctiveToken (struct _MIO *input, langType *candidates, unsigned int nCandidates);
+
 #endif

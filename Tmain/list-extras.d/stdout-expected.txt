@@ -15,6 +15,7 @@ z       nulltag             yes     NONE        no      1 Include tags with empt
 -       configPrefixed      yes     Kconfig     no      0 prepend CONFIG_ to config names
 -       CppDef              no      Make        no      1 Include FOO in -DFOO as as a name of CPreProcessor macro
 -       guessedFromFileName yes     PkgConfig   no      0 the guessed package name of the .pc file
+-       arityAppended       yes     Prolog      no      0 Include predicates with their arities
 -       funcmap             yes     QemuHX      no      0 Include mapping SQMP to C function name
 -       whitespaceSwapped   yes     Robot       no      0 Include tags swapping whitespace and underscore chars
 #LETTER	NAME	ENABLED	LANGUAGE	FIXED	VER	DESCRIPTION
@@ -34,6 +35,7 @@ z	nulltag	yes	NONE	no	1	Include tags with empty strings as their names
 -	configPrefixed	yes	Kconfig	no	0	prepend CONFIG_ to config names
 -	CppDef	no	Make	no	1	Include FOO in -DFOO as as a name of CPreProcessor macro
 -	guessedFromFileName	yes	PkgConfig	no	0	the guessed package name of the .pc file
+-	arityAppended	yes	Prolog	no	0	Include predicates with their arities
 -	funcmap	yes	QemuHX	no	0	Include mapping SQMP to C function name
 -	whitespaceSwapped	yes	Robot	no	0	Include tags swapping whitespace and underscore chars
 #LETTER NAME      ENABLED LANGUAGE FIXED VER DESCRIPTION

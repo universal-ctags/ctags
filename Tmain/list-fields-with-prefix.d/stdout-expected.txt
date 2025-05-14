@@ -42,6 +42,7 @@ x       UCTAGSxpath          no      NONE             s--    no    --   0 xpath 
 -       UCTAGSprotocols      yes     ObjectiveC       s--    no    --   0 protocols that the class (or category) confirms to
 -       UCTAGShome           yes     Passwd           s--    no    rw   0 home directory
 -       UCTAGSshell          yes     Passwd           s--    no    rw   0 login shell
+-       UCTAGSarity          yes     Prolog           -i-    no    --   0 the number of parameters
 -       UCTAGSdecorators     no      Python           s--    no    --   0 decorators on functions and classes
 -       UCTAGSnameref        yes     Python           s--    no    --   0 the original name for the tag
 -       UCTAGSassignmentop   no      R                s--    no    --   0 operator for assignment
