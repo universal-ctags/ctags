@@ -1,0 +1,18 @@
+mother_child	input.pl	/^mother_child(trude, sally).$/;"	predicate	line:2	arity:2
+mother_child/2	input.pl	/^mother_child(trude, sally).$/;"	predicate	line:2	extras:arityAppended	arity:2
+father_child	input.pl	/^father_child(tom, sally).$/;"	predicate	line:4	arity:2
+father_child/2	input.pl	/^father_child(tom, sally).$/;"	predicate	line:4	extras:arityAppended	arity:2
+father_child	input.pl	/^father_child(tom, erica).$/;"	predicate	line:5	arity:2
+father_child/2	input.pl	/^father_child(tom, erica).$/;"	predicate	line:5	extras:arityAppended	arity:2
+father_child	input.pl	/^father_child(mike, tom).$/;"	predicate	line:6	arity:2
+father_child/2	input.pl	/^father_child(mike, tom).$/;"	predicate	line:6	extras:arityAppended	arity:2
+sibling	input.pl	/^sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).$/;"	predicate	line:8	arity:2
+sibling/2	input.pl	/^sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).$/;"	predicate	line:8	extras:arityAppended	arity:2
+parent_child	input.pl	/^parent_child(X, Y) :- father_child(X, Y).$/;"	predicate	line:10	arity:2
+parent_child/2	input.pl	/^parent_child(X, Y) :- father_child(X, Y).$/;"	predicate	line:10	extras:arityAppended	arity:2
+parent_child	input.pl	/^parent_child(X, Y) :- mother_child(X, Y).$/;"	predicate	line:11	arity:2
+parent_child/2	input.pl	/^parent_child(X, Y) :- mother_child(X, Y).$/;"	predicate	line:11	extras:arityAppended	arity:2
+not_dummy	input.pl	/^not_dummy.$/;"	predicate	line:15	arity:0
+not_dummy/0	input.pl	/^not_dummy.$/;"	predicate	line:15	extras:arityAppended	arity:0
+'quoted predicate'	input.pl	/^'quoted predicate'($/;"	predicate	line:17	arity:1
+'quoted predicate'/1	input.pl	/^'quoted predicate'($/;"	predicate	line:17	extras:arityAppended	arity:1
