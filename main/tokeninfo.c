@@ -180,6 +180,16 @@ void tokenUnread      (tokenInfo *token)
 	tokenUnreadFull (token, NULL);
 }
 
+static int tokenGetRightSideOfPair (tokenInfo *token)
+{
+	int start = token->type;
+	for (unsigned i = 0; i < token->klass->pairCount; i++)
+		if (start == token->klass->pairs[i].start)
+			return token->klass->pairs[i].end;
+
+	return token->klass->typeForUndefined;
+}
+
 bool tokenSkipOverPair (tokenInfo *token)
 {
 	return tokenSkipOverPairFull(token, NULL);
@@ -189,11 +199,8 @@ bool tokenSkipOverPairFull (tokenInfo *token, void *data)
 {
 	int start = token->type;
 	int end = token->klass->typeForUndefined;
-	unsigned int i;
 
-	for (i = 0; i < token->klass->pairCount; i++)
-		if (start == token->klass->pairs[i].start)
-			end = token->klass->pairs[i].end;
+	end = tokenGetRightSideOfPair (token);
 
 	if (end == token->klass->typeForUndefined)
 		return false;
