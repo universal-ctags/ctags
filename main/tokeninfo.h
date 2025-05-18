@@ -107,4 +107,9 @@ bool tokenSkipToOneOfTypesImpl (tokenInfo *token, bool skipPair, tokenType ts[],
 bool tokenSkipOverPair (tokenInfo *token);
 bool tokenSkipOverPairFull (tokenInfo *token, void *data);
 
+void tokenInitTagEntry (tokenInfo *token, tagEntryInfo *e, int kind);
+void tokenInitRefTagEntry (tokenInfo *token, tagEntryInfo *e, int kind, int role);
+int tokenMakeSimpleTag (tokenInfo *token, int kind);
+int tokenMakeSimpleRefTag (tokenInfo *token, int kind, int role);
+
 #endif
