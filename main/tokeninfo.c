@@ -190,6 +190,34 @@ static int tokenGetRightSideOfPair (tokenInfo *token)
 	return token->klass->typeForUndefined;
 }
 
+static bool tokenTypeIsIn (tokenInfo *token, tokenType ts[], size_t count)
+{
+	tokenType t = token->type;
+
+	for (size_t i = 0; i < count; i++)
+	{
+		if (t == ts[i])
+			return true;
+	}
+	return false;
+}
+
+bool tokenSkipToOneOfTypesImpl (tokenInfo *token, bool skipPair, tokenType ts[], size_t count)
+{
+	while (! tokenIsEOF (token))
+	{
+		if (tokenTypeIsIn (token, ts, count))
+			return true;
+		if (skipPair &&
+			tokenGetRightSideOfPair (token) != token->klass->typeForUndefined)
+			tokenSkipOverPair (token);
+		else
+			tokenReadFull (token, NULL);
+	}
+
+	return false;
+}
+
 bool tokenSkipOverPair (tokenInfo *token)
 {
 	return tokenSkipOverPairFull(token, NULL);
