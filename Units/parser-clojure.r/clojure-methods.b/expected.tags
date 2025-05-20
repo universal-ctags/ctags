@@ -1,0 +1,7 @@
+multimethod.test	input.clj	/^(ns multimethod.test)$/;"	kind:namespace
+test	input.clj	/^(defmulti test$/;"	kind:multi	scope:namespace:multimethod.test
+documented-multimethod	input.clj	/^(defmulti documented-multimethod "Documentation"$/;"	kind:multi	scope:namespace:multimethod.test
+test	input.clj	/^(defmethod test nil$/;"	kind:method	scope:namespace:multimethod.test
+test	input.clj	/^(defmethod test :test$/;"	kind:method	scope:namespace:multimethod.test
+test	input.clj	/^(defmethod test :test2 named-method$/;"	kind:method	scope:namespace:multimethod.test
+named-method	input.clj	/^(defmethod test :test2 named-method$/;"	kind:methodId	method:test	scope:namespace:multimethod.test
