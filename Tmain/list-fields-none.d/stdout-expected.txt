@@ -14,7 +14,7 @@ e       end            no      NONE     -i-    no    rw end lines of various ite
 f       file           yes     NONE     --b    no    -- File-restricted scoping
 i       inherits       no      NONE     s-b    no    -w Inheritance information
 k       NONE           yes     NONE     s--    no    -- Kind of tag in one-letter form
-l       language       no      NONE     s--    no    -- Language of input file containing tag
+l       language       no      NONE     s--    no    r- Language of input file containing tag
 m       implementation no      NONE     s--    no    -- Implementation information
 n       line           no      NONE     -i-    no    rw Line number of tag definition
 o       nth            no      NONE     -i-    no    -- the order in the parent scope

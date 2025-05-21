@@ -25,5 +25,5 @@ subsection ReStructuredText
 #
 # LIST: ENABLING COMMON FIELD BY SPECIFYING WILDCARD
 #
-l       language       yes     NONE             s--    no    -- Language of input file containing tag
+l       language       yes     NONE             s--    no    r- Language of input file containing tag
 -       target         yes     Thrift           s--    no    -- the target language specified at "namespace"

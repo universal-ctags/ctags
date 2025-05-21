@@ -1,0 +1,1 @@
+a	input.foo	/^def a$/;"	v
