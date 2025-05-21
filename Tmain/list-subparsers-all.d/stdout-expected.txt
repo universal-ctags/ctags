@@ -13,6 +13,8 @@ Glade                XML        base <> sub {bidirectional}
 I18nRubyGem          Yaml       base <> sub {bidirectional}
 IPythonCell          Python     base => sub {shared}
 ITcl                 Tcl        base <> sub {bidirectional}
+JNI                  C          base <> sub {bidirectional}
+JNI                  C++        base <> sub {bidirectional}
 Maven2               XML        base <> sub {bidirectional}
 Moose                Perl       base <> sub {bidirectional}
 OpenAPI              Yaml       base <> sub {bidirectional}

@@ -15,6 +15,7 @@
 #include "cxx_token_chain.h"
 #include "cxx_scope.h"
 #include "cxx_side_chain.h"
+#include "cxx_subparser_internal.h"
 
 #include "vstring.h"
 #include "read.h"
@@ -930,6 +931,7 @@ got_identifier:
 			if (iCorkIndex != CORK_NIL)
 			{
 				cxxParserSetEndLineForTagInCorkQueue (iCorkIndex, t->iLineNumber);
+				cxxSubparserNotifyVariableBodyMaybe (iCorkIndex, t);
 				iCorkIndex = CORK_NIL;
 				if(iCorkIndexFQ != CORK_NIL)
 				{
