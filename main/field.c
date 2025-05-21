@@ -91,6 +91,7 @@ static EsObject* getFieldValueForName (const tagEntryInfo *, const fieldDefiniti
 static EsObject* setFieldValueForName (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* getFieldValueForInput (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* getFieldValueForKind (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* getFieldValueForLanguage (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* getFieldValueForTyperef (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForTyperef (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 static EsObject* checkFieldValueForTyperef (const fieldDefinition *, const EsObject *);
@@ -210,6 +211,11 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.renderNoEscaping   = NULL,
 		.doesContainAnyChar = NULL,
 		.dataType           = FIELDTYPE_STRING,
+		.getterValueType    = "language",
+		.getValueObject     = getFieldValueForLanguage,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = NULL,
 	},
 	[FIELD_LINE_NUMBER - FIELD_ECTAGS_START] = {
 		.letter             = 'n',
@@ -1606,6 +1612,12 @@ static EsObject* getFieldValueForKind (const tagEntryInfo *tag, const fieldDefin
 {
 	const char *kind_name = getLanguageKindName (tag->langType, tag->kindIndex);
 	return opt_name_new_from_cstr (kind_name);
+}
+
+static EsObject* getFieldValueForLanguage (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	const char * lang_name = getLanguageName (tag->langType);
+	return opt_name_new_from_cstr (lang_name);
 }
 
 static EsObject* getFieldValueForTyperef (const tagEntryInfo *tag, const fieldDefinition *fdef)

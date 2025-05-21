@@ -1,0 +1,8 @@
+--langdef=foo
+--map-foo=+.foo
+
+--kinddef-foo=v,var,variables
+
+--regex-foo=/def ([a-z])/\1/v/{{
+   . :language =
+}}
