@@ -148,6 +148,7 @@
 	PkgConfigParser, \
 	PodParser, \
 	PowerShellParser, \
+	PrologParser, \
 	ProtobufParser, \
 	PuppetManifestParser, \
 	PythonParser, \

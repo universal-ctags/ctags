@@ -99,7 +99,17 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
    return false if it reaches EOF. */
 bool tokenSkipToType (tokenInfo *token, tokenType t);
 bool tokenSkipToTypeFull (tokenInfo *token, tokenType t, void *data);
+
+#define tokenSkipToOneOfTypes(TOKEN, SKIPPAIR, ...)						\
+	tokenSkipToOneOfTypesImpl(TOKEN, SKIPPAIR, ((tokenType []){__VA_ARGS__}), sizeof((tokenType []){__VA_ARGS__})/sizeof(tokenType))
+bool tokenSkipToOneOfTypesImpl (tokenInfo *token, bool skipPair, tokenType ts[], size_t count);
+
 bool tokenSkipOverPair (tokenInfo *token);
 bool tokenSkipOverPairFull (tokenInfo *token, void *data);
+
+void tokenInitTagEntry (tokenInfo *token, tagEntryInfo *e, int kind);
+void tokenInitRefTagEntry (tokenInfo *token, tagEntryInfo *e, int kind, int role);
+int tokenMakeSimpleTag (tokenInfo *token, int kind);
+int tokenMakeSimpleRefTag (tokenInfo *token, int kind, int role);
 
 #endif
