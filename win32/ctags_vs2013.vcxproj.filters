@@ -381,6 +381,9 @@
     <ClCompile Include="..\parsers\cxx\cxx_debug_type.c">
       <Filter>Source Files\parsers\cxx</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_jni.c">
+      <Filter>Source Files\parsers\cxx</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\cxx\cxx_keyword.c">
       <Filter>Source Files\parsers\cxx</Filter>
     </ClCompile>

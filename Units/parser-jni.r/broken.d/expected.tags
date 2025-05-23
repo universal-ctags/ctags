@@ -1,0 +1,18 @@
+a	input.c	/^int a;$/;"	v	typeref:typename:int
+gMethods00	input.c	/^static JNINativeMethod gMethods00[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods01	input.c	/^static JNINativeMethod gMethods01[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods02	input.c	/^static JNINativeMethod gMethods02[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods03	input.c	/^static JNINativeMethod gMethods03[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods04	input.c	/^static JNINativeMethod gMethods04[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods05	input.c	/^static JNINativeMethod gMethods05[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods06	input.c	/^static JNINativeMethod gMethods06[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods10	input.c	/^static JNINativeMethod gMethods10[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods20	input.c	/^static JNINativeMethod gMethods20[] =;$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods21	input.c	/^static JNINativeMethod gMethods21[] = 1;$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods22	input.c	/^static JNINativeMethod gMethods22[] = "a";$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods23	input.c	/^static JNINativeMethod gMethods23[] = ['a'];$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods24	input.c	/^static JNINativeMethod gMethods24[] = [NULL];$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods25	input.c	/^static JNINativeMethod gMethods25[] = [[NULL]];$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods30	input.c	/^static JNINativeMethod gMethods30[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+gMethods40	input.c	/^static JNINativeMethod gMethods40[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+b	input.c	/^int b;$/;"	v	typeref:typename:int

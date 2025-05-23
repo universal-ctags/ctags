@@ -126,14 +126,18 @@ mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	File	language:Plugin
 List subparsers of C ( EVENT + HOOK + PLUGIN + UA )
 #NAME   BASEPARSER DIRECTIONS
 Event   C          base => sub {shared}
+JNI     C          base <> sub {bidirectional}
 Plugin  C          base => sub {shared}
 List subparsers of C ( EVENT + HOOK + PLUGIN + UA ) without the header
 Event   C          base => sub {shared}
+JNI     C          base <> sub {bidirectional}
 Plugin  C          base => sub {shared}
 List subparsers of C ( EVENT + HOOK + PLUGIN + UA ) in machinable
 #NAME	BASEPARSER	DIRECTIONS
 Event	C	base => sub {shared}
+JNI	C	base <> sub {bidirectional}
 Plugin	C	base => sub {shared}
 List subparsers of C ( EVENT + HOOK + PLUGIN + UA ) in machinable without the header
 Event	C	base => sub {shared}
+JNI	C	base <> sub {bidirectional}
 Plugin	C	base => sub {shared}

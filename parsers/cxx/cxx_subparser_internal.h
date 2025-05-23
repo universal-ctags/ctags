@@ -24,4 +24,7 @@ void cxxSubparserUnknownIdentifierInClassNotify(CXXToken *pToken);
 void cxxSubparserNotifyEnterBlock (void);
 void cxxSubparserNotifyLeaveBlock (void);
 
+bool cxxSubparserWantVariableBody (CXXToken * pEndOfRightSide);
+void cxxSubparserNotifyVariableBodyMaybe (int iVarCork, CXXToken * pEnd);
+
 #endif //!ctags_cxx_subparser_interanl_h_

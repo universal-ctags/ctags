@@ -44,6 +44,7 @@ New parsers
 * SELinuxTypeEnforcement *optlib*
 * PythonEntryPoints *subparser*
 * Scdoc *optlib*
+* JNI *subparser*
 
 .. note:: We added a TOML as a new parser in this version. However,
 		  after adding it, we learned its implementation didn't work

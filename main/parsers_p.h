@@ -118,6 +118,7 @@
 	JavaParser, \
 	JavaPropertiesParser, \
 	JavaScriptParser, \
+	JNIParser, \
 	JsonParser, \
 	JuliaParser, \
 	KconfigParser, \

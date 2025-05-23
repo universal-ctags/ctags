@@ -123,3 +123,61 @@ void cxxSubparserNotifyLeaveBlock (void)
 		}
 	}
 }
+
+bool cxxSubparserWantVariableBody (CXXToken * pEndOfRightSide)
+{
+	bool bR = false;
+	subparser *pSubparser;
+
+	foreachSubparser (pSubparser, false)
+	{
+		if (bR)
+			continue;
+
+		cxxSubparser *pS = (cxxSubparser *)pSubparser;
+		if (pS->wantsVariableBody)
+		{
+			enterSubparser(pSubparser);
+			if (pS->wantsVariableBody (pS, pEndOfRightSide))
+				bR = true;
+			leaveSubparser();
+		}
+	}
+	return bR;
+}
+
+void cxxSubparserNotifyVariableBodyMaybe (int iVarCork, CXXToken * pEnd)
+{
+	CXXToken * pStart = NULL;
+
+
+	if (!cxxTokenTypeIs(pEnd ,CXXTokenTypeSemicolon))
+		return;
+
+	for (CXXToken * pT = pEnd->pPrev; pT; pT = pT->pPrev)
+	{
+		if (cxxTokenTypeIs(pT, CXXTokenTypeAssignment))
+		{
+			pStart = pT->pNext;
+			break;
+		}
+	}
+
+	if (pStart)
+	{
+		if (pStart == pEnd)
+			return;
+
+		subparser *pSubparser;
+		foreachSubparser (pSubparser, false)
+		{
+			cxxSubparser *pS = (cxxSubparser *)pSubparser;
+			if (pS->variableBodyNotify)
+			{
+				enterSubparser(pSubparser);
+				pS->variableBodyNotify (pS, iVarCork, pStart, pEnd);
+				leaveSubparser();
+			}
+		}
+	}
+}

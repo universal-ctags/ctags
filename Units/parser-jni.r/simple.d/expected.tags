@@ -1,0 +1,22 @@
+gMethods	input.cpp	/^static JNINativeMethod gMethods[] = {$/;"	v	typeref:typename:JNINativeMethod[]	file:
+nGetMaximumTextureWidth	input.cpp	/^        {"nGetMaximumTextureWidth", "()I", (void*)android_view_DisplayListCanvas_getMaxTextureSi/;"	m	variable:gMethods	typeref:typename:I	signature:()
+nGetMaximumTextureHeight	input.cpp	/^        {"nGetMaximumTextureHeight", "()I",$/;"	m	variable:gMethods	typeref:typename:I	signature:()
+nCreateDisplayListCanvas	input.cpp	/^        {"nCreateDisplayListCanvas", "(JII)J",$/;"	m	variable:gMethods	typeref:typename:J	signature:(JII)
+nResetDisplayListCanvas	input.cpp	/^        {"nResetDisplayListCanvas", "(JJII)V",$/;"	m	variable:gMethods	typeref:typename:V	signature:(JJII)
+nEnableZ	input.cpp	/^        {"nEnableZ", "(JZ)V", (void*)android_view_DisplayListCanvas_enableZ},$/;"	m	variable:gMethods	typeref:typename:V	signature:(JZ)
+nFinishRecording	input.cpp	/^        {"nFinishRecording", "(JJ)V", (void*)android_view_DisplayListCanvas_finishRecording},$/;"	m	variable:gMethods	typeref:typename:V	signature:(JJ)
+nDrawRenderNode	input.cpp	/^        {"nDrawRenderNode", "(JJ)V", (void*)android_view_DisplayListCanvas_drawRenderNode},$/;"	m	variable:gMethods	typeref:typename:V	signature:(JJ)
+nDrawTextureLayer	input.cpp	/^        {"nDrawTextureLayer", "(JJ)V", (void*)android_view_DisplayListCanvas_drawTextureLayer},$/;"	m	variable:gMethods	typeref:typename:V	signature:(JJ)
+nDrawCircle	input.cpp	/^        {"nDrawCircle", "(JJJJJ)V", (void*)android_view_DisplayListCanvas_drawCircleProps},$/;"	m	variable:gMethods	typeref:typename:V	signature:(JJJJJ)
+nDrawRoundRect	input.cpp	/^        {"nDrawRoundRect", "(JJJJJJJJ)V", (void*)android_view_DisplayListCanvas_drawRoundRectPro/;"	m	variable:gMethods	typeref:typename:V	signature:(JJJJJJJJ)
+nDrawWebViewFunctor	input.cpp	/^        {"nDrawWebViewFunctor", "(JI)V", (void*)android_view_DisplayListCanvas_drawWebViewFuncto/;"	m	variable:gMethods	typeref:typename:V	signature:(JI)
+nDrawRipple	input.cpp	/^        {"nDrawRipple", "(JJJJJJJIJ)V", (void*)android_view_DisplayListCanvas_drawRippleProps},$/;"	m	variable:gMethods	typeref:typename:V	signature:(JJJJJJJIJ)
+languages	input.cpp	/^static Lanaguage languages [] = {$/;"	v	typeref:typename:Lanaguage[]	file:
+foo	input-0.cpp	/^static void foo()$/;"	f	typeref:typename:void	file:	signature:()
+LocalMethods	input-0.cpp	/^  static JNINativeMethod LocalMethods[] = {{"aLocalMethod", "()I", (void*)localMethod},};$/;"	l	function:foo	typeref:typename:JNINativeMethod[]	file:
+aLocalMethod	input-0.cpp	/^  static JNINativeMethod LocalMethods[] = {{"aLocalMethod", "()I", (void*)localMethod},};$/;"	m	local:foo.LocalMethods	typeref:typename:I	signature:()
+CC	input-1.cpp	/^#define CC /;"	d	file:
+FN_PTR	input-1.cpp	/^#define FN_PTR(f) CAST_FROM_FN_PTR(/;"	d	file:	signature:(f)
+LANG	input-1.cpp	/^#define LANG /;"	d	file:
+UH_methods	input-1.cpp	/^static JNINativeMethod UH_methods[] = {$/;"	v	typeref:typename:JVM_END JNINativeMethod[]	file:
+freeUpcallStub0	input-1.cpp	/^  {CC "freeUpcallStub0",     CC "(J)Z",                FN_PTR(UH_FreeUpcallStub0)}$/;"	m	variable:UH_methods	typeref:typename:Z	signature:(J)

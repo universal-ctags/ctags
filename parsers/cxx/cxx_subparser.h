@@ -40,6 +40,9 @@ struct sCxxSubparser {
 	bool (* parseAccessSpecifierNotify) (struct sCxxSubparser *pSubparser);
 	void (* foundExtraIdentifierAsAccessSpecifier) (struct sCxxSubparser *pSubparser,
 													CXXToken * pToken);
+	bool (* wantsVariableBody) (struct sCxxSubparser *pSubparser, CXXToken * pEndOfRightSide);
+	void (* variableBodyNotify) (struct sCxxSubparser *pSubparser, int iVarCork,
+								 CXXToken * pStart, CXXToken * pEnd);
 };
 
 #endif //!ctags_cxx_subparser_h_

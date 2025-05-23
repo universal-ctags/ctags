@@ -42,6 +42,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	enum CXXScopeType eScopeType = cxxScopeGetType();
 	bool bIsCPP = cxxParserCurrentLanguageIsCPP();
 	CXXToken * pAux;
+	bool bAssignment = false;
 
 	if(
 			(
@@ -55,6 +56,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 					(eScopeType == CXXScopeTypeUnion)    ||
 					(eScopeType == CXXScopeTypeNamespace)
 				)
+				&& (bAssignment = true)
 			) || (
 				bIsCPP &&
 				(g_cxx.pToken->pPrev) &&
@@ -111,12 +113,19 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 			)
 		)
 	{
+		bool bReduce = true;
+		// Give subparsers a chance to inspect inside {} of of `something[] = {}`
+		// if they want.
+		if (bAssignment && g_cxx.pToken->pPrev->pPrev)
+			bReduce = !cxxSubparserWantVariableBody (g_cxx.pToken->pPrev->pPrev);
+
 		// array or list-like initialisation
+
 		bool bRet = cxxParserParseAndCondenseCurrentSubchain(
 				CXXTokenTypeOpeningBracket | CXXTokenTypeOpeningParenthesis |
 					CXXTokenTypeOpeningSquareParenthesis,
 				false,
-				true
+				bReduce
 			);
 
 		CXX_DEBUG_LEAVE_TEXT("Handled array or list-like initialisation or return");
