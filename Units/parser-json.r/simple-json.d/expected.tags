@@ -1,5 +1,5 @@
-0	input.json	/^    {$/;"	o	array:phoneNumbers
-1	input.json	/^    {$/;"	o	array:phoneNumbers
+0	input.json	/^    {$/;"	o	array:phoneNumbers	nth:0
+1	input.json	/^    {$/;"	o	array:phoneNumbers	nth:1
 address	input.json	/^  "address": {$/;"	o
 age	input.json	/^  "age": 25,$/;"	n
 children	input.json	/^  "children": [],$/;"	a

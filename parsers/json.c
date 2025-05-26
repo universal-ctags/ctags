@@ -119,7 +119,7 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 	dest->filePosition = src->filePosition;
 }
 
-static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
+static void makeJsonTag (tokenInfo *const token, const jsonKind kind, int nth)
 {
 	tagEntryInfo e;
 
@@ -136,6 +136,9 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 
 		e.extensionFields.scopeKindIndex = token->scopeKind;
 		e.extensionFields.scopeName = vStringValue (token->scope);
+
+		if (token->scopeKind == TAG_ARRAY)
+			e.extensionFields.nth = nth;
 	}
 
 	makeTagEntry (&e);
@@ -337,7 +340,7 @@ static void parseValue (tokenInfo *const token)
 					popScope (token, name);
 				}
 
-				makeJsonTag (name, tagKind);
+				makeJsonTag (name, tagKind, 0);
 			}
 			/* skip to the end of the construct */
 			skipToOneOf2 (token, TOKEN_CLOSE_CURLY, TOKEN_COMMA);
@@ -365,10 +368,10 @@ static void parseValue (tokenInfo *const token)
 			tagKind = tokenToKind (token->type);
 
 			copyToken (name, token);
-			snprintf (buf, sizeof buf, "%u", nth++);
+			snprintf (buf, sizeof buf, "%u", nth);
 			vStringCopyS (name->string, buf);
 
-			makeJsonTag (name, tagKind);
+			makeJsonTag (name, tagKind, nth++);
 			pushScope (token, name, tagKind);
 			parseValue (token);
 			popScope (token, name);

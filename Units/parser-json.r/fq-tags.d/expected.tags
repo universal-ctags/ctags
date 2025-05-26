@@ -1,3 +1,11 @@
+0	input.json	/^      "b": [1, true, {}],$/;"	n	array:welcome.x.b	nth:0
+welcome.x.b.0	input.json	/^      "b": [1, true, {}],$/;"	n	array:welcome.x.b	nth:0
+1	input.json	/^      "b": [1, true, {}],$/;"	b	array:welcome.x.b	nth:1
+welcome.x.b.1	input.json	/^      "b": [1, true, {}],$/;"	b	array:welcome.x.b	nth:1
+2	input.json	/^      "b": [1, true, {}],$/;"	o	array:welcome.x.b	nth:2
+welcome.x.b.2	input.json	/^      "b": [1, true, {}],$/;"	o	array:welcome.x.b	nth:2
+b	input.json	/^      "b": [1, true, {}],$/;"	a	object:welcome.x
+welcome.x.b	input.json	/^      "b": [1, true, {}],$/;"	a	object:welcome.x
 c	input.json	/^      "c": "hello {{.Name}}"$/;"	s	object:welcome.x
 welcome.x.c	input.json	/^      "c": "hello {{.Name}}"$/;"	s	object:welcome.x
 x	input.json	/^    "x": {$/;"	o	object:welcome
