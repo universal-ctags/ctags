@@ -1,6 +1,8 @@
 Name.Space	input.tsp	/^namespace Name.Space;$/;"	n
 Inner	input.tsp	/^namespace Inner {$/;"	n	namespace:Name.Space
 Versions	input.tsp	/^  enum Versions {$/;"	g	namespace:Name.Space.Inner
+v2024_05_01_preview	input.tsp	/^    v2024_05_01_preview: "2024-05-01-preview",$/;"	e	enum:Name.Space.Inner.Versions
+v2024_05_02_preview	input.tsp	/^    v2024_05_02_preview,$/;"	e	enum:Name.Space.Inner.Versions
 OpA	input.tsp	/^  op OpA<T extends TypeSpec.Reflection.Model> is OpB<$/;"	o	namespace:Name.Space.Inner
 InterfaceA	input.tsp	/^  interface InterfaceA extends InterfaceB {$/;"	i	namespace:Name.Space.Inner
 opA	input.tsp	/^    opA is OpA<{$/;"	p	interface:Name.Space.Inner.InterfaceA

@@ -16,6 +16,7 @@ namespace Inner {
   enum Versions {
     @doc("May 01, 2024 Preview API Version")
     v2024_05_01_preview: "2024-05-01-preview",
+    v2024_05_02_preview,
   }
 
   @summary("Example operation summary for demonstration purposes.")
