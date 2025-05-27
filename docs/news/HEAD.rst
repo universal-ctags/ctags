@@ -45,6 +45,7 @@ New parsers
 * PythonEntryPoints *subparser*
 * Scdoc *optlib*
 * JNI *subparser*
+* TypeSpec *parser*
 
 .. note:: We added a TOML as a new parser in this version. However,
 		  after adding it, we learned its implementation didn't work
