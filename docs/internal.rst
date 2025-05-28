@@ -439,7 +439,7 @@ and (3) ``end``. (This description is a bit simplified the real usage.)
 
 
 Let's see the actual code from "`parsers/yacc.c
-<https://github.com/universal-ctags/ctags/blob/master/parsers/yacc.c>`_".
+<https://github.com/universal-ctags/ctags/blob/29f3d603a3884fb5b9834402a20c9589e694b819/parsers/yacc.c>`_".
 
 .. code-block:: c
 
