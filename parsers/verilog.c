@@ -1020,7 +1020,17 @@ static void createTagFull (tokenInfo *const token, verilogKind kind, int role, t
 			token->parameter = true;
 	}
 	Assert (kind >= 0 && kind != K_UNDEFINED && kind != K_IDENTIFIER);
-	Assert (vStringLength (token->name) > 0);
+
+	/* Accept empty names under limited condition */
+	bool nulltag = false;
+	bool emptyName = vStringIsEmpty (token->name);
+	if (emptyName &&
+		(kind == K_MODULE || kind == K_STRUCT || kind == K_MEMBER))
+		nulltag = true;
+
+	if (emptyName && !nulltag)
+		VERBOSE ("nulltag kind: %d\n", kind);
+	Assert (nulltag || !emptyName);
 
 	/* check if a container before kind is modified by prototype */
 	/* BTW should we create a context for a prototype? */
@@ -1068,6 +1078,9 @@ static void createTagFull (tokenInfo *const token, verilogKind kind, int role, t
 
 	if (token->parameter)
 		attachParserField (&tag, fieldTable [F_PARAMETER].ftype, "");
+
+	if (nulltag)
+		tag.allowNullTag = 1;
 
 	makeTagEntry (&tag);
 
