@@ -50,10 +50,13 @@
 --_extradef-Kconfig=configPrefixed,prepend CONFIG_ to config names
 --extras-Kconfig=+{configPrefixed}
 
+--_sequel-Kconfg={{ clear }}
+
 # skip the comment lines.
 --regex-Kconfig=/^[ \t]*#.*$//{placeholder}
 
 --regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$/\2/c/{scope=ref}{{
+   clear
    .
 }}
 --regex-Kconfig=/^[ \t]*(def_)?(bool|boolean|hex|int|string|tristate)\>///{exclusive}{{
