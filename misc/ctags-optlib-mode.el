@@ -35,7 +35,7 @@
     ("^[[:space:]]*--\\(langdef\\)=\\([a-zA-Z0-9]+\\)"
      (1 font-lock-keyword-face t)
      (2 font-lock-type-face t))
-    ("^[[:space:]]*--\\(map\\|alias\\|_?prelude\\|_?scopesep\\)-\\([a-zA-Z0-9]+\\)=.*"
+    ("^[[:space:]]*--\\(map\\|alias\\|_?prelude\\|_?scopesep\\|__selector\\)-\\([a-zA-Z0-9]+\\)=.*"
      (1 font-lock-keyword-face t)
      (2 font-lock-type-face t))
     ;;
