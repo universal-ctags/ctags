@@ -20,6 +20,8 @@ typedef enum {
 
 static void initializeKconfigParser (const langType language CTAGS_ATTR_UNUSED)
 {
+	addLanguageOptscriptToHook (language, SCRIPT_HOOK_SEQUEL,
+		"{{ clear }}");
 }
 
 extern parserDefinition* KconfigParser (void)
@@ -74,6 +76,7 @@ extern parserDefinition* KconfigParser (void)
 		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$", "\\2",
 		"c", "{scope=ref}"
 		"{{\n"
+		"   clear\n"
 		"   .\n"
 		"}}", NULL, false},
 		{"^[ \t]*(def_)?(bool|boolean|hex|int|string|tristate)\\>", "",
