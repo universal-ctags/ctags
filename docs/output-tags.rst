@@ -135,7 +135,7 @@ The fourth column shows whether the role is enabled or not.
 The fifth column shows the description of the role.
 
 You can define a role in an optlib parser for capturing reference
-tags. See :ref:`Capturing reference tags <roles>` for more
+tags. See :ref:`Capturing reference tags <role-regex-flag>` for more
 details.
 
 ``--roles-<LANG>.<KIND>`` is the option for enabling/disabling

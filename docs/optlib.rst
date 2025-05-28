@@ -314,12 +314,12 @@ Experimental flags
 ``_extra``
 
 	This flag indicates the tag should only be generated if the given
-	``extra`` type is enabled, as explained in ":ref:`extras`".
+	``extra`` type is enabled, as explained in ":ref:`extra-regex-flag`".
 
 ``_field``
 
 	This flag allows a regex match to add additional custom fields to the
-	generated tag entry, as explained in ":ref:`fields`".
+	generated tag entry, as explained in ":ref:`field-regex-flag`".
 
 ``_guest``
 
@@ -334,9 +334,9 @@ Experimental flags
 ``_role``
 
 	This flag allows a regex match to generate a reference tag entry and
-	specify the role of the reference, as explained in ":ref:`roles`".
+	specify the role of the reference, as explained in ":ref:`role-regex-flag`".
 
-.. _extras:
+.. _extra-regex-flag:
 
 Conditional tagging with extras
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -379,7 +379,7 @@ The combination of these flags is new in version 6.2.0.
 .. TODO: this "fields" section should probably be moved up this document, as a
 	subsection in the "Regex option argument flags" section
 
-.. _fields:
+.. _field-regex-flag:
 
 Adding custom fields to the tag output
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -472,7 +472,7 @@ with `<LANG>` in ``--regex-<LANG>``. Together with ``{_language=<LANG>}``
 flag, you can switch the language of the field. See ":ref:`foreigntag`".
 The combination of these flags is new in version 6.2.0.
 
-.. _roles:
+.. _role-regex-flag:
 
 Capturing reference tags
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
