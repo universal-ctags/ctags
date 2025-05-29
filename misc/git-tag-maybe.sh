@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BASE=6.1
+BASE=6.2
 
 set -e
 
