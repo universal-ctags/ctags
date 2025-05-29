@@ -67,8 +67,8 @@
  * Chaning for the command line interface, and implementation changes
  * like bug fixes don't affect the CURRENT an AGE.
  */
-#define OUTPUT_VERSION_CURRENT 0
-#define OUTPUT_VERSION_AGE 0
+#define OUTPUT_VERSION_CURRENT 1
+#define OUTPUT_VERSION_AGE 1
 
 /*
  * Constant
