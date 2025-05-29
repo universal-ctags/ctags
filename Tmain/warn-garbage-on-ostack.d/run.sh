@@ -1,4 +1,4 @@
-# Copyright: 2017 Masatake YAMATO
+# Copyright: 2025 Masatake YAMATO
 # License: GPL-2
 
 CTAGS=$1

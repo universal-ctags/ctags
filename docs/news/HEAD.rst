@@ -17,7 +17,7 @@ See :ref:`extras` in :ref:`ctags(1) <ctags(1)>`.
 .. note::
 
    * ``libreadtags`` and ``readtags`` do not support the null tags yet.
-   * ``json`` and ``xref`` output formats support the null tags.
+   * Only ``json`` and ``xref`` output formats support the null tags.
 
 Incompatible changes
 ---------------------------------------------------------------------
