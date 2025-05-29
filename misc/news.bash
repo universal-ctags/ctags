@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-FROM=v6.0.0
+FROM=v6.1.0
 TO=.
 PROJ=universal-ctags
 REPO=ctags
