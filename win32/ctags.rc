@@ -58,8 +58,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 6,1,0,0
- PRODUCTVERSION 6,1,0,0
+ FILEVERSION 6,2,0,0
+ PRODUCTVERSION 6,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -76,12 +76,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Universal Ctags Team"
             VALUE "FileDescription", "Universal Ctags"
-            VALUE "FileVersion", "6.1.0.0"
+            VALUE "FileVersion", "6.2.0.0"
             VALUE "InternalName", "ctags.exe"
             VALUE "LegalCopyright", "Copyright \251 2015-2023 Universal Ctags Team"
             VALUE "OriginalFilename", "ctags.exe"
             VALUE "ProductName", "Universal Ctags"
-            VALUE "ProductVersion", "6.1.0.0"
+            VALUE "ProductVersion", "6.2.0.0"
         END
     END
     BLOCK "VarFileInfo"
