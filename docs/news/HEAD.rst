@@ -1,5 +1,5 @@
 ======================================================================
-Changes in 6.?.0
+Changes in 6.2.0
 ======================================================================
 
 This page lists only the most significant changes as remembered.  Use

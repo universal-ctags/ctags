@@ -6,7 +6,7 @@ ctags-lang-meson
 
 Random notes about tagging Meson build scripts with Universal Ctags
 
-:Version: 6.1.0
+:Version: 6.2.0
 :Manual group: Universal Ctags
 :Manual section: 7
 
