@@ -1,5 +1,13 @@
-c	input.json	/^      "c": "hello {{.Name}}"$/;"	s	object:welcome.x
-welcome.x.c	input.json	/^      "c": "hello {{.Name}}"$/;"	s	object:welcome.x
-x	input.json	/^    "x": {$/;"	o	object:welcome
-welcome.x	input.json	/^    "x": {$/;"	o	object:welcome
-welcome	input.json	/^  "welcome": {$/;"	o
+0	input.json	/^      "b": [1, true, {}],$/;"	n	array:welcome.x.b	end:4	nth:0
+welcome.x.b.0	input.json	/^      "b": [1, true, {}],$/;"	n	array:welcome.x.b	end:4	nth:0
+1	input.json	/^      "b": [1, true, {}],$/;"	b	array:welcome.x.b	end:4	nth:1
+welcome.x.b.1	input.json	/^      "b": [1, true, {}],$/;"	b	array:welcome.x.b	end:4	nth:1
+2	input.json	/^      "b": [1, true, {}],$/;"	o	array:welcome.x.b	end:4	nth:2
+welcome.x.b.2	input.json	/^      "b": [1, true, {}],$/;"	o	array:welcome.x.b	end:4	nth:2
+b	input.json	/^      "b": [1, true, {}],$/;"	a	object:welcome.x	end:4
+welcome.x.b	input.json	/^      "b": [1, true, {}],$/;"	a	object:welcome.x	end:4
+c	input.json	/^      "c": "hello {{.Name}}"$/;"	s	object:welcome.x	end:5
+welcome.x.c	input.json	/^      "c": "hello {{.Name}}"$/;"	s	object:welcome.x	end:5
+x	input.json	/^    "x": {$/;"	o	object:welcome	end:6
+welcome.x	input.json	/^    "x": {$/;"	o	object:welcome	end:6
+welcome	input.json	/^  "welcome": {$/;"	o	end:7

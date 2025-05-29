@@ -1,6 +1,7 @@
 {
   "welcome": {
     "x": {
+      "b": [1, true, {}],
       "c": "hello {{.Name}}"
     }
   }
