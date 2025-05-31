@@ -3979,6 +3979,21 @@ static void xtagDefinitionDestroy (xtagDefinition *xdef)
 	eFree (xdef);
 }
 
+static void pre_xtag_def_flag_version_long (const char* const optflag,
+											const char* const param, void* data)
+{
+	xtagDefinition *xdef = data;
+
+	if (!strToUInt (param, 10, &xdef->version))
+		error (FATAL, "Faile to parse the version number for role \"%s\": %s",
+			   xdef->name, param);
+}
+
+static flagDefinition PreXtagDefFlagDef [] = {
+	{ '\0', "version",  NULL, pre_xtag_def_flag_version_long,
+	  "VERSION", "in which version of the parser this extra is added"},
+};
+
 static bool processLangDefineExtra (const langType language,
 									const char *const option,
 									const char *const parameter)
@@ -4022,7 +4037,7 @@ static bool processLangDefineExtra (const langType language,
 	xdef->isEnabled = NULL;
 	DEFAULT_TRASH_BOX(xdef, xtagDefinitionDestroy);
 
-	flagsEval (flags, NULL, 0, xdef);
+	flagsEval (flags, PreXtagDefFlagDef, ARRAY_SIZE (PreXtagDefFlagDef), xdef);
 
 	defineXtag (xdef, language);
 
@@ -5446,6 +5461,7 @@ defineSimplePrintFLagsFunction(Langdef, PreLangDefFlagDef);
 defineSimplePrintFLagsFunction(Kinddef, PreKindDefFlagDef);
 defineSimplePrintFLagsFunction(Roledef, PreRoleDefFlagDef);
 defineSimplePrintFLagsFunction(Fielddef, FieldDefFlagDef);
+defineSimplePrintFLagsFunction(Extradef, PreXtagDefFlagDef);
 
 extern void printLanguageMultitableStatistics (langType language)
 {
