@@ -2,8 +2,8 @@
 # NOSUCHLANG
 
 # define "a"
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-a       aa   yes     no      0      NONE   aaa
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+a       aa   yes     no      0      NONE     0 aaa
 
 # no description 1
 
@@ -42,45 +42,45 @@ a       aa   yes     no      0      NONE   aaa
 # reusing the name for file kind
 
 # inject a flag separator
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     no      0      NONE   desc
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     no      0      NONE     0 desc
 
 # inject a broken flag separator(1)
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     no      0      NONE   desc
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     no      0      NONE     0 desc
 
 # inject a broken flag separator(2)
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     no      0      NONE   desc
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     no      0      NONE     0 desc
 
 # use a { in description (1)
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     no      0      NONE   desc{
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     no      0      NONE     0 desc{
 
 # use a { in description (2)
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     no      0      NONE   desc{}
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     no      0      NONE     0 desc{}
 
 # use a number char as the initial letter
 
 # use a number char within the body
-#LETTER NAME  ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       k0ind yes     no      0      NONE   desc
+#LETTER NAME  ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       k0ind yes     no      0      NONE     0 desc
 
 # use a \ in description
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     no      0      NONE   desc\backslash
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     no      0      NONE     0 desc\backslash
 
 # description started from {
 
 # description started from \{
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     no      0      NONE   {
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     no      0      NONE     0 {
 
 # _refonly flag
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     no      0      NONE   desc
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     no      1      NONE   desc
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-x       kind yes     yes     1      NONE   desc
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     no      0      NONE     0 desc
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     no      1      NONE     0 desc
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+x       kind yes     yes     1      NONE     0 desc

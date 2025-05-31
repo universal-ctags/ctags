@@ -1191,6 +1191,9 @@ Listing Options
 
 		.. TODO: need a reference to "master parser"
 
+	VER
+		The parser version introducing the kind.
+
 	DESCRIPTION
 		Human readable description for the kind.
 

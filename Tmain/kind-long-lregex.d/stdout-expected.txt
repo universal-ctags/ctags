@@ -1,6 +1,6 @@
 # definition
-d       definition yes     no      0      NONE   definitions
+d       definition yes     no      0      NONE     0 definitions
 # disabling
-d       definition no      no      0      NONE   definitions
+d       definition no      no      0      NONE     0 definitions
 # enabling again
-d       definition yes     no      0      NONE   definitions
+d       definition yes     no      0      NONE     0 definitions
