@@ -128,6 +128,7 @@ extern void printLanguageParams (const langType language,
 								 bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageSubparsers (const langType language,
 									 bool withListHeader, bool machinable, FILE *fp);
+extern void printExtradefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern void printRoledefFlags (bool withListHeader, bool machinable, FILE *fp);

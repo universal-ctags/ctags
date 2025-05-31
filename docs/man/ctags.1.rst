@@ -1052,6 +1052,13 @@ Listing Options
 		The name of language if the extra is owned by a parser.
 		``NONE`` means the extra is common in parsers.
 
+	VER
+		The ctags output version introducing the extra for a language-independent
+		extra, or the parser version introducing the extra for a
+		language-specified extra. See the ``--version`` option and
+		``TAG_OUTPUT_VERSION`` in :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the ctags output
+		version.
+
 	DESCRIPTION
 		Human readable description for the extra.
 

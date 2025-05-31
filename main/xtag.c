@@ -150,7 +150,7 @@ extern xtagType  getXtagTypeForNameAndLanguage (const char *name, langType langu
 extern struct colprintTable * xtagColprintTableNew (void)
 {
 	return colprintTableNew ("L:LETTER", "L:NAME", "L:ENABLED",
-							 "L:LANGUAGE", "L:FIXED", "L:DESCRIPTION", NULL);
+							 "L:LANGUAGE", "L:FIXED", "R:VER", "L:DESCRIPTION", NULL);
 }
 
 static void  xtagColprintAddLine (struct colprintTable *table, int xtype)
@@ -171,6 +171,7 @@ static void  xtagColprintAddLine (struct colprintTable *table, int xtype)
 									 ? RSV_NONE
 									 : getLanguageName (xobj->language));
 	colprintLineAppendColumnBool (line, isXtagFixed(xdef->xtype));
+	colprintLineAppendColumnVersion (line, xdef->version);
 	colprintLineAppendColumnCString (line, xdef->description);
 }
 
@@ -378,6 +379,12 @@ extern int defineXtag (xtagDefinition *def, langType language)
 			 def->xtype,
 			 def->name, def->description,
 			 getLanguageName (language));
+
+	if (def->version > getLanguageVersionCurrent (language))
+		error (WARNING, "the version number (%u) of extra \"%s\" of language \"%s\" "
+			   "should be less than or equal to the current number (%u) of the language",
+			   def->version, def->name, getLanguageName (language),
+			   getLanguageVersionCurrent (language));
 
 	return def->xtype;
 }

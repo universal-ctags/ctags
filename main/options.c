@@ -464,6 +464,8 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"       --list-{aliases,extras,features,fields,kind-full,langdef-flags,params," },
  {1,0,"       pseudo-tags,regex-flags,roles,subparsers} support this option."},
  {1,0,"       Specify before --list-* option."},
+ {1,1,"  --_list-extradef-flags"},
+ {1,1,"       Output list of flags which can be used with --extradef option."},
  {1,1,"  --_list-fielddef-flags"},
  {1,1,"       Output list of flags which can be used with --fielddef option."},
  {1,1,"  --_list-kinddef-flags"},
@@ -2224,6 +2226,7 @@ defineListFunctionForOption (LangdefFlags, printLangdefFlags);
 defineListFunctionForOption (KinddefFlags, printKinddefFlags);
 defineListFunctionForOption (RoledefFlags, printRoledefFlags);
 defineListFunctionForOption (FielddefFlags, printFielddefFlags);
+defineListFunctionForOption (ExtradefFlags, printExtradefFlags);
 
 defineListFunctionForOption (OutputFormats, printOutputFormats);
 
@@ -2923,6 +2926,7 @@ static parametricOption ParametricOptions [] = {
 #ifdef HAVE_JANSSON
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
 #endif
+	{ "_list-extradef-flags",   processListExtradefFlagsOption, true,   STAGE_ANY },
 	{ "_list-fielddef-flags",   processListFielddefFlagsOption, true,   STAGE_ANY },
 	{ "_list-kinddef-flags",    processListKinddefFlagsOption,  true,   STAGE_ANY },
 	{ "_list-langdef-flags",    processListLangdefFlagsOption,  true,   STAGE_ANY },
