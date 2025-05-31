@@ -25,6 +25,8 @@ struct sRoleDefinition {
 	char* name;		  /* role name */
 	char* description;	  /* displayed in --help output */
 
+	unsigned int    version;
+
 	int id;
 };
 
