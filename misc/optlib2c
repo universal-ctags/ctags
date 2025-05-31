@@ -107,6 +107,9 @@ my $fielddef_flags =
 
 	 $_[0]->{'datatype'} = $datatype;
        } ],
+     [ qr/\{version=([0-9]+)\}/, sub {
+	 $_[0]->{'version'} = $1;
+       } ],
     ];
 
 my $options =
@@ -200,7 +203,7 @@ my $options =
 	 die "unacceptable character is used for field name: $name"
 	     unless ($name =~ /^[a-zA-Z]+$/);
 
-	 my $fdef = { name => $name, desc => $desc };
+	 my $fdef = { name => $name, desc => $desc, version => 0 };
 	 push @{$_[0]->{'fielddefs'}}, $fdef;
 	 parse_flags ($rest, $fdef, $fielddef_flags);
 
@@ -1193,6 +1196,11 @@ EOF
 		  .isValueAvailable = isValueAvailableGeneric,
 		  .getValueObject = getFieldValueGeneric,
 		  .setValueObject = setFieldValueGeneric,
+EOF
+      }
+      if ($_->{'version'}) {
+	  print <<EOF;
+		  .version     = $_->{'version'},
 EOF
       }
       print <<EOF;
