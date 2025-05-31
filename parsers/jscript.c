@@ -289,6 +289,7 @@ static fieldDefinition JsFields[] = {
 		.name = "properties",
 		.description = "properties (static)",
 		.enabled = false,
+		.version = 2,
 	},
 };
 
