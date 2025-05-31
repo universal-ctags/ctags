@@ -5392,41 +5392,19 @@ extern void printLanguageSubparsers (const langType language,
 	colprintTableDelete (table);
 }
 
-extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
-{
-	struct colprintTable * table;
+#define defineSimplePrintFLagsFunction(target, flagDef) \
+	extern void print##target##Flags (bool withListHeader, bool machinable, FILE *fp) \
+	{																	\
+		struct colprintTable * table = 	flagsColprintTableNew();		\
+		flagsColprintAddDefinitions (table, flagDef, ARRAY_SIZE (flagDef)); \
+		flagsColprintTablePrint (table, withListHeader, machinable, fp); \
+		colprintTableDelete(table);										\
+	} extern void print##target##Flags (bool withListHeader, bool machinable, FILE *fp \
+		)						/* So we can put ';' here. */
 
-	table = flagsColprintTableNew ();
-
-	flagsColprintAddDefinitions (table, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef));
-
-	flagsColprintTablePrint (table, withListHeader, machinable, fp);
-	colprintTableDelete(table);
-}
-
-extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp)
-{
-	struct colprintTable * table;
-
-	table = flagsColprintTableNew ();
-
-	flagsColprintAddDefinitions (table, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef));
-
-	flagsColprintTablePrint (table, withListHeader, machinable, fp);
-	colprintTableDelete(table);
-}
-
-extern void printFielddefFlags (bool withListHeader, bool machinable, FILE *fp)
-{
-	struct colprintTable * table;
-
-	table = flagsColprintTableNew ();
-
-	flagsColprintAddDefinitions (table, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef));
-
-	flagsColprintTablePrint (table, withListHeader, machinable, fp);
-	colprintTableDelete(table);
-}
+defineSimplePrintFLagsFunction(Langdef, PreLangDefFlagDef);
+defineSimplePrintFLagsFunction(Kinddef, PreKindDefFlagDef);
+defineSimplePrintFLagsFunction(Fielddef, FieldDefFlagDef);
 
 extern void printLanguageMultitableStatistics (langType language)
 {
