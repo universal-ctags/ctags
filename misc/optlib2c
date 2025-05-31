@@ -63,6 +63,9 @@ my $kinddef_flags =
      [ qr/\{_refonly\}/, sub {
 	 $_[0]->{'refonly'} = 1;
        } ],
+     [ qr/\{version=([0-9]+)\}/, sub {
+	 $_[0]->{'version'} = $1;
+       } ],
     ];
 
 my $fielddef_flags =
@@ -157,7 +160,7 @@ my $options =
 	     unless (substr ($name, 1) =~ /^[a-zA-Z0-9]+$/);
 
 	 my $kdef = { enabled => 1, letter => $letter, name => $name, desc => $desc,
-		      refonly => 0, roles => [], seps => [] };
+		      refonly => 0, roles => [], seps => [], version => 0 };
 	 push @{$_[0]->{'kinddefs'}}, $kdef;
 	 parse_flags ($rest, $kdef, $kinddef_flags);
 
@@ -988,6 +991,11 @@ EOF
       if (@{$_->{'seps'}}) {
 	  print <<EOF;
 		  ATTACH_SEPARATORS($opts->{'Clangdef'}${Kind}Separators),
+EOF
+      }
+      if ($_->{'version'}) {
+	  print <<EOF;
+		  .version = $_->{'version'},
 EOF
       }
       print <<EOF;
