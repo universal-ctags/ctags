@@ -656,9 +656,11 @@ extern parserDefinition* MesonParser (void)
 		},
 		{
 		  true, 'D', "cfgdata", "configuration data objects",
+		  .version = 1,
 		},
 		{
 		  true, 'C', "cfgvar", "configuration variables",
+		  .version = 1,
 		},
 	};
 

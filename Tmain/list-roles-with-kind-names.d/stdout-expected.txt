@@ -2,8 +2,8 @@
 #LANGUAGE      KIND(L/N) NAME     ENABLED VER DESCRIPTION
 C              h/header  local    on        0 local header
 C              h/header  system   on        0 system header
-C++            h/header  exported on        0 exported with "exported imported ..."
-C++            h/header  imported on        0 imported with "imported ..."
+C++            h/header  exported on        2 exported with "exported imported ..."
+C++            h/header  imported on        2 imported with "imported ..."
 C++            h/header  local    on        0 local header
 C++            h/header  system   on        0 system header
 CPreProcessor  h/header  local    on        0 local header
@@ -16,8 +16,8 @@ Vera           h/header  system   on        0 system header
 #LANGUAGE      KIND(L/N)   NAME      ENABLED VER DESCRIPTION
 C              h/header    local     on        0 local header
 C              h/header    system    on        0 system header
-C++            h/header    exported  on        0 exported with "exported imported ..."
-C++            h/header    imported  on        0 imported with "imported ..."
+C++            h/header    exported  on        2 exported with "exported imported ..."
+C++            h/header    imported  on        2 imported with "imported ..."
 C++            h/header    local     on        0 local header
 C++            h/header    system    on        0 system header
 CPreProcessor  h/header    local     on        0 local header
@@ -45,8 +45,8 @@ C              h/header    local     on        0 local header
 C              h/header    system    on        0 system header
 C++            d/macro     condition off       0 used in part of #if/#ifdef/#elif conditions
 C++            d/macro     undef     on        0 undefined
-C++            h/header    exported  on        0 exported with "exported imported ..."
-C++            h/header    imported  on        0 imported with "imported ..."
+C++            h/header    exported  on        2 exported with "exported imported ..."
+C++            h/header    imported  on        2 imported with "imported ..."
 C++            h/header    local     on        0 local header
 C++            h/header    system    on        0 system header
 CPreProcessor  d/macro     condition off       0 used in part of #if/#ifdef/#elif conditions

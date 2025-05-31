@@ -25,17 +25,17 @@ Basic                   f/function        decl               on        0 declare
 Bats                    S/script          loaded             on        0 script loaed with "load" command
 C                       d/macro           condition          off       0 used in part of #if/#ifdef/#elif conditions
 C                       d/macro           undef              on        0 undefined
-C                       f/function        foreigndecl        on        0 declared in foreign languages
+C                       f/function        foreigndecl        on        1 declared in foreign languages
 C                       h/header          local              on        0 local header
 C                       h/header          system             on        0 system header
-C                       s/struct          foreigndecl        on        0 declared in foreign languages
-C++                     M/module          imported           on        0 imported with "imported ..."
-C++                     M/module          partOwner          on        0 used for specifying a partition
-C++                     P/partition       imported           on        0 imported with "imported ..."
+C                       s/struct          foreigndecl        on        1 declared in foreign languages
+C++                     M/module          imported           on        2 imported with "imported ..."
+C++                     M/module          partOwner          on        2 used for specifying a partition
+C++                     P/partition       imported           on        2 imported with "imported ..."
 C++                     d/macro           condition          off       0 used in part of #if/#ifdef/#elif conditions
 C++                     d/macro           undef              on        0 undefined
-C++                     h/header          exported           on        0 exported with "exported imported ..."
-C++                     h/header          imported           on        0 imported with "imported ..."
+C++                     h/header          exported           on        2 exported with "exported imported ..."
+C++                     h/header          imported           on        2 imported with "imported ..."
 C++                     h/header          local              on        0 local header
 C++                     h/header          system             on        0 system header
 CPreProcessor           d/macro           condition          off       0 used in part of #if/#ifdef/#elif conditions
@@ -68,7 +68,7 @@ HTML                    J/script          extFile            on        0 referen
 HTML                    c/class           attribute          on        0 assigned as attributes
 Java                    p/package         imported           on        0 imported package
 JavaScript              c/class           chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
-JavaScript              f/function        foreigndecl        on        0 declared in foreign languages
+JavaScript              f/function        foreigndecl        on        1 declared in foreign languages
 JavaScript              v/variable        chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Julia                   Y/unknown         imported           on        0 loaded by "import"
 Julia                   Y/unknown         used               on        0 loaded by "using"
@@ -76,11 +76,11 @@ Julia                   n/module          imported           on        0 loaded 
 Julia                   n/module          namespace          on        0 only some symbols in it are imported
 Julia                   n/module          used               on        0 loaded by "using"
 Kconfig                 k/kconfig         source             on        0 kconfig file loaded with source directive
-LEX                     c/cond            grouping           on        0  conditions used for grouping of start or exclusive condition rules
-LdScript                i/inputSection    destination        on        0 specified as the destination of code and data
+LEX                     c/cond            grouping           on        1  conditions used for grouping of start or exclusive condition rules
+LdScript                i/inputSection    destination        on        1 specified as the destination of code and data
 LdScript                i/inputSection    discarded          on        0 discarded when linking
 LdScript                i/inputSection    mapped             on        0 mapped to output section
-LdScript                s/symbol          aliased            on        0 aliased with __attribute__((alias(...))) in C/C++ code
+LdScript                s/symbol          aliased            on        1 aliased with __attribute__((alias(...))) in C/C++ code
 LdScript                s/symbol          entrypoint         on        0 entry points
 Lua                     Y/unknown         referenced         off       0 referenced somehow
 M4                      I/macrofile       included           on        0 included macro
@@ -102,8 +102,8 @@ Protobuf                D/protodef        imported           on        0 importe
 Protobuf                m/message         extension          on        0 extending the message
 Python                  Y/unknown         imported           on        0 imported from the other module
 Python                  Y/unknown         indirectlyImported on        0 classes/variables/functions/modules imported in alternative name
-Python                  f/function        entryPoint         on        0 specified as an entry point
-Python                  i/module          entryPoint         on        0 specified as a module of an entry point
+Python                  f/function        entryPoint         on        1 specified as an entry point
+Python                  i/module          entryPoint         on        1 specified as a module of an entry point
 Python                  i/module          imported           on        0 imported modules
 Python                  i/module          indirectlyImported on        0 module imported in alternative name
 Python                  i/module          namespace          on        0 namespace from where classes/variables/functions are imported
@@ -115,11 +115,11 @@ RpmSpec                 p/patch           decl               on        0 declare
 Ruby                    L/library         loaded             on        0 loaded by "load" method
 Ruby                    L/library         required           on        0 loaded by "require" method
 Ruby                    L/library         requiredRel        on        0 loaded by "require_relative" method
-SCSS                    M/module          used               on        0 used
+SCSS                    M/module          used               on        1 used
 SELinuxTypeEnforcement  t/type            aliased            on        0 aliased
 Sh                      h/heredoc         endmarker          on        0 end marker
 Sh                      s/script          loaded             on        0 loaded
-SystemTap               p/probe           attached           on        0 attached by code for probing
+SystemTap               p/probe           attached           on        1 attached by code for probing
 SystemVerilog           m/module          decl               on        0 declaring instances
 SystemdUnit             u/unit            After              on        0 referred in After key
 SystemdUnit             u/unit            Before             on        0 referred in Before key
@@ -175,17 +175,17 @@ Basic                   f/function        decl               on        0 declare
 Bats                    S/script          loaded             on        0 script loaed with "load" command
 C                       d/macro           condition          off       0 used in part of #if/#ifdef/#elif conditions
 C                       d/macro           undef              on        0 undefined
-C                       f/function        foreigndecl        on        0 declared in foreign languages
+C                       f/function        foreigndecl        on        1 declared in foreign languages
 C                       h/header          local              on        0 local header
 C                       h/header          system             on        0 system header
-C                       s/struct          foreigndecl        on        0 declared in foreign languages
-C++                     M/module          imported           on        0 imported with "imported ..."
-C++                     M/module          partOwner          on        0 used for specifying a partition
-C++                     P/partition       imported           on        0 imported with "imported ..."
+C                       s/struct          foreigndecl        on        1 declared in foreign languages
+C++                     M/module          imported           on        2 imported with "imported ..."
+C++                     M/module          partOwner          on        2 used for specifying a partition
+C++                     P/partition       imported           on        2 imported with "imported ..."
 C++                     d/macro           condition          off       0 used in part of #if/#ifdef/#elif conditions
 C++                     d/macro           undef              on        0 undefined
-C++                     h/header          exported           on        0 exported with "exported imported ..."
-C++                     h/header          imported           on        0 imported with "imported ..."
+C++                     h/header          exported           on        2 exported with "exported imported ..."
+C++                     h/header          imported           on        2 imported with "imported ..."
 C++                     h/header          local              on        0 local header
 C++                     h/header          system             on        0 system header
 CPreProcessor           d/macro           condition          off       0 used in part of #if/#ifdef/#elif conditions
@@ -218,7 +218,7 @@ HTML                    J/script          extFile            on        0 referen
 HTML                    c/class           attribute          on        0 assigned as attributes
 Java                    p/package         imported           on        0 imported package
 JavaScript              c/class           chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
-JavaScript              f/function        foreigndecl        on        0 declared in foreign languages
+JavaScript              f/function        foreigndecl        on        1 declared in foreign languages
 JavaScript              v/variable        chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Julia                   Y/unknown         imported           on        0 loaded by "import"
 Julia                   Y/unknown         used               on        0 loaded by "using"
@@ -226,11 +226,11 @@ Julia                   n/module          imported           on        0 loaded 
 Julia                   n/module          namespace          on        0 only some symbols in it are imported
 Julia                   n/module          used               on        0 loaded by "using"
 Kconfig                 k/kconfig         source             on        0 kconfig file loaded with source directive
-LEX                     c/cond            grouping           on        0  conditions used for grouping of start or exclusive condition rules
-LdScript                i/inputSection    destination        on        0 specified as the destination of code and data
+LEX                     c/cond            grouping           on        1  conditions used for grouping of start or exclusive condition rules
+LdScript                i/inputSection    destination        on        1 specified as the destination of code and data
 LdScript                i/inputSection    discarded          on        0 discarded when linking
 LdScript                i/inputSection    mapped             on        0 mapped to output section
-LdScript                s/symbol          aliased            on        0 aliased with __attribute__((alias(...))) in C/C++ code
+LdScript                s/symbol          aliased            on        1 aliased with __attribute__((alias(...))) in C/C++ code
 LdScript                s/symbol          entrypoint         on        0 entry points
 Lua                     Y/unknown         referenced         off       0 referenced somehow
 M4                      I/macrofile       included           on        0 included macro
@@ -252,8 +252,8 @@ Protobuf                D/protodef        imported           on        0 importe
 Protobuf                m/message         extension          on        0 extending the message
 Python                  Y/unknown         imported           on        0 imported from the other module
 Python                  Y/unknown         indirectlyImported on        0 classes/variables/functions/modules imported in alternative name
-Python                  f/function        entryPoint         on        0 specified as an entry point
-Python                  i/module          entryPoint         on        0 specified as a module of an entry point
+Python                  f/function        entryPoint         on        1 specified as an entry point
+Python                  i/module          entryPoint         on        1 specified as a module of an entry point
 Python                  i/module          imported           on        0 imported modules
 Python                  i/module          indirectlyImported on        0 module imported in alternative name
 Python                  i/module          namespace          on        0 namespace from where classes/variables/functions are imported
@@ -265,11 +265,11 @@ RpmSpec                 p/patch           decl               on        0 declare
 Ruby                    L/library         loaded             on        0 loaded by "load" method
 Ruby                    L/library         required           on        0 loaded by "require" method
 Ruby                    L/library         requiredRel        on        0 loaded by "require_relative" method
-SCSS                    M/module          used               on        0 used
+SCSS                    M/module          used               on        1 used
 SELinuxTypeEnforcement  t/type            aliased            on        0 aliased
 Sh                      h/heredoc         endmarker          on        0 end marker
 Sh                      s/script          loaded             on        0 loaded
-SystemTap               p/probe           attached           on        0 attached by code for probing
+SystemTap               p/probe           attached           on        1 attached by code for probing
 SystemVerilog           m/module          decl               on        0 declaring instances
 SystemdUnit             u/unit            After              on        0 referred in After key
 SystemdUnit             u/unit            Before             on        0 referred in Before key
@@ -305,10 +305,10 @@ Zsh                     s/script          loaded             on        0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # all.d
@@ -344,10 +344,10 @@ s/script   loaded on        0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       off       0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
 
 #
 # C.* with disabling all roles of all kinds of all languages
@@ -355,10 +355,10 @@ s/struct    foreigndecl off       0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       off       0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
 
 #
 # C.* with enabling all roles of all kinds in all languages
@@ -367,10 +367,10 @@ s/struct    foreigndecl off       0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   on        0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with enabling all roles in all languages
@@ -379,10 +379,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   on        0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with disabling all roles in C language
@@ -390,10 +390,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       off       0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
 
 #
 # Sh.* with disabling all roles in C language
@@ -408,10 +408,10 @@ s/script   loaded    on        0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       off       0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
 
 #
 # Sh.* with disabling all roles of all kinds in C language
@@ -427,10 +427,10 @@ s/script   loaded    on        0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   on        0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # Sh.* with enabling all roles in C language
@@ -447,10 +447,10 @@ s/script   loaded    off       0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   on        0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # Sh.* with enabling all roles of all kinds in C language
@@ -466,10 +466,10 @@ s/script   loaded    off       0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       off       0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # Sh.* with disabling all roles of {header} kind in C language
@@ -484,10 +484,10 @@ s/script   loaded    on        0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       off       0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # Sh.* with disabling all roles of h kind in C language
@@ -503,10 +503,10 @@ s/script   loaded    on        0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
 
 #
 # Sh.* with enabling all roles of {header} kind in C language
@@ -523,10 +523,10 @@ s/script   loaded    off       0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
 
 #
 # Sh.* with enabling all roles of h kind in C language
@@ -542,10 +542,10 @@ s/script   loaded    off       0 loaded
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with disabling system role of {header} kind
@@ -553,10 +553,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with enabling system role of h kind after disabling the role
@@ -564,10 +564,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with enabling system role of {header} kind after disabling the role
@@ -575,10 +575,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with disabling system and local roles of h kind
@@ -586,10 +586,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       off       0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with disabling system and local roles of {header} kind
@@ -597,10 +597,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       off       0 local header
 h/header    system      off       0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with enabling system and local roles of h kind
@@ -609,10 +609,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
 
 #
 # C.* with enabling system and local roles of {header} kind
@@ -621,10 +621,10 @@ s/struct    foreigndecl off       0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
 
 #
 # C.* with disabling local role of h kind and undef role of d kind
@@ -632,10 +632,10 @@ s/struct    foreigndecl off       0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       off       0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with enabling all roles of header kinds after disabling all roles of the kind
@@ -643,10 +643,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on        0 undefined
-f/function  foreigndecl on        0 declared in foreign languages
+f/function  foreigndecl on        1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl on        0 declared in foreign languages
+s/struct    foreigndecl on        1 declared in foreign languages
 
 #
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language
@@ -654,10 +654,10 @@ s/struct    foreigndecl on        0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
 
 #
 # C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language (short notation)
@@ -665,7 +665,7 @@ s/struct    foreigndecl off       0 declared in foreign languages
 #KIND(L/N)  NAME        ENABLED VER DESCRIPTION
 d/macro     condition   off       0 used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off       0 undefined
-f/function  foreigndecl off       0 declared in foreign languages
+f/function  foreigndecl off       1 declared in foreign languages
 h/header    local       on        0 local header
 h/header    system      on        0 system header
-s/struct    foreigndecl off       0 declared in foreign languages
+s/struct    foreigndecl off       1 declared in foreign languages
