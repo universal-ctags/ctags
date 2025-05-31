@@ -1283,6 +1283,9 @@ Listing Options
 	ENABLED
 		Whether the kind is enabled or not. It takes ``yes`` or ``no``.
 
+	VER
+		The parser version introducing the role.
+
 	DESCRIPTION
 		Human readable description for the role.
 

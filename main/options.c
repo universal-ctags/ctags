@@ -474,6 +474,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Output list of flags which can be used in a multitable regex parser definition."},
  {1,1,"  --_list-operators"},
  {1,1,"       Output list of optscript operators."},
+ {1,1,"  --_list-roledef-flags"},
+ {1,1,"       Output list of flags which can be used with --roledef option."},
  {1,0,""},
  {1,0,"Miscellaneous Options"},
  {1,0,"  --help"},
@@ -2220,6 +2222,7 @@ defineListFunctionForOptionWithParameter (MultitableRegexFlags, printMultitableR
 
 defineListFunctionForOption (LangdefFlags, printLangdefFlags);
 defineListFunctionForOption (KinddefFlags, printKinddefFlags);
+defineListFunctionForOption (RoledefFlags, printRoledefFlags);
 defineListFunctionForOption (FielddefFlags, printFielddefFlags);
 
 defineListFunctionForOption (OutputFormats, printOutputFormats);
@@ -2925,6 +2928,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_list-langdef-flags",    processListLangdefFlagsOption,  true,   STAGE_ANY },
 	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOption, true, STAGE_ANY },
 	{ "_list-operators",        processListOperators,           true,   STAGE_ANY },
+	{ "_list-roledef-flags",    processListRoledefFlagsOption,  true,   STAGE_ANY },
 #ifdef DO_TRACING
 	{ "_trace",                 processTraceOption,             false,  STAGE_ANY },
 #endif

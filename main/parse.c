@@ -2836,6 +2836,21 @@ static void freeRdef (roleDefinition *rdef)
 	eFree (rdef);
 }
 
+static void pre_role_def_flag_version_long (const char* const optflag,
+											const char* const param, void* data)
+{
+	roleDefinition *rdef = data;
+
+	if (!isdigit((unsigned char)*param) || !strToUInt (param, 10, &rdef->version))
+		error (FATAL, "Failed to parse the version number for role \"%s\": %s",
+			   rdef->name, param);
+}
+
+static flagDefinition PreRoleDefFlagDef [] = {
+	{ '\0', "version",  NULL, pre_role_def_flag_version_long,
+	  "VERSION", "in which version of the parser this role is added"},
+};
+
 static bool processLangDefineRole(const langType language,
 								  const char *const kindSpec,
 								  const char *const option,
@@ -2932,7 +2947,7 @@ static bool processLangDefineRole(const langType language,
 	rdef->name = name;
 	rdef->description = description;
 
-	flagsEval (flags, NULL, 0, rdef);
+	flagsEval (flags, PreRoleDefFlagDef, ARRAY_SIZE (PreRoleDefFlagDef), rdef);
 
 	defineRole (parser->kindControlBlock, kdef->id, rdef, freeRdef);
 
@@ -5417,6 +5432,7 @@ extern void printLanguageSubparsers (const langType language,
 
 defineSimplePrintFLagsFunction(Langdef, PreLangDefFlagDef);
 defineSimplePrintFLagsFunction(Kinddef, PreKindDefFlagDef);
+defineSimplePrintFLagsFunction(Roledef, PreRoleDefFlagDef);
 defineSimplePrintFLagsFunction(Fielddef, FieldDefFlagDef);
 
 extern void printLanguageMultitableStatistics (langType language)

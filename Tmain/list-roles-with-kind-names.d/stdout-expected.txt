@@ -1,64 +1,64 @@
 {header}
-#LANGUAGE      KIND(L/N) NAME     ENABLED DESCRIPTION
-C              h/header  local    on      local header
-C              h/header  system   on      system header
-C++            h/header  exported on      exported with "exported imported ..."
-C++            h/header  imported on      imported with "imported ..."
-C++            h/header  local    on      local header
-C++            h/header  system   on      system header
-CPreProcessor  h/header  local    on      local header
-CPreProcessor  h/header  system   on      system header
-CUDA           h/header  local    on      local header
-CUDA           h/header  system   on      system header
-Vera           h/header  local    on      local header
-Vera           h/header  system   on      system header
+#LANGUAGE      KIND(L/N) NAME     ENABLED VER DESCRIPTION
+C              h/header  local    on        0 local header
+C              h/header  system   on        0 system header
+C++            h/header  exported on        0 exported with "exported imported ..."
+C++            h/header  imported on        0 imported with "imported ..."
+C++            h/header  local    on        0 local header
+C++            h/header  system   on        0 system header
+CPreProcessor  h/header  local    on        0 local header
+CPreProcessor  h/header  system   on        0 system header
+CUDA           h/header  local    on        0 local header
+CUDA           h/header  system   on        0 system header
+Vera           h/header  local    on        0 local header
+Vera           h/header  system   on        0 system header
 {header}I
-#LANGUAGE      KIND(L/N)   NAME      ENABLED DESCRIPTION
-C              h/header    local     on      local header
-C              h/header    system    on      system header
-C++            h/header    exported  on      exported with "exported imported ..."
-C++            h/header    imported  on      imported with "imported ..."
-C++            h/header    local     on      local header
-C++            h/header    system    on      system header
-CPreProcessor  h/header    local     on      local header
-CPreProcessor  h/header    system    on      system header
-CUDA           h/header    local     on      local header
-CUDA           h/header    system    on      system header
-Flex           I/import    import    on      imports
-M4             I/macrofile included  on      included macro
-M4             I/macrofile sincluded on      silently included macro
-Make           I/makefile  included  on      included
-Make           I/makefile  optional  on      optionally included
-Vera           h/header    local     on      local header
-Vera           h/header    system    on      system header
+#LANGUAGE      KIND(L/N)   NAME      ENABLED VER DESCRIPTION
+C              h/header    local     on        0 local header
+C              h/header    system    on        0 system header
+C++            h/header    exported  on        0 exported with "exported imported ..."
+C++            h/header    imported  on        0 imported with "imported ..."
+C++            h/header    local     on        0 local header
+C++            h/header    system    on        0 system header
+CPreProcessor  h/header    local     on        0 local header
+CPreProcessor  h/header    system    on        0 system header
+CUDA           h/header    local     on        0 local header
+CUDA           h/header    system    on        0 system header
+Flex           I/import    import    on        0 imports
+M4             I/macrofile included  on        0 included macro
+M4             I/macrofile sincluded on        0 silently included macro
+Make           I/makefile  included  on        0 included
+Make           I/makefile  optional  on        0 optionally included
+Vera           h/header    local     on        0 local header
+Vera           h/header    system    on        0 system header
 d{header}
-#LANGUAGE      KIND(L/N)   NAME      ENABLED DESCRIPTION
-Automake       d/directory data      on      directory for DATA primary
-Automake       d/directory library   on      directory for LIBRARIES primary
-Automake       d/directory ltlibrary on      directory for LTLIBRARIES primary
-Automake       d/directory man       on      directory for MANS primary
-Automake       d/directory program   on      directory for PROGRAMS primary
-Automake       d/directory script    on      directory for SCRIPTS primary
-C              d/macro     condition off     used in part of #if/#ifdef/#elif conditions
-C              d/macro     undef     on      undefined
-C              h/header    local     on      local header
-C              h/header    system    on      system header
-C++            d/macro     condition off     used in part of #if/#ifdef/#elif conditions
-C++            d/macro     undef     on      undefined
-C++            h/header    exported  on      exported with "exported imported ..."
-C++            h/header    imported  on      imported with "imported ..."
-C++            h/header    local     on      local header
-C++            h/header    system    on      system header
-CPreProcessor  d/macro     condition off     used in part of #if/#ifdef/#elif conditions
-CPreProcessor  d/macro     undef     on      undefined
-CPreProcessor  h/header    local     on      local header
-CPreProcessor  h/header    system    on      system header
-CUDA           d/macro     condition off     used in part of #if/#ifdef/#elif conditions
-CUDA           d/macro     undef     on      undefined
-CUDA           h/header    local     on      local header
-CUDA           h/header    system    on      system header
-M4             d/macro     undef     on      undefined
-Vera           d/macro     condition off     used in part of #if/#ifdef/#elif conditions
-Vera           d/macro     undef     on      undefined
-Vera           h/header    local     on      local header
-Vera           h/header    system    on      system header
+#LANGUAGE      KIND(L/N)   NAME      ENABLED VER DESCRIPTION
+Automake       d/directory data      on        0 directory for DATA primary
+Automake       d/directory library   on        0 directory for LIBRARIES primary
+Automake       d/directory ltlibrary on        0 directory for LTLIBRARIES primary
+Automake       d/directory man       on        0 directory for MANS primary
+Automake       d/directory program   on        0 directory for PROGRAMS primary
+Automake       d/directory script    on        0 directory for SCRIPTS primary
+C              d/macro     condition off       0 used in part of #if/#ifdef/#elif conditions
+C              d/macro     undef     on        0 undefined
+C              h/header    local     on        0 local header
+C              h/header    system    on        0 system header
+C++            d/macro     condition off       0 used in part of #if/#ifdef/#elif conditions
+C++            d/macro     undef     on        0 undefined
+C++            h/header    exported  on        0 exported with "exported imported ..."
+C++            h/header    imported  on        0 imported with "imported ..."
+C++            h/header    local     on        0 local header
+C++            h/header    system    on        0 system header
+CPreProcessor  d/macro     condition off       0 used in part of #if/#ifdef/#elif conditions
+CPreProcessor  d/macro     undef     on        0 undefined
+CPreProcessor  h/header    local     on        0 local header
+CPreProcessor  h/header    system    on        0 system header
+CUDA           d/macro     condition off       0 used in part of #if/#ifdef/#elif conditions
+CUDA           d/macro     undef     on        0 undefined
+CUDA           h/header    local     on        0 local header
+CUDA           h/header    system    on        0 system header
+M4             d/macro     undef     on        0 undefined
+Vera           d/macro     condition off       0 used in part of #if/#ifdef/#elif conditions
+Vera           d/macro     undef     on        0 undefined
+Vera           h/header    local     on        0 local header
+Vera           h/header    system    on        0 system header
