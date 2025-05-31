@@ -196,6 +196,12 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 	kcb->kind [def->id].rcb = allocRoleControlBlock(kcb->kind + def->id);
 	kcb->kind [def->id].dynamicSeparators = NULL;
 
+	if (def->version > getLanguageVersionCurrent (kcb->owner))
+		error (WARNING, "the version number (%u) of kind \"%c,%s\" of language \"%s\" "
+			   "should be less than or equal to the current number (%u) of the language",
+			   def->version, def->letter, def->name, getLanguageName (kcb->owner),
+			   getLanguageVersionCurrent (kcb->owner));
+
 	verbose ("Add kind[%d] \"%c,%s,%s\" to %s\n", def->id,
 			 def->letter, def->name, def->description,
 			 getLanguageName (kcb->owner));
@@ -526,7 +532,7 @@ extern struct colprintTable * kindColprintTableNew (void)
 {
 	return colprintTableNew ("L:LANGUAGE", "L:LETTER", "L:NAME", "L:ENABLED",
 							 "L:REFONLY", "L:NROLES", "L:MASTER",
-							 "L:DESCRIPTION",
+							 "R:VER", "L:DESCRIPTION",
 							 NULL);
 }
 
@@ -547,6 +553,7 @@ static void kindColprintFillLine (struct colprintLine *line,
 	colprintLineAppendColumnCString (line, (kdef->master
 											|| kdef->slave ) ?
 									 getLanguageName (kdef->syncWith): RSV_NONE);
+	colprintLineAppendColumnVersion (line, kdef->version);
 	colprintLineAppendColumnCString (line, kdef->description? kdef->description: "NO DESCRIPTION GIVEN");
 }
 

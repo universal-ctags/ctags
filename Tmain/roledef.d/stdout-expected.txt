@@ -27,10 +27,10 @@ v/variable  foos on      foods
 v/variable  role on      roles
 
 # listing with --list-kinds-full
-#LETTER NAME     ENABLED REFONLY NROLES MASTER DESCRIPTION
-v       variable yes     no      1      NONE   variables
-#LETTER NAME     ENABLED REFONLY NROLES MASTER DESCRIPTION
-v       variable yes     no      2      NONE   variables
+#LETTER NAME     ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+v       variable yes     no      1      NONE     0 variables
+#LETTER NAME     ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+v       variable yes     no      2      NONE     0 variables
 
 # inject a flag separator
 #KIND(L/N)  NAME ENABLED DESCRIPTION

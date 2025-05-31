@@ -2695,9 +2695,21 @@ static void pre_kind_def_flag_refonly_long (const char* const optflag,
 	kdef->referenceOnly = true;
 }
 
+static void pre_kind_def_flag_version_long (const char* const optflag,
+											const char* const param, void* data)
+{
+	kindDefinition *kdef = data;
+
+	if (!strToUInt (param, 10, &kdef->version))
+		error (FATAL, "Faile to parse the version number for kind \"%s\": %s",
+			   kdef->name, param);
+}
+
 static flagDefinition PreKindDefFlagDef [] = {
 	{ '\0', "_refonly", NULL, pre_kind_def_flag_refonly_long,
 	  NULL, "use this kind reference tags only"},
+	{ '\0', "version",  NULL, pre_kind_def_flag_version_long,
+	  "VERSION", "in which version of the parser this kind is added"},
 };
 
 static bool processLangDefineKind(const langType language,

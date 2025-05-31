@@ -1,3 +1,3 @@
-L       label      yes     no      0      C      goto labels
-D       macroparam no      no      0      C      parameters inside macro definitions
-d       macro      no      no      2      C      macro definitions
+L       label      yes     no      0      C        0 goto labels
+D       macroparam no      no      0      C        0 parameters inside macro definitions
+d       macro      no      no      2      C        0 macro definitions
