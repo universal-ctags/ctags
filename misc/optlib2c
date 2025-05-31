@@ -112,6 +112,13 @@ my $fielddef_flags =
        } ],
     ];
 
+my $extradef_flags =
+    [
+     [ qr/\{version=([0-9]+)\}/, sub {
+	 $_[0]->{'version'} = $1;
+       } ],
+    ];
+
 my $options =
     [
      [ qr/^--options=(.*)/, sub {
@@ -176,7 +183,7 @@ my $options =
 
 	 return 1;
        } ],
-     [ qr/^--_extradef-(.*)=([^,]+),([^\{]+)/, sub {
+     [ qr/^--_extradef-(.*)=([^,]+),([^\{]+)(.*)/, sub {
 	 die "Don't use --_extradef-<LANG>=+ option before defining the language"
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding an extra is allowed only to the language specified with --langdef: $1"
@@ -184,11 +191,14 @@ my $options =
 
 	 my $name = $2;
 	 my $desc = $3;
+	 my $rest = $4;
 
 	 die "unacceptable character is used for extra name: $name"
 	     unless ($name =~ /^[a-zA-Z0-9]+$/);
 
-	 push @{$_[0]->{'extradefs'}}, { name => $name, desc => $desc };
+	 my $xdef = { name => $name, desc => $desc, version => 0, };
+	 push @{$_[0]->{'extradefs'}}, $xdef;
+	 parse_flags ($rest, $xdef, $extradef_flags);
 	 return 1;
        } ],
      [ qr/^--_fielddef-(.*)=([^,]+),([^\{]+)(.*)/, sub {
@@ -1142,6 +1152,13 @@ EOF
 		  .enabled     = $enabled,
 		  .name        = "$_->{'name'}",
 		  .description = "$desc",
+EOF
+      if ($_->{'version'}) {
+	  print <<EOF;
+		  .version     = "$_->{'version'}",
+EOF
+      }
+      print <<EOF;
 		},
 EOF
     }
