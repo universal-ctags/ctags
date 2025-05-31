@@ -31,6 +31,7 @@ void colprintLineAppendColumnInt  (struct colprintLine *line, unsigned int colum
 
 /* Appends "yes" or "no". */
 void colprintLineAppendColumnBool (struct colprintLine *line, bool column);
+void colprintLineAppendColumnVersion (struct colprintLine *line, unsigned int version);
 
 const char *colprintLineGetColumn (struct colprintLine *line, unsigned int column);
 
