@@ -20,11 +20,11 @@
 # role is acceptable but no input file
 
 # listing with --list-roles
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  foos on      foods
-v/variable  role on      roles
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  foos on        0 foods
+v/variable  role on        0 roles
 
 # listing with --list-kinds-full
 #LETTER NAME     ENABLED REFONLY NROLES MASTER VER DESCRIPTION
@@ -33,47 +33,47 @@ v       variable yes     no      1      NONE     0 variables
 v       variable yes     no      2      NONE     0 variables
 
 # inject a flag separator
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles
 
 # inject a broken flag separator(1)
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles
 
 # inject a broken flag separator(2)
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles
 
 # use a { in description (1)
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles{
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles{
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles{
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles{
 
 # use a { in description (2)
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles{}
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles{}
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles{}
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles{}
 
 # use a \ in description
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles\backslash
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      roles\backslash
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles\backslash
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 roles\backslash
 
 # description started from {
 
 # description started from \{
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      {
-#KIND(L/N)  NAME ENABLED DESCRIPTION
-v/variable  role on      {
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 {
+#KIND(L/N)  NAME ENABLED VER DESCRIPTION
+v/variable  role on        0 {
 
 # too many roles
