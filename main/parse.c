@@ -2317,7 +2317,7 @@ static flagDefinition PreLangDefFlagDef [] = {
 	{ '\0', "_foreignLanguage",    NULL, pre_lang_def_flag_foreignLanguage_long,
 	  "LANG", "initialize another parser" },
 	{ '\0', "version",     NULL, pre_lang_def_flag_version_long,
-	  NULL, "set the version of the parser (current.age)"},
+	  "CURRENT.AGE", "set the version of the parser"},
 };
 
 static void optlibFreeDep (langType lang, bool initialized CTAGS_ATTR_UNUSED)
