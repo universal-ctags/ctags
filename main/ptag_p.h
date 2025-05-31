@@ -74,6 +74,8 @@ struct sPtagDesc {
 
 	/* See writer-json.c */
 	const char *jsonObjectKey;
+
+	unsigned int version;
 };
 
 extern bool makePtagIfEnabled (ptagType type, langType language, const void *data);

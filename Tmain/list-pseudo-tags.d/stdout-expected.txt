@@ -1,20 +1,20 @@
-#NAME                     ENABLED DESCRIPTION
-JSON_OUTPUT_VERSION       off     the version of json output stream format
-TAG_EXTRA_DESCRIPTION     on      the names and descriptions of enabled extras
-TAG_FIELD_DESCRIPTION     on      the names and descriptions of enabled fields
-TAG_FILE_FORMAT           on      the version of tags file format
-TAG_FILE_SORTED           on      how tags are sorted
-TAG_KIND_DESCRIPTION      on      the letters, names and descriptions of enabled kinds in the language
-TAG_KIND_SEPARATOR        off     the separators used in kinds
-TAG_OUTPUT_EXCMD          on      the excmd: number, pattern, mixed, or combine
-TAG_OUTPUT_FILESEP        on      the separator used in file name (slash or backslash)
-TAG_OUTPUT_MODE           on      the output mode: u-ctags or e-ctags
-TAG_OUTPUT_VERSION        on      the version of the output interface (current.age)
-TAG_PARSER_VERSION        on      the version of the parser (current.age)
-TAG_PATTERN_LENGTH_LIMIT  on      the limit of pattern length
-TAG_PROC_CWD              on      the current working directory of the tags generator
-TAG_PROGRAM_AUTHOR        on      the author of this ctags implementation
-TAG_PROGRAM_NAME          on      the name of this ctags implementation
-TAG_PROGRAM_URL           on      the official site URL of this ctags implementation
-TAG_PROGRAM_VERSION       on      the version of this ctags implementation
-TAG_ROLE_DESCRIPTION      on      the names and descriptions of enabled roles
+#NAME                     ENABLED VER DESCRIPTION
+JSON_OUTPUT_VERSION       off       0 the version of json output stream format
+TAG_EXTRA_DESCRIPTION     on        0 the names and descriptions of enabled extras
+TAG_FIELD_DESCRIPTION     on        0 the names and descriptions of enabled fields
+TAG_FILE_FORMAT           on        0 the version of tags file format
+TAG_FILE_SORTED           on        0 how tags are sorted
+TAG_KIND_DESCRIPTION      on        0 the letters, names and descriptions of enabled kinds in the language
+TAG_KIND_SEPARATOR        off       0 the separators used in kinds
+TAG_OUTPUT_EXCMD          on        0 the excmd: number, pattern, mixed, or combine
+TAG_OUTPUT_FILESEP        on        0 the separator used in file name (slash or backslash)
+TAG_OUTPUT_MODE           on        0 the output mode: u-ctags or e-ctags
+TAG_OUTPUT_VERSION        on        0 the version of the output interface (current.age)
+TAG_PARSER_VERSION        on        0 the version of the parser (current.age)
+TAG_PATTERN_LENGTH_LIMIT  on        0 the limit of pattern length
+TAG_PROC_CWD              on        0 the current working directory of the tags generator
+TAG_PROGRAM_AUTHOR        on        0 the author of this ctags implementation
+TAG_PROGRAM_NAME          on        0 the name of this ctags implementation
+TAG_PROGRAM_URL           on        0 the official site URL of this ctags implementation
+TAG_PROGRAM_VERSION       on        0 the version of this ctags implementation
+TAG_ROLE_DESCRIPTION      on        0 the names and descriptions of enabled roles
