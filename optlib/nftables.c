@@ -28,10 +28,14 @@ extern parserDefinition* NftablesParser (void)
 	};
 
 	static roleDefinition NftablesFamilyRoleTable [] = {
-		{ false, "referenced", "referenced somehow" },
+		{
+		  false, "referenced", "referenced somehow",
+		},
 	};
 	static roleDefinition NftablesRulesetRoleTable [] = {
-		{ true, "included", "included ruleset" },
+		{
+		  true, "included", "included ruleset",
+		},
 	};
 	static kindDefinition NftablesKindTable [] = {
 		{

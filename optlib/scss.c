@@ -201,7 +201,9 @@ extern parserDefinition* SCSSParser (void)
 	};
 
 	static roleDefinition SCSSModuleRoleTable [] = {
-		{ true, "used", "used" },
+		{
+		  true, "used", "used",
+		},
 	};
 	static kindDefinition SCSSKindTable [] = {
 		{

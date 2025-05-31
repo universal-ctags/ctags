@@ -68,6 +68,13 @@ my $kinddef_flags =
        } ],
     ];
 
+my $roledef_flags =
+    [
+     [ qr/\{version=([0-9]+)\}/, sub {
+	 $_[0]->{'version'} = $1;
+       } ],
+    ];
+
 my $fielddef_flags =
     [
      [ qr/\{datatype=([^\}]+)\}/, sub {
@@ -199,7 +206,7 @@ my $options =
 
 	 return 1;
        } ],
-     [ qr/^--_roledef-([^.]*)\.(?:([a-zA-Z])|\{([a-zA-Z][a-zA-Z0-9]*)\})=([a-zA-Z0-9]+),([^\{]+)/, sub {
+     [ qr/^--_roledef-([^.]*)\.(?:([a-zA-Z])|\{([a-zA-Z][a-zA-Z0-9]*)\})=([a-zA-Z0-9]+),([^\{]+)(.*)/, sub {
 	   die "Don't use --_roledef-<LANG>.<KNID>=+ option before defining the language"
 	     if (! defined $_[0]->{'langdef'});
 	   die "Adding a field is allowed only to the language specified with --langdef: $1"
@@ -209,9 +216,13 @@ my $options =
 	   for (@{$_[0]->{'kinddefs'}}) {
 	       if ((defined $2 && $_->{'letter'} eq $2)
 		   || (defined $3 && $_->{'name'} eq $3)) {
-		   my $role = { enabled => 1, name => $4, desc => $5, owner => $_ };
+		   my $role = { enabled => 1, name => $4, desc => $5, owner => $_, version => 0 };
 		   push @{$_->{'roles'}}, $role;
 		   $kind_found = 1;
+
+		   my $rest = $6;
+		   parse_flags ($rest, $role, $roledef_flags);
+
 		   last;
 	       }
 	   }
@@ -902,7 +913,16 @@ EOF
 	    my $desc = escape_as_cstr $_->{'desc'};
 	    my $enabled = $_->{'enabled'}? "true": "false";
 	    print <<EOF;
-		{ $enabled, "$_->{'name'}", "$desc" },
+		{
+		  $enabled, "$_->{'name'}", "$desc",
+EOF
+	    if ($_->{'version'}) {
+		print <<EOF;
+		  .version = $_->{'version'},
+EOF
+	    }
+	    print <<EOF;
+		},
 EOF
 	}
 

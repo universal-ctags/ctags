@@ -149,7 +149,9 @@ extern parserDefinition* SELinuxTypeEnforcementParser (void)
 	};
 
 	static roleDefinition SELinuxTypeEnforcementTypeRoleTable [] = {
-		{ true, "aliased", "aliased" },
+		{
+		  true, "aliased", "aliased",
+		},
 	};
 	static kindDefinition SELinuxTypeEnforcementKindTable [] = {
 		{

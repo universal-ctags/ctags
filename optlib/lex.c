@@ -98,7 +98,9 @@ extern parserDefinition* LEXParser (void)
 	};
 
 	static roleDefinition LEXCondRoleTable [] = {
-		{ true, "grouping", " conditions used for grouping of start or exclusive condition rules" },
+		{
+		  true, "grouping", " conditions used for grouping of start or exclusive condition rules",
+		},
 	};
 	static kindDefinition LEXKindTable [] = {
 		{

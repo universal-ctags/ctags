@@ -623,7 +623,9 @@ extern parserDefinition* MesonParser (void)
 	};
 
 	static roleDefinition MesonModuleRoleTable [] = {
-		{ true, "imported", "imported" },
+		{
+		  true, "imported", "imported",
+		},
 	};
 	static kindDefinition MesonKindTable [] = {
 		{
