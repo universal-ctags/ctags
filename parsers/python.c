@@ -110,7 +110,8 @@ static roleDefinition PythonModuleRoles [] = {
 	{ true, "indirectlyImported",
 	  "module imported in alternative name" },
 	{ true, "entryPoint",
-	  "specified as a module of an entry point" },
+	  "specified as a module of an entry point",
+	  .version = 1 },
 };
 
 static roleDefinition PythonUnknownRoles [] = {
@@ -121,7 +122,8 @@ static roleDefinition PythonUnknownRoles [] = {
 
 static roleDefinition PythonFunctionRoles [] = {
 	{ true, "entryPoint",
-	  "specified as an entry point" },
+	  "specified as an entry point",
+	  .version = 1 },
 };
 
 static kindDefinition PythonKinds[PYTHON_COUNT_KIND] = {

@@ -458,6 +458,7 @@ extern parserDefinition* SystemTapParser (void)
 	static roleDefinition SystemTapProbeRoleTable [] = {
 		{
 		  true, "attached", "attached by code for probing",
+		  .version = 1,
 		},
 	};
 	static kindDefinition SystemTapKindTable [] = {

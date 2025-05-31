@@ -123,6 +123,7 @@ extern parserDefinition* TerraformParser (void)
 		},
 		{
 		  true, 'l', "local", "locals",
+		  .version = 1,
 		},
 	};
 

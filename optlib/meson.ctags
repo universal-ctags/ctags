@@ -27,8 +27,8 @@
 --kinddef-Meson=b,benchmark,benchmark targets
 --kinddef-Meson=r,run,run targets
 --kinddef-Meson=m,module,modules
---kinddef-Meson=D,cfgdata,configuration data objects
---kinddef-Meson=C,cfgvar,configuration variables
+--kinddef-Meson=D,cfgdata,configuration data objects{version=1}
+--kinddef-Meson=C,cfgvar,configuration variables{version=1}
 
 #
 # Role definitions

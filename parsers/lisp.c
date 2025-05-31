@@ -51,12 +51,17 @@ static kindDefinition LispKinds [] = {
 	{ true, 'v', "variable", "variables" },
 	{ true, 'm', "macro", "macros" },
 	{ true, 'c', "const", "constants" },
-	{ true, 't', "type", "types" },
-	{ true, 'C', "class", "classes" },
-	{ true, 's', "struct", "structs" },
+	{ true, 't', "type", "types",
+	  .version = 1 },
+	{ true, 'C', "class", "classes",
+	  .version = 1 },
+	{ true, 's', "struct", "structs",
+	  .version = 1 },
 	{ true, 'M', "method", "methods" },
-	{ true, 'G', "generic", "generics" },
-	{ true, 'p', "parameter", "parameters" },
+	{ true, 'G', "generic", "generics",
+	  .version = 1 },
+	{ true, 'p', "parameter", "parameters",
+	  .version = 1 },
 };
 
 typedef enum {
@@ -66,7 +71,8 @@ typedef enum {
 static fieldDefinition LispFields[] = {
 	{ .name = "definer",
 	  .description = "the name of the function or macro that defines the unknown/Y-kind object",
-	  .enabled = true },
+	  .enabled = true,
+	  .version = 1 },
 };
 
 typedef enum {
@@ -96,7 +102,8 @@ typedef enum {
 static fieldDefinition EmacsLispFields[] = {
 	{ .name = "definer",
 	  .description = "the name of the function or macro that defines the unknown/Y-kind object",
-	  .enabled = true },
+	  .enabled = true,
+	  .version = 1 },
 };
 
 /* Following macro/builtin doesn't define a name appeared

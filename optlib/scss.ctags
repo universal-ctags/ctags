@@ -36,11 +36,11 @@
 --kinddef-SCSS=i,id,identities
 # --kinddef-SCSS=p,pseudo,pseudos
 --kinddef-SCSS=z,parameter,function parameters
---kinddef-SCSS=n,namespace,namespaces
---kinddef-SCSS=M,module,modules
---_roledef-SCSS.{module}=used,used
+--kinddef-SCSS=n,namespace,namespaces{version=1}
+--kinddef-SCSS=M,module,modules{version=1}
+--_roledef-SCSS.{module}=used,used{version=1}
 
---_fielddef-SCSS=module,the name of module behind the namespace{datatype=str}
+--_fielddef-SCSS=module,the name of module behind the namespace{datatype=str}{version=1}
 --fields-SCSS=+{module}
 
 --_tabledef-SCSS=toplevel

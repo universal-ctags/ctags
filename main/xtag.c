@@ -78,7 +78,8 @@ static xtagDefinition xtagDefinitions [] = {
 	{ true, '\0', "anonymous",
 	  "Include tags for non-named objects like lambda"},
 	{ false, 'z', "nulltag",
-	  "Include tags with empty strings as their names"},
+	  "Include tags with empty strings as their names",
+	  .version = 1, },
 };
 
 static unsigned int       xtagObjectUsed;

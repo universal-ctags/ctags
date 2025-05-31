@@ -26,33 +26,33 @@ x	xpath	no	NONE	s--	no	--	0	xpath for the tag
 z	kind	no	NONE	s--	no	r-	0	[tags output] prepend "kind:" to k/ (or K/) field output, [xref and json output] kind in long-name form
 -	properties	yes	Asm	s--	no	--	0	properties (req, vararg for parameters)
 -	properties	no	AutoIt	s--	no	--	0	properties (static, volatile, ...)
--	alias	no	C	s--	no	--	0	the name of the alias target specified in __attribute__((alias(...)))
+-	alias	no	C	s--	no	--	1	the name of the alias target specified in __attribute__((alias(...)))
 -	macrodef	no	C	s--	no	--	0	macro definition
 -	properties	no	C	s--	no	--	0	properties (static, inline, mutable, export,...)
--	section	no	C	s--	no	--	0	the place where the object is placed
--	alias	no	C++	s--	no	--	0	the name of the alias target specified in __attribute__((alias(...)))
+-	section	no	C	s--	no	--	1	the place where the object is placed
+-	alias	no	C++	s--	no	--	1	the name of the alias target specified in __attribute__((alias(...)))
 -	captures	no	C++	s--	no	--	0	lambda capture list
 -	macrodef	no	C++	s--	no	--	0	macro definition
 -	name	yes	C++	s--	no	--	0	aliased names
 -	properties	no	C++	s--	no	--	0	properties (static, inline, mutable, export,...)
--	section	no	C++	s--	no	--	0	the place where the object is placed
+-	section	no	C++	s--	no	--	1	the place where the object is placed
 -	specialization	no	C++	s--	no	--	0	template specialization parameters
 -	template	no	C++	s--	no	--	0	template parameters
 -	macrodef	no	CPreProcessor	s--	no	--	0	macro definition
--	alias	no	CUDA	s--	no	--	0	the name of the alias target specified in __attribute__((alias(...)))
+-	alias	no	CUDA	s--	no	--	1	the name of the alias target specified in __attribute__((alias(...)))
 -	macrodef	no	CUDA	s--	no	--	0	macro definition
 -	properties	no	CUDA	s--	no	--	0	properties (static, inline, mutable, export,...)
--	section	no	CUDA	s--	no	--	0	the place where the object is placed
+-	section	no	CUDA	s--	no	--	1	the place where the object is placed
 -	moduleName	yes	Elm	s--	no	--	0	actual name of renamed module
--	definer	yes	EmacsLisp	s--	no	--	0	the name of the function or macro that defines the unknown/Y-kind object
+-	definer	yes	EmacsLisp	s--	no	--	1	the name of the function or macro that defines the unknown/Y-kind object
 -	annotations	yes	GDScript	s--	no	--	0	annotations on functions and variables
 -	howImported	no	Go	s--	no	--	0	how the package is imported ("inline" for `.' or "init" for `_')
 -	package	yes	Go	s--	no	--	0	the real package specified by the package name
 -	packageName	yes	Go	s--	no	--	0	the name for referring the package
 -	implements	yes	Inko	s--	no	rw	0	Trait being implemented
--	properties	no	JavaScript	s--	no	--	0	properties (static)
+-	properties	no	JavaScript	s--	no	--	2	properties (static)
 -	assignment	yes	LdScript	s--	no	--	0	how a value is assigned to the symbol
--	definer	yes	Lisp	s--	no	--	0	the name of the function or macro that defines the unknown/Y-kind object
+-	definer	yes	Lisp	s--	no	--	1	the name of the function or macro that defines the unknown/Y-kind object
 -	sectionMarker	no	Markdown	s--	no	--	0	character used for declaring section(#, ##, =, or -)
 -	wrapping	yes	Moose	s--	no	--	0	how a wrapper wrapping the method (around, after, or before)
 -	langid	yes	NSIS	s--	no	--	0	language identifier specified in (License)LangString commands
@@ -67,8 +67,8 @@ z	kind	no	NONE	s--	no	r-	0	[tags output] prepend "kind:" to k/ (or K/) field out
 -	overline	no	ReStructuredText	--b	no	--	0	whether using overline & underline for declaring section
 -	sectionMarker	no	ReStructuredText	s--	no	--	0	character used for declaring section
 -	mixin	yes	Ruby	s--	no	--	0	how the class or module is mixed in (mixin:HOW:MODULE)
--	module	yes	SCSS	s--	no	rw	0	the name of module behind the namespace
--	definer	yes	Scheme	s--	no	--	0	the name of the function or macro that defines the unknown/Y-kind object
+-	module	yes	SCSS	s--	no	rw	1	the name of module behind the namespace
+-	definer	yes	Scheme	s--	no	--	1	the name of the function or macro that defines the unknown/Y-kind object
 -	parameter	no	SystemVerilog	--b	no	--	0	parameter whose value can be overridden.
 -	target	yes	Thrift	s--	no	--	0	the target language specified at "namespace"
 -	throws	yes	Thrift	s--	no	--	0	throws list of function

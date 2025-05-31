@@ -16,7 +16,7 @@
 #   - https://developer.hashicorp.com/terraform/language/syntax/configuration
 #
 # There ctags regex were re-implemented into multi-table regex to support
-# multi-line comments and locals blocks 
+# multi-line comments and locals blocks
 #
 # Changed the name from `terraform` to `tf` so vim will recognise it properly based
 # on file extension (*.tf).
@@ -37,7 +37,7 @@
 --kinddef-Terraform=p,provider,providers
 --kinddef-Terraform=m,module,modules
 --kinddef-Terraform=o,output,output
---kinddef-Terraform=l,local,locals
+--kinddef-Terraform=l,local,locals{version=1}
 
 
 --_tabledef-Terraform=toplevel

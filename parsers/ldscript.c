@@ -34,7 +34,8 @@ typedef enum {
 
 static roleDefinition LdScriptSymbolRoles [] = {
 	{ true, "entrypoint", "entry points" },
-	{ true, "aliased", "aliased with __attribute__((alias(...))) in C/C++ code" },
+	{ true, "aliased", "aliased with __attribute__((alias(...))) in C/C++ code",
+	  .version = 1 },
 };
 
 typedef enum {
@@ -46,7 +47,8 @@ typedef enum {
 static roleDefinition LdScriptInputSectionRoles [] = {
 	{ true, "mapped",  "mapped to output section" },
 	{ true, "discarded", "discarded when linking" },
-	{ true, "destination", "specified as the destination of code and data" },
+	{ true, "destination", "specified as the destination of code and data",
+	  .version = 1 },
 };
 
 typedef enum {
