@@ -2188,64 +2188,45 @@ static void processListLanguagesOption (
 	exit (0);
 }
 
-static void processListPseudoTagsOptions (
-		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
-{
-	printPtags (localOption.withListHeader, localOption.machinable, stdout);
-	exit (0);
-}
+#define defineListFunctionForOption(target,proc)						\
+	attr__noreturn														\
+	static void processList##target##Option (							\
+		const char *const option CTAGS_ATTR_UNUSED,						\
+		const char *const parameter CTAGS_ATTR_UNUSED)					\
+	{																	\
+		proc (localOption.withListHeader, localOption.machinable, stdout); \
+		exit (0);														\
+	} attr__noreturn static void processList##target##Option (			\
+		const char *const option CTAGS_ATTR_UNUSED,						\
+		const char *const parameter CTAGS_ATTR_UNUSED) /* So we cat put ';' at the end of macro expansion. */
 
-static void processListRegexFlagsOptions (
-		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter)
-{
-	printRegexFlags (localOption.withListHeader, localOption.machinable, parameter, stdout);
-	exit (0);
-}
+#define defineListFunctionForOptionWithParameter(target,proc)			\
+	attr__noreturn														\
+	static void processList##target##Option (							\
+		const char *const option CTAGS_ATTR_UNUSED,						\
+		const char *const parameter)									\
+	{																	\
+		proc (localOption.withListHeader, localOption.machinable, parameter, stdout); \
+		exit (0);														\
+	} attr__noreturn static void processList##target##Option (			\
+		const char *const option CTAGS_ATTR_UNUSED,						\
+		const char *const parameter) /* So we cat put ';' at the end of macro expansion. */
 
-static void processListMultilineRegexFlagsOptions (
-		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter)
-{
-	printMultilineRegexFlags (localOption.withListHeader, localOption.machinable, parameter, stdout);
-	exit (0);
-}
+defineListFunctionForOption (PseudoTags, printPtags);
 
-static void processListMultitableRegexFlagsOptions (
-		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter)
-{
-	printMultitableRegexFlags (localOption.withListHeader, localOption.machinable, parameter, stdout);
-	exit (0);
-}
+defineListFunctionForOptionWithParameter (RegexFlags, printRegexFlags);
+defineListFunctionForOptionWithParameter (MultilineRegexFlags, printMultilineRegexFlags);
+defineListFunctionForOptionWithParameter (MultitableRegexFlags, printMultitableRegexFlags);
 
-static void processListLangdefFlagsOptions (
-		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
-{
-	printLangdefFlags (localOption.withListHeader, localOption.machinable, stdout);
-	exit (0);
-}
+defineListFunctionForOption (LangdefFlags, printLangdefFlags);
+defineListFunctionForOption (KinddefFlags, printKinddefFlags);
+defineListFunctionForOption (FielddefFlags, printFielddefFlags);
 
-static void processListKinddefFlagsOptions (
-		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
-{
-	printKinddefFlags (localOption.withListHeader, localOption.machinable, stdout);
-	exit (0);
-}
+defineListFunctionForOption (OutputFormats, printOutputFormats);
 
-static void processListFielddefFlagsOptions (
-		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
-{
-	printFielddefFlags (localOption.withListHeader, localOption.machinable, stdout);
-	exit (0);
-}
 
 attr__noreturn
-static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
+static void processListRolesOption (const char *const option CTAGS_ATTR_UNUSED,
 				     const char *const parameter)
 {
 	const char* sep;
@@ -2268,7 +2249,7 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 	{
 		vString* vstr = vStringNewInit (parameter);
 		vStringCatS (vstr, (sep? "*": ".*"));
-		processListRolesOptions (option, vStringValue (vstr));
+		processListRolesOption (option, vStringValue (vstr));
 		/* The control should never reached here. */
 	}
 
@@ -2294,7 +2275,7 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 	exit (0);
 }
 
-static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UNUSED,
+static void processListSubparsersOption (const char *const option CTAGS_ATTR_UNUSED,
 				     const char *const parameter)
 {
 	langType lang;
@@ -2324,13 +2305,6 @@ static void processListOperators (const char *const option CTAGS_ATTR_UNUSED,
 {
 	initializeParser (LANG_AUTO);
 	listRegexOpscriptOperators (stdout);
-	exit (0);
-}
-
-static void processListOutputFormatsOption(const char *const option CTAGS_ATTR_UNUSED,
-										   const char *const parameter CTAGS_ATTR_UNUSED)
-{
-	printOutputFormats (localOption.withListHeader, localOption.machinable, stdout);
 	exit (0);
 }
 
@@ -2918,13 +2892,13 @@ static parametricOption ParametricOptions [] = {
 	{ "list-maps",              processListMapsOption,          true,   STAGE_ANY },
 	{ "list-map-extensions",    processListMapExtensionsOption, true,   STAGE_ANY },
 	{ "list-map-patterns",      processListMapPatternsOption,   true,   STAGE_ANY },
-	{ "list-mline-regex-flags", processListMultilineRegexFlagsOptions, true, STAGE_ANY },
+	{ "list-mline-regex-flags", processListMultilineRegexFlagsOption, true, STAGE_ANY },
 	{ "list-output-formats",    processListOutputFormatsOption, true,   STAGE_ANY },
 	{ "list-params",            processListParametersOption,    true,   STAGE_ANY },
-	{ "list-pseudo-tags",       processListPseudoTagsOptions,   true,   STAGE_ANY },
-	{ "list-regex-flags",       processListRegexFlagsOptions,   true,   STAGE_ANY },
-	{ "list-roles",             processListRolesOptions,        true,   STAGE_ANY },
-	{ "list-subparsers",        processListSubparsersOptions,   true,   STAGE_ANY },
+	{ "list-pseudo-tags",       processListPseudoTagsOption,    true,   STAGE_ANY },
+	{ "list-regex-flags",       processListRegexFlagsOption,    true,   STAGE_ANY },
+	{ "list-roles",             processListRolesOption,         true,   STAGE_ANY },
+	{ "list-subparsers",        processListSubparsersOption,    true,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, true,   STAGE_ANY },
 	{ "optlib-dir",             processOptlibDir,               false,  STAGE_ANY },
 	{ "options",                processOptionFile,              false,  STAGE_ANY },
@@ -2946,10 +2920,10 @@ static parametricOption ParametricOptions [] = {
 #ifdef HAVE_JANSSON
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
 #endif
-	{ "_list-fielddef-flags",   processListFielddefFlagsOptions,true,   STAGE_ANY },
-	{ "_list-kinddef-flags",    processListKinddefFlagsOptions, true,   STAGE_ANY },
-	{ "_list-langdef-flags",    processListLangdefFlagsOptions, true,   STAGE_ANY },
-	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
+	{ "_list-fielddef-flags",   processListFielddefFlagsOption, true,   STAGE_ANY },
+	{ "_list-kinddef-flags",    processListKinddefFlagsOption,  true,   STAGE_ANY },
+	{ "_list-langdef-flags",    processListLangdefFlagsOption,  true,   STAGE_ANY },
+	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOption, true, STAGE_ANY },
 	{ "_list-operators",        processListOperators,           true,   STAGE_ANY },
 #ifdef DO_TRACING
 	{ "_trace",                 processTraceOption,             false,  STAGE_ANY },
