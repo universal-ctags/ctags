@@ -79,6 +79,8 @@ struct sKindDefinition {
 	scopeSeparator *separators;
 	unsigned int separatorCount;
 
+	unsigned int    version;
+
 	int id;
 
 	/* TODO:Following fields should be moved to kindObject. */
