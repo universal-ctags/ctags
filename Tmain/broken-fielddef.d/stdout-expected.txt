@@ -12,31 +12,31 @@
 # no input file
 
 # inject a flag separator
-#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP DESCRIPTION
--       field no      IMAGINARY s--    no    -- desc
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP VER DESCRIPTION
+-       field no      IMAGINARY s--    no    --   0 desc
 
 # inject a broken flag separator(1)
-#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP DESCRIPTION
--       field no      IMAGINARY s--    no    -- desc
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP VER DESCRIPTION
+-       field no      IMAGINARY s--    no    --   0 desc
 
 # inject a broken flag separator(2)
-#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP DESCRIPTION
--       field no      IMAGINARY s--    no    -- desc
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP VER DESCRIPTION
+-       field no      IMAGINARY s--    no    --   0 desc
 
 # use a { in description (1)
-#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP DESCRIPTION
--       field no      IMAGINARY s--    no    -- desc{
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP VER DESCRIPTION
+-       field no      IMAGINARY s--    no    --   0 desc{
 
 # use a { in description (2)
-#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP DESCRIPTION
--       field no      IMAGINARY s--    no    -- desc{}
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP VER DESCRIPTION
+-       field no      IMAGINARY s--    no    --   0 desc{}
 
 # use a \ in description
-#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP DESCRIPTION
--       field no      IMAGINARY s--    no    -- desc\backslash
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP VER DESCRIPTION
+-       field no      IMAGINARY s--    no    --   0 desc\backslash
 
 # description started from {
 
 # description started from \{
-#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP DESCRIPTION
--       field no      IMAGINARY s--    no    -- {
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED OP VER DESCRIPTION
+-       field no      IMAGINARY s--    no    --   0 {

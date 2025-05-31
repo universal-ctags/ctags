@@ -1098,6 +1098,13 @@ Listing Options
 		How this field can be accessed from optscript code.
 		This field is for Universal Ctags developers.
 
+	VER
+		The ctags output version introducing the field for a language-independent
+		field, or the parser version introducing the field for a
+		language-specified field. See the ``--version`` option and
+		``TAG_OUTPUT_VERSION`` in :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the ctags output
+		version.
+
 	DESCRIPTION
 		Human readable description for the field.
 

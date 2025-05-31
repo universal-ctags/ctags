@@ -1379,6 +1379,12 @@ extern int defineField (fieldDefinition *def, langType language)
 	updateSiblingField (def->ftype, def->name);
 	installOptscriptFieldAccessor (def->ftype);
 
+	if (def->version > getLanguageVersionCurrent (language))
+		error (WARNING, "the version number (%u) of field \"%s\" of language \"%s\" "
+			   "should be less than or equal to the current number (%u) of the language",
+			   def->version, def->name, getLanguageName (language),
+			   getLanguageVersionCurrent (language));
+
 	return def->ftype;
 }
 
@@ -1395,7 +1401,7 @@ extern struct colprintTable * fieldColprintTableNew (void)
 {
 	return colprintTableNew ("L:LETTER", "L:NAME", "L:ENABLED",
 							 "L:LANGUAGE", "L:JSTYPE", "L:FIXED",
-							 "L:OP", "L:DESCRIPTION", NULL);
+							 "L:OP", "R:VER", "L:DESCRIPTION", NULL);
 }
 
 static void  fieldColprintAddLine (struct colprintTable *table, int i)
@@ -1437,6 +1443,7 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 	if (fdef->setValueObject)
 		operator[1] = 'w';
 	colprintLineAppendColumnCString (line, operator);
+	colprintLineAppendColumnVersion (line, fdef->version);
 	colprintLineAppendColumnCString (line, fdef->description);
 }
 

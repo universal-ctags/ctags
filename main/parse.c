@@ -4070,9 +4070,22 @@ static void field_def_flag_datatype_long (const char *const optflag CTAGS_ATTR_U
 		error (FATAL, "unknown datatype for field \"%s\": \"%s\"", fdef->name, param);
 }
 
+static void field_def_flag_version_long (const char *const optflag CTAGS_ATTR_UNUSED,
+										 const char* const param,
+										 void *data)
+{
+	fieldDefinition *fdef = data;
+
+	if (!isdigit((unsigned char)*param) || !strToUInt (param, 10, &fdef->version))
+		error (FATAL, "Failed to parse the version number for field \"%s\": %s",
+			   fdef->name, param);
+}
+
 static flagDefinition FieldDefFlagDef [] = {
 	{ '\0', "datatype", NULL, field_def_flag_datatype_long,
 	  "TYPE", "acceptable datatype of the field (str|bool|int|str+bool)" },
+	{ '\0', "version",  NULL, field_def_flag_version_long,
+	  "VERSION", "in which version of the parser this field is added"},
 };
 
 static bool processLangDefineField (const langType language,
