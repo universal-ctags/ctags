@@ -2809,8 +2809,8 @@ static bool processLangDefineKind(const langType language,
 	kdef->letter = letter;
 	kdef->name = name;
 	kdef->description = description;
-	if (flags)
-		flagsEval (flags, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef), kdef);
+
+	flagsEval (flags, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef), kdef);
 
 	defineKind (parser->kindControlBlock, kdef, freeKdef);
 	return true;
@@ -2919,8 +2919,7 @@ static bool processLangDefineRole(const langType language,
 	rdef->name = name;
 	rdef->description = description;
 
-	if (flags)
-		flagsEval (flags, NULL, 0, rdef);
+	flagsEval (flags, NULL, 0, rdef);
 
 	defineRole (parser->kindControlBlock, kdef->id, rdef, freeRdef);
 
@@ -3589,8 +3588,7 @@ static bool processLangDefineParam (const langType language,
 	pdef->name = eStrndup (parameter, name_end - parameter);
 	pdef->desc = desc;
 
-	if (flags)
-		flagsEval (flags, NULL, 0, pdef);
+	flagsEval (flags, NULL, 0, pdef);
 
 	parser = LanguageTable + language;
 	defineParam (parser->paramControlBlock, pdef, freePdef);
@@ -3997,8 +3995,7 @@ static bool processLangDefineExtra (const langType language,
 	xdef->isEnabled = NULL;
 	DEFAULT_TRASH_BOX(xdef, xtagDefinitionDestroy);
 
-	if (flags)
-		flagsEval (flags, NULL, 0, xdef);
+	flagsEval (flags, NULL, 0, xdef);
 
 	defineXtag (xdef, language);
 
@@ -4092,8 +4089,7 @@ static bool processLangDefineField (const langType language,
 	fdef->description = desc;
 
 	fdef->dataType = 0;
-	if (flags)
-		flagsEval (flags, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef), fdef);
+	flagsEval (flags, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef), fdef);
 	if (!fdef->dataType)
 		fdef->dataType = FIELDTYPE_STRING;
 
