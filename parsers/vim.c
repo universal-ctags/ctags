@@ -75,8 +75,10 @@ static kindDefinition VimKinds [] = {
 	{ true,  'n', "filename", "vimball filename" },
 	{ true,  'C', "constant", "constant definitions" },
 	{ false, 'h', "heredoc",  "marker for here document",
-	  .referenceOnly = false, ATTACH_ROLES (VimHeredocRoles) },
-	{ true,  'k', "class", "vim9script classes" },
+	  .referenceOnly = false, ATTACH_ROLES (VimHeredocRoles),
+	  .version = 1 },
+	{ true,  'k', "class", "vim9script classes",
+	  .version = 1 },
 };
 
 /*

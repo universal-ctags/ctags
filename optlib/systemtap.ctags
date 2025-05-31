@@ -32,7 +32,7 @@
 --alias-SystemTap=+stap
 
 --kinddef-SystemTap=p,probe,probe aliases
---_roledef-SystemTap.{probe}=attached,attached by code for probing
+--_roledef-SystemTap.{probe}=attached,attached by code for probing{version=1}
 --kinddef-SystemTap=f,function,functions
 --kinddef-SystemTap=v,variable,variables
 --kinddef-SystemTap=m,macro,macros
