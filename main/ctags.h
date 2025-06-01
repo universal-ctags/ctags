@@ -47,7 +47,7 @@
 #endif
 #define PROGRAM_NAME      "Universal Ctags"
 #define PROGRAM_URL       "https://ctags.io/"
-#define PROGRAM_COPYRIGHT "Copyright (C) 2015-2023"
+#define PROGRAM_COPYRIGHT "Copyright (C) 2015-2025"
 #define AUTHOR_NAME       "Universal Ctags Team"
 
 /* The concept of CURRENT and AGE is taken from libtool.
