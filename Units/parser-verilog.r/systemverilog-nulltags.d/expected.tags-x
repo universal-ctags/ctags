@@ -1,0 +1,14 @@
+                 module        6 input.sv module \ ; :
+                 struct       16 input.sv } \ ; module:
+                 member       11 input.sv } \ ; struct:.
+een              member       15 input.sv } \een ; struct:.
+en               struct       26 input.sv } \en ; module:
+                 member       21 input.sv } \ ; struct:.en
+enn              member       25 input.sv } \enn ; struct:.en
+n                module       29 input.sv module \n ; :
+                 struct       39 input.sv } \ ; module:n
+                 member       34 input.sv } \ ; struct:n.
+nen              member       38 input.sv } \nen ; struct:n.
+nn               struct       49 input.sv } \nn ; module:n
+                 member       44 input.sv } \ ; struct:n.nn
+nnn              member       48 input.sv } \nnn ; struct:n.nn

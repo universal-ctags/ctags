@@ -1020,7 +1020,6 @@ static void createTagFull (tokenInfo *const token, verilogKind kind, int role, t
 			token->parameter = true;
 	}
 	Assert (kind >= 0 && kind != K_UNDEFINED && kind != K_IDENTIFIER);
-	Assert (vStringLength (token->name) > 0);
 
 	/* check if a container before kind is modified by prototype */
 	/* BTW should we create a context for a prototype? */
@@ -2207,6 +2206,9 @@ extern parserDefinition* VerilogParser (void)
 	def->parser     = findVerilogTags;
 	def->initialize = initializeVerilog;
 	def->selectLanguage  = selectors;
+
+	/* See the comment in SystemVerilogParser. */
+	def->allowNullTag = true;
 	return def;
 }
 
@@ -2223,5 +2225,23 @@ extern parserDefinition* SystemVerilogParser (void)
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeSystemVerilog;
+
+	/*
+	 * A.9.3 Identifiers in LRM
+	 * ------------------------
+	 * escaped_identifier ::= \ {any_printable_ASCII_character_except_white_space} white_space
+	 * ...
+	 * identifier ::=
+	 * simple_identifier
+	 * | escaped_identifier
+	 * ...
+	 * simple_identifier ::= [ a-zA-Z_ ] { [ a-zA-Z0-9_$ ] }
+	 * ------------------------
+	 * All kinds are classified as identifiers, including text macros.
+	 * Let the parser allow to emit null tags for any kind of language
+	 * objects the parser extracts. See als #4257.
+	 */
+	def->allowNullTag = true;
+
 	return def;
 }
