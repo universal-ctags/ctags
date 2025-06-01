@@ -58,6 +58,13 @@ my $langdef_flags =
        } ],
     ];
 
+my $kinddef_flags =
+    [
+     [ qr/\{_refonly\}/, sub {
+	 $_[0]->{'refonly'} = 1;
+       } ],
+    ];
+
 my $fielddef_flags =
     [
      [ qr/\{datatype=([^\}]+)\}/, sub {
@@ -126,7 +133,7 @@ my $options =
 
 	   return 1;
        } ],
-     [ qr/^--kinddef-(.*)=([^,]),([^,]+),([^\{]+)(\{_refonly\})?/, sub {
+     [ qr/^--kinddef-(.*)=([^,]),([^,]+),([^\{]+)(.*)/, sub {
 	 die "Don't use --kinddef-<LANG>=+ option before defining the language"
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding a kind is allowed only to the language specified with --langdef: $1"
@@ -135,8 +142,7 @@ my $options =
 	 my $letter = $2;
 	 my $name = $3;
 	 my $desc = $4;
-	 my $refonly = 0;
-	 $refonly = 1 if defined $5;
+	 my $rest = $5;
 
 	 die "'F' as a kind letter is reserved for file kind."
 	     if ($letter eq 'F');
@@ -150,8 +156,11 @@ my $options =
 	 die "Letters used in kind name other than initial letter must be alphanumeric characters: $name"
 	     unless (substr ($name, 1) =~ /^[a-zA-Z0-9]+$/);
 
-	 push @{$_[0]->{'kinddefs'}}, { enabled => 1, letter => $letter, name => $name, desc => $desc,
-					refonly => $refonly, roles => [], seps => [] };
+	 my $kdef = { enabled => 1, letter => $letter, name => $name, desc => $desc,
+		      refonly => 0, roles => [], seps => [] };
+	 push @{$_[0]->{'kinddefs'}}, $kdef;
+	 parse_flags ($rest, $kdef, $kinddef_flags);
+
 	 return 1;
        } ],
      [ qr/^--_extradef-(.*)=([^,]+),([^\{]+)/, sub {

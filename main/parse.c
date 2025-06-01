@@ -2317,7 +2317,7 @@ static flagDefinition PreLangDefFlagDef [] = {
 	{ '\0', "_foreignLanguage",    NULL, pre_lang_def_flag_foreignLanguage_long,
 	  "LANG", "initialize another parser" },
 	{ '\0', "version",     NULL, pre_lang_def_flag_version_long,
-	  NULL, "set the version of the parser (current.age)"},
+	  "CURRENT.AGE", "set the version of the parser"},
 };
 
 static void optlibFreeDep (langType lang, bool initialized CTAGS_ATTR_UNUSED)
@@ -2809,8 +2809,8 @@ static bool processLangDefineKind(const langType language,
 	kdef->letter = letter;
 	kdef->name = name;
 	kdef->description = description;
-	if (flags)
-		flagsEval (flags, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef), kdef);
+
+	flagsEval (flags, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef), kdef);
 
 	defineKind (parser->kindControlBlock, kdef, freeKdef);
 	return true;
@@ -2919,8 +2919,7 @@ static bool processLangDefineRole(const langType language,
 	rdef->name = name;
 	rdef->description = description;
 
-	if (flags)
-		flagsEval (flags, NULL, 0, rdef);
+	flagsEval (flags, NULL, 0, rdef);
 
 	defineRole (parser->kindControlBlock, kdef->id, rdef, freeRdef);
 
@@ -3589,8 +3588,7 @@ static bool processLangDefineParam (const langType language,
 	pdef->name = eStrndup (parameter, name_end - parameter);
 	pdef->desc = desc;
 
-	if (flags)
-		flagsEval (flags, NULL, 0, pdef);
+	flagsEval (flags, NULL, 0, pdef);
 
 	parser = LanguageTable + language;
 	defineParam (parser->paramControlBlock, pdef, freePdef);
@@ -3997,8 +3995,7 @@ static bool processLangDefineExtra (const langType language,
 	xdef->isEnabled = NULL;
 	DEFAULT_TRASH_BOX(xdef, xtagDefinitionDestroy);
 
-	if (flags)
-		flagsEval (flags, NULL, 0, xdef);
+	flagsEval (flags, NULL, 0, xdef);
 
 	defineXtag (xdef, language);
 
@@ -4092,8 +4089,7 @@ static bool processLangDefineField (const langType language,
 	fdef->description = desc;
 
 	fdef->dataType = 0;
-	if (flags)
-		flagsEval (flags, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef), fdef);
+	flagsEval (flags, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef), fdef);
 	if (!fdef->dataType)
 		fdef->dataType = FIELDTYPE_STRING;
 
@@ -5396,41 +5392,19 @@ extern void printLanguageSubparsers (const langType language,
 	colprintTableDelete (table);
 }
 
-extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
-{
-	struct colprintTable * table;
+#define defineSimplePrintFLagsFunction(target, flagDef) \
+	extern void print##target##Flags (bool withListHeader, bool machinable, FILE *fp) \
+	{																	\
+		struct colprintTable * table = 	flagsColprintTableNew();		\
+		flagsColprintAddDefinitions (table, flagDef, ARRAY_SIZE (flagDef)); \
+		flagsColprintTablePrint (table, withListHeader, machinable, fp); \
+		colprintTableDelete(table);										\
+	} extern void print##target##Flags (bool withListHeader, bool machinable, FILE *fp \
+		)						/* So we can put ';' here. */
 
-	table = flagsColprintTableNew ();
-
-	flagsColprintAddDefinitions (table, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef));
-
-	flagsColprintTablePrint (table, withListHeader, machinable, fp);
-	colprintTableDelete(table);
-}
-
-extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp)
-{
-	struct colprintTable * table;
-
-	table = flagsColprintTableNew ();
-
-	flagsColprintAddDefinitions (table, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef));
-
-	flagsColprintTablePrint (table, withListHeader, machinable, fp);
-	colprintTableDelete(table);
-}
-
-extern void printFielddefFlags (bool withListHeader, bool machinable, FILE *fp)
-{
-	struct colprintTable * table;
-
-	table = flagsColprintTableNew ();
-
-	flagsColprintAddDefinitions (table, FieldDefFlagDef, ARRAY_SIZE (FieldDefFlagDef));
-
-	flagsColprintTablePrint (table, withListHeader, machinable, fp);
-	colprintTableDelete(table);
-}
+defineSimplePrintFLagsFunction(Langdef, PreLangDefFlagDef);
+defineSimplePrintFLagsFunction(Kinddef, PreKindDefFlagDef);
+defineSimplePrintFLagsFunction(Fielddef, FieldDefFlagDef);
 
 extern void printLanguageMultitableStatistics (langType language)
 {
