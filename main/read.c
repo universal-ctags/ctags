@@ -1394,7 +1394,7 @@ extern char *readLineFromBypass (
 	return data.result;
 }
 
-extern void   pushArea (
+extern bool   pushArea (
 				       bool useMemoryStreamInput,
 				       unsigned long startLine, long startColumn,
 				       unsigned long endLine, long endColumn,
@@ -1415,7 +1415,7 @@ extern void   pushArea (
 		{
 			File.thinDepth++;
 			verbose ("push thin area (%d)\n", File.thinDepth);
-			return;
+			return true;
 		}
 		error(WARNING, "INTERNAL ERROR: though pushing MEMORY based thin area, "
 			  "underlying area is a FILE base: %s@%s",
@@ -1448,6 +1448,9 @@ extern void   pushArea (
 
 	mio_setpos (File.mio, &original);
 
+	if (q <= p)
+		return false;
+
 	invalidatePatternCache();
 
 	size_t size = q - p;
@@ -1473,6 +1476,8 @@ extern void   pushArea (
 
 	File.input.lineNumberOrigin = ((startLine == 0)? 0: startLine - 1);
 	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
+
+	return true;
 }
 
 extern bool isAreaStacked (void)
