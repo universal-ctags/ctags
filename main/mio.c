@@ -317,6 +317,9 @@ MIO *mio_new_mio (MIO *base, long start, long size)
 	MIO *submio;
 	size_t r;
 
+	if (start < 0 || size < -1)
+		return NULL;
+
 	original_pos = mio_tell (base);
 
 	if (size == -1)
