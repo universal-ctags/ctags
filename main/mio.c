@@ -1082,13 +1082,8 @@ int mio_seek (MIO *mio, long offset, int whence)
 		switch (whence)
 		{
 			case SEEK_SET:
-				if (offset < 0)
+				if (offset < 0 || (size_t)offset > mio->impl.mem.size)
 					errno = EINVAL;
-				else if ((size_t)offset > mio->impl.mem.size)
-				{
-					errno = EINVAL;
-					mio->impl.mem.pos = mio->impl.mem.size;
-				}
 				else
 				{
 					mio->impl.mem.pos = (size_t)offset;
@@ -1097,12 +1092,10 @@ int mio_seek (MIO *mio, long offset, int whence)
 				break;
 
 			case SEEK_CUR:
-				if (offset < 0 && (size_t)-offset > mio->impl.mem.pos)
-					errno = EINVAL;
-				else if (mio->impl.mem.pos + (size_t)offset > mio->impl.mem.size)
+				if ((offset < 0 && (size_t)-offset > mio->impl.mem.pos) ||
+					mio->impl.mem.pos + (size_t)offset > mio->impl.mem.size)
 				{
 					errno = EINVAL;
-					mio->impl.mem.pos = mio->impl.mem.size;
 				}
 				else
 				{
@@ -1289,10 +1282,7 @@ int mio_setpos (MIO *mio, MIOPos *pos)
 		rv = -1;
 
 		if (pos->impl.mem > mio->impl.mem.size)
-		{
 			errno = EINVAL;
-			mio->impl.mem.pos = mio->impl.mem.size;
-		}
 		else
 		{
 			mio->impl.mem.ungetch = EOF;
