@@ -35,6 +35,7 @@ typedef enum {
 	LMAP_EXTENSION = 1 << 1,
 	LMAP_ALL       = LMAP_PATTERN | LMAP_EXTENSION,
 	LMAP_TABLE_OUTPUT = 1 << 2,
+	LMAP_NO_LANG_PREFIX = 1 << 3,
 } langmapType;
 
 enum parserCategory
