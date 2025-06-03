@@ -3762,7 +3762,8 @@ static void printMaps (const langType language, langmapType type)
 	unsigned int i;
 
 	parser = LanguageTable + language;
-	printf ("%-8s", parser->def->name);
+	if (! (LMAP_NO_LANG_PREFIX & type))
+		printf ("%-8s", parser->def->name);
 	if (parser->currentPatterns != NULL && (type & LMAP_PATTERN))
 		for (i = 0  ;  i < stringListCount (parser->currentPatterns)  ;  ++i)
 			printf (" %s", vStringValue (

@@ -1322,6 +1322,9 @@ Listing Options
 Miscellaneous Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+``--describe-language=<language>``
+	Prints the various aspects of the parser implementing the language.
+
 ``--help``
 	Prints to standard output a detailed usage description, and then exits.
 

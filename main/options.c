@@ -480,6 +480,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Output list of flags which can be used with --roledef option."},
  {1,0,""},
  {1,0,"Miscellaneous Options"},
+ {1,0,"  --describe-language=<language>"},
+ {1,0,"       Print the various aspects of the parser implementing the language."},
  {1,0,"  --help"},
  {1,0,"       Print this option summary."},
  {1,0,"  -?   Print this option summary."},
@@ -2306,6 +2308,107 @@ static void processListSubparsersOption (const char *const option CTAGS_ATTR_UNU
 	exit (0);
 }
 
+static void processDescribeLanguage(const char *const option,
+									const char *const parameter)
+{
+	/* Version, enable */
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "No language given in \"--%s\" option", option);
+
+
+	langType language = getNamedLanguage (parameter, 0);
+	if (language == LANG_IGNORE)
+		error (FATAL, "Unknown language \"--%s\" in \"%s\"", parameter, option);
+
+	initializeParser (language);
+
+	printf("About %s language\n", parameter);
+	puts("=======================================================");
+
+	printf("enabled: %s\n", isLanguageEnabled(language)? "yes": "no");
+	printf("version: %u.%u\n",
+		   getLanguageVersionCurrent (language),
+		   getLanguageVersionAge (language));
+
+	puts("");
+	puts("Mappings/patterns");
+	puts("-------------------------------------------------------");
+	printLanguageMaps (language, LMAP_PATTERN|LMAP_NO_LANG_PREFIX,
+					   localOption.withListHeader, localOption.machinable,
+					   stdout);
+
+	puts("");
+	puts("Mappings/extensions");
+	puts("-------------------------------------------------------");
+	printLanguageMaps (language, LMAP_EXTENSION|LMAP_NO_LANG_PREFIX,
+					   localOption.withListHeader, localOption.machinable,
+					   stdout);
+
+	puts("");
+	puts("Aliases");
+	puts("-------------------------------------------------------");
+	printLanguageAliases (language,
+						  localOption.withListHeader, localOption.machinable, stdout);
+
+	puts("");
+	puts("Kinds");
+	puts("-------------------------------------------------------");
+
+	printLanguageKinds (language, true,
+						localOption.withListHeader, localOption.machinable, stdout);
+
+	puts("");
+	puts("Roles");
+	puts("-------------------------------------------------------");
+	printLanguageRoles (language, "*",
+						localOption.withListHeader,
+						localOption.machinable,
+						stdout);
+
+	puts("");
+	puts("Fields");
+	puts("-------------------------------------------------------");
+	{
+		writerCheckOptions (Option.fieldsReset);
+		struct colprintTable * table = fieldColprintTableNew ();
+		fieldColprintAddLanguageLines (table, language);
+		fieldColprintTablePrint (table, localOption.withListHeader, localOption.machinable, stdout);
+		colprintTableDelete (table);
+	}
+
+	puts("");
+	puts("Extras");
+	puts("-------------------------------------------------------");
+	{
+		struct colprintTable * table = xtagColprintTableNew ();
+		xtagColprintAddLanguageLines (table, language);
+		xtagColprintTablePrint (table, localOption.withListHeader, localOption.machinable, stdout);
+		colprintTableDelete (table);
+	}
+
+	puts("");
+	puts("Parameters");
+	puts("-------------------------------------------------------");
+	printLanguageParams (language,
+						 localOption.withListHeader, localOption.machinable,
+						 stdout);
+
+	puts ("");
+	puts("Sub parsers stacked on this parser");
+	puts("-------------------------------------------------------");
+	printLanguageSubparsers(language,
+							localOption.withListHeader, localOption.machinable,
+							stdout);
+
+	puts("");
+	puts("Implementation specific status");
+	puts("-------------------------------------------------------");
+	printf("allow null tags: %s\n", doesLanguageAllowNullTag(language)? "yes": "no");
+
+	exit (0);
+
+}
+
 static void processListOperators (const char *const option CTAGS_ATTR_UNUSED,
 								  const char *const parameter)
 {
@@ -2864,6 +2967,7 @@ static void processDumpOptionsOption (const char *const option, const char *cons
 static void processDumpPreludeOption (const char *const option, const char *const parameter);
 
 static parametricOption ParametricOptions [] = {
+	{ "describe-language",      processDescribeLanguage,        true,   STAGE_ANY },
 	{ "etags-include",          processEtagsInclude,            false,  STAGE_ANY },
 	{ "exclude",                processExcludeOption,           false,  STAGE_ANY },
 	{ "exclude-exception",      processExcludeExceptionOption,  false,  STAGE_ANY },
