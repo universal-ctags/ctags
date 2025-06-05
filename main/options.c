@@ -1751,7 +1751,7 @@ static char* skipPastMap (char* p)
 static char* extractMapFromParameter (const langType language,
 				      char* parameter,
 				      char** tail,
-				      bool* pattern_p,
+				      langmapType *mapType,
 				      char* (* skip) (char *))
 {
 	char* p = NULL;
@@ -1761,7 +1761,7 @@ static char* extractMapFromParameter (const langType language,
 
 	if (first == EXTENSION_SEPARATOR)  /* extension map */
 	{
-		*pattern_p = false;
+		*mapType = LMAP_EXTENSION;
 
 		++parameter;
 		p = (* skip) (parameter);
@@ -1783,7 +1783,7 @@ static char* extractMapFromParameter (const langType language,
 	}
 	else if (first == PATTERN_START)  /* pattern map */
 	{
-		*pattern_p = true;
+		*mapType = LMAP_PATTERN;
 
 		++parameter;
 		for (p = parameter  ;  *p != PATTERN_STOP  &&  *p != '\0'  ;  ++p)
@@ -1812,13 +1812,13 @@ static char* addLanguageMap (const langType language, char* map_parameter,
 			     bool exclusiveInAllLanguages)
 {
 	char* p = NULL;
-	bool pattern_p;
+	langmapType map_type;
 	char* map;
 
-	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
-	if (map && pattern_p == false)
+	map = extractMapFromParameter (language, map_parameter, &p, &map_type, skipPastMap);
+	if (map && map_type == LMAP_EXTENSION)
 		addLanguageExtensionMap (language, map, exclusiveInAllLanguages);
-	else if (map && pattern_p == true)
+	else if (map && map_type == LMAP_PATTERN)
 		addLanguagePatternMap (language, map, exclusiveInAllLanguages);
 	else
 		error (FATAL, "Badly formed language map for %s language",
@@ -1832,13 +1832,13 @@ static char* addLanguageMap (const langType language, char* map_parameter,
 static char* removeLanguageMap (const langType language, char* map_parameter)
 {
 	char* p = NULL;
-	bool pattern_p;
+	langmapType map_type;
 	char* map;
 
-	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
-	if (map && pattern_p == false)
+	map = extractMapFromParameter (language, map_parameter, &p, &map_type, skipPastMap);
+	if (map && map_type == LMAP_EXTENSION)
 		removeLanguageExtensionMap (language, map);
-	else if (map && pattern_p == true)
+	else if (map && map_type == LMAP_PATTERN)
 		removeLanguagePatternMap (language, map);
 	else
 		error (FATAL, "Badly formed language map for %s language",
