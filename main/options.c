@@ -1777,17 +1777,16 @@ static char* extractMapFromParameter (const langType language,
 			*tail = parameter + strlen (parameter);
 			return result;
 		}
-		else
-		{
-			tmp = *p;
-			*p = '\0';
-			result = eStrdup (parameter);
-			*p = tmp;
-			*tail = p;
-			return result;
-		}
+
+		tmp = *p;
+		*p = '\0';
+		result = eStrdup (parameter);
+		*p = tmp;
+		*tail = p;
+		return result;
 	}
-	else if (first == PATTERN_START)  /* pattern map */
+
+	if (first == PATTERN_START)  /* pattern map */
 	{
 		*mapType = LMAP_PATTERN;
 
@@ -1800,15 +1799,13 @@ static char* extractMapFromParameter (const langType language,
 		if (*p == '\0')
 			error (FATAL, "Unterminated file name pattern for %s language",
 			   getLanguageName (language));
-		else
-		{
-			tmp = *p;
-			*p = '\0';
-			result = eStrdup (parameter);
-			*p = tmp;
-			*tail = p + 1;
-			return result;
-		}
+
+		tmp = *p;
+		*p = '\0';
+		result = eStrdup (parameter);
+		*p = tmp;
+		*tail = p + 1;
+		return result;
 	}
 
 	return NULL;
