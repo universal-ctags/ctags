@@ -123,6 +123,7 @@ typedef enum eTokenType {
 	TOKEN_REGEXP,
 	TOKEN_POSTFIX_OPERATOR,
 	TOKEN_STAR,
+	TOKEN_HASH,
 	/* To handle Babel's decorators.
 	 * Used only in readTokenFull or lower functions. */
 	TOKEN_ATMARK,
@@ -487,7 +488,7 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 
 static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 							vString *const signature, vString *const inheritance,
-							bool anonymous, bool nulltag)
+							bool anonymous, bool is_private, bool nulltag)
 {
 	int index = CORK_NIL;
 	const char *name = vStringValue (token->string);
@@ -525,6 +526,9 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 	initTagEntry (&e, name, kind);
 	updateTagLine (&e, token->lineNumber, token->filePosition);
 	e.extensionFields.scopeIndex = scope;
+
+	if (is_private)
+		e.extensionFields.access = "private";
 
 #ifdef DO_TRACING
 	{
@@ -573,19 +577,26 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 static int makeJsTag (const tokenInfo *const token, const jsKind kind,
 					   vString *const signature, vString *const inheritance)
 {
-	return makeJsTagCommon (token, kind, signature, inheritance, false, false);
+	return makeJsTagCommon (token, kind, signature, inheritance, false, false, false);
+}
+
+static int makeJsTagMaybePrivate (const tokenInfo *const token, const jsKind kind,
+								  vString *const signature, vString *const inheritance,
+								  const bool is_private)
+{
+	return makeJsTagCommon (token, kind, signature, inheritance, false, is_private, false);
 }
 
 static int makeJsNullTag (const tokenInfo *const token, const jsKind kind,
 						  vString *const signature, vString *const inheritance)
 {
-	return makeJsTagCommon (token, kind, signature, inheritance, false, true);
+	return makeJsTagCommon (token, kind, signature, inheritance, false, false, true);
 }
 
 static int makeClassTagCommon (tokenInfo *const token, vString *const signature,
 						  vString *const inheritance, bool anonymous)
 {
-	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance, anonymous, false);
+	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance, anonymous, false, false);
 }
 
 static int makeClassTag (tokenInfo *const token, vString *const signature,
@@ -598,7 +609,7 @@ static int makeFunctionTagCommon (tokenInfo *const token, vString *const signatu
 								  bool generator, bool anonymous)
 {
 	return makeJsTagCommon (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL,
-							anonymous, false);
+							anonymous, false, false);
 }
 
 static int makeFunctionTag (tokenInfo *const token, vString *const signature, bool generator)
@@ -1300,11 +1311,11 @@ getNextChar:
 		case '#':
 			/* skip shebang in case of e.g. Node.js scripts */
 			if (token->lineNumber > 1)
-				token->type = TOKEN_UNDEFINED;
+				token->type = TOKEN_HASH;
 			else if ((c = getcFromInputFile ()) != '!')
 			{
 				ungetcToInputFile (c);
-				token->type = TOKEN_UNDEFINED;
+				token->type = TOKEN_HASH;
 			}
 			else
 			{
@@ -1530,7 +1541,7 @@ static int parseMethodsInAnonymousObject (tokenInfo *const token)
 	anonGenerate (anon_object->string, "anonymousObject", JSTAG_VARIABLE);
 	anon_object->type = TOKEN_IDENTIFIER;
 
-	index = makeJsTagCommon (anon_object, JSTAG_VARIABLE, NULL, NULL, true, false);
+	index = makeJsTagCommon (anon_object, JSTAG_VARIABLE, NULL, NULL, true, false, false);
 	if (! parseMethods (token, index, false))
 	{
 		/* If no method is found, the anonymous object
@@ -2222,6 +2233,7 @@ start:
 			 ! isType (token, TOKEN_SEMICOLON))
 		{
 			bool is_generator = false;
+			bool is_private = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
 			bool is_computed_name = false; /* ES6 computed property name */
 			bool is_dynamic_prop = false;
@@ -2233,6 +2245,11 @@ start:
 			if (isType (token, TOKEN_STAR)) /* shorthand generator */
 			{
 				is_generator = true;
+				readToken (token);
+			}
+			else if (isType (token, TOKEN_HASH))
+			{
+				is_private = true;
 				readToken (token);
 			}
 
@@ -2352,7 +2369,16 @@ function:
 						else if (is_setter)
 							kind = JSTAG_SETTER;
 
-						index_for_name = makeJsTag (name, kind, signature, NULL);
+						if (is_private)
+						{
+							vString * s = vStringNew ();
+							vStringPut (s, '#');
+							vStringCat (s, name->string);
+							vStringCopy (name->string, s);
+							vStringDelete (s);
+						}
+
+						index_for_name = makeJsTagMaybePrivate (name, kind, signature, NULL, is_private);
 						parseBlock (token, index_for_name);
 
 						/*
@@ -2447,8 +2473,17 @@ function:
 			}
 			else
 			{
+				if (is_private)
+				{
+					vString * s = vStringNew ();
+					vStringPut (s, '#');
+					vStringCat (s, name->string);
+					vStringCopy (name->string, s);
+					vStringDelete (s);
+				}
+
 				bool is_property = isType (token, TOKEN_COMMA);
-				makeJsTag (name, is_property ? JSTAG_PROPERTY : JSTAG_FIELD, NULL, NULL);
+				makeJsTagMaybePrivate (name, is_property ? JSTAG_PROPERTY : JSTAG_FIELD, NULL, NULL, is_private);
 				if (!isType (token, TOKEN_SEMICOLON) && !is_property)
 					dont_read = true;
 			}
@@ -2517,7 +2552,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *target_name)
 	TRACE_PRINT("Emitting tag for class '%s'", vStringValue(target_name->string));
 
 	int r = makeJsTagCommon (target_name, JSTAG_CLASS, NULL, inheritance,
-							 (is_anonymous && (target_name == class_name)), false);
+							 (is_anonymous && (target_name == class_name)), false, false);
 
 	if (! is_anonymous && target_name != class_name)
 	{
@@ -2855,7 +2890,7 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		if ( parseMethods(token, p, false) )
 		{
 			jsKind kind = state->foundThis || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
-			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, anon_object, false);
+			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, anon_object, false, false);
 			moveChildren (p, state->indexForName);
 		}
 		else if ( token->nestLevel == 0 && state->isGlobal )
@@ -2902,7 +2937,7 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		 */
 		if ( ( token->nestLevel == 0 && state->isGlobal ) || kind == JSTAG_PROPERTY )
 		{
-			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, false, false);
+			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, false, false, false);
 		}
 	}
 	else if (isKeyword (token, KEYWORD_new))
