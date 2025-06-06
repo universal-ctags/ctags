@@ -14,6 +14,10 @@ Incompatible changes
 
 Parser related changes
 ---------------------------------------------------------------------
+JavaScript:
+* A new field "properties" was added to indicate that a field or
+  member of a class is static.
+* Class member names prefixed with # are recognized as private.
 
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

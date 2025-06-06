@@ -50,6 +50,7 @@ z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field outpu
 -	package	yes	Go	s--	no	--	the real package specified by the package name
 -	packageName	yes	Go	s--	no	--	the name for referring the package
 -	implements	yes	Inko	s--	no	rw	Trait being implemented
+-	properties	no	JavaScript	s--	no	--	properties (static)
 -	assignment	yes	LdScript	s--	no	--	how a value is assigned to the symbol
 -	definer	yes	Lisp	s--	no	--	the name of the function or macro that defines the unknown/Y-kind object
 -	sectionMarker	no	Markdown	s--	no	--	character used for declaring section(#, ##, =, or -)

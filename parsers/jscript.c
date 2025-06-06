@@ -123,6 +123,7 @@ typedef enum eTokenType {
 	TOKEN_REGEXP,
 	TOKEN_POSTFIX_OPERATOR,
 	TOKEN_STAR,
+	TOKEN_HASH,
 	/* To handle Babel's decorators.
 	 * Used only in readTokenFull or lower functions. */
 	TOKEN_ATMARK,
@@ -143,6 +144,10 @@ typedef struct sTokenInfo {
 	bool			dynamicProp;
 	int				c;
 } tokenInfo;
+
+typedef enum {
+	F_STATIC,
+} jsField;
 
 /*
  * DATA DEFINITIONS
@@ -277,6 +282,14 @@ static kindDefinition JsKinds [] = {
 	{ true,  'G', "getter",		  "getters"          },
 	{ true,  'S', "setter",		  "setters"          },
 	{ true,  'M', "field",		  "fields"           },
+};
+
+static fieldDefinition JsFields[] = {
+	{
+		.name = "properties",
+		.description = "properties (static)",
+		.enabled = false,
+	},
 };
 
 static const keywordTable JsKeywordTable [] = {
@@ -487,7 +500,7 @@ static int makeJsRefTagsForNameChain (char *name_chain, const tokenInfo *token, 
 
 static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 							vString *const signature, vString *const inheritance,
-							bool anonymous, bool nulltag)
+							bool anonymous, bool is_static, bool is_private, bool nulltag)
 {
 	int index = CORK_NIL;
 	const char *name = vStringValue (token->string);
@@ -525,6 +538,12 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 	initTagEntry (&e, name, kind);
 	updateTagLine (&e, token->lineNumber, token->filePosition);
 	e.extensionFields.scopeIndex = scope;
+
+	if (is_private)
+		e.extensionFields.access = "private";
+
+	if (is_static)
+		attachParserField (&e, JsFields[F_STATIC].ftype, "static");
 
 #ifdef DO_TRACING
 	{
@@ -573,19 +592,33 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 static int makeJsTag (const tokenInfo *const token, const jsKind kind,
 					   vString *const signature, vString *const inheritance)
 {
-	return makeJsTagCommon (token, kind, signature, inheritance, false, false);
+	return makeJsTagCommon (token, kind, signature, inheritance, false, false, false, false);
+}
+
+static int makeJsTagMaybePrivate (const tokenInfo *const token, const jsKind kind,
+								  vString *const signature, vString *const inheritance,
+								  const bool is_static, const bool is_private)
+{
+	if (is_private) {
+		vString * s = vStringNewInit ("#");
+		vStringCat (s, token->string);
+		vStringCopy (token->string, s);
+		vStringDelete (s);
+	}
+
+	return makeJsTagCommon (token, kind, signature, inheritance, false, is_static, is_private, false);
 }
 
 static int makeJsNullTag (const tokenInfo *const token, const jsKind kind,
 						  vString *const signature, vString *const inheritance)
 {
-	return makeJsTagCommon (token, kind, signature, inheritance, false, true);
+	return makeJsTagCommon (token, kind, signature, inheritance, false, false, false, true);
 }
 
 static int makeClassTagCommon (tokenInfo *const token, vString *const signature,
 						  vString *const inheritance, bool anonymous)
 {
-	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance, anonymous, false);
+	return makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance, anonymous, false, false, false);
 }
 
 static int makeClassTag (tokenInfo *const token, vString *const signature,
@@ -598,7 +631,7 @@ static int makeFunctionTagCommon (tokenInfo *const token, vString *const signatu
 								  bool generator, bool anonymous)
 {
 	return makeJsTagCommon (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL,
-							anonymous, false);
+							anonymous, false, false, false);
 }
 
 static int makeFunctionTag (tokenInfo *const token, vString *const signature, bool generator)
@@ -1300,11 +1333,11 @@ getNextChar:
 		case '#':
 			/* skip shebang in case of e.g. Node.js scripts */
 			if (token->lineNumber > 1)
-				token->type = TOKEN_UNDEFINED;
+				token->type = TOKEN_HASH;
 			else if ((c = getcFromInputFile ()) != '!')
 			{
 				ungetcToInputFile (c);
-				token->type = TOKEN_UNDEFINED;
+				token->type = TOKEN_HASH;
 			}
 			else
 			{
@@ -1530,7 +1563,7 @@ static int parseMethodsInAnonymousObject (tokenInfo *const token)
 	anonGenerate (anon_object->string, "anonymousObject", JSTAG_VARIABLE);
 	anon_object->type = TOKEN_IDENTIFIER;
 
-	index = makeJsTagCommon (anon_object, JSTAG_VARIABLE, NULL, NULL, true, false);
+	index = makeJsTagCommon (anon_object, JSTAG_VARIABLE, NULL, NULL, true, false, false, false);
 	if (! parseMethods (token, index, false))
 	{
 		/* If no method is found, the anonymous object
@@ -2162,6 +2195,7 @@ static bool parseMethods (tokenInfo *const token, int class_index,
 	{
 		bool is_setter = false;
 		bool is_getter = false;
+		bool is_static = false;
 
 		if (!dont_read)
 			readToken (token);
@@ -2204,6 +2238,9 @@ start:
 			else if (isKeyword (saved_token, KEYWORD_async) ||
 					 isKeyword (saved_token, KEYWORD_static))
 			{
+				if (isKeyword (saved_token, KEYWORD_static))
+					is_static = true;
+
 				/* can be a qualifier for another "keyword", so start over */
 				deleteToken (saved_token);
 				goto start;
@@ -2222,6 +2259,7 @@ start:
 			 ! isType (token, TOKEN_SEMICOLON))
 		{
 			bool is_generator = false;
+			bool is_private = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
 			bool is_computed_name = false; /* ES6 computed property name */
 			bool is_dynamic_prop = false;
@@ -2233,6 +2271,11 @@ start:
 			if (isType (token, TOKEN_STAR)) /* shorthand generator */
 			{
 				is_generator = true;
+				readToken (token);
+			}
+			else if (isType (token, TOKEN_HASH))
+			{
+				is_private = true;
 				readToken (token);
 			}
 
@@ -2352,7 +2395,7 @@ function:
 						else if (is_setter)
 							kind = JSTAG_SETTER;
 
-						index_for_name = makeJsTag (name, kind, signature, NULL);
+						index_for_name = makeJsTagMaybePrivate (name, kind, signature, NULL, is_static, is_private);
 						parseBlock (token, index_for_name);
 
 						/*
@@ -2448,7 +2491,7 @@ function:
 			else
 			{
 				bool is_property = isType (token, TOKEN_COMMA);
-				makeJsTag (name, is_property ? JSTAG_PROPERTY : JSTAG_FIELD, NULL, NULL);
+				makeJsTagMaybePrivate (name, is_property ? JSTAG_PROPERTY : JSTAG_FIELD, NULL, NULL, is_static, is_private);
 				if (!isType (token, TOKEN_SEMICOLON) && !is_property)
 					dont_read = true;
 			}
@@ -2517,7 +2560,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *target_name)
 	TRACE_PRINT("Emitting tag for class '%s'", vStringValue(target_name->string));
 
 	int r = makeJsTagCommon (target_name, JSTAG_CLASS, NULL, inheritance,
-							 (is_anonymous && (target_name == class_name)), false);
+							 (is_anonymous && (target_name == class_name)), false, false, false);
 
 	if (! is_anonymous && target_name != class_name)
 	{
@@ -2855,7 +2898,7 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		if ( parseMethods(token, p, false) )
 		{
 			jsKind kind = state->foundThis || strchr (vStringValue(name->string), '.') != NULL ? JSTAG_PROPERTY : JSTAG_VARIABLE;
-			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, anon_object, false);
+			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, anon_object, false, false, false);
 			moveChildren (p, state->indexForName);
 		}
 		else if ( token->nestLevel == 0 && state->isGlobal )
@@ -2902,7 +2945,7 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 		 */
 		if ( ( token->nestLevel == 0 && state->isGlobal ) || kind == JSTAG_PROPERTY )
 		{
-			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, false, false);
+			state->indexForName = makeJsTagCommon (name, kind, NULL, NULL, false, false, false, false);
 		}
 	}
 	else if (isKeyword (token, KEYWORD_new))
@@ -3762,6 +3805,8 @@ extern parserDefinition* JavaScriptParser (void)
 	 */
 	def->kindTable	= JsKinds;
 	def->kindCount	= ARRAY_SIZE (JsKinds);
+	def->fieldTable = JsFields;
+	def->fieldCount = ARRAY_SIZE (JsFields);
 	def->parser		= findJsTags;
 	def->initialize = initialize;
 	def->finalize   = finalize;
@@ -3773,8 +3818,8 @@ extern parserDefinition* JavaScriptParser (void)
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 
-	def->versionCurrent = 1;
-	def->versionAge = 1;
+	def->versionCurrent = 2;
+	def->versionAge = 2;
 
 	return def;
 }
