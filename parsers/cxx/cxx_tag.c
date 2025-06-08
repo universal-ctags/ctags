@@ -46,10 +46,12 @@ CXX_COMMON_HEADER_ROLES(CUDA);
 
 /* Currently V parser wants these items. */
 #define RoleTemplateForeignDecl { true, "foreigndecl", "declared in foreign languages" }
+#define RoleTemplateForeignCall { true, "foreigncall", "called in foreign languages" }
 
 #define CXX_COMMON_FUNCTION_ROLES(__langPrefix) \
 	static roleDefinition __langPrefix##FunctionRoles [] = { \
 		RoleTemplateForeignDecl, \
+		RoleTemplateForeignCall, \
 	}
 
 CXX_COMMON_FUNCTION_ROLES(C);

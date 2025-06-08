@@ -25,6 +25,7 @@ Basic                   f/function        decl               on      declared
 Bats                    S/script          loaded             on      script loaed with "load" command
 C                       d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C                       d/macro           undef              on      undefined
+C                       f/function        foreigncall        on      called in foreign languages
 C                       f/function        foreigndecl        on      declared in foreign languages
 C                       h/header          local              on      local header
 C                       h/header          system             on      system header
@@ -173,6 +174,7 @@ Basic                   f/function        decl               on      declared
 Bats                    S/script          loaded             on      script loaed with "load" command
 C                       d/macro           condition          off     used in part of #if/#ifdef/#elif conditions
 C                       d/macro           undef              on      undefined
+C                       f/function        foreigncall        on      called in foreign languages
 C                       f/function        foreigndecl        on      declared in foreign languages
 C                       h/header          local              on      local header
 C                       h/header          system             on      system header
@@ -301,6 +303,7 @@ Zsh                     s/script          loaded             on      loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -340,6 +343,7 @@ s/script   loaded on      loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       off     local header
 h/header    system      off     system header
@@ -351,6 +355,7 @@ s/struct    foreigndecl off     declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       off     local header
 h/header    system      off     system header
@@ -363,6 +368,7 @@ s/struct    foreigndecl off     declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   on      used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -375,6 +381,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   on      used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -386,6 +393,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       off     local header
 h/header    system      off     system header
@@ -404,6 +412,7 @@ s/script   loaded    on      loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       off     local header
 h/header    system      off     system header
@@ -423,6 +432,7 @@ s/script   loaded    on      loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   on      used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -443,6 +453,7 @@ s/script   loaded    off     loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   on      used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -462,6 +473,7 @@ s/script   loaded    off     loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       off     local header
 h/header    system      off     system header
@@ -480,6 +492,7 @@ s/script   loaded    on      loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       off     local header
 h/header    system      off     system header
@@ -499,6 +512,7 @@ s/script   loaded    on      loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -519,6 +533,7 @@ s/script   loaded    off     loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -538,6 +553,7 @@ s/script   loaded    off     loaded
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      off     system header
@@ -549,6 +565,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      off     system header
@@ -560,6 +577,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -571,6 +589,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -582,6 +601,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       off     local header
 h/header    system      off     system header
@@ -593,6 +613,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       off     local header
 h/header    system      off     system header
@@ -605,6 +626,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -617,6 +639,7 @@ s/struct    foreigndecl off     declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -628,6 +651,7 @@ s/struct    foreigndecl off     declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       off     local header
 h/header    system      on      system header
@@ -639,6 +663,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       on      undefined
+f/function  foreigncall on      called in foreign languages
 f/function  foreigndecl on      declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -650,6 +675,7 @@ s/struct    foreigndecl on      declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
@@ -661,6 +687,7 @@ s/struct    foreigndecl off     declared in foreign languages
 #KIND(L/N)  NAME        ENABLED DESCRIPTION
 d/macro     condition   off     used in part of #if/#ifdef/#elif conditions
 d/macro     undef       off     undefined
+f/function  foreigncall off     called in foreign languages
 f/function  foreigndecl off     declared in foreign languages
 h/header    local       on      local header
 h/header    system      on      system header
