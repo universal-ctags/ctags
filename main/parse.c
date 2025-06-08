@@ -37,6 +37,7 @@
 #include "ptrarray.h"
 #include "read.h"
 #include "read_p.h"
+#include "rexprcode_p.h"
 #include "routines.h"
 #include "routines_p.h"
 #include "stats_p.h"
@@ -61,9 +62,10 @@ enum specType {
 	SPEC_ALIAS = SPEC_NAME,
 	SPEC_EXTENSION,
 	SPEC_PATTERN,
+	SPEC_REXPR,
 };
 const char *specTypeName [] = {
-	"none", "name", "extension", "pattern"
+	"none", "name", "extension", "pattern", "regex"
 };
 
 typedef struct {
@@ -80,6 +82,7 @@ typedef struct sParserObject {
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
 	stringList* currentAliases;    /* current list of aliases */
+	ptrArray*   currentRegularExpressions;
 
 	unsigned int initialized:1;    /* initialize() is called or not */
 	unsigned int dontEmit:1;	   /* run but don't emit tags.
@@ -470,7 +473,40 @@ extern langType getLanguageForCommand (const char *const command, langType start
 											&tmp_specType);
 }
 
-static langType getPatternLanguageAndSpec (const char *const baseName, langType start_index,
+static ptrArray* rExpressionsNew (void)
+{
+	return ptrArrayNew ((ptrArrayDeleteFunc)rExprCodeDelete);
+}
+
+static void rExpressionsDelete (ptrArray* rexprs)
+{
+	ptrArrayDelete (rexprs);
+}
+
+static void rExpressionsAddFromArray (ptrArray* rexprs, const struct rExprSrc *const array)
+{
+	for (unsigned int i = 0; array[i].expr; i++)
+	{
+		struct rExprCode *rxcode = rExprCodeNew (array[i].expr, array[i].iCase);
+		if (rxcode)
+			ptrArrayAdd (rexprs, rxcode);
+	}
+}
+
+static struct rExprCode *rExpressionsFinds(ptrArray *rexprs, const char *fullName)
+{
+	for (unsigned int i = 0; i < ptrArrayCount (rexprs); i++)
+	{
+		struct rExprCode *rxcode = ptrArrayItem (rexprs, i);
+		if (rExprCodeMatch (rxcode, fullName))
+			return rxcode;
+	}
+	return NULL;
+}
+
+static langType getPatternLanguageAndSpec (const char *const baseName,
+										   const char *const fullName,
+										   langType start_index,
 					   const char **const spec, enum specType *specType)
 {
 	langType result = LANG_IGNORE;
@@ -482,6 +518,29 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 		return result;
 
 	*spec = NULL;
+
+	if (fullName == NULL)
+		goto classical_methods;
+
+	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
+	{
+		if (! isLanguageEnabled (i))
+			continue;
+
+		parserObject *parser = LanguageTable + i;
+		ptrArray* const rexprs = parser->currentRegularExpressions;
+		struct rExprCode *rxcode;
+
+		if (rexprs != NULL && (rxcode = rExpressionsFinds (rexprs, fullName)))
+		{
+			result = i;
+			*spec = rExprCodeGetSource (rxcode);
+			*specType = SPEC_REXPR;
+			goto found;
+		}
+	}
+
+ classical_methods:
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
 		if (! isLanguageEnabled (i))
@@ -528,7 +587,7 @@ extern langType getLanguageForFilename (const char *const filename, langType sta
 	char *tmp_spec;
 	enum specType tmp_specType;
 
-	return getPatternLanguageAndSpec (tmp_filename, startFrom,
+	return getPatternLanguageAndSpec (tmp_filename, filename, startFrom,
 									  (const char **const)&tmp_spec,
 									  &tmp_specType);
 }
@@ -694,7 +753,8 @@ static parserCandidate* parserCandidateNew(unsigned int count CTAGS_ATTR_UNUSED)
 }
 
 /* If multiple parsers are found, return LANG_AUTO */
-static unsigned int nominateLanguageCandidates (const char *const key, parserCandidate** candidates)
+static unsigned int nominateLanguageCandidates (const char *const key, const char *const fullKey CTAGS_ATTR_UNUSED,
+												parserCandidate** candidates)
 {
 	unsigned int count;
 	langType i;
@@ -718,7 +778,8 @@ static unsigned int nominateLanguageCandidates (const char *const key, parserCan
 }
 
 static unsigned int
-nominateLanguageCandidatesForPattern(const char *const baseName, parserCandidate** candidates)
+nominateLanguageCandidatesForPattern(const char *const baseName, const char *const fullName,
+									 parserCandidate** candidates)
 {
 	unsigned int count;
 	langType i;
@@ -729,7 +790,7 @@ nominateLanguageCandidatesForPattern(const char *const baseName, parserCandidate
 
 	for (count = 0, i = LANG_AUTO; i != LANG_IGNORE; )
 	{
-		i = getPatternLanguageAndSpec (baseName, i, &spec, &specType);
+		i = getPatternLanguageAndSpec (baseName, fullName, i, &spec, &specType);
 		if (i != LANG_IGNORE)
 		{
 			(*candidates)[count].lang = i++;
@@ -1324,8 +1385,8 @@ static bool doesCandidatesRequireMemoryStream(const parserCandidate *candidates,
 	return false;
 }
 
-static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
-				       unsigned int nominate (const char *const, parserCandidate**),
+static langType getSpecLanguageCommon (const char *const spec, const char *const fullSpec, struct getLangCtx *glc,
+				       unsigned int nominate (const char *const, const char *const, parserCandidate**),
 				       langType *fallback)
 {
 	langType language;
@@ -1335,7 +1396,7 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 	if (fallback)
 		*fallback = LANG_IGNORE;
 
-	n_candidates = (*nominate)(spec, &candidates);
+	n_candidates = (*nominate)(spec, fullSpec, &candidates);
 	verboseReportCandidate ("candidates",
 				candidates, n_candidates);
 
@@ -1383,15 +1444,16 @@ static langType getSpecLanguage (const char *const spec,
                                  struct getLangCtx *glc,
 				 langType *fallback)
 {
-	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates,
+	return getSpecLanguageCommon(spec, NULL, glc, nominateLanguageCandidates,
 				     fallback);
 }
 
 static langType getPatternLanguage (const char *const baseName,
+									const char *const fullName,
                                     struct getLangCtx *glc,
 				    langType *fallback)
 {
-	return getSpecLanguageCommon(baseName, glc,
+	return getSpecLanguageCommon(baseName, fullName, glc,
 				     nominateLanguageCandidatesForPattern,
 				     fallback);
 }
@@ -1485,7 +1547,7 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
     verbose ("Get file language for %s\n", fileName);
 
     verbose ("	pattern: %s\n", baseName);
-    language = getPatternLanguage (baseName, &glc,
+    language = getPatternLanguage (baseName, fileName, &glc,
 				   fallback + HINT_FILENAME);
     if (language != LANG_IGNORE || glc.err)
         goto cleanup;
@@ -1498,7 +1560,7 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
             verbose ("	pattern + template(%s): %s\n", tExt, templateBaseName);
             GLC_FOPEN_IF_NECESSARY(&glc, cleanup, false);
             mio_rewind(glc.input);
-            language = getPatternLanguage(templateBaseName, &glc,
+            language = getPatternLanguage (templateBaseName, NULL, &glc,
 					  fallback + HINT_TEMPLATE);
             if (language != LANG_IGNORE)
                 goto cleanup;
@@ -1632,10 +1694,18 @@ extern void installLanguageMapDefault (const langType language)
 	parserObject* parser;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable + language;
+
+	if (parser->currentRegularExpressions != NULL)
+		rExpressionsDelete (parser->currentRegularExpressions);
 	if (parser->currentPatterns != NULL)
 		stringListDelete (parser->currentPatterns);
 	if (parser->currentExtensions != NULL)
 		stringListDelete (parser->currentExtensions);
+
+	parser->currentRegularExpressions = rExpressionsNew ();
+	if (parser->def->rexprs)
+		rExpressionsAddFromArray (parser->currentRegularExpressions,
+								  parser->def->rexprs);
 
 	if (parser->def->patterns == NULL)
 		parser->currentPatterns = stringListNew ();
@@ -1796,6 +1866,56 @@ extern void addLanguageExtensionMap (
 	if (exclusiveInAllLanguages)
 		removeLanguageExtensionMap (LANG_AUTO, extension);
 	stringListAdd ((LanguageTable + language)->currentExtensions, str);
+}
+
+static bool removeLanguageRexprMap1(const langType language, const char *const rexpr, bool iCase)
+{
+	bool result = false;
+	ptrArray* const rexprs = (LanguageTable + language)->currentRegularExpressions;
+
+	for (unsigned int i = 0; i < ptrArrayCount (rexprs); i++)
+	{
+		struct rExprCode *rxcode = ptrArrayItem (rexprs, i);
+		if (strcmp (rExprCodeGetSource (rxcode), rexpr) == 0)
+		{
+			ptrArrayDeleteItem (rexprs, i);
+			verbose (" (removed from %s)", getLanguageName (language));
+			result = true;
+			break;
+		}
+	}
+	return result;
+}
+
+extern bool removeLanguageRexprMap (const langType language, const char *const rexpr, bool iCase)
+{
+	bool result = false;
+
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0; i < LanguageCount && ! result ; ++i)
+			result = removeLanguageRexprMap1 (i, rexpr, iCase) || result;
+	}
+	else
+		result = removeLanguageRexprMap1 (language, rexpr, iCase);
+
+	return result;
+}
+
+extern void addLanguageRexprMap (const langType language, const char* rexpr, bool iCase,
+				   bool exclusiveInAllLanguages)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	ptrArray* const rexprs = (LanguageTable + language)->currentRegularExpressions;
+
+	if (exclusiveInAllLanguages)
+		removeLanguageRexprMap (LANG_AUTO, rexpr, iCase);
+
+	struct rExprCode *rxcode = rExprCodeNew (rexpr,iCase);
+	if (rxcode)
+		ptrArrayAdd (rexprs, rxcode);
 }
 
 extern void addLanguageAlias (const langType language, const char* alias)
@@ -2130,6 +2250,11 @@ extern void freeParserResources (void)
 
 		freeList (&parser->currentPatterns);
 		freeList (&parser->currentExtensions);
+		if (parser->currentRegularExpressions != NULL)
+		{
+			rExpressionsDelete (parser->currentRegularExpressions);
+			parser->currentRegularExpressions = NULL;
+		}
 		freeList (&parser->currentAliases);
 
 		eFree (parser->def->name);
@@ -3735,6 +3860,18 @@ static void printMaps (const langType language, langmapType type)
 
 	parser = LanguageTable + language;
 	printf ("%-8s", parser->def->name);
+	if (parser->currentRegularExpressions != NULL && (type & LMAP_REXPR))
+	{
+		for (i = 0 ; i < ptrArrayCount (parser->currentRegularExpressions) ; ++i)
+		{
+			struct rExprCode *rxcode = ptrArrayItem (parser->currentRegularExpressions,
+													 i);
+			vString *encodedSource = rExprCodeNewEncodedSource (rxcode);
+			printf (" %s", vStringValue (encodedSource));
+			vStringDelete (encodedSource);
+		}
+	}
+
 	if (parser->currentPatterns != NULL && (type & LMAP_PATTERN))
 		for (i = 0  ;  i < stringListCount (parser->currentPatterns)  ;  ++i)
 			printf (" %s", vStringValue (
@@ -3754,6 +3891,8 @@ static struct colprintTable *mapColprintTableNew (langmapType type)
 		return colprintTableNew ("L:LANGUAGE", "L:PATTERN", NULL);
 	else if (type & LMAP_EXTENSION)
 		return colprintTableNew ("L:LANGUAGE", "L:EXTENSION", NULL);
+	else if (type & LMAP_REXPR)
+		return colprintTableNew ("L:LANGUAGE", "L:EXPRESSION", "L:CASE", NULL);
 	else
 	{
 		AssertNotReached ();
@@ -3769,6 +3908,35 @@ static void mapColprintAddLanguage (struct colprintTable * table,
 	unsigned int count;
 	unsigned int i;
 
+	if ((type & LMAP_REXPR)
+		&& parser->currentRegularExpressions
+		&& (0 < (count = ptrArrayCount (parser->currentRegularExpressions))))
+	{
+		for (i = 0; i < count; i++)
+		{
+			line = colprintTableGetNewLine (table);
+			struct rExprCode *rxcode = ptrArrayItem (parser->currentRegularExpressions,
+													 i);
+
+			colprintLineAppendColumnCString (line, parser->def->name);
+			if ((type & LMAP_ALL) != LMAP_REXPR)
+			{
+				colprintLineAppendColumnCString (line, "regex");
+				vString *encodedSource = rExprCodeNewEncodedSource (rxcode);
+				colprintLineAppendColumnVString (line, encodedSource);
+				vStringDelete (encodedSource);
+			}
+			else
+			{
+				const char *rxsrc = rExprCodeGetSource (rxcode);
+				bool iCase = rExprCodeGetICase (rxcode);
+
+				colprintLineAppendColumnCString (line, rxsrc);
+				colprintLineAppendColumnCString (line, iCase? "insensitive": "sensitive");
+			}
+		}
+	}
+
 	if ((type & LMAP_PATTERN) && (0 < (count = stringListCount (parser->currentPatterns))))
 	{
 		for (i = 0; i < count; i++)
@@ -3777,7 +3945,7 @@ static void mapColprintAddLanguage (struct colprintTable * table,
 			vString *pattern = stringListItem (parser->currentPatterns, i);
 
 			colprintLineAppendColumnCString (line, parser->def->name);
-			if (type & LMAP_EXTENSION)
+			if ((type & LMAP_ALL) != LMAP_PATTERN)
 				colprintLineAppendColumnCString (line, "pattern");
 			colprintLineAppendColumnVString (line, pattern);
 		}
@@ -3791,7 +3959,7 @@ static void mapColprintAddLanguage (struct colprintTable * table,
 			vString *extension = stringListItem (parser->currentExtensions, i);
 
 			colprintLineAppendColumnCString (line, parser->def->name);
-			if (type & LMAP_PATTERN)
+			if ((type & LMAP_ALL) != LMAP_EXTENSION)
 				colprintLineAppendColumnCString (line, "extension");
 			colprintLineAppendColumnVString (line, extension);
 		}
