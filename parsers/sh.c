@@ -74,6 +74,19 @@ static roleDefinition ZshHeredocRoles [] = {
 };
 
 typedef enum {
+	R_VARIABLE_UNSET,
+} shVariableRole;
+
+#define SH_VARIABLE_ROLES_COMMON { true, "unset", "unset", .version = 1 }
+static roleDefinition ShVariableRoles [] = {
+	SH_VARIABLE_ROLES_COMMON,
+};
+
+static roleDefinition ZshVariableRoles [] = {
+	SH_VARIABLE_ROLES_COMMON,
+};
+
+typedef enum {
 	R_ZSH_FUNCTION_AUTOLOADED,
 } zshFunctionRole;
 
@@ -81,7 +94,7 @@ static roleDefinition ZshFunctionRoles [] = {
 	{ true, "autoloaded", "function name passed to autoload built-in command" },
 };
 
-#define SH_KINDS_COMMON(SCRIPT_ROLES,HEREDOC_ROLES, FUNCTION_ROLES_SPEC) \
+#define SH_KINDS_COMMON(SCRIPT_ROLES,HEREDOC_ROLES, VARIABLE_ROLES, FUNCTION_ROLES_SPEC) \
 	{ true, 'a', "alias", "aliases"},							\
 	{ true, 'f', "function", "functions",						\
 	  .referenceOnly = false, FUNCTION_ROLES_SPEC },			\
@@ -89,15 +102,16 @@ static roleDefinition ZshFunctionRoles [] = {
 	  .referenceOnly = true, ATTACH_ROLES (SCRIPT_ROLES) },		\
 	{ true, 'h', "heredoc", "labels for here document",			\
 	  .referenceOnly = false, ATTACH_ROLES (HEREDOC_ROLES) },   \
-	{ true, 'v', "variable", "variables assigment (experimental)", .version = 1 }
+	{ true, 'v', "variable", "variables assigment (experimental)", \
+	  .referenceOnly = false, ATTACH_ROLES (VARIABLE_ROLES), .version = 1 }
 
 
 static kindDefinition ShKinds [] = {
-	SH_KINDS_COMMON(ShScriptRoles, ShHeredocRoles,),
+	SH_KINDS_COMMON(ShScriptRoles, ShHeredocRoles, ShVariableRoles,)
 };
 
 static kindDefinition ZshKinds [] = {
-	SH_KINDS_COMMON(ZshScriptRoles, ZshHeredocRoles,
+	SH_KINDS_COMMON(ZshScriptRoles, ZshHeredocRoles, ZshVariableRoles,
 					ATTACH_ROLES(ZshFunctionRoles)),
 };
 
@@ -107,6 +121,7 @@ enum eShKeywordId {
 	KEYWORD_source,
 	KEYWORD_autoload,
 	KEYWORD_declare,			/* declare, typeset, local, export, readonly, float(zsh), integer */
+	KEYWORD_unset,
 };
 
 const char *dialectMap [] = {
@@ -125,6 +140,7 @@ static const struct dialectalKeyword KeywordTable [] = {
 	{ "readonly",  KEYWORD_declare,  { 1, 1 } },
 	{ "float",     KEYWORD_declare,  { 0, 1 } },
 	{ "integer",   KEYWORD_declare,  { 0, 1 } },
+	{ "unset",     KEYWORD_unset,    { 1, 1 } },
 };
 
 /*
@@ -367,6 +383,9 @@ static size_t handleShKeyword (int keyword,
 		*role = R_SCRIPT_LOADED;
 		*check_char = isFileChar;
 		break;
+	case KEYWORD_unset:
+		*role = R_VARIABLE_UNSET;
+		/* FALL THROUGH */
 	case KEYWORD_declare:
 		*kind = K_VARIABLE;
 		*check_char = isIdentChar;

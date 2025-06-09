@@ -126,6 +126,7 @@ SELinuxTypeEnforcement  t/type            aliased            on        0 aliased
 SQL                     k/type            decl               off       1 declaration (shell in PostgreSQL)
 Sh                      h/heredoc         endmarker          on        0 end marker
 Sh                      s/script          loaded             on        0 loaded
+Sh                      v/variable        unset              on        1 unset
 SystemTap               p/probe           attached           on        1 attached by code for probing
 SystemVerilog           m/module          decl               on        0 declaring instances
 SystemdUnit             u/unit            After              on        0 referred in After key
@@ -156,6 +157,7 @@ Zsh                     f/function        autoloaded         on        0 functio
 Zsh                     h/heredoc         endmarker          on        0 end marker
 Zsh                     s/script          autoloaded         on        0 autoloaded
 Zsh                     s/script          loaded             on        0 loaded
+Zsh                     v/variable        unset              on        1 unset
 
 #
 # all.*
@@ -284,6 +286,7 @@ SELinuxTypeEnforcement  t/type            aliased            on        0 aliased
 SQL                     k/type            decl               off       1 declaration (shell in PostgreSQL)
 Sh                      h/heredoc         endmarker          on        0 end marker
 Sh                      s/script          loaded             on        0 loaded
+Sh                      v/variable        unset              on        1 unset
 SystemTap               p/probe           attached           on        1 attached by code for probing
 SystemVerilog           m/module          decl               on        0 declaring instances
 SystemdUnit             u/unit            After              on        0 referred in After key
@@ -314,6 +317,7 @@ Zsh                     f/function        autoloaded         on        0 functio
 Zsh                     h/heredoc         endmarker          on        0 end marker
 Zsh                     s/script          autoloaded         on        0 autoloaded
 Zsh                     s/script          loaded             on        0 loaded
+Zsh                     v/variable        unset              on        1 unset
 
 #
 # C.*
@@ -420,9 +424,10 @@ s/struct    foreigndecl off       1 declared in foreign languages
 #
 # Sh.* with disabling all roles in C language
 #
-#KIND(L/N) NAME      ENABLED VER DESCRIPTION
-h/heredoc  endmarker on        0 end marker
-s/script   loaded    on        0 loaded
+#KIND(L/N)  NAME      ENABLED VER DESCRIPTION
+h/heredoc   endmarker on        0 end marker
+s/script    loaded    on        0 loaded
+v/variable  unset     on        1 unset
 
 #
 # C.* with disabling all roles of all kinds in C language
@@ -439,9 +444,10 @@ s/struct    foreigndecl off       1 declared in foreign languages
 #
 # Sh.* with disabling all roles of all kinds in C language
 #
-#KIND(L/N) NAME      ENABLED VER DESCRIPTION
-h/heredoc  endmarker on        0 end marker
-s/script   loaded    on        0 loaded
+#KIND(L/N)  NAME      ENABLED VER DESCRIPTION
+h/heredoc   endmarker on        0 end marker
+s/script    loaded    on        0 loaded
+v/variable  unset     on        1 unset
 
 #
 # C.* with enabling all roles in C language
@@ -460,9 +466,10 @@ s/struct    foreigndecl on        1 declared in foreign languages
 # Sh.* with enabling all roles in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED VER DESCRIPTION
-h/heredoc  endmarker off       0 end marker
-s/script   loaded    off       0 loaded
+#KIND(L/N)  NAME      ENABLED VER DESCRIPTION
+h/heredoc   endmarker off       0 end marker
+s/script    loaded    off       0 loaded
+v/variable  unset     off       1 unset
 
 #
 # C.* with enabling all roles of all kinds in C language
@@ -481,9 +488,10 @@ s/struct    foreigndecl on        1 declared in foreign languages
 # Sh.* with enabling all roles of all kinds in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED VER DESCRIPTION
-h/heredoc  endmarker off       0 end marker
-s/script   loaded    off       0 loaded
+#KIND(L/N)  NAME      ENABLED VER DESCRIPTION
+h/heredoc   endmarker off       0 end marker
+s/script    loaded    off       0 loaded
+v/variable  unset     off       1 unset
 
 #
 # C.* with disabling all roles of {header} kind in C language
@@ -500,9 +508,10 @@ s/struct    foreigndecl on        1 declared in foreign languages
 #
 # Sh.* with disabling all roles of {header} kind in C language
 #
-#KIND(L/N) NAME      ENABLED VER DESCRIPTION
-h/heredoc  endmarker on        0 end marker
-s/script   loaded    on        0 loaded
+#KIND(L/N)  NAME      ENABLED VER DESCRIPTION
+h/heredoc   endmarker on        0 end marker
+s/script    loaded    on        0 loaded
+v/variable  unset     on        1 unset
 
 #
 # C.* with disabling all roles of h kind in C language
@@ -519,9 +528,10 @@ s/struct    foreigndecl on        1 declared in foreign languages
 #
 # Sh.* with disabling all roles of h kind in C language
 #
-#KIND(L/N) NAME      ENABLED VER DESCRIPTION
-h/heredoc  endmarker on        0 end marker
-s/script   loaded    on        0 loaded
+#KIND(L/N)  NAME      ENABLED VER DESCRIPTION
+h/heredoc   endmarker on        0 end marker
+s/script    loaded    on        0 loaded
+v/variable  unset     on        1 unset
 
 #
 # C.* with enabling all roles of {header} kind in C language
@@ -540,9 +550,10 @@ s/struct    foreigndecl off       1 declared in foreign languages
 # Sh.* with enabling all roles of {header} kind in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED VER DESCRIPTION
-h/heredoc  endmarker off       0 end marker
-s/script   loaded    off       0 loaded
+#KIND(L/N)  NAME      ENABLED VER DESCRIPTION
+h/heredoc   endmarker off       0 end marker
+s/script    loaded    off       0 loaded
+v/variable  unset     off       1 unset
 
 #
 # C.* with enabling all roles of h kind in C language
@@ -561,9 +572,10 @@ s/struct    foreigndecl off       1 declared in foreign languages
 # Sh.* with enabling all roles of h kind in C language
 # after disabling all roles in all languages
 #
-#KIND(L/N) NAME      ENABLED VER DESCRIPTION
-h/heredoc  endmarker off       0 end marker
-s/script   loaded    off       0 loaded
+#KIND(L/N)  NAME      ENABLED VER DESCRIPTION
+h/heredoc   endmarker off       0 end marker
+s/script    loaded    off       0 loaded
+v/variable  unset     off       1 unset
 
 #
 # C.* with disabling system role of h kind
