@@ -99,7 +99,8 @@ static void makeIniconfTagMaybe (const char *section, const char *key, const cha
 	}
 	else
 	{
-		setTagEndLineToCorkEntry (*index, getInputLineNumber ());
+		unsigned long el = getInputLineNumber ();
+		setTagEndLineToCorkEntry (*index, el > 1? el - 1: 1);
 
 		initTagEntry (&e, section, K_SECTION);
 		*index = makeTagEntry (&e);
