@@ -692,8 +692,9 @@ extern parserDefinition* MakefileParser (void)
 	static const char *const patterns [] = { "[Mm]akefile", "GNUmakefile", NULL };
 	static const char *const extensions [] = { "mak", "mk", NULL };
 	static const char *const aliases [] = {
-		/* the mode name in emacs */
+		/* the mode names defined in make-mode.el in GNU Emacs */
 		"makefile",
+		"makefile-gmake",
 		NULL };
 
 	static parserDependency dependencies [] = {
