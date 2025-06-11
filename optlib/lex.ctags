@@ -44,7 +44,7 @@
 
 --kinddef-LEX=r,regex,named regular expression
 --kinddef-LEX=c,cond,definition of start or exclusive condition
---_roledef-LEX.{cond}=grouping, conditions used for grouping of start or exclusive condition rules
+--_roledef-LEX.{cond}=grouping, conditions used for grouping of start or exclusive condition rules{version=1}
 
 #
 # Table declarations

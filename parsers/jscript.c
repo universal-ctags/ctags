@@ -252,7 +252,8 @@ typedef enum {
 
 static roleDefinition JsFunctionRoles [] = {
 	/* Currently V parser wants this items. */
-	{ true, "foreigndecl", "declared in foreign languages" },
+	{ true, "foreigndecl", "declared in foreign languages",
+	  .version = 1 },
 };
 
 static roleDefinition JsVariableRoles [] = {

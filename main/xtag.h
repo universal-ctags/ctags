@@ -60,6 +60,8 @@ struct sXtagDefinition {
 	bool (* isFixed)   (struct sXtagDefinition *def);
 	void (* enable)    (struct sXtagDefinition *def, bool state);
 
+	unsigned int    version;
+
 	unsigned int xtype;	/* Given from the main part */
 };
 

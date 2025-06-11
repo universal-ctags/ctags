@@ -59,7 +59,8 @@ static kindDefinition MarkdownKinds[] = {
 	{ true, 'T', "l4subsection",  "level 4 sections" },
 	{ true, 'u', "l5subsection",  "level 5 sections" },
 	{ true, 'n', "footnote",      "footnotes" },
-	{ true, 'h', "hashtag",       "hashtags"},
+	{ true, 'h', "hashtag",       "hashtags",
+	  .version = 1 },
 };
 
 static fieldDefinition MarkdownFields [] = {

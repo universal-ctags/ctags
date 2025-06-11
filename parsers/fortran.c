@@ -378,6 +378,7 @@ static xtagDefinition FortranXtagTable [] = {
 		.enabled = false,
 		.name    = "linkName",
 		.description = "Linking name used in foreign languages",
+		.version = 1
 	},
 };
 
