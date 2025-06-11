@@ -5,7 +5,7 @@ IOSchedulingClass	input.service	/^IOSchedulingClass=3$/;"	key	language:Iniconf	s
 IOSchedulingPriority	input.service	/^IOSchedulingPriority=7$/;"	key	language:Iniconf	section:Service	roles:def
 Nice	input.service	/^Nice=19$/;"	key	language:Iniconf	section:Service	roles:def
 Requires	input.service	/^Requires=network-online.target$/;"	key	language:Iniconf	section:Unit	roles:def
-Service	input.service	/^[Service]$/;"	section	language:Iniconf	roles:def
+Service	input.service	/^[Service]$/;"	section	language:Iniconf	roles:def	end:11
 Type	input.service	/^Type=oneshot$/;"	key	language:Iniconf	section:Service	roles:def
 Unit	input.service	/^[Unit]$/;"	section	language:Iniconf	roles:def	end:5
 network-online.target	input.service	/^After=network-online.target$/;"	unit	language:SystemdUnit	roles:After

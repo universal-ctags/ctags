@@ -84,6 +84,18 @@ static kindDefinition IniconfKinds [] = {
 	{ true, 'k', "key",      "keys"},
 };
 
+static void updateEndLineMaybe (int index, bool atEOF)
+{
+	if (index != CORK_NIL)
+	{
+		unsigned long el = getInputLineNumber ();
+		if (atEOF)
+			setTagEndLineToCorkEntry (index, el);
+		else
+			setTagEndLineToCorkEntry (index, el > 1? el - 1: 1);
+	}
+}
+
 static void makeIniconfTagMaybe (const char *section, const char *key, const char *value CTAGS_ATTR_UNUSED, int *index)
 {
 	tagEntryInfo e;
@@ -99,8 +111,7 @@ static void makeIniconfTagMaybe (const char *section, const char *key, const cha
 	}
 	else
 	{
-		unsigned long el = getInputLineNumber ();
-		setTagEndLineToCorkEntry (*index, el > 1? el - 1: 1);
+		updateEndLineMaybe (*index, false);
 
 		initTagEntry (&e, section, K_SECTION);
 		*index = makeTagEntry (&e);
@@ -220,6 +231,9 @@ static void findIniconfTags (void)
 				++cp;
 		}
 	}
+
+	updateEndLineMaybe(sectionCorkIndex, true);
+	sectionCorkIndex = CORK_NIL;
 
 	vStringDelete (name);
 	vStringDelete (scope);
