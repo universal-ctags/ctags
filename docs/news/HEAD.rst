@@ -25,6 +25,10 @@ C#:
     * Fix a bug that prevents the parser from extracting methods
 	  if the method has nullable parameters.
 
+Meson:
+
+    * Extract config vars defined inside configuration_data({...}).
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:

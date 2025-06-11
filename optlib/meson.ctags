@@ -45,6 +45,9 @@
 --_tabledef-Meson=skipPair
 --_tabledef-Meson=common
 --_tabledef-Meson=skipToArgEnd
+--_tabledef-Meson=configBody
+--_tabledef-Meson=configElt
+--_tabledef-Meson=configValue
 
 --_prelude-Meson={{
     /lastvar false def
@@ -76,20 +79,33 @@
 --_mtable-regex-Meson=common/(alias|run)_target[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\2/r/{tenter=skipToArgEnd}
 --_mtable-regex-Meson=common/benchmark[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/b/{tenter=skipToArgEnd}
 --_mtable-regex-Meson=common/import[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/m/{tenter=skipToArgEnd}{_role=imported}
---_mtable-regex-Meson=common/configuration_data[ \t\n]*\([ \t\n]*\)[ \t\n]*//{{
+
+--_mtable-regex-Meson=common/(configuration_data)[ \t\n]*\([ \t\n]*//{tenter=configBody}{{
    lastvar false ne {
       lastvar :name
       /cfgdata
       lastvar _tagloc
       _tag _commit
 
+      % Keep the newly created /cfgdata tag on the stack
+      % till leaving /configBody table.
+      dup
+
       cfgdict lastvar :name 3 -1 roll put
 
       % Don't emit the tag for the original variable.
       lastvar _markplaceholder
       /lastvar false def
-   } if
+   } {
+      % Looks broken input. There is no left side for the configuration_data(...).
+      % Push a dummy tag.
+      (cfg) /cfgdata _anongen /cfgdata @1 _tag _commit
+      dup /anonymous _markextra
+   } ifelse
+   % The configElt table refers to the cork index pushed by this table
+   % for filling the scope of cfgvar/C tags.
 }}
+
 --_mtable-regex-Meson=common/([a-zA-Z_][a-zA-Z0-9_]*)\.(set(_quoted|10)?)[ \t\n]*\('([^']*[^\\])'[ \t\n]*//{{
    cfgdict \1 known {
       \4 /cfgvar @4 _tag _commit
@@ -102,6 +118,24 @@
 --_mtable-regex-Meson=skipPair/.//
 
 --_mtable-extend-Meson=skipToArgEnd+skipPair
+
+--_mtable-regex-Meson=configBody/\{//{tenter=configElt}
+--_mtable-regex-Meson=configBody/\)//{tleave}{{
+    pop
+}}
+--_mtable-extend-Meson=configBody+common
+
+--_mtable-regex-Meson=configElt/'([^']+)'[ \t\n]*:/\1/C/{tenter=configValue}{{
+    count 1 ge {
+       dup . exch scope:
+    } if
+}}
+--_mtable-regex-Meson=configElt/\}//{tleave}
+--_mtable-extend-Meson=configElt+common
+
+--_mtable-regex-Meson=configValue/,//{tjump=configElt}
+--_mtable-regex-Meson=configValue/\}//{_advanceTo=0start}{tleave}
+--_mtable-extend-Meson=configValue+skipToArgEnd
 
 --_mtable-extend-Meson=main+common
 --_mtable-regex-Meson=main/project[ \t\n]*\([ \t\n]*'([^']*[^\\])'[ \t\n]*/\1/P/{tenter=skipToArgEnd}
