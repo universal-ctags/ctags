@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        version: [2022, 2019]
+        version: [2022, 2025]
         arch: [x64, x86]
 
     runs-on: windows-${{ matrix.version }}
@@ -27,15 +27,9 @@ jobs:
 
       - name: setup nmake
         run: |
-          if "${{ matrix.version }}" == "2019" (
-            set "XX= (x86)"
-          ) else (
-            set "XX="
-          )
-
           @echo on
 
-          echo call "C:\Program Files%XX%\Microsoft Visual Studio\${{ matrix.version }}\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.arch }} > nmake-setup.cmd
+          echo call "C:\Program Files\Microsoft Visual Studio\${{ matrix.version }}\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.arch }} > nmake-setup.cmd
           type nmake-setup.cmd
 
       - name: build libiconv
