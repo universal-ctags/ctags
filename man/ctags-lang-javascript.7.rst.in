@@ -30,6 +30,12 @@ Change since "0.0"
 
 * New role ``foreigndecl`` for ``function`` kind
 
+Change since "1.1"
+~~~~~~~~~~~~~~~~~~
+
+* New field ``properties``
+
+
 SEE ALSO
 --------
 ctags(1), ctags-client-tools(7)
