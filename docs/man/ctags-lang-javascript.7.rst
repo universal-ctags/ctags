@@ -30,6 +30,12 @@ Change since "0.0"
 
 * New role ``foreigndecl`` for ``function`` kind
 
+Change since "1.1"
+~~~~~~~~~~~~~~~~~~
+
+* New field ``properties``
+
+
 SEE ALSO
 --------
 :ref:`ctags(1) <ctags(1)>`, :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`
