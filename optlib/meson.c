@@ -27,6 +27,21 @@ static void initializeMesonParser (const langType language)
 	addLanguageRegexTable (language, "configValue");
 
 	addLanguageTagMultiTableRegex (language, "main",
+	                               "^([a-zA-Z_][a-zA-Z_0-9]*)[ \t\n]*=([^=]|$)",
+	                               "\\1", "V", "{_advanceTo=2start}"
+		"{{\n"
+		"   /lastvar . def\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^project[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
+	                               "\\1", "P", "{tenter=skipToArgEnd}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^subdir[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
+	                               "\\1", "S", "{tenter=skipToArgEnd}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^test[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
+	                               "\\1", "t", "{tenter=skipToArgEnd}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
 	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
@@ -41,6 +56,18 @@ static void initializeMesonParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
+	                               "", "", ""
+		"{{\n"
+		"   cfgdict \\1 known {\n"
+		"      \\4 /cfgvar @4 _tag _commit\n"
+		"      cfgdict \\1 get scope:\n"
+		"   } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^[df-hkm-qt-z][a-zA-Z0-9_]*",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
@@ -83,30 +110,6 @@ static void initializeMesonParser (const langType language)
 		"   } ifelse\n"
 		"   % The configElt table refers to the cork index pushed by this table\n"
 		"   % for filling the scope of cfgvar/C tags.\n"
-		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "main",
-	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
-	                               "", "", ""
-		"{{\n"
-		"   cfgdict \\1 known {\n"
-		"      \\4 /cfgvar @4 _tag _commit\n"
-		"      cfgdict \\1 get scope:\n"
-		"   } if\n"
-		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "main",
-	                               "^project[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
-	                               "\\1", "P", "{tenter=skipToArgEnd}", NULL);
-	addLanguageTagMultiTableRegex (language, "main",
-	                               "^subdir[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
-	                               "\\1", "S", "{tenter=skipToArgEnd}", NULL);
-	addLanguageTagMultiTableRegex (language, "main",
-	                               "^test[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
-	                               "\\1", "t", "{tenter=skipToArgEnd}", NULL);
-	addLanguageTagMultiTableRegex (language, "main",
-	                               "^([a-zA-Z_][a-zA-Z_0-9]*)[ \t\n]*=([^=]|$)",
-	                               "\\1", "V", "{_advanceTo=2start}"
-		"{{\n"
-		"   /lastvar . def\n"
 		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^.",
@@ -124,11 +127,11 @@ static void initializeMesonParser (const langType language)
 	                               "^[^\\\\']+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "string",
-	                               "^\\\\.",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "string",
 	                               "^'",
 	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "string",
+	                               "^\\\\.",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "string",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -139,6 +142,9 @@ static void initializeMesonParser (const langType language)
 	                               "^\n",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
+	                               "^[])}]",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipPair",
 	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
@@ -153,6 +159,18 @@ static void initializeMesonParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "skipPair",
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipPair",
+	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
+	                               "", "", ""
+		"{{\n"
+		"   cfgdict \\1 known {\n"
+		"      \\4 /cfgvar @4 _tag _commit\n"
+		"      cfgdict \\1 get scope:\n"
+		"   } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipPair",
+	                               "^[df-hkm-qt-z][a-zA-Z0-9_]*",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
 	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
@@ -196,18 +214,6 @@ static void initializeMesonParser (const langType language)
 		"   % The configElt table refers to the cork index pushed by this table\n"
 		"   % for filling the scope of cfgvar/C tags.\n"
 		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "skipPair",
-	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
-	                               "", "", ""
-		"{{\n"
-		"   cfgdict \\1 known {\n"
-		"      \\4 /cfgvar @4 _tag _commit\n"
-		"      cfgdict \\1 get scope:\n"
-		"   } if\n"
-		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "skipPair",
-	                               "^[])}]",
-	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipPair",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -227,6 +233,18 @@ static void initializeMesonParser (const langType language)
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
 	addLanguageTagMultiTableRegex (language, "common",
+	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
+	                               "", "", ""
+		"{{\n"
+		"   cfgdict \\1 known {\n"
+		"      \\4 /cfgvar @4 _tag _commit\n"
+		"      cfgdict \\1 get scope:\n"
+		"   } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "common",
+	                               "^[df-hkm-qt-z][a-zA-Z0-9_]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "common",
 	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "common",
@@ -269,15 +287,9 @@ static void initializeMesonParser (const langType language)
 		"   % The configElt table refers to the cork index pushed by this table\n"
 		"   % for filling the scope of cfgvar/C tags.\n"
 		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "common",
-	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
-	                               "", "", ""
-		"{{\n"
-		"   cfgdict \\1 known {\n"
-		"      \\4 /cfgvar @4 _tag _commit\n"
-		"      cfgdict \\1 get scope:\n"
-		"   } if\n"
-		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
+	                               "^[])}]",
+	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
 	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
@@ -294,6 +306,18 @@ static void initializeMesonParser (const langType language)
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
+	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
+	                               "", "", ""
+		"{{\n"
+		"   cfgdict \\1 known {\n"
+		"      \\4 /cfgvar @4 _tag _commit\n"
+		"      cfgdict \\1 get scope:\n"
+		"   } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
+	                               "^[df-hkm-qt-z][a-zA-Z0-9_]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
 	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
@@ -336,18 +360,6 @@ static void initializeMesonParser (const langType language)
 		"   % The configElt table refers to the cork index pushed by this table\n"
 		"   % for filling the scope of cfgvar/C tags.\n"
 		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
-	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
-	                               "", "", ""
-		"{{\n"
-		"   cfgdict \\1 known {\n"
-		"      \\4 /cfgvar @4 _tag _commit\n"
-		"      cfgdict \\1 get scope:\n"
-		"   } if\n"
-		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
-	                               "^[])}]",
-	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "skipToArgEnd",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -376,6 +388,18 @@ static void initializeMesonParser (const langType language)
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
 	addLanguageTagMultiTableRegex (language, "configBody",
+	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
+	                               "", "", ""
+		"{{\n"
+		"   cfgdict \\1 known {\n"
+		"      \\4 /cfgvar @4 _tag _commit\n"
+		"      cfgdict \\1 get scope:\n"
+		"   } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "configBody",
+	                               "^[df-hkm-qt-z][a-zA-Z0-9_]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "configBody",
 	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "configBody",
@@ -417,15 +441,6 @@ static void initializeMesonParser (const langType language)
 		"   } ifelse\n"
 		"   % The configElt table refers to the cork index pushed by this table\n"
 		"   % for filling the scope of cfgvar/C tags.\n"
-		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "configBody",
-	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
-	                               "", "", ""
-		"{{\n"
-		"   cfgdict \\1 known {\n"
-		"      \\4 /cfgvar @4 _tag _commit\n"
-		"      cfgdict \\1 get scope:\n"
-		"   } if\n"
 		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "configElt",
 	                               "^'([^']+)'[ \t\n]*:",
@@ -454,6 +469,18 @@ static void initializeMesonParser (const langType language)
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
 	addLanguageTagMultiTableRegex (language, "configElt",
+	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
+	                               "", "", ""
+		"{{\n"
+		"   cfgdict \\1 known {\n"
+		"      \\4 /cfgvar @4 _tag _commit\n"
+		"      cfgdict \\1 get scope:\n"
+		"   } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "configElt",
+	                               "^[df-hkm-qt-z][a-zA-Z0-9_]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "configElt",
 	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "configElt",
@@ -496,21 +523,15 @@ static void initializeMesonParser (const langType language)
 		"   % The configElt table refers to the cork index pushed by this table\n"
 		"   % for filling the scope of cfgvar/C tags.\n"
 		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "configElt",
-	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
-	                               "", "", ""
-		"{{\n"
-		"   cfgdict \\1 known {\n"
-		"      \\4 /cfgvar @4 _tag _commit\n"
-		"      cfgdict \\1 get scope:\n"
-		"   } if\n"
-		"}}", NULL);
 	addLanguageTagMultiTableRegex (language, "configValue",
 	                               "^,",
 	                               "", "", "{tjump=configElt}", NULL);
 	addLanguageTagMultiTableRegex (language, "configValue",
 	                               "^\\}",
 	                               "", "", "{_advanceTo=0start}{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "configValue",
+	                               "^[])}]",
+	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "configValue",
 	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
@@ -527,6 +548,18 @@ static void initializeMesonParser (const langType language)
 	                               "^[[({]",
 	                               "", "", "{tenter=skipPair}", NULL);
 	addLanguageTagMultiTableRegex (language, "configValue",
+	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
+	                               "", "", ""
+		"{{\n"
+		"   cfgdict \\1 known {\n"
+		"      \\4 /cfgvar @4 _tag _commit\n"
+		"      cfgdict \\1 get scope:\n"
+		"   } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "configValue",
+	                               "^[df-hkm-qt-z][a-zA-Z0-9_]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "configValue",
 	                               "^(jar|executable|shared_module|(both_|shared_|static_)?library)[ \t\n]*\\([ \t\n]*'([^']*[^\\\\])'[ \t\n]*",
 	                               "\\3", "B", "{tenter=skipToArgEnd}", NULL);
 	addLanguageTagMultiTableRegex (language, "configValue",
@@ -569,18 +602,6 @@ static void initializeMesonParser (const langType language)
 		"   % The configElt table refers to the cork index pushed by this table\n"
 		"   % for filling the scope of cfgvar/C tags.\n"
 		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "configValue",
-	                               "^([a-zA-Z_][a-zA-Z0-9_]*)\\.(set(_quoted|10)?)[ \t\n]*\\('([^']*[^\\\\])'[ \t\n]*",
-	                               "", "", ""
-		"{{\n"
-		"   cfgdict \\1 known {\n"
-		"      \\4 /cfgvar @4 _tag _commit\n"
-		"      cfgdict \\1 get scope:\n"
-		"   } if\n"
-		"}}", NULL);
-	addLanguageTagMultiTableRegex (language, "configValue",
-	                               "^[])}]",
-	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "configValue",
 	                               "^.",
 	                               "", "", "", NULL);
