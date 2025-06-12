@@ -10,8 +10,9 @@ jobs:
   test:
 
     strategy:
+      fail-fast: false
       matrix:
-        version: [2022, 2019]
+        version: [2022]
         arch: [x64, x86]
 
     runs-on: windows-${{ matrix.version }}
