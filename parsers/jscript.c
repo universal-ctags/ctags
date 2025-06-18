@@ -51,6 +51,7 @@
 #include "options.h"
 #include "mbcs.h"
 #include "trace.h"
+#include "numarray.h"
 
 #include "x-html.h"
 #include "x-jscript.h"
@@ -98,6 +99,10 @@ enum eKeywordId {
 	KEYWORD_async,
 	KEYWORD_get,
 	KEYWORD_set,
+	KEYWORD_import,
+	KEYWORD_from,
+	KEYWORD_as,
+	KEYWORD_with,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -255,6 +260,68 @@ typedef enum {
 	JS_CLASS_CHAINELT,
 } jsClassRole;
 
+/* Kinds and Roles related to `import'
+ * ====================================
+ *
+ * ref. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import
+ *
+ * import Y from "X";
+ *   X = (kind:module,  role:imported)
+ *   Y = (kind:unknown, role:importedAsDefault, module:X)
+ *
+ * import * as Y from "X";
+ *   X = (kind:module,  role:imported)
+ *   Y = (kind:unknown?, nameref:*?, module:X)
+ *
+ * import { Y } from "X";
+ *   X = (kind:module,  role:imported)
+ *   Y = (kind:unknown, role:imported, module:X)
+ *
+ * import { Y as Z } from "X";
+ *   X = (kind:module,  role:imported)
+ *   Y = (kind:unknown, role:imported, module:X)
+ *   Z = (kind:unknown, nameref:unknown:Y)
+ *
+ * import { default as Y } from "X";
+ *   X = (kind:module,  role:imported)
+ *   ANON? = (kind:unknown, role:importedAsDefault, module:X, extras:anon)
+ *   Y = (kind:unknown, nameref:unknown:ANON?)
+ *
+ * import { Y0, Y1 } from "X";
+ *   X = (kind:module,  role:imported)
+ *   Y0, Y1 = (kind:unknown, role:imported, module:X)
+ *
+ * import { Y0, Y1 as Z1, ... } from "X";
+ *   X = (kind:module,  role:imported)
+ *   Y0, Y1 = (kind:unknown, role:imported, module:X)
+ *   Z1 = (kind:unknown, nameref:unknown:Y1)
+ *
+ * import { "Y" as Z } from "X";
+ *   X = (kind:module,  role:imported)
+ *   Y = (kind:unknown, role:imported, module:X)
+ *   Z = (kind:unknown, nameref:unknown:Y)
+ *
+ * import Y, { Y1, ... } from "X";
+ *   X = (kind:module,  role:imported)
+ *   Y = (kind:unknown, role:importedAsDefault, module:X)
+ *   Y1 = (kind:unknown, role:imported, module:X)
+ *
+ * import Y, * as Z from "X";
+ *   X = (kind:module,  role:imported)
+ *   Y = (kind:unknown, role:importedAsDefault, module:X)
+ *   Z = (kind:unknown?, nameref:*?)
+ *
+ */
+
+typedef enum {
+	JS_MODULE_IMPORTED,
+} jsModuleRole;
+
+typedef enum {
+	JS_UNKNOWN_IMPORTED,
+	JS_UNKNOWN_IMPORTED_AS_DEFAULT,
+} jsUnknownRole;
+
 static roleDefinition JsFunctionRoles [] = {
 	/* Currently V parser wants this items. */
 	{ true, "foreigndecl", "declared in foreign languages",
@@ -267,6 +334,18 @@ static roleDefinition JsVariableRoles [] = {
 
 static roleDefinition JsClassRoles [] = {
 	{ false, "chainElt", "(EXPERIMENTAL)used as an element in a name chain like a.b.c" },
+};
+
+static roleDefinition JsModuleRoles [] = {
+	{ true, "imported",   "imported",
+	  .version = 2, },
+};
+
+static roleDefinition JsUnknownRoles [] = {
+	{ true, "imported",   "imported from the other module",
+	  .version = 2, },
+	{ true, "importedAsDefault", "",
+	  .version = 2, },
 };
 
 static kindDefinition JsKinds [] = {
@@ -283,6 +362,14 @@ static kindDefinition JsKinds [] = {
 	{ true,  'G', "getter",		  "getters"          },
 	{ true,  'S', "setter",		  "setters"          },
 	{ true,  'M', "field",		  "fields"           },
+	{ true,  'N', "module",		  "modules",
+	  .referenceOnly = true,  ATTACH_ROLES(JsModuleRoles),
+	  .version = 2,
+	},
+	{ true,  'Y', "unknown",      "",
+	  .referenceOnly = false, ATTACH_ROLES(JsUnknownRoles),
+	  .version = 2,
+	},
 };
 
 static fieldDefinition JsFields[] = {
@@ -314,7 +401,7 @@ static const keywordTable JsKeywordTable [] = {
 	{ "try",		KEYWORD_try					},
 	{ "catch",		KEYWORD_catch				},
 	{ "finally",	KEYWORD_finally				},
-	{ "sap",	    KEYWORD_sap					},
+	{ "sap",		KEYWORD_sap					},
 	{ "return",		KEYWORD_return				},
 	{ "class",		KEYWORD_class				},
 	{ "extends",	KEYWORD_extends				},
@@ -324,6 +411,10 @@ static const keywordTable JsKeywordTable [] = {
 	{ "async",		KEYWORD_async				},
 	{ "get",		KEYWORD_get					},
 	{ "set",		KEYWORD_set					},
+	{ "import",		KEYWORD_import				},
+	{ "from",		KEYWORD_from				},
+	{ "as", 		KEYWORD_as					},
+	{ "with", 		KEYWORD_with				},
 };
 
 /*
@@ -2025,6 +2116,7 @@ static bool parseFunction (tokenInfo *const token, tokenInfo *const lhs_name, co
 			f = p;
 
 		parseBlock (token, f);
+		setTagEndLineToCorkEntry (f, token->lineNumber);
 	}
 
 	if ( lhs_name == NULL )
@@ -2399,6 +2491,7 @@ function:
 
 						index_for_name = makeJsTagMaybePrivate (name, kind, signature, NULL, is_static, is_private);
 						parseBlock (token, index_for_name);
+						setTagEndLineToCorkEntry (index_for_name, token->lineNumber);
 
 						/*
 						 * If we aren't parsing an ES6 class (for which there
@@ -2987,8 +3080,8 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 				state->isTerminated = false;
 		}
 	}
-	else if (! isType (token, TOKEN_KEYWORD) &&
-			 token->nestLevel == 0 && state->isGlobal )
+	else if (! isType (token, TOKEN_KEYWORD) && true
+			 /* token->nestLevel == 0 && state->isGlobal */)
 	{
 		/*
 		 * Only create variables for global scope
@@ -3037,7 +3130,11 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_CURLY))
-				parseBlock (token, state->indexForName);
+			{
+				int i = state->indexForName;
+				parseBlock (token, i);
+				setTagEndLineToCorkEntry (i, token->lineNumber);
+			}
 			else if (! isType (token, TOKEN_SEMICOLON))
 				state->isTerminated = false;
 		}
@@ -3077,7 +3174,10 @@ static bool parseStatementRHS (tokenInfo *const name, tokenInfo *const token, st
 				readToken (token);
 				if (isType (token, TOKEN_OPEN_CURLY))
 				{
-					parseBlock (token, state->indexForName);
+					int i = state->indexForName;
+					parseBlock (token, i);
+					setTagEndLineToCorkEntry (i, token->lineNumber);
+
 					/* here we're at the close curly but it's part of the arrow
 					 * function body, so skip over not to confuse further code */
 					readTokenFull(token, true, NULL);
@@ -3322,13 +3422,19 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 		}
 		readToken(token);
 
-		if (state.isGlobal)
+		if (state.isGlobal || 1)
 		{
 			bool found = false;
 			if (isType (token, TOKEN_OPEN_CURLY))
+			{
+				TRACE_PRINT("parseObjectDestructuring");
 				found = parseObjectDestructuring (token, state.isConst);
+			}
 			else if (isType (token, TOKEN_OPEN_SQUARE))
+			{
+				TRACE_PRINT("parseArrayDestructuring");
 				found = parseArrayDestructuring (token, state.isConst);
+			}
 
 			if (found)
 			{
@@ -3468,6 +3574,9 @@ nextVar:
 			 * }
 			 */
 			state.isTerminated = findCmdTerm (token, true, true);
+			if (state.indexForName != CORK_NIL)
+				setTagEndLineToCorkEntry (state.indexForName, token->lineNumber);
+
 			/* if we're at a comma, try and read a second var */
 			if (isType (token, TOKEN_COMMA))
 			{
@@ -3626,6 +3735,113 @@ static bool parseLine (tokenInfo *const token, bool is_inside_class)
 	return is_terminated;
 }
 
+static void parseImportObjectDestructuring (tokenInfo *const token,
+											intArray *us)
+{
+	while (true)
+	{
+		readToken (token);
+		if (isType (token, TOKEN_EOF))
+			return;
+
+		if (isType (token, TOKEN_IDENTIFIER))
+		{
+			int d = makeSimpleRefTag (token->string, JSTAG_UNKNOWN, JS_UNKNOWN_IMPORTED);
+			intArrayAdd (us, d);
+			readToken (token);
+			if (isKeyword (token, KEYWORD_as))
+			{
+				readToken (token);
+				if (isType (token, TOKEN_IDENTIFIER))
+				{
+					makeSimpleTag (token->string, JSTAG_UNKNOWN);
+					readToken (token);
+				}
+			}
+		}
+
+		if (isType (token, TOKEN_COMMA))
+			continue;
+		if (isType (token, TOKEN_CLOSE_CURLY ))
+		{
+			readToken (token);
+			return;
+		}
+	}
+}
+
+static void skipObject (tokenInfo *const token)
+{
+	readToken (token);
+	if (isType (token, TOKEN_EOF))
+		return;
+
+	int depth = 1;
+	do
+	{
+		if (isType (token, TOKEN_CLOSE_CURLY))
+			depth--;
+		readToken (token);
+	}
+	while (depth != 0);
+}
+
+static void parseImport (tokenInfo *const token)
+{
+	readToken (token);
+	if (isType (token, TOKEN_EOF))
+		return;
+
+	intArray *us = intArrayNew ();
+	if (isType (token, TOKEN_IDENTIFIER))
+	{
+		int d = makeSimpleRefTag (token->string, JSTAG_UNKNOWN, JS_UNKNOWN_IMPORTED_AS_DEFAULT);
+		intArrayAdd (us, d);
+		readToken (token);
+		if (isType (token, TOKEN_COMMA))
+			readToken (token);
+	}
+
+	if (isType (token, TOKEN_OPEN_CURLY))
+		parseImportObjectDestructuring (token, us);
+
+	if (isKeyword (token, KEYWORD_from))
+		readToken (token);
+
+
+	int m = CORK_NIL;
+	if (isType (token, TOKEN_STRING))
+	{
+		if (vStringLength (token->string) > 0)
+			m = makeSimpleRefTag (token->string, JSTAG_MODULE, JS_MODULE_IMPORTED);
+		readToken (token);
+	}
+
+	if (m != CORK_NIL && !intArrayIsEmpty (us))
+	{
+		for (unsigned int i = 0; i < intArrayCount (us); i++)
+		{
+			tagEntryInfo *e;
+			int u = intArrayItem (us, i);
+			e = getEntryInCorkQueue (u);
+			if (e)
+				e->extensionFields.scopeIndex = m;
+		}
+	}
+	intArrayDelete (us);
+
+	if (isKeyword (token, KEYWORD_with))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_OPEN_CURLY))
+			skipObject (token);
+	}
+
+	while (! (isType (token, TOKEN_EOF)
+			  || ! isType (token, TOKEN_SEMICOLON)) )
+		readToken (token);
+}
+
 static void parseJsFile (tokenInfo *const token)
 {
 	TRACE_ENTER();
@@ -3639,6 +3855,8 @@ static void parseJsFile (tokenInfo *const token)
 		else if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_export ||
 												   token->keyword == KEYWORD_default))
 			/* skip those at top-level */;
+		else if (isType (token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_import))
+			parseImport (token);
 		else
 			parseLine (token, false);
 	} while (! isType (token, TOKEN_EOF));
