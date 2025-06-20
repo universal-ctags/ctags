@@ -45,6 +45,9 @@ static const char *TR_VERILOG = "Verilog";
 
 static const char *TR_PROLOG = "Prolog";
 
+static const char *TR_SYSTEMD_UNIT = "SystemdUnit";
+static const char *TR_DBUS_SERVICE = "DBusService";
+
 #define startsWith(line,prefix)									\
 	(strncmp(line, prefix, strlen(prefix)) == 0? true: false)
 
@@ -480,6 +483,24 @@ selectPerlOrPrologByDistinctiveToken (struct _MIO *input, langType *candidates, 
 		return TR_PROLOG;
 	else
 		return TR_UNKNOWN;
+}
+
+static const char *
+tasteDBusServiceOrSystemdUnit (const char *line, void *data CTAGS_ATTR_UNUSED)
+{
+	if (startsWith (line, "[D-BUS Service]"))
+		return TR_DBUS_SERVICE;
+	if (startsWith (line, "[Unit]"))
+		return TR_SYSTEMD_UNIT;
+	return TR_UNKNOWN;
+}
+
+const char *
+selectByDBusServiceAndSystemdUnitSectionNames (MIO *input,
+							langType *candidates CTAGS_ATTR_UNUSED,
+							unsigned int nCandidates CTAGS_ATTR_UNUSED)
+{
+	return selectByLines (input, tasteDBusServiceOrSystemdUnit, TR_SYSTEMD_UNIT, NULL);
 }
 
 #ifdef HAVE_LIBXML

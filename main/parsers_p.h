@@ -88,6 +88,7 @@
 	CobolVariableParser, \
 	CUDAParser, \
 	DParser, \
+	DbusServiceParser, \
 	DiffParser, \
 	DtdParser, \
 	DTSParser, \

@@ -360,6 +360,7 @@ PARSER_SRCS =				\
 	parsers/cxx/cxx_tag.c		\
 	parsers/cxx/cxx_token.c		\
 	parsers/cxx/cxx_token_chain.c	\
+	parsers/dbus-service.c		\
 	parsers/diff.c			\
 	parsers/dosbatch.c		\
 	parsers/dtd.c			\

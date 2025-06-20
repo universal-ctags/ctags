@@ -22,6 +22,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "selectors.h"
 #include "vstring.h"
 #include "xtag.h"
 
@@ -115,6 +116,11 @@ extern parserDefinition* SystemdUnitParser (void)
 		[0] = { DEPTYPE_SUBPARSER, "Iniconf", &systemdUnitSubparser },
 	};
 
+	static selectLanguage selectors[] = {
+		selectByDBusServiceAndSystemdUnitSectionNames,
+		NULL
+	};
+
 	parserDefinition* const def = parserNew ("SystemdUnit");
 
 	def->dependencies = dependencies;
@@ -122,6 +128,7 @@ extern parserDefinition* SystemdUnitParser (void)
 	def->kindTable      = SystemdUnitKinds;
 	def->kindCount  = ARRAY_SIZE (SystemdUnitKinds);
 	def->extensions = extensions;
+	def->selectLanguage = selectors;
 	def->parser     = findSystemdUnitTags;
 	def->useCork    = CORK_QUEUE;
 
