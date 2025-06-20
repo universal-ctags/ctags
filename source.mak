@@ -450,7 +450,7 @@ PARSER_SRCS =				\
 XML_HEADS = parsers/x-xml.h
 XML_SRCS = \
 	parsers/maven2.c		\
-	parsers/dbusintrospect.c	\
+	parsers/dbus-introspect.c	\
 	parsers/glade.c			\
 	parsers/svg.c			\
 	parsers/plist.c			\
