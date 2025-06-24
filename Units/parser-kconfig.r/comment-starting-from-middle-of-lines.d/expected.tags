@@ -1,6 +1,6 @@
-A	input.kconfig	/^config A # ...$/;"	c	typeref:typename:bool
+A	input.kconfig	/^config A # ...$/;"	c	typeref:typename:bool	end:3
 B	input.kconfig	/^	prompt "B"$/;"	C	end:10
-C	input.kconfig	/^config C # ...$/;"	c	choice:B	typeref:typename:bool
+C	input.kconfig	/^config C # ...$/;"	c	choice:B	typeref:typename:bool	end:9
 D	input.kconfig	/^menu "D" # ...$/;"	m	end:17
-E	input.kconfig	/^config E # ...$/;"	c	menu:D	typeref:typename:bool
-F	input.kconfig	/^menuconfig F # ...$/;"	c
+E	input.kconfig	/^config E # ...$/;"	c	menu:D	typeref:typename:bool	end:16
+F	input.kconfig	/^menuconfig F # ...$/;"	c	end:19

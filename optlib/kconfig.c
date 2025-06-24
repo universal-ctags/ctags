@@ -21,7 +21,15 @@ typedef enum {
 static void initializeKconfigParser (const langType language CTAGS_ATTR_UNUSED)
 {
 	addLanguageOptscriptToHook (language, SCRIPT_HOOK_SEQUEL,
-		"{{ clear }}");
+		"{{   {\n"
+		"      count 0 gt {\n"
+		"         % ...tag:int\n"
+		"         . :line end:\n"
+		"      } {\n"
+		"         exit\n"
+		"      } ifelse\n"
+		"   } loop\n"
+		"}}");
 }
 
 extern parserDefinition* KconfigParser (void)
@@ -76,15 +84,24 @@ extern parserDefinition* KconfigParser (void)
 		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$", "\\2",
 		"c", "{scope=ref}"
 		"{{\n"
-		"   clear\n"
+		"   count 0 gt {\n"
+		"      . :line 1 gt {\n"
+		"        dup . :line 1 sub end:\n"
+		"      } if\n"
+		"      clear\n"
+		"   } if\n"
 		"   .\n"
 		"}}", NULL, false},
 		{"^[ \t]*(def_)?(bool|boolean|hex|int|string|tristate)\\>", "",
 		"", "{exclusive}"
 		"{{\n"
 		"   count 0 gt {\n"
-		"         \\2 typeref:\n"
-		"         clear\n"
+		"         dup :typeref {\n"
+		"            pop\n"
+		"            % already the field is filled. Do nothing.\n"
+		"         } {\n"
+		"            dup \\2 typeref:\n"
+		"         } ifelse\n"
 		"   } if\n"
 		"}}", NULL, false},
 		{"^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$", "CONFIG_\\2",
@@ -93,14 +110,64 @@ extern parserDefinition* KconfigParser (void)
 		"c", "{scope=ref}{_extra=configPrefixed}{exclusive}", NULL, false},
 		{"^[ \t]*menu[ \t]+\"([^\"]+)\"[ \t]*(#.*)?$", "\\1",
 		"m", "{scope=push}{exclusive}", NULL, false},
-		{"^[ \t]*endmenu[ \t]*(#.*)?$", "",
-		"", "{scope=pop}{placeholder}{exclusive}", NULL, false},
+		{"^[ \t]*(endmenu)[ \t]*(#.*)?$", "",
+		"", "{scope=pop}{placeholder}{exclusive}"
+		"{{\n"
+		"   {\n"
+		"      count 0 gt {\n"
+		"         _scopetop {\n"
+		"            % ... config:tag scope:tag\n"
+		"            1 index\n"
+		"            % ... config:tag scope:tag config:tag\n"
+		"            :line exch\n"
+		"            :line\n"
+		"            % ... config:tag config-line:int scope-line:int\n"
+		"            gt {\n"
+		"               % ... config:tag\n"
+		"               @1 _matchloc2line dup 1 gt {1 sub} if\n"
+		"               % ... config:tag endline:int\n"
+		"               end:\n"
+		"               % ...\n"
+		"            } {\n"
+		"               % ... config:tag\n"
+		"               exit\n"
+		"            }  ifelse\n"
+		"         } if\n"
+		"      } {\n"
+		"         exit\n"
+		"      } ifelse\n"
+		"   } loop\n"
+		"}}", NULL, false},
 		{"^[ \t]*source[ \t]+\"?([^\"]+)\"?[ \t]*(#.*)?$", "\\1",
-		"k", "{_role=source}{exclusive}{scope=ref}", NULL, false},
+		"k", "{_role=source}{exclusive}{scope=ref}"
+		"{{\n"
+		"   count 0 gt {\n"
+		"      . :line 1 gt {\n"
+		"        dup . :line 1 sub end:\n"
+		"      } if\n"
+		"      clear\n"
+		"   } if\n"
+		"}}", NULL, false},
 		{"^[ \t]*choice[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$", "\\1",
-		"C", "{scope=push}{exclusive}", NULL, false},
+		"C", "{scope=push}{exclusive}"
+		"{{\n"
+		"   count 0 gt {\n"
+		"      . :line 1 gt {\n"
+		"        dup . :line 1 sub end:\n"
+		"      } if\n"
+		"      clear\n"
+		"   } if\n"
+		"}}", NULL, false},
 		{"^[ \t]*choice[ \t]*(#.*)?$", "",
-		"C", "{_anonymous=choice}{scope=push}{exclusive}", NULL, false},
+		"C", "{_anonymous=choice}{scope=push}{exclusive}"
+		"{{\n"
+		"   count 0 gt {\n"
+		"      . :line 1 gt {\n"
+		"        dup . :line 1 sub end:\n"
+		"      } if\n"
+		"      clear\n"
+		"   } if\n"
+		"}}", NULL, false},
 		{"^[ \t]*prompt[ \t]+\"([^\"]+)\"[ \t]*(#.*|if)?", "",
 		"", "{exclusive}"
 		"{{\n"
@@ -128,8 +195,34 @@ extern parserDefinition* KconfigParser (void)
 		"       } ifelse\n"
 		"   } if\n"
 		"}}", NULL, false},
-		{"^[ \t]*endchoice[ \t]*(#.*)?$", "",
-		"", "{scope=pop}{placeholder}{exclusive}", NULL, false},
+		{"^[ \t]*(endchoice)[ \t]*(#.*)?$", "",
+		"", "{scope=pop}{placeholder}{exclusive}"
+		"{{\n"
+		"   {\n"
+		"      count 0 gt {\n"
+		"         _scopetop {\n"
+		"            % ... config:tag scope:tag\n"
+		"            1 index\n"
+		"            % ... config:tag scope:tag config:tag\n"
+		"            :line exch\n"
+		"            :line\n"
+		"            % ... config:tag config-line:int scope-line:int\n"
+		"            gt {\n"
+		"               % ... config:tag\n"
+		"               @1 _matchloc2line dup 1 gt {1 sub} if\n"
+		"               % ... config:tag endline:int\n"
+		"               end:\n"
+		"               % ...\n"
+		"            } {\n"
+		"               % ... config:tag\n"
+		"               exit\n"
+		"            }  ifelse\n"
+		"         } if\n"
+		"      } {\n"
+		"         exit\n"
+		"      } ifelse\n"
+		"   } loop\n"
+		"}}", NULL, false},
 		{"^[ \t]*mainmenu[ \t]+\"([^\"]+)\"[ \t]*(#.*)?$", "\\1",
 		"M", "{exclusive}", NULL, false},
 		{"^([-a-zA-Z0-9_$]+)[ \t]*:?=", "\\1",

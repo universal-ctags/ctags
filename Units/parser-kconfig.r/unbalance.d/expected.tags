@@ -1,10 +1,10 @@
-A	input.kconfig	/^config A$/;"	c	typeref:typename:bool
-B	input.kconfig	/^config B$/;"	c	typeref:typename:bool
+A	input.kconfig	/^config A$/;"	c	typeref:typename:bool	end:5
+B	input.kconfig	/^config B$/;"	c	typeref:typename:bool	end:7
 Y	input-0.kconfig	/^menu "Y"$/;"	m	end:11
-C	input-0.kconfig	/^config C$/;"	c	menu:Y	typeref:typename:bool
-D	input-0.kconfig	/^config D$/;"	c	menu:Y	typeref:typename:bool
-E	input-1.kconfig	/^config E$/;"	c	typeref:typename:bool
-F	input-1.kconfig	/^config F$/;"	c	typeref:typename:bool
+C	input-0.kconfig	/^config C$/;"	c	menu:Y	typeref:typename:bool	end:7
+D	input-0.kconfig	/^config D$/;"	c	menu:Y	typeref:typename:bool	end:10
+E	input-1.kconfig	/^config E$/;"	c	typeref:typename:bool	end:5
+F	input-1.kconfig	/^config F$/;"	c	typeref:typename:bool	end:8
 W	input-2.kconfig	/^choice W$/;"	C	end:8
-G	input-2.kconfig	/^	config G$/;"	c	choice:W	typeref:typename:bool
-H	input-3.kconfig	/^config H$/;"	c	typeref:typename:bool
+G	input-2.kconfig	/^	config G$/;"	c	choice:W	typeref:typename:bool	end:7
+H	input-3.kconfig	/^config H$/;"	c	typeref:typename:bool	end:4
