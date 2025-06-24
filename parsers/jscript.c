@@ -315,11 +315,14 @@ typedef enum {
 
 typedef enum {
 	JS_MODULE_IMPORTED,
+	JS_MODULE_AGGREGATED,
 } jsModuleRole;
 
 typedef enum {
 	JS_UNKNOWN_IMPORTED,
-	JS_UNKNOWN_IMPORTED_AS_DEFAULT,
+	JS_UNKNOWN_IMPORTED_AS_DEFAULT, /* property? */
+	JS_UNKNOWN_EXPORTED,
+	JS_UNKNOWN_EXPORTED_AS_DEFAULT,/* property? */
 } jsUnknownRole;
 
 static roleDefinition JsFunctionRoles [] = {
@@ -339,12 +342,18 @@ static roleDefinition JsClassRoles [] = {
 static roleDefinition JsModuleRoles [] = {
 	{ true, "imported",   "imported",
 	  .version = 2, },
+	{ true, "aggregated", "aggregated",
+	  .version = 2, },
 };
 
 static roleDefinition JsUnknownRoles [] = {
 	{ true, "imported",   "imported from the other module",
 	  .version = 2, },
 	{ true, "importedAsDefault", "",
+	  .version = 2, },
+	{ true, "exported",   "exported",
+	  .version = 2, },
+	{ true, "exportedAsDefault", "",
 	  .version = 2, },
 };
 
@@ -3808,7 +3817,6 @@ static void parseImport (tokenInfo *const token)
 	if (isKeyword (token, KEYWORD_from))
 		readToken (token);
 
-
 	int m = CORK_NIL;
 	if (isType (token, TOKEN_STRING))
 	{
@@ -3837,9 +3845,129 @@ static void parseImport (tokenInfo *const token)
 			skipObject (token);
 	}
 
-	while (! (isType (token, TOKEN_EOF)
-			  || ! isType (token, TOKEN_SEMICOLON)) )
+	findCmdTerm (token, false, false);
+}
+
+/* TODO: we should separate exported objects and aggregated objects. */
+static void parseExportObjectDestructuring (tokenInfo *const token, intArray *us)
+{
+	while (true)
+	{
 		readToken (token);
+		if (isType (token, TOKEN_EOF))
+			return;
+
+		if (isType (token, TOKEN_IDENTIFIER)
+			|| ( isType (token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_default)))
+		{
+			bool isDefault = false;
+			tokenInfo * nameToken = newToken ();
+			copyToken (nameToken, token, false);
+
+			readToken (token);
+			if (isKeyword (token, KEYWORD_as))
+			{
+				readToken (token);
+				if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_STRING))
+				{
+					makeSimpleTag (token->string, JSTAG_UNKNOWN);
+					readToken (token);
+				}
+				else if (isType (token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_default))
+				{
+					isDefault = true;
+					readToken (token);
+				}
+			}
+
+			if (isType (nameToken, TOKEN_IDENTIFIER))
+			{
+				int role = isDefault? JS_UNKNOWN_EXPORTED_AS_DEFAULT: JS_UNKNOWN_EXPORTED;
+
+				tagEntryInfo e;
+				initRefTagEntry (&e, vStringValue (nameToken->string), JSTAG_UNKNOWN, role);
+				updateTagLine (&e, nameToken->lineNumber, nameToken->filePosition);
+				int d = makeTagEntry (&e);
+				deleteToken (nameToken);
+				intArrayAdd (us, d);
+			}
+		}
+
+		if (isType (token, TOKEN_COMMA))
+			continue;
+		if (isType (token, TOKEN_CLOSE_CURLY ))
+		{
+			readToken (token);
+			return;
+		}
+	}
+}
+
+static void parseExport (tokenInfo *const token)
+{
+	bool isDefault = false;
+
+	readToken (token);
+	if (isType (token, TOKEN_EOF))
+		return;
+
+	if (isType (token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_default))
+	{
+		isDefault = true;
+		readToken (token);
+	}
+
+	if (isType (token, TOKEN_OPEN_CURLY))
+	{
+		intArray *us = intArrayNew ();
+		int m = CORK_NIL;
+		parseExportObjectDestructuring (token, us);
+		if (isKeyword (token, KEYWORD_from))
+		{
+			readToken (token);
+			if (isType (token, TOKEN_STRING))
+			{
+				m = makeSimpleRefTag (token->string, JSTAG_MODULE, JS_MODULE_AGGREGATED);
+				readToken (token);
+			}
+			/* TODO: put m  to fileds of tags in us. */
+		}
+		intArrayDelete (us);
+	}
+	else if (isType (token, TOKEN_STAR))
+	{
+		int u = CORK_NIL;
+		int m = CORK_NIL;
+		/* TODO */
+		readToken (token);
+		if (isKeyword (token, KEYWORD_as))
+		{
+			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER)
+				|| isType (token, TOKEN_STRING))
+			{
+				u = makeSimpleTag (token->string, JSTAG_UNKNOWN);
+				readToken (token);
+			}
+		}
+		if (isKeyword (token, KEYWORD_from))
+		{
+			readToken (token);
+			if (isType (token, TOKEN_STRING))
+			{
+				m = makeSimpleRefTag (token->string, JSTAG_MODULE, JS_MODULE_AGGREGATED);
+				readToken (token);
+			}
+			/* TODO: put m  to fileds of u. */
+		}
+	}
+	else
+	{
+		parseLine (token, false);
+		return;
+	}
+
+	findCmdTerm (token, false, false);
 }
 
 static void parseJsFile (tokenInfo *const token)
@@ -3852,9 +3980,8 @@ static void parseJsFile (tokenInfo *const token)
 
 		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
-		else if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_export ||
-												   token->keyword == KEYWORD_default))
-			/* skip those at top-level */;
+		else if (isType (token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_export))
+			parseExport (token);
 		else if (isType (token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_import))
 			parseImport (token);
 		else
