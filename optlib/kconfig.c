@@ -61,6 +61,7 @@ extern parserDefinition* KconfigParser (void)
 		},
 		{
 		  true, 'v', "variable", "macro variables",
+		  .version = 1,
 		},
 	};
 	static xtagDefinition KconfigXtagTable [] = {

@@ -23,7 +23,7 @@
 --kinddef-Kconfig=M,mainMenu,the main menu
 --kinddef-Kconfig=k,kconfig,kconfig file
 --kinddef-Kconfig=C,choice,choices
---kinddef-Kconfig=v,variable,macro variables
+--kinddef-Kconfig=v,variable,macro variables{version=1}
 
 --_roledef-Kconfig.{kconfig}=source,kconfig file loaded with source directive
 

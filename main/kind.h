@@ -25,6 +25,8 @@ struct sRoleDefinition {
 	char* name;		  /* role name */
 	char* description;	  /* displayed in --help output */
 
+	unsigned int    version;
+
 	int id;
 };
 
@@ -78,6 +80,8 @@ struct sKindDefinition {
 	roleDefinition *roles;
 	scopeSeparator *separators;
 	unsigned int separatorCount;
+
+	unsigned int    version;
 
 	int id;
 

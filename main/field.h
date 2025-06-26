@@ -347,6 +347,8 @@ struct sFieldDefinition {
 
 	fieldDataType dataType; /* used in json output. See OP column in --list-fields. */
 
+	unsigned int    version;
+
 	unsigned int ftype;	/* Given from the main part */
 };
 
