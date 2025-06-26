@@ -77,6 +77,13 @@ enum scriptHook {
 	SCRIPT_HOOK_MAX,
 };
 
+/* --map-<LANG>=[+|-|]%reguar-expresson%[i] */
+struct rExprSrc {
+	const char *expr;			/* The last element must be NULL. */
+	bool iCase;
+};
+#define REXPR_LAST_ENTRY { .expr = NULL, }
+
 struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
@@ -104,6 +111,8 @@ struct sParserDefinition {
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
 	const char *const *aliases;    /* list of default aliases (alternative names) */
+	const struct rExprSrc * rexprs;  /* list of default file name regex patterns */
+
 	parserInitialize initialize;   /* initialization routine, if needed */
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
