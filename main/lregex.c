@@ -3337,7 +3337,7 @@ static void scriptEvalHook (OptVM *vm, struct lregexControlBlock *lcb, enum scri
 		EsObject * e = optscriptEval (vm, code);
 		if (es_error_p (e))
 			error (WARNING, "error when evaluating hook[%d] code: %s",
-				   hook, (char *)ptrArrayItem (lcb->hook[i], i));
+				   hook, (char *)ptrArrayItem (lcb->hook[hook], i));
 	}
 }
 
