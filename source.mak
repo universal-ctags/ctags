@@ -419,6 +419,7 @@ PARSER_SRCS =				\
 	parsers/scheme.c		\
 	parsers/selinux-interface.c	\
 	parsers/sh.c			\
+	parsers/sinex.c			\
 	parsers/slang.c			\
 	parsers/sml.c			\
 	parsers/sql.c			\
