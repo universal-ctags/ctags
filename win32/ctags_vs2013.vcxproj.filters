@@ -624,6 +624,9 @@
     <ClCompile Include="..\parsers\sh.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\sinex.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\slang.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
