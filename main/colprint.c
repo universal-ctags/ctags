@@ -285,6 +285,13 @@ void colprintLineAppendColumnBool  (struct colprintLine *line, bool column)
 	colprintLineAppendColumnCString	(line, column? "yes": "no");
 }
 
+void colprintLineAppendColumnVersion (struct colprintLine *line, unsigned int version)
+{
+	char buf[12+1];
+	snprintf(buf, sizeof(buf), "%u", version);
+	colprintLineAppendColumnCString	(line, buf);
+}
+
 const char *colprintLineGetColumn (struct colprintLine *line, unsigned int column)
 {
 	stringList *slist = (stringList *)line;

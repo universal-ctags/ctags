@@ -36,11 +36,13 @@ typedef enum {
 static fieldDefinition SchemeFields[] = {
 	{ .name = "definer",
 	  .description = "the name of the function or macro that defines the unknown/Y-kind object",
-	  .enabled = true },
+	  .enabled = true,
+	  .version = 1 },
 };
 
 static kindDefinition SchemeKinds [] = {
-	{ true, 'Y', "unknown", "unknown type of definitions" },
+	{ true, 'Y', "unknown", "unknown type of definitions",
+	  .version = 1 },
 	{ true, 'f', "function", "functions" },
 	{ true, 's', "set",      "sets" }
 };
