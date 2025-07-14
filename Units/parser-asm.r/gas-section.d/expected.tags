@@ -5,5 +5,11 @@ limit	input.s	/^limit:	.double 0.29$/;"	label	language:Asm	roles:def
 .inittext	input-0.s	/^	.section ".inittext","ax"$/;"	inputSection	language:LdScript	roles:destination
 intcall	input-0.s	/^	.globl	intcall$/;"	symbol	language:LdScript	inputSection:.inittext	roles:def
 intcall	input-0.s	/^intcall:$/;"	label	language:Asm	roles:def
-define_ftsec	input-1.s	/^.macro define_ftsec name$/;"	macro	language:Asm	roles:def
+define_ftsec	input-1.s	/^.macro define_ftsec name$/;"	macro	language:Asm	roles:def	end:5
 .head.text.\\name\\()	input-1.s	/^	.section ".head.text.\\name\\()","ax",@progbits$/;"	inputSection	language:LdScript	roles:destination
+.tramp.ftrace.text	input-2.s	/^.pushsection ".tramp.ftrace.text","aw",@progbits;$/;"	inputSection	language:LdScript	roles:destination	end:11
+ftrace_tramp_text	input-2.s	/^.globl ftrace_tramp_text$/;"	symbol	language:LdScript	inputSection:.tramp.ftrace.text	roles:def
+ftrace_tramp_text	input-2.s	/^ftrace_tramp_text:$/;"	label	language:Asm	roles:def
+.tramp.ftrace.init	input-2.s	/^.pushsection ".tramp.ftrace.init","aw",@progbits;$/;"	inputSection	language:LdScript	roles:destination	end:17
+ftrace_tramp_init	input-2.s	/^.globl ftrace_tramp_init$/;"	symbol	language:LdScript	inputSection:.tramp.ftrace.init	roles:def
+ftrace_tramp_init	input-2.s	/^ftrace_tramp_init:$/;"	label	language:Asm	roles:def
