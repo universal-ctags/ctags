@@ -4,6 +4,15 @@ isalpha	input.sql	/^create or replace FUNCTION isalpha(ch CHAR)$/;"	f	typeref:ty
 isalphanum	input.sql	/^create or replace FUNCTION isalphanum(ch CHAR)$/;"	f	typeref:typename:BOOLEAN	signature:(ch CHAR)
 isdigit	input.sql	/^create or replace function isdigit(ch CHAR)$/;"	f	typeref:typename:BOOLEAN	signature:(ch CHAR)
 rpmver_array	input.sql	/^create or replace FUNCTION rpmver_array (string1 IN VARCHAR)$/;"	f	typeref:typename:evr_array_item[]	signature:(string1 IN VARCHAR)
+str1	input.sql	/^		str1 VARCHAR := string1;$/;"	v
+digits	input.sql	/^		digits VARCHAR(10) := '0123456789';$/;"	v
+lc_alpha	input.sql	/^		lc_alpha VARCHAR(27) := 'abcdefghijklmnopqrstuvwxyz';$/;"	v
+uc_alpha	input.sql	/^		uc_alpha VARCHAR(27) := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';$/;"	v
+alpha	input.sql	/^		alpha VARCHAR(54) := lc_alpha || uc_alpha;$/;"	v
+one	input.sql	/^		one VARCHAR;$/;"	v
+isnum	input.sql	/^		isnum BOOLEAN;$/;"	v
+ver_array	input.sql	/^		ver_array evr_array_item[] := ARRAY[]::evr_array_item[];$/;"	v
+segment_loop	input.sql	/^		<<segment_loop>>$/;"	L
 dfunc0	input-0.sql	/^create function dfunc0(a text DEFAULT '->''Hello', b text DEFAULT 'World''') returns text as $\$$/;"	f	typeref:typename:text	signature:(a text DEFAULT '->''Hello', b text DEFAULT 'World''')
 dfunc1	input-0.sql	/^create function dfunc1(r numeric = 20.39, p numeric DEFAULT 99.88) returns numeric as $\$$/;"	f	typeref:typename:numeric	signature:(r numeric = 20.39, p numeric DEFAULT 99.88)
 dfunc2	input-0.sql	/^create function dfunc2(anyelement = 'World'::text) returns text as $\$$/;"	f	typeref:typename:text	signature:(anyelement = 'World'::text)

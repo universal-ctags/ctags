@@ -34,6 +34,11 @@ Change since "0.0"
 
 * New field ``alias``
 
+Change since "1.1"
+~~~~~~~~~~~~~~~~~~
+
+* New role ``foreigncall`` for ``function`` kind
+
 SEE ALSO
 --------
 :ref:`ctags(1) <ctags(1)>`,
