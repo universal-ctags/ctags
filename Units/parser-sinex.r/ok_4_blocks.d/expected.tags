@@ -1,0 +1,4 @@
+FILE/COMMENT	input.snx	/^+FILE\/COMMENT$/;"	b	line:3	end:5
+SITE/ID	input.snx	/^+SITE\/ID$/;"	b	line:7	end:14
+SOLUTION/EPOCHS	input.snx	/^+SOLUTION\/EPOCHS$/;"	b	line:15	end:23
+SOLUTION/ESTIMATE	input.snx	/^+SOLUTION\/ESTIMATE$/;"	b	line:24	end:40

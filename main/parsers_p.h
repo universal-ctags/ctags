@@ -174,6 +174,7 @@
 	SCSSParser, \
 	SELinuxInterfaceParser, \
 	SELinuxTypeEnforcementParser, \
+	SinexParser, \
 	ShParser, \
 	SlangParser, \
 	SmlParser, \
