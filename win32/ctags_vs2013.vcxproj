@@ -367,6 +367,7 @@
     <ClCompile Include="..\parsers\scheme.c" />
     <ClCompile Include="..\parsers\selinux-interface.c" />
     <ClCompile Include="..\parsers\sh.c" />
+    <ClCompile Include="..\parsers\sinex.c" />
     <ClCompile Include="..\parsers\slang.c" />
     <ClCompile Include="..\parsers\sml.c" />
     <ClCompile Include="..\parsers\sql.c" />
