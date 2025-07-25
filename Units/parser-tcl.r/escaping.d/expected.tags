@@ -1,2 +1,4 @@
+a	input-0.tcl	/^proc a {} {set quotedText a\\"}$/;"	p
+b	input-0.tcl	/^proc b {} {}$/;"	p
 proc1	input.tcl	/^proc proc1 {} {$/;"	p
 proc2	input.tcl	/^proc proc2  {} {}$/;"	p
