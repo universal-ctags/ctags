@@ -174,11 +174,25 @@ static void readString (vString *string)
 
 static void readIdentifier (vString *string)
 {
+	bool seen_backslash = false;
+
 	while (1)
 	{
 		int c = getcFromInputFile ();
-		if (isgraph (c) && (!strchr ("{}[]\"", c)))
+		if (c == EOF)
+			break;
+
+		if (c == '\\')
+		{
 			vStringPut (string, c);
+			seen_backslash = true;
+		}
+		else if (isgraph (c) &&
+				 (seen_backslash ||  (!strchr ("{}[]\"", c))))
+		{
+			vStringPut (string, c);
+			seen_backslash = false;
+		}
 		else
 		{
 			ungetcToInputFile (c);
