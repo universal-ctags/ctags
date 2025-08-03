@@ -1173,7 +1173,7 @@ static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 				/* if this is a "new" something then no need to parse */
 				skipPast (";");
 			}
-			else if (line[pos] == '(')
+			else if (!eof_reached && line[pos] == '(')
 			{
 				/* '(' is the starter of an expression function. */
 				skipPast (";");
