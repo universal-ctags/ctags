@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cross-platform-actions/action@v0.28.0
+      - uses: cross-platform-actions/action@v0.29.0
         with:
           operating_system: netbsd
           version: ${{ matrix.netbsd-version }}
