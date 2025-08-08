@@ -1,0 +1,32 @@
+insights-client	input.meson	/^project('insights-client',$/;"	project
+python	input.meson	/^python = import('python')$/;"	variable
+python_installation	input.meson	/^python_installation = python.find_installation(get_option('python'))$/;"	variable
+python_exec	input.meson	/^python_exec = '\/usr\/bin\/python3'$/;"	variable
+systemd	input.meson	/^systemd = dependency('systemd', version: '>=231')$/;"	variable
+config_data	input.meson	/^config_data = configuration_data({$/;"	cfgdata
+bindir	input.meson	/^  'bindir': get_option('prefix') \/ get_option('bindir'),$/;"	cfgvar	cfgdata:config_data
+BINDIR	input.meson	/^  'BINDIR': get_option('prefix') \/ get_option('bindir'),$/;"	cfgvar	cfgdata:config_data
+DATADIR	input.meson	/^  'DATADIR': get_option('prefix') \/ get_option('datadir'),$/;"	cfgvar	cfgdata:config_data
+DATAROOTDIR	input.meson	/^  'DATAROOTDIR':get_option('prefix') \/ get_option('datadir'),$/;"	cfgvar	cfgdata:config_data
+DOCDIR	input.meson	/^  'DOCDIR': get_option('prefix') \/ get_option('datadir') \/ 'doc' \/ meson.project_name(),$/;"	cfgvar	cfgdata:config_data
+LIBEXECDIR	input.meson	/^  'LIBEXECDIR': get_option('prefix') \/ get_option('libexecdir'),$/;"	cfgvar	cfgdata:config_data
+LOCALSTATEDIR	input.meson	/^  'LOCALSTATEDIR': get_option('localstatedir'),$/;"	cfgvar	cfgdata:config_data
+PACKAGE	input.meson	/^  'PACKAGE': meson.project_name(),$/;"	cfgvar	cfgdata:config_data
+PACKAGE_VERSION	input.meson	/^  'PACKAGE_VERSION': meson.project_version(),$/;"	cfgvar	cfgdata:config_data
+pkgsysconfdir	input.meson	/^  'pkgsysconfdir': '\/' \/ get_option('sysconfdir') \/ meson.project_name(),$/;"	cfgvar	cfgdata:config_data
+PREFIX	input.meson	/^  'PREFIX': get_option('prefix'),$/;"	cfgvar	cfgdata:config_data
+PYTHON	input.meson	/^  'PYTHON': python_exec,$/;"	cfgvar	cfgdata:config_data
+pythondir	input.meson	/^  'pythondir': python_installation.get_install_dir(),$/;"	cfgvar	cfgdata:config_data
+SBINDIR	input.meson	/^  'SBINDIR': get_option('prefix') \/ get_option('sbindir'),$/;"	cfgvar	cfgdata:config_data
+SYSCONFDIR	input.meson	/^  'SYSCONFDIR': '\/' \/ get_option('sysconfdir'),$/;"	cfgvar	cfgdata:config_data
+sysconfdir	input.meson	/^  'sysconfdir': '\/' \/ get_option('sysconfdir'),$/;"	cfgvar	cfgdata:config_data
+top_srcdir	input.meson	/^  'top_srcdir': meson.source_root()$/;"	cfgvar	cfgdata:config_data
+update-egg	input.meson	/^run_target('update-egg', command: 'scripts\/01-upgrade-egg.sh')$/;"	run
+data	input.meson	/^subdir('data')$/;"	subdir
+docs	input.meson	/^subdir('docs')$/;"	subdir
+src	input.meson	/^subdir('src')$/;"	subdir
+configuration	input.meson	/^configuration = '**Configuration**\\n'$/;"	variable
+cfgf5631d8f0109	input-0.meson	/^configuration_data({$/;"	cfgdata
+a	input-0.meson	/^  'a': get_option('prefix') \/ get_option('bindir'),$/;"	cfgvar	cfgdata:cfgf5631d8f0109
+b	input-0.meson	/^  'b': meson.source_root()$/;"	cfgvar	cfgdata:cfgf5631d8f0109
+update-eggx	input-0.meson	/^run_target('update-eggx', command: 'scripts\/01-upgrade-egg.sh')$/;"	run

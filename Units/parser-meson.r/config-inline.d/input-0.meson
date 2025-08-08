@@ -1,0 +1,7 @@
+configuration_data({
+  'a': get_option('prefix') / get_option('bindir'),
+  # ...
+  'b': meson.source_root()
+})
+
+run_target('update-eggx', command: 'scripts/01-upgrade-egg.sh')
