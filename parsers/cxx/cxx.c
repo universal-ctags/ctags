@@ -101,8 +101,8 @@ parserDefinition * CParser (void)
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
 
-	def->versionCurrent = 1;
-	def->versionAge = 1;
+	def->versionCurrent = 2;
+	def->versionAge = 2;
 
 	return def;
 }
