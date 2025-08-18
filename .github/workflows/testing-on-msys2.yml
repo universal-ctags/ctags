@@ -30,7 +30,7 @@ jobs:
     - run: git config --global core.autocrlf input
       shell: bash
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - run: ./autogen.sh
     - run: ./configure --prefix=/usr

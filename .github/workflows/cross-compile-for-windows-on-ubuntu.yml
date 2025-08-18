@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.build-machine-os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - run: sudo apt-get -y -o APT::Immediate-Configure=false update
       - run: sudo apt-get -y -o APT::Immediate-Configure=false install mingw-w64 gcc make automake autoconf file

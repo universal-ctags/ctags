@@ -21,7 +21,7 @@ jobs:
       READTAGS: '${{ github.workspace }}/readtags'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: update package information
         run: sudo apt-get -y -o APT::Immediate-Configure=false update
       - name: install tools and libraries
@@ -41,7 +41,7 @@ jobs:
       - name: install Emacs
         run: sudo apt-get -y -o APT::Immediate-Configure=false install emacs
       - name: checkout Citre repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: 'universal-ctags/citre'
           path: 'citre'
