@@ -1,0 +1,9 @@
+Input	input.adb	/^package body Input is$/;"	p
+F	input.adb	/^  function F (S : Integer) return Integer is$/;"	r	package:Input	file:
+R	input.adb	/^  R : Integer;$/;"	v	subprogram:F	file:
+T	input.adb	/^	T : Integer := 2;$/;"	v	anon:declare	file:
+P	input.adb	/^	P : Integer := 4;$/;"	v	anon:declare	file:
+G	input.adb	/^  function G (A : Integer) return Integer is$/;"	r	package:Input	file:
+B	input.adb	/^  B : Integer;$/;"	v	subprogram:G	file:
+C	input.adb	/^	C : Integer := 2;$/;"	v	anon:declare	file:
+D	input.adb	/^	D : Integer := 4;$/;"	v	anon:declare	file:

@@ -1992,7 +1992,12 @@ static adaTokenInfo *adaParse (adaParseMode mode, adaTokenInfo *parent)
 				}
 #endif
 
-				if (adaCmp (parent->name))
+				if (adaCmp ("if") || adaCmp ("case"))
+				{
+					/* TODO: "select" */
+					skipPast (";");
+				}
+				else if (adaCmp (parent->name))
 				{
 					skipPast (";");
 
