@@ -23,7 +23,7 @@ jobs:
       PKG_CONFIG_PATH: ${{ github.workspace }}/amd64-unknown-netbsd-3rdroot/lib/pkgconfig
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - run: sudo apt-get -y update
       - run: sudo apt-get -y install clang cmake make automake autoconf pkg-config curl file
