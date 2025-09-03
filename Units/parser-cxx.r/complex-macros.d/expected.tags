@@ -1,7 +1,7 @@
 DECLARE_FUNCTION_1	input.cpp	/^#define DECLARE_FUNCTION_1 /;"	d	file:
 p0	input.cpp	/^DECLARE_FUNCTION_1;$/;"	p	typeref:typename:int	file:	signature:()
 DECLARE_FUNCTION_1A	input.cpp	/^#define DECLARE_FUNCTION_1A(/;"	d	file:	signature:()
-p0A	input.cpp	/^DECLARE_FUNCTION_1A;$/;"	p	typeref:typename:int	file:	signature:()
+p0A	input.cpp	/^unsigned DECLARE_FUNCTION_1A();	\/\/ expand$/;"	p	typeref:typename:unsigned int	file:	signature:()
 _ret	input.cpp	/^#define DECLARE_FUNCTION_2(_ret,_name) _ret _name();$/;"	D	macro:DECLARE_FUNCTION_2
 _name	input.cpp	/^#define DECLARE_FUNCTION_2(_ret,_name) _ret _name();$/;"	D	macro:DECLARE_FUNCTION_2
 DECLARE_FUNCTION_2	input.cpp	/^#define DECLARE_FUNCTION_2(/;"	d	file:	signature:(_ret,_name)
@@ -50,3 +50,4 @@ __anonb64b5bec010d	input.cpp	/^int main(int,char **)$/;"	z	function:main	typeref
 __anonb64b5bec020d	input.cpp	/^int main(int,char **)$/;"	z	function:main	typeref:typename:char **	file:
 la	input.cpp	/^	DECLARE_VARS(l);$/;"	l	function:main	typeref:typename:int	file:
 lb	input.cpp	/^	DECLARE_VARS(l);$/;"	l	function:main	typeref:typename:int	file:
+input0	input-0.cpp	/^int input0;$/;"	v	typeref:typename:int

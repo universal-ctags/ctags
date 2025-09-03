@@ -8,7 +8,8 @@ DECLARE_FUNCTION_1;
 // Macro without parameters
 #define DECLARE_FUNCTION_1A() int p0A()
 
-DECLARE_FUNCTION_1A;
+DECLARE_FUNCTION_1A; // don't expand
+unsigned DECLARE_FUNCTION_1A();	// expand
 
 // Simple macro with parameters
 

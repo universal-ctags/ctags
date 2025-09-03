@@ -15,3 +15,4 @@
 -D DECLARE_FUNCTION_4(Ret,Class,Method,...)=Ret Class##__##Method(Class *that, ##__VA_ARGS__)
 -D DECLARE_FUNCTION_4_BEGIN(...)={
 -D DECLARE_FUNCTION_4_END(...)=}
+-D var(X)=X

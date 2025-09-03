@@ -1125,6 +1125,7 @@ static bool cxxParserParseNextTokenSkipMacroParenthesis(CXXToken ** ppChain)
 	if(g_cxx.iChar != '(')
 	{
 		*ppChain = NULL;
+		CXX_DEBUG_LEAVE_TEXT("No macro parenthesis");
 		return true; // no parenthesis
 	}
 
@@ -1400,16 +1401,44 @@ bool cxxParserParseNextToken(void)
 				CXX_DEBUG_PRINT("Macro %s <%p> useCount: %d", pMacro->name,
 								pMacro, pMacro->useCount);
 
-				cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+				/* `t' is at the end of g_cxx.pTokenChain. */
+				cxxTokenChainTakeLast(g_cxx.pTokenChain);
 
 				CXXToken * pParameterChain = NULL;
 
 				if(pMacro->hasParameterList)
 				{
 					CXX_DEBUG_PRINT("Macro has parameter list");
-					if(!cxxParserParseNextTokenSkipMacroParenthesis(&pParameterChain))
+					if(!cxxParserParseNextTokenSkipMacroParenthesis(&pParameterChain)) {
+						cxxTokenDestroy(t);
 						return false;
+					}
+
+					/* The macro definition requires argument(s).
+					 * However, the parser cannot find '(' just after the macro token (`t')
+					 * on the current input stream.
+					 *
+					 * e.g.
+					 *
+					 *   // the macro definition
+					 *   -D't(x)=(x+1)'
+					 *
+					 *   // input stream
+					 *   int t;
+					 * -------^ no '('.
+					 *
+					 * In this case we should expand nothing. Just extract token `t'
+					 * as is; just append `t' to g_cxx.pTokenChain. and return the
+					 * control.
+					 */
+					if (pParameterChain == NULL) {
+						CXX_DEBUG_PRINT("Macro definition requires argument(s) but we cannot find them");
+						cxxTokenChainAppend(g_cxx.pTokenChain, t);
+						return true;
+					}
 				}
+				cxxTokenDestroy(t);
+
 
 				// This is used to avoid infinite recursion in substitution
 				// (things like -D foo=foo or similar)
