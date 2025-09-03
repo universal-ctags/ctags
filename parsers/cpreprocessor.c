@@ -2588,6 +2588,7 @@ static cppMacroInfo * saveMacro(hashTable *table, const char * macro)
 		CXX_DEBUG_PRINT("Got %d parameters",iParamCount);
 
 	} else {
+		CXX_DEBUG_PRINT("Macro has no parameter list");
 		info->hasParameterList = false;
 	}
 
