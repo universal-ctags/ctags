@@ -136,6 +136,7 @@
 	MesonOptionsParser, \
 	MooseParser, \
 	MyrddinParser, \
+	NixParser, \
 	NsisParser, \
 	ObjcParser, \
 	OcamlParser, \
