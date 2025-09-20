@@ -21,7 +21,7 @@ SYNOPSIS
     +===============+===============+===================+
     | SystemVerilog | SystemVerilog | .sv, .svh, svi    |
     +---------------+---------------+-------------------+
-    | Verilog       | Verilog       | .v                |
+    | Verilog       | Verilog       | .v, .vh           |
     +---------------+---------------+-------------------+
 
 DESCRIPTION
@@ -204,6 +204,7 @@ Change since "0.0"
 ~~~~~~~~~~~~~~~~~~
 
 * New kind ``define``
+* map ``.vh`` to Verilog
 
 SEE ALSO
 --------
