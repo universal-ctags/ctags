@@ -190,7 +190,7 @@ TIPS
 ~~~~
 
 If you want to map files ``*.v`` to SystemVerilog, add
-``--langmap=SystemVerilog:.v`` option.
+``--map-SystemVerilog=+.v`` option.
 
 KNOWN ISSUES
 ---------------------------------------------------------------------
