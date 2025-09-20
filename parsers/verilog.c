@@ -2193,7 +2193,7 @@ static void findVerilogTags (void)
 
 extern parserDefinition* VerilogParser (void)
 {
-	static const char *const extensions [] = { "v", NULL };
+	static const char *const extensions [] = { "v", "vh", NULL };
 	parserDefinition* def = parserNew ("Verilog");
 	static selectLanguage selectors[] = { selectVOrVerilogByKeywords, NULL };
 	def->versionCurrent = 1;
