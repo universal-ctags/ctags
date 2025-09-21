@@ -46,6 +46,17 @@ static kindDefinition SinexKinds [] = {
 };
 
 
+static void blockNameCopy (char blockName[MAX_BLOCK_NAME_LEN+1], const char *line)
+{
+	strncpy (blockName, (const char *)&line[1], MAX_BLOCK_NAME_LEN);
+	blockName[MAX_BLOCK_NAME_LEN] = '\0'; /* THIS IS O.K. */
+
+	// remove possible trailing spaces
+	for (char * ptr = blockName+strlen(blockName)-1 ; (ptr>=blockName) && isspace(*ptr) ; ptr--)
+		*ptr = '\0' ;
+}
+
+
 static void findSinexTags (void)
 {
 	const unsigned char *line;
@@ -58,16 +69,14 @@ static void findSinexTags (void)
 	{
 		if (line[0] == '+')
 		{
-			strncpy (blockNameStart, (const char *)&line[1], MAX_BLOCK_NAME_LEN);
-			blockNameStart[MAX_BLOCK_NAME_LEN] = '\0' ;      // safeguard if line length > MAX_BLOCK_NAME_LEN+1 (should not happen)
+			blockNameCopy(blockNameStart, (const char *)line);
 			initTagEntry (&e, (const char * const)blockNameStart, K_BLOCK);
 			inBlock = true ;
 		} 
 		else if (inBlock && (line[0] == '-'))
 		{
 			unsigned long lineNumber = getInputLineNumber ();
-			strncpy (blockNameEnd, (const char *)&line[1], MAX_BLOCK_NAME_LEN);
-			blockNameEnd[MAX_BLOCK_NAME_LEN] = '\0' ;      // safeguard if line length > MAX_BLOCK_NAME_LEN (should not happen)
+			blockNameCopy(blockNameEnd, (const char *)line);
 			if (strcmp (blockNameStart, blockNameEnd) == 0)
 			{
 				setTagEndLine(&e, lineNumber);

@@ -1,0 +1,7 @@
+FILE/REFERENCE	input.snx	/^+FILE\/REFERENCE                                                                 $/;"	b	line:6	end:13
+FILE/COMMENT	input.snx	/^+FILE\/COMMENT                                                                   $/;"	b	line:15	end:21
+INPUT/HISTORY	input.snx	/^+INPUT\/HISTORY$/;"	b	line:23	end:26
+SOLUTION/EPOCHS	input.snx	/^+SOLUTION\/EPOCHS$/;"	b	line:41	end:53
+SITE/ECCENTRICITY	input.snx	/^+SITE\/ECCENTRICITY                                                              $/;"	b	line:55	end:68
+MODEL/TIME_BIAS	input.snx	/^+MODEL\/TIME_BIAS                                                                $/;"	b	line:70	end:72
+MODEL/RANGE_BIAS	input.snx	/^+MODEL\/RANGE_BIAS                                                               $/;"	b	line:74	end:81
