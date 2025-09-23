@@ -1,0 +1,33 @@
+table inet x {
+	counter user123 {
+		packets 12 bytes 1433
+	}
+
+	counter user321 {
+		packets 0 bytes 0
+	}
+
+	quota user123 {
+		over 2000 bytes
+	}
+
+	quota user124 {
+		over 2000 bytes
+	}
+
+	set y {
+		type ipv4_addr
+	}
+
+	map test {
+		type ipv4_addr : quota
+		elements = { 192.168.2.2 : "user124",
+			     192.168.2.3 : "user124" }
+	}
+
+	chain y {
+		type filter hook input priority filter; policy accept;
+		counter name ip saddr map { 1.1.1.1 : "user123", 2.2.2.2 : "user123", 192.168.2.2 : "user123" }
+		quota name ip saddr map @test drop
+	}
+}

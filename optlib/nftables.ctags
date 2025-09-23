@@ -1,0 +1,92 @@
+#
+#  nftables.ctags --- regex parser for the output of nft command
+#
+#  Copyright (c) 2025, Red Hat, Inc.
+#
+#  Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+--langdef=Nftables
+--map-Nftables=+.nft
+
+#
+# Kind and role definitions
+#
+--kinddef-Nftables=f,family,families
+--_roledef-Nftables.f=referenced,referenced somehow
+--roles-Nftables.f=-{referenced}
+--kinddef-Nftables=h,hook,hooks
+
+--kinddef-Nftables=t,table,tables
+--kinddef-Nftables=c,chain,chains
+
+--kinddef-Nftables=s,set,sets
+--kinddef-Nftables=m,map,maps
+
+--kinddef-Nftables=D,definition,definitions
+--kinddef-Nftables=R,ruleset,rulesets
+--_roledef-Nftables.{ruleset}=included,included ruleset
+
+--kinddef-Nftables=H,ctherlper,connection tracking helpers
+--kinddef-Nftables=E,ctexpectation,connection tracking expectations
+--kinddef-Nftables=T,cttimeout,connection tracking timeout
+
+--kinddef-Nftables=S,secmark,secmarks
+
+--kinddef-Nftables=W,flowtable,flowtables
+
+--kinddef-Nftables=P,synproxy,synproxies
+
+--kinddef-Nftables=C,counter,counters
+--kinddef-Nftables=l,limit,limits
+--kinddef-Nftables=Q,quota,quotas
+
+#
+# Regex patterns
+#
+--regex-Nftables=/^[ \t]*#//{exclusive}
+
+# Patterns for parsing the output for "nft list hooks"
+--regex-Nftables=/^[ \t]*family[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/f/{exclusive}{scope=set}
+--regex-Nftables=/^[ \t]*hook[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/h/{exclusive}{scope=ref}
+
+--regex-Nftables=/^[ \t]*table[ \t]+([-a-zA-Z0-9_]+)[ \t]+([a-zA-Z0-9_]+)[ \t]*\{//{exclusive}{{
+   \1 /family /referenced _reftag _commit
+   \2 /table _tag _commit dup 3 -1 roll scope:
+   _scopeset
+}}
+--regex-Nftables=/^[ \t]*table[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/t/{exclusive}{scope=set}
+--regex-Nftables=/^[ \t]*chain[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/c/{exclusive}{scope=ref}
+
+--regex-Nftables=/^[ \t]*set[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/s/{exclusive}{scope=ref}
+--regex-Nftables=/^[ \t]*map[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/m/{exclusive}{scope=ref}
+--regex-Nftables=/^[ \t]*define[ \t]+([-a-zA-Z0-9_]+)[ \t]*=/\1/D/{exclusive}
+--regex-Nftables=/^[ \t]*include[ \t]+"([^"]+)"/\1/R/{exclusive}{_role=included}
+
+--regex-Nftables=/^[ \t]*ct[ \t]+helper[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/H/{exclusive}{scope=ref}
+--regex-Nftables=/^[ \t]*ct[ \t]+expectation[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/E/{exclusive}{scope=ref}
+--regex-Nftables=/^[ \t]*ct[ \t]+timeout[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/T/{exclusive}{scope=ref}
+
+--regex-Nftables=/^[ \t]*secmark[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/S/{exclusive}{scope=ref}
+
+--regex-Nftables=/^[ \t]*flowtable[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/W/{exclusive}{scope=ref}
+
+--regex-Nftables=/^[ \t]*synproxy[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/P/{exclusive}{scope=ref}
+
+--regex-Nftables=/^[ \t]*counter[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/C/{exclusive}{scope=ref}
+--regex-Nftables=/^[ \t]*limit[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/L/{exclusive}{scope=ref}
+--regex-Nftables=/^[ \t]*quota[ \t]+([-a-zA-Z0-9_]+)[ \t]*\{/\1/Q/{exclusive}{scope=ref}

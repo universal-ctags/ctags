@@ -1,0 +1,3 @@
+t	input.nft	/^table inet t {$/;"	t	family:inet
+f	input.nft	/^	flowtable f {$/;"	W	table:inet.t
+c	input.nft	/^	chain c {$/;"	c	table:inet.t

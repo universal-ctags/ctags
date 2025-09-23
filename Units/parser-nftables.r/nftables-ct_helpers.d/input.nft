@@ -1,0 +1,43 @@
+#!/usr/sbin/nft -f
+
+# This example file shows how to use ct helpers in the nftables framework.
+# Note that nftables includes interesting improvements compared to how this
+# was done with iptables, such as loading multiple helpers with a single rule
+# This script is meant to be loaded with `nft -f <file>`
+# You require linux kernel >= 4.12 and nft >= 0.8
+# For up-to-date information please visit https://wiki.nftables.org
+
+# Using ct helpers is an important security feature when doing stateful
+# firewalling, since it mitigate certain networking attacks.
+# More info at: https://home.regit.org/netfilter-en/secure-use-of-helpers/
+
+
+flush ruleset
+table inet filter {
+	# declare helpers of this table
+	ct helper ftp-standard {
+		type "ftp" protocol tcp;
+		l3proto inet
+	}
+	ct helper sip-5060 {
+		type "sip" protocol udp;
+		l3proto inet
+	}
+	ct helper tftp-69 {
+		type "tftp" protocol udp
+		l3proto inet
+	}
+
+	chain input {
+		type filter hook input priority 0; policy drop;
+		ct state established,related accept
+
+		# assign a single helper in a single rule
+		tcp dport 21 ct helper set "ftp-standard"
+
+		# assign multiple helpers in a single rule
+		ct helper set udp dport map {
+	                        69 : "tftp-69", \
+		                5060 : "sip-5060" }
+	}
+}

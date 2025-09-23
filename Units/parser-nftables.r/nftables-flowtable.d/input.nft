@@ -1,0 +1,10 @@
+table inet t {
+	flowtable f {
+		hook ingress priority filter + 10
+		devices = { lo }
+	}
+
+	chain c {
+		flow add @f
+	}
+}

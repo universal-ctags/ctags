@@ -1,0 +1,11 @@
+table inet filter {
+	counter TEST {
+		packets 0 bytes 0
+	}
+
+	map testmap {
+		type ipv4_addr : counter
+		flags interval
+		elements = { 192.168.0.0/24 : "TEST" }
+	}
+}

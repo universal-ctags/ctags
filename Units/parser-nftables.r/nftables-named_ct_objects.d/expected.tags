@@ -1,0 +1,11 @@
+t	input.nft	/^table inet t {$/;"	t	family:inet
+exp1	input.nft	/^	ct expectation exp1 {$/;"	E	table:inet.t
+exp2	input.nft	/^	ct expectation exp2 {$/;"	E	table:inet.t
+myftp	input.nft	/^	ct helper myftp {$/;"	H	table:inet.t
+dns	input.nft	/^	ct timeout dns {$/;"	T	table:inet.t
+exp	input.nft	/^	map exp {$/;"	m	table:inet.t
+exp6	input.nft	/^	map exp6 {$/;"	m	table:inet.t
+helpobj	input.nft	/^	map helpobj {$/;"	m	table:inet.t
+timeoutmap	input.nft	/^	map timeoutmap {$/;"	m	table:inet.t
+helpname	input.nft	/^	set helpname {$/;"	s	table:inet.t
+y	input.nft	/^	chain y {$/;"	c	table:inet.t

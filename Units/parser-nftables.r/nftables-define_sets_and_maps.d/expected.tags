@@ -1,0 +1,15 @@
+int_if1	input.nft	/^define int_if1	 = eth0$/;"	D
+int_if2	input.nft	/^define int_if2	 = eth1$/;"	D
+int_ifs	input.nft	/^define int_ifs	 = { $int_if1, $int_if2 }$/;"	D
+ext_if1	input.nft	/^define ext_if1	 = eth2$/;"	D
+ext_if2	input.nft	/^define ext_if2	 = eth3$/;"	D
+ext_ifs	input.nft	/^define ext_ifs	 = { $ext_if1, $ext_if2 }$/;"	D
+local_ifs	input.nft	/^define local_ifs = { $int_ifs, $ext_ifs }$/;"	D
+tcp_ports	input.nft	/^define tcp_ports = { ssh, domain, https, 123-125 }$/;"	D
+filter	input.nft	/^table filter {$/;"	t
+local_ifs	input.nft	/^	set local_ifs {$/;"	s	table:filter
+nat_map	input.nft	/^	map nat_map {$/;"	m	table:filter
+jump_map	input.nft	/^	map jump_map {$/;"	m	table:filter
+input_1	input.nft	/^	chain input_1 { counter; }$/;"	c	table:filter
+input_2	input.nft	/^	chain input_2 { counter; }$/;"	c	table:filter
+input	input.nft	/^	chain input {$/;"	c	table:filter

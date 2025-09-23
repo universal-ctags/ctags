@@ -1,0 +1,5 @@
+x	input.nft	/^table inet x {$/;"	t	family:inet
+https-synproxy	input.nft	/^	synproxy https-synproxy {$/;"	P	table:inet.x
+other-synproxy	input.nft	/^	synproxy other-synproxy {$/;"	P	table:inet.x
+test2	input.nft	/^	map test2 {$/;"	m	table:inet.x
+y	input.nft	/^	chain y {$/;"	c	table:inet.x

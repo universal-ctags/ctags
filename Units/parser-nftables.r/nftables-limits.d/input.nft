@@ -1,0 +1,55 @@
+table inet filter {
+	limit tarpit-pps {
+		rate 1/second
+	}
+
+	limit tarpit-bps {
+		rate 1 kbytes/second
+	}
+
+	limit http-bulk-rl-1m {
+		rate 1 mbytes/second
+	}
+
+	limit http-bulk-rl-10m {
+		rate 10 mbytes/second
+	}
+
+	set tarpit4 {
+		typeof ip saddr
+		size 10000
+		flags dynamic,timeout
+		timeout 1m
+	}
+
+	set tarpit6 {
+		typeof ip6 saddr
+		size 10000
+		flags dynamic,timeout
+		timeout 1m
+	}
+
+	map addr4limit {
+		typeof meta l4proto . ip saddr . tcp sport : limit
+		flags interval
+		elements = { tcp . 192.168.0.0/16 . 1-65535 : "tarpit-bps",
+			     udp . 192.168.0.0/16 . 1-65535 : "tarpit-pps",
+			     tcp . 127.0.0.1-127.1.2.3 . 1-1024 : "tarpit-pps",
+			     tcp . 10.0.0.1-10.0.0.255 . 80 : "http-bulk-rl-1m",
+			     tcp . 10.0.0.1-10.0.0.255 . 443 : "http-bulk-rl-1m",
+			     tcp . 10.0.1.0/24 . 1024-65535 : "http-bulk-rl-10m",
+			     tcp . 10.0.2.1 . 22 : "http-bulk-rl-10m" }
+	}
+
+	map saddr6limit {
+		typeof ip6 saddr : limit
+		flags interval
+		elements = { dead::beef-dead::1:aced : "tarpit-pps" }
+	}
+
+	chain input {
+		type filter hook input priority filter; policy accept;
+		limit name meta l4proto . ip saddr . th sport map @addr4limit
+		limit name ip6 saddr map @saddr6limit
+	}
+}

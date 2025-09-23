@@ -1,0 +1,5 @@
+filter	input.nft	/^table inet filter {$/;"	t	family:inet
+ftp-standard	input.nft	/^	ct helper ftp-standard {$/;"	H	table:inet.filter
+sip-5060	input.nft	/^	ct helper sip-5060 {$/;"	H	table:inet.filter
+tftp-69	input.nft	/^	ct helper tftp-69 {$/;"	H	table:inet.filter
+input	input.nft	/^	chain input {$/;"	c	table:inet.filter

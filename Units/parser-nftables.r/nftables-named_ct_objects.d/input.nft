@@ -1,0 +1,71 @@
+table inet t {
+	ct expectation exp1 {
+		protocol tcp
+		dport 9876
+		timeout 1m
+		size 12
+		l3proto ip
+	}
+
+	ct expectation exp2 {
+		protocol tcp
+		dport 9876
+		timeout 3s
+		size 13
+		l3proto ip6
+	}
+
+	ct helper myftp {
+		type "ftp" protocol tcp
+		l3proto inet
+	}
+
+	ct timeout dns {
+		protocol tcp
+		l3proto ip
+		policy = { established : 3s, close : 1s }
+	}
+
+	map exp {
+		typeof ip saddr : ct expectation
+		elements = { 192.168.2.2 : "exp1" }
+	}
+
+	map exp6 {
+		typeof ip6 saddr : ct expectation
+		flags interval
+		elements = { dead:beef::/64 : "exp2" }
+	}
+
+	map helpobj {
+		typeof ip6 saddr : ct helper
+		flags interval
+		elements = { dead:beef::/64 : "myftp" }
+	}
+
+	map timeoutmap {
+		typeof ip daddr : ct timeout
+		elements = { 192.168.0.1 : "dns" }
+	}
+
+	set helpname {
+		typeof ct helper
+		elements = { "sip",
+			     "ftp" }
+	}
+
+	chain y {
+		ct expectation set ip saddr map @exp
+		ct expectation set ip6 saddr map { dead::beef : "exp2" }
+		ct expectation set ip6 daddr map { dead::beef : "exp2", feed::17 : "exp2" }
+		ct expectation set ip6 daddr . tcp dport map { feed::17 . 512 : "exp2", dead::beef . 123 : "exp2" }
+		ct helper set ip6 saddr map { 1c3::c01d : "myftp", dead::beef : "myftp" }
+		ct helper set ip6 saddr map @helpobj
+		ct timeout set ip daddr map @timeoutmap
+		ct timeout set ip daddr map { 1.2.3.4 : "dns", 5.6.7.8 : "dns", 192.168.8.0/24 : "dns" }
+		ct timeout set ip daddr map { 1.2.3.4-1.2.3.8 : "dns" }
+		ct timeout set ip6 daddr map { 1ce::/64 : "dns", dead::beef : "dns" }
+		ct helper @helpname accept
+		ip saddr 192.168.1.1 ct timeout set "dns"
+	}
+}

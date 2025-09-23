@@ -1,0 +1,12 @@
+ip	input.nft	/^family ip {$/;"	f
+prerouting	input.nft	/^	hook prerouting {$/;"	h	family:ip
+input	input.nft	/^	hook input {$/;"	h	family:ip
+forward	input.nft	/^	hook forward {$/;"	h	family:ip
+output	input.nft	/^	hook output {$/;"	h	family:ip
+postrouting	input.nft	/^	hook postrouting {$/;"	h	family:ip
+ip6	input.nft	/^family ip6 {$/;"	f
+prerouting	input.nft	/^	hook prerouting {$/;"	h	family:ip6
+input	input.nft	/^	hook input {$/;"	h	family:ip6
+forward	input.nft	/^	hook forward {$/;"	h	family:ip6
+output	input.nft	/^	hook output {$/;"	h	family:ip6
+postrouting	input.nft	/^	hook postrouting {$/;"	h	family:ip6
