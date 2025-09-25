@@ -1,0 +1,87 @@
+#!/usr/sbin/nft -f
+
+# This example file shows how to use secmark labels with the nftables framework.
+# This script is meant to be loaded with `nft -f <file>`
+# You require linux kernel >= 4.20 and nft >= 0.9.3
+# This example is SELinux based, for the secmark objects you require
+# SELinux enabled and a SELinux policy defining the stated contexts
+# For up-to-date information please visit https://wiki.nftables.org
+
+
+flush ruleset
+
+table inet x {
+	secmark ssh_server {
+		"system_u:object_r:ssh_server_packet_t:s0"
+	}
+
+	secmark dns_client {
+		"system_u:object_r:dns_client_packet_t:s0"
+	}
+
+	secmark http_client {
+		"system_u:object_r:http_client_packet_t:s0"
+	}
+
+	secmark https_client {
+		"system_u:object_r:http_client_packet_t:s0"
+	}
+
+	secmark ntp_client {
+		"system_u:object_r:ntp_client_packet_t:s0"
+	}
+
+	secmark icmp_client {
+		"system_u:object_r:icmp_client_packet_t:s0"
+	}
+
+	secmark icmp_server {
+		"system_u:object_r:icmp_server_packet_t:s0"
+	}
+
+	secmark ssh_client {
+		"system_u:object_r:ssh_client_packet_t:s0"
+	}
+
+	secmark git_client {
+		"system_u:object_r:git_client_packet_t:s0"
+	}
+
+	map secmapping_in {
+		type inet_service : secmark
+		elements = { 22 : "ssh_server" }
+	}
+
+	map secmapping_out {
+		type inet_service : secmark
+		elements = { 22 : "ssh_client", 53 : "dns_client", 80 : "http_client", 123 : "ntp_client", 443 : "http_client", 9418 : "git_client" }
+	}
+
+	chain y {
+		type filter hook input priority -225;
+
+		# label new incoming packets and add to connection
+		ct state new meta secmark set tcp dport map @secmapping_in
+		ct state new meta secmark set udp dport map @secmapping_in
+		ct state new ip protocol icmp meta secmark set "icmp_server"
+		ct state new ip6 nexthdr icmpv6 meta secmark set "icmp_server"
+		ct state new ct secmark set meta secmark
+
+		# set label for est/rel packets from connection
+		ct state established,related meta secmark set ct secmark
+	}
+
+	chain z {
+		type filter hook output priority 225;
+
+		# label new outgoing packets and add to connection
+		ct state new meta secmark set tcp dport map @secmapping_out
+		ct state new meta secmark set udp dport map @secmapping_out
+		ct state new ip protocol icmp meta secmark set "icmp_client"
+		ct state new ip6 nexthdr icmpv6 meta secmark set "icmp_client"
+		ct state new ct secmark set meta secmark
+
+		# set label for est/rel packets from connection
+		ct state established,related meta secmark set ct secmark
+	}
+}

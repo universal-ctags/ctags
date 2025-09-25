@@ -1,0 +1,10 @@
+filter	input.nft	/^table inet filter {$/;"	t	family:inet
+tarpit-pps	input.nft	/^	limit tarpit-pps {$/;"	L	table:inet.filter
+tarpit-bps	input.nft	/^	limit tarpit-bps {$/;"	L	table:inet.filter
+http-bulk-rl-1m	input.nft	/^	limit http-bulk-rl-1m {$/;"	L	table:inet.filter
+http-bulk-rl-10m	input.nft	/^	limit http-bulk-rl-10m {$/;"	L	table:inet.filter
+tarpit4	input.nft	/^	set tarpit4 {$/;"	s	table:inet.filter
+tarpit6	input.nft	/^	set tarpit6 {$/;"	s	table:inet.filter
+addr4limit	input.nft	/^	map addr4limit {$/;"	m	table:inet.filter
+saddr6limit	input.nft	/^	map saddr6limit {$/;"	m	table:inet.filter
+input	input.nft	/^	chain input {$/;"	c	table:inet.filter

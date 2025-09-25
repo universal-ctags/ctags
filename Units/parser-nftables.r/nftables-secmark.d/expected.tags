@@ -1,0 +1,14 @@
+x	input.nft	/^table inet x {$/;"	t	family:inet
+ssh_server	input.nft	/^	secmark ssh_server {$/;"	S	table:inet.x
+dns_client	input.nft	/^	secmark dns_client {$/;"	S	table:inet.x
+http_client	input.nft	/^	secmark http_client {$/;"	S	table:inet.x
+https_client	input.nft	/^	secmark https_client {$/;"	S	table:inet.x
+ntp_client	input.nft	/^	secmark ntp_client {$/;"	S	table:inet.x
+icmp_client	input.nft	/^	secmark icmp_client {$/;"	S	table:inet.x
+icmp_server	input.nft	/^	secmark icmp_server {$/;"	S	table:inet.x
+ssh_client	input.nft	/^	secmark ssh_client {$/;"	S	table:inet.x
+git_client	input.nft	/^	secmark git_client {$/;"	S	table:inet.x
+secmapping_in	input.nft	/^	map secmapping_in {$/;"	m	table:inet.x
+secmapping_out	input.nft	/^	map secmapping_out {$/;"	m	table:inet.x
+y	input.nft	/^	chain y {$/;"	c	table:inet.x
+z	input.nft	/^	chain z {$/;"	c	table:inet.x

@@ -206,14 +206,48 @@ my $options =
 	   for (@{$_[0]->{'kinddefs'}}) {
 	       if ((defined $2 && $_->{'letter'} eq $2)
 		   || (defined $3 && $_->{'name'} eq $3)) {
-		   my $role = { name => $4, desc => $5, owner => $_ };
+		   my $role = { enabled => 1, name => $4, desc => $5, owner => $_ };
 		   push @{$_->{'roles'}}, $role;
 		   $kind_found = 1;
 		   last;
 	       }
 	   }
-	   die "no such kind, \"$2\" where role \"$3\" is attached to" if (! $kind_found);
+	   my $k;
+	   $k = $2 if defined $2;
+	   $k = $3 if defined $3;
+	   die "no such kind, \"$k\" where role \"$4\" is attached to" if (! $kind_found);
 	   return 1;
+       } ],
+     [ qr/^--roles-([^.]+)\.(?:([a-zA-Z])|\{([a-zA-Z][a-zA-Z0-9]*)\})=-(.*)/, sub {
+	   die "Don't use --roles-<LANG>.<KIND>= option before defining the language"
+	       if (! defined $_[0]->{'langdef'});
+	   my $kind;
+	   my $kletter = $2;
+	   my $kname = $3;
+	   my $roles = $4;
+
+	   for my $k (@{$_[0]->{'kinddefs'}}) {
+	       if (defined $kletter && $k->{'letter'} eq $kletter
+		   || defined $kname && $k->{'name'} eq $kname) {
+		   $kind = $k;
+		   last;
+	       }
+	   }
+	   die "Don't use --roles-<LANG>.<KIND>= option before defined the kind"
+	       if (! defined $kind);
+
+	   if ($roles =~ /^{(.*)}$/) {
+	       $roles = $1;
+	   } else {
+	       die "The roles in --roles-<LANG>.<KIND>=-<ROLES> must be surrounded by '{' and '}'";
+	   }
+	   my @rolesa = split /\}\{/, $roles;
+
+	   parse_roles ($kind, \@rolesa, $_[0]);
+	   return 1;
+       } ],
+     [ qr/^--roles-([^.]+)\.([^=]+)=(.*)/, sub {
+	   die "--roles-<LANG>.<KIND>= can be used only for disabling a role: $2";
        } ],
      [ qr/^--languages=-(.*)/, sub {
 	   die "Don't use --languages=- option before defining the language"
@@ -567,6 +601,20 @@ sub parse_kinds {
     }
 }
 
+sub parse_roles {
+    my ($kind, $roles, $opts) = @_;
+
+    NEXT: for my $role (@$roles) {
+	for my $r (@{$kind->{'roles'}}) {
+	    if ($role eq $r->{'name'}) {
+		$r->{'enabled'} = 0;
+		next NEXT;
+	    }
+	}
+	die "No role $_ is defined in kind $kind->{'name'}"
+    }
+}
+
 sub parse_optlib {
     my ($optlib, $opts) = @_;
 
@@ -849,8 +897,9 @@ sub emit_roledefs {
 EOF
 	for (@{$_->{'roles'}}) {
 	    my $desc = escape_as_cstr $_->{'desc'};
+	    my $enabled = $_->{'enabled'}? "true": "false";
 	    print <<EOF;
-		{ true, "$_->{'name'}", "$desc" },
+		{ $enabled, "$_->{'name'}", "$desc" },
 EOF
 	}
 

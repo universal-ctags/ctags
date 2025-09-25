@@ -1,0 +1,8 @@
+x	input.nft	/^table inet x {$/;"	t	family:inet
+user123	input.nft	/^	counter user123 {$/;"	C	table:inet.x
+user321	input.nft	/^	counter user321 {$/;"	C	table:inet.x
+user123	input.nft	/^	quota user123 {$/;"	Q	table:inet.x
+user124	input.nft	/^	quota user124 {$/;"	Q	table:inet.x
+y	input.nft	/^	set y {$/;"	s	table:inet.x
+test	input.nft	/^	map test {$/;"	m	table:inet.x
+y	input.nft	/^	chain y {$/;"	c	table:inet.x

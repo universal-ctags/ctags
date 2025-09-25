@@ -1,0 +1,13 @@
+./inet-filter.nft	input.nft	/^include ".\/inet-filter.nft"$/;"	R
+./inet-nat.nft	input.nft	/^include ".\/inet-nat.nft"$/;"	R
+./netdev-ingress.nft	input.nft	/^include ".\/netdev-ingress.nft"$/;"	R
+./ipv4-filter.nft	input.nft	/^include ".\/ipv4-filter.nft"$/;"	R
+./ipv4-mangle.nft	input.nft	/^include ".\/ipv4-mangle.nft"$/;"	R
+./ipv4-nat.nft	input.nft	/^include ".\/ipv4-nat.nft"$/;"	R
+./ipv4-raw.nft	input.nft	/^include ".\/ipv4-raw.nft"$/;"	R
+./ipv6-filter.nft	input.nft	/^include ".\/ipv6-filter.nft"$/;"	R
+./ipv6-mangle.nft	input.nft	/^include ".\/ipv6-mangle.nft"$/;"	R
+./ipv6-nat.nft	input.nft	/^include ".\/ipv6-nat.nft"$/;"	R
+./ipv6-raw.nft	input.nft	/^include ".\/ipv6-raw.nft"$/;"	R
+./arp-filter.nft	input.nft	/^include ".\/arp-filter.nft"$/;"	R
+./bridge-filter.nft	input.nft	/^include ".\/bridge-filter.nft"$/;"	R

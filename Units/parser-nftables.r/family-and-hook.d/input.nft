@@ -1,0 +1,89 @@
+# nft list hooks
+family ip {
+	hook prerouting {
+		-0000000400 ipv4_conntrack_defrag [nf_defrag_ipv4]
+		-0000000300 ipt_do_table [ip_tables]
+		-0000000200 ipv4_conntrack_in [nf_conntrack]
+		-0000000150 iptable_mangle_hook [iptable_mangle]
+		-0000000140 chain inet firewalld mangle_PREROUTING [nf_tables]
+		-0000000100 nf_nat_ipv4_pre_routing [nf_nat]
+		+0000000010 chain inet firewalld filter_PREROUTING [nf_tables]
+	}
+	hook input {
+		-0000000150 iptable_mangle_hook [iptable_mangle]
+		 0000000000 ipt_do_table [ip_tables]
+		+0000000010 chain inet firewalld filter_INPUT [nf_tables]
+		+0000000050 ipt_do_table [ip_tables]
+		+0000000100 nf_nat_ipv4_local_in [nf_nat]
+		+2147483647 nf_confirm [nf_conntrack]
+	}
+	hook forward {
+		-0000000225 selinux_ip_forward
+		-0000000150 iptable_mangle_hook [iptable_mangle]
+		 0000000000 chain ip libvirt_network forward [nf_tables]
+		 0000000000 ipt_do_table [ip_tables]
+		+0000000010 chain inet firewalld filter_FORWARD [nf_tables]
+		+0000000050 ipt_do_table [ip_tables]
+	}
+	hook output {
+		-0000000400 ipv4_conntrack_defrag [nf_defrag_ipv4]
+		-0000000300 ipt_do_table [ip_tables]
+		-0000000225 selinux_ip_output
+		-0000000200 ipv4_conntrack_local [nf_conntrack]
+		-0000000150 iptable_mangle_hook [iptable_mangle]
+		-0000000100 nf_nat_ipv4_local_fn [nf_nat]
+		 0000000000 ipt_do_table [ip_tables]
+		+0000000010 chain inet firewalld filter_OUTPUT [nf_tables]
+		+0000000050 ipt_do_table [ip_tables]
+	}
+	hook postrouting {
+		-0000000150 iptable_mangle_hook [iptable_mangle]
+		+0000000100 nf_nat_ipv4_out [nf_nat]
+		+0000000225 selinux_ip_postroute
+		+2147483647 nf_confirm [nf_conntrack]
+	}
+}
+family ip6 {
+	hook prerouting {
+		-0000000400 ipv6_defrag [nf_defrag_ipv6]
+		-0000000300 ip6t_do_table [ip6_tables]
+		-0000000200 ipv6_conntrack_in [nf_conntrack]
+		-0000000150 ip6table_mangle_hook [ip6table_mangle]
+		-0000000140 chain inet firewalld mangle_PREROUTING [nf_tables]
+		-0000000100 nf_nat_ipv6_in [nf_nat]
+		+0000000010 chain inet firewalld filter_PREROUTING [nf_tables]
+	}
+	hook input {
+		-0000000150 ip6table_mangle_hook [ip6table_mangle]
+		 0000000000 ip6t_do_table [ip6_tables]
+		+0000000010 chain inet firewalld filter_INPUT [nf_tables]
+		+0000000050 ip6t_do_table [ip6_tables]
+		+0000000100 nf_nat_ipv6_local_in [nf_nat]
+		+2147483646 nf_confirm [nf_conntrack]
+	}
+	hook forward {
+		-0000000225 selinux_ip_forward
+		-0000000150 ip6table_mangle_hook [ip6table_mangle]
+		 0000000000 chain ip6 libvirt_network forward [nf_tables]
+		 0000000000 ip6t_do_table [ip6_tables]
+		+0000000010 chain inet firewalld filter_FORWARD [nf_tables]
+		+0000000050 ip6t_do_table [ip6_tables]
+	}
+	hook output {
+		-0000000400 ipv6_defrag [nf_defrag_ipv6]
+		-0000000300 ip6t_do_table [ip6_tables]
+		-0000000225 selinux_ip_output
+		-0000000200 ipv6_conntrack_local [nf_conntrack]
+		-0000000150 ip6table_mangle_hook [ip6table_mangle]
+		-0000000100 nf_nat_ipv6_local_fn [nf_nat]
+		 0000000000 ip6t_do_table [ip6_tables]
+		+0000000010 chain inet firewalld filter_OUTPUT [nf_tables]
+		+0000000050 ip6t_do_table [ip6_tables]
+	}
+	hook postrouting {
+		-0000000150 ip6table_mangle_hook [ip6table_mangle]
+		+0000000100 nf_nat_ipv6_out [nf_nat]
+		+0000000225 selinux_ip_postroute
+		+2147483647 nf_confirm [nf_conntrack]
+	}
+}

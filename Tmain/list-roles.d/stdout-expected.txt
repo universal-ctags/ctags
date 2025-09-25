@@ -90,6 +90,8 @@ Make                    I/makefile        included           on      included
 Make                    I/makefile        optional           on      optionally included
 Meson                   m/module          imported           on      imported
 NSIS                    i/script          included           on      included with !include
+Nftables                R/ruleset         included           on      included ruleset
+Nftables                f/family          referenced         off     referenced somehow
 Perl                    M/module          unused             on      specified in `no' built-in function
 Perl                    M/module          used               on      specified in `use' built-in function
 Perl                    h/heredoc         endmarker          on      end marker
@@ -238,6 +240,8 @@ Make                    I/makefile        included           on      included
 Make                    I/makefile        optional           on      optionally included
 Meson                   m/module          imported           on      imported
 NSIS                    i/script          included           on      included with !include
+Nftables                R/ruleset         included           on      included ruleset
+Nftables                f/family          referenced         off     referenced somehow
 Perl                    M/module          unused             on      specified in `no' built-in function
 Perl                    M/module          used               on      specified in `use' built-in function
 Perl                    h/heredoc         endmarker          on      end marker

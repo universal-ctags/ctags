@@ -1,0 +1,54 @@
+#!/usr/sbin/nft -f
+
+# This example file shows how to use sets and maps in the nftables framework.
+# This script is meant to be loaded with `nft -f <file>`
+# For up-to-date information please visit https://wiki.nftables.org
+
+# symbolic anonymous set definition built from symbolic singleton definitions
+define int_if1	 = eth0
+define int_if2	 = eth1
+define int_ifs	 = { $int_if1, $int_if2 }
+
+define ext_if1	 = eth2
+define ext_if2	 = eth3
+define ext_ifs	 = { $ext_if1, $ext_if2 }
+
+# recursive symbolic anonymous set definition
+define local_ifs = { $int_ifs, $ext_ifs }
+
+# symbolic anonymous set definition
+define tcp_ports = { ssh, domain, https, 123-125 }
+
+delete table filter
+table filter {
+	# named set of type iface_index
+	set local_ifs {
+		type iface_index
+	}
+
+	# named map of type iface_index : ipv4_addr
+	map nat_map {
+		type iface_index : ipv4_addr
+	}
+
+	map jump_map {
+		type iface_index : verdict
+	}
+
+	chain input_1 { counter; }
+	chain input_2 { counter; }
+	chain input {
+		type filter hook input priority 0
+
+		# symbolic anonymous sets
+		meta iif $local_ifs tcp dport $tcp_ports counter
+
+		# literal anonymous set
+		meta iif { eth0, eth1 } counter
+
+		meta iif @local_ifs counter
+		meta iif vmap @jump_map
+
+		#meta iif vmap { eth0 : jump input1, eth1 : jump input2 }
+	}
+}
