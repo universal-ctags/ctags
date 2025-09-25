@@ -20,6 +20,11 @@ JavaScript:
       member of a class is static.
     * Class member names prefixed with # are recognized as private.
 
+C#:
+
+    * Fix a bug that prevents the parser from extracting methods
+	  if the method has nullable parameters.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:

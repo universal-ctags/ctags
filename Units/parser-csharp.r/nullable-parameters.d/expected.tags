@@ -1,0 +1,2 @@
+Foo	input.cs	/^public class Foo$/;"	c
+Bar	input.cs	/^    public void Bar(decimal? p)$/;"	m	class:Foo	signature:(decimal? p)
