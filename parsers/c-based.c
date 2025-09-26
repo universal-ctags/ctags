@@ -2385,6 +2385,14 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 					++depth;
 				break;
 
+			case '?':
+				if (isInputLanguage (Lang_csharp))
+				{
+					/* C# uses '?' at the end of type name for
+					 * representing nullable parameter. */
+					break;
+				}
+				/* FALLTHROUGH */
 			default:
 				if (c == '@' && (isInputLanguage (Lang_d) || isInputLanguage (Lang_java)))
 				{

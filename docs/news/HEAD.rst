@@ -15,9 +15,15 @@ Incompatible changes
 Parser related changes
 ---------------------------------------------------------------------
 JavaScript:
-* A new field "properties" was added to indicate that a field or
-  member of a class is static.
-* Class member names prefixed with # are recognized as private.
+
+    * A new field "properties" was added to indicate that a field or
+      member of a class is static.
+    * Class member names prefixed with # are recognized as private.
+
+C#:
+
+    * Fix a bug that prevents the parser from extracting methods
+	  if the method has nullable parameters.
 
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
