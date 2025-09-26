@@ -16,22 +16,22 @@ z  emit a tag having an empty string
 Z  don't emit a tag having an empty string
 
 # list kinds-full
-#LETTER NAME                                      ENABLED REFONLY NROLES MASTER DESCRIPTION
-        no letter                                 yes     no      0      NONE   kind with no letter
-B       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   beginning of an area for a guest
-E       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   end of an area for a guest
-L       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   kind with no long name
-N       nothingSpecial                            yes     no      0      NONE   emit a normal tag
-Q       quit                                      yes     no      0      NONE   stop the parsing
-R       rolesDisabled                             no      yes     2      NONE   emit a tag with multi roles(disabled by default)
-Z       dontEmitNullTag                           yes     no      0      NONE   don't emit a tag having an empty string
-b       broken tag                                yes     no      1      NONE   name with unwanted characters
-d       disabled                                  no      no      2      NONE   a kind disabled by default
-e       enabled                                   yes     no      2      NONE   a kind enabled by default
-f       fieldMaker                                yes     no      0      NONE   tag for testing field:
-n       triggerNotice                             yes     no      0      NONE   trigger notice output
-r       roles                                     yes     yes     4      NONE   emit a tag with multi roles
-z       emitNullTag                               yes     no      0      NONE   emit a tag having an empty string
+#LETTER NAME                                      ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+        no letter                                 yes     no      0      NONE     0 kind with no letter
+B       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE     0 beginning of an area for a guest
+E       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE     0 end of an area for a guest
+L       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE     0 kind with no long name
+N       nothingSpecial                            yes     no      0      NONE     0 emit a normal tag
+Q       quit                                      yes     no      0      NONE     0 stop the parsing
+R       rolesDisabled                             no      yes     2      NONE     0 emit a tag with multi roles(disabled by default)
+Z       dontEmitNullTag                           yes     no      0      NONE     0 don't emit a tag having an empty string
+b       broken tag                                yes     no      1      NONE     0 name with unwanted characters
+d       disabled                                  no      no      2      NONE     0 a kind disabled by default
+e       enabled                                   yes     no      2      NONE     0 a kind enabled by default
+f       fieldMaker                                yes     no      0      NONE     0 tag for testing field:
+n       triggerNotice                             yes     no      0      NONE     0 trigger notice output
+r       roles                                     yes     yes     4      NONE     0 emit a tag with multi roles
+z       emitNullTag                               yes     no      0      NONE     0 emit a tag having an empty string
 
 # +K
 abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	no letter

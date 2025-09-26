@@ -39,36 +39,41 @@ CXX_COMMON_HEADER_ROLES(C);
 static roleDefinition CXXHeaderRoles [] = {
 		RoleTemplateSystem,
 		RoleTemplateLocal,
-		{ true, "imported", "imported with \"imported ...\"" },
-		{ true, "exported", "exported with \"exported imported ...\"" },
+		{ true, "imported", "imported with \"imported ...\"",
+		  .version = 2 },
+		{ true, "exported", "exported with \"exported imported ...\"",
+		  .version = 2 },
 };
 CXX_COMMON_HEADER_ROLES(CUDA);
 
 /* Currently V parser wants these items. */
-#define RoleTemplateForeignDecl { true, "foreigndecl", "declared in foreign languages" }
+#define RoleTemplateForeignDecl(V) { true, "foreigndecl", "declared in foreign languages", .version = V }
 
 #define CXX_COMMON_FUNCTION_ROLES(__langPrefix) \
 	static roleDefinition __langPrefix##FunctionRoles [] = { \
-		RoleTemplateForeignDecl, \
+		RoleTemplateForeignDecl(1), \
 	}
 
 CXX_COMMON_FUNCTION_ROLES(C);
 
 #define CXX_COMMON_STRUCT_ROLES(__langPrefix) \
 	static roleDefinition __langPrefix##StructRoles [] = { \
-		RoleTemplateForeignDecl, \
+		RoleTemplateForeignDecl(1), \
 	}
 
 CXX_COMMON_STRUCT_ROLES(C);
 
 static roleDefinition CXXModuleRoles [] = {
 
-	{ true, "partOwner", "used for specifying a partition" },
-	{ true, "imported", "imported with \"imported ...\"" },
+	{ true, "partOwner", "used for specifying a partition",
+	  .version = 2 },
+	{ true, "imported", "imported with \"imported ...\"",
+	  .version = 2 },
 };
 
 static roleDefinition CXXPartitionRoles [] = {
-	{ true, "imported", "imported with \"imported ...\"" },
+	{ true, "imported", "imported with \"imported ...\"",
+	  .version = 2 },
 };
 
 #define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription, _syncWith, FUNC_ROLES, STRUCT_ROLES) \
@@ -111,9 +116,11 @@ static kindDefinition g_aCXXCPPKinds [] = {
 	{ false, 'U', "using",      "using namespace statements" },
 	{ false, 'Z', "tparam",     "template parameters" },
 	{ true,  'M', "module",     "modules",
-			.referenceOnly = false, ATTACH_ROLES(CXXModuleRoles) },
+			.referenceOnly = false, ATTACH_ROLES(CXXModuleRoles),
+			.version = 2 },
 	{ true,  'P', "partition",  "partitions",
-			.referenceOnly = false, ATTACH_ROLES(CXXPartitionRoles) },
+			.referenceOnly = false, ATTACH_ROLES(CXXPartitionRoles),
+			.version = 2 },
 };
 
 static kindDefinition g_aCXXCUDAKinds [] = {
@@ -139,11 +146,13 @@ static const char * g_aCXXAccessStrings [] = {
 	}, { \
 		.name = "section", \
 		.description = "the place where the object is placed", \
-		.enabled = false \
+		.enabled = false, \
+		.version = 1 \
 	}, { \
 		.name = "alias", \
 		.description = "the name of the alias target specified in __attribute__((alias(...)))", \
-		.enabled = false \
+		.enabled = false, \
+		.version = 1 \
 	}
 
 static fieldDefinition g_aCXXCFields [] = {

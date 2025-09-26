@@ -56,7 +56,8 @@ static kindDefinition PowerShellKinds[COUNT_KIND] = {
 	{ true, 'c', "class",		"classes" },
 	{ true, 'i', "filter",		"filter" },
 	{ true, 'g', "enum",		"enum names" },
-	{ true, 'e', "enumlabel",	"enum labels" },
+	{ true, 'e', "enumlabel",	"enum labels",
+	  .version = 1 },
 };
 
 

@@ -1,2 +1,3 @@
-#LETTER NAME     DESCRIPTION
--       _refonly use this kind reference tags only
+#LETTER NAME            DESCRIPTION
+-       version=VERSION in which version of the parser this kind is added
+-       _refonly        use this kind reference tags only

@@ -159,7 +159,8 @@ static roleDefinition SystemVerilogModuleRoles [] = {
 
 static kindDefinition VerilogKinds [] = {
  { true, 'c', "constant",	"constants (parameter, specparam)" },
- { true, 'd', "define",		"text macros" },
+ { true, 'd', "define",		"text macros",
+   .version = 1 },
  { true, 'e', "event",		"events" },
  { true, 'f', "function",	"functions" },
  { true, 'm', "module",		"modules",
@@ -174,7 +175,8 @@ static kindDefinition VerilogKinds [] = {
 
 static kindDefinition SystemVerilogKinds [] = {
  { true, 'c', "constant",	"constants (parameter, specparam, enum values)" },
- { true, 'd', "define",		"text macros" },
+ { true, 'd', "define",		"text macros",
+   .version = 1 },
  { true, 'e', "event",		"events" },
  { true, 'f', "function",	"functions" },
  { true, 'm', "module",		"modules",
