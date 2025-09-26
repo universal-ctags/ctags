@@ -221,6 +221,7 @@ typedef enum {
 
 typedef enum {
 	CXXTagFUNCTIONRoleFOREIGNDECL,
+	CXXTagFUNCTIONRoleFOREIGNCALL,
 } CXXTagCFunctionRole;
 
 typedef enum {
