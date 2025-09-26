@@ -880,6 +880,13 @@ process_token:
 //
 static bool cxxParserParseBlockFull(bool bExpectClosingBracket, bool bExported)
 {
+	g_cxx.iNestingLevels++;
+	if(g_cxx.iNestingLevels > CXX_PARSER_MAXIMUM_NESTING_LEVELS)
+	{
+		CXX_DEBUG_LEAVE_TEXT("Nesting level grown too much: something nasty is going on");
+		return false;
+	}
+
 	cxxSubparserNotifyEnterBlock ();
 
 	cppPushExternalParserBlock();
@@ -887,6 +894,7 @@ static bool cxxParserParseBlockFull(bool bExpectClosingBracket, bool bExported)
 	cppPopExternalParserBlock();
 
 	cxxSubparserNotifyLeaveBlock ();
+	g_cxx.iNestingLevels--;
 
 	return bRet;
 }

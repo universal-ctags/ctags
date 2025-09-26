@@ -1,0 +1,4 @@
+foo	input.cxx	/^void foo(void) {$/;"	f	typeref:typename:void
+bar	input-0.cxx	/^void bar(void) {}$/;"	f	typeref:typename:void
+v1	input-0.cxx	/^  int v1[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[/;"	v	typeref:typename:int
+baz	input-1.cxx	/^void baz(void) {}$/;"	f	typeref:typename:void
