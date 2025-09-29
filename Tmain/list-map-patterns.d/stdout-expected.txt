@@ -1,8 +1,10 @@
 ## all|grep LdScript
 #LANGUAGE          PATTERN
 LdScript           *.lds.S
+LdScript           *.ld.S
 LdScript           ld.script
 ## LdScript
 #PATTERN
 *.lds.S
+*.ld.S
 ld.script
