@@ -935,7 +935,7 @@ extern parserDefinition* LdScriptParser (void)
 
 	/* lds.S must be here because Asm parser registers .S as an extension.
 	 * ld.script is used in linux/arch/mips/boot/compressed/ld.script. */
-	static const char *const patterns [] = { "*.lds.S", "ld.script", NULL };
+	static const char *const patterns [] = { "*.lds.S", "*.ld.S", "ld.script", NULL };
 
 	/* Emacs's mode */
 	static const char *const aliases [] = { "ld-script", NULL };
