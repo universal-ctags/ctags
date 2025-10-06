@@ -252,14 +252,66 @@ Instead, you should write them to a .ctags file.
   marker ``}}`` must be at the beginning of line. If you break the
   rule, the optlib loader of ctags fails to read your file.
 
-``--_prelude-<LANG>`` is for specified code fragments run at the
+``--_prelude-<LANG>`` is for specified code fragments running at the
 beginning of parsing a source file. You can use this option for
 defining the common code used in the parser.
 
-``--_sequel-<LANG>`` is for for specified code fragments run at the end
-of parser a source file. You can use this option for debug-printing
-the final state of parsing the source file.
-e.g. ``--_sequel-Foo={{ _traced { pstack } if }}``.
+``--_sequel-<LANG>`` is for for specified code fragments running at the end
+of parser a source file. Other than clean-up operations, the typical
+use case of this option is for filling ``end:`` field of the tags
+ctags found at the end of the input file.
+
+Consider the following input, written in a Python-like pseudocode:
+.. code-blcok::
+
+	...
+	def fun(args)
+		...
+	EOF
+
+You can make a tag with ``--regex-PseudoLang=/^def[ \t]+([a-f]+)/\1/d/``.
+However, there was no way to fill the ``end:`` field of ``f``.
+Here ``--_sequel-<LANG>`` option comes in. ctas runs the code fragment
+specified with the option after reaching the end of input.
+
+.. code-block:: ctags
+	--langdef=PseudoLang
+	--map-PseudoLang=.ppp
+	--kinddef-PseudoLang=d,def,definitions
+	--regex-PseudoLang=/^def[ \t]+([a-f]+)/\1/d/{{
+		% New definition
+		% Let's fill end: field of the tags on the stack
+		count 0 gt {
+			% Push the the line number (currentLine) of the tag (currentTag)
+			% just extracted.
+			. :line
+			% The last tag extracted before extracting currentTag ends
+			% at currentLine - 1.  (lastLine)
+			1 sub
+			% Fill the end: field with the lastLine.
+			end:
+		} if
+		% push the currentTag
+		.
+		% Unless more `def` is found, we have no chance to fill
+		% the end: field of the currentTag. but ...
+	}}
+	--_sequel-PseudoLang={{
+		% this option gives the chance to fill the field.
+		count 0 gt {
+			. :line end:
+		} if
+	}}
+
+``.`` in ``--_sequel-<LANG>`` code fragment is a placeholder tag.
+ctags makes the placeholder tag when executing the code fragment
+implicitly. The placeholder tag is only for providing the line number
+of the end of input file. You can get the line number with
+``. :line``.
+
+You can also use this option for debug-printing the final state of
+parsing the source file.  e.g. ``--_sequel-Foo={{ _traced { pstack }
+if }}``.
 
 ``--_list-operators`` lists all operators (and built-in procedures)
 and exits. In additions to operators defined in  ``optscript``,

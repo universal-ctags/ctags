@@ -2241,7 +2241,16 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
 {
+	/* Push a placeholder tag representing the end of input file.
+	 * From .ctags code, you can refer the placeholder tag with ".".
+	 * The typical code pattern is ". :line":, pushing the line
+	 * number of the last line of the input file.
+	 */
+	int index = makePlaceholder ("EndOfInput");
+	optscriptSetup (optvm, lcb->local_dict, index);
 	scriptEvalHook (optvm, lcb, SCRIPT_HOOK_SEQUEL);
+	optscriptTeardown (optvm, lcb->local_dict);
+
 	unsigned int garbage;
 	if ((garbage = opt_vm_ostack_count (optvm)) > 0)
 		error (WARNING, "[%s] %u objects are left on the operand stack: %s",
