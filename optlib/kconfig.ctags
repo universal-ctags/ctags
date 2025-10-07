@@ -50,32 +50,97 @@
 --_extradef-Kconfig=configPrefixed,prepend CONFIG_ to config names
 --extras-Kconfig=+{configPrefixed}
 
---_sequel-Kconfg={{ clear }}
+# Fill end: field of the tags remaining on the stack.
+--_sequel-Kconfg={{
+   {
+      count 0 gt {
+         % ...tag:int
+         . :line end:
+      } {
+         exit
+      } ifelse
+   } loop
+}}
 
 # skip the comment lines.
 --regex-Kconfig=/^[ \t]*#.*$//{placeholder}
 
 --regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$/\2/c/{scope=ref}{{
-   clear
+   count 0 gt {
+      . :line 1 gt {
+        dup . :line 1 sub end:
+      } if
+      clear
+   } if
    .
 }}
 --regex-Kconfig=/^[ \t]*(def_)?(bool|boolean|hex|int|string|tristate)\>///{exclusive}{{
    count 0 gt {
-         \2 typeref:
-         clear
+         dup :typeref {
+            pop
+            % already the field is filled. Do nothing.
+         } {
+            dup \2 typeref:
+         } ifelse
    } if
 }}
 --regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$/CONFIG_\2/c/{scope=ref}{_extra=configPrefixed}
 --regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$/CONFIG_\2_MODULE/c/{scope=ref}{_extra=configPrefixed}{exclusive}
 
 --regex-Kconfig=/^[ \t]*menu[ \t]+"([^"]+)"[ \t]*(#.*)?$/\1/m/{scope=push}{exclusive}
---regex-Kconfig=/^[ \t]*endmenu[ \t]*(#.*)?$//{scope=pop}{placeholder}{exclusive}
+--regex-Kconfig=/^[ \t]*(endmenu)[ \t]*(#.*)?$//{scope=pop}{placeholder}{exclusive}{{
+   {
+      count 0 gt {
+         _scopetop {
+            % ... config:tag scope:tag
+            1 index
+            % ... config:tag scope:tag config:tag
+            :line exch
+            :line
+            % ... config:tag config-line:int scope-line:int
+            gt {
+               % ... config:tag
+               @1 _matchloc2line dup 1 gt {1 sub} if
+               % ... config:tag endline:int
+               end:
+               % ...
+            } {
+               % ... config:tag
+               exit
+            }  ifelse
+         } if
+      } {
+         exit
+      } ifelse
+   } loop
+}}
 
 # Qemu's Kconfig does't use double quotes
---regex-Kconfig=/^[ \t]*source[ \t]+"?([^"]+)"?[ \t]*(#.*)?$/\1/k/{_role=source}{exclusive}{scope=ref}
+--regex-Kconfig=/^[ \t]*source[ \t]+"?([^"]+)"?[ \t]*(#.*)?$/\1/k/{_role=source}{exclusive}{scope=ref}{{
+   count 0 gt {
+      . :line 1 gt {
+        dup . :line 1 sub end:
+      } if
+      clear
+   } if
+}}
 
---regex-Kconfig=/^[ \t]*choice[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$/\1/C/{scope=push}{exclusive}
---regex-Kconfig=/^[ \t]*choice[ \t]*(#.*)?$//C/{_anonymous=choice}{scope=push}{exclusive}
+--regex-Kconfig=/^[ \t]*choice[ \t]+([A-Za-z0-9_]+)[ \t]*(#.*)?$/\1/C/{scope=push}{exclusive}{{
+   count 0 gt {
+      . :line 1 gt {
+        dup . :line 1 sub end:
+      } if
+      clear
+   } if
+}}
+--regex-Kconfig=/^[ \t]*choice[ \t]*(#.*)?$//C/{_anonymous=choice}{scope=push}{exclusive}{{
+   count 0 gt {
+      . :line 1 gt {
+        dup . :line 1 sub end:
+      } if
+      clear
+   } if
+}}
 --regex-Kconfig=/^[ \t]*prompt[ \t]+"([^"]+)"[ \t]*(#.*|if)?//{exclusive}{{
    _scopetop {
       dup :kind /choice eq {
@@ -101,7 +166,32 @@
        } ifelse
    } if
 }}
---regex-Kconfig=/^[ \t]*endchoice[ \t]*(#.*)?$//{scope=pop}{placeholder}{exclusive}
+--regex-Kconfig=/^[ \t]*(endchoice)[ \t]*(#.*)?$//{scope=pop}{placeholder}{exclusive}{{
+   {
+      count 0 gt {
+         _scopetop {
+            % ... config:tag scope:tag
+            1 index
+            % ... config:tag scope:tag config:tag
+            :line exch
+            :line
+            % ... config:tag config-line:int scope-line:int
+            gt {
+               % ... config:tag
+               @1 _matchloc2line dup 1 gt {1 sub} if
+               % ... config:tag endline:int
+               end:
+               % ...
+            } {
+               % ... config:tag
+               exit
+            }  ifelse
+         } if
+      } {
+         exit
+      } ifelse
+   } loop
+}}
 
 --regex-Kconfig=/^[ \t]*mainmenu[ \t]+"([^"]+)"[ \t]*(#.*)?$/\1/M/{exclusive}
 
