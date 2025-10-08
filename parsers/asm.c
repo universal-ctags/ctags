@@ -306,13 +306,16 @@ static int makeAsmTag (
 			case K_NONE:
 				break;
 			case K_MACRO:
-				r = makeAsmSimpleTag (operator, kind_for_directive, useCpp);
-				macro_tag = getEntryInCorkQueue (r);
-				if (macro_tag)
+				if (!vStringIsEmpty (operator))
 				{
-					macro_tag->extensionFields.scopeIndex = *macroScope;
-					registerEntry (r);
-					*macroScope = r;
+					r = makeAsmSimpleTag (operator, kind_for_directive, useCpp);
+					macro_tag = getEntryInCorkQueue (r);
+					if (macro_tag)
+					{
+						macro_tag->extensionFields.scopeIndex = *macroScope;
+						registerEntry (r);
+						*macroScope = r;
+					}
 				}
 				break;
 			case K_PSUEDO_MACRO_END:
@@ -326,11 +329,13 @@ static int makeAsmTag (
 				break;
 			case K_PSUEDO_FOREIGN_LD_SCRIPT_SYMBOL:
 			case K_PSUEDO_FOREIGN_LD_SCRIPT_SECTION:
-				r = makeTagForLdScript (vStringValue (operator),
-										kind_for_directive, sectionScope, useCpp);
+				if (!vStringIsEmpty (operator))
+					r = makeTagForLdScript (vStringValue (operator),
+											kind_for_directive, sectionScope, useCpp);
 				break;
 			default:
-				r = makeAsmSimpleTag (operator, kind_for_directive, useCpp);
+				if (!vStringIsEmpty (operator))
+					r = makeAsmSimpleTag (operator, kind_for_directive, useCpp);
 				break;
 			}
 		}

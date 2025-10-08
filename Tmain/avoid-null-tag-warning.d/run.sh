@@ -10,3 +10,5 @@ V=
 
 echo '# no warning should be printed' 1>&2
 $CTAGS --quiet --options=NONE -o - input.sql
+$CTAGS --quiet --options=NONE -o - input-0.sql
+$CTAGS --quiet --options=NONE -o - input.asm
