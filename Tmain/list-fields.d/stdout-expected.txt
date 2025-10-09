@@ -72,6 +72,7 @@ z	kind	no	NONE	s--	no	r-	0	[tags output] prepend "kind:" to k/ (or K/) field out
 -	parameter	no	SystemVerilog	--b	no	--	0	parameter whose value can be overridden.
 -	target	yes	Thrift	s--	no	--	0	the target language specified at "namespace"
 -	throws	yes	Thrift	s--	no	--	0	throws list of function
+-	properties	no	TypeScript	s--	no	--	1	properties (static)
 -	architecture	yes	VHDL	s--	no	--	0	architecture designing the entity
 -	parameter	no	Verilog	--b	no	--	0	parameter whose value can be overridden.
 #

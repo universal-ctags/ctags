@@ -54,5 +54,6 @@ x       UCTAGSxpath          no      NONE             s--    no    --   0 xpath 
 -       UCTAGSparameter      no      SystemVerilog    --b    no    --   0 parameter whose value can be overridden.
 -       UCTAGStarget         yes     Thrift           s--    no    --   0 the target language specified at "namespace"
 -       UCTAGSthrows         yes     Thrift           s--    no    --   0 throws list of function
+-       UCTAGSproperties     no      TypeScript       s--    no    --   1 properties (static)
 -       UCTAGSarchitecture   yes     VHDL             s--    no    --   0 architecture designing the entity
 -       UCTAGSparameter      no      Verilog          --b    no    --   0 parameter whose value can be overridden.
