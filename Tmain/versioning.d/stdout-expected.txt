@@ -1,0 +1,68 @@
+parser/TEST: 10.9
+#LETTER NAME  ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+d       def   yes     no      0      NONE     6 definitions
+m       macro yes     no      2      NONE     3 macros
+#KIND(L/N) NAME     ENABLED VER DESCRIPTION
+m/macro    expanded on        4 expanded macros
+m/macro    redef    on        5 redefinied macros
+#LETTER NAME  ENABLED LANGUAGE JSTYPE FIXED OP VER DESCRIPTION
+-       local no      TEST     s--    no    --   6 used in narrow scopes
+-       param no      TEST     s--    no    --   4 parameters
+#LETTER NAME      ENABLED LANGUAGE FIXED VER DESCRIPTION
+-       fullname  no      TEST     no      9 extended full name
+-       shortname no      TEST     no     10 the named only narow scopes
+About TEST language
+=======================================================
+enabled: yes
+version: 10.9
+
+Mappings/patterns
+-------------------------------------------------------
+ MYTEST
+
+Mappings/extensions
+-------------------------------------------------------
+ *.mytest
+
+Aliases
+-------------------------------------------------------
+#ALIAS
+my-test
+
+Kinds
+-------------------------------------------------------
+#LETTER NAME  ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+d       def   yes     no      0      NONE     6 definitions
+m       macro yes     no      2      NONE     3 macros
+
+Roles
+-------------------------------------------------------
+#KIND(L/N) NAME     ENABLED VER DESCRIPTION
+m/macro    expanded on        4 expanded macros
+m/macro    redef    on        5 redefinied macros
+
+Fields
+-------------------------------------------------------
+#LETTER NAME  ENABLED LANGUAGE JSTYPE FIXED OP VER DESCRIPTION
+-       local no      TEST     s--    no    --   6 used in narrow scopes
+-       param no      TEST     s--    no    --   4 parameters
+
+Extras
+-------------------------------------------------------
+#LETTER NAME      ENABLED LANGUAGE FIXED VER DESCRIPTION
+-       fullname  no      TEST     no      9 extended full name
+-       shortname no      TEST     no     10 the named only narow scopes
+
+Parameters
+-------------------------------------------------------
+#NAME  DESCRIPTION
+debug  enable the debug features
+
+Sub parsers stacked on this parser
+-------------------------------------------------------
+#NAME    BASEPARSER DIRECTIONS
+EXAMINE  TEST       base => sub {shared}
+
+Implementation specific status
+-------------------------------------------------------
+allow null tags: no

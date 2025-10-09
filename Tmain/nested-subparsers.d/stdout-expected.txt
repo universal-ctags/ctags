@@ -33,39 +33,39 @@ n  name
 #
 # list kinds-full C
 #
-#LETTER NAME       ENABLED REFONLY NROLES MASTER DESCRIPTION
-D       macroparam no      no      0      C      parameters inside macro definitions
-L       label      no      no      0      C      goto labels
-d       macro      yes     no      2      C      macro definitions
-e       enumerator yes     no      0      C      enumerators (values inside an enumeration)
-f       function   yes     no      1      C      function definitions
-g       enum       yes     no      0      C      enumeration names
-h       header     yes     yes     2      C      included header files
-l       local      no      no      0      C      local variables
-m       member     yes     no      0      C      struct, and union members
-p       prototype  no      no      0      C      function prototypes
-s       struct     yes     no      1      C      structure names
-t       typedef    yes     no      0      C      typedefs
-u       union      yes     no      0      C      union names
-v       variable   yes     no      0      C      variable definitions
-x       externvar  no      no      0      C      external and forward variable declarations
-z       parameter  no      no      0      C      function parameters inside function or prototype definitions
+#LETTER NAME       ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+D       macroparam no      no      0      C        0 parameters inside macro definitions
+L       label      no      no      0      C        0 goto labels
+d       macro      yes     no      2      C        0 macro definitions
+e       enumerator yes     no      0      C        0 enumerators (values inside an enumeration)
+f       function   yes     no      1      C        0 function definitions
+g       enum       yes     no      0      C        0 enumeration names
+h       header     yes     yes     2      C        0 included header files
+l       local      no      no      0      C        0 local variables
+m       member     yes     no      0      C        0 struct, and union members
+p       prototype  no      no      0      C        0 function prototypes
+s       struct     yes     no      1      C        0 structure names
+t       typedef    yes     no      0      C        0 typedefs
+u       union      yes     no      0      C        0 union names
+v       variable   yes     no      0      C        0 variable definitions
+x       externvar  no      no      0      C        0 external and forward variable declarations
+z       parameter  no      no      0      C        0 function parameters inside function or prototype definitions
 #
 # list kinds-full Event
 #
-#LETTER NAME  ENABLED REFONLY NROLES MASTER DESCRIPTION
-e       event yes     no      0      NONE   events
+#LETTER NAME  ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+e       event yes     no      0      NONE     0 events
 #
 # list kinds-full Hook
 #
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-h       hook yes     no      0      NONE   hooks
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+h       hook yes     no      0      NONE     0 hooks
 #
 # list kinds-full Plugin
 #
-#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-f       File yes     no      0      NONE   files
-n       name yes     no      0      NONE   name
+#LETTER NAME ENABLED REFONLY NROLES MASTER VER DESCRIPTION
+f       File yes     no      0      NONE     0 files
+n       name yes     no      0      NONE     0 name
 C only
 main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
 
