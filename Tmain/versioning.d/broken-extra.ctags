@@ -1,0 +1,2 @@
+--langdef=TEST{version=10.9}
+--_extradef-TEST=fullname,extended full name{version=-4}

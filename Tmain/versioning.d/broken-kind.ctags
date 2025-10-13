@@ -1,0 +1,2 @@
+--langdef=TEST{version=10.9}
+--kinddef-TEST=d,def,definitions{version=-1}
