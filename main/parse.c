@@ -2287,11 +2287,11 @@ static void pre_lang_def_flag_version_long (const char* const optflag CTAGS_ATTR
 	*age = '\0';
 	age++;
 
-	if (!strToUInt (verstr, 10, &flag_data->versionCurrent))
+	if (!isdigit((unsigned char)*verstr) || !strToUInt (verstr, 10, &flag_data->versionCurrent))
 		error (FATAL, "Faile to parse the version number (the current part) for language \"%s\": %s",
 			   flag_data->name, param);
 
-	if (!strToUInt (age, 10, &flag_data->versionAge))
+	if (!isdigit((unsigned char)*age) || !strToUInt (age, 10, &flag_data->versionAge))
 		error (FATAL, "Faile to parse the version number (the age part) for language \"%s\": %s",
 			   flag_data->name, param);
 
