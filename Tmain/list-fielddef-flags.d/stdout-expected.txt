@@ -1,3 +1,0 @@
-#LETTER NAME            DESCRIPTION
--       datatype=TYPE   acceptable datatype of the field (str|bool|int|str+bool)
--       version=VERSION in which version of the parser this field is added
