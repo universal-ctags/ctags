@@ -1,79 +1,79 @@
-#LETTER	NAME	ENABLED	LANGUAGE	JSTYPE	FIXED	OP	DESCRIPTION
-N	name	yes	NONE	s--	yes	rw	tag name
-F	input	yes	NONE	s--	yes	r-	input file
-P	pattern	yes	NONE	s-b	yes	--	pattern
-C	compact	no	NONE	s--	no	--	compact input line (used only in xref output)
-E	extras	no	NONE	s--	no	r-	Extra tag type information
-K	NONE	no	NONE	s--	no	--	Kind of tag in long-name form
-R	NONE	no	NONE	s--	no	--	Marker (R or D) representing whether tag is definition or reference
-S	signature	no	NONE	s--	no	rw	Signature of routine (e.g. prototype or parameter list)
-T	epoch	yes	NONE	-i-	no	--	the last modified time of the input file (only for F/file kind tag)
-Z	scope	no	NONE	s--	no	rw	[tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
-a	access	no	NONE	s--	no	rw	Access (or export) of class members
-e	end	no	NONE	-i-	no	rw	end lines of various items
-f	file	yes	NONE	--b	no	--	File-restricted scoping
-i	inherits	no	NONE	s-b	no	-w	Inheritance information
-k	NONE	yes	NONE	s--	no	--	Kind of tag in one-letter form
-l	language	no	NONE	s--	no	r-	Language of input file containing tag
-m	implementation	no	NONE	s--	no	--	Implementation information
-n	line	no	NONE	-i-	no	rw	Line number of tag definition
-o	nth	no	NONE	-i-	no	--	the order in the parent scope
-p	scopeKind	no	NONE	s--	no	--	[tags output] no effect, [xref and json output] kind of scope in long-name form
-r	roles	no	NONE	s--	no	r-	Roles
-s	NONE	yes	NONE	s--	no	--	[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope
-t	typeref	yes	NONE	s--	no	rw	Type and name of a variable or typedef
-x	xpath	no	NONE	s--	no	--	xpath for the tag
-z	kind	no	NONE	s--	no	r-	[tags output] prepend "kind:" to k/ (or K/) field output, [xref and json output] kind in long-name form
--	properties	yes	Asm	s--	no	--	properties (req, vararg for parameters)
--	properties	no	AutoIt	s--	no	--	properties (static, volatile, ...)
--	alias	no	C	s--	no	--	the name of the alias target specified in __attribute__((alias(...)))
--	macrodef	no	C	s--	no	--	macro definition
--	properties	no	C	s--	no	--	properties (static, inline, mutable, export,...)
--	section	no	C	s--	no	--	the place where the object is placed
--	alias	no	C++	s--	no	--	the name of the alias target specified in __attribute__((alias(...)))
--	captures	no	C++	s--	no	--	lambda capture list
--	macrodef	no	C++	s--	no	--	macro definition
--	name	yes	C++	s--	no	--	aliased names
--	properties	no	C++	s--	no	--	properties (static, inline, mutable, export,...)
--	section	no	C++	s--	no	--	the place where the object is placed
--	specialization	no	C++	s--	no	--	template specialization parameters
--	template	no	C++	s--	no	--	template parameters
--	macrodef	no	CPreProcessor	s--	no	--	macro definition
--	alias	no	CUDA	s--	no	--	the name of the alias target specified in __attribute__((alias(...)))
--	macrodef	no	CUDA	s--	no	--	macro definition
--	properties	no	CUDA	s--	no	--	properties (static, inline, mutable, export,...)
--	section	no	CUDA	s--	no	--	the place where the object is placed
--	moduleName	yes	Elm	s--	no	--	actual name of renamed module
--	definer	yes	EmacsLisp	s--	no	--	the name of the function or macro that defines the unknown/Y-kind object
--	annotations	yes	GDScript	s--	no	--	annotations on functions and variables
--	howImported	no	Go	s--	no	--	how the package is imported ("inline" for `.' or "init" for `_')
--	package	yes	Go	s--	no	--	the real package specified by the package name
--	packageName	yes	Go	s--	no	--	the name for referring the package
--	implements	yes	Inko	s--	no	rw	Trait being implemented
--	properties	no	JavaScript	s--	no	--	properties (static)
--	assignment	yes	LdScript	s--	no	--	how a value is assigned to the symbol
--	definer	yes	Lisp	s--	no	--	the name of the function or macro that defines the unknown/Y-kind object
--	sectionMarker	no	Markdown	s--	no	--	character used for declaring section(#, ##, =, or -)
--	wrapping	yes	Moose	s--	no	--	how a wrapper wrapping the method (around, after, or before)
--	langid	yes	NSIS	s--	no	--	language identifier specified in (License)LangString commands
--	category	yes	ObjectiveC	s--	no	--	category attached to the class
--	protocols	yes	ObjectiveC	s--	no	--	protocols that the class (or category) confirms to
--	home	yes	Passwd	s--	no	rw	home directory
--	shell	yes	Passwd	s--	no	rw	login shell
--	decorators	no	Python	s--	no	--	decorators on functions and classes
--	nameref	yes	Python	s--	no	--	the original name for the tag
--	assignmentop	no	R	s--	no	--	operator for assignment
--	constructor	yes	R	s--	no	--	function used for making value assigned to the nameattr tag
--	overline	no	ReStructuredText	--b	no	--	whether using overline & underline for declaring section
--	sectionMarker	no	ReStructuredText	s--	no	--	character used for declaring section
--	mixin	yes	Ruby	s--	no	--	how the class or module is mixed in (mixin:HOW:MODULE)
--	module	yes	SCSS	s--	no	rw	the name of module behind the namespace
--	definer	yes	Scheme	s--	no	--	the name of the function or macro that defines the unknown/Y-kind object
--	parameter	no	SystemVerilog	--b	no	--	parameter whose value can be overridden.
--	target	yes	Thrift	s--	no	--	the target language specified at "namespace"
--	throws	yes	Thrift	s--	no	--	throws list of function
--	architecture	yes	VHDL	s--	no	--	architecture designing the entity
--	parameter	no	Verilog	--b	no	--	parameter whose value can be overridden.
+#LETTER	NAME	ENABLED	LANGUAGE	JSTYPE	FIXED	OP	VER	DESCRIPTION
+N	name	yes	NONE	s--	yes	rw	0	tag name
+F	input	yes	NONE	s--	yes	r-	0	input file
+P	pattern	yes	NONE	s-b	yes	--	0	pattern
+C	compact	no	NONE	s--	no	--	0	compact input line (used only in xref output)
+E	extras	no	NONE	s--	no	r-	0	Extra tag type information
+K	NONE	no	NONE	s--	no	--	0	Kind of tag in long-name form
+R	NONE	no	NONE	s--	no	--	0	Marker (R or D) representing whether tag is definition or reference
+S	signature	no	NONE	s--	no	rw	0	Signature of routine (e.g. prototype or parameter list)
+T	epoch	yes	NONE	-i-	no	--	0	the last modified time of the input file (only for F/file kind tag)
+Z	scope	no	NONE	s--	no	rw	0	[tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
+a	access	no	NONE	s--	no	rw	0	Access (or export) of class members
+e	end	no	NONE	-i-	no	rw	0	end lines of various items
+f	file	yes	NONE	--b	no	--	0	File-restricted scoping
+i	inherits	no	NONE	s-b	no	-w	0	Inheritance information
+k	NONE	yes	NONE	s--	no	--	0	Kind of tag in one-letter form
+l	language	no	NONE	s--	no	r-	0	Language of input file containing tag
+m	implementation	no	NONE	s--	no	--	0	Implementation information
+n	line	no	NONE	-i-	no	rw	0	Line number of tag definition
+o	nth	no	NONE	-i-	no	--	0	the order in the parent scope
+p	scopeKind	no	NONE	s--	no	--	0	[tags output] no effect, [xref and json output] kind of scope in long-name form
+r	roles	no	NONE	s--	no	r-	0	Roles
+s	NONE	yes	NONE	s--	no	--	0	[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope
+t	typeref	yes	NONE	s--	no	rw	0	Type and name of a variable or typedef
+x	xpath	no	NONE	s--	no	--	0	xpath for the tag
+z	kind	no	NONE	s--	no	r-	0	[tags output] prepend "kind:" to k/ (or K/) field output, [xref and json output] kind in long-name form
+-	properties	yes	Asm	s--	no	--	0	properties (req, vararg for parameters)
+-	properties	no	AutoIt	s--	no	--	0	properties (static, volatile, ...)
+-	alias	no	C	s--	no	--	1	the name of the alias target specified in __attribute__((alias(...)))
+-	macrodef	no	C	s--	no	--	0	macro definition
+-	properties	no	C	s--	no	--	0	properties (static, inline, mutable, export,...)
+-	section	no	C	s--	no	--	1	the place where the object is placed
+-	alias	no	C++	s--	no	--	1	the name of the alias target specified in __attribute__((alias(...)))
+-	captures	no	C++	s--	no	--	0	lambda capture list
+-	macrodef	no	C++	s--	no	--	0	macro definition
+-	name	yes	C++	s--	no	--	0	aliased names
+-	properties	no	C++	s--	no	--	0	properties (static, inline, mutable, export,...)
+-	section	no	C++	s--	no	--	1	the place where the object is placed
+-	specialization	no	C++	s--	no	--	0	template specialization parameters
+-	template	no	C++	s--	no	--	0	template parameters
+-	macrodef	no	CPreProcessor	s--	no	--	0	macro definition
+-	alias	no	CUDA	s--	no	--	1	the name of the alias target specified in __attribute__((alias(...)))
+-	macrodef	no	CUDA	s--	no	--	0	macro definition
+-	properties	no	CUDA	s--	no	--	0	properties (static, inline, mutable, export,...)
+-	section	no	CUDA	s--	no	--	1	the place where the object is placed
+-	moduleName	yes	Elm	s--	no	--	0	actual name of renamed module
+-	definer	yes	EmacsLisp	s--	no	--	1	the name of the function or macro that defines the unknown/Y-kind object
+-	annotations	yes	GDScript	s--	no	--	0	annotations on functions and variables
+-	howImported	no	Go	s--	no	--	0	how the package is imported ("inline" for `.' or "init" for `_')
+-	package	yes	Go	s--	no	--	0	the real package specified by the package name
+-	packageName	yes	Go	s--	no	--	0	the name for referring the package
+-	implements	yes	Inko	s--	no	rw	0	Trait being implemented
+-	properties	no	JavaScript	s--	no	--	2	properties (static)
+-	assignment	yes	LdScript	s--	no	--	0	how a value is assigned to the symbol
+-	definer	yes	Lisp	s--	no	--	1	the name of the function or macro that defines the unknown/Y-kind object
+-	sectionMarker	no	Markdown	s--	no	--	0	character used for declaring section(#, ##, =, or -)
+-	wrapping	yes	Moose	s--	no	--	0	how a wrapper wrapping the method (around, after, or before)
+-	langid	yes	NSIS	s--	no	--	0	language identifier specified in (License)LangString commands
+-	category	yes	ObjectiveC	s--	no	--	0	category attached to the class
+-	protocols	yes	ObjectiveC	s--	no	--	0	protocols that the class (or category) confirms to
+-	home	yes	Passwd	s--	no	rw	0	home directory
+-	shell	yes	Passwd	s--	no	rw	0	login shell
+-	decorators	no	Python	s--	no	--	0	decorators on functions and classes
+-	nameref	yes	Python	s--	no	--	0	the original name for the tag
+-	assignmentop	no	R	s--	no	--	0	operator for assignment
+-	constructor	yes	R	s--	no	--	0	function used for making value assigned to the nameattr tag
+-	overline	no	ReStructuredText	--b	no	--	0	whether using overline & underline for declaring section
+-	sectionMarker	no	ReStructuredText	s--	no	--	0	character used for declaring section
+-	mixin	yes	Ruby	s--	no	--	0	how the class or module is mixed in (mixin:HOW:MODULE)
+-	module	yes	SCSS	s--	no	rw	1	the name of module behind the namespace
+-	definer	yes	Scheme	s--	no	--	1	the name of the function or macro that defines the unknown/Y-kind object
+-	parameter	no	SystemVerilog	--b	no	--	0	parameter whose value can be overridden.
+-	target	yes	Thrift	s--	no	--	0	the target language specified at "namespace"
+-	throws	yes	Thrift	s--	no	--	0	throws list of function
+-	architecture	yes	VHDL	s--	no	--	0	architecture designing the entity
+-	parameter	no	Verilog	--b	no	--	0	parameter whose value can be overridden.
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/

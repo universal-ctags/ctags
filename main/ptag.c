@@ -317,6 +317,7 @@ extern void printPtags (bool withListHeader, bool machinable, FILE *fp)
 {
 	struct colprintTable *table = colprintTableNew ("L:NAME",
 													"L:ENABLED",
+													"R:VER",
 													"L:DESCRIPTION",
 													NULL);
 	for (unsigned int i = 0; i < PTAG_COUNT; i++)
@@ -326,6 +327,7 @@ extern void printPtags (bool withListHeader, bool machinable, FILE *fp)
 		colprintLineAppendColumnCString (line, ptagDescs[i].enabled
 										 ? "on"
 										 : "off");
+		colprintLineAppendColumnVersion (line, ptagDescs[i].version);
 		colprintLineAppendColumnCString (line, ptagDescs[i].description);
 	}
 

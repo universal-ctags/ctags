@@ -103,9 +103,15 @@ extern parserDefinition* PkgConfigParser (void)
 	};
 
 	static roleDefinition PkgConfigPkgRoleTable [] = {
-		{ true, "required", "required" },
-		{ true, "provided", "provided" },
-		{ true, "conflicted", "confliected" },
+		{
+		  true, "required", "required",
+		},
+		{
+		  true, "provided", "provided",
+		},
+		{
+		  true, "conflicted", "conflicted",
+		},
 	};
 	static kindDefinition PkgConfigKindTable [] = {
 		{

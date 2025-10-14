@@ -1052,6 +1052,13 @@ Listing Options
 		The name of language if the extra is owned by a parser.
 		``NONE`` means the extra is common in parsers.
 
+	VER
+		The ctags output version introducing the extra for a language-independent
+		extra, or the parser version introducing the extra for a
+		language-specified extra. See the ``--version`` option and
+		``TAG_OUTPUT_VERSION`` in :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the ctags output
+		version.
+
 	DESCRIPTION
 		Human readable description for the extra.
 
@@ -1097,6 +1104,13 @@ Listing Options
 	OP
 		How this field can be accessed from optscript code.
 		This field is for Universal Ctags developers.
+
+	VER
+		The ctags output version introducing the field for a language-independent
+		field, or the parser version introducing the field for a
+		language-specified field. See the ``--version`` option and
+		``TAG_OUTPUT_VERSION`` in :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the ctags output
+		version.
 
 	DESCRIPTION
 		Human readable description for the field.
@@ -1191,6 +1205,9 @@ Listing Options
 
 		.. TODO: need a reference to "master parser"
 
+	VER
+		The parser version introducing the kind.
+
 	DESCRIPTION
 		Human readable description for the kind.
 
@@ -1280,6 +1297,9 @@ Listing Options
 	ENABLED
 		Whether the kind is enabled or not. It takes ``yes`` or ``no``.
 
+	VER
+		The parser version introducing the role.
+
 	DESCRIPTION
 		Human readable description for the role.
 
@@ -1301,6 +1321,9 @@ Listing Options
 
 Miscellaneous Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``--describe-language=<language>``
+	Prints the various aspects of the parser implementing the language.
 
 ``--help``
 	Prints to standard output a detailed usage description, and then exits.

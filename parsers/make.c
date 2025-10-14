@@ -66,6 +66,7 @@ static xtagDefinition MakeXtagTable [] = {
 		.enabled = false,
 		.name = "CppDef",
 		.description = "Include FOO in -DFOO as as a name of CPreProcessor macro",
+		.version = 1,
 	}
 };
 

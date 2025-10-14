@@ -37,11 +37,13 @@ typedef enum {
 static fieldDefinition ClojureFields[] = {
 	{ .name = "definer",
 	  .description = "the name of the function or macro that defines the unknown/Y-kind object",
-	  .enabled = true },
+	  .enabled = true,
+	  .version = 1 },
 };
 
 static kindDefinition ClojureKinds[] = {
-	{ true, 'Y', "unknown", "unknown type of definitions" },
+	{ true, 'Y', "unknown", "unknown type of definitions",
+	  .version = 1 },
 	{ true, 'f', "function", "functions" },
 	{ true, 'n', "namespace", "namespaces" },
 };

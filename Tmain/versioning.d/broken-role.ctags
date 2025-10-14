@@ -1,0 +1,3 @@
+--langdef=TEST{version=10.9}
+--kinddef-TEST=m,macro,macros{version=3}
+--_roledef-TEST.{macro}=expanded,expanded macros{version=-2}

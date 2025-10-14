@@ -1,0 +1,23 @@
+langdef-flags:
+#LETTER NAME                  DESCRIPTION
+-       base=BASEPARSER       utilize as a base parser
+-       bidirectional         utilize the base parser both 'dedicated' and 'shared' way
+-       dedicated             make the base parser dedicated to this subparser
+-       shared                share the base parser with the other subparsers
+-       version=CURRENT.AGE   set the version of the parser
+-       _autoFQTag            make full qualified tags automatically based on scope information
+-       _foreignLanguage=LANG initialize another parser
+fielddef-flags:
+#LETTER NAME            DESCRIPTION
+-       datatype=TYPE   acceptable datatype of the field (str|bool|int|str+bool)
+-       version=VERSION in which version of the parser this field is added
+kinddef-flags:
+#LETTER NAME            DESCRIPTION
+-       version=VERSION in which version of the parser this kind is added
+-       _refonly        use this kind reference tags only
+roledef-flags:
+#LETTER NAME            DESCRIPTION
+-       version=VERSION in which version of the parser this role is added
+extradef-flags:
+#LETTER NAME            DESCRIPTION
+-       version=VERSION in which version of the parser this extra is added

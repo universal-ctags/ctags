@@ -48,7 +48,9 @@ extern parserDefinition* KconfigParser (void)
 	};
 
 	static roleDefinition KconfigKconfigRoleTable [] = {
-		{ true, "source", "kconfig file loaded with source directive" },
+		{
+		  true, "source", "kconfig file loaded with source directive",
+		},
 	};
 	static kindDefinition KconfigKindTable [] = {
 		{
@@ -69,6 +71,7 @@ extern parserDefinition* KconfigParser (void)
 		},
 		{
 		  true, 'v', "variable", "macro variables",
+		  .version = 1,
 		},
 	};
 	static xtagDefinition KconfigXtagTable [] = {

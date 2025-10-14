@@ -9,6 +9,15 @@ parsers.
 New and extended options and their flags
 ---------------------------------------------------------------------
 
+New option: ``--describe-language=<language>``
+
+    Prints the various aspects of the parser implementing the language.
+
+New column, VER in the output of --list-{kinds-full,roles,fields,extras,pseudo-tags} options
+
+    Indicates the versions of ctags output (or the parser) introducing the
+    item in the list.
+
 Incompatible changes
 ---------------------------------------------------------------------
 

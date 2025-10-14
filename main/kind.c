@@ -196,6 +196,12 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 	kcb->kind [def->id].rcb = allocRoleControlBlock(kcb->kind + def->id);
 	kcb->kind [def->id].dynamicSeparators = NULL;
 
+	if (def->version > getLanguageVersionCurrent (kcb->owner))
+		error (WARNING, "the version number (%u) of kind \"%c,%s\" of language \"%s\" "
+			   "should be less than or equal to the current number (%u) of the language",
+			   def->version, def->letter, def->name, getLanguageName (kcb->owner),
+			   getLanguageVersionCurrent (kcb->owner));
+
 	verbose ("Add kind[%d] \"%c,%s,%s\" to %s\n", def->id,
 			 def->letter, def->name, def->description,
 			 getLanguageName (kcb->owner));
@@ -220,6 +226,20 @@ extern int defineRole (struct kindControlBlock* kcb, int kindIndex,
 
 	rcb->role = xRealloc (rcb->role, rcb->count, roleObject);
 	initRoleObject (rcb->role + roleIndex, def, freeRoleDef, roleIndex);
+
+	if (def->version > getLanguageVersionCurrent (kcb->owner))
+		error (WARNING, "the version number (%u) of role \"%s\" of language \"%s\" "
+			   "should be less than or equal to the current number (%u) of the language",
+			   def->version, def->name, getLanguageName (kcb->owner),
+			   getLanguageVersionCurrent (kcb->owner));
+	kindDefinition * kdef = getKind (kcb, kindIndex);
+	if (kdef->version > def->version)
+		error (WARNING, "the version number (%u) of role \"%s\" in kind \"%c,%s\" of language \"%s\" "
+			   "should be greater than or equal to the version number (%u) of its kind",
+			   def->version, def->name,
+			   kdef->letter, kdef->name,
+			   getLanguageName (kcb->owner),
+			   kdef->version);
 
 	return roleIndex;
 }
@@ -526,7 +546,7 @@ extern struct colprintTable * kindColprintTableNew (void)
 {
 	return colprintTableNew ("L:LANGUAGE", "L:LETTER", "L:NAME", "L:ENABLED",
 							 "L:REFONLY", "L:NROLES", "L:MASTER",
-							 "L:DESCRIPTION",
+							 "R:VER", "L:DESCRIPTION",
 							 NULL);
 }
 
@@ -547,6 +567,7 @@ static void kindColprintFillLine (struct colprintLine *line,
 	colprintLineAppendColumnCString (line, (kdef->master
 											|| kdef->slave ) ?
 									 getLanguageName (kdef->syncWith): RSV_NONE);
+	colprintLineAppendColumnVersion (line, kdef->version);
 	colprintLineAppendColumnCString (line, kdef->description? kdef->description: "NO DESCRIPTION GIVEN");
 }
 
@@ -595,7 +616,7 @@ extern void kindColprintTablePrint (struct colprintTable *table, bool noparser,
 extern struct colprintTable * roleColprintTableNew (void)
 {
 	return colprintTableNew ("L:LANGUAGE", "L:KIND(L/N)", "L:NAME",
-							 "L:ENABLED", "L:DESCRIPTION", NULL);
+							 "L:ENABLED", "R:VER", "L:DESCRIPTION", NULL);
 }
 
 extern void roleColprintAddRoles (struct colprintTable *table, struct kindControlBlock *kcb,
@@ -653,6 +674,7 @@ extern void roleColprintAddRoles (struct colprintTable *table, struct kindContro
 					colprintLineAppendColumnCString (line, r->name);
 					colprintLineAppendColumnCString (line,
 													 r->enabled ? "on" : "off");
+					colprintLineAppendColumnVersion (line, r->version);
 					colprintLineAppendColumnCString (line, r->description);
 				}
 				if (! (!kname && *c == KIND_WILDCARD_LETTER))

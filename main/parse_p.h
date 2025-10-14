@@ -35,6 +35,7 @@ typedef enum {
 	LMAP_EXTENSION = 1 << 1,
 	LMAP_ALL       = LMAP_PATTERN | LMAP_EXTENSION,
 	LMAP_TABLE_OUTPUT = 1 << 2,
+	LMAP_NO_LANG_PREFIX = 1 << 3,
 } langmapType;
 
 enum parserCategory
@@ -128,8 +129,10 @@ extern void printLanguageParams (const langType language,
 								 bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageSubparsers (const langType language,
 									 bool withListHeader, bool machinable, FILE *fp);
+extern void printExtradefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp);
+extern void printRoledefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern void printFielddefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);

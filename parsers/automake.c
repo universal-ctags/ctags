@@ -94,7 +94,8 @@ static kindDefinition AutomakeKinds [] = {
 	  .referenceOnly = true, ATTACH_ROLES(AutomakeConditionRoles) },
 	{ true, 's', "subdir", "subdirs" },
 	{ false,'p', "pseudodir", "placeholder for EXTRA_, noinst_, and _check_ prefixed primaries (internal use)",
-	  .referenceOnly = true, ATTACH_ROLES(AutomakePseudodirRoles)},
+	  .referenceOnly = true, ATTACH_ROLES(AutomakePseudodirRoles),
+	  .version = 1 },
 };
 
 typedef enum {
@@ -106,6 +107,7 @@ static xtagDefinition AutomakeXtagTable [] = {
 		.enabled = true,
 		.name = "canonicalizedName",
 		.description = "Include canonicalized object name like libctags_a",
+		.version = 1
 	},
 };
 

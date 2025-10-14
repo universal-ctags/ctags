@@ -1,0 +1,20 @@
+ctags: Failed to parse the version number (the current part) for language "TEST": a.9
+ctags: Failed to parse the version number (the age part) for language "TEST": 10.b
+ctags: Failed to parse the version number (the current part) for language "TEST": -1.9
+ctags: Failed to parse the version number (the age part) for language "TEST": 10.-3
+ctags: Failed to parse the version number for kind "def": -1
+broken kind: 1
+ctags: Failed to parse the version number for role "expanded": -2
+broken role: 1
+ctags: Failed to parse the version number for field "param": -3
+broken field: 1
+ctags: Failed to parse the version number for extra "fullname": -4
+broken extra: 1
+ctags: Warning: the version number (11) of kind "d,def" of language "TEST" should be less than or equal to the current number (10) of the language
+warning kind: 0
+ctags: Warning: the version number (11) of role "expanded" of language "TEST" should be less than or equal to the current number (10) of the language
+warning role: 0
+ctags: Warning: the version number (11) of field "param" of language "TEST" should be less than or equal to the current number (10) of the language
+warning field: 0
+ctags: Warning: the version number (11) of extra "fullname" of language "TEST" should be less than or equal to the current number (10) of the language
+warning extra: 0

@@ -34,7 +34,7 @@
 --kinddef-PkgConfig=p,pkg,packages
 --_roledef-PkgConfig.{pkg}=required,required
 --_roledef-PkgConfig.{pkg}=provided,provided
---_roledef-PkgConfig.{pkg}=conflicted,confliected
+--_roledef-PkgConfig.{pkg}=conflicted,conflicted
 --kinddef-PkgConfig=v,var,variabels
 
 --_extradef-PkgConfig=guessedFromFileName,the guessed package name of the .pc file

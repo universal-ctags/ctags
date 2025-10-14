@@ -1,0 +1,20 @@
+--langdef=TEST{version=10.9}
+--map-TEST=+.mytest
+--map-TEST=+(MYTEST)
+--alias-TEST=+my-test
+
+--kinddef-TEST=d,def,definitions{version=6}
+--kinddef-TEST=m,macro,macros{version=3}
+--_roledef-TEST.{macro}=expanded,expanded macros{version=4}
+--_roledef-TEST.{macro}=redef,redefinied macros{version=5}
+
+--_fielddef-TEST=param,parameters{version=4}
+--_fielddef-TEST=local,used in narrow scopes{version=6}
+
+--_extradef-TEST=fullname,extended full name{version=9}
+--_extradef-TEST=shortname,the named only narow scopes{version=10}
+
+
+--_paramdef-TEST=debug,enable the debug features
+
+--langdef=EXAMINE{base=TEST}{shared}

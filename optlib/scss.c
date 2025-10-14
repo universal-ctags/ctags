@@ -201,7 +201,10 @@ extern parserDefinition* SCSSParser (void)
 	};
 
 	static roleDefinition SCSSModuleRoleTable [] = {
-		{ true, "used", "used" },
+		{
+		  true, "used", "used",
+		  .version = 1,
+		},
 	};
 	static kindDefinition SCSSKindTable [] = {
 		{
@@ -227,10 +230,12 @@ extern parserDefinition* SCSSParser (void)
 		},
 		{
 		  true, 'n', "namespace", "namespaces",
+		  .version = 1,
 		},
 		{
 		  true, 'M', "module", "modules",
 		  ATTACH_ROLES(SCSSModuleRoleTable),
+		  .version = 1,
 		},
 	};
 	static fieldDefinition SCSSFieldTable [] = {
@@ -242,6 +247,7 @@ extern parserDefinition* SCSSParser (void)
 		  .isValueAvailable = isValueAvailableGeneric,
 		  .getValueObject = getFieldValueGeneric,
 		  .setValueObject = setFieldValueGeneric,
+		  .version     = 1,
 		},
 	};
 

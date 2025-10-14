@@ -18,6 +18,7 @@
 #include "options_p.h"
 
 #include <string.h>
+#include <ctype.h>
 
 #include "ctags.h"
 #include "debug.h"
@@ -2282,17 +2283,17 @@ static void pre_lang_def_flag_version_long (const char* const optflag CTAGS_ATTR
 	char * verstr = eStrdup (param);
 	char * age = strchr(verstr, '.');
 	if (!age)
-		error (FATAL, "Faile to parse the version number ('.') for language \"%s\": %s",
+		error (FATAL, "Failed to parse the version number ('.') for language \"%s\": %s",
 			   flag_data->name, param);
 	*age = '\0';
 	age++;
 
-	if (!strToUInt (verstr, 10, &flag_data->versionCurrent))
-		error (FATAL, "Faile to parse the version number (the current part) for language \"%s\": %s",
+	if (!isdigit((unsigned char)*verstr) || !strToUInt (verstr, 10, &flag_data->versionCurrent))
+		error (FATAL, "Failed to parse the version number (the current part) for language \"%s\": %s",
 			   flag_data->name, param);
 
-	if (!strToUInt (age, 10, &flag_data->versionAge))
-		error (FATAL, "Faile to parse the version number (the age part) for language \"%s\": %s",
+	if (!isdigit((unsigned char)*age) || !strToUInt (age, 10, &flag_data->versionAge))
+		error (FATAL, "Failed to parse the version number (the age part) for language \"%s\": %s",
 			   flag_data->name, param);
 
 	eFree (verstr);
@@ -2695,9 +2696,21 @@ static void pre_kind_def_flag_refonly_long (const char* const optflag,
 	kdef->referenceOnly = true;
 }
 
+static void pre_kind_def_flag_version_long (const char* const optflag,
+											const char* const param, void* data)
+{
+	kindDefinition *kdef = data;
+
+	if (!isdigit((unsigned char)*param) || !strToUInt (param, 10, &kdef->version))
+		error (FATAL, "Failed to parse the version number for kind \"%s\": %s",
+			   kdef->name, param);
+}
+
 static flagDefinition PreKindDefFlagDef [] = {
 	{ '\0', "_refonly", NULL, pre_kind_def_flag_refonly_long,
 	  NULL, "use this kind reference tags only"},
+	{ '\0', "version",  NULL, pre_kind_def_flag_version_long,
+	  "VERSION", "in which version of the parser this kind is added"},
 };
 
 static bool processLangDefineKind(const langType language,
@@ -2823,6 +2836,21 @@ static void freeRdef (roleDefinition *rdef)
 	eFree (rdef);
 }
 
+static void pre_role_def_flag_version_long (const char* const optflag,
+											const char* const param, void* data)
+{
+	roleDefinition *rdef = data;
+
+	if (!isdigit((unsigned char)*param) || !strToUInt (param, 10, &rdef->version))
+		error (FATAL, "Failed to parse the version number for role \"%s\": %s",
+			   rdef->name, param);
+}
+
+static flagDefinition PreRoleDefFlagDef [] = {
+	{ '\0', "version",  NULL, pre_role_def_flag_version_long,
+	  "VERSION", "in which version of the parser this role is added"},
+};
+
 static bool processLangDefineRole(const langType language,
 								  const char *const kindSpec,
 								  const char *const option,
@@ -2919,7 +2947,7 @@ static bool processLangDefineRole(const langType language,
 	rdef->name = name;
 	rdef->description = description;
 
-	flagsEval (flags, NULL, 0, rdef);
+	flagsEval (flags, PreRoleDefFlagDef, ARRAY_SIZE (PreRoleDefFlagDef), rdef);
 
 	defineRole (parser->kindControlBlock, kdef->id, rdef, freeRdef);
 
@@ -3734,7 +3762,8 @@ static void printMaps (const langType language, langmapType type)
 	unsigned int i;
 
 	parser = LanguageTable + language;
-	printf ("%-8s", parser->def->name);
+	if (! (LMAP_NO_LANG_PREFIX & type))
+		printf ("%-8s", parser->def->name);
 	if (parser->currentPatterns != NULL && (type & LMAP_PATTERN))
 		for (i = 0  ;  i < stringListCount (parser->currentPatterns)  ;  ++i)
 			printf (" %s", vStringValue (
@@ -3952,6 +3981,21 @@ static void xtagDefinitionDestroy (xtagDefinition *xdef)
 	eFree (xdef);
 }
 
+static void pre_xtag_def_flag_version_long (const char* const optflag,
+											const char* const param, void* data)
+{
+	xtagDefinition *xdef = data;
+
+	if (!isdigit((unsigned char)*param) || !strToUInt (param, 10, &xdef->version))
+		error (FATAL, "Failed to parse the version number for extra \"%s\": %s",
+			   xdef->name, param);
+}
+
+static flagDefinition PreXtagDefFlagDef [] = {
+	{ '\0', "version",  NULL, pre_xtag_def_flag_version_long,
+	  "VERSION", "in which version of the parser this extra is added"},
+};
+
 static bool processLangDefineExtra (const langType language,
 									const char *const option,
 									const char *const parameter)
@@ -3995,7 +4039,7 @@ static bool processLangDefineExtra (const langType language,
 	xdef->isEnabled = NULL;
 	DEFAULT_TRASH_BOX(xdef, xtagDefinitionDestroy);
 
-	flagsEval (flags, NULL, 0, xdef);
+	flagsEval (flags, PreXtagDefFlagDef, ARRAY_SIZE (PreXtagDefFlagDef), xdef);
 
 	defineXtag (xdef, language);
 
@@ -4042,9 +4086,22 @@ static void field_def_flag_datatype_long (const char *const optflag CTAGS_ATTR_U
 		error (FATAL, "unknown datatype for field \"%s\": \"%s\"", fdef->name, param);
 }
 
+static void field_def_flag_version_long (const char *const optflag CTAGS_ATTR_UNUSED,
+										 const char* const param,
+										 void *data)
+{
+	fieldDefinition *fdef = data;
+
+	if (!isdigit((unsigned char)*param) || !strToUInt (param, 10, &fdef->version))
+		error (FATAL, "Failed to parse the version number for field \"%s\": %s",
+			   fdef->name, param);
+}
+
 static flagDefinition FieldDefFlagDef [] = {
 	{ '\0', "datatype", NULL, field_def_flag_datatype_long,
-	  "TYPE", "acceaptable datatype of the field (str|bool|int|str+bool)" },
+	  "TYPE", "acceptable datatype of the field (str|bool|int|str+bool)" },
+	{ '\0', "version",  NULL, field_def_flag_version_long,
+	  "VERSION", "in which version of the parser this field is added"},
 };
 
 static bool processLangDefineField (const langType language,
@@ -5404,7 +5461,9 @@ extern void printLanguageSubparsers (const langType language,
 
 defineSimplePrintFLagsFunction(Langdef, PreLangDefFlagDef);
 defineSimplePrintFLagsFunction(Kinddef, PreKindDefFlagDef);
+defineSimplePrintFLagsFunction(Roledef, PreRoleDefFlagDef);
 defineSimplePrintFLagsFunction(Fielddef, FieldDefFlagDef);
+defineSimplePrintFLagsFunction(Extradef, PreXtagDefFlagDef);
 
 extern void printLanguageMultitableStatistics (langType language)
 {
