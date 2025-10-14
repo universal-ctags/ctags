@@ -95,7 +95,7 @@ Nftables                f/family          referenced         off     referenced 
 Perl                    M/module          unused             on      specified in `no' built-in function
 Perl                    M/module          used               on      specified in `use' built-in function
 Perl                    h/heredoc         endmarker          on      end marker
-PkgConfig               p/pkg             conflicted         on      confliected
+PkgConfig               p/pkg             conflicted         on      conflicted
 PkgConfig               p/pkg             provided           on      provided
 PkgConfig               p/pkg             required           on      required
 Protobuf                D/protodef        imported           on      imported
@@ -245,7 +245,7 @@ Nftables                f/family          referenced         off     referenced 
 Perl                    M/module          unused             on      specified in `no' built-in function
 Perl                    M/module          used               on      specified in `use' built-in function
 Perl                    h/heredoc         endmarker          on      end marker
-PkgConfig               p/pkg             conflicted         on      confliected
+PkgConfig               p/pkg             conflicted         on      conflicted
 PkgConfig               p/pkg             provided           on      provided
 PkgConfig               p/pkg             required           on      required
 Protobuf                D/protodef        imported           on      imported
