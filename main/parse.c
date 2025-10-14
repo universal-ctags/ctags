@@ -4044,7 +4044,7 @@ static void field_def_flag_datatype_long (const char *const optflag CTAGS_ATTR_U
 
 static flagDefinition FieldDefFlagDef [] = {
 	{ '\0', "datatype", NULL, field_def_flag_datatype_long,
-	  "TYPE", "acceaptable datatype of the field (str|bool|int|str+bool)" },
+	  "TYPE", "acceptable datatype of the field (str|bool|int|str+bool)" },
 };
 
 static bool processLangDefineField (const langType language,
