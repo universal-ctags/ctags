@@ -2282,17 +2282,17 @@ static void pre_lang_def_flag_version_long (const char* const optflag CTAGS_ATTR
 	char * verstr = eStrdup (param);
 	char * age = strchr(verstr, '.');
 	if (!age)
-		error (FATAL, "Faile to parse the version number ('.') for language \"%s\": %s",
+		error (FATAL, "Failed to parse the version number ('.') for language \"%s\": %s",
 			   flag_data->name, param);
 	*age = '\0';
 	age++;
 
 	if (!isdigit((unsigned char)*verstr) || !strToUInt (verstr, 10, &flag_data->versionCurrent))
-		error (FATAL, "Faile to parse the version number (the current part) for language \"%s\": %s",
+		error (FATAL, "Failed to parse the version number (the current part) for language \"%s\": %s",
 			   flag_data->name, param);
 
 	if (!isdigit((unsigned char)*age) || !strToUInt (age, 10, &flag_data->versionAge))
-		error (FATAL, "Faile to parse the version number (the age part) for language \"%s\": %s",
+		error (FATAL, "Failed to parse the version number (the age part) for language \"%s\": %s",
 			   flag_data->name, param);
 
 	eFree (verstr);

@@ -1,4 +1,4 @@
-ctags: Faile to parse the version number (the current part) for language "TEST": a.9
-ctags: Faile to parse the version number (the age part) for language "TEST": 10.b
-ctags: Faile to parse the version number (the current part) for language "TEST": -1.9
-ctags: Faile to parse the version number (the age part) for language "TEST": 10.-3
+ctags: Failed to parse the version number (the current part) for language "TEST": a.9
+ctags: Failed to parse the version number (the age part) for language "TEST": 10.b
+ctags: Failed to parse the version number (the current part) for language "TEST": -1.9
+ctags: Failed to parse the version number (the age part) for language "TEST": 10.-3
