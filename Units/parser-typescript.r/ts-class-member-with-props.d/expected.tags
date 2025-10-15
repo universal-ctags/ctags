@@ -1,0 +1,7 @@
+C	input.ts	/^class C {$/;"	c
+a	input.ts	/^      a$/;"	p	class:C	access:public
+b	input.ts	/^      protected b;$/;"	p	class:C	access:protected
+c	input.ts	/^      c$/;"	p	class:C	access:public
+d	input.ts	/^      static d;$/;"	p	class:C	access:public	properties:static
+e	input.ts	/^      e$/;"	p	class:C	access:public
+f	input.ts	/^      protected static f;$/;"	p	class:C	access:protected	properties:static

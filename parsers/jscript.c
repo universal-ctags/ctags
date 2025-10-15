@@ -146,7 +146,7 @@ typedef struct sTokenInfo {
 } tokenInfo;
 
 typedef enum {
-	F_STATIC,
+	F_PROPERTIES,
 } jsField;
 
 /*
@@ -545,7 +545,7 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 		e.extensionFields.access = "private";
 
 	if (is_static)
-		attachParserField (&e, JsFields[F_STATIC].ftype, "static");
+		attachParserField (&e, JsFields[F_PROPERTIES].ftype, "static");
 
 #ifdef DO_TRACING
 	{

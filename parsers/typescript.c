@@ -167,6 +167,10 @@ typedef enum {
 	TSTAG_ALIAS
 } tsKind;
 
+typedef enum {
+	F_PROPERTIES,
+} tsField;
+
 typedef struct sTokenInfo {
 	tokenType type;
 	keywordId keyword;
@@ -175,6 +179,7 @@ typedef struct sTokenInfo {
 	unsigned long lineNumber;
 	MIOPos filePosition;
 	keywordId accessKeyword;
+	bool isStatic;
 } tokenInfo;
 
 typedef struct sCommentState {
@@ -188,6 +193,15 @@ typedef struct sBlockState {
 	int nestLevel;
 	int curlyLevel;
 } blockState;
+
+static fieldDefinition TsFields[] = {
+	{
+		.name = "properties",
+		.description = "properties (static)",
+		.enabled = false,
+		.version = 1,
+	},
+};
 
 static const keywordTable TsKeywordTable [] = {
 	/* keyword		  keyword ID */
@@ -294,6 +308,9 @@ static int emitTag(const tokenInfo *const token, const tsKind kind)
 			break;
 	}
 
+	if (token->isStatic)
+		attachParserField (&e, TsFields[F_PROPERTIES].ftype, "static");
+
 	return makeTagEntry (&e);
 }
 
@@ -318,6 +335,7 @@ static void clearPoolToken (void *data)
 	token->scope = CORK_NIL;
 
 	token->accessKeyword = KEYWORD_NONE;
+	token->isStatic      = false;
 
 	token->string = vStringNewOrClear (token->string);
 }
@@ -1687,6 +1705,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 	bool isGenerator = false;
 	bool parsingValue = false;
 	int visibility = 0;
+	bool isStatic = false;
 
 	do
 	{
@@ -1763,6 +1782,16 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 							visibility = token->keyword;
 							parsingValue = false;
 							break;
+						case KEYWORD_static:
+							if (member)
+							{
+								emitTag (member, TSTAG_PROPERTY);
+								deleteToken (member);
+								member = NULL;
+							}
+							isStatic = true;
+							parsingValue = false;
+							break;
 						case KEYWORD_new:
 						case KEYWORD_typeof:
 							parsingValue = true;
@@ -1791,6 +1820,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 						member = NULL;
 						isGenerator = false;
 						visibility = 0;
+						isStatic = false;
 					}
 					parsingValue = false;
 					break;
@@ -1831,6 +1861,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 
 					isGenerator = false;
 					visibility = 0;
+					isStatic = false;
 					parsingValue = false;
 					break;
 				case TOKEN_IDENTIFIER:
@@ -1839,6 +1870,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 						member = newToken ();
 						copyToken (member, token, false);
 						member->scope = scope;
+						member->isStatic = isStatic;
 						if (visibility) member->accessKeyword = visibility;
 						else member->accessKeyword = KEYWORD_public;
 					}
@@ -1849,6 +1881,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 				default:
 					isGenerator = false;
 					visibility = 0;
+					isStatic = false;
 					break;
 			}
 		}
@@ -2122,6 +2155,8 @@ extern parserDefinition *TypeScriptParser (void)
 	def->extensions = extensions;
 	def->kindTable  = TsKinds;
 	def->kindCount  = ARRAY_SIZE (TsKinds);
+	def->fieldTable = TsFields;
+	def->fieldCount = ARRAY_SIZE (TsFields);
 	def->parser     = findTsTags;
 	def->initialize = initialize;
 	def->finalize   = finalize;
@@ -2132,6 +2167,9 @@ extern parserDefinition *TypeScriptParser (void)
 
 	def->initStats = initStats;
 	def->printStats = printStats;
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 
 	return def;
 }
