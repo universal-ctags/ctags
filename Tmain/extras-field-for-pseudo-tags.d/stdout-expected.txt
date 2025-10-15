@@ -23,6 +23,7 @@
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_ROLE_DESCRIPTION!C!function	foreigncall	/called in foreign languages/
 !_TAG_ROLE_DESCRIPTION!C!function	foreigndecl	/declared in foreign languages/
 !_TAG_ROLE_DESCRIPTION!C!header	local	/local header/
 !_TAG_ROLE_DESCRIPTION!C!header	system	/system header/
@@ -54,6 +55,7 @@ main	input.c	/^int main (void) { return 0; }$/
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//;"	extras:pseudo
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/;"	extras:pseudo
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/;"	extras:pseudo
+!_TAG_ROLE_DESCRIPTION!C!function	foreigncall	/called in foreign languages/;"	extras:pseudo
 !_TAG_ROLE_DESCRIPTION!C!function	foreigndecl	/declared in foreign languages/;"	extras:pseudo
 !_TAG_ROLE_DESCRIPTION!C!header	local	/local header/;"	extras:pseudo
 !_TAG_ROLE_DESCRIPTION!C!header	system	/system header/;"	extras:pseudo

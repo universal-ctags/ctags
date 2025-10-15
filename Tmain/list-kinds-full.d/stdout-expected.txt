@@ -3,7 +3,7 @@ D	macroparam	no	no	0	C	0	parameters inside macro definitions
 L	label	no	no	0	C	0	goto labels
 d	macro	yes	no	2	C	0	macro definitions
 e	enumerator	yes	no	0	C	0	enumerators (values inside an enumeration)
-f	function	yes	no	1	C	0	function definitions
+f	function	yes	no	2	C	0	function definitions
 g	enum	yes	no	0	C	0	enumeration names
 h	header	yes	yes	2	C	0	included header files
 l	local	no	no	0	C	0	local variables

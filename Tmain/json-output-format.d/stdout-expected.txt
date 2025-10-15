@@ -83,7 +83,7 @@
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "m,member", "pattern": "class members"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "v,variable", "pattern": "variables"}
 {"_type": "ptag", "name": "TAG_OUTPUT_EXCMD", "path": "mixed", "pattern": "number, pattern, mixed, or combineV2"}
-{"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "C", "path": "1.1", "pattern": "current.age"}
+{"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "C", "path": "2.2", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Go", "path": "0.0", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Man", "path": "0.0", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Python", "path": "1.1", "pattern": "current.age"}
@@ -91,6 +91,7 @@
 {"_type": "ptag", "name": "TAG_PROGRAM_AUTHOR", "path": "Universal Ctags Team", "pattern": ""}
 {"_type": "ptag", "name": "TAG_PROGRAM_NAME", "path": "Universal Ctags", "pattern": "Derived from Exuberant Ctags"}
 {"_type": "ptag", "name": "TAG_PROGRAM_URL", "path": "https://ctags.io/", "pattern": "official site"}
+{"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "function", "path": "foreigncall", "pattern": "called in foreign languages"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "function", "path": "foreigndecl", "pattern": "declared in foreign languages"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "header", "path": "local", "pattern": "local header"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "header", "path": "system", "pattern": "system header"}
