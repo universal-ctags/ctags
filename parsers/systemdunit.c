@@ -16,6 +16,7 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "x-systemdunit.h"
 #include "entry.h"
 #include "x-iniconf.h"
 #include "parse.h"
@@ -29,20 +30,6 @@
 /*
 *   DATA DEFINITIONS
 */
-typedef enum {
-	K_UNIT,
-} systemdUnitKind;
-
-typedef enum {
-	R_UNIT_Requires,
-	R_UNIT_Wants,
-	R_UNIT_After,
-	R_UNIT_Before,
-	R_UNIT_RequiredBy,
-	R_UNIT_WantedBy,
-
-} systemdUnitRole;
-
 static roleDefinition SystemdUnitUnitRoles [] = {
 	{ true, "Requires", "referred in Requires key" },
 	{ true, "Wants", "referred in Wants key" },
@@ -50,6 +37,7 @@ static roleDefinition SystemdUnitUnitRoles [] = {
 	{ true, "Before", "referred in Before key" },
 	{ true, "RequiredBy", "referred in RequiredBy key" },
 	{ true, "WantedBy", "referred in WantedBy key" },
+	{ true, "foreignlang", "referenced in foreign languages", .version = 1 },
 	/* ... */
 };
 
@@ -100,9 +88,9 @@ static void newDataCallback (iniconfSubparser *s CTAGS_ATTR_UNUSED,
 
 	if (isXtagEnabled (XTAG_REFERENCE_TAGS) && value)
 	{
-		r = roleOf (key, K_UNIT);
+		r = roleOf (key, SYSTEMD_UNIT_KIND);
 		if (r >= 0)
-			makeSystemdReferencedUnit (value, K_UNIT, r);
+			makeSystemdReferencedUnit (value, SYSTEMD_UNIT_KIND, r);
 	}
 }
 
@@ -136,5 +124,8 @@ extern parserDefinition* SystemdUnitParser (void)
 	def->extensions = extensions;
 	def->parser     = findSystemdUnitTags;
 	def->useCork    = CORK_QUEUE;
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	return def;
 }

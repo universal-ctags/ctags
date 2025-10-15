@@ -308,6 +308,7 @@ PARSER_HEADS = \
 	parsers/x-r.h \
 	parsers/x-ruby.h \
 	parsers/x-sh.h \
+	parsers/x-systemdunit.h \
 	parsers/x-tcl.h \
 	parsers/x-toml.h \
 	parsers/x-tex.h \

@@ -307,6 +307,7 @@
     <ClCompile Include="..\parsers\cxx\cxx_tag.c" />
     <ClCompile Include="..\parsers\cxx\cxx_token.c" />
     <ClCompile Include="..\parsers\cxx\cxx_token_chain.c" />
+    <ClCompile Include="..\parsers\dbus-service.c" />
     <ClCompile Include="..\parsers\diff.c" />
     <ClCompile Include="..\parsers\dosbatch.c" />
     <ClCompile Include="..\parsers\dtd.c" />
@@ -495,6 +496,7 @@
     <ClInclude Include="..\parsers\x-r.h" />
     <ClInclude Include="..\parsers\x-ruby.h" />
     <ClInclude Include="..\parsers\x-sh.h" />
+    <ClInclude Include="..\parsers\x-systemdunit.h" />
     <ClInclude Include="..\parsers\x-tcl.h" />
     <ClInclude Include="..\parsers\x-tex.h" />
     <ClInclude Include="..\parsers\x-toml.h" />
