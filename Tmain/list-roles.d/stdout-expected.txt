@@ -98,6 +98,7 @@ Perl                    h/heredoc         endmarker          on        0 end mar
 PkgConfig               p/pkg             conflicted         on        0 conflicted
 PkgConfig               p/pkg             provided           on        0 provided
 PkgConfig               p/pkg             required           on        0 required
+Prolog                  m/module          chainElt           off       0 (EXPERIMENTAL)used as an element in a module-qualified atom like module:predicate
 Protobuf                D/protodef        imported           on        0 imported
 Protobuf                m/message         extension          on        0 extending the message
 Python                  Y/unknown         imported           on        0 imported from the other module
@@ -248,6 +249,7 @@ Perl                    h/heredoc         endmarker          on        0 end mar
 PkgConfig               p/pkg             conflicted         on        0 conflicted
 PkgConfig               p/pkg             provided           on        0 provided
 PkgConfig               p/pkg             required           on        0 required
+Prolog                  m/module          chainElt           off       0 (EXPERIMENTAL)used as an element in a module-qualified atom like module:predicate
 Protobuf                D/protodef        imported           on        0 imported
 Protobuf                m/message         extension          on        0 extending the message
 Python                  Y/unknown         imported           on        0 imported from the other module

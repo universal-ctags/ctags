@@ -1,0 +1,12 @@
+unicode_file_name	input.pl	/^unicode_file_name(Name) :-$/;"	predicate	line:44	end:47	arity:1
+unicode_file_name/1	input.pl	/^unicode_file_name(Name) :-$/;"	predicate	line:44	extras:arityAppended	end:47	arity:1
+unicode_file	input.pl	/^unicode_file(mkdir-1) :-                        % create Cyrillic directory$/;"	predicate	line:49	end:58	arity:1
+unicode_file/1	input.pl	/^unicode_file(mkdir-1) :-                        % create Cyrillic directory$/;"	predicate	line:49	extras:arityAppended	end:58	arity:1
+unicode_file	input.pl	/^unicode_file(file-1) :-                         % create Cyrillic file$/;"	predicate	line:59	end:71	arity:1
+unicode_file/1	input.pl	/^unicode_file(file-1) :-                         % create Cyrillic file$/;"	predicate	line:59	extras:arityAppended	end:71	arity:1
+unicode_file	input.pl	/^unicode_file(absfile-1) :-$/;"	predicate	line:72	end:78	arity:1
+unicode_file/1	input.pl	/^unicode_file(absfile-1) :-$/;"	predicate	line:72	extras:arityAppended	end:78	arity:1
+unicode_file	input.pl	/^unicode_file(ext-1) :-$/;"	predicate	line:79	end:83	arity:1
+unicode_file/1	input.pl	/^unicode_file(ext-1) :-$/;"	predicate	line:79	extras:arityAppended	end:83	arity:1
+seek	input.pl	/^seek(write-1) :-$/;"	predicate	line:90	end:108	arity:1
+seek/1	input.pl	/^seek(write-1) :-$/;"	predicate	line:90	extras:arityAppended	end:108	arity:1

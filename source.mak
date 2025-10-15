@@ -399,6 +399,7 @@ PARSER_SRCS =				\
 	parsers/perl-moose.c		\
 	parsers/php.c			\
 	parsers/powershell.c		\
+	parsers/prolog.c		\
 	parsers/protobuf.c		\
 	parsers/python.c		\
 	parsers/python-entry-points.c	\

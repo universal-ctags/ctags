@@ -60,6 +60,7 @@ z	kind	no	NONE	s--	no	r-	0	[tags output] prepend "kind:" to k/ (or K/) field out
 -	protocols	yes	ObjectiveC	s--	no	--	0	protocols that the class (or category) confirms to
 -	home	yes	Passwd	s--	no	rw	0	home directory
 -	shell	yes	Passwd	s--	no	rw	0	login shell
+-	arity	yes	Prolog	-i-	no	--	0	the number of parameters
 -	decorators	no	Python	s--	no	--	0	decorators on functions and classes
 -	nameref	yes	Python	s--	no	--	0	the original name for the tag
 -	assignmentop	no	R	s--	no	--	0	operator for assignment

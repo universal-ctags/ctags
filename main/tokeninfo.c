@@ -190,6 +190,34 @@ static int tokenGetRightSideOfPair (tokenInfo *token)
 	return token->klass->typeForUndefined;
 }
 
+static bool tokenTypeIsIn (tokenInfo *token, tokenType ts[], size_t count)
+{
+	tokenType t = token->type;
+
+	for (size_t i = 0; i < count; i++)
+	{
+		if (t == ts[i])
+			return true;
+	}
+	return false;
+}
+
+bool tokenSkipToOneOfTypesImpl (tokenInfo *token, bool skipPair, tokenType ts[], size_t count)
+{
+	while (! tokenIsEOF (token))
+	{
+		if (tokenTypeIsIn (token, ts, count))
+			return true;
+		if (skipPair &&
+			tokenGetRightSideOfPair (token) != token->klass->typeForUndefined)
+			tokenSkipOverPair (token);
+		else
+			tokenReadFull (token, NULL);
+	}
+
+	return false;
+}
+
 bool tokenSkipOverPair (tokenInfo *token)
 {
 	return tokenSkipOverPairFull(token, NULL);
@@ -215,4 +243,33 @@ bool tokenSkipOverPairFull (tokenInfo *token, void *data)
 	} while ((!tokenIsEOF(token)) && (depth > 0));
 
 	return (depth == 0)? true: false;
+}
+
+void tokenInitTagEntry (tokenInfo *token, tagEntryInfo *e, int kind)
+{
+	initTagEntry (e, tokenString (token), kind);
+	e->lineNumber = token->lineNumber;
+	e->filePosition = token->filePosition;
+}
+
+void tokenInitRefTagEntry (tokenInfo *token, tagEntryInfo *e, int kind, int role)
+{
+	initRefTagEntry (e, tokenString (token), kind, role);
+	e->lineNumber = token->lineNumber;
+	e->filePosition = token->filePosition;
+}
+
+int tokenMakeSimpleTag (tokenInfo *token, int kind)
+{
+	tagEntryInfo e;
+
+	tokenInitTagEntry (token, &e, kind);
+	return makeTagEntry (&e);
+}
+
+int tokenMakeSimpleRefTag (tokenInfo *token, int kind, int role)
+{
+	tagEntryInfo e;
+	tokenInitRefTagEntry (token, &e, kind, role);
+	return makeTagEntry (&e);
 }
