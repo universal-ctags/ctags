@@ -26,7 +26,7 @@ jobs:
              # These are for input-validation.
              dnf -y install g++ jq puppet nodejs gcc-gfortran gcc-gnat typescript
              # nodejs requires libsqlite.so.0 with sqlite-session feature
-             # It was tured off in 3.46.1-1.
+             # It was turned off in 3.46.1-1.
              dnf -y update sqlite-libs
        - run:
            name: Build
