@@ -1432,7 +1432,6 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 								parseStringDQuote,
 								parseStringTemplate,
 								parseStringRegex,
-								parseTemplate,
 								parseVarKeyword,
 								parseLetKeyword,
 								parseConstKeyword,

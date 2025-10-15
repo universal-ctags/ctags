@@ -1,0 +1,2 @@
+saveTemplate	input.ts	/^function saveTemplate()$/;"	f
+foobar	input.ts	/^function foobar()$/;"	f
