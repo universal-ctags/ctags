@@ -308,6 +308,7 @@ PARSER_HEADS = \
 	parsers/x-r.h \
 	parsers/x-ruby.h \
 	parsers/x-sh.h \
+	parsers/x-systemdunit.h \
 	parsers/x-tcl.h \
 	parsers/x-toml.h \
 	parsers/x-tex.h \
@@ -359,6 +360,7 @@ PARSER_SRCS =				\
 	parsers/cxx/cxx_tag.c		\
 	parsers/cxx/cxx_token.c		\
 	parsers/cxx/cxx_token_chain.c	\
+	parsers/dbus-service.c		\
 	parsers/diff.c			\
 	parsers/dosbatch.c		\
 	parsers/dtd.c			\
@@ -450,7 +452,7 @@ PARSER_SRCS =				\
 XML_HEADS = parsers/x-xml.h
 XML_SRCS = \
 	parsers/maven2.c		\
-	parsers/dbusintrospect.c	\
+	parsers/dbus-introspect.c	\
 	parsers/glade.c			\
 	parsers/svg.c			\
 	parsers/plist.c			\

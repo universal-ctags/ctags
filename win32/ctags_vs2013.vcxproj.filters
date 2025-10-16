@@ -444,6 +444,9 @@
     <ClCompile Include="..\parsers\cxx\cxx_token_chain.c">
       <Filter>Source Files\parsers\cxx</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\dbus-service.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\diff.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
@@ -1002,6 +1005,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\x-sh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\parsers\x-systemdunit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\x-tcl.h">

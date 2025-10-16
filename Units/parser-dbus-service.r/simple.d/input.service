@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.libvirt
+Exec=/bin/false
+SystemdService=libvirt-dbus.service

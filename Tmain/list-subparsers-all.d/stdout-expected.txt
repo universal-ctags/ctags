@@ -7,6 +7,7 @@ Bats                 Sh         base <= sub {dedicated}
 BibLaTeX             BibTeX     base <> sub {bidirectional}
 Cargo                TOML       base <= sub {dedicated}
 DBusIntrospect       XML        base <> sub {bidirectional}
+DBusService          Iniconf    base <= sub {dedicated}
 FunctionParameters   Perl       base <> sub {bidirectional}
 GemSpec              Ruby       base <= sub {dedicated}
 Glade                XML        base <> sub {bidirectional}

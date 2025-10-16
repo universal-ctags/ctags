@@ -42,4 +42,7 @@ selectFortranOrForthByForthMarker (struct _MIO *input, langType *candidates, uns
 const char *
 selectPerlOrPrologByDistinctiveToken (struct _MIO *input, langType *candidates, unsigned int nCandidates);
 
+const char *
+selectByDBusServiceAndSystemdUnitSectionNames (struct _MIO *input, langType *candidates, unsigned int nCandidates);
+
 #endif

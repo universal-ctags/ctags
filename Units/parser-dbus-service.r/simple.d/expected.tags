@@ -1,0 +1,6 @@
+D-BUS Service	input.service	/^[D-BUS Service]$/;"	s	roles:def
+Name	input.service	/^Name=org.libvirt$/;"	k	section:D-BUS Service	roles:def
+org.libvirt	input.service	/^Name=org.libvirt$/;"	n	roles:def
+Exec	input.service	/^Exec=\/bin\/false$/;"	k	section:D-BUS Service	roles:def
+SystemdService	input.service	/^SystemdService=libvirt-dbus.service$/;"	k	section:D-BUS Service	roles:def
+libvirt-dbus.service	input.service	/^SystemdService=libvirt-dbus.service$/;"	u	roles:foreignlang

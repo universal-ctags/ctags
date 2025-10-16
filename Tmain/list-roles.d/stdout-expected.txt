@@ -129,6 +129,7 @@ SystemdUnit             u/unit            RequiredBy         on        0 referre
 SystemdUnit             u/unit            Requires           on        0 referred in Requires key
 SystemdUnit             u/unit            WantedBy           on        0 referred in WantedBy key
 SystemdUnit             u/unit            Wants              on        0 referred in Wants key
+SystemdUnit             u/unit            foreignlang        on        1 referenced in foreign languages
 TOML                    k/key             chainElt           off       0 (EXPERIMENTAL)used as an element in a key name chain like a.b.c
 Terraform               v/variable        assigned           on        0 assigned in Variable Definitions (.tfvars) files
 Tex                     e/environment     used               off       0 environment usage introduced by \begin{MyEnv}
@@ -281,6 +282,7 @@ SystemdUnit             u/unit            RequiredBy         on        0 referre
 SystemdUnit             u/unit            Requires           on        0 referred in Requires key
 SystemdUnit             u/unit            WantedBy           on        0 referred in WantedBy key
 SystemdUnit             u/unit            Wants              on        0 referred in Wants key
+SystemdUnit             u/unit            foreignlang        on        1 referenced in foreign languages
 TOML                    k/key             chainElt           off       0 (EXPERIMENTAL)used as an element in a key name chain like a.b.c
 Terraform               v/variable        assigned           on        0 assigned in Variable Definitions (.tfvars) files
 Tex                     e/environment     used               off       0 environment usage introduced by \begin{MyEnv}
