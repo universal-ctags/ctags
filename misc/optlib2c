@@ -915,7 +915,6 @@ sub escape_as_cstr {
 sub emit_roledefs {
     my $opts = shift;
 
-
     for (@{$opts->{'kinddefs'}}) {
 	next unless @{$_->{'roles'}};
 	my $Kind = capitalize($_->{'name'});
