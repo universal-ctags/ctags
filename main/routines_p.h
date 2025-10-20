@@ -97,7 +97,6 @@ extern char* absoluteDirname (char *file);
 extern char* relativeFilename (const char *file, const char *dir);
 extern MIO *tempFile (const char *const mode, char **const pName);
 
-extern char* baseFilenameSansExtensionNew (const char *const fileName, const char *const templateExt);
 extern char* filenameSansExtensionNew (const char *const fileName, const char *const templateExt);
 
 #endif  /* CTAGS_MAIN_ROUTINES_PRIVATE_H */

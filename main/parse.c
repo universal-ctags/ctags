@@ -1477,7 +1477,7 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
 		.err      = false,
 	};
 	const char* const baseName = baseFilename (fileName);
-	char *templateBaseName = NULL;
+	char *templateFileNameSansExt = NULL;
 	fileStatus *fstatus = NULL;
 
 	for (i = 0; i < N_HINTS; i++)
@@ -1493,13 +1493,14 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
 
 	{
 		const char* const tExt = ".in";
-		templateBaseName = baseFilenameSansExtensionNew (fileName, tExt);
-		if (templateBaseName)
+		templateFileNameSansExt = filenameSansExtensionNew (fileName, tExt);
+		if (templateFileNameSansExt)
 		{
-			verbose ("	pattern + template(%s): %s\n", tExt, templateBaseName);
+			verbose ("	pattern + template(%s): %s\n", tExt, templateFileNameSansExt);
 			GLC_FOPEN_IF_NECESSARY(&glc, cleanup, false);
 			mio_rewind(glc.input);
-			language = getPatternLanguage(templateBaseName, &glc,
+			const char *const templateBaseFileNameSansExt = baseFilename (templateFileNameSansExt);
+			language = getPatternLanguage(templateBaseFileNameSansExt, &glc,
 					  fallback + HINT_TEMPLATE);
 			if (language != LANG_IGNORE)
 				goto cleanup;
@@ -1541,8 +1542,8 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
 	GLC_FCLOSE(&glc);
 	if (fstatus)
 		eStatFree (fstatus);
-	if (templateBaseName)
-		eFree (templateBaseName);
+	if (templateFileNameSansExt)
+		eFree (templateFileNameSansExt);
 
 	for (i = 0;
 	 language == LANG_IGNORE && i < N_HINTS;

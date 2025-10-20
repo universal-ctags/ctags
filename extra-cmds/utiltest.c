@@ -278,31 +278,6 @@ static void test_routines_strrstr(void)
 	TEST_CHECK(strcmp(strrstr("abcdcdb", "cd"), "cdb") == 0);
 }
 
-static void test_routines_baseFilenameSansExtensionNew(void)
-{
-	char *bs;
-
-	TEST_CHECK ((bs = baseFilenameSansExtensionNew ("a.in", ".in"))
-				&& strcmp(bs, "a") == 0);
-	if (bs)
-		eFree (bs);
-
-	TEST_CHECK ((bs = baseFilenameSansExtensionNew ("x/b.in", ".in"))
-				&& strcmp(bs, "b") == 0);
-	if (bs)
-		eFree (bs);
-
-	TEST_CHECK ((bs = baseFilenameSansExtensionNew ("c.in.in", ".in.in"))
-				&& strcmp(bs, "c") == 0);
-	if (bs)
-		eFree (bs);
-
-	TEST_CHECK ((bs = baseFilenameSansExtensionNew ("/y/d.in.in", ".in.in"))
-				&& strcmp(bs, "d") == 0);
-	if (bs)
-		eFree (bs);
-}
-
 static void test_routines_filenameSansExtensionNew(void)
 {
 	char *bs;
@@ -402,7 +377,6 @@ TEST_LIST = {
    { "intern",           test_intern           },
    { "numarray",         test_numarray         },
    { "routines/strrstr", test_routines_strrstr },
-   { "routines/baseFilenameSansExtensionNew", test_routines_baseFilenameSansExtensionNew },
    { "routines/filenameSansExtensionNew", test_routines_filenameSansExtensionNew },
    { "vstring/ncats",    test_vstring_ncats    },
    { "vstring/truncate_leading", test_vstring_truncate_leading },

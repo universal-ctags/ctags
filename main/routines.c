@@ -670,24 +670,6 @@ extern char* filenameSansExtensionNew (const char *const fileName,
 	return NULL;
 }
 
-extern char* baseFilenameSansExtensionNew (const char *const fileName,
-					   const char *const templateExt)
-{
-	const char *pDelimiter;
-	const char *const base = baseFilename (fileName);
-	char* shorten_base;
-
-	pDelimiter = strrstr (base, templateExt);
-
-	if (pDelimiter && (strcmp (pDelimiter, templateExt) == 0))
-	{
-		shorten_base = eStrndup (base, pDelimiter - base);
-		return shorten_base;
-	}
-	else
-		return NULL;
-}
-
 extern bool isAbsolutePath (const char *const path)
 {
 	bool result;
