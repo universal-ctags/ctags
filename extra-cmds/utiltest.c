@@ -303,6 +303,31 @@ static void test_routines_baseFilenameSansExtensionNew(void)
 		eFree (bs);
 }
 
+static void test_routines_filenameSansExtensionNew(void)
+{
+	char *bs;
+
+	TEST_CHECK ((bs = filenameSansExtensionNew ("a.in", ".in"))
+				&& strcmp(bs, "a") == 0);
+	if (bs)
+		eFree (bs);
+
+	TEST_CHECK ((bs = filenameSansExtensionNew ("x/b.in", ".in"))
+				&& strcmp(bs, "x/b") == 0);
+	if (bs)
+		eFree (bs);
+
+	TEST_CHECK ((bs = filenameSansExtensionNew ("c.in.in", ".in.in"))
+				&& strcmp(bs, "c") == 0);
+	if (bs)
+		eFree (bs);
+
+	TEST_CHECK ((bs = filenameSansExtensionNew ("/y/d.in.in", ".in.in"))
+				&& strcmp(bs, "/y/d") == 0);
+	if (bs)
+		eFree (bs);
+}
+
 static void test_vstring_ncats(void)
 {
 	vString *vstr = vStringNew ();
@@ -378,6 +403,7 @@ TEST_LIST = {
    { "numarray",         test_numarray         },
    { "routines/strrstr", test_routines_strrstr },
    { "routines/baseFilenameSansExtensionNew", test_routines_baseFilenameSansExtensionNew },
+   { "routines/filenameSansExtensionNew", test_routines_filenameSansExtensionNew },
    { "vstring/ncats",    test_vstring_ncats    },
    { "vstring/truncate_leading", test_vstring_truncate_leading },
    { "vstring/EqC",      test_vstring_eqc },

@@ -657,6 +657,19 @@ extern const char *fileExtension (const char *const fileName)
 	return extension;
 }
 
+extern char* filenameSansExtensionNew (const char *const fileName,
+									   const char *const templateExt)
+{
+	Assert (templateExt);
+	Assert (fileName);
+
+	const char *pDelimiter = strrstr (fileName, templateExt);
+
+	if (pDelimiter && (strcmp (pDelimiter, templateExt) == 0))
+		return eStrndup (fileName, pDelimiter - fileName);
+	return NULL;
+}
+
 extern char* baseFilenameSansExtensionNew (const char *const fileName,
 					   const char *const templateExt)
 {
