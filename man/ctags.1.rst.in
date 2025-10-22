@@ -470,9 +470,10 @@ Language Selection and Mapping Options
 	feature list; otherwise, the file name patterns are matched against
 	file names using a simple textual comparison.
 
-	When mapping a file extension with ``--langmap`` option,
-	it will first be unmapped from any other languages. (``--map-<LANG>``
-	option provides more fine-grained control.)
+	When mapping a file extension or a file name pattern with
+	``--langmap`` option, it will first be unmapped from any other
+	languages. (``--map-<LANG>`` option provides more fine-grained
+	control.)
 
 	If the first character in a *<map>* is a plus sign ('``+``'), then the extensions and
 	file name patterns in that map will be appended to the current map
