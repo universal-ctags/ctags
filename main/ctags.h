@@ -43,7 +43,7 @@
  * The --version option of readtags also prints this. */
 # define PROGRAM_VERSION PACKAGE_VERSION
 #else
-# define PROGRAM_VERSION "6.2.0"
+# define PROGRAM_VERSION "6.2.1"
 #endif
 #define PROGRAM_NAME      "Universal Ctags"
 #define PROGRAM_URL       "https://ctags.io/"

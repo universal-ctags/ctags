@@ -4,7 +4,7 @@
 ctags-lang-inko
 ======================================================================
 
-:Version: 6.2.0
+:Version: 6.2.1
 :Manual group: Universal Ctags
 :Manual section: 7
 
