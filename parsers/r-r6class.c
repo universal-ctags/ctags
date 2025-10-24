@@ -219,14 +219,14 @@ static int r6ReadRightSideSymbol (rSubparser *s,
 	tokenInfo * token1 = NULL;
 	if (strcmp (tokenString (token), "R6") == 0)
 	{
-		tokenInfo * token0 = rNewToken ();
+		token0 = rNewToken ();
 		tokenRead (token0);
 		if (!tokenIsType (token0, R_SCOPE))
 			goto reject;
 		if (strcmp (tokenString (token0), "::"))
 			goto reject;
 
-		tokenInfo * token1 = rNewToken ();
+		token1 = rNewToken ();
 		tokenRead (token1);
 		if (!tokenIsType (token1, R_SYMBOL))
 			goto reject;
@@ -252,11 +252,12 @@ static int r6ReadRightSideSymbol (rSubparser *s,
 	}
 	return CORK_NIL;
  reject:
-	if (token1)
+	/* For incomplete "R6::" cases, we don't want to unread the "::" token
+	   as the main R parser may not handle it well. */
+	if (token1 && tokenIsType(token1, R_SYMBOL)) {
 		tokenUnread (token1);
-	if (token0)
-		tokenUnread (token0);
-	/* tokenDelete accepts NULL. */
+	}
+	/* Don't unread token0 (::) to prevent main parser confusion */
 	tokenDelete (token1);
 	tokenDelete (token0);
 
