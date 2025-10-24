@@ -499,26 +499,71 @@ Language Selection and Mapping Options
 	Exuberant Ctags. See ctags-incompatibilities(7) for the background of
 	this incompatible change.
 
-``--map-<LANG>=[+|-]<extension>|<pattern>``
+	Unlike ``--map-<LANG>`` option, you cannot specify relative-path regular
+	 expressions to ``--langmap`` option.
+
+``--map-<LANG>=[+|-]<extension>|<pattern>|<rexpr>``
 	This option provides the way to control mapping(s) of file names to
 	languages in a more fine-grained way than ``--langmap`` option.
 
 	In @CTAGS_NAME_EXECUTABLE@, more than one language can map to a
-	file name *<pattern>* or file *<extension>* (*N:1 map*). Alternatively,
-	``--langmap`` option handle only *1:1 map*, only one language
-	mapping to one file name *<pattern>* or file *<extension>*.  A typical N:1
-	map is seen in C++ and ObjectiveC language; both languages have
-	a map to ``.h`` as a file extension.
+	relative-path regular expression (*<rexpr>*), file name *<pattern>*, or
+	file *<extension>* (*N:1 map*). Alternatively, ``--langmap``
+	option handle only *1:1 map*, only one language mapping to one
+	file name *<pattern>* or file *<extension>*.  A typical N:1 map is
+	seen in C++ and ObjectiveC language; both languages have a map to
+	``.h`` as a file extension.
 
-	A file extension is specified by preceding the extension with a period (e.g. ``.c``).
-	A file name pattern is specified by enclosing the pattern in parentheses (e.g.
-	``([Mm]akefile)``). A prefixed plus ('``+``') sign is for adding, and
+	A file extension is specified by preceding the extension with a period
+	(e.g. ``.c``).  A file name pattern is specified by enclosing the pattern in
+	parentheses (e.g.  ``([Mm]akefile)``). A relative-path regular expression is
+	specified by enclosing the expressions in percent signs '``%``'
+	(e.g. ``%include/.*\.h%``). To include a literal percent sign
+	inside the regular expression, escape it as ``\%``.
+
+	A prefixed plus ('``+``') sign is for adding, and
 	minus ('``-``') is for removing. No prefix means replacing the map of *<LANG>*.
 
-	Unlike ``--langmap``, *<extension>* (or *<pattern>*) is not a list.
-	``--map-<LANG>`` takes one extension (or pattern). However,
-	the option can be specified with different arguments multiple times
-	in a command line.
+	Unlike ``--langmap``, ``--map-<LANG>`` does not take a list; ``--map-<LANG>``
+	takes one extension, one pattern, or one regular expression. However, the
+	option can be specified with different arguments multiple times in a command
+	line.
+
+	For file extensions and file name patterns, the match is performed
+	with a base file name, a file without any directory components.
+	For relative-path regular expressions, the match is performed with
+	a relative-path incorporating the directory components. A
+	relative-path is relative to the directory where ctags launches.
+
+	Assume your shell is in ``/project/x`` directory and you have the following
+	source tree under the directory.
+
+	.. code-block::
+
+		src
+		└── lib
+		    ├── data.c
+		    └── logic.c
+
+	If you run @CTAGS_NAME_EXECUTABLE@ with ``@CTAGS_NAME_EXECUTABLE@ -R src``,
+	the match is performed with ``src/lib/data.c`` and ``src/lib/logic.c`` If you
+	give ``--map-YourParser='%src/lib/.*\.c%'``, @CTAGS_NAME_EXECUTABLE@
+	chooses ``YourParser`` parser for processing ``data.c`` and ``logic.c`` in the
+	tree.
+
+	If your shell is in ``/project/x/src`` and you run
+	``@CTAGS_NAME_EXECUTABLE@ -R lib``, @CTAGS_NAME_EXECUTABLE@ may not choose
+	``YourParser`` because the match is performed with ``lib/data.c`` and
+	``lib/logic.c``.
+
+	A relative-path regular expression can take a flag controlling its testing.
+	The flag comes after the last percent sign. Currently only one available flag:
+
+	``{icase}`` (one-letter form '``i``')
+		The regular expression is to be applied in a case-insensitive
+		manner. (e.g. ``%include/.*\.h%i`` or ``%include/.*\.h%{icase}``
+
+	The relative-path regular expression is available since version 6.3.0.
 
 .. _option_tags_file_contents:
 
@@ -1243,14 +1288,24 @@ Listing Options
 	languages, and then exits.
 	``all`` is used as default value if the option argument is omitted.
 
-``--list-maps[=(<language>|all)]``
-	Lists file name patterns and the file extensions which associate a file
+``--list-map-rexprs[=(<language>|all)]``
+	Lists the relative-path regular expressions which associate a file
 	name with a language for either the specified *<language>* or ``all``
 	languages, and then exits.
 	``all`` is used as default value if the option argument is omitted.
 
-	To list the file extensions or file name patterns individually, use
-	``--list-map-extensions`` or ``--list-map-patterns`` option.
+	(since version 6.3.0)
+
+``--list-maps[=(<language>|all)]``
+	Lists the file name patterns, the file extensions, and the relative-path
+	regular expressions which associate a file name with a language for either
+	the specified *<language>* or ``all`` languages, and then exits.
+	``all`` is used as default value if the option argument is omitted.
+
+	To list the file extensions, file name patterns, or relative-path regular
+	expressions individually, use ``--list-map-extensions``,
+	``--list-map-patterns``, or ``--list-map-rexprs`` option.
+
 	See the ``--langmap`` option, and "`Determining file language`_", above.
 
 	This option does not work with ``--machinable`` nor
@@ -1507,9 +1562,12 @@ are mapped to C++, C and ObjectiveC. These mappings can cause
 issues. @CTAGS_NAME_EXECUTABLE@ tries to select the proper parser
 for the source file by applying heuristics to its content, however
 it is not perfect.  In case of issues one can use ``--language-force=<language>``,
-``--langmap=<map>[,<map>[...]]``, or the ``--map-<LANG>=[+|-]<extension>|<pattern>``
+``--langmap=<map>[,<map>[...]]``, or the ``--map-<LANG>=[+|-]<extension>|<pattern>|<rexpr>``
 options. (Some of the heuristics are applied whether ``--guess-language-eagerly``
 is given or not.)
+
+The order of testing is relative-path regular expressions (specified with
+``--map-<LANG>=<rexpr>``), file name patterns, then file extensions.
 
 .. TODO: all heuristics??? To be confirmed.
 
