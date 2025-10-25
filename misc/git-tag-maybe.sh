@@ -23,7 +23,7 @@ run() {
 ##################################### main #######################################
 
 base=$BASE
-cal=$(date +%Y%m%d)
+cal=1
 chicken=0
 new_tagname="p${base}.${cal}.${chicken}"
 

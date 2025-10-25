@@ -1,375 +1,84 @@
 ======================================================================
-Changes in 6.2.0
+Changes in 6.2.1
 ======================================================================
 
-This page lists only the most significant changes as remembered.  Use
-git-log to review changes not enumerated here, especially in language
-parsers.
+This release fixes some critical bugs reported/found after releasing
+6.2.0.
 
-New and extended options and their flags
----------------------------------------------------------------------
+commit 5445a348f290450b3f230cce221a8d5fe9a35f4a
+Author: Bernát Gábor <bgabor8@bloomberg.net>
+Date:   Fri Oct 24 08:51:57 2025 -0700
 
-``--list-output-formats`` option
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-See :ref:`option_listing` in :ref:`ctags(1) <ctags(1)>`.
+    R6: fix valgrind error
 
-``nulltag``/``z`` extra
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Universal Ctags now supports tags (*null tags*) having empty strings as their names.
-See :ref:`extras` in :ref:`ctags(1) <ctags(1)>`.
+    Signed-off-by: Bernát Gábor <bgabor8@bloomberg.net>
+    (cherry picked from commit 2bfc47b01e1e51ad38bbd9485bf0b0486b2ae42b)
 
-.. note::
+commit 466bf9b416415ef0068c29858e2bf1620acc91aa
+Author: Bernát Gábor <bgabor8@bloomberg.net>
+Date:   Fri Oct 24 07:46:41 2025 -0700
 
-   * ``libreadtags`` and ``readtags`` do not support the null tags yet.
-   * Only ``json`` and ``xref`` output formats support the null tags.
+    tokeninfo: fix null pointer crash in tokenDelete function
 
-Incompatible changes
----------------------------------------------------------------------
+    The tokenDelete() function in main/tokeninfo.c was being called with NULL
+    pointers from the R6 parser error handling code, causing segmentation faults.
 
-* [readtags] make -Q,--filter not work on ptags when -P,--with-pseudo-tags is specified together
+    The R6 parser in parsers/r-r6class.c had a comment stating "tokenDelete
+    accepts NULL" but the function did not actually handle NULL pointers safely.
+    This occurred when parsing malformed R6 syntax such as:
+    - R6::SomethingElse() (wrong function after R6 namespace)
+    - R6:: (incomplete namespace reference)
+    - R6::R6Clas() (typo in R6Class)
 
-  With this version, ``-Q,--filter`` option doesn't affect the pseudo tags listed
-  with ``-P,--with-pseudo-tags`` option.  ``-Q,--filter`` option specified wth
-  ``-P,--with-pseudo-tags`` option affect only regular tags.
+    The fix ensures ctags handles malformed R6 syntax gracefully by falling back
+    to parsing assignments as regular global variables instead of crashing.
 
-  To extract speicifed pseudo tags, use ``-Q,--filter`` option with
-  ``-D,--list-pseudo`` action.
+      Fixes segmentation fault when processing certain R6Class syntax patterns.
 
-Parser related changes
----------------------------------------------------------------------
+    Signed-off-by: Bernát Gábor <bgabor8@bloomberg.net>
+    (cherry picked from commit a60763cfdba6d0744836a1ebab48d19e0d7cf4fe)
 
-#4026
-   Integrate `pegof <https://github.com/dolik-rce/pegof>`_ to our build process.
+commit bc67b9257c60b8abaf567a4ec661fc75bdf32cfa
+Author: Colomban Wendling <ban@herbesfolles.org>
+Date:   Fri Jul 25 00:36:26 2025 +0200
 
-New parsers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The following parsers have been added:
+    ada: Fix crash with `is` at EOF
 
-* SELinuxIntefae *M4 based subparser*
-* SELinuxTypeEnforcement *optlib*
-* PythonEntryPoints *subparser*
-* Scdoc *optlib*
-* JNI *subparser*
-* TypeSpec *parser*
+    Fixes #4284.
 
-  + TypeSpec by Kaisheng Xu · Pull Request #4243
+    (cherry picked from commit 33d1d1b493464dab35b71f09e9d308f97c65e58e)
 
-.. note:: We added a TOML as a new parser in this version. However,
-		  after adding it, we learned its implementation didn't work
-		  entirely. So we deleted the TOML parser, and Cargo subparser
-		  runs on the TOML parser from this "New parsers" list.
-		  See `TOML: infinite loop <https://github.com/universal-ctags/ctags/issues/4096>`__
-		  about how it doesn't work.
+commit 0869fb8ec78634f1cd199b5676231e94111e3ddf
+Author: Masatake YAMATO <yamato@redhat.com>
+Date:   Sat Sep 27 02:36:20 2025 +0900
 
-Changes about parser specific kinds, roles, fields, and extras
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Cxx: limit recursion when parsing too deep blocks
 
-.. See the output of ./misc/news.bash man [v6.1.0]
+    Fixed #4292.
 
-* C++
+    Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+    (cherry picked from commit 0be19d0fc565f1bda46e76c11b3b2fc8a4c7bbee)
 
-  + New kinds `module` and `partition`
-  + New roles `imported` and `exported` for `header` kind
+commit 4a7d896424838bf8bb5e04037bd6918305b64e09
+Author: Masatake YAMATO <yamato@redhat.com>
+Date:   Tue Jun 3 02:16:23 2025 +0900
 
-* Clojure
+    fixup! C++: Update the parser version to 2.2
 
-  + New kind `unknown`
-  + New field `definer`
+    In d469bf986acc7837514680434e90bc6087fe2827, I forgot to update
+    versionCurrent and versionAge member of the parser.
 
-* EmacsLisp
+    (This means the parser versioning of ctags-6.2 is broken.
+    I must backport this change to ctags-6.2 and release 6.2.1.)
 
-  + New field `definer`
+    Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+    (cherry picked from commit 556fc03c340eb0e1ef45e1e6aafbfdbb0bd2b086)
 
-* LEX
+commit 3805034ceece73c295e87c0ef5f12e02995ab0e0
+Author: Masatake YAMATO <yamato@redhat.com>
+Date:   Sat Jul 26 01:25:21 2025 +0900
 
-  + New role `grouping` for `cond` kind
+    circleci: use fedora:42 for cross-build tests targeting aarch64
 
-* Lisp
-
-  + New kinds `class`, `generic`, `method`, `parameter`, `struct`, and `type`
-
-* Make
-
-  + New extra `CppDef`
-
-* Meson
-
-  + New kinds `cfgdata` and `cfgvar`
-
-* PowerShell
-
-  + New kind `enumlabel`
-
-* Python
-
-  + New role `entryPoint` for `module` and `function` kinds
-
-	PythonEntryPoints parser emits tag entries having this role.
-
-* Scheme
-
-  + New kind `unknown`
-  + New field `definer`
-
-* SCSS
-
-  + New kind `module`
-  + New role `used` for the `module` kind
-  + New kind `namespace`
-  + New field `module`
-
-* SQL
-
-  + New kind `local`
-
-* Vim
-
-  + New kind `heredoc`
-  + New kind `class`
-
-Readtags
----------------------------------------------------------------------
-
-* make formatter work with -D,--list-pseudo-tags option
-
-  An example extracting the value of ``!_TAG_PROC_CWD``:
-
-  .. code-block:: console
-
-	 $ ./readtags -t podman.tags -Q '(#/.*CWD.*/ $name)' -F '(list $input #t)' -D
-	 /home/yamato/var/ctags-github/
-
-* make -Q,--filter not work on ptags when -P,--with-pseudo-tags is specified together
-
-Merged pull requests
----------------------------------------------------------------------
-
-.. note::
-
-   This list is imperfect. masatake cleaned up some pull requests before
-   merging. Though his names is used in "... by ...", his is not the
-   primary contributor of the pull requests. See git log for more
-   defatils.
-
-.. generated by ./misc/news.bash pr [v6.1.0...]
-
-* SystemVerilog,Verilog: accept empty names for any kind of language objects by masatake · Pull Request #4257
-* Units(JSON): add a test case for extracting null tags by masatake · Pull Request #4256
-* Misc fix by masatake · Pull Request #4258
-* build(deps): bump cross-platform-actions/action from 0.27.0 to 0.28.0 by dependabot[bot] · Pull Request #4250
-* Kconfig: don't leave without any items on the stack by masatake · Pull Request #4255
-* TypeSpec: new parser by iaalm · Pull Request #4243
-*  JNI: new subparser by masatake · Pull Request #4252
-* operator: add a getter for the language field by masatake · Pull Request #4251
-* Tests for more Clojure tags by aartaka · Pull Request #4126
-* optlib: allow users to set fields and check extras defined in a foreign language by masatake · Pull Request #3960
-* TOML,Cargo: disable the parsers temporarily by masatake · Pull Request #4248
-* Scdoc: new parser by masatake · Pull Request #4244
-* Some minor fixes by masatake · Pull Request #4245
-* circleci: switch to use Fedoa42 by masatake · Pull Request #4246
-* GitHub Actions: set timeout to tests on Qemu by masatake · Pull Request #4247
-* main/read:  revise the offset calculation on nested input stream by masatake · Pull Request #4212
-* Fix wrong parser versions by masatake · Pull Request #4242
-* Miscellaneous minor fixes by masatake · Pull Request #4241
-* SQL: fill signature and typeref fields for functions and procedures by masatake · Pull Request #4238
-* V: don't use multi-bytes chars in debug print by masatake · Pull Request #4236
-* CPreProcessor: (bugfix) don't return negative value other than EOF from unget-buffer by masatake · Pull Request #4234
-* RpmSpec: don't make a FQ tag for sub-packages if -n option is specified on %package line by masatake · Pull Request #4233
-* main: (bugfix) don't reset lineFposMap even in the 2nd pass when the parser runs as a guest by masatake · Pull Request #4231
-* main: fix typos in a parameter name by masatake · Pull Request #4230
-* SQL: extract trigger of Postgresql dialect by masatake · Pull Request #4229
-* JavaScript: (bugfix) consider << operator when detecting JSX area by masatake · Pull Request #4228
-* CPreProcessor,LdScript,Asm: (bugfix) don't expand macros defined with -I by masatake · Pull Request #4226
-* main/read: refactor step1 by masatake · Pull Request #4223
-* C++: skip broken C++11 attributes by masatake · Pull Request #4221
-* PythonEntryPoints: new subparser based on Iniconf parser by masatake · Pull Request #4219
-* lregex: avoid crashes when regex pattern compilation fails by masatake · Pull Request #4220
-* Moose: stop parsing when the base parser stops parsing by masatake · Pull Request #4218
-* units,tmain: add a variable to control the number of threads running test cases by masatake · Pull Request #4215
-* Ada: print debug messages only if --_trace=Ada is given by masatake · Pull Request #4213
-* main: various minor improvements, especially about mio by masatake · Pull Request #4214
-* readtags:  revise feature listing ptags (including an incompatible change) by masatake · Pull Request #4095
-* GitHub Actions: install pkg-config to the msys2 environment by masatake · Pull Request #4211
-* Ada: accept 'end;' as the end of function by masatake · Pull Request #4206
-* Circleci:  (fedora41) update libsqlite.so explicitly by masatake · Pull Request #4209
-* buildsys: (msvc) avoid "multiply defined symbols" errors by masatake · Pull Request #4208
-* JavaScript,HTML: skip JSX elements by masatake · Pull Request #4191
-* CPreProcessor: adjust line numbers when reading characters from unget-chars-buffer by masatake · Pull Request #4198
-* JavaScript: don't extract local constants and variables defined in arrow functions by masatake · Pull Request #4197
-* Asm: support Cpp macro arguments spanning multiple lines by masatake · Pull Request #4201
-* JavaScript: Fix held tokens breaking implicit semicolon insertion by b4n · Pull Request #4193
-* Ruby  minor improvements by masatake · Pull Request #4190
-* Units(Meson): add a case testing extracting config variables by masatake · Pull Request #4189
-* Meson: extract config variables by masatake · Pull Request #4186
-* CUDA: support function parameters with default values by masatake · Pull Request #4188
-* build(deps): bump cross-platform-actions/action from 0.25.0 to 0.27.0 by dependabot[bot] · Pull Request #4183
-* CPreProcessor: support variadic macros with GNU cpp extension syntax  by masatake · Pull Request #4184
-* SELinuxTypeEnforcement: fill typeref: field for alias kind objects by masatake · Pull Request #4180
-* optlib2c: make the error message more specific when a wrong datatype is given by masatake · Pull Request #4179
-* main:  provide the way to specify data taype in --_fielddef option by masatake · Pull Request #4178
-* main: support integer field in the writers by masatake · Pull Request #4177
-* Kotlin: fix annotation parsing by dolik-rce · Pull Request #4176
-* main: FIX the way to print boolean typed parser specific fields correctly in {xref,ctags} output by masatake · Pull Request #4174
-* Lisp: introduce version 0.0 of lisp meta parser by masatake · Pull Request #4130
-* Parsers for files defining SELinux policy by masatake · Pull Request #4173
-* various minor fixes by masatake · Pull Request #4172
-* optscropt: fix _scopedepth operator by masatake · Pull Request #4170
-* SCSS: support modules specified with single-quote chars like @use 'foo'  by masatake · Pull Request #4169
-* SCSS: extract modules and namespaces from @use "..." by masatake · Pull Request #4168
-* Tcl: extract null tags by masatake · Pull Request #4167
-* JavaScript: destructuring binding by masatake · Pull Request #3435
-* JSON: emit full qualified tags by masatake · Pull Request #4165
-* main: add nulltag/z, a new extra by masatake · Pull Request #4152
-* ObjectiveC: (bugfix) extract the line numbers for methods correctly by masatake · Pull Request #4162
-* (System)Verilog: escaped identifiers (LRM 5.6.1) by cousteaulecommandant · Pull Request #4129
-* PowerShell: recognize herestrings by masatake · Pull Request #4145
-* Introducing Universal Ctags Guru on Gurubase.io by kursataktas · Pull Request #4124
-* delete an accidentally commited file by masatake · Pull Request #4143
-* Revise the files for CI (ubi8, fedora, stream10) by masatake · Pull Request #4131
-* units.py: Fix format-NlKkFnP on Windows by k-takata · Pull Request #4137
-* verilog: support ifdef in enum by hirooih · Pull Request #4140
-* verilog: do not add scope to define (#4127) by hirooih · Pull Request #4139
-* Lisp: add def{struct,type,method,class,generic,parameter} kinds and definer field by masatake · Pull Request #4121
-* Verilog: Add final_specifier support for class parse by roccomao · Pull Request #4116
-* Verilog: Fix function parse when return type contains `::` by roccomao · Pull Request #4111
-* Verilog: Skip the escaped characters in string by roccomao · Pull Request #4115
-* verilog.c: keyword "unsigned1" should be "unsigned", without the 1 by cousteaulecommandant · Pull Request #4110
-* units.py: pass `count' as a keyword argument by masatake · Pull Request #4112
-* iniconf: some more adjustments for parsing TOML by techee · Pull Request #4099
-* treewide: delete more unwated files by masatake · Pull Request #4108
-* Remove unwanted files by k-takata · Pull Request #4107
-* readtags: add tr operator by masatake · Pull Request #4106
-* Meson: handle backshash chars in strings and == operator correctly by masatake · Pull Request #4104
-* Meson: extract benchmark langage objects correctly by masatake · Pull Request #4101
-* readtags:  refactoring for support multiple tag files by masatake · Pull Request #4079
-* Rust: don't put EOF to a vString by masatake · Pull Request #4093
-* GPerf: skip comment lines started from '#' by masatake · Pull Request #4092
-* main: error with more friendly and understandable message when "tags" directory exists by masatake · Pull Request #4085
-* Suppress warnings by masatake · Pull Request #4086
-* JavaScript: (bug fix) don't append EOF token to a repr by masatake · Pull Request #4087
-* Make: don't track EOF as a part of value by masatake · Pull Request #4088
-* Update libreadtags by masatake · Pull Request #4080
-* SystemTap: fill the typeref field for functions by masatake · Pull Request #4084
-*  build-sys: eliminate READTAGS_DSL condition  by masatake · Pull Request #4078
-* readtags: refactor for searching multiple tag files by masatake · Pull Request #4074
-* GemSpec: parse %q string by masatake · Pull Request #4077
-* Tmain: run Tmain/readtags-canonicalize-input-names.d only if DSL is enabled in readtags by masatake · Pull Request #4072
-* readtags:  minor fixes by masatake · Pull Request #4071
-* Fix build for Haiku by Begasus · Pull Request #4069
-* dsl: fix the function for hashing integer object by masatake · Pull Request #4067
-* Optscript:  fix bugs in foreigntag proc by masatake · Pull Request #4064
-* Main:  use extras and fields in the foreign language specified in {_language=...} flag by masatake · Pull Request #4059
-* verilog: skip compiler directives in enum definition (#4056) by hirooih · Pull Request #4058
-* Kconfig: fill names of anonymous choices with the values of their prompts by masatake · Pull Request #4057
-* Cargo: new subparser based on TOML parser by masatake · Pull Request #4048
-* iniconf: Allow dot and dash for ini keys by techee · Pull Request #4052
-* Kconfig: avoid stack underflow when filling typeref filed by masatake · Pull Request #4051
-* Kconfig: fill typeref: field by masatake · Pull Request #4050
-* main: make the implementation of --list-languages=_CATEGORY efficient by masatake · Pull Request #4047
-* main: extend --list-languages option to list only parsers using packcc by masatake · Pull Request #4046
-* TOML: new PEG based parser by masatake · Pull Request #3509
-* Fix quotes & option syntax in manpage by JaSpa · Pull Request #4045
-* build-sys,mvc: generate rules for running packcc from source.mak by masatake · Pull Request #4036
-* Fortran: accept $ as parts of names by masatake · Pull Request #4034
-*  Make: add CppDef extra for extracting FOO in -DFOO as a macro of CPreProcessor by masatake · Pull Request #4024
-* Make:  refactor and add comments by masatake · Pull Request #4031
-* build-sys: utilize pegof by masatake · Pull Request #4026
-* Make: minor changes by masatake · Pull Request #4028
-* Circleci:  update images by masatake · Pull Request #4029
-* Make: parse inside define/endef by masatake · Pull Request #4025
-* Haskell: skip multi-line type signature by masatake · Pull Request #4019
-* readtags: mark <or> as a special form by masatake · Pull Request #4022
-* main: fix a typo in an error message by masatake · Pull Request #4014
-* main: report errors when calling ftell(3) fails by masatake · Pull Request #4012
-* Cxx:  fix file field for exported objects by masatake · Pull Request #4010
-* jscript: Fix representation of held tokens by b4n · Pull Request #4008
-* php: Skip class and trait use not to confuse typerefs by b4n · Pull Request #4009
-* C++: record "export" in the property field if the keyword is put at a "using" declaration by masatake · Pull Request #4006
-* powershell: Parse enum labels by b4n · Pull Request #3998
-* matlab: A couple fixes for corner cases by b4n · Pull Request #3999
-* Pascal: support for inline or one line comments added by masatake · Pull Request #3997
-* JavaScript: Improve support for contextual keywords as identifiers by b4n · Pull Request #3993
-* vera: Explicit fallthrough by b4n · Pull Request #3992
-* docs,man: Fix typos by k-takata · Pull Request #3987
-* dsl: allow to specify a default value in $ and & operators by masatake · Pull Request #3984
-* CI: use codecov/codecov-action by k-takata · Pull Request #3986
-* Update  packcc by masatake · Pull Request #3983
-* C++: extract operators specified in using declarations by masatake · Pull Request #3982
-* main: don't allocate a buffer for tagEntryInfoX::sourceFileName if possible by masatake · Pull Request #3980
-* build-sys: make lto optional by iLeeWell · Pull Request #3978
-* build-sys: fix checking Windows platform with _WIN32 macro by Biswa96 · Pull Request #3977
-* configure.ac: fix result message grammar by glibg10b · Pull Request #3976
-* Automake: add "makefile-automake", the name of an emacs mode, as an alias by masatake · Pull Request #3975
-* optscript: add _anongen operator by masatake · Pull Request #3973
-* C++: recognize definitions of variable templates by masatake · Pull Request #3966
-* Asm: relax the condition for accepting characters within a section name by masatake · Pull Request #3964
-* optscript: make the help messages for @[0-9] and [0-9]@ operators easier to understand by masatake · Pull Request #3965
-* FrontMatter: fix the crash for an empty input by masatake · Pull Request #3961
-* add support for loongarch by wuruilong01 · Pull Request #3958
-* main: reset file-position map when input stream is reset by masatake · Pull Request #3953
-* Vim: extract classes by masatake · Pull Request #3951
-* main: fix typos in a variable name by masatake · Pull Request #3957
-* JavaScript: skip static blocks by masatake · Pull Request #3949
-* C++ : support C++20 modules by masatake · Pull Request #3941
-* Terraform: fix two known bugs by ponchoalv · Pull Request #3945
-* C,C++: fix properties field for object defined or declared with structure definitions by masatake · Pull Request #3944
-* LEX: make reference tags for the conditions used for making groups by masatake · Pull Request #3939
-* Docs(web): wrtite about foreign tags by masatake · Pull Request #3934
-* main: count the added tags after emitting parser-specific ptags by masatake · Pull Request #3936
-*  Make: fix wrong end fields for targets having macros on the same line  by masatake · Pull Request #3931
-* Vim:  support vim9script by masatake · Pull Request #3930
-* docs(man),man-test: require "yaml" feature in the man-test of I18nRubyGem by masatake · Pull Request #3929
-* Vim: skip heredoc regions  by masatake · Pull Request #3925
-* Fix typo by pepsiman · Pull Request #3926
-* build-sys: enable LTO by masatake · Pull Request #3922
-* build(deps): bump actions/cache from 3 to 4 by dependabot[bot] · Pull Request #3923
-* I18nRubyGem: trim leading colon inside of tag name by masatake · Pull Request #3921
-* Rake: extract m in "task (:m)" as a task by masatake · Pull Request #3919
-* Markdown,FrontMatter,YamlFrontMatter: recognize "..." as the end of YAML documents by masatake · Pull Request #3918
-* Ruby:  optimize the parser by reducing the numbers of calling strlen by masatake · Pull Request #3916
-* Python: extract n in "n = SimpleNamespace(" as namespace/I kind by masatake · Pull Request #3917
-* Ruby: extract m in "define_method(:m" as a method by masatake · Pull Request #3908
-* Sh,Zsh: handle options for alias and function built-in commands by masatake · Pull Request #3909
-* docs(web): add the news entry for 6.1.0 by masatake · Pull Request #3910
-* GitHub Actions: add CODECOV_TOKEN to env by masatake · Pull Request #3911
-* Ruby: extract m in "m = Module.new()" as a tag with module kind by masatake · Pull Request #3907
-* Post-release administrivia by masatake · Pull Request #3904
-
-Issues close or partially closed via above pull requests
----------------------------------------------------------------------
-
-.. generated by ./misc/news.bash issue [v6.1.0...]
-
-* TOML: reporting wrong patterns when the parser runs as a sub parser · Issue #4114
-* Just another crash · Issue #4181
-* Java: crash with a multi-byte character · Issue #4222
-* JavaScript: Segfault on jQuery v1.11.0 · Issue #4227
-* ctags  crashes  with memory access violation  while tagging Linux source code · Issue #4225
-* C++: bug in code detecting attributes · Issue #4089
-* Perl: Segfault on Throwable::Error · Issue #4217
-* CPreprocessor,C: macro expands multiple lines · Issue #4018
-* JavaScript:  extract local vars unexpectedly · Issue #4194
-* Issues in CUDA parsing · Issue #4187
-* JavaScript: destructural binding · Issue #1112
-* JSON full attributes path · Issue #4164
-* Support Null Tag · Issue #4151
-* Objective-C method linenumber is the first block (not the function name like in C) · Issue #4161
-* Powershell: (bug) herestr breaks ctags functions list. · Issue #4141
-*  `parsers/args.ctags` was also committed accidentally. · Issue #4135
-* Unwanted files accidentally committed · Issue #4098
-* meson: use benchmark() instead of bench_mark() · Issue #4100
-* "ctags: Failure on attempt to read file : Is a directory" · Issue #4081
-* Fortran: How to include "$" in variable and function names · Issue #4033
-* Haskell: reference to too generic part of the type signature emitted when tagging Haskell source with multi-line type signature · Issue #4013
-* C++ modules: "export" declaration wrongly marked as file-local (static) · Issue #4003
-* tagging pascal language does not recognize one-line-comments '//' · Issue #3988
-* C++: null tag for the code specfying operator in unsing statement · Issue #3981
-* Support XDG specification on Windows · Issue #3969
-* C++:  crash when a variable template is given · Issue #3963
-* C++: variable template · Issue #3962
-* JavaScript static initialization blocks break the tagging of the rest of the class · Issue #3948
-* C++: disappearing pseudo tags · Issue #3935
-* ctags-lang-i18nrubygem test fails without yaml support · Issue #3928
-* Enabling LTO (Was: p5.9.20210221.0: build fails) · Issue #2885
-* I18nRubyGem leading colon inside of tag name · Issue #3920
-* Python: extract SimpleNamespace · Issue #3912
+    Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+    (cherry picked from commit 21769fe58d8aa6a05f7f6f2941e06ddff5a6da68)

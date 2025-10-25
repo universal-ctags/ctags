@@ -288,10 +288,10 @@ jobs:
              # make check roundtrip
              make units CATEGORIES=parser-varlink
 
-   fedora33_cross_aarch64:
+   fedora42_cross_aarch64:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/library/fedora:33
+       - image: docker.io/library/fedora:42
      steps:
        - run:
            name: Install tools
@@ -300,7 +300,7 @@ jobs:
        - run:
            name: Prepare repo file for install cross compiler
            command: |
-             curl -o /etc/yum.repos.d/lantw44-aarch64-linux-gnu-toolchain-fedora-33.repo https://copr.fedorainfracloud.org/coprs/lantw44/aarch64-linux-gnu-toolchain/repo/fedora-33/lantw44-aarch64-linux-gnu-toolchain-fedora-33.repo
+             curl -o /etc/yum.repos.d/lantw44-aarch64-linux-gnu-toolchain-fedora-42.repo https://copr.fedorainfracloud.org/coprs/lantw44/aarch64-linux-gnu-toolchain/repo/fedora-42/lantw44-aarch64-linux-gnu-toolchain-fedora-42.repo
        - run:
            name: Install the cross compiler for aarch64
            command: |
@@ -340,7 +340,7 @@ workflows:
       - stream10
       - stream9
       - fedora42_gmake
-      - fedora33_cross_aarch64
+      - fedora42_cross_aarch64
       - ubuntu20_mingw
       - fedora30_bmake_roundtrip
       - fedora42_gmake_roundtrip

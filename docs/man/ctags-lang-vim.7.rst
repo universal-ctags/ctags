@@ -6,7 +6,7 @@ ctags-lang-vim
 
 Random notes about tagging Vim source code with Universal Ctags
 
-:Version: 6.2.0
+:Version: 6.2.1
 :Manual group: Universal Ctags
 :Manual section: 7
 

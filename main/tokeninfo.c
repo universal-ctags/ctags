@@ -91,7 +91,8 @@ void  flashTokenBacklog (struct tokenInfoClass *klass)
 
 void tokenDelete (tokenInfo *token)
 {
-	objPoolPut (token->klass->pool, token);
+	if (token != NULL)
+		objPoolPut (token->klass->pool, token);
 }
 
 
