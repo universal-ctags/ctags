@@ -470,9 +470,10 @@ Language Selection and Mapping Options
 	feature list; otherwise, the file name patterns are matched against
 	file names using a simple textual comparison.
 
-	When mapping a file extension with ``--langmap`` option,
-	it will first be unmapped from any other languages. (``--map-<LANG>``
-	option provides more fine-grained control.)
+	When mapping a file extension or a file name pattern with
+	``--langmap`` option, it will first be unmapped from any other
+	languages. (``--map-<LANG>`` option provides more fine-grained
+	control.)
 
 	If the first character in a *<map>* is a plus sign ('``+``'), then the extensions and
 	file name patterns in that map will be appended to the current map
@@ -1059,6 +1060,8 @@ Listing Options
 		``TAG_OUTPUT_VERSION`` in :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the ctags output
 		version.
 
+		(since verison 6.3.0)
+
 	DESCRIPTION
 		Human readable description for the extra.
 
@@ -1111,6 +1114,8 @@ Listing Options
 		language-specified field. See the ``--version`` option and
 		``TAG_OUTPUT_VERSION`` in :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the ctags output
 		version.
+
+		(since verison 6.3.0)
 
 	DESCRIPTION
 		Human readable description for the field.
@@ -1208,6 +1213,8 @@ Listing Options
 	VER
 		The parser version introducing the kind.
 
+		(since verison 6.3.0)
+
 	DESCRIPTION
 		Human readable description for the kind.
 
@@ -1300,6 +1307,8 @@ Listing Options
 	VER
 		The parser version introducing the role.
 
+		(since verison 6.3.0)
+
 	DESCRIPTION
 		Human readable description for the role.
 
@@ -1324,6 +1333,8 @@ Miscellaneous Options
 
 ``--describe-language=<language>``
 	Prints the various aspects of the parser implementing the language.
+
+	(since verison 6.3.0)
 
 ``--help``
 	Prints to standard output a detailed usage description, and then exits.

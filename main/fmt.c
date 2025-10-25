@@ -147,7 +147,7 @@ static fmtElement** queueLiteral (fmtElement **last, char *literal)
    Here the two parts are combined with `.'.
 
    If it cannot find a period, it returns LANG_IGNORE and sets
-   fullname to *fieldName.
+   fullName to *fieldName.
 
    If lang part if `*', it returns LANG_AUTO and sets the field
    name part to *fieldName.
