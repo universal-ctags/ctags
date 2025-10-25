@@ -1060,6 +1060,8 @@ Listing Options
 		``TAG_OUTPUT_VERSION`` in ctags-client-tools(7) about the ctags output
 		version.
 
+		(since verison 6.3.0)
+
 	DESCRIPTION
 		Human readable description for the extra.
 
@@ -1112,6 +1114,8 @@ Listing Options
 		language-specified field. See the ``--version`` option and
 		``TAG_OUTPUT_VERSION`` in ctags-client-tools(7) about the ctags output
 		version.
+
+		(since verison 6.3.0)
 
 	DESCRIPTION
 		Human readable description for the field.
@@ -1209,6 +1213,8 @@ Listing Options
 	VER
 		The parser version introducing the kind.
 
+		(since verison 6.3.0)
+
 	DESCRIPTION
 		Human readable description for the kind.
 
@@ -1301,6 +1307,8 @@ Listing Options
 	VER
 		The parser version introducing the role.
 
+		(since verison 6.3.0)
+
 	DESCRIPTION
 		Human readable description for the role.
 
@@ -1325,6 +1333,8 @@ Miscellaneous Options
 
 ``--describe-language=<language>``
 	Prints the various aspects of the parser implementing the language.
+
+	(since verison 6.3.0)
 
 ``--help``
 	Prints to standard output a detailed usage description, and then exits.
