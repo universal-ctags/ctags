@@ -27,7 +27,9 @@ typedef enum eWriterType {
 	WRITER_E_CTAGS,
 	WRITER_ETAGS,
 	WRITER_XREF,
+#ifdef HAVE_JANSSON
 	WRITER_JSON,
+#endif
 	WRITER_CUSTOM,
 	WRITER_COUNT,
 } writerType;

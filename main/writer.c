@@ -21,14 +21,18 @@ extern tagWriter uCtagsWriter;
 extern tagWriter eCtagsWriter;
 extern tagWriter etagsWriter;
 extern tagWriter xrefWriter;
+#ifdef HAVE_JANSSON
 extern tagWriter jsonWriter;
+#endif
 
 static tagWriter *writerTable [WRITER_COUNT] = {
 	[WRITER_U_CTAGS] = &uCtagsWriter,
 	[WRITER_E_CTAGS] = &eCtagsWriter,
 	[WRITER_ETAGS] = &etagsWriter,
 	[WRITER_XREF]  = &xrefWriter,
+#ifdef HAVE_JANSSON
 	[WRITER_JSON]  = &jsonWriter,
+#endif
 	[WRITER_CUSTOM] = NULL,
 };
 
