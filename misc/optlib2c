@@ -293,7 +293,12 @@ my $options =
 	   die "Adding a map is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
 	   my $spec = $2;
-	   if ($spec =~ /\((.*)\)/) {
+	   if ($spec =~ /%(.+?)%(i|\{icase\})?/) {
+	       # TODO: handle \% in the regular expression.
+	       my $rexpr = { expr => $1,
+			     iCase => (defined $2 && ($2 eq 'i' || $2 eq '{icase}'))? 1: 0 };
+	       push @{$_[0]->{'rexprs'}}, $rexpr;
+	   } elsif ($spec =~ /\((.*)\)/) {
 	       push @{$_[0]->{'patterns'}}, $1;
 	   } elsif ($spec =~ /\.(.*)/) {
 	       push @{$_[0]->{'extensions'}}, $1;
@@ -894,6 +899,31 @@ sub emit_patterns {
     emit_list $_[0], "patterns";
 }
 
+sub emit_rexprs {
+    my $opts = shift;
+
+    return if (! @{$opts->{'rexprs'}});
+
+    printf <<EOF;
+	static const struct rExprSrc rexprs [] = {
+EOF
+    for (@{$opts->{'rexprs'}}) {
+	my $expr = escape_as_cstr ("$_->{'expr'}");
+	my $iCase = $_->{'iCase'}? "true": "false";
+	printf <<EOF;
+		{
+		  .expr = "$expr",
+		  .iCase = $iCase,
+		},
+EOF
+    }
+    printf <<EOF;
+		REXPR_LAST_ENTRY
+	};
+
+EOF
+}
+
 # TODO: handling '\'
 sub escape_as_cstr {
     my $input = shift;
@@ -1255,6 +1285,13 @@ sub emit_fields_initialization {
 	def->enabled       = ${enabled};
 	def->extensions    = extensions;
 	def->patterns      = patterns;
+EOF
+    if (@{$opts->{'rexprs'}}) {
+	print <<EOF;
+	def->rexprs        = rexprs;
+EOF
+    }
+    print <<EOF;
 	def->aliases       = aliases;
 EOF
     if (defined $opts->{'selector'}) {
@@ -1357,6 +1394,7 @@ EOF
     emit_extensions      $opts;
     emit_aliases         $opts;
     emit_patterns        $opts;
+    emit_rexprs          $opts;
     emit_roledefs        $opts;
     emit_scopeseps       $opts;
     emit_kinddefs        $opts;
@@ -1417,6 +1455,7 @@ sub main {
 		disabled => 0,
 		patterns => [],
 		extensions => [],
+		rexprs => [],
 		aliases => [],
 		regexs => [# { regex => "", name => "", kind => "", flags => "", mline => 1|0, optscript => "" },
 			  ],

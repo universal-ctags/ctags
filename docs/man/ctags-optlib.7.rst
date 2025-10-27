@@ -31,7 +31,7 @@ readers should read :ref:`ctags(1) <ctags(1)>` of Universal Ctags first.
 Following options are for defining (or customizing) a parser:
 
 * ``--langdef=<name>``
-* ``--map-<LANG>=[+|-]<extension>|<pattern>``
+* ``--map-<LANG>=[+|-]<extension>|<pattern>|<rexpr>``
 * ``--kinddef-<LANG>=<letter>,<name>,<description>``
 * ``--regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/[<flags>]``
 * ``--mline-regex-<LANG>=/<line_pattern>/<name_pattern>/<kind-spec>/{mgroup=<N>}[<flags>]``
@@ -103,7 +103,7 @@ Overview for defining a parser
 
 3. Give a file pattern or file extension for activating the parser
 
-   Use ``--map-<LANG>=[+|-]<extension>|<pattern>``.
+   Use ``--map-<LANG>=[+|-]<extension>|<pattern>|<rexpr>``.
 
 4. Define kinds
 

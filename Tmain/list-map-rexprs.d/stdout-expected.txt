@@ -1,0 +1,7 @@
+#EXPRESSION CASE
+%ESCAPING%  sensitive
+ICASE       insensitive
+Something %aExpr% %\%ESCAPING\%% %ICASE%i
+       int Something
+     float Something
+    double Something

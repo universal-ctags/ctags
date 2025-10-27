@@ -1,0 +1,5 @@
+# < macros.d/macros.vm
+macros.d/macros.vim: RpmMacros
+vimfiles_root	macros.d/macros.vim	/^%vimfiles_root %{_datadir}\/vim\/vimfiles$/;"	m
+# cd macros.d; < macros.vim
+macros.vim: Vim

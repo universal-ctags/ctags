@@ -17,12 +17,7 @@
 #
 --langdef=RpmMacros
 
-# This map is too generic.
-# e.g. "macros.h" of C language input matches this pattern.
-# --map-RpmMacros=+(macros.*)
-
-# This one is too general.
-# --map-RpmMacros=+(macros)
+--map-RpmMacros=+%(.*/)?macros\.d/macros\.([^/]+)$%
 
 --kinddef-RpmMacros=m,macro,macros
 

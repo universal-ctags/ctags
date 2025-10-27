@@ -39,6 +39,7 @@
 #include "interactive_p.h"
 #include "writer_p.h"
 #include "trace.h"
+#include "flags_p.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>
@@ -59,6 +60,8 @@
 /*  The following separators are permitted for list options.
  */
 #define EXTENSION_SEPARATOR '.'
+#define REXPR_START '%'
+#define REXPR_STOP '%'
 #define PATTERN_START '('
 #define PATTERN_STOP  ')'
 #define IGNORE_SEPARATORS   ", \t\n"
@@ -303,10 +306,10 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"  --langmap=<map>[,<map>[...]]"},
  {1,0,"       Override default mapping of language to input file extension."},
  {1,0,"       e.g. --langmap=c:.c.x,java:+.j,make:([Mm]akefile).mak"},
- {1,0,"  --map-<LANG>=[+|-]<extension>|<pattern>"},
+ {1,0,"  --map-<LANG>=[+|-]<extension>|<pattern>|<rexpr>"},
  {1,0,"       Set, add(+) or remove(-) the map for <LANG>."},
- {1,0,"       Unlike --langmap, this doesn't take a list; only one file name <pattern>"},
- {1,0,"       or one file <extension> can be specified at once."},
+ {1,0,"       Unlike --langmap, this doesn't take a list; only one file name <pattern>,"},
+ {1,0,"       one file name <extension>, or one file <rexpr> can be specified at once."},
  {1,0,"       Unlike --langmap the change with this option affects mapping of <LANG> only."},
  {1,0,""},
  {1,0,"Tags File Contents Options"},
@@ -436,6 +439,8 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"       Output list of language extensions in mapping."},
  {1,0,"  --list-map-patterns[=(<language>|all)]"},
  {1,0,"       Output list of language patterns in mapping."},
+ {1,0,"  --list-map-rexprs[=(<language>|all)]"},
+ {1,0,"       Output list of language regular expressions in mapping."},
  {1,0,"  --list-maps[=(<language>|all)]"},
  {1,0,"       Output list of language mappings (both extensions and patterns)."},
  {1,0,"  --list-mline-regex-flags"},
@@ -1757,7 +1762,7 @@ static char* skipPastMap (char* p)
 static char* extractMapFromParameter (const langType language,
 				      char* parameter,
 				      char** tail,
-				      bool* pattern_p,
+				      langmapType *mapType,
 				      char* (* skip) (char *))
 {
 	char* p = NULL;
@@ -1767,7 +1772,7 @@ static char* extractMapFromParameter (const langType language,
 
 	if (first == EXTENSION_SEPARATOR)  /* extension map */
 	{
-		*pattern_p = false;
+		*mapType = LMAP_EXTENSION;
 
 		++parameter;
 		p = (* skip) (parameter);
@@ -1777,19 +1782,18 @@ static char* extractMapFromParameter (const langType language,
 			*tail = parameter + strlen (parameter);
 			return result;
 		}
-		else
-		{
-			tmp = *p;
-			*p = '\0';
-			result = eStrdup (parameter);
-			*p = tmp;
-			*tail = p;
-			return result;
-		}
+
+		tmp = *p;
+		*p = '\0';
+		result = eStrdup (parameter);
+		*p = tmp;
+		*tail = p;
+		return result;
 	}
-	else if (first == PATTERN_START)  /* pattern map */
+
+	if (first == PATTERN_START)  /* pattern map */
 	{
-		*pattern_p = true;
+		*mapType = LMAP_PATTERN;
 
 		++parameter;
 		for (p = parameter  ;  *p != PATTERN_STOP  &&  *p != '\0'  ;  ++p)
@@ -1800,32 +1804,73 @@ static char* extractMapFromParameter (const langType language,
 		if (*p == '\0')
 			error (FATAL, "Unterminated file name pattern for %s language",
 			   getLanguageName (language));
-		else
+
+		tmp = *p;
+		*p = '\0';
+		result = eStrdup (parameter);
+		*p = tmp;
+		*tail = p + 1;
+		return result;
+	}
+
+	if (first == REXPR_START)
+	{
+		*mapType = LMAP_REXPR;
+
+		++parameter;
+		vString *rexpr = vStringNew ();
+		for (p = parameter  ;  *p != REXPR_STOP  &&  *p != '\0'  ;  ++p)
 		{
-			tmp = *p;
-			*p = '\0';
-			result = eStrdup (parameter);
-			*p = tmp;
-			*tail = p + 1;
-			return result;
+			if (*p == '\\'  &&  *(p + 1) == REXPR_STOP)
+				p++;
+			vStringPut (rexpr, *p);
 		}
+		if (*p == '\0')
+			error (FATAL, "Unterminated file name regular expression for %s language: %s",
+				   getLanguageName (language), parameter);
+
+		*tail = p + 1;
+		return vStringDeleteUnwrap (rexpr);
 	}
 
 	return NULL;
 }
 
+static void langmap_rexpr_icase_short (char c CTAGS_ATTR_UNUSED, void* data)
+{
+	bool *icase = data;
+	*icase = true;
+}
+
+static void langmap_rexpr_icase_long (const char* s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
+{
+	langmap_rexpr_icase_short ('i', data);
+}
+
+static flagDefinition langmapRexprFlagDef[] = {
+	{ 'i', "icase",  langmap_rexpr_icase_short,  langmap_rexpr_icase_long,
+	  NULL, "applied in a case-insensitive manner"},
+};
+
 static char* addLanguageMap (const langType language, char* map_parameter,
-			     bool exclusiveInAllLanguages)
+			     bool exclusiveInAllLanguages, bool handleRexpr)
 {
 	char* p = NULL;
-	bool pattern_p;
+	langmapType map_type;
 	char* map;
 
-	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
-	if (map && pattern_p == false)
+	map = extractMapFromParameter (language, map_parameter, &p, &map_type, skipPastMap);
+	if (map && map_type == LMAP_EXTENSION)
 		addLanguageExtensionMap (language, map, exclusiveInAllLanguages);
-	else if (map && pattern_p == true)
+	else if (map && map_type == LMAP_PATTERN)
 		addLanguagePatternMap (language, map, exclusiveInAllLanguages);
+	else if (handleRexpr && map && map_type == LMAP_REXPR)
+	{
+		bool icase = false;
+
+		flagsEval (p, langmapRexprFlagDef, ARRAY_SIZE(langmapRexprFlagDef), &icase);
+		addLanguageRexprMap (language, map, icase, exclusiveInAllLanguages);
+	}
 	else
 		error (FATAL, "Badly formed language map for %s language",
 				getLanguageName (language));
@@ -1838,14 +1883,21 @@ static char* addLanguageMap (const langType language, char* map_parameter,
 static char* removeLanguageMap (const langType language, char* map_parameter)
 {
 	char* p = NULL;
-	bool pattern_p;
+	langmapType map_type;
 	char* map;
 
-	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
-	if (map && pattern_p == false)
+	map = extractMapFromParameter (language, map_parameter, &p, &map_type, skipPastMap);
+	if (map && map_type == LMAP_EXTENSION)
 		removeLanguageExtensionMap (language, map);
-	else if (map && pattern_p == true)
+	else if (map && map_type == LMAP_PATTERN)
 		removeLanguagePatternMap (language, map);
+	else if (map && map_type == LMAP_REXPR)
+	{
+		bool icase = false;
+
+		flagsEval (p, langmapRexprFlagDef, ARRAY_SIZE(langmapRexprFlagDef), &icase);
+		removeLanguageRexprMap (language, map, icase);
+	}
 	else
 		error (FATAL, "Badly formed language map for %s language",
 		       getLanguageName (language));
@@ -1892,7 +1944,7 @@ static char* processLanguageMap (char* map)
 				else
 					verbose ("    Adding to %s language map:", getLanguageName (language));
 				while (list != NULL  &&  *list != '\0'  &&  *list != ',')
-					list = addLanguageMap (language, list, true);
+					list = addLanguageMap (language, list, true, false);
 				verbose ("\n");
 			}
 			if (list != NULL  &&  *list == ',')
@@ -2019,7 +2071,7 @@ extern bool processMapOption (
 	map_parameter = eStrdup (spec);
 
 	if (op == '+')
-		addLanguageMap (language, map_parameter, false);
+		addLanguageMap (language, map_parameter, false, true);
 	else if (op == '-')
 		removeLanguageMap (language, map_parameter);
 	else
@@ -2166,6 +2218,13 @@ static void processListMapPatternsOption (const char *const option,
 {
 	processListMapsOptionForType (option, parameter, LMAP_PATTERN|LMAP_TABLE_OUTPUT);
 }
+
+static void processListMapRexprsOption (const char *const option,
+				       const char *const parameter)
+{
+	processListMapsOptionForType (option, parameter, LMAP_REXPR|LMAP_TABLE_OUTPUT);
+}
+
 
 static void processListMapsOption (
 		const char *const option CTAGS_ATTR_UNUSED,
@@ -2329,6 +2388,13 @@ static void processDescribeLanguage(const char *const option,
 	printf("version: %u.%u\n",
 		   getLanguageVersionCurrent (language),
 		   getLanguageVersionAge (language));
+
+	puts("");
+	puts("Mappings/rexprs");
+	puts("-------------------------------------------------------");
+	printLanguageMaps (language, LMAP_REXPR|LMAP_NO_LANG_PREFIX,
+					   localOption.withListHeader, localOption.machinable,
+					   stdout);
 
 	puts("");
 	puts("Mappings/patterns");
@@ -3002,6 +3068,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-maps",              processListMapsOption,          true,   STAGE_ANY },
 	{ "list-map-extensions",    processListMapExtensionsOption, true,   STAGE_ANY },
 	{ "list-map-patterns",      processListMapPatternsOption,   true,   STAGE_ANY },
+	{ "list-map-rexprs",        processListMapRexprsOption,     true,   STAGE_ANY },
 	{ "list-mline-regex-flags", processListMultilineRegexFlagsOption, true, STAGE_ANY },
 	{ "list-output-formats",    processListOutputFormatsOption, true,   STAGE_ANY },
 	{ "list-params",            processListParametersOption,    true,   STAGE_ANY },

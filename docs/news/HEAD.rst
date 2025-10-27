@@ -18,6 +18,15 @@ New column, VER in the output of ``--list-{kinds-full,roles,fields,extras,pseudo
     Indicates the versions of ctags output (or the parser) introducing the
     item in the list.
 
+Extend ``--map-<LANG>=`` and ``--langmap=`` options to choose a parser using regular expressions
+
+	``--map-<LANG>=[+]%REXPR%`` (or ``--langmap=<LANG>:[+]%REXPR%``) maps relative-paths
+	that match the regular expression to the given language.
+
+	The new ``--list-map-rexprs`` lists all regular-expression-based mappings.
+
+	``--list-maps`` has also been extended to include regular-expression-based mappings.
+
 Incompatible changes
 ---------------------------------------------------------------------
 
