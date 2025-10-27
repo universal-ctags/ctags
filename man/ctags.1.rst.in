@@ -1060,7 +1060,7 @@ Listing Options
 		``TAG_OUTPUT_VERSION`` in ctags-client-tools(7) about the ctags output
 		version.
 
-		(since verison 6.3.0)
+		(since version 6.3.0)
 
 	DESCRIPTION
 		Human readable description for the extra.
@@ -1115,7 +1115,7 @@ Listing Options
 		``TAG_OUTPUT_VERSION`` in ctags-client-tools(7) about the ctags output
 		version.
 
-		(since verison 6.3.0)
+		(since version 6.3.0)
 
 	DESCRIPTION
 		Human readable description for the field.
@@ -1213,7 +1213,7 @@ Listing Options
 	VER
 		The parser version introducing the kind.
 
-		(since verison 6.3.0)
+		(since version 6.3.0)
 
 	DESCRIPTION
 		Human readable description for the kind.
@@ -1267,7 +1267,7 @@ Listing Options
 	``NULLTAG`` column represetns whether the format supports *null tags* or
 	not. See ``nulltag``/``z`` in "`Extras`_" about the null tags.
 
-	(since verison 6.2.0)
+	(since version 6.2.0)
 
 ``--list-params[=(<language>|all)]``
 	Lists the parameters for either the specified *<language>* or ``all``
@@ -1307,7 +1307,7 @@ Listing Options
 	VER
 		The parser version introducing the role.
 
-		(since verison 6.3.0)
+		(since version 6.3.0)
 
 	DESCRIPTION
 		Human readable description for the role.
@@ -1334,7 +1334,7 @@ Miscellaneous Options
 ``--describe-language=<language>``
 	Prints the various aspects of the parser implementing the language.
 
-	(since verison 6.3.0)
+	(since version 6.3.0)
 
 ``--help``
 	Prints to standard output a detailed usage description, and then exits.

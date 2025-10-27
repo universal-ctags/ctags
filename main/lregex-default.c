@@ -106,7 +106,7 @@ static regexCompiledCode compile (struct regexBackend *backend,
 	if (errcode != 0)
 	{
 		char errmsg[256];
-		regerror (errcode, regex_code, errmsg, 256);
+		regerror (errcode, regex_code, errmsg, sizeof(errmsg));
 		error (WARNING, "regcomp: %s", errmsg);
 		regfree (regex_code);
 		eFree (regex_code);

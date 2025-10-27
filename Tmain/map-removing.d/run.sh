@@ -49,3 +49,18 @@ ${CTAGS} --quiet --options=NONE   \
 	 --guess-language-eagerly \
 	 ada.m matlab.m objc.m
 echo
+
+X=xxxyyyzzz
+echo 'Removing multi extension entries'
+${CTAGS} --quiet --options=NONE   \
+	 --map-Pascal=.$X \
+	 --map-Fortran=.$X \
+	 --langmap=C:.$X \
+	 --list-maps | grep $X
+
+echo 'Removing multi pattern entries'
+${CTAGS} --quiet --options=NONE   \
+	 --map-Pascal='('$X')' \
+	 --map-Fortran='('$X')' \
+	 --langmap=C:'('$X')' \
+	 --list-maps | grep $X

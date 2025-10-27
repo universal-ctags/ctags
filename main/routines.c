@@ -664,7 +664,7 @@ extern char* baseFilenameSansExtensionNew (const char *const fileName,
 	const char *const base = baseFilename (fileName);
 	char* shorten_base;
 
-	pDelimiter = strrchr (base, templateExt[0]);
+	pDelimiter = strrstr (base, templateExt);
 
 	if (pDelimiter && (strcmp (pDelimiter, templateExt) == 0))
 	{
