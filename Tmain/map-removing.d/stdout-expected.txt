@@ -30,3 +30,7 @@ ada.m: Ada
 matlab.m: MatLab
 objc.m: ObjectiveC
 
+Removing multi extension entries
+C        *.xxxyyyzzz
+Removing multi pattern entries
+C        xxxyyyzzz

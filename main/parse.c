@@ -1740,7 +1740,7 @@ extern bool removeLanguagePatternMap (const langType language, const char *const
 	if (language == LANG_AUTO)
 	{
 		unsigned int i;
-		for (i = 0  ;  i < LanguageCount  &&  ! result ;  ++i)
+		for (i = 0  ;  i < LanguageCount ;  ++i)
 			result = removeLanguagePatternMap1 (i, pattern) || result;
 	}
 	else
