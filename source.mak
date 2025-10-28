@@ -232,6 +232,7 @@ OPTLIB2C_INPUT = \
 	optlib/elixir.ctags			\
 	optlib/forth.ctags			\
 	optlib/gdbinit.ctags			\
+	optlib/gomod.ctags			\
 	optlib/gperf.ctags			\
 	optlib/inko.ctags			\
 	optlib/iPythonCell.ctags		\

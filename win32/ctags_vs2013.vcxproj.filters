@@ -243,6 +243,9 @@
     <ClCompile Include="..\optlib\gdbinit.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\gomod.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\gperf.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
