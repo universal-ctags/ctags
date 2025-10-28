@@ -55,6 +55,7 @@ The following parsers have been added:
 * Netfilter: to handle the output of "nft list ..." command
 * Prolog
 * DBusService
+* GoMod
 
 Changes about parser specific kinds, roles, fields, and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
