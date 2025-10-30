@@ -15,7 +15,7 @@ error on missing arguments
 error on invalid file
 =======================================
 {"_type": "program", "name": "Universal Ctags"}
-{"_type": "error", "message": "cannot open input file \"test.foo\"", "warning": true, "errno": 2, "perror": "No such file or directory"}
+{"_type": "error", "message": "cannot open input file \"test.foo\"", "warning": true, "perror": "No such file or directory"}
 {"_type": "completed", "command": "generate-tags"}
 
 generate tags from file
