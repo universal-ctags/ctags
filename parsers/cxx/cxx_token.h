@@ -101,6 +101,18 @@ void cxxTokenDestroy(CXXToken * t);
 // A shortcut for quickly creating a fake token.
 CXXToken * cxxTokenCopy(CXXToken *pToken);
 
+
+// Replace pOriginal with pNew.
+void cxxTokenReplace(CXXToken *pOriginal, CXXToken *pNew);
+
+CXXToken * cxxTokenReplaceWithTokens(CXXToken *pOriginal,
+									 CXXToken *pHead,
+									 CXXToken *pTail);
+// Replace pOriginal with tokens in pChain.
+// Returns the first token of the tokens.
+CXXToken * cxxTokenReplaceWithTokensInChain(CXXToken *pOriginal,
+											CXXTokenChain *pChain);
+
 // A shortcut for quickly creating keyword tokens.
 CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,CXXKeyword eKeyword);
 

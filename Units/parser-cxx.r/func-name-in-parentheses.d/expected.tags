@@ -1,0 +1,16 @@
+gboolean	input.c	/^typedef boolean gboolean;$/;"	kind:typedef	typeref:typename:boolean	file:
+gchar	input.c	/^typedef char gchar;$/;"	kind:typedef	typeref:typename:char	file:
+g_str_has_prefix	input.c	/^gboolean             (g_str_has_prefix) (const gchar *str,$/;"	kind:prototype	typeref:typename:gboolean	file:	signature:(const gchar * str,const gchar * prefix)
+I	input.c	/^typedef int I;$/;"	kind:typedef	typeref:typename:int	file:
+fp	input.c	/^I (fp) (void);$/;"	kind:prototype	typeref:typename:I	file:	signature:(void)
+fi	input.c	/^I (fi) (void) { return 0; }$/;"	kind:function	typeref:typename:I	signature:(void)
+gp	input.c	/^I* (gp) (void);$/;"	kind:prototype	typeref:typename:I *	file:	signature:(void)
+gi	input.c	/^I* (gi) (void) { return NULL; }$/;"	kind:function	typeref:typename:I *	signature:(void)
+Point	input-0.cpp	/^class Point {$/;"	kind:class	file:
+x	input-0.cpp	/^  double x, y;$/;"	kind:member	class:Point	typeref:typename:double	file:
+y	input-0.cpp	/^  double x, y;$/;"	kind:member	class:Point	typeref:typename:double	file:
+myns	input-0.cpp	/^namespace myns {$/;"	kind:namespace	file:
+g	input-0.cpp	/^  class Point * (g)();$/;"	kind:prototype	namespace:myns	typeref:class:Point *	file:	signature:()
+mysubns	input-0.cpp	/^  namespace mysubns {$/;"	kind:namespace	namespace:myns	file:
+h	input-0.cpp	/^    class Point * ((h))();$/;"	kind:prototype	namespace:myns::mysubns	typeref:class:Point *	file:	signature:()
+f	input-0.cpp	/^class Point * (f)() {$/;"	kind:function	typeref:class:Point *	signature:()

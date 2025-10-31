@@ -138,6 +138,37 @@ CXXToken * cxxTokenCopy(CXXToken * pToken)
 	return pRetToken;
 }
 
+void cxxTokenReplace(CXXToken *pOriginal, CXXToken *pNew)
+{
+	cxxTokenReplaceWithTokens(pOriginal, pNew, pNew);
+}
+
+CXXToken * cxxTokenReplaceWithTokens(CXXToken *pOriginal,
+									 CXXToken *pHead, CXXToken *pTail)
+{
+	pTail->pNext = pOriginal->pNext;
+	if (pOriginal->pNext)
+		pOriginal->pNext->pPrev = pTail;
+	pOriginal->pNext = NULL;
+
+	pHead->pPrev = pOriginal->pPrev;
+	if (pOriginal->pPrev)
+		pOriginal->pPrev->pNext = pHead;
+	pOriginal->pPrev = NULL;
+
+	return pHead;
+}
+
+CXXToken * cxxTokenReplaceWithTokensInChain(CXXToken *pOriginal,
+											CXXTokenChain *pChain)
+{
+	CXXToken * pHead = pChain->pHead;
+	CXXToken * pTail = pChain->pTail;
+	cxxTokenChainInit(pChain);
+
+	return cxxTokenReplaceWithTokens(pOriginal, pHead, pTail);
+}
+
 CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,CXXKeyword eKeyword)
 {
 	CXXToken * pToken = cxxTokenCreate();

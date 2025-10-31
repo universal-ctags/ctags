@@ -679,6 +679,41 @@ static bool cxxParserisConstructor(const char *szFuncname)
 	return false;
 }
 
+static CXXTokenChain * cxxParserLookForFunctionNameOnlyInParenthesis(CXXTokenChain * pChain)
+{
+	if (pChain->iCount == 3) {
+		CXXToken *pToken = cxxTokenChainAt(pChain,1);
+
+		// It rejects void keyword implicitly to examine the token is an Identifier.
+		if (cxxTokenTypeIs(pToken, CXXTokenTypeIdentifier))
+			return pChain;
+		if (cxxTokenTypeIs(pToken, CXXTokenTypeParenthesisChain))
+			return cxxParserLookForFunctionNameOnlyInParenthesis(pToken->pChain);
+	} else if (pChain->iCount > 3) {
+		CXXToken *pBegin = cxxTokenChainAt(pChain,1);
+		CXXToken *pTmp = pBegin;
+		while (pTmp)
+		{
+			if (!cxxTokenTypeIsOneOf(pTmp,
+									CXXTokenTypeIdentifier | CXXTokenTypeMultipleColons))
+				break;
+			pTmp = pTmp->pNext;
+		}
+		if (pChain->pTail == pTmp)
+			return pChain;
+	}
+	return NULL;
+}
+
+static CXXTokenChain * cxxParserLookForFunctionNameInParenthesisFollowedByParameterList(CXXToken * pParenthesis)
+{
+	CXXToken *pNext = pParenthesis->pNext;
+
+	if (pNext && cxxTokenTypeIs(pNext, CXXTokenTypeParenthesisChain))
+		return cxxParserLookForFunctionNameOnlyInParenthesis(pParenthesis->pChain);
+	return NULL;
+}
+
 //
 // Look for a function signature in the specified chain.
 //
@@ -983,6 +1018,60 @@ bool cxxParserLookForFunctionSignature(
 		{
 			CXX_DEBUG_PRINT("Parenthesis at position 0, meaningless");
 			goto next_token;
+		}
+
+		// Before considering macros, here we examine (FUNC)(ARGS) sequence like:
+		//
+		//   myType (myFunc0)(args...);
+		//   myType ((myFunc1)(args...);
+		//   myType (myNs::myFunc2)(args...);
+		//
+		{
+			CXXTokenChain * pFnameInParenthesis =
+				cxxParserLookForFunctionNameInParenthesisFollowedByParameterList(pToken);
+
+			if (pFnameInParenthesis)
+			{
+				// If the current pToken is at the head of pChain, the following
+				// code chaining the pChain destructive way doesn't work. */
+				Assert(pChain->pHead != pToken);
+
+				int iChainLen = pFnameInParenthesis->iCount;
+				//       v----------- pFnameHead
+				// type (ns:f)(...)
+				//      ^   ^-------- pFnameTail
+				//       `----------- pToken, pFnameInParenthesis
+				//
+				CXXToken * pFnameHead = pFnameInParenthesis->pHead->pNext;
+				CXXToken * pFnameTail = pFnameInParenthesis->pTail->pPrev;
+
+				// Remove the name of function including namespace specifier
+				// from the pFnameInParenthesis; only `(' and `)' remain
+				// in the chain.
+				pFnameInParenthesis->pHead->pNext = pFnameInParenthesis->pTail;
+				pFnameInParenthesis->pTail->pPrev = pFnameInParenthesis->pHead;
+				pFnameInParenthesis->iCount = 2;
+
+				// Remove the parenthesis like:
+				//
+				//   type (ns::f)(...) => type ns::f(...)
+				//
+				cxxTokenReplaceWithTokens(pToken, pFnameHead, pFnameTail);
+				Assert(pFnameHead->pPrev);
+				cxxTokenDestroy(pToken);
+				// And adjust the chain length.
+				pChain->iCount += (iChainLen - 3);
+
+				// Restart the process from the name of function:
+				//   v----------------pToken
+				//   type ns::f(...)
+				//        ^-----------pFnameHead
+				//
+				pToken = pFnameHead->pPrev;
+
+				CXX_DEBUG_PRINT("Found a function name in parenthesis followed by parameter list");
+				goto next_token;
+			}
 		}
 
 		CXX_DEBUG_PRINT("Found interesting parenthesis chain: check for identifier");

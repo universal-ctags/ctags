@@ -1,0 +1,4 @@
+--sort=no
+--kinds-C=+p
+--kinds-C++=+p
+--fields=+KzS
