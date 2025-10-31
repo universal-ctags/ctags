@@ -170,6 +170,7 @@ typedef enum {
 	F_PACKAGE,
 	F_PACKAGE_NAME,
 	F_HOW_IMPORTED,
+	F_RECEIVER,
 } goField;
 
 static fieldDefinition GoFields [] = {
@@ -188,6 +189,12 @@ static fieldDefinition GoFields [] = {
 		.description = "how the package is imported (\"inline\" for `.' or \"init\" for `_')",
 		.enabled = false,
 	},
+	{
+		.name = "receiver",
+		.description = "the name of the receiver",
+		.enabled = false,
+		.version = 1,
+	}
 };
 
 
@@ -828,7 +835,10 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		{
 			tagEntryInfo *receiver = getEntryInCorkQueue (receiver_cork);
 			if (receiver)
+			{
 				receiver->extensionFields.scopeIndex = cork;
+				attachParserField (e, GoFields [F_RECEIVER].ftype, receiver->name);
+			}
 		}
 
 		deleteToken (functionToken);
@@ -1411,5 +1421,7 @@ extern parserDefinition *GoParser (void)
 	def->fieldCount = ARRAY_SIZE (GoFields);
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->requestAutomaticFQTag = true;
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	return def;
 }

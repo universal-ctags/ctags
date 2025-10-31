@@ -84,7 +84,7 @@
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "Python", "path": "v,variable", "pattern": "variables"}
 {"_type": "ptag", "name": "TAG_OUTPUT_EXCMD", "path": "mixed", "pattern": "number, pattern, mixed, or combineV2"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "C", "path": "2.2", "pattern": "current.age"}
-{"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Go", "path": "0.0", "pattern": "current.age"}
+{"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Go", "path": "1.1", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Man", "path": "0.0", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PARSER_VERSION", "parserName": "Python", "path": "1.1", "pattern": "current.age"}
 {"_type": "ptag", "name": "TAG_PATTERN_LENGTH_LIMIT", "path": "96", "pattern": "0 for no limit"}

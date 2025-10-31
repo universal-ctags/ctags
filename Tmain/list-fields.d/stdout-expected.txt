@@ -49,6 +49,7 @@ z	kind	no	NONE	s--	no	r-	0	[tags output] prepend "kind:" to k/ (or K/) field out
 -	howImported	no	Go	s--	no	--	0	how the package is imported ("inline" for `.' or "init" for `_')
 -	package	yes	Go	s--	no	--	0	the real package specified by the package name
 -	packageName	yes	Go	s--	no	--	0	the name for referring the package
+-	receiver	no	Go	s--	no	--	1	the name of the receiver
 -	implements	yes	Inko	s--	no	rw	0	Trait being implemented
 -	properties	no	JavaScript	s--	no	--	2	properties (static)
 -	assignment	yes	LdScript	s--	no	--	0	how a value is assigned to the symbol
