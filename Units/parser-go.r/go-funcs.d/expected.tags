@@ -3,8 +3,8 @@ f1	input.go	/^func f1() {$/;"	f	package:main	signature:()	end:6
 f2	input.go	/^func f2(a int) {$/;"	f	package:main	signature:(a int)	end:9
 f3	input.go	/^func f3(a int) string {$/;"	f	package:main	typeref:typename:string	signature:(a int)	end:13
 f4	input.go	/^func f4(a, b, c <-chan int, d, e, f string) (A, B, C int, D string) {$/;"	f	package:main	typeref:typename:(A, B, C int, D string)	signature:(a, b, c <-chan int, d, e, f string)	end:17
-f5	input.go	/^func (t *T) f5(\/* comment *\/ a, \/*comment*\/ \/*comment*\/       b string, $/;"	f	type:main.T	typeref:typename:(int, string)	signature:(a, b string, c []int)	end:24
-f6	input.go	/^func (t *(T)) f6(r struct {a int `foo`; b string `bar`}) net.IP {$/;"	f	type:main.T	typeref:typename:net.IP	signature:(r struct {a int `foo`; b string `bar`})	end:28
+f5	input.go	/^func (t *T) f5(\/* comment *\/ a, \/*comment*\/ \/*comment*\/       b string, $/;"	f	type:main.T	typeref:typename:(int, string)	signature:(a, b string, c []int)	end:24	receiver:t
+f6	input.go	/^func (t *(T)) f6(r struct {a int `foo`; b string `bar`}) net.IP {$/;"	f	type:main.T	typeref:typename:net.IP	signature:(r struct {a int `foo`; b string `bar`})	end:28	receiver:t
 main	input.go	/^func main() {$/;"	f	package:main	signature:()	end:31
 main	input.go	/^package main$/;"	p
 t	input.go	/^func (t *(T)) f6(r struct {a int `foo`; b string `bar`}) net.IP {$/;"	R	func:main.T.f6	typeref:typename:T
