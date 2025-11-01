@@ -44,6 +44,7 @@ typedef enum {
 	K_PACKAGE,
 	K_GLOBAL,
 	K_PATCH,
+	K_BCOND,
 } rpmSpecKind;
 
 enum rpmSpecMacroRole {
@@ -76,6 +77,9 @@ static kindDefinition RpmSpecKinds[] = {
 	{ true, 'g', "global", "global macros" },
 	{ true, 'p', "patch", "patch files",
 	  .referenceOnly = true, ATTACH_ROLES(RpmSpecPatchRoles) },
+	{ true, 'b', "bcond", "build condition",
+	  .version = 1 },
+
 };
 
 struct macro_cb_data {
@@ -348,6 +352,21 @@ static bool found_package_cb (const char *line,
 	return true;
 }
 
+static bool found_bcond_cb (const char *line,
+			      const regexMatch *matches,
+			      unsigned int count,
+			      void *userData)
+{
+	char *name = eStrndup(line + matches[2].start, matches[2].length);
+	tagEntryInfo tag;
+
+	initTagEntry (&tag, name, K_BCOND);
+
+	makeTagEntry (&tag);
+	eFree (name);
+	return true;
+}
+
 static bool check_line_continuation (const char *line,
 			      const regexMatch *matches,
 			      unsigned int count,
@@ -403,6 +422,8 @@ static void initializeRpmSpecParser (langType language)
 			  "{exclusive}", found_global_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 	addLanguageCallbackRegex (language, "^%package[ \t]+(-n[ \t]+)?([A-Za-z_][A-Za-z_0-9-]+)",
 			  "{exclusive}", found_package_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
+	addLanguageCallbackRegex (language, "^%bcond(|_without|_with)[ \t]+([A-Za-z_]+)",
+			  "{exclusive}", found_bcond_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 	addLanguageCallbackRegex (language, "^.*$",
 			  "{exclusive}", check_line_continuation, NULL, &rpmSpecCtx);
 }
@@ -430,5 +451,7 @@ extern parserDefinition* RpmSpecParser (void)
 	def->method     = METHOD_REGEX;
 	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	return def;
 }
