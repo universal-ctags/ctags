@@ -45,6 +45,10 @@ Something must be written here.
 %description universal-ctags-devel
 Something must be written here.
 
+%bcond cond1 0
+%bcond_with condw
+%bcond_without condwo
+
 %prep
 %setup -q
 

@@ -20,9 +20,12 @@ install_post	input.spec	/^%define install_post \\$/;"	kind:macro	line:31	roles:d
 docs	input.spec	/^%package docs$/;"	kind:package	line:40	package:ctags	roles:def
 ctags-docs	input.spec	/^%package docs$/;"	kind:package	line:40	package:ctags	roles:def
 universal-ctags-devel	input.spec	/^%package -n universal-ctags-devel$/;"	kind:package	line:44	package:ctags	roles:def
-libxml	input.spec	/^%configure --with-libxml=%{YES} --with-libyml=%{YES}\\$/;"	kind:optwith	line:52	roles:cmdline
-libyml	input.spec	/^%configure --with-libxml=%{YES} --with-libyml=%{YES}\\$/;"	kind:optwith	line:52	roles:cmdline
-foo	input.spec	/^	   --without-foo --enable-bar \\$/;"	kind:optwith	line:53	roles:cmdline
-bar	input.spec	/^	   --without-foo --enable-bar \\$/;"	kind:optenable	line:53	roles:cmdline
-baz	input.spec	/^	   --disable-baz\\$/;"	kind:optenable	line:54	roles:cmdline
-bazz	input.spec	/^	   --with-bazz=0$/;"	kind:optwith	line:55	roles:cmdline
+cond	input.spec	/^%bcond cond1 0$/;"	kind:bcond	line:48	roles:def
+condw	input.spec	/^%bcond_with condw$/;"	kind:bcond	line:49	roles:def
+condwo	input.spec	/^%bcond_without condwo$/;"	kind:bcond	line:50	roles:def
+libxml	input.spec	/^%configure --with-libxml=%{YES} --with-libyml=%{YES}\\$/;"	kind:optwith	line:56	roles:cmdline
+libyml	input.spec	/^%configure --with-libxml=%{YES} --with-libyml=%{YES}\\$/;"	kind:optwith	line:56	roles:cmdline
+foo	input.spec	/^	   --without-foo --enable-bar \\$/;"	kind:optwith	line:57	roles:cmdline
+bar	input.spec	/^	   --without-foo --enable-bar \\$/;"	kind:optenable	line:57	roles:cmdline
+baz	input.spec	/^	   --disable-baz\\$/;"	kind:optenable	line:58	roles:cmdline
+bazz	input.spec	/^	   --with-bazz=0$/;"	kind:optwith	line:59	roles:cmdline
