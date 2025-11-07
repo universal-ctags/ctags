@@ -69,3 +69,6 @@ tasks	input.ts	/^  private tasks: string[] = [];$/;"	p	class:TasksService
 taskObj	input.ts	/^  private taskObj: object = {};$/;"	p	class:TasksService
 getAllTasks	input.ts	/^  getAllTasks(): string[] {$/;"	m	class:TasksService
 getTaskObj	input.ts	/^  getTaskObj(): object {$/;"	m	class:TasksService
+Test	input-0.ts	/^export class Test {$/;"	c
+var	input-0.ts	/^    public var?: string;$/;"	p	class:Test
+foo	input-0.ts	/^    public foo() {$/;"	m	class:Test
