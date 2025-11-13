@@ -1652,9 +1652,9 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 }
 
 MULTI_CHAR_PARSER_DEF (ClassBodyChars, "\n,{", TOKEN_NL, TOKEN_COMMA, TOKEN_OPEN_CURLY)
-MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(:;=-+/^<>.,|&",
+MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(?:;=-+/^<>.,|&",
 		TOKEN_NL, TOKEN_CLOSE_CURLY, TOKEN_STAR, TOKEN_AT, TOKEN_OPEN_PAREN,
-		TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_EQUAL_SIGN,
+		TOKEN_QUESTION_MARK, TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_EQUAL_SIGN,
 		TOKEN_MINUS, TOKEN_PLUS, TOKEN_DIV, TOKEN_POWER,
 		TOKEN_GREATER, TOKEN_LOWER, TOKEN_PERIOD, TOKEN_COMMA,
 		TOKEN_PIPE, TOKEN_AMPERSAND)
@@ -1808,6 +1808,8 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 					}
 					parsingValue = true;
 					break;
+				case TOKEN_QUESTION_MARK:
+					break;		/* Just consuming the token */
 				case TOKEN_COLON:
 					uwiUngetC (':');
 					parsePropertyType (token);
