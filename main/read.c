@@ -417,8 +417,20 @@ extern MIOPos getInputFilePositionForLine (unsigned int line)
 extern long getInputFileOffsetForLine (unsigned int line)
 {
 	compoundPos *cpos = getInputFileCompoundPosForLine (line);
-	long r = cpos->offset - (File.bomFound? 3: 0) - cpos->crAdjustment;
+	long bomOffset = File.bomFound ? 3 : 0;
+
+	// The position stored for this line was captured before processing this line's CRLF,
+	// but crAdjustment includes this line's CRLF. Use previous line's adjustment.
+	long relevantCrAdjustment = 0;
+	if (line > 1) {
+		// For line N > 1, use adjustment from line N-1
+		compoundPos *prevCpos = getInputFileCompoundPosForLine(line - 1);
+		relevantCrAdjustment = prevCpos->crAdjustment;
+	}
+
+	long r = cpos->offset - bomOffset - relevantCrAdjustment;
 	Assert (r >= 0);
+
 	return r;
 }
 
