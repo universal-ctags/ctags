@@ -1,0 +1,11 @@
+TestUtil	input.cpp	/^struct TestUtil {$/;"	s	file:
+isNull	input.cpp	/^    static bool isNull(const T&) { return false; }$/;"	f	struct:TestUtil	typeref:typename:bool	file:
+TestUtil	input.cpp	/^struct TestUtil<T*> {$/;"	s	file:
+isNull	input.cpp	/^    static bool isNull(T* f) { return 0 == f; }$/;"	f	struct:TestUtil	typeref:typename:bool	file:
+isNull	input.cpp	/^TestUtil<MEMTYPE CLASS::*>::isNull(MEMTYPE CLASS::* f)$/;"	f	class:TestUtil::*	typeref:typename:bool
+Handler	input.cpp	/^struct Handler {$/;"	s	file:
+process	input.cpp	/^    void process(T value) { }$/;"	f	struct:Handler	typeref:typename:void	file:
+Handler	input.cpp	/^struct Handler<R (C::*)()> {$/;"	s	file:
+process	input.cpp	/^    void process(R (C::*method)()) { }$/;"	f	struct:Handler	typeref:typename:void	file:
+Handler	input.cpp	/^struct Handler<R (C::*)(A)> {$/;"	s	file:
+process	input.cpp	/^    void process(R (C::*method)(A)) { }$/;"	f	struct:Handler	typeref:typename:void	file:

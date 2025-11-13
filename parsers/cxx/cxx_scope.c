@@ -233,13 +233,14 @@ void cxxScopeSetAccess(enum CXXScopeAccess eAccess)
 void cxxScopePushTop(CXXToken * t)
 {
 	CXX_DEBUG_ASSERT(
-			cxxTokenTypeIs(t, CXXTokenTypeIdentifier),
-			"The scope name must be an identifier"
-		);
-	CXX_DEBUG_ASSERT(
 			t->pszWord,
 			"The scope name should have a text"
 		);
+
+	// For complex template specializations, the token may not be a simple identifier.
+	// If it has valid text content, force it to be an identifier for scope purposes.
+	if (!cxxTokenTypeIs(t, CXXTokenTypeIdentifier))
+		t->eType = CXXTokenTypeIdentifier;
 
 	// Inherit the export'ed status from the parent scope.
 	// You can override the inherited status with cxxScopePushExported().
