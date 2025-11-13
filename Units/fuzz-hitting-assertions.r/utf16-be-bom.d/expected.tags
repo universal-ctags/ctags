@@ -1,0 +1,2 @@
+globalVar	input.cpp	/^int globalVar;$/;"	v	typeref:typename:int
+BETestClass	input.cpp	/^class BETestClass {$/;"	c	file:
