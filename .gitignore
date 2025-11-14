@@ -21,6 +21,7 @@
 /Makefile
 /packcc
 /packcc.exe
+/packcc.dSYM
 .cache
 .deps
 .dirstamp
