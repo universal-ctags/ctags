@@ -47,6 +47,7 @@ enum {
 	KEYWORD_lambda,
 	KEYWORD_pass,
 	KEYWORD_return,
+	KEYWORD_type,
 	KEYWORD_REST
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -157,6 +158,7 @@ static const keywordTable PythonKeywordTable[] = {
 	{ "lambda",			KEYWORD_lambda			},
 	{ "pass",			KEYWORD_pass			},
 	{ "return",			KEYWORD_return			},
+	{ "type",			KEYWORD_type			},  /* not a real keyword */
 };
 
 /* Taken from https://docs.python.org/3/reference/lexical_analysis.html#keywords */
@@ -1767,6 +1769,11 @@ static void findPythonTags (void)
 
 		/* skip async keyword that confuses decorator parsing before a def */
 		if (token->keyword == KEYWORD_async)
+			readToken (token);
+
+		/* skip type soft keyword that precedes type assignments and treat the
+		 * rest as a simple variable assignment */
+		if (token->keyword == KEYWORD_type)
 			readToken (token);
 
 		if (token->type == TOKEN_INDENT)
