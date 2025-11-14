@@ -32,6 +32,7 @@ typedef enum {
 	K_UNION,
 	K_ALIAS,
 	K_PROPERTY,
+	K_ENUMERATOR,
 	COUNT_KIND
 } typeSpecKind;
 
@@ -43,7 +44,8 @@ static kindDefinition TypeSpecKinds[COUNT_KIND] = {
 	{ true, 'm', "model",		"models" },
 	{ true, 'u', "union",		"unions" },
 	{ true, 'a', "alias",		"aliases" },
-	{ true, 'p', "property",	"properties" }
+	{ true, 'p', "property",	"properties" },
+	{ true, 'e', "enumerator",	"enumerators (values inside an enumeration)", .version = 1 },
 };
 
 typedef enum eTokenType {
@@ -388,8 +390,12 @@ static void parseNamespace(tokenInfo *const token)
 	vStringDelete(name);
 }
 
-static void parseEnum(tokenInfo *const token)
+static void parseEnum(tokenInfo *const parentToken)
 {
+	tokenInfo *token = newToken();
+	copyToken (token, parentToken);
+	setScope(token, parentToken->scope);
+
 	readToken(token);
 
 	if (token->type == TOKEN_IDENTIFIER)
@@ -399,9 +405,40 @@ static void parseEnum(tokenInfo *const token)
 
 		if (token->type == TOKEN_OPEN_CURLY)
 		{
-			enterScope(token, enumIndex);
+			/* Parse enum body */
+			while (token->type != TOKEN_CLOSE_CURLY && token->type != TOKEN_EOF)
+			{
+				if (token->type == TOKEN_IDENTIFIER)
+				{
+					/* Create tag for enumerator */
+					setScope (token, enumIndex);
+					makeTypeSpecTag(token, K_ENUMERATOR);
+					readToken(token);
+
+					/* Skip value assignment if any */
+					if (token->type == TOKEN_COLON)
+					{
+						readToken(token);
+						/* Skip the value */
+						while (token->type != TOKEN_COMMA &&
+							   token->type != TOKEN_CLOSE_CURLY &&
+							   token->type != TOKEN_EOF)
+						{
+							readToken(token);
+						}
+					}
+
+					/* Skip comma if present */
+					if (token->type == TOKEN_COMMA)
+						readToken(token);
+				}
+				else
+					readToken(token);
+			}
 		}
 	}
+
+	deleteToken (token);
 }
 
 static void parseProperty(tokenInfo *const token)
@@ -678,5 +715,7 @@ extern parserDefinition* TypeSpecParser (void)
 	def->keywordCount = ARRAY_SIZE (TypeSpecKeywordTable);
 	def->defaultScopeSeparator = SCOPE_SEPARATOR;
 	def->useCork = CORK_QUEUE;
+	def->versionCurrent = 1;
+ 	def->versionAge = 1;
 	return def;
 }
