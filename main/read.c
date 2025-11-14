@@ -34,6 +34,7 @@
 #ifdef HAVE_ICONV
 # include "mbcs.h"
 # include "mbcs_p.h"
+# include <iconv.h>
 #endif
 
 /*
@@ -881,8 +882,32 @@ static MIO *getMioFull (const char *const fileName, const char *const openMode,
 	if (mtime)
 		*mtime = st->mtime;
 	eStatFree (st);
-	if ((!memStreamRequired)
-	    && (size > MAX_IN_MEMORY_FILE_SIZE || size == 0))
+
+	/* Always use memory stream for UTF-16 files to enable conversion */
+	bool forceMemStream = false;
+#ifdef HAVE_ICONV
+	if (size >= 2)
+	{
+		FILE *peek = fopen(fileName, openMode);
+		if (peek)
+		{
+			unsigned char bom[2];
+			if (fread(bom, 1, 2, peek) == 2)
+			{
+				/* Check for UTF-16 BOM */
+				if ((bom[0] == 0xFF && bom[1] == 0xFE) ||
+					(bom[0] == 0xFE && bom[1] == 0xFF))
+				{
+					forceMemStream = true;
+				}
+			}
+			fclose(peek);
+		}
+	}
+#endif
+
+	if ((!memStreamRequired) && (!forceMemStream) &&
+	    (size > MAX_IN_MEMORY_FILE_SIZE || size == 0))
 		return mio_new_file (fileName, openMode);
 
 	src = fopen (fileName, openMode);
@@ -900,6 +925,62 @@ static MIO *getMioFull (const char *const fileName, const char *const openMode,
 			return mio_new_file (fileName, openMode);
 	}
 	fclose (src);
+
+#ifdef HAVE_ICONV
+	/* Check for UTF-16 BOM and convert to UTF-8 if found */
+	if (size >= 2)
+	{
+		unsigned char *converted_data = NULL;
+		unsigned long converted_size = 0;
+		const char *encoding = NULL;
+
+		/* Check for UTF-16 LE BOM (FF FE) */
+		if (data[0] == 0xFF && data[1] == 0xFE)
+		{
+			encoding = "UTF-16LE";
+		}
+		/* Check for UTF-16 BE BOM (FE FF) */
+		else if (data[0] == 0xFE && data[1] == 0xFF)
+		{
+			encoding = "UTF-16BE";
+		}
+
+		if (encoding != NULL)
+		{
+			/* Convert UTF-16 to UTF-8 */
+			iconv_t cd = iconv_open("UTF-8", encoding);
+			if (cd != (iconv_t)-1)
+			{
+				/* Skip BOM in input */
+				char *inbuf = (char*)(data + 2);
+				size_t inbytesleft = size - 2;
+
+				/* Allocate output buffer (UTF-8 can be up to 4 bytes per character) */
+				size_t outbufsize = inbytesleft * 2;
+				converted_data = eMalloc(outbufsize);
+				char *outbuf = (char*)converted_data;
+				size_t outbytesleft = outbufsize;
+
+				if (iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft) != (size_t)-1)
+				{
+					converted_size = outbufsize - outbytesleft;
+					eFree(data);
+					data = converted_data;
+					size = converted_size;
+					converted_data = NULL; /* Prevent double free */
+				}
+				else
+				{
+					/* Conversion failed, fall back to original data */
+					if (converted_data)
+						eFree(converted_data);
+				}
+				iconv_close(cd);
+			}
+		}
+	}
+#endif
+
 	return mio_new_memory (data, size, eRealloc, eFreeNoNullCheck);
 }
 
