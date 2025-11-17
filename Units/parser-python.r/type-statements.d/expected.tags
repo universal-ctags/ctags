@@ -1,0 +1,16 @@
+MyList0	input.py	/^MyList0 = list[str]$/;"	v
+MyList1	input.py	/^MyList1: TypeAlias = list[str]$/;"	v	typeref:typename:TypeAlias
+MyList2	input.py	/^type MyList2 = list[str]$/;"	v	typeref:typename:TypeAliasType
+ListOrSet	input.py	/^type ListOrSet[T] = list[T] | set[T]$/;"	v	typeref:typename:TypeAliasType
+x	input-0.py	/^x = type(1)$/;"	v
+f	input-0.py	/^def f(x, a):$/;"	f	signature:(x, a)
+x	input-0.py	/^def f(x, a):$/;"	z	function:f	file:
+a	input-0.py	/^def f(x, a):$/;"	z	function:f	file:
+y	input-0.py	/^y = f(type, ...)$/;"	v
+type	input-0.py	/^class type: ...$/;"	c
+type	input-0.py	/^def type(a): ...$/;"	f	signature:(a)
+a	input-0.py	/^def type(a): ...$/;"	z	function:type	file:
+type	input-0.py	/^type = lambda t: ...$/;"	f	signature:(t)
+fn	input-0.py	/^def fn(type, a): ...$/;"	f	signature:(type, a)
+type	input-0.py	/^def fn(type, a): ...$/;"	z	function:fn	file:
+a	input-0.py	/^def fn(type, a): ...$/;"	z	function:fn	file:

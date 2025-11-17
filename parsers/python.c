@@ -33,8 +33,15 @@
 #define newToken() (objPoolGet (TokenPool))
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
+/* A token holding a soft keyword
+ * has TOKEN_IDENTIFIER as its type member and
+ * SOFT_KEYWORD_* as its keyword member.
+ */
+#define isSoftKeyword(K) (K < 0 && K != KEYWORD_NONE)
 enum {
-	KEYWORD_as,
+	SOFT_KEYWORD_type = -2,
+	/* KEYWORD_NONE occupies -1. */
+	KEYWORD_as = 0,
 	KEYWORD_async,
 	KEYWORD_cdef,
 	KEYWORD_class,
@@ -157,6 +164,7 @@ static const keywordTable PythonKeywordTable[] = {
 	{ "lambda",			KEYWORD_lambda			},
 	{ "pass",			KEYWORD_pass			},
 	{ "return",			KEYWORD_return			},
+	{ "type",			SOFT_KEYWORD_type		},
 };
 
 /* Taken from https://docs.python.org/3/reference/lexical_analysis.html#keywords */
@@ -661,7 +669,8 @@ getNextChar:
 				/* FIXME: handle U, B, R and F string prefixes? */
 				readIdentifier (token->string, c);
 				token->keyword = lookupKeyword (vStringValue (token->string), Lang_python);
-				if (token->keyword == KEYWORD_NONE)
+				if (token->keyword == KEYWORD_NONE
+					|| isSoftKeyword(token->keyword))
 					token->type = TOKEN_IDENTIFIER;
 				else
 					token->type = TOKEN_KEYWORD;
@@ -1747,6 +1756,41 @@ static void setIndent (tokenInfo *const token)
 	}
 }
 
+static bool parseType (tokenInfo *const token, pythonKind kind)
+{
+	TRACE_ENTER();
+	/* https://docs.python.org/3.14/reference/simple_stmts.html#type */
+	int index = makeSimplePythonTag (token, kind);
+	tagEntryInfo *e = getEntryInCorkQueue (index);
+	if (e)
+	{
+		/* Technically the type statement creates variables of type typing.TypeAliasType,
+		 * which is a different thing from typing.TypeAlias (which is deprecated).
+		 * Thus it would be misleading to claim they're of type TypeAlias. */
+		e->extensionFields.typeRef [0] = eStrdup ("typename");
+		e->extensionFields.typeRef [1] = eStrdup ("TypeAliasType");
+	}
+
+	readToken (token);
+
+	if (token->type == '[')
+	{
+		if (skipOverPair (token, '[', ']', NULL, false))
+			readToken (token);
+	}
+	if (token->type == TOKEN_EOF)
+	{
+		TRACE_LEAVE_TEXT("Unexpected EOF");
+		return false;
+	}
+
+	vString *tspec = vStringNew ();
+	bool r = skipVariableTypeAnnotation (token, tspec);
+	vStringDelete (tspec);
+	TRACE_LEAVE();
+	return r;
+}
+
 static void findPythonTags (void)
 {
 	TRACE_ENTER();
@@ -1797,11 +1841,35 @@ static void findPythonTags (void)
 			NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
 			tagEntryInfo *lvEntry = getEntryOfNestingLevel (lv);
 			pythonKind kind = PYTHON_VARIABLE_KIND;
+			bool isTypeStatement = false;
 
 			if (lvEntry && lvEntry->kindIndex != PYTHON_CLASS_KIND)
 				kind = PYTHON_LOCAL_VARIABLE_KIND;
 
-			readNext = parseVariable (token, kind);
+			if (token->keyword == SOFT_KEYWORD_type)
+			{
+				/* Is a type statement? */
+				tokenInfo *const type = newToken ();
+
+				copyToken (type, token);
+				readToken (token);
+				if (token->type == TOKEN_IDENTIFIER)
+				{
+					/* Yes. this is a type statement. */
+					isTypeStatement = true;
+					readNext = parseType (token, kind);
+				}
+				else
+				{
+					/* No. */
+					ungetToken (token);
+					copyToken (token, type);
+				}
+				deleteToken (type);
+			}
+
+			if (!isTypeStatement)
+				readNext = parseVariable (token, kind);
 		}
 		else if (token->type == '@' && atStatementStart &&
 		         PythonFields[F_DECORATORS].enabled)
