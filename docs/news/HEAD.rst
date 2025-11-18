@@ -47,6 +47,10 @@ Meson:
 
     * Extract config vars defined inside configuration_data({...}).
 
+Python:
+
+    * Support type statements.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
