@@ -1591,10 +1591,37 @@ int cxxParserEmitFunctionTags(
 			{
 				CXXToken * pScopeId = pInfo->pScopeStart;
 
-				pInfo->pScopeStart = cxxTokenChainNextTokenOfType(
+				while (1)
+				{
+					pInfo->pScopeStart = cxxTokenChainNextTokenOfType(
 						pInfo->pScopeStart,
-						CXXTokenTypeMultipleColons
-					);
+						CXXTokenTypeMultipleColons|CXXTokenTypeSmallerThanSign);
+
+					CXX_DEBUG_ASSERT(pInfo->pScopeStart,
+									 "We could find neither '::' nor '<'");
+					if (!pInfo->pScopeStart)
+					{
+						pInfo->pScopeStart = pInfo->pIdentifierStart;
+						break;
+					}
+
+					if (cxxTokenTypeIs(pInfo->pScopeStart, CXXTokenTypeMultipleColons))
+						break;	// Good!
+
+					if (cxxTokenTypeIs(pInfo->pScopeStart, CXXTokenTypeSmallerThanSign))
+					{
+						// Skip the template arguments.
+						// Should we add the template arguments to the scope? (FIXME)
+						pInfo->pScopeStart = cxxTokenChainSkipToEndOfTemplateAngleBracket(pInfo->pScopeStart);
+						CXX_DEBUG_ASSERT(pInfo->pScopeStart,
+										 "We could not find '>', the end of template argument(s)");
+						if (!pInfo->pScopeStart)
+						{
+							pInfo->pScopeStart = pInfo->pIdentifierStart;
+							break;
+						}
+					}
+				}
 
 				CXX_DEBUG_ASSERT(pInfo->pScopeStart,"We should have found a next token here");
 

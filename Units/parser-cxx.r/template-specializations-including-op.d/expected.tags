@@ -1,0 +1,8 @@
+Point	input.cpp	/^struct Point {$/;"	s	file:
+distance	input.cpp	/^  int distance(void) {$/;"	f	struct:Point	typeref:typename:int	file:
+NS	input.cpp	/^namespace NS {$/;"	n	file:
+MyReal	input.cpp	/^  using MyReal = float;$/;"	t	namespace:NS	typeref:typename:float	file:
+MyVec	input.cpp	/^  using MyVec = T[2];$/;"	t	namespace:NS	typeref:typename:T[2]	file:
+distance	input.cpp	/^int Point<int>::distance(void) { return 1; }$/;"	f	class:Point	typeref:typename:int
+distance	input.cpp	/^int Point<NS::MyReal>::distance(void) { return 1; }$/;"	f	class:Point	typeref:typename:int
+distance	input.cpp	/^int Point<NS::MyVec<int>>::distance(void) { return 1; }$/;"	f	class:Point	typeref:typename:int
