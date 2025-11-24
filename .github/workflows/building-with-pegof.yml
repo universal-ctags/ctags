@@ -23,9 +23,9 @@ jobs:
       - run: sudo apt -y install cmake g++ pkg-config automake libseccomp-dev libjansson-dev libyaml-dev libxml2-dev libpcre2-dev bash gdb python3-docutils
       # cmake and g++ are used to build pegof
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: dolik-rce/pegof
           submodules: recursive

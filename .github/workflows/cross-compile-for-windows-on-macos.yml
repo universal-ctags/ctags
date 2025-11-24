@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.build-machine-os }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - run: brew install mingw-w64 make automake autoconf file
 
