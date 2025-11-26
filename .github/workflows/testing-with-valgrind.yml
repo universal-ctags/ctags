@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - run: sudo apt-get update
     - run: sudo apt-get install valgrind pkg-config automake bash libjansson-dev libyaml-dev libseccomp-dev libxml2-dev libpcre2-dev gdb

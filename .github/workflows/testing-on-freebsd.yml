@@ -16,7 +16,7 @@ jobs:
         freebsd-version: ['14.3', '14.2', '14.1', '14.0', '13.5', '13.4', '13.3', '13.2']
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: cross-platform-actions/action@master
         with:

@@ -24,7 +24,7 @@ jobs:
     steps:
       - run: choco install -y file
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: setup nmake
         run: |
