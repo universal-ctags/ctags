@@ -1,0 +1,19 @@
+TestUtil	input.cpp	/^struct TestUtil {$/;"	s	file:
+isNull	input.cpp	/^    static bool isNull(const T&) { return false; }$/;"	f	struct:TestUtil	typeref:typename:bool	file:	signature:(const T &)
+__anon39cbdfcb010d	input.cpp	/^    static bool isNull(const T&) { return false; }$/;"	z	function:TestUtil::isNull	typeref:typename:const T &	file:
+TestUtil	input.cpp	/^struct TestUtil<T*> {$/;"	s	file:
+isNull	input.cpp	/^    static bool isNull(T* f) { return 0 == f; }$/;"	f	struct:TestUtil	typeref:typename:bool	file:	signature:(T * f)
+f	input.cpp	/^    static bool isNull(T* f) { return 0 == f; }$/;"	z	function:TestUtil::isNull	typeref:typename:T *	file:
+memtype	input.cpp	/^struct memtype {};$/;"	s	file:
+klass	input.cpp	/^struct klass {};$/;"	s	file:
+isNull	input.cpp	/^TestUtil<const memtype klass::*&>::isNull(const memtype klass::* &f)$/;"	f	class:TestUtil	typeref:typename:bool	signature:(const memtype klass::* & f)
+f	input.cpp	/^TestUtil<const memtype klass::*&>::isNull(const memtype klass::* &f)$/;"	z	function:TestUtil::isNull	typeref:typename:const memtype klass::* &	file:
+Handler	input.cpp	/^struct Handler {$/;"	s	file:
+process	input.cpp	/^    void process(T value) { }$/;"	f	struct:Handler	typeref:typename:void	file:	signature:(T value)
+value	input.cpp	/^    void process(T value) { }$/;"	z	function:Handler::process	typeref:typename:T	file:
+Handler	input.cpp	/^struct Handler<R (C::*)()> {$/;"	s	file:
+process	input.cpp	/^    void process(R (C::*method)()) { }$/;"	f	struct:Handler	typeref:typename:void	file:	signature:(R (C::* method)())
+method	input.cpp	/^    void process(R (C::*method)()) { }$/;"	z	function:Handler::process	typeref:typename:R (C::*)()	file:
+Handler	input.cpp	/^struct Handler<R (C::*)(A)> {$/;"	s	file:
+process	input.cpp	/^    void process(R (C::*method)(A)) { }$/;"	f	struct:Handler	typeref:typename:void	file:	signature:(R (C::* method)(A))
+method	input.cpp	/^    void process(R (C::*method)(A)) { }$/;"	z	function:Handler::process	typeref:typename:R (C::*)(A)	file:
