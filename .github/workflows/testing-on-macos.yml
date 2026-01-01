@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-15, macos-14, macos-13]
+        os: [macos-15, macos-14, macos-26]
 
     runs-on: ${{ matrix.os }}
 
@@ -23,10 +23,9 @@ jobs:
 
     # NOTE: DO NOT try to install libiconv and libxml2 package via brew, because macOS already provides them.
     # NOTE: DO NOT try to install python3 package via brew, it has already been included in macos-xx runner images
-    # https://github.com/actions/runner-images/blob/macos-13/20231002.1/images/macos/macos-13-Readme.md#python
+    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
 
-    # https://github.com/universal-ctags/ctags/pull/3954
-    - if: matrix.os == 'macos-13'
+    - if: matrix.os == 'macos-26'
       run: brew install --overwrite python@3.12
 
     - run: brew install automake jansson libyaml pcre2
