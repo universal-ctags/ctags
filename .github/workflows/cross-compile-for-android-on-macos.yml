@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build-machine-os: [macos-15, macos-14, macos-13]
+        build-machine-os: [macos-15, macos-14, macos-26]
 
     runs-on: ${{ matrix.build-machine-os }}
 
