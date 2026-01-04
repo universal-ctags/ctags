@@ -1,0 +1,10 @@
+PHP_JSON_T_NUL	input.y	/^%token <value> PHP_JSON_T_NUL$/;"	t	typeref:typename:value
+PHP_JSON_T_EOI	input.y	/^%token PHP_JSON_T_EOI$/;"	t
+start	input.y	/^start:$/;"	l
+php.h	input.y	/^#include "php.h"/;"	h
+json_yydebug	input.y	/^int json_yydebug = 1;$/;"	v	typeref:typename:int
+__anon5ae0960c010a	input.y	/union {$/;"	u	file:
+value	input.y	/^	zval value;$/;"	m	union:__anon5ae0960c010a	typeref:typename:zval	file:
+php_json_yylex	input.y	/^static int php_json_yylex(union YYSTYPE *value, php_json_parser *parser);$/;"	p	typeref:typename:int	file:
+php_json_yyerror	input.y	/^static void php_json_yyerror(php_json_parser *parser, char const *msg);$/;"	p	typeref:typename:void	file:
+php_json_parser_array_create	input.y	/^static int php_json_parser_array_create(php_json_parser *parser, zval *array)$/;"	f	typeref:typename:int	file:

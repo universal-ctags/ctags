@@ -1,0 +1,4 @@
+--sort=no
+--extras=+g
+--kinds-C=+p
+--extras=+r

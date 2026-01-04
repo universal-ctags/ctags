@@ -54,6 +54,7 @@
 --_tabledef-YACC=toplevel
 --_tabledef-YACC=comment
 --_tabledef-YACC=cPrologue
+--_tabledef-YACC=cCode
 --_tabledef-YACC=grammar
 --_tabledef-YACC=cEpilogue
 --_tabledef-YACC=token
@@ -85,6 +86,10 @@
 
 --_mtable-extend-YACC=cAction+cActionCommon
 --_mtable-regex-YACC=cAction/\}//{tleave}
+
+--_mtable-extend-YACC=cCode+cActionCommon
+--_mtable-regex-YACC=cCode/\}//{tleave}{_guest=,,0start}
+--_mtable-regex-YACC=cCode/.//
 
 --_mtable-regex-YACC=rule/[^\{;]+//
 --_mtable-regex-YACC=rule/\{//{tenter=cAction}
@@ -166,7 +171,7 @@
     /token-type false def
 }}
 --_mtable-regex-YACC=toplevel/%(union)[^\{]*\{//{tenter=cUnion}{_guest=C,1start,}
---_mtable-regex-YACC=toplevel/%(code[^\{]*)?\{//{tenter=cPrologue}{_guest=C,0end,}
+--_mtable-regex-YACC=toplevel/%(code[^\{]*)?\{//{tenter=cCode}{_guest=C,0end,}
 --_mtable-regex-YACC=toplevel/%(type|nterm)[ \n\t]*//{tenter=type}{{
     /token-type false def
 }}
