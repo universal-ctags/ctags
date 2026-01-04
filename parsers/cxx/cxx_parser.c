@@ -1127,7 +1127,10 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		// }
 
 		if(g_cxx.pTemplateSpecializationTokenChain)
+		{
 			cxxTokenChainDestroy(g_cxx.pTemplateSpecializationTokenChain);
+			g_cxx.pTemplateSpecializationTokenChain = NULL;
+		}
 
 		g_cxx.pTemplateSpecializationTokenChain = cxxParserParseTemplateAngleBracketsToSeparateChain(false);
 		if(!g_cxx.pTemplateSpecializationTokenChain)
