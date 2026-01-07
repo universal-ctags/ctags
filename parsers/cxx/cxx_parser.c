@@ -57,6 +57,13 @@ void cxxParserNewStatementFull(bool bExported)
 		// we don't care about stale specializations as they
 		// are destroyed wen the base template prefix is extracted
 	}
+	// Fixed a memory leak by freeing the specializations here anyway.
+	// For certain invalid inputs, parseTemplateAngleBracketsToTemplateChain is never called.
+	if(g_cxx.pTemplateSpecializationTokenChain)
+	{
+		cxxTokenChainDestroy(g_cxx.pTemplateSpecializationTokenChain);
+		g_cxx.pTemplateSpecializationTokenChain = NULL;
+	}
 	g_cxx.uKeywordState = bExported? CXXParserKeywordStateSeenExport: 0;
 
 	// FIXME: this cpp handling of end/statement is kind of broken:
