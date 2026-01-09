@@ -18,6 +18,7 @@ static void initializeYACCParser (const langType language)
 	addLanguageRegexTable (language, "toplevel");
 	addLanguageRegexTable (language, "comment");
 	addLanguageRegexTable (language, "cPrologue");
+	addLanguageRegexTable (language, "cCode");
 	addLanguageRegexTable (language, "grammar");
 	addLanguageRegexTable (language, "cEpilogue");
 	addLanguageRegexTable (language, "token");
@@ -44,7 +45,7 @@ static void initializeYACCParser (const langType language)
 	                               "", "", "{tenter=cUnion}{_guest=C,1start,}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^%(code[^\\{]*)?\\{",
-	                               "", "", "{tenter=cPrologue}{_guest=C,0end,}", NULL);
+	                               "", "", "{tenter=cCode}{_guest=C,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^%(type|nterm)[ \n\t]*",
 	                               "", "", "{tenter=type}"
@@ -73,6 +74,27 @@ static void initializeYACCParser (const langType language)
 	                               "^%\\}",
 	                               "", "", "{tleave}{_guest=,,0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "cPrologue",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cCode",
+	                               "^[^\"/\\{\\}]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cCode",
+	                               "^\"",
+	                               "", "", "{tenter=cString}", NULL);
+	addLanguageTagMultiTableRegex (language, "cCode",
+	                               "^'",
+	                               "", "", "{tenter=cCharlit}", NULL);
+	addLanguageTagMultiTableRegex (language, "cCode",
+	                               "^/\\*",
+	                               "", "", "{tenter=comment}", NULL);
+	addLanguageTagMultiTableRegex (language, "cCode",
+	                               "^\\{",
+	                               "", "", "{tenter=cAction}", NULL);
+	addLanguageTagMultiTableRegex (language, "cCode",
+	                               "^\\}",
+	                               "", "", "{tleave}{_guest=,,0start}", NULL);
+	addLanguageTagMultiTableRegex (language, "cCode",
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "grammar",
