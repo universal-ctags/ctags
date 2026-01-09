@@ -803,7 +803,7 @@ int cxxTagCommit(int *piCorkQueueIndexFQ)
 		// If the scope kind is enumeration then we need to remove the
 		// last scope part. This is what old ctags did.
 		if(cxxScopeGetSize() < 2)
-			return -1; // toplevel enum
+			return CORK_NIL; // toplevel enum
 
 		x = cxxScopeGetFullNameExceptLastComponentAsString();
 		CXX_DEBUG_ASSERT(x,"Scope with size >= 2 should have returned a value here");

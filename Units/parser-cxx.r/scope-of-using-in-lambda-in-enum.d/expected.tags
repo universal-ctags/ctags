@@ -1,0 +1,5 @@
+e	input.cpp	/^enum e {$/;"	g	file:
+__anon92a0b9a90102	input.cpp	/^  x = [] {$/;"	f	enum:e	file:
+T3	input.cpp	/^    using T3 = int;$/;"	t	function:e::__anon92a0b9a90102	typeref:typename:int	file:
+x	input.cpp	/^  x = [] {$/;"	e	enum:e	file:
+main	input.cpp	/^int main(void)$/;"	f	typeref:typename:int
