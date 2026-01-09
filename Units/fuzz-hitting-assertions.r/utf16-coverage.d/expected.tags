@@ -1,0 +1,7 @@
+TestStruct	input.cpp	/^struct TestStruct {$/;"	s	file:
+field1	input.cpp	/^    int field1;$/;"	m	struct:TestStruct	typeref:typename:int	file:
+field2	input.cpp	/^    char* field2;$/;"	m	struct:TestStruct	typeref:typename:char *	file:
+methodA	input.cpp	/^    void methodA() {}$/;"	f	struct:TestStruct	typeref:typename:void	file:
+TestClass	input.cpp	/^class TestClass {$/;"	c	file:
+staticVar	input.cpp	/^    static int staticVar;$/;"	m	class:TestClass	typeref:typename:int	file:
+privateField	input.cpp	/^    int privateField;$/;"	m	class:TestClass	typeref:typename:int	file:
