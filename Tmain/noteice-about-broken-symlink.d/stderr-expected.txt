@@ -1,0 +1,9 @@
+# broken-symlink.c + no option
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: cannot open input file "broken-symlink.c" : No such file or directory
+# broken-symlink.c + --quiet option
+# no-such-file.c + no option
+ctags: Notice: No options will be read from files or environment
+ctags: Warning: cannot open input file "no-such-file.c" : No such file or directory
+# no-such-file.c + --quiet option
+ctags: Warning: cannot open input file "no-such-file.c" : No such file or directory

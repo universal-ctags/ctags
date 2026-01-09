@@ -29,6 +29,9 @@ Extend ``--map-<LANG>=`` and ``--langmap=`` options to choose a parser using reg
 
 Incompatible changes
 ---------------------------------------------------------------------
+Messages for broken symlinks are now emitted at NOTICE level instead of
+WARNING.  They are shown by default, but can be suppressed with the
+``--quiet`` option.
 
 Parser related changes
 ---------------------------------------------------------------------
