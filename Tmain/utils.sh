@@ -68,6 +68,13 @@ skip_if_no_readtags()
 	fi
 }
 
+skip_if_running_on_msys()
+{
+	if [ -n "$MSYSTEM" ]; then
+		skip "this test case doesn't work well on MSYS2"
+	fi
+}
+
 exit_if_win32()
 {
 	is_feature_available $1 '!' win32
