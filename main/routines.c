@@ -448,12 +448,18 @@ extern fileStatus *eStat (const char *const fileName)
 		eStatFree (&file);
 		file.name = eStrdup (fileName);
 		if (lstat (file.name, &status) != 0)
+		{
+			file.isSymbolicLink = false;
 			file.exists = false;
+		}
 		else
 		{
 			file.isSymbolicLink = (bool) S_ISLNK (status.st_mode);
 			if (file.isSymbolicLink  &&  stat (file.name, &status) != 0)
+			{
+				file.isSymbolicLink = true;
 				file.exists = false;
+			}
 			else
 			{
 				file.exists = true;
