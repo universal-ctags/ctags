@@ -141,7 +141,7 @@ static kindDefinition EmacsLispKinds [] = {
  * lisp tag functions
  *  look for (def or (DEF, quote or QUOTE
  */
-bool lispIsDef (struct lispDialect *dialect, const unsigned char *strp)
+extern bool lispIsDef (struct lispDialect *dialect, const unsigned char *strp)
 {
 	bool cis = dialect->case_insensitive; /* Renaming for making code short */
 	bool is_def = ( (strp [1] == 'd' || (cis && strp [1] == 'D'))
@@ -331,9 +331,9 @@ static int elisp_hint2kind (const vString *const hint, const char *namespace CTA
 	return k;
 }
 
- int lispGetIt (struct lispDialect *dialect,
-				vString *const name, const unsigned char *dbp, vString *kind_hint,
-				const char *namespace)
+extern int lispGetIt (struct lispDialect *dialect,
+					  vString *const name, const unsigned char *dbp, vString *kind_hint,
+					  const char *namespace)
 {
 	int index = CORK_NIL;
 	const unsigned char *p;
@@ -383,7 +383,7 @@ static int elisp_hint2kind (const vString *const hint, const char *namespace CTA
 
 /* Algorithm adapted from from GNU etags.
  */
-void findLispTagsCommon (struct lispDialect *dialect)
+extern void findLispTagsCommon (struct lispDialect *dialect)
 {
 	vString *name = vStringNew ();
 	vString *kind_hint = vStringNew ();
