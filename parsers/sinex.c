@@ -70,8 +70,10 @@ static void findSinexTags (void)
 		if (line[0] == '+')
 		{
 			blockNameCopy(blockNameStart, (const char *)line);
-			initTagEntry (&e, (const char * const)blockNameStart, K_BLOCK);
-			inBlock = true ;
+			if (strlen(blockNameStart) > 0) {
+				initTagEntry (&e, (const char * const)blockNameStart, K_BLOCK);
+				inBlock = true ;
+			}
 		} 
 		else if (inBlock && (line[0] == '-'))
 		{
