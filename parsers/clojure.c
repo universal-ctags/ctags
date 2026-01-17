@@ -79,6 +79,8 @@ static int clojure_hint2kind (const vString *const hint, const char *namespace)
 		offset = 0;
 		n++;
 	}
+	else if (namespace[0] != '\0')
+		return K_UNKNOWN;
 
 	if (strncmp (vStringValue (hint) + offset, "ns", 2) == 0)
 		return K_NAMESPACE;

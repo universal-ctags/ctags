@@ -1,0 +1,5 @@
+N	input.clj	/^(ns N)$/;"	n
+defn	input.clj	/^(defn defn [n]$/;"	f	namespace:N
+S	input.clj	/^(ns S$/;"	n
+g	input.clj	/^(N\/defn 'g)$/;"	Y	namespace:S	name:g
+h	input.clj	/^(clojure.core\/defn h [] 1)$/;"	f	namespace:S
