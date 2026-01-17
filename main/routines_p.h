@@ -45,10 +45,20 @@ typedef struct {
 		/* Name of file for which status is valid */
 	char* name;
 
-		/* Does file exist? If not, members below do not contain valid data. */
+		/* Does file exist? If not, members below do not contain valid data.
+		 * `isSymbolicLink' is the only exception.
+		 */
 	bool exists;
 
-		/* is file path a symbolic link to another file? */
+		/* is file path a symbolic link to another file?
+		 * This member contains valid data even if `exists' member
+		 * is false.
+		 *
+		 * if ( exists &&  isSymbolicLink) => It is a valid symbolic link.
+		 * if ( exists && !isSymbolicLink) => It exists. It is not a symbolic link.
+		 * if (!exists &&  isSymbolicLink) => It is a broken symbolic link.
+		 * if (!exists && !isSymbolicLink) => It is not a valid file system entry.
+		 */
 	bool isSymbolicLink;
 
 		/* Is file (pointed to) a directory? */
