@@ -24,9 +24,9 @@
 
 struct sOptVM
 {
-	ptrArray  *ostack;
-	ptrArray  *dstack;
-	ptrArray  *estack;
+	ptrArray *ostack;
+	ptrArray *dstack;
+	ptrArray *estack;
 
 	int        dstack_protection;
 	MIO       *in;

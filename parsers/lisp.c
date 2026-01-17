@@ -193,7 +193,7 @@ static int L_issetf (const unsigned char *strp, bool case_insensitive)
 		  && isspace (*(++strp)));
 }
 
-static int  lisp_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
+static int lisp_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
 {
 	int k = K_UNKNOWN;
 	int n = vStringLength (hint) - 4;
@@ -244,7 +244,7 @@ static int  lisp_hint2kind (const vString *const hint, const char *namespace CTA
 }
 
 /* TODO: implement this in hashtable. */
-static int  elisp_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
+static int elisp_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
 {
 	int k = eK_UNKNOWN;
 	int n = vStringLength (hint) - 4;

@@ -1115,7 +1115,7 @@ static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 	x->corkIndex = CORK_NIL;
 	memset(&x->intervalnode, 0, sizeof (x->intervalnode));
 	x->__intervalnode_subtree_last = 0;
-	tagEntryInfo  *slot = (tagEntryInfo *)x;
+	tagEntryInfo *slot = (tagEntryInfo *)x;
 
 	*slot = *tag;
 

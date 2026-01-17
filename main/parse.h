@@ -145,7 +145,7 @@ struct sParserDefinition {
 	parserDependency * dependencies;
 	unsigned int dependencyCount;
 
-	paramDefinition  *paramTable;
+	paramDefinition *paramTable;
 	unsigned int paramCount;
 
 	xpathFileSpec *xpathFileSpecs;

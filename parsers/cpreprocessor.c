@@ -1024,7 +1024,7 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 	return CORK_NIL;
 }
 
-static void makeIncludeTag (const  char *const name, bool systemHeader)
+static void makeIncludeTag (const char *const name, bool systemHeader)
 {
 	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_HEADER);
 	langType lang = standing_alone ? Cpp.lang: Cpp.clientLang;

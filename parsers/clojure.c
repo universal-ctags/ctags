@@ -63,7 +63,7 @@ static bool clojure_is_def (struct lispDialect *dialect CTAGS_ATTR_UNUSED, const
 	return false;
 }
 
-static int  clojure_hint2kind (const vString *const hint, const char *namespace)
+static int clojure_hint2kind (const vString *const hint, const char *namespace)
 {
 	int k = K_UNKNOWN;
 	int n = vStringLength (hint) - 4;

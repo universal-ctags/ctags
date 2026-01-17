@@ -705,8 +705,8 @@ static const unsigned char *asmReadLineFromInputFile (const char *commentChars, 
 		return readLineNoCpp (commentChars);
 }
 
-static void  readMacroParameters (int index, tagEntryInfo *e, const unsigned char *cp,
-								  bool useCpp)
+static void readMacroParameters (int index, tagEntryInfo *e, const unsigned char *cp,
+								 bool useCpp)
 {
 	vString *name = vStringNew ();
 	vString *signature = vStringNew ();

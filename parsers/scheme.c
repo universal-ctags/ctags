@@ -68,7 +68,7 @@ static bool scheme_is_def (struct lispDialect *dialect, const unsigned char *str
 	return lispIsDef (dialect, strp);
 }
 
-static int  scheme_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
+static int scheme_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
 {
 	int k = K_UNKNOWN;
 	int n = vStringLength (hint) - 4;

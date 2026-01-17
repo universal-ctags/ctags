@@ -188,7 +188,7 @@ static int buildNameandReturnRoot (int corkIndex, vString *buf, int root)
 	return CORK_NIL;
 }
 
-static void makeLocaleXTag (const  tagEntryInfo *const e0, vString *buf, i18nRubyGemXtag xtag)
+static void makeLocaleXTag (const tagEntryInfo *const e0, vString *buf, i18nRubyGemXtag xtag)
 {
 	tagEntryInfo e  = *e0;
 	resetTagCorkState (&e, RESET_TAG_MEMBER_CLEAR, RESET_TAG_MEMBER_CLEAR);
@@ -208,7 +208,7 @@ static void makeLocaleXTag (const  tagEntryInfo *const e0, vString *buf, i18nRub
 	makeTagEntry (&e);
 }
 
-static void makeLocalefulXTag (const  tagEntryInfo *const e0, vString *buf)
+static void makeLocalefulXTag (const tagEntryInfo *const e0, vString *buf)
 {
 	makeLocaleXTag (e0, buf, X_localeful);
 }

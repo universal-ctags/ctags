@@ -98,7 +98,7 @@ typedef struct sParserObject {
 	unsigned int anonymousIdentiferId; /* managed by anon* functions */
 
 	struct slaveControlBlock *slaveControlBlock;
-	struct kindControlBlock  *kindControlBlock;
+	struct kindControlBlock *kindControlBlock;
 	struct lregexControlBlock *lregexControlBlock;
 	struct paramControlBlock *paramControlBlock;
 
@@ -1337,7 +1337,7 @@ static int sortParserCandidatesBySpecType (const void *a, const void *b)
 		return 1;
 }
 
-static unsigned int sortAndFilterParserCandidates (parserCandidate  *candidates,
+static unsigned int sortAndFilterParserCandidates (parserCandidate *candidates,
 						   unsigned int n_candidates)
 {
 	enum specType highestSpecType;
@@ -1361,7 +1361,7 @@ static unsigned int sortAndFilterParserCandidates (parserCandidate  *candidates,
 }
 
 static void verboseReportCandidate (const char *header,
-					parserCandidate  *candidates,
+					parserCandidate *candidates,
 					unsigned int n_candidates)
 {
 	unsigned int i;
@@ -1391,7 +1391,7 @@ static langType getSpecLanguageCommon (const char *const spec, const char *const
 					   langType *fallback)
 {
 	langType language;
-	parserCandidate  *candidates;
+	parserCandidate *candidates;
 	unsigned int n_candidates;
 
 	if (fallback)

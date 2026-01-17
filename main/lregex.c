@@ -2003,7 +2003,7 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
 	int match;
 	regexPattern* patbuf = entry->pattern;
-	struct guestSpec  *guest = &patbuf->guest;
+	struct guestSpec *guest = &patbuf->guest;
 
 	if (patbuf->disabled && *(patbuf->disabled))
 		return false;
@@ -2080,7 +2080,7 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 	const char *current;
 	regexPattern* patbuf = entry->pattern;
 	struct mGroupSpec *mgroup = &patbuf->mgroup;
-	struct guestSpec  *guest = &patbuf->guest;
+	struct guestSpec *guest = &patbuf->guest;
 
 	bool result = false;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
@@ -2913,7 +2913,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 			continue;
 
 		regexPattern *ptrn = entry->pattern;
-		struct guestSpec  *guest = &ptrn->guest;
+		struct guestSpec *guest = &ptrn->guest;
 
 		Assert (ptrn);
 
