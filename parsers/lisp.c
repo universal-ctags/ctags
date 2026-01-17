@@ -352,7 +352,8 @@ static int elisp_hint2kind (const vString *const hint, const char *namespace CTA
 		while (isspace (*dbp))
 			dbp++;
 	}
-	for (p=dbp ; *p!='\0' && *p!='(' && !isspace (*p) && *p!=')' ; p++)
+
+	for (p = dbp; *p != '\0' && *p != '(' && !isspace (*p) && *p != ')'; p++)
 		vStringPut (name, *p);
 
 	if (vStringLength (name) > 0)
