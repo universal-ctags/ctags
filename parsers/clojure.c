@@ -51,50 +51,38 @@ static kindDefinition ClojureKinds[] = {
 /*
 *   FUNCTION DEFINITIONS
 */
-static bool clojure_is_def (struct lispDialect *dialect CTAGS_ATTR_UNUSED, const unsigned char *strp)
+static struct lispIsDefResult clojure_is_def (struct lispDialect *dialect CTAGS_ATTR_UNUSED,
+											  const unsigned char *strp)
 {
+	struct lispIsDefResult r = { .is_def = false, .kind = KIND_GHOST_INDEX, };
 	const unsigned char *input = strp + 1;
 
 #define EQN(input, expect) (strncmp((const char *)(input), (expect), sizeof(expect) - 1) == 0 \
 							&& (isspace ((input)[sizeof(expect) - 1])))
 
 	if (EQN(input, "ns"))
-		return true;
+	{
+		r.is_def = true;
+		r.kind = K_NAMESPACE;
+	}
 	else if (EQN(input, "defn"))
-		return true;
+	{
+		r.is_def = true;
+		r.kind = K_FUNCTION;
+	}
 
 #undef EQN
 
-	return false;
+	return r;
 }
 
-static int clojure_hint2kind (const vString *const hint, const char *namespace)
+static int clojure_hint2kind (struct lispKindHint *hint, const char *namespace)
 {
-	int k = K_UNKNOWN;
-	int n = vStringLength (hint) - 4;
-	unsigned int offset = 1;
-
-	if (strcmp (namespace, "clojure.core/") == 0)
-	{
-		offset = 0;
-		n++;
-	}
-	else if (namespace[0] != '\0')
+	if (namespace[0] != '\0'
+		&& strcmp (namespace, "clojure.core/") != 0)
 		return K_UNKNOWN;
 
-	if (strncmp (vStringValue (hint) + offset, "ns", 2) == 0)
-		return K_NAMESPACE;
-
-#define EQN(X) strncmp(vStringValue (hint) + offset + 3, &X[3], n) == 0
-	switch (n)
-	{
-	case 1:
-		if (EQN("defn"))
-			k = K_FUNCTION;
-		break;
-	}
-#undef EQN
-	return k;
+	return hint->isDefResult.kind;
 }
 
 const unsigned char* clojure_skip_metadata (const unsigned char *dbp)
@@ -132,7 +120,7 @@ const unsigned char* clojure_skip_metadata (const unsigned char *dbp)
 }
 
 static int clojure_get_it (struct lispDialect *dialect,
-						   vString *const name, const unsigned char *dbp, vString *kind_hint,
+						   vString *const name, const unsigned char *dbp, struct lispKindHint *kind_hint,
 						   const char *namespace)
 {
 	dbp = clojure_skip_metadata (dbp);

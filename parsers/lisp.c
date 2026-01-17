@@ -141,7 +141,8 @@ static kindDefinition EmacsLispKinds [] = {
  * lisp tag functions
  *  look for (def or (DEF, quote or QUOTE
  */
-extern bool lispIsDef (struct lispDialect *dialect, const unsigned char *strp)
+extern struct lispIsDefResult lispIsDef (struct lispDialect *dialect,
+										 const unsigned char *strp)
 {
 	bool cis = dialect->case_insensitive; /* Renaming for making code short */
 	bool is_def = ( (strp [1] == 'd' || (cis && strp [1] == 'D'))
@@ -154,7 +155,7 @@ extern bool lispIsDef (struct lispDialect *dialect, const unsigned char *strp)
 		&& (strp [5] == 'u' || (cis && strp [5] == 'U'))
 		&& (strp [6] == 'l' || (cis && strp [6] == 'L'))
 		&& (strp [7] == 't' || (cis && strp [7] == 'T')))
-		return false;
+		is_def = false;
 
 	/* Ignore def"inition" */
 	if (is_def
@@ -165,9 +166,10 @@ extern bool lispIsDef (struct lispDialect *dialect, const unsigned char *strp)
 		&& (strp  [8] == 'i' || (cis && strp  [8] == 'I'))
 		&& (strp  [9] == 'o' || (cis && strp  [9] == 'O'))
 		&& (strp [10] == 'n' || (cis && strp [10] == 'N')))
-		return false;
+		is_def = false;
 
-	return is_def;
+
+	return (struct lispIsDefResult) { .is_def = is_def, .kind = KIND_GHOST_INDEX };
 }
 
 static int L_isquote (const unsigned char *strp, bool case_insensitive)
@@ -193,13 +195,13 @@ static int L_issetf (const unsigned char *strp, bool case_insensitive)
 		  && isspace (*(++strp)));
 }
 
-static int lisp_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
+static int lisp_hint2kind (struct lispKindHint *hint, const char *namespace CTAGS_ATTR_UNUSED)
 {
 	int k = K_UNKNOWN;
-	int n = vStringLength (hint) - 4;
+	int n = vStringLength (hint->str) - 4;
 
 	/* 4 means strlen("(def"). */
-#define EQN(X) strncmp(vStringValue (hint) + 4, &X[3], n) == 0
+#define EQN(X) strncmp(vStringValue (hint->str) + 4, &X[3], n) == 0
 	switch (n)
 	{
 	case 2:
@@ -244,13 +246,13 @@ static int lisp_hint2kind (const vString *const hint, const char *namespace CTAG
 }
 
 /* TODO: implement this in hashtable. */
-static int elisp_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
+static int elisp_hint2kind (struct lispKindHint *hint, const char *namespace CTAGS_ATTR_UNUSED)
 {
 	int k = eK_UNKNOWN;
-	int n = vStringLength (hint) - 4;
+	int n = vStringLength (hint->str) - 4;
 
 	/* 4 means strlen("(def"). */
-#define EQN(X) strncmp(vStringValue (hint) + 4, &X[3], n) == 0
+#define EQN(X) strncmp(vStringValue (hint->str) + 4, &X[3], n) == 0
 	switch (n)
 	{
 	case 2:
@@ -332,7 +334,7 @@ static int elisp_hint2kind (const vString *const hint, const char *namespace CTA
 }
 
 extern int lispGetIt (struct lispDialect *dialect,
-					  vString *const name, const unsigned char *dbp, vString *kind_hint,
+					  vString *const name, const unsigned char *dbp, struct lispKindHint *kind_hint,
 					  const char *namespace)
 {
 	int index = CORK_NIL;
@@ -358,12 +360,12 @@ extern int lispGetIt (struct lispDialect *dialect,
 
 	if (vStringLength (name) > 0)
 	{
-		int kind =  dialect->definer2kind(kind_hint, namespace);
+		int kind = dialect->definer2kind(kind_hint, namespace);
 		const char *definer = NULL;
 
 		if (kind == dialect->unknown_kind)
 		{
-			definer = vStringValue(kind_hint);
+			definer = vStringValue(kind_hint->str);
 			if (definer[0] == '(')
 				definer++;
 		}
@@ -386,8 +388,10 @@ extern int lispGetIt (struct lispDialect *dialect,
 extern void findLispTagsCommon (struct lispDialect *dialect)
 {
 	vString *name = vStringNew ();
-	vString *kind_hint = vStringNew ();
+	struct lispKindHint kind_hint = {0};
 	const unsigned char* line;
+
+	kind_hint.str = vStringNew ();
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -401,12 +405,13 @@ extern void findLispTagsCommon (struct lispDialect *dialect)
 
 		if (*p == '(')
 		{
-			if (dialect->is_def (dialect, p))
+			kind_hint.isDefResult = dialect->is_def (dialect, p);
+			if (kind_hint.isDefResult.is_def)
 			{
-				vStringClear (kind_hint);
+				vStringClear (kind_hint.str);
 				while (*p != '\0' && !isspace (*p))
 				{
-					vStringPut (kind_hint,
+					vStringPut (kind_hint.str,
 								dialect->case_insensitive? toupper(*p): *p);
 					p++;
 				}
@@ -434,7 +439,7 @@ extern void findLispTagsCommon (struct lispDialect *dialect)
 					while (isspace (*p))
 						p++;
 				}
-				dialect->get_it(dialect, name, p, kind_hint, "");
+				dialect->get_it(dialect, name, p, &kind_hint, "");
 			}
 			else if (dialect->namespace_sep != 0)
 			{
@@ -456,18 +461,19 @@ extern void findLispTagsCommon (struct lispDialect *dialect)
 					}
 					while (*p == dialect->namespace_sep);
 
-					if (dialect->is_def (dialect, p - 1))
+					kind_hint.isDefResult = dialect->is_def (dialect, p - 1);
+					if (kind_hint.isDefResult.is_def)
 					{
-						vStringClear (kind_hint);
+						vStringClear (kind_hint.str);
 						while (*p != '\0' && !isspace (*p))
 						{
-							vStringPut (kind_hint,
+							vStringPut (kind_hint.str,
 										dialect->case_insensitive? toupper(*p): *p);
 							p++;
 						}
 						while (isspace (*p))
 							p++;
-						dialect->get_it(dialect, name, p, kind_hint, vStringValue (namespace));
+						dialect->get_it(dialect, name, p, &kind_hint, vStringValue (namespace));
 					}
 				}
 				vStringDelete (namespace);
@@ -475,7 +481,7 @@ extern void findLispTagsCommon (struct lispDialect *dialect)
 		}
 	}
 	vStringDelete (name);
-	vStringDelete (kind_hint);
+	vStringDelete (kind_hint.str);
 }
 
 static void findLispTags (void)

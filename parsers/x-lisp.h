@@ -14,17 +14,27 @@
 
 #include "field.h"
 
+struct lispIsDefResult {
+	bool is_def;
+	int kind;
+};
+
+struct lispKindHint {
+	vString * str;
+	struct lispIsDefResult isDefResult;
+};
+
 struct lispDialect {
-	int (* definer2kind) (const vString *const hint, const char *namespace);
+	int (* definer2kind) (struct lispKindHint *hint, const char *namespace);
 	bool case_insensitive;
 	unsigned char namespace_sep;
 	int unknown_kind;
 	fieldDefinition *definer_field;
 	bool skip_initial_spaces;
 	bool lambda_syntax_sugar;
-	bool (* is_def) (struct lispDialect *, const unsigned char *);
+	struct lispIsDefResult (* is_def) (struct lispDialect *, const unsigned char *);
 	int (* get_it) (struct lispDialect *,
-					vString *const, const unsigned char *, vString *,
+					vString *const, const unsigned char *, struct lispKindHint *,
 					const char *);
 	int scope;
 };
@@ -32,8 +42,8 @@ struct lispDialect {
 void findLispTagsCommon (struct lispDialect *dialect);
 
 int lispGetIt (struct lispDialect *dialect,
-			   vString *const name, const unsigned char *dbp, vString *kind_hint,
+			   vString *const name, const unsigned char *dbp, struct lispKindHint *kind_hint,
 			   const char *namespace);
-bool lispIsDef (struct lispDialect *dialect, const unsigned char *strp);
+struct lispIsDefResult lispIsDef (struct lispDialect *dialect, const unsigned char *strp);
 
 #endif	/* CTAGS_LISP_H */
