@@ -336,7 +336,6 @@ extern int lispGetIt (struct lispDialect *dialect,
 					  const char *namespace)
 {
 	int index = CORK_NIL;
-	const unsigned char *p;
 
 	if (*dbp == '\'')  /* Skip prefix quote */
 		dbp++;
@@ -352,8 +351,9 @@ extern int lispGetIt (struct lispDialect *dialect,
 		while (isspace (*dbp))
 			dbp++;
 	}
-
-	for (p = dbp; *p != '\0' && *p != '(' && !isspace (*p) && *p != ')'; p++)
+	for (const unsigned char *p = dbp;
+		 *p != '\0' && *p != '(' && !isspace (*p) && *p != ')';
+		 p++)
 		vStringPut (name, *p);
 
 	if (vStringLength (name) > 0)
