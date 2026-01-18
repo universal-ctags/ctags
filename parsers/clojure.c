@@ -27,7 +27,8 @@
 typedef enum {
 	K_UNKNOWN,
 	K_FUNCTION,
-	K_NAMESPACE
+	K_NAMESPACE,
+	K_MACRO,
 } clojureKind;
 
 typedef enum {
@@ -46,6 +47,8 @@ static kindDefinition ClojureKinds[] = {
 	  .version = 1 },
 	{ true, 'f', "function", "functions" },
 	{ true, 'n', "namespace", "namespaces" },
+	{ true, 'm', "macro", "macros",
+	  .version = 2 },
 };
 
 /*
@@ -69,6 +72,11 @@ static struct lispIsDefResult clojure_is_def (struct lispDialect *dialect CTAGS_
 	{
 		r.is_def = true;
 		r.kind = K_FUNCTION;
+	}
+	else if (EQN(input, "defmacro"))
+	{
+		r.is_def = true;
+		r.kind = K_MACRO;
 	}
 
 #undef EQN
@@ -171,7 +179,7 @@ extern parserDefinition *ClojureParser (void)
 	def->aliases = aliases;
 	def->parser = findClojureTags;
 	def->useCork = CORK_QUEUE;
-	def->versionCurrent = 1;
-	def->versionAge = 1;
+	def->versionCurrent = 1; /* Set 2 when releasing 6.3.0 */
+	def->versionAge = 1; /* Set 2 when releasing 6.3.0 */
 	return def;
 }
