@@ -68,6 +68,12 @@ HTML                    C/stylesheet      extFile            on        0 referen
 HTML                    J/script          extFile            on        0 referenced as external files
 HTML                    c/class           attribute          on        0 assigned as attributes
 Java                    p/package         imported           on        0 imported package
+JavaScript              N/module          aggregated         on        2 aggregated
+JavaScript              N/module          imported           on        2 imported
+JavaScript              Y/unknown         exported           on        2 exported
+JavaScript              Y/unknown         exportedAsDefault  on        2 
+JavaScript              Y/unknown         imported           on        2 imported from the other module
+JavaScript              Y/unknown         importedAsDefault  on        2 
 JavaScript              c/class           chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
 JavaScript              f/function        foreigndecl        on        1 declared in foreign languages
 JavaScript              v/variable        chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
@@ -221,6 +227,12 @@ HTML                    C/stylesheet      extFile            on        0 referen
 HTML                    J/script          extFile            on        0 referenced as external files
 HTML                    c/class           attribute          on        0 assigned as attributes
 Java                    p/package         imported           on        0 imported package
+JavaScript              N/module          aggregated         on        2 aggregated
+JavaScript              N/module          imported           on        2 imported
+JavaScript              Y/unknown         exported           on        2 exported
+JavaScript              Y/unknown         exportedAsDefault  on        2 
+JavaScript              Y/unknown         imported           on        2 imported from the other module
+JavaScript              Y/unknown         importedAsDefault  on        2 
 JavaScript              c/class           chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
 JavaScript              f/function        foreigndecl        on        1 declared in foreign languages
 JavaScript              v/variable        chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
