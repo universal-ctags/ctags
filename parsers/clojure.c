@@ -53,12 +53,17 @@ static kindDefinition ClojureKinds[] = {
 */
 static bool clojure_is_def (struct lispDialect *dialect CTAGS_ATTR_UNUSED, const unsigned char *strp)
 {
-	if (strp [1] == 'n' && strp [2] == 's' && isspace (strp [3]))
+	const unsigned char *input = strp + 1;
+
+#define EQN(input, expect) (strncmp((const char *)(input), (expect), sizeof(expect) - 1) == 0 \
+							&& (isspace ((input)[sizeof(expect) - 1])))
+
+	if (EQN(input, "ns"))
+		return true;
+	else if (EQN(input, "defn"))
 		return true;
 
-	if (strp [1] == 'd' && strp [2] == 'e' && strp [3] == 'f' && strp [4] == 'n'
-		&& isspace (strp [5]))
-		return true;
+#undef EQN
 
 	return false;
 }
