@@ -54,7 +54,8 @@ static kindDefinition SchemeKinds [] = {
 /*
 *   FUNCTION DEFINITIONS
 */
-static bool scheme_is_def (struct lispDialect *dialect, const unsigned char *strp)
+static struct lispIsDefResult scheme_is_def (struct lispDialect *dialect,
+											 const unsigned char *strp)
 {
 	bool cis = dialect->case_insensitive; /* Renaming for making code short */
 
@@ -63,21 +64,21 @@ static bool scheme_is_def (struct lispDialect *dialect, const unsigned char *str
 					&& (strp [3] == 't' || (cis && strp [3] == 'T'))
 					&& (strp [4] == '!'));
 	if (is_set)
-		return true;
+		return (struct lispIsDefResult){ .is_def = true, .kind = K_SET, };
 
 	return lispIsDef (dialect, strp);
 }
 
-static int  scheme_hint2kind (const vString *const hint, const char *namespace CTAGS_ATTR_UNUSED)
+static int scheme_hint2kind (struct lispKindHint *hint, const char *namespace CTAGS_ATTR_UNUSED)
 {
 	int k = K_UNKNOWN;
-	int n = vStringLength (hint) - 4;
+	int n = vStringLength (hint->str) - 4;
 
-	if (strncmp (vStringValue (hint) + 1, "SET!", 4) == 0)
+	if (strncmp (vStringValue (hint->str) + 1, "SET!", 4) == 0)
 		return K_SET;
 
 	/* 4 means strlen("(def"). */
-#define EQN(X) strncmp(vStringValue (hint) + 4, &X[3], n) == 0
+#define EQN(X) strncmp(vStringValue (hint->str) + 4, &X[3], n) == 0
 	switch (n)
 	{
 	case 3:

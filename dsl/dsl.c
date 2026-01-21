@@ -362,7 +362,7 @@ void dsl_help (DSLEngineType engine, FILE *fp)
 	dsl_help0 (engine, fp);
 }
 
-static void dsl_cache_reset0 (DSLProcBind  *pb)
+static void dsl_cache_reset0 (DSLProcBind *pb)
 {
 	if (pb->flags & DSL_PATTR_MEMORABLE)
 		pb->cache = NULL;
@@ -979,7 +979,7 @@ static EsObject* builtin_length (EsObject *args, DSLEnv *env)
 	return es_object_autounref (es_integer_new ((int)len));
 }
 
-static MIO  *miodebug;
+static MIO *miodebug;
 static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env)
 {
 	if (miodebug == NULL)
@@ -1573,7 +1573,7 @@ static EsObject* macro_debug_printX (EsObject *expr)
 
 void dsl_report_error (const char *msg, EsObject *obj)
 {
-	MIO  *mioerr = mio_new_fp (stderr, NULL);
+	MIO *mioerr = mio_new_fp (stderr, NULL);
 
 	if (es_error_p (obj))
 	{

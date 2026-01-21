@@ -381,7 +381,7 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 		markTagExtraBit (e, XTAG_ANONYMOUS);
 }
 
-static void  makePhpTagEntry  (tagEntryInfo *const e)
+static void makePhpTagEntry (tagEntryInfo *const e)
 {
 	makeTagEntry (e);
 	makeQualifiedTagEntry (e);

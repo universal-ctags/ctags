@@ -1,0 +1,2 @@
+with-tree	input.clj	/^(defmacro with-tree$/;"	m
+unless	input.clj	/^(defmacro unless [pred a b]$/;"	m

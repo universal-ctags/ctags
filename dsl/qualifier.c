@@ -49,7 +49,7 @@ static int initialize (void)
 	return 1;
 }
 
-QCode  *q_compile (EsObject *exp)
+QCode *q_compile (EsObject *exp)
 {
 	QCode *code;
 

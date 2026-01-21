@@ -28,12 +28,12 @@ EsObject *OPTSCRIPT_ERR_UNKNOWNLANGUAGE;
 EsObject *OPTSCRIPT_ERR_FIELDRESET;
 
 int OPT_TYPE_MATCHLOC;
-static int locEqual (const void *a, const void  *b);
+static int locEqual (const void *a, const void *b);
 static void locPrint (const void *a, MIO *out);
 
 int OPT_TYPE_TAG;
 static void tagFree (void *a);
-static int tagEqual (const void *a, const void  *b);
+static int tagEqual (const void *a, const void *b);
 static void tagPrint (const void *a, MIO *out);
 
 static void vStringCatToupperS (vString *str, const char *s)
@@ -494,7 +494,7 @@ extern void optscriptHelp (OptVM *vm, FILE *fp, EsObject *procdocs)
 	mio_unref (out);
 }
 
-static int locEqual (const void *a, const void  *b)
+static int locEqual (const void *a, const void *b)
 {
 	if (a == b)
 		return 1;
@@ -521,7 +521,7 @@ static void tagFree (void *a)
 	eFree (e);
 }
 
-static int tagEqual (const void *a, const void  *b)
+static int tagEqual (const void *a, const void *b)
 {
 	if (a == b)
 		return 1;

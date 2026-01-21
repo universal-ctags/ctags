@@ -183,8 +183,8 @@ static EsSingleton* es_obarray_intern(EsType type, const char* name);
 static const char*  es_singleton_get   (EsSingleton *singleton);
 static unsigned int hash(const char* keyarg);
 #define OBARRAY_SIZE    83
-static EsSingleton  *symbol_obarray[OBARRAY_SIZE];
-static EsSingleton  *error_obarray [OBARRAY_SIZE];
+static EsSingleton *symbol_obarray[OBARRAY_SIZE];
+static EsSingleton *error_obarray [OBARRAY_SIZE];
 
 static EsObjectClass es_nil_class = {
 	.size    = 0,
@@ -295,7 +295,7 @@ static EsObjectClass *classes[ES_TYPE_CLASS_MAX] = {
 
 static MIO *mio_stdout (void)
 {
-	static MIO  *out;
+	static MIO *out;
 
 	if (out == NULL)
 		out = mio_new_fp (stdout, NULL);
@@ -305,7 +305,7 @@ static MIO *mio_stdout (void)
 
 static MIO *mio_stdin (void)
 {
-	static MIO  *out;
+	static MIO *out;
 
 	if (out == NULL)
 		out = mio_new_fp (stdin, NULL);
@@ -315,7 +315,7 @@ static MIO *mio_stdin (void)
 
 static MIO *mio_stderr (void)
 {
-	static MIO  *out;
+	static MIO *out;
 
 	if (out == NULL)
 		out = mio_new_fp (stderr, NULL);

@@ -27,7 +27,8 @@
 typedef enum {
 	K_UNKNOWN,
 	K_FUNCTION,
-	K_NAMESPACE
+	K_NAMESPACE,
+	K_MACRO,
 } clojureKind;
 
 typedef enum {
@@ -46,48 +47,50 @@ static kindDefinition ClojureKinds[] = {
 	  .version = 1 },
 	{ true, 'f', "function", "functions" },
 	{ true, 'n', "namespace", "namespaces" },
+	{ true, 'm', "macro", "macros",
+	  .version = 2 },
 };
 
 /*
 *   FUNCTION DEFINITIONS
 */
-static bool clojure_is_def (struct lispDialect *dialect CTAGS_ATTR_UNUSED, const unsigned char *strp)
+static struct lispIsDefResult clojure_is_def (struct lispDialect *dialect CTAGS_ATTR_UNUSED,
+											  const unsigned char *strp)
 {
-	if (strp [1] == 'n' && strp [2] == 's' && isspace (strp [3]))
-		return true;
+	struct lispIsDefResult r = { .is_def = false, .kind = KIND_GHOST_INDEX, };
+	const unsigned char *input = strp + 1;
 
-	if (strp [1] == 'd' && strp [2] == 'e' && strp [3] == 'f' && strp [4] == 'n'
-		&& isspace (strp [5]))
-		return true;
+#define EQN(input, expect) (strncmp((const char *)(input), (expect), sizeof(expect) - 1) == 0 \
+							&& (isspace ((input)[sizeof(expect) - 1])))
 
-	return false;
+	if (EQN(input, "ns"))
+	{
+		r.is_def = true;
+		r.kind = K_NAMESPACE;
+	}
+	else if (EQN(input, "defn"))
+	{
+		r.is_def = true;
+		r.kind = K_FUNCTION;
+	}
+	else if (EQN(input, "defmacro"))
+	{
+		r.is_def = true;
+		r.kind = K_MACRO;
+	}
+
+#undef EQN
+
+	return r;
 }
 
-static int  clojure_hint2kind (const vString *const hint, const char *namespace)
+static int clojure_hint2kind (struct lispKindHint *hint, const char *namespace)
 {
-	int k = K_UNKNOWN;
-	int n = vStringLength (hint) - 4;
-	unsigned int offset = 1;
+	if (namespace[0] != '\0'
+		&& strcmp (namespace, "clojure.core/") != 0)
+		return K_UNKNOWN;
 
-	if (strcmp (namespace, "clojure.core/") == 0)
-	{
-		offset = 0;
-		n++;
-	}
-
-	if (strncmp (vStringValue (hint) + offset, "ns", 2) == 0)
-		return K_NAMESPACE;
-
-#define EQN(X) strncmp(vStringValue (hint) + offset + 3, &X[3], n) == 0
-	switch (n)
-	{
-	case 1:
-		if (EQN("defn"))
-			k = K_FUNCTION;
-		break;
-	}
-#undef EQN
-	return k;
+	return hint->isDefResult.kind;
 }
 
 const unsigned char* clojure_skip_metadata (const unsigned char *dbp)
@@ -125,7 +128,7 @@ const unsigned char* clojure_skip_metadata (const unsigned char *dbp)
 }
 
 static int clojure_get_it (struct lispDialect *dialect,
-						   vString *const name, const unsigned char *dbp, vString *kind_hint,
+						   vString *const name, const unsigned char *dbp, struct lispKindHint *kind_hint,
 						   const char *namespace)
 {
 	dbp = clojure_skip_metadata (dbp);
@@ -176,7 +179,7 @@ extern parserDefinition *ClojureParser (void)
 	def->aliases = aliases;
 	def->parser = findClojureTags;
 	def->useCork = CORK_QUEUE;
-	def->versionCurrent = 1;
-	def->versionAge = 1;
+	def->versionCurrent = 1; /* Set 2 when releasing 6.3.0 */
+	def->versionAge = 1; /* Set 2 when releasing 6.3.0 */
 	return def;
 }

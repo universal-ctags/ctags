@@ -42,7 +42,7 @@ static kindDefinition ITclKinds[] = {
 	  ATTACH_SEPARATORS(ITclGenericSeparators)},
 	{ true, 'C', "common", "common variables",
 	  ATTACH_SEPARATORS(ITclGenericSeparators)},
-	{ true, 'p', "procedure", "procedures within the  class  namespace",
+	{ true, 'p', "procedure", "procedures within the class namespace",
 	  ATTACH_SEPARATORS(ITclGenericSeparators)},
 };
 

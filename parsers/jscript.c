@@ -410,13 +410,13 @@ static void injectDynamicName (tokenInfo *const token, vString *newName)
  * Tag generation functions
  */
 
-struct  bestJSEntryInScopeData {
+struct bestJSEntryInScopeData {
 	int index;
 };
 
 static bool findBestJSEntry (int corkIndex, tagEntryInfo *entry, void *cb_data)
 {
-	struct  bestJSEntryInScopeData *data = cb_data;
+	struct bestJSEntryInScopeData *data = cb_data;
 
 	if (isRoleAssigned (entry, ROLE_DEFINITION_INDEX))
 	{
@@ -438,7 +438,7 @@ static int bestJSEntryInScope(int scope, const char *name)
 	 * tag having smallest cork index is the best.
 	 */
 
-	struct  bestJSEntryInScopeData data = {
+	struct bestJSEntryInScopeData data = {
 		.index = CORK_NIL,
 	};
 	foreachEntriesInScope (scope, name,  findBestJSEntry, &data);

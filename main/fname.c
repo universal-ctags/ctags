@@ -167,7 +167,7 @@ static bool is_special_link(const char *name)
 
 extern char *canonicalizeAbsoluteFileName (char *fname)
 {
-	char  *next = strchr (fname, '/');
+	char *next = strchr (fname, '/');
 	if (next == NULL)
 	{
 		if (is_special_link(fname))

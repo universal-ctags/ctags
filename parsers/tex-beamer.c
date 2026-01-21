@@ -147,8 +147,8 @@ static struct TexParseStrategy frame_env_strategy [] = {
  *	 FUNCTION DEFINITIONS
  */
 
-static  struct TexParseStrategy *readIdentifierNotify (texSubparser *s,
-													   vString *identifier)
+static struct TexParseStrategy *readIdentifierNotify (texSubparser *s,
+													  vString *identifier)
 {
 	/* Reject uninteresting identifiers early. */
 	if (! (vStringLength (identifier) > 10

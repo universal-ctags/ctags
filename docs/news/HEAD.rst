@@ -54,6 +54,18 @@ Python:
 
     * Support type statements.
 
+Clojure:
+
+    * Verify namespace when extracting tag.
+
+      The older version doesn't consider NAMESPACE when processing
+      input like (NAMESPACE/defn foo ...).
+
+      With this change, the parser emits ``functions`` and/or
+      ``namespaces`` kind tags only if NAMESPACES is
+      "``clojure.core``".  For the other namespaces, the parser emits
+      "``unknown``" kind tags.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:

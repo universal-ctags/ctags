@@ -237,15 +237,15 @@ static struct tokenInfoClass rTokenInfoClass = {
 static bool parseStatement (tokenInfo *const token, int parent, bool in_arglist, bool in_continuous_pair);
 static void parsePair (tokenInfo *const token, int parent, tokenInfo *const funcall);
 
-static  int notifyReadRightSideSymbol (tokenInfo *const symbol,
-									   const char *const assignmentOperator,
-									   int parent,
-									   tokenInfo *const token);
-static  int makeSimpleSubparserTag (int langType, tokenInfo *const token, int parent,
-									bool in_func, int kindInR, const char *assignmentOperator);
-static  bool askSubparserTagAcceptancy (tagEntryInfo *pe);
-static  bool askSubparserTagHasFunctionAlikeKind (tagEntryInfo *e);
-static  int notifyReadFuncall (tokenInfo *const func, tokenInfo *const token, int parent);
+static int notifyReadRightSideSymbol (tokenInfo *const symbol,
+									  const char *const assignmentOperator,
+									  int parent,
+									  tokenInfo *const token);
+static int makeSimpleSubparserTag (int langType, tokenInfo *const token, int parent,
+								   bool in_func, int kindInR, const char *assignmentOperator);
+static bool askSubparserTagAcceptancy (tagEntryInfo *pe);
+static bool askSubparserTagHasFunctionAlikeKind (tagEntryInfo *e);
+static int notifyReadFuncall (tokenInfo *const func, tokenInfo *const token, int parent);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -1257,10 +1257,10 @@ extern bool rParseStatement (tokenInfo *const token, int parentIndex, bool in_ar
 	return r;
 }
 
-static  int notifyReadRightSideSymbol (tokenInfo *const symbol,
-									   const char *const assignmentOperator,
-									   int parent,
-									   tokenInfo *const token)
+static int notifyReadRightSideSymbol (tokenInfo *const symbol,
+									  const char *const assignmentOperator,
+									  int parent,
+									  tokenInfo *const token)
 {
 	subparser *sub;
 	int q = CORK_NIL;
@@ -1281,10 +1281,10 @@ static  int notifyReadRightSideSymbol (tokenInfo *const symbol,
 	return q;
 }
 
-static  int makeSimpleSubparserTag (int langType,
-									tokenInfo *const token, int parent,
-									bool in_func, int kindInR,
-									const char *assignmentOperator)
+static int makeSimpleSubparserTag (int langType,
+								   tokenInfo *const token, int parent,
+								   bool in_func, int kindInR,
+								   const char *assignmentOperator)
 {
 	int q = CORK_NIL;
 	subparser *sub = getLanguageSubparser (langType, false);
@@ -1304,7 +1304,7 @@ static  int makeSimpleSubparserTag (int langType,
 	return q;
 }
 
-static  bool askSubparserTagAcceptancy (tagEntryInfo *pe)
+static bool askSubparserTagAcceptancy (tagEntryInfo *pe)
 {
 	bool q = false;
 	subparser *sub = getLanguageSubparser (pe->langType, false);
@@ -1320,7 +1320,7 @@ static  bool askSubparserTagAcceptancy (tagEntryInfo *pe)
 	return q;
 }
 
-static  bool askSubparserTagHasFunctionAlikeKind (tagEntryInfo *e)
+static bool askSubparserTagHasFunctionAlikeKind (tagEntryInfo *e)
 {
 	bool q = false;
 	pushLanguage (Lang_R);
@@ -1337,9 +1337,9 @@ static  bool askSubparserTagHasFunctionAlikeKind (tagEntryInfo *e)
 	return q;
 }
 
-static  int notifyReadFuncall (tokenInfo *const func,
-							   tokenInfo *const token,
-							   int parent)
+static int notifyReadFuncall (tokenInfo *const func,
+							  tokenInfo *const token,
+							  int parent)
 {
 	int q = CORK_NIL;
 	subparser *sub;
