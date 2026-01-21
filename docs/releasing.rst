@@ -12,6 +12,8 @@ How to release a new version
 
 ----
 
+#. Update parsers' ``versionCurrent`` and ``versionAge`` members
+
 #. Revise misc/visit-version-info.bash, run it, verify the output
 
 #. Update NEWS.rst
