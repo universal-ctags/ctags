@@ -6,10 +6,96 @@
 #include "routines.h"
 #include "field.h"
 #include "xtag.h"
+#include "selectors.h"
 
 
-static void initializeQemuHXParser (const langType language CTAGS_ATTR_UNUSED)
+static void initializeQemuHXParser (const langType language)
 {
+
+	addLanguageRegexTable (language, "toplevel");
+	addLanguageRegexTable (language, "skiplines");
+	addLanguageRegexTable (language, "rst");
+	addLanguageRegexTable (language, "cmd");
+	addLanguageRegexTable (language, "cmd0");
+
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^HXCOMM[^\n]*[\n]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^SRST[^\n]*[\n]*",
+	                               "", "", "{tenter=rst}", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^[ \t]*DEF\\(\"([^\"\n]+)\"[^\n]*[\n]",
+	                               "\\1", "c", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^[ \t]*\\{[ \t]*[\n]+",
+	                               "", "", "{tenter=cmd}", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^[^\n]+[\n]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "skiplines",
+	                               "^[^\n]+[\n]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "skiplines",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "skiplines",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "rst",
+	                               "^ERST[^\n]*[\n]*",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "rst",
+	                               "^[^\n]+[\n]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "rst",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "rst",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd",
+	                               "^[ \t]*(SRST)[^\n]*[\n]*",
+	                               "", "", "{tleave}{_advanceTo=1start}", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd",
+	                               "^[ \t]*\\}[ \t]*,[ \t]*[\n]*",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd",
+	                               "^[ \t]*DEF\\(\"([^\"\n]+)\"[^\n]*[\n]",
+	                               "\\1", "c", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd",
+	                               "^[ \t]*\\.name[ \t]*=[ \t]*\"",
+	                               "", "", "{tenter=cmd0}", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd",
+	                               "^[^\n]+[\n]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd0",
+	                               "^([^|\n]+)\\|",
+	                               "\\1", "c", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd0",
+	                               "^([^\"\n]+)\"[^\n]*[\n]",
+	                               "\\1", "c", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd0",
+	                               "^[^\n]+[\n]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd0",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd0",
+	                               "^.",
+	                               "", "", "", NULL);
 }
 
 extern parserDefinition* QemuHXParser (void)
@@ -34,6 +120,10 @@ extern parserDefinition* QemuHXParser (void)
 		{
 		  true, 'i', "infoitem", "item in texinfo doc",
 		},
+		{
+		  true, 'c', "commands", "name member in HMPCommand struct",
+		  .version = 1,
+		},
 	};
 	static xtagDefinition QemuHXXtagTable [] = {
 		{
@@ -55,6 +145,7 @@ extern parserDefinition* QemuHXParser (void)
 		"i", NULL, NULL, false},
 	};
 
+	static selectLanguage selectors[] = { selectHaxeOrQemuHXByCommentMarker, NULL };
 
 	parserDefinition* const def = parserNew ("QemuHX");
 
@@ -64,6 +155,7 @@ extern parserDefinition* QemuHXParser (void)
 	def->extensions    = extensions;
 	def->patterns      = patterns;
 	def->aliases       = aliases;
+	def->selectLanguage= selectors;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->useCork       = CORK_QUEUE;
 	def->kindTable     = QemuHXKindTable;

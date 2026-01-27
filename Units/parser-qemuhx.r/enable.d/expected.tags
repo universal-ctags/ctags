@@ -4,3 +4,8 @@ check	input.hx	/^@item check [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leak
 create	input.hx	/^@item create [-q] [-f @var{fmt}] [-o @var{options}] @var{filename} [@var{size}]$/;"	i
 quit	input.hx	/^quit$/;"	q
 qmp_quit	input.hx	/^quit$/;"	q	extras:funcmap
+help	input.hx	/^        .name       = "help|?",$/;"	c
+?	input.hx	/^        .name       = "help|?",$/;"	c
+version	input.hx	/^DEF("version", 0, QEMU_OPTION_version,$/;"	c
+check	input.hx	/^DEF("check", img_check,$/;"	c
+create	input.hx	/^DEF("create", img_create,$/;"	c

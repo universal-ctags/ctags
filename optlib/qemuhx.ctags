@@ -32,7 +32,10 @@
 --langdef=QemuHX
 --kinddef-QemuHX=q,qmp,QEMU Management Protocol dispatch table entries
 --kinddef-QemuHX=i,infoitem,item in texinfo doc
+--kinddef-QemuHX=c,commands,name member in HMPCommand struct{version=1}
+
 --map-QemuHX=+.hx
+--__selector-QemuHX=selectHaxeOrQemuHXByCommentMarker
 --_extradef-QemuHX=funcmap,Include mapping SQMP to C function name
 --extras-QemuHX=+{funcmap}
 
@@ -42,3 +45,33 @@
     . exch name:
 }}
 --regex-QemuHX=/^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})/\1/i/
+
+--_tabledef-QemuHX=toplevel
+--_tabledef-QemuHX=skiplines
+
+--_tabledef-QemuHX=rst
+--_tabledef-QemuHX=cmd
+--_tabledef-QemuHX=cmd0
+
+--_mtable-regex-QemuHX=skiplines/[^\n]+[\n]*//
+--_mtable-regex-QemuHX=skiplines/[\n]+//
+--_mtable-regex-QemuHX=skiplines/.//
+
+--_mtable-regex-QemuHX=toplevel/HXCOMM[^\n]*[\n]*//
+--_mtable-regex-QemuHX=toplevel/SRST[^\n]*[\n]*//{tenter=rst}
+--_mtable-regex-QemuHX=toplevel/[ \t]*DEF\("([^"\n]+)"[^\n]*[\n]/\1/c/
+--_mtable-regex-QemuHX=toplevel/[ \t]*\{[ \t]*[\n]+//{tenter=cmd}
+--_mtable-extend-QemuHX=toplevel+skiplines
+
+--_mtable-regex-QemuHX=rst/ERST[^\n]*[\n]*//{tleave}
+--_mtable-extend-QemuHX=rst+skiplines
+
+--_mtable-regex-QemuHX=cmd/[ \t]*(SRST)[^\n]*[\n]*//{tleave}{_advanceTo=1start}
+--_mtable-regex-QemuHX=cmd/[ \t]*\}[ \t]*,[ \t]*[\n]*//{tleave}
+--_mtable-regex-QemuHX=cmd/[ \t]*DEF\("([^"\n]+)"[^\n]*[\n]/\1/c/
+--_mtable-regex-QemuHX=cmd/[ \t]*\.name[ \t]*=[ \t]*"//{tenter=cmd0}
+--_mtable-extend-QemuHX=cmd+skiplines
+
+--_mtable-regex-QemuHX=cmd0/([^|\n]+)\|/\1/c/
+--_mtable-regex-QemuHX=cmd0/([^"\n]+)"[^\n]*[\n]/\1/c/{tleave}
+--_mtable-extend-QemuHX=cmd0+skiplines
