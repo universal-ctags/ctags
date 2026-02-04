@@ -1,0 +1,9 @@
+HTML comments in JS	input.html	/^<title>HTML comments in JS<\/title>$/;"	j	language:HTML
+HTML comments in JS	input.html	/^  <h1>HTML comments in JS<\/h1>$/;"	h	language:HTML
+func1	input.html	/^function func1() {}; <!-- function bug2() {}$/;"	f	language:JavaScript
+func2	input.html	/^function func2() {};$/;"	f	language:JavaScript
+a	input.html	/^let a = 1;$/;"	v	language:JavaScript
+b	input.html	/^let b = a --> (function anonfunc1() { return 0; })();$/;"	v	language:JavaScript
+anonfunc1	input.html	/^let b = a --> (function anonfunc1() { return 0; })();$/;"	f	language:JavaScript
+func3	input.html	/^function func3() {}; \/\/ test for parser internal$/;"	f	language:JavaScript
+func4	input.html	/^a --> 0; function func4() {}$/;"	f	language:JavaScript

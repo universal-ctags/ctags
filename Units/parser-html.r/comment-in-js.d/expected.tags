@@ -1,0 +1,5 @@
+simple_anchor	input.html	/^  <a name="simple_anchor"><\/a>$/;"	a	language:HTML
+unquoted_anchor	input.html	/^  <a name=unquoted_anchor><\/a>$/;"	a	language:HTML
+prefixed_anchor	input.html	/^  <a title="Title" name="prefixed_anchor"><\/a>$/;"	a	language:HTML
+postfixed_anchor	input.html	/^  <a name=postfixed_anchor href="http:\/\/darrenhiebert.com"><\/a>$/;"	a	language:HTML
+message	input.html	/^function message()$/;"	f	language:JavaScript
