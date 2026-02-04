@@ -33,6 +33,7 @@ x       UCTAGSxpath          no      NONE             s--    no    --   0 xpath 
 -       UCTAGSpackageName    yes     Go               s--    no    --   0 the name for referring the package
 -       UCTAGSreceiver       no      Go               s--    no    --   1 the name of the receiver
 -       UCTAGSimplements     yes     Inko             s--    no    rw   0 Trait being implemented
+-       UCTAGSproperties     no      JSX              s--    no    --   2 properties (static)
 -       UCTAGSproperties     no      JavaScript       s--    no    --   2 properties (static)
 -       UCTAGSassignment     yes     LdScript         s--    no    --   0 how a value is assigned to the symbol
 -       UCTAGSdefiner        yes     Lisp             s--    no    --   1 the name of the function or macro that defines the unknown/Y-kind object
