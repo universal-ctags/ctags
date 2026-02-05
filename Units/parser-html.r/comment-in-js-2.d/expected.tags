@@ -7,3 +7,9 @@ b	input.html	/^let b = a --> (function anonfunc1() { return 0; })();$/;"	v	langu
 anonfunc1	input.html	/^let b = a --> (function anonfunc1() { return 0; })();$/;"	f	language:JavaScript
 func3	input.html	/^function func3() {}; \/\/ test for parser internal$/;"	f	language:JavaScript
 func4	input.html	/^a --> 0; function func4() {}$/;"	f	language:JavaScript
+c	input.html	/^let c = 1;$/;"	v	language:JavaScript
+func5	input.html	/^function func5() {};$/;"	f	language:JavaScript
+d	input.html	/^let d = c<!42;$/;"	v	language:JavaScript
+func6	input.html	/^function func6() {};$/;"	f	language:JavaScript
+e	input.html	/^let e = c<!-42;$/;"	v	language:JavaScript
+func7	input.html	/^function func7() {};$/;"	f	language:JavaScript

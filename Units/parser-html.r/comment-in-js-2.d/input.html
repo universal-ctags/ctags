@@ -13,6 +13,16 @@ console.log(b); // true, because above should have read as "let b = (a--) > 0"
 function func3() {}; // test for parser internal
 --> function bug4() {}
 a --> 0; function func4() {}
+
+/* just to cover all related logic in the parser (basically backup code paths) */
+let c = 1;
+--c;
+function func5() {};
+let d = c<!42;
+function func6() {};
+let e = c<!-42;
+function func7() {};
+
 func4();
 </script>
 <body>
