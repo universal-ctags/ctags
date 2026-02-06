@@ -876,7 +876,10 @@ static int findPhpStart (int *tagStartColumn)
 				c = getcFromInputFile ();
 				/* echo tag */
 				if (c == '=')
+				{
 					c = getcFromInputFile ();
+					break;
+				}
 				/* don't enter PHP mode on "<?xml", yet still support short open tags (<?) */
 				else if (tolower (c)                          != 'x' ||
 				         tolower ((c = getcFromInputFile ())) != 'm' ||

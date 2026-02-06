@@ -1,0 +1,3 @@
+paginate	input.php	/^function paginate() {$/;"	f	language:PHP
+Home page	input.php	/^<h1>Home page<\/h1>$/;"	h	language:HTML
+onload	input.php	/^document.onload = function() {$/;"	f	language:JavaScript	variable:document
