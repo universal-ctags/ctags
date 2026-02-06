@@ -8,6 +8,7 @@
  * files.
  *
  * Reference: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+ *            https://tc39.es/ecma262/
  *
  * This is a good reference for different forms of the function statement:
  *     http://www.permadi.com/tutorial/jsFunc/
@@ -1142,12 +1143,19 @@ static void readTokenFullRaw (tokenInfo *const token, bool include_newlines, vSt
 	token->keyword		= KEYWORD_NONE;
 	vStringClear (token->string);
 
+#define SKIP_COMMENT_SINGLE_AND_RETRY()									\
+	do {																\
+		skipToCharacterInInputFile ('\n');								\
+		newline_encountered = true;										\
+		goto getNextChar;												\
+	} while (0)
+
 getNextChar:
 	i = 0;
 	do
 	{
 		c = getcFromInputFile ();
-		if (include_newlines && (c == '\r' || c == '\n'))
+		if (c == '\r' || c == '\n')
 			newline_encountered = true;
 		i++;
 	}
@@ -1215,7 +1223,19 @@ getNextChar:
 		{
 			int d = getcFromInputFile ();
 			if (d == c) /* ++ or -- */
+			{
+				/* HTML comment close like "-->" behave as single-line comments "//", see
+				 * https://tc39.es/ecma262/multipage/additional-ecmascript-features-for-web-browsers.html#sec-html-like-comments */
+				if (newline_encountered && c == '-')
+				{
+					d = getcFromInputFile ();
+					if (d != '>')
+						ungetcToInputFile (d);
+					else
+						SKIP_COMMENT_SINGLE_AND_RETRY();
+				}
 				token->type = TOKEN_POSTFIX_OPERATOR;
+			}
 			else
 			{
 				ungetcToInputFile (d);
@@ -1237,7 +1257,33 @@ getNextChar:
 			break;
 
 		case '<':
-			if (doesExpectBinaryOperator (LastTokenType))
+		{
+			int d = getcFromInputFile ();
+			/* HTML comment like "<!--" behave as single-line comments "//", see
+			 * https://tc39.es/ecma262/multipage/additional-ecmascript-features-for-web-browsers.html#sec-html-like-comments
+			 * This is *not* JSX */
+			if (d == '!')
+			{
+				d = getcFromInputFile ();
+				if (d != '-')
+					ungetcToInputFile (d);
+				else
+				{
+					d = getcFromInputFile ();
+					if (d != '-')
+					{
+						ungetcToInputFile (d);
+						/* put back the previous '-' */
+						ungetcToInputFile ('-');
+					}
+					else
+						SKIP_COMMENT_SINGLE_AND_RETRY();
+				}
+				/* if we made it here, it's a binary '<' followed by '!' */
+				ungetcToInputFile ('!');
+				token->type = TOKEN_BINARY_OPERATOR;
+			}
+			else if (doesExpectBinaryOperator (LastTokenType))
 			{
 				token->type = TOKEN_BINARY_OPERATOR;
 				/*
@@ -1251,18 +1297,14 @@ getNextChar:
 				 * Handling '<=' and '<<=' here is just for minor
 				 * optimization.
 				 */
-				int d = getcFromInputFile ();
 				if (d == '<')
-				{
 					d = getcFromInputFile ();
-					if (d != '=')
-						ungetcToInputFile (d);
-				}
-				else if (d != '=')
+				if (d != '=')
 					ungetcToInputFile (d);
 			}
 			else
 			{
+				ungetcToInputFile (d);
 				bool skip = !isXtagEnabled (XTAG_GUEST);
 				token->type = TOKEN_JSX;
 				token->lineNumber = getInputLineNumber ();
@@ -1270,6 +1312,7 @@ getNextChar:
 				parseHTML (skip);
 			}
 			break;
+		}
 
 		case '\'':
 		case '"':
@@ -1322,11 +1365,7 @@ getNextChar:
 				}
 				else if (d == '/')	/* is this the start of a comment?  */
 				{
-					skipToCharacterInInputFile ('\n');
-					/* if we care about newlines, put it back so it is seen */
-					if (include_newlines)
-						ungetcToInputFile ('\n');
-					goto getNextChar;
+					SKIP_COMMENT_SINGLE_AND_RETRY();
 				}
 			}
 			break;
@@ -1427,6 +1466,8 @@ getNextChar:
 
 	if (repr)
 		reprToken (token, repr);
+
+#undef SKIP_COMMENT_SINGLE_AND_RETRY
 }
 
 /* whether something we consider a keyword (either because it sometimes is or

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>HTML comments in JS</title>
+<script language="JavaScript">
+<!-- function bug1() {}
+function func1() {}; <!-- function bug2() {}
+function func2() {};
+--> function bug3() {}
+let a = 1;
+let b = a --> (function anonfunc1() { return 0; })();
+console.log(b); // true, because above should have read as "let b = (a--) > 0"
+function func3() {}; // test for parser internal
+--> function bug4() {}
+a --> 0; function func4() {}
+
+/* just to cover all related logic in the parser (basically backup code paths) */
+let c = 1;
+--c;
+function func5() {};
+let d = c<!42;
+function func6() {};
+let e = c<!-42;
+function func7() {};
+
+func4();
+</script>
+<body>
+  <h1>HTML comments in JS</h1>
+  <p>
+    See <a href="https://tc39.es/ecma262/multipage/additional-ecmascript-features-for-web-browsers.html#sec-html-like-comments">ECMA-262 Annex B.1.1 HTML-like Comments</a>
+    and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features#html_comments">MDN's JavaScript Reference of Deprecated Features</a>.
+  </p>
+  <p>
+    In a nutshell, <code>&lt;!--</code> behaves the same as <code>//</code> (single-line) comments.
+    <code>--&gt;</code> behaves the same, but only at the start of a line (only allowing whitespaces and comments before).
+  </p>
+</body>
+</html>
