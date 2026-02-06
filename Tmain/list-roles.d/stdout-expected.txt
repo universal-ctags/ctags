@@ -67,6 +67,9 @@ Go                      p/package         imported           on        0 importe
 HTML                    C/stylesheet      extFile            on        0 referenced as external files
 HTML                    J/script          extFile            on        0 referenced as external files
 HTML                    c/class           attribute          on        0 assigned as attributes
+JSX                     c/class           chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JSX                     f/function        foreigndecl        on        1 declared in foreign languages
+JSX                     v/variable        chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Java                    p/package         imported           on        0 imported package
 JavaScript              c/class           chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
 JavaScript              f/function        foreigndecl        on        1 declared in foreign languages
@@ -220,6 +223,9 @@ Go                      p/package         imported           on        0 importe
 HTML                    C/stylesheet      extFile            on        0 referenced as external files
 HTML                    J/script          extFile            on        0 referenced as external files
 HTML                    c/class           attribute          on        0 assigned as attributes
+JSX                     c/class           chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JSX                     f/function        foreigndecl        on        1 declared in foreign languages
+JSX                     v/variable        chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Java                    p/package         imported           on        0 imported package
 JavaScript              c/class           chainElt           off       0 (EXPERIMENTAL)used as an element in a name chain like a.b.c
 JavaScript              f/function        foreigndecl        on        1 declared in foreign languages
