@@ -14,6 +14,7 @@ static void initializeQemuHXParser (const langType language)
 
 	addLanguageRegexTable (language, "toplevel");
 	addLanguageRegexTable (language, "skiplines");
+	addLanguageRegexTable (language, "qmp");
 	addLanguageRegexTable (language, "texi");
 	addLanguageRegexTable (language, "rst");
 	addLanguageRegexTable (language, "cmd");
@@ -22,6 +23,9 @@ static void initializeQemuHXParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^HXCOMM[^\n]*[\n]*",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^SQMP[[:space:]]+",
+	                               "", "", "{tenter=qmp}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^STEXI[\n]*",
 	                               "", "", "{tenter=texi}", NULL);
@@ -52,6 +56,33 @@ static void initializeQemuHXParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "skiplines",
 	                               "^.",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "qmp",
+	                               "^EQMP[^\n]*[\n]*",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "qmp",
+	                               "^([-a-z_0-9A-Z]+)[[:space:]]---[^\n]*[\n]",
+	                               "\\1", "q", ""
+		"{{\n"
+		"    /QemuHX.funcmap _extraenabled {\n"
+		"        % make an extra tag for \"n-a-m-e\":\n"
+		"        % make string: qmp_n-a-m-e\n"
+		"        mark (qmp_) . :name _buildstring\n"
+		"        % replace - with _: qmp_n_a_m_e\n"
+		"        dup (-_) _tr!\n"
+		"        . :kind . _tagloc _tag\n"
+		"        _commit\n"
+		"        /QemuHX.funcmap _markextra\n"
+		"    } if\n"
+		"}}", NULL);
+	addLanguageTagMultiTableRegex (language, "qmp",
+	                               "^[^\n]+[\n]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "qmp",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "qmp",
+	                               "^.",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "texi",
 	                               "^ETEXI[\n]*",
 	                               "", "", "{tleave}", NULL);
@@ -79,6 +110,9 @@ static void initializeQemuHXParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "rst",
 	                               "^.",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd",
+	                               "^[ \t]*(SQMP)[\n]*",
+	                               "", "", "{tleave}{_advanceTo=1start}", NULL);
 	addLanguageTagMultiTableRegex (language, "cmd",
 	                               "^[ \t]*(STEXI)[\n]*",
 	                               "", "", "{tleave}{_advanceTo=1start}", NULL);
@@ -154,17 +188,6 @@ extern parserDefinition* QemuHXParser (void)
 		  .description = "Include mapping SQMP to C function name",
 		},
 	};
-	static tagRegexTable QemuHXTagRegexTable [] = {
-		{"^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---", "\\1",
-		"q", "{mgroup=1}", NULL, true},
-		{"^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---", "qmp_\\1",
-		"q", "{mgroup=1}{_extra=funcmap}"
-		"{{\n"
-		"    . :name dup (-_) _tr!\n"
-		"    . exch name:\n"
-		"}}", NULL, true},
-	};
-
 	static selectLanguage selectors[] = { selectHaxeOrQemuHXByCommentMarker, NULL };
 
 	parserDefinition* const def = parserNew ("QemuHX");
@@ -182,8 +205,6 @@ extern parserDefinition* QemuHXParser (void)
 	def->kindCount     = ARRAY_SIZE(QemuHXKindTable);
 	def->xtagTable     = QemuHXXtagTable;
 	def->xtagCount     = ARRAY_SIZE(QemuHXXtagTable);
-	def->tagRegexTable = QemuHXTagRegexTable;
-	def->tagRegexCount = ARRAY_SIZE(QemuHXTagRegexTable);
 	def->initialize    = initializeQemuHXParser;
 
 	return def;
