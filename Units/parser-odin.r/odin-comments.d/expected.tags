@@ -1,0 +1,4 @@
+comments	input.odin	/^package comments$/;"	p
+after_nested	input.odin	/^after_nested :: proc() {}$/;"	f	package:comments
+after_line	input.odin	/^after_line :: proc() {}$/;"	f	package:comments
+after_multi	input.odin	/^after_multi :: proc() {}$/;"	f	package:comments

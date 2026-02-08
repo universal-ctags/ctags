@@ -1,0 +1,13 @@
+enums	input.odin	/^package enums$/;"	package	line:1
+Color	input.odin	/^Color :: enum {$/;"	enum	line:3	package:enums	end:7
+Red	input.odin	/^    Red,$/;"	enumerator	line:4	enum:enums.Color
+Green	input.odin	/^    Green,$/;"	enumerator	line:5	enum:enums.Color
+Blue	input.odin	/^    Blue,$/;"	enumerator	line:6	enum:enums.Color
+Small	input.odin	/^Small :: enum u8 {$/;"	enum	line:9	package:enums	end:13
+A	input.odin	/^    A,$/;"	enumerator	line:10	enum:enums.Small
+B	input.odin	/^    B,$/;"	enumerator	line:11	enum:enums.Small
+C	input.odin	/^    C,$/;"	enumerator	line:12	enum:enums.Small
+Explicit	input.odin	/^Explicit :: enum {$/;"	enum	line:15	package:enums	end:19
+First	input.odin	/^    First = 1,$/;"	enumerator	line:16	enum:enums.Explicit
+Second	input.odin	/^    Second = 5,$/;"	enumerator	line:17	enum:enums.Explicit
+Third	input.odin	/^    Third = 10,$/;"	enumerator	line:18	enum:enums.Explicit

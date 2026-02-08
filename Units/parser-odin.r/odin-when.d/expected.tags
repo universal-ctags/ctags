@@ -1,0 +1,7 @@
+when_test	input.odin	/^package when_test$/;"	package
+PATH_SEP	input.odin	/^    PATH_SEP :: "\\\\"$/;"	const	package:when_test
+platform_init	input.odin	/^    platform_init :: proc() {}$/;"	proc	package:when_test
+PATH_SEP	input.odin	/^    PATH_SEP :: "\/"$/;"	const	package:when_test
+platform_init	input.odin	/^    platform_init :: proc() {}$/;"	proc	package:when_test
+PATH_SEP	input.odin	/^    PATH_SEP :: "\/"$/;"	const	package:when_test
+platform_init	input.odin	/^    platform_init :: proc() {}$/;"	proc	package:when_test

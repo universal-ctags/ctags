@@ -1,0 +1,9 @@
+ffi	input.odin	/^package ffi$/;"	package	line:1
+libc	input.odin	/^foreign import libc "system:libc.so"$/;"	foreign	line:3	package:ffi
+puts	input.odin	/^    puts :: proc "c" (s: cstring) -> i32 ---$/;"	proc	line:6	package:ffi	signature:((s: cstring)
+exit	input.odin	/^    exit :: proc "c" (code: i32) ---$/;"	proc	line:7	package:ffi	signature:((code: i32)
+errno	input.odin	/^    errno: i32$/;"	var	line:8	package:ffi
+signal_handler	input.odin	/^    signal_handler: proc "c" (sig: i32)$/;"	var	line:9	package:ffi
+mruby	input.odin	/^foreign import mruby "libmruby.a"$/;"	foreign	line:12	package:ffi
+open	input.odin	/^    open :: proc() -> rawptr ---$/;"	proc	line:17	package:ffi	signature:(()
+close	input.odin	/^    close :: proc(state: rawptr) ---$/;"	proc	line:18	package:ffi	signature:((state: rawptr)

@@ -1,0 +1,5 @@
+attrs	input.odin	/^package attrs$/;"	package
+internal_state	input.odin	/^internal_state := 10$/;"	var	package:attrs
+restore_mode	input.odin	/^restore_mode :: proc() {}$/;"	proc	package:attrs
+cleanup	input.odin	/^cleanup :: proc() {}$/;"	proc	package:attrs
+destroy	input.odin	/^destroy :: proc() {}$/;"	proc	package:attrs

@@ -1,0 +1,17 @@
+scope	input.odin	/^package scope$/;"	p
+Point	input.odin	/^Point :: struct {$/;"	s	package:scope
+scope.Point	input.odin	/^Point :: struct {$/;"	s	package:scope
+x	input.odin	/^    x: f32,$/;"	m	struct:scope.Point
+scope.Point.x	input.odin	/^    x: f32,$/;"	m	struct:scope.Point
+y	input.odin	/^    y: f32,$/;"	m	struct:scope.Point
+scope.Point.y	input.odin	/^    y: f32,$/;"	m	struct:scope.Point
+Color	input.odin	/^Color :: enum {$/;"	e	package:scope
+scope.Color	input.odin	/^Color :: enum {$/;"	e	package:scope
+Red	input.odin	/^    Red,$/;"	n	enum:scope.Color
+scope.Color.Red	input.odin	/^    Red,$/;"	n	enum:scope.Color
+Green	input.odin	/^    Green,$/;"	n	enum:scope.Color
+scope.Color.Green	input.odin	/^    Green,$/;"	n	enum:scope.Color
+Blue	input.odin	/^    Blue,$/;"	n	enum:scope.Color
+scope.Color.Blue	input.odin	/^    Blue,$/;"	n	enum:scope.Color
+origin	input.odin	/^origin :: proc() -> Point {$/;"	f	package:scope
+scope.origin	input.odin	/^origin :: proc() -> Point {$/;"	f	package:scope

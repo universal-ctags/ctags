@@ -142,6 +142,7 @@
 	NsisParser, \
 	ObjcParser, \
 	OcamlParser, \
+	OdinParser, \
 	OrgParser, \
 	PasswdParser, \
 	PascalParser, \

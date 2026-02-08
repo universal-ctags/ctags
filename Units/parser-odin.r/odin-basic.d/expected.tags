@@ -1,0 +1,11 @@
+main	input.odin	/^package main$/;"	p	line:1
+Vec2	input.odin	/^Vec2 :: struct {$/;"	s	line:3	package:main	end:6
+x	input.odin	/^    x: f32,$/;"	m	line:4	struct:main.Vec2
+y	input.odin	/^    y: f32,$/;"	m	line:5	struct:main.Vec2
+Direction	input.odin	/^Direction :: enum {$/;"	e	line:8	package:main	end:13
+North	input.odin	/^    North,$/;"	n	line:9	enum:main.Direction
+East	input.odin	/^    East,$/;"	n	line:10	enum:main.Direction
+South	input.odin	/^    South,$/;"	n	line:11	enum:main.Direction
+West	input.odin	/^    West,$/;"	n	line:12	enum:main.Direction
+add	input.odin	/^add :: proc(a, b: Vec2) -> Vec2 {$/;"	f	line:15	package:main	end:17
+main	input.odin	/^main :: proc() {$/;"	f	line:19	package:main	end:21

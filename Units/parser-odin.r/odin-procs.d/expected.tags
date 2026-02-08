@@ -1,0 +1,11 @@
+procs	input.odin	/^package procs$/;"	p	line:1
+Comparator	input.odin	/^Comparator :: #type proc(x, y: int) -> int$/;"	t	line:3	package:procs
+init	input.odin	/^init :: proc() {$/;"	f	line:5	package:procs	signature:(()	end:6
+vec2_add	input.odin	/^vec2_add :: proc(x, y: f32) -> f32 {$/;"	f	line:8	package:procs	signature:((x, y: f32)	end:10
+div_check	input.odin	/^div_check :: proc(a: f32) -> (int, bool) {$/;"	f	line:12	package:procs	signature:((a: f32)	end:14
+write_bytes	input.odin	/^write_bytes :: proc "c" (n: i32, data: rawptr) {$/;"	f	line:16	package:procs	signature:((n: i32, data: rawptr)	end:17
+get_errno	input.odin	/^get_errno :: proc "cdecl" () -> i32 {$/;"	f	line:19	package:procs	signature:(()	end:21
+clamp_value	input.odin	/^clamp_value :: proc(x: $T) -> T where T == int {$/;"	f	line:23	package:procs	signature:((x: $T)	end:25
+add_ints	input.odin	/^add_ints :: proc(a, b: int) -> int {return a + b}$/;"	f	line:27	package:procs	signature:((a, b: int)	end:27
+add_floats	input.odin	/^add_floats :: proc(a, b: f32) -> f32 {return a + b}$/;"	f	line:28	package:procs	signature:((a, b: f32)	end:28
+add	input.odin	/^add :: proc {$/;"	f	line:29	package:procs

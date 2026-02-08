@@ -1,0 +1,20 @@
+types	input.odin	/^package types$/;"	package	line:1
+Meter	input.odin	/^Meter :: distinct f64$/;"	type	line:3	package:types
+Handle	input.odin	/^Handle :: distinct rawptr$/;"	type	line:4	package:types
+Ref	input.odin	/^Ref :: u8$/;"	type	line:6	package:types
+Lookup	input.odin	/^Lookup :: map[string]int$/;"	type	line:7	package:types
+Days	input.odin	/^Days :: enum {$/;"	enum	line:9	package:types	end:17
+Mon	input.odin	/^    Mon,$/;"	enumerator	line:10	enum:types.Days
+Tue	input.odin	/^    Tue,$/;"	enumerator	line:11	enum:types.Days
+Wed	input.odin	/^    Wed,$/;"	enumerator	line:12	enum:types.Days
+Thu	input.odin	/^    Thu,$/;"	enumerator	line:13	enum:types.Days
+Fri	input.odin	/^    Fri,$/;"	enumerator	line:14	enum:types.Days
+Sat	input.odin	/^    Sat,$/;"	enumerator	line:15	enum:types.Days
+Sun	input.odin	/^    Sun,$/;"	enumerator	line:16	enum:types.Days
+Day_Set	input.odin	/^Day_Set :: bit_set[Days]$/;"	type	line:19	package:types
+Flags	input.odin	/^Flags :: bit_field u16 {$/;"	type	line:21	package:types	end:25
+x	input.odin	/^    x: i32  | 3,$/;"	member	line:22	type:types.Flags
+y	input.odin	/^    y: u16  | 5,$/;"	member	line:23	type:types.Flags
+z	input.odin	/^    z: bool | 1,$/;"	member	line:24	type:types.Flags
+Vec3	input.odin	/^Vec3 :: [3]f32$/;"	type	line:27	package:types
+Ptr_Int	input.odin	/^Ptr_Int :: ^int$/;"	type	line:28	package:types

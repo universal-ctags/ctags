@@ -1,0 +1,22 @@
+structs	input.odin	/^package structs$/;"	package	line:1
+Point	input.odin	/^Point :: struct {$/;"	struct	line:3	package:structs	end:5
+x	input.odin	/^    x, y: f32,$/;"	member	line:4	struct:structs.Point
+y	input.odin	/^    x, y: f32,$/;"	member	line:4	struct:structs.Point
+Color	input.odin	/^Color :: struct #packed {$/;"	struct	line:7	package:structs	end:9
+r	input.odin	/^    r, g, b, a: u8,$/;"	member	line:8	struct:structs.Color
+g	input.odin	/^    r, g, b, a: u8,$/;"	member	line:8	struct:structs.Color
+b	input.odin	/^    r, g, b, a: u8,$/;"	member	line:8	struct:structs.Color
+a	input.odin	/^    r, g, b, a: u8,$/;"	member	line:8	struct:structs.Color
+Entity	input.odin	/^Entity :: struct {$/;"	struct	line:11	package:structs	end:14
+pos	input.odin	/^    using pos: Point,$/;"	member	line:12	struct:structs.Entity
+name	input.odin	/^    name:      string,$/;"	member	line:13	struct:structs.Entity
+Generic_Pair	input.odin	/^Generic_Pair :: struct($T: typeid) {$/;"	struct	line:16	package:structs	end:19
+first	input.odin	/^    first:  T,$/;"	member	line:17	struct:structs.Generic_Pair
+second	input.odin	/^    second: T,$/;"	member	line:18	struct:structs.Generic_Pair
+Engine	input.odin	/^Engine :: struct {$/;"	struct	line:21	package:structs	end:36
+title	input.odin	/^    title:      string,$/;"	member	line:22	struct:structs.Engine
+resolution	input.odin	/^    resolution: [2]f32,$/;"	member	line:23	struct:structs.Engine
+debug	input.odin	/^    debug:      bool,$/;"	member	line:24	struct:structs.Engine
+fonts	input.odin	/^    fonts:      struct {$/;"	member	line:25	struct:structs.Engine
+metrics	input.odin	/^    metrics:    struct {$/;"	member	line:29	struct:structs.Engine
+_	input.odin	/^    _:          struct {$/;"	member	line:33	struct:structs.Engine

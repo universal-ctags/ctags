@@ -1,0 +1,2 @@
+incomplete	input.odin	/^package incomplete$/;"	p
+foo	input.odin	/^foo :: proc($/;"	t	package:incomplete
