@@ -44,11 +44,11 @@
     . :name dup (-_) _tr!
     . exch name:
 }}
---regex-QemuHX=/^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})/\1/i/
 
 --_tabledef-QemuHX=toplevel
 --_tabledef-QemuHX=skiplines
 
+--_tabledef-QemuHX=texi
 --_tabledef-QemuHX=rst
 --_tabledef-QemuHX=cmd
 --_tabledef-QemuHX=cmd0
@@ -58,14 +58,20 @@
 --_mtable-regex-QemuHX=skiplines/.//
 
 --_mtable-regex-QemuHX=toplevel/HXCOMM[^\n]*[\n]*//
+--_mtable-regex-QemuHX=toplevel/STEXI[\n]*//{tenter=texi}
 --_mtable-regex-QemuHX=toplevel/SRST[^\n]*[\n]*//{tenter=rst}
 --_mtable-regex-QemuHX=toplevel/[ \t]*DEF\("([^"\n]+)"[^\n]*[\n]/\1/c/
 --_mtable-regex-QemuHX=toplevel/[ \t]*\{[ \t]*[\n]+//{tenter=cmd}
 --_mtable-extend-QemuHX=toplevel+skiplines
 
+--_mtable-regex-QemuHX=texi/ETEXI[\n]*//{tleave}
+--_mtable-regex-QemuHX=texi/@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})[^\n]*[\n]*/\1/i/
+--_mtable-extend-QemuHX=texi+skiplines
+
 --_mtable-regex-QemuHX=rst/ERST[^\n]*[\n]*//{tleave}
 --_mtable-extend-QemuHX=rst+skiplines
 
+--_mtable-regex-QemuHX=cmd/[ \t]*(STEXI)[\n]*//{tleave}{_advanceTo=1start}
 --_mtable-regex-QemuHX=cmd/[ \t]*(SRST)[^\n]*[\n]*//{tleave}{_advanceTo=1start}
 --_mtable-regex-QemuHX=cmd/[ \t]*\}[ \t]*,[ \t]*[\n]*//{tleave}
 --_mtable-regex-QemuHX=cmd/[ \t]*DEF\("([^"\n]+)"[^\n]*[\n]/\1/c/

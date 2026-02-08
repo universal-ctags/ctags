@@ -14,6 +14,7 @@ static void initializeQemuHXParser (const langType language)
 
 	addLanguageRegexTable (language, "toplevel");
 	addLanguageRegexTable (language, "skiplines");
+	addLanguageRegexTable (language, "texi");
 	addLanguageRegexTable (language, "rst");
 	addLanguageRegexTable (language, "cmd");
 	addLanguageRegexTable (language, "cmd0");
@@ -21,6 +22,9 @@ static void initializeQemuHXParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^HXCOMM[^\n]*[\n]*",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^STEXI[\n]*",
+	                               "", "", "{tenter=texi}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^SRST[^\n]*[\n]*",
 	                               "", "", "{tenter=rst}", NULL);
@@ -48,6 +52,21 @@ static void initializeQemuHXParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "skiplines",
 	                               "^.",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "texi",
+	                               "^ETEXI[\n]*",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "texi",
+	                               "^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})[^\n]*[\n]*",
+	                               "\\1", "i", "", NULL);
+	addLanguageTagMultiTableRegex (language, "texi",
+	                               "^[^\n]+[\n]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "texi",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "texi",
+	                               "^.",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "rst",
 	                               "^ERST[^\n]*[\n]*",
 	                               "", "", "{tleave}", NULL);
@@ -60,6 +79,9 @@ static void initializeQemuHXParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "rst",
 	                               "^.",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "cmd",
+	                               "^[ \t]*(STEXI)[\n]*",
+	                               "", "", "{tleave}{_advanceTo=1start}", NULL);
 	addLanguageTagMultiTableRegex (language, "cmd",
 	                               "^[ \t]*(SRST)[^\n]*[\n]*",
 	                               "", "", "{tleave}{_advanceTo=1start}", NULL);
@@ -141,8 +163,6 @@ extern parserDefinition* QemuHXParser (void)
 		"    . :name dup (-_) _tr!\n"
 		"    . exch name:\n"
 		"}}", NULL, true},
-		{"^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})", "\\1",
-		"i", NULL, NULL, false},
 	};
 
 	static selectLanguage selectors[] = { selectHaxeOrQemuHXByCommentMarker, NULL };
