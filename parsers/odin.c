@@ -122,14 +122,23 @@ typedef enum {
 	ODINTAG_TYPE,
 	ODINTAG_FOREIGN,
 	ODINTAG_IMPORT_NAME,
+	ODINTAG_CCODE,
 } odinKind;
 
 typedef enum {
 	R_ODINTAG_PACKAGE_IMPORTED,
 } OdinPackageRole;
 
+typedef enum {
+	R_ODINTAG_CCODE_IMPORTED,
+} OdinCcodeRole;
+
 static roleDefinition OdinPackageRoles [] = {
 	{ true, "imported", "imported package" },
+};
+
+static roleDefinition OdinCcodeRoles [] = {
+	{ true, "imported", "imported ccode via foreign" },
 };
 
 static kindDefinition OdinKinds[] = {
@@ -146,6 +155,8 @@ static kindDefinition OdinKinds[] = {
 	{true, 't', "type", "type aliases"},
 	{true, 'g', "foreign", "foreign imports"},
 	{true, 'i', "importName", "import names"},
+	{true, 'C', "ccode", "C code",
+	 .referenceOnly = true, ATTACH_ROLES (OdinCcodeRoles)},
 };
 
 static const keywordTable OdinKeywordTable[] = {
@@ -771,7 +782,17 @@ static void parseForeign (tokenInfo *const token, const int scope)
 			makeTag (token, ODINTAG_FOREIGN, scope, NULL);
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_CURLY))
-				skipToMatchedNoRead (token, NULL);
+			{
+				do
+				{
+					readToken (token);
+					if (isType (token, TOKEN_STRING))
+						makeRefTag (token, ODINTAG_CCODE, R_ODINTAG_CCODE_IMPORTED);
+				} while (!isType (token, TOKEN_CLOSE_CURLY)
+						 && !isType (token, TOKEN_EOF));
+			}
+			else if (isType (token, TOKEN_STRING))
+				makeRefTag (token, ODINTAG_CCODE, R_ODINTAG_CCODE_IMPORTED);
 		}
 	}
 	else if (isType (token, TOKEN_IDENTIFIER))

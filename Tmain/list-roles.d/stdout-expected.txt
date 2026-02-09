@@ -93,6 +93,7 @@ Meson                   m/module          imported           on        0 importe
 NSIS                    i/script          included           on        0 included with !include
 Nftables                R/ruleset         included           on        0 included ruleset
 Nftables                f/family          referenced         off       0 referenced somehow
+Odin                    C/ccode           imported           on        0 imported ccode via foreign
 Odin                    p/package         imported           on        0 imported package
 Perl                    M/module          unused             on        0 specified in `no' built-in function
 Perl                    M/module          used               on        0 specified in `use' built-in function
@@ -247,6 +248,7 @@ Meson                   m/module          imported           on        0 importe
 NSIS                    i/script          included           on        0 included with !include
 Nftables                R/ruleset         included           on        0 included ruleset
 Nftables                f/family          referenced         off       0 referenced somehow
+Odin                    C/ccode           imported           on        0 imported ccode via foreign
 Odin                    p/package         imported           on        0 imported package
 Perl                    M/module          unused             on        0 specified in `no' built-in function
 Perl                    M/module          used               on        0 specified in `use' built-in function
