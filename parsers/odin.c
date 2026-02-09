@@ -58,7 +58,7 @@ enum eKeywordId {
 	KEYWORD_return,
 	KEYWORD_defer,
 	KEYWORD_using,
-	KEYWORD_where
+	KEYWORD_where,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -85,7 +85,7 @@ typedef enum eTokenType {
 	TOKEN_HASH,
 	TOKEN_AT,
 	TOKEN_CARET,
-	TOKEN_EOF
+	TOKEN_EOF,
 } tokenType;
 
 typedef struct sTokenInfo {
@@ -121,11 +121,11 @@ typedef enum {
 	ODINTAG_ENUMERATOR,
 	ODINTAG_TYPE,
 	ODINTAG_FOREIGN,
-	ODINTAG_IMPORT_NAME
+	ODINTAG_IMPORT_NAME,
 } odinKind;
 
 typedef enum {
-	R_ODINTAG_PACKAGE_IMPORTED
+	R_ODINTAG_PACKAGE_IMPORTED,
 } OdinPackageRole;
 
 static roleDefinition OdinPackageRoles [] = {
@@ -145,7 +145,7 @@ static kindDefinition OdinKinds[] = {
 	{true, 'n', "enumerator", "enum values"},
 	{true, 't', "type", "type aliases"},
 	{true, 'g', "foreign", "foreign imports"},
-	{true, 'i', "importName", "import names"}
+	{true, 'i', "importName", "import names"},
 };
 
 static const keywordTable OdinKeywordTable[] = {
