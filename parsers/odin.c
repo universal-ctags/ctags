@@ -133,6 +133,10 @@ typedef enum {
 	R_ODINTAG_CCODE_IMPORTED,
 } OdinCcodeRole;
 
+typedef enum {
+	F_FOREIGN, F_IMPORT_NAME
+} OdinForeignField;
+
 static roleDefinition OdinPackageRoles [] = {
 	{ true, "imported", "imported package" },
 };
@@ -157,6 +161,14 @@ static kindDefinition OdinKinds[] = {
 	{true, 'i', "importName", "import names"},
 	{true, 'C', "ccode", "C code",
 	 .referenceOnly = true, ATTACH_ROLES (OdinCcodeRoles)},
+};
+
+static fieldDefinition OdinFields[] = {
+	{
+		.name = "foreign",
+		.description = "foreign name given to the ccode",
+		.enabled = true,
+	},
 };
 
 static const keywordTable OdinKeywordTable[] = {
@@ -779,7 +791,11 @@ static void parseForeign (tokenInfo *const token, const int scope)
 		readToken (token);
 		if (isType (token, TOKEN_IDENTIFIER))
 		{
-			makeTag (token, ODINTAG_FOREIGN, scope, NULL);
+			int ccode;
+			int foreign = makeTag (token, ODINTAG_FOREIGN, scope, NULL);
+			tagEntryInfo *foreign_e = getEntryInCorkQueue (foreign);
+			const char *foreign_name = foreign_e ? foreign_e->name : NULL;
+
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_CURLY))
 			{
@@ -787,12 +803,22 @@ static void parseForeign (tokenInfo *const token, const int scope)
 				{
 					readToken (token);
 					if (isType (token, TOKEN_STRING))
-						makeRefTag (token, ODINTAG_CCODE, R_ODINTAG_CCODE_IMPORTED);
+					{
+						ccode = makeRefTag (token, ODINTAG_CCODE, R_ODINTAG_CCODE_IMPORTED);
+						attachParserFieldToCorkEntry (ccode,
+													  OdinFields[F_FOREIGN].ftype,
+													  foreign_name);
+					}
 				} while (!isType (token, TOKEN_CLOSE_CURLY)
 						 && !isType (token, TOKEN_EOF));
 			}
 			else if (isType (token, TOKEN_STRING))
-				makeRefTag (token, ODINTAG_CCODE, R_ODINTAG_CCODE_IMPORTED);
+			{
+				ccode = makeRefTag (token, ODINTAG_CCODE, R_ODINTAG_CCODE_IMPORTED);
+				attachParserFieldToCorkEntry (ccode,
+											  OdinFields[F_FOREIGN].ftype,
+											  foreign_name);
+			}
 		}
 	}
 	else if (isType (token, TOKEN_IDENTIFIER))
@@ -1448,6 +1474,8 @@ extern parserDefinition *OdinParser (void)
 	parserDefinition *def = parserNew ("Odin");
 	def->kindTable = OdinKinds;
 	def->kindCount = ARRAY_SIZE (OdinKinds);
+	def->fieldTable = OdinFields;
+	def->fieldCount = ARRAY_SIZE (OdinFields);
 	def->extensions = extensions;
 	def->parser = findOdinTags;
 	def->initialize = initialize;
