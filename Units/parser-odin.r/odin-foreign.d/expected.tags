@@ -7,3 +7,10 @@ signal_handler	input.odin	/^    signal_handler: proc "c" (sig: i32)$/;"	var	line
 mruby	input.odin	/^foreign import mruby "libmruby.a"$/;"	foreign	line:12	package:ffi
 open	input.odin	/^    open :: proc() -> rawptr ---$/;"	proc	line:17	package:ffi	signature:(()
 close	input.odin	/^    close :: proc(state: rawptr) ---$/;"	proc	line:18	package:ffi	signature:((state: rawptr)
+gl	input.odin	/^foreign import gl { "system:opengl32.lib", "system:glu32.lib" }$/;"	foreign	line:21	package:ffi
+internal_init	input.odin	/^    internal_init :: proc "c" () ---$/;"	proc	line:25	package:ffi	signature:(()
+readv	input.odin	/^    readv :: proc "c" (fd: i32, iov: rawptr, cnt: i32) -> i32 ---$/;"	proc	line:26	package:ffi	signature:((fd: i32, iov: rawptr, cnt: i32)
+getres	input.odin	/^    getres :: proc "c" (w: ^i32, h: ^i32) -> (i32, i32) ---$/;"	proc	line:27	package:ffi	signature:((w: ^i32, h: ^i32)
+printf	input.odin	/^    printf :: proc "c" (fmt: cstring, #c_vararg args: ..any) -> i32 ---$/;"	proc	line:28	package:ffi	signature:((fmt: cstring, #c_vararg args: ..any)
+get_buf	input.odin	/^    get_buf :: proc "c" (n: i32) -> [4]i32 ---$/;"	proc	line:29	package:ffi	signature:((n: i32)
+epoll_create	input.odin	/^        epoll_create :: proc "c" (size: i32) -> i32 ---$/;"	proc	line:31	package:ffi	signature:((size: i32)

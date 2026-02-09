@@ -18,3 +18,12 @@ y	input.odin	/^    y: u16  | 5,$/;"	member	line:23	type:types.Flags
 z	input.odin	/^    z: bool | 1,$/;"	member	line:24	type:types.Flags
 Vec3	input.odin	/^Vec3 :: [3]f32$/;"	type	line:27	package:types
 Ptr_Int	input.odin	/^Ptr_Int :: ^int$/;"	type	line:28	package:types
+Id_Map	input.odin	/^Id_Map :: distinct map[string]int$/;"	type	line:30	package:types
+Tile_Row	input.odin	/^Tile_Row :: distinct [16]u8$/;"	type	line:31	package:types
+Ptr_Handle	input.odin	/^Ptr_Handle :: distinct ^u8$/;"	type	line:32	package:types
+Key	input.odin	/^Key :: enum {$/;"	enum	line:33	package:types	end:37
+Bronze	input.odin	/^    Bronze =  1,$/;"	enumerator	line:34	enum:types.Key
+Silver	input.odin	/^    Silver =  5,$/;"	enumerator	line:35	enum:types.Key
+Gold	input.odin	/^    Gold   = 10,$/;"	enumerator	line:36	enum:types.Key
+Key_Descriptions	input.odin	/^Key_Descriptions :: #sparse[Key]string {$/;"	type	line:38	package:types
+INIT_VALUE	input.odin	/^INIT_VALUE :: (100 + 200)$/;"	const	line:44	package:types

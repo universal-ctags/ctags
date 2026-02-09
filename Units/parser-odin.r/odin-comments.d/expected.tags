@@ -2,3 +2,6 @@ comments	input.odin	/^package comments$/;"	p
 after_nested	input.odin	/^after_nested :: proc() {}$/;"	f	package:comments
 after_line	input.odin	/^after_line :: proc() {}$/;"	f	package:comments
 after_multi	input.odin	/^after_multi :: proc() {}$/;"	f	package:comments
+after_deep	input.odin	/^after_deep :: proc() {}$/;"	f	package:comments
+after_slash	input.odin	/^after_slash :: proc() {}$/;"	f	package:comments
+after_complex	input.odin	/^after_complex :: proc() {}$/;"	f	package:comments

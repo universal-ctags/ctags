@@ -1,3 +1,4 @@
+#+build linux, darwin
 package attrs
 
 @(private)
@@ -8,5 +9,8 @@ restore_mode :: proc() {}
 
 @(deprecated = "use destroy", private = "file")
 cleanup :: proc() {}
+
+@private
+hidden :: proc() {}
 
 destroy :: proc() {}

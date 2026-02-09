@@ -5,3 +5,5 @@ PATH_SEP	input.odin	/^    PATH_SEP :: "\/"$/;"	const	package:when_test
 platform_init	input.odin	/^    platform_init :: proc() {}$/;"	proc	package:when_test
 PATH_SEP	input.odin	/^    PATH_SEP :: "\/"$/;"	const	package:when_test
 platform_init	input.odin	/^    platform_init :: proc() {}$/;"	proc	package:when_test
+ARCH_64	input.odin	/^    ARCH_64 :: true$/;"	const	package:when_test
+WORD_SIZE	input.odin	/^    WORD_SIZE :: 8$/;"	const	package:when_test

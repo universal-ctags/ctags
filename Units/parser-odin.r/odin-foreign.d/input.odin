@@ -17,3 +17,17 @@ foreign mruby {
     open :: proc() -> rawptr ---
     close :: proc(state: rawptr) ---
 }
+
+foreign import gl { "system:opengl32.lib", "system:glu32.lib" }
+
+foreign libc {
+    @private
+    internal_init :: proc "c" () ---
+    readv :: proc "c" (fd: i32, iov: rawptr, cnt: i32) -> i32 ---
+    getres :: proc "c" (w: ^i32, h: ^i32) -> (i32, i32) ---
+    printf :: proc "c" (fmt: cstring, #c_vararg args: ..any) -> i32 ---
+    get_buf :: proc "c" (n: i32) -> [4]i32 ---
+    when ODIN_OS == .Linux {
+        epoll_create :: proc "c" (size: i32) -> i32 ---
+    }
+}

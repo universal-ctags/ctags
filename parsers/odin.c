@@ -285,8 +285,6 @@ static void collectorAppendToken (collector *collector, const tokenInfo *const t
 {
 	if (token->type == TOKEN_ARROW)
 		collectorCatS (collector, "->");
-	else if (token->type == TOKEN_DOUBLE_COLON)
-		collectorCatS (collector, "::");
 	else if (token->type == TOKEN_COLON_EQUAL)
 		collectorCatS (collector, ":=");
 	else if (token->type == TOKEN_STRING)
@@ -302,11 +300,8 @@ static void collectorAppendToken (collector *collector, const tokenInfo *const t
 		collectorPut (collector, token->c);
 }
 
-static void collectorTruncate (collector *collector, bool dropLast)
+static void collectorTruncate (collector *collector)
 {
-	if (dropLast)
-		vStringTruncate (collector->str, collector->last_len);
-
 	vStringStripLeading (collector->str);
 	vStringStripTrailing (collector->str);
 }
@@ -573,7 +568,7 @@ static void skipToMatched (tokenInfo *const token, collector *collector)
 }
 
 static int makeTagFull (tokenInfo *const token, const odinKind kind,
-						const int scope, const char *argList, const char *typeref,
+						const int scope, const char *argList,
 						const int role)
 {
 	const char *const name = vStringValue (token->string);
@@ -589,27 +584,22 @@ static int makeTagFull (tokenInfo *const token, const odinKind kind,
 	updateTagLine (&e, token->lineNumber, token->filePosition);
 	if (argList)
 		e.extensionFields.signature = argList;
-	if (typeref)
-	{
-		e.extensionFields.typeRef [0] = "typename";
-		e.extensionFields.typeRef [1] = typeref;
-	}
 
 	e.extensionFields.scopeIndex = scope;
 	return makeTagEntry (&e);
 }
 
 static int makeTag (tokenInfo *const token, const odinKind kind,
-					const int scope, const char *argList, const char *typeref)
+					const int scope, const char *argList)
 {
-	return makeTagFull (token, kind, scope, argList, typeref,
+	return makeTagFull (token, kind, scope, argList,
 						ROLE_DEFINITION_INDEX);
 }
 
 static int makeRefTag (tokenInfo *const token, const odinKind kind,
 					   const int role)
 {
-	return makeTagFull (token, kind, CORK_NIL, NULL, NULL, role);
+	return makeTagFull (token, kind, CORK_NIL, NULL, role);
 }
 
 static int parsePackage (tokenInfo *const token)
@@ -617,52 +607,40 @@ static int parsePackage (tokenInfo *const token)
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		return makeTag (token, ODINTAG_PACKAGE, CORK_NIL, NULL, NULL);
+		return makeTag (token, ODINTAG_PACKAGE, CORK_NIL, NULL);
 	}
 	return CORK_NIL;
 }
 
-static void parseImport (tokenInfo *const token, const int scope)
+static bool nameHasLower (const vString *name)
 {
-	/* import "path"
-	 * import name "path"
-	 * import name "path" { ... } - for foreign
-	 */
+	for (const char *p = vStringValue (name); *p; p++)
+		if (islower ((unsigned char) *p))
+			return true;
+	return false;
+}
+
+static void parseImport (tokenInfo *const token)
+{
 	readToken (token);
 
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		/* import name "path" */
-		tokenInfo *nameToken = newToken ();
-		copyToken (nameToken, token);
-
 		readToken (token);
 		if (isType (token, TOKEN_STRING))
-		{
 			makeRefTag (token, ODINTAG_PACKAGE, R_ODINTAG_PACKAGE_IMPORTED);
-		}
-		deleteToken (nameToken);
 	}
 	else if (isType (token, TOKEN_STRING))
 	{
-		/* import "path" */
 		makeRefTag (token, ODINTAG_PACKAGE, R_ODINTAG_PACKAGE_IMPORTED);
 	}
 }
 
 static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 {
-	/* Parse procedure declarations inside a foreign block:
-	 * foreign name {
-	 *     ProcName :: proc "c" (...) -> RetType ---
-	 *     varName: Type
-	 *     @(link_name="foo") Bar :: proc(...) ---
-	 * }
-	 */
 	readToken (token);
 	while (!isType (token, TOKEN_EOF) && !isType (token, TOKEN_CLOSE_CURLY))
 	{
-		/* Skip attributes: @(...) or @name */
 		while (isType (token, TOKEN_AT))
 		{
 			readToken (token);
@@ -691,7 +669,6 @@ static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 
 					readTokenFull (token, &sig_collector);
 
-					/* Skip calling convention string: proc "c" (...) */
 					if (isType (token, TOKEN_STRING))
 					{
 						vStringClear (signature);
@@ -702,14 +679,13 @@ static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 					{
 						vStringPut (signature, '(');
 						skipToMatchedNoRead (token, &sig_collector);
-						collectorTruncate (&sig_collector, false);
+						collectorTruncate (&sig_collector);
 					}
 
 					makeTag (nameToken, ODINTAG_PROC, scope,
-							 vStringValue (signature), NULL);
+							 vStringValue (signature));
 					vStringDelete (signature);
 
-					/* Skip past -> RetType and --- */
 					readToken (token);
 					if (isType (token, TOKEN_ARROW))
 					{
@@ -718,7 +694,6 @@ static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 							skipToMatched (token, NULL);
 						else
 						{
-							/* Skip return type tokens until --- delimiter */
 							while (!isType (token, TOKEN_EOF) &&
 								   !isType (token, TOKEN_CLOSE_CURLY) &&
 								   !isType (token, TOKEN_OTHER))
@@ -733,22 +708,14 @@ static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 							}
 						}
 					}
-					/* Skip --- (TOKEN_OTHER for each '-') */
+					/* --- */
 					while (isType (token, TOKEN_OTHER))
 						readToken (token);
-				}
-				else
-				{
-					makeTag (nameToken, ODINTAG_CONST, scope, NULL, NULL);
-					readToken (token);
 				}
 			}
 			else if (isType (token, TOKEN_COLON))
 			{
-				/* name: type (variable) — skip the type expression,
-				 * handling brackets so we don't stop inside e.g.
-				 * proc "c" (sig: i32) */
-				makeTag (nameToken, ODINTAG_VAR, scope, NULL, NULL);
+				makeTag (nameToken, ODINTAG_VAR, scope, NULL);
 				readToken (token);
 				while (!isType (token, TOKEN_EOF) &&
 					   !isType (token, TOKEN_CLOSE_CURLY) &&
@@ -764,8 +731,6 @@ static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 						readToken (token);
 				}
 			}
-			/* else: not a declaration, token already advanced */
-
 			deleteToken (nameToken);
 		}
 		else
@@ -777,10 +742,6 @@ static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 
 static void parseForeign (tokenInfo *const token, const int scope)
 {
-	/* foreign import name "path"
-	 * foreign import name { "path1", "path2" }
-	 * foreign name { ... }  -- block with procedure declarations
-	 */
 	readToken (token);
 
 	if (isKeyword (token, KEYWORD_import))
@@ -788,15 +749,14 @@ static void parseForeign (tokenInfo *const token, const int scope)
 		readToken (token);
 		if (isType (token, TOKEN_IDENTIFIER))
 		{
-			makeTag (token, ODINTAG_FOREIGN, scope, NULL, NULL);
+			makeTag (token, ODINTAG_FOREIGN, scope, NULL);
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_CURLY))
-				skipToMatched (token, NULL);
+				skipToMatchedNoRead (token, NULL);
 		}
 	}
 	else if (isType (token, TOKEN_IDENTIFIER))
 	{
-		/* foreign name { ... } -- block with procedure declarations */
 		readToken (token);
 		if (isType (token, TOKEN_OPEN_CURLY))
 		{
@@ -819,15 +779,14 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 			readToken (token);
 			if (isType (token, TOKEN_COMMA))
 			{
-				/* Multiple fields: a, b, c: type */
 				multiField = true;
-				makeTag (memberToken, ODINTAG_MEMBER, scope, NULL, NULL);
+				makeTag (memberToken, ODINTAG_MEMBER, scope, NULL);
 				while (isType (token, TOKEN_COMMA))
 				{
 					readToken (token);
 					if (isType (token, TOKEN_IDENTIFIER))
 					{
-						makeTag (token, ODINTAG_MEMBER, scope, NULL, NULL);
+						makeTag (token, ODINTAG_MEMBER, scope, NULL);
 						readToken (token);
 					}
 				}
@@ -835,9 +794,8 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 
 			if (isType (token, TOKEN_COLON))
 			{
-				/* field: type  OR  a, b, c: type — skip the type */
 				if (!multiField)
-					makeTag (memberToken, ODINTAG_MEMBER, scope, NULL, NULL);
+					makeTag (memberToken, ODINTAG_MEMBER, scope, NULL);
 				readToken (token);
 				while (!isType (token, TOKEN_EOF) &&
 					   !isType (token, TOKEN_COMMA) &&
@@ -857,11 +815,10 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 		}
 		else if (isKeyword (token, KEYWORD_using))
 		{
-			/* using field: create member tag then skip type */
 			readToken (token);
 			if (isType (token, TOKEN_IDENTIFIER))
 			{
-				makeTag (token, ODINTAG_MEMBER, scope, NULL, NULL);
+				makeTag (token, ODINTAG_MEMBER, scope, NULL);
 				readToken (token);
 				if (isType (token, TOKEN_COLON))
 				{
@@ -894,14 +851,8 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 
 static void parseEnumMembers (tokenInfo *const token, const int scope)
 {
-	/* enum { A, B, C = 5, ... } */
 	readToken (token);
 
-	/* Skip generic params: enum($T: typeid) */
-	if (isType (token, TOKEN_OPEN_PAREN))
-		skipToMatched (token, NULL);
-
-	/* Skip optional base type */
 	if (isType (token, TOKEN_IDENTIFIER))
 		readToken (token);
 
@@ -913,10 +864,9 @@ static void parseEnumMembers (tokenInfo *const token, const int scope)
 	{
 		if (isType (token, TOKEN_IDENTIFIER))
 		{
-			makeTag (token, ODINTAG_ENUMERATOR, scope, NULL, NULL);
+			makeTag (token, ODINTAG_ENUMERATOR, scope, NULL);
 			readToken (token);
 
-			/* Skip optional value assignment */
 			if (isType (token, TOKEN_EQUAL))
 			{
 				readToken (token);
@@ -928,17 +878,6 @@ static void parseEnumMembers (tokenInfo *const token, const int scope)
 				}
 			}
 		}
-		else if (isType (token, TOKEN_DOT))
-		{
-			/* .Member syntax for enum */
-			readToken (token);
-			if (isType (token, TOKEN_IDENTIFIER))
-			{
-				makeTag (token, ODINTAG_ENUMERATOR, scope, NULL, NULL);
-				readToken (token);
-			}
-		}
-
 		if (isType (token, TOKEN_COMMA))
 			readToken (token);
 	}
@@ -946,57 +885,41 @@ static void parseEnumMembers (tokenInfo *const token, const int scope)
 
 static void parseUnionMembers (tokenInfo *const token, const int scope)
 {
-	/* union { Type1, Type2, ... } */
 	readToken (token);
 
-	/* Skip generic params: union($T: typeid) */
 	if (isType (token, TOKEN_OPEN_PAREN))
 		skipToMatched (token, NULL);
 
-	/* Skip #no_nil etc */
 	while (isType (token, TOKEN_HASH))
 	{
-		readToken (token); /* skip directive name */
+		readToken (token);
 		readToken (token);
 	}
 
 	if (!isType (token, TOKEN_OPEN_CURLY))
 		return;
 
-	/* Just skip the union body - members are types, not named */
+	/* union members are types, not named */
 	skipToMatchedNoRead (token, NULL);
 }
 
-/* Skip a single type expression, leaving token at the first token
- * past the type. Handles ^T, [N]T, []T, map[K]V, proc(...)->T,
- * #type proc(...), distinct T, pkg.Type, and generic Type(T). */
 static void skipTypeExpression (tokenInfo *const token)
 {
-	/* Prefix operators: ^, ^^, etc. */
 	while (isType (token, TOKEN_CARET))
 		readToken (token);
 
-	/* Array/slice prefix: [N] or [] */
 	if (isType (token, TOKEN_OPEN_SQUARE))
 		skipToMatched (token, NULL);
 
-	/* Hash directive: #type, #simd, etc. */
 	if (isType (token, TOKEN_HASH))
 	{
 		readToken (token);
 		if (isType (token, TOKEN_IDENTIFIER))
 			readToken (token);
-	}
-
-	/* distinct T */
-	if (isKeyword (token, KEYWORD_distinct))
-	{
-		readToken (token);
 		skipTypeExpression (token);
 		return;
 	}
 
-	/* map[K]V */
 	if (isKeyword (token, KEYWORD_map))
 	{
 		readToken (token);
@@ -1004,7 +927,6 @@ static void skipTypeExpression (tokenInfo *const token)
 			skipToMatched (token, NULL);
 	}
 
-	/* proc "conv" (...) -> T */
 	if (isKeyword (token, KEYWORD_proc))
 	{
 		readToken (token);
@@ -1023,7 +945,6 @@ static void skipTypeExpression (tokenInfo *const token)
 		return;
 	}
 
-	/* Base identifier, possibly qualified (pkg.Type) or generic (Type(T)) */
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
 		readToken (token);
@@ -1040,13 +961,11 @@ static void skipTypeExpression (tokenInfo *const token)
 
 static void parseProcedure (tokenInfo *const token, tokenInfo *const nameToken, const int scope)
 {
-	/* proc(args) -> return_type { body } */
 	vString *signature = vStringNew ();
 	collector sig_collector = { .str = signature, .last_len = 0, };
 
 	readTokenFull (token, &sig_collector);
 
-	/* Skip calling convention string: proc "c" (...) or proc "cdecl" (...) */
 	if (isType (token, TOKEN_STRING))
 	{
 		vStringClear (signature);
@@ -1055,8 +974,8 @@ static void parseProcedure (tokenInfo *const token, tokenInfo *const nameToken, 
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
-		/* Procedure group: name :: proc{proc1, proc2} */
-		makeTag (nameToken, ODINTAG_PROC, scope, NULL, NULL);
+		/* proc group: proc{a, b} */
+		makeTag (nameToken, ODINTAG_PROC, scope, NULL);
 		skipToMatchedNoRead (token, NULL);
 		vStringDelete (signature);
 		return;
@@ -1066,24 +985,29 @@ static void parseProcedure (tokenInfo *const token, tokenInfo *const nameToken, 
 	{
 		vStringPut (signature, '(');
 		skipToMatchedNoRead (token, &sig_collector);
-		collectorTruncate (&sig_collector, false);
+		collectorTruncate (&sig_collector);
 	}
 
-	int cork = makeTag (nameToken, ODINTAG_PROC, scope, vStringValue (signature), NULL);
+	int cork = makeTag (nameToken, ODINTAG_PROC, scope, vStringValue (signature));
 
 	readToken (token);
 
 	if (isType (token, TOKEN_ARROW))
 	{
 		readToken (token);
-		/* Skip return type(s) */
 		if (isType (token, TOKEN_OPEN_PAREN))
 			skipToMatched (token, NULL);
 		else
 			skipTypeExpression (token);
 	}
 
-	/* Skip 'where' clause if present */
+	while (isType (token, TOKEN_HASH))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_IDENTIFIER))
+			readToken (token);
+	}
+
 	if (isKeyword (token, KEYWORD_where))
 	{
 		while (!isType (token, TOKEN_EOF) &&
@@ -1094,7 +1018,6 @@ static void parseProcedure (tokenInfo *const token, tokenInfo *const nameToken, 
 		}
 	}
 
-	/* Body present — this is a proc definition */
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
 		skipToMatchedNoRead (token, NULL);
@@ -1102,15 +1025,9 @@ static void parseProcedure (tokenInfo *const token, tokenInfo *const nameToken, 
 		if (e)
 			setTagEndLine (e, getInputLineNumber());
 	}
-	else if (isType (token, TOKEN_OTHER) && token->c == '-')
-	{
-		/* --- foreign proc marker — still a proc, skip the dashes */
-		while (isType (token, TOKEN_OTHER) && token->c == '-')
-			readToken (token);
-	}
 	else
 	{
-		/* No body and no --- — procedure type, not definition. */
+		/* bodyless: reclassify as type alias */
 		tagEntryInfo *e = getEntryInCorkQueue (cork);
 		if (e)
 			e->kindIndex = ODINTAG_TYPE;
@@ -1121,17 +1038,6 @@ static void parseProcedure (tokenInfo *const token, tokenInfo *const nameToken, 
 
 static void parseDeclaration (tokenInfo *const token, const int scope)
 {
-	/* name :: value
-	 * name :: proc(...)
-	 * name :: struct { ... }
-	 * name :: enum { ... }
-	 * name :: union { ... }
-	 * name :: distinct Type
-	 * name : type = value
-	 * name : type : value  (typed constant)
-	 * name := value
-	 */
-
 	tokenInfo *nameToken = newToken ();
 	copyToken (nameToken, token);
 
@@ -1147,19 +1053,17 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 		}
 		else if (isKeyword (token, KEYWORD_struct))
 		{
-			int member_scope = makeTag (nameToken, ODINTAG_STRUCT, scope, NULL, NULL);
+			int member_scope = makeTag (nameToken, ODINTAG_STRUCT, scope, NULL);
 			if (member_scope != CORK_NIL)
 				registerEntry (member_scope);
 
-			/* Skip generic params: struct($T: typeid) */
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_PAREN))
 				skipToMatched (token, NULL);
 
-			/* Skip struct attributes like #packed, #align etc */
 			while (isType (token, TOKEN_HASH))
 			{
-				readToken (token); /* skip attribute name */
+				readToken (token);
 				readToken (token);
 				if (isType (token, TOKEN_OPEN_PAREN))
 					skipToMatched (token, NULL);
@@ -1176,7 +1080,7 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 		}
 		else if (isKeyword (token, KEYWORD_enum))
 		{
-			int member_scope = makeTag (nameToken, ODINTAG_ENUM, scope, NULL, NULL);
+			int member_scope = makeTag (nameToken, ODINTAG_ENUM, scope, NULL);
 			if (member_scope != CORK_NIL)
 				registerEntry (member_scope);
 			parseEnumMembers (token, member_scope);
@@ -1186,7 +1090,7 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 		}
 		else if (isKeyword (token, KEYWORD_union))
 		{
-			int member_scope = makeTag (nameToken, ODINTAG_UNION, scope, NULL, NULL);
+			int member_scope = makeTag (nameToken, ODINTAG_UNION, scope, NULL);
 			parseUnionMembers (token, member_scope);
 			tagEntryInfo *e = getEntryInCorkQueue (member_scope);
 			if (e)
@@ -1194,25 +1098,24 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 		}
 		else if (isKeyword (token, KEYWORD_bit_set))
 		{
-			makeTag (nameToken, ODINTAG_TYPE, scope, NULL, NULL);
+			makeTag (nameToken, ODINTAG_TYPE, scope, NULL);
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_SQUARE))
 				skipToMatchedNoRead (token, NULL);
 		}
 		else if (isKeyword (token, KEYWORD_bit_field))
 		{
-			int member_scope = makeTag (nameToken, ODINTAG_TYPE, scope, NULL, NULL);
+			int member_scope = makeTag (nameToken, ODINTAG_TYPE, scope, NULL);
 			if (member_scope != CORK_NIL)
 				registerEntry (member_scope);
 
-			/* Skip backing type (e.g. u16) */
 			readToken (token);
 			if (isType (token, TOKEN_IDENTIFIER))
 				readToken (token);
 
 			if (isType (token, TOKEN_OPEN_CURLY))
 			{
-				/* Reuse struct member parsing — `| width` is skipped as TOKEN_OTHER */
+				/* bit_field | widths are TOKEN_OTHER, so struct parsing works */
 				parseStructMembers (token, member_scope);
 			}
 
@@ -1222,8 +1125,7 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 		}
 		else if (isKeyword (token, KEYWORD_distinct))
 		{
-			makeTag (nameToken, ODINTAG_TYPE, scope, NULL, NULL);
-			/* Skip the underlying type expression */
+			makeTag (nameToken, ODINTAG_TYPE, scope, NULL);
 			readToken (token);
 			while (isType (token, TOKEN_CARET))
 				readToken (token);
@@ -1235,73 +1137,78 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 				if (isType (token, TOKEN_OPEN_SQUARE))
 					skipToMatched (token, NULL);
 			}
-			/* token is now at the final type identifier;
-			 * parseBlock's readToken will advance past it */
+			/* parseBlock's readToken advances past this */
 		}
 		else if (isKeyword (token, KEYWORD_map))
 		{
-			makeTag (nameToken, ODINTAG_TYPE, scope, NULL, NULL);
+			makeTag (nameToken, ODINTAG_TYPE, scope, NULL);
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_SQUARE))
 				skipToMatched (token, NULL);
 		}
 		else if (isType (token, TOKEN_IDENTIFIER))
 		{
-			/* name :: Type  (type alias) or name :: value (constant)
-			 * By convention, constants are SCREAMING_SNAKE_CASE (all
-			 * uppercase). If the name contains any lowercase letter,
-			 * it is a type alias. */
-			const char *name = vStringValue (nameToken->string);
-			bool has_lower = false;
-			for (const char *p = name; *p; p++)
-			{
-				if (islower ((unsigned char) *p))
-				{
-					has_lower = true;
-					break;
-				}
-			}
-			if (has_lower)
-				makeTag (nameToken, ODINTAG_TYPE, scope, NULL, NULL);
+			/* Lowercase in name => type alias, else constant */
+			if (nameHasLower (nameToken->string))
+				makeTag (nameToken, ODINTAG_TYPE, scope, NULL);
 			else
-				makeTag (nameToken, ODINTAG_CONST, scope, NULL, NULL);
+				makeTag (nameToken, ODINTAG_CONST, scope, NULL);
 		}
 		else if (isType (token, TOKEN_STRING) ||
 				 isType (token, TOKEN_OTHER))
 		{
-			/* name :: "string" or name :: 123 (constant) */
-			makeTag (nameToken, ODINTAG_CONST, scope, NULL, NULL);
+			makeTag (nameToken, ODINTAG_CONST, scope, NULL);
 		}
 		else if (isType (token, TOKEN_CARET) ||
 				 isType (token, TOKEN_HASH) ||
 				 isType (token, TOKEN_OPEN_SQUARE))
 		{
-			/* name :: ^Type, name :: #type proc(...), name :: [N]Type */
-			makeTag (nameToken, ODINTAG_TYPE, scope, NULL, NULL);
-			if (isType (token, TOKEN_CARET))
+			if (isType (token, TOKEN_HASH))
 			{
-				while (isType (token, TOKEN_CARET))
+				readToken (token);
+				if (isType (token, TOKEN_IDENTIFIER))
 					readToken (token);
-				/* token at type identifier */
+				if (isKeyword (token, KEYWORD_proc))
+				{
+					parseProcedure (token, nameToken, scope);
+				}
+				else
+				{
+					if (nameHasLower (nameToken->string))
+						makeTag (nameToken, ODINTAG_TYPE, scope, NULL);
+					else
+						makeTag (nameToken, ODINTAG_CONST, scope, NULL);
+					if (isType (token, TOKEN_OPEN_PAREN) ||
+						isType (token, TOKEN_OPEN_SQUARE))
+					{
+						skipToMatchedNoRead (token, NULL);
+					}
+				}
 			}
-			else if (isType (token, TOKEN_OPEN_SQUARE))
+			else
 			{
-				skipToMatched (token, NULL);
-				/* token at element type identifier */
+				makeTag (nameToken, ODINTAG_TYPE, scope, NULL);
+				if (isType (token, TOKEN_CARET))
+				{
+					while (isType (token, TOKEN_CARET))
+						readToken (token);
+				}
+				else if (isType (token, TOKEN_OPEN_SQUARE))
+				{
+					skipToMatched (token, NULL);
+				}
 			}
-			/* For HASH, leave at #; parseBlock handles it via continue */
 		}
 		else if (isType (token, TOKEN_OPEN_PAREN) ||
 				 isType (token, TOKEN_OPEN_CURLY))
 		{
-			makeTag (nameToken, ODINTAG_CONST, scope, NULL, NULL);
+			makeTag (nameToken, ODINTAG_CONST, scope, NULL);
 		}
 	}
 	else if (isType (token, TOKEN_COLON))
 	{
 		readToken (token);
 
-		/* Skip the type - stop at tokens that can't be part of a type expression */
 		while (!isType (token, TOKEN_EOF) &&
 			   !isType (token, TOKEN_EQUAL) &&
 			   !isType (token, TOKEN_COLON) &&
@@ -1322,24 +1229,24 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 		}
 
 		if (isType (token, TOKEN_COLON))
-			makeTag (nameToken, ODINTAG_CONST, scope, NULL, NULL);
+			makeTag (nameToken, ODINTAG_CONST, scope, NULL);
 		else
-			makeTag (nameToken, ODINTAG_VAR, scope, NULL, NULL);
+			makeTag (nameToken, ODINTAG_VAR, scope, NULL);
 	}
 	else if (isType (token, TOKEN_COLON_EQUAL))
 	{
-		makeTag (nameToken, ODINTAG_VAR, scope, NULL, NULL);
+		makeTag (nameToken, ODINTAG_VAR, scope, NULL);
 	}
 	else if (isType (token, TOKEN_COMMA))
 	{
-		makeTag (nameToken, ODINTAG_VAR, scope, NULL, NULL);
+		makeTag (nameToken, ODINTAG_VAR, scope, NULL);
 
 		while (isType (token, TOKEN_COMMA))
 		{
 			readToken (token);
 			if (isType (token, TOKEN_IDENTIFIER))
 			{
-				makeTag (token, ODINTAG_VAR, scope, NULL, NULL);
+				makeTag (token, ODINTAG_VAR, scope, NULL);
 				readToken (token);
 			}
 		}
@@ -1352,16 +1259,11 @@ static void parseBlock (tokenInfo *const token, int scope, bool isTopLevel);
 
 static void parseWhenBlock (tokenInfo *const token, const int scope)
 {
-	/* when condition { ... } else when condition { ... } else { ... }
-	 * Skip condition tokens until '{', then parse the body as declarations. */
 	readToken (token);
 
 	for (;;)
 	{
-		/* Skip condition until '{'.
-		 * Bail out if we hit '::' / ':' / ':=' — that means this was an
-		 * expression-level `when` (ternary), not a block-level one, and
-		 * we've overshot into the next declaration. */
+		/* Bail on declaration operators — expression-level when */
 		while (!isType (token, TOKEN_EOF) &&
 			   !isType (token, TOKEN_OPEN_CURLY) &&
 			   !isType (token, TOKEN_DOUBLE_COLON) &&
@@ -1378,35 +1280,24 @@ static void parseWhenBlock (tokenInfo *const token, const int scope)
 		}
 
 		if (!isType (token, TOKEN_OPEN_CURLY))
-		{
-			/* Not a block when — bail, let caller handle current token */
 			break;
-		}
 
-		/* Parse the body as top-level declarations */
 		readToken (token);
 		parseBlock (token, scope, false);
-		/* token is now at '}' or EOF */
 
-		/* Check for else / else when */
 		readToken (token);
 		if (isKeyword (token, KEYWORD_else))
 		{
 			readToken (token);
 			if (isKeyword (token, KEYWORD_when))
 			{
-				/* else when condition { ... } — continue loop */
 				readToken (token);
 				continue;
 			}
-			/* else { ... } — token should be at '{' or condition */
 			continue;
 		}
 		else
-		{
-			/* No else — we're done */
 			break;
-		}
 	}
 }
 
@@ -1419,7 +1310,6 @@ static void parseBlock (tokenInfo *const token, int scope, bool isTopLevel)
 
 	while (!isType (token, TOKEN_EOF) && !isType (token, stopToken))
 	{
-		/* Skip any attributes before a declaration */
 		while (isType (token, TOKEN_AT))
 		{
 			readToken (token);
@@ -1441,7 +1331,7 @@ static void parseBlock (tokenInfo *const token, int scope, bool isTopLevel)
 						scope = parsePackage (token);
 					break;
 				case KEYWORD_import:
-					parseImport (token, scope);
+					parseImport (token);
 					break;
 				case KEYWORD_foreign:
 					parseForeign (token, scope);
@@ -1459,14 +1349,10 @@ static void parseBlock (tokenInfo *const token, int scope, bool isTopLevel)
 		}
 		else if (isType (token, TOKEN_HASH))
 		{
-			/* Skip directives like #assert, #load, #+build, etc.
-			 * #+build has '+' (TOKEN_OTHER) before the directive name,
-			 * and the rest of the line is a comma-separated list that
-			 * would otherwise be misparsed as variable declarations. */
 			readToken (token);
 			if (isType (token, TOKEN_OTHER))
 			{
-				/* #+build or similar — skip to end of line */
+				/* #+build — skip line to avoid misparsing */
 				skipToCharacterInInputFile ('\n');
 			}
 			continue;
@@ -1474,8 +1360,7 @@ static void parseBlock (tokenInfo *const token, int scope, bool isTopLevel)
 		else if (isType (token, TOKEN_IDENTIFIER))
 		{
 			parseDeclaration (token, scope);
-			/* parseDeclaration may leave token at the start of the next
-			 * statement (e.g. bodyless proc types read one token ahead) */
+			/* parseDeclaration may leave token at next statement */
 			if (isType (token, TOKEN_AT) || isType (token, TOKEN_HASH) ||
 				isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 				continue;

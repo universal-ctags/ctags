@@ -17,3 +17,4 @@ Explicit :: enum {
     Second = 5,
     Third = 10,
 }
+

@@ -9,13 +9,18 @@ Color :: struct #packed {
 }
 
 Entity :: struct {
-    using pos: Point,
+    using pos: ^Point,
     name:      string,
 }
 
 Generic_Pair :: struct($T: typeid) {
     first:  T,
     second: T,
+}
+
+Aligned :: struct #align(8) {
+    val: i32,
+    using data: [4]u8,
 }
 
 Engine :: struct {
