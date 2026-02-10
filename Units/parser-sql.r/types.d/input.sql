@@ -45,3 +45,11 @@ CREATE TABLE big_objs (
     id integer,
     obj bigobj
 );
+
+-- Taken from postgresql/src/test/regress/sql/create_cast.sql
+CREATE TYPE casttesttype;
+
+CREATE FUNCTION casttesttype_in(cstring)
+   RETURNS casttesttype
+   AS 'textin'
+   LANGUAGE internal STRICT IMMUTABLE;

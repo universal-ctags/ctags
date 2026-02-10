@@ -1,20 +1,24 @@
-compfoo	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	k
-f1	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	E	type:compfoo
-f2	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	E	type:compfoo
-getfoo	input.sql	/^CREATE FUNCTION getfoo() RETURNS SETOF compfoo AS $\$$/;"	f	typeref:typename:SETOF compfoo
-bug_status	input.sql	/^CREATE TYPE bug_status AS ENUM ('new', 'open', 'closed');$/;"	k
-bug	input.sql	/^CREATE TABLE bug ($/;"	t
-id	input.sql	/^    id serial,$/;"	E	table:bug
-description	input.sql	/^    description text,$/;"	E	table:bug
-status	input.sql	/^    status bug_status$/;"	E	table:bug
-float8_range	input.sql	/^CREATE TYPE float8_range AS RANGE (subtype = float8, subtype_diff = float8mi);$/;"	k
-my_box_in_function	input.sql	/^CREATE FUNCTION my_box_in_function(cstring) RETURNS box AS $\$$/;"	f	typeref:typename:box
-my_box_out_function	input.sql	/^CREATE FUNCTION my_box_out_function(box) RETURNS cstring AS $\$$/;"	f	typeref:typename:cstring
-box	input.sql	/^CREATE TYPE box ($/;"	k
-myboxes	input.sql	/^CREATE TABLE myboxes ($/;"	t
-id	input.sql	/^    id integer,$/;"	E	table:myboxes
-description	input.sql	/^    description box$/;"	E	table:myboxes
-bigobj	input.sql	/^CREATE TYPE bigobj ($/;"	k
-big_objs	input.sql	/^CREATE TABLE big_objs ($/;"	t
-id	input.sql	/^    id integer,$/;"	E	table:big_objs
-obj	input.sql	/^    obj bigobj$/;"	E	table:big_objs
+compfoo	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	k	roles:def
+f1	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	E	type:compfoo	roles:def
+f2	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	E	type:compfoo	roles:def
+getfoo	input.sql	/^CREATE FUNCTION getfoo() RETURNS SETOF compfoo AS $\$$/;"	f	typeref:typename:SETOF compfoo	roles:def
+bug_status	input.sql	/^CREATE TYPE bug_status AS ENUM ('new', 'open', 'closed');$/;"	k	roles:def
+bug	input.sql	/^CREATE TABLE bug ($/;"	t	roles:def
+id	input.sql	/^    id serial,$/;"	E	table:bug	roles:def
+description	input.sql	/^    description text,$/;"	E	table:bug	roles:def
+status	input.sql	/^    status bug_status$/;"	E	table:bug	roles:def
+float8_range	input.sql	/^CREATE TYPE float8_range AS RANGE (subtype = float8, subtype_diff = float8mi);$/;"	k	roles:def
+box	input.sql	/^CREATE TYPE box;$/;"	k	roles:decl
+my_box_in_function	input.sql	/^CREATE FUNCTION my_box_in_function(cstring) RETURNS box AS $\$$/;"	f	typeref:typename:box	roles:def
+my_box_out_function	input.sql	/^CREATE FUNCTION my_box_out_function(box) RETURNS cstring AS $\$$/;"	f	typeref:typename:cstring	roles:def
+box	input.sql	/^CREATE TYPE box ($/;"	k	roles:def
+myboxes	input.sql	/^CREATE TABLE myboxes ($/;"	t	roles:def
+id	input.sql	/^    id integer,$/;"	E	table:myboxes	roles:def
+description	input.sql	/^    description box$/;"	E	table:myboxes	roles:def
+bigobj	input.sql	/^CREATE TYPE bigobj ($/;"	k	roles:def
+big_objs	input.sql	/^CREATE TABLE big_objs ($/;"	t	roles:def
+id	input.sql	/^    id integer,$/;"	E	table:big_objs	roles:def
+obj	input.sql	/^    obj bigobj$/;"	E	table:big_objs	roles:def
+casttesttype	input.sql	/^CREATE TYPE casttesttype;$/;"	k	roles:decl
+casttesttype_in	input.sql	/^CREATE FUNCTION casttesttype_in(cstring)$/;"	f	typeref:typename:casttesttype	roles:def
+textin	input.sql	/^   AS 'textin'$/;"	f	roles:foreigncall

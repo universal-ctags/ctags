@@ -254,6 +254,15 @@ typedef enum {
 	SQLTAG_COUNT
 } sqlKind;
 
+typedef enum {
+	R_SQLTAG_TYPE_DECL,
+} sqlTypeRole;
+
+static roleDefinition SqlTypeRoles [] = {
+	{ false, "decl", "declaration (shell in PostgreSQL)",
+	  .version = 1 },
+};
+
 static kindDefinition SqlKinds [] = {
 	{ true,  'C', "ccflag",		  "PLSQL_CCFLAGS"          },
 	{ true,  'D', "domain",		  "domains"				   },
@@ -272,6 +281,7 @@ static kindDefinition SqlKinds [] = {
 	{ true,  'f', "function",	  "functions"			   },
 	{ true,  'i', "index",		  "indexes"				   },
 	{ true,  'k', "type",		  "types",
+	  .referenceOnly = false, ATTACH_ROLES (SqlTypeRoles),
 	  .version = 1 },
 	{ false, 'l', "local",		  "local variables"		   },
 	{ true,  'n', "synonym",	  "synonyms"			   },
@@ -1781,8 +1791,11 @@ static void parseType (tokenInfo *const token)
 			token->scopeKind = SQLTAG_COUNT;
 		}
 		else if (isType (token, TOKEN_SEMICOLON))
-			/* Type declaration (or shell type); don't make a "type" tag for it. */
-			markCorkEntryAsPlaceholder(r, true);
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (r);
+			if (e)
+				assignRole (e, R_SQLTAG_TYPE_DECL);
+		}
 	}
 	vStringCopy(token->scope, saveScope);
 	token->scopeKind = saveScopeKind;
