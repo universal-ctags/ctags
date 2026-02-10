@@ -1732,13 +1732,22 @@ static void parseType (tokenInfo *const token)
 	/* If a scope has been set, add it to the name */
 	addToScope (name, token->scope, token->scopeKind);
 	saveScopeKind = token->scopeKind;
-	readToken (name);
+	readIdentifier (name);
+
+	while (isType (name, TOKEN_IDENTIFIER))
+	{
+		readToken (token);
+		if (!isType (token, TOKEN_PERIOD))
+			break;
+		/* FIXME: Throw away valuable scope information. */
+		readIdentifier (name);
+	}
+
 	if (isType (name, TOKEN_IDENTIFIER))
 	{
 		int r = makeSqlTag (name, SQLTAG_TYPE);
 		sqlKind scopeKind = SQLTAG_TYPE;
 
-		readToken (token);
 		if (isKeyword (token, KEYWORD_is))
 		{
 			readToken (token);

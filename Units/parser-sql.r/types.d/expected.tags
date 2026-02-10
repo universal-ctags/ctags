@@ -22,3 +22,8 @@ obj	input.sql	/^    obj bigobj$/;"	E	table:big_objs	roles:def
 casttesttype	input.sql	/^CREATE TYPE casttesttype;$/;"	k	roles:decl
 casttesttype_in	input.sql	/^CREATE FUNCTION casttesttype_in(cstring)$/;"	f	typeref:typename:casttesttype	roles:def
 textin	input.sql	/^   AS 'textin'$/;"	f	roles:foreigncall
+tststats	input-0.sql	/^CREATE schema tststats;$/;"	S	roles:def
+ty	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	k	roles:def
+a	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	E	type:ty	roles:def
+b	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	E	type:ty	roles:def
+c	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	E	type:ty	roles:def
