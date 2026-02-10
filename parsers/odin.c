@@ -623,11 +623,13 @@ static bool nameHasLower (const vString *name)
 
 static void parseImport (tokenInfo *const token)
 {
+	/* import "path"
+	 * import name "path"
+	 */
 	readToken (token);
 
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		/* import name "path" */
 		tokenInfo *nameToken = newToken ();
 		copyToken (nameToken, token);
 		readToken (token);
@@ -646,6 +648,11 @@ static void parseImport (tokenInfo *const token)
 
 static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 {
+	/* foreign name {
+	 *     ProcName :: proc "c" (...) -> RetType ---
+	 *     varName: Type
+	 * }
+	 */
 	readToken (token);
 	while (!isType (token, TOKEN_EOF) && !isType (token, TOKEN_CLOSE_CURLY))
 	{
@@ -750,6 +757,10 @@ static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 
 static void parseForeign (tokenInfo *const token, const int scope)
 {
+	/* foreign import name "path"
+	 * foreign import name { "path1", "path2" }
+	 * foreign name { ... }  (proc block)
+	 */
 	readToken (token);
 
 	if (isKeyword (token, KEYWORD_import))
@@ -911,6 +922,7 @@ static void parseUnionMembers (tokenInfo *const token, const int scope)
 	skipToMatchedNoRead (token, NULL);
 }
 
+/* ^T, [N]T, map[K]V, proc(...)->T, etc. */
 static void skipTypeExpression (tokenInfo *const token)
 {
 	while (isType (token, TOKEN_CARET))
@@ -969,6 +981,7 @@ static void skipTypeExpression (tokenInfo *const token)
 
 static void parseProcedure (tokenInfo *const token, tokenInfo *const nameToken, const int scope)
 {
+	/* proc "conv" (args) -> ret { body } */
 	vString *signature = vStringNew ();
 	collector sig_collector = { .str = signature, .last_len = 0, };
 
@@ -1046,6 +1059,14 @@ static void parseProcedure (tokenInfo *const token, tokenInfo *const nameToken, 
 
 static void parseDeclaration (tokenInfo *const token, const int scope)
 {
+	/* name :: proc(...)
+	 * name :: struct/enum/union { ... }
+	 * name :: distinct Type
+	 * name :: value  (constant)
+	 * name : type = value  (variable)
+	 * name : type : value  (typed constant)
+	 * name := value  (variable)
+	 */
 	tokenInfo *nameToken = newToken ();
 	copyToken (nameToken, token);
 
@@ -1267,6 +1288,7 @@ static void parseBlock (tokenInfo *const token, int scope, bool isTopLevel);
 
 static void parseWhenBlock (tokenInfo *const token, const int scope)
 {
+	/* when cond { ... } else when cond { ... } else { ... } */
 	readToken (token);
 
 	for (;;)
