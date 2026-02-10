@@ -60,6 +60,7 @@ z	kind	no	NONE	s--	no	r-	0	[tags output] prepend "kind:" to k/ (or K/) field out
 -	category	yes	ObjectiveC	s--	no	--	0	category attached to the class
 -	protocols	yes	ObjectiveC	s--	no	--	0	protocols that the class (or category) confirms to
 -	foreign	yes	Odin	s--	no	--	0	foreign name given to the ccode
+-	importName	yes	Odin	s--	no	--	0	import name specifying the package
 -	home	yes	Passwd	s--	no	rw	0	home directory
 -	shell	yes	Passwd	s--	no	rw	0	login shell
 -	arity	yes	Prolog	-i-	no	--	0	the number of parameters

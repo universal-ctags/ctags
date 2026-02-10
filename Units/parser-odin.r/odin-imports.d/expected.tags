@@ -2,4 +2,4 @@ imports	input.odin	/^package imports$/;"	package	roles:def
 core:fmt	input.odin	/^import "core:fmt"$/;"	package	roles:imported
 core:os	input.odin	/^import "core:os"$/;"	package	roles:imported
 m	input.odin	/^import m "core:math"$/;"	importName	roles:def
-core:math	input.odin	/^import m "core:math"$/;"	package	roles:imported
+core:math	input.odin	/^import m "core:math"$/;"	package	roles:imported	importName:m

@@ -134,7 +134,8 @@ typedef enum {
 } OdinCcodeRole;
 
 typedef enum {
-	F_FOREIGN, F_IMPORT_NAME
+	F_FOREIGN,
+	F_IMPORT_NAME,
 } OdinForeignField;
 
 static roleDefinition OdinPackageRoles [] = {
@@ -167,6 +168,11 @@ static fieldDefinition OdinFields[] = {
 	{
 		.name = "foreign",
 		.description = "foreign name given to the ccode",
+		.enabled = true,
+	},
+	{
+		.name = "importName",
+		.description = "import name specifying the package",
 		.enabled = true,
 	},
 };
@@ -659,7 +665,10 @@ static void parseImport (tokenInfo *const token)
 		if (isType (token, TOKEN_STRING))
 		{
 			makeTag (nameToken, ODINTAG_IMPORT_NAME, CORK_NIL, NULL);
-			makeRefTag (token, ODINTAG_PACKAGE, R_ODINTAG_PACKAGE_IMPORTED);
+			int package = makeRefTag (token, ODINTAG_PACKAGE, R_ODINTAG_PACKAGE_IMPORTED);
+			attachParserFieldToCorkEntry (package,
+										  OdinFields[F_IMPORT_NAME].ftype,
+										  vStringValue (nameToken->string));
 		}
 		deleteToken (nameToken);
 	}

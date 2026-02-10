@@ -42,6 +42,7 @@ x       UCTAGSxpath          no      NONE             s--    no    --   0 xpath 
 -       UCTAGScategory       yes     ObjectiveC       s--    no    --   0 category attached to the class
 -       UCTAGSprotocols      yes     ObjectiveC       s--    no    --   0 protocols that the class (or category) confirms to
 -       UCTAGSforeign        yes     Odin             s--    no    --   0 foreign name given to the ccode
+-       UCTAGSimportName     yes     Odin             s--    no    --   0 import name specifying the package
 -       UCTAGShome           yes     Passwd           s--    no    rw   0 home directory
 -       UCTAGSshell          yes     Passwd           s--    no    rw   0 login shell
 -       UCTAGSarity          yes     Prolog           -i-    no    --   0 the number of parameters
