@@ -120,7 +120,8 @@ typedef enum {
 	ODINTAG_MEMBER,
 	ODINTAG_ENUMERATOR,
 	ODINTAG_TYPE,
-	ODINTAG_FOREIGN
+	ODINTAG_FOREIGN,
+	ODINTAG_IMPORT_NAME
 } odinKind;
 
 typedef enum {
@@ -143,7 +144,8 @@ static kindDefinition OdinKinds[] = {
 	{true, 'm', "member", "struct members"},
 	{true, 'n', "enumerator", "enum values"},
 	{true, 't', "type", "type aliases"},
-	{true, 'g', "foreign", "foreign imports"}
+	{true, 'g', "foreign", "foreign imports"},
+	{true, 'i', "importName", "import names"}
 };
 
 static const keywordTable OdinKeywordTable[] = {
@@ -625,9 +627,16 @@ static void parseImport (tokenInfo *const token)
 
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
+		/* import name "path" */
+		tokenInfo *nameToken = newToken ();
+		copyToken (nameToken, token);
 		readToken (token);
 		if (isType (token, TOKEN_STRING))
+		{
+			makeTag (nameToken, ODINTAG_IMPORT_NAME, CORK_NIL, NULL);
 			makeRefTag (token, ODINTAG_PACKAGE, R_ODINTAG_PACKAGE_IMPORTED);
+		}
+		deleteToken (nameToken);
 	}
 	else if (isType (token, TOKEN_STRING))
 	{
