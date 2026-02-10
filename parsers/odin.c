@@ -185,8 +185,7 @@ static void clearPoolToken (void *data)
 
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
+	token->c = EOF;
 	vStringClear (token->string);
 }
 
@@ -233,7 +232,7 @@ static void parseString (vString *const string, const int delimiter)
 		else if (c == '\\' && delimiter != '`')
 		{
 			c = getcFromInputFile ();
-			if (c != '\'' && c != '\"')
+			if (c != delimiter)
 				vStringPut (string, '\\');
 			vStringPut (string, c);
 		}
@@ -402,7 +401,7 @@ getNextChar:
 								break;
 							else
 								ungetcToInputFile (c);
-						} while (c != EOF && c != '\0');
+						} while (c != EOF);
 
 						ungetcToInputFile (hasNewline ? '\n' : ' ');
 						goto getNextChar;
