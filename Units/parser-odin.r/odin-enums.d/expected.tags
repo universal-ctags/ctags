@@ -3,7 +3,7 @@ Color	input.odin	/^Color :: enum {$/;"	enum	line:3	package:enums	end:7
 Red	input.odin	/^    Red,$/;"	enumerator	line:4	enum:enums.Color
 Green	input.odin	/^    Green,$/;"	enumerator	line:5	enum:enums.Color
 Blue	input.odin	/^    Blue,$/;"	enumerator	line:6	enum:enums.Color
-Small	input.odin	/^Small :: enum u8 {$/;"	enum	line:9	package:enums	end:13
+Small	input.odin	/^Small :: enum u8 {$/;"	enum	line:9	package:enums	typeref:typename:u8	end:13
 A	input.odin	/^    A,$/;"	enumerator	line:10	enum:enums.Small
 B	input.odin	/^    B,$/;"	enumerator	line:11	enum:enums.Small
 C	input.odin	/^    C,$/;"	enumerator	line:12	enum:enums.Small

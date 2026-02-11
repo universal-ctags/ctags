@@ -929,7 +929,15 @@ static void parseEnumMembers (tokenInfo *const token, const int scope)
 	readToken (token);
 
 	if (isType (token, TOKEN_IDENTIFIER))
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (scope);
+		if (e)
+		{
+			e->extensionFields.typeRef[0] = eStrdup ("typename");
+			e->extensionFields.typeRef[1] = vStringStrdup (token->string);
+		}
 		readToken (token);
+	}
 
 	if (!isType (token, TOKEN_OPEN_CURLY))
 		return;
