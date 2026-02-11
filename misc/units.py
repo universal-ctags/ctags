@@ -530,7 +530,11 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
     guessed_lang = None
     if len(LANGUAGES) > 0:
         guessed_lang = guess_lang(basecmdline, finput)
-        if not guessed_lang in LANGUAGES:
+        # If the args.ctags is broken, ctags cannot guess the language.
+        # In that case, we don't skip this test case.
+        # So we can raise an error.
+        if not broken_args_ctags \
+           and not guessed_lang in LANGUAGES:
             return False
 
     clean_tcase(o, obundles)

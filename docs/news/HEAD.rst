@@ -66,6 +66,10 @@ Clojure:
       "``clojure.core``".  For the other namespaces, the parser emits
       "``unknown``" kind tags.
 
+SQL:
+
+    * Add ``type`` kind to extract ``t`` in "``CREATE TYPE t ...``".
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:

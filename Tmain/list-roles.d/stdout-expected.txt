@@ -119,6 +119,7 @@ Ruby                    L/library         required           on        0 loaded 
 Ruby                    L/library         requiredRel        on        0 loaded by "require_relative" method
 SCSS                    M/module          used               on        1 used
 SELinuxTypeEnforcement  t/type            aliased            on        0 aliased
+SQL                     k/type            decl               off       1 declaration (shell in PostgreSQL)
 Sh                      h/heredoc         endmarker          on        0 end marker
 Sh                      s/script          loaded             on        0 loaded
 SystemTap               p/probe           attached           on        1 attached by code for probing
@@ -272,6 +273,7 @@ Ruby                    L/library         required           on        0 loaded 
 Ruby                    L/library         requiredRel        on        0 loaded by "require_relative" method
 SCSS                    M/module          used               on        1 used
 SELinuxTypeEnforcement  t/type            aliased            on        0 aliased
+SQL                     k/type            decl               off       1 declaration (shell in PostgreSQL)
 Sh                      h/heredoc         endmarker          on        0 end marker
 Sh                      s/script          loaded             on        0 loaded
 SystemTap               p/probe           attached           on        1 attached by code for probing

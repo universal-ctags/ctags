@@ -240,6 +240,7 @@ typedef enum {
 	SQLTAG_EVENT,
 	SQLTAG_FUNCTION,
 	SQLTAG_INDEX,
+	SQLTAG_TYPE,
 	SQLTAG_LOCAL_VARIABLE,
 	SQLTAG_SYNONYM,
 	SQLTAG_PROCEDURE,
@@ -252,6 +253,15 @@ typedef enum {
 	SQLTAG_MLPROP,
 	SQLTAG_COUNT
 } sqlKind;
+
+typedef enum {
+	R_SQLTAG_TYPE_DECL,
+} sqlTypeRole;
+
+static roleDefinition SqlTypeRoles [] = {
+	{ false, "decl", "declaration (shell in PostgreSQL)",
+	  .version = 1 },
+};
 
 static kindDefinition SqlKinds [] = {
 	{ true,  'C', "ccflag",		  "PLSQL_CCFLAGS"          },
@@ -270,6 +280,9 @@ static kindDefinition SqlKinds [] = {
 	{ true,  'e', "event",		  "events"				   },
 	{ true,  'f', "function",	  "functions"			   },
 	{ true,  'i', "index",		  "indexes"				   },
+	{ true,  'k', "type",		  "types",
+	  .referenceOnly = false, ATTACH_ROLES (SqlTypeRoles),
+	  .version = 1 },
 	{ false, 'l', "local",		  "local variables"		   },
 	{ true,  'n', "synonym",	  "synonyms"			   },
 	{ true,  'p', "procedure",	  "procedures"			   },
@@ -667,6 +680,14 @@ static int makeSqlTagFull (tokenInfo *const token, const sqlKind kind, int *fqIn
 static int makeSqlTag (tokenInfo *const token, const sqlKind kind)
 {
 	return makeSqlTagFull (token, kind, NULL);
+}
+
+/* Make the tag that OLDTAGINDEX specifies a placeholder, then make a new
+ * tag for TOKEN with KIND kind. */
+static int makeSqlTagInstead (tokenInfo *const token, const sqlKind kind, int oldTagIndex)
+{
+	markCorkEntryAsPlaceholder(oldTagIndex, true);
+	return makeSqlTag (token, kind);
 }
 
 /*
@@ -1711,36 +1732,89 @@ static void parseType (tokenInfo *const token)
 	/* If a scope has been set, add it to the name */
 	addToScope (name, token->scope, token->scopeKind);
 	saveScopeKind = token->scopeKind;
-	readToken (name);
-	if (isType (name, TOKEN_IDENTIFIER))
+	readIdentifier (name);
+
+	/* Consider "CREATE TYPE BODY t" in oracle. */
+	if (isType (name, TOKEN_KEYWORD)
+		&& isKeyword (name, KEYWORD_body))
+		readIdentifier (name);
+
+	while (isType (name, TOKEN_IDENTIFIER) ||
+		   isType (name, TOKEN_STRING) ||
+		   (isType (name, TOKEN_KEYWORD)
+			&& (!isReservedWord (name))))
 	{
 		readToken (token);
+		if (!isType (token, TOKEN_PERIOD))
+			break;
+		/* FIXME: Throw away valuable scope information. */
+		readIdentifier (name);
+	}
+
+	if (isType (name, TOKEN_IDENTIFIER) ||
+		isType (name, TOKEN_STRING) ||
+			(isType (name, TOKEN_KEYWORD)
+			 && (!isReservedWord (name))))
+	{
+		int r = makeSqlTag (name, SQLTAG_TYPE);
+		sqlKind scopeKind = SQLTAG_TYPE;
+
 		if (isKeyword (token, KEYWORD_is))
 		{
 			readToken (token);
-			switch (token->keyword)
+			if (isType (token, TOKEN_KEYWORD))
 			{
+				switch (token->keyword)
+				{
 				case KEYWORD_record:
 				case KEYWORD_object:
-					makeSqlTag (name, SQLTAG_RECORD);
-					addToScope (token, name->string, SQLTAG_RECORD);
+					if (isLanguageKindEnabled (Lang_sql, SQLTAG_RECORD))
+					{
+						makeSqlTagInstead (name, SQLTAG_RECORD, r);
+						scopeKind = SQLTAG_RECORD;
+					}
+					addToScope (token, name->string, scopeKind);
 					parseRecord (token);
 					break;
 
 				case KEYWORD_table:
-					makeSqlTag (name, SQLTAG_TABLE);
+					if (isLanguageKindEnabled (Lang_sql, SQLTAG_TABLE))
+						makeSqlTagInstead (name, SQLTAG_TABLE, r);
 					break;
 
 				case KEYWORD_ref:
 					readToken (token);
-					if (isKeyword (token, KEYWORD_cursor))
-						makeSqlTag (name, SQLTAG_CURSOR);
+					if (isKeyword (token, KEYWORD_cursor)
+						&& isLanguageKindEnabled (Lang_sql, SQLTAG_CURSOR))
+							makeSqlTagInstead (name, SQLTAG_CURSOR, r);
 					break;
 
-				default: break;
+				default:
+					/* TODO: PostgreSQL can take 'enum (' and 'range (' here.
+					 * Add them as keywords first when implementing this branch. */
+					break;
+				}
+			}
+			else if (isType (token, TOKEN_OPEN_PAREN))
+			{
+				if (isLanguageKindEnabled (Lang_sql, SQLTAG_RECORD))
+				{
+					/* When the record kind is enabled, emit a
+					 * record tag and suppress the type tag. */
+					makeSqlTagInstead (name, SQLTAG_RECORD, r);
+					scopeKind = SQLTAG_RECORD;
+				}
+				addToScope (token, name->string, scopeKind);
+				parseRecord (token);
 			}
 			vStringClear (token->scope);
 			token->scopeKind = SQLTAG_COUNT;
+		}
+		else if (isType (token, TOKEN_SEMICOLON))
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (r);
+			if (e)
+				assignRole (e, R_SQLTAG_TYPE_DECL);
 		}
 	}
 	vStringCopy(token->scope, saveScope);

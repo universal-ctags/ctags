@@ -1,0 +1,34 @@
+compfoo	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	k	roles:def
+f1	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	E	type:compfoo	roles:def
+f2	input.sql	/^CREATE TYPE compfoo AS (f1 int, f2 text);$/;"	E	type:compfoo	roles:def
+getfoo	input.sql	/^CREATE FUNCTION getfoo() RETURNS SETOF compfoo AS $\$$/;"	f	typeref:typename:SETOF compfoo	roles:def
+bug_status	input.sql	/^CREATE TYPE bug_status AS ENUM ('new', 'open', 'closed');$/;"	k	roles:def
+bug	input.sql	/^CREATE TABLE bug ($/;"	t	roles:def
+id	input.sql	/^    id serial,$/;"	E	table:bug	roles:def
+description	input.sql	/^    description text,$/;"	E	table:bug	roles:def
+status	input.sql	/^    status bug_status$/;"	E	table:bug	roles:def
+float8_range	input.sql	/^CREATE TYPE float8_range AS RANGE (subtype = float8, subtype_diff = float8mi);$/;"	k	roles:def
+box	input.sql	/^CREATE TYPE box;$/;"	k	roles:decl
+my_box_in_function	input.sql	/^CREATE FUNCTION my_box_in_function(cstring) RETURNS box AS $\$$/;"	f	typeref:typename:box	roles:def
+my_box_out_function	input.sql	/^CREATE FUNCTION my_box_out_function(box) RETURNS cstring AS $\$$/;"	f	typeref:typename:cstring	roles:def
+box	input.sql	/^CREATE TYPE box ($/;"	k	roles:def
+myboxes	input.sql	/^CREATE TABLE myboxes ($/;"	t	roles:def
+id	input.sql	/^    id integer,$/;"	E	table:myboxes	roles:def
+description	input.sql	/^    description box$/;"	E	table:myboxes	roles:def
+bigobj	input.sql	/^CREATE TYPE bigobj ($/;"	k	roles:def
+big_objs	input.sql	/^CREATE TABLE big_objs ($/;"	t	roles:def
+id	input.sql	/^    id integer,$/;"	E	table:big_objs	roles:def
+obj	input.sql	/^    obj bigobj$/;"	E	table:big_objs	roles:def
+casttesttype	input.sql	/^CREATE TYPE casttesttype;$/;"	k	roles:decl
+casttesttype_in	input.sql	/^CREATE FUNCTION casttesttype_in(cstring)$/;"	f	typeref:typename:casttesttype	roles:def
+textin	input.sql	/^   AS 'textin'$/;"	f	roles:foreigncall
+another_type	input.sql	/^CREATE TYPE "another_type";$/;"	k	roles:decl
+language	input.sql	/^CREATE TYPE language;$/;"	k	roles:decl
+database	input.sql	/^CREATE TYPE "public".database;$/;"	k	roles:decl
+tststats	input-0.sql	/^CREATE schema tststats;$/;"	S	roles:def
+ty	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	k	roles:def
+a	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	E	type:ty	roles:def
+b	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	E	type:ty	roles:def
+c	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	E	type:ty	roles:def
+emp_obj_typ	input-1.sql	/^CREATE OR REPLACE TYPE BODY emp_obj_typ AS$/;"	k	roles:def
+display_emp	input-1.sql	/^    MEMBER PROCEDURE display_emp (SELF IN OUT emp_obj_typ)$/;"	p	roles:def
