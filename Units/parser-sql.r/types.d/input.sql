@@ -53,3 +53,12 @@ CREATE FUNCTION casttesttype_in(cstring)
    RETURNS casttesttype
    AS 'textin'
    LANGUAGE internal STRICT IMMUTABLE;
+
+-- string literal
+CREATE TYPE "another_type";
+
+-- non-reserved word
+CREATE TYPE language;
+
+-- non-reserved word with schema name
+CREATE TYPE "public".database;

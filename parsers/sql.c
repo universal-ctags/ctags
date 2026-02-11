@@ -1734,7 +1734,10 @@ static void parseType (tokenInfo *const token)
 	saveScopeKind = token->scopeKind;
 	readIdentifier (name);
 
-	while (isType (name, TOKEN_IDENTIFIER))
+	while (isType (name, TOKEN_IDENTIFIER) ||
+		   isType (name, TOKEN_STRING) ||
+		   (isType (name, TOKEN_KEYWORD)
+			&& (!isReservedWord (name))))
 	{
 		readToken (token);
 		if (!isType (token, TOKEN_PERIOD))
@@ -1743,7 +1746,10 @@ static void parseType (tokenInfo *const token)
 		readIdentifier (name);
 	}
 
-	if (isType (name, TOKEN_IDENTIFIER))
+	if (isType (name, TOKEN_IDENTIFIER) ||
+		isType (name, TOKEN_STRING) ||
+			(isType (name, TOKEN_KEYWORD)
+			 && (!isReservedWord (name))))
 	{
 		int r = makeSqlTag (name, SQLTAG_TYPE);
 		sqlKind scopeKind = SQLTAG_TYPE;
