@@ -48,6 +48,9 @@ static const char *TR_PROLOG = "Prolog";
 static const char *TR_SYSTEMD_UNIT = "SystemdUnit";
 static const char *TR_DBUS_SERVICE = "DBusService";
 
+static const char *TR_HAXE = "Haxe";
+static const char *TR_QEMUHX = "QemuHX";
+
 #define startsWith(line,prefix)									\
 	(strncmp(line, prefix, strlen(prefix)) == 0? true: false)
 
@@ -501,6 +504,27 @@ selectByDBusServiceAndSystemdUnitSectionNames (MIO *input,
 							unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
 	return selectByLines (input, tasteDBusServiceOrSystemdUnit, TR_SYSTEMD_UNIT, NULL);
+}
+
+static const char *
+tasteHaxeOrQemuHX (const char *line, void *data CTAGS_ATTR_UNUSED)
+{
+	if (startsWith (line, "HXCOMM"))
+		return TR_QEMUHX;
+	if (startsWith (line, "enum")
+		|| startsWith (line, "interface")
+		|| startsWith (line, "typedef")
+		|| startsWith (line, "class"))
+		return TR_HAXE;
+	return TR_UNKNOWN;
+}
+
+const char *
+selectHaxeOrQemuHXByCommentMarker (MIO *input,
+								   langType *candidates CTAGS_ATTR_UNUSED,
+								   unsigned int nCandidates CTAGS_ATTR_UNUSED)
+{
+	return selectByLines (input, tasteHaxeOrQemuHX, TR_HAXE, NULL);
 }
 
 #ifdef HAVE_LIBXML

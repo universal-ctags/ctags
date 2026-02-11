@@ -25,6 +25,7 @@
 #include "read.h"
 #include "vstring.h"
 #include "routines.h"
+#include "selectors.h"
 
 /*
  *       MACROS
@@ -205,12 +206,16 @@ extern parserDefinition* HaxeParser (void)
 
 	parserDefinition *const def = parserNew ("Haxe");
 	def->extensions = extensions;
+
+	static selectLanguage selectors[] = { selectHaxeOrQemuHXByCommentMarker, NULL };
+
 	/*
 	 * New definitions for parsing instead of regex
 	 */
 	def->kindTable          = HxKinds;
 	def->kindCount  = ARRAY_SIZE (HxKinds);
 	def->parser             = findHxTags;
+	def->selectLanguage = selectors;
 	/*def->initialize = initialize;*/
 	return def;
 }

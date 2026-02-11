@@ -70,6 +70,12 @@ SQL:
 
     * Add ``type`` kind to extract ``t`` in "``CREATE TYPE t ...``".
 
+QemuHX:
+
+    * Extract command in ``{ "command", ...``.
+    * Implement a selector arbitrating Haxe and QemuHX parsers, both handling
+	  ``.hx`` file extension.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:

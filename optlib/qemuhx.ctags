@@ -32,13 +32,64 @@
 --langdef=QemuHX
 --kinddef-QemuHX=q,qmp,QEMU Management Protocol dispatch table entries
 --kinddef-QemuHX=i,infoitem,item in texinfo doc
+--kinddef-QemuHX=c,commands,name member in HMPCommand struct{version=1}
+
 --map-QemuHX=+.hx
+--__selector-QemuHX=selectHaxeOrQemuHXByCommentMarker
 --_extradef-QemuHX=funcmap,Include mapping SQMP to C function name
 --extras-QemuHX=+{funcmap}
 
---mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/\1/q/{mgroup=1}
---mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/q/{mgroup=1}{_extra=funcmap}{{
-    . :name dup (-_) _tr!
-    . exch name:
+--_tabledef-QemuHX=toplevel
+--_tabledef-QemuHX=skiplines
+
+--_tabledef-QemuHX=qmp
+--_tabledef-QemuHX=texi
+--_tabledef-QemuHX=rst
+--_tabledef-QemuHX=cmd
+--_tabledef-QemuHX=cmd0
+
+--_mtable-regex-QemuHX=skiplines/[^\n]+[\n]*//
+--_mtable-regex-QemuHX=skiplines/[\n]+//
+--_mtable-regex-QemuHX=skiplines/.//
+
+--_mtable-regex-QemuHX=toplevel/HXCOMM[^\n]*[\n]*//
+--_mtable-regex-QemuHX=toplevel/SQMP[[:space:]]+//{tenter=qmp}
+--_mtable-regex-QemuHX=toplevel/STEXI[\n]*//{tenter=texi}
+--_mtable-regex-QemuHX=toplevel/SRST[^\n]*[\n]*//{tenter=rst}
+--_mtable-regex-QemuHX=toplevel/[ \t]*DEF\("([^"\n]+)"[^\n]*[\n]/\1/c/
+--_mtable-regex-QemuHX=toplevel/[ \t]*\{[ \t]*[\n]+//{tenter=cmd}
+--_mtable-extend-QemuHX=toplevel+skiplines
+
+--_mtable-regex-QemuHX=qmp/EQMP[^\n]*[\n]*//{tleave}
+--_mtable-regex-QemuHX=qmp/([-a-z_0-9A-Z]+)[[:space:]]---[^\n]*[\n]/\1/q/{{
+    /QemuHX.funcmap _extraenabled {
+        % make an extra tag for "n-a-m-e":
+        % make string: qmp_n-a-m-e
+        mark (qmp_) . :name _buildstring
+        % replace - with _: qmp_n_a_m_e
+        dup (-_) _tr!
+        . :kind . _tagloc _tag
+        _commit
+        /QemuHX.funcmap _markextra
+    } if
 }}
---regex-QemuHX=/^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})/\1/i/
+--_mtable-extend-QemuHX=qmp+skiplines
+
+--_mtable-regex-QemuHX=texi/ETEXI[\n]*//{tleave}
+--_mtable-regex-QemuHX=texi/@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})[^\n]*[\n]*/\1/i/
+--_mtable-extend-QemuHX=texi+skiplines
+
+--_mtable-regex-QemuHX=rst/ERST[^\n]*[\n]*//{tleave}
+--_mtable-extend-QemuHX=rst+skiplines
+
+--_mtable-regex-QemuHX=cmd/[ \t]*(SQMP)[\n]*//{tleave}{_advanceTo=1start}
+--_mtable-regex-QemuHX=cmd/[ \t]*(STEXI)[\n]*//{tleave}{_advanceTo=1start}
+--_mtable-regex-QemuHX=cmd/[ \t]*(SRST)[^\n]*[\n]*//{tleave}{_advanceTo=1start}
+--_mtable-regex-QemuHX=cmd/[ \t]*\}[ \t]*,[ \t]*[\n]*//{tleave}
+--_mtable-regex-QemuHX=cmd/[ \t]*DEF\("([^"\n]+)"[^\n]*[\n]/\1/c/
+--_mtable-regex-QemuHX=cmd/[ \t]*\.name[ \t]*=[ \t]*"//{tenter=cmd0}
+--_mtable-extend-QemuHX=cmd+skiplines
+
+--_mtable-regex-QemuHX=cmd0/([^|\n]+)\|/\1/c/
+--_mtable-regex-QemuHX=cmd0/([^"\n]+)"[^\n]*[\n]/\1/c/{tleave}
+--_mtable-extend-QemuHX=cmd0+skiplines

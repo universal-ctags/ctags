@@ -1,0 +1,2 @@
+version	input.hx	/^        .name       = "version",$/;"	c
+cryptodev	input.hx	/^        .name       = "cryptodev",$/;"	c

@@ -45,4 +45,8 @@ selectPerlOrPrologByDistinctiveToken (struct _MIO *input, langType *candidates, 
 const char *
 selectByDBusServiceAndSystemdUnitSectionNames (struct _MIO *input, langType *candidates, unsigned int nCandidates);
 
+const char *
+selectHaxeOrQemuHXByCommentMarker (struct _MIO *input,
+								   langType *candidates CTAGS_ATTR_UNUSED,
+								   unsigned int nCandidates CTAGS_ATTR_UNUSED);
 #endif
