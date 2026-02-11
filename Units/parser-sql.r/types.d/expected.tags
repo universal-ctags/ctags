@@ -30,3 +30,5 @@ ty	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	k	roles:
 a	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	E	type:ty	roles:def
 b	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	E	type:ty	roles:def
 c	input-0.sql	/^CREATE TYPE tststats.ty AS (a int, b int, c text);$/;"	E	type:ty	roles:def
+emp_obj_typ	input-1.sql	/^CREATE OR REPLACE TYPE BODY emp_obj_typ AS$/;"	k	roles:def
+display_emp	input-1.sql	/^    MEMBER PROCEDURE display_emp (SELF IN OUT emp_obj_typ)$/;"	p	roles:def

@@ -1734,6 +1734,11 @@ static void parseType (tokenInfo *const token)
 	saveScopeKind = token->scopeKind;
 	readIdentifier (name);
 
+	/* Consider "CREATE TYPE BODY t" in oracle. */
+	if (isType (name, TOKEN_KEYWORD)
+		&& isKeyword (name, KEYWORD_body))
+		readIdentifier (name);
+
 	while (isType (name, TOKEN_IDENTIFIER) ||
 		   isType (name, TOKEN_STRING) ||
 		   (isType (name, TOKEN_KEYWORD)
