@@ -35,6 +35,12 @@ WARNING.  They are shown by default, but can be suppressed with the
 
 Parser related changes
 ---------------------------------------------------------------------
+General:
+
+    *  Detection of UTF-16 BOM (both LE and BE) in file reading and 
+       automatic conversion from UTF-16 to UTF-8 using iconv when
+       UTF-16 is detected so that the parser does not crash
+       
 JavaScript:
 
     * A new field "properties" was added to indicate that a field or
