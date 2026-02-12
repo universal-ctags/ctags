@@ -82,7 +82,7 @@ extern char *readLineFromBypass (vString *const vLine, MIOPos pos, long *const o
  * args (endColumn): [absolute]
  * args (sourceLineOffset): [buggy]
  */
-extern void   pushArea (
+extern bool   pushArea (
 				       bool useMemoryStreamInput,
 				       unsigned long startLine, long startColumn,
 				       unsigned long endLine, long endColumn,
