@@ -1,32 +1,32 @@
 procs	input.odin	/^package procs$/;"	p	line:1
-Comparator	input.odin	/^Comparator :: #type proc(x, y: int) -> int$/;"	t	line:5	package:procs	signature:((x, y: int)
-init	input.odin	/^init :: proc() {$/;"	f	line:7	package:procs	signature:(()	end:8
-vec2_add	input.odin	/^vec2_add :: proc(x, y: f32) -> f32 {$/;"	f	line:10	package:procs	signature:((x, y: f32)	end:12
-div_check	input.odin	/^div_check :: proc(a: f32) -> (int, bool) {$/;"	f	line:14	package:procs	signature:((a: f32)	end:16
-write_bytes	input.odin	/^write_bytes :: proc "c" (n: i32, data: rawptr) {$/;"	f	line:18	package:procs	signature:((n: i32, data: rawptr)	end:19
-get_errno	input.odin	/^get_errno :: proc "cdecl" () -> i32 {$/;"	f	line:21	package:procs	signature:(()	end:23
-clamp_value	input.odin	/^clamp_value :: proc(x: $T) -> T where T == int {$/;"	f	line:25	package:procs	signature:((x: $T)	end:27
-add_ints	input.odin	/^add_ints :: proc(a, b: int) -> int {return a + b}$/;"	f	line:29	package:procs	signature:((a, b: int)	end:29
-add_floats	input.odin	/^add_floats :: proc(a, b: f32) -> f32 {return a + b}$/;"	f	line:30	package:procs	signature:((a, b: f32)	end:30
+Comparator	input.odin	/^Comparator :: #type proc(x, y: int) -> int$/;"	t	line:5	package:procs	signature:(x, y: int)
+init	input.odin	/^init :: proc() {$/;"	f	line:7	package:procs	signature:()	end:8
+vec2_add	input.odin	/^vec2_add :: proc(x, y: f32) -> f32 {$/;"	f	line:10	package:procs	signature:(x, y: f32)	end:12
+div_check	input.odin	/^div_check :: proc(a: f32) -> (int, bool) {$/;"	f	line:14	package:procs	signature:(a: f32)	end:16
+write_bytes	input.odin	/^write_bytes :: proc "c" (n: i32, data: rawptr) {$/;"	f	line:18	package:procs	signature:(n: i32, data: rawptr)	end:19
+get_errno	input.odin	/^get_errno :: proc "cdecl" () -> i32 {$/;"	f	line:21	package:procs	signature:()	end:23
+clamp_value	input.odin	/^clamp_value :: proc(x: $T) -> T where T == int {$/;"	f	line:25	package:procs	signature:(x: $T)	end:27
+add_ints	input.odin	/^add_ints :: proc(a, b: int) -> int {return a + b}$/;"	f	line:29	package:procs	signature:(a, b: int)	end:29
+add_floats	input.odin	/^add_floats :: proc(a, b: f32) -> f32 {return a + b}$/;"	f	line:30	package:procs	signature:(a, b: f32)	end:30
 add	input.odin	/^add :: proc {$/;"	f	line:31	package:procs
-My_Callback	input.odin	/^My_Callback :: proc(x: int) -> bool$/;"	t	line:36	package:procs	signature:((x: int)
-Loader	input.odin	/^Loader :: proc(path: string) -> ^u8$/;"	t	line:37	package:procs	signature:((path: string)
-alloc_buf	input.odin	/^alloc_buf :: proc(size: int, allocator := context.allocator) -> []u8 {$/;"	f	line:38	package:procs	signature:((size: int, allocator := context.allocator)	end:40
-get_items	input.odin	/^get_items :: proc() -> [dynamic]int {$/;"	f	line:41	package:procs	signature:(()	end:43
-make_handler	input.odin	/^make_handler :: proc() -> proc(int) {$/;"	f	line:44	package:procs	signature:(()	end:46
-get_builder	input.odin	/^get_builder :: proc() -> strings.Builder {$/;"	f	line:47	package:procs	signature:(()	end:49
-get_lookup	input.odin	/^get_lookup :: proc() -> map[string]int {$/;"	f	line:51	package:procs	signature:(()	end:53
-get_c_callback	input.odin	/^get_c_callback :: proc() -> proc "c" (i32) {$/;"	f	line:55	package:procs	signature:(()	end:57
-get_transform	input.odin	/^get_transform :: proc() -> proc(int) -> int {$/;"	f	line:59	package:procs	signature:(()	end:61
-get_checker	input.odin	/^get_checker :: proc() -> proc(int) -> (bool, int) {$/;"	f	line:63	package:procs	signature:(()	end:65
-get_simd	input.odin	/^get_simd :: proc() -> #simd[4]f32 {$/;"	f	line:67	package:procs	signature:(()	end:69
+My_Callback	input.odin	/^My_Callback :: proc(x: int) -> bool$/;"	t	line:36	package:procs	signature:(x: int)
+Loader	input.odin	/^Loader :: proc(path: string) -> ^u8$/;"	t	line:37	package:procs	signature:(path: string)
+alloc_buf	input.odin	/^alloc_buf :: proc(size: int, allocator := context.allocator) -> []u8 {$/;"	f	line:38	package:procs	signature:(size: int, allocator := context.allocator)	end:40
+get_items	input.odin	/^get_items :: proc() -> [dynamic]int {$/;"	f	line:41	package:procs	signature:()	end:43
+make_handler	input.odin	/^make_handler :: proc() -> proc(int) {$/;"	f	line:44	package:procs	signature:()	end:46
+get_builder	input.odin	/^get_builder :: proc() -> strings.Builder {$/;"	f	line:47	package:procs	signature:()	end:49
+get_lookup	input.odin	/^get_lookup :: proc() -> map[string]int {$/;"	f	line:51	package:procs	signature:()	end:53
+get_c_callback	input.odin	/^get_c_callback :: proc() -> proc "c" (i32) {$/;"	f	line:55	package:procs	signature:()	end:57
+get_transform	input.odin	/^get_transform :: proc() -> proc(int) -> int {$/;"	f	line:59	package:procs	signature:()	end:61
+get_checker	input.odin	/^get_checker :: proc() -> proc(int) -> (bool, int) {$/;"	f	line:63	package:procs	signature:()	end:65
+get_simd	input.odin	/^get_simd :: proc() -> #simd[4]f32 {$/;"	f	line:67	package:procs	signature:()	end:69
 Number	input.odin	/^Number :: struct($T: typeid) { val: T }$/;"	s	line:71	package:procs	end:71
 val	input.odin	/^Number :: struct($T: typeid) { val: T }$/;"	m	line:71	struct:procs.Number
-get_number	input.odin	/^get_number :: proc() -> Number(int) {$/;"	f	line:72	package:procs	signature:(()	end:74
-foo_no_alias	input.odin	/^foo_no_alias :: proc(#no_alias a, b: ^int) {}$/;"	f	line:76	package:procs	signature:((#no_alias a, b: ^int)	end:76
-print_caller_location	input.odin	/^print_caller_location :: proc(loc := #caller_location) {}$/;"	f	line:78	package:procs	signature:((loc := #caller_location)	end:78
-optional_result	input.odin	/^optional_result :: proc(x: int) -> (value: int, ok: bool) #optional_ok {$/;"	f	line:80	package:procs	signature:((x: int)	end:82
-proc_no_type_assert	input.odin	/^proc_no_type_assert :: proc(a: any) -> int #no_type_assert {$/;"	f	line:84	package:procs	signature:((a: any)	end:86
-apply	input.odin	/^apply :: proc(f: proc(int) -> int, x: int) -> int {$/;"	f	line:88	package:procs	signature:((f: proc(int) -> int, x: int)	end:90
-add_inline	input.odin	/^add_inline :: #force_inline proc(a, b: int) -> int {$/;"	f	line:92	package:procs	signature:((a, b: int)	end:94
-spaced	input.odin	/^spaced :: proc(a: int ) -> int {$/;"	f	line:96	package:procs	signature:((a: int)	end:98
+get_number	input.odin	/^get_number :: proc() -> Number(int) {$/;"	f	line:72	package:procs	signature:()	end:74
+foo_no_alias	input.odin	/^foo_no_alias :: proc(#no_alias a, b: ^int) {}$/;"	f	line:76	package:procs	signature:(#no_alias a, b: ^int)	end:76
+print_caller_location	input.odin	/^print_caller_location :: proc(loc := #caller_location) {}$/;"	f	line:78	package:procs	signature:(loc := #caller_location)	end:78
+optional_result	input.odin	/^optional_result :: proc(x: int) -> (value: int, ok: bool) #optional_ok {$/;"	f	line:80	package:procs	signature:(x: int)	end:82
+proc_no_type_assert	input.odin	/^proc_no_type_assert :: proc(a: any) -> int #no_type_assert {$/;"	f	line:84	package:procs	signature:(a: any)	end:86
+apply	input.odin	/^apply :: proc(f: proc(int) -> int, x: int) -> int {$/;"	f	line:88	package:procs	signature:(f: proc(int) -> int, x: int)	end:90
+add_inline	input.odin	/^add_inline :: #force_inline proc(a, b: int) -> int {$/;"	f	line:92	package:procs	signature:(a, b: int)	end:94
+spaced	input.odin	/^spaced :: proc(a: int ) -> int {$/;"	f	line:96	package:procs	signature:(a: int)	end:98

@@ -533,8 +533,6 @@ getNextChar:
 			if (isStartIdentChar (c))
 			{
 				parseIdentifier (token->string, c);
-				token->lineNumber = getInputLineNumber ();
-				token->filePosition = getInputFilePosition ();
 				token->keyword = lookupKeyword (vStringValue (token->string), Lang_odin);
 				if (isKeyword (token, KEYWORD_NONE))
 					token->type = TOKEN_IDENTIFIER;
@@ -612,8 +610,7 @@ static int makeTagFull (tokenInfo *const token, const odinKind kind,
 	initRefTagEntry (&e, name, kind, role);
 
 	updateTagLine (&e, token->lineNumber, token->filePosition);
-	if (argList)
-		e.extensionFields.signature = argList;
+	e.extensionFields.signature = argList;
 
 	e.extensionFields.scopeIndex = scope;
 	return makeTagEntry (&e);
@@ -724,7 +721,6 @@ static void parseForeignBlockProcs (tokenInfo *const token, const int scope)
 
 					if (isType (token, TOKEN_OPEN_PAREN))
 					{
-						vStringPut (signature, '(');
 						skipToMatchedNoRead (token, &sig_collector);
 						collectorTruncate (&sig_collector);
 					}
@@ -1068,7 +1064,6 @@ static void parseProcedure (tokenInfo *const token, tokenInfo *const nameToken, 
 
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		vStringPut (signature, '(');
 		skipToMatchedNoRead (token, &sig_collector);
 		collectorTruncate (&sig_collector);
 	}
@@ -1147,8 +1142,6 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 		else if (isKeyword (token, KEYWORD_struct))
 		{
 			int member_scope = makeTag (nameToken, ODINTAG_STRUCT, scope, NULL);
-			if (member_scope != CORK_NIL)
-				registerEntry (member_scope);
 
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_PAREN))
@@ -1174,8 +1167,6 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 		else if (isKeyword (token, KEYWORD_enum))
 		{
 			int member_scope = makeTag (nameToken, ODINTAG_ENUM, scope, NULL);
-			if (member_scope != CORK_NIL)
-				registerEntry (member_scope);
 			parseEnumMembers (token, member_scope);
 			tagEntryInfo *e = getEntryInCorkQueue (member_scope);
 			if (e)
@@ -1199,8 +1190,6 @@ static void parseDeclaration (tokenInfo *const token, const int scope)
 		else if (isKeyword (token, KEYWORD_bit_field))
 		{
 			int member_scope = makeTag (nameToken, ODINTAG_TYPE, scope, NULL);
-			if (member_scope != CORK_NIL)
-				registerEntry (member_scope);
 
 			readToken (token);
 			if (isType (token, TOKEN_IDENTIFIER))
@@ -1384,10 +1373,7 @@ static void parseWhenBlock (tokenInfo *const token, const int scope)
 		{
 			readToken (token);
 			if (isKeyword (token, KEYWORD_when))
-			{
 				readToken (token);
-				continue;
-			}
 			continue;
 		}
 		else
@@ -1499,7 +1485,7 @@ extern parserDefinition *OdinParser (void)
 	def->finalize = finalize;
 	def->keywordTable = OdinKeywordTable;
 	def->keywordCount = ARRAY_SIZE (OdinKeywordTable);
-	def->useCork = CORK_QUEUE | CORK_SYMTAB;
+	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
 	return def;
 }
