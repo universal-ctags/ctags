@@ -85,6 +85,7 @@ The following parsers have been added:
 * Prolog
 * DBusService
 * GoMod
+* Odin
 
 Changes about parser specific kinds, roles, fields, and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -398,6 +398,7 @@ PARSER_SRCS =				\
 	parsers/nsis.c			\
 	parsers/objc.c			\
 	parsers/ocaml.c			\
+	parsers/odin.c			\
 	parsers/pascal.c		\
 	parsers/perl.c			\
 	parsers/perl-function-parameters.c \

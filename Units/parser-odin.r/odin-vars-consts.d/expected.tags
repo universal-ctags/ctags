@@ -1,0 +1,15 @@
+vars	input.odin	/^package vars$/;"	package
+PI	input.odin	/^PI :: 3.14159$/;"	const	package:vars
+MAX_BUFFER_SIZE	input.odin	/^MAX_BUFFER_SIZE :: 1024$/;"	const	package:vars
+DEFAULT_PROMPT	input.odin	/^DEFAULT_PROMPT :: ">"$/;"	const	package:vars
+initial_capacity	input.odin	/^initial_capacity: int : 42$/;"	const	package:vars
+log_level	input.odin	/^log_level: int = 10$/;"	var	package:vars
+frame_count	input.odin	/^frame_count := 20$/;"	var	package:vars
+width	input.odin	/^width, height, depth := 1, 2, 3$/;"	var	package:vars
+height	input.odin	/^width, height, depth := 1, 2, 3$/;"	var	package:vars
+depth	input.odin	/^width, height, depth := 1, 2, 3$/;"	var	package:vars
+handler	input.odin	/^handler: proc(i32) = nil$/;"	var	package:vars
+HALF	input.odin	/^HALF :: 1024 \/ 2$/;"	const	package:vars
+ENABLE_DEBUG	input.odin	/^ENABLE_DEBUG :: #config(ENABLE_DEBUG, false)$/;"	const	package:vars
+a	input.odin	/^a := 1; b := 2$/;"	var	package:vars
+b	input.odin	/^a := 1; b := 2$/;"	var	package:vars

@@ -1,0 +1,20 @@
+ffi	input.odin	/^package ffi$/;"	package	line:1	roles:def
+libc	input.odin	/^foreign import libc "system:libc.so"$/;"	foreign	line:3	package:ffi	roles:def
+system:libc.so	input.odin	/^foreign import libc "system:libc.so"$/;"	ccode	line:3	roles:imported	foreign:libc
+puts	input.odin	/^    puts :: proc "c" (s: cstring) -> i32 ---$/;"	proc	line:6	package:ffi	signature:(s: cstring)	roles:def
+exit	input.odin	/^    exit :: proc "c" (code: i32) ---$/;"	proc	line:7	package:ffi	signature:(code: i32)	roles:def
+errno	input.odin	/^    errno: i32$/;"	var	line:8	package:ffi	roles:def
+signal_handler	input.odin	/^    signal_handler: proc "c" (sig: i32)$/;"	var	line:9	package:ffi	roles:def
+mruby	input.odin	/^foreign import mruby "libmruby.a"$/;"	foreign	line:12	package:ffi	roles:def
+libmruby.a	input.odin	/^foreign import mruby "libmruby.a"$/;"	ccode	line:12	roles:imported	foreign:mruby
+open	input.odin	/^    open :: proc() -> rawptr ---$/;"	proc	line:17	package:ffi	signature:()	roles:def
+close	input.odin	/^    close :: proc(state: rawptr) ---$/;"	proc	line:18	package:ffi	signature:(state: rawptr)	roles:def
+gl	input.odin	/^foreign import gl { "system:opengl32.lib", "system:glu32.lib" }$/;"	foreign	line:21	package:ffi	roles:def
+system:opengl32.lib	input.odin	/^foreign import gl { "system:opengl32.lib", "system:glu32.lib" }$/;"	ccode	line:21	roles:imported	foreign:gl
+system:glu32.lib	input.odin	/^foreign import gl { "system:opengl32.lib", "system:glu32.lib" }$/;"	ccode	line:21	roles:imported	foreign:gl
+internal_init	input.odin	/^    internal_init :: proc "c" () ---$/;"	proc	line:25	package:ffi	signature:()	roles:def
+readv	input.odin	/^    readv :: proc "c" (fd: i32, iov: rawptr, cnt: i32) -> i32 ---$/;"	proc	line:26	package:ffi	signature:(fd: i32, iov: rawptr, cnt: i32)	roles:def
+getres	input.odin	/^    getres :: proc "c" (w: ^i32, h: ^i32) -> (i32, i32) ---$/;"	proc	line:27	package:ffi	signature:(w: ^i32, h: ^i32)	roles:def
+printf	input.odin	/^    printf :: proc "c" (fmt: cstring, #c_vararg args: ..any) -> i32 ---$/;"	proc	line:28	package:ffi	signature:(fmt: cstring, #c_vararg args: ..any)	roles:def
+get_buf	input.odin	/^    get_buf :: proc "c" (n: i32) -> [4]i32 ---$/;"	proc	line:29	package:ffi	signature:(n: i32)	roles:def
+epoll_create	input.odin	/^        epoll_create :: proc "c" (size: i32) -> i32 ---$/;"	proc	line:31	package:ffi	signature:(size: i32)	roles:def

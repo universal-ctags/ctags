@@ -555,6 +555,9 @@
     <ClCompile Include="..\parsers\ocaml.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\odin.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\pascal.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>

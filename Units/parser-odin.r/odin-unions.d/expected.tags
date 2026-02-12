@@ -1,0 +1,4 @@
+unions	input.odin	/^package unions$/;"	package	line:1
+Value	input.odin	/^Value :: union {$/;"	union	line:3	package:unions	end:8
+Non_Nil	input.odin	/^Non_Nil :: union #no_nil {$/;"	union	line:10	package:unions	end:13
+Result	input.odin	/^Result :: union($T: typeid) {$/;"	union	line:15	package:unions	end:18

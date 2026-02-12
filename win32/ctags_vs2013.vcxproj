@@ -344,6 +344,7 @@
     <ClCompile Include="..\parsers\nsis.c" />
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
+    <ClCompile Include="..\parsers\odin.c" />
     <ClCompile Include="..\parsers\pascal.c" />
     <ClCompile Include="..\parsers\perl-function-parameters.c" />
     <ClCompile Include="..\parsers\perl-moose.c" />
