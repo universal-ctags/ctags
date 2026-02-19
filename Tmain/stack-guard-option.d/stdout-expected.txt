@@ -1,0 +1,21 @@
+
+# ulimit(V): 512, no option
+Notice: call stack exceeds the limit (LIMIT) during processing input: input.v
+qnCmeoduen	input.v	/^moluleptt b); assi9223372036854775n b const qnCmeoduen=$/;"	c
+
+# ulimit(V): 512, --stack-limit=131072
+Notice: call stack exceeds the limit (LIMIT) during processing input: input.v
+qnCmeoduen	input.v	/^moluleptt b); assi9223372036854775n b const qnCmeoduen=$/;"	c
+
+# ulimit(V): 64, no option
+Notice: call stack exceeds the limit (LIMIT) during processing input: input.v
+qnCmeoduen	input.v	/^moluleptt b); assi9223372036854775n b const qnCmeoduen=$/;"	c
+
+# ulimit(V): 64, --stack-limit=32768
+Notice: call stack exceeds the limit (LIMIT) during processing input: input.v
+qnCmeoduen	input.v	/^moluleptt b); assi9223372036854775n b const qnCmeoduen=$/;"	c
+
+# ulimit(V): 64, --stack-limit=32769
+Warning: don't specify stack limit larger than default: 32769 > 32768
+Notice: call stack exceeds the limit (LIMIT) during processing input: input.v
+qnCmeoduen	input.v	/^moluleptt b); assi9223372036854775n b const qnCmeoduen=$/;"	c
