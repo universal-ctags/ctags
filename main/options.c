@@ -40,6 +40,7 @@
 #include "writer_p.h"
 #include "trace.h"
 #include "flags_p.h"
+#include "stackguard_p.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>
@@ -506,6 +507,9 @@ static optionDescription LongOptionDescription [] = {
  {0,0,"       input file."},
  {1,0,"  --quiet[=(yes|no)]"},
  {1,0,"       Don't print NOTICE class messages [no]."},
+ {1,0,"  --stack-limit=<bytes>"},
+ {1,0,"       Limit the stack usage while parsing, in bytes ",
+  makeStackGuardHelpDescription },
  {1,0,"  --totals[=(yes|no|extra)]"},
  {1,0,"       Print statistics about input and tag files [no]."},
  {1,0,"  --verbose[=(yes|no)]"},
@@ -634,6 +638,11 @@ static struct Feature {
 	{"optscript", "can use the interpreter"},
 #ifdef HAVE_PCRE2
 	{"pcre2", "has pcre2 regex engine"},
+#endif
+#if HAVE_SYS_RESOURCE_H
+	{"rlimit-based-stack-guard", "uses getrlimit to determine the default stack limit" },
+#else
+	{"static-stack-guard", "sets the default stack limit statically" },
 #endif
 	{NULL,}
 };
@@ -2486,6 +2495,7 @@ static void processDescribeLanguage(const char *const option,
 	puts("Implementation specific status");
 	puts("-------------------------------------------------------");
 	printf("allow null tags: %s\n", doesLanguageAllowNullTag(language)? "yes": "no");
+	printf("stack guard: %s\n", doesParserSupportStackGuard (language)? "supported": "unsupported");
 
 	exit (0);
 
@@ -2697,6 +2707,22 @@ static void processPseudoTags (const char *const option CTAGS_ATTR_UNUSED,
 		vStringClear (str);
 	}
 	vStringDelete (str);
+}
+
+static void processStackLimit (
+		const char *const option, const char *const parameter)
+{
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A positive number or 0 is needed after --%s option", option);
+
+	unsigned long limit = 0;
+	if (!strToULong(parameter, 0, &limit))
+		error (FATAL, "Invalid stack limit: %s", parameter);
+	if (limit > SIZE_MAX)
+		error (FATAL, "Too large limit: %s (> %lu)",
+			   parameter, SIZE_MAX);
+
+	stackGuardSetLimit ((size_t)limit);
 }
 
 static void processSortOption (
@@ -3108,6 +3134,7 @@ static parametricOption ParametricOptions [] = {
 	{ "output-format",          processOutputFormat,            true,   STAGE_ANY },
 	{ "pattern-length-limit",   processPatternLengthLimit,      true,   STAGE_ANY },
 	{ "pseudo-tags",            processPseudoTags,              false,  STAGE_ANY },
+	{ "stack-limit",            processStackLimit,              true,   STAGE_ANY },
 	{ "sort",                   processSortOption,              true,   STAGE_ANY },
 	{ "tag-relative",           processTagRelative,             true,   STAGE_ANY },
 	{ "totals",                 processTotals,                  true,   STAGE_ANY },
