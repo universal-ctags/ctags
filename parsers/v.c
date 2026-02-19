@@ -2341,6 +2341,9 @@ static void parseAlias (tokenInfo *const token, vString *const access, int scope
 static void parseExprList (tokenInfo *const token, int scope,
 						   vString *const access, bool hasInDecl)
 {
+	if (!stackGuardCheck(token))
+		return;
+
 	PARSER_PROLOGUE ("list");
 
 	// attempt to consume multi-var declaration (special case of list)
@@ -3031,6 +3034,15 @@ static void parseFile (tokenInfo *const token)
 	PARSER_EPILOGUE ();
 }
 
+static void discardInput (void *data)
+{
+	tokenInfo *token = data;
+
+	do
+		readToken (token);
+	while (!isToken (token, TOKEN_EOF));
+}
+
 // _____________________________________________________________________________
 //
 
@@ -3091,5 +3103,8 @@ extern parserDefinition *VParser (void)
 	def->requestAutomaticFQTag = true;
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
+
+	def->discardInput = discardInput;
+
 	return def;
 }
