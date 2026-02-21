@@ -498,7 +498,7 @@ static optionDescription LongOptionDescription [] = {
  {0,0,"       Don't make tags file but just print the guessed language name for"},
  {0,0,"       input file."},
  {1,0,"  --quiet[=(yes|no)]"},
- {0,0,"       Don't print NOTICE class messages [no]."},
+ {1,0,"       Don't print NOTICE class messages [no]."},
  {1,0,"  --totals[=(yes|no|extra)]"},
  {1,0,"       Print statistics about input and tag files [no]."},
  {1,0,"  --verbose[=(yes|no)]"},
