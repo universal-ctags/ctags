@@ -2989,10 +2989,10 @@ static void processMaxRecursionDepthOption (const char *const option, const char
 static void processPatternLengthLimit(const char *const option, const char *const parameter)
 {
 	if (parameter == NULL || parameter[0] == '\0')
-		error (FATAL, "A parameter is needed after \"%s\" option", option);
+		error (FATAL, "A positive integer is needed after --%s option", option);
 
 	if (!strToUInt(parameter, 0, &Option.patternLengthLimit))
-		error (FATAL, "-%s: Invalid pattern length limit", option);
+		error (FATAL, "Invalid pattern length limit: %s", parameter);
 }
 
 extern bool ptagMakePatternLengthLimit (ptagDesc *pdesc, langType language CTAGS_ATTR_UNUSED,
