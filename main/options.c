@@ -566,6 +566,7 @@ static const char* const License2 =
 static struct Feature {
 	const char *name;
 	const char *description;
+	char *(*descriptionNew) (const char *template);
 } Features [] = {
 #ifdef _WIN32
 	{"win32", "TO BE WRITTEN"},
@@ -1566,7 +1567,14 @@ static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED
 		if (strcmp (Features [i].name, "regex") != 0 || checkRegex ())
 		{
 			colprintLineAppendColumnCString (line, Features [i].name);
-			colprintLineAppendColumnCString (line, Features [i].description);
+			if (Features [i].descriptionNew)
+			{
+				char *desc = Features [i].descriptionNew(Features [i].description);
+				colprintLineAppendColumnCString (line, desc);
+				eFree (desc);
+			}
+			else
+				colprintLineAppendColumnCString (line, Features [i].description);
 		}
 	}
 
