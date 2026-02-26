@@ -96,6 +96,18 @@ CTAGS_INLINE size_t getLimit (void)
 	return limit_;
 }
 
+extern char *makeFeatureStackGuardDescription (const char *template)
+{
+	vString *vstr = vStringNewInit (template);
+	char buf[32] = {'\0'};
+
+	vStringCatS (vstr, " (default: ");
+	snprintf (buf, sizeof (buf), "%zu", getLimit ());
+	vStringCatS (vstr, buf);
+	vStringPut (vstr, ')');
+	return vStringDeleteUnwrap (vstr);
+}
+
 extern size_t stackGuardGetLimit (void)
 {
 	return getLimit ();

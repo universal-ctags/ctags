@@ -27,4 +27,5 @@ extern void stackGuardPrepare (discardInputFn gotoEOF);
 extern void stackGuardRelease (void);
 extern size_t stackGuardObservedPeak (const char **input);
 
+extern char *makeFeatureStackGuardDescription(const char *template);
 #endif	/* CTAGS_MAIN_STACK_GUARD_H */

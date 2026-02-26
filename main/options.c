@@ -632,6 +632,13 @@ static struct Feature {
 #ifdef HAVE_PCRE2
 	{"pcre2", "has pcre2 regex engine"},
 #endif
+#if HAVE_SYS_RESOURCE_H
+	{"dynamic-stack-guard", "sets the default stack limit dynamically",
+	 makeFeatureStackGuardDescription },
+#else
+	{"static-stack-guard", "sets the default stack limit statically",
+	 makeFeatureStackGuardDescription },
+#endif
 	{NULL,}
 };
 
