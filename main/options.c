@@ -1568,7 +1568,6 @@ static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED
 			colprintLineAppendColumnCString (line, Features [i].name);
 			colprintLineAppendColumnCString (line, Features [i].description);
 		}
-
 	}
 
 	colprintTableSort (table, featureCompare);
