@@ -29,6 +29,70 @@
 #include "entry.h"
 #include "inline.h"
 #include "unwindi.h"
+#include "trace.h"
+
+#define STATUS2STRING(status)									\
+	((status) == PARSER_FINISHED ? "FINISHED" :					\
+	 (status) == PARSER_NEEDS_MORE_INPUT ? "needs_more_input" :	\
+	 (status) == PARSER_FAILED ? "failed" : "unknown")
+#define TRACE_LEAVE_WITH_RESULT(RESULT)					\
+	TRACE_LEAVE_TEXT("status: %s, unusedChars: %u",		\
+					 STATUS2STRING((RESULT)->status),	\
+					 (RESULT)->unusedChars)
+#define TRACE_LEAVE_WITH_RESULT_AND_TOKEN(RESULT,TOKEN)					\
+	TRACE_LEAVE_TEXT("status: %s, unusedChars: %u%s%s%s%s",				\
+					 STATUS2STRING((RESULT)->status),					\
+					 (RESULT)->unusedChars,								\
+					 ((RESULT)->status == PARSER_FAILED)?"":", ",		\
+					 ((RESULT)->status == PARSER_FAILED)?"":decodeToken(TOKEN), \
+					 ((RESULT)->status == PARSER_FAILED)?"":", str: ",	\
+					 ((RESULT)->status == PARSER_FAILED)?"":vStringValue((TOKEN)->string))
+#define TRACE_LEAVE_IN_THE_MIDDLE()				\
+	TRACE_LEAVE_TEXT("(in the middle)")
+#define TRACE_LEAVE_IN_THE_STAGE(STAGE)				\
+	TRACE_LEAVE_TEXT("(at the stage %d)", STAGE)
+#ifdef DO_TRACING
+static const char *encodeString (const char *str)
+{
+	static vString *buf;
+	buf = vStringNewOrClearWithAutoRelease (buf);
+
+	while (*str)
+	{
+		if (*str == '\n')
+		{
+			vStringPut (buf, '\\');
+			vStringPut (buf, 'n');
+		}
+		else if (*str == '\t')
+		{
+			vStringPut (buf, '\\');
+			vStringPut (buf, 't');
+		}
+		else if (*str == '\r')
+		{
+			vStringPut (buf, '\\');
+			vStringPut (buf, 'r');
+		}
+		else if (*str == '\f')
+		{
+			vStringPut (buf, '\\');
+			vStringPut (buf, 'f');
+		}
+		else
+			vStringPut (buf, *str);
+		str++;
+	}
+
+	return vStringValue (buf);
+}
+
+static const char *encodeChar (const char c)
+{
+	const char str[] = {c, '\0'};
+	return encodeString(str);
+}
+#endif
 
 #define isType(token,t)     (bool) ((token)->type == (t))
 #define isKeyword(token,k)  (bool) ((token)->keyword == (k))
@@ -44,7 +108,9 @@
 									  parserState *state, \
 									  parserResult * const result)	\
 	{ \
+		TRACE_ENTER();									   \
 		pfun (c, token, word, &state->stateField, result); \
+		TRACE_LEAVE_WITH_RESULT_AND_TOKEN(result, token);	\
 	}
 
 #define SINGLE_CHAR_PARSER_DEF(fname, ch, ttype) \
@@ -52,7 +118,9 @@
 									  parserState *state, \
 									  parserResult * const result)	\
 	{ \
+		TRACE_ENTER();								\
 		parseOneChar (c, token, ch, ttype, result); \
+		TRACE_LEAVE_WITH_RESULT_AND_TOKEN(result, token);	\
 	}
 
 #define MULTI_CHAR_PARSER_DEF(fname, chs, ...) \
@@ -60,8 +128,10 @@
 									  parserState *state, \
 									  parserResult * const result)	\
 	{ \
+		TRACE_ENTER();								\
 		tokenType types[] = { __VA_ARGS__ }; \
 		parseChar (c, token, state, result, chs, types); \
+		TRACE_LEAVE_WITH_RESULT_AND_TOKEN(result, token);	\
 	}
 
 #define WORD_TOKEN_PARSER_DEF(fname, w, ttype) \
@@ -69,7 +139,9 @@
 									  parserState *state, \
 									  parserResult * const result)	\
 	{ \
+		TRACE_ENTER();								\
 		parseWordToken (c, token, w, ttype, &state->num, result); \
+		TRACE_LEAVE_WITH_RESULT_AND_TOKEN(result, token);	\
 	}
 
 #define BLOCK_PARSER_DEF(fname, start, end, ttype) \
@@ -77,7 +149,9 @@
 									  parserState *state, \
 									  parserResult * const result)	\
 	{ \
+		TRACE_ENTER();								\
 		parseBlock (c, token, ttype, start, end, &state->block, result); \
+		TRACE_LEAVE_WITH_RESULT_AND_TOKEN(result, token);	\
 	}
 
 /*
@@ -192,6 +266,7 @@ typedef struct sTokenInfo {
 	keywordId accessKeyword;
 	bool isStatic;
 } tokenInfo;
+#include "d-typescript.h"
 
 typedef struct sCommentState {
 	int parsed;
@@ -296,6 +371,8 @@ CTAGS_INLINE void parseStringTemplate(const int c, tokenInfo * const token,
 
 static int emitTag(const tokenInfo *const token, const tsKind kind)
 {
+	TRACE_PRINT("tag: %s", vStringValue (token->string));
+
 	if (! TsKinds [kind].enabled)
 		return CORK_NIL;
 
@@ -393,60 +470,86 @@ CTAGS_INLINE void parseWhiteChars(const int c, tokenInfo *const token,
 								  parserState *state,
 								  parserResult * const result)
 {
+	TRACE_ENTER();
+
 	if (whiteChar (c))
 	{
 		result->status = PARSER_NEEDS_MORE_INPUT;
 		state->num += 1;
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
 	if (state->num == 0)
 	{
 		result->status = PARSER_FAILED;
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
 	result->status = PARSER_FINISHED;
 	result->unusedChars = 1;
+
+	TRACE_LEAVE_WITH_RESULT(result);
 }
 
 CTAGS_INLINE void parseOneChar(const int c, tokenInfo *const token, const char expected,
 							   const tokenType type, parserResult *const result)
 {
+	TRACE_ENTER_TEXT("char: %c", expected);
+
 	if (c != expected)
 	{
 		result->status = PARSER_FAILED;
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
 	initToken (token, type);
 	result->status = PARSER_FINISHED;
+
+	TRACE_LEAVE_WITH_RESULT(result);
 }
 
 CTAGS_INLINE void parseChar(const int c, tokenInfo *const token, void *state,
 							parserResult *const result,
 							const char *chars, const tokenType *types)
 {
+	TRACE_ENTER_TEXT("chars: %s", encodeString (chars));
+
 	const char *pos = strchr (chars, c);
 
 	if (pos)
 	{
+		TRACE_PRINT("found: %s", encodeChar(*pos));
+
 		result->status = PARSER_FINISHED;
 		initToken (token, types[pos - chars]);
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
 	result->status = PARSER_FAILED;
+
+	TRACE_LEAVE_WITH_RESULT(result);
 }
 
 CTAGS_INLINE void parseWord(const int c, tokenInfo *const token, const char *word, int *parsed,
 							parserResult *const result)
 {
+	TRACE_ENTER();
+
 	if (word [*parsed] == '\0')
 	{
 		if (isIdentChar (c))
 		{
 			result->status = PARSER_FAILED;
+
+			TRACE_LEAVE_WITH_RESULT(result);
 			return;
 		}
 
@@ -456,6 +559,8 @@ CTAGS_INLINE void parseWord(const int c, tokenInfo *const token, const char *wor
 
 		result->unusedChars = 1;
 		result->status = PARSER_FINISHED;
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
@@ -464,21 +569,29 @@ CTAGS_INLINE void parseWord(const int c, tokenInfo *const token, const char *wor
 		*parsed += 1;
 
 		result->status = PARSER_NEEDS_MORE_INPUT;
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
 	result->status = PARSER_FAILED;
+
+	TRACE_LEAVE_WITH_RESULT(result);
 }
 
 CTAGS_INLINE void parseNumber(const int c, tokenInfo *const token, int *parsed,
 							  parserResult *const result)
 {
+	TRACE_ENTER();
+
 	if (*parsed == 0)
 	{
 		if (c == '-')
 		{
 			result->status = PARSER_NEEDS_MORE_INPUT;
 			*parsed += 1;
+
+			TRACE_LEAVE_WITH_RESULT(result);
 			return;
 		}
 	}
@@ -487,11 +600,15 @@ CTAGS_INLINE void parseNumber(const int c, tokenInfo *const token, int *parsed,
 	{
 		result->status = PARSER_NEEDS_MORE_INPUT;
 		*parsed += 1;
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 	else if (*parsed == 0)
 	{
 		result->status = PARSER_FAILED;
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
@@ -499,12 +616,16 @@ CTAGS_INLINE void parseNumber(const int c, tokenInfo *const token, int *parsed,
 
 	result->unusedChars = 1;
 	result->status = PARSER_FINISHED;
+
+	TRACE_LEAVE_WITH_RESULT(result);
 }
 
 CTAGS_INLINE void parseWordToken(const int c, tokenInfo *const token, const char *word,
 								 const tokenType type, int *parsed,
 								 parserResult *const result)
 {
+	TRACE_ENTER();
+
 	if (c == word [*parsed])
 	{
 		*parsed += 1;
@@ -513,19 +634,27 @@ CTAGS_INLINE void parseWordToken(const int c, tokenInfo *const token, const char
 		{
 			initToken (token, type);
 			result->status = PARSER_FINISHED;
+
+			TRACE_LEAVE_WITH_RESULT(result);
 			return;
 		}
 
 		result->status = PARSER_NEEDS_MORE_INPUT;
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
 	result->status = PARSER_FAILED;
+
+	TRACE_LEAVE_WITH_RESULT(result);
 }
 
 CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, parserState *state,
 							   parserResult *const result)
 {
+	TRACE_ENTER();
+
 	if (state->comment.parsed < 2)
 	{
 		parseWordToken (c, token, "//", TOKEN_COMMENT_BLOCK, &state->comment.parsed,
@@ -547,6 +676,7 @@ CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, parserState 
 			state->comment.isBlock = false;
 		}
 
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
@@ -574,15 +704,21 @@ CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, parserState 
 	if (result->status == PARSER_FINISHED)
 	{
 		initToken (token, TOKEN_COMMENT_BLOCK);
+
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
 	result->status = PARSER_NEEDS_MORE_INPUT;
+
+	TRACE_LEAVE_WITH_RESULT(result);
 }
 
 CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char quote, char *prev,
 							  parserResult *const result)
 {
+	TRACE_ENTER();
+
 	if (*prev == '\0')
 	{
 		if (c == quote)
@@ -593,12 +729,14 @@ CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char qu
 		else
 			result->status = PARSER_FAILED;
 
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 	else if (c == EOF)
 	{
 		result->status = PARSER_FAILED;
 
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
@@ -607,6 +745,7 @@ CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char qu
 		*prev = '\1';
 		result->status = PARSER_NEEDS_MORE_INPUT;
 
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 	else if (c == quote && *prev != '\\')
@@ -614,17 +753,21 @@ CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char qu
 		result->status = PARSER_FINISHED;
 		initToken (token, TOKEN_STRING);
 
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 	else if (quote == '/' && c == '\n') // regex cannot contain new lines
 	{
 		result->status = PARSER_FAILED;
 
+		TRACE_LEAVE_WITH_RESULT(result);
 		return;
 	}
 
 	*prev = c;
 	result->status = PARSER_NEEDS_MORE_INPUT;
+
+	TRACE_LEAVE_WITH_RESULT(result);
 }
 
 
@@ -704,13 +847,17 @@ CTAGS_INLINE void parseIdentifierCommon(const int c, tokenInfo *const token, int
 CTAGS_INLINE void parseIdentifier(const int c, tokenInfo *const token, int *parsed,
 								  parserResult *const result)
 {
+	TRACE_ENTER();
 	parseIdentifierCommon (c, token, parsed, result, false);
+	TRACE_LEAVE_WITH_RESULT_AND_TOKEN(result, token);
 }
 
 CTAGS_INLINE void parseFQIdentifier(const int c, tokenInfo *const token, int *parsed,
 									parserResult *const result)
 {
+	TRACE_ENTER();
 	parseIdentifierCommon (c, token, parsed, result, true);
+	TRACE_LEAVE_WITH_RESULT_AND_TOKEN(result, token);
 }
 
 PARSER_DEF (AsKeyword, parseWord, "as", num)
@@ -762,6 +909,8 @@ BLOCK_PARSER_DEF (Curlies, '{', '}', TOKEN_CURLIES)
 
 CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhite)
 {
+	TRACE_ENTER();
+
 	parserState currentState;
 	parserResult result;
 	int c;
@@ -794,11 +943,14 @@ CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhit
 	else
 		uwiDropMaker ();
 
+	TRACE_LEAVE_TEXT("result: %d", result.status == PARSER_FINISHED);
 	return result.status == PARSER_FINISHED;
 }
 
 static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, Parser parser, ...)
 {
+	TRACE_ENTER();
+
 	Parser currentParser = NULL;
 	bool result = false;
 
@@ -830,15 +982,19 @@ static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, Parser pars
 		if (c != EOF && skippedNextWord)
 			uwiUngetC (c);
 
+		TRACE_LEAVE_TEXT("(skipUnparsed) result: %d", c != EOF);
 		return c != EOF;
 	}
 
+	TRACE_LEAVE_TEXT("result: %d", result);
 	return result;
 }
 
 MULTI_CHAR_PARSER_DEF (DecoratorChars, "@\n", TOKEN_AT, TOKEN_NL)
 static void parseDecorator (tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed = false;
 
 	do
@@ -859,6 +1015,8 @@ static void parseDecorator (tokenInfo *const token)
 
 	//parse optional parens block
 	tryParser ((Parser) parseParens, token, true);
+
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (InterfaceBodyChars, "}:;.,|&",
@@ -867,6 +1025,8 @@ MULTI_CHAR_PARSER_DEF (InterfaceBodyChars, "}:;.,|&",
 		TOKEN_PIPE, TOKEN_AMPERSAND)
 static void parseInterfaceBody (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed;
 
 	do
@@ -885,7 +1045,10 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	tokenInfo *member = NULL;
 	bool parsingType = false;
@@ -997,10 +1160,14 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 		emitTag (member, TSTAG_PROPERTY);
 		deleteToken (member);
 	}
+
+	TRACE_LEAVE();
 }
 
 static void parseInterface (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed;
 
 	do
@@ -1014,13 +1181,18 @@ static void parseInterface (const int scope, tokenInfo *const token)
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	token->scope = scope;
 
 	const int nscope = emitTag (token, TSTAG_INTERFACE);
 
 	parseInterfaceBody (nscope, token);
+
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (TypeChars, ":;,=|&",
@@ -1028,6 +1200,8 @@ MULTI_CHAR_PARSER_DEF (TypeChars, ":;,=|&",
 		TOKEN_EQUAL_SIGN, TOKEN_PIPE, TOKEN_AMPERSAND)
 static void parseType (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed;
 	bool parsingType = false;
 	bool shouldEnd = false;
@@ -1105,6 +1279,8 @@ static void parseType (const int scope, tokenInfo *const token)
 			 && ! isType (token, TOKEN_SEMICOLON));
 
 	clearPoolToken(token);
+
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (EnumBodyChars, "},=|&.",
@@ -1112,6 +1288,8 @@ MULTI_CHAR_PARSER_DEF (EnumBodyChars, "},=|&.",
 		TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_PERIOD)
 static void parseEnumBody (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed;
 
 	do
@@ -1130,7 +1308,10 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	tokenInfo *member = NULL;
 	bool parsingValue = false;
@@ -1200,10 +1381,14 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 
 	if (member)
 		deleteToken (member);
+
+	TRACE_LEAVE();
 }
 
 static void parseEnum (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed;
 
 	do
@@ -1216,12 +1401,17 @@ static void parseEnum (const int scope, tokenInfo *const token)
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	token->scope = scope;
 	const int nscope = emitTag (token, TSTAG_ENUM);
 
 	parseEnumBody (nscope, token);
+
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{}()\n:;,.-+/^<>*!",
@@ -1232,6 +1422,8 @@ MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{}()\n:;,.-+/^<>*!",
 		TOKEN_DIV, TOKEN_POWER, TOKEN_LOWER, TOKEN_GREATER, TOKEN_STAR, TOKEN_BANG)
 static void parseVariable (bool constVar, bool localVar, const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	tokenInfo *member = NULL;
 	bool parsed = false;
 	bool parsingType = false;
@@ -1374,6 +1566,8 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 				&& ! parsingType && nestLevel <= 0));
 
 	clearPoolToken (token);
+
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (FunctionArgsChars, "\n(", TOKEN_NL, TOKEN_OPEN_PAREN)
@@ -1383,6 +1577,8 @@ MULTI_CHAR_PARSER_DEF (FunctionArgsAfterParenChars, "|&=?[]{})\n:,.@",
 		TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_COMMA, TOKEN_PERIOD, TOKEN_AT)
 static void parseFunctionArgs (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed = false;
 	bool parsingType = false;
 	int nestLevel = 0;
@@ -1399,7 +1595,10 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 	} while (parsed && token->type != TOKEN_OPEN_PAREN);
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	do
 	{
@@ -1462,11 +1661,15 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 			}
 		}
 	} while (parsed && token->type != TOKEN_CLOSE_PAREN);
+
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (FunctionBodyChars, "{}", TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY)
 static void parseFunctionBody (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed = false;
 	int nestLevel = 1;
 
@@ -1487,7 +1690,10 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	do
 	{
@@ -1535,10 +1741,14 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 						  && nestLevel <= 0));
 
 	clearPoolToken (token);
+
+	TRACE_LEAVE();
 }
 
 static void parseFunction (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool isGenerator = false;
 	bool parsed;
 
@@ -1556,7 +1766,10 @@ static void parseFunction (const int scope, tokenInfo *const token)
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	token->scope = scope;
 
@@ -1565,6 +1778,8 @@ static void parseFunction (const int scope, tokenInfo *const token)
 
 	parseFunctionArgs (nscope, token);
 	parseFunctionBody (nscope, token);
+
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (PropertyTypeChars, "\n;|&,)",
@@ -1572,12 +1787,17 @@ MULTI_CHAR_PARSER_DEF (PropertyTypeChars, "\n;|&,)",
 		TOKEN_COMMA, TOKEN_CLOSE_PAREN)
 static void parsePropertyType (tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed = tryParser ((Parser) parseColon, token, true);
 	bool parsedIdentifier = false;
 	bool parseReturnValue = false;
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_STAGE(0);
 		return;
+	}
 
 	do
 	{
@@ -1636,12 +1856,17 @@ static void parsePropertyType (tokenInfo *const token)
 					|| isType (token, TOKEN_SQUARES))));
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_STAGE(1);
 		return;
+	}
 
 	if (isType (token, TOKEN_CLOSE_PAREN))
 		uwiUngetC (')');
 
 	clearPoolToken (token);
+
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (ConstructorParamsChars, "\n(", TOKEN_NL, TOKEN_OPEN_PAREN)
@@ -1650,6 +1875,8 @@ MULTI_CHAR_PARSER_DEF (ConstructorParamsAfterParenChars, "\n:,)@",
 static void parseConstructorParams (const int classScope, const int constrScope,
 									tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed = false;
 
 	do
@@ -1663,7 +1890,10 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 	} while (parsed && ! isType (token, TOKEN_OPEN_PAREN));
 
 	if (! parsed)
+	{
+		TRACE_LEAVE();
 		return;
+	}
 
 	tokenInfo *member = NULL;
 	int visibility = 0;
@@ -1729,6 +1959,7 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 		}
 	} while (parsed && ! isType (token, TOKEN_CLOSE_PAREN));
 
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (ClassBodyChars, "\n,{", TOKEN_NL, TOKEN_COMMA, TOKEN_OPEN_CURLY)
@@ -1740,6 +1971,8 @@ MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(?!:;=-+/^<>.,|&",
 		TOKEN_PIPE, TOKEN_AMPERSAND)
 static void parseClassBody (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed = false;
 	vString *inheritance = NULL;
 
@@ -1769,6 +2002,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 	if (! parsed)
 	{
 		vStringDelete (inheritance); /* NULL is acceptable. */
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
 	}
 
@@ -1987,10 +2221,14 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 	}
 	else if (member)
 		deleteToken (member);
+
+	TRACE_LEAVE();
 }
 
 static void parseClass (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed = false;
 
 	do
@@ -2005,12 +2243,17 @@ static void parseClass (const int scope, tokenInfo *const token)
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	token->scope = scope;
 	const int nscope = emitTag (token, TSTAG_CLASS);
 
 	parseClassBody (nscope, token);
+
+	TRACE_LEAVE();
 }
 
 MULTI_CHAR_PARSER_DEF (NamespaceBodyChars, "\n{", TOKEN_NL, TOKEN_OPEN_CURLY)
@@ -2019,6 +2262,8 @@ MULTI_CHAR_PARSER_DEF (NamespaceBodyAfterCurlyChars, "@{}()[]",
 		TOKEN_CLOSE_PAREN, TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE)
 static void parseNamespaceBody (const int scope, tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed = false;
 
 	//parse until {
@@ -2031,7 +2276,10 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	int parenLvl = 0;
 	int squareLvl = 0;
@@ -2116,10 +2364,14 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 	} while (parsed
 			 && ! (isType (token, TOKEN_CLOSE_CURLY)
 				   && parenLvl <= 0 && squareLvl <= 0 && curlyLvl <= 0));
+
+	TRACE_LEAVE();
 }
 
 static void parseNamespace (tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	bool parsed = false;
 
 	do
@@ -2134,16 +2386,23 @@ static void parseNamespace (tokenInfo *const token)
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
+	{
+		TRACE_LEAVE_IN_THE_MIDDLE();
 		return;
+	}
 
 	const int scope = emitTag (token, TSTAG_NAMESPACE);
 
 	parseNamespaceBody (scope, token);
+
+	TRACE_LEAVE();
 }
 
 static void parseTsFile (tokenInfo *const token)
 {
 	bool parsed;
+
+	TRACE_ENTER();
 
 	do
 	{
@@ -2208,10 +2467,14 @@ static void parseTsFile (tokenInfo *const token)
 				break;
 		}
 	} while (parsed);
+
+	TRACE_LEAVE();
 }
 
 static void findTsTags (void)
 {
+	TRACE_ENTER();
+
 	uwiActivate (256);
 
 	tokenInfo *const token = newToken ();
@@ -2221,6 +2484,8 @@ static void findTsTags (void)
 	deleteToken (token);
 
 	uwiDeactivate (&tsUwiStats);
+
+	TRACE_LEAVE();
 }
 
 static void initialize (const langType language)
