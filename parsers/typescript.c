@@ -775,9 +775,9 @@ CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhit
 	c = uwiGetC ();
 	if (skipWhite && whiteChar (c))
 	{
-		do {
+		do
 			c = uwiGetC ();
-		} while (whiteChar (c));
+		while (whiteChar (c));
 	}
 	parser (c, token, &currentState, &result);
 
@@ -1199,9 +1199,7 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 	} while (parsed && ! isType (token, TOKEN_CLOSE_CURLY));
 
 	if (member)
-	{
 		deleteToken (member);
-	}
 }
 
 static void parseEnum (const int scope, tokenInfo *const token)
