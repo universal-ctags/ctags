@@ -40,32 +40,42 @@
 	 (c) >= 0x80)
 
 #define PARSER_DEF(fname, pfun, word, stateField) \
-	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, parserState *state, parserResult * const result) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, \
+									  parserState *state, \
+									  parserResult * const result)	\
 	{ \
 		pfun (c, token, word, &state->stateField, result); \
 	}
 
 #define SINGLE_CHAR_PARSER_DEF(fname, ch, ttype) \
-	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, parserState *state, parserResult * const result) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, \
+									  parserState *state, \
+									  parserResult * const result)	\
 	{ \
 		parseOneChar (c, token, ch, ttype, result); \
 	}
 
 #define MULTI_CHAR_PARSER_DEF(fname, chs, ...) \
-	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, parserState *state, parserResult * const result) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, \
+									  parserState *state, \
+									  parserResult * const result)	\
 	{ \
 		tokenType types[] = { __VA_ARGS__ }; \
 		parseChar (c, token, state, result, chs, types); \
 	}
 
 #define WORD_TOKEN_PARSER_DEF(fname, w, ttype) \
-	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, parserState *state, parserResult * const result) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, \
+									  parserState *state, \
+									  parserResult * const result)	\
 	{ \
 		parseWordToken (c, token, w, ttype, &state->num, result); \
 	}
 
 #define BLOCK_PARSER_DEF(fname, start, end, ttype) \
-	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, parserState *state, parserResult * const result) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, \
+									  parserState *state, \
+									  parserResult * const result)	\
 	{ \
 		parseBlock (c, token, ttype, start, end, &state->block, result); \
 	}
@@ -271,13 +281,18 @@ typedef union uParserState {
 
 static struct sUwiStats tsUwiStats;
 
-typedef void (*Parser)(const int c, tokenInfo *const, parserState *state, parserResult *const);
+typedef void (*Parser)(const int c, tokenInfo *const,
+					   parserState *state, parserResult *const);
 
 static bool tryParser(Parser parser, tokenInfo *const token, bool skipWhite);
-CTAGS_INLINE void parseStringRegex(const int c, tokenInfo * const token, parserState *state, parserResult * const result);
-CTAGS_INLINE void parseStringSQuote(const int c, tokenInfo * const token, parserState *state, parserResult * const result);
-CTAGS_INLINE void parseStringDQuote(const int c, tokenInfo * const token, parserState *state, parserResult * const result);
-CTAGS_INLINE void parseStringTemplate(const int c, tokenInfo * const token, parserState *state, parserResult * const result);
+CTAGS_INLINE void parseStringRegex(const int c, tokenInfo * const token,
+								   parserState *state, parserResult * const result);
+CTAGS_INLINE void parseStringSQuote(const int c, tokenInfo * const token,
+									parserState *state, parserResult * const result);
+CTAGS_INLINE void parseStringDQuote(const int c, tokenInfo * const token,
+									parserState *state, parserResult * const result);
+CTAGS_INLINE void parseStringTemplate(const int c, tokenInfo * const token,
+									  parserState *state, parserResult * const result);
 
 static int emitTag(const tokenInfo *const token, const tsKind kind)
 {
@@ -374,7 +389,9 @@ CTAGS_INLINE bool whiteChar(const int c)
 	return c == ' ' || c == '\r' || c == '\t';
 }
 
-CTAGS_INLINE void parseWhiteChars(const int c, tokenInfo *const token, parserState *state, parserResult * const result)
+CTAGS_INLINE void parseWhiteChars(const int c, tokenInfo *const token,
+								  parserState *state,
+								  parserResult * const result)
 {
 	if (whiteChar (c))
 	{
@@ -393,7 +410,8 @@ CTAGS_INLINE void parseWhiteChars(const int c, tokenInfo *const token, parserSta
 	result->unusedChars = 1;
 }
 
-CTAGS_INLINE void parseOneChar(const int c, tokenInfo *const token, const char expected, const tokenType type, parserResult *const result)
+CTAGS_INLINE void parseOneChar(const int c, tokenInfo *const token, const char expected,
+							   const tokenType type, parserResult *const result)
 {
 	if (c != expected)
 	{
@@ -405,7 +423,9 @@ CTAGS_INLINE void parseOneChar(const int c, tokenInfo *const token, const char e
 	result->status = PARSER_FINISHED;
 }
 
-CTAGS_INLINE void parseChar(const int c, tokenInfo *const token, void *state, parserResult *const result, const char *chars, const tokenType *types)
+CTAGS_INLINE void parseChar(const int c, tokenInfo *const token, void *state,
+							parserResult *const result,
+							const char *chars, const tokenType *types)
 {
 	const char *pos = strchr (chars, c);
 
@@ -419,7 +439,8 @@ CTAGS_INLINE void parseChar(const int c, tokenInfo *const token, void *state, pa
 	result->status = PARSER_FAILED;
 }
 
-CTAGS_INLINE void parseWord(const int c, tokenInfo *const token, const char *word, int *parsed, parserResult *const result)
+CTAGS_INLINE void parseWord(const int c, tokenInfo *const token, const char *word, int *parsed,
+							parserResult *const result)
 {
 	if (word [*parsed] == '\0')
 	{
@@ -449,7 +470,8 @@ CTAGS_INLINE void parseWord(const int c, tokenInfo *const token, const char *wor
 	result->status = PARSER_FAILED;
 }
 
-CTAGS_INLINE void parseNumber(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+CTAGS_INLINE void parseNumber(const int c, tokenInfo *const token, int *parsed,
+							  parserResult *const result)
 {
 	if (*parsed == 0)
 	{
@@ -479,7 +501,9 @@ CTAGS_INLINE void parseNumber(const int c, tokenInfo *const token, int *parsed, 
 	result->status = PARSER_FINISHED;
 }
 
-CTAGS_INLINE void parseWordToken(const int c, tokenInfo *const token, const char *word, const tokenType type, int *parsed, parserResult *const result)
+CTAGS_INLINE void parseWordToken(const int c, tokenInfo *const token, const char *word,
+								 const tokenType type, int *parsed,
+								 parserResult *const result)
 {
 	if (c == word [*parsed])
 	{
@@ -499,15 +523,18 @@ CTAGS_INLINE void parseWordToken(const int c, tokenInfo *const token, const char
 	result->status = PARSER_FAILED;
 }
 
-CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, parserState *state, parserResult *const result)
+CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, parserState *state,
+							   parserResult *const result)
 {
 	if (state->comment.parsed < 2)
 	{
-		parseWordToken (c, token, "//", TOKEN_COMMENT_BLOCK, &state->comment.parsed, result);
+		parseWordToken (c, token, "//", TOKEN_COMMENT_BLOCK, &state->comment.parsed,
+						result);
 
 		if (result->status == PARSER_FAILED)
 		{
-			parseWordToken (c, token, "/*", TOKEN_COMMENT_BLOCK, &state->comment.parsed, result);
+			parseWordToken (c, token, "/*", TOKEN_COMMENT_BLOCK, &state->comment.parsed,
+							result);
 			if (result->status == PARSER_FINISHED)
 			{
 				result->status = PARSER_NEEDS_MORE_INPUT;
@@ -529,7 +556,8 @@ CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, parserState 
 		result->status = PARSER_FINISHED;
 	else if (state->comment.isBlock)
 	{
-		parseWordToken (c, token, "*/", TOKEN_COMMENT_BLOCK, &state->comment.blockParsed, result);
+		parseWordToken (c, token, "*/", TOKEN_COMMENT_BLOCK, &state->comment.blockParsed,
+						result);
 
 		if (result->status == PARSER_FAILED)
 		{
@@ -552,7 +580,8 @@ CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, parserState 
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
-CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char quote, char *prev, parserResult *const result)
+CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char quote, char *prev,
+							  parserResult *const result)
 {
 	if (*prev == '\0')
 	{
@@ -599,7 +628,9 @@ CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char qu
 }
 
 
-CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType const ttype, const char start, const char end, blockState *state, parserResult *const result)
+CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType const ttype,
+							 const char start, const char end, blockState *state,
+							 parserResult *const result)
 {
 	if (state->parsed == 0)
 	{
@@ -647,8 +678,8 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 }
 
 
-CTAGS_INLINE void parseIdentifierCommon(const int c, tokenInfo *const token, int *parsed, parserResult *const result,
-										   bool acceptFqName)
+CTAGS_INLINE void parseIdentifierCommon(const int c, tokenInfo *const token, int *parsed,
+										parserResult *const result, bool acceptFqName)
 {
 	if (isIdentChar (c) || (acceptFqName && c == '.'))
 	{
@@ -670,12 +701,14 @@ CTAGS_INLINE void parseIdentifierCommon(const int c, tokenInfo *const token, int
 	result->status = PARSER_FAILED;
 }
 
-CTAGS_INLINE void parseIdentifier(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+CTAGS_INLINE void parseIdentifier(const int c, tokenInfo *const token, int *parsed,
+								  parserResult *const result)
 {
 	parseIdentifierCommon (c, token, parsed, result, false);
 }
 
-CTAGS_INLINE void parseFQIdentifier(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+CTAGS_INLINE void parseFQIdentifier(const int c, tokenInfo *const token, int *parsed,
+									parserResult *const result)
 {
 	parseIdentifierCommon (c, token, parsed, result, true);
 }
@@ -811,15 +844,18 @@ static void parseDecorator (tokenInfo *const token)
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token, false, parseDecoratorChars, parseComment, NULL);
+		parsed = tryInSequence (token, false, parseDecoratorChars, parseComment,
+								NULL);
 	} while (parsed && token->type != TOKEN_PARENS);
 
 	do
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token, false, parseNewLine, parseComment, parseIdentifier, NULL);
-	} while (parsed && (token->type != TOKEN_IDENTIFIER || tryParser ((Parser) parsePeriod, token, true)));
+		parsed = tryInSequence (token, false, parseNewLine, parseComment, parseIdentifier,
+								NULL);
+	} while (parsed && (token->type != TOKEN_IDENTIFIER
+						|| tryParser ((Parser) parsePeriod, token, true)));
 
 	//parse optional parens block
 	tryParser ((Parser) parseParens, token, true);
@@ -1065,7 +1101,8 @@ static void parseType (const int scope, tokenInfo *const token)
 					break;
 			}
 		}
-	} while (parsed && ! isType (token, TOKEN_COMMA) && ! isType (token, TOKEN_SEMICOLON));
+	} while (parsed && ! isType (token, TOKEN_COMMA)
+			 && ! isType (token, TOKEN_SEMICOLON));
 
 	clearPoolToken(token);
 }
@@ -1204,7 +1241,9 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 	bool mayBeFun = false;
 	bool isFunction = false;
 	int nestLevel = 0, parenLevel = 0;
-	tsKind varKind = constVar ? TSTAG_CONSTANT : (localVar ? TSTAG_LOCAL : TSTAG_VARIABLE);
+	tsKind varKind = constVar ? TSTAG_CONSTANT : (localVar
+												  ? TSTAG_LOCAL
+												  : TSTAG_VARIABLE);
 
 	do
 	{
@@ -1324,7 +1363,8 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 					break;
 			}
 
-			if (isType (token, TOKEN_EQUAL_SIGN) || isKeyword (token, KEYWORD_function))
+			if (isType (token, TOKEN_EQUAL_SIGN)
+				|| isKeyword (token, KEYWORD_function))
 				mayBeFun = true;
 			else if (! isType(token, TOKEN_COMMENT_BLOCK) && nestLevel <= 0)
 				mayBeFun = false;
@@ -1493,7 +1533,8 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 					break;
 			}
 		}
-	} while (parsed && ! (isType (token, TOKEN_CLOSE_CURLY) && nestLevel <= 0));
+	} while (parsed && ! (isType (token, TOKEN_CLOSE_CURLY)
+						  && nestLevel <= 0));
 
 	clearPoolToken (token);
 }
@@ -1521,7 +1562,8 @@ static void parseFunction (const int scope, tokenInfo *const token)
 
 	token->scope = scope;
 
-	const int nscope = emitTag (token, isGenerator ? TSTAG_GENERATOR : TSTAG_FUNCTION);
+	const int nscope = emitTag (token,
+								isGenerator ? TSTAG_GENERATOR : TSTAG_FUNCTION);
 
 	parseFunctionArgs (nscope, token);
 	parseFunctionBody (nscope, token);
@@ -1607,7 +1649,8 @@ static void parsePropertyType (tokenInfo *const token)
 MULTI_CHAR_PARSER_DEF (ConstructorParamsChars, "\n(", TOKEN_NL, TOKEN_OPEN_PAREN)
 MULTI_CHAR_PARSER_DEF (ConstructorParamsAfterParenChars, "\n:,)@",
 		TOKEN_NL, TOKEN_COLON, TOKEN_COMMA, TOKEN_CLOSE_PAREN, TOKEN_AT)
-static void parseConstructorParams (const int classScope, const int constrScope, tokenInfo *const token)
+static void parseConstructorParams (const int classScope, const int constrScope,
+									tokenInfo *const token)
 {
 	bool parsed = false;
 
@@ -1717,7 +1760,8 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 								NULL);
 
 		if (token->type == TOKEN_KEYWORD
-			&& (token->keyword == KEYWORD_extends || token->keyword == KEYWORD_implements)
+			&& (token->keyword == KEYWORD_extends
+				|| token->keyword == KEYWORD_implements)
 			&& inheritance == NULL)
 			inheritance = vStringNew ();
 		else if (inheritance && token->type == TOKEN_IDENTIFIER)
@@ -1896,7 +1940,10 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 						break;
 					}
 
-					const int nscope = emitTag (member, isGenerator ? TSTAG_GENERATOR : TSTAG_METHOD);
+					const int nscope = emitTag (member,
+												isGenerator
+												? TSTAG_GENERATOR
+												: TSTAG_METHOD);
 
 					deleteToken (member);
 					member = NULL;
@@ -2068,7 +2115,9 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 			default:
 				break;
 		}
-	} while (parsed && ! (isType (token, TOKEN_CLOSE_CURLY) && parenLvl <= 0 && squareLvl <= 0 && curlyLvl <= 0));
+	} while (parsed
+			 && ! (isType (token, TOKEN_CLOSE_CURLY)
+				   && parenLvl <= 0 && squareLvl <= 0 && curlyLvl <= 0));
 }
 
 static void parseNamespace (tokenInfo *const token)
@@ -2180,7 +2229,8 @@ static void initialize (const langType language)
 {
 	Lang_ts = language;
 
-	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
+	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken,
+							NULL);
 }
 
 static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
