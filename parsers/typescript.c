@@ -132,7 +132,7 @@ typedef enum eTokenType {
 	TOKEN_KEYWORD,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
-	TOKEN_TEMPLATE,
+	TOKEN_GENERIC,
 	TOKEN_PERIOD,
 	TOKEN_OPEN_CURLY,
 	TOKEN_CLOSE_CURLY,
@@ -757,7 +757,7 @@ PARSER_DEF (StringRegex, parseString, '/', ch)
 
 BLOCK_PARSER_DEF (Parens, '(', ')', TOKEN_PARENS)
 BLOCK_PARSER_DEF (Squares, '[', ']', TOKEN_SQUARES)
-BLOCK_PARSER_DEF (Template, '<', '>', TOKEN_TEMPLATE)
+BLOCK_PARSER_DEF (Generic, '<', '>', TOKEN_GENERIC)
 BLOCK_PARSER_DEF (Curlies, '{', '}', TOKEN_CURLIES)
 
 CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhite)
@@ -873,7 +873,7 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 	{
 		parsed = tryInSequence (token, true,
 								parseComment,
-								parseTemplate,
+								parseGeneric,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
@@ -896,7 +896,7 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token, true,
-								parseTemplate,
+								parseGeneric,
 								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -979,7 +979,7 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 					}
 				case TOKEN_SQUARES:
 				case TOKEN_CURLIES:
-				case TOKEN_TEMPLATE:
+				case TOKEN_GENERIC:
 				case TOKEN_SEMICOLON:
 				case TOKEN_COMMA:
 				case TOKEN_STRING:
@@ -1037,7 +1037,7 @@ static void parseType (const int scope, tokenInfo *const token)
 		clearPoolToken (token);
 		parsed = tryInSequence (token, false,
 								parseComment,
-								parseTemplate,
+								parseGeneric,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
@@ -1067,7 +1067,7 @@ static void parseType (const int scope, tokenInfo *const token)
 					}
 					break;
 				case TOKEN_COLON:
-				case TOKEN_TEMPLATE:
+				case TOKEN_GENERIC:
 				case TOKEN_STRING:
 				case TOKEN_PARENS:
 				case TOKEN_SQUARES:
@@ -1117,7 +1117,7 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 	do
 	{
 		parsed = tryInSequence (token, true,
-								parseTemplate,
+								parseGeneric,
 								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -1138,7 +1138,7 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token, true,
-								parseTemplate,
+								parseGeneric,
 								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -1247,7 +1247,7 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token, false,
-								parseTemplate,
+								parseGeneric,
 								parseComment,
 								parseStringRegex,
 								parseStringSQuote,
@@ -1392,7 +1392,7 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token, false,
-								parseTemplate,
+								parseGeneric,
 								parseComment,
 								parseFunctionArgsChars,
 								NULL);
@@ -1405,7 +1405,7 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token, false,
-								parseTemplate,
+								parseGeneric,
 								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -1481,7 +1481,7 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 								parseStringDQuote,
 								parseStringTemplate,
 								parseStringRegex,
-								parseTemplate,
+								parseGeneric,
 								NULL);
 
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
@@ -1588,7 +1588,7 @@ static void parsePropertyType (tokenInfo *const token)
 			parsed = tryInSequence (token, false,
 									parsePropertyTypeChars,
 									parseArrow,
-									parseTemplate,
+									parseGeneric,
 									parseParens,
 									parseComment,
 									parseStringSQuote,
@@ -1607,7 +1607,7 @@ static void parsePropertyType (tokenInfo *const token)
 			parsed = tryInSequence (token, false,
 									parsePropertyTypeChars,
 									parseArrow,
-									parseTemplate,
+									parseGeneric,
 									parseParens,
 									parseComment,
 									parseStringSQuote,
@@ -1750,7 +1750,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 
 		parsed = tryInSequence (token, false,
 								parseClassBodyChars,
-								parseTemplate,
+								parseGeneric,
 								parseComment,
 								parseExtendsKeyword,
 								parseImplementsKeyword,
@@ -1808,7 +1808,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 								parseReadonlyKeyword,
 								parseStaticKeyword,
 								parseNumber,
-								parseTemplate,
+								parseGeneric,
 								parseTypeofKeyword,
 								parseClassBodyAfterCurlyChars,
 								parseSquares,
@@ -2043,7 +2043,7 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 
 		parsed = tryInSequence (token, true,
 								parseComment,
-								parseTemplate,
+								parseGeneric,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
@@ -2151,7 +2151,7 @@ static void parseTsFile (tokenInfo *const token)
 
 		parsed = tryInSequence (token, true,
 								parseComment,
-								parseTemplate,
+								parseGeneric,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
