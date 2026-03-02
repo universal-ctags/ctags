@@ -334,23 +334,26 @@ getNextChar:
 					d = getcFromInputFile ();
 					if (d == '-')
 					{
-						int e = ' ';
-						int f = ' ';
-						do
+						/* JSX does not support HTML comments, so don't skip
+						 * over them */
+						if (!asJSX)
 						{
-							d = e;
-							e = f;
-							f = getcFromInputFile ();
-						}
-						while (f != EOF && ! (d == '-' && e == '-' && f == '>'));
+							int e = ' ';
+							int f = ' ';
+							do
+							{
+								d = e;
+								e = f;
+								f = getcFromInputFile ();
+							}
+							while (f != EOF && ! (d == '-' && e == '-' && f == '>'));
 
-						if (skipComments)
-							goto getNextChar;
-						else
-						{
-							token->type = TOKEN_COMMENT;
-							break;
+							if (skipComments)
+								goto getNextChar;
 						}
+
+						token->type = TOKEN_COMMENT;
+						break;
 					}
 				}
 				ungetcToInputFile (d);
@@ -843,7 +846,7 @@ extern void htmlParseJSXElement (void)
 		tokenInfo token;
 		token.string = vStringNew ();
 
-		readToken (&token, true, true);
+		readToken (&token, false, true);
 		if (token.type == TOKEN_OPEN_TAG_START)
 			readTag (&token, NULL, 0, true);
 
