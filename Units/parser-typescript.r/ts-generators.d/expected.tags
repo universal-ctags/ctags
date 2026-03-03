@@ -1,0 +1,8 @@
+Rectangle	input.ts	/^class Rectangle {$/;"	c
+height	input.ts	/^  height: number;$/;"	p	class:Rectangle
+width	input.ts	/^  width: number;$/;"	p	class:Rectangle
+constructor	input.ts	/^  constructor(height, width) {$/;"	m	class:Rectangle
+area	input.ts	/^  get area() {$/;"	m	class:Rectangle
+calcArea	input.ts	/^  calcArea() {$/;"	m	class:Rectangle
+getSides	input.ts	/^  *getSides() {$/;"	G	class:Rectangle
+idMaker	input.ts	/^function* idMaker() {$/;"	G
