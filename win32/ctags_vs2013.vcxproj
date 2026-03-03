@@ -484,6 +484,7 @@
     <ClInclude Include="..\parsers\cxx\cxx_tag.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token_chain.h" />
+    <ClInclude Include="..\parsers\d-typescript.h" />
     <ClInclude Include="..\parsers\x-autoconf.h" />
     <ClInclude Include="..\parsers\x-bibtex.h" />
     <ClInclude Include="..\parsers\x-cpreprocessor.h" />
