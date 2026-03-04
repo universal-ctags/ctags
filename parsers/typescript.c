@@ -2146,7 +2146,12 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 					parsingValue = false;
 					break;
 				case TOKEN_STAR:
-					isGenerator = true;
+					if (!parsingValue)
+					{
+						isGenerator = true;
+						break;
+					}
+					/* FALLTHROUGH */
 				case TOKEN_MINUS:
 				case TOKEN_PLUS:
 				case TOKEN_DIV:
@@ -2189,7 +2194,9 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 					parsingValue = false;
 					break;
 				case TOKEN_IDENTIFIER:
-					if (!parsingValue) {
+					if (parsingValue)
+						isGenerator = false;
+					else {
 						if (member)
 							deleteToken (member);
 						member = newToken ();
@@ -2203,7 +2210,6 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 					}
 
 					parsingValue = false;
-					isGenerator = false;
 					break;
 				default:
 					isGenerator = false;
