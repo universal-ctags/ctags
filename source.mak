@@ -307,6 +307,7 @@ PARSER_X_HEADS = \
 
 PARSER_D_HEADS = \
 	parsers/d-typescript.h \
+	parsers/d-rust.h \
 	\
 	$(NULL)
 
