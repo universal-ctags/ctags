@@ -93,7 +93,8 @@ typedef struct {
 *   FUNCTION PROTOTYPES
 */
 
-static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope);
+static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope,
+						bool as_token_tree);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -616,7 +617,7 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 		vStringStripTrailing(arg_list);
 		addTag(name, vStringValue(arg_list), kind, line, pos, scope, parent_kind);
 		addToScope(scope, name);
-		parseBlock(lexer, true, kind, scope);
+		parseBlock(lexer, true, kind, scope, false);
 	}
 
 	vStringDelete(name);
@@ -644,7 +645,7 @@ static void parseMod (lexerState *lexer, vString *scope, int parent_kind)
 
 	advanceToken(lexer, true);
 
-	parseBlock(lexer, true, K_MOD, scope);
+	parseBlock(lexer, true, K_MOD, scope, false);
 
 	TRACE_LEAVE();
 }
@@ -667,7 +668,7 @@ static void parseTrait (lexerState *lexer, vString *scope, int parent_kind)
 
 	skipUntil(lexer, goal_tokens, 1);
 
-	parseBlock(lexer, true, K_TRAIT, scope);
+	parseBlock(lexer, true, K_TRAIT, scope, false);
 }
 
 /* Skips type blocks of the form <T:T<T>, ...> */
@@ -732,7 +733,7 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 	addTag(name, NULL, K_IMPL, line, pos, scope, parent_kind);
 	addToScope(scope, name);
 
-	parseBlock(lexer, true, K_IMPL, scope);
+	parseBlock(lexer, true, K_IMPL, scope, false);
 
 	vStringDelete(name);
 }
@@ -985,14 +986,25 @@ static void parseMacroRules (lexerState *lexer, vString *scope, int parent_kind)
 /*
  * Rust is very liberal with nesting, so this function is used pretty much for any block
  */
-static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
+static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope,
+						bool as_token_tree)
 {
 	TRACE_ENTER();
 
 	int level = 1;
 	if (delim)
 	{
-		if (lexer->cur_token != '{')
+		if (as_token_tree)
+		{
+			if (lexer->cur_token != '{'
+				&& lexer->cur_token != '('
+				&& lexer->cur_token != '[')
+			{
+				TRACE_LEAVE_TEXT("no opening characters '{[('");
+				return;
+			}
+		}
+		else if (lexer->cur_token != '{')
 		{
 			TRACE_LEAVE_TEXT("no opening curly bracket '{'");
 			return;
@@ -1049,17 +1061,24 @@ static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 				advanceToken(lexer, true);
 				if (lexer->cur_token == '!')
 				{
-					skipMacro(lexer);
+					advanceToken(lexer, true);
+					parseBlock(lexer, true, kind, scope, true);
 				}
 			}
 			resetScope(scope, old_scope_len);
 		}
-		else if (lexer->cur_token == '{')
+		else if (lexer->cur_token == '{'
+				 || (as_token_tree
+					 && (lexer->cur_token == '('
+						 || lexer->cur_token == '[')))
 		{
 			level++;
 			advanceToken(lexer, true);
 		}
-		else if (lexer->cur_token == '}')
+		else if (lexer->cur_token == '}'
+				 || (as_token_tree
+					 && (lexer->cur_token == ')'
+						 || lexer->cur_token == ']')))
 		{
 			level--;
 			advanceToken(lexer, true);
@@ -1090,7 +1109,7 @@ static void findRustTags (void)
 	vString* scope = vStringNew();
 	initLexer(&lexer);
 
-	parseBlock(&lexer, false, K_NONE, scope);
+	parseBlock(&lexer, false, K_NONE, scope, false);
 	vStringDelete(scope);
 
 	deInitLexer(&lexer);
