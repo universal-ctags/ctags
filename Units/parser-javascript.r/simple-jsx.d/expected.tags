@@ -1,13 +1,13 @@
-foo	input.jsx	/^function foo() {$/;"	f	language:JavaScript	roles:def
-Comp1	input-0.jsx	/^const Comp1 = () => {$/;"	f	language:JavaScript	roles:def
-x	input-0.jsx	/^    const x = (arg) => console.log(arg)$/;"	f	language:JavaScript	function:Comp1	roles:def
-Comp2	input-0.jsx	/^const Comp2 = (props) => {$/;"	f	language:JavaScript	roles:def
-Comp3	input-0.jsx	/^const Comp3 = (str) => {$/;"	f	language:JavaScript	roles:def
+foo	input.jsx	/^function foo() {$/;"	f	language:JSX	roles:def
+Comp1	input-0.jsx	/^const Comp1 = () => {$/;"	f	language:JSX	roles:def
+x	input-0.jsx	/^    const x = (arg) => console.log(arg)$/;"	f	language:JSX	function:Comp1	roles:def
+Comp2	input-0.jsx	/^const Comp2 = (props) => {$/;"	f	language:JSX	roles:def
+Comp3	input-0.jsx	/^const Comp3 = (str) => {$/;"	f	language:JSX	roles:def
 hello	input-0.jsx	/^	       <h1>hello<\/h1>$/;"	h	language:HTML	roles:def
 bye	input-0.jsx	/^	       <h1>bye<\/h1>$/;"	h	language:HTML	roles:def
-Comp4	input-0.jsx	/^const Comp4 = (str) => {$/;"	f	language:JavaScript	roles:def
+Comp4	input-0.jsx	/^const Comp4 = (str) => {$/;"	f	language:JSX	roles:def
 bonjour	input-0.jsx	/^	       <h1>bonjour<\/h1>$/;"	h	language:HTML	roles:def
 frag ment	input-0.jsx	/^	       {<h2>frag{subtitle}ment<\/h2>}$/;"	i	language:HTML	roles:def
 au revoir	input-0.jsx	/^	       <h1>au revoir<\/h1>$/;"	h	language:HTML	roles:def
-Comp5	input-0.jsx	/^const Comp5 = (str) => {$/;"	f	language:JavaScript	roles:def
-z0	input-0.jsx	/^var z0$/;"	v	language:JavaScript	roles:def
+Comp5	input-0.jsx	/^const Comp5 = (str) => {$/;"	f	language:JSX	roles:def
+z0	input-0.jsx	/^var z0$/;"	v	language:JSX	roles:def
