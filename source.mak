@@ -316,6 +316,8 @@ PARSER_HEADS = \
 	parsers/x-toml.h \
 	parsers/x-tex.h \
 	\
+	parsers/d-typescript.h \
+	\
 	$(NULL)
 
 PARSER_SRCS =				\
