@@ -506,6 +506,7 @@ fi
 
 AC_CHECK_HEADERS([direct.h dirent.h fcntl.h io.h stat.h types.h unistd.h])
 AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/types.h sys/wait.h])
+AC_CHECK_HEADERS([sys/resource.h])
 
 # Checks for header file macros
 # -----------------------------

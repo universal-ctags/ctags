@@ -19,6 +19,7 @@
 
 #include "entry_p.h"
 #include "options_p.h"
+#include "stackguard_p.h"
 #include "stats_p.h"
 
 /*
@@ -82,4 +83,10 @@ extern void printTotals (const clock_t *const timeStamps, bool append, sortType 
 	fprintf (stderr, "longest tag line = %lu\n",
 		 (unsigned long) maxTagsLine ());
 #endif
+
+	const char *peakInput = NULL;
+	size_t stack_usage = stackGuardObservedPeak (&peakInput);
+	fprintf (stderr, "Observed peak stack usage: %zu bytes (%.1f KiB) in %s\n",
+			 stack_usage, stack_usage / 1024.0,
+			 peakInput ? peakInput : "UNKNOWN");
 }
