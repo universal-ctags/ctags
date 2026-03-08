@@ -305,6 +305,11 @@ PARSER_X_HEADS = \
 	\
 	$(NULL)
 
+PARSER_D_HEADS = \
+	parsers/d-typescript.h \
+	\
+	$(NULL)
+
 PARSER_HEADS = \
 	parsers/cxx/cxx_debug.h \
 	parsers/cxx/cxx_keyword.h \
@@ -319,8 +324,7 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token_chain.h \
 	\
 	$(PARSER_X_HEADS) \
-	\
-	parsers/d-typescript.h \
+	$(PARSER_D_HEADS) \
 	\
 	$(NULL)
 
