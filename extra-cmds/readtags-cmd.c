@@ -602,7 +602,8 @@ static void printFormatterExpression (FILE *stream, int exitCode)
 static void *compileExpression(const char* exp, void * (*compiler) (EsObject *),
 							   const char *compiler_name)
 {
-	EsObject *sexp = es_read_from_string (exp, NULL);
+	const char *rest = NULL;
+	EsObject *sexp = es_read_from_string (exp, &rest);
 	void *code;
 
 	if (es_error_p (sexp))
@@ -612,6 +613,19 @@ static void *compileExpression(const char* exp, void * (*compiler) (EsObject *),
 		fprintf (stderr,
 				 "Reason: %s\n", es_error_name (sexp));
 		exit (1);
+	}
+
+	if (rest && *rest != '\0')
+	{
+		EsObject *tmp = es_read_from_string (rest, NULL);
+		if (!es_object_equal (tmp, ES_READER_EOF))
+		{
+			fprintf (stderr,
+					 "Garbage at the end of the %s expression: %s\n",
+					 compiler_name, rest);
+			exit (1);
+		}
+		es_object_unref (tmp);
 	}
 
 	code = compiler (sexp);
