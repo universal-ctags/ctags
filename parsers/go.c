@@ -832,7 +832,29 @@ static tokenInfo * parseReceiver (tokenInfo *const token, int *corkIndex)
 	return receiver_type_token;
 }
 
-static intArray * parseTypeParameters (tokenInfo *const token, collector *collector)
+static void attachConstraint (intArray *tparams_indexes, collector *constraint)
+{
+	collectorTruncate (constraint, false);
+	if (collectorIsEmpty (constraint))
+		return;
+
+	const char *constraint_cstr = vStringValue (constraint->str);
+	for (unsigned int i = intArrayCount (tparams_indexes); i > 0; i--)
+	{
+		int index = intArrayItem (tparams_indexes, i - 1);
+		tagEntryInfo *e = getEntryInCorkQueue (index);
+		if (!e)
+			continue;			/* Maybe "_" */
+
+		if (e->extensionFields.typeRef [0])
+			return;
+
+		e->extensionFields.typeRef [0] = eStrdup ("constraint");
+		e->extensionFields.typeRef [1] = eStrdup (constraint_cstr);
+	}
+}
+
+static intArray * parseTypeParameters (tokenInfo *const token, collector *tparams)
 {
 	// TypeParameters = "[" TypeParamList [ "," ] "]" .
 	// TypeParamList  = TypeParamDecl { "," TypeParamDecl } .
@@ -842,40 +864,63 @@ static intArray * parseTypeParameters (tokenInfo *const token, collector *collec
 
 	int nest_level = 1;
 	bool expecting_param = true;
-	intArray *tparams = intArrayNew ();
+	intArray *tparams_indexes = intArrayNew ();
+	bool expecting_constraint = false;
+
+	vString *buffer = vStringNew ();
+	collector constraint = COLLECTOR (buffer);
 
 	while (nest_level > 0 && !isType (token, TOKEN_EOF))
 	{
-		readTokenFull (token, collector);
+		readTokenFull (token, tparams);
 		if (isType (token, TOKEN_OPEN_PAREN)
 			|| isType (token, TOKEN_OPEN_CURLY)
 			|| isType (token, TOKEN_OPEN_SQUARE))
+		{
 			nest_level++;
+			collectorAppendToken (&constraint, token);
+		}
 		else if (isType (token, TOKEN_CLOSE_PAREN)
 				 || isType (token, TOKEN_CLOSE_CURLY)
 				 || isType (token, TOKEN_CLOSE_SQUARE))
+		{
 			nest_level--;
+			if (nest_level == 0)
+			{
+				attachConstraint (tparams_indexes, &constraint);
+				collectorReset (&constraint);
+				continue;
+			}
+			collectorAppendToken (&constraint, token);
+		}
 		else if (nest_level == 1
 				 && isType (token, TOKEN_IDENTIFIER)
 				 && expecting_param)
 		{
+			attachConstraint (tparams_indexes, &constraint);
+			collectorReset (&constraint);
+
 			expecting_param = false;
+			expecting_constraint = true;
 			int index = makeTag (token, GOTAG_TPARAM, CORK_NIL, NULL, NULL);
-			intArrayAdd (tparams, index);
+			intArrayAdd (tparams_indexes, index);
 		}
 		else if (nest_level == 1
 				 && isType (token, TOKEN_COMMA))
 		{
-			/* TODO: put the tokens to typeref:constrain:... of the
-			 * tparam tag */
 			expecting_param = true;
+			expecting_constraint = false;
 		}
+		else if (expecting_constraint)
+			collectorAppendToken (&constraint, token);
 	}
+
+	vStringDelete (buffer);
 
 	/* Read the next token as the other parser* functions do.
 	 * However, don't put the token to the collector. */
 	readToken (token);
-	return tparams;
+	return tparams_indexes;
 }
 
 static void fillScopeAndNthFields (int scope, intArray *corks)
