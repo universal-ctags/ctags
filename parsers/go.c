@@ -3,7 +3,7 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Reference:
-*     https://golang.org/ref/spec
+*     https://go.dev/ref/spec
 */
 
 
