@@ -1,0 +1,15 @@
+x	input.go	/^package x$/;"	p
+T	input.go	/^func min[T ~int|~float64](x, y T) T {$/;"	Z	func:x.min	nth:0
+min	input.go	/^func min[T ~int|~float64](x, y T) T {$/;"	f	package:x	typeref:typename:T	signature:(x, y T)	tparams:[T ~int|~float64]
+S1	input.go	/^func EqualFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, eq func(E1, E2) bool) bool {$/;"	Z	func:x.EqualFunc	nth:0
+S2	input.go	/^func EqualFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, eq func(E1, E2) bool) bool {$/;"	Z	func:x.EqualFunc	nth:1
+E1	input.go	/^func EqualFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, eq func(E1, E2) bool) bool {$/;"	Z	func:x.EqualFunc	nth:2
+E2	input.go	/^func EqualFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, eq func(E1, E2) bool) bool {$/;"	Z	func:x.EqualFunc	nth:3
+EqualFunc	input.go	/^func EqualFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, eq func(E1, E2) bool) bool {$/;"	f	package:x	typeref:typename:bool	signature:(s1 S1, s2 S2, eq func(E1, E2) bool)	tparams:[S1 ~[]E1, S2 ~[]E2, E1, E2 any]
+L	input.go	/^func F0[L ~[]M, M comparable, _, G any](s L, v M) int {$/;"	Z	func:x.F0	nth:0
+M	input.go	/^func F0[L ~[]M, M comparable, _, G any](s L, v M) int {$/;"	Z	func:x.F0	nth:1
+G	input.go	/^func F0[L ~[]M, M comparable, _, G any](s L, v M) int {$/;"	Z	func:x.F0	nth:3
+F0	input.go	/^func F0[L ~[]M, M comparable, _, G any](s L, v M) int {$/;"	f	package:x	typeref:typename:int	signature:(s L, v M)	tparams:[L ~[]M, M comparable, _, G any]
+N	input.go	/^func F1[N ~[]O, O comparable, _ any](s N, v O) int {$/;"	Z	func:x.F1	nth:0
+O	input.go	/^func F1[N ~[]O, O comparable, _ any](s N, v O) int {$/;"	Z	func:x.F1	nth:1
+F1	input.go	/^func F1[N ~[]O, O comparable, _ any](s N, v O) int {$/;"	f	package:x	typeref:typename:int	signature:(s N, v O)	tparams:[N ~[]O, O comparable, _ any]

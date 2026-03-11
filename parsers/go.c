@@ -116,6 +116,7 @@ typedef enum {
 	GOTAG_PACKAGE_NAME,
 	GOTAG_TALIAS,
 	GOTAG_RECEIVER,
+	GOTAG_TPARAM,
 } goKind;
 
 typedef enum {
@@ -151,6 +152,7 @@ static kindDefinition GoKinds[] = {
 	{true, 'P', "packageName", "name for specifying imported package"},
 	{true, 'a', "talias", "type aliases"},
 	{false,'R', "receiver", "receivers"},
+	{false,'Z', "tparam", "type parameters", .version = 1, },
 };
 
 static const keywordTable GoKeywordTable[] = {
@@ -171,6 +173,7 @@ typedef enum {
 	F_PACKAGE_NAME,
 	F_HOW_IMPORTED,
 	F_RECEIVER,
+	F_TPARAMS,
 } goField;
 
 static fieldDefinition GoFields [] = {
@@ -194,7 +197,13 @@ static fieldDefinition GoFields [] = {
 		.description = "the name of the receiver",
 		.enabled = false,
 		.version = 1,
-	}
+	},
+	{
+		.name = "tparams",
+		.description = "the type parameters",
+		.enabled = false,
+		.version = 1,
+	},
 };
 
 
@@ -734,7 +743,8 @@ static int makeTagFull (tokenInfo *const token, const goKind kind,
 	tagEntryInfo e;
 
 	/* Don't record `_' placeholder variable  */
-	if (kind == GOTAG_VAR && name[0] == '_' && name[1] == '\0')
+	if ((kind == GOTAG_VAR || kind == GOTAG_TPARAM)
+		&& name[0] == '_' && name[1] == '\0')
 		return CORK_NIL;
 
 	initRefTagEntry (&e, name, kind, role);
@@ -822,12 +832,72 @@ static tokenInfo * parseReceiver (tokenInfo *const token, int *corkIndex)
 	return receiver_type_token;
 }
 
+static intArray * parseTypeParameters (tokenInfo *const token, collector *collector)
+{
+	// TypeParameters = "[" TypeParamList [ "," ] "]" .
+	// TypeParamList  = TypeParamDecl { "," TypeParamDecl } .
+	// TypeParamDecl  = IdentifierList TypeConstraint .
+
+	/* Now the token points the "[". */
+
+	int nest_level = 1;
+	bool expecting_param = true;
+	intArray *tparams = intArrayNew ();
+
+	while (nest_level > 0 && !isType (token, TOKEN_EOF))
+	{
+		readTokenFull (token, collector);
+		if (isType (token, TOKEN_OPEN_PAREN)
+			|| isType (token, TOKEN_OPEN_CURLY)
+			|| isType (token, TOKEN_OPEN_SQUARE))
+			nest_level++;
+		else if (isType (token, TOKEN_CLOSE_PAREN)
+				 || isType (token, TOKEN_CLOSE_CURLY)
+				 || isType (token, TOKEN_CLOSE_SQUARE))
+			nest_level--;
+		else if (nest_level == 1
+				 && isType (token, TOKEN_IDENTIFIER)
+				 && expecting_param)
+		{
+			expecting_param = false;
+			int index = makeTag (token, GOTAG_TPARAM, CORK_NIL, NULL, NULL);
+			intArrayAdd (tparams, index);
+		}
+		else if (nest_level == 1
+				 && isType (token, TOKEN_COMMA))
+		{
+			/* TODO: put the tokens to typeref:constrain:... of the
+			 * tparam tag */
+			expecting_param = true;
+		}
+	}
+
+	/* Read the next token as the other parser* functions do.
+	 * However, don't put the token to the collector. */
+	readToken (token);
+	return tparams;
+}
+
+static void fillScopeAndNthFields (int scope, intArray *corks)
+{
+	for (unsigned int i = 0; i < intArrayCount (corks); i++)
+	{
+		int cork = intArrayItem (corks, i);
+		tagEntryInfo *e = getEntryInCorkQueue (cork);
+		if (!e)
+			continue;
+
+		e->extensionFields.scopeIndex = scope;
+		e->extensionFields.nth = i;
+	}
+}
+
 static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 {
 	int receiver_cork = CORK_NIL;
 	tokenInfo *receiver_type_token = NULL;
 
-	// FunctionDecl = "func" identifier Signature [ Body ] .
+	// FunctionDecl = "func" identifier [ TypeParameters ] Signature [ Body ] .
 	// Body         = Block.
 	//
 	// MethodDecl   = "func" Receiver MethodName Signature [ Body ] .
@@ -851,9 +921,21 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		// Start recording signature
 		vString *buffer = vStringNew ();
 		collector collector = COLLECTOR (buffer);
+		char *tparams = NULL;
+		intArray *tparams_indexes = NULL;
 
-		// Skip over parameters.
 		readTokenFull (token, &collector);
+		if (isType (token, TOKEN_OPEN_SQUARE))
+		{
+			// Skip over type parameters.
+			tparams_indexes = parseTypeParameters (token, &collector);
+			collectorTruncate (&collector, false);
+			tparams = vStringStrdup (buffer);
+
+			collectorReset (&collector);
+			collectorAppendToken (&collector, token);
+		}
+		// Skip over parameters.
 		skipToMatchedNoRead (token, &collector);
 
 		collectorTruncate (&collector, false);
@@ -878,6 +960,18 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 				receiver->extensionFields.scopeIndex = cork;
 				attachParserField (e, GoFields [F_RECEIVER].ftype, receiver->name);
 			}
+
+			if (tparams)
+				attachParserField (e, GoFields [F_TPARAMS].ftype, tparams);
+			if (tparams_indexes)
+				fillScopeAndNthFields (cork, tparams_indexes);
+		}
+		intArrayDelete (tparams_indexes); /* NULL is acceptable. */
+		tparams_indexes = NULL;
+		if (tparams)
+		{
+			eFree (tparams);
+			tparams = NULL;
 		}
 
 		deleteToken (functionToken);

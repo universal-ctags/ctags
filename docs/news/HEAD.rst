@@ -79,6 +79,9 @@ QemuHX:
 Go:
 
     * Add ``receiver`` field to ``func`` kind tags.
+    * Start supporting generics:
+      + Add ``tparam`` kind to extract type parameters, and
+      + Add ``tparams`` field to ``func`` kind tags.
 
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
