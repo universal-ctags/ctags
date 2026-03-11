@@ -389,6 +389,15 @@ static void collectorTruncate (collector *collector, bool dropLast)
 	vStringStripTrailing (collector->str);
 }
 
+static void collectorReset (collector *collector)
+{
+	if (collector->str)
+		vStringClear (collector->str);
+	collector->last_len = 0;
+}
+
+#define COLLECTOR(VSTR) { .str = VSTR, .last_len = 0, }
+
 static void readTokenFull (tokenInfo *const token, collector *collector)
 {
 	int c;
@@ -841,7 +850,7 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 		// Start recording signature
 		vString *buffer = vStringNew ();
-		collector collector = { .str = buffer, .last_len = 0, };
+		collector collector = COLLECTOR (buffer);
 
 		// Skip over parameters.
 		readTokenFull (token, &collector);
@@ -873,8 +882,7 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 		deleteToken (functionToken);
 
-		vStringClear (collector.str);
-		collector.last_len = 0;
+		collectorReset (&collector);
 
 		readTokenFull (token, &collector);
 
@@ -935,7 +943,7 @@ static void parseInterfaceMethods (tokenInfo *const token, const int scope)
 	// InterfaceTypeName  = TypeName .
 
 	vString *inheritsBuf = vStringNew ();
-	collector inherits = { .str = inheritsBuf, .last_len = 0, };
+	collector inherits = COLLECTOR (inheritsBuf);
 
 	readToken (token);
 	if (!isType (token, TOKEN_OPEN_CURLY))
@@ -977,9 +985,9 @@ static void parseInterfaceMethods (tokenInfo *const token, const int scope)
 				// => Signature
 				// Signature      = Parameters [ Result ] .
 				vString *pbuf = vStringNew ();
-				collector pcol = { .str = pbuf, .last_len = 0, };
+				collector pcol = COLLECTOR (pbuf);
 				vString *rbuf = NULL;
-				collector rcol = { .str = NULL, .last_len = 0, };
+				collector rcol = COLLECTOR (NULL);
 
 				// Parameters
 				collectorPut (&pcol, '(');
@@ -1130,7 +1138,7 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 		else
 		{
 			vString *typeForMember = vStringNew ();
-			collector collector = { .str = typeForMember, .last_len = 0, };
+			collector collector = COLLECTOR (typeForMember);
 
 			collectorAppendToken (&collector, token);
 			skipType (token, &collector);
@@ -1247,7 +1255,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 			{
 				/* Filling "typeref:" field of typeToken. */
 				vString *buffer = vStringNew ();
-				collector collector = { .str = buffer, .last_len = 0, };
+				collector collector = COLLECTOR(buffer);
 
 				collectorAppendToken (&collector, token);
 				skipType (token, &collector);
@@ -1270,7 +1278,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 		else if (corks)
 		{
 			vString *buffer = vStringNew ();
-			collector collector = { .str = buffer, .last_len = 0, };
+			collector collector = COLLECTOR (buffer);
 
 			collectorAppendToken (&collector, token);
 			skipType (token, &collector);
