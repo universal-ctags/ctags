@@ -95,6 +95,17 @@ Changes about parser specific kinds, roles, fields, and extras
 Readtags
 ---------------------------------------------------------------------
 
+* Add ``list`` operator to the filter and sorter engines.
+  The operator was available only in the formatter expression.
+
+  You can use ``member`` and ``list`` together.
+
+  e.g. With the following command line, you can list only tag entries
+  having ``z`` or ``p`` as their kind.
+
+  .. code-block:: console
+
+	 $ readtags -et tags -Q '(member $kind (list "z" "p" ))' -l
 
 Merged pull requests
 ---------------------------------------------------------------------
