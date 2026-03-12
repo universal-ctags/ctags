@@ -13,3 +13,14 @@ F0	input.go	/^func F0[L ~[]M, M comparable, _, G any](s L, v M) int {$/;"	f	pack
 N	input.go	/^func F1[N ~[]O, O comparable, _ any](s N, v O) int {$/;"	Z	func:x.F1	typeref:constraint:~[]O	nth:0
 O	input.go	/^func F1[N ~[]O, O comparable, _ any](s N, v O) int {$/;"	Z	func:x.F1	typeref:constraint:comparable	nth:1
 F1	input.go	/^func F1[N ~[]O, O comparable, _ any](s N, v O) int {$/;"	f	package:x	typeref:typename:int	signature:(s N, v O)	tparams:[N ~[]O, O comparable, _ any]
+T	input.go	/^type List[T any] struct {$/;"	Z	struct:x.List	typeref:constraint:any	nth:0
+List	input.go	/^type List[T any] struct {$/;"	s	package:x	tparams:[T any]
+next	input.go	/^	next  *List[T]$/;"	m	struct:x.List	typeref:typename:*List
+value	input.go	/^	value T$/;"	m	struct:x.List	typeref:typename:T
+X	input.go	/^type List2[X any] = []X$/;"	Z	talias:x.List2	typeref:constraint:any	nth:0
+List2	input.go	/^type List2[X any] = []X$/;"	a	package:x	typeref:typename:[]X	tparams:[X any]
+K	input.go	/^type Assoc[K comparable, V any] = map[K]V$/;"	Z	talias:x.Assoc	typeref:constraint:comparable	nth:0
+V	input.go	/^type Assoc[K comparable, V any] = map[K]V$/;"	Z	talias:x.Assoc	typeref:constraint:any	nth:1
+Assoc	input.go	/^type Assoc[K comparable, V any] = map[K]V$/;"	a	package:x	typeref:typename:map[K]V	tparams:[K comparable, V any]
+UUIDBuflen	input.go	/^	UUIDBuflen = 256$/;"	c	package:x
+UUID	input.go	/^type UUID [UUIDBuflen]byte$/;"	t	package:x	typeref:typename:[UUIDBuflen]byte

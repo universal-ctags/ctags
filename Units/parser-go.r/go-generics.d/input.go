@@ -30,3 +30,19 @@ func F0[L ~[]M, M comparable, _, G any](s L, v M) int {
 func F1[N ~[]O, O comparable, _ any](s N, v O) int {
     return -1
 }
+
+// Taken from https://go.dev/ref/spec#Type_definitions
+type List[T any] struct {
+	next  *List[T]
+	value T
+}
+
+// Aliases
+type List2[X any] = []X
+type Assoc[K comparable, V any] = map[K]V
+
+// Taken from podman/vendor/github.com/digitalocean/go-libvirt/remote_protocol.gen.go
+const (
+	UUIDBuflen = 256
+)
+type UUID [UUIDBuflen]byte
