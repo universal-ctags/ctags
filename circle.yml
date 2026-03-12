@@ -22,7 +22,7 @@ jobs:
            name: Install tools for building ctags and validating test input files
            command: |
              dnf -y install awk gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel pcre2-devel findutils diffutils sudo
-             dnf -y install jq puppet python3-sphinx
+             dnf -y install python3-sphinx
              # These are for input-validation.
              dnf -y install g++ jq puppet nodejs gcc-gfortran gcc-gnat typescript swi-prolog
              # nodejs requires libsqlite.so.0 with sqlite-session feature
