@@ -32,4 +32,8 @@ case "$action" in
 	gfortran -fsyntax-only "$@" "$input" > /dev/null
 	exit $?
 	;;
+	*)
+	echo "$0: unknown action: $action" >&2
+	exit 1
+	;;
 esac

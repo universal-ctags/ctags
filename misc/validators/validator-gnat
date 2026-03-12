@@ -30,4 +30,8 @@ case "$action" in
 	gnat compile -gnats "$input" >& /dev/null
 	exit $?
 	;;
+    *)
+	echo "$0: unknown action: $action" >&2
+	exit 1
+	;;
 esac

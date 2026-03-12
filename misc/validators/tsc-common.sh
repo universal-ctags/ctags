@@ -33,4 +33,8 @@ case "$action" in
 	tsc --noEmit "$input" --target $TARGET > /dev/null
 	exit $?
 	;;
+	*)
+	echo "$0: unknown action: $action" >&2
+	exit 1
+	;;
 esac

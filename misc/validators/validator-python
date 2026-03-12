@@ -36,4 +36,8 @@ case "$action" in
 	rmdir $d/__pycache__
 	exit $s
 	;;
+    *)
+	echo "$0: unknown action: $action" >&2
+	exit 1
+	;;
 esac
