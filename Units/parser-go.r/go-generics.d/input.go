@@ -31,6 +31,17 @@ func F1[N ~[]O, O comparable, _ any](s N, v O) int {
     return -1
 }
 
+// podman/vendor/github.com/containers/image/v5/internal/set/set.go
+type Set[E comparable] struct {
+	m map[E]struct{}
+}
+
+func New[E comparable]() *Set[E] {
+	return &Set[E]{
+		m: map[E]struct{}{},
+	}
+}
+
 // Taken from https://go.dev/ref/spec#Type_definitions
 type List[T any] struct {
 	next  *List[T]

@@ -655,7 +655,7 @@ static void skipToMatched (tokenInfo *const token, collector *collector)
 
 static bool skipType (tokenInfo *const token, collector *collector)
 {
-	// Type      = TypeName | TypeLit | "(" Type ")" .
+	// Type      = TypeName [ TypeArgs ] | TypeLit | "(" Type ")" .
 	// Skips also function multiple return values "(" Type {"," Type} ")"
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
@@ -675,6 +675,8 @@ static bool skipType (tokenInfo *const token, collector *collector)
 			if (isType (token, TOKEN_IDENTIFIER))
 				readTokenFull (token, collector);
 		}
+		else if (isType (token, TOKEN_OPEN_SQUARE))
+			skipToMatched (token, collector);
 		return true;
 	}
 
