@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-c --- validating C input files
 #
 #  Copyright (c) 2022, Masatake YAMATO

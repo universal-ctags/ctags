@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-puppet - validating puppetManifest input files
 #
 #  Copyright (c) 2018, Hakan Baba

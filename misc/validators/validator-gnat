@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-gnat --- validating Ada input files
 #
 #  Copyright (c) 2025, Masatake YAMATO

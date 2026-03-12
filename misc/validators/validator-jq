@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-jq - validating json input files
 #
 #  Copyright (c) 2018, Red Hat, Inc.

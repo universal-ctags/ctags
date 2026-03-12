@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-python --- validating Python input files
 #
 #  Copyright (c) 2025, Masatake YAMATO

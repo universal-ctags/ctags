@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # gfortran-common.sh - common code used in validator-fortran*
 #
 #  Copyright (c) 2024, Masatake YAMATO

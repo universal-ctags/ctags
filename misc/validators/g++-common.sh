@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # g++-common.sh - common code used in validator-cxx*
 #
 #  Copyright (c) 2022, Masatake YAMATO

@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-svlint - validating Verilog/SystemVerilog input files with svlint
 #   https://github.com/dalance/svlint
 #

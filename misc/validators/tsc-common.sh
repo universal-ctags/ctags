@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # tsc-common.sh - common code used in validator-tsc*
 #
 #  Copyright (c) 2026, Masatake YAMATO

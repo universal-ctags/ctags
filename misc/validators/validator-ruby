@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-ruby - validating Ruby input files with ruby
 #
 #  Copyright (c) 2022 Masatake YAMATO
