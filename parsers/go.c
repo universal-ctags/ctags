@@ -293,6 +293,19 @@ static bool collectorIsEmpty(const collector *collector)
 	return !vStringLength(collector->str);
 }
 
+static bool collectorCanAppend (const collector *collector,
+								size_t n_to_append)
+{
+	size_t current_len = vStringLength (collector->str);
+	if (current_len >= MAX_COLLECTOR_LENGTH)
+		return false;
+	if (n_to_append == 0)
+		return true;
+	if (n_to_append > MAX_COLLECTOR_LENGTH)
+		return false;
+	return n_to_append <= MAX_COLLECTOR_LENGTH - current_len;
+}
+
 static void collectorPut (collector *collector, char c)
 {
 	if ((vStringLength(collector->str) > 2)
@@ -309,18 +322,31 @@ static void collectorPut (collector *collector, char c)
 			vStringChop(collector->str);
 	}
 
+	if (!collectorCanAppend (collector, 1))
+		return;
+
 	collector->last_len = vStringLength (collector->str);
 	vStringPut (collector->str, c);
 }
 
 static void collectorCatS (collector *collector, const char *cstr)
 {
+	size_t cstr_len = strlen (cstr);
+	if (cstr_len == 0)
+		return;
+
+	if (!collectorCanAppend (collector, cstr_len))
+		return;
+
 	collector->last_len = vStringLength (collector->str);
-	vStringCatS (collector->str, cstr);
+	vStringNCatSUnsafe (collector->str, cstr, cstr_len);
 }
 
 static void collectorCat (collector *collector, const vString *str)
 {
+	if (!collectorCanAppend (collector, vStringLength (str)))
+		return;
+
 	collector->last_len = vStringLength (collector->str);
 	vStringCat (collector->str, str);
 }
@@ -333,6 +359,9 @@ static void collectorAppendToken (collector *collector, const tokenInfo *const t
 	{
 		// only struct member annotations can appear in function prototypes
 		// so only `` type strings are possible
+		if (!collectorCanAppend (collector,
+								 vStringLength (token->string) + 2))
+			return;
 		collector->last_len = vStringLength (collector->str);
 		vStringPut(collector->str, '`');
 		vStringCat(collector->str, token->string);
@@ -388,7 +417,7 @@ getNextChar:
 			c = ';';  // semicolon injection
 		}
 		whitespace = c == '\t'  ||  c == ' ' ||  c == '\r' || c == '\n';
-		if (collector && whitespace && firstWhitespace && vStringLength (collector->str) < MAX_COLLECTOR_LENGTH)
+		if (collector && whitespace && firstWhitespace)
 		{
 			firstWhitespace = false;
 			collectorPut (collector, ' ');
@@ -551,7 +580,7 @@ getNextChar:
 
 	token->c = c;
 
-	if (collector && vStringLength (collector->str) < MAX_COLLECTOR_LENGTH)
+	if (collector)
 		collectorAppendToken (collector, token);
 
 	lastTokenType = token->type;
