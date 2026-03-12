@@ -300,11 +300,12 @@ static void collectorPut (collector *collector, char c)
 				  "...") == 0
 		&& c == ' ')
 		return;
-	else if (vStringLength(collector->str) > 0)
+
+	if (vStringLength(collector->str) > 0)
 	{
 		if (vStringLast(collector->str) == '(' && c == ' ')
 			return;
-		else if (vStringLast(collector->str) == ' ' && c == ')')
+		if (vStringLast(collector->str) == ' ' && c == ')')
 			vStringChop(collector->str);
 	}
 
