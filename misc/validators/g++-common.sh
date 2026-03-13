@@ -26,15 +26,15 @@ shift 3
 
 case "$action" in
     is_runnable)
-	type g++ > /dev/null 2>&1
-	exit $?
-	;;
+		type g++ > /dev/null 2>&1
+		exit $?
+		;;
     validate)
-	g++ -fsyntax-only -std=${STD} "$@" "$input" > /dev/null
-	exit $?
+		g++ -fsyntax-only -std=${STD} "$@" "$input" > /dev/null
+		exit $?
 	;;
 	*)
-	echo "$0: unknown action: $action" >&2
-	exit 1
+		echo "$0: unknown action: $action" >&2
+		exit 1
 	;;
 esac

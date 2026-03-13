@@ -25,15 +25,15 @@ shift 2
 
 case "$action" in
     is_runnable)
-	type gfortran > /dev/null 2>&1
-	exit $?
+		type gfortran > /dev/null 2>&1
+		exit $?
 	;;
     validate)
-	gfortran -fsyntax-only "$@" "$input" > /dev/null
-	exit $?
+		gfortran -fsyntax-only "$@" "$input" > /dev/null
+		exit $?
 	;;
 	*)
-	echo "$0: unknown action: $action" >&2
-	exit 1
+		echo "$0: unknown action: $action" >&2
+		exit 1
 	;;
 esac

@@ -26,15 +26,15 @@ shift 3
 
 case "$action" in
     is_runnable)
-	type tsc > /dev/null 2>&1
-	exit $?
+		type tsc > /dev/null 2>&1
+		exit $?
 	;;
     validate)
-	tsc --noEmit "$input" --target $TARGET > /dev/null
-	exit $?
+		tsc --noEmit "$input" --target $TARGET > /dev/null
+		exit $?
 	;;
 	*)
-	echo "$0: unknown action: $action" >&2
-	exit 1
+		echo "$0: unknown action: $action" >&2
+		exit 1
 	;;
 esac
