@@ -66,7 +66,7 @@ extern void vStringCatS (vString *const string, const char *const s);
 extern void vStringNCat (vString *const string, const vString *const s, const size_t length);
 
 /* vStringNCatS calls strnlen(S,LENGTH) though it takes LENGTH because
- * the handle the case that the length of S is smaller than LENGTH.
+ * it handles the case that the length of S is smaller than LENGTH.
  *
  * In the case a caller knows the length equals to or is greater than LENGTH,
  * calling strlen is just overhead. vStringNCatSUnsafe doesn't call strlen. */
