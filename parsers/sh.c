@@ -328,7 +328,11 @@ static int hdocStateReadDestfileName (struct hereDocParsingState *hstate,
 
 static void hdocStateUpdateTag (struct hereDocParsingState *hstate, unsigned long endLine)
 {
+	if (hstate->corkIndex == CORK_NIL)
+		return;
+
 	setTagEndLineToCorkEntry (hstate->corkIndex, endLine);
+	registerEntry (hstate->corkIndex);
 	hstate->corkIndex = CORK_NIL;
 }
 
@@ -845,7 +849,7 @@ extern parserDefinition* ShParser (void)
 	def->aliases = aliases;
 	def->parser     = findShTags;
 	def->initialize = initializeSh;
-	def->useCork    = CORK_QUEUE;
+	def->useCork    = CORK_QUEUE|CORK_SYMTAB;
 	return def;
 }
 
@@ -864,6 +868,6 @@ extern parserDefinition* ZshParser (void)
 	def->aliases = aliases;
 	def->parser     = findZshTags;
 	def->initialize = initializeSh;
-	def->useCork    = CORK_QUEUE;
+	def->useCork    = CORK_QUEUE|CORK_SYMTAB;
 	return def;
 }
