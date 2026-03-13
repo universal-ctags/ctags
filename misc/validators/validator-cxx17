@@ -1,2 +1,2 @@
 #!/bin/sh
-source $3/g++-common.sh $1 $2 c++17
+. $3/g++-common.sh $1 $2 c++17

@@ -1,2 +1,2 @@
 #!/bin/sh
-source $3/gfortran-common.sh $1 $2 -fdollar-ok
+. $3/gfortran-common.sh $1 $2 -fdollar-ok

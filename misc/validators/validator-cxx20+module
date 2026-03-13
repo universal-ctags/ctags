@@ -1,2 +1,2 @@
 #!/bin/sh
-source $3/g++-common.sh $1 $2 c++20 -fmodules-ts -c
+. $3/g++-common.sh $1 $2 c++20 -fmodules-ts -c
