@@ -26,7 +26,7 @@ shift 3
 
 case "$action" in
     is_runnable)
-		type g++ > /dev/null 2>&1
+		command -v g++ > /dev/null 2>&1
 		exit $?
 		;;
     validate)

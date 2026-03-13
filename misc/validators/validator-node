@@ -23,7 +23,7 @@ action=$1
 input=$2
 case "$action" in
     is_runnable)
-	type node > /dev/null 2>&1
+	command -v node > /dev/null 2>&1
 	exit $?
 	;;
     validate)

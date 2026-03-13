@@ -24,7 +24,7 @@ input=$2
 
 case "$action" in
     is_runnable)
-	type "${PYTHON}" > /dev/null 2>&1
+	command -v "${PYTHON}" > /dev/null 2>&1
 	exit $?
 	;;
     validate)

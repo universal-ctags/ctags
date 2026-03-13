@@ -26,7 +26,7 @@ cmd=svlint
 flags="--ignore-include"
 case "$action" in
     is_runnable)
-	type $cmd > /dev/null 2>&1
+	command -v $cmd > /dev/null 2>&1
 	exit $?
 	;;
     validate)

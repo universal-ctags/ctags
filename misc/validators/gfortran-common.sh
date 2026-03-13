@@ -25,7 +25,7 @@ shift 2
 
 case "$action" in
     is_runnable)
-		type gfortran > /dev/null 2>&1
+		command -v gfortran > /dev/null 2>&1
 		exit $?
 	;;
     validate)
