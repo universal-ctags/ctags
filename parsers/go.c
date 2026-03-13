@@ -288,7 +288,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	ungetcToInputFile (c);		/* always unget, LF might add a semicolon */
 }
 
-static bool collectorIsEmpty(collector *collector)
+static bool collectorIsEmpty(const collector *collector)
 {
 	return !vStringLength(collector->str);
 }
@@ -313,13 +313,13 @@ static void collectorPut (collector *collector, char c)
 	vStringPut (collector->str, c);
 }
 
-static void collectorCatS (collector *collector, char *cstr)
+static void collectorCatS (collector *collector, const char *cstr)
 {
 	collector->last_len = vStringLength (collector->str);
 	vStringCatS (collector->str, cstr);
 }
 
-static void collectorCat (collector *collector, vString *str)
+static void collectorCat (collector *collector, const vString *str)
 {
 	collector->last_len = vStringLength (collector->str);
 	vStringCat (collector->str, str);
