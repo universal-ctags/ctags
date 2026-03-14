@@ -1,0 +1,3 @@
+build_error	input.rs	/^pub const fn build_error(msg: &'static str) -> ! {$/;"	f
+square	input-0.rs	/^const fn square(x: i32) -> i32 { x * x }$/;"	f
+VALUE	input-0.rs	/^const VALUE: i32 = square(12);$/;"	C
