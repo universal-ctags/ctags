@@ -737,6 +737,8 @@ static void parseConst (lexerState *lexer, vString *scope, int parent_kind)
 	advanceToken(lexer, true);
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
+	if (tokenLitEq (lexer, "fn"))
+		return;
 
 	addTag(lexer->token_str, NULL, K_CONST, lexer->line, lexer->pos, scope, parent_kind);
 }
