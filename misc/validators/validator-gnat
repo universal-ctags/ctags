@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-gnat --- validating Ada input files
 #
 #  Copyright (c) 2025, Masatake YAMATO
@@ -22,11 +23,15 @@ input=$2
 
 case "$action" in
     is_runnable)
-	type gnat > /dev/null 2>&1
+	command -v gnat > /dev/null 2>&1
 	exit $?
 	;;
     validate)
-	gnat compile -gnats "$input" >& /dev/null
+	gnat compile -gnats "$input" > /dev/null 2>&1
 	exit $?
+	;;
+    *)
+	echo "$0: unknown action: $action" >&2
+	exit 1
 	;;
 esac

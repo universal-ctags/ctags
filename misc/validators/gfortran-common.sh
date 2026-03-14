@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # gfortran-common.sh - common code used in validator-fortran*
 #
 #  Copyright (c) 2024, Masatake YAMATO
@@ -24,11 +25,15 @@ shift 2
 
 case "$action" in
     is_runnable)
-	type gfortran > /dev/null 2>&1
-	exit $?
+		command -v gfortran > /dev/null 2>&1
+		exit $?
 	;;
     validate)
-	gfortran -fsyntax-only "$@" "$input" > /dev/null
-	exit $?
+		gfortran -fsyntax-only "$@" "$input" > /dev/null
+		exit $?
+	;;
+	*)
+		echo "$0: unknown action: $action" >&2
+		exit 1
 	;;
 esac

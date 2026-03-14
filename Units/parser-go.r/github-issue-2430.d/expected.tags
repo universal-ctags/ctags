@@ -1,0 +1,1 @@
+main	input.go	/^func main() {$/;"	f	package:main

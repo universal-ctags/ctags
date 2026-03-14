@@ -76,6 +76,10 @@ QemuHX:
     * Implement a selector arbitrating Haxe and QemuHX parsers, both handling
 	  ``.hx`` file extension.
 
+Go:
+
+    * Add ``receiver`` field to ``func`` kind tags.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:

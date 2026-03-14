@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # tsc-common.sh - common code used in validator-tsc*
 #
 #  Copyright (c) 2026, Masatake YAMATO
@@ -25,11 +26,15 @@ shift 3
 
 case "$action" in
     is_runnable)
-	type tsc > /dev/null 2>&1
-	exit $?
+		command -v tsc > /dev/null 2>&1
+		exit $?
 	;;
     validate)
-	tsc --noEmit "$input" --target $TARGET > /dev/null
-	exit $?
+		tsc --noEmit "$input" --target $TARGET > /dev/null
+		exit $?
+	;;
+	*)
+		echo "$0: unknown action: $action" >&2
+		exit 1
 	;;
 esac

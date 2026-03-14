@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-svlint - validating Verilog/SystemVerilog input files with svlint
 #   https://github.com/dalance/svlint
 #
@@ -25,11 +26,15 @@ cmd=svlint
 flags="--ignore-include"
 case "$action" in
     is_runnable)
-	type $cmd > /dev/null 2>&1
+	command -v $cmd > /dev/null 2>&1
 	exit $?
 	;;
     validate)
 	$cmd $flags "$input" > /dev/null
 	exit $?
+	;;
+    *)
+	echo "$0: unknown action: $action" >&2
+	exit 1
 	;;
 esac

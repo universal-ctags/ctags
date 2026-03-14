@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-ruby - validating Ruby input files with ruby
 #
 #  Copyright (c) 2022 Masatake YAMATO
@@ -22,11 +23,15 @@ action=$1
 input=$2
 case "$action" in
     is_runnable)
-	type ruby > /dev/null 2>&1
+	command -v ruby > /dev/null 2>&1
 	exit $?
 	;;
     validate)
 	ruby -c "$input" > /dev/null
 	exit $?
+	;;
+    *)
+	echo "$0: unknown action: $action" >&2
+	exit 1
 	;;
 esac

@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-puppet - validating puppetManifest input files
 #
 #  Copyright (c) 2018, Hakan Baba
@@ -50,11 +51,15 @@ action=$1
 input=$2
 case "$action" in
     is_runnable)
-	type puppet > /dev/null 2>&1
+	command -v puppet > /dev/null 2>&1
 	exit $?
 	;;
     validate)
 	puppet apply --noop "$input" > /dev/null
 	exit $?
+	;;
+    *)
+	echo "$0: unknown action: $action" >&2
+	exit 1
 	;;
 esac

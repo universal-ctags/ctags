@@ -4,3 +4,6 @@ package main
 type Interval struct {
         Start, Stop string
 }
+
+func main() {
+}

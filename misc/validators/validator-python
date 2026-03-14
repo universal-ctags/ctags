@@ -1,4 +1,5 @@
-# -*- sh -*-
+#!/bin/sh
+#
 # validator-python --- validating Python input files
 #
 #  Copyright (c) 2025, Masatake YAMATO
@@ -23,16 +24,20 @@ input=$2
 
 case "$action" in
     is_runnable)
-	type ${PYTHON} > /dev/null 2>&1
+	command -v "${PYTHON}" > /dev/null 2>&1
 	exit $?
 	;;
     validate)
-	${PYTHON} -m py_compile "$input"
+	"${PYTHON}" -m py_compile "$input"
 	s=$?
 	d=$(dirname "$input")
 	b=$(basename "$input" .py)
-	rm $d/__pycache__/$b*pyc
-	rmdir $d/__pycache__
+	rm "$d"/__pycache__/"$b"*pyc
+	rmdir "$d"/__pycache__
 	exit $s
+	;;
+    *)
+	echo "$0: unknown action: $action" >&2
+	exit 1
 	;;
 esac
