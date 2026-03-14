@@ -17,6 +17,26 @@
 #include <seccomp.h>
 
 
+static void installSyscallOpenFilter(scmp_filter_ctx ctx)
+{
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (open), 0);
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (openat), 0);
+	verbose ("open/openat ");
+}
+
+static void installSyscallCloseFilter(scmp_filter_ctx ctx)
+{
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (close), 0);
+	verbose ("close ");
+}
+
+static void installSyscallCtrlsetFilter(scmp_filter_ctx ctx)
+{
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (prctl), 0);
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (seccomp), 0);
+	verbose ("ctrlset ");
+}
+
 static void installSyscallCoresetFilter(scmp_filter_ctx ctx)
 {
 	// Memory allocation.
@@ -69,6 +89,12 @@ int installSyscallFilter (unsigned int set)
 	verbose ("Entering sandbox (");
 	if (set & syscall_coreset)
 		installSyscallCoresetFilter (ctx);
+	if (set & syscall_open)
+		installSyscallOpenFilter (ctx);
+	if (set & syscall_close)
+		installSyscallCloseFilter (ctx);
+	if (set & syscall_ctrlset)
+		installSyscallCtrlsetFilter (ctx);
 	verbose (")\n");
 
 	int err = seccomp_load (ctx);

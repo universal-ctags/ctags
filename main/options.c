@@ -227,6 +227,9 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"  --filter-terminator=<string>"},
  {1,0,"       Specify <string> to print to stdout following the tags for each file"},
  {1,0,"       parsed when --filter is enabled."},
+ {1,0,"  --oneshot=<filename>"},
+ {1,0,"       Behave as a filter, reading file contents from standard input and"},
+ {1,0,"       writing tags to standard output. <filename> is used as the input field of tags."},
  {1,0,"  --links[=(yes|no)]"},
  {1,0,"       Indicate whether symbolic links should be followed [yes]."},
  {1,0,"  --maxdepth=<N>"},
@@ -496,6 +499,8 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"       Print this option summary including experimental features."},
  {1,0,"  --license"},
  {1,0,"       Print details of software license."},
+ {1,0,"  --oneshot-limit=<bytes>"},
+ {1,0,"       Limit the input size in the oneshot mode, in bytes (default is 32MB)."},
  {0,0,"  --print-language"},
  {0,0,"       Don't make tags file but just print the guessed language name for"},
  {0,0,"       input file."},
@@ -1678,6 +1683,27 @@ static void processHelpFullOption (
 	exit (0);
 }
 
+static void processOneshot (
+		const char *const option,
+		const char *const parameter)
+{
+	if (!parameter || parameter[0] == '\0')
+		error (FATAL, "--%s option requires a non-empty <filename>", option);
+
+	static struct interactiveModeArgs args;
+	Option.interactive = INTERACTIVE_ONESHOT;
+
+#ifdef HAVE_SECCOMP
+	Option.interactive |= INTERACTIVE_WITH_SANDBOX;
+#endif
+
+	args.fname = parameter;
+	args.limit = oneshotLimit;
+	args.sandbox = (Option.interactive & INTERACTIVE_WITH_SANDBOX);
+
+	setMainLoop (batchOneshot, &args);
+}
+
 #ifdef HAVE_JANSSON
 static void processInteractiveOption (
 		const char *const option,
@@ -2717,6 +2743,28 @@ static bool inOneshotMode (void)
 	return (Option.interactive & INTERACTIVE_ONESHOT);
 }
 
+static void oneshotSetLimit (size_t limit)
+{
+	verbose ("adjust input limit of oneshot mode: %lu", (unsigned long)limit);
+	oneshotLimit = limit;
+}
+
+static void processOneshotLimit (
+		const char *const option, const char *const parameter)
+{
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A positive number or 0 is needed after --%s option", option);
+
+	unsigned long limit = 0;
+	if (!strToULong(parameter, 0, &limit))
+		error (FATAL, "Invalid oneshot limit: %s", parameter);
+	if (limit > SIZE_MAX)
+		error (FATAL, "Too large limit: %s (> %lu)",
+			   parameter, (unsigned long)SIZE_MAX);
+
+	oneshotSetLimit ((size_t)limit);
+}
+
 static void processSortOption (
 		const char *const option, const char *const parameter)
 {
@@ -3119,6 +3167,8 @@ static parametricOption ParametricOptions [] = {
 	{ "list-roles",             processListRolesOption,         true,   STAGE_ANY },
 	{ "list-subparsers",        processListSubparsersOption,    true,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, true,   STAGE_ANY },
+	{ "oneshot",                processOneshot,                 true,   STAGE_ANY },
+	{ "oneshot-limit",          processOneshotLimit,            true,   STAGE_ANY },
 	{ "optlib-dir",             processOptlibDir,               false,  STAGE_ANY },
 	{ "options",                processOptionFile,              false,  STAGE_ANY },
 	{ "options-maybe",          processOptionFileMaybe,         false,  STAGE_ANY },

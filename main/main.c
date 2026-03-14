@@ -485,9 +485,12 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 }
 #endif
 
-static void oneshotCommon (const char *fname, size_t limit, bool sandbox)
+static void oneshotCommon (const char *fname, size_t limit, bool sandbox, int strictSyscallset)
 {
 	openTagFile ();
+
+	if (sandbox && strictSyscallset)
+		prepareSandbox (strictSyscallset);
 
 	MIO *mio = mio_new_memory (NULL, 0, eRealloc, eFreeNoNullCheck);
 	int c;
@@ -514,6 +517,24 @@ static void oneshotCommon (const char *fname, size_t limit, bool sandbox)
 	closeTagFile (false, sandbox ? true : false);
 }
 
+extern void batchOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
+{
+	struct interactiveModeArgs *iargs = user;
+
+	Assert (iargs->fname);
+
+	unsigned int extra_set;
+
+	extra_set = isDestinationStdout () ? syscall_close | syscall_ctrlset
+		: syscall_open | syscall_close | syscall_ctrlset;
+	if (iargs->sandbox)
+		prepareSandbox (syscall_coreset | extra_set);
+
+	extra_set = isDestinationStdout () ? 0
+		: syscall_open | syscall_close;
+	oneshotCommon (iargs->fname, iargs->limit, iargs->sandbox, syscall_coreset | extra_set);
+}
+
 extern void interactiveOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 {
 	struct interactiveModeArgs *iargs = user;
@@ -523,7 +544,7 @@ extern void interactiveOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 	if (iargs->sandbox)
 		prepareSandbox (syscall_coreset);
 
-	oneshotCommon (iargs->fname, iargs->limit, iargs->sandbox);
+	oneshotCommon (iargs->fname, iargs->limit, iargs->sandbox, 0);
 }
 
 static bool isSafeVar (const char* var)

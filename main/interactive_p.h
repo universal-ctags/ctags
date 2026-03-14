@@ -31,9 +31,13 @@ bool jsonErrorPrinter (const errorSelection selection, const char *const format,
 #endif
 
 void interactiveOneshot (cookedArgs *args, void *user);
+void batchOneshot (cookedArgs *args, void *user);
 
 enum syscallSet {
 	syscall_coreset    = 1 << 0,
+	syscall_open       = 1 << 1,
+	syscall_close      = 1 << 2,
+	syscall_ctrlset    = 1 << 3,
 };
 
 int installSyscallFilter (unsigned int set);

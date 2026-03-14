@@ -27,6 +27,12 @@ Extend ``--map-<LANG>=`` and ``--langmap=`` options to choose a parser using reg
 
 	``--list-maps`` has also been extended to include regular-expression-based mappings.
 
+New option: ``--oneshot=<filename>``
+
+	Makes @CTAGS_NAME_EXECUTABLE@ behave as a filter, reading source
+	file contents from standard input and printing their tags to
+	standard output.
+
 Incompatible changes
 ---------------------------------------------------------------------
 Messages for broken symlinks are now emitted at NOTICE level instead of
