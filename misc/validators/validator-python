@@ -24,16 +24,16 @@ input=$2
 
 case "$action" in
     is_runnable)
-	type ${PYTHON} > /dev/null 2>&1
+	type "${PYTHON}" > /dev/null 2>&1
 	exit $?
 	;;
     validate)
-	${PYTHON} -m py_compile "$input"
+	"${PYTHON}" -m py_compile "$input"
 	s=$?
 	d=$(dirname "$input")
 	b=$(basename "$input" .py)
-	rm $d/__pycache__/$b*pyc
-	rmdir $d/__pycache__
+	rm "$d"/__pycache__/"$b"*pyc
+	rmdir "$d"/__pycache__
 	exit $s
 	;;
     *)
