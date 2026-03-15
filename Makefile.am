@@ -37,6 +37,8 @@ EXTRA_DIST   = README.md NEWS.rst autogen.sh \
 	       win32/gen-repoinfo.bat \
 	       misc/txt2cstr \
 	       $(PEG_INPUT) $(OPTLIB2C_INPUT) $(OPTLIB2C_PCRE2_INPUT) $(TXT2CSTR_INPUT) \
+	       misc/universal-ctags.svg \
+	       misc/review \
 	       docs Tmain Units m4/gnulib-cache.m4
 
 if HAVE_PEGOF
