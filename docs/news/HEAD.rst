@@ -80,6 +80,13 @@ Go:
 
     * Add ``receiver`` field to ``func`` kind tags.
 
+Rust:
+
+    * Add ``macro`` field.
+      The Rust parser now extracts definition-like constructs found
+      in macro arguments as tags. For such tags, the parser records
+      the name of the enclosing macro invocation in the ``macro`` field.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:

@@ -52,6 +52,7 @@ x       UCTAGSxpath          no      NONE             s--    no    --   0 xpath 
 -       UCTAGSoverline       no      ReStructuredText --b    no    --   0 whether using overline & underline for declaring section
 -       UCTAGSsectionMarker  no      ReStructuredText s--    no    --   0 character used for declaring section
 -       UCTAGSmixin          yes     Ruby             s--    no    --   0 how the class or module is mixed in (mixin:HOW:MODULE)
+-       UCTAGSmacro          yes     Rust             s--    no    --   1 macro invocation containing the definition
 -       UCTAGSmodule         yes     SCSS             s--    no    rw   1 the name of module behind the namespace
 -       UCTAGSdefiner        yes     Scheme           s--    no    --   1 the name of the function or macro that defines the unknown/Y-kind object
 -       UCTAGSparameter      no      SystemVerilog    --b    no    --   0 parameter whose value can be overridden.
