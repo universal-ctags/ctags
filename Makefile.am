@@ -16,6 +16,31 @@ PACKCC_FILES = misc/packcc/.gitignore   \
 	       \
 	       $(NULL)
 
+VALIDATOR_SH = \
+	     misc/validators/g++-common.sh			\
+	     misc/validators/gfortran-common.sh			\
+	     misc/validators/tsc-common.sh			\
+	     misc/validators/validator-c			\
+	     misc/validators/validator-cxx03			\
+	     misc/validators/validator-cxx11			\
+	     misc/validators/validator-cxx17			\
+	     misc/validators/validator-cxx20+module		\
+	     misc/validators/validator-fortran+dollar-ok	\
+	     misc/validators/validator-gnat			\
+	     misc/validators/validator-jq			\
+	     misc/validators/validator-KNOWN-INVALIDATION	\
+	     misc/validators/validator-node			\
+	     misc/validators/validator-NONE			\
+	     misc/validators/validator-puppet			\
+	     misc/validators/validator-python			\
+	     misc/validators/validator-ruby			\
+	     misc/validators/validator-svlint			\
+	     misc/validators/validator-swipl			\
+	     misc/validators/validator-tsc			\
+	     misc/validators/validator-tsc-es2015		\
+	     \
+	     $(NULL)
+
 EXTRA_DIST   = README.md NEWS.rst autogen.sh \
 	       misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
@@ -23,10 +48,7 @@ EXTRA_DIST   = README.md NEWS.rst autogen.sh \
 	       misc/ctags-optlib-mode.el \
 	       misc/mk-interactive-request.sh misc/roundtrip misc/tinst \
 	       $(PACKCC_FILES) \
-	       misc/validators/validator-jq \
-	       misc/validators/validator-KNOWN-INVALIDATION \
-	       misc/validators/validator-NONE \
-	       misc/validators/validator-puppet \
+	       $(VALIDATOR_SH) \
 	       $(WIN32_HEADS) $(WIN32_SRCS) mk_mingw.mak mk_mvc.mak \
 	       win32/mkstemp/COPYING.MinGW-w64-runtime.txt \
 	       win32/ctags.rc win32/ctags.exe.manifest win32/resource.h \
