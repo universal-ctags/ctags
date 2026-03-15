@@ -41,8 +41,20 @@ VALIDATOR_SH = \
 	     \
 	     $(NULL)
 
+DEBUGGENS = misc/enumstr.sh misc/gencxxtypedumper.sh \
+	    \
+	    misc/debuggen/README misc/debuggen/libdebuggen.sh \
+	    \
+	    misc/debuggen/rust.sh \
+	    misc/debuggen/typescript.sh \
+	    \
+	    $(NULL)
+
 EXTRA_DIST   = README.md NEWS.rst autogen.sh \
 	       misc/optlib2c \
+	       misc/enumstr.sh \
+	       misc/gencxxtypedumper.sh \
+	       $(DEBUGGENS) \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
 	       .indent.pro .uncrustify.cfg \
 	       misc/ctags-optlib-mode.el \
