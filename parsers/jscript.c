@@ -158,8 +158,10 @@ static tokenType LastTokenType;
 static tokenInfo *NextToken;
 
 static langType Lang_js;
+static langType Lang_jsx;
 
 static objPool *TokenPool = NULL;
+static unsigned int TokenPoolRefCount = 0;
 
 #ifdef HAVE_ICONV
 static iconv_t JSUnicodeConverter = (iconv_t) -2;
@@ -671,7 +673,7 @@ static int handleUnicodeCodePoint (uint32_t point)
 	if (isConverting () && JSUnicodeConverter == (iconv_t) -2)
 	{
 		/* if we didn't try creating the converter yet, try and do so */
-		JSUnicodeConverter = iconv_open (getLanguageEncoding (Lang_js), INTERNAL_ENCODING);
+		JSUnicodeConverter = iconv_open (getLanguageEncoding (getInputLanguage ()), INTERNAL_ENCODING);
 	}
 	if (isConverting () && JSUnicodeConverter != (iconv_t) -1)
 	{
@@ -1283,7 +1285,8 @@ getNextChar:
 				ungetcToInputFile ('!');
 				token->type = TOKEN_BINARY_OPERATOR;
 			}
-			else if (doesExpectBinaryOperator (LastTokenType))
+			else if (getInputLanguage () != Lang_jsx ||
+			         doesExpectBinaryOperator (LastTokenType))
 			{
 				token->type = TOKEN_BINARY_OPERATOR;
 				/*
@@ -1402,7 +1405,7 @@ getNextChar:
 				parseIdentifier (token->string, c);
 				token->lineNumber = getInputLineNumber ();
 				token->filePosition = getInputFilePosition ();
-				token->keyword = lookupKeyword (vStringValue (token->string), Lang_js);
+				token->keyword = lookupKeyword (vStringValue (token->string), getInputLanguage ());
 				if (isKeyword (token, KEYWORD_NONE))
 					token->type = TOKEN_IDENTIFIER;
 				else
@@ -3783,20 +3786,43 @@ static const char *tokenTypeName(enum eTokenType e)
 }
 #endif
 
-static void initialize (const langType language)
+static void initializeCommon ()
 {
 	Assert (ARRAY_SIZE (JsKinds) == JSTAG_COUNT);
-	Lang_js = language;
 
-	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
+	if (! TokenPoolRefCount++)
+		TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
 }
 
-static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
+static void finalizeCommon (bool initialized)
 {
 	if (!initialized)
 		return;
 
-	objPoolDelete (TokenPool);
+	if (! --TokenPoolRefCount)
+		objPoolDelete (TokenPool);
+}
+
+static void initializeJs (const langType language)
+{
+	Lang_js = language;
+	initializeCommon ();
+}
+
+static void finalizeJs (langType language CTAGS_ATTR_UNUSED, bool initialized)
+{
+	finalizeCommon (initialized);
+}
+
+static void initializeJsx (const langType language)
+{
+	Lang_jsx = language;
+	initializeCommon ();
+}
+
+static void finalizeJsx (langType language CTAGS_ATTR_UNUSED, bool initialized)
+{
+	finalizeCommon (initialized);
 }
 
 static void findJsTags (void)
@@ -3822,23 +3848,16 @@ static void findJsTags (void)
 	Assert (NextToken == NULL);
 }
 
-/* Create parser definition structure */
+/* Create JS parser definition structure */
 extern parserDefinition* JavaScriptParser (void)
 {
-	// .jsx files are JSX: https://facebook.github.io/jsx/
-	// which have JS function definitions, so we just use the JS parser
-	static const char *const extensions [] = { "js", "jsx", "mjs", NULL };
+	static const char *const extensions [] = { "js", "mjs", NULL };
 	static const char *const aliases [] = { "js", "node", "nodejs",
 											"seed", "gjs",
 											/* Used in PostgreSQL
 											 * https://github.com/plv8/plv8 */
 											"v8",
 											NULL };
-
-	/* Fore initialize HTML parser to handle JSX elements. */
-	static parserDependency dependencies [] = {
-		[0] = { DEPTYPE_FOREIGNER, "HTML", NULL },
-	};
 
 	parserDefinition *const def = parserNew ("JavaScript");
 	def->extensions = extensions;
@@ -3851,8 +3870,41 @@ extern parserDefinition* JavaScriptParser (void)
 	def->fieldTable = JsFields;
 	def->fieldCount = ARRAY_SIZE (JsFields);
 	def->parser		= findJsTags;
-	def->initialize = initialize;
-	def->finalize   = finalize;
+	def->initialize = initializeJs;
+	def->finalize   = finalizeJs;
+	def->keywordTable = JsKeywordTable;
+	def->keywordCount = ARRAY_SIZE (JsKeywordTable);
+	def->useCork	= CORK_QUEUE|CORK_SYMTAB;
+	def->requestAutomaticFQTag = true;
+
+	def->versionCurrent = 2;
+	def->versionAge = 2;
+
+	return def;
+}
+
+/* Create JSX parser definition structure */
+extern parserDefinition* JsxParser (void)
+{
+	static const char *const extensions [] = { "jsx", NULL };
+
+	/* Fore initialize HTML parser to handle JSX elements. */
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_FOREIGNER, "HTML", NULL },
+	};
+
+	parserDefinition *const def = parserNew ("JSX");
+	def->extensions = extensions;
+	/*
+	 * New definitions for parsing instead of regex
+	 */
+	def->kindTable	= JsKinds;
+	def->kindCount	= ARRAY_SIZE (JsKinds);
+	def->fieldTable = JsFields;
+	def->fieldCount = ARRAY_SIZE (JsFields);
+	def->parser		= findJsTags;
+	def->initialize = initializeJsx;
+	def->finalize   = finalizeJsx;
 	def->keywordTable = JsKeywordTable;
 	def->keywordCount = ARRAY_SIZE (JsKeywordTable);
 	def->useCork	= CORK_QUEUE|CORK_SYMTAB;
@@ -3861,6 +3913,8 @@ extern parserDefinition* JavaScriptParser (void)
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 
+	/* need to match the JavaScript parser because it uses the same kinds and
+	 * fields which might be versioned */
 	def->versionCurrent = 2;
 	def->versionAge = 2;
 
@@ -3869,7 +3923,7 @@ extern parserDefinition* JavaScriptParser (void)
 
 extern void javaScriptSkipObjectExpression (void)
 {
-	pushLanguage (Lang_js);
+	pushLanguage (Lang_jsx);
 
 	int c = getcFromInputFile ();
 	if (c == '{')
