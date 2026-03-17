@@ -1394,7 +1394,7 @@ extern char *readLineFromBypass (
 	return data.result;
 }
 
-extern void   pushArea (
+extern bool   pushArea (
 				       bool useMemoryStreamInput,
 				       unsigned long startLine, long startColumn,
 				       unsigned long endLine, long endColumn,
@@ -1415,7 +1415,7 @@ extern void   pushArea (
 		{
 			File.thinDepth++;
 			verbose ("push thin area (%d)\n", File.thinDepth);
-			return;
+			return true;
 		}
 		error(WARNING, "INTERNAL ERROR: though pushing MEMORY based thin area, "
 			  "underlying area is a FILE base: %s@%s",
@@ -1427,12 +1427,15 @@ extern void   pushArea (
 	original = getInputFilePosition ();
 
 	tmp = getInputFilePositionForLine (startLine);
-	mio_setpos (File.mio, &tmp);
-	mio_seek (File.mio, startColumn, SEEK_CUR);
+	if (mio_setpos (File.mio, &tmp) != 0)
+		goto fail;
+	if (mio_seek (File.mio, startColumn, SEEK_CUR) != 0)
+		goto fail;
 	p = mio_tell (File.mio);
 
 	tmp = getInputFilePositionForLine (endLine);
-	mio_setpos (File.mio, &tmp);
+	if (mio_setpos (File.mio, &tmp) != 0)
+		goto fail;
 	if (endColumn == EOL_COLUMN)
 	{
 		long line_start = mio_tell (File.mio);
@@ -1443,8 +1446,14 @@ extern void   pushArea (
 		Assert (endColumn >= 0);
 	}
 	else
-		mio_seek (File.mio, endColumn, SEEK_CUR);
+	{
+		if (mio_seek (File.mio, endColumn, SEEK_CUR) != 0)
+			goto fail;
+	}
 	q = mio_tell (File.mio);
+
+	if (q <= p)
+		goto fail;
 
 	mio_setpos (File.mio, &original);
 
@@ -1473,6 +1482,12 @@ extern void   pushArea (
 
 	File.input.lineNumberOrigin = ((startLine == 0)? 0: startLine - 1);
 	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
+
+	return true;
+
+fail:
+	mio_setpos (File.mio, &original);
+	return false;
 }
 
 extern bool isAreaStacked (void)
