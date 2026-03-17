@@ -41,7 +41,7 @@ VALIDATOR_SH = \
 	     \
 	     $(NULL)
 
-DEBUGGENS = misc/enumstr.sh misc/gencxxtypedumper.sh \
+DEBUGGENS = \
 	    \
 	    misc/debuggen/README misc/debuggen/libdebuggen.sh \
 	    \
