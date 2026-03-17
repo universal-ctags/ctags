@@ -417,8 +417,20 @@ extern MIOPos getInputFilePositionForLine (unsigned int line)
 extern long getInputFileOffsetForLine (unsigned int line)
 {
 	compoundPos *cpos = getInputFileCompoundPosForLine (line);
-	long r = cpos->offset - (File.bomFound? 3: 0) - cpos->crAdjustment;
+	long bomOffset = File.bomFound ? 3 : 0;
+
+	// The position stored for this line was captured before processing this line's CRLF,
+	// but crAdjustment includes this line's CRLF. Use previous line's adjustment.
+	long relevantCrAdjustment = 0;
+	if (line > 1) {
+		// For line N > 1, use adjustment from line N-1
+		compoundPos *prevCpos = getInputFileCompoundPosForLine(line - 1);
+		relevantCrAdjustment = prevCpos->crAdjustment;
+	}
+
+	long r = cpos->offset - bomOffset - relevantCrAdjustment;
 	Assert (r >= 0);
+
 	return r;
 }
 
@@ -608,11 +620,30 @@ static int compoundPosForOffset (const void* oft, const void *p)
 	const compoundPos *pos = p;
 	const compoundPos *next = (compoundPos *)(((char *)pos) + sizeof (compoundPos));
 
-	if (offset < (pos->offset - pos->crAdjustment))
+	// For consistency with getInputFileOffsetForLine, use previous line's crAdjustment
+	// for position calculation to account for timing mismatch
+	long relevantCrAdjustment = 0;
+	if (pos > File.lineFposMap.pos) {
+		// Not the first position, use previous position's crAdjustment
+		const compoundPos *prevPos = pos - 1;
+		relevantCrAdjustment = prevPos->crAdjustment;
+	}
+
+	long nextRelevantCrAdjustment = 0;
+	if (next <= File.lineFposMap.pos + File.lineFposMap.count - 1) {
+		// Not past the last position
+		if (next > File.lineFposMap.pos) {
+			// Not the first position, use previous position's crAdjustment
+			const compoundPos *nextPrevPos = next - 1;
+			nextRelevantCrAdjustment = nextPrevPos->crAdjustment;
+		}
+	}
+
+	if (offset < (pos->offset - relevantCrAdjustment))
 		return -1;
-	else if (((pos->offset - pos->crAdjustment) <= offset)
+	else if (((pos->offset - relevantCrAdjustment) <= offset)
 		 && (pos->open
-		     || (offset < (next->offset - next->crAdjustment))))
+		     || (offset < (next->offset - nextRelevantCrAdjustment))))
 		return 0;
 	else
 		return 1;
