@@ -1,0 +1,4 @@
+This directory contains scripts generating code for debugging parsers.
+Currently running the scripts is not integrated to our build system.
+Therefore you must run the script manually when you add something
+to the parsers.

@@ -281,23 +281,10 @@ PEG_OBJS = $(PEG_SRCS:.c=.$(OBJEXT))
 
 PEGO_INTERMEDIATE = $(PEG_INPUT:.peg=.pego)
 
-PARSER_HEADS = \
+PARSER_X_HEADS = \
 	parsers/x-autoconf.h \
-	parsers/x-cpreprocessor.h \
-	\
-	parsers/cxx/cxx_debug.h \
-	parsers/cxx/cxx_keyword.h \
-	parsers/cxx/cxx_parser_internal.h \
-	parsers/cxx/cxx_parser.h \
-	parsers/cxx/cxx_scope.h \
-	parsers/cxx/cxx_side_chain.h \
-	parsers/cxx/cxx_subparser.h \
-	parsers/cxx/cxx_subparser_internal.h \
-	parsers/cxx/cxx_tag.h \
-	parsers/cxx/cxx_token.h \
-	parsers/cxx/cxx_token_chain.h \
-	\
 	parsers/x-bibtex.h \
+	parsers/x-cpreprocessor.h \
 	parsers/x-frontmatter.h \
 	parsers/x-html.h \
 	parsers/x-iniconf.h \
@@ -313,10 +300,32 @@ PARSER_HEADS = \
 	parsers/x-sh.h \
 	parsers/x-systemdunit.h \
 	parsers/x-tcl.h \
-	parsers/x-toml.h \
 	parsers/x-tex.h \
+	parsers/x-toml.h \
 	\
+	$(NULL)
+
+PARSER_D_HEADS = \
 	parsers/d-typescript.h \
+	parsers/d-rust.h \
+	\
+	$(NULL)
+
+PARSER_HEADS = \
+	parsers/cxx/cxx_debug.h \
+	parsers/cxx/cxx_keyword.h \
+	parsers/cxx/cxx_parser_internal.h \
+	parsers/cxx/cxx_parser.h \
+	parsers/cxx/cxx_scope.h \
+	parsers/cxx/cxx_side_chain.h \
+	parsers/cxx/cxx_subparser.h \
+	parsers/cxx/cxx_subparser_internal.h \
+	parsers/cxx/cxx_tag.h \
+	parsers/cxx/cxx_token.h \
+	parsers/cxx/cxx_token_chain.h \
+	\
+	$(PARSER_X_HEADS) \
+	$(PARSER_D_HEADS) \
 	\
 	$(NULL)
 
