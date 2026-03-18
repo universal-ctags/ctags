@@ -35,6 +35,9 @@ foo	input.rs	/^	foo: isize,$/;"	m	struct:B
 foo_field_1	input.rs	/^struct Foo{foo_field_1:isize}$/;"	m	struct:Foo
 gfunc	input.rs	/^fn gfunc<X:Testable+DoZ>(x:&X) {$/;"	f	signature:<X:Testable+DoZ>(x:&X)
 ignore	input.rs	/^macro_rules! ignore {($($x:tt)*) => (())}$/;"	M
+ignored_inside_macro0	input.rs	/^		fn ignored_inside_macro0() {}$/;"	f	function:main	signature:()	macro:ignore
+ignored_inside_macro1	input.rs	/^		fn ignored_inside_macro1() {}$/;"	f	function:main	signature:()	macro:ignore
+ignored_inside_macro2	input.rs	/^		fn ignored_inside_macro2() {}$/;"	f	function:main	signature:()	macro:ignore
 lifetime_and_char	input.rs	/^fn lifetime_and_char<'lifetime>(_: &'lifetime isize)$/;"	f	signature:<'lifetime>(_: &'lifetime isize)
 main	input.rs	/^fn main() {	$/;"	f	signature:()
 my_method	input.rs	/^	fn my_method(&self,_:isize){ println!("{}", "my_method of foo");}$/;"	P	implementation:Foo	signature:(&self,_:isize)

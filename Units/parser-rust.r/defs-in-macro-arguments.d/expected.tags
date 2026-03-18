@@ -1,0 +1,2 @@
+Framed	input.rs	/^    pub struct Framed<T, U> {$/;"	s	macro:pin_project
+inner	input.rs	/^        inner: FramedImpl<T, U, RWFrames>$/;"	m	struct:Framed	macro:pin_project
