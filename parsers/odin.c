@@ -1490,7 +1490,7 @@ static void parseWhenBlock (tokenInfo *const token, const int scope)
 
 	for (;;)
 	{
-		/* Bail on declaration operators — expression-level when */
+		/* Bail on declaration operators - expression-level when */
 		while (!isType (token, TOKEN_EOF) &&
 			   !isType (token, TOKEN_OPEN_CURLY) &&
 			   !isType (token, TOKEN_DOUBLE_COLON) &&
@@ -1576,7 +1576,7 @@ static void parseBlock (tokenInfo *const token, int scope, bool isTopLevel)
 			readToken (token);
 			if (isType (token, TOKEN_OTHER))
 			{
-				/* #+build — skip line to avoid misparsing */
+				/* #+build - skip line to avoid misparsing */
 				skipToCharacterInInputFile ('\n');
 			}
 			continue;
