@@ -28,6 +28,8 @@
 
 #if HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
+#elif _WIN32
+#include <windows.h>			/* GetCurrentThreadStackLimits */
 #endif
 
 /*
@@ -79,11 +81,10 @@ CTAGS_INLINE size_t getLimit (void)
 		else
 			cur_size = (size_t) cur;
 	}
-#else
-	/* TODO
-	 * On windows, you can extract the assumed stack size from the program itself.
-	 * https://github.com/cygwin/cygwin/blob/main/winsup/cygwin/resource.cc
-	 */
+#elif _WIN32
+	ULONG_PTR low, high;
+	GetCurrentThreadStackLimits (&low, &high);
+	cur_size = (size_t) (high - low);
 #endif
 
 	if (cur_size > MARGIN)
