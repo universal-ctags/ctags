@@ -641,6 +641,9 @@ static struct Feature {
 #endif
 #if HAVE_SYS_RESOURCE_H
 	{"rlimit-based-stack-guard", "uses getrlimit to determine the default stack limit" },
+#elif (HAVE_GETCURRENTTHREADSTACKLIMITS \
+	   && !NEED_PROTO_GETCURRENTTHREADSTACKLIMITS)
+	{"thread-stack-limit-based-stack-guard", "uses GetCurrentThreadStackLimits to determine the default stack limit" },
 #else
 	{"static-stack-guard", "sets the default stack limit statically" },
 #endif

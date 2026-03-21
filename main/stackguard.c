@@ -28,6 +28,8 @@
 
 #if HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
+#elif HAVE_GETCURRENTTHREADSTACKLIMITS && !NEED_PROTO_GETCURRENTTHREADSTACKLIMITS
+#include <windows.h>			/* GetCurrentThreadStackLimits */
 #endif
 
 /*
@@ -89,11 +91,12 @@ CTAGS_INLINE size_t getDefaultLimit (void)
 		else
 			cur_size = (size_t) cur;
 	}
+#elif HAVE_GETCURRENTTHREADSTACKLIMITS && !NEED_PROTO_GETCURRENTTHREADSTACKLIMITS
+	ULONG_PTR low, high;
+	GetCurrentThreadStackLimits (&low, &high);
+	cur_size = (size_t) (high - low);
 #else
-	/* TODO
-	 * On windows, you can extract the assumed stack size from the program itself.
-	 * https://github.com/cygwin/cygwin/blob/main/winsup/cygwin/resource.cc
-	 */
+#warning "no dynamic stackguard available on this platform"
 #endif
 
 	raw_limit_ = cur_size;

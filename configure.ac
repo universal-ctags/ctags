@@ -877,6 +877,7 @@ if test "${enable_static}" = "yes"; then
 	fi
 fi
 
+AC_CHECK_FUNCS(GetCurrentThreadStackLimits)
 
 # Checks for missing prototypes
 # -----------------------------
@@ -890,6 +891,8 @@ fi
 if test "$have_ftruncate" = yes ; then
 	CHECK_PROTO(ftruncate, unistd.h)
 fi
+
+CHECK_PROTO(GetCurrentThreadStackLimits, windows.h)
 
 # Process library configuration options
 # -------------------------------------
