@@ -18,6 +18,10 @@ struct interactiveModeArgs
 {
 	bool sandbox;
 	const char *fname;			/* --_interactive=oneshot:FNAME */
+	size_t limit;				/* Upper limit of input data
+								 * received via stdin.
+								 * Used in oneshot mode.
+								 * 0 means no limit. */
 };
 
 #ifdef HAVE_JANSSON

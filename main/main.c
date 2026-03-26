@@ -485,14 +485,26 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 }
 #endif
 
-static void oneshotCommon (const char *fname)
+static void oneshotCommon (const char *fname, size_t limit)
 {
 	openTagFile ();
 
 	MIO *mio = mio_new_memory (NULL, 0, eRealloc, eFreeNoNullCheck);
 	int c;
+	size_t r = 0;
 	while ((c = getchar()) != EOF)
+	{
+		r++;
+		if (limit != 0 && r > limit)
+		{
+			error (WARNING, "input read from stdin exceeds the limit: name: %s, size: %lu",
+				   fname,
+				   (unsigned long) limit);
+			break;
+		}
 		mio_putc (mio, c);
+	}
+
 	mio_seek (mio, 0, SEEK_SET);
 
 	parseFileWithMio (fname, mio, NULL);
@@ -511,7 +523,7 @@ extern void interactiveOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 	if (iargs->sandbox)
 		prepareSandbox ();
 
-	oneshotCommon (iargs->fname);
+	oneshotCommon (iargs->fname, iargs->limit);
 }
 
 static bool isSafeVar (const char* var)

@@ -186,6 +186,8 @@ optionValues Option = {
 #endif
 };
 
+static size_t oneshotLimit = 32 * 1024 * 1024; /* 32MB */
+
 struct localOptionValues {
 	bool machinable;			/* --machinable */
 	bool withListHeader;		/* --with-list-header */
@@ -1686,6 +1688,7 @@ static void processInteractiveOption (
 
 	args.sandbox = false;
 	args.fname = NULL;
+	args.limit = 0;
 
 	if (parameter && (strcmp (parameter, "sandbox") == 0))
 		Option.interactive = INTERACTIVE_MODE|INTERACTIVE_WITH_SANDBOX;
@@ -1710,6 +1713,7 @@ static void processInteractiveOption (
 
 			Option.interactive |= INTERACTIVE_MODE|INTERACTIVE_ONESHOT;
 			args.fname = fname;
+			args.limit = oneshotLimit;
 		}
 	}
 
