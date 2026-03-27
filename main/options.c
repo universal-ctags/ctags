@@ -1683,35 +1683,28 @@ static void processInteractiveOption (
 {
 	static struct interactiveModeArgs args;
 
+	args.sandbox = false;
 
 	if (parameter && (strcmp (parameter, "sandbox") == 0))
-	{
 		Option.interactive = INTERACTIVE_MODE|INTERACTIVE_WITH_SANDBOX;
-		args.sandbox = true;
-	}
-	else if (parameter && (strcmp (parameter, "default") == 0))
-	{
+	else if (parameter == NULL || *parameter == '\0'
+			 || (parameter && strcmp (parameter, "default") == 0))
 		Option.interactive = INTERACTIVE_MODE;
-		args.sandbox = false;
-	}
-	else if ((!parameter) || *parameter == '\0')
-	{
-		Option.interactive = INTERACTIVE_MODE;
-		args.sandbox = false;
-	}
-	else
+
+	if (! (Option.interactive & INTERACTIVE_MODE))
 		error (FATAL, "Unknown option argument \"%s\" for --%s option",
 			   parameter, option);
 
+	if (Option.interactive & INTERACTIVE_WITH_SANDBOX)
+	{
 #ifndef HAVE_SECCOMP
-	if (args.sandbox)
 		error (FATAL, "sandbox submode is not supported on this platform");
 #endif
-
 #ifdef ENABLE_GCOV
-	if (args.sandbox)
 		error (FATAL, "sandbox submode does not work if gcov is instrumented");
 #endif
+		args.sandbox = true;
+	}
 
 	Option.sorted = SO_UNSORTED;
 	setMainLoop (interactiveLoop, &args);
