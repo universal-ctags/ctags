@@ -174,7 +174,7 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 	vStringDelete (cmd);
 }
 
-#else
+#endif
 
 /*
  *  These functions provide a basic internal sort. No great memory
@@ -304,5 +304,3 @@ extern void internalSortTags (const bool toStdout, MIO* mio, size_t numTags)
 		free (table [i]);
 	free (table);
 }
-
-#endif

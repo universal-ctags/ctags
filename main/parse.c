@@ -4820,7 +4820,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio,
 #endif
 		tagFileResized = parseMio (fileName, language, req.mio, req.mtime, true, clientData);
 		if (Option.filter && ! (Option.interactive & INTERACTIVE_MODE))
-			closeTagFile (tagFileResized);
+			closeTagFile (tagFileResized, false);
 		addTotals (1, 0L, 0L);
 
 #ifdef HAVE_ICONV

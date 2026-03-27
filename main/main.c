@@ -376,7 +376,7 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 	timeStamp (1);
 
 	if ((! Option.filter) && (!Option.printLanguage))
-		closeTagFile (resize);
+		closeTagFile (resize, false);
 
 	timeStamp (2);
 
@@ -454,7 +454,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 				if (iargs->sandbox) {
 					error (FATAL,
 						   "invalid request in sandbox submode: reading file contents from a file is limited");
-					closeTagFile (false);
+					closeTagFile (false, false);
 					goto next;
 				}
 
@@ -469,7 +469,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 				mio_unref (mio);
 			}
 
-			closeTagFile (false);
+			closeTagFile (false, false);
 			fputs ("{\"_type\": \"completed\", \"command\": \"generate-tags\"}\n", stdout);
 			fflush(stdout);
 		}
@@ -485,7 +485,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 }
 #endif
 
-static void oneshotCommon (const char *fname, size_t limit)
+static void oneshotCommon (const char *fname, size_t limit, bool sandbox)
 {
 	openTagFile ();
 
@@ -511,7 +511,7 @@ static void oneshotCommon (const char *fname, size_t limit)
 
 	mio_unref (mio);
 
-	closeTagFile (false);
+	closeTagFile (false, sandbox ? true : false);
 }
 
 extern void interactiveOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
@@ -523,7 +523,7 @@ extern void interactiveOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 	if (iargs->sandbox)
 		prepareSandbox ();
 
-	oneshotCommon (iargs->fname, iargs->limit);
+	oneshotCommon (iargs->fname, iargs->limit, iargs->sandbox);
 }
 
 static bool isSafeVar (const char* var)

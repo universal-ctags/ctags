@@ -536,7 +536,6 @@ static int replacementTruncate (const char *const name, const long size)
 
 #endif
 
-#ifndef EXTERNAL_SORT
 static void internalSortTagFile (void)
 {
 	MIO *mio;
@@ -562,20 +561,25 @@ static void internalSortTagFile (void)
 	if (! TagsToStdout)
 		mio_unref (mio);
 }
-#endif
 
-static void sortTagFile (void)
+static void sortTagFile (bool forceUseInternalSort)
 {
 	if (TagFile.numTags.added > 0L)
 	{
 		if (Option.sorted != SO_UNSORTED)
 		{
 			verbose ("sorting tag file\n");
+
+			if (forceUseInternalSort)
+				internalSortTagFile ();
+			else
+			{
 #ifdef EXTERNAL_SORT
-			externalSortTags (TagsToStdout, TagFile.mio);
+				externalSortTags (TagsToStdout, TagFile.mio);
 #else
-			internalSortTagFile ();
+				internalSortTagFile ();
 #endif
+			}
 		}
 		else if (TagsToStdout)
 			catFile (TagFile.mio);
@@ -632,7 +636,7 @@ static void writeEtagsIncludes (MIO *const mio)
 	}
 }
 
-extern void closeTagFile (const bool resize)
+extern void closeTagFile (const bool resize, bool forceUseInternalSort)
 {
 	long desiredSize, size;
 
@@ -656,7 +660,7 @@ extern void closeTagFile (const bool resize)
 				TagFile.name? TagFile.name: "<mio>", size, desiredSize); )
 		resizeTagFile (desiredSize);
 	}
-	sortTagFile ();
+	sortTagFile (forceUseInternalSort);
 	if (TagsToStdout)
 	{
 		if (mio_unref (TagFile.mio) != 0)
