@@ -54,8 +54,11 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 				const char *const parserName,
 				void *clientData);
 
+static void initJsonWriter (void);
+
 tagWriter jsonWriter = {
 	.oformat = "json",
+	.init = initJsonWriter,
 	.writeEntry = writeJsonEntry,
 	.writePtagEntry = writeJsonPtagEntry,
 	.printPtagByDefault = true,
@@ -66,6 +69,11 @@ tagWriter jsonWriter = {
 	.canPrintNullTag = true,
 	.defaultFileName = NULL,
 };
+
+static void initJsonWriter (void)
+{
+	json_set_alloc_funcs (eMalloc, eFree);
+}
 
 static const char* escapeFieldValueRaw (const tagEntryInfo * tag, fieldType ftype, int fieldIndex)
 {

@@ -1715,8 +1715,6 @@ static void processInteractiveOption (
 	setErrorPrinter (jsonErrorPrinter, NULL);
 	setTagWriter (WRITER_JSON, NULL);
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
-
-	json_set_alloc_funcs (eMalloc, eFree);
 }
 #endif
 
