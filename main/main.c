@@ -391,9 +391,9 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 #undef timeStamp
 }
 
-static void prepareSandbox (void)
+static void prepareSandbox (unsigned int set)
 {
-	if (installSyscallFilter ()) {
+	if (installSyscallFilter (set)) {
 		error (FATAL, "install_syscall_filter failed");
 		/* The explicit exit call is needed because
 		   "error (FATAL,..." just prints a message in
@@ -408,7 +408,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 	struct interactiveModeArgs *iargs = user;
 
 	if (iargs->sandbox)
-		prepareSandbox ();
+		prepareSandbox (syscall_coreset);
 
 	char buffer[1024];
 	json_t *request;
@@ -521,7 +521,7 @@ extern void interactiveOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 	Assert (iargs->fname);
 
 	if (iargs->sandbox)
-		prepareSandbox ();
+		prepareSandbox (syscall_coreset);
 
 	oneshotCommon (iargs->fname, iargs->limit, iargs->sandbox);
 }
