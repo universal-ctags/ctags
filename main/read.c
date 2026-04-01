@@ -1206,21 +1206,53 @@ static vString *iFileGetLine (bool chop_newline)
 				MIOPos pos = File.filePosition.pos;
 
 				vString *line = vStringNew();
-				for (size_t i = 0; i < File.lineFposMap.count; i++)
-				{
-					File.input.lineNumber = i + 1;
-					File.source.lineNumber = File.input.lineNumber;
-					File.filePosition.pos = File.lineFposMap.pos[i].pos;
 
-					vStringNCopySUnsafe(line,
-										vStringValue(File.allLines) +
-										File.lineFposMap.pos[i].posInAllLines,
-										(((i + 1) < File.lineFposMap.count)
-										 ? File.lineFposMap.pos[i+1].posInAllLines
-										 : vStringLength (File.allLines))
-										- File.lineFposMap.pos[i].posInAllLines);
-					matchLanguageRegex (lang, line, true);
+				if (isAreaStacked())
+				{
+					unsigned long area_startLine;
+					long area_startColumn;
+					unsigned long area_endLine;
+					long area_endColumn;
+					getAreaInfo (&area_startLine, &area_startColumn,
+								 &area_endLine, &area_endColumn);
+
+					Assert(area_startLine > 0);
+					for (size_t i = area_startLine - 1; i < area_endLine; i++)
+					{
+						File.input.lineNumber = i + 1;
+						File.source.lineNumber = File.input.lineNumber;
+						File.filePosition.pos = File.lineFposMap.pos[i].pos;
+
+						vStringNCopySUnsafe(line,
+											vStringValue(File.allLines) +
+											File.lineFposMap.pos[i].posInAllLines
+											- File.lineFposMap.pos[area_startLine - 1].posInAllLines,
+											(((i + 1) < File.lineFposMap.count)
+											 ? (File.lineFposMap.pos[i+1].posInAllLines
+												- File.lineFposMap.pos[i].posInAllLines)
+											 : area_endLine));
+						matchLanguageRegex (lang, line, true);
+					}
 				}
+				else
+				{
+					for (size_t i = 0; i < File.lineFposMap.count; i++)
+					{
+						File.input.lineNumber = i + 1;
+						File.source.lineNumber = File.input.lineNumber;
+						File.filePosition.pos = File.lineFposMap.pos[i].pos;
+
+						vStringNCopySUnsafe(line,
+											vStringValue(File.allLines) +
+											File.lineFposMap.pos[i].posInAllLines,
+											(((i + 1) < File.lineFposMap.count)
+											 ? File.lineFposMap.pos[i+1].posInAllLines
+											 : vStringLength (File.allLines))
+											- File.lineFposMap.pos[i].posInAllLines);
+						matchLanguageRegex (lang, line, true);
+					}
+				}
+
 				vStringDelete(line);
 
 				File.filePosition.pos = pos;
