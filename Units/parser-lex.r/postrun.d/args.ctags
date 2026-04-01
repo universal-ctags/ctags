@@ -1,0 +1,11 @@
+--sort=no
+--extras=+g
+
+# This is a timeout test.
+# The following sub parser definition do not affect the output.
+#
+# If a guest parser had postrun regex code,
+# ctags jumped into an infinite-loop.
+--langdef=TestCSub{base=C}{_foreignLanguage=Python}
+--kinddef-TestCSub=M,module,PyModuleDef
+--regex-TestCSub=/[ \t]*\.tp_name[ \t]*=[ \t]*"(.*)\.([^"]+)"//{postrun}{{}}

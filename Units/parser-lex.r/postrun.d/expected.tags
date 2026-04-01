@@ -1,0 +1,29 @@
+IDENT	input.l	/^IDENT			[A-Za-z_\\$][A-Za-z0-9_\\$]*$/;"	r
+O_INT	input.l	/^O_INT			0[0-7]*$/;"	r
+D_INT	input.l	/^D_INT			[1-9][0-9]*$/;"	r
+X_INT	input.l	/^X_INT			0[Xx][0-9A-Fa-f]+$/;"	r
+I_SUF	input.l	/^I_SUF			[Uu]|[Ll]|[Uu][Ll]|[Ll][Uu]$/;"	r
+INT	input.l	/^INT			({O_INT}|{D_INT}|{X_INT}){I_SUF}?$/;"	r
+FRAC	input.l	/^FRAC			([0-9]*\\.[0-9]+)|([0-9]+\\.)$/;"	r
+EXP	input.l	/^EXP			[Ee][+-]?[0-9]+$/;"	r
+F_SUF	input.l	/^F_SUF			[FfLl]$/;"	r
+REAL	input.l	/^REAL			({FRAC}{EXP}?{F_SUF}?)|([0-9]+{EXP}{F_SUF}?)$/;"	r
+STRING	input.l	/^STRING			L?\\"([^\\\\\\"]*\\\\.)*[^\\\\\\"]*\\"$/;"	r
+CHAR	input.l	/^CHAR			L?\\'([^\\\\\\']*\\\\.)*[^\\\\\\']*\\'$/;"	r
+MC_TOKEN	input.l	/^MC_TOKEN		([~%^&*+=|<>\/-]=)|(&&)|("||")|(->)|(<<)|(>>)$/;"	r
+YY_DECL	input.l	/^#define YY_DECL	/;"	d	file:
+_APP	input.l	/^#define _APP(/;"	d	file:
+APP	input.l	/^#define APP		_APP(/;"	d	file:
+dont_want_type_specifier	input.l	/^bool dont_want_type_specifier;$/;"	v	typeref:typename:bool
+yylex	input.l	/^yylex(void)$/;"	f	typeref:typename:int
+__anon3045ca7c0103	input.l	/^  static enum {$/;"	g	function:yylex	file:
+ST_NOTSTARTED	input.l	/^    ST_NOTSTARTED, ST_NORMAL, ST_ATTRIBUTE, ST_ASM, ST_TYPEOF, ST_TYPEOF_1,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
+ST_NORMAL	input.l	/^    ST_NOTSTARTED, ST_NORMAL, ST_ATTRIBUTE, ST_ASM, ST_TYPEOF, ST_TYPEOF_1,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
+ST_ATTRIBUTE	input.l	/^    ST_NOTSTARTED, ST_NORMAL, ST_ATTRIBUTE, ST_ASM, ST_TYPEOF, ST_TYPEOF_1,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
+ST_ASM	input.l	/^    ST_NOTSTARTED, ST_NORMAL, ST_ATTRIBUTE, ST_ASM, ST_TYPEOF, ST_TYPEOF_1,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
+ST_TYPEOF	input.l	/^    ST_NOTSTARTED, ST_NORMAL, ST_ATTRIBUTE, ST_ASM, ST_TYPEOF, ST_TYPEOF_1,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
+ST_TYPEOF_1	input.l	/^    ST_NOTSTARTED, ST_NORMAL, ST_ATTRIBUTE, ST_ASM, ST_TYPEOF, ST_TYPEOF_1,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
+ST_BRACKET	input.l	/^    ST_BRACKET, ST_BRACE, ST_EXPRESSION, ST_STATIC_ASSERT,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
+ST_BRACE	input.l	/^    ST_BRACKET, ST_BRACE, ST_EXPRESSION, ST_STATIC_ASSERT,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
+ST_EXPRESSION	input.l	/^    ST_BRACKET, ST_BRACE, ST_EXPRESSION, ST_STATIC_ASSERT,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
+ST_STATIC_ASSERT	input.l	/^    ST_BRACKET, ST_BRACE, ST_EXPRESSION, ST_STATIC_ASSERT,$/;"	e	enum:yylex::__anon3045ca7c0103	file:
