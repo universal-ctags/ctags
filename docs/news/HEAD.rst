@@ -6,6 +6,12 @@ This page lists only the most significant changes as remembered.  Use
 git-log to review changes not enumerated here, especially in language
 parsers.
 
+Critical bug fixes
+---------------------------------------------------------------------
+
+* fixes a bug where a guest parser with a regex rule using postrun flag
+  could enter an infinite loop.
+
 New and extended options and their flags
 ---------------------------------------------------------------------
 
