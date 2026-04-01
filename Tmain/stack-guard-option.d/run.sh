@@ -33,8 +33,9 @@ header()
 
 extract()
 {
-	grep 'ctags\|^qn' \
+	grep 'ctags\|^qn\|^f0' \
 		| grep -v '\.ctags\|No options will be read from files or environment' \
+		| grep -v 'too deep scope' \
 		| sed -e 's/ctags[^:]*: //' \
 		| sed -e 's/(\([0-9]*\))/(LIMIT)/'
 }
@@ -78,5 +79,11 @@ limit $CTAGS --options=NONE --verbose --stack-limit=$given_ -o - input.v > /dev/
 r=$((r + $?))
 limit $CTAGS --options=NONE --verbose --stack-limit=$given_ -o - input.v 2>&1 \
 	| extract
+
+header JavaScript 64
+limit $CTAGS --options=NONE --verbose -o - input.js > /dev/null 2>&1
+r=$((r + $?))
+limit $CTAGS --options=NONE --verbose --sort=no -o - input.js 2>&1 \
+		| extract
 
 exit $r

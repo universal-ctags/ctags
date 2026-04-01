@@ -2085,6 +2085,12 @@ static bool parseBlock (tokenInfo *const token, int parent_scope)
 {
 	TRACE_ENTER();
 
+	if (!stackGuardCheck(token))
+	{
+		TRACE_LEAVE_TEXT("too deep recursion");
+		return false;
+	}
+
 	bool is_class = false;
 	bool read_next_token = true;
 	int save_scope = token->scope;
@@ -3299,6 +3305,11 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 {
 	TRACE_ENTER_TEXT("is_inside_class: %s", is_inside_class? "yes": "no");
 
+	if (!stackGuardCheck(token))
+	{
+		TRACE_LEAVE_TEXT("too deep recursion");
+		return true;			/* isTerminated => true */
+	}
 	/*
 	 * When making a tag for `name', its core index is stored to
 	 * `indexForName'. The value stored to `indexForName' is valid
@@ -3822,6 +3833,15 @@ static void findJsTags (void)
 	Assert (NextToken == NULL);
 }
 
+static void discardInput (void *data)
+{
+	tokenInfo *token = data;
+
+	do
+		readToken (token);
+	while (! isType (token, TOKEN_EOF));
+}
+
 /* Create parser definition structure */
 extern parserDefinition* JavaScriptParser (void)
 {
@@ -3860,6 +3880,8 @@ extern parserDefinition* JavaScriptParser (void)
 
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
+
+	def->discardInput = discardInput;
 
 	def->versionCurrent = 2;
 	def->versionAge = 2;

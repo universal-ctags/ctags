@@ -19,3 +19,7 @@ qnCmeoduen	input.v	/^moluleptt b); assi9223372036854775n b const qnCmeoduen=$/;"
 Warning: don't specify stack limit larger than default: 32769 > 32768
 Notice: call stack exceeds the limit (LIMIT) during processing input: input.v
 qnCmeoduen	input.v	/^moluleptt b); assi9223372036854775n b const qnCmeoduen=$/;"	c
+
+# ulimit(JavaScript): 64, no option
+Notice: call stack exceeds the limit (LIMIT) during processing input: input.js
+f0	input.js	/^var f0 = function(LIMIT) {$/;"	f
