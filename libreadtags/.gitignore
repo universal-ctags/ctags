@@ -41,6 +41,7 @@ tests/test-api-tagsOpen
 tests/test-api-tagsSetSortType
 tests/test-fix-large-tags
 tests/test-fix-null-deref
+tests/test-fix-too-many-fields
 tests/test-fix-unescaping
 tests/test-fix-unescaping-input-fields
 tests/test-fix-unescaping-input-fields-exuberant

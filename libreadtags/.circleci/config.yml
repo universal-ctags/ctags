@@ -1,9 +1,9 @@
 version: 2
 jobs:
-  fedora40_cmake:
+  fedora42_cmake:
     working_directory: ~/libreadtags
     docker:
-      - image: docker.io/fedora:40
+      - image: docker.io/fedora:42
     steps:
       - run:
           name: Install Git
@@ -34,10 +34,10 @@ jobs:
             cmake --build build --target install
             test -e /usr/local/include/readtags.h
             test -e /usr/local/lib/libreadtags.so
-  fedora40_autotools:
+  fedora42_autotools:
     working_directory: ~/libreadtags
     docker:
-      - image: docker.io/fedora:40
+      - image: docker.io/fedora:42
     steps:
       - run:
           name: Install Git
@@ -58,10 +58,10 @@ jobs:
           name: Test
           command: |
             make check VERBOSE=1
-  fedora40_distcheck:
+  fedora42_distcheck:
     working_directory: ~/libreadtags
     docker:
-      - image: docker.io/fedora:40
+      - image: docker.io/fedora:42
     steps:
       - run:
           name: Install Git
@@ -85,6 +85,6 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - fedora40_cmake
-      - fedora40_autotools
-      - fedora40_distcheck
+      - fedora42_cmake
+      - fedora42_autotools
+      - fedora42_distcheck

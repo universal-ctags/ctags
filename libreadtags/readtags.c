@@ -156,10 +156,22 @@ static int xdigitValue (unsigned char digit)
 		return 0;
 }
 
+static unsigned char altchars[0x100] = {
+	['\\'] = '\\',
+	['a']  = '\a', /* u-ctags extension */
+	['b']  = '\b', /* u-ctags extension */
+	['f']  = '\f', /* u-ctags extension */
+	['n']  = '\n',
+	['r']  = '\r',
+	['t']  = '\t',
+	['v']  = '\v', /* u-ctags extension */
+};
+
 /*
  * Reads the first character from the string, possibly un-escaping it, and
  * advances *s to the start of the next character.
  */
+
 READTAGS_INLINE
 int readTagCharacter (const char **const s)
 {
@@ -170,28 +182,27 @@ int readTagCharacter (const char **const s)
 
 	if (c == '\\')
 	{
+		unsigned char a;
 		switch (*p)
 		{
-			case 't': c = '\t'; p++; break;
-			case 'r': c = '\r'; p++; break;
-			case 'n': c = '\n'; p++; break;
-			case '\\': c = '\\'; p++; break;
-			/* Universal-CTags extensions */
-			case 'a': c = '\a'; p++; break;
-			case 'b': c = '\b'; p++; break;
-			case 'v': c = '\v'; p++; break;
-			case 'f': c = '\f'; p++; break;
-			case 'x':
-				if (isxdigit (p[1]) && isxdigit (p[2]))
+		default:
+			a = altchars[*p];
+			if (a) {
+				c = a;
+				p++;
+			}
+			break;
+		case 'x':
+			if (isxdigit (p[1]) && isxdigit (p[2]))
+			{
+				int val = (xdigitValue (p[1]) << 4) | xdigitValue (p[2]);
+				if (val < 0x80)
 				{
-					int val = (xdigitValue (p[1]) << 4) | xdigitValue (p[2]);
-					if (val < 0x80)
-					{
-						p += 3;
-						c = val;
-					}
+					p += 3;
+					c = val;
 				}
-				break;
+			}
+			break;
 		}
 	}
 
@@ -410,7 +421,15 @@ static tagResult growFields (tagFile *const file)
 {
 	tagResult result = TagFailure;
 	unsigned short newCount = (unsigned short) 2 * file->fields.max;
-	tagExtensionField *newFields = (tagExtensionField*)
+	tagExtensionField *newFields;
+
+	if (!(newCount > file->fields.max)) {
+		errno = EOVERFLOW;
+		perror ("too many extension fields");
+		goto out;				/* integer overflow */
+	}
+
+	newFields = (tagExtensionField*)
 			realloc (file->fields.list, newCount * sizeof (tagExtensionField));
 	if (newFields == NULL)
 		perror ("too many extension fields");
@@ -420,6 +439,8 @@ static tagResult growFields (tagFile *const file)
 		file->fields.max = newCount;
 		result = TagSuccess;
 	}
+
+ out:
 	return result;
 }
 
@@ -502,7 +523,7 @@ static tagResult parseExtensionFields (tagFile *const file, tagEntry *const entr
 					{
 						if (growFields (file) != TagSuccess)
 						{
-							*err = ENOMEM;
+							*err = errno;
 							return TagFailure;
 						}
 					}
@@ -541,7 +562,8 @@ static unsigned int countContinuousBackslashesBackward(const char *from,
  * It is converted to 0x9 and occupies one byte.
  * memmove called here for shortening the line
  * buffer. */
-static char *unescapeInPlace (char *q, char **tab, size_t *p_len)
+READTAGS_INLINE
+char *unescapeInPlace (char *q, char **tab, size_t *p_len)
 {
 	char *p = q;
 

@@ -16,6 +16,7 @@ TESTS = \
 	test-fix-unescaping-input-fields-no-mode \
 	test-fix-unescaping-input-fields-backslash \
 	test-fix-unescaping-input-fields-no-filesep \
+	test-fix-too-many-fields \
 	\
 	$(NULL)
 
@@ -37,6 +38,7 @@ check_PROGRAMS = \
 	test-fix-unescaping-input-fields-no-mode \
 	test-fix-unescaping-input-fields-backslash \
 	test-fix-unescaping-input-fields-no-filesep \
+	test-fix-too-many-fields \
 	\
 	$(NULL)
 
@@ -120,3 +122,7 @@ EXTRA_DIST += unescaping-input-fields-backslash.tags
 test_fix_unescaping_input_fields_no_filesep = test-fix-unescaping-input-fields-no-filesep.c
 test_fix_unescaping_input_fields_no_filesep_DEPENDENCIES = $(DEPS)
 EXTRA_DIST += unescaping-input-fields-no-filesep.tags
+
+test_fix_too_many_fields = test-fix-too-many-fields.c
+test_fix_too_many_fields_DEPENDENCIES = $(DEPS)
+EXTRA_DIST += too-many-fields.tags
