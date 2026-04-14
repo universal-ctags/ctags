@@ -1,7 +1,7 @@
 # -*- Autoconf -*-
 #
 # When updating the above version, you also update VERSION in CMakeList.txt.
-AC_INIT(libreadtags, 0.4.0)
+AC_INIT(libreadtags, 0.5.0)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([readtags.c])
 

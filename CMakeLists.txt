@@ -3,7 +3,7 @@ project(
         readtags
 	#
 	# Synchronize VERSION with the value in configure.ac.
-        VERSION 0.4.0
+        VERSION 0.5.0
         DESCRIPTION "a library for looking up tag entries in tag files"
         HOMEPAGE_URL "https://github.com/universal-ctags/libreadtags"
         LANGUAGES C
