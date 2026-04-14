@@ -1,22 +1,27 @@
-# Version XXX
+# Version 0.5.0
 
-- imporve performance; put inline keyword on a hot spot function.
+- improve performance; put inline keyword on hot spot functions.
 
-	- before this change
+	- before this change (0.4.0)
 
 		```
-		$ /bin/time ./readtags -t ~/.citre/kernel82.tags -l > /dev/null
-		9.59user 0.42system 0:10.06elapsed 99%CPU (0avgtext+0avgdata 2819340maxresident)k
-		0inputs+0outputs (0major+44149minor)pagefaults 0swaps
+		$ /bin/time ~/bin/readtags -t ~/.citre/kernel82.tags -l > /dev/null
+		7.68user 0.15system 0:07.88elapsed 99%CPU (0avgtext+0avgdata 2819592maxresident)k
+		0inputs+0outputs (0major+44138minor)pagefaults 0swaps
 		```
 
 	- after this change
 
 		```
-		$ /bin/time ./readtags -t ~/.citre/kernel82.tags -l > /dev/null
-		7.82user 0.43system 0:08.30elapsed 99%CPU (0avgtext+0avgdata 2819688maxresident)k
-		0inputs+0outputs (0major+44138minor)pagefaults 0swaps
+		$ /bin/time ~/bin/readtags -t ~/.citre/kernel82.tags -l > /dev/null
+		4.67user 0.19system 0:04.89elapsed 99%CPU (0avgtext+0avgdata 2819612maxresident)k
+		0inputs+0outputs (0major+44137minor)pagefaults 0swaps
 		```
+- fix an integer overflow occurring when a tag has too many fields.
+
+  The original issue was reported by Arthur Chan
+  <arthur.chan@adalogics.com> from Ada Logics in collaboration with
+  Claude and Anthropic Research.
 
 # Version 0.4.0
 

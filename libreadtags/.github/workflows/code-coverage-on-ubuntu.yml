@@ -1,0 +1,36 @@
+name: upload coverage report to codecov.io
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  coverage:
+
+    runs-on: ubuntu-22.04
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+
+      CC: gcc
+
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - run: sudo apt-get -y -o APT::Immediate-Configure=false update
+    - run: sudo apt-get -y -o APT::Immediate-Configure=false install bash pkg-config automake autoconf make gcc lcov
+
+    - run: ./autogen.sh
+    - run:  ./configure --enable-gcov
+    - run:  make -j2
+    - run:  make check
+    - run:  lcov --compat-libtool -c -d . -o coverage.info
+    - uses: codecov/codecov-action@v5
+      with:
+        files: coverage.info
+        name: gha-ubuntu-latest
+        token: ${{ secrets.CODECOV_TOKEN }}
