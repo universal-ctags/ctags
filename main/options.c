@@ -98,6 +98,7 @@ typedef struct sOptionDescription {
 	int usedByEtags;
 	int experimentalOption;
 	const char *description;
+	char *(*descriptionNew) (const char *template);
 } optionDescription;
 
 typedef void (*parametricOptionHandler) (const char *const option, const char *const parameter);
@@ -1650,9 +1651,19 @@ static void processHelpOptionCommon (
 	int i;
 	for (i = 0 ; LongOptionDescription [i].description != NULL ; ++i)
 	{
-		if ((! Option.etags || LongOptionDescription [i].usedByEtags)
-			&& (! LongOptionDescription [i].experimentalOption || includingExperimentalOptions))
-			puts (LongOptionDescription [i].description);
+		optionDescription *longopt = LongOptionDescription + i;
+		if ((! Option.etags || longopt->usedByEtags)
+			&& (! longopt->experimentalOption || includingExperimentalOptions))
+		{
+			if (longopt->descriptionNew)
+			{
+				char *desc = longopt->descriptionNew (longopt->description);
+				puts (desc);
+				eFree (desc);
+			}
+			else
+				puts (longopt->description);
+		}
 	}
 }
 
