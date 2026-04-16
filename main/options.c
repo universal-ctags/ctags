@@ -86,6 +86,11 @@
 	} while (0)
 
 /*
+*   Function declarations
+*/
+static char *makePatternLengthLimitHelpDescription (const char *template);
+
+/*
 *   Data declarations
 */
 
@@ -335,7 +340,8 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"  --kinds-(<LANG>|all)=[+|-](<kinds>|*)"},
  {1,0,"       Enable/disable tag <kinds> for language <LANG>."},
  {0,0,"  --pattern-length-limit=<N>"},
- {0,0,"      Cutoff patterns of tag entries after <N> characters. Disable by setting to 0. [96]"},
+ {0,0,"      Cutoff patterns of tag entries after <N> characters. Disable by setting to 0. [%u]",
+  makePatternLengthLimitHelpDescription },
  {0,0,"  --pseudo-tags=[+|-](<pseudo-tag>|*)"},
  {0,0,"       Enable/disable emitting pseudo tag named <pseudo-tag>."},
  {0,0,"       if '*' is given, enable emitting all pseudo tags."},
@@ -2994,6 +3000,15 @@ static void processMaxRecursionDepthOption (const char *const option, const char
 		error (FATAL, "-%s: Invalid maximum recursion depth", option);
 
 	Option.maxRecursionDepth = atol(parameter);
+}
+
+static char *makePatternLengthLimitHelpDescription (const char *template)
+{
+	char *str = NULL;
+	asprintf (&str, template, Option.patternLengthLimit);
+	if (str == NULL)
+		error (FATAL, "out of memory");
+	return str;
 }
 
 static void processPatternLengthLimit(const char *const option, const char *const parameter)
