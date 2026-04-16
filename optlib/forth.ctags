@@ -22,6 +22,6 @@
 --kinddef-Forth=c,constant,constants
 
 --regex-Forth=/^[[:space:]]*\\.*//{exclusive}
---regex-Forth=/^:[[:space:]]+([^[:space:]]+)/\1/w/{exclusive}
---regex-Forth=/^variable[[:space:]]+([^[:space:]]+)/\1/v/{exclusive}{icase}
---regex-Forth=/^[[:alnum:]]+[[:space:]]+constant[[:space:]]+([^[:space:]]+)/\1/c/{exclusive}{icase}
+--regex-Forth=/:[[:space:]]+([^[:space:]]+)/\1/w/{exclusive}
+--regex-Forth=/variable[[:space:]]+([^[:space:]]+)/\1/v/{exclusive}{icase}
+--regex-Forth=/[[:alnum:]]+[[:space:]]+constant[[:space:]]+([^[:space:]]+)/\1/c/{exclusive}{icase}
