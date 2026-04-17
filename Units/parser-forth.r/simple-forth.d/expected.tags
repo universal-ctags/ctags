@@ -1,9 +1,13 @@
 DUMMY1	input.fth	/^10 constant DUMMY1$/;"	c
 DUMMY2	input.fth	/^12 CONSTANT DUMMY2$/;"	c
+DUMMY_INDENTED	input.fth	/^  13 CONSTANT DUMMY_INDENTED$/;"	c
 dummy3	input.fth	/^variable dummy3$/;"	v
 dummy4	input.fth	/^variable dummy4$/;"	v
 dummy5	input.fth	/^VARIABLE dummy5$/;"	v
+dummy_indented2	input.fth	/^  VARIABLE dummy_indented2$/;"	v
+IN_ONE_LINE	input.fth	/^7 constant SEVERAL variable _DEFINITIONS : IN_ONE_LINE 7 emit ;$/;"	w
 fizz?	input.fth	/^: fizz?  \\ a simple comment $/;"	w
 buzz?	input.fth	/^: buzz?  $/;"	w
+baz_indented	input.fth	/^  : baz_indented ( - )$/;"	w
 fizz-buzz?	input.fth	/^: fizz-buzz?  $/;"	w
 do-fizz-buzz	input.fth	/^: do-fizz-buzz  $/;"	w
