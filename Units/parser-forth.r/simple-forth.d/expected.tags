@@ -7,3 +7,7 @@ fizz?	input.fth	/^: fizz?  \\ a simple comment $/;"	w
 buzz?	input.fth	/^: buzz?  $/;"	w
 fizz-buzz?	input.fth	/^: fizz-buzz?  $/;"	w
 do-fizz-buzz	input.fth	/^: do-fizz-buzz  $/;"	w
+DUMMY_INDENTED	input.fth	/^  13 CONSTANT DUMMY_INDENTED$/;"	c
+IN_ONE_LINE	input.fth	/^7 constant SEVERAL variable _DEFINITIONS : IN_ONE_LINE 7 emit ;$/;"	w
+baz_indented	input.fth	/^  : baz_indented ( - )$/;"	w
+dummy_indented2	input.fth	/^  VARIABLE dummy_indented2$/;"	v
