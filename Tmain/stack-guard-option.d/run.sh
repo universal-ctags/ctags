@@ -80,6 +80,9 @@ r=$((r + $?))
 limit $CTAGS --options=NONE --verbose --stack-limit=$given_ -o - input.v 2>&1 \
 	| extract
 
+header HELP 64
+limit $CTAGS --help | grep -A1 -e --stack-limit
+
 header JavaScript 64
 limit $CTAGS --options=NONE --verbose -o - input.js > /dev/null 2>&1
 r=$((r + $?))
