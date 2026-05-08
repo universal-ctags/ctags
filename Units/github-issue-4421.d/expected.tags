@@ -1,0 +1,3 @@
+Bar	input.js	/^function Bar() {}$/;"	c
+Foo	input.js	/^function Foo() {$/;"	c
+foo	input.js	/^Foo.prototype.foo = function() {}$/;"	m	class:Foo
