@@ -6,3 +6,10 @@ function Foo() {
 }
 
 Foo.prototype.foo = function() {}
+
+function Baz() {
+	Bar.prototype.constructor = call(this)
+	this.baz = null
+}
+
+Baz.prototype.baz = function() {}

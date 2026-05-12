@@ -1,3 +1,6 @@
 Bar	input.js	/^function Bar() {}$/;"	c
 Foo	input.js	/^function Foo() {$/;"	c
 foo	input.js	/^Foo.prototype.foo = function() {}$/;"	m	class:Foo
+Baz	input.js	/^function Baz() {$/;"	c
+constructor	input.js	/^	Bar.prototype.constructor = call(this)$/;"	m	class:Bar
+baz	input.js	/^Baz.prototype.baz = function() {}/;"	m	class:Baz

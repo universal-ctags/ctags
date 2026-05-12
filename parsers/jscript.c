@@ -2816,12 +2816,11 @@ static bool parsePrototype (tokenInfo *const name, tokenInfo *const token, state
 			vStringDelete (signature);
 
 			if ( isType (method_body_token, TOKEN_OPEN_CURLY))
-			{
 				parseBlock (method_body_token, index);
-				state->isTerminated = true;
-			}
-			else
-				state->isTerminated = isType (method_body_token, TOKEN_SEMICOLON);
+			else if ( isType (method_body_token, TOKEN_CLOSE_CURLY))
+				ungetcToInputFile ('}');
+
+			state->isTerminated = true;
 
 			deleteToken (method_body_token);
 			TRACE_LEAVE_TEXT("done: single");
