@@ -1,5 +1,5 @@
 ======================================================================
-Changes in 6.2.1
+Changes in 6.2.2
 ======================================================================
 
 This release fixes some critical bugs reported/found after releasing
