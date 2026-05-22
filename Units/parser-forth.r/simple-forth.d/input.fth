@@ -33,6 +33,8 @@ dup fizz? swap buzz? or invert ;
 : do-fizz-buzz  
 25 1 do cr i fizz-buzz? if i . then loop ;
 
+: anon-tst [: cr ." hello" cr ;] execute ;
+
 do-fizz-buzz
 cr
 baz_indented
