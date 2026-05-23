@@ -13,3 +13,4 @@ buzz?	input.fth	/^: buzz?  $/;"	w
 baz_indented	input.fth	/^  : baz_indented ( - )$/;"	w
 fizz-buzz?	input.fth	/^: fizz-buzz?  $/;"	w
 do-fizz-buzz	input.fth	/^: do-fizz-buzz  $/;"	w
+anon-tst	input.fth	/^: anon-tst [: cr ." hello" cr ;] execute ;$/;"	w

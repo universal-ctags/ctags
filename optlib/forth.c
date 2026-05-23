@@ -46,7 +46,7 @@ extern parserDefinition* ForthParser (void)
 	static tagRegexTable ForthTagRegexTable [] = {
 		{"^[[:space:]]*\\\\.*", "",
 		"", "{exclusive}", NULL, false},
-		{":[[:space:]]+([^[:space:]]+)", "\\1",
+		{"(^|[[:space:]]+):[[:space:]]+([^[:space:]]+)", "\\2",
 		"w", NULL, NULL, false},
 		{"variable[[:space:]]+([^[:space:]]+)", "\\1",
 		"v", "{icase}", NULL, false},
