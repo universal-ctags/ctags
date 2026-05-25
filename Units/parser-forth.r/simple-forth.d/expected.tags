@@ -1,6 +1,8 @@
 DUMMY1	input.fth	/^10 constant DUMMY1$/;"	c
 DUMMY2	input.fth	/^12 CONSTANT DUMMY2$/;"	c
 DUMMY_INDENTED	input.fth	/^  13 CONSTANT DUMMY_INDENTED$/;"	c
+NON-NUMERIC-CONSTANT	input.fth	/^HERE CELL \/ CONSTANT NON-NUMERIC-CONSTANT$/;"	c
+HEX-CONSTANT	input.fth	/^FFF32 CONSTANT HEX-CONSTANT$/;"	c
 dummy3	input.fth	/^variable dummy3$/;"	v
 dummy4	input.fth	/^variable dummy4$/;"	v
 dummy5	input.fth	/^VARIABLE dummy5$/;"	v

@@ -24,4 +24,4 @@
 --regex-Forth=/^[[:space:]]*\\.*//{exclusive}
 --regex-Forth=/(^|[[:space:]]+):[[:space:]]+([^[:space:]]+)/\2/w/
 --regex-Forth=/variable[[:space:]]+([^[:space:]]+)/\1/v/{icase}
---regex-Forth=/[[:alnum:]]+[[:space:]]+constant[[:space:]]+([^[:space:]]+)/\1/c/{icase}
+--regex-Forth=/constant[[:space:]]+([^[:space:]]+)/\1/c/{icase}

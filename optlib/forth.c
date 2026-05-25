@@ -50,7 +50,7 @@ extern parserDefinition* ForthParser (void)
 		"w", NULL, NULL, false},
 		{"variable[[:space:]]+([^[:space:]]+)", "\\1",
 		"v", "{icase}", NULL, false},
-		{"[[:alnum:]]+[[:space:]]+constant[[:space:]]+([^[:space:]]+)", "\\1",
+		{"constant[[:space:]]+([^[:space:]]+)", "\\1",
 		"c", "{icase}", NULL, false},
 	};
 
