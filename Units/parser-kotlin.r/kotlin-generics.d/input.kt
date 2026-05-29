@@ -6,3 +6,5 @@ interface Foo<T> {
 
 class Bar<T, U>(val a: T, val b: U): Foo<T>
 class Baz <T, U: Pair<String,Pair<T, Double>>>(val c: T, val d: U): Foo<T>
+
+suspend fun<T> quux(x: T?): T & Any = checkNotNull(x)

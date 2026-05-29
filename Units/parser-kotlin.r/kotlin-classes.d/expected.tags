@@ -1,0 +1,12 @@
+Person	input.kt	/^open class Person(val name: String, var age: Int) {$/;"	c
+name	input.kt	/^open class Person(val name: String, var age: Int) {$/;"	C	class:Person
+age	input.kt	/^open class Person(val name: String, var age: Int) {$/;"	v	class:Person
+Companion	input.kt	/^    companion object {$/;"	o	class:Person
+NOBODY	input.kt	/^        val NOBODY = Person("", 0)$/;"	C	object:Person.Companion
+Permission	input.kt	/^value class Permission(val id: Int)$/;"	c
+id	input.kt	/^value class Permission(val id: Int)$/;"	C	class:Permission
+User	input.kt	/^data class User(val person: Person, val permissions: List<Permission>)$/;"	c
+person	input.kt	/^data class User(val person: Person, val permissions: List<Permission>)$/;"	C	class:User
+permissions	input.kt	/^data class User(val person: Person, val permissions: List<Permission>)$/;"	C	class:User
+Admin	input.kt	/^object Admin: Person("Administrator", 0) {$/;"	o
+SCOPE	input.kt	/^    const val SCOPE = "global"$/;"	C	object:Admin
