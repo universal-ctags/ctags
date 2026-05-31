@@ -39,7 +39,7 @@
 # - https://cmake.org/cmake/help/latest/manual/cmake-language.7.html
 #
 
---langdef=CMake
+--langdef=CMake{version=1.1}
 --map-CMake=+.cmake
 --map-CMake=+(CMakeLists.txt)
 
@@ -52,6 +52,8 @@
 --kinddef-CMake=v,variable,variable definitions
 --kinddef-CMake=D,option,options specified with -D
 --kinddef-CMake=p,project,projects
+--kinddef-CMake=M,module,modules{version=1}
+--_roledef-CMake.{module}=included,load with "include" command{version=1}
 
 #
 # Tables
@@ -64,6 +66,7 @@
 --_tabledef-CMake=target
 --_tabledef-CMake=option
 --_tabledef-CMake=project
+--_tabledef-CMake=include
 
 #
 # comment
@@ -101,7 +104,7 @@
 # matching tokens with leading characters that could not possibly match a later regex,
 # and just skipping the whole token (and trailing whitespace). This one regex line
 # improved performance by an order of magnitude.
---_mtable-regex-CMake=main/[^sSfFmMaAoOpP# \t\n][^ #\t\n]*[ \t\n]+//
+--_mtable-regex-CMake=main/[^sSfFmMaAoOpPiI# \t\n][^ #\t\n]*[ \t\n]+//
 --_mtable-extend-CMake=main+skipComment
 --_mtable-regex-CMake=main/set[ \t]*\(//{icase}{tenter=variable}
 --_mtable-regex-CMake=main/function[ \t]*\(//{icase}{tenter=function}
@@ -109,6 +112,7 @@
 --_mtable-regex-CMake=main/add_(custom_target|executable|library)[ \t]*\(//{icase}{tenter=target}
 --_mtable-regex-CMake=main/option[ \t]*\(//{icase}{tenter=option}
 --_mtable-regex-CMake=main/project[ \t]*\(//{icase}{tenter=project}
+--_mtable-regex-CMake=main/include[ \t]*\(//{icase}{tenter=include}
 --_mtable-extend-CMake=main+nextToken
 --_mtable-extend-CMake=main+skipWhiteSpace
 
@@ -196,3 +200,9 @@
 #
 --_mtable-regex-CMake=project/([A-Za-z0-9_.-]+)([# \t\n\)])/\1/p/{tleave}{_advanceTo=2start}
 --_mtable-extend-CMake=project+skipToName
+
+#
+# include
+#
+--_mtable-regex-CMake=include/([^# \t\n\)]+)([# \t\n\)])/\1/M/{_role=included}{tleave}{_advanceTo=2start}
+--_mtable-extend-CMake=include+skipToName

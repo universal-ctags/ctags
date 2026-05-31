@@ -99,6 +99,10 @@ DosBatch:
       New ``called`` role is used for recording batch files.
     * Add ``called`` role to ``label`` kind for recording labels passed to ``call`` command.
 
+CMake:
+
+    * Add ``module`` kind for extracting ``MODULE`` in ``Include(MODULE)``.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
