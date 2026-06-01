@@ -79,6 +79,7 @@ enum eKeywordId {
 	KEYWORD_OPERATOR, KEYWORD_OVERRIDE,
 	KEYWORD_PACKAGE, KEYWORD_PRIVATE,
 	KEYWORD_PROTECTED, KEYWORD_PUBLIC,
+	KEYWORD_RECORD,
 	KEYWORD_REGISTER, KEYWORD_RETURN, KEYWORD_SHARED,
 	KEYWORD_SHORT, KEYWORD_SIGNED, KEYWORD_STATIC, KEYWORD_STRING,
 	KEYWORD_STRUCT, KEYWORD_SWITCH, KEYWORD_SYNCHRONIZED,
@@ -166,6 +167,7 @@ typedef enum eDeclaration {
 	DECL_USING,
 	DECL_VERSION,        /* D conditional compile */
 	DECL_ANNOTATION,     /* Java annotation */
+	DECL_RECORD,		 /* Java Record */
 	DECL_COUNT
 } declType;
 
@@ -244,6 +246,7 @@ typedef enum eTagType {
 	TAG_PACKAGEREF,	 /* referenced package name */
 	TAG_PROPERTY,    /* property name */
 	TAG_PROTOTYPE,   /* function prototype or declaration */
+	TAG_RECORD,      /* Java record name */
 	TAG_STRUCT,      /* structure name */
 	TAG_TYPEDEF,     /* typedef name / D alias name */
 	TAG_TEMPLATE,    /* D template name */
@@ -348,7 +351,7 @@ static roleDefinition JavaPackageRoles [] = {
 typedef enum {
 	JK_UNDEFINED = COMMONK_UNDEFINED,
 	JK_ANNOTATION, JK_CLASS, JK_ENUM_CONSTANT, JK_FIELD, JK_ENUM, JK_INTERFACE,
-	JK_LOCAL, JK_METHOD, JK_PACKAGE,
+	JK_LOCAL, JK_METHOD, JK_PACKAGE, JK_RECORD,
 } javaKind;
 
 static kindDefinition JavaKinds [] = {
@@ -362,6 +365,8 @@ static kindDefinition JavaKinds [] = {
 	{ true,  'm', "method",        "methods"},
 	{ true,  'p', "package",       "packages",
 	  .referenceOnly = false, ATTACH_ROLES(JavaPackageRoles)},
+	{ true,  'r', "record",        "records",
+	  .version = 1 },
 };
 
 static const keywordDesc KeywordTable [] = {
@@ -450,6 +455,7 @@ static const keywordDesc KeywordTable [] = {
      { "protected",       KEYWORD_PROTECTED,       { 1, 1, 1 } },
      { "public",          KEYWORD_PUBLIC,          { 1, 1, 1 } },
      { "real",            KEYWORD_REAL,            { 0, 1, 0 } },
+     { "record",          KEYWORD_RECORD,          { 0, 0, 1 } },
      { "register",        KEYWORD_REGISTER,        { 0, 1, 0 } },
      { "return",          KEYWORD_RETURN,          { 1, 1, 1 } },
      { "scope",           KEYWORD_SCOPE,           { 0, 1, 0 } },
@@ -613,7 +619,7 @@ static const char *declString (const declType declaration)
 		"?", "base", "class", "enum", "event", "function", "function template",
 		"ignore", "interface", "mixin", "namespace", "package", "package ref",
 		"private", "protected", "public", "struct", "template",
-		"union", "using", "version", "annotation"
+		"union", "using", "version", "annotation", "record",
 	};
 	Assert (ARRAY_SIZE (names) == DECL_COUNT);
 	Assert ((int) declaration < DECL_COUNT);
@@ -691,6 +697,7 @@ static bool isContextualKeyword (const tokenInfo *const token)
 		case KEYWORD_ENUM:
 		case KEYWORD_INTERFACE:
 		case KEYWORD_NAMESPACE:
+		case KEYWORD_RECORD:
 		case KEYWORD_STRUCT:
 		case KEYWORD_UNION:
 		case KEYWORD_VERSION:
@@ -715,6 +722,7 @@ static bool isContextualStatement (const statementInfo *const st)
 		case DECL_PRIVATE:
 		case DECL_PROTECTED:
 		case DECL_PUBLIC:
+		case DECL_RECORD:
 		case DECL_STRUCT:
 		case DECL_UNION:
 		case DECL_TEMPLATE:
@@ -760,6 +768,7 @@ static void initMemberInfo (statementInfo *const st)
 			break;
 
 		case DECL_CLASS:
+		case DECL_RECORD:
 			if (isInputLanguage (Lang_java))
 				accessDefault = ACCESS_DEFAULT;
 			else if (isInputLanguage (Lang_d))
@@ -878,6 +887,7 @@ static javaKind javaTagKindFull (const tagType type, bool with_assert)
 		case TAG_PACKAGE:    /* Fall through */
 		case TAG_PACKAGEREF: result = JK_PACKAGE;       break;
 		case TAG_ANNOTATION: result = JK_ANNOTATION;     break;
+		case TAG_RECORD:     result = JK_RECORD;        break;
 
 		default: if (with_assert) Assert ("Bad Java tag type" == NULL); break;
 	}
@@ -991,6 +1001,7 @@ static tagType declToTagType (const declType declaration)
 		case DECL_PRIVATE:      type = TAG_CLASS;       break;
 		case DECL_PROTECTED:    type = TAG_CLASS;       break;
 		case DECL_PUBLIC:       type = TAG_CLASS;       break;
+		case DECL_RECORD:       type = TAG_RECORD;      break;
 		case DECL_TEMPLATE: 	type = TAG_TEMPLATE; 	break;
 		case DECL_STRUCT:       type = TAG_STRUCT;      break;
 		case DECL_UNION:        type = TAG_UNION;       break;
@@ -1030,6 +1041,11 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 		case TAG_TEMPLATE:
 		case TAG_METHOD:
 		case TAG_PROTOTYPE:
+		case TAG_RECORD:		/* Records are not callable. However,
+								 * components appear just after the name
+								 * of record. Let's attach the components
+								 * to the signature field of the record
+								 * tag. */
 			if (vStringLength (Signature) > 0)
 				tag->extensionFields.signature = vStringValue (Signature);
 			/* Fallthrough */
@@ -1266,6 +1282,7 @@ static bool isValidTypeSpecifier (const declType declaration)
 		case DECL_CLASS:
 		case DECL_ENUM:
 		case DECL_EVENT:
+		case DECL_RECORD:
 		case DECL_STRUCT:
 		case DECL_UNION:
 		case DECL_ANNOTATION:
@@ -1350,6 +1367,7 @@ static int qualifyBlockTag (statementInfo *const st,
 		case DECL_ENUM:
 		case DECL_INTERFACE:
 		case DECL_NAMESPACE:
+		case DECL_RECORD:
 		case DECL_STRUCT:
 		case DECL_UNION:
 		case DECL_TEMPLATE:
@@ -1909,6 +1927,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_PRIVATE:   setAccess (st, ACCESS_PRIVATE);         break;
 		case KEYWORD_PROTECTED: setAccess (st, ACCESS_PROTECTED);       break;
 		case KEYWORD_PUBLIC:    setAccess (st, ACCESS_PUBLIC);          break;
+		case KEYWORD_RECORD:    st->declaration = DECL_RECORD;          break;
 		case KEYWORD_RETURN:    skipStatement (st);                     break;
 		case KEYWORD_SHORT:     st->declaration = DECL_BASE;            break;
 		case KEYWORD_SIGNED:    st->declaration = DECL_BASE;            break;
@@ -2102,6 +2121,7 @@ static bool skipPostArgumentStuff (
 				case KEYWORD_ALIAS:
 				case KEYWORD_CATCH:
 				case KEYWORD_CLASS:
+				case KEYWORD_RECORD:
 				case KEYWORD_EXPLICIT:
 				case KEYWORD_EXTERN:
 				case KEYWORD_FRIEND:
@@ -2832,6 +2852,7 @@ static void nest (statementInfo *const st, const unsigned int nestLevel)
 		case DECL_PRIVATE:
 		case DECL_PROTECTED:
 		case DECL_PUBLIC:
+		case DECL_RECORD:
 		case DECL_STRUCT:
 		case DECL_UNION:
 		case DECL_ANNOTATION:
@@ -2891,6 +2912,8 @@ static int tagCheck (statementInfo *const st)
 						st->declaration == DECL_INTERFACE || st->declaration == DECL_UNION ||
 						st->declaration == DECL_TEMPLATE))
 						corkIndex = qualifyBlockTag (st, prev2);
+					else if (st->declaration == DECL_RECORD)
+						corkIndex = qualifyBlockTag (st, st->blockName);
 					else
 					{
 						st->declaration = DECL_FUNCTION;
@@ -3127,5 +3150,7 @@ extern parserDefinition* JavaParser (void)
 	def->parser2    = findCTags;
 	def->initialize = initializeJavaParser;
 	def->useCork    = CORK_QUEUE;
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	return def;
 }

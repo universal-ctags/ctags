@@ -1,0 +1,5 @@
+Point	input.java	/^record Point(int x, int y) { }$/;"	r	signature:(int x, int y)
+Person	input-0.java	/^public record Person(String name, int age) {}$/;"	r	signature:(String name, int age)
+Rectangle	input-1.java	/^record Rectangle(double length, double width) {$/;"	r	signature:(double length, double width)
+RotationAngle	input-1.java	/^    record RotationAngle(double angle) {$/;"	r	record:Rectangle	signature:(double angle)
+getRotatedRectangleBoundingBox	input-1.java	/^    public Rectangle getRotatedRectangleBoundingBox(double angle) {$/;"	m	record:Rectangle	signature:(double angle)
