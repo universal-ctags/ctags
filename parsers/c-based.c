@@ -348,7 +348,7 @@ static roleDefinition JavaPackageRoles [] = {
 typedef enum {
 	JK_UNDEFINED = COMMONK_UNDEFINED,
 	JK_ANNOTATION, JK_CLASS, JK_ENUM_CONSTANT, JK_FIELD, JK_ENUM, JK_INTERFACE,
-	JK_LOCAL, JK_METHOD, JK_PACKAGE, JK_ACCESS, JK_CLASS_PREFIX
+	JK_LOCAL, JK_METHOD, JK_PACKAGE,
 } javaKind;
 
 static kindDefinition JavaKinds [] = {
