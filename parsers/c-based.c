@@ -1080,7 +1080,8 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 				}
 			}
 			if ((type == TAG_CLASS  ||  type == TAG_INTERFACE  ||
-				 type == TAG_STRUCT || type == TAG_ANNOTATION) && vStringLength (st->parentClasses) > 0)
+				 type == TAG_STRUCT || type == TAG_ANNOTATION || type == TAG_RECORD)
+				&& vStringLength (st->parentClasses) > 0)
 			{
 
 				tag->extensionFields.inheritance =
@@ -2188,7 +2189,12 @@ static void skipJavaThrows (statementInfo *const st)
 	tokenInfo *const token = activeToken (st);
 	int c = skipToNonWhite ();
 
-	if (cppIsident1 (c))
+	/* Skip "...) throws ..." here.
+	 * -----------^
+	 * However, don't skip "record R(...) implements ...
+	 * -----------------------------------^
+	 */
+	if (c == 't')
 	{
 		readIdentifier (token, c);
 		if (token->keyword == KEYWORD_THROWS)
