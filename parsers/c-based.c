@@ -51,6 +51,8 @@
 
 enum { NumTokens = 3 };
 
+#define MAX_NEST_LEVEL 1024
+
 typedef enum eException {
 	ExceptionNone, ExceptionEOF, ExceptionFormattingError,
 	ExceptionBraceFormattingError
@@ -3005,7 +3007,17 @@ static void createTags (const unsigned int nestLevel,
 		{
 			int corkIndex = tagCheck (st);
 			if (isType (token, TOKEN_BRACE_OPEN))
-				nest (st, nestLevel + 1);
+			{
+				if (nestLevel < MAX_NEST_LEVEL)
+					nest (st, nestLevel + 1);
+				else
+				{
+					verbose ("%s: nesting level too deep (%u) at line %lu, skipping\n",
+						 getInputFileName (), nestLevel, getInputLineNumber ());
+					skipToMatch ("{}");
+					setToken (st, TOKEN_BRACE_CLOSE);
+				}
+			}
 			checkStatementEnd (st, corkIndex);
 		}
 	}
