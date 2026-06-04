@@ -2949,6 +2949,20 @@ static int tagCheck (statementInfo *const st)
 			}
 			else if (isInputLanguage (Lang_csharp))
 				corkIndex = makeTag (prev, st, false, TAG_PROPERTY);
+			else if (isInputLanguage (Lang_java))
+			{
+				if (isType (prev, TOKEN_NAME)
+					&& st->parent && st->parent->declaration == DECL_RECORD
+					&& st->parent->blockName
+					&& strcmp(vStringValue (prev->name),
+							  vStringValue (st->parent->blockName->name)) == 0)
+				{
+					/* A record can have a COMPACT constructor. */
+					st->declaration = DECL_FUNCTION;
+					vStringClear (Signature);
+					corkIndex = qualifyFunctionTag (st, prev);
+				}
+			}
 			break;
 
 		case TOKEN_KEYWORD:
