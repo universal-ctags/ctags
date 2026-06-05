@@ -103,6 +103,10 @@ CMake:
 
     * Add ``module`` kind for extracting ``MODULE`` in ``Include(MODULE)``.
 
+Java:
+
+    * Add ``record`` kind for extracting ``RECORD`` in ``record RECORD(...)``.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:

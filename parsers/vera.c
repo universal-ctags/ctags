@@ -1317,11 +1317,6 @@ static void processInterface (statementInfo *const st)
 	st->declaration = DECL_INTERFACE;
 }
 
-static void checkIsClassEnum (statementInfo *const st, const declType decl)
-{
-	st->declaration = decl;
-}
-
 static void processToken (tokenInfo *const token, statementInfo *const st)
 {
 	switch ((int)token->keyword)        /* is it a reserved word? */
@@ -1331,7 +1326,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_NONE:      processName (st);                       break;
 		case KEYWORD_BIND:      st->declaration = DECL_BASE;            break;
 		case KEYWORD_BIT:       st->declaration = DECL_BASE;            break;
-		case KEYWORD_CLASS:     checkIsClassEnum (st, DECL_CLASS);      break;
+		case KEYWORD_CLASS:     st->declaration = DECL_CLASS;           break;
 		case KEYWORD_ENUM:      st->declaration = DECL_ENUM;            break;
 		case KEYWORD_EXTENDS:   readParents (st, '.');
 		                        setToken (st, TOKEN_NONE);              break;
