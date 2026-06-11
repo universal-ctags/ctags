@@ -36,6 +36,9 @@ typedef enum {
 	K_HEADING1,
 	K_HEADING2,
 	K_HEADING3,
+	K_HEADING4,
+	K_HEADING5,
+	K_HEADING6,
 	K_STYELSHEET,
 	K_ID,
 	K_SCRIPT,
@@ -74,6 +77,12 @@ static kindDefinition HtmlKinds [] = {
 	{ true, 'h', "heading1",	"H1 headings" },
 	{ true, 'i', "heading2",	"H2 headings" },
 	{ true, 'j', "heading3",	"H3 headings" },
+	{ true, 'k', "heading4",	"H4 headings",
+	  .version = 1 },
+	{ true, 'l', "heading5",	"H5 headings",
+	  .version = 1 },
+	{ true, 'm', "heading6",	"H6 headings",
+	  .version = 1, },
 	{ true, 'C', "stylesheet",	"stylesheets",
 	  .referenceOnly = true, ATTACH_ROLES (StylesheetRoles)},
 	{ true, 'I', "id",			"identifiers" },
@@ -82,7 +91,7 @@ static kindDefinition HtmlKinds [] = {
 };
 
 typedef enum {
-	/* The order starting from "title" to "h3" should
+	/* The order starting from "title" to "h6" should
 	 * not be changed.
 	 *
 	 */
@@ -91,7 +100,10 @@ typedef enum {
 	KEYWORD_h1,
 	KEYWORD_h2,
 	KEYWORD_h3,
-	KEYWORD_heading_end = KEYWORD_h3,
+	KEYWORD_h4,
+	KEYWORD_h5,
+	KEYWORD_h6,
+	KEYWORD_heading_end = KEYWORD_h6,
 	KEYWORD_a,
 	KEYWORD_script,
 	KEYWORD_style,
@@ -126,6 +138,9 @@ static const keywordTable HtmlKeywordTable[] = {
 	{"h1", KEYWORD_h1},
 	{"h2", KEYWORD_h2},
 	{"h3", KEYWORD_h3},
+	{"h4", KEYWORD_h4},
+	{"h5", KEYWORD_h5},
+	{"h6", KEYWORD_h6},
 	{"a", KEYWORD_a},
 	{"script", KEYWORD_script},
 	{"style", KEYWORD_style},
@@ -764,8 +779,14 @@ static void readTag (tokenInfo *token, vString *text, int depth, bool asJSX)
 							headingKind = K_HEADING1;
 						else if (startTag == KEYWORD_h2)
 							headingKind = K_HEADING2;
-						else
+						else if (startTag == KEYWORD_h3)
 							headingKind = K_HEADING3;
+						else if (startTag == KEYWORD_h4)
+							headingKind = K_HEADING4;
+						else if (startTag == KEYWORD_h5)
+							headingKind = K_HEADING5;
+						else
+							headingKind = K_HEADING6;
 
 						vStringStripLeading (text);
 						vStringStripTrailing (text);
@@ -830,6 +851,8 @@ extern parserDefinition* HtmlParser (void)
 	def->initialize   = initialize;
 	def->keywordTable = HtmlKeywordTable;
 	def->keywordCount = ARRAY_SIZE (HtmlKeywordTable);
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	return def;
 }
 

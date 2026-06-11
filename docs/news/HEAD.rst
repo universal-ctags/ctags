@@ -107,6 +107,10 @@ Java:
 
     * Add ``record`` kind for extracting ``RECORD`` in ``record RECORD(...)``.
 
+HTML:
+
+    * Extract ``h4``, ``h5``, and ``h6`` contents.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
