@@ -760,7 +760,7 @@ static void readTag (tokenInfo *token, vString *text, int depth, bool asJSX)
 
 						if (startTag == KEYWORD_title)
 							headingKind = K_TITLE;
-						if (startTag == KEYWORD_h1)
+						else if (startTag == KEYWORD_h1)
 							headingKind = K_HEADING1;
 						else if (startTag == KEYWORD_h2)
 							headingKind = K_HEADING2;

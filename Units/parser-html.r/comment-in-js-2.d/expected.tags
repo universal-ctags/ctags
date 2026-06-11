@@ -1,4 +1,4 @@
-HTML comments in JS	input.html	/^<title>HTML comments in JS<\/title>$/;"	j	language:HTML
+HTML comments in JS	input.html	/^<title>HTML comments in JS<\/title>$/;"	t	language:HTML
 HTML comments in JS	input.html	/^  <h1>HTML comments in JS<\/h1>$/;"	h	language:HTML
 func1	input.html	/^function func1() {}; <!-- function bug2() {}$/;"	f	language:JavaScript
 func2	input.html	/^function func2() {};$/;"	f	language:JavaScript
