@@ -522,6 +522,9 @@ AM_CONDITIONAL([HOST_MINGW], [test "x${host_mingw}" = "xyes"])
 AC_CHECK_HEADERS([direct.h dirent.h fcntl.h io.h stat.h types.h unistd.h])
 AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/types.h sys/wait.h])
 
+dnl for backtrace().
+AC_CHECK_HEADERS([execinfo.h],have_execinfo_h=yes)
+
 # Checks for header file macros
 # -----------------------------
 
@@ -631,6 +634,9 @@ AS_VAR_IF([use_lto], [yes], [
 		AC_MSG_ERROR([though --enable-lto is specified, the fto feature is not available nor usable.])
 	])
 ])
+
+CC_CHECK_LDFLAGS([-rdynamic], have_cc_rdynamic=yes)
+
 
 # Checks for function availability
 # -----------------------------------
@@ -873,6 +879,11 @@ if test "${enable_static}" = "yes"; then
 		fi
 	fi
 fi
+
+AC_CHECK_FUNCS(backtrace, have_backtrace=yes)
+AC_CHECK_FUNCS(backtrace_symbols_fd, have_backtrace_symbols_fd=yes)
+AM_CONDITIONAL(HAVE_BACKTRACE,
+	[test "x${have_cc_rdynamic}${have_execinfo_h}${have_backtrace}${have_backtrace_symbols_fd}" = "xyesyesyesyes"])
 
 
 # Checks for missing prototypes
