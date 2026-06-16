@@ -18,6 +18,7 @@
 --langdef=RpmMacros
 
 --map-RpmMacros=+%(.*/)?macros\.d/macros\.([^/]+)$%
+--map-RpmMacros=+.rpmmacros
 
 --kinddef-RpmMacros=m,macro,macros
 
