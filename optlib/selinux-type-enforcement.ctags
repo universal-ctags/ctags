@@ -29,6 +29,7 @@
 --_tabledef-SELinuxTypeEnforcement=alias
 --_tabledef-SELinuxTypeEnforcement=compoundalias
 --_tabledef-SELinuxTypeEnforcement=lit
+--_tabledef-SELinuxTypeEnforcement=skipblock
 
 #
 # main
@@ -57,6 +58,8 @@
 
 --_mtable-regex-SELinuxTypeEnforcement=main/user[[:blank:]]+([a-zA-Z0-9_]+)[[:blank:]]*[^;]*;/\1/u/
 --_mtable-regex-SELinuxTypeEnforcement=main/gen_user\([[:blank:]]*([^,[:space:]\)]+)[^\)]*\)/\1/u/
+
+--_mtable-regex-SELinuxTypeEnforcement=main/require[ \t\n]+\{//{tenter=skipblock}
 
 --_mtable-regex-SELinuxTypeEnforcement=main/.//
 
@@ -98,3 +101,13 @@
 --_mtable-regex-SELinuxTypeEnforcement=lit/'//{tleave}
 --_mtable-regex-SELinuxTypeEnforcement=lit/`//{tenter=lit}
 --_mtable-regex-SELinuxTypeEnforcement=lit/.//
+
+#
+# skipblock
+#
+--_mtable-regex-SELinuxTypeEnforcement=skipblock/#[^\n]*//
+--_mtable-regex-SELinuxTypeEnforcement=skipblock/`//{tenter=lit}
+--_mtable-regex-SELinuxTypeEnforcement=skipblock/[[:space:]]+//
+--_mtable-regex-SELinuxTypeEnforcement=skipblock/\{//{tenter=skipblock}
+--_mtable-regex-SELinuxTypeEnforcement=skipblock/\}//{tleave}
+--_mtable-regex-SELinuxTypeEnforcement=skipblock/.//
