@@ -102,6 +102,7 @@ static void initializeRpmMacrosParser (const langType language)
 extern parserDefinition* RpmMacrosParser (void)
 {
 	static const char *const extensions [] = {
+		"rpmmacros",
 		NULL
 	};
 
