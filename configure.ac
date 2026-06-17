@@ -500,6 +500,21 @@ if test "$enable_external_sort" != yes ; then
 	AC_MSG_NOTICE(using internal sort algorithm as fallback)
 fi
 
+# Check for host type
+case "$host" in
+  i?86-*-mingw* | x86_64-*-mingw*)
+	host_mingw=yes
+	# See https://github.com/universal-ctags/ctags/pull/3069
+	gl_cv_have_weak=no
+	AC_DEFINE(MSDOS_STYLE_PATH)
+	AC_DEFINE(MANUAL_GLOBBING)
+	AC_DEFINE(HAVE__FINDFIRST)
+	;;
+  *-cygwin | *-msys)
+	gl_cv_have_weak=no
+	;;
+esac
+AM_CONDITIONAL([HOST_MINGW], [test "x${host_mingw}" = "xyes"])
 
 # Checks for header files
 # -----------------------
@@ -531,22 +546,6 @@ AC_C_TYPEOF
 if test "${enable_static}" = "yes"; then
 	LDFLAGS="$LDFLAGS -static"
 fi
-
-# Check for host type
-case "$host" in
-  i?86-*-mingw* | x86_64-*-mingw*)
-	host_mingw=yes
-	# See https://github.com/universal-ctags/ctags/pull/3069
-	gl_cv_have_weak=no
-	AC_DEFINE(MSDOS_STYLE_PATH)
-	AC_DEFINE(MANUAL_GLOBBING)
-	AC_DEFINE(HAVE__FINDFIRST)
-	;;
-  *-cygwin | *-msys)
-	gl_cv_have_weak=no
-	;;
-esac
-AM_CONDITIONAL([HOST_MINGW], [test "x${host_mingw}" = "xyes"])
 
 AC_MSG_CHECKING(if compiler supports statement expressions)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
