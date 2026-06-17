@@ -535,6 +535,25 @@ AC_TYPE_OFF_T
 
 AC_CHECK_HEADERS([stdbool.h])
 
+# Check if struct stat contains st_ino.
+# MinGW has st_ino, but it doesn't work.
+if test yes != "$host_mingw"; then
+	AC_MSG_CHECKING(if struct stat contains st_ino)
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+		#include <sys/stat.h>
+		#include <stdlib.h>
+		], [
+		struct stat st;
+		stat(".", &st);
+		if (st.st_ino > 0)
+			exit(0);
+	])],[have_st_ino=yes],[have_st_ino=no])
+	AC_MSG_RESULT($have_st_ino)
+	if test yes = "$have_st_ino"; then
+		AC_DEFINE(HAVE_STAT_ST_INO)
+	fi
+fi
+
 # Checks for compiler characteristics
 # -----------------------------------
 
@@ -554,26 +573,6 @@ int main(int argc, char **argv) {return ({ int x = 1; x + argc;});}
 AC_MSG_RESULT($have_statement_expression_ext)
 if test yes = "$have_statement_expression_ext"; then
 	AC_DEFINE(HAVE_STATEMENT_EXPRESSION_EXT)
-fi
-
-
-# Check if struct stat contains st_ino.
-# MinGW has st_ino, but it doesn't work.
-if test yes != "$host_mingw"; then
-	AC_MSG_CHECKING(if struct stat contains st_ino)
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
-		#include <sys/stat.h>
-		#include <stdlib.h>
-		], [
-		struct stat st;
-		stat(".", &st);
-		if (st.st_ino > 0)
-			exit(0);
-	])],[have_st_ino=yes],[have_st_ino=no])
-	AC_MSG_RESULT($have_st_ino)
-	if test yes = "$have_st_ino"; then
-		AC_DEFINE(HAVE_STAT_ST_INO)
-	fi
 fi
 
 PRETTY_ARG_VAR([EXTRA_CPPFLAGS], [extra (Objective) C/C++ preprocessor flags],
