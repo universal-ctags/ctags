@@ -1,0 +1,5 @@
+require {
+	type mydaemon_t;
+}
+
+type ssh_keygen_t;

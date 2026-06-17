@@ -16,6 +16,7 @@ static void initializeSELinuxTypeEnforcementParser (const langType language)
 	addLanguageRegexTable (language, "alias");
 	addLanguageRegexTable (language, "compoundalias");
 	addLanguageRegexTable (language, "lit");
+	addLanguageRegexTable (language, "skipblock");
 
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^#[^\n]*",
@@ -68,6 +69,9 @@ static void initializeSELinuxTypeEnforcementParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^gen_user\\([[:blank:]]*([^,[:space:]\\)]+)[^\\)]*\\)",
 	                               "\\1", "u", "", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^require[ \t\n]+\\{",
+	                               "", "", "{tenter=skipblock}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -129,6 +133,24 @@ static void initializeSELinuxTypeEnforcementParser (const langType language)
 	                               "^`",
 	                               "", "", "{tenter=lit}", NULL);
 	addLanguageTagMultiTableRegex (language, "lit",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "skipblock",
+	                               "^#[^\n]*",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "skipblock",
+	                               "^`",
+	                               "", "", "{tenter=lit}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipblock",
+	                               "^[[:space:]]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "skipblock",
+	                               "^\\{",
+	                               "", "", "{tenter=skipblock}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipblock",
+	                               "^\\}",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "skipblock",
 	                               "^.",
 	                               "", "", "", NULL);
 }
