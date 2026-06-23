@@ -176,7 +176,7 @@ optionValues Option = {
 	.patternLengthLimit = 96,
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
-	.interactive = false,
+	.interactive = INTERACTIVE_NONE,
 	.fieldsReset = false,
 #ifdef _WIN32
 	.useSlashAsFilenameSeparator = FILENAME_SEP_UNSET,
@@ -185,6 +185,8 @@ optionValues Option = {
 	.breakLine = 0,
 #endif
 };
+
+static size_t oneshotLimit = 32 * 1024 * 1024; /* 32MB */
 
 struct localOptionValues {
 	bool machinable;			/* --machinable */
@@ -225,6 +227,9 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"  --filter-terminator=<string>"},
  {1,0,"       Specify <string> to print to stdout following the tags for each file"},
  {1,0,"       parsed when --filter is enabled."},
+ {1,0,"  --oneshot=<filename>"},
+ {1,0,"       Behave as a filter, reading file contents from standard input and"},
+ {1,0,"       writing tags to standard output. <filename> is used as the input field of tags."},
  {1,0,"  --links[=(yes|no)]"},
  {1,0,"       Indicate whether symbolic links should be followed [yes]."},
  {1,0,"  --maxdepth=<N>"},
@@ -494,6 +499,8 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"       Print this option summary including experimental features."},
  {1,0,"  --license"},
  {1,0,"       Print details of software license."},
+ {1,0,"  --oneshot-limit=<bytes>"},
+ {1,0,"       Limit the input size in the oneshot mode, in bytes (default is 32MB)."},
  {0,0,"  --print-language"},
  {0,0,"       Don't make tags file but just print the guessed language name for"},
  {0,0,"       input file."},
@@ -743,7 +750,7 @@ extern void freeList (stringList** const pList)
 
 extern void setDefaultTagFileName (void)
 {
-	if (Option.filter || Option.interactive)
+	if (Option.filter || (Option.interactive & INTERACTIVE_MODE))
 		return;
 
 	if (Option.tagFileName == NULL)
@@ -882,8 +889,11 @@ static void setXrefMode (void)
 }
 
 #ifdef HAVE_JANSSON
-static void setJsonMode (void)
+static void setJsonMode (bool useJsonEvenInErrorReporting)
 {
+	if (useJsonEvenInErrorReporting)
+		setErrorPrinter (jsonErrorPrinter, NULL);
+
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
 	enablePtag (PTAG_OUTPUT_MODE, false);
 	enablePtag (PTAG_FILE_FORMAT, false);
@@ -1673,50 +1683,90 @@ static void processHelpFullOption (
 	exit (0);
 }
 
-#ifdef HAVE_JANSSON
-static void processInteractiveOption (
-		const char *const option CTAGS_ATTR_UNUSED,
+static void processOneshot (
+		const char *const option,
 		const char *const parameter)
 {
+	if (!parameter || parameter[0] == '\0')
+		error (FATAL, "--%s option requires a non-empty <filename>", option);
+
+	static struct interactiveModeArgs args;
+	Option.interactive = INTERACTIVE_ONESHOT;
+
+#ifdef HAVE_SECCOMP
+	Option.interactive |= INTERACTIVE_WITH_SANDBOX;
+#endif
+
+	args.fname = parameter;
+	args.limit = oneshotLimit;
+	args.sandbox = (Option.interactive & INTERACTIVE_WITH_SANDBOX);
+
+	setMainLoop (batchOneshot, &args);
+}
+
+#ifdef HAVE_JANSSON
+static void processInteractiveOption (
+		const char *const option,
+		const char *const parameter)
+{
+	void (* loop) (cookedArgs *args, void *user) = interactiveLoop;
 	static struct interactiveModeArgs args;
 
+	args.sandbox = false;
+	args.fname = NULL;
+	args.limit = 0;
 
 	if (parameter && (strcmp (parameter, "sandbox") == 0))
-	{
-		Option.interactive = INTERACTIVE_SANDBOX;
-		args.sandbox = true;
-	}
-	else if (parameter && (strcmp (parameter, "default") == 0))
-	{
-		Option.interactive = INTERACTIVE_DEFAULT;
-		args.sandbox = false;
-	}
-	else if ((!parameter) || *parameter == '\0')
-	{
-		Option.interactive = INTERACTIVE_DEFAULT;
-		args.sandbox = false;
-	}
+		Option.interactive = INTERACTIVE_MODE|INTERACTIVE_WITH_SANDBOX;
+	else if (parameter == NULL || *parameter == '\0'
+			 || (parameter && strcmp (parameter, "default") == 0))
+		Option.interactive = INTERACTIVE_MODE;
 	else
+	{
+		const char * p = parameter;
+		if (p && (strncmp (p, "sandbox,", strlen ("sandbox,")) == 0))
+		{
+			Option.interactive = INTERACTIVE_MODE|INTERACTIVE_WITH_SANDBOX;
+			p += strlen ("sandbox,");
+		}
+
+		if (p && (strncmp (p, "oneshot:", strlen ("oneshot:")) == 0))
+		{
+			const char *fname = p + strlen ("oneshot:");
+
+			if (fname[0] == '\0')
+				error (FATAL, "--%s option requires a non-empty <filename>", option);
+
+			Option.interactive |= INTERACTIVE_MODE|INTERACTIVE_ONESHOT;
+			args.fname = fname;
+			args.limit = oneshotLimit;
+		}
+	}
+
+	if (! (Option.interactive & INTERACTIVE_MODE))
 		error (FATAL, "Unknown option argument \"%s\" for --%s option",
 			   parameter, option);
 
+	if (Option.interactive & INTERACTIVE_WITH_SANDBOX)
+	{
 #ifndef HAVE_SECCOMP
-	if (args.sandbox)
 		error (FATAL, "sandbox submode is not supported on this platform");
 #endif
-
 #ifdef ENABLE_GCOV
-	if (args.sandbox)
 		error (FATAL, "sandbox submode does not work if gcov is instrumented");
 #endif
+		args.sandbox = true;
+	}
+
+	if (Option.interactive & INTERACTIVE_ONESHOT)
+	{
+		Assert (args.fname);
+		loop = interactiveOneshot;
+	}
 
 	Option.sorted = SO_UNSORTED;
-	setMainLoop (interactiveLoop, &args);
-	setErrorPrinter (jsonErrorPrinter, NULL);
-	setTagWriter (WRITER_JSON, NULL);
-	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
-
-	json_set_alloc_funcs (eMalloc, eFree);
+	setJsonMode (true);
+	setMainLoop (loop, &args);
 }
 #endif
 
@@ -2603,7 +2653,7 @@ static void processOutputFormat (const char *const option CTAGS_ATTR_UNUSED,
 		break;
 #ifdef HAVE_JANSSON
 	case WRITER_JSON:
-		setJsonMode ();
+		setJsonMode (false);
 		break;
 #endif
 	case WRITER_CUSTOM:
@@ -2683,17 +2733,57 @@ static void processPseudoTags (const char *const option CTAGS_ATTR_UNUSED,
 	vStringDelete (str);
 }
 
+static bool inSandbox (void)
+{
+	return (Option.interactive & INTERACTIVE_WITH_SANDBOX);
+}
+
+static bool inOneshotMode (void)
+{
+	return (Option.interactive & INTERACTIVE_ONESHOT);
+}
+
+static void oneshotSetLimit (size_t limit)
+{
+	verbose ("adjust input limit of oneshot mode: %lu", (unsigned long)limit);
+	oneshotLimit = limit;
+}
+
+static void processOneshotLimit (
+		const char *const option, const char *const parameter)
+{
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A positive number or 0 is needed after --%s option", option);
+
+	unsigned long limit = 0;
+	if (!strToULong(parameter, 0, &limit))
+		error (FATAL, "Invalid oneshot limit: %s", parameter);
+	if (limit > SIZE_MAX)
+		error (FATAL, "Too large limit: %s (> %lu)",
+			   parameter, (unsigned long)SIZE_MAX);
+
+	oneshotSetLimit ((size_t)limit);
+}
+
 static void processSortOption (
 		const char *const option, const char *const parameter)
 {
 	if (isFalse (parameter))
 		Option.sorted = SO_UNSORTED;
 	else if (isTrue (parameter))
+	{
+		if (inSandbox () && !inOneshotMode ())
+			error (FATAL, "cannot sort in sandbox");
 		Option.sorted = SO_SORTED;
+	}
 	else if (strcasecmp (parameter, "f") == 0 ||
 			strcasecmp (parameter, "fold") == 0 ||
 			strcasecmp (parameter, "foldcase") == 0)
+	{
+		if (inSandbox () && !inOneshotMode ())
+			error (FATAL, "cannot sort in sandbox");
 		Option.sorted = SO_FOLDSORTED;
+	}
 	else
 		error (FATAL, "Invalid value for \"%s\" option", option);
 }
@@ -3077,6 +3167,8 @@ static parametricOption ParametricOptions [] = {
 	{ "list-roles",             processListRolesOption,         true,   STAGE_ANY },
 	{ "list-subparsers",        processListSubparsersOption,    true,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, true,   STAGE_ANY },
+	{ "oneshot",                processOneshot,                 true,   STAGE_ANY },
+	{ "oneshot-limit",          processOneshotLimit,            true,   STAGE_ANY },
 	{ "optlib-dir",             processOptlibDir,               false,  STAGE_ANY },
 	{ "options",                processOptionFile,              false,  STAGE_ANY },
 	{ "options-maybe",          processOptionFileMaybe,         false,  STAGE_ANY },
@@ -4169,11 +4261,6 @@ static void processDumpPreludeOption (const char *const option CTAGS_ATTR_UNUSED
 	exit (0);
 }
 
-extern bool inSandbox (void)
-{
-	return (Option.interactive == INTERACTIVE_SANDBOX);
-}
-
 extern bool canUseLineNumberAsLocator (void)
 {
 	return (Option.locate != EX_PATTERN);
@@ -4183,7 +4270,7 @@ extern bool isDestinationStdout (void)
 {
 	bool toStdout = false;
 
-	if (Option.filter || Option.interactive ||
+	if (Option.filter || (Option.interactive & INTERACTIVE_MODE) ||
 		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
 						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
 		)))
