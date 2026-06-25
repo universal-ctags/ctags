@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - run: brew install make automake autoconf file
+      - run: brew install make automake autoconf
 
       - run: ./autogen.sh
 
@@ -28,7 +28,9 @@ jobs:
           TOOLCHAIN_BIN_DIR=$TOOLCHAIN_BASE_DIR/bin
           SYSROOT=$TOOLCHAIN_BASE_DIR/sysroot
 
-          export CC=$TOOLCHAIN_BIN_DIR/armv7a-linux-androideabi24-clang
+          ln -s "$TOOLCHAIN_BIN_DIR/llvm-readelf" llvm-readelf
+
+          export CC=$TOOLCHAIN_BIN_DIR/aarch64-linux-android24-clang
           export AR=$TOOLCHAIN_BIN_DIR/llvm-ar
           export RANLIB=$TOOLCHAIN_BIN_DIR/llvm-ranlib
 
@@ -37,7 +39,7 @@ jobs:
           export LDFLAGS="--sysroot $SYSROOT"
 
           ./configure \
-              --host=armv7a-linux-androideabi \
+              --host=aarch64-linux-android \
               --disable-iconv \
               --disable-xml \
               --disable-json \
@@ -46,4 +48,7 @@ jobs:
 
       - run: make V=1
 
-      - run: file ctags | grep 'ELF 32-bit LSB pie executable, ARM, EABI5'
+      - run: ./llvm-readelf -h ctags
+
+      # https://www.sco.com/developers/gabi/latest/ch4.eheader.html
+      - run: test "$(hexdump -n 20 -e '20/1 "%02X" "\n"' ctags)" = '7F454C460201010000000000000000000300B700'
