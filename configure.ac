@@ -506,6 +506,7 @@ fi
 
 AC_CHECK_HEADERS([direct.h dirent.h fcntl.h io.h stat.h types.h unistd.h])
 AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/types.h sys/wait.h])
+AC_CHECK_HEADERS([sys/resource.h])
 
 # Checks for header file macros
 # -----------------------------
@@ -876,6 +877,7 @@ if test "${enable_static}" = "yes"; then
 	fi
 fi
 
+AC_CHECK_FUNCS(GetCurrentThreadStackLimits)
 
 # Checks for missing prototypes
 # -----------------------------
@@ -889,6 +891,8 @@ fi
 if test "$have_ftruncate" = yes ; then
 	CHECK_PROTO(ftruncate, unistd.h)
 fi
+
+CHECK_PROTO(GetCurrentThreadStackLimits, windows.h)
 
 # Process library configuration options
 # -------------------------------------

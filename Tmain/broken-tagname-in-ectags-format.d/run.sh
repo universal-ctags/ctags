@@ -7,7 +7,7 @@ CTAGS=$1
 BUILD_SUBDIR=$2
 stderr_tmp=${BUILD_SUBDIR}/stderr-actual.txt.tmp
 
-${CTAGS} --options=NONE -o - --language-force=CTagsSelfTest --verbose --output-format=e-ctags input.cst \
+${CTAGS} --options=NONE -o - --language-force=CTagsSelfTest --stack-limit=8192 --verbose --output-format=e-ctags input.cst \
 	 2> ${stderr_tmp}
 
 # externalSortTags invokes sort command, and it is logged to stderr.
