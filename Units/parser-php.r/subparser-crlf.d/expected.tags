@@ -1,0 +1,3 @@
+a	input.php	/^<?php function a() {} ?>$/;"	f
+b	input.php	/^<?php function b() {} ?>$/;"	f
+A	input.php	/^<h1>A<\/h1>$/;"	h
