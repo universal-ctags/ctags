@@ -16,7 +16,7 @@ jobs:
         netbsd-version: ['10.1', '10.0', '9.4', '9.3', '9.2']
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: cross-platform-actions/action@v1.1.0
         with:
