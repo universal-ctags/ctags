@@ -23,35 +23,27 @@ jobs:
 
       - run: ./autogen.sh
 
-      - name: Run ./configure ...
+      - name: setup Android NDK build environment
         run: |
           TOOLCHAIN_BASE_DIR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64
           TOOLCHAIN_BIN_DIR=$TOOLCHAIN_BASE_DIR/bin
           SYSROOT=$TOOLCHAIN_BASE_DIR/sysroot
 
-          ln -s "$TOOLCHAIN_BIN_DIR/llvm-readelf" llvm-readelf
+          cat >> "$GITHUB_ENV" <<EOF
+          CC=$TOOLCHAIN_BIN_DIR/aarch64-linux-android24-clang
+          AR=$TOOLCHAIN_BIN_DIR/llvm-ar
+          RANLIB=$TOOLCHAIN_BIN_DIR/llvm-ranlib
+          READELF=$TOOLCHAIN_BIN_DIR/llvm-readelf
+          CFLAGS=--sysroot $SYSROOT -Qunused-arguments -Os -fpic
+          CPPFLAGS=--sysroot $SYSROOT -Qunused-arguments
+          LDFLAGS=--sysroot $SYSROOT
+          EOF
 
-          export CC=$TOOLCHAIN_BIN_DIR/aarch64-linux-android24-clang
-          export AR=$TOOLCHAIN_BIN_DIR/llvm-ar
-          export RANLIB=$TOOLCHAIN_BIN_DIR/llvm-ranlib
-
-          export CFLAGS="--sysroot $SYSROOT -Qunused-arguments -Os -fpic"
-          export CPPFLAGS="--sysroot $SYSROOT -Qunused-arguments"
-          export LDFLAGS="--sysroot $SYSROOT"
-
-          set -ex
-
-          ./configure \
-              --host=aarch64-linux-android \
-              --disable-iconv \
-              --disable-xml \
-              --disable-json \
-              --disable-yaml \
-              --disable-pcre2
+      - run: ./configure --host=aarch64-linux-android --disable-iconv --disable-xml --disable-json --disable-yaml --disable-pcre2
 
       - run: make V=1
 
-      - run: ./llvm-readelf -h ctags
+      - run: ${{ env.READELF }} -h ctags
 
       # https://www.sco.com/developers/gabi/latest/ch4.eheader.html
       - run: test "$(hexdump -n 20 -e '20/1 "%02X" "\n"' ctags)" = '7F454C460201010000000000000000000300B700'
