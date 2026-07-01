@@ -61,6 +61,7 @@
 #include "parse_p.h"
 #include "read_p.h"
 #include "routines_p.h"
+#include "stackguard_p.h"
 #include "stats_p.h"
 #include "trace.h"
 #include "trashbox_p.h"
@@ -584,6 +585,9 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	parseCmdlineOptions (args);
 	checkOptions ();
 
+	size_t stack_limit = stackGuardGetLimit ();
+	verbose ("Stack usage limit: %zu bytes (%.1f KiB)\n",
+			 stack_limit, stack_limit / 1024.0);
 	runMainLoop (args);
 
 	/*  Clean up.
