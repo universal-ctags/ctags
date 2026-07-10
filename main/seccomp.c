@@ -17,15 +17,28 @@
 #include <seccomp.h>
 
 
-int installSyscallFilter (void)
+static void installSyscallOpenFilter(scmp_filter_ctx ctx)
 {
-	// Use SCMP_ACT_TRAP to get a core dump.
-	scmp_filter_ctx ctx = seccomp_init (SCMP_ACT_KILL);
-	if (ctx == NULL)
-	{
-		return 1;
-	}
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (open), 0);
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (openat), 0);
+	verbose ("open/openat ");
+}
 
+static void installSyscallCloseFilter(scmp_filter_ctx ctx)
+{
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (close), 0);
+	verbose ("close ");
+}
+
+static void installSyscallCtrlsetFilter(scmp_filter_ctx ctx)
+{
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (prctl), 0);
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (seccomp), 0);
+	verbose ("ctrlset ");
+}
+
+static void installSyscallCoresetFilter(scmp_filter_ctx ctx)
+{
 	// Memory allocation.
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (mmap), 0);
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (munmap), 0);
@@ -61,7 +74,29 @@ int installSyscallFilter (void)
 	// libxml2 uses pthread_once, which in turn uses a futex
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (futex), 0);
 
-	verbose ("Entering sandbox\n");
+	verbose ("coreset ");
+}
+
+int installSyscallFilter (unsigned int set)
+{
+	// Use SCMP_ACT_TRAP to get a core dump.
+	scmp_filter_ctx ctx = seccomp_init (SCMP_ACT_KILL);
+	if (ctx == NULL)
+	{
+		return 1;
+	}
+
+	verbose ("Entering sandbox (");
+	if (set & syscall_coreset)
+		installSyscallCoresetFilter (ctx);
+	if (set & syscall_open)
+		installSyscallOpenFilter (ctx);
+	if (set & syscall_close)
+		installSyscallCloseFilter (ctx);
+	if (set & syscall_ctrlset)
+		installSyscallCtrlsetFilter (ctx);
+	verbose (")\n");
+
 	int err = seccomp_load (ctx);
 	if (err < 0)
 	{
@@ -81,7 +116,7 @@ int installSyscallFilter (void)
  */
 
 #else
-int installSyscallFilter (void)
+int installSyscallFilter (unsigned int set)
 {
 	AssertNotReached ();
 	return -1;
