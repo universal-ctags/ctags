@@ -12,6 +12,10 @@ Critical bug fixes
 * fixes a bug where a guest parser with a regex rule using postrun flag
   could enter an infinite loop.
 
+Common enhancement
+---------------------------------------------------------------------
+* Makes ``--_interactive=sandbox`` option work with musl libc.
+
 New and extended options and their flags
 ---------------------------------------------------------------------
 

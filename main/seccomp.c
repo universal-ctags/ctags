@@ -15,6 +15,7 @@
 
 #ifdef HAVE_SECCOMP
 #include <seccomp.h>
+#include <sys/ioctl.h>
 
 
 int installSyscallFilter (void)
@@ -34,7 +35,14 @@ int installSyscallFilter (void)
 
 	// I/O
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (read), 0);
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (readv), 0);
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (write), 0);
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (writev), 0);
+
+	// musl libc uses this to check whether stdout is a tty when writing to it
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (ioctl), 2,
+		SCMP_CMP (0, SCMP_CMP_EQ, 1),           // fd == 1
+		SCMP_CMP (1, SCMP_CMP_EQ, TIOCGWINSZ)); // request == TIOCGWINSZ
 
 	// Clean exit
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (exit), 0);
