@@ -1194,7 +1194,7 @@ void mio_rewind (MIO *mio)
  * @mio: A #MIO stream
  * @pos: (out): A #MIOPos object to fill-in
  *
- * Stores the current position (and maybe other informations about the stream
+ * Stores the current position (and maybe other information about the stream
  * state) of a #MIO stream in order to restore it later with mio_setpos(). This
  * function behaves the same as fgetpos().
  *

@@ -3320,10 +3320,10 @@ extern bool processKindsOption (
  * How --paramdef should be to align --roles-<LANG> notation
  * ---------------------------------------------------------------------
  *
- * --_paramdef-<LANG>.name=[ default (desription) ]
+ * --_paramdef-<LANG>.name=[ default (description) ]
  *
  *
- * Discussion: which shoule we use . or : ?
+ * Discussion: which should we use . or : ?
  * ---------------------------------------------------------------------
  *
  * `.' is better because `:' implies fields.

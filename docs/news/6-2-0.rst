@@ -29,7 +29,7 @@ Incompatible changes
 * [readtags] make -Q,--filter not work on ptags when -P,--with-pseudo-tags is specified together
 
   With this version, ``-Q,--filter`` option doesn't affect the pseudo tags listed
-  with ``-P,--with-pseudo-tags`` option.  ``-Q,--filter`` option specified wth
+  with ``-P,--with-pseudo-tags`` option.  ``-Q,--filter`` option specified with
   ``-P,--with-pseudo-tags`` option affect only regular tags.
 
   To extract speicifed pseudo tags, use ``-Q,--filter`` option with

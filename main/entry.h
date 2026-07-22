@@ -221,7 +221,7 @@ void        unregisterEntry (int corkIndex);
  * under the scope.
  *
  * If FUNC returns false, this function returns false immediately
- * even if more entires in the scope.
+ * even if there are more entries in the scope.
  * If FUNC never returns false, this function returns true.
  * If FUNC is not called because no node for NAME in the symbol table,
  * this function returns true.

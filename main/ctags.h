@@ -27,9 +27,9 @@
    VERSION. Set REVISION and PATCH to 0.
    When chaging VERSION, set REVISION and PATCH to 0.
 
-   For uppper compatible changes for the CLI,
+   For forward-compatible changes for the CLI,
    increment REVISION.
-   Adding a new parameter to a parser is an uppper compatible change.
+   Adding a new parameter to a parser is a forward-compatible change.
    When incrementing OUTPUT_VERSION_CURRENT but not setting
    OUTPUT_VERSION_AGE to 0, increment REVISION.
    For changing increment versionCurrent member of a parser but not
