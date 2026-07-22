@@ -35,6 +35,8 @@ jobs:
             export  CFLAGS='-I/usr/local/include'
             export LDFLAGS='-L/usr/local/lib'
 
+            sudo sh -c 'printf "http://ftp.eu.openbsd.org/pub/OpenBSD\n" > /etc/installurl'
+
             run sudo pkg_add autoconf%2.69 automake%1.16 gmake pkgconf jansson libyaml libxml libiconv
 
             run cc --version
