@@ -18,7 +18,7 @@ I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 .PHONY: help clean check-if-sphinx-build-is-installed html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
 
 help:
-	@echo "\
+	@echo -e "\
 	Usage: make <TARGET>\n\n\
 	<TARGET> is one of following:\n\
 	help       show help information\n\
