@@ -608,7 +608,7 @@ static flagDefinition prePtrnFlagDef[] = {
 	{ 'x',  "exclusive", pre_ptrn_flag_exclusive_short, pre_ptrn_flag_exclusive_long ,
 	  NULL, "skip testing the other patterns if a line is matched to this pattern"},
 	{ '\0', "postrun",   NULL, pre_ptrn_flag_postrun_long,
-	  NULL, "run after parsing with built-in code, multline regex patterns, and multitable regex patterns" },
+	  NULL, "run after parsing with built-in code, multiline regex patterns, and multitable regex patterns" },
 };
 
 static void scope_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
@@ -1506,11 +1506,11 @@ static regexPattern *addCompiledCallbackPattern (struct lregexControlBlock *lcb,
 #ifndef HAVE_PCRE2
 static void no_pcre2_regex_flag_short (char c, void* data)
 {
-	error (WARNING, "'p' flag is specied but pcre2 regex engine is not linked.");
+	error (WARNING, "'p' flag is specified but pcre2 regex engine is not linked.");
 }
 static void no_pcre2_regex_flag_long (const char* const s, const char* const unused CTAGS_ATTR_UNUSED, void* data)
 {
-	error (WARNING, "{pcre2} flag is specied but pcre2 regex engine is not linked.");
+	error (WARNING, "{pcre2} flag is specified but pcre2 regex engine is not linked.");
 }
 #endif
 

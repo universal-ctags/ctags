@@ -21,8 +21,8 @@ help:
 	@echo "\
 	Usage: make <TARGET>\n\n\
 	<TARGET> is one of following:\n\
-	help       show help infomation\n\
-	clean      detele cached files\n\
+	help       show help information\n\
+	clean      delete cached files\n\
 	html       to make standalone HTML files\n\
 	dirhtml    to make HTML files named index.html in directories\n\
 	singlehtml to make a single large HTML file\n\

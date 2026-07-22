@@ -62,7 +62,7 @@ the ``annotations`` field.
 		return x
 
 	static func f_s(x):
-		reutrn x
+		return x
 
 	remote func f_r(x):
 		return x
