@@ -234,7 +234,7 @@ Merged pull requests
 * Verilog: Fix function parse when return type contains `::` by roccomao · Pull Request #4111
 * Verilog: Skip the escaped characters in string by roccomao · Pull Request #4115
 * verilog.c: keyword "unsigned1" should be "unsigned", without the 1 by cousteaulecommandant · Pull Request #4110
-* units.py: pass `count' as a keyword argument by masatake · Pull Request #4112
+* units.py: pass \`count' as a keyword argument by masatake · Pull Request #4112
 * iniconf: some more adjustments for parsing TOML by techee · Pull Request #4099
 * treewide: delete more unwated files by masatake · Pull Request #4108
 * Remove unwanted files by k-takata · Pull Request #4107
