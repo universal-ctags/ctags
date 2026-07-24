@@ -48,7 +48,7 @@ with "--options=NONE --extras=+r --fields=+KlrE -o - input.mak"
    hello.o	input.mak	/^hello.o: hello.c$/;"	target	language:Make	roles:def
 
 
-EXTRACTING CPP MACRO DEFINTIONS DEFINED WITH -DFOO
+EXTRACTING CPP MACRO DEFINITIONS DEFINED WITH -DFOO
 ---------------------------------------------------
 With ``-D`` option in a C compiler like gcc, a programmer can define a
 macro outside C source files. The options appears on a Makefile

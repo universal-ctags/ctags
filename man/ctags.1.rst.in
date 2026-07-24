@@ -2037,7 +2037,7 @@ The meaning of major extras is as follows (long-name flag/one-letter flag):
 	null tag away. To suppress the warnings, use ``--quiet`` option.
 
 	On the other hand, null tags are valid in some languages.
-	Consider ``{"":  val}`` in a JavaScript sourece code. The empty string is
+	Consider ``{"":  val}`` in a JavaScript source code. The empty string is
 	valid as a key. If a parser intentionally makes a null tag (a valid null tag),
 	@CTAGS_NAME_EXECUTABLE@ doesn't warn but discard it by default.
 
