@@ -1,5 +1,6 @@
 ctags: Notice: No options will be read from files or environment
   Option: --output-format=e-ctags
+Stack usage limit: 8192 bytes (8.0 KiB)
 Reading command line arguments
 CTagsSelfTest requires a memory stream for input
 OPENING input.cst as CTagsSelfTest language file [new,required]
