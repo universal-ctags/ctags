@@ -71,7 +71,7 @@
  *
  * From the view of a host parser, its current area and its
  * base area are the same.
- * From the vie of a guest parser, its current area and its
+ * From the view of a guest parser, its current area and its
  * base area are different.
  *
  * Coordinate system

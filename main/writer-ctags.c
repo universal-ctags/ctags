@@ -438,7 +438,7 @@ static int writeCtagsPtagEntry (tagWriter *writer,
 		if ((c = strchr (fileName, '\t')) || (c = strchr (fileName, '\n')))
 		{
 			vStringDelete (vfileName);
-			error (WARNING, "skip priting %s%s pseudo tag; the input field of the pseudo tag includes a %s character: %s",
+			error (WARNING, "skip printing %s%s pseudo tag; the input field of the pseudo tag includes a %s character: %s",
 				   PSEUDO_TAG_PREFIX, desc->name,
 				   *c == '\t'? "tab": "newline",
 				   fileName);

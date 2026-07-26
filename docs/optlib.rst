@@ -1973,10 +1973,10 @@ the output for input.docc:
 .. TESTCASE: Tmain/parser-specific-fields-for-foreign-lang.d
 
 ``{_language=<LANG>}`` flag affects ``{_field=FIELDNAME:GROUP}`` flag; ctags looks up
-the field defintion in `<LANG>`.
+the field definition in `<LANG>`.
 
 ``{_language=<LANG>}`` flag affects ``{_extra=XNAME}`` flag; ctags looks up
-the extra defintion in `<LANG>`.
+the extra definition in `<LANG>`.
 
 .. END: NOT REVIEWED YET
 

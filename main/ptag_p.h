@@ -66,7 +66,7 @@ struct sPtagDesc {
 	 * are passed.
 	 *
 	 * For parser specific ptags, the pointer for parserObject
-	 * of the parser is passed as the thrid argument.
+	 * of the parser is passed as the third argument.
 	 */
 	bool (* makeTag) (ptagDesc *, langType, const void *);
 

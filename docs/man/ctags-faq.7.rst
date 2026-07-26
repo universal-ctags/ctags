@@ -21,7 +21,7 @@ DESCRIPTION
 .. TODO: https://github.com/universal-ctags/ctags/issues/2312
 	#1421: feature: clean up stale tags when appending (`-a`)
 	#2356: can't pre-process the macro but it works with Exuberant Ctags 5.8
-	#2540: C/C++：conditional compilation like #ifdef will cause parse errror
+	#2540: C/C++：conditional compilation like #ifdef will cause parse error
 
 What is the difference between Universal Ctags and Exuberant Ctags?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

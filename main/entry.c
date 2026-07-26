@@ -816,7 +816,7 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 		if (scope && scope->extensionFields.scopeIndex == scopeIndex)
 		{
 			error (WARNING,
-				   "interanl error: scope information made a loop structure: %s in %s:%lu",
+				   "internal error: scope information made a loop structure: %s in %s:%lu",
 				   scope->name, scope->inputFileName, scope->lineNumber);
 			/* Force break this while-loop. */
 			scope = NULL;
@@ -1665,11 +1665,11 @@ extern void setTagEndLine(tagEntryInfo *tag, unsigned long endLine)
 		/*
 		 * If we enable this assertion, (option based) user parsers can
 		 * crash. No user wants this behavior even if the one pass
-		 * --enable-debuggng to configre when building; jut warning
+		 * --enable-debuggng to configure when building; jut warning
 		 * is enough.
 		 *
 		 * Till implementing the way to detect whether a builtin parser
-		 * calls this setTagEndLine() or a user parser callit, we canot
+		 * calls this setTagEndLine() or a user parser callit, we cannot
 		 * enable this assertion. The assertion should be enabled for
 		 * builtin parsers.
 		 */

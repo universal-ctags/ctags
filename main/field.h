@@ -136,7 +136,7 @@ typedef enum eFieldDataType {
  * setter
  * ---------------------------------------------------------------------
  *
- *     stack | C sting stored to the field
+ *     stack | C string stored to the field
  * ----------+----------------------------
  *   . (str) | "str"
  *      . () | ""
@@ -188,7 +188,7 @@ typedef enum eFieldDataType {
  * setter
  * ---------------------------------------------------------------------
  *
- *     stack | C sting stored to the field
+ *     stack | C string stored to the field
  * ----------+----------------------------
  *   . (str) | "str"
  *      . () | ""
@@ -244,7 +244,7 @@ typedef enum eFieldDataType {
  * setter
  * ---------------------------------------------------------------------
  *
- *     stack | C sting stored to the field
+ *     stack | C string stored to the field
  * ----------+----------------------------
  *   . false | do nothing if the field was not set.
  *           | ERROR:fieldreset if the field was already set.
@@ -306,7 +306,7 @@ typedef enum eFieldDataType {
  * setter
  * ---------------------------------------------------------------------
  *
- *     stack | C sting stored to the field
+ *     stack | C string stored to the field
  * ----------+----------------------------
  *     . int | int
  *       . 1 | "1" (as an example)
