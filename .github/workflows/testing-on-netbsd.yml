@@ -29,6 +29,11 @@ jobs:
               eval "$@"
             }
 
+            # https://github.com/NetBSD/pkgsrc/issues/183
+            case ${{ matrix.netbsd-version }} in
+              9.*)  sudo sh -c 'sed -i.bak "\$s|9\.[0-9]|9.0_2026Q1|" /usr/pkg/etc/pkgin/repositories.conf'
+            esac
+
             # DO NOT try to install libxml2, because it has already been pre-installed
             run sudo pkgin -y install automake autoconf gmake pkg-config jansson libyaml libiconv
 
