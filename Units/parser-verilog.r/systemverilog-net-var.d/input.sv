@@ -228,7 +228,7 @@ module delay_control_wire #(d, e);
   wire w$ire, wire$;  // '$' included
 endmodule
 
-// orignal : LRM 5.8 Time literals
+// original : LRM 5.8 Time literals
 module rst;
   logic trst_n;
   initial begin

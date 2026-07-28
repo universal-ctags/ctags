@@ -36,7 +36,7 @@ endmodule
 
 // LRM 9.3.4 Block names
 
-// orignal tests
+// original tests
 module block1 #(N_IF = 8) (
   input logic clk, rst_n
 );

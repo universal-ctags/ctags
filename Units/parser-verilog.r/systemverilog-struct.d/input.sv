@@ -79,7 +79,7 @@ class U;
   // FIXME: TBD
 endclass
 
-// orignal
+// original
 class O;
   struct { bit [7:0] opcode; }IR;
   struct packed signed { int a; } pack1;
