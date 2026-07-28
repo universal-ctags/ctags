@@ -434,7 +434,7 @@
    this. */
 /* #undef L_tmpnam */
 
-/* Define this label if you want macro tags (defined lables) to use patterns
+/* Define this label if you want macro tags (defined labels) to use patterns
    in the EX command by default (original ctags behavior is to use line
    numbers). */
 /* #undef MACROS_USE_PATTERNS */

@@ -80,7 +80,7 @@ AH_TEMPLATE([CUSTOM_CONFIGURATION_FILE],
 AH_TEMPLATE([ETAGS],
 	[Define the string to check (in executable name) for etags mode])
 AH_TEMPLATE([MACROS_USE_PATTERNS],
-	[Define this label if you want macro tags (defined lables) to use patterns
+	[Define this label if you want macro tags (defined labels) to use patterns
 	in the EX command by default (original ctags behavior is to use line
 	numbers).])
 AH_VERBATIM([DEFAULT_FILE_FORMAT], [
