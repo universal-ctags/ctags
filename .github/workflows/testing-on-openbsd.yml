@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        openbsd-version: ['7.9', '7.8', '7.7', '7.6', '7.5', '7.4', '7.3', '7.2']
+        openbsd-version: ['7.9', '7.8', '7.7', '7.6']
 
     steps:
       - uses: actions/checkout@v6
@@ -34,8 +34,6 @@ jobs:
 
             export  CFLAGS='-I/usr/local/include'
             export LDFLAGS='-L/usr/local/lib'
-
-            sudo sh -c 'printf "http://ftp.eu.openbsd.org/pub/OpenBSD\n" > /etc/installurl'
 
             run sudo pkg_add autoconf%2.69 automake%1.16 gmake pkgconf jansson libyaml libxml libiconv
 
