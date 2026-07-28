@@ -164,7 +164,7 @@ module test;
     `endif
 endmodule
 
-// orignal tests
+// original tests
 module ifdef_in_port (
     input logic a,
     `ifdef FOO// comment w/o white space
