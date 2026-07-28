@@ -122,6 +122,7 @@
 	JavaScriptParser, \
 	JNIParser, \
 	JsonParser, \
+	JsxParser, \
 	JuliaParser, \
 	KconfigParser, \
 	LdScriptParser, \
