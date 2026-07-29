@@ -54,8 +54,11 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 				const char *const parserName,
 				void *clientData);
 
+static void initJsonWriter (void);
+
 tagWriter jsonWriter = {
 	.oformat = "json",
+	.init = initJsonWriter,
 	.writeEntry = writeJsonEntry,
 	.writePtagEntry = writeJsonPtagEntry,
 	.printPtagByDefault = true,
@@ -66,6 +69,21 @@ tagWriter jsonWriter = {
 	.canPrintNullTag = true,
 	.defaultFileName = NULL,
 };
+
+static void initJsonWriter (void)
+{
+	json_set_alloc_funcs (eMalloc, eFree);
+
+#ifdef HAVE_SECCOMP
+	/* The sandbox feature requires this step. */
+	/* As of jansson 2.6, the object hashing is seeded off
+	   of /dev/urandom, so trigger the hash seeding
+	   before installing the syscall filter.
+	*/
+	json_t * tmp = json_object ();
+	json_decref (tmp);
+#endif
+}
 
 static const char* escapeFieldValueRaw (const tagEntryInfo * tag, fieldType ftype, int fieldIndex)
 {

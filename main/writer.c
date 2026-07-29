@@ -45,6 +45,9 @@ extern void setTagWriter (writerType wtype, tagWriter *customWriter)
 	else
 		writer = customWriter;
 	writer->type = wtype;
+
+	if (writer->init)
+		writer->init ();
 }
 
 extern void writerSetup (MIO *mio, void *clientData)

@@ -34,9 +34,6 @@ extern void verbose (const char *const format, ...) CTAGS_ATTR_PRINTF (1, 2);
 #define BEGIN_VERBOSE_IF(COND,VFP) do { if (ctags_verbose || (COND)) { \
                                 FILE* VFP = stderr
 
-
-extern bool inSandbox (void);
-
 /* This is for emitting a tag for a common block of Fortran parser*/
 extern bool canUseLineNumberAsLocator (void);
 

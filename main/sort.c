@@ -132,7 +132,12 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 			fdsave = dup (fdstdin);
 			if (fdsave < 0)
 				error (FATAL | PERROR, "cannot save stdin fd");
-			if (dup2 (fileno (mio_file_get_fp (tagFile)), fdstdin) < 0)
+
+			FILE *tagFP = mio_file_get_fp (tagFile);
+			if (!tagFP)
+				error (FATAL, "cannot get FILE object from mio: %p",  tagFile);
+
+			if (dup2 (fileno (tagFP), fdstdin) < 0)
 				error (FATAL | PERROR, "cannot redirect stdin");
 			if (lseek (fdstdin, 0, SEEK_SET) != 0)
 				error (FATAL | PERROR, "cannot rewind tag file");
@@ -169,7 +174,7 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 	vStringDelete (cmd);
 }
 
-#else
+#endif
 
 /*
  *  These functions provide a basic internal sort. No great memory
@@ -299,5 +304,3 @@ extern void internalSortTags (const bool toStdout, MIO* mio, size_t numTags)
 		free (table [i]);
 	free (table);
 }
-
-#endif

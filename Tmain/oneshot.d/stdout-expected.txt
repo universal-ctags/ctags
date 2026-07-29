@@ -1,0 +1,6 @@
+v	sort-no.c	/^int v;$/;"	v	typeref:typename:int
+f	sort-no.c	/^int f(void)$/;"	f	typeref:typename:int
+f	sort-yes.c	/^int f(void)$/;"	f	typeref:typename:int
+v	sort-yes.c	/^int v;$/;"	v	typeref:typename:int
+f                function      2 x.c              int f(void)
+v                variable      1 x.c              int v;

@@ -17,12 +17,30 @@
 struct interactiveModeArgs
 {
 	bool sandbox;
+	const char *fname;			/* --_interactive=oneshot:FNAME */
+	size_t limit;				/* Upper limit of input data
+								 * received via stdin.
+								 * Used in oneshot mode.
+								 * 0 means no limit. */
 };
 
+#ifdef HAVE_JANSSON
 void interactiveLoop (cookedArgs *args, void *user);
 bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
 					  void *data);
-int installSyscallFilter (void);
+#endif
+
+void interactiveOneshot (cookedArgs *args, void *user);
+void batchOneshot (cookedArgs *args, void *user);
+
+enum syscallSet {
+	syscall_coreset    = 1 << 0,
+	syscall_open       = 1 << 1,
+	syscall_close      = 1 << 2,
+	syscall_ctrlset    = 1 << 3,
+};
+
+int installSyscallFilter (unsigned int set);
 
 #endif  /* CTAGS_MAIN_INTERACTIVE_H */
 
