@@ -1,4 +1,4 @@
-/* Derrived from
+/* Derived from
    https://kernel.googlesource.com/pub/scm/linux/kernel/git/dhowells/linux-asm_system/+/refs/tags/v2.6.15-rc7/scripts/genksyms/keywords.gperf */
 %{
 %}

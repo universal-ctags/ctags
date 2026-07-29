@@ -1,4 +1,4 @@
-# Derrived from linux/Makefile
+# Derived from linux/Makefile
 
 REALMODE_CFLAGS	:= -std=gnu11 -m16 -g -Os -DDISABLE_BRANCH_PROFILING -D__DISABLE_EXPORTS \
 		   -Wall -Wstrict-prototypes -march=i386 -mregparm=3 \

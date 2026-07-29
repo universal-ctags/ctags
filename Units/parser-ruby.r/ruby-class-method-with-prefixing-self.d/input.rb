@@ -1,4 +1,4 @@
-# Derrived from gitlab/app/models/integration.rb
+# Derived from gitlab/app/models/integration.rb
 class Integration < ApplicationRecord
   UnknownType = Class.new(StandardError)
   self.inheritance_column = :type_new

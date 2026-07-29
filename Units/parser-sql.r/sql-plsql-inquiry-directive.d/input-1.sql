@@ -1,4 +1,4 @@
--- Derrived from from https://github.com/universal-ctags/ctags/issues/3006
+-- Derived from from https://github.com/universal-ctags/ctags/issues/3006
 -- submitted by bagl
 create or replace package body demo_pkg1 is
 

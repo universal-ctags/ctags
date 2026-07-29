@@ -1,4 +1,4 @@
-# Derrived from https://metacpan.org/pod/Moose::Role
+# Derived from https://metacpan.org/pod/Moose::Role
 
 package Eq;
 use Moose::Role; # automatically turns on strict and warnings

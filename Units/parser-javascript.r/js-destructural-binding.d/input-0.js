@@ -1,4 +1,4 @@
-// Derrived from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
+// Derived from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 function userDisplayName({displayName: dname}) {
   return dname;
 }

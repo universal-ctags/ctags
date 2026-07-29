@@ -1,4 +1,4 @@
-/* Derrived from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters */
+/* Derived from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters */
 function rf0(a,  b, ...manyMoreArgs0) {
   console.log("a", a)
   console.log("b", b)

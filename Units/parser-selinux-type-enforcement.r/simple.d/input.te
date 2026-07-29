@@ -1,5 +1,5 @@
 #
-# Derrived from policy/modules/contrib/dbus.te
+# Derived from policy/modules/contrib/dbus.te
 #
 policy_module(dbus, 1.19.0)
 

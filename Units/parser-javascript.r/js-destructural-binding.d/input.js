@@ -1,4 +1,4 @@
-// Derrived from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
+// Derived from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 const [x] = [1];
 const [y, z] = [1, 2, 3, 4, 5];
 let [a=5, b=7] = [1];

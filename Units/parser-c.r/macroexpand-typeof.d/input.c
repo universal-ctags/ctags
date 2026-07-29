@@ -1,4 +1,4 @@
-// Derrived from glibc
+// Derived from glibc
 # define __attribute_copy__(arg) __attribute__ ((__copy__ (arg)))
 # define weak_alias(name, aliasname) _weak_alias (name, aliasname)
 # define _weak_alias(name, aliasname) \

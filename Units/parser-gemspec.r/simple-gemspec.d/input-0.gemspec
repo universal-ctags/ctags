@@ -1,4 +1,4 @@
-# Derrived from katello/katello.gemspec
+# Derived from katello/katello.gemspec
 $LOAD_PATH.push File.expand_path("../lib", __FILE__)
 
 # Maintain your gem's version:
