@@ -1,5 +1,5 @@
 vim9script
-# Derrived from
+# Derived from
 # https://github.com/girishji/scope.vim/blob/271ad6d1b76e04cfacf5b30f80103654a2cfce73/autoload/scope/task.vim
 
 export class AsyncCmd

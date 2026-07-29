@@ -1,4 +1,4 @@
-# Derrived from #3588 submitted by @petdance
+# Derived from #3588 submitted by @petdance
 
 sub f0tag() {}
 

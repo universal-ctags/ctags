@@ -1,5 +1,5 @@
 # -*- Meson -*-
-# Derrived from test/dbus/meson.build of dbus-broker
+# Derived from test/dbus/meson.build of dbus-broker
 test_kwargs = {
         'dependencies': [dep_test],
         'install': use_tests,

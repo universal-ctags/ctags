@@ -1,5 +1,5 @@
 #
-# Derrived from  rpm/rpm.pc.in
+# Derived from  rpm/rpm.pc.in
 #
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=@CMAKE_INSTALL_PREFIX@

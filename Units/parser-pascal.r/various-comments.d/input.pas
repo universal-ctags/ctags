@@ -1,4 +1,4 @@
-{ Derrived from https://wiki.freepascal.org/Procedure }
+{ Derived from https://wiki.freepascal.org/Procedure }
 program procedureDemo(input, output, stderr);
 
 var

@@ -1,4 +1,4 @@
-/* Derrived FROM crun-1.4.4/src/libcrun/signals.perf
+/* Derived FROM crun-1.4.4/src/libcrun/signals.perf
    and systemd/src/resolve/resolved-gperf.gperf */
 /*
  * crun - OCI runtime written in C
