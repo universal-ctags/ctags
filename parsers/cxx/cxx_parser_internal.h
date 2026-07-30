@@ -149,7 +149,7 @@ typedef struct _CXXFunctionSignatureInfo
 	CXXToken * pTemplateSpecializationStart;
 	CXXToken * pTemplateSpecializationEnd;
 
-	// Additional informations
+	// Additional information
 	unsigned int uFlags;
 
 } CXXFunctionSignatureInfo;
