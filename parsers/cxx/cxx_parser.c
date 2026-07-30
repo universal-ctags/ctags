@@ -741,7 +741,7 @@ bool cxxParserParseEnum(void)
 
 	// If we have found a semicolon then we might be in the special case of KnR function
 	// declaration. This requires at least 5 tokens and has some additional constraints.
-	// See cxxParserMaybeParseKnRStyleFunctionDefinition() for more informations.
+	// See cxxParserMaybeParseKnRStyleFunctionDefinition() for more information.
 	if(
 			// found semicolon
 			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon) &&
@@ -1172,7 +1172,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 	// If we have found a semicolon then we might be in the special case of KnR function
 	// declaration. This requires at least 5 tokens and has some additional constraints.
-	// See cxxParserMaybeParseKnRStyleFunctionDefinition() for more informations.
+	// See cxxParserMaybeParseKnRStyleFunctionDefinition() for more information.
 	// FIXME: This block is duplicated in enum
 	if(
 			// found semicolon

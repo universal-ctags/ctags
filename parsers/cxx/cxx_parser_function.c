@@ -2089,7 +2089,7 @@ void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 // and such.
 //
 // If pParamInfo is non NULL then the function will also gather
-// informations about the parameters and store them.
+// information about the parameters and store them.
 //
 bool cxxParserTokenChainLooksLikeFunctionParameterList(
 		CXXTokenChain * tc,

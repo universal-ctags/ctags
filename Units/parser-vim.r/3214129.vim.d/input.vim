@@ -504,7 +504,7 @@ function! s:HGInstallDocumentation(full_name, revision)
                 if (!(filewritable(l:vim_doc_path) == 2))
                     " Put a warning:
                     echomsg "Unable to open documentation directory"
-                    echomsg " type :help add-local-help for more informations."
+                    echomsg " type :help add-local-help for more information."
                     return 0
                 endif
             endif
