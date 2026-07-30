@@ -6,7 +6,7 @@
 #  This source code is released for free distribution under the terms of the
 #  GNU General Public License version 2 or (at your option) any later version.
 #
-#  The regex pattern is derrived from
+#  The regex pattern is derived from
 #  - https://github.com/juliosueiras/vim-terraform-completion/blob/master/ctags/terraform.ctags
 #
 #  This module contains functions to extract language objects for Terraform from
