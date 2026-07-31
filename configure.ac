@@ -500,38 +500,6 @@ if test "$enable_external_sort" != yes ; then
 	AC_MSG_NOTICE(using internal sort algorithm as fallback)
 fi
 
-
-# Checks for header files
-# -----------------------
-
-AC_CHECK_HEADERS([direct.h dirent.h fcntl.h io.h stat.h types.h unistd.h])
-AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/types.h sys/wait.h])
-
-# Checks for header file macros
-# -----------------------------
-
-CHECK_HEADER_DEFINE(L_tmpnam, [stdio.h],, AC_DEFINE(L_tmpnam, 20))
-
-
-# Checks for typedefs and types
-# -----------------------------
-
-AC_TYPE_OFF_T
-
-AC_CHECK_HEADERS([stdbool.h])
-
-# Checks for compiler characteristics
-# -----------------------------------
-
-AC_C_CONST
-AC_OBJEXT
-AC_EXEEXT
-AC_C_TYPEOF
-
-if test "${enable_static}" = "yes"; then
-	LDFLAGS="$LDFLAGS -static"
-fi
-
 # Check for host type
 case "$host" in
   i?86-*-mingw* | x86_64-*-mingw*)
@@ -548,15 +516,27 @@ case "$host" in
 esac
 AM_CONDITIONAL([HOST_MINGW], [test "x${host_mingw}" = "xyes"])
 
-AC_MSG_CHECKING(if compiler supports statement expressions)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
-int main(int argc, char **argv) {return ({ int x = 1; x + argc;});}
-])],[have_statement_expression_ext=yes],[have_statement_expression_ext=no])
-AC_MSG_RESULT($have_statement_expression_ext)
-if test yes = "$have_statement_expression_ext"; then
-	AC_DEFINE(HAVE_STATEMENT_EXPRESSION_EXT)
-fi
+# Checks for header files
+# -----------------------
 
+AC_CHECK_HEADERS([direct.h dirent.h fcntl.h io.h stat.h types.h unistd.h])
+AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/types.h sys/wait.h])
+
+dnl for backtrace().
+AC_CHECK_HEADERS([execinfo.h],have_execinfo_h=yes)
+
+# Checks for header file macros
+# -----------------------------
+
+CHECK_HEADER_DEFINE(L_tmpnam, [stdio.h],, AC_DEFINE(L_tmpnam, 20))
+
+
+# Checks for typedefs and types
+# -----------------------------
+
+AC_TYPE_OFF_T
+
+AC_CHECK_HEADERS([stdbool.h])
 
 # Check if struct stat contains st_ino.
 # MinGW has st_ino, but it doesn't work.
@@ -575,6 +555,27 @@ if test yes != "$host_mingw"; then
 	if test yes = "$have_st_ino"; then
 		AC_DEFINE(HAVE_STAT_ST_INO)
 	fi
+fi
+
+# Checks for compiler characteristics
+# -----------------------------------
+
+AC_C_CONST
+AC_OBJEXT
+AC_EXEEXT
+AC_C_TYPEOF
+
+if test "${enable_static}" = "yes"; then
+	LDFLAGS="$LDFLAGS -static"
+fi
+
+AC_MSG_CHECKING(if compiler supports statement expressions)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+int main(int argc, char **argv) {return ({ int x = 1; x + argc;});}
+])],[have_statement_expression_ext=yes],[have_statement_expression_ext=no])
+AC_MSG_RESULT($have_statement_expression_ext)
+if test yes = "$have_statement_expression_ext"; then
+	AC_DEFINE(HAVE_STATEMENT_EXPRESSION_EXT)
 fi
 
 PRETTY_ARG_VAR([EXTRA_CPPFLAGS], [extra (Objective) C/C++ preprocessor flags],
@@ -633,6 +634,9 @@ AS_VAR_IF([use_lto], [yes], [
 		AC_MSG_ERROR([though --enable-lto is specified, the fto feature is not available nor usable.])
 	])
 ])
+
+CC_CHECK_LDFLAGS([-rdynamic], have_cc_rdynamic=yes)
+
 
 # Checks for function availability
 # -----------------------------------
@@ -875,6 +879,11 @@ if test "${enable_static}" = "yes"; then
 		fi
 	fi
 fi
+
+AC_CHECK_FUNCS(backtrace, have_backtrace=yes)
+AC_CHECK_FUNCS(backtrace_symbols_fd, have_backtrace_symbols_fd=yes)
+AM_CONDITIONAL(HAVE_BACKTRACE,
+	[test "x${have_cc_rdynamic}${have_execinfo_h}${have_backtrace}${have_backtrace_symbols_fd}" = "xyesyesyesyes"])
 
 
 # Checks for missing prototypes

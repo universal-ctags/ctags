@@ -25,6 +25,10 @@
 #include "read.h"
 #include "read_p.h"
 
+#ifdef HAVE_EXECINFO_H
+#include <execinfo.h>
+#endif
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -215,6 +219,22 @@ extern void circularRefCheckClear (struct circularRefChecker *c)
 {
 	hashTableClear (c->visitTable);
 	c->counter = 0;
+}
+
+extern void ctagsBacktrace (void)
+{
+#if defined(HAVE_EXECINFO_H) && \
+	defined(HAVE_BACKTRACE) && defined(HAVE_BACKTRACE_SYMBOLS_FD)
+	void *trace[128];
+	int fd = fileno(stderr);
+	int n = backtrace(trace, sizeof(trace) / sizeof(trace[0]));
+
+	fputs("------------------------------------------------------------------------\n",
+		  stderr);
+	backtrace_symbols_fd(trace, n, fd);
+	fputs("------------------------------------------------------------------------\n",
+		  stderr);
+#endif
 }
 
 #endif
