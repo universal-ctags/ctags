@@ -1,0 +1,15 @@
+mod1	input.f90	/^module mod1$/;"	line:1	end:26
+iface1	input.f90	/^  interface iface1$/;"	line:2	end:5
+proto1	input.f90	/^    subroutine proto1(/;"	line:3	end:4
+type1	input.f90	/^  type :: type1$/;"	line:7	end:9
+x	input.f90	/^    integer :: x$/;"	line:8
+struct1	input.f90	/^  structure \/struct1\//;"	line:11	end:13
+y	input.f90	/^    integer :: y$/;"	line:12
+enum1	input.f90	/^  enum :: enum1$/;"	line:15	end:16
+sub1	input.f90	/^  subroutine sub1(/;"	line:20	end:21
+func1	input.f90	/^  function func1(/;"	line:23	end:25
+submod1	input.f90	/^submodule (mod1) submod1$/;"	line:28	end:32
+sub2	input.f90	/^  module subroutine sub2(/;"	line:30	end:31
+block1	input.f90	/^block data block1$/;"	line:34	end:36
+z	input.f90	/^  integer :: z$/;"	line:35
+prog1	input.f90	/^program prog1$/;"	line:38	end:39
