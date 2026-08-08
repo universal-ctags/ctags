@@ -221,6 +221,7 @@ typedef struct sTokenInfo {
 	unsigned long lineNumber;
 	MIOPos filePosition;
 	bool anonymous;
+	int corkIndex;
 } tokenInfo;
 
 /*
@@ -421,10 +422,13 @@ static void ancestorPush (tokenInfo *const token)
 	Ancestors.count++;
 }
 
-static void ancestorPop (void)
+/* Save the line before advancing past END; 0 skips the update. */
+static void ancestorPop (unsigned long endLine)
 {
 	Assert (Ancestors.count > 0);
 	--Ancestors.count;
+	if (endLine > 0)
+		setTagEndLineToCorkEntry (Ancestors.list [Ancestors.count].corkIndex, endLine);
 	vStringDelete (Ancestors.list [Ancestors.count].string);
 	vStringDelete (Ancestors.list [Ancestors.count].signature);
 
@@ -436,6 +440,7 @@ static void ancestorPop (void)
 	Ancestors.list [Ancestors.count].lineNumber = 0L;
 	Ancestors.list [Ancestors.count].implementation = IMP_DEFAULT;
 	Ancestors.list [Ancestors.count].isMethod   = false;
+	Ancestors.list [Ancestors.count].corkIndex  = CORK_NIL;
 }
 
 static const tokenInfo* ancestorScope (void)
@@ -463,7 +468,7 @@ static const tokenInfo* ancestorTop (void)
 static void ancestorClear (void)
 {
 	while (Ancestors.count > 0)
-		ancestorPop ();
+		ancestorPop (0);
 	if (Ancestors.list != NULL)
 		eFree (Ancestors.list);
 	Ancestors.list = NULL;
@@ -502,6 +507,7 @@ static tokenInfo *newToken (void)
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	token->anonymous    = false;
+	token->corkIndex    = CORK_NIL;
 
 	return token;
 }
@@ -652,7 +658,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 			 token->tag == TAG_SUBROUTINE ||
 			 token->tag == TAG_PROTOTYPE))
 			e.extensionFields.signature = vStringValue (token->signature);
-		makeTagEntry (&e);
+		token->corkIndex = makeTagEntry (&e);
 		if (isXtagEnabled (FortranXtagTable[X_LINK_NAME].xtype)
 			&& hasLinkName(&e))
 			makeFortranLinkNameTag(&e);
@@ -1089,6 +1095,7 @@ static void readToken (tokenInfo *const token)
 	token->parentType = NULL;
 	token->isMethod = false;
 	token->signature = NULL;
+	token->corkIndex = CORK_NIL;
 
 getNextChar:
 	c = getChar ();
@@ -1877,10 +1884,10 @@ static void parseStructureStmt (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end) &&
 		   ! isType (token, TOKEN_EOF))
 		parseFieldDefinition (token);
+	ancestorPop (token->lineNumber);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_structure token */
 	skipToNextStatement (token);
-	ancestorPop ();
 	deleteToken (name);
 }
 
@@ -2048,10 +2055,10 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 		else
 			skipToNextStatement (token);
 	}
+	ancestorPop (token->lineNumber);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_type token */
 	skipToToken (token, TOKEN_STATEMENT_END);
-	ancestorPop ();
 }
 
 /*  interface-block
@@ -2121,10 +2128,10 @@ static void parseInterfaceBlock (tokenInfo *const token)
 				break;
 		}
 	}
+	ancestorPop (token->lineNumber);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_interface token */
 	skipToNextStatement (token);
-	ancestorPop ();
 	deleteToken (name);
 }
 
@@ -2172,10 +2179,10 @@ static void parseEnumBlock (tokenInfo *const token)
 		else
 			skipToNextStatement (token);
 	}
+	ancestorPop (token->lineNumber);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_enum token */
 	skipToNextStatement (token);
-	ancestorPop ();
 	deleteToken (name);
 }
 
@@ -2364,10 +2371,10 @@ static void parseBlockData (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end) &&
 		   ! isType (token, TOKEN_EOF))
 		skipToNextStatement (token);
+	ancestorPop (token->lineNumber);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_NONE or KEYWORD_block token */
 	skipToNextStatement (token);
-	ancestorPop ();
 }
 
 /*  internal-subprogram-part is
@@ -2508,10 +2515,10 @@ static void parseModule (tokenInfo *const token, bool isSubmodule)
 	while (! isKeyword (token, KEYWORD_end) &&
 		   ! isType (token, TOKEN_EOF))
 		skipToNextStatement (token);
+	ancestorPop (token->lineNumber);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_NONE or KEYWORD_module token */
 	skipToNextStatement (token);
-	ancestorPop ();
 
 	if (parentIdentifier)
 		vStringDelete (parentIdentifier);
@@ -2625,12 +2632,12 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 	if (isKeyword (token, KEYWORD_contains))
 		parseInternalSubprogramPart (token);
 	/* should be at KEYWORD_end token */
+	ancestorPop (token->lineNumber);
 	readSubToken (token);
 	/* secondary token should be one of KEYWORD_NONE, KEYWORD_program,
 	 * KEYWORD_function, KEYWORD_function
 	 */
 	skipToNextStatement (token);
-	ancestorPop ();
 }
 
 static tagType subprogramTagType (tokenInfo *const token)
@@ -2785,6 +2792,7 @@ extern parserDefinition* FortranParser (void)
 	def->keywordCount = ARRAY_SIZE (FortranKeywordTable);
 	def->xtagTable  = FortranXtagTable;
 	def->xtagCount  = ARRAY_SIZE(FortranXtagTable);
+	def->useCork    = CORK_QUEUE;
 
 	def->versionCurrent = 1;
 	def->versionAge = 1;
