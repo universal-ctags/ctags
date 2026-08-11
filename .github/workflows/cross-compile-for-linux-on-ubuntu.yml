@@ -1,0 +1,145 @@
+name: cross compile for GNU/Linux on Ubuntu
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  cross-compile:
+
+    runs-on: ubuntu-26.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-arch: [powerpc64le, loongarch64, aarch64, riscv64, s390x]
+
+    env:
+      CC: ${{ matrix.target-arch }}-linux-gnu-gcc
+      AR: ${{ matrix.target-arch }}-linux-gnu-ar
+      RANLIB: ${{ matrix.target-arch }}-linux-gnu-ranlib
+      CFLAGS: -I${{ github.workspace }}/sysroot/include
+      LDFLAGS: -L${{ github.workspace }}/sysroot/lib
+      PKG_CONFIG_PATH: ${{ github.workspace }}/sysroot/lib/pkgconfig
+
+    steps:
+      - run: printf 'CFLAGS=%s -mlong-double-64\n' "$CFLAGS" >> "$GITHUB_ENV"
+        if: matrix.target-arch == 'powerpc64le'
+        # https://www.openwall.com/lists/musl/2022/06/29/1
+
+      - id: musl-arch
+        run: |
+          if [ ${{ matrix.target-arch }} = powerpc64le ] ; then
+            ARCH=powerpc64
+          else
+            ARCH=${{ matrix.target-arch }}
+          fi
+          printf 'ARCH=%s\n' "$ARCH" >> "$GITHUB_OUTPUT"
+
+      - run: sudo apt -y update
+      - run: sudo apt -y install gcc gcc-${{ matrix.target-arch }}-linux-gnu automake autoconf pkg-config cmake make qemu-user
+
+      - uses: actions/checkout@v5
+
+      - run: curl -LO https://archive.ubuntu.com/ubuntu/pool/universe/m/musl/musl_1.2.6.orig.tar.gz
+      - run: install -d src/musl/
+      - run: tar xf *.tar.gz -C src/musl/ --strip-components=1
+
+      - run: cd src/musl/ && ./configure --prefix=${{ github.workspace }}/sysroot
+      - run: cd src/musl/ && make ARCH=${{ steps.musl-arch.outputs.ARCH }}
+      - run: cd src/musl/ && make install
+
+      - name: build zlib
+        run: |
+          install -d src/libz
+          cd         src/libz
+          curl -L -o src.tar.gz https://distfiles.macports.org/zlib/zlib-1.3.2.tar.xz
+          tar vxf    src.tar.gz --strip-components=1
+          cmake -S . -B build.d -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/sysroot -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON -DZLIB_BUILD_TESTING=OFF -DZLIB_BUILD_STATIC=ON -DZLIB_BUILD_SHARED=OFF
+          cmake --build build.d
+          cmake --install build.d
+
+      - name: build libiconv
+        run: |
+          install -d src/libiconv
+          cd         src/libiconv
+          curl -L -o src.tar.gz https://distfiles.macports.org/libiconv/libiconv-1.19.tar.gz
+          tar xf     src.tar.gz --strip-components=1
+          ./configure --host=${{ matrix.target-arch }}-unknown-linux-gnu --prefix=${{ github.workspace }}/sysroot --enable-extra-encodings --enable-static --disable-shared
+          make V=1
+          make install
+
+      - name: build libxml2
+        run: |
+          install -d src/libxml2
+          cd         src/libxml2
+          curl -L -o src.tar.gz https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.3.tar.xz
+          tar vxf    src.tar.gz --strip-components=1
+          ./configure --host=${{ matrix.target-arch }}-unknown-linux-gnu --prefix=${{ github.workspace }}/sysroot --with-zlib --without-lzma --without-python --without-readline --without-coverage --enable-ipv6 --enable-static --disable-shared LIBS=-liconv || (cat config.log; exit 1)
+          make V=1
+          make install
+
+      - name: build libyaml
+        run: |
+          install -d src/libyaml
+          cd         src/libyaml
+          curl -L -o src.tar.gz https://github.com/yaml/libyaml/releases/download/0.2.5/yaml-0.2.5.tar.gz
+          tar vxf    src.tar.gz --strip-components=1
+          ./configure --host=${{ matrix.target-arch }}-unknown-linux-gnu --prefix=${{ github.workspace }}/sysroot --enable-static --disable-shared
+          make V=1
+          make install
+
+      - name: build jansson
+        run: |
+          install -d src/jansson
+          cd         src/jansson
+          curl -L -o src.tar.gz https://github.com/akheron/jansson/releases/download/v2.15.0/jansson-2.15.0.tar.gz
+          tar vxf    src.tar.gz --strip-components=1
+          cmake -S . -B build.d -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/sysroot -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON -DENABLE_TESTING=OFF -DJANSSON_BUILD_SHARED_LIBS=OFF -DJANSSON_BUILD_DOCS=OFF -DJANSSON_COVERAGE=OFF -DJANSSON_EXAMPLES=OFF -DJANSSON_WITHOUT_TESTS=ON
+          cmake --build build.d
+          cmake --install build.d
+
+      - name: build libpcre2
+        run: |
+          install -d src/libpcre2
+          cd         src/libpcre2
+          curl -L -o src.tar.gz https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2
+          tar vxf    src.tar.gz --strip-components=1
+          cmake -S . -B build.d -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/sysroot -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON -DENABLE_TESTING=OFF -DJANSSON_BUILD_SHARED_LIBS=OFF -DCMAKE_C_STANDARD=99 -DCMAKE_C_STANDARD_REQUIRED=ON -DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_BUILD_PCRE2_16=ON -DPCRE2_BUILD_PCRE2_32=ON -DPCRE2_BUILD_PCRE2GREP=OFF -DPCRE2_BUILD_TESTS=OFF -DPCRE2_SUPPORT_VALGRIND=OFF -DPCRE2_SUPPORT_UNICODE=ON
+          cmake --build build.d
+          cmake --install build.d
+
+      - run: ./autogen.sh
+      - run: ./configure --host=${{ matrix.target-arch }}-unknown-linux-gnu --enable-debugging --enable-static CC=${{ github.workspace }}/sysroot/bin/musl-gcc || (cat config.log; exit 1)
+      - run: make V=1
+
+      - run: readelf -h ctags
+      - run: readelf -d ctags
+
+      - id: actual-hex
+        run: |
+          HEX=$(hexdump -n 20 -e '20/1 "%02X" "\n"' ctags)
+          printf 'HEX=%s\n' "$HEX" >> "$GITHUB_OUTPUT"
+
+      - id: expect-hex
+        run: |
+          case ${{ matrix.target-arch }} in
+            powerpc64le) HEX=7F454C4602010100000000000000000002001500 ;;
+            loongarch64) HEX=7F454C4602010100000000000000000002000201 ;;
+            aarch64)     HEX=7F454C460201010000000000000000000200B700 ;;
+            riscv64)     HEX=7F454C460201010000000000000000000200F300 ;;
+            s390x)       HEX=7F454C4602020100000000000000000000020016 ;;
+          esac
+          printf 'HEX=%s\n' "$HEX" >> "$GITHUB_OUTPUT"
+
+      - run: test ${{ steps.actual-hex.outputs.HEX }} = ${{ steps.expect-hex.outputs.HEX }}
+
+      - run: ./ctags --help
+      - run: ./ctags --version
+
+      - run: make check V=1
+      - run: make roundtrip
+      - run: make tmain CI=1 CTAGS_DEP= READTAGS_DEP= OPTSCRIPT_DEP=
+      - run: make units CI=1 CTAGS_DEP=
