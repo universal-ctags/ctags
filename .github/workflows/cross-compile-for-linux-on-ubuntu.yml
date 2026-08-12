@@ -20,8 +20,8 @@ jobs:
       CC: ${{ matrix.target-arch }}-linux-gnu-gcc
       AR: ${{ matrix.target-arch }}-linux-gnu-ar
       RANLIB: ${{ matrix.target-arch }}-linux-gnu-ranlib
-      CFLAGS: -I${{ github.workspace }}/sysroot/include
-      LDFLAGS: -L${{ github.workspace }}/sysroot/lib
+      CFLAGS: -fPIC
+      LDFLAGS: -Wl,--as-needed
       PKG_CONFIG_PATH: ${{ github.workspace }}/sysroot/lib/pkgconfig
 
     steps:
@@ -41,7 +41,7 @@ jobs:
       - run: sudo apt -y update
       - run: sudo apt -y install gcc gcc-${{ matrix.target-arch }}-linux-gnu automake autoconf pkg-config cmake make qemu-user
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - run: curl -LO https://archive.ubuntu.com/ubuntu/pool/universe/m/musl/musl_1.2.6.orig.tar.gz
       - run: install -d src/musl/
@@ -50,6 +50,8 @@ jobs:
       - run: cd src/musl/ && ./configure --prefix=${{ github.workspace }}/sysroot
       - run: cd src/musl/ && make ARCH=${{ steps.musl-arch.outputs.ARCH }}
       - run: cd src/musl/ && make install
+
+      - run: printf 'CC=${{ github.workspace }}/sysroot/bin/musl-gcc\n' >> "$GITHUB_ENV"
 
       - name: build zlib
         run: |
@@ -107,12 +109,12 @@ jobs:
           cd         src/libpcre2
           curl -L -o src.tar.gz https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2
           tar vxf    src.tar.gz --strip-components=1
-          cmake -S . -B build.d -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/sysroot -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON -DENABLE_TESTING=OFF -DJANSSON_BUILD_SHARED_LIBS=OFF -DCMAKE_C_STANDARD=99 -DCMAKE_C_STANDARD_REQUIRED=ON -DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_BUILD_PCRE2_16=ON -DPCRE2_BUILD_PCRE2_32=ON -DPCRE2_BUILD_PCRE2GREP=OFF -DPCRE2_BUILD_TESTS=OFF -DPCRE2_SUPPORT_VALGRIND=OFF -DPCRE2_SUPPORT_UNICODE=ON
+          cmake -S . -B build.d -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/sysroot -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON -DENABLE_TESTING=OFF -DCMAKE_C_STANDARD=99 -DCMAKE_C_STANDARD_REQUIRED=ON -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_BUILD_PCRE2_16=ON -DPCRE2_BUILD_PCRE2_32=ON -DPCRE2_BUILD_PCRE2GREP=OFF -DPCRE2_BUILD_TESTS=OFF -DPCRE2_SUPPORT_VALGRIND=OFF -DPCRE2_SUPPORT_UNICODE=ON -DPCRE2_SUPPORT_LIBZ=OFF -DPCRE2_SUPPORT_LIBBZ2=OFF -DPCRE2_SUPPORT_LIBEDIT=OFF -DPCRE2_SUPPORT_LIBREADLINE=OFF
           cmake --build build.d
           cmake --install build.d
 
       - run: ./autogen.sh
-      - run: ./configure --host=${{ matrix.target-arch }}-unknown-linux-gnu --enable-debugging --enable-static CC=${{ github.workspace }}/sysroot/bin/musl-gcc || (cat config.log; exit 1)
+      - run: ./configure --host=${{ matrix.target-arch }}-unknown-linux-gnu --enable-debugging --enable-static || (cat config.log; exit 1)
       - run: make V=1
 
       - run: readelf -h ctags
