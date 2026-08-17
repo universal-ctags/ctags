@@ -206,6 +206,12 @@ libctags_a_CFLAGS  += $(LIBYAML_CFLAGS)
 libctags_a_CFLAGS  += $(SECCOMP_CFLAGS)
 libctags_a_CFLAGS  += $(PCRE2_CFLAGS)
 
+if ENABLE_DEBUGGING
+if HAVE_BACKTRACE
+libctags_a_CFLAGS  += -g
+endif
+endif
+
 nodist_libctags_a_SOURCES = $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
 CLEANFILES += $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
@@ -292,6 +298,14 @@ ctags_LDADD += $(LIBYAML_LIBS)
 ctags_LDADD += $(SECCOMP_LIBS)
 ctags_LDADD += $(ICONV_LIBS)
 ctags_LDADD += $(PCRE2_LIBS)
+
+ctags_LDFLAGS =
+if ENABLE_DEBUGGING
+if HAVE_BACKTRACE
+ctags_LDFLAGS += -rdynamic
+endif
+endif
+
 dist_ctags_SOURCES = $(CMDLINE_HEADS) $(CMDLINE_SRCS)
 
 if HOST_MINGW

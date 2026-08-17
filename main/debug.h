@@ -100,6 +100,8 @@ extern int circularRefCheckerCheck (struct circularRefChecker *c, void *ptr);
 extern int circularRefCheckerGetCurrent (struct circularRefChecker *c);
 extern void circularRefCheckClear (struct circularRefChecker *c);
 
+extern void ctagsBacktrace (void);
+
 #else
 #define DEBUG_INIT() do { } while(0)
 #endif	/* DEBUG */
