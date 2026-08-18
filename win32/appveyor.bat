@@ -33,7 +33,7 @@ exit 1
 
 :msbuild_build
 :: ----------------------------------------------------------------------
-:: Using VC12 (VC2013) with msbuild, iconv disabled
+:: Using VC2022 with msbuild, iconv disabled
 @echo on
 copy win32\config_mvc.h config.h
 copy win32\gnulib_h\langinfo.h gnulib
@@ -62,12 +62,12 @@ goto :eof
 
 :msvc_build
 :: ----------------------------------------------------------------------
-:: Using VC12 (VC2013) with nmake, iconv enabled
+:: Using VC2022 with nmake, iconv enabled
 :: Also create Makefile with msys2 and test the VC binary on msys2.
 set MSYS2_ARCH=x86_64
 set MSYS2_DIR=msys64
 set MSYSTEM=MINGW64
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
+call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
 
 :: Build libiconv (MSVC port)
 set ICONV_BUILD_DIR=C:\projects\libiconv
