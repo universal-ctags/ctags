@@ -114,11 +114,11 @@ Before starting to build, you need to copy some files to proper location::
 
 The simplest build instruction like below::
 
-        msbuild win32\ctags_vs2013.sln
+        msbuild win32\ctags.sln
 
 If you want to build a release version, run command like below::
 
-        msbuild win32\ctags_vs2013.sln /p:Configuration=Release
+        msbuild win32\ctags.sln /p:Configuration=Release
 
 MSBuild is what the IDE uses internally and therefore will produce the same files as the IDE.
 

@@ -39,7 +39,7 @@ copy win32\config_mvc.h config.h
 copy win32\gnulib_h\langinfo.h gnulib
 copy win32\gnulib_h\fnmatch.h gnulib
 cd win32
-msbuild ctags_vs2013.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=%CONFIGURATION%
+msbuild ctags.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=%CONFIGURATION%
 
 @echo off
 goto :eof

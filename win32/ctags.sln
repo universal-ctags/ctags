@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2022
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ctags", "ctags_vs2013.vcxproj", "{CE5CDD7C-2102-4753-8AAB-7915802BF658}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ctags", "ctags.vcxproj", "{CE5CDD7C-2102-4753-8AAB-7915802BF658}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
