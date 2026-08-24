@@ -1,6 +1,6 @@
 /* Memory allocation on the stack.
 
-   Copyright (C) 1995, 1999, 2001-2004, 2006-2021 Free Software Foundation,
+   Copyright (C) 1995, 1999, 2001-2004, 2006-2026 Free Software Foundation,
    Inc.
 
    This file is free software: you can redistribute it and/or modify

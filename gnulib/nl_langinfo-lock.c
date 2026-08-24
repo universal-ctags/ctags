@@ -1,5 +1,5 @@
 /* Return the internal lock used by nl_langinfo.
-   Copyright (C) 2019-2021 Free Software Foundation, Inc.
+   Copyright (C) 2019-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -18,9 +18,10 @@
 
 #include <config.h>
 
+/* The option '--disable-threads' explicitly requests no locking.  */
 /* When it is known that the gl_get_nl_langinfo_lock function is defined
    by a dependency library, it should not be defined here.  */
-#if OMIT_NL_LANGINFO_LOCK
+#if AVOID_ANY_THREADS || OMIT_NL_LANGINFO_LOCK
 
 /* This declaration is solely to ensure that after preprocessing
    this file is never empty.  */
@@ -37,14 +38,14 @@ typedef int dummy;
 
 /* Macro for exporting a symbol (function, not variable) defined in this file,
    when compiled into a shared library.  */
-# ifndef DLL_EXPORTED
+# ifndef SHLIB_EXPORTED
 #  if HAVE_VISIBILITY
   /* Override the effect of the compiler option '-fvisibility=hidden'.  */
-#   define DLL_EXPORTED __attribute__((__visibility__("default")))
+#   define SHLIB_EXPORTED __attribute__((__visibility__("default")))
 #  elif defined _WIN32 || defined __CYGWIN__
-#   define DLL_EXPORTED __declspec(dllexport)
+#   define SHLIB_EXPORTED __declspec(dllexport)
 #  else
-#   define DLL_EXPORTED
+#   define SHLIB_EXPORTED
 #  endif
 # endif
 
@@ -59,7 +60,7 @@ typedef int dummy;
    because the latter is not guaranteed to be a stable ABI in the future.  */
 
 /* Make sure the function gets exported from DLLs.  */
-DLL_EXPORTED CRITICAL_SECTION *gl_get_nl_langinfo_lock (void);
+SHLIB_EXPORTED CRITICAL_SECTION *gl_get_nl_langinfo_lock (void);
 
 static glwthread_initguard_t guard = GLWTHREAD_INITGUARD_INIT;
 static CRITICAL_SECTION lock;
@@ -96,7 +97,7 @@ gl_get_nl_langinfo_lock (void)
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* Make sure the function gets exported from shared libraries.  */
-DLL_EXPORTED pthread_mutex_t *gl_get_nl_langinfo_lock (void);
+SHLIB_EXPORTED pthread_mutex_t *gl_get_nl_langinfo_lock (void);
 
 /* Returns the internal lock used by nl_langinfo.  */
 pthread_mutex_t *
@@ -123,7 +124,7 @@ atomic_init (void)
 }
 
 /* Make sure the function gets exported from shared libraries.  */
-DLL_EXPORTED mtx_t *gl_get_nl_langinfo_lock (void);
+SHLIB_EXPORTED mtx_t *gl_get_nl_langinfo_lock (void);
 
 /* Returns the internal lock used by nl_langinfo.  */
 mtx_t *

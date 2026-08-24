@@ -1,5 +1,5 @@
 /* Dispatching based on the current locale's character encoding.
-   Copyright (C) 2018-2021 Free Software Foundation, Inc.
+   Copyright (C) 2018-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -24,7 +24,7 @@
 #if GNULIB_defined_mbstate_t
 
 # include "localcharset.h"
-# include "streq.h"
+# include "streq-opt.h"
 
 # if GNULIB_WCHAR_SINGLE_LOCALE
 /* When we know that the locale does not change, provide a speedup by
