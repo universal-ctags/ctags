@@ -29,13 +29,13 @@ jobs:
               eval "$@"
             }
 
-            export AUTOCONF_VERSION=2.69
+            export AUTOCONF_VERSION=2.72
             export AUTOMAKE_VERSION=1.16
 
             export  CFLAGS='-I/usr/local/include'
             export LDFLAGS='-L/usr/local/lib'
 
-            run sudo pkg_add autoconf%2.69 automake%1.16 gmake pkgconf jansson libyaml libxml libiconv
+            run sudo pkg_add autoconf%2.72 automake%1.16 gmake pkgconf jansson libyaml libxml libiconv
 
             run cc --version
 
