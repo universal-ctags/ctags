@@ -35,11 +35,11 @@ The iPythonCell parser defines only a ``cell`` kind.
 EXTRA(S)
 --------
 
-Tagging cells staring with ``##...`` is disabled by default because
+Tagging cells starting with ``##...`` is disabled by default because
 the pattern is too generic; with that pattern unwanted tags can be extracted.
 
 Enable ``doubleSharps`` language specific extra for tagging cells
-staring with ``##...``.
+starting with ``##...``.
 
 CUSTOMIZING
 -----------
