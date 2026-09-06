@@ -2131,7 +2131,7 @@ get_regex (MIO* fp)
 		return NULL;
 
 	/* Inject a placeholder representing
-	 * case-{in}sesitive. */
+	 * case-{in}sensitive. */
 	if (!token_append(t, ' '))
 		return NULL;
 
@@ -2611,7 +2611,7 @@ es_read_from_string(const char* buf,
 	EsObject* o;
 
 
-	/* IN is opend in "r" mode and the stream pointed by
+	/* IN is opened in "r" mode and the stream pointed by
 	   IN is short-lived here. */
 	in = mio_new_memory((void *)buf, strlen(buf), NULL, NULL);
 	o = es_read(in);

@@ -887,7 +887,7 @@ static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 static bool parseNewEnvironment (tokenInfo *const token, bool *tokenUnprocessed)
 {
 	bool eof = false;
-	/* \newenvironment{nam}[args]{begdef}{enddef} */
+	/* \newenvironment{name}[args]{begdef}{enddef} */
 	struct TexParseStrategy strategy [] = {
 		{
 			.type = '{',

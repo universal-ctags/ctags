@@ -822,7 +822,7 @@ process_token:
 					&& (strcmp(vStringValue(g_cxx.pToken->pszWord), "module") == 0)
 					)
 				{
-					/* "module" introduced in C++20, can be a keyworkd in limited contexts.
+					/* "module" introduced in C++20, can be a keyword in limited contexts.
 					 * If the parsing is not in the context, the parser should handle it
 					 * as an identifier. */
 					if(!cxxParserParseModule())

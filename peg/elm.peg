@@ -168,7 +168,7 @@ typeAlias <-
 # In a definition such as 'type MyType = Cons1 String Int' we
 # capture 'MyType', and then for each type in each constructor
 # subtype (here, 'String' and 'Int') we append a '->' and finally
-# concatentate them all to get the constructor's type description,
+# concatenate them all to get the constructor's type description,
 # such as 'String -> Int -> MyType'
 
 customType <-

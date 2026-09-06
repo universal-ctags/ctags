@@ -25,7 +25,7 @@
    and PATCH to 0.
    For changing setting versionAge member of a parser, increment
    VERSION. Set REVISION and PATCH to 0.
-   When chaging VERSION, set REVISION and PATCH to 0.
+   When changing VERSION, set REVISION and PATCH to 0.
 
    For forward-compatible changes for the CLI,
    increment REVISION.
@@ -64,7 +64,7 @@
  *
  * In the tags file, !_TAGS_OUTPUT_VERSION shows the the version.
  *
- * Chaning for the command line interface, and implementation changes
+ * Changing for the command line interface, and implementation changes
  * like bug fixes don't affect the CURRENT an AGE.
  */
 #define OUTPUT_VERSION_CURRENT 1

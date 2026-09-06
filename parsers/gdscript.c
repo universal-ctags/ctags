@@ -1240,7 +1240,7 @@ static int prepareUnnamedClass (struct NestingLevels *nls)
 	if (e)
 		markTagExtraBit (e, XTAG_ANONYMOUS);
 
-	/* This virtual scope should not be poped. */
+	/* This virtual scope should not be popped. */
 	NestingLevel *lv = nestingLevelsPush (nls, corkIndex);
 	GDS_NL (lv)->indentation = -1;
 

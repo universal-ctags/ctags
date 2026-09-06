@@ -1693,7 +1693,7 @@ int cxxParserEmitFunctionTags(
 		//   inline friend void y(){ ... }
 		//  }
 		//
-		// Here y() is implicitly defined as a function in the namespace contaning X
+		// Here y() is implicitly defined as a function in the namespace containing X
 		// (so it is NOT X::y()).
 
 		pSavedScope = cxxScopeTakeTop();

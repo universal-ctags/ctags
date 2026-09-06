@@ -22,7 +22,7 @@ sub convert {
 
     $name =~ s/\.[a-z]+$//g;
 
-    open(INPUT, "< " . $input) or die("faild to open " . $input);
+    open(INPUT, "< " . $input) or die("failed to open " . $input);
 
     print "const char ctags$name []=\n";
     while (<INPUT>) {

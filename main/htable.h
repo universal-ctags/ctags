@@ -32,8 +32,8 @@ typedef unsigned int (* hashTableHashFunc)  (const void * const key);
 typedef bool      (* hashTableEqualFunc) (const void* a, const void* b);
 typedef void         (* hashTableDeleteFunc)  (void * ptr);
 
-/* To continue interation, return true.
- * To break interation, return false. */
+/* To continue iteration, return true.
+ * To break iteration, return false. */
 typedef bool         (* hashTableForeachFunc) (const void *key, void *value, void *user_data);
 
 unsigned int hashPtrhash (const void * x);

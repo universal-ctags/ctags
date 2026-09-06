@@ -246,7 +246,7 @@ typedef enum eTokenType {
 	TOKEN_CHPOP, // <-
 	TOKEN_AT,
 	TOKEN_LABEL, // ident-then-colon (e.g., "foo:")
-	TOKEN_EXTERN, // symbol in exteral namespace (e.g., "C.foo" or "JS.Object")
+	TOKEN_EXTERN, // symbol in external namespace (e.g., "C.foo" or "JS.Object")
 	TOKEN_EOF,
 	COUNT_TOKEN
 } tokenType;

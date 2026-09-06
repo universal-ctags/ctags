@@ -99,7 +99,7 @@ static roleDefinition RLibraryRoles [] = {
 };
 
 static roleDefinition RSourceRoles [] = {
-	{ true, "source", "source loaded by source fucntion" },
+	{ true, "source", "source loaded by source function" },
 };
 
 static kindDefinition RKinds[KIND_COUNT] = {
@@ -114,7 +114,7 @@ static kindDefinition RKinds[KIND_COUNT] = {
 	{true, 'c', "vector", "vectors explicitly created with `c()'" },
 	{true, 'L', "list", "lists explicitly created with `list()'" },
 	{true, 'd', "dataframe", "data frame explicitly created with `data.frame()'" },
-	{true, 'n', "nameattr", "names attribtes in vectors, lists, or dataframes" },
+	{true, 'n', "nameattr", "names attributes in vectors, lists, or dataframes" },
 };
 
 struct sKindExtraInfo {
@@ -950,7 +950,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 			tag->extensionFields.signature = vStringDeleteUnwrap(signature);
 			signature = NULL;
 		}
-		/* If a vector has no named attribte and it has no lval,
+		/* If a vector has no named attribute and it has no lval,
 		 * we don't make a tag for the vector. */
 		if ((kind == K_VECTOR || kind == K_LIST || kind == K_DATAFRAME)
 			&& *assignment_operator == '\0')

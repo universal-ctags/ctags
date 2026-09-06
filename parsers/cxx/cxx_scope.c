@@ -293,7 +293,7 @@ void cxxScopePushExported(
 	)
 {
 	cxxScopePush(t, eScopeType, eInitialAccess);
-	// Overrite the default value inherited from the parent scope.
+	// Overwrite the default value inherited from the parent scope.
 	t->bInternalScopeExported = exported;
 }
 

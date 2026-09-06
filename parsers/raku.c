@@ -346,7 +346,7 @@ RakuParser (void)
  * doesn't work.
  */
 #define perl6Kinds rakuKinds
-/* NOTE: We assume the grammer of Raku is upper compatible with
+/* NOTE: We assume the grammar of Raku is upper compatible with
  * Perl6. When this assumption is no longer true, we may have to
  * copy the function, or this file. Don't waste your time to
  * make one function support two languages; Copying may be enough. */

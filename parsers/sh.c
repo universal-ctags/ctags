@@ -718,11 +718,11 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 					++cp;
 				if (*cp == ')')
 				{
-					/* A function definiton can look like an array initialization:
+					/* A function definition can look like an array initialization:
 					 *
 					 *   ... f=()
 					 *
-					 * We use followng heuristics to distinguish a function definition
+					 * We use following heuristics to distinguish a function definition
 					 * from an array initialization:
 					 *
 					 *   preceding "function" keyword: function f=()

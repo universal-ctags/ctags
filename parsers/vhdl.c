@@ -914,7 +914,7 @@ static void parseArchitecture (tokenInfo * const token)
 					? role_index
 					: entity_index);
 
-				/* TODO: append thes architecture name to
+				/* TODO: append these architecture name to
 				 * architecture: field of *e*. */
 			}
 

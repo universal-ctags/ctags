@@ -137,7 +137,7 @@ main(int argc, char **argv)
 		}
 		else if (in)
 		{
-			fprintf (stderr, "too many arugments\n");
+			fprintf (stderr, "too many arguments\n");
 			mio_unref (in);
 			exit (2);
 		}

@@ -598,7 +598,7 @@ extern parserDefinition* DtdParser (void)
 {
 	parserDefinition* def = parserNew ("DTD");
 
-	/* File name patters are picked from Linux kernel. */
+	/* File name patterns are picked from Linux kernel. */
 	static const char *const extensions [] = {
 		"dtd",
 		"mod",

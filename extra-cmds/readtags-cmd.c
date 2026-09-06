@@ -741,7 +741,7 @@ static void finiInputSpec (struct inputSpec *inputSpec)
 static void printVersion(void)
 {
 	/* readtags uses code of ctags via libutil.
-	 * So we here use the versoin of ctags as the version of readtags. */
+	 * So we here use the version of ctags as the version of readtags. */
 	puts(PROGRAM_VERSION);
 	exit (0);
 }

@@ -841,7 +841,7 @@ bool cxxParserParseEnum(void)
 			{
 				// enum type structure member with bit-width:
 				// e.g.
-				//    sturct { enum E m: 2; } v;
+				//    struct { enum E m: 2; } v;
 				CXX_DEBUG_PRINT("Found semicolon, member definition with bit-width");
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain, 0);
 			}

@@ -160,7 +160,7 @@ EsObject*    es_regex_exec    (const EsObject* regex,
 							   const EsObject* str);
 
 /* Return #f if unmatched.
- * Retrun NIL is the associate group is not in REGEX. */
+ * Return NIL is the associate group is not in REGEX. */
 EsObject*    es_regex_exec_extract_match_new (const EsObject* regex,
 											  const EsObject* str,
 											  unsigned int group);
@@ -253,7 +253,7 @@ EsObject* es_srealize  (const char* fmt,...);
 EsObject* es_map   (EsObject * (*fn) (EsObject *, void *),
 					EsObject *list, void *user_data);
 
-/* Unlike es_map, the value returnd from FN is not accumulated.
+/* Unlike es_map, the value returned from FN is not accumulated.
  * If FN returns a value other than #f, es_foreach stops the
  * iteration immediately and returns the value.
  */

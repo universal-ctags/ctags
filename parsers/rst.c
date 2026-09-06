@@ -530,7 +530,7 @@ static void findRstTags (void)
 		else if ((markup_line = is_markup_line_with_char (line_trimmed, '|')) != NULL)
 		{
 			overline_clear(&overline);
-			/* Hanle .. |substitute definition|
+			/* Handle .. |substitute definition|
 			 * https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#substitution-definitions
 			 */
 			if (capture_markup (markup_line, '|', K_SUBSTDEF) != CORK_NIL)

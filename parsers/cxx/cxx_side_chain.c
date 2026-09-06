@@ -90,7 +90,7 @@ static void cxxScanAttrExtractAlias(const CXXToken * pToken)
 
 	Assert(vStringLength(pArgToken->pszWord));
 
-	// Remve doubule quote characters surrounding the constant string.
+	// Remove doubule quote characters surrounding the constant string.
 	vStringChop(pArgToken->pszWord);
 	cxxTagSetField(CXXTagFieldAlias, vStringValue(pArgToken->pszWord)+1, true);
 
