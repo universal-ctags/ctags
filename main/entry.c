@@ -1405,7 +1405,10 @@ extern bool foreachEntriesInScope (int corkIndex,
 			verbose ("symtbl[< ] %s->%p\n", name, &entry->slot);
 			if (!func (entry->corkIndex, &entry->slot, data))
 				return false;
-			if (cursor == &rep->symnode)
+			/* REP is filled only when NAME is given.  Don't take the
+			 * address of a member of a NULL pointer; that is undefined
+			 * behavior. */
+			if (rep && cursor == &rep->symnode)
 				revisited_rep = true;
 		}
 		else if (name)
