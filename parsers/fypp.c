@@ -78,7 +78,7 @@ struct fyppParseCtx {
 
 	   if_tracker field tracks the branches. When the parser enters #:if area,
 	   it appends 1 to if_tracker. When it enters #:elif or #:else area,
-	   it repalces 1 with 0. When it reaches at #:endif, remove the last
+	   it replaces 1 with 0. When it reaches at #:endif, remove the last
 	   element from the field. The product of if_tracker should be either
 	   0 or 1. In the case that the product is 1, we can say the current line
 	   is in the first if block.

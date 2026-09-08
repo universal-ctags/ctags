@@ -511,7 +511,7 @@ static bool processCppMacroX (vString *identifier, int lastChar, vString *line)
 
 	if (macroInfo->useCount >= CPP_MAXIMUM_MACRO_USE_COUNT)
 	{
-		TRACE_PRINT ("Overly uesd macro %s<%p> useCount: %d (> %d)",
+		TRACE_PRINT ("Overly used macro %s<%p> useCount: %d (> %d)",
 					 vStringValue (identifier), macroInfo, macroInfo->useCount,
 					 CPP_MAXIMUM_MACRO_USE_COUNT);
 		goto out;

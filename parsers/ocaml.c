@@ -677,7 +677,7 @@ static void pushEmptyContext (parseNext continuation)
  * then discard it. Used to handle the :
  * let f x y = ...
  * in ...
- * where the context is reseted after the in. Context may have
+ * where the context is reset after the in. Context may have
  * been really nested before that. */
 static void popLastNamed ( void )
 {

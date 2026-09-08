@@ -96,7 +96,7 @@
  * same.  The FTW manpage could be more readable, but so it goes.
  *
  * Anyhow, feel free to post these, and incorporate them into your existing
- * packages.  I have readdir() routiens for MSDOS and the Amiga if anyone
+ * packages.  I have readdir() routines for MSDOS and the Amiga if anyone
  *  wants them, and should have them for VMS by the end of January; let me
  *  know if you want copies.
  *

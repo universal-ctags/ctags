@@ -396,7 +396,7 @@ static void processCppMacroX (tokenInfo *const token)
 
 		if (macroInfo->useCount >= CPP_MAXIMUM_MACRO_USE_COUNT)
 		{
-			TRACE_PRINT ("Overly uesd macro %s<%p> useCount: %d (> %d)",
+			TRACE_PRINT ("Overly used macro %s<%p> useCount: %d (> %d)",
 						 vStringValue (token->string), macroInfo, macroInfo->useCount,
 						 CPP_MAXIMUM_MACRO_USE_COUNT);
 			return;
@@ -932,7 +932,7 @@ extern parserDefinition* LdScriptParser (void)
 {
 	parserDefinition* def = parserNew ("LdScript");
 
-	/* File name patters are picked from Linux kernel and ecos. */
+	/* File name patterns are picked from Linux kernel and ecos. */
 	static const char *const extensions [] = { "lds", "scr", "ld", "ldi", NULL };
 
 	/* lds.S must be here because Asm parser registers .S as an extension.

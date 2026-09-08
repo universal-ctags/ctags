@@ -1389,7 +1389,7 @@ bool cxxParserParseNextToken(void)
 			if(pMacro && (pMacro->useCount >= CPP_MAXIMUM_MACRO_USE_COUNT))
 			{
 				/* If the macro is overly used, report it here. */
-				CXX_DEBUG_PRINT("Overly uesd macro %s <%p> useCount: %d (> %d)",
+				CXX_DEBUG_PRINT("Overly used macro %s <%p> useCount: %d (> %d)",
 								pMacro->name,
 								pMacro, pMacro->useCount,
 								CPP_MAXIMUM_MACRO_USE_COUNT);
@@ -1669,7 +1669,7 @@ bool cxxParserParseNextToken(void)
 		{
 			case CXXTokenTypeSmallerThanSign:
 				// The < sign is used in templates and is problematic if parsed incorrectly.
-				// We must exctract only the valid operator types: <, <<, <<=, <= <=>
+				// We must extract only the valid operator types: <, <<, <<=, <= <=>
 				switch(g_cxx.iChar)
 				{
 					case '<':

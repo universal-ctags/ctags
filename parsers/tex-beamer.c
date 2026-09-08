@@ -129,7 +129,7 @@ static struct TexParseStrategy frame_env_strategy [] = {
 		.scopeIndex = CORK_NIL,	/* root scope */
 	},
 	{
-		/* This should not be optoinal. */
+		/* This should not be optional. */
 		.type = '{',
 		.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
 		.kindIndex = K_FRAMESUBTITLE,

@@ -118,7 +118,7 @@ Python                  i/module          indirectlyImported on        0 module 
 Python                  i/module          namespace          on        0 namespace from where classes/variables/functions are imported
 R                       l/library         library            on        0 library attached by library function
 R                       l/library         require            on        0 library attached by require function
-R                       s/source          source             on        0 source loaded by source fucntion
+R                       s/source          source             on        0 source loaded by source function
 RpmSpec                 m/macro           undef              on        0 undefined
 RpmSpec                 p/patch           decl               on        0 declared for applying later
 Ruby                    L/library         loaded             on        0 loaded by "load" method
@@ -279,7 +279,7 @@ Python                  i/module          indirectlyImported on        0 module 
 Python                  i/module          namespace          on        0 namespace from where classes/variables/functions are imported
 R                       l/library         library            on        0 library attached by library function
 R                       l/library         require            on        0 library attached by require function
-R                       s/source          source             on        0 source loaded by source fucntion
+R                       s/source          source             on        0 source loaded by source function
 RpmSpec                 m/macro           undef              on        0 undefined
 RpmSpec                 p/patch           decl               on        0 declared for applying later
 Ruby                    L/library         loaded             on        0 loaded by "load" method

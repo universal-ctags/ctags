@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# man-test.py - test exapmles in a man page
+# man-test.py - test examples in a man page
 #
 # Copyright (C) 2021 Masatake YAMATO
 #

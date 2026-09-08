@@ -289,7 +289,7 @@ def run_shrink(cmdline_template, finput, foutput, lang):
 def basename_filter(internal, output_type):
     filters_external = {
             'ctags': r's%\(^[^\t]\{1,\}\t\)\(/\{0,1\}\([^/\t]\{1,\}/\)*\)%\\1%',
-            # "input" in the expresion is for finding input file names in the TAGS file.
+            # "input" in the expression is for finding input file names in the TAGS file.
             # RAWOUT.tmp:
             #
             #   ./Units/parser-ada.r/ada-etags-suffix.d/input_0.adb,238

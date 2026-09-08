@@ -126,13 +126,13 @@ static DSLEngine engines [DSL_ENGINE_COUNT];
 
 static DSLProcBind pbinds_interanl_pseudo [] = {
 	{ "#/PATTERN/", NULL, NULL, 0, 0,
-	  .helpstr = "(#/patter/ <string>) -> <boolean>; regular expression matching\n"
-	  "(#/patter/ <string> <integer>) -> <string>|\"\"; extact a group matching to the pattern\n"
-	  "(#/patter/ <string> <integer> <any:default>) -> <string>|default; ...returning DEFAULT in case of no match"},
+	  .helpstr = "(#/pattern/ <string>) -> <boolean>; regular expression matching\n"
+	  "(#/pattern/ <string> <integer>) -> <string>|\"\"; extract a group matching to the pattern\n"
+	  "(#/pattern/ <string> <integer> <any:default>) -> <string>|default; ...returning DEFAULT in case of no match"},
 	{ "#/PATTERN/i", NULL, NULL, 0, 0,
-	  .helpstr = "(#/patter/i <string>) -> <boolean>; in case insensitive way\n"
-	  "(#/patter/i <string> <integer>) -> <string>|\"\"; extact a group matching to the pattern\n"
-	  "(#/patter/i <string> <integer> <any:default>) -> <string>|default; ...returning DEFAULT in case of no match"},
+	  .helpstr = "(#/pattern/i <string>) -> <boolean>; in case insensitive way\n"
+	  "(#/pattern/i <string> <integer>) -> <string>|\"\"; extract a group matching to the pattern\n"
+	  "(#/pattern/i <string> <integer> <any:default>) -> <string>|default; ...returning DEFAULT in case of no match"},
 };
 
 static DSLProcBind pbinds [] = {

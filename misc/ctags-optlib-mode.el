@@ -52,7 +52,7 @@
      (2 font-lock-type-face t)
      (3 font-lock-constant-face t))
     ;;
-    ;; Singe line regex
+    ;; Single line regex
     ;;
     ("^[[:space:]]*--\\(regex\\)-\\([^=]+\\)="
      (1 font-lock-keyword-face t)

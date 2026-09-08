@@ -349,7 +349,7 @@ my $options =
 	       if (! defined $_[0]->{'langdef'});
 	   die "Enabling/disabling an extra is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
-	   die "Specifing multiple extras in one --extras-... is not handled: {$3}"
+	   die "Specifying multiple extras in one --extras-... is not handled: {$3}"
 	       if ( index ($3, '{') != -1 );
 	   parse_extras ($2, $3, $_[0]);
 	   return 1;
@@ -365,7 +365,7 @@ my $options =
 	       if (! defined $_[0]->{'langdef'});
 	   die "Enabling/disabling a field is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
-	   die "Specifing multiple fields in one --fields-... is not handled: {$3}"
+	   die "Specifying multiple fields in one --fields-... is not handled: {$3}"
 	       if ( index ($3, '{') != -1 );
 	   parse_fields ($2, $3, $_[0]);
 	   return 1;

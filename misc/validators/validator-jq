@@ -27,7 +27,7 @@
 #
 # https://github.com/universal-ctags/ctags/pull/1909/commits/234540f2cc8faf711aaa1ac28b84aca133625797
 #
-# , chainge in a pull request submitted by @ahakanbaba.
+# , change in a pull request submitted by @ahakanbaba.
 #
 action=$1
 input=$2

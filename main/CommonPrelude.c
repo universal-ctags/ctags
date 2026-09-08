@@ -163,7 +163,7 @@ const char ctagsCommonPrelude []=
 "    } ifelse\n"
 "} __bddef\n"
 "\n"
-"(array key _AMEMBER true|fales)\n"
+"(array key _AMEMBER true|false)\n"
 "/_amember {\n"
 "    false 3 1 roll\n"
 "    % false array key\n"

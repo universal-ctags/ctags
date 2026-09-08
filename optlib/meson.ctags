@@ -82,7 +82,7 @@
 }}
 
 #
-# Skip an unintersting token for optimization
+# Skip an uninteresting token for optimization
 # ./ctags -o -  /home/yamato/backup/var/util-linux/util-linux-2.41.devel-232-07aac-dirty/meson.build > /dev/null 2> /tmp/logf  0.46s user 0.01s system 97% cpu 0.483 total
 # => ./ctags -o -  /home/yamato/backup/var/util-linux/util-linux-2.41.devel-232-07aac-dirty/meson.build > /dev/null 2> /tmp/logf  0.19s user 0.01s system 97% cpu 0.209 total
 #

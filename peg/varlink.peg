@@ -31,7 +31,7 @@
 #
 ########################################################################
 #
-# This module contains PEG grammer and functions for generating tags
+# This module contains PEG grammar and functions for generating tags
 # for varlink IDL:
 #
 # * https://github.com/varlink

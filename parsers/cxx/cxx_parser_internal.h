@@ -373,7 +373,7 @@ typedef struct _CXXParserState
 	//
 	// Note that this is really a kind-of arbitrary measure as the counter
 	// is increased in certain parser code paths that often lead to recursion.
-	// It does not necessairly match the real number of stack frames or nested
+	// It does not necessarily match the real number of stack frames or nested
 	// brackets/parentheses in the input.
 	//
 	// The counter is used to avoid stack overflow when nesting grows too much.

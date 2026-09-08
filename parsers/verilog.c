@@ -12,7 +12,7 @@
  *	 References:
  *		IEEE Std 1800-2017, SystemVerilog Language Reference Manual
  *			https://ieeexplore.ieee.org/document/8299595
- *		SystemVerilog IEEE Std 1800-2012 Grammer
+ *		SystemVerilog IEEE Std 1800-2012 Grammar
  *			https://insights.sigasi.com/tech/systemverilog.ebnf/
  *		Verilog Formal Syntax Specification
  *			http://www.verilog.com/VerilogBNF.html
@@ -77,7 +77,7 @@ typedef enum {
 	K_WITH,
 
 	K_UNDEFINED = KEYWORD_NONE,
-	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
+	/* the following items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
 	K_CONSTANT= 0,
 	K_DEFINE,
 	K_EVENT,
@@ -713,7 +713,7 @@ static bool isWordToken (const int c)
 	return (isalpha (c) || c == '_' || c == '`' || c == '\\');
 }
 
-// Is a charactor in an identifier? [a-zA-Z0-9_`$]
+// Is a character in an identifier? [a-zA-Z0-9_`$]
 static bool isIdentifierCharacter (const int c)
 {
 	return (isalnum (c) || c == '_' || c == '`' || c == '$');
@@ -903,14 +903,14 @@ static int _readWordToken (tokenInfo *const token, int c, bool skip)
 }
 
 // read a word token starting with "c".
-// returns the first charactor of the next token.
+// returns the first character of the next token.
 static int readWordToken (tokenInfo *const token, int c)
 {
 	return _readWordToken (token, c, true);
 }
 
 // read a word token starting with "c".
-// returns the next charactor of the token read.
+// returns the next character of the token read.
 // For compiler directives which are line-based, skipWhite() cannot be used.
 static int readWordTokenNoSkip (tokenInfo *const token, int c)
 {
@@ -1511,7 +1511,7 @@ static int processDefine (tokenInfo *const token, int c)
 }
 
 // immediate_assertion_statement ::=
-//	   ( assert | asume | cover ) [ #0 | final ] '(' expression ')' block
+//	   ( assert | assume | cover ) [ #0 | final ] '(' expression ')' block
 // concurrent_assertion_statement ::=
 //	   ( assert | assume ) property ( property_spec ) action_block
 //	 | expect ( property_spec ) action_block  # ignore : processed as same as "if"
@@ -1802,7 +1802,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 		c = skipDimension (c);
 		c = skipMacro (c, token);
 
-		// break on ',', ';', ')', '}', or other unexpected charactors
+		// break on ',', ';', ')', '}', or other unexpected characters
 		if (!isWordToken (c))
 			break;
 

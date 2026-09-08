@@ -33,7 +33,7 @@ struct sMarkdownSubparser {
 
 	   ```{python}
 
-	   Fot this input, ctags pases "{python}" as LANGMARKER. */
+	   For this input, ctags pases "{python}" as LANGMARKER. */
 	bool (* extractLanguageForCodeBlock) (markdownSubparser *s,
 										  const char *langMarker,
 										  vString *langName);

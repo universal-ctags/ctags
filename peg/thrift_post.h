@@ -57,7 +57,7 @@ static vString* unliteral(const char *literal)
 				break;
 
 			/* ???
-			 * How the backslash is handled is not wel explained in the document. */
+			 * How the backslash is handled is not well explained in the document. */
 			if (! (*c == '"' || *c == '\'' || *c == '\\'))
 				vStringPut (vstr, '\\');
 		}

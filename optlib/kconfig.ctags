@@ -115,7 +115,7 @@
    } loop
 }}
 
-# Qemu's Kconfig does't use double quotes
+# Qemu's Kconfig doesn't use double quotes
 --regex-Kconfig=/^[ \t]*source[ \t]+"?([^"]+)"?[ \t]*(#.*)?$/\1/k/{_role=source}{exclusive}{scope=ref}{{
    count 0 gt {
       . :line 1 gt {

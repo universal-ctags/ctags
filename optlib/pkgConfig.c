@@ -122,7 +122,7 @@ extern parserDefinition* PkgConfigParser (void)
 		  ATTACH_ROLES(PkgConfigPkgRoleTable),
 		},
 		{
-		  true, 'v', "var", "variabels",
+		  true, 'v', "var", "variables",
 		},
 	};
 	static xtagDefinition PkgConfigXtagTable [] = {
