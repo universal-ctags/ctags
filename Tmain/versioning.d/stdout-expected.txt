@@ -70,3 +70,4 @@ EXAMINE  TEST       base => sub {shared}
 Implementation specific status
 -------------------------------------------------------
 allow null tags: no
+stack guard: unsupported

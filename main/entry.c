@@ -821,6 +821,18 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 			/* Force break this while-loop. */
 			scope = NULL;
 		}
+
+#define SCOPE_DEPTH_LIMIT 32
+		if (scope
+			/* '* 2' considers the separators in the queue. */
+			&& stringListCount (queue) > (SCOPE_DEPTH_LIMIT * 2))
+		{
+			notice ("too deep scope (> %d): %s in %s:%lu",
+					SCOPE_DEPTH_LIMIT,
+					scope->name, scope->inputFileName, scope->lineNumber);
+			/* Force break this while-loop. */
+			scope = NULL;
+		}
 	}
 
 	n = vStringNew ();

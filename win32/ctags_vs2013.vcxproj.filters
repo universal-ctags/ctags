@@ -189,6 +189,9 @@
     <ClCompile Include="..\main\sort.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\stackguard.c">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\stats.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
@@ -894,6 +897,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\sort_r.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\stackguard_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\stats_p.h">
