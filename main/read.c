@@ -221,6 +221,24 @@ extern long translateFileOffset (unsigned long offset)
 	return getAreaStartOffset () + offset;
 }
 
+static compoundPos* getInputFileCompoundPosForLine (unsigned int line)
+{
+	int index;
+	if (line > 0)
+	{
+		if (File.lineFposMap.count > (line - 1))
+			index = line - 1;
+		else if (File.lineFposMap.count != 0)
+			index = File.lineFposMap.count - 1;
+		else
+			index = 0;
+	}
+	else
+		index = 0;
+
+	return File.lineFposMap.pos + index;
+}
+
 extern int getInputColumnNumber (void)
 {
 	int ret;
@@ -315,14 +333,17 @@ extern int getInputColumnNumber (void)
 		 *                 |                 |
 		 *                 +-----------------+
 		 *
-		 * Q => getInputFileOffsetForLine(File.input.lineNumber)
+		 * Q => getInputFileCompoundPosForLine(File.input.lineNumber)->offset - (File.bomFound? 3: 0)
+		 *
+		 * (File.bomFound? 3: 0) on each side cancel each other, so can be left out.
 		 *
 		 * dz = O + P - Q
 		 */
 		unsigned long ln = getInputLineNumber ();
+		compoundPos *cpos = getInputFileCompoundPosForLine (ln);
 		ret = getAreaStartOffset ()
-			+ mio_tell (File.mio) - (File.bomFound? 3: 0)
-			- getInputFileOffsetForLine(ln)
+			+ mio_tell (File.mio)
+			- cpos->offset
 			- File.ungetchIdx;
 	}
 	else
@@ -351,24 +372,6 @@ extern const char *getInputFileName (void)
 extern MIOPos getInputFilePosition (void)
 {
 	return File.filePosition.pos;
-}
-
-static compoundPos* getInputFileCompoundPosForLine (unsigned int line)
-{
-	int index;
-	if (line > 0)
-	{
-		if (File.lineFposMap.count > (line - 1))
-			index = line - 1;
-		else if (File.lineFposMap.count != 0)
-			index = File.lineFposMap.count - 1;
-		else
-			index = 0;
-	}
-	else
-		index = 0;
-
-	return File.lineFposMap.pos + index;
 }
 
 
