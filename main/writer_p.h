@@ -39,6 +39,7 @@ typedef struct sTagWriter tagWriter;
 struct sTagWriter {
 	const char *oformat;		/* name used in CLI: --output-format=
 								 * NULL is acceptable.*/
+	void (* init) (void);		/* Called in setTagWriter() */
 	int (* writeEntry) (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag,
 						void *clientData);
 	int (* writePtagEntry) (tagWriter *writer, MIO * mio, const ptagDesc *desc,

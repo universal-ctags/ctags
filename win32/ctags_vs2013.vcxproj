@@ -220,6 +220,7 @@
     <ClCompile Include="..\main\rexprcode.c" />
     <ClCompile Include="..\main\routines.c" />
     <ClCompile Include="..\main\script.c" />
+    <ClCompile Include="..\main\seccomp.c" />
     <ClCompile Include="..\main\selectors.c" />
     <ClCompile Include="..\main\sort.c" />
     <ClCompile Include="..\main\stats.c" />
@@ -421,6 +422,7 @@
     <ClInclude Include="..\main\gvars.h" />
     <ClInclude Include="..\main\htable.h" />
     <ClInclude Include="..\main\inline.h" />
+    <ClInclude Include="..\main\interactive_p.h" />
     <ClInclude Include="..\main\intern.h" />
     <ClInclude Include="..\main\interval_tree_generic.h" />
     <ClInclude Include="..\main\keyword.h" />

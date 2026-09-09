@@ -67,8 +67,8 @@
 #include "writer_p.h"
 #include "xtag_p.h"
 
-#ifdef HAVE_JANSSON
 #include "interactive_p.h"
+#ifdef HAVE_JANSSON
 #include <jansson.h>
 #include <errno.h>
 #endif
@@ -376,7 +376,7 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 	timeStamp (1);
 
 	if ((! Option.filter) && (!Option.printLanguage))
-		closeTagFile (resize);
+		closeTagFile (resize, false);
 
 	timeStamp (2);
 
@@ -391,27 +391,24 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 #undef timeStamp
 }
 
+static void prepareSandbox (unsigned int set)
+{
+	if (installSyscallFilter (set)) {
+		error (FATAL, "install_syscall_filter failed");
+		/* The explicit exit call is needed because
+		   "error (FATAL,..." just prints a message in
+		   interactive mode. */
+		exit (1);
+	}
+}
+
 #ifdef HAVE_JANSSON
 void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 {
 	struct interactiveModeArgs *iargs = user;
 
-	if (iargs->sandbox) {
-		/* As of jansson 2.6, the object hashing is seeded off
-		   of /dev/urandom, so trigger the hash seeding
-		   before installing the syscall filter.
-		*/
-		json_t * tmp = json_object ();
-		json_decref (tmp);
-
-		if (installSyscallFilter ()) {
-			error (FATAL, "install_syscall_filter failed");
-			/* The explicit exit call is needed because
-			   "error (FATAL,..." just prints a message in
-			   interactive mode. */
-			exit (1);
-		}
-	}
+	if (iargs->sandbox)
+		prepareSandbox (syscall_coreset);
 
 	char buffer[1024];
 	json_t *request;
@@ -457,7 +454,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 				if (iargs->sandbox) {
 					error (FATAL,
 						   "invalid request in sandbox submode: reading file contents from a file is limited");
-					closeTagFile (false);
+					closeTagFile (false, false);
 					goto next;
 				}
 
@@ -472,7 +469,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 				mio_unref (mio);
 			}
 
-			closeTagFile (false);
+			closeTagFile (false, false);
 			fputs ("{\"_type\": \"completed\", \"command\": \"generate-tags\"}\n", stdout);
 			fflush(stdout);
 		}
@@ -487,6 +484,68 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 	}
 }
 #endif
+
+static void oneshotCommon (const char *fname, size_t limit, bool sandbox, int strictSyscallset)
+{
+	openTagFile ();
+
+	if (sandbox && strictSyscallset)
+		prepareSandbox (strictSyscallset);
+
+	MIO *mio = mio_new_memory (NULL, 0, eRealloc, eFreeNoNullCheck);
+	int c;
+	size_t r = 0;
+	while ((c = getchar()) != EOF)
+	{
+		r++;
+		if (limit != 0 && r > limit)
+		{
+			error (WARNING, "input read from stdin exceeds the limit: name: %s, size: %lu",
+				   fname,
+				   (unsigned long) limit);
+			break;
+		}
+		mio_putc (mio, c);
+	}
+
+	mio_seek (mio, 0, SEEK_SET);
+
+	parseFileWithMio (fname, mio, NULL);
+
+	mio_unref (mio);
+
+	closeTagFile (false, sandbox ? true : false);
+}
+
+extern void batchOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
+{
+	struct interactiveModeArgs *iargs = user;
+
+	Assert (iargs->fname);
+
+	unsigned int extra_set;
+
+	extra_set = isDestinationStdout () ? syscall_close | syscall_ctrlset
+		: syscall_open | syscall_close | syscall_ctrlset;
+	if (iargs->sandbox)
+		prepareSandbox (syscall_coreset | extra_set);
+
+	extra_set = isDestinationStdout () ? 0
+		: syscall_open | syscall_close;
+	oneshotCommon (iargs->fname, iargs->limit, iargs->sandbox, syscall_coreset | extra_set);
+}
+
+extern void interactiveOneshot (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
+{
+	struct interactiveModeArgs *iargs = user;
+
+	Assert (iargs->fname);
+
+	if (iargs->sandbox)
+		prepareSandbox (syscall_coreset);
+
+	oneshotCommon (iargs->fname, iargs->limit, iargs->sandbox, 0);
+}
 
 static bool isSafeVar (const char* var)
 {
