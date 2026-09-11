@@ -1,5 +1,5 @@
 /* Query the name of the current global locale.
-   Copyright (C) 2019-2021 Free Software Foundation, Inc.
+   Copyright (C) 2019-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -44,9 +44,8 @@ extern "C" {
    55+5*58.  */
 #define SETLOCALE_NULL_ALL_MAX (148+12*256+1)
 
-/* setlocale_null_r (CATEGORY, BUF, BUFSIZE) is like setlocale (CATEGORY, NULL),
-   except that
-     - it is guaranteed to be multithread-safe,
+/* setlocale_null_r_unlocked (CATEGORY, BUF, BUFSIZE) is like
+   setlocale (CATEGORY, NULL), except that
      - it returns the resulting locale category name or locale name in the
        user-supplied buffer BUF, which must be BUFSIZE bytes long.
    The recommended minimum buffer size is
@@ -56,7 +55,36 @@ extern "C" {
    CATEGORY is invalid, or ERANGE if BUFSIZE is smaller than the length needed
    size (including the trailing NUL byte).  In the latter case, a truncated
    result is returned in BUF, but still NUL-terminated if BUFSIZE > 0.
-   For this call to be multithread-safe, *all* calls to
+   This call is guaranteed to be thread-safe only if
+     - CATEGORY != LC_ALL and SETLOCALE_NULL_ONE_MTSAFE is true, or
+     - CATEGORY == LC_ALL and SETLOCALE_NULL_ALL_MTSAFE is true,
+   and the other threads must not make other setlocale invocations (since
+   changing the global locale has side effects on all threads).  */
+extern int setlocale_null_r_unlocked (int category, char *buf, size_t bufsize)
+  _GL_ARG_NONNULL ((2));
+
+/* setlocale_null_unlocked (CATEGORY) is like setlocale (CATEGORY, NULL).
+   The return value is NULL if CATEGORY is invalid.
+   This call is guaranteed to be thread-safe only if
+     - CATEGORY != LC_ALL and SETLOCALE_NULL_ONE_MTSAFE is true, or
+     - CATEGORY == LC_ALL and SETLOCALE_NULL_ALL_MTSAFE is true,
+   and the other threads must not make other setlocale invocations (since
+   changing the global locale has side effects on all threads).  */
+extern const char *setlocale_null_unlocked (int category);
+
+/* setlocale_null_r (CATEGORY, BUF, BUFSIZE) is like setlocale (CATEGORY, NULL),
+   except that
+     - it is guaranteed to be thread-safe,
+     - it returns the resulting locale category name or locale name in the
+       user-supplied buffer BUF, which must be BUFSIZE bytes long.
+   The recommended minimum buffer size is
+     - SETLOCALE_NULL_MAX for CATEGORY != LC_ALL, and
+     - SETLOCALE_NULL_ALL_MAX for CATEGORY == LC_ALL.
+   The return value is an error code: 0 if the call is successful, EINVAL if
+   CATEGORY is invalid, or ERANGE if BUFSIZE is smaller than the length needed
+   size (including the trailing NUL byte).  In the latter case, a truncated
+   result is returned in BUF, but still NUL-terminated if BUFSIZE > 0.
+   For this call to be thread-safe, *all* calls to
    setlocale (CATEGORY, NULL) in all other threads must have been converted
    to use setlocale_null_r or setlocale_null as well, and the other threads
    must not make other setlocale invocations (since changing the global locale
@@ -65,9 +93,9 @@ extern int setlocale_null_r (int category, char *buf, size_t bufsize)
   _GL_ARG_NONNULL ((2));
 
 /* setlocale_null (CATEGORY) is like setlocale (CATEGORY, NULL), except that
-   it is guaranteed to be multithread-safe.
+   it is guaranteed to be thread-safe.
    The return value is NULL if CATEGORY is invalid.
-   For this call to be multithread-safe, *all* calls to
+   For this call to be thread-safe, *all* calls to
    setlocale (CATEGORY, NULL) in all other threads must have been converted
    to use setlocale_null_r or setlocale_null as well, and the other threads
    must not make other setlocale invocations (since changing the global locale

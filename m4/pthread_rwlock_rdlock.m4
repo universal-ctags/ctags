@@ -1,8 +1,10 @@
-# pthread_rwlock_rdlock.m4 serial 4
-dnl Copyright (C) 2017-2021 Free Software Foundation, Inc.
+# pthread_rwlock_rdlock.m4
+# serial 8
+dnl Copyright (C) 2017-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Bruno Haible.
 dnl Inspired by
@@ -30,15 +32,15 @@ dnl https://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_rwlock_rd
 dnl but this test verifies the guarantee regardless of TPS and regardless of
 dnl scheduling policy.
 dnl Glibc does not provide this guarantee (and never will on Linux), see
-dnl https://sourceware.org/bugzilla/show_bug.cgi?id=13701
+dnl https://sourceware.org/PR13701
 dnl https://bugzilla.redhat.com/show_bug.cgi?id=1410052
 AC_DEFUN([gl_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER],
 [
-  AC_REQUIRE([gl_THREADLIB_EARLY])
+  AC_REQUIRE([gl_THREADLIB])
   AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
   AC_CACHE_CHECK([whether pthread_rwlock_rdlock prefers a writer to a reader],
     [gl_cv_pthread_rwlock_rdlock_prefer_writer],
-    [save_LIBS="$LIBS"
+    [saved_LIBS="$LIBS"
      LIBS="$LIBS $LIBMULTITHREAD"
      AC_RUN_IFELSE(
        [AC_LANG_SOURCE([[
@@ -156,25 +158,25 @@ main ()
        [gl_cv_pthread_rwlock_rdlock_prefer_writer=yes],
        [gl_cv_pthread_rwlock_rdlock_prefer_writer=no],
        [case "$host_os" in
-                         # Guess no on glibc systems.
-          *-gnu* | gnu*) gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing no" ;;
-                         # Guess no on musl systems.
-          *-musl*)       gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing no" ;;
-                         # Guess no on bionic systems.
-          *-android*)    gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing no" ;;
-                         # Guess yes on native Windows with the mingw-w64 winpthreads library.
-                         # Guess no on native Windows with the gnulib windows-rwlock module.
-          mingw*)        if test "$gl_use_threads" = yes || test "$gl_use_threads" = posix; then
-                           gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing yes"
-                         else
-                           gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing no"
-                         fi
-                         ;;
-                         # If we don't know, obey --enable-cross-guesses.
-          *)             gl_cv_pthread_rwlock_rdlock_prefer_writer="$gl_cross_guess_normal" ;;
+                              # Guess no on glibc systems.
+          *-gnu* | gnu*)      gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing no" ;;
+                              # Guess no on musl systems.
+          *-musl* | midipix*) gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing no" ;;
+                              # Guess no on bionic systems.
+          *-android*)         gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing no" ;;
+                              # Guess yes on native Windows with the mingw-w64 winpthreads library.
+                              # Guess no on native Windows with the gnulib windows-rwlock module.
+          mingw* | windows*)  if test "$gl_use_threads" = yes || test "$gl_use_threads" = posix; then
+                                gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing yes"
+                              else
+                                gl_cv_pthread_rwlock_rdlock_prefer_writer="guessing no"
+                              fi
+                              ;;
+                              # If we don't know, obey --enable-cross-guesses.
+          *)                  gl_cv_pthread_rwlock_rdlock_prefer_writer="$gl_cross_guess_normal" ;;
          esac
        ])
-     LIBS="$save_LIBS"
+     LIBS="$saved_LIBS"
     ])
   case "$gl_cv_pthread_rwlock_rdlock_prefer_writer" in
     *yes)

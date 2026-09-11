@@ -1,10 +1,10 @@
-# serial 73
-
-# Copyright (C) 1996-2001, 2003-2021 Free Software Foundation, Inc.
-#
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
+# regex.m4
+# serial 82
+dnl Copyright (C) 1996-2001, 2003-2026 Free Software Foundation, Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl Initially derived from code in GNU grep.
 dnl Mostly written by Jim Meyering.
@@ -15,7 +15,7 @@ AC_DEFUN([gl_REGEX],
 [
   AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
   AC_ARG_WITH([included-regex],
-    [AS_HELP_STRING([--without-included-regex],
+    [AS_HELP_STRING([[--without-included-regex]],
                     [don't compile regex; this is the default on systems
                      with recent-enough versions of the GNU C Library
                      (use with caution on other systems).])])
@@ -40,19 +40,24 @@ AC_DEFUN([gl_REGEX],
             #include <limits.h>
             #include <string.h>
 
-            #if defined M_CHECK_ACTION || HAVE_DECL_ALARM
+            #if HAVE_MALLOC_H
+            # include <malloc.h> /* defines M_CHECK_ACTION on glibc */
+            #endif
+
+            #if defined __HAIKU__ || defined M_CHECK_ACTION || HAVE_DECL_ALARM
             # include <signal.h>
             # include <unistd.h>
             #endif
 
-            #if HAVE_MALLOC_H
-            # include <malloc.h>
-            #endif
-
-            #ifdef M_CHECK_ACTION
+            #if defined __HAIKU__ || defined M_CHECK_ACTION
             /* Exit with distinguishable exit code.  */
             static void sigabrt_no_core (int sig) { raise (SIGTERM); }
             #endif
+
+            /* There is no need to check whether RE_SYNTAX_EMACS is
+               (RE_CHAR_CLASSES | RE_INTERVALS), corresponding to
+               Emacs 21 (2001) and later, because Gnulib's lib/regex.h
+               is always used and has this value.  */
           ]],
           [[int result = 0;
             static struct re_pattern_buffer regex;
@@ -67,6 +72,9 @@ AC_DEFUN([gl_REGEX],
 #if HAVE_DECL_ALARM
             signal (SIGALRM, SIG_DFL);
             alarm (2);
+#endif
+#ifdef __HAIKU__
+            signal (SIGABRT, sigabrt_no_core);
 #endif
 #ifdef M_CHECK_ACTION
             signal (SIGABRT, sigabrt_no_core);
@@ -310,6 +318,39 @@ AC_DEFUN([gl_REGEX],
                 free (regs.end);
               }
 
+            /* These tests are derived from bug#68725, reported by
+               Ed Morton.  The regex uses backrefs with optional groups
+               to detect palindromes.  */
+            {
+              regex_t re68725;
+              i = regcomp (&re68725,
+                           "^(.?)(.?).?\\\\2\\\\1$",
+                           REG_EXTENDED);
+              if (i)
+                result |= 64;
+              else
+                {
+                  regmatch_t pm[3];
+                  /* "ab" is not a palindrome, so must not match
+                     with $.  */
+                  if (regexec (&re68725, "ab", 1, pm, 0) == 0)
+                    result |= 64;
+                  /* Without $, a shorter match (e.g., empty or "a")
+                     is valid at position 0.  Ensure set_regs retries
+                     with a shorter match_last when the longest
+                     structural match fails content validation.  */
+                  regfree (&re68725);
+                  i = regcomp (&re68725,
+                               "^(.?)(.?).?\\\\2\\\\1",
+                               REG_EXTENDED);
+                  if (i)
+                    result |= 64;
+                  else if (regexec (&re68725, "ab", 3, pm, 0) != 0)
+                    result |= 64;
+                  regfree (&re68725);
+                }
+            }
+
 #if 0
             /* It would be nice to reject hosts whose regoff_t values are too
                narrow (including glibc on hosts with 64-bit ptrdiff_t and
@@ -327,10 +368,10 @@ AC_DEFUN([gl_REGEX],
         [gl_cv_func_re_compile_pattern_working=yes],
         [gl_cv_func_re_compile_pattern_working=no],
         [case "$host_os" in
-                   # Guess no on native Windows.
-           mingw*) gl_cv_func_re_compile_pattern_working="guessing no" ;;
-                   # Otherwise obey --enable-cross-guesses.
-           *)      gl_cv_func_re_compile_pattern_working="$gl_cross_guess_normal" ;;
+                              # Guess no on native Windows.
+           mingw* | windows*) gl_cv_func_re_compile_pattern_working="guessing no" ;;
+                              # Otherwise obey --enable-cross-guesses.
+           *)                 gl_cv_func_re_compile_pattern_working="$gl_cross_guess_normal" ;;
          esac
         ])
       ])
@@ -389,7 +430,6 @@ AC_DEFUN([gl_PREREQ_REGEX],
   AC_REQUIRE([AC_C_INLINE])
   AC_REQUIRE([AC_C_RESTRICT])
   AC_REQUIRE([AC_TYPE_MBSTATE_T])
-  AC_REQUIRE([gl_EEMALLOC])
   AC_CHECK_HEADERS([libintl.h])
   AC_CHECK_FUNCS_ONCE([isblank iswctype])
   AC_CHECK_DECLS([isblank], [], [], [[#include <ctype.h>]])

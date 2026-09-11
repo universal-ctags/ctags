@@ -1,5 +1,5 @@
 /* Convert multibyte character to wide character.
-   Copyright (C) 1999-2002, 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 1999-2002, 2005-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -41,8 +41,6 @@
     char buf[4];
     const char *p;
     size_t m;
-    enc_t enc;
-    int res;
 
     switch (nstate)
       {
@@ -75,12 +73,13 @@
 
     /* Here m > 0.  */
 
-    enc = locale_encoding_classification ();
+    enc_t enc = locale_encoding_classification ();
+    int res;
 
     if (enc == enc_utf8) /* UTF-8 */
       {
         /* Achieve
-             - multi-thread safety and
+             - thread safety and
              - the ability to produce wide character values > WCHAR_MAX
            by not calling mbtowc() at all.  */
 #include "mbrtowc-impl-utf8.h"
@@ -88,18 +87,20 @@
     else
       {
         /* The hidden internal state of mbtowc would make this function not
-           multi-thread safe.  Achieve multi-thread safety through a lock.  */
-        wchar_t wc;
-        res = mbtowc_with_lock (&wc, p, m);
+           thread-safe.  Achieve thread safety through a lock.  */
+        {
+          wchar_t wc;
+          res = mbtowc_with_lock (&wc, p, m);
 
-        if (res >= 0)
-          {
-            if ((wc == 0) != (res == 0))
-              abort ();
-            if (pwc != NULL)
-              *pwc = wc;
-            goto success;
-          }
+          if (res >= 0)
+            {
+              if ((wc == 0) != (res == 0))
+                abort ();
+              if (pwc != NULL)
+                *pwc = wc;
+              goto success;
+            }
+        }
 
         /* mbtowc does not distinguish between invalid and incomplete multibyte
            sequences.  But mbrtowc needs to make this distinction.

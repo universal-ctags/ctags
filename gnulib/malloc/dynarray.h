@@ -1,5 +1,5 @@
 /* Type-safe arrays which grow dynamically.  Shared definitions.
-   Copyright (C) 2017-2021 Free Software Foundation, Inc.
+   Copyright (C) 2017-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -94,7 +94,6 @@
 #ifndef _DYNARRAY_H
 #define _DYNARRAY_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
