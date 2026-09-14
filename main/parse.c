@@ -4570,7 +4570,7 @@ extern bool runParserInArea (const langType language,
 							 unsigned long sourceLineOffset,
 							 int promise)
 {
-	bool tagFileResized;
+	bool tagFileResized = false;
 
 	verbose ("runParserInArea: %s; "
 			 "file: %s, "
@@ -4582,13 +4582,15 @@ extern bool runParserInArea (const langType language,
 			 startLine, startCharOffset, sourceLineOffset,
 			 endLine, endCharOffset);
 
-	pushArea (doesParserRequireMemoryStream (language),
+	if (pushArea (doesParserRequireMemoryStream (language),
 			  startLine, startCharOffset,
 			  endLine, endCharOffset,
 			  sourceLineOffset,
-			  promise);
-	tagFileResized = createTagsWithFallback1 (language, NULL);
-	popArea  ();
+			  promise))
+	{
+		tagFileResized = createTagsWithFallback1 (language, NULL);
+		popArea  ();
+	}
 	return tagFileResized;
 
 }
