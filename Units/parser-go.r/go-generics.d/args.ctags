@@ -1,0 +1,4 @@
+--sort=no
+--fields=+{signature}{nth}
+--kinds-Go=+{tparam}
+--fields-Go=+{tparams}
