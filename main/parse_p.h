@@ -155,6 +155,7 @@ extern void freeEncodingResources (void);
 #endif
 
 extern bool doesLanguageHaveForeignDependency (const langType language, const langType foreign_lang);
+extern bool doesParserSupportStackGuard (const langType language);
 
 /* Regex interface */
 extern bool processLanguageRegexOption (langType language, enum regexParserType regptype, const char *const parameter);
