@@ -26,6 +26,7 @@
 .deps
 .dirstamp
 .DS_Store
+.vs
 a.out
 aclocal.m4
 autom4te.cache
@@ -62,6 +63,7 @@ mini-geany.exe
 missing
 mkinstalldirs
 optscript
+optscript.exe
 perf.data*
 readtags
 readtags.exe
@@ -77,13 +79,16 @@ test.*.diff
 tg
 tinst-root
 utiltest
+utiltest.exe
 win32/*.aps
 win32/*.opensdf
+win32/*.res
 win32/*.sdf
 win32/*.suo
 win32/*.user
 win32/[Dd]ebug/
 win32/[Rr]elease/
+win32/x64/
 _build
 man/ctags.1
 man/ctags.1.html

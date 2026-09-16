@@ -628,9 +628,9 @@ extern int re_exec (const char *);
    Otherwise, GCC 3.1 and clang support this syntax (but not in C++ mode).
    Other ISO C99 compilers support it as well.  */
 #ifndef _Restrict_arr_
-# ifdef __restrict_arr
+# if (defined __restrict_arr && !defined _MSC_VER)
 #  define _Restrict_arr_ __restrict_arr
-# elif ((199901L <= __STDC_VERSION__ \
+# elif (((199901L <= __STDC_VERSION__ && !defined _MSC_VER) \
          || 3 < __GNUC__ + (1 <= __GNUC_MINOR__) \
          || __clang_major__ >= 3) \
         && !defined __cplusplus)
