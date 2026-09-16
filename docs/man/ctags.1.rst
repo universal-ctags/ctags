@@ -1319,7 +1319,7 @@ Listing Options
 ``--list-output-formats``
 	Lists the output formats that can be used in ``--output-format`` option.
 
-	``NULLTAG`` column represetns whether the format supports *null tags* or
+	``NULLTAG`` column represents whether the format supports *null tags* or
 	not. See ``nulltag``/``z`` in "`Extras`_" about the null tags.
 
 	(since version 6.2.0)
