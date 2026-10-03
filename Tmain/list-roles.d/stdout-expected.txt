@@ -62,6 +62,7 @@ Elm                     f/function        exposed            on        0 item ex
 Elm                     m/module          imported           on        0 module imported
 Elm                     t/type            exposed            on        0 item exposed from a module
 Flex                    I/import          import             on        0 imports
+Fortran                 m/module          used               on        2 used module
 GDScript                c/class           extended           on        0 used as a base class for extending
 GemSpec                 g/gem             develDep           on        0 specifying development dependency
 GemSpec                 g/gem             runtimeDep         on        0 specifying runtime dependency
@@ -223,6 +224,7 @@ Elm                     f/function        exposed            on        0 item ex
 Elm                     m/module          imported           on        0 module imported
 Elm                     t/type            exposed            on        0 item exposed from a module
 Flex                    I/import          import             on        0 imports
+Fortran                 m/module          used               on        2 used module
 GDScript                c/class           extended           on        0 used as a base class for extending
 GemSpec                 g/gem             develDep           on        0 specifying development dependency
 GemSpec                 g/gem             runtimeDep         on        0 specifying runtime dependency

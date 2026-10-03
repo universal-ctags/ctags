@@ -1,0 +1,6 @@
+non_intrinsic	input.f90	/^module non_intrinsic$/;"	m
+child	input.f90	/^submodule (non_intrinsic) child$/;"	S	inherits:non_intrinsic
+worker	input.f90	/^  subroutine worker(/;"	s	submodule:child
+grandchild	input.f90	/^submodule (non_intrinsic:child) grandchild$/;"	S	inherits:non_intrinsic:child
+outer	input.f90	/^subroutine outer(/;"	s
+non_intrinsic	input.f90	/^  entry non_intrinsic(/;"	e	subroutine:outer
