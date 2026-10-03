@@ -1,0 +1,9 @@
+m	input.f90	/^module m$/;"	m
+v1	input.f90	/^   integer :: v1$/;"	v	module:m
+v2	input.f90	/^   integer :: v2 /;"	v	module:m
+v3	input.f90	/^   integer :: v3$/;"	v	module:m
+v4	input.f90	/^   integer :: v4,/;"	v	module:m
+v5	input.f90	/^               v5$/;"	v	module:m
+s	input.f90	/^   character(len=8) :: s /;"	v	module:m
+v6	input.f90	/^   integer :: v6$/;"	v	module:m
+s1	input.f90	/^   subroutine s1 /;"	s	module:m
