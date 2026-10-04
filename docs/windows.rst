@@ -22,7 +22,7 @@ Many professional developers targeting Windows use Visual Studio. Visual Studio 
 
 Installing Visual Studio will give you the IDE, the command line compilers and the MS-version of make named nmake.
 
-Note that ctags cannot be built with Visual Studio older than 2013 anymore. There is C99 (or C11) coding used that generates syntax errors with VS2012 and older. This could affect compilers from other vendors as well.
+Note that ctags must be built with Visual Studio 2022 or later.
 
 
 GCC
@@ -50,11 +50,11 @@ Microsoft Visual Studio provides ``Visual Studio Developer Command Prompt`` for 
 
 There are two ways to setup ``Visual Studio Developer Command Prompt``.
 
-The first way to setup ``Visual Studio Developer Command Prompt`` is by clicking the ``Windows Start Menu``, details please refer to https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2019
+The first way to setup ``Visual Studio Developer Command Prompt`` is by clicking the ``Windows Start Menu``, details please refer to https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2022
 
 The second way to setup ``Visual Studio Developer Command Prompt`` is opening ``Command Prompt`` Application and calling ``vcvarsall.bat`` in current ``Command Prompt``.
 
-The location of ``vcvarsall.bat`` is various for different Microsoft Visual Studio versions and editions.
+The location of ``vcvarsall.bat`` varies across different Microsoft Visual Studio versions and editions.
 
 For Microsoft Visual Studio 2022 Enterprise::
 
@@ -64,26 +64,18 @@ For Microsoft Visual Studio 2022 Community::
 
         C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat
 
-For Microsoft Visual Studio 2019 Enterprise::
-
-        C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat
-
-For Microsoft Visual Studio 2019 Community::
-
-        C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat
-
 Following is an example shows you how to use ``vcvarsall.bat`` to setup ``Visual Studio Developer Command Prompt``::
 
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
 
-For more details about ``vcvarsall.bat`` please refer to https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-160
+For more details about ``vcvarsall.bat`` please refer to https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170
 
 Once ``Visual Studio Developer Command Prompt`` is setup, you can build ctags with ``NMake`` or ``MSBuild``.
 
 Building ctags with NMake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This requires Microsoft Visual Studio 2019 or later.
+This requires Microsoft Visual Studio 2022 or later.
 
 The simplest build instructions like below::
 
@@ -104,8 +96,6 @@ If you want to create PDB files for debugging even for a release version, you mu
 Building ctags with MSBuild
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This supports only Microsoft Visual Studio 2013.
-
 Before starting to build, you need to copy some files to proper location::
 
         copy win32\config_mvc.h config.h
@@ -114,15 +104,15 @@ Before starting to build, you need to copy some files to proper location::
 
 The simplest build instruction like below::
 
-        msbuild win32\ctags_vs2013.sln
+        msbuild win32\ctags.sln
 
 If you want to build a release version, run command like below::
 
-        msbuild win32\ctags_vs2013.sln /p:Configuration=Release
+        msbuild win32\ctags.sln /p:Configuration=Release
 
 MSBuild is what the IDE uses internally and therefore will produce the same files as the IDE.
 
-For more information about MSBuild, please refer to https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild?view=vs-2019
+For more information about MSBuild, please refer to https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild?view=vs-2022
 
 GCC
 .............................................................................
@@ -202,7 +192,7 @@ I have no idea how things work for the most GNU/Linux developers, but most of Wi
 Microsoft Visual Studio
 .............................................................................
 
-As already mentioned Microsoft Visual Studio 2013 has the free Express and Community editions. For ctags the Windows Desktop Express Edition is enough to get the job done. The IDE has a proper debugger. Project files for VS2013 can be found in the win32 directory.
+As already mentioned Microsoft Visual Studio 2022 has the free Express and Community editions. For ctags the Windows Desktop Express Edition is enough to get the job done. The IDE has a proper debugger. Project files for VS2022 can be found in the win32 directory.
 
 Please know that when files are added to the sources.mak, these files need to be added to the .vcxproj and .vcxproj.filters files as well. The XML of these files should not be a problem.
 

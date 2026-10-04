@@ -265,8 +265,8 @@ To add your optlib parser, ``foo.ctags``, into ``ctags`` do the following steps;
 * add ``foo.ctags`` on ``OPTLIB2C_INPUT`` variable in ``source.mak``
 * add ``fooParser`` on ``PARSER_LIST`` macro variable in ``main/parser_p.h``
 * add ``foo`` on the list in the section "New parsers" in ``docs/news.rst``
-* add ``"..\optlib\foo.c"`` in ``win32/ctags_vs2013.vcxproj``
-* add ``"..\optlib\foo.c"`` in  ``win32/ctags_vs2013.vcxproj.filters``
+* add ``"..\optlib\foo.c"`` in ``win32/ctags.vcxproj``
+* add ``"..\optlib\foo.c"`` in  ``win32/ctags.vcxproj.filters``
 
 Translated C code is also committed to our git repository. The translated code
 is useful for building ctags on the platforms where optlib2c doesn't run.
@@ -276,8 +276,8 @@ To add your parser file, ``foo.c``, into ``ctags`` do the following steps;
 * put ``foo.c`` file on ``parsers/`` directory
 * add ``foo.c`` on ``PARSER_SRCS`` variable in ``sources.mak``
 * add ``foo`` on the list in the section "New parsers" in ``docs/news.rst``
-* add ``"..\parsers\foo.c"`` in ``win32/ctags_vs2013.vcxproj``
-* add ``"..\parsers\foo.c"`` in  ``win32/ctags_vs2013.vcxproj.filters``
+* add ``"..\parsers\foo.c"`` in ``win32/ctags.vcxproj``
+* add ``"..\parsers\foo.c"`` in  ``win32/ctags.vcxproj.filters``
 
 If you have GNU make, ``make -C win32`` updates the win32 files described above
 from ``makefile.mak``.
