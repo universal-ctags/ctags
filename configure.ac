@@ -6,7 +6,7 @@
 
 #	Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.64])
+AC_PREREQ([2.70])
 
 dnl You must update PROGRAM_VERSION in main/ctags.h, too.
 dnl --version option of readtags also prints this.
@@ -259,7 +259,6 @@ AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
 # -------------------
 
 AC_PROG_CC
-AC_PROG_CC_C99
 AC_C_INLINE
 # For gnulib.
 #  Typically, this is immediately after AC_PROG_CC, ...
