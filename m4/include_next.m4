@@ -1,8 +1,10 @@
-# include_next.m4 serial 26
-dnl Copyright (C) 2006-2021 Free Software Foundation, Inc.
+# include_next.m4
+# serial 27
+dnl Copyright (C) 2006-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Paul Eggert and Derek Price.
 
@@ -74,17 +76,17 @@ EOF
 #endif
 #define DEFINED_IN_CONFTESTD2
 EOF
-     gl_save_CPPFLAGS="$CPPFLAGS"
-     CPPFLAGS="$gl_save_CPPFLAGS -Iconftestd1b -Iconftestd2"
+     gl_saved_CPPFLAGS="$CPPFLAGS"
+     CPPFLAGS="$gl_saved_CPPFLAGS -Iconftestd1b -Iconftestd2"
 dnl We intentionally avoid using AC_LANG_SOURCE here.
      AC_COMPILE_IFELSE([AC_LANG_DEFINES_PROVIDED[#include <conftest.h>]],
        [gl_cv_have_include_next=yes],
-       [CPPFLAGS="$gl_save_CPPFLAGS -Iconftestd1a -Iconftestd2"
+       [CPPFLAGS="$gl_saved_CPPFLAGS -Iconftestd1a -Iconftestd2"
         AC_COMPILE_IFELSE([AC_LANG_DEFINES_PROVIDED[#include <conftest.h>]],
           [gl_cv_have_include_next=buggy],
           [gl_cv_have_include_next=no])
        ])
-     CPPFLAGS="$gl_save_CPPFLAGS"
+     CPPFLAGS="$gl_saved_CPPFLAGS"
      rm -rf conftestd1a conftestd1b conftestd2
     ])
   PRAGMA_SYSTEM_HEADER=
@@ -193,9 +195,9 @@ AC_DEFUN([gl_NEXT_HEADERS_INTERNAL],
              if test AS_VAR_GET([gl_header_exists]) = yes; then
              AS_VAR_POPDEF([gl_header_exists])
             ])
-           gl_ABSOLUTE_HEADER_ONE(gl_HEADER_NAME)
-           AS_VAR_COPY([gl_header], [gl_cv_absolute_]AS_TR_SH(gl_HEADER_NAME))
-           AS_VAR_SET([gl_next_header], ['"'$gl_header'"'])
+          gl_ABSOLUTE_HEADER_ONE(gl_HEADER_NAME)
+          AS_VAR_COPY([gl_header], [gl_cv_absolute_]AS_TR_SH(gl_HEADER_NAME))
+          AS_VAR_SET([gl_next_header], ['"'$gl_header'"'])
           m4_if([$2], [check],
             [else
                AS_VAR_SET([gl_next_header], ['<'gl_HEADER_NAME'>'])

@@ -1,5 +1,5 @@
 /* Query the name of the current global locale.
-   Copyright (C) 2019-2021 Free Software Foundation, Inc.
+   Copyright (C) 2019-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -25,12 +25,14 @@
 #include <locale.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined _WIN32 && !defined __CYGWIN__
-# include <wchar.h>
-#endif
 
 #if !(SETLOCALE_NULL_ALL_MTSAFE && SETLOCALE_NULL_ONE_MTSAFE)
-# if defined _WIN32 && !defined __CYGWIN__
+
+# if AVOID_ANY_THREADS
+
+/* The option '--disable-threads' explicitly requests no locking.  */
+
+# elif defined _WIN32 && !defined __CYGWIN__
 
 #  define WIN32_LEAN_AND_MEAN  /* avoid including junk */
 #  include <windows.h>
@@ -51,154 +53,39 @@
 #  include <threads.h>
 
 # endif
+
 #endif
 
-/* Use the system's setlocale() function, not the gnulib override, here.  */
-#undef setlocale
+#if !(SETLOCALE_NULL_ALL_MTSAFE && SETLOCALE_NULL_ONE_MTSAFE) /* musl libc, macOS, FreeBSD, NetBSD, OpenBSD, AIX, Haiku, Cygwin < 3.4.6 */
 
-static const char *
-setlocale_null_androidfix (int category)
-{
-  const char *result = setlocale (category, NULL);
-
-#ifdef __ANDROID__
-  if (result == NULL)
-    switch (category)
-      {
-      case LC_CTYPE:
-      case LC_NUMERIC:
-      case LC_TIME:
-      case LC_COLLATE:
-      case LC_MONETARY:
-      case LC_MESSAGES:
-      case LC_ALL:
-      case LC_PAPER:
-      case LC_NAME:
-      case LC_ADDRESS:
-      case LC_TELEPHONE:
-      case LC_MEASUREMENT:
-        result = "C";
-        break;
-      default:
-        break;
-      }
-#endif
-
-  return result;
-}
-
-static int
-setlocale_null_unlocked (int category, char *buf, size_t bufsize)
-{
-#if defined _WIN32 && !defined __CYGWIN__ && defined _MSC_VER
-  /* On native Windows, nowadays, the setlocale() implementation is based
-     on _wsetlocale() and uses malloc() for the result.  We are better off
-     using _wsetlocale() directly.  */
-  const wchar_t *result = _wsetlocale (category, NULL);
-
-  if (result == NULL)
-    {
-      /* CATEGORY is invalid.  */
-      if (bufsize > 0)
-        /* Return an empty string in BUF.
-           This is a convenience for callers that don't want to write explicit
-           code for handling EINVAL.  */
-        buf[0] = '\0';
-      return EINVAL;
-    }
-  else
-    {
-      size_t length = wcslen (result);
-      if (length < bufsize)
-        {
-          size_t i;
-
-          /* Convert wchar_t[] -> char[], assuming plain ASCII.  */
-          for (i = 0; i <= length; i++)
-            buf[i] = result[i];
-
-          return 0;
-        }
-      else
-        {
-          if (bufsize > 0)
-            {
-              /* Return a truncated result in BUF.
-                 This is a convenience for callers that don't want to write
-                 explicit code for handling ERANGE.  */
-              size_t i;
-
-              /* Convert wchar_t[] -> char[], assuming plain ASCII.  */
-              for (i = 0; i < bufsize; i++)
-                buf[i] = result[i];
-              buf[bufsize - 1] = '\0';
-            }
-          return ERANGE;
-        }
-    }
-#else
-  const char *result = setlocale_null_androidfix (category);
-
-  if (result == NULL)
-    {
-      /* CATEGORY is invalid.  */
-      if (bufsize > 0)
-        /* Return an empty string in BUF.
-           This is a convenience for callers that don't want to write explicit
-           code for handling EINVAL.  */
-        buf[0] = '\0';
-      return EINVAL;
-    }
-  else
-    {
-      size_t length = strlen (result);
-      if (length < bufsize)
-        {
-          memcpy (buf, result, length + 1);
-          return 0;
-        }
-      else
-        {
-          if (bufsize > 0)
-            {
-              /* Return a truncated result in BUF.
-                 This is a convenience for callers that don't want to write
-                 explicit code for handling ERANGE.  */
-              memcpy (buf, result, bufsize - 1);
-              buf[bufsize - 1] = '\0';
-            }
-          return ERANGE;
-        }
-    }
-#endif
-}
-
-#if !(SETLOCALE_NULL_ALL_MTSAFE && SETLOCALE_NULL_ONE_MTSAFE) /* musl libc, macOS, FreeBSD, NetBSD, OpenBSD, AIX, Haiku, Cygwin */
-
-/* Use a lock, so that no two threads can invoke setlocale_null_unlocked
+/* Use a lock, so that no two threads can invoke setlocale_null_r_unlocked
    at the same time.  */
 
 /* Prohibit renaming this symbol.  */
 # undef gl_get_setlocale_null_lock
 
-# if defined _WIN32 && !defined __CYGWIN__
+# if AVOID_ANY_THREADS
+
+/* The option '--disable-threads' explicitly requests no locking.  */
+#  define setlocale_null_r_with_lock setlocale_null_r_unlocked
+
+# elif defined _WIN32 && !defined __CYGWIN__
 
 extern __declspec(dllimport) CRITICAL_SECTION *gl_get_setlocale_null_lock (void);
 
 static int
-setlocale_null_with_lock (int category, char *buf, size_t bufsize)
+setlocale_null_r_with_lock (int category, char *buf, size_t bufsize)
 {
   CRITICAL_SECTION *lock = gl_get_setlocale_null_lock ();
-  int ret;
 
   EnterCriticalSection (lock);
-  ret = setlocale_null_unlocked (category, buf, bufsize);
+  int ret = setlocale_null_r_unlocked (category, buf, bufsize);
   LeaveCriticalSection (lock);
 
   return ret;
 }
 
-# elif HAVE_PTHREAD_API /* musl libc, macOS, FreeBSD, NetBSD, OpenBSD, AIX, Haiku, Cygwin */
+# elif HAVE_PTHREAD_API /* musl libc, macOS, FreeBSD, NetBSD, OpenBSD, AIX, Haiku, Cygwin < 3.4.6 */
 
 extern
 #  if defined _WIN32 || defined __CYGWIN__
@@ -223,23 +110,22 @@ extern
 #  endif
 
 static int
-setlocale_null_with_lock (int category, char *buf, size_t bufsize)
+setlocale_null_r_with_lock (int category, char *buf, size_t bufsize)
 {
   if (pthread_in_use())
     {
       pthread_mutex_t *lock = gl_get_setlocale_null_lock ();
-      int ret;
 
       if (pthread_mutex_lock (lock))
         abort ();
-      ret = setlocale_null_unlocked (category, buf, bufsize);
+      int ret = setlocale_null_r_unlocked (category, buf, bufsize);
       if (pthread_mutex_unlock (lock))
         abort ();
 
       return ret;
     }
   else
-    return setlocale_null_unlocked (category, buf, bufsize);
+    return setlocale_null_r_unlocked (category, buf, bufsize);
 }
 
 # elif HAVE_THREADS_H
@@ -247,14 +133,13 @@ setlocale_null_with_lock (int category, char *buf, size_t bufsize)
 extern mtx_t *gl_get_setlocale_null_lock (void);
 
 static int
-setlocale_null_with_lock (int category, char *buf, size_t bufsize)
+setlocale_null_r_with_lock (int category, char *buf, size_t bufsize)
 {
   mtx_t *lock = gl_get_setlocale_null_lock ();
-  int ret;
 
   if (mtx_lock (lock) != thrd_success)
     abort ();
-  ret = setlocale_null_unlocked (category, buf, bufsize);
+  int ret = setlocale_null_r_unlocked (category, buf, bufsize);
   if (mtx_unlock (lock) != thrd_success)
     abort ();
 
@@ -271,27 +156,27 @@ setlocale_null_r (int category, char *buf, size_t bufsize)
 #if SETLOCALE_NULL_ALL_MTSAFE
 # if SETLOCALE_NULL_ONE_MTSAFE
 
-  return setlocale_null_unlocked (category, buf, bufsize);
+  return setlocale_null_r_unlocked (category, buf, bufsize);
 
 # else
 
   if (category == LC_ALL)
-    return setlocale_null_unlocked (category, buf, bufsize);
+    return setlocale_null_r_unlocked (category, buf, bufsize);
   else
-    return setlocale_null_with_lock (category, buf, bufsize);
+    return setlocale_null_r_with_lock (category, buf, bufsize);
 
 # endif
 #else
 # if SETLOCALE_NULL_ONE_MTSAFE
 
   if (category == LC_ALL)
-    return setlocale_null_with_lock (category, buf, bufsize);
+    return setlocale_null_r_with_lock (category, buf, bufsize);
   else
-    return setlocale_null_unlocked (category, buf, bufsize);
+    return setlocale_null_r_unlocked (category, buf, bufsize);
 
 # else
 
-  return setlocale_null_with_lock (category, buf, bufsize);
+  return setlocale_null_r_with_lock (category, buf, bufsize);
 
 # endif
 #endif
@@ -301,10 +186,10 @@ const char *
 setlocale_null (int category)
 {
 #if SETLOCALE_NULL_ALL_MTSAFE && SETLOCALE_NULL_ONE_MTSAFE
-  return setlocale_null_androidfix (category);
+  return setlocale_null_unlocked (category);
 #else
 
-  /* This call must be multithread-safe.  To achieve this without using
+  /* This call must be thread-safe.  To achieve this without using
      thread-local storage:
        1. We use a specific static buffer for each possible CATEGORY
           argument.  So that different threads can call setlocale_mtsafe
@@ -317,7 +202,7 @@ setlocale_null (int category)
   if (category == LC_ALL)
     {
 # if SETLOCALE_NULL_ALL_MTSAFE
-      return setlocale_null_androidfix (LC_ALL);
+      return setlocale_null_unlocked (LC_ALL);
 # else
       char buf[SETLOCALE_NULL_ALL_MAX];
       static char resultbuf[SETLOCALE_NULL_ALL_MAX];
@@ -331,7 +216,7 @@ setlocale_null (int category)
   else
     {
 # if SETLOCALE_NULL_ONE_MTSAFE
-      return setlocale_null_androidfix (category);
+      return setlocale_null_unlocked (category);
 # else
       enum
         {
@@ -364,9 +249,7 @@ setlocale_null (int category)
         i;
       char buf[SETLOCALE_NULL_MAX];
       static char resultbuf[LC_INDICES_COUNT][SETLOCALE_NULL_MAX];
-      int err;
-
-      err = setlocale_null_r (category, buf, sizeof (buf));
+      int err = setlocale_null_r (category, buf, sizeof (buf));
       if (err == EINVAL)
         return NULL;
       if (err)

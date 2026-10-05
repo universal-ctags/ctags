@@ -1,8 +1,10 @@
-# 00gnulib.m4 serial 8
-dnl Copyright (C) 2009-2021 Free Software Foundation, Inc.
+# 00gnulib.m4
+# serial 9
+dnl Copyright (C) 2009-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl This file must be named something that sorts before all other
 dnl gnulib-provided .m4 files.  It is needed until the clang fix has
@@ -49,14 +51,14 @@ dnl AC_REQUIRE([gl_COMPILER_CLANG])
     [if test $gl_cv_compiler_clang = yes; then
        dnl Test whether the compiler supports the option
        dnl '-Werror=implicit-function-declaration'.
-       save_ac_compile="$ac_compile"
+       saved_ac_compile="$ac_compile"
        ac_compile="$ac_compile -Werror=implicit-function-declaration"
        dnl Use _AC_COMPILE_IFELSE instead of AC_COMPILE_IFELSE, to avoid a
        dnl warning "AC_COMPILE_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS".
        _AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]],[[]])],
          [gl_cv_compiler_check_decl_option='-Werror=implicit-function-declaration'],
          [gl_cv_compiler_check_decl_option=none])
-       ac_compile="$save_ac_compile"
+       ac_compile="$saved_ac_compile"
      else
        gl_cv_compiler_check_decl_option=none
      fi
@@ -71,11 +73,11 @@ dnl Redefine _AC_CHECK_DECL_BODY so that it references ac_compile_for_check_decl
 dnl instead of ac_compile.  If, for whatever reason, the override of AC_PROG_CC
 dnl in zzgnulib.m4 is inactive, use the original ac_compile.
 m4_define([_AC_CHECK_DECL_BODY],
-[  ac_save_ac_compile="$ac_compile"
+[  ac_saved_ac_compile="$ac_compile"
   if test -n "$ac_compile_for_check_decl"; then
     ac_compile="$ac_compile_for_check_decl"
   fi]
-m4_defn([_AC_CHECK_DECL_BODY])[  ac_compile="$ac_save_ac_compile"
+m4_defn([_AC_CHECK_DECL_BODY])[  ac_compile="$ac_saved_ac_compile"
 ])
 
 # gl_00GNULIB

@@ -1,5 +1,5 @@
 /* Find the length of STRING + 1, but scan at most MAXLEN bytes.
-   Copyright (C) 2005, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2009-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -16,6 +16,11 @@
 
 #ifndef _STRNLEN1_H
 #define _STRNLEN1_H
+
+/* This file uses _GL_ATTRIBUTE_PURE.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
 
 #include <stddef.h>
 

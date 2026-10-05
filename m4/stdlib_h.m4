@@ -1,8 +1,10 @@
-# stdlib_h.m4 serial 63
-dnl Copyright (C) 2007-2021 Free Software Foundation, Inc.
+# stdlib_h.m4
+# serial 86
+dnl Copyright (C) 2007-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN_ONCE([gl_STDLIB_H],
 [
@@ -23,14 +25,64 @@ AC_DEFUN_ONCE([gl_STDLIB_H],
 # include <random.h>
 #endif
     ]], [_Exit aligned_alloc atoll canonicalize_file_name free
-    getloadavg getsubopt grantpt
-    initstate initstate_r mbtowc mkdtemp mkostemp mkostemps mkstemp mkstemps
-    posix_memalign posix_openpt ptsname ptsname_r qsort_r
+    getloadavg getprogname getsubopt grantpt
+    initstate initstate_r mbstowcs mbtowc mkdtemp mkostemp mkostemps mkstemp
+    mkstemps posix_memalign posix_openpt ptsname ptsname_r qsort_r
     random random_r reallocarray realpath rpmatch secure_getenv setenv
     setstate setstate_r srandom srandom_r
     strtod strtol strtold strtoll strtoul strtoull unlockpt unsetenv])
 
   AC_REQUIRE([AC_C_RESTRICT])
+
+  dnl Test whether MB_CUR_MAX needs to be overridden.
+  dnl On Solaris 10, in UTF-8 locales, its value is 3 but needs to be 4.
+  dnl Fortunately, we can do this because on this platform MB_LEN_MAX is 5.
+  AC_REQUIRE([AC_CANONICAL_HOST])
+  AC_REQUIRE([gt_LOCALE_EN_UTF8])
+  AC_CACHE_CHECK([whether MB_CUR_MAX is correct],
+    [gl_cv_macro_MB_CUR_MAX_good],
+    [AC_LINK_IFELSE(
+       [AC_LANG_PROGRAM([[#include <stdlib.h>
+                        ]],
+                        [[return !!MB_CUR_MAX;]])
+       ],
+       [dnl Initial guess, used when cross-compiling or when no suitable locale
+        dnl is present.
+        # Guess no on Solaris and Haiku, yes otherwise.
+        AS_CASE([$host_os],
+          [solaris* | haiku*],
+            [gl_cv_macro_MB_CUR_MAX_good="guessing no"],
+            [gl_cv_macro_MB_CUR_MAX_good="guessing yes"])
+        if test "$LOCALE_EN_UTF8" != none; then
+          AC_RUN_IFELSE(
+            [AC_LANG_SOURCE([[
+#include <locale.h>
+#include <stdlib.h>
+int main ()
+{
+  int result = 0;
+  if (setlocale (LC_ALL, "$LOCALE_EN_UTF8") != NULL)
+    {
+      if (MB_CUR_MAX < 4)
+        result |= 1;
+    }
+  return result;
+}]])],
+            [gl_cv_macro_MB_CUR_MAX_good=yes],
+            [gl_cv_macro_MB_CUR_MAX_good=no],
+            [:])
+        fi
+       ],
+       [gl_cv_macro_MB_CUR_MAX_good="link failed - so no"])
+    ])
+  AS_CASE([$gl_cv_macro_MB_CUR_MAX_good],
+    [*yes],
+      [],
+    ["link failed - so no"],
+      [# 4 suffices as a workaround in Android NDK 16,
+       # the only known platform with the bug.
+       REPLACE_MB_CUR_MAX=4],
+      [REPLACE_MB_CUR_MAX="(-1)"])
 
   AC_CHECK_DECLS_ONCE([ecvt])
   if test $ac_cv_have_decl_ecvt = no; then
@@ -66,15 +118,20 @@ AC_DEFUN([gl_STDLIB_H_REQUIRE_DEFAULTS],
 [
   m4_defun(GL_MODULE_INDICATOR_PREFIX[_STDLIB_H_MODULE_INDICATOR_DEFAULTS], [
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB__EXIT])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_ABORT_DEBUG])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_ALIGNED_ALLOC])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_ATOLL])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_CALLOC_GNU])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_CALLOC_POSIX])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_CANONICALIZE_FILE_NAME])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FREE_POSIX])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETLOADAVG])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETPROGNAME])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETSUBOPT])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GRANTPT])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MALLOC_GNU])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MALLOC_POSIX])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MBSTOWCS])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MBTOWC])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MKDTEMP])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MKOSTEMP])
@@ -87,6 +144,7 @@ AC_DEFUN([gl_STDLIB_H_REQUIRE_DEFAULTS],
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_PTSNAME_R])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_PUTENV])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_QSORT_R])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_RAND])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_RANDOM])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_RANDOM_R])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_REALLOCARRAY])
@@ -95,7 +153,9 @@ AC_DEFUN([gl_STDLIB_H_REQUIRE_DEFAULTS],
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_RPMATCH])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_SECURE_GETENV])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_SETENV])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_STACK_TRACE])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_STRTOD])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_STRTOF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_STRTOL])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_STRTOLD])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_STRTOLL])
@@ -127,6 +187,8 @@ AC_DEFUN([gl_STDLIB_H_DEFAULTS],
   HAVE_DECL_FCVT=1;          AC_SUBST([HAVE_DECL_FCVT])
   HAVE_DECL_GCVT=1;          AC_SUBST([HAVE_DECL_GCVT])
   HAVE_DECL_GETLOADAVG=1;    AC_SUBST([HAVE_DECL_GETLOADAVG])
+  HAVE_DECL_PROGRAM_INVOCATION_NAME=1; AC_SUBST([HAVE_DECL_PROGRAM_INVOCATION_NAME])
+  HAVE_GETPROGNAME=1;        AC_SUBST([HAVE_GETPROGNAME])
   HAVE_GETSUBOPT=1;          AC_SUBST([HAVE_GETSUBOPT])
   HAVE_GRANTPT=1;            AC_SUBST([HAVE_GRANTPT])
   HAVE_INITSTATE=1;          AC_SUBST([HAVE_INITSTATE])
@@ -143,7 +205,6 @@ AC_DEFUN([gl_STDLIB_H_DEFAULTS],
   HAVE_PTSNAME_R=1;          AC_SUBST([HAVE_PTSNAME_R])
   HAVE_QSORT_R=1;            AC_SUBST([HAVE_QSORT_R])
   HAVE_RANDOM=1;             AC_SUBST([HAVE_RANDOM])
-  HAVE_RANDOM_H=1;           AC_SUBST([HAVE_RANDOM_H])
   HAVE_RANDOM_R=1;           AC_SUBST([HAVE_RANDOM_R])
   HAVE_REALLOCARRAY=1;       AC_SUBST([HAVE_REALLOCARRAY])
   HAVE_REALPATH=1;           AC_SUBST([HAVE_REALPATH])
@@ -154,6 +215,7 @@ AC_DEFUN([gl_STDLIB_H_DEFAULTS],
   HAVE_SETSTATE=1;           AC_SUBST([HAVE_SETSTATE])
   HAVE_DECL_SETSTATE=1;      AC_SUBST([HAVE_DECL_SETSTATE])
   HAVE_STRTOD=1;             AC_SUBST([HAVE_STRTOD])
+  HAVE_STRTOF=1;             AC_SUBST([HAVE_STRTOF])
   HAVE_STRTOL=1;             AC_SUBST([HAVE_STRTOL])
   HAVE_STRTOLD=1;            AC_SUBST([HAVE_STRTOLD])
   HAVE_STRTOLL=1;            AC_SUBST([HAVE_STRTOLL])
@@ -161,29 +223,44 @@ AC_DEFUN([gl_STDLIB_H_DEFAULTS],
   HAVE_STRTOULL=1;           AC_SUBST([HAVE_STRTOULL])
   HAVE_STRUCT_RANDOM_DATA=1; AC_SUBST([HAVE_STRUCT_RANDOM_DATA])
   HAVE_SYS_LOADAVG_H=0;      AC_SUBST([HAVE_SYS_LOADAVG_H])
+  HAVE_SYS_PROCESS_H=0;      AC_SUBST([HAVE_SYS_PROCESS_H])
   HAVE_UNLOCKPT=1;           AC_SUBST([HAVE_UNLOCKPT])
   HAVE_DECL_UNSETENV=1;      AC_SUBST([HAVE_DECL_UNSETENV])
+  REPLACE__EXIT=0;           AC_SUBST([REPLACE__EXIT])
+  REPLACE_ABORT=0;           AC_SUBST([REPLACE_ABORT])
   REPLACE_ALIGNED_ALLOC=0;   AC_SUBST([REPLACE_ALIGNED_ALLOC])
-  REPLACE_CALLOC=0;          AC_SUBST([REPLACE_CALLOC])
+  REPLACE_CALLOC_FOR_CALLOC_GNU=0;    AC_SUBST([REPLACE_CALLOC_FOR_CALLOC_GNU])
+  REPLACE_CALLOC_FOR_CALLOC_POSIX=0;  AC_SUBST([REPLACE_CALLOC_FOR_CALLOC_POSIX])
   REPLACE_CANONICALIZE_FILE_NAME=0;  AC_SUBST([REPLACE_CANONICALIZE_FILE_NAME])
   REPLACE_FREE=0;            AC_SUBST([REPLACE_FREE])
+  REPLACE_GETLOADAVG=0;      AC_SUBST([REPLACE_GETLOADAVG])
+  REPLACE_GETPROGNAME=0;     AC_SUBST([REPLACE_GETPROGNAME])
+  REPLACE_GETSUBOPT=0;       AC_SUBST([REPLACE_GETSUBOPT])
   REPLACE_INITSTATE=0;       AC_SUBST([REPLACE_INITSTATE])
-  REPLACE_MALLOC=0;          AC_SUBST([REPLACE_MALLOC])
+  REPLACE_MALLOC_FOR_MALLOC_GNU=0;    AC_SUBST([REPLACE_MALLOC_FOR_MALLOC_GNU])
+  REPLACE_MALLOC_FOR_MALLOC_POSIX=0;  AC_SUBST([REPLACE_MALLOC_FOR_MALLOC_POSIX])
+  REPLACE_MB_CUR_MAX=0;      AC_SUBST([REPLACE_MB_CUR_MAX])
+  REPLACE_MBSTOWCS=0;        AC_SUBST([REPLACE_MBSTOWCS])
   REPLACE_MBTOWC=0;          AC_SUBST([REPLACE_MBTOWC])
+  REPLACE_MKOSTEMP=0;        AC_SUBST([REPLACE_MKOSTEMP])
+  REPLACE_MKOSTEMPS=0;       AC_SUBST([REPLACE_MKOSTEMPS])
   REPLACE_MKSTEMP=0;         AC_SUBST([REPLACE_MKSTEMP])
   REPLACE_POSIX_MEMALIGN=0;  AC_SUBST([REPLACE_POSIX_MEMALIGN])
+  REPLACE_POSIX_OPENPT=0;    AC_SUBST([REPLACE_POSIX_OPENPT])
   REPLACE_PTSNAME=0;         AC_SUBST([REPLACE_PTSNAME])
   REPLACE_PTSNAME_R=0;       AC_SUBST([REPLACE_PTSNAME_R])
   REPLACE_PUTENV=0;          AC_SUBST([REPLACE_PUTENV])
   REPLACE_QSORT_R=0;         AC_SUBST([REPLACE_QSORT_R])
+  REPLACE_RAND=0;            AC_SUBST([REPLACE_RAND])
   REPLACE_RANDOM=0;          AC_SUBST([REPLACE_RANDOM])
   REPLACE_RANDOM_R=0;        AC_SUBST([REPLACE_RANDOM_R])
-  REPLACE_REALLOC=0;         AC_SUBST([REPLACE_REALLOC])
+  REPLACE_REALLOC_FOR_REALLOC_POSIX=0;  AC_SUBST([REPLACE_REALLOC_FOR_REALLOC_POSIX])
   REPLACE_REALLOCARRAY=0;    AC_SUBST([REPLACE_REALLOCARRAY])
   REPLACE_REALPATH=0;        AC_SUBST([REPLACE_REALPATH])
   REPLACE_SETENV=0;          AC_SUBST([REPLACE_SETENV])
   REPLACE_SETSTATE=0;        AC_SUBST([REPLACE_SETSTATE])
   REPLACE_STRTOD=0;          AC_SUBST([REPLACE_STRTOD])
+  REPLACE_STRTOF=0;          AC_SUBST([REPLACE_STRTOF])
   REPLACE_STRTOL=0;          AC_SUBST([REPLACE_STRTOL])
   REPLACE_STRTOLD=0;         AC_SUBST([REPLACE_STRTOLD])
   REPLACE_STRTOLL=0;         AC_SUBST([REPLACE_STRTOLL])
@@ -191,4 +268,5 @@ AC_DEFUN([gl_STDLIB_H_DEFAULTS],
   REPLACE_STRTOULL=0;        AC_SUBST([REPLACE_STRTOULL])
   REPLACE_UNSETENV=0;        AC_SUBST([REPLACE_UNSETENV])
   REPLACE_WCTOMB=0;          AC_SUBST([REPLACE_WCTOMB])
+  CAN_PRINT_STACK_TRACE=0;   AC_SUBST([CAN_PRINT_STACK_TRACE])
 ])

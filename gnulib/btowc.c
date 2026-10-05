@@ -1,5 +1,5 @@
 /* Convert unibyte character to wide character.
-   Copyright (C) 2008, 2010-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008, 2010-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This file is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 wint_t
 btowc (int c)
@@ -32,7 +33,14 @@ btowc (int c)
       wchar_t wc;
 
       buf[0] = c;
+#if HAVE_MBRTOWC
+      mbstate_t state;
+      mbszero (&state);
+      size_t ret = mbrtowc (&wc, buf, 1, &state);
+      if (!(ret == (size_t)(-1) || ret == (size_t)(-2)))
+#else
       if (mbtowc (&wc, buf, 1) >= 0)
+#endif
         return wc;
     }
   return WEOF;

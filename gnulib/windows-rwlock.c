@@ -1,5 +1,5 @@
 /* Read-write locks (native Windows implementation).
-   Copyright (C) 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -46,9 +46,6 @@ glwthread_waitqueue_init (glwthread_waitqueue_t *wq)
 static HANDLE
 glwthread_waitqueue_add (glwthread_waitqueue_t *wq)
 {
-  HANDLE event;
-  unsigned int index;
-
   if (wq->count == wq->alloc)
     {
       unsigned int new_alloc = 2 * wq->alloc + 1;
@@ -64,14 +61,13 @@ glwthread_waitqueue_add (glwthread_waitqueue_t *wq)
           unsigned int old_count = wq->count;
           unsigned int old_alloc = wq->alloc;
           unsigned int old_offset = wq->offset;
-          unsigned int i;
           if (old_offset + old_count > old_alloc)
             {
               unsigned int limit = old_offset + old_count - old_alloc;
-              for (i = 0; i < limit; i++)
+              for (unsigned int i = 0; i < limit; i++)
                 new_array[old_alloc + i] = new_array[i];
             }
-          for (i = 0; i < old_count; i++)
+          for (unsigned int i = 0; i < old_count; i++)
             new_array[i] = new_array[old_offset + i];
           wq->offset = 0;
         }
@@ -80,11 +76,11 @@ glwthread_waitqueue_add (glwthread_waitqueue_t *wq)
     }
   /* Whether the created event is a manual-reset one or an auto-reset one,
      does not matter, since we will wait on it only once.  */
-  event = CreateEvent (NULL, TRUE, FALSE, NULL);
+  HANDLE event = CreateEvent (NULL, TRUE, FALSE, NULL);
   if (event == INVALID_HANDLE_VALUE)
     /* No way to allocate an event.  */
     return INVALID_HANDLE_VALUE;
-  index = wq->offset + wq->count;
+  unsigned int index = wq->offset + wq->count;
   if (index >= wq->alloc)
     index -= wq->alloc;
   wq->array[index] = event;
@@ -107,9 +103,7 @@ glwthread_waitqueue_notify_first (glwthread_waitqueue_t *wq)
 static void
 glwthread_waitqueue_notify_all (glwthread_waitqueue_t *wq)
 {
-  unsigned int i;
-
-  for (i = 0; i < wq->count; i++)
+  for (unsigned int i = 0; i < wq->count; i++)
     {
       unsigned int index = wq->offset + i;
       if (index >= wq->alloc)
@@ -160,10 +154,9 @@ glwthread_rwlock_rdlock (glwthread_rwlock_t *lock)
       HANDLE event = glwthread_waitqueue_add (&lock->waiting_readers);
       if (event != INVALID_HANDLE_VALUE)
         {
-          DWORD result;
           LeaveCriticalSection (&lock->lock);
           /* Wait until another thread signals this event.  */
-          result = WaitForSingleObject (event, INFINITE);
+          DWORD result = WaitForSingleObject (event, INFINITE);
           if (result == WAIT_FAILED || result == WAIT_TIMEOUT)
             abort ();
           CloseHandle (event);
@@ -217,10 +210,9 @@ glwthread_rwlock_wrlock (glwthread_rwlock_t *lock)
       HANDLE event = glwthread_waitqueue_add (&lock->waiting_writers);
       if (event != INVALID_HANDLE_VALUE)
         {
-          DWORD result;
           LeaveCriticalSection (&lock->lock);
           /* Wait until another thread signals this event.  */
-          result = WaitForSingleObject (event, INFINITE);
+          DWORD result = WaitForSingleObject (event, INFINITE);
           if (result == WAIT_FAILED || result == WAIT_TIMEOUT)
             abort ();
           CloseHandle (event);

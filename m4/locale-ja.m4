@@ -1,13 +1,15 @@
-# locale-ja.m4 serial 15
-dnl Copyright (C) 2003, 2005-2021 Free Software Foundation, Inc.
+# locale-ja.m4
+# serial 21
+dnl Copyright (C) 2003, 2005-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Bruno Haible.
 
 dnl Determine the name of a japanese locale with EUC-JP encoding.
-AC_DEFUN([gt_LOCALE_JA],
+AC_DEFUN_ONCE([gt_LOCALE_JA],
 [
   AC_REQUIRE([AC_CANONICAL_HOST])
   AC_REQUIRE([AM_LANGINFO_CODESET])
@@ -85,12 +87,13 @@ int main ()
     if AC_TRY_EVAL([ac_link]) && test -s conftest$ac_exeext; then
       case "$host_os" in
         # Handle native Windows specially, because there setlocale() interprets
-        # "ar" as "Arabic" or "Arabic_Saudi Arabia.1256",
+        # "ar" or "ara" as "Arabic" or "Arabic_Saudi Arabia.1256",
+        # "en" or "eng" as "English" or "English_United States.1252",
         # "fr" or "fra" as "French" or "French_France.1252",
         # "ge"(!) or "deu"(!) as "German" or "German_Germany.1252",
-        # "ja" as "Japanese" or "Japanese_Japan.932",
+        # "ja" or "jpn" as "Japanese" or "Japanese_Japan.932",
         # and similar.
-        mingw*)
+        mingw* | windows*)
           # Note that on native Windows, the Japanese locale is
           # Japanese_Japan.932, and CP932 is very different from EUC-JP, so we
           # cannot use it here.
@@ -109,15 +112,15 @@ int main ()
             if (LC_ALL=ja_JP.EUC-JP LC_TIME= LC_CTYPE= ./conftest; exit) 2>/dev/null; then
               gt_cv_locale_ja=ja_JP.EUC-JP
             else
-              # Test for the HP-UX, OSF/1, NetBSD locale name.
+              # Test for the HP-UX, NetBSD locale name.
               if (LC_ALL=ja_JP.eucJP LC_TIME= LC_CTYPE= ./conftest; exit) 2>/dev/null; then
                 gt_cv_locale_ja=ja_JP.eucJP
               else
-                # Test for the IRIX, FreeBSD locale name.
+                # Test for the FreeBSD locale name.
                 if (LC_ALL=ja_JP.EUC LC_TIME= LC_CTYPE= ./conftest; exit) 2>/dev/null; then
                   gt_cv_locale_ja=ja_JP.EUC
                 else
-                  # Test for the Solaris 7 locale name.
+                  # Test for the Solaris 10 locale name.
                   if (LC_ALL=ja LC_TIME= LC_CTYPE= ./conftest; exit) 2>/dev/null; then
                     gt_cv_locale_ja=ja
                   else
@@ -139,5 +142,11 @@ int main ()
     rm -fr conftest*
   ])
   LOCALE_JA=$gt_cv_locale_ja
+  case $LOCALE_JA in #(
+    '' | *[[[:space:]\"\$\'*@<:@]]*)
+      dnl This locale name might cause trouble with sh or make.
+      AC_MSG_WARN([invalid locale "$LOCALE_JA"; assuming "none"])
+      LOCALE_JA=none;;
+  esac
   AC_SUBST([LOCALE_JA])
 ])

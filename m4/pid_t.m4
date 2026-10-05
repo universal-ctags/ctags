@@ -1,8 +1,10 @@
-# pid_t.m4 serial 4
-dnl Copyright (C) 2020-2021 Free Software Foundation, Inc.
+# pid_t.m4
+# serial 4
+dnl Copyright (C) 2020-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 # The following implementation works around a problem in autoconf <= 2.69.
 m4_version_prereq([2.70], [], [

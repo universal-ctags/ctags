@@ -1,11 +1,13 @@
-# wctype_h.m4 serial 30
+# wctype_h.m4
+# serial 33
 
 dnl A placeholder for ISO C99 <wctype.h>, for platforms that lack it.
 
-dnl Copyright (C) 2006-2021 Free Software Foundation, Inc.
+dnl Copyright (C) 2006-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl Written by Paul Eggert.
 
@@ -178,6 +180,7 @@ AC_DEFUN([gl_WCTYPE_H_REQUIRE_DEFAULTS],
   m4_defun(GL_MODULE_INDICATOR_PREFIX[_WCTYPE_H_MODULE_INDICATOR_DEFAULTS], [
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_ISWBLANK])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_ISWDIGIT])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_ISWPUNCT])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_ISWXDIGIT])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_WCTYPE])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_ISWCTYPE])
@@ -196,5 +199,8 @@ AC_DEFUN([gl_WCTYPE_H_DEFAULTS],
   HAVE_WCTRANS_T=1;     AC_SUBST([HAVE_WCTRANS_T])
   REPLACE_ISWBLANK=0;   AC_SUBST([REPLACE_ISWBLANK])
   REPLACE_ISWDIGIT=0;   AC_SUBST([REPLACE_ISWDIGIT])
+  REPLACE_ISWPUNCT=0;   AC_SUBST([REPLACE_ISWPUNCT])
   REPLACE_ISWXDIGIT=0;  AC_SUBST([REPLACE_ISWXDIGIT])
+  REPLACE_WCTRANS=0;    AC_SUBST([REPLACE_WCTRANS])
+  REPLACE_WCTYPE=0;     AC_SUBST([REPLACE_WCTYPE])
 ])

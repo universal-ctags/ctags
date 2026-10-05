@@ -1,6 +1,6 @@
 /* System definitions for code taken from the GNU C Library
 
-   Copyright 2017-2021 Free Software Foundation, Inc.
+   Copyright 2017-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -48,6 +48,11 @@
 
 /* From glibc <features.h>.  */
 
+#if defined __clang__
+  /* clang really only groks GNU C 4.2, regardless of its value of __GNUC__.  */
+# undef __GNUC_PREREQ
+# define __GNUC_PREREQ(maj, min) ((maj) < 4 + ((min) <= 2))
+#endif
 #ifndef __GNUC_PREREQ
 # if defined __GNUC__ && defined __GNUC_MINOR__
 #  define __GNUC_PREREQ(maj, min) ((maj) < __GNUC__ + ((min) <= __GNUC_MINOR__))
@@ -117,7 +122,11 @@
 # undef __THROW
 # undef __THROWNL
 # undef __attr_access
+# undef __attr_access_none
+# undef __attr_dealloc
+# undef __attr_dealloc_free
 # undef __attribute__
+# undef __attribute_alloc_align__
 # undef __attribute_alloc_size__
 # undef __attribute_artificial__
 # undef __attribute_const__
@@ -126,28 +135,27 @@
 # undef __attribute_format_arg__
 # undef __attribute_format_strfmon__
 # undef __attribute_malloc__
+# undef __attribute_maybe_unused__
 # undef __attribute_noinline__
 # undef __attribute_nonstring__
 # undef __attribute_pure__
 # undef __attribute_returns_twice__
 # undef __attribute_used__
 # undef __attribute_warn_unused_result__
-# undef __bos
-# undef __bos0
 # undef __errordecl
 # undef __extension__
 # undef __extern_always_inline
 # undef __extern_inline
 # undef __flexarr
+# undef __fortified_attr_access
 # undef __fortify_function
 # undef __glibc_c99_flexarr_available
 # undef __glibc_has_attribute
 # undef __glibc_has_builtin
 # undef __glibc_has_extension
+# undef __glibc_likely
 # undef __glibc_macro_warning
 # undef __glibc_macro_warning1
-# undef __glibc_objsize
-# undef __glibc_objsize0
 # undef __glibc_unlikely
 # undef __inline
 # undef __ptr_t
@@ -156,6 +164,19 @@
 # undef __va_arg_pack
 # undef __va_arg_pack_len
 # undef __warnattr
+# undef __wur
+# ifndef __GNULIB_CDEFS
+#  undef __bos
+#  undef __bos0
+#  undef __glibc_fortify
+#  undef __glibc_fortify_n
+#  undef __glibc_objsize
+#  undef __glibc_objsize0
+#  undef __glibc_safe_len_cond
+#  undef __glibc_safe_or_unknown_len
+#  undef __glibc_unsafe_len
+#  undef __glibc_unsigned_or_positive
+# endif
 
 /* Include our copy of glibc <sys/cdefs.h>.  */
 # include <cdefs.h>

@@ -1,5 +1,5 @@
 /* Substitute for and wrapper around <langinfo.h>.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -33,6 +33,11 @@
 
 #ifndef _@GUARD_PREFIX@_LANGINFO_H
 #define _@GUARD_PREFIX@_LANGINFO_H
+
+/* This file uses GNULIB_POSIXCHECK, HAVE_RAW_DECL_*.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
 
 
 #if !@HAVE_LANGINFO_H@
@@ -110,6 +115,18 @@ typedef int nl_item;
 # define ABMON_10    (ABMON_1 + 9)
 # define ABMON_11    (ABMON_1 + 10)
 # define ABMON_12    (ABMON_1 + 11)
+# define ABALTMON_1  10220
+# define ABALTMON_2  (ABALTMON_1 + 1)
+# define ABALTMON_3  (ABALTMON_1 + 2)
+# define ABALTMON_4  (ABALTMON_1 + 3)
+# define ABALTMON_5  (ABALTMON_1 + 4)
+# define ABALTMON_6  (ABALTMON_1 + 5)
+# define ABALTMON_7  (ABALTMON_1 + 6)
+# define ABALTMON_8  (ABALTMON_1 + 7)
+# define ABALTMON_9  (ABALTMON_1 + 8)
+# define ABALTMON_10 (ABALTMON_1 + 9)
+# define ABALTMON_11 (ABALTMON_1 + 10)
+# define ABALTMON_12 (ABALTMON_1 + 11)
 # define ERA         10047
 # define ERA_D_FMT   10048
 # define ERA_D_T_FMT 10049
@@ -145,11 +162,6 @@ typedef int nl_item;
 #  define GNULIB_defined_CODESET 1
 # endif
 
-# if !@HAVE_LANGINFO_T_FMT_AMPM@
-#  define T_FMT_AMPM  10006
-#  define GNULIB_defined_T_FMT_AMPM 1
-# endif
-
 # if !@HAVE_LANGINFO_ALTMON@
 #  define ALTMON_1    10200
 #  define ALTMON_2    (ALTMON_1 + 1)
@@ -166,6 +178,37 @@ typedef int nl_item;
 #  define GNULIB_defined_ALTMON 1
 # endif
 
+# if !@HAVE_LANGINFO_ABALTMON@
+#  if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 27
+#   define ABALTMON_1  _NL_ABALTMON_1
+#   define ABALTMON_2  _NL_ABALTMON_2
+#   define ABALTMON_3  _NL_ABALTMON_3
+#   define ABALTMON_4  _NL_ABALTMON_4
+#   define ABALTMON_5  _NL_ABALTMON_5
+#   define ABALTMON_6  _NL_ABALTMON_6
+#   define ABALTMON_7  _NL_ABALTMON_7
+#   define ABALTMON_8  _NL_ABALTMON_8
+#   define ABALTMON_9  _NL_ABALTMON_9
+#   define ABALTMON_10 _NL_ABALTMON_10
+#   define ABALTMON_11 _NL_ABALTMON_11
+#   define ABALTMON_12 _NL_ABALTMON_12
+#  else
+#   define ABALTMON_1  10220
+#   define ABALTMON_2  (ABALTMON_1 + 1)
+#   define ABALTMON_3  (ABALTMON_1 + 2)
+#   define ABALTMON_4  (ABALTMON_1 + 3)
+#   define ABALTMON_5  (ABALTMON_1 + 4)
+#   define ABALTMON_6  (ABALTMON_1 + 5)
+#   define ABALTMON_7  (ABALTMON_1 + 6)
+#   define ABALTMON_8  (ABALTMON_1 + 7)
+#   define ABALTMON_9  (ABALTMON_1 + 8)
+#   define ABALTMON_10 (ABALTMON_1 + 9)
+#   define ABALTMON_11 (ABALTMON_1 + 10)
+#   define ABALTMON_12 (ABALTMON_1 + 11)
+#   define GNULIB_defined_ABALTMON 1
+#  endif
+# endif
+
 # if !@HAVE_LANGINFO_ERA@
 #  define ERA         10047
 #  define ERA_D_FMT   10048
@@ -173,12 +216,6 @@ typedef int nl_item;
 #  define ERA_T_FMT   10050
 #  define ALT_DIGITS  10051
 #  define GNULIB_defined_ERA 1
-# endif
-
-# if !@HAVE_LANGINFO_YESEXPR@
-#  define YESEXPR     10053
-#  define NOEXPR      10054
-#  define GNULIB_defined_YESEXPR 1
 # endif
 
 #endif
@@ -200,17 +237,18 @@ typedef int nl_item;
 #   undef nl_langinfo
 #   define nl_langinfo rpl_nl_langinfo
 #  endif
-_GL_FUNCDECL_RPL (nl_langinfo, char *, (nl_item item));
+_GL_FUNCDECL_RPL (nl_langinfo, char *, (nl_item item), );
 _GL_CXXALIAS_RPL (nl_langinfo, char *, (nl_item item));
 # else
 #  if !@HAVE_NL_LANGINFO@
-_GL_FUNCDECL_SYS (nl_langinfo, char *, (nl_item item));
+_GL_FUNCDECL_SYS (nl_langinfo, char *, (nl_item item), );
 #  endif
 _GL_CXXALIAS_SYS (nl_langinfo, char *, (nl_item item));
 # endif
+# if __GLIBC__ >= 2
 _GL_CXXALIASWARN (nl_langinfo);
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef nl_langinfo
 # if HAVE_RAW_DECL_NL_LANGINFO
 _GL_WARN_ON_USE (nl_langinfo, "nl_langinfo is not portable - "
                  "use gnulib module nl_langinfo for portability");

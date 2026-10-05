@@ -1,6 +1,6 @@
 /* Inline functions for <unistd.h>.
 
-   Copyright (C) 2012-2021 Free Software Foundation, Inc.
+   Copyright (C) 2012-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -15,8 +15,8 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+#define _GL_UNISTD_INLINE _GL_EXTERN_INLINE
 #include <config.h>
 
-#define _GL_UNISTD_INLINE _GL_EXTERN_INLINE
-#include "unistd.h"
+#include <unistd.h>
 typedef int dummy;

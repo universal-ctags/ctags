@@ -1,8 +1,10 @@
-# sys_types_h.m4 serial 13
-dnl Copyright (C) 2011-2021 Free Software Foundation, Inc.
+# sys_types_h.m4
+# serial 15
+dnl Copyright (C) 2011-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN_ONCE([gl_SYS_TYPES_H],
 [
@@ -22,6 +24,9 @@ AC_DEFUN_ONCE([gl_SYS_TYPES_H],
   dnl Whether to override the 'off_t' type.
   AC_REQUIRE([gl_TYPE_OFF_T])
 
+  dnl Whether to define the 'off64_t' type.
+  AC_REQUIRE([gl_TYPE_OFF64_T])
+
   dnl Whether to override the 'dev_t' and 'ino_t' types.
   m4_ifdef([gl_WINDOWS_STAT_INODES], [
     AC_REQUIRE([gl_WINDOWS_STAT_INODES])
@@ -29,6 +34,14 @@ AC_DEFUN_ONCE([gl_SYS_TYPES_H],
     WINDOWS_STAT_INODES=0
   ])
   AC_SUBST([WINDOWS_STAT_INODES])
+
+  dnl Test whether the 'blksize_t' type is defined.
+  AC_CHECK_TYPE([blksize_t], [HAVE_BLKSIZE_T=1], [HAVE_BLKSIZE_T=0])
+  AC_SUBST([HAVE_BLKSIZE_T])
+
+  dnl Test whether the 'blkcnt_t' type is defined.
+  AC_CHECK_TYPE([blkcnt_t], [HAVE_BLKCNT_T=1], [HAVE_BLKCNT_T=0])
+  AC_SUBST([HAVE_BLKCNT_T])
 ])
 
 # Initializes the default values for AC_SUBSTed shell variables.

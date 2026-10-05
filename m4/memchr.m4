@@ -1,8 +1,10 @@
-# memchr.m4 serial 18
-dnl Copyright (C) 2002-2004, 2009-2021 Free Software Foundation, Inc.
+# memchr.m4
+# serial 21
+dnl Copyright (C) 2002-2004, 2009-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN_ONCE([gl_FUNC_MEMCHR],
 [
@@ -19,7 +21,7 @@ AC_DEFUN_ONCE([gl_FUNC_MEMCHR],
   #   https://bugzilla.redhat.com/show_bug.cgi?id=499689
   # memchr should not dereference overestimated length after a match
   #   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=521737
-  #   https://sourceware.org/bugzilla/show_bug.cgi?id=10162
+  #   https://sourceware.org/PR10162
   # memchr should cast the second argument to 'unsigned char'.
   #   This bug exists in Android 4.3.
   # Assume that memchr works on platforms that lack mprotect.
@@ -31,31 +33,20 @@ AC_DEFUN_ONCE([gl_FUNC_MEMCHR],
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/mman.h>
-# ifndef MAP_FILE
-#  define MAP_FILE 0
-# endif
 #endif
 ]], [[
   int result = 0;
   char *fence = NULL;
 #if HAVE_SYS_MMAN_H && HAVE_MPROTECT
-# if HAVE_MAP_ANONYMOUS
-  const int flags = MAP_ANONYMOUS | MAP_PRIVATE;
-  const int fd = -1;
-# else /* !HAVE_MAP_ANONYMOUS */
-  const int flags = MAP_FILE | MAP_PRIVATE;
-  int fd = open ("/dev/zero", O_RDONLY, 0666);
-  if (fd >= 0)
-# endif
-    {
-      int pagesize = getpagesize ();
-      char *two_pages =
-        (char *) mmap (NULL, 2 * pagesize, PROT_READ | PROT_WRITE,
-                       flags, fd, 0);
-      if (two_pages != (char *)(-1)
-          && mprotect (two_pages + pagesize, pagesize, PROT_NONE) == 0)
-        fence = two_pages + pagesize;
-    }
+  {
+    long int pagesize = sysconf (_SC_PAGESIZE);
+    char *two_pages =
+      (char *) mmap (NULL, 2 * pagesize, PROT_READ | PROT_WRITE,
+                     MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    if (two_pages != (char *)(-1)
+        && mprotect (two_pages + pagesize, pagesize, PROT_NONE) == 0)
+      fence = two_pages + pagesize;
+  }
 #endif
   if (fence)
     {
@@ -85,12 +76,12 @@ AC_DEFUN_ONCE([gl_FUNC_MEMCHR],
        [gl_cv_func_memchr_works=yes],
        [gl_cv_func_memchr_works=no],
        [case "$host_os" in
-                           # Guess no on Android.
-          linux*-android*) gl_cv_func_memchr_works="guessing no" ;;
-                           # Guess yes on native Windows.
-          mingw*)          gl_cv_func_memchr_works="guessing yes" ;;
-                           # If we don't know, obey --enable-cross-guesses.
-          *)               gl_cv_func_memchr_works="$gl_cross_guess_normal" ;;
+                             # Guess no on Android.
+          linux*-android*)   gl_cv_func_memchr_works="guessing no" ;;
+                             # Guess yes on native Windows.
+          mingw* | windows*) gl_cv_func_memchr_works="guessing yes" ;;
+                             # If we don't know, obey --enable-cross-guesses.
+          *)                 gl_cv_func_memchr_works="$gl_cross_guess_normal" ;;
         esac
        ])
     ])

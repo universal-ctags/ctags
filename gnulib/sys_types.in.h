@@ -1,6 +1,6 @@
 /* Provide a more complete sys/types.h.
 
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -19,6 +19,13 @@
 @PRAGMA_SYSTEM_HEADER@
 #endif
 @PRAGMA_COLUMNS@
+
+/* This file uses #include_next of a system file that defines time_t.
+   For the 'year2038' module to work right, <config.h> needs to have been
+   included before.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
 
 #if defined _WIN32 && !defined __CYGWIN__ \
     && (defined __need_off_t || defined __need___off64_t \
@@ -51,6 +58,15 @@
 # endif
 /* Indicator, for gnulib internal purposes.  */
 # define _GL_WINDOWS_64_BIT_OFF_T 1
+#endif
+
+/* Define the off64_t type.  */
+#if !@HAVE_OFF64_T@
+# if !GNULIB_defined_off64_t
+/* Define off64_t to int64_t always.  */
+typedef long long off64_t;
+#  define GNULIB_defined_off64_t 1
+# endif
 #endif
 
 /* Override dev_t and ino_t if distinguishable inodes support is requested
@@ -99,6 +115,22 @@ typedef unsigned long long int rpl_ino_t;
 /* But avoid namespace pollution on glibc systems.  */
 #if (defined _WIN32 && ! defined __CYGWIN__) && ! defined __GLIBC__
 # include <stddef.h>
+#endif
+
+/* Define blksize_t, required by POSIX:2024.  */
+#if !@HAVE_BLKSIZE_T@
+# if !defined GNULIB_defined_blksize_t
+typedef int blksize_t;
+#  define GNULIB_defined_blksize_t 1
+# endif
+#endif
+
+/* Define blkcnt_t, required by POSIX:2024.  */
+#if !@HAVE_BLKCNT_T@
+# if !defined GNULIB_defined_blkcnt_t
+typedef long long blkcnt_t;
+#  define GNULIB_defined_blkcnt_t 1
+# endif
 #endif
 
 #endif /* _@GUARD_PREFIX@_SYS_TYPES_H */

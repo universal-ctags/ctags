@@ -1,5 +1,5 @@
 /* Test for initial conversion state.
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This file is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@
 /* Specification.  */
 #include <wchar.h>
 
-#include "verify.h"
 
 #if GNULIB_defined_mbstate_t
 
@@ -37,9 +36,9 @@
        buffered bytes (in the range 0..3), followed by up to 3 buffered bytes.
        See mbrtowc.c.
      - In wc -> mb direction, mbstate_t contains no information. In other
-       words, it is always in the initial state.  */
+       words, it is always in an initial state.  */
 
-verify (sizeof (mbstate_t) >= 4);
+static_assert (sizeof (mbstate_t) >= 4);
 
 int
 mbsinit (const mbstate_t *ps)

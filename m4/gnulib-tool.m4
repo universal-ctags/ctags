@@ -1,8 +1,10 @@
-# gnulib-tool.m4 serial 2
-dnl Copyright (C) 2004-2005, 2009-2021 Free Software Foundation, Inc.
+# gnulib-tool.m4
+# serial 5
+dnl Copyright (C) 2004-2005, 2009-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl The following macros need not be invoked explicitly.
 dnl Invoking them does nothing except to declare default arguments
@@ -41,8 +43,17 @@ AC_DEFUN([gl_LIB], [])
 dnl Usage: gl_LGPL or gl_LGPL([VERSION])
 AC_DEFUN([gl_LGPL], [])
 
+dnl Usage: gl_GPL([VERSION])
+AC_DEFUN([gl_GPL], [])
+
 dnl Usage: gl_MAKEFILE_NAME([FILENAME])
 AC_DEFUN([gl_MAKEFILE_NAME], [])
+
+dnl Usage: gl_TESTS_MAKEFILE_NAME([FILENAME])
+AC_DEFUN([gl_TESTS_MAKEFILE_NAME], [])
+
+dnl Usage: gl_AUTOMAKE_SUBDIR
+AC_DEFUN([gl_AUTOMAKE_SUBDIR], [])
 
 dnl Usage: gl_LIBTOOL
 AC_DEFUN([gl_LIBTOOL], [])

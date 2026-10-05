@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2021 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -30,14 +30,45 @@
 #include <errno.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdckdint.h>
 #include <stdlib.h>
 #if defined _LIBC || HAVE_ALLOCA
 # include <alloca.h>
 #endif
-#include <wchar.h>
-#include <wctype.h>
 #include <stddef.h>
-#include <stdbool.h>
+#include <uchar.h>
+#if defined _LIBC || !_GL_SMALL_WCHAR_T
+/* It's OK to use wchar_t, since it's wide enough.  */
+# include <wchar.h>
+# include <wctype.h>
+# define WCHAR_T wchar_t
+# define WINT_T wint_t
+# define BTOWC btowc
+# define MBSRTOWCS mbsrtowcs
+# define WCSLEN wcslen
+# define WCSCAT wcscat
+# define WMEMPCPY wmempcpy
+# define WMEMCHR wmemchr
+# define TOWLOWER towlower
+# define WCTYPE_T wctype_t
+# define WCTYPE wctype
+# define ISWCTYPE iswctype
+#else
+/* wchar_t is too small, use char32_t instead.  */
+# include "unistr.h"
+# define WCHAR_T char32_t
+# define WINT_T char32_t
+# define BTOWC btoc32
+# define MBSRTOWCS mbsrtoc32s
+# define WCSLEN u32_strlen
+# define WCSCAT u32_strcat
+# define WMEMPCPY u32_pcpy
+# define WMEMCHR(S, C, N) u32_chr (S, N, C)
+# define TOWLOWER c32tolower
+# define WCTYPE_T c32_type_test_t
+# define WCTYPE c32_get_type_test
+# define ISWCTYPE c32_apply_type_test
+#endif
 
 /* We need some of the locale data (the collation sequence information)
    but there is no interface to get this information in general.  Therefore
@@ -64,7 +95,7 @@ extern int fnmatch (const char *pattern, const char *string, int flags);
 #endif
 
 #ifdef _LIBC
-# if __GNUC__ >= 7
+# if __glibc_has_attribute (__fallthrough__)
 #  define FALLTHROUGH __attribute__ ((__fallthrough__))
 # else
 #  define FALLTHROUGH ((void) 0)
@@ -73,7 +104,6 @@ extern int fnmatch (const char *pattern, const char *string, int flags);
 # include "attribute.h"
 #endif
 
-#include <intprops.h>
 #include <flexmember.h>
 
 #ifdef _LIBC
@@ -112,7 +142,7 @@ typedef ptrdiff_t idx_t;
 # define CHAR_CLASS_MAX_LENGTH 256
 #endif
 
-#define IS_CHAR_CLASS(string) wctype (string)
+#define IS_CHAR_CLASS(string) WCTYPE (string)
 
 /* Avoid depending on library functions or files
    whose names are inconsistent.  */
@@ -130,7 +160,7 @@ static int posixly_correct;
 #define END     end_pattern
 #define STRUCT  fnmatch_struct
 #define L_(CS)  CS
-#define BTOWC(C) btowc (C)
+#define UCHAR_TO_WCHAR(C) BTOWC (C)
 #define STRLEN(S) strlen (S)
 #define STRCAT(D, S) strcat (D, S)
 #define MEMPCPY(D, S, N) mempcpy (D, S, N)
@@ -143,19 +173,19 @@ static int posixly_correct;
 #include "fnmatch_loop.c"
 
 
-#define FOLD(c) ((flags & FNM_CASEFOLD) ? towlower (c) : (c))
-#define CHAR    wchar_t
-#define UCHAR   wint_t
-#define INT     wint_t
+#define FOLD(c) ((flags & FNM_CASEFOLD) ? TOWLOWER (c) : (c))
+#define CHAR    WCHAR_T
+#define UCHAR   WINT_T
+#define INT     WINT_T
 #define FCT     internal_fnwmatch
 #define EXT     ext_wmatch
 #define END     end_wpattern
 #define L_(CS)  L##CS
-#define BTOWC(C) (C)
-#define STRLEN(S) wcslen (S)
-#define STRCAT(D, S) wcscat (D, S)
-#define MEMPCPY(D, S, N) wmempcpy (D, S, N)
-#define MEMCHR(S, C, N) wmemchr (S, C, N)
+#define UCHAR_TO_WCHAR(C) (C)
+#define STRLEN(S) WCSLEN (S)
+#define STRCAT(D, S) WCSCAT (D, S)
+#define MEMPCPY(D, S, N) WMEMPCPY (D, S, N)
+#define MEMCHR(S, C, N) WMEMCHR (S, C, N)
 #define WIDE_CHAR_VERSION 1
 #ifdef _LIBC
 /* Change the name the header defines so it doesn't conflict with
@@ -173,8 +203,8 @@ static int posixly_correct;
    for a member of the portable character set is the same code point as
    its single-byte encoding, we can use a simplified method to convert the
    string to a multibyte character string.  */
-static wctype_t
-is_char_class (const wchar_t *wcs)
+static WCTYPE_T
+is_char_class (const WCHAR_T *wcs)
 {
   char s[CHAR_CLASS_MAX_LENGTH + 1];
   char *cp = s;
@@ -185,7 +215,7 @@ is_char_class (const wchar_t *wcs)
 #ifdef _LIBC
       if (*wcs < 0x20 || *wcs > 0x7e
           || *wcs == 0x24 || *wcs == 0x40 || *wcs == 0x60)
-        return (wctype_t) 0;
+        return (WCTYPE_T) 0;
 #else
       switch (*wcs)
         {
@@ -211,13 +241,13 @@ is_char_class (const wchar_t *wcs)
         case L'z': case L'{': case L'|': case L'}': case L'~':
           break;
         default:
-          return (wctype_t) 0;
+          return (WCTYPE_T) 0;
         }
 #endif
 
       /* Avoid overrunning the buffer.  */
       if (cp == s + CHAR_CLASS_MAX_LENGTH)
-        return (wctype_t) 0;
+        return (WCTYPE_T) 0;
 
       *cp++ = (char) *wcs++;
     }
@@ -225,7 +255,7 @@ is_char_class (const wchar_t *wcs)
 
   *cp = '\0';
 
-  return wctype (s);
+  return WCTYPE (s);
 }
 #define IS_CHAR_CLASS(string) is_char_class (string)
 
@@ -240,10 +270,10 @@ fnmatch (const char *pattern, const char *string, int flags)
       mbstate_t ps;
       size_t n;
       const char *p;
-      wchar_t *wpattern_malloc = NULL;
-      wchar_t *wpattern;
-      wchar_t *wstring_malloc = NULL;
-      wchar_t *wstring;
+      WCHAR_T *wpattern_malloc = NULL;
+      WCHAR_T *wpattern;
+      WCHAR_T *wstring_malloc = NULL;
+      WCHAR_T *wstring;
       size_t alloca_used = 0;
 
       /* Convert the strings into wide characters.  */
@@ -252,9 +282,9 @@ fnmatch (const char *pattern, const char *string, int flags)
       n = strnlen (pattern, 1024);
       if (__glibc_likely (n < 1024))
         {
-          wpattern = (wchar_t *) alloca_account ((n + 1) * sizeof (wchar_t),
+          wpattern = (WCHAR_T *) alloca_account ((n + 1) * sizeof (WCHAR_T),
                                                  alloca_used);
-          n = mbsrtowcs (wpattern, &p, n + 1, &ps);
+          n = MBSRTOWCS (wpattern, &p, n + 1, &ps);
           if (__glibc_unlikely (n == (size_t) -1))
             /* Something wrong.
                XXX Do we have to set 'errno' to something which mbsrtows hasn't
@@ -269,23 +299,23 @@ fnmatch (const char *pattern, const char *string, int flags)
       else
         {
         prepare_wpattern:
-          n = mbsrtowcs (NULL, &pattern, 0, &ps);
+          n = MBSRTOWCS (NULL, &pattern, 0, &ps);
           if (__glibc_unlikely (n == (size_t) -1))
             /* Something wrong.
                XXX Do we have to set 'errno' to something which mbsrtows hasn't
                already done?  */
             return -1;
-          if (__glibc_unlikely (n >= (size_t) -1 / sizeof (wchar_t)))
+          if (__glibc_unlikely (n >= (size_t) -1 / sizeof (WCHAR_T)))
             {
               __set_errno (ENOMEM);
               return -2;
             }
           wpattern_malloc = wpattern
-            = (wchar_t *) malloc ((n + 1) * sizeof (wchar_t));
+            = (WCHAR_T *) malloc ((n + 1) * sizeof (WCHAR_T));
           assert (mbsinit (&ps));
           if (wpattern == NULL)
             return -2;
-          (void) mbsrtowcs (wpattern, &pattern, n + 1, &ps);
+          (void) MBSRTOWCS (wpattern, &pattern, n + 1, &ps);
         }
 
       assert (mbsinit (&ps));
@@ -293,9 +323,9 @@ fnmatch (const char *pattern, const char *string, int flags)
       p = string;
       if (__glibc_likely (n < 1024))
         {
-          wstring = (wchar_t *) alloca_account ((n + 1) * sizeof (wchar_t),
+          wstring = (WCHAR_T *) alloca_account ((n + 1) * sizeof (WCHAR_T),
                                                 alloca_used);
-          n = mbsrtowcs (wstring, &p, n + 1, &ps);
+          n = MBSRTOWCS (wstring, &p, n + 1, &ps);
           if (__glibc_unlikely (n == (size_t) -1))
             {
               /* Something wrong.
@@ -314,13 +344,13 @@ fnmatch (const char *pattern, const char *string, int flags)
       else
         {
         prepare_wstring:
-          n = mbsrtowcs (NULL, &string, 0, &ps);
+          n = MBSRTOWCS (NULL, &string, 0, &ps);
           if (__glibc_unlikely (n == (size_t) -1))
             /* Something wrong.
                XXX Do we have to set 'errno' to something which mbsrtows hasn't
                already done?  */
             goto free_return;
-          if (__glibc_unlikely (n >= (size_t) -1 / sizeof (wchar_t)))
+          if (__glibc_unlikely (n >= (size_t) -1 / sizeof (WCHAR_T)))
             {
               free (wpattern_malloc);
               __set_errno (ENOMEM);
@@ -328,14 +358,14 @@ fnmatch (const char *pattern, const char *string, int flags)
             }
 
           wstring_malloc = wstring
-            = (wchar_t *) malloc ((n + 1) * sizeof (wchar_t));
+            = (WCHAR_T *) malloc ((n + 1) * sizeof (WCHAR_T));
           if (wstring == NULL)
             {
               free (wpattern_malloc);
               return -2;
             }
           assert (mbsinit (&ps));
-          (void) mbsrtowcs (wstring, &string, n + 1, &ps);
+          (void) MBSRTOWCS (wstring, &string, n + 1, &ps);
         }
 
       int res = internal_fnwmatch (wpattern, wstring, wstring + n,
