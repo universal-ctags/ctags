@@ -1006,3 +1006,93 @@ Ghost kind in regex parser (TBW)
 	automatically assigned to an empty name pattern.
 
 	Normally you don't need to know this.
+
+Limiting the stack depth
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Parsers may use recursive calls to process nested structures in the
+input. For such parsers, a crafted source file with deeply nested
+structures may cause a stack overflow.
+
+The mechanism described here is a best-effort safeguard and may skip
+parsing of the remaining input when the limit is exceeded.
+
+The ``stackGuardCheck`` function declared in ``main/parse.h`` helps
+protect your parser from such input.
+
+``stackGuardCheck`` works only if the parser terminates cleanly when
+reaching EOF and if it implements the ``discardInput`` method.
+
+.. code-block:: C
+
+   extern bool stackGuardCheck (void *dataForDiscardFunc);
+
+Call ``stackGuardCheck`` at the beginning of functions that are called
+recursively.
+
+``stackGuardCheck`` checks the current stack usage. If the usage exceeds
+the limit specified by ``--stack-limit=<bytes>``, it calls the parser's
+``discardInput`` method and returns ``false``.
+
+The ``discardInput`` method should repeatedly read input until EOF is
+reached, discarding all data read.
+
+As a result, the parser will eventually stop when it encounters EOF
+after ``stackGuardCheck`` returns ``false``.
+
+The ``discardInput`` method has the following prototype.
+
+.. code-block:: C
+
+   typedef void (*discardInputFn) (void *);
+
+   struct sParserDefinition {
+           /* ... */
+           discardInputFn discardInput;
+           /* ... */
+   };
+
+``stackGuardCheck`` passes the value given via the
+``dataForDiscardFunc`` parameter to this method.
+
+.. code-block:: Diff
+
+   diff --git a/parsers/v.c b/parsers/v.c
+   index 8cecf27fb..f8727b9c0 100644
+   --- a/parsers/v.c
+   +++ b/parsers/v.c
+   @@ -2341,6 +2341,9 @@ static void parseAlias (tokenInfo *const token, vString *const access, int scope
+	static void parseExprList (tokenInfo *const token, int scope,
+							  vString *const access, bool hasInDecl)
+	{
+   +   if (!stackGuardCheck(token))
+   +       return;
+   +
+	   PARSER_PROLOGUE ("list");
+
+	   // attempt to consume multi-var declaration (special case of list)
+   @@ -3031,6 +3034,15 @@ static void parseFile (tokenInfo *const token)
+	   PARSER_EPILOGUE ();
+	}
+
+   +static void discardInput (void *data)
+   +{
+   +   tokenInfo *token = data;
+   +
+   +   do
+   +       readToken (token);
+   +   while (!isToken (token, TOKEN_EOF));
+   +}
+   +
+	// _____________________________________________________________________________
+	//
+
+   @@ -3091,5 +3103,8 @@ extern parserDefinition *VParser (void)
+	   def->requestAutomaticFQTag = true;
+	   def->dependencies = dependencies;
+	   def->dependencyCount = ARRAY_SIZE (dependencies);
+   +
+   +   def->discardInput = discardInput;
+   +
+	   return def;
+	}

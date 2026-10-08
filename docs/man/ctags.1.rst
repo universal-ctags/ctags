@@ -1411,6 +1411,21 @@ Miscellaneous Options
 ``--quiet[=(yes|no)]``
 	Write fewer messages (default is ``no``).
 
+``--stack-limit=<bytes>``
+	Limit stack usage while parsing, in bytes.
+	See the output of the ``--help`` option for the default value.
+
+	If the ``rlimit-based-stack-guard`` feature or the
+	``thread-stack-limit-based-stack-guard`` feature is available,
+	ctags determines the default value dynamically
+	in a platform-dependent manner. If the ``static-stack-guard``
+	feature is available, a fixed value is used as the default.
+	``--list-features`` option for the available features.
+
+	This option is effective only for parsers that support the
+	stack guard. Refer to the output of the
+	``--describe-language=<language>`` option for the support status.
+
 ``--totals[=(yes|no|extra)]``
 	Prints statistics about the source files read and the tag file written
 	during the current invocation of ctags. This option
