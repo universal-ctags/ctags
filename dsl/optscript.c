@@ -2859,9 +2859,6 @@ op_cleartomark (OptVM *vm, EsObject *name)
 	if (r < 0)
 		return OPT_ERR_UNMATCHEDMARK;
 
-	if (r < 0)
-		return OPT_ERR_UNMATCHEDMARK;
-
 	for (int i = 0; i <= r; i++)
 		ptrArrayDeleteLast (vm->ostack);
 	return es_false;
