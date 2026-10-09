@@ -1145,9 +1145,12 @@ getNextChar:
 		case '!':
 			if (inFreeSourceForm)
 			{
+				/* Read the comment directly: an '&' in a comment is not a
+				 * continuation marker. */
 				do
-				   c = getChar ();
+				   c = getcFromInputFile ();
 				while (c != '\n' && c != EOF);
+				Free.newline = (bool) (c == '\n');
 			}
 			else
 			{
