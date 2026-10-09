@@ -1,0 +1,15 @@
+# default
+provider	input.f90	/^module provider$/;"	m	roles:def
+consumer	input.f90	/^program consumer$/;"	p	roles:def
+# --extras=-r
+provider	input.f90	/^module provider$/;"	m	roles:def
+consumer	input.f90	/^program consumer$/;"	p	roles:def
+# --extras=+r
+provider	input.f90	/^module provider$/;"	m	roles:def
+consumer	input.f90	/^program consumer$/;"	p	roles:def
+provider	input.f90	/^  use provider$/;"	m	program:consumer	roles:used
+# --roles-Fortran.m=-{used}
+provider	input.f90	/^module provider$/;"	m	roles:def
+consumer	input.f90	/^program consumer$/;"	p	roles:def
+# --kinds-Fortran=-m
+consumer	input.f90	/^program consumer$/;"	p	roles:def
