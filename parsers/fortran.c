@@ -1746,14 +1746,14 @@ static void parseCommonNamelistStmt (tokenInfo *const token, tagType type)
 			strcmp (vStringValue (token->string), "/") == 0)
 		{
 			readToken (token);
-			if (isType (token, TOKEN_IDENTIFIER))
+			if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 			{
 				makeFortranTag (token, type);
 				readToken (token);
 			}
 			skipPast (token, TOKEN_OPERATOR);
 		}
-		if (isType (token, TOKEN_IDENTIFIER))
+		if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 			makeFortranTag (token, TAG_LOCAL);
 		readToken (token);
 		if (isType (token, TOKEN_PAREN_OPEN))
@@ -2206,7 +2206,7 @@ static void parseEntryStmt (tokenInfo *const token)
 {
 	Assert (isKeyword (token, KEYWORD_entry));
 	readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 		makeFortranTag (token, TAG_ENTRY_POINT);
 	skipToNextStatement (token);
 }
@@ -2375,8 +2375,11 @@ static void parseBlockData (tokenInfo *const token)
 	if (isKeyword (token, KEYWORD_data))
 	{
 		readToken (token);
-		if (isType (token, TOKEN_IDENTIFIER))
+		if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
+		{
+			token->type = TOKEN_IDENTIFIER;
 			makeFortranTag (token, TAG_BLOCK_DATA);
+		}
 	}
 	ancestorPush (token);
 	skipToNextStatement (token);
@@ -2453,7 +2456,7 @@ static vString *parserParentIdentifierOfSubmoduleStatement (tokenInfo *const tok
 	while (1)
 	{
 		readToken (token);
-		if (isType (token, TOKEN_IDENTIFIER))
+		if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 			vStringCat (parentId, token->string);
 		else if (isType (token, TOKEN_COLON))
 			vStringPut (parentId, ':');
@@ -2630,8 +2633,8 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
-		tokenInfo* name = newTokenFrom (token);
 		token->type = TOKEN_IDENTIFIER;
+		tokenInfo* name = newTokenFrom (token);
 		if (tag == TAG_SUBROUTINE ||
 			tag == TAG_PROTOTYPE)
 			name->signature = parseSignature (token);
