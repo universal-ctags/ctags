@@ -687,8 +687,13 @@ int asprintf(char **strp, const char *fmt, ...)
 #endif
 
 	va_end(args_copy);
+	va_end(args);
 
 	Assert(length >= 0);
+	if (length < 0) {
+		*strp = NULL;
+		return -1;
+	}
 	size = length + 1;
 
 	*strp = malloc(size);
