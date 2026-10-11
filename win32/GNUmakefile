@@ -4,19 +4,19 @@
 # This source code is released for free distribution under the terms of the
 # GNU General Public License version 2 or (at your option) any later version.
 #
-# Makefile to generate ctags_vs2013.vcxproj, ctags_vs2013.vcxproj.filters, and peg_rule.mak
+# Makefile to generate ctags.vcxproj, ctags.vcxproj.filters, and peg_rule.mak
 #
 #   usage: make [-B]
 #
 # Restrictions:
-#   - Input Files: ctags_vs2013.vcxproj.in and ctags_vs2013.vcxproj.filters.in
+#   - Input Files: ctags.vcxproj.in and ctags.vcxproj.filters.in
 #     - The last charactor of the files must be '>'.
 #       cf. check_eof_chars_in_vcxproj() in misc/src-check.
 #     - Other lines must be end with LF.
 #   - GNU make is required.
 
-VCXPROJ = ctags_vs2013.vcxproj
-VCXPROJ_FILTERS = ctags_vs2013.vcxproj.filters
+VCXPROJ = ctags.vcxproj
+VCXPROJ_FILTERS = ctags.vcxproj.filters
 SOURCE_MAK = ../source.mak
 PEG_RULE_MAK = peg_rule.mak
 

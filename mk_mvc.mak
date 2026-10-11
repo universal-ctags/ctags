@@ -1,10 +1,11 @@
 #
-# Makefile for Win32 using Microsoft Visual Studio 2013
+# Makefile for Win32 using Microsoft Visual Studio 2022
 #
 # To use from the command line:
-# 1. From the Start Menu "Visual Studio 2013" -> "Visual Studio Tools" -> "VS2013 x86 Native Tools Command Prompt"
-# 2. In the command prompt that opens goto the directory containing the sources
-# 3. Execute: nmake -f mk_mvc.mak
+# 1. Open the project in Visual Studio 2022
+# 2. Click "Tools" -> "Command Line" -> "Developer Command Prompt"
+# 3. In the command prompt, navigate to the root directory of the repository
+# 4. Execute: nmake -f mk_mvc.mak
 #
 
 OBJEXT = obj
@@ -13,7 +14,7 @@ include source.mak
 COMMON_DEFINES =
 DEFINES = $(COMMON_DEFINES) -DHAVE_REPOINFO_H -DHAVE_PACKCC
 INCLUDES = -I. -Ignulib -Imain -Iparsers -Ilibreadtags -Idsl
-OPT = /O2 /WX /Zc:preprocessor
+OPT = /O2 /WX /Zc:preprocessor /std:c11
 LOPT = /FORCE:MULTIPLE
 PACKCC = packcc.exe
 GNULIB_OBJS = $(MVC_GNULIB_SRCS:.c=.obj)
