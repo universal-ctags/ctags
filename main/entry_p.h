@@ -29,7 +29,7 @@ extern const roleDefinition* getTagRole(const tagEntryInfo *const tag, int roleI
 extern void freeTagFileResources (void);
 extern const char *tagFileName (void);
 extern void openTagFile (void);
-extern void closeTagFile (const bool resize);
+extern void closeTagFile (const bool resize, bool forceUseInternalSort);
 extern void  setupWriter (void *writerClientData);
 extern bool  teardownWriter (const char *inputFilename);
 
