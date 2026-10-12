@@ -1,8 +1,10 @@
-# absolute-header.m4 serial 17
-dnl Copyright (C) 2006-2021 Free Software Foundation, Inc.
+# absolute-header.m4
+# serial 18
+dnl Copyright (C) 2006-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Derek Price.
 
@@ -66,7 +68,7 @@ AC_DEFUN([gl_ABSOLUTE_HEADER_ONE],
   esac
 changequote(,)
   case "$host_os" in
-    mingw*)
+    mingw* | windows*)
       dnl For the sake of native Windows compilers (excluding gcc),
       dnl treat backslash as a directory separator, like /.
       dnl Actually, these compilers use a double-backslash as

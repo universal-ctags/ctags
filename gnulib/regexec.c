@@ -1,5 +1,5 @@
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002-2021 Free Software Foundation, Inc.
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -67,11 +67,9 @@ static reg_errcode_t set_regs (const regex_t *preg,
 			       bool fl_backtrack);
 static reg_errcode_t free_fail_stack_return (struct re_fail_stack_t *fs);
 
-#ifdef RE_ENABLE_I18N
 static int sift_states_iter_mb (const re_match_context_t *mctx,
 				re_sift_context_t *sctx,
 				Idx node_idx, Idx str_idx, Idx max_str_idx);
-#endif /* RE_ENABLE_I18N */
 static reg_errcode_t sift_states_backward (const re_match_context_t *mctx,
 					   re_sift_context_t *sctx);
 static reg_errcode_t build_sifted_states (const re_match_context_t *mctx,
@@ -123,10 +121,8 @@ static re_dfastate_t *transit_state_sb (reg_errcode_t *err,
 					re_match_context_t *mctx,
 					re_dfastate_t *pstate);
 #endif
-#ifdef RE_ENABLE_I18N
 static reg_errcode_t transit_state_mb (re_match_context_t *mctx,
 				       re_dfastate_t *pstate);
-#endif /* RE_ENABLE_I18N */
 static reg_errcode_t transit_state_bkref (re_match_context_t *mctx,
 					  const re_node_set *nodes);
 static reg_errcode_t get_subexp (re_match_context_t *mctx,
@@ -156,14 +152,12 @@ static reg_errcode_t expand_bkref_cache (re_match_context_t *mctx,
 					 re_node_set *cur_nodes, Idx cur_str,
 					 Idx subexp_num, int type);
 static bool build_trtable (const re_dfa_t *dfa, re_dfastate_t *state);
-#ifdef RE_ENABLE_I18N
 static int check_node_accept_bytes (const re_dfa_t *dfa, Idx node_idx,
 				    const re_string_t *input, Idx idx);
-# ifdef _LIBC
+#ifdef _LIBC
 static unsigned int find_collation_sequence_value (const unsigned char *mbs,
 						   size_t name_len);
-# endif /* _LIBC */
-#endif /* RE_ENABLE_I18N */
+#endif
 static Idx group_nodes_into_DFAstates (const re_dfa_t *dfa,
 				       const re_dfastate_t *state,
 				       re_node_set *states_node,
@@ -330,7 +324,7 @@ re_search_2_stub (struct re_pattern_buffer *bufp, const char *string1,
   char *s = NULL;
 
   if (__glibc_unlikely ((length1 < 0 || length2 < 0 || stop < 0
-			 || INT_ADD_WRAPV (length1, length2, &len))))
+			 || ckd_add (&len, length1, length2))))
     return -2;
 
   /* Concatenate the strings.  */
@@ -633,6 +627,8 @@ re_search_internal (const regex_t *preg, const char *string, Idx length,
   /* We must check the longest matching, if nmatch > 0.  */
   fl_longest_match = (nmatch != 0 || dfa->nbackref);
 
+  re_dfastate_t **save_state_log = NULL;
+
   err = re_string_allocate (&mctx.input, string, length, dfa->nodes_len + 1,
 			    preg->translate, (preg->syntax & RE_ICASE) != 0,
 			    dfa);
@@ -758,10 +754,9 @@ re_search_internal (const regex_t *preg, const char *string, Idx length,
 
 		  offset = match_first - mctx.input.raw_mbs_idx;
 		}
-	      /* If MATCH_FIRST is out of the buffer, leave it as '\0'.
-		 Note that MATCH_FIRST must not be smaller than 0.  */
-	      ch = (match_first >= length
-		    ? 0 : re_string_byte_at (&mctx.input, offset));
+	      /* Use buffer byte if OFFSET is in buffer, otherwise '\0'.  */
+	      ch = (offset < mctx.input.valid_len
+		    ? re_string_byte_at (&mctx.input, offset) : 0);
 	      if (fastmap[ch])
 		break;
 	      match_first += incr;
@@ -780,12 +775,10 @@ re_search_internal (const regex_t *preg, const char *string, Idx length,
       if (__glibc_unlikely (err != REG_NOERROR))
 	goto free_return;
 
-#ifdef RE_ENABLE_I18N
-     /* Don't consider this char as a possible match start if it part,
-	yet isn't the head, of a multibyte character.  */
+      /* Don't consider this char as a possible match start if it part,
+         yet isn't the head, of a multibyte character.  */
       if (!sb && !re_string_first_byte (&mctx.input, 0))
 	continue;
-#endif
 
       /* It seems to be appropriate one, then use the matcher.  */
       /* We assume that the matching starts from 0.  */
@@ -811,11 +804,32 @@ re_search_internal (const regex_t *preg, const char *string, Idx length,
 	      if ((!preg->no_sub && nmatch > 1 && dfa->has_plural_match)
 		  || dfa->nbackref)
 		{
+		  /* Save state_log before pruning, in case set_regs
+		     later fails and we need to retry with a shorter
+		     match.  */
+		  re_free (save_state_log);
+		  save_state_log = NULL;
+		  if (!preg->no_sub && nmatch > 1 && dfa->nbackref)
+		    {
+		      save_state_log
+			= re_malloc (re_dfastate_t *,
+				     mctx.match_last + 1);
+		      if (__glibc_unlikely (save_state_log == NULL))
+			{
+			  err = REG_ESPACE;
+			  goto free_return;
+			}
+		      memcpy (save_state_log, mctx.state_log,
+			      sizeof (re_dfastate_t *)
+			      * (mctx.match_last + 1));
+		    }
 		  err = prune_impossible_nodes (&mctx);
 		  if (err == REG_NOERROR)
 		    break;
 		  if (__glibc_unlikely (err != REG_NOMATCH))
 		    goto free_return;
+		  re_free (save_state_log);
+		  save_state_log = NULL;
 		  match_last = -1;
 		}
 	      else
@@ -834,24 +848,79 @@ re_search_internal (const regex_t *preg, const char *string, Idx length,
     {
       Idx reg_idx;
 
-      /* Initialize registers.  */
-      for (reg_idx = 1; reg_idx < nmatch; ++reg_idx)
-	pmatch[reg_idx].rm_so = pmatch[reg_idx].rm_eo = -1;
-
-      /* Set the points where matching start/end.  */
-      pmatch[0].rm_so = 0;
-      pmatch[0].rm_eo = mctx.match_last;
-      /* FIXME: This function should fail if mctx.match_last exceeds
-	 the maximum possible regoff_t value.  We need a new error
-	 code REG_OVERFLOW.  */
-
-      if (!preg->no_sub && nmatch > 1)
+      /* When set_regs fails for a backref pattern, the structural
+	 match at match_last has no valid register assignment.  Try
+	 shorter match lengths, since a valid shorter match may
+	 exist (e.g., all groups matching empty).  */
+      for (;;)
 	{
+	  /* Initialize registers.  */
+	  for (reg_idx = 1; reg_idx < nmatch; ++reg_idx)
+	    pmatch[reg_idx].rm_so = pmatch[reg_idx].rm_eo = -1;
+	  pmatch[0].rm_so = 0;
+	  pmatch[0].rm_eo = mctx.match_last;
+
+	  if (preg->no_sub || nmatch <= 1)
+	    break;
+
 	  err = set_regs (preg, &mctx, nmatch, pmatch,
 			  dfa->has_plural_match && dfa->nbackref > 0);
+	  if (__glibc_likely (err == REG_NOERROR)
+	      || save_state_log == NULL
+	      || err != REG_NOMATCH)
+	    break;
+
+	  /* set_regs failed; try a shorter match_last.  */
+	  Idx ml = mctx.match_last;
+	  re_free (mctx.state_log);
+	  do
+	    {
+	      --ml;
+	      if (ml < 0)
+		break;
+	    }
+	  while (save_state_log[ml] == NULL
+		 || !save_state_log[ml]->halt
+		 || !check_halt_state_context
+		      (&mctx, save_state_log[ml], ml));
+	  if (ml < 0)
+	    {
+	      err = REG_NOMATCH;
+	      mctx.state_log = save_state_log;
+	      save_state_log = NULL;
+	      break;
+	    }
+	  mctx.state_log
+	    = re_malloc (re_dfastate_t *, ml + 1);
+	  if (__glibc_unlikely (mctx.state_log == NULL))
+	    {
+	      mctx.state_log = save_state_log;
+	      save_state_log = NULL;
+	      err = REG_ESPACE;
+	      break;
+	    }
+	  memcpy (mctx.state_log, save_state_log,
+		  sizeof (re_dfastate_t *) * (ml + 1));
+	  mctx.match_last = ml;
+	  mctx.last_node
+	    = check_halt_state_context
+		(&mctx, save_state_log[ml], ml);
+	  err = prune_impossible_nodes (&mctx);
 	  if (__glibc_unlikely (err != REG_NOERROR))
-	    goto free_return;
+	    {
+	      if (err == REG_NOMATCH)
+		{
+		  re_free (mctx.state_log);
+		  mctx.state_log = save_state_log;
+		  save_state_log = NULL;
+		}
+	      break;
+	    }
 	}
+      re_free (save_state_log);
+      save_state_log = NULL;
+      if (__glibc_unlikely (err != REG_NOERROR))
+	goto free_return;
 
       /* At last, add the offset to each register, since we slid
 	 the buffers so that we could assume that the matching starts
@@ -859,7 +928,6 @@ re_search_internal (const regex_t *preg, const char *string, Idx length,
       for (reg_idx = 0; reg_idx < nmatch; ++reg_idx)
 	if (pmatch[reg_idx].rm_so != -1)
 	  {
-#ifdef RE_ENABLE_I18N
 	    if (__glibc_unlikely (mctx.input.offsets_needed != 0))
 	      {
 		pmatch[reg_idx].rm_so =
@@ -871,9 +939,6 @@ re_search_internal (const regex_t *preg, const char *string, Idx length,
 		   ? mctx.input.valid_raw_len
 		   : mctx.input.offsets[pmatch[reg_idx].rm_eo]);
 	      }
-#else
-	    DEBUG_ASSERT (mctx.input.offsets_needed == 0);
-#endif
 	    pmatch[reg_idx].rm_so += match_first;
 	    pmatch[reg_idx].rm_eo += match_first;
 	  }
@@ -895,6 +960,7 @@ re_search_internal (const regex_t *preg, const char *string, Idx length,
     }
 
  free_return:
+  re_free (save_state_log);
   re_free (mctx.state_log);
   if (dfa->nbackref)
     match_ctx_free (&mctx);
@@ -947,7 +1013,7 @@ prune_impossible_nodes (re_match_context_t *mctx)
 	      goto free_return;
 	  if (sifted_states[0] != NULL || lim_states[0] != NULL)
 	    break;
-	  do
+	  for (;;)
 	    {
 	      --match_last;
 	      if (match_last < 0)
@@ -955,11 +1021,17 @@ prune_impossible_nodes (re_match_context_t *mctx)
 		  ret = REG_NOMATCH;
 		  goto free_return;
 		}
-	    } while (mctx->state_log[match_last] == NULL
-		     || !mctx->state_log[match_last]->halt);
-	  halt_node = check_halt_state_context (mctx,
-						mctx->state_log[match_last],
-						match_last);
+              if (mctx->state_log[match_last] != NULL
+                  && mctx->state_log[match_last]->halt)
+                {
+                  halt_node
+                    = check_halt_state_context (mctx,
+                                                mctx->state_log[match_last],
+                                                match_last);
+                  if (halt_node)
+                    break;
+                }
+	    }
 	}
       ret = merge_state_array (dfa, sifted_states, lim_states,
 			       match_last + 1);
@@ -997,8 +1069,7 @@ prune_impossible_nodes (re_match_context_t *mctx)
    We must select appropriate initial state depending on the context,
    since initial states may have constraints like "\<", "^", etc..  */
 
-static inline re_dfastate_t *
-__attribute__ ((always_inline))
+static __always_inline re_dfastate_t *
 acquire_init_state_context (reg_errcode_t *err, const re_match_context_t *mctx,
 			    Idx idx)
 {
@@ -1262,12 +1333,9 @@ proceed_next_node (const re_match_context_t *mctx, Idx nregs, regmatch_t *regs,
       Idx naccepted = 0;
       re_token_type_t type = dfa->nodes[node].type;
 
-#ifdef RE_ENABLE_I18N
       if (dfa->nodes[node].accept_mb)
 	naccepted = check_node_accept_bytes (dfa, node, &mctx->input, *pidx);
-      else
-#endif /* RE_ENABLE_I18N */
-      if (type == OP_BACK_REF)
+      else if (type == OP_BACK_REF)
 	{
 	  Idx subexp_idx = dfa->nodes[node].opr.idx + 1;
 	  if (subexp_idx < nregs)
@@ -1325,8 +1393,8 @@ push_fail_stack (struct re_fail_stack_t *fs, Idx str_idx, Idx dest_node,
 		 re_node_set *eps_via_nodes)
 {
   reg_errcode_t err;
-  Idx num = fs->num++;
-  if (fs->num == fs->alloc)
+  Idx num = fs->num;
+  if (num == fs->alloc)
     {
       struct re_fail_stack_ent_t *new_array;
       new_array = re_realloc (fs->stack, struct re_fail_stack_ent_t,
@@ -1341,6 +1409,7 @@ push_fail_stack (struct re_fail_stack_t *fs, Idx str_idx, Idx dest_node,
   fs->stack[num].regs = re_malloc (regmatch_t, 2 * nregs);
   if (fs->stack[num].regs == NULL)
     return REG_ESPACE;
+  fs->num = num + 1;
   memcpy (fs->stack[num].regs, regs, sizeof (regmatch_t) * nregs);
   memcpy (fs->stack[num].regs + nregs, prevregs, sizeof (regmatch_t) * nregs);
   err = re_node_set_init_copy (&fs->stack[num].eps_via_nodes, eps_via_nodes);
@@ -1635,12 +1704,10 @@ build_sifted_states (const re_match_context_t *mctx, re_sift_context_t *sctx,
       bool ok;
       DEBUG_ASSERT (!IS_EPSILON_NODE (dfa->nodes[prev_node].type));
 
-#ifdef RE_ENABLE_I18N
       /* If the node may accept "multi byte".  */
       if (dfa->nodes[prev_node].accept_mb)
 	naccepted = sift_states_iter_mb (mctx, sctx, prev_node,
 					 str_idx, sctx->last_str_idx);
-#endif /* RE_ENABLE_I18N */
 
       /* We don't check backreferences here.
 	 See update_cur_sifted_state().  */
@@ -1689,6 +1756,7 @@ clean_state_log_if_needed (re_match_context_t *mctx, Idx next_state_log_idx)
 
   if (top < next_state_log_idx)
     {
+      DEBUG_ASSERT (mctx->state_log != NULL);
       memset (mctx->state_log + top + 1, '\0',
 	      sizeof (re_dfastate_t *) * (next_state_log_idx - top));
       mctx->state_log_top = next_state_log_idx;
@@ -2177,7 +2245,6 @@ sift_states_bkref (const re_match_context_t *mctx, re_sift_context_t *sctx,
 }
 
 
-#ifdef RE_ENABLE_I18N
 static int
 sift_states_iter_mb (const re_match_context_t *mctx, re_sift_context_t *sctx,
 		     Idx node_idx, Idx str_idx, Idx max_str_idx)
@@ -2197,8 +2264,6 @@ sift_states_iter_mb (const re_match_context_t *mctx, re_sift_context_t *sctx,
      'naccepted' bytes input.  */
   return naccepted;
 }
-#endif /* RE_ENABLE_I18N */
-
 
 /* Functions for state transition.  */
 
@@ -2216,7 +2281,6 @@ transit_state (reg_errcode_t *err, re_match_context_t *mctx,
   re_dfastate_t **trtable;
   unsigned char ch;
 
-#ifdef RE_ENABLE_I18N
   /* If the current state can accept multibyte.  */
   if (__glibc_unlikely (state->accept_mb))
     {
@@ -2224,7 +2288,6 @@ transit_state (reg_errcode_t *err, re_match_context_t *mctx,
       if (__glibc_unlikely (*err != REG_NOERROR))
 	return NULL;
     }
-#endif /* RE_ENABLE_I18N */
 
   /* Then decide the next state with the single byte.  */
 #if 0
@@ -2278,7 +2341,7 @@ merge_state_with_log (reg_errcode_t *err, re_match_context_t *mctx,
       mctx->state_log[cur_idx] = next_state;
       mctx->state_log_top = cur_idx;
     }
-  else if (mctx->state_log[cur_idx] == 0)
+  else if (mctx->state_log[cur_idx] == NULL)
     {
       mctx->state_log[cur_idx] = next_state;
     }
@@ -2293,7 +2356,7 @@ merge_state_with_log (reg_errcode_t *err, re_match_context_t *mctx,
 	 these destinations and the results of the transition table.  */
       pstate = mctx->state_log[cur_idx];
       log_nodes = pstate->entrance_nodes;
-      if (next_state != NULL)
+      if (next_state != NULL && next_state->entrance_nodes != NULL)
 	{
 	  table_nodes = next_state->entrance_nodes;
 	  *err = re_node_set_init_union (&next_nodes, table_nodes,
@@ -2445,7 +2508,6 @@ transit_state_sb (reg_errcode_t *err, re_match_context_t *mctx,
 }
 #endif
 
-#ifdef RE_ENABLE_I18N
 static reg_errcode_t
 transit_state_mb (re_match_context_t *mctx, re_dfastate_t *pstate)
 {
@@ -2513,7 +2575,6 @@ transit_state_mb (re_match_context_t *mctx, re_dfastate_t *pstate)
     }
   return REG_NOERROR;
 }
-#endif /* RE_ENABLE_I18N */
 
 static reg_errcode_t
 transit_state_bkref (re_match_context_t *mctx, const re_node_set *nodes)
@@ -2745,8 +2806,8 @@ get_subexp (re_match_context_t *mctx, Idx bkref_node, Idx bkref_str_idx)
 	    continue; /* No.  */
 	  if (sub_top->path == NULL)
 	    {
-	      sub_top->path = calloc (sizeof (state_array_t),
-				      sl_str - sub_top->str_idx + 1);
+	      sub_top->path = calloc (sl_str - sub_top->str_idx + 1,
+                                      sizeof (state_array_t));
 	      if (sub_top->path == NULL)
 		return REG_ESPACE;
 	    }
@@ -3003,9 +3064,7 @@ check_arrival_add_next_nodes (re_match_context_t *mctx, Idx str_idx,
   const re_dfa_t *const dfa = mctx->dfa;
   bool ok;
   Idx cur_idx;
-#ifdef RE_ENABLE_I18N
   reg_errcode_t err = REG_NOERROR;
-#endif
   re_node_set union_set;
   re_node_set_init_empty (&union_set);
   for (cur_idx = 0; cur_idx < cur_nodes->nelem; ++cur_idx)
@@ -3014,7 +3073,6 @@ check_arrival_add_next_nodes (re_match_context_t *mctx, Idx str_idx,
       Idx cur_node = cur_nodes->elems[cur_idx];
       DEBUG_ASSERT (!IS_EPSILON_NODE (dfa->nodes[cur_node].type));
 
-#ifdef RE_ENABLE_I18N
       /* If the node may accept "multi byte".  */
       if (dfa->nodes[cur_node].accept_mb)
 	{
@@ -3052,7 +3110,7 @@ check_arrival_add_next_nodes (re_match_context_t *mctx, Idx str_idx,
 		}
 	    }
 	}
-#endif /* RE_ENABLE_I18N */
+
       if (naccepted
 	  || check_node_accept (mctx, dfa->nodes + cur_node, str_idx))
 	{
@@ -3293,7 +3351,7 @@ build_trtable (const re_dfa_t *dfa, re_dfastate_t *state)
       if (ndests == 0)
 	{
 	  state->trtable = (re_dfastate_t **)
-	    calloc (sizeof (re_dfastate_t *), SBC_MAX);
+	    calloc (SBC_MAX, sizeof (re_dfastate_t *));
           if (__glibc_unlikely (state->trtable == NULL))
             return false;
 	  return true;
@@ -3365,7 +3423,7 @@ build_trtable (const re_dfa_t *dfa, re_dfastate_t *state)
 	 discern by looking at the character code: allocate a
 	 256-entry transition table.  */
       trtable = state->trtable =
-	(re_dfastate_t **) calloc (sizeof (re_dfastate_t *), SBC_MAX);
+	(re_dfastate_t **) calloc (SBC_MAX, sizeof (re_dfastate_t *));
       if (__glibc_unlikely (trtable == NULL))
 	goto out_free;
 
@@ -3396,7 +3454,7 @@ build_trtable (const re_dfa_t *dfa, re_dfastate_t *state)
 	 transition tables, one starting at trtable[0] and one
 	 starting at trtable[SBC_MAX].  */
       trtable = state->word_trtable =
-	(re_dfastate_t **) calloc (sizeof (re_dfastate_t *), 2 * SBC_MAX);
+	(re_dfastate_t **) calloc (2 * SBC_MAX, sizeof (re_dfastate_t *));
       if (__glibc_unlikely (trtable == NULL))
 	goto out_free;
 
@@ -3476,18 +3534,15 @@ group_nodes_into_DFAstates (const re_dfa_t *dfa, const re_dfastate_t *state,
 	}
       else if (type == OP_PERIOD)
 	{
-#ifdef RE_ENABLE_I18N
 	  if (dfa->mb_cur_max > 1)
 	    bitset_merge (accepts, dfa->sb_char);
 	  else
-#endif
 	    bitset_set_all (accepts);
 	  if (!(dfa->syntax & RE_DOT_NEWLINE))
 	    bitset_clear (accepts, '\n');
 	  if (dfa->syntax & RE_DOT_NOT_NULL)
 	    bitset_clear (accepts, '\0');
 	}
-#ifdef RE_ENABLE_I18N
       else if (type == OP_UTF8_PERIOD)
 	{
 	  if (ASCII_CHARS % BITSET_WORD_BITS == 0)
@@ -3499,7 +3554,6 @@ group_nodes_into_DFAstates (const re_dfa_t *dfa, const re_dfastate_t *state,
 	  if (dfa->syntax & RE_DOT_NOT_NULL)
 	    bitset_clear (accepts, '\0');
 	}
-#endif
       else
 	continue;
 
@@ -3530,12 +3584,10 @@ group_nodes_into_DFAstates (const re_dfa_t *dfa, const re_dfastate_t *state,
 		  bitset_empty (accepts);
 		  continue;
 		}
-#ifdef RE_ENABLE_I18N
 	      if (dfa->mb_cur_max > 1)
 		for (j = 0; j < BITSET_WORDS; ++j)
 		  any_set |= (accepts[j] &= (dfa->word_char[j] | ~dfa->sb_char[j]));
 	      else
-#endif
 		for (j = 0; j < BITSET_WORDS; ++j)
 		  any_set |= (accepts[j] &= dfa->word_char[j]);
 	      if (!any_set)
@@ -3549,12 +3601,10 @@ group_nodes_into_DFAstates (const re_dfa_t *dfa, const re_dfastate_t *state,
 		  bitset_empty (accepts);
 		  continue;
 		}
-#ifdef RE_ENABLE_I18N
 	      if (dfa->mb_cur_max > 1)
 		for (j = 0; j < BITSET_WORDS; ++j)
 		  any_set |= (accepts[j] &= ~(dfa->word_char[j] & dfa->sb_char[j]));
 	      else
-#endif
 		for (j = 0; j < BITSET_WORDS; ++j)
 		  any_set |= (accepts[j] &= ~dfa->word_char[j]);
 	      if (!any_set)
@@ -3631,7 +3681,6 @@ group_nodes_into_DFAstates (const re_dfa_t *dfa, const re_dfastate_t *state,
   return -1;
 }
 
-#ifdef RE_ENABLE_I18N
 /* Check how many bytes the node 'dfa->nodes[node_idx]' accepts.
    Return the number of the bytes the node accepts.
    STR_IDX is the current index of the input string.
@@ -3640,9 +3689,9 @@ group_nodes_into_DFAstates (const re_dfa_t *dfa, const re_dfastate_t *state,
    one collating element like '.', '[a-z]', opposite to the other nodes
    can only accept one byte.  */
 
-# ifdef _LIBC
-#  include <locale/weight.h>
-# endif
+#ifdef _LIBC
+# include <locale/weight.h>
+#endif
 
 static int
 check_node_accept_bytes (const re_dfa_t *dfa, Idx node_idx,
@@ -3726,12 +3775,12 @@ check_node_accept_bytes (const re_dfa_t *dfa, Idx node_idx,
   if (node->type == COMPLEX_BRACKET)
     {
       const re_charset_t *cset = node->opr.mbcset;
-# ifdef _LIBC
+#ifdef _LIBC
       const unsigned char *pin
 	= ((const unsigned char *) re_string_get_buffer (input) + str_idx);
       Idx j;
       uint32_t nrules;
-# endif /* _LIBC */
+#endif
       int match_len = 0;
       wchar_t wc = ((cset->nranges || cset->nchar_classes || cset->nmbchars)
 		    ? re_string_wchar_at (input, str_idx) : 0);
@@ -3754,7 +3803,7 @@ check_node_accept_bytes (const re_dfa_t *dfa, Idx node_idx,
 	    }
 	}
 
-# ifdef _LIBC
+#ifdef _LIBC
       nrules = _NL_CURRENT_WORD (LC_COLLATE, _NL_COLLATE_NRULES);
       if (nrules != 0)
 	{
@@ -3843,7 +3892,7 @@ check_node_accept_bytes (const re_dfa_t *dfa, Idx node_idx,
 	    }
 	}
       else
-# endif /* _LIBC */
+#endif /* _LIBC */
 	{
 	  /* match with range expression?  */
 	  for (i = 0; i < cset->nranges; ++i)
@@ -3869,7 +3918,7 @@ check_node_accept_bytes (const re_dfa_t *dfa, Idx node_idx,
   return 0;
 }
 
-# ifdef _LIBC
+#ifdef _LIBC
 static unsigned int
 find_collation_sequence_value (const unsigned char *mbs, size_t mbs_len)
 {
@@ -3927,8 +3976,7 @@ find_collation_sequence_value (const unsigned char *mbs, size_t mbs_len)
       return UINT_MAX;
     }
 }
-# endif /* _LIBC */
-#endif /* RE_ENABLE_I18N */
+#endif /* _LIBC */
 
 /* Check whether the node accepts the byte which is IDX-th
    byte of the INPUT.  */
@@ -3951,12 +3999,10 @@ check_node_accept (const re_match_context_t *mctx, const re_token_t *node,
         return false;
       break;
 
-#ifdef RE_ENABLE_I18N
     case OP_UTF8_PERIOD:
       if (ch >= ASCII_CHARS)
         return false;
       FALLTHROUGH;
-#endif
     case OP_PERIOD:
       if ((ch == '\n' && !(mctx->dfa->syntax & RE_DOT_NEWLINE))
 	  || (ch == '\0' && (mctx->dfa->syntax & RE_DOT_NOT_NULL)))
@@ -4017,7 +4063,6 @@ extend_buffers (re_match_context_t *mctx, int min_len)
   /* Then reconstruct the buffers.  */
   if (pstr->icase)
     {
-#ifdef RE_ENABLE_I18N
       if (pstr->mb_cur_max > 1)
 	{
 	  ret = build_wcs_upper_buffer (pstr);
@@ -4025,16 +4070,13 @@ extend_buffers (re_match_context_t *mctx, int min_len)
 	    return ret;
 	}
       else
-#endif /* RE_ENABLE_I18N  */
 	build_upper_buffer (pstr);
     }
   else
     {
-#ifdef RE_ENABLE_I18N
       if (pstr->mb_cur_max > 1)
 	build_wcs_buffer (pstr);
       else
-#endif /* RE_ENABLE_I18N  */
 	{
 	  if (pstr->trans != NULL)
 	    re_string_translate_buffer (pstr);

@@ -1,5 +1,5 @@
 /* Determine a canonical name for the current locale's character encoding.
-   Copyright (C) 2000-2003, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2000-2003, 2009-2026 Free Software Foundation, Inc.
    This file is part of the GNU CHARSET Library.
 
    This file is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ extern "C" {
    The result must not be freed; it is statically allocated.  The result
    becomes invalid when setlocale() is used to change the global locale, or
    when the value of one of the environment variables LC_ALL, LC_CTYPE, LANG
-   is changed; threads in multithreaded programs should not do this.
+   is changed; threads in multithreaded processes should not do this.
    If the canonical name cannot be determined, the result is a non-canonical
    name.  */
 extern const char * locale_charset (void);
@@ -48,24 +48,24 @@ extern const char * locale_charset (void);
                                     (darwin = Mac OS X, windows = native Windows)
 
    ASCII, ANSI_X3.4-1968       glibc solaris freebsd netbsd darwin minix cygwin
-   ISO-8859-1              Y   glibc aix hpux irix osf solaris freebsd netbsd openbsd darwin cygwin zos
-   ISO-8859-2              Y   glibc aix hpux irix osf solaris freebsd netbsd openbsd darwin cygwin zos
+   ISO-8859-1              Y   glibc aix hpux solaris freebsd netbsd openbsd darwin cygwin zos
+   ISO-8859-2              Y   glibc aix hpux solaris freebsd netbsd openbsd darwin cygwin zos
    ISO-8859-3              Y   glibc solaris cygwin
-   ISO-8859-4              Y   hpux osf solaris freebsd netbsd openbsd darwin
-   ISO-8859-5              Y   glibc aix hpux irix osf solaris freebsd netbsd openbsd darwin cygwin zos
+   ISO-8859-4              Y   hpux solaris freebsd netbsd openbsd darwin
+   ISO-8859-5              Y   glibc aix hpux solaris freebsd netbsd openbsd darwin cygwin zos
    ISO-8859-6              Y   glibc aix hpux solaris cygwin
-   ISO-8859-7              Y   glibc aix hpux irix osf solaris freebsd netbsd openbsd darwin cygwin zos
-   ISO-8859-8              Y   glibc aix hpux osf solaris cygwin zos
-   ISO-8859-9              Y   glibc aix hpux irix osf solaris freebsd darwin cygwin zos
+   ISO-8859-7              Y   glibc aix hpux solaris freebsd netbsd openbsd darwin cygwin zos
+   ISO-8859-8              Y   glibc aix hpux solaris cygwin zos
+   ISO-8859-9              Y   glibc aix hpux solaris freebsd darwin cygwin zos
    ISO-8859-13                 glibc hpux solaris freebsd netbsd openbsd darwin cygwin
    ISO-8859-14                 glibc cygwin
-   ISO-8859-15                 glibc aix irix osf solaris freebsd netbsd openbsd darwin cygwin
+   ISO-8859-15                 glibc aix solaris freebsd netbsd openbsd darwin cygwin
    KOI8-R                  Y   glibc hpux solaris freebsd netbsd openbsd darwin
    KOI8-U                  Y   glibc freebsd netbsd openbsd darwin cygwin
    KOI8-T                      glibc
    CP437                       dos
    CP775                       dos
-   CP850                       aix osf dos
+   CP850                       aix dos
    CP852                       dos
    CP855                       dos
    CP856                       aix
@@ -80,7 +80,7 @@ extern const char * locale_charset (void);
    CP922                       aix
    CP932                       aix cygwin windows dos
    CP943                       aix zos
-   CP949                       osf darwin windows dos
+   CP949                       darwin windows dos
    CP950                       windows dos
    CP1046                      aix
    CP1124                      aix
@@ -95,19 +95,17 @@ extern const char * locale_charset (void);
    CP1255                      glibc windows
    CP1256                      windows
    CP1257                      windows
-   GB2312                  Y   glibc aix hpux irix solaris freebsd netbsd darwin cygwin zos
-   EUC-JP                  Y   glibc aix hpux irix osf solaris freebsd netbsd darwin cygwin
-   EUC-KR                  Y   glibc aix hpux irix osf solaris freebsd netbsd darwin cygwin zos
-   EUC-TW                      glibc aix hpux irix osf solaris netbsd
-   BIG5                    Y   glibc aix hpux osf solaris freebsd netbsd darwin cygwin zos
+   GB2312                  Y   glibc aix hpux solaris freebsd netbsd darwin cygwin zos
+   EUC-JP                  Y   glibc aix hpux solaris freebsd netbsd darwin cygwin
+   EUC-KR                  Y   glibc aix hpux solaris freebsd netbsd darwin cygwin zos
+   EUC-TW                      glibc aix hpux solaris netbsd
+   BIG5                    Y   glibc aix hpux solaris freebsd netbsd darwin cygwin zos
    BIG5-HKSCS                  glibc hpux solaris netbsd darwin
-   GBK                         glibc aix osf solaris freebsd darwin cygwin windows dos
+   GBK                         glibc aix solaris freebsd darwin cygwin windows dos
    GB18030                     glibc hpux solaris freebsd netbsd darwin
-   SHIFT_JIS               Y   hpux osf solaris freebsd netbsd darwin
-   JOHAB                       glibc solaris windows
-   TIS-620                     glibc aix hpux osf solaris cygwin zos
-   VISCII                  Y   glibc
-   TCVN5712-1                  glibc
+   SHIFT_JIS               Y   hpux solaris freebsd netbsd darwin
+   JOHAB                       solaris windows
+   TIS-620                     glibc aix hpux solaris cygwin zos
    ARMSCII-8                   glibc freebsd netbsd darwin
    GEORGIAN-PS                 glibc cygwin
    PT154                       glibc netbsd cygwin
@@ -117,9 +115,9 @@ extern const char * locale_charset (void);
    HP-HEBREW8                  hpux
    HP-TURKISH8                 hpux
    HP-KANA8                    hpux
-   DEC-KANJI                   osf
-   DEC-HANYU                   osf
-   UTF-8                   Y   glibc aix hpux osf solaris netbsd darwin cygwin zos
+   DEC-KANJI                   vms
+   DEC-HANYU                   vms
+   UTF-8                   Y   glibc aix hpux solaris netbsd darwin cygwin zos
 
    Note: Names which are not marked as being a MIME name should not be used in
    Internet protocols for information interchange (mail, news, etc.).

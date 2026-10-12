@@ -1,5 +1,5 @@
 /* Once-only control (native Windows implementation).
-   Copyright (C) 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -25,13 +25,14 @@
 
 typedef struct
         {
-          volatile int inited;
+          volatile LONG inited;
+          volatile LONG num_threads;
           volatile LONG started;
           CRITICAL_SECTION lock;
         }
         glwthread_once_t;
 
-#define GLWTHREAD_ONCE_INIT { -1, -1 }
+#define GLWTHREAD_ONCE_INIT { -1, 0, -1 }
 
 #ifdef __cplusplus
 extern "C" {

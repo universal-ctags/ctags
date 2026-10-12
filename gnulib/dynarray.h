@@ -1,5 +1,5 @@
 /* Type-safe arrays which grow dynamically.
-   Copyright 2021 Free Software Foundation, Inc.
+   Copyright 2021-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -249,11 +249,11 @@ static DYNARRAY_ELEMENT *
 /* The implementation is imported from glibc.  */
 
 /* Avoid possible conflicts with symbols exported by the GNU libc.  */
-#define __libc_dynarray_at_failure gl_dynarray_at_failure
-#define __libc_dynarray_emplace_enlarge gl_dynarray_emplace_enlarge
-#define __libc_dynarray_finalize gl_dynarray_finalize
-#define __libc_dynarray_resize_clear gl_dynarray_resize_clear
-#define __libc_dynarray_resize gl_dynarray_resize
+#define __libc_dynarray_at_failure _gl_dynarray_at_failure
+#define __libc_dynarray_emplace_enlarge _gl_dynarray_emplace_enlarge
+#define __libc_dynarray_finalize _gl_dynarray_finalize
+#define __libc_dynarray_resize_clear _gl_dynarray_resize_clear
+#define __libc_dynarray_resize _gl_dynarray_resize
 
 #if defined DYNARRAY_STRUCT || defined DYNARRAY_ELEMENT || defined DYNARRAY_PREFIX
 

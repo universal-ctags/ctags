@@ -1,6 +1,6 @@
 /* Sizes of structs with flexible array members.
 
-   Copyright 2016-2021 Free Software Foundation, Inc.
+   Copyright 2016-2026 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -20,14 +20,20 @@
 
    Written by Paul Eggert.  */
 
+/* This file uses _Alignof.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
+
 #include <stddef.h>
 
 /* Nonzero multiple of alignment of TYPE, suitable for FLEXSIZEOF below.
-   On older platforms without _Alignof, use a pessimistic bound that is
+   If _Alignof might not exist or might not work correctly on
+   structs with flexible array members, use a pessimistic bound that is
    safe in practice even if FLEXIBLE_ARRAY_MEMBER is 1.
-   On newer platforms, use _Alignof to get a tighter bound.  */
+   Otherwise, use _Alignof to get a tighter bound.  */
 
-#if !defined __STDC_VERSION__ || __STDC_VERSION__ < 201112
+#if !defined __STDC_VERSION__ || __STDC_VERSION__ < 201112 || defined _Alignof
 # define FLEXALIGNOF(type) (sizeof (type) & ~ (sizeof (type) - 1))
 #else
 # define FLEXALIGNOF(type) _Alignof (type)
@@ -38,7 +44,7 @@
    followed by N bytes of other data.  The result is suitable as an
    argument to malloc.  For example:
 
-     struct s { int n; char d[FLEXIBLE_ARRAY_MEMBER]; };
+     struct s { int a; char d[FLEXIBLE_ARRAY_MEMBER]; };
      struct s *p = malloc (FLEXSIZEOF (struct s, d, n * sizeof (char)));
 
    FLEXSIZEOF (TYPE, MEMBER, N) is not simply (sizeof (TYPE) + N),
@@ -58,3 +64,14 @@
 #define FLEXSIZEOF(type, member, n) \
    ((offsetof (type, member) + FLEXALIGNOF (type) - 1 + (n)) \
     & ~ (FLEXALIGNOF (type) - 1))
+
+/* Yield a properly aligned upper bound on the size of a struct of
+   type TYPE with a flexible array member named MEMBER that has N
+   elements.  The result is suitable as an argument to malloc.
+   For example:
+
+     struct s { int a; double d[FLEXIBLE_ARRAY_MEMBER]; };
+     struct s *p = malloc (FLEXNSIZEOF (struct s, d, n));
+ */
+#define FLEXNSIZEOF(type, member, n) \
+  FLEXSIZEOF (type, member, (n) * sizeof (((type *) 0)->member[0]))

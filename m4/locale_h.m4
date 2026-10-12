@@ -1,8 +1,10 @@
-# locale_h.m4 serial 28
-dnl Copyright (C) 2007, 2009-2021 Free Software Foundation, Inc.
+# locale_h.m4
+# serial 39
+dnl Copyright (C) 2007, 2009-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN_ONCE([gl_LOCALE_H],
 [
@@ -18,6 +20,26 @@ AC_DEFUN_ONCE([gl_LOCALE_H],
   AC_REQUIRE([gl_STDDEF_H])
 
   AC_REQUIRE([gl_LOCALE_T])
+  dnl On native Windows, there is a type '_locale_t' that can be used to
+  dnl define locale_t.
+  AC_CACHE_CHECK([whether locale.h defines _locale_t],
+    [gl_cv_header_locale_has_windows_locale_t],
+    [AC_COMPILE_IFELSE(
+       [AC_LANG_PROGRAM(
+          [[#include <locale.h>
+            _locale_t x;]],
+          [[]])],
+       [gl_cv_header_locale_has_windows_locale_t=yes],
+       [gl_cv_header_locale_has_windows_locale_t=no])
+    ])
+  if test $gl_cv_header_locale_has_windows_locale_t = yes; then
+    HAVE_WINDOWS_LOCALE_T=1
+    AC_DEFINE([HAVE_WINDOWS_LOCALE_T], [1],
+      [Define to 1 if <locale.h> defines the _locale_t type.])
+  else
+    HAVE_WINDOWS_LOCALE_T=0
+  fi
+  AC_SUBST([HAVE_WINDOWS_LOCALE_T])
 
   dnl Solaris 11.0 defines the int_p_*, int_n_* members of 'struct lconv'
   dnl only if _LCONV_C99 is defined.
@@ -41,8 +63,8 @@ AC_DEFUN_ONCE([gl_LOCALE_H],
 
   dnl Check whether 'struct lconv' is complete.
   dnl Bionic libc's 'struct lconv' is just a dummy.
-  dnl On OpenBSD 4.9, HP-UX 11, IRIX 6.5, OSF/1 5.1, Solaris 9, Cygwin 1.5.x,
-  dnl mingw, MSVC 9, it lacks the int_p_* and int_n_* members.
+  dnl On OpenBSD 4.9, HP-UX 11, Solaris 9, Cygwin 1.5.x, mingw, MSVC 9,
+  dnl it lacks the int_p_* and int_n_* members.
   AC_CACHE_CHECK([whether struct lconv is properly defined],
     [gl_cv_sys_struct_lconv_ok],
     [AC_COMPILE_IFELSE(
@@ -59,7 +81,9 @@ AC_DEFUN_ONCE([gl_LOCALE_H],
     dnl On native Windows with MSVC, merely define these member names as macros.
     dnl This avoids trouble in C++ mode.
     case "$host_os" in
-      mingw*)
+      windows*-msvc*)
+        ;;
+      mingw* | windows*)
         AC_EGREP_CPP([Special], [
 #ifdef _MSC_VER
  Special
@@ -83,7 +107,7 @@ AC_DEFUN_ONCE([gl_LOCALE_H],
 # include <xlocale.h>
 #endif
     ]],
-    [setlocale newlocale duplocale freelocale])
+    [setlocale newlocale duplocale freelocale getlocalename_l])
 ])
 
 dnl Checks to determine whether the system has the locale_t type,
@@ -127,6 +151,7 @@ AC_DEFUN([gl_LOCALE_T],
     fi
   fi
   AC_SUBST([HAVE_XLOCALE_H])
+  AC_SUBST([HAVE_LOCALE_T])
 ])
 
 # gl_LOCALE_MODULE_INDICATOR([modulename])
@@ -151,8 +176,12 @@ AC_DEFUN([gl_LOCALE_H_REQUIRE_DEFAULTS],
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_LOCALECONV])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_SETLOCALE])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_SETLOCALE_NULL])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_NEWLOCALE])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_DUPLOCALE])
-    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_LOCALENAME])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FREELOCALE])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETLOCALENAME_L])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETLOCALENAME_L_UNSAFE])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_LOCALENAME_UNSAFE])
   ])
   m4_require(GL_MODULE_INDICATOR_PREFIX[_LOCALE_H_MODULE_INDICATOR_DEFAULTS])
   AC_REQUIRE([gl_LOCALE_H_DEFAULTS])
@@ -161,14 +190,16 @@ AC_DEFUN([gl_LOCALE_H_REQUIRE_DEFAULTS],
 AC_DEFUN([gl_LOCALE_H_DEFAULTS],
 [
   dnl Assume proper GNU behavior unless another module says otherwise.
-  HAVE_NEWLOCALE=1;       AC_SUBST([HAVE_NEWLOCALE])
-  HAVE_DUPLOCALE=1;       AC_SUBST([HAVE_DUPLOCALE])
-  HAVE_FREELOCALE=1;      AC_SUBST([HAVE_FREELOCALE])
-  REPLACE_LOCALECONV=0;   AC_SUBST([REPLACE_LOCALECONV])
-  REPLACE_SETLOCALE=0;    AC_SUBST([REPLACE_SETLOCALE])
-  REPLACE_NEWLOCALE=0;    AC_SUBST([REPLACE_NEWLOCALE])
-  REPLACE_DUPLOCALE=0;    AC_SUBST([REPLACE_DUPLOCALE])
-  REPLACE_FREELOCALE=0;   AC_SUBST([REPLACE_FREELOCALE])
-  REPLACE_STRUCT_LCONV=0; AC_SUBST([REPLACE_STRUCT_LCONV])
+  HAVE_NEWLOCALE=1;          AC_SUBST([HAVE_NEWLOCALE])
+  HAVE_DUPLOCALE=1;          AC_SUBST([HAVE_DUPLOCALE])
+  HAVE_FREELOCALE=1;         AC_SUBST([HAVE_FREELOCALE])
+  HAVE_GETLOCALENAME_L=1;    AC_SUBST([HAVE_GETLOCALENAME_L])
+  REPLACE_LOCALECONV=0;      AC_SUBST([REPLACE_LOCALECONV])
+  REPLACE_SETLOCALE=0;       AC_SUBST([REPLACE_SETLOCALE])
+  REPLACE_NEWLOCALE=0;       AC_SUBST([REPLACE_NEWLOCALE])
+  REPLACE_DUPLOCALE=0;       AC_SUBST([REPLACE_DUPLOCALE])
+  REPLACE_FREELOCALE=0;      AC_SUBST([REPLACE_FREELOCALE])
+  REPLACE_GETLOCALENAME_L=0; AC_SUBST([REPLACE_GETLOCALENAME_L])
+  REPLACE_STRUCT_LCONV=0;    AC_SUBST([REPLACE_STRUCT_LCONV])
   LOCALENAME_ENHANCE_LOCALE_FUNCS=0; AC_SUBST([LOCALENAME_ENHANCE_LOCALE_FUNCS])
 ])

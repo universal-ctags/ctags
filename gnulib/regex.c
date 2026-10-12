@@ -1,5 +1,5 @@
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002-2021 Free Software Foundation, Inc.
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -20,14 +20,13 @@
 #define __STDC_WANT_IEC_60559_BFP_EXT__
 
 #ifndef _LIBC
+# define _GL_USE_STDLIB_ALLOC 1
 # include <libc-config.h>
 
 # if __GNUC_PREREQ (4, 6)
 #  pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
-# endif
-# if __GNUC_PREREQ (4, 3)
-#  pragma GCC diagnostic ignored "-Wold-style-definition"
-#  pragma GCC diagnostic ignored "-Wtype-limits"
+#  pragma GCC diagnostic ignored "-Wswitch-enum"
+#  pragma GCC diagnostic ignored "-Wvla"
 # endif
 #endif
 

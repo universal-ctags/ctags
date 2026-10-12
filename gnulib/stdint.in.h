@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2002, 2004-2021 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2002, 2004-2026 Free Software Foundation, Inc.
    Written by Paul Eggert, Bruno Haible, Sam Steingold, Peter Burwood.
    This file is part of gnulib.
 
@@ -51,13 +51,6 @@
    in public interfaces due to compiler differences.  */
 
 #if @HAVE_STDINT_H@
-# if defined __sgi && ! defined __c99
-   /* Bypass IRIX's <stdint.h> if in C89 mode, since it merely annoys users
-      with "This header file is to be used only for c99 mode compilations"
-      diagnostics.  */
-#  define __STDINT_H__
-# endif
-
   /* Some pre-C++11 <stdint.h> implementations need this.  */
 # ifdef __cplusplus
 #  ifndef __STDC_CONSTANT_MACROS
@@ -80,7 +73,7 @@
 #define _@GUARD_PREFIX@_STDINT_H
 
 /* Get SCHAR_MIN, SCHAR_MAX, UCHAR_MAX, INT_MIN, INT_MAX,
-   LONG_MIN, LONG_MAX, ULONG_MAX, _GL_INTEGER_WIDTH.  */
+   LONG_MIN, LONG_MAX, ULONG_MAX, CHAR_BIT, _GL_INTEGER_WIDTH.  */
 #include <limits.h>
 
 /* Override WINT_MIN and WINT_MAX if gnulib's <wchar.h> or <wctype.h> overrides
@@ -94,8 +87,8 @@
 
 #if ! @HAVE_C99_STDINT_H@
 
-/* <sys/types.h> defines some of the stdint.h types as well, on glibc,
-   IRIX 6.5, and OpenBSD 3.8 (via <machine/types.h>).
+/* <sys/types.h> defines some of the stdint.h types as well, on glibc and
+   OpenBSD 3.8 (via <machine/types.h>).
    AIX 5.2 <sys/types.h> isn't needed and causes troubles.
    Mac OS X 10.4.6 <sys/types.h> includes <stdint.h> (which is us), but
    relies on the system <stdint.h> definitions, so include
@@ -189,6 +182,10 @@ typedef __int64 gl_int64_t;
 #   define int64_t gl_int64_t
 #   define GL_INT64_T
 #  else
+/* Verify that 'long long' has exactly 64 bits.  */
+typedef _gl_verify_int64_bits[
+        _STDINT_MAX (1, sizeof (long long) * CHAR_BIT, 0ll) >> 31 >> 31 == 1
+        ? 1 : -1];
 #   undef int64_t
 typedef long long int gl_int64_t;
 #   define int64_t gl_int64_t
@@ -210,6 +207,11 @@ typedef unsigned __int64 gl_uint64_t;
 #   define uint64_t gl_uint64_t
 #   define GL_UINT64_T
 #  else
+/* Verify that 'unsigned long long' has exactly 64 bits.  */
+typedef _gl_verify_uint64_bits[
+        _STDINT_MAX (0, sizeof (unsigned long long) * CHAR_BIT, 0ull)
+        >> 31 >> 31 >> 1 == 1
+        ? 1 : -1];
 #   undef uint64_t
 typedef unsigned long long int gl_uint64_t;
 #   define uint64_t gl_uint64_t
@@ -306,6 +308,8 @@ typedef gl_uint_fast32_t gl_uint_fast16_t;
    uintptr_t to avoid conflicting declarations of system functions like
    _findclose in <io.h>.  */
 # if !((defined __KLIBC__ && defined _INTPTR_T_DECLARED) \
+       || (defined __INTPTR_WIDTH__ \
+           && __INTPTR_WIDTH__ != (defined _WIN64 ? LLONG_WIDTH : LONG_WIDTH)) \
        || defined __MINGW32__)
 #  undef intptr_t
 #  undef uintptr_t
@@ -573,11 +577,7 @@ typedef int _verify_intmax_size[sizeof (intmax_t) == sizeof (uintmax_t)
 # endif
 
 /* wchar_t limits */
-/* Get WCHAR_MIN, WCHAR_MAX.
-   This include is not on the top, above, because on OSF/1 4.0 we have a
-   sequence of nested includes
-   <wchar.h> -> <stdio.h> -> <getopt.h> -> <stdlib.h>, and the latter includes
-   <stdint.h> and assumes its types are already defined.  */
+/* Get WCHAR_MIN, WCHAR_MAX.  */
 # if @HAVE_WCHAR_H@ && ! (defined WCHAR_MIN && defined WCHAR_MAX)
 #  define _GL_JUST_INCLUDE_SYSTEM_WCHAR_H
 #  include <wchar.h>

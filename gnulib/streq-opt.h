@@ -1,5 +1,5 @@
 /* Optimized string comparison.
-   Copyright (C) 2001-2002, 2007, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2007, 2009-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -16,12 +16,17 @@
 
 /* Written by Bruno Haible <bruno@clisp.org>.  */
 
-#ifndef _GL_STREQ_H
-#define _GL_STREQ_H
+#ifndef _GL_STREQ_OPT_H
+#define _GL_STREQ_OPT_H
 
 #include <string.h>
 
-/* STREQ_OPT allows to optimize string comparison with a small literal string.
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/* STREQ_OPT optimizes string comparison with a small literal string.
      STREQ_OPT (s, "EUC-KR", 'E', 'U', 'C', '-', 'K', 'R', 0, 0, 0)
    is semantically equivalent to
      strcmp (s, "EUC-KR") == 0
@@ -34,7 +39,7 @@
 static inline int
 streq9 (const char *s1, const char *s2)
 {
-  return strcmp (s1 + 9, s2 + 9) == 0;
+  return streq (s1 + 9, s2 + 9);
 }
 
 static inline int
@@ -173,4 +178,9 @@ streq0 (const char *s1, const char *s2, char s20, char s21, char s22, char s23, 
 
 #endif
 
-#endif /* _GL_STREQ_H */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _GL_STREQ_OPT_H */
