@@ -358,6 +358,11 @@ static bool doesStringLiteralStart (m4Subparser *m4, int c)
 
 static int notifyNewMacro (m4Subparser *m4, const char *token)
 {
+	/* A subparser defined with the optlib {base=M4} syntax has no
+	 * newMacroNotify; only crafted ones install a callback here. */
+	if (!m4->newMacroNotify)
+		return CORK_NIL;
+
 	int index;
 
 	enterSubparser ((subparser *)m4);
@@ -565,6 +570,7 @@ extern parserDefinition* M4Parser (void)
 	def->useCork = CORK_QUEUE;
 	def->keywordTable = m4KeywordTable;
 	def->keywordCount = ARRAY_SIZE (m4KeywordTable);
+	def->subparserSize = sizeof (m4Subparser);
 
 	return def;
 }

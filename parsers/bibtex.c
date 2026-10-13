@@ -456,5 +456,6 @@ extern parserDefinition* BibtexParser (void)
 	def->initialize		= initialize;
 	def->keywordTable	= BibKeywordTable;
 	def->keywordCount	= ARRAY_SIZE (BibKeywordTable);
+	def->subparserSize = sizeof (bibTexSubparser);
 	return def;
 }
