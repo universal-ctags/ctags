@@ -249,6 +249,7 @@ OPTLIB2C_INPUT = \
 	optlib/pod.ctags			\
 	optlib/puppetManifest.ctags		\
 	optlib/qemuhx.ctags			\
+	optlib/rgc.ctags			\
 	optlib/rpmMacros.ctags			\
 	optlib/selinux-type-enforcement.ctags	\
 	optlib/scdoc.ctags			\

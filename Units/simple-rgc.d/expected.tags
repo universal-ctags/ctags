@@ -1,0 +1,9 @@
+fib	input.rg	/^def fib(n: int) -> int:$/;"	f
+Counter	input.rg	/^class Counter:$/;"	c
+value	input.rg	/^    value: int = 0$/;"	m
+increment	input.rg	/^    def increment(self) -> None:$/;"	f
+Color	input.rg	/^enum Color:$/;"	e
+Shape	input.rg	/^interface Shape:$/;"	i
+area	input.rg	/^    def area(self) -> float$/;"	f
+main	input.rg	/^def main() -> None:$/;"	f
+counter	input.rg	/^    counter: Counter = @var Counter()$/;"	m

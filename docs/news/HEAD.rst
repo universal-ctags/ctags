@@ -129,6 +129,7 @@ The following parsers have been added:
 * DBusService
 * GoMod
 * Odin
+* RGC
 
 Changes about parser specific kinds, roles, fields, and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

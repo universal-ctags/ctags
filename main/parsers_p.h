@@ -168,6 +168,7 @@
 	R6ClassParser, \
 	RSpecParser, \
 	RexxParser, \
+	RGCParser, \
 	RobotParser, \
 	RpmMacrosParser, \
 	RpmSpecParser, \
