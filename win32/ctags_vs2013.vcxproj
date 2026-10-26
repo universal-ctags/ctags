@@ -257,6 +257,7 @@
     <ClCompile Include="..\optlib\pod.c" />
     <ClCompile Include="..\optlib\puppetManifest.c" />
     <ClCompile Include="..\optlib\qemuhx.c" />
+    <ClCompile Include="..\optlib\rgc.c" />
     <ClCompile Include="..\optlib\rpmMacros.c" />
     <ClCompile Include="..\optlib\scdoc.c" />
     <ClCompile Include="..\optlib\scss.c" />
