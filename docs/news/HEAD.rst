@@ -15,6 +15,10 @@ Critical bug fixes
 Common enhancement
 ---------------------------------------------------------------------
 * Makes ``--_interactive=sandbox`` option work with musl libc.
+* Removes the temporary file used for writing tags to stdout (``-o -``
+  and ``--_interactive``) right after creating it, so the file no
+  longer stays behind when ctags is killed. This doesn't apply to
+  Windows.
 
 New and extended options and their flags
 ---------------------------------------------------------------------
