@@ -415,7 +415,19 @@ extern void openTagFile (void)
 			TagFile.name = NULL;
 		}
 		else
+		{
 			TagFile.mio = tempFile ("w+", &TagFile.name);
+			/* Remove the temporary file right away so that the system
+			 * reclaims it even if ctags is killed before closeTagFile ().
+			 * From here on the file is used only through TagFile.mio.
+			 * If removing an open file is not allowed (Windows), keep
+			 * the name and remove the file in closeTagFile () as before. */
+			if (remove (TagFile.name) == 0)
+			{
+				eFree (TagFile.name);
+				TagFile.name = NULL;
+			}
+		}
 		if (isXtagEnabled (XTAG_PSEUDO_TAGS))
 			addCommonPseudoTags ();
 	}

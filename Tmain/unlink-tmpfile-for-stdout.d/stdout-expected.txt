@@ -1,0 +1,3 @@
+x	input.c	/^int x;$/;"	v	typeref:typename:int
+# files in TMPDIR while ctags is running
+# files in TMPDIR after ctags exits
