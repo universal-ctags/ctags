@@ -278,6 +278,11 @@ typedef struct sBlockState {
 	int parsed;
 	int nestLevel;
 	int curlyLevel;
+	/* The last character outside spaces, comments, and literals, and the
+	 * identifier ending at it, for telling regex literals from divisions. */
+	int lastChar;
+	char word[sizeof ("instanceof")];
+	size_t wordLen;
 } blockState;
 
 static fieldDefinition TsFields[] = {
@@ -771,6 +776,41 @@ CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char qu
 }
 
 
+/* A '/' right after an operand is a division operator, not the start of
+ * a regex literal. Parsing "h / 2 }, // x" as a regex literal swallows
+ * the closing bracket and everything after it. regexAllowed tracks this
+ * for tokens read by tryInSequence(); blockState tracks it inside
+ * blocks. */
+static bool regexAllowed;
+
+static bool isKeywordBeforeRegex (const char *word, size_t len)
+{
+	static const char *const keywords[] = {
+		"await", "case", "delete", "do", "else", "in", "instanceof",
+		"new", "of", "return", "throw", "typeof", "void", "yield",
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE (keywords); i++)
+	{
+		if (strlen (keywords[i]) == len && strncmp (keywords[i], word, len) == 0)
+			return true;
+	}
+	return false;
+}
+
+static bool isRegexAllowedInBlock (const blockState *state)
+{
+	switch (state->lastChar)
+	{
+		case ')': case ']': case '"':
+			return false;
+	}
+
+	if (isIdentChar (state->lastChar))
+		return isKeywordBeforeRegex (state->word, state->wordLen);
+	return true;
+}
+
 CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType const ttype,
 							 const char start, const char end, blockState *state,
 							 parserResult *const result)
@@ -809,13 +849,29 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 		return;
 	}
 
+	if (isIdentChar (c))
+	{
+		if (! isIdentChar (state->lastChar))
+			state->wordLen = 0;
+		if (state->wordLen < sizeof (state->word))
+			state->word[state->wordLen] = c;
+		state->wordLen++;
+	}
+	if (! whiteChar (c) && c != '\n')
+		state->lastChar = c;
+
 	//skip comments:
 	tryParser ((Parser) parseComment, token, false);
-	//skip strings:
-	tryParser ((Parser) parseStringRegex, token, false);
-	tryParser ((Parser) parseStringSQuote, token, false);
-	tryParser ((Parser) parseStringDQuote, token, false);
-	tryParser ((Parser) parseStringTemplate, token, false);
+	//skip strings, remembering each as an operand:
+	if (isRegexAllowedInBlock (state)
+		&& tryParser ((Parser) parseStringRegex, token, false))
+		state->lastChar = '"';
+	if (tryParser ((Parser) parseStringSQuote, token, false))
+		state->lastChar = '"';
+	if (tryParser ((Parser) parseStringDQuote, token, false))
+		state->lastChar = '"';
+	if (tryParser ((Parser) parseStringTemplate, token, false))
+		state->lastChar = '"';
 
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
@@ -894,6 +950,7 @@ SINGLE_CHAR_PARSER_DEF (OpenCurly, '{', TOKEN_OPEN_CURLY)
 SINGLE_CHAR_PARSER_DEF (Star, '*', TOKEN_STAR)
 SINGLE_CHAR_PARSER_DEF (At, '@', TOKEN_AT)
 SINGLE_CHAR_PARSER_DEF (NewLine, '\n', TOKEN_NL)
+SINGLE_CHAR_PARSER_DEF (Div, '/', TOKEN_DIV)
 
 WORD_TOKEN_PARSER_DEF (Arrow, "=>", TOKEN_ARROW)
 
@@ -947,6 +1004,27 @@ CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhit
 	return result.status == PARSER_FINISHED;
 }
 
+static bool isOperand (const tokenInfo *const token)
+{
+	switch (token->type)
+	{
+		case TOKEN_IDENTIFIER:
+			return ! isKeywordBeforeRegex (vStringValue (token->string),
+										   vStringLength (token->string));
+		case TOKEN_KEYWORD:
+			return token->keyword == KEYWORD_this;
+		case TOKEN_STRING:
+		case TOKEN_NUMBER:
+		case TOKEN_CLOSE_PAREN:
+		case TOKEN_CLOSE_SQUARE:
+		case TOKEN_PARENS:
+		case TOKEN_SQUARES:
+			return true;
+		default:
+			return false;
+	}
+}
+
 static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, Parser parser, ...)
 {
 	TRACE_ENTER();
@@ -962,22 +1040,37 @@ static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, Parser pars
 	currentParser = parser;
 	while (! result && currentParser)
 	{
+		if (currentParser == parseStringRegex && ! regexAllowed)
+			currentParser = parseDiv;
 		result = tryParser (currentParser, token, false);
 		currentParser = va_arg (args, Parser);
 	}
 
 	va_end (args);
 
+	if (result && ! isType (token, TOKEN_COMMENT_BLOCK) && ! isType (token, TOKEN_NL))
+		regexAllowed = ! isOperand (token);
+
 	if (skipUnparsed && ! result)
 	{
 		bool skippedNextWord = false;
+		char word[sizeof ("instanceof")];
+		size_t wordLen = 0;
 		int c = uwiGetC ();
 
 		while (c != EOF && isIdentChar(c))
 		{
+			if (wordLen < sizeof (word))
+				word[wordLen] = c;
+			wordLen++;
 			c = uwiGetC ();
 			skippedNextWord = true;
 		}
+
+		if (skippedNextWord)
+			regexAllowed = isKeywordBeforeRegex (word, wordLen);
+		else if (! whiteChar (c) && c != '\n')
+			regexAllowed = (c != ')' && c != ']');
 
 		if (c != EOF && skippedNextWord)
 			uwiUngetC (c);
@@ -2485,6 +2578,7 @@ static void findTsTags (void)
 
 	tokenInfo *const token = newToken ();
 
+	regexAllowed = true;
 	parseTsFile (token);
 
 	deleteToken (token);
