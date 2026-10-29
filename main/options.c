@@ -40,6 +40,7 @@
 #include "writer_p.h"
 #include "trace.h"
 #include "flags_p.h"
+#include "stackguard_p.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>
@@ -86,6 +87,11 @@
 	} while (0)
 
 /*
+*   Function declarations
+*/
+static char *makePatternLengthLimitHelpDescription (const char *template);
+
+/*
 *   Data declarations
 */
 
@@ -98,6 +104,7 @@ typedef struct sOptionDescription {
 	int usedByEtags;
 	int experimentalOption;
 	const char *description;
+	char *(*descriptionNew) (const char *template);
 } optionDescription;
 
 typedef void (*parametricOptionHandler) (const char *const option, const char *const parameter);
@@ -334,7 +341,8 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"  --kinds-(<LANG>|all)=[+|-](<kinds>|*)"},
  {1,0,"       Enable/disable tag <kinds> for language <LANG>."},
  {0,0,"  --pattern-length-limit=<N>"},
- {0,0,"      Cutoff patterns of tag entries after <N> characters. Disable by setting to 0. [96]"},
+ {0,0,"      Cutoff patterns of tag entries after <N> characters. Disable by setting to 0. [%u]",
+  makePatternLengthLimitHelpDescription },
  {0,0,"  --pseudo-tags=[+|-](<pseudo-tag>|*)"},
  {0,0,"       Enable/disable emitting pseudo tag named <pseudo-tag>."},
  {0,0,"       if '*' is given, enable emitting all pseudo tags."},
@@ -498,7 +506,10 @@ static optionDescription LongOptionDescription [] = {
  {0,0,"       Don't make tags file but just print the guessed language name for"},
  {0,0,"       input file."},
  {1,0,"  --quiet[=(yes|no)]"},
- {0,0,"       Don't print NOTICE class messages [no]."},
+ {1,0,"       Don't print NOTICE class messages [no]."},
+ {1,0,"  --stack-limit=<bytes>"},
+ {1,0,"       Limit the stack usage while parsing, in bytes ",
+  makeStackGuardHelpDescription },
  {1,0,"  --totals[=(yes|no|extra)]"},
  {1,0,"       Print statistics about input and tag files [no]."},
  {1,0,"  --verbose[=(yes|no)]"},
@@ -627,6 +638,14 @@ static struct Feature {
 	{"optscript", "can use the interpreter"},
 #ifdef HAVE_PCRE2
 	{"pcre2", "has pcre2 regex engine"},
+#endif
+#if HAVE_SYS_RESOURCE_H
+	{"rlimit-based-stack-guard", "uses getrlimit to determine the default stack limit" },
+#elif (HAVE_GETCURRENTTHREADSTACKLIMITS \
+	   && !NEED_PROTO_GETCURRENTTHREADSTACKLIMITS)
+	{"thread-stack-limit-based-stack-guard", "uses GetCurrentThreadStackLimits to determine the default stack limit" },
+#else
+	{"static-stack-guard", "sets the default stack limit statically" },
 #endif
 	{NULL,}
 };
@@ -1568,7 +1587,6 @@ static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED
 			colprintLineAppendColumnCString (line, Features [i].name);
 			colprintLineAppendColumnCString (line, Features [i].description);
 		}
-
 	}
 
 	colprintTableSort (table, featureCompare);
@@ -1651,9 +1669,19 @@ static void processHelpOptionCommon (
 	int i;
 	for (i = 0 ; LongOptionDescription [i].description != NULL ; ++i)
 	{
-		if ((! Option.etags || LongOptionDescription [i].usedByEtags)
-			&& (! LongOptionDescription [i].experimentalOption || includingExperimentalOptions))
-			puts (LongOptionDescription [i].description);
+		optionDescription *longopt = LongOptionDescription + i;
+		if ((! Option.etags || longopt->usedByEtags)
+			&& (! longopt->experimentalOption || includingExperimentalOptions))
+		{
+			if (longopt->descriptionNew)
+			{
+				char *desc = longopt->descriptionNew (longopt->description);
+				puts (desc);
+				eFree (desc);
+			}
+			else
+				puts (longopt->description);
+		}
 	}
 }
 
@@ -2470,6 +2498,7 @@ static void processDescribeLanguage(const char *const option,
 	puts("Implementation specific status");
 	puts("-------------------------------------------------------");
 	printf("allow null tags: %s\n", doesLanguageAllowNullTag(language)? "yes": "no");
+	printf("stack guard: %s\n", doesParserSupportStackGuard (language)? "supported": "unsupported");
 
 	exit (0);
 
@@ -2681,6 +2710,22 @@ static void processPseudoTags (const char *const option CTAGS_ATTR_UNUSED,
 		vStringClear (str);
 	}
 	vStringDelete (str);
+}
+
+static void processStackLimit (
+		const char *const option, const char *const parameter)
+{
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A positive number or 0 is needed after --%s option", option);
+
+	unsigned long limit = 0;
+	if (!strToULong(parameter, 0, &limit))
+		error (FATAL, "Invalid stack limit: %s", parameter);
+	if (limit > SIZE_MAX)
+		error (FATAL, "Too large limit: %s (> %lu)",
+			   parameter, SIZE_MAX);
+
+	stackGuardSetLimit ((size_t)limit);
 }
 
 static void processSortOption (
@@ -2986,13 +3031,22 @@ static void processMaxRecursionDepthOption (const char *const option, const char
 	Option.maxRecursionDepth = atol(parameter);
 }
 
+static char *makePatternLengthLimitHelpDescription (const char *template)
+{
+	char *str = NULL;
+	asprintf (&str, template, Option.patternLengthLimit);
+	if (str == NULL)
+		error (FATAL, "out of memory");
+	return str;
+}
+
 static void processPatternLengthLimit(const char *const option, const char *const parameter)
 {
 	if (parameter == NULL || parameter[0] == '\0')
-		error (FATAL, "A parameter is needed after \"%s\" option", option);
+		error (FATAL, "A positive integer is needed after --%s option", option);
 
 	if (!strToUInt(parameter, 0, &Option.patternLengthLimit))
-		error (FATAL, "-%s: Invalid pattern length limit", option);
+		error (FATAL, "Invalid pattern length limit: %s", parameter);
 }
 
 extern bool ptagMakePatternLengthLimit (ptagDesc *pdesc, langType language CTAGS_ATTR_UNUSED,
@@ -3083,6 +3137,7 @@ static parametricOption ParametricOptions [] = {
 	{ "output-format",          processOutputFormat,            true,   STAGE_ANY },
 	{ "pattern-length-limit",   processPatternLengthLimit,      true,   STAGE_ANY },
 	{ "pseudo-tags",            processPseudoTags,              false,  STAGE_ANY },
+	{ "stack-limit",            processStackLimit,              true,   STAGE_ANY },
 	{ "sort",                   processSortOption,              true,   STAGE_ANY },
 	{ "tag-relative",           processTagRelative,             true,   STAGE_ANY },
 	{ "totals",                 processTotals,                  true,   STAGE_ANY },

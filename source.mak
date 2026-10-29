@@ -129,6 +129,7 @@ LIB_PRIVATE_HEADS =		\
 	main/rexprcode_p.h	\
 	main/script_p.h		\
 	main/sort_p.h		\
+	main/stackguard_p.h	\
 	main/stats_p.h		\
 	main/subparser_p.h	\
 	main/trashbox_p.h	\
@@ -180,6 +181,7 @@ LIB_SRCS =			\
 	main/seccomp.c			\
 	main/selectors.c		\
 	main/sort.c			\
+	main/stackguard.c		\
 	main/stats.c			\
 	main/strlist.c			\
 	main/trace.c			\

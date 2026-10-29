@@ -75,6 +75,13 @@ skip_if_running_on_msys()
 	fi
 }
 
+skip_if_runnint_on_qemu_user_mode()
+{
+	if [ "$QEMU_USER" = 1 ]; then
+		skip "this test case doesn't work well on Qemu user mode"
+	fi
+}
+
 exit_if_win32()
 {
 	is_feature_available $1 '!' win32

@@ -42,6 +42,9 @@ typedef void (*parserInitialize) (langType language);
 typedef void (*initStatistics) (langType language);
 typedef void (*printStatistics) (langType langType);
 
+/* Used in the stack guard. */
+typedef void (*discardInputFn) (void *);
+
 /* Per language finalizer is called anytime when ctags exits.
    (Exceptions are a kind of options are given when invoked. Here
    options are: --version, --help, --list-*, and so on.)
@@ -158,6 +161,8 @@ struct sParserDefinition {
 	initStatistics initStats;
 	printStatistics printStats;
 
+	discardInputFn discardInput;
+
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int traced:1;
@@ -223,5 +228,8 @@ extern void anonConcatFull   (vString *buffer, langType lang, int kind);
 extern vString *anonGenerateNewFull (const char *prefix, langType lang, int kind);
 #define anonGenerateNew(P,K) anonGenerateNewFull((P), LANG_AUTO, (K))
 extern void anonHashString (const char *filename, char buf[9]);
+
+/* Return false if unsafe. */
+extern bool stackGuardCheck (void *dataForDiscardFunc);
 
 #endif  /* CTAGS_MAIN_PARSE_H */
