@@ -1,0 +1,8 @@
+# BibTeX base
+# Iniconf base
+k	key.probe	/^k=v$/;"	k
+key	key.probe	/^key=value$/;"	k
+key	section.probe	/^key=value$/;"	k	section:section
+section	section.probe	/^[section]$/;"	s
+# M4 base
+x	t.m4	/^define(x, y)$/;"	d
