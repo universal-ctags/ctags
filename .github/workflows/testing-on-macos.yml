@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     # temporarily disabled, because it always fails these days.
     #- run: brew update
