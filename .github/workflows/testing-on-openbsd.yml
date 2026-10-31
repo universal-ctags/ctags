@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        openbsd-version: ['7.9', '7.8', '7.7', '7.6']
+        openbsd-version: ['8.0', '7.9', '7.8', '7.7', '7.6']
 
     steps:
       - uses: actions/checkout@v6
