@@ -71,10 +71,10 @@ jobs:
 
           run ./ctags --version
 
-          run make check V=1
-          run make roundtrip
-          run make tmain CI=1 CTAGS_DEP= READTAGS_DEP= OPTSCRIPT_DEP=
-          run make units CI=1 CTAGS_DEP=
+          run make check V=1 QEMU_USER=1
+          run make roundtrip QEMU_USER=1
+          run make tmain CI=1 CTAGS_DEP= READTAGS_DEP= OPTSCRIPT_DEP= QEMU_USER=1
+          run make units CI=1 CTAGS_DEP= QEMU_USER=1
           EOF
 
       - run: curl -LO https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/master/alpine-chroot-install

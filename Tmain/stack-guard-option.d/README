@@ -1,0 +1,5 @@
+input.v is taken from https://github.com/oneafter/0116/blob/main/poc.v
+See also https://github.com/universal-ctags/ctags/issues/4369 .
+
+input.js is genereated-by gen-js.py.
+gen-js.py is derived from #4409 opened by @theteatoast.
