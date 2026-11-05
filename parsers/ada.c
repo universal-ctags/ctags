@@ -1406,7 +1406,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 			}
 		}
 		else if (buf[bufPos] == ';' ||
-				 ((bufPos + 1) < bufLen &&
+				 (i == 0 && (bufPos + 1) < bufLen &&
 				  (strncasecmp (&buf[bufPos], ":=", strlen (":=")) == 0 ||
 				   strncasecmp (&buf[bufPos], "=>", strlen ("=>")) == 0)))
 		{
