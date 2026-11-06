@@ -126,12 +126,12 @@ static void notifyFindingQuotedWord (int moduleIndex,
 
 static bool isIdentifier1 (int c)
 {
-	return (bool) (isalpha (c) || c == '_');
+	return (bool) (isalpha (c) || c == '_' || c >= 0x80);
 }
 
 static bool isIdentifier (int c)
 {
-	return (bool) (isalnum (c) || c == '_');
+	return (bool) (isalnum (c) || c == '_' || c >= 0x80);
 }
 
 static bool isPodWord (const char *word)
