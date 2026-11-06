@@ -167,7 +167,7 @@ typedef enum eDeclaration {
 	DECL_USING,
 	DECL_VERSION,        /* D conditional compile */
 	DECL_ANNOTATION,     /* Java annotation */
-	DECL_RECORD,		 /* Java Record */
+	DECL_RECORD,		 /* Java and C# Record */
 	DECL_COUNT
 } declType;
 
@@ -246,7 +246,7 @@ typedef enum eTagType {
 	TAG_PACKAGEREF,	 /* referenced package name */
 	TAG_PROPERTY,    /* property name */
 	TAG_PROTOTYPE,   /* function prototype or declaration */
-	TAG_RECORD,      /* Java record name */
+	TAG_RECORD,      /* Java and C# record name */
 	TAG_STRUCT,      /* structure name */
 	TAG_TYPEDEF,     /* typedef name / D alias name */
 	TAG_TEMPLATE,    /* D template name */
@@ -290,7 +290,7 @@ typedef enum {
 	CSK_UNDEFINED = COMMONK_UNDEFINED,
 	CSK_CLASS, CSK_DEFINE, CSK_ENUMERATOR, CSK_EVENT, CSK_FIELD,
 	CSK_ENUMERATION, CSK_INTERFACE, CSK_LOCAL, CSK_METHOD,
-	CSK_NAMESPACE, CSK_PROPERTY, CSK_STRUCT, CSK_TYPEDEF
+	CSK_NAMESPACE, CSK_PROPERTY, CSK_STRUCT, CSK_TYPEDEF, CSK_RECORD,
 } csharpKind;
 
 static kindDefinition CsharpKinds [] = {
@@ -307,6 +307,8 @@ static kindDefinition CsharpKinds [] = {
 	{ true,  'p', "property",   "properties"},
 	{ true,  's', "struct",     "structure names"},
 	{ true,  't', "typedef",    "typedefs"},
+	{ true,  'r', "record",     "records",
+	  .version = 1 },
 };
 
 typedef enum
@@ -455,7 +457,7 @@ static const keywordDesc KeywordTable [] = {
      { "protected",       KEYWORD_PROTECTED,       { 1, 1, 1 } },
      { "public",          KEYWORD_PUBLIC,          { 1, 1, 1 } },
      { "real",            KEYWORD_REAL,            { 0, 1, 0 } },
-     { "record",          KEYWORD_RECORD,          { 0, 0, 1 } },
+     { "record",          KEYWORD_RECORD,          { 1, 0, 1 } },
      { "register",        KEYWORD_REGISTER,        { 0, 1, 0 } },
      { "return",          KEYWORD_RETURN,          { 1, 1, 1 } },
      { "scope",           KEYWORD_SCOPE,           { 0, 1, 0 } },
@@ -864,6 +866,7 @@ static csharpKind csharpTagKindFull (const tagType type, const bool with_assert)
 		case TAG_PROPERTY:   result = CSK_PROPERTY;        break;
 		case TAG_STRUCT:     result = CSK_STRUCT;          break;
 		case TAG_TYPEDEF:    result = CSK_TYPEDEF;         break;
+		case TAG_RECORD:     result = CSK_RECORD;          break;
 
 		default: if (with_assert) Assert ("Bad C# tag type" == NULL); break;
 	}
@@ -1882,6 +1885,31 @@ static void processInterface (statementInfo *const st)
 	st->declaration = DECL_INTERFACE;
 }
 
+static void processRecord (tokenInfo *const token, statementInfo *const st)
+{
+	if (isInputLanguage (Lang_csharp))
+	{
+		/* In C#, "record" is a contextual keyword. It starts a record
+		 * declaration only when a name (or "class"/"struct") follows it,
+		 * as in "record Person". Otherwise, as in "Record record;", it is
+		 * an ordinary identifier. */
+		const int c = skipToNonWhite ();
+		cppUngetc (c);
+		if (! cppIsident1 (c))
+		{
+			token->keyword = KEYWORD_NONE;
+			token->type = TOKEN_NAME;
+			processName (st);
+			return;
+		}
+
+		/* A C# record may have no parameter list. Don't let the signature
+		 * of an earlier method leak into the record tag. */
+		vStringClear (Signature);
+	}
+	st->declaration = DECL_RECORD;
+}
+
 static void processToken (tokenInfo *const token, statementInfo *const st)
 {
 	switch ((int)token->keyword)        /* is it a reserved word? */
@@ -1928,7 +1956,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_PRIVATE:   setAccess (st, ACCESS_PRIVATE);         break;
 		case KEYWORD_PROTECTED: setAccess (st, ACCESS_PROTECTED);       break;
 		case KEYWORD_PUBLIC:    setAccess (st, ACCESS_PUBLIC);          break;
-		case KEYWORD_RECORD:    st->declaration = DECL_RECORD;          break;
+		case KEYWORD_RECORD:    processRecord (token, st);              break;
 		case KEYWORD_RETURN:    skipStatement (st);                     break;
 		case KEYWORD_SHORT:     st->declaration = DECL_BASE;            break;
 		case KEYWORD_SIGNED:    st->declaration = DECL_BASE;            break;
@@ -2551,6 +2579,7 @@ static bool inheritingDeclaration (declType decl)
 	}
 	return (bool) (
 		decl == DECL_CLASS ||
+		decl == DECL_RECORD ||
 		decl == DECL_STRUCT ||
 		decl == DECL_INTERFACE);
 }
@@ -2978,14 +3007,25 @@ static int tagCheck (statementInfo *const st)
 				;
 			else if (isType (prev, TOKEN_NAME))
 			{
-				if (isContextualKeyword (prev2))
+				if (st->declaration == DECL_RECORD)
+				{
+					/* C# record without a body: "record Empty;" */
+					corkIndex = qualifyCompoundTag (st, prev);
+				}
+				else if (isContextualKeyword (prev2))
 					corkIndex = makeTag (prev, st, true, TAG_EXTERN_VAR);
 				else
 					corkIndex = qualifyVariableTag (st, prev);
 			}
 			else if (isType (prev, TOKEN_ARGS)  &&  isType (prev2, TOKEN_NAME))
 			{
-				if (st->isPointer || st->inFunction)
+				if (st->declaration == DECL_RECORD)
+				{
+					/* C# positional record without a body:
+					 * "record Person(string First, string Last);" */
+					corkIndex = qualifyCompoundTag (st, prev2);
+				}
+				else if (st->isPointer || st->inFunction)
 				{
 					/* If it looks like a pointer or we are in a function body then
 					   it's far more likely to be a variable. */
@@ -3157,6 +3197,8 @@ extern parserDefinition* CsharpParser (void)
 
 	/* cpreprocessor wants corkQueue. */
 	def->useCork    = CORK_QUEUE;
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 	return def;
 }
 

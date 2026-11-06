@@ -59,6 +59,8 @@ C#:
 
     * Fix a bug that prevents the parser from extracting methods
 	  if the method has nullable parameters.
+    * Add ``record`` kind for extracting ``RECORD`` in ``record RECORD { ... }``
+      and ``record RECORD(...);``.
 
 Meson:
 

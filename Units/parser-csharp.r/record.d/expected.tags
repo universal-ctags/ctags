@@ -1,0 +1,16 @@
+Demo	input.cs	/^namespace Demo$/;"	n
+MyClass	input.cs	/^	public class MyClass {$/;"	c	namespace:Demo
+Field	input.cs	/^		public int Field;$/;"	f	class:Demo.MyClass
+Method	input.cs	/^		public void Method() {}$/;"	m	class:Demo.MyClass	signature:()
+MyRecord	input.cs	/^	public record MyRecord {$/;"	r	namespace:Demo
+Field	input.cs	/^		public int Field;$/;"	f	record:Demo.MyRecord
+Method	input.cs	/^		public void Method() {}$/;"	m	record:Demo.MyRecord	signature:()
+Person	input.cs	/^	public record Person(string First, string Last);$/;"	r	namespace:Demo	signature:(string First, string Last)
+Shape	input.cs	/^	public abstract record Shape : IShape {$/;"	r	namespace:Demo	inherits:IShape
+Id	input.cs	/^		public int Id;$/;"	f	record:Demo.Shape
+Point	input.cs	/^	public sealed record Point(int X, int Y) : Shape$/;"	r	namespace:Demo	signature:(int X, int Y)
+Length	input.cs	/^		public double Length() { return 0; }$/;"	m	record:Demo.Point	signature:()
+Empty	input.cs	/^	public record Empty;$/;"	r	namespace:Demo
+Holder	input.cs	/^	public class Holder {$/;"	c	namespace:Demo
+record	input.cs	/^		private Record record;$/;"	f	class:Demo.Holder	file:
+Other	input.cs	/^		public Record Other { get; set; }$/;"	p	class:Demo.Holder
