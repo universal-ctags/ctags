@@ -1,0 +1,14 @@
+preceder	input.pl	/^sub preceder { }$/;"	s
+précéder	input.pl	/^sub précéder { }$/;"	s
+preceder2	input.pl	/^sub preceder2 { }$/;"	s
+日本語	input.pl	/^sub 日本語 { }$/;"	s
+café	input.pl	/^sub café;$/;"	d
+écho	input.pl	/^sub écho { }$/;"	s
+Café	input.pl	/^package Café;$/;"	p
+méthode	input.pl	/^sub méthode { }$/;"	s
+Café::méthode	input.pl	/^sub méthode { }$/;"	s
+ÉTÉ	input.pl	/^use constant ÉTÉ => 1;$/;"	c
+Café::ÉTÉ	input.pl	/^use constant ÉTÉ => 1;$/;"	c
+ÉTIQUETTE	input.pl	/^ÉTIQUETTE: while (0) { }$/;"	l
+après	input.pl	/^sub après { }$/;"	s
+Café::après	input.pl	/^sub après { }$/;"	s
