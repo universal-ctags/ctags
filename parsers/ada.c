@@ -212,6 +212,7 @@ typedef struct sAdaTokenInfo
 
 typedef enum eAdaKeywords
 {
+	ADA_KEYWORD_ABSTRACT,
 	ADA_KEYWORD_ACCEPT,
 	ADA_KEYWORD_BEGIN,
 	ADA_KEYWORD_BODY,
@@ -233,6 +234,7 @@ typedef enum eAdaKeywords
 	ADA_KEYWORD_LOOP,
 	ADA_KEYWORD_NEW,
 	ADA_KEYWORD_NOT,
+	ADA_KEYWORD_NULL,		/* Ada 2005 */
 	ADA_KEYWORD_OR,
 	ADA_KEYWORD_OVERRIDING,		/* Ada 2005 */
 	ADA_KEYWORD_PACKAGE,
@@ -257,6 +259,7 @@ typedef enum eAdaKeywords
 
 static const char *AdaKeywords[] =
 {
+	"abstract",
 	"accept",
 	"begin",
 	"body",
@@ -278,6 +281,7 @@ static const char *AdaKeywords[] =
 	"loop",
 	"new",
 	"not",
+	"null",
 	"or",
 	"overriding",
 	"package",
@@ -1173,6 +1177,17 @@ static adaTokenInfo *adaParseSubprogram (adaTokenInfo *parent, adaKind kind)
 				/* if this is a "new" something then no need to parse */
 				skipPast (";");
 			}
+			else if (adaKeywordCmp (ADA_KEYWORD_NULL))
+			{
+				/* a null procedure has no body to parse */
+				skipPast (";");
+			}
+			else if (adaKeywordCmp (ADA_KEYWORD_ABSTRACT))
+			{
+				/* an abstract subprogram is just a spec */
+				token->isSpec = true;
+				skipPast (";");
+			}
 			else if (!eof_reached && line[pos] == '(')
 			{
 				/* '(' is the starter of an expression function. */
@@ -1406,7 +1421,7 @@ static adaTokenInfo *adaParseVariables (adaTokenInfo *parent, adaKind kind)
 			}
 		}
 		else if (buf[bufPos] == ';' ||
-				 ((bufPos + 1) < bufLen &&
+				 (i == 0 && (bufPos + 1) < bufLen &&
 				  (strncasecmp (&buf[bufPos], ":=", strlen (":=")) == 0 ||
 				   strncasecmp (&buf[bufPos], "=>", strlen ("=>")) == 0)))
 		{

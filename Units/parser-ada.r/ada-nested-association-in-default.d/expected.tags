@@ -1,0 +1,7 @@
+Test	input.adb	/^package body Test is$/;"	p
+Full_Iterate	input.adb	/^  procedure Full_Iterate (FP_Id    : in Id_T;$/;"	r	package:Test	file:
+Scope	input.adb	/^    Scope : constant String := "FULL_ITERATE";$/;"	n	subprogram:Full_Iterate	file:
+Nested	input.adb	/^  procedure Nested (A : in Matrix_T := (others => (others => 0));$/;"	r	package:Test	file:
+V	input.adb	/^    V : Flags_T := (1 => True, others => False);$/;"	v	subprogram:Nested	file:
+Last	input.adb	/^  function Last (X : in Flags_T := (others => False)) return Boolean is$/;"	r	package:Test	file:
+After	input.adb	/^  procedure After is$/;"	r	package:Test	file:
