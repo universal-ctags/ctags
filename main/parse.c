@@ -41,6 +41,7 @@
 #include "rexprcode_p.h"
 #include "routines.h"
 #include "routines_p.h"
+#include "stackguard_p.h"
 #include "stats_p.h"
 #include "subparser.h"
 #include "subparser_p.h"
@@ -4377,6 +4378,18 @@ extern bool processFielddefOption (const char *const option, const char *const p
 *   File parsing
 */
 
+static void condPrepareStackGuard (parserDefinition *const lang)
+{
+	if (lang->discardInput)
+		stackGuardPrepare (lang->discardInput);
+}
+
+static void condReleaseStackGuard (parserDefinition *const lang)
+{
+	if (lang->discardInput)
+		stackGuardRelease ();
+}
+
 static rescanReason createTagsForFile (const langType language,
 					   const unsigned int passCount)
 {
@@ -4389,10 +4402,14 @@ static rescanReason createTagsForFile (const langType language,
 
 	notifyInputStart ();
 
+	condPrepareStackGuard (lang);
+
 	if (lang->parser != NULL)
 		lang->parser ();
 	else if (lang->parser2 != NULL)
 		rescan = lang->parser2 (passCount);
+
+	condReleaseStackGuard (lang);
 
 	notifyInputEnd ();
 
@@ -4749,6 +4766,14 @@ extern bool doesParserRequireMemoryStream (const langType language)
 	}
 
 	return false;
+}
+
+extern bool doesParserSupportStackGuard (const langType language)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parserDefinition *const lang = LanguageTable [language].def;
+
+	return !!lang->discardInput;
 }
 
 extern bool parseFile (const char *const fileName)
