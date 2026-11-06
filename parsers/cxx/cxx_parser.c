@@ -468,7 +468,10 @@ void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 static void cxxParserCleanupEnumStructClassOrUnionPrefixChain(CXXKeyword eKeyword,CXXToken * pLastToken)
 {
 	CXXToken * pToken = cxxTokenChainFirst(g_cxx.pTokenChain);
-	while(pToken && (pToken != pLastToken))
+	// pLastToken may have been destroyed by the token chain size limit in
+	// cxxParserParseNextToken(): stop at the current token in that case, as
+	// destroying it would leave the caller with a dangling g_cxx.pToken.
+	while(pToken && (pToken != pLastToken) && (pToken != g_cxx.pToken))
 	{
 		if(
 				cxxTokenTypeIs(pToken,CXXTokenTypeKeyword) &&
