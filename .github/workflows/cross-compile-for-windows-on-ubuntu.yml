@@ -11,10 +11,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build-machine-os: [ubuntu-22.04, ubuntu-24.04, ubuntu-26.04]
+        runner: [ubuntu-22.04, ubuntu-24.04, ubuntu-26.04]
         target: [i686-w64-mingw32,x86_64-w64-mingw32]
 
-    runs-on: ${{ matrix.build-machine-os }}
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - uses: actions/checkout@v6

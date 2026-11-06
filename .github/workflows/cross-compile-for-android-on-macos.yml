@@ -11,9 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build-machine-os: [macos-15, macos-26]
+        runner: [macos-15, macos-26]
 
-    runs-on: ${{ matrix.build-machine-os }}
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - uses: actions/checkout@v6
