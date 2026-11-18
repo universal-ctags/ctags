@@ -24,11 +24,8 @@ jobs:
       with:
         msystem: ${{ matrix.msystem }}
         update: true
-        install: automake autoconf make dos2unix pkg-config python-sphinx
-        pacboy: toolchain:p libxml2:p libyaml:p pcre2:p
-
-    - run: |
-        pacman -Sy --noconfirm --needed ${MINGW_PACKAGE_PREFIX}-jansson || :
+        install: automake autoconf make dos2unix pkg-config python-sphinx libxml2 libyaml jansson pcre2
+        pacboy: toolchain:p
 
     - run: git config --global core.autocrlf input
       shell: bash
