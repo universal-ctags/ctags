@@ -24,7 +24,7 @@
 #
 # References:
 #
-# - https://sourceware.org/systemtap/langref/
+# - https://sourceware.org/systemtap/langref.html
 #
 --langdef=SystemTap{version=1.1}
 --map-SystemTap=+.stp
