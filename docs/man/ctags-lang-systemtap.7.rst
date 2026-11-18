@@ -50,4 +50,4 @@ Change since "0.0"
 
 SEE ALSO
 --------
-:ref:`ctags(1) <ctags(1)>`, `SystemTap Language Reference <https://sourceware.org/systemtap/langref>`_ (https://sourceware.org/systemtap/langref/)
+:ref:`ctags(1) <ctags(1)>`, `SystemTap Language Reference <https://sourceware.org/systemtap/langref.html>`_ (https://sourceware.org/systemtap/langref.html)
