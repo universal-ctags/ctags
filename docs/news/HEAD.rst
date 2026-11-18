@@ -123,6 +123,12 @@ Fortran:
 
     * Fill ``end`` field.
 
+Perl:
+
+    * Preserve non-ASCII bytes in identifiers.
+      Non-ASCII characters in subroutine names, package names, etc., are
+      now preserved instead of being cut at the first non-ASCII byte.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
