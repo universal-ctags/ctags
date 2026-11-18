@@ -96,9 +96,9 @@ extern void cppInit (const bool state,
 		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
 		     int macroConditionRoleIndex,
+		     int macroParamKindIndex,
 		     int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macroParamKindIndex,
 		     int macrodefFieldIndex);
 
 extern void cppTerminate (void);
