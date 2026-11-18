@@ -101,7 +101,7 @@ enum eState {
 	DRCTV_ELIF,    /* "#elif" encountered */
 	DRCTV_PRAGMA,  /* #pragma encountered */
 	DRCTV_UNDEF,   /* "#undef" encountered */
-	DRCTV_INCLUDE, /* "#include" encountered */
+	DRCTV_INCLUDE, /* "#include" or "#embed" encountered */
 };
 
 /*  Defines the current state of the pre-processor.
@@ -1355,7 +1355,8 @@ static bool directiveHash (const int c)
 	readDirective (c, directive, MaxDirectiveName);
 	if (stringMatch (directive, "define"))
 		Cpp.directive.state = DRCTV_DEFINE;
-	else if (stringMatch (directive, "include"))
+	else if (stringMatch (directive, "include")
+			 || stringMatch (directive, "embed"))	/* C23 */
 		Cpp.directive.state = DRCTV_INCLUDE;
 	else if (stringMatch (directive, "undef"))
 		Cpp.directive.state = DRCTV_UNDEF;
