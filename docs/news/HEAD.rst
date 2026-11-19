@@ -123,6 +123,11 @@ Fortran:
 
     * Fill ``end`` field.
 
+C and C++:
+
+    * Parse the C23 ``typeof_unqual`` specifier and ``_BitInt`` type, and
+      expressions in decltype-like parameters such as ``decltype(a + b)``.
+
 Perl:
 
     * Preserve non-ASCII bytes in identifiers.

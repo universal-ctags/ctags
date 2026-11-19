@@ -1,0 +1,6 @@
+a	input.cpp	/^int a, b;$/;"	v	typeref:typename:int
+b	input.cpp	/^int a, b;$/;"	v	typeref:typename:int
+f1	input.cpp	/^void f1(decltype(a + b) x) {}$/;"	f	typeref:typename:void
+f2	input.cpp	/^void f2(int y, decltype(a * 2) z);$/;"	p	typeref:typename:void	file:
+f3	input.cpp	/^void f3(decltype(a) x, decltype(b - 1) y) {}$/;"	f	typeref:typename:void
+g	input.cpp	/^decltype(a + b) g(int q) { return 0; }$/;"	f	typeref:typename:decltype(a+b)

@@ -35,7 +35,7 @@ enum CXXKeywordFlag
 	// in a variable declaration.
 	// Examples: __global__, __host__, restrict, register...
 	CXXKeywordMayAppearInVariableDeclaration = (1 << 5),
-	// decltype, __typeof, __typeof__, and typeof
+	// decltype, __typeof, __typeof__, typeof, typeof_unqual, and _BitInt
 	CXXKeywordIsDecltype = (1 << 6),
 	// keywords making the parsers too complicated; they are dropped in
 	// cxxParserParseNextToken().
@@ -158,9 +158,24 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
+		"__typeof_unqual",
+		CXXLanguageC,
+		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"__typeof_unqual__",
+		CXXLanguageC,
+		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
 		"_Alignas",
 		CXXLanguageC,
 		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordMayDropInTokenizer,
+	},
+	{
+		"_BitInt",
+		CXXLanguageC,
+		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"_Thread_local",
@@ -549,6 +564,11 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"typeof",
 		CXXLanguageC | CXXLanguageCPP,
+		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"typeof_unqual",
+		CXXLanguageC,
 		CXXKeywordIsDecltype | CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
