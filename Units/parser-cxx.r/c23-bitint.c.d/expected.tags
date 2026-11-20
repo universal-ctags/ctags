@@ -3,6 +3,11 @@ g_uvar	input.c	/^unsigned _BitInt(8) g_uvar;$/;"	v	typeref:typename:unsigned _Bi
 g_const	input.c	/^static _BitInt(64) const g_const = 1;$/;"	v	typeref:typename:_BitInt(64) const	file:	properties:static
 S	input.c	/^struct S {$/;"	s	file:
 member	input.c	/^	_BitInt(32) member;$/;"	m	struct:S	typeref:typename:_BitInt(32)	file:
-process_data	input.c	/^void process_data(_BitInt(16) x) {}$/;"	f	typeref:typename:void
-process_pair	input.c	/^void process_pair(int y, unsigned _BitInt(16) x);$/;"	p	typeref:typename:void	file:
-twelve	input.c	/^unsigned _BitInt(12) twelve(unsigned _BitInt(12) v, int w) { return v; }$/;"	f	typeref:typename:unsigned _BitInt(12)
+process_data	input.c	/^void process_data(_BitInt(16) x) {}$/;"	f	typeref:typename:void	signature:(_BitInt(16) x)
+x	input.c	/^void process_data(_BitInt(16) x) {}$/;"	z	function:process_data	typeref:typename:_BitInt(16)	file:
+process_pair	input.c	/^void process_pair(int y, unsigned _BitInt(16) x);$/;"	p	typeref:typename:void	file:	signature:(int y,unsigned _BitInt(16) x)
+y	input.c	/^void process_pair(int y, unsigned _BitInt(16) x);$/;"	z	prototype:process_pair	typeref:typename:int	file:
+x	input.c	/^void process_pair(int y, unsigned _BitInt(16) x);$/;"	z	prototype:process_pair	typeref:typename:unsigned _BitInt(16)	file:
+twelve	input.c	/^unsigned _BitInt(12) twelve(unsigned _BitInt(12) v, int w) { return v; }$/;"	f	typeref:typename:unsigned _BitInt(12)	signature:(unsigned _BitInt(12) v,int w)
+v	input.c	/^unsigned _BitInt(12) twelve(unsigned _BitInt(12) v, int w) { return v; }$/;"	z	function:twelve	typeref:typename:unsigned _BitInt(12)	file:
+w	input.c	/^unsigned _BitInt(12) twelve(unsigned _BitInt(12) v, int w) { return v; }$/;"	z	function:twelve	typeref:typename:int	file:
