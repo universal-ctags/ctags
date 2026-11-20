@@ -1005,34 +1005,34 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 	return CORK_NIL;
 }
 
-static void makeIncludeTag (const char *const name, bool systemHeader)
+static void makeIncludeTagCommon (const char *const name,
+								  int cprepro_native_kind,
+								  int kind_index, int role_index)
 {
-	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_HEADER);
+	bool standing_alone = doesCPreProRunAsStandaloneParser(cprepro_native_kind);
 	langType lang = standing_alone ? Cpp.lang: Cpp.clientLang;
 	tagEntryInfo e;
-	int role_index;
 
 	if (!isLanguageEnabled (lang))
 		return;
 
-	Assert (Cpp.header.kindIndex != KIND_GHOST_INDEX);
+	Assert (kind_index != KIND_GHOST_INDEX);
 
-	role_index = systemHeader? Cpp.header.systemRoleIndex: Cpp.header.localRoleIndex;
 	if (role_index == ROLE_DEFINITION_INDEX)
 		return;
 
 	if (!isXtagEnabled (XTAG_REFERENCE_TAGS))
 		return;
 
-	if (!isLanguageKindEnabled(lang, Cpp.header.kindIndex))
+	if (!isLanguageKindEnabled(lang, kind_index))
 		return;
 
-	if (isLanguageRoleEnabled(lang, Cpp.header.kindIndex, role_index))
+	if (isLanguageRoleEnabled(lang, kind_index, role_index))
 	{
 		if (standing_alone)
 			pushLanguage (Cpp.lang);
 
-		initRefTagEntry (&e, name, Cpp.header.kindIndex, role_index);
+		initRefTagEntry (&e, name, kind_index, role_index);
 		e.isFileScope  = false;
 		e.truncateLineAfterTag = true;
 		makeTagEntry (&e);
@@ -1040,6 +1040,14 @@ static void makeIncludeTag (const char *const name, bool systemHeader)
 		if (standing_alone)
 			popLanguage ();
 	}
+}
+
+static void makeIncludeTag (const char *const name, bool systemHeader)
+{
+	makeIncludeTagCommon (name, CPREPRO_HEADER, Cpp.header.kindIndex,
+						  systemHeader
+						  ? Cpp.header.systemRoleIndex
+						  : Cpp.header.localRoleIndex);
 }
 
 static int makeParamTag (vString *name, short nth, bool placeholder)
