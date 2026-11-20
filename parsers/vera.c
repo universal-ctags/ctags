@@ -2217,23 +2217,27 @@ static rescanReason findCTags (const unsigned int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;
-	int kind_for_define = VK_DEFINE;
-	int kind_for_header = VK_HEADER;
-	int kind_for_param  = VK_MACRO_PARAM;
-	int role_for_macro_undef = VR_MACRO_UNDEF;
-	int role_for_macro_condition = VR_MACRO_CONDITION;
-	int role_for_header_system   = VR_HEADER_SYSTEM;
-	int role_for_header_local   = VR_HEADER_LOCAL;
+	struct sCPreProLangModel model = {
+		.defineMacroKindIndex = VK_DEFINE,
+		.macroUndefRoleIndex = VR_MACRO_UNDEF,
+		.macroConditionRoleIndex = VR_MACRO_CONDITION,
+
+		.macroParamKindIndex = VK_MACRO_PARAM,
+
+		.header = {
+			.kindIndex = VK_HEADER,
+			.systemRoleIndex = VR_HEADER_SYSTEM,
+			.localRoleIndex = VR_HEADER_LOCAL,
+		},
+
+		.macrodefFieldIndex = FIELD_UNKNOWN,
+	};
 
 	Assert (passCount < 3);
 
 	AnonymousID = 0;
 
-	cppInit ((bool) (passCount > 1), false, false,
-		 true,
-		 kind_for_define, role_for_macro_undef, role_for_macro_condition, kind_for_param,
-		 kind_for_header, role_for_header_system, role_for_header_local,
-		 FIELD_UNKNOWN);
+	cppInit ((bool) (passCount > 1), false, false, true, &model);
 
 	Signature = vStringNew ();
 
