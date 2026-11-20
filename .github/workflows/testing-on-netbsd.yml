@@ -13,12 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        netbsd-version: ['11.0', '10.2', '10.1', '10.0']
+        netbsd-version: ['11.1', '11.0', '10.2', '10.1', '10.0']
 
     steps:
       - uses: actions/checkout@v6
 
-      - uses: cross-platform-actions/action@v1.7.0
+      - uses: cross-platform-actions/action@v1.8.0
         with:
           operating_system: netbsd
           version: ${{ matrix.netbsd-version }}
