@@ -956,9 +956,9 @@ static bool popConditional (void)
 static bool doesCPreProRunAsStandaloneParser (int kind)
 {
 	if (kind == CPREPRO_HEADER)
-		return !Cpp.useClientLangDefineMacroKindIndex;
-	else if (kind == CPREPRO_MACRO)
 		return !Cpp.useClientLangHeaderKindIndex;
+	else if (kind == CPREPRO_MACRO)
+		return !Cpp.useClientLangDefineMacroKindIndex;
 	else if (kind == CPREPRO_PARAM)
 		return !Cpp.useClientLangMacroParamKindIndex;
 	else
