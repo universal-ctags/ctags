@@ -253,8 +253,8 @@ typedef enum {
 } veraHeaderRole;
 
 static roleDefinition VeraHeaderRoles [] = {
-	RoleTemplateSystem,
-	RoleTemplateLocal,
+	RoleTemplateSystemHeader,
+	RoleTemplateLocalHeader,
 };
 
 typedef enum {

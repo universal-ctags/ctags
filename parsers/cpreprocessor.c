@@ -209,8 +209,8 @@ typedef enum {
 } cPreProHeaderRole;
 
 static roleDefinition CPREPROHeaderRoles [] = {
-	RoleTemplateSystem,
-	RoleTemplateLocal,
+	RoleTemplateSystemHeader,
+	RoleTemplateLocalHeader,
 };
 
 
