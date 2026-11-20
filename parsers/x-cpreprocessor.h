@@ -74,8 +74,13 @@
 #define RoleTemplateUndef { true, "undef", "undefined" }
 #define RoleTemplateCondition { false, "condition", "used in part of #if/#ifdef/#elif conditions" }
 
-#define RoleTemplateSystem { true, "system", "system header" }
-#define RoleTemplateLocal  { true, "local", "local header" }
+#define RoleTemplateSystemFor(FILETYPE, VERSION) \
+	{ true, "system", "system " #FILETYPE, .version = VERSION }
+#define RoleTemplateLocalFor(FILETYPE, VERSION) \
+	{ true, "local", "local " #FILETYPE, .version = VERSION }
+
+#define RoleTemplateSystemHeader(VERSION) RoleTemplateSystemFor(header, VERSION)
+#define RoleTemplateLocalHeader(VERSION)  RoleTemplateLocalFor(header, VERSION)
 
 typedef enum {
 	CPREPRO_MACRO, CPREPRO_HEADER, CPREPRO_PARAM,
