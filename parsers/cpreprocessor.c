@@ -352,13 +352,7 @@ static void cppInitCommon(langType clientLang,
 		     const bool state, const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
-		     int defineMacroKindIndex,
-		     int macroUndefRoleIndex,
-		     int macroConditionRoleIndex,
-		     int macroParamKindIndex,
-		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macrodefFieldIndex)
+		     const struct sCPreProLangModel *model)
 {
 	BraceFormat = state;
 
@@ -386,14 +380,14 @@ static void cppInitCommon(langType clientLang,
 	Cpp.hasCxxRawLiteralStrings = hasCxxRawLiteralStrings;
 	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
 
-	if (defineMacroKindIndex != KIND_GHOST_INDEX)
+	if (model->defineMacroKindIndex != KIND_GHOST_INDEX)
 	{
-		Cpp.defineMacroKindIndex = defineMacroKindIndex;
+		Cpp.defineMacroKindIndex = model->defineMacroKindIndex;
 		Cpp.useClientLangDefineMacroKindIndex = true;
 
-		Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
-		Cpp.macroConditionRoleIndex = macroConditionRoleIndex;
-		Cpp.macrodefFieldIndex = macrodefFieldIndex;
+		Cpp.macroUndefRoleIndex = model->macroUndefRoleIndex;
+		Cpp.macroConditionRoleIndex = model->macroConditionRoleIndex;
+		Cpp.macrodefFieldIndex = model->macrodefFieldIndex;
 	}
 	else
 	{
@@ -405,9 +399,9 @@ static void cppInitCommon(langType clientLang,
 		Cpp.macrodefFieldIndex = CPreProFields [F_MACRODEF].ftype;
 	}
 
-	if (macroParamKindIndex != KIND_GHOST_INDEX)
+	if (model->macroParamKindIndex != KIND_GHOST_INDEX)
 	{
-		Cpp.macroParamKindIndex = macroParamKindIndex;
+		Cpp.macroParamKindIndex = model->macroParamKindIndex;
 		Cpp.useClientLangMacroParamKindIndex = true;
 	}
 	else
@@ -416,13 +410,13 @@ static void cppInitCommon(langType clientLang,
 		Cpp.useClientLangMacroParamKindIndex = false;
 	}
 
-	if (headerKindIndex != KIND_GHOST_INDEX)
+	if (model->headerKindIndex != KIND_GHOST_INDEX)
 	{
-		Cpp.headerKindIndex = headerKindIndex;
+		Cpp.headerKindIndex = model->headerKindIndex;
 		Cpp.useClientLangHeaderKindIndex = true;
 
-		Cpp.headerSystemRoleIndex = headerSystemRoleIndex;
-		Cpp.headerLocalRoleIndex =  headerLocalRoleIndex;
+		Cpp.headerSystemRoleIndex = model->headerSystemRoleIndex;
+		Cpp.headerLocalRoleIndex =  model->headerLocalRoleIndex;
 	}
 	else
 	{
@@ -459,22 +453,12 @@ static void cppInitCommon(langType clientLang,
 extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
-		     int defineMacroKindIndex,
-		     int macroUndefRoleIndex,
-		     int macroConditionRoleIndex,
-		     int macroParamKindIndex,
-		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macrodefFieldIndex)
+		     const struct sCPreProLangModel *model)
 {
 	langType client = getInputLanguage ();
 
 	cppInitCommon (client, state, hasAtLiteralStrings,
-				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
-				   defineMacroKindIndex, macroUndefRoleIndex, macroConditionRoleIndex,
-				   macroParamKindIndex,
-				   headerKindIndex, headerSystemRoleIndex, headerLocalRoleIndex,
-				   macrodefFieldIndex);
+				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers, model);
 }
 
 static void cppClearMacroInUse (cppMacroInfo **pM)
@@ -2164,11 +2148,7 @@ process:
 
 static void findCppTags (void)
 {
-	cppInitCommon (Cpp.lang, 0, false, false, false,
-				   KIND_GHOST_INDEX, 0, 0,
-				   KIND_GHOST_INDEX,
-				   KIND_GHOST_INDEX, 0, 0,
-				   FIELD_UNKNOWN);
+	cppInitCommon (Cpp.lang, 0, false, false, false, &CPreProAsIsModel);
 
 	findRegexTagsMainloop (cppGetc);
 

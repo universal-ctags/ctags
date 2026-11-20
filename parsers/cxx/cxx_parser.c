@@ -1994,13 +1994,19 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	cxxTokenAPINewFile();
 	cxxParserNewStatement();
 
-	int kind_for_define = CXXTagKindMACRO;
-	int kind_for_header = CXXTagKindINCLUDE;
-	int kind_for_macro_param = CXXTagKindMACROPARAM;
-	int role_for_macro_undef = CR_MACRO_UNDEF;
-	int role_for_macro_condition = CR_MACRO_CONDITION;
-	int role_for_header_system = CR_HEADER_SYSTEM;
-	int role_for_header_local = CR_HEADER_LOCAL;
+	struct sCPreProLangModel model = {
+		.defineMacroKindIndex = CXXTagKindMACRO,
+		.macroUndefRoleIndex = CR_MACRO_UNDEF,
+		.macroConditionRoleIndex = CR_MACRO_CONDITION,
+
+		.macroParamKindIndex = CXXTagKindMACROPARAM,
+
+		.headerKindIndex = CXXTagKindINCLUDE,
+		.headerSystemRoleIndex = CR_HEADER_SYSTEM,
+		.headerLocalRoleIndex = CR_HEADER_LOCAL,
+
+		.macrodefFieldIndex = g_cxx.pFieldOptions[CXXTagFieldMacrodef].ftype,
+	};
 
 	Assert(passCount < 3);
 
@@ -2009,14 +2015,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 			false,
 			true, // raw literals
 			false,
-			kind_for_define,
-			role_for_macro_undef,
-			role_for_macro_condition,
-			kind_for_macro_param,
-			kind_for_header,
-			role_for_header_system,
-			role_for_header_local,
-			g_cxx.pFieldOptions[CXXTagFieldMacrodef].ftype
+			&model
 		);
 
 	g_cxx.iChar = ' ';

@@ -888,11 +888,7 @@ static void findLdScriptTags (void)
 	tokenInfo *const token = newLdScriptToken ();
 	tokenInfo *const tmp = newLdScriptToken ();
 
-	cppInit (false, false, false, false,
-			 KIND_GHOST_INDEX, 0, 0,
-			 KIND_GHOST_INDEX,
-			 KIND_GHOST_INDEX, 0, 0,
-			 FIELD_UNKNOWN);
+	cppInit (false, false, false, false, &CPreProAsIsModel);
 
 	do {
 		tokenRead (token);

@@ -80,6 +80,30 @@ typedef enum {
 	CPREPRO_MACRO, CPREPRO_HEADER, CPREPRO_PARAM,
 } cPreProKind;
 
+struct sCPreProLangModel {
+	int defineMacroKindIndex,
+		macroUndefRoleIndex, macroConditionRoleIndex;
+	int macroParamKindIndex;
+	int headerKindIndex,
+		headerSystemRoleIndex, headerLocalRoleIndex;
+	int macrodefFieldIndex;
+};
+
+/* Use the language model of CPreProcessor without any customizing */
+#define CPreProAsIsModel ((struct sCPreProLangModel) {	\
+		.defineMacroKindIndex    = KIND_GHOST_INDEX,	\
+		.macroUndefRoleIndex     = 0,					\
+		.macroConditionRoleIndex = 0,					\
+														\
+		.macroParamKindIndex     = KIND_GHOST_INDEX,	\
+														\
+		.headerKindIndex         = KIND_GHOST_INDEX,	\
+		.headerSystemRoleIndex   = 0,					\
+		.headerLocalRoleIndex    = 0,					\
+														\
+		.macrodefFieldIndex      = FIELD_UNKNOWN,		\
+	})
+
 /*
 *   FUNCTION PROTOTYPES
 */
@@ -93,13 +117,7 @@ extern void cppInit (const bool state,
 		     const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
-		     int defineMacroKindIndex,
-		     int macroUndefRoleIndex,
-		     int macroConditionRoleIndex,
-		     int macroParamKindIndex,
-		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macrodefFieldIndex);
+		     const struct sCPreProLangModel *model);
 
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);
