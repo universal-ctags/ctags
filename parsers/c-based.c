@@ -3056,23 +3056,13 @@ static rescanReason findCTags (const unsigned int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;
-	int kind_for_define = KIND_GHOST_INDEX;
-	int kind_for_header = KIND_GHOST_INDEX;
-	int kind_for_param  = KIND_GHOST_INDEX;
-	int role_for_macro_undef = ROLE_DEFINITION_INDEX;
-	int role_for_macro_condition = ROLE_DEFINITION_INDEX;
-	int role_for_header_system   = ROLE_DEFINITION_INDEX;
-	int role_for_header_local   = ROLE_DEFINITION_INDEX;
 
 	Assert (passCount < 3);
 
 	AnonymousID = 0;
 
 	cppInit ((bool) (passCount > 1), isInputLanguage (Lang_csharp), false,
-		 false,
-		 kind_for_define, role_for_macro_undef, role_for_macro_condition, kind_for_param,
-		 kind_for_header, role_for_header_system, role_for_header_local,
-		 FIELD_UNKNOWN);
+		 false, &CPreProAsIsModel);
 
 	Signature = vStringNew ();
 

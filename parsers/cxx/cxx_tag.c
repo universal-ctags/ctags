@@ -31,14 +31,14 @@ CXX_COMMON_MACRO_ROLES(CUDA);
 
 #define CXX_COMMON_HEADER_ROLES(__langPrefix) \
 	static roleDefinition __langPrefix##HeaderRoles [] = { \
-		RoleTemplateSystem, \
-		RoleTemplateLocal, \
+		RoleTemplateSystemHeader, \
+		RoleTemplateLocalHeader, \
 	}
 
 CXX_COMMON_HEADER_ROLES(C);
 static roleDefinition CXXHeaderRoles [] = {
-		RoleTemplateSystem,
-		RoleTemplateLocal,
+		RoleTemplateSystemHeader,
+		RoleTemplateLocalHeader,
 		{ true, "imported", "imported with \"imported ...\"",
 		  .version = 2 },
 		{ true, "exported", "exported with \"exported imported ...\"",
