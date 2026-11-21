@@ -2182,6 +2182,18 @@ try_again:
 		if(cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain))
 		{
 			CXX_DEBUG_PRINT("Found parenthesis chain");
+
+			if(
+				t->pPrev &&
+				cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword) &&
+				cxxKeywordIsDecltype(t->pPrev->eKeyword)
+			)
+			{
+				// decltype(a + b), typeof(a), _BitInt(16): the parentheses
+				// are part of the type and may contain any expression.
+				goto try_again;
+			}
+
 			// Either part of function pointer declaration or a very ugly variable decl
 			// Examples are:
 			//    type (*name)(args)

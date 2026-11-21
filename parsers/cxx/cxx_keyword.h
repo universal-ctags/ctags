@@ -36,7 +36,10 @@ typedef enum _CXXKeyword
 	CXXKeyword__THREAD, // GCC (https://gcc.gnu.org/onlinedocs/gcc-3.3.1/gcc/Thread-Local.html#Thread-Local)
 	CXXKeyword__TYPEOF, // GCC accepts this.
 	CXXKeyword__TYPEOF__, // GCC (https://gcc.gnu.org/onlinedocs/gcc-3.3.1/gcc/Typeof.html#Typeof)
+	CXXKeyword__TYPEOF_UNQUAL, // GCC (C23 typeof_unqual)
+	CXXKeyword__TYPEOF_UNQUAL__, // GCC (C23 typeof_unqual)
 	CXXKeyword_ALIGNAS, // C11
+	CXXKeyword_BITINT, // C23
 	CXXKeyword_THREAD_LOCAL, // C11
 	CXXKeywordALIGNAS, // (since C++11, C11 (stdalign.h), C23)
 	CXXKeywordALIGNOF, // (since C++11)
@@ -120,7 +123,8 @@ typedef enum _CXXKeyword
 	CXXKeywordTYPEDEF,
 	CXXKeywordTYPEID,
 	CXXKeywordTYPENAME,
-	CXXKeywordTYPEOF, // GCC (https://gcc.gnu.org/onlinedocs/gcc-3.3.1/gcc/Typeof.html#Typeof)
+	CXXKeywordTYPEOF, // GCC (https://gcc.gnu.org/onlinedocs/gcc-3.3.1/gcc/Typeof.html#Typeof), C23
+	CXXKeywordTYPEOF_UNQUAL, // C23
 	CXXKeywordUNION,
 	CXXKeywordUNSIGNED,
 	CXXKeywordUSING,

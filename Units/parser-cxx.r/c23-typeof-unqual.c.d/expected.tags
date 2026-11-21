@@ -1,0 +1,12 @@
+a	input.c	/^const int a = 1;$/;"	v	typeref:typename:const int
+var1	input.c	/^typeof(a) var1 = 2;$/;"	v	typeref:typename:typeof(a)
+var2	input.c	/^typeof_unqual(a) var2 = 3;$/;"	v	typeref:typename:typeof_unqual(a)
+var3	input.c	/^typeof_unqual(const int) var3 = 4;$/;"	v	typeref:typename:typeof_unqual(const int)
+var4	input.c	/^static typeof_unqual(a) const var4 = 5;$/;"	v	typeref:typename:typeof_unqual(a) const	file:	properties:static
+S	input.c	/^struct S {$/;"	s	file:
+member	input.c	/^	typeof_unqual(a) member;$/;"	m	struct:S	typeref:typename:typeof_unqual(a)	file:
+f	input.c	/^void f(typeof_unqual(a) param) {}$/;"	f	typeref:typename:void	signature:(typeof_unqual(a) param)
+param	input.c	/^void f(typeof_unqual(a) param) {}$/;"	z	function:f	typeref:typename:typeof_unqual(a)	file:
+g	input.c	/^typeof_unqual(a) g(void) { return 0; }$/;"	f	typeref:typename:typeof_unqual(a)	signature:(void)
+var5	input.c	/^__typeof_unqual(a) var5 = 6;$/;"	v	typeref:typename:__typeof_unqual(a)
+var6	input.c	/^__typeof_unqual__(const int) var6 = 7;$/;"	v	typeref:typename:__typeof_unqual__(const int)
