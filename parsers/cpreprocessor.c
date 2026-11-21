@@ -1063,7 +1063,7 @@ static void makeIncludeTag (const char *const name, bool systemHeader)
 
 static int makeParamTag (vString *name, short nth, bool placeholder)
 {
-	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_MACRO);
+	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_PARAM);
 
 	Assert (Cpp.macroParamKindIndex != KIND_GHOST_INDEX);
 
