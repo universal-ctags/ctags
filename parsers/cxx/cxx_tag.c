@@ -29,13 +29,19 @@ CXX_COMMON_MACRO_ROLES(C);
 CXX_COMMON_MACRO_ROLES(CXX);
 CXX_COMMON_MACRO_ROLES(CUDA);
 
-#define CXX_COMMON_HEADER_ROLES(__langPrefix) \
-	static roleDefinition __langPrefix##HeaderRoles [] = { \
-		RoleTemplateSystemHeader(0), \
-		RoleTemplateLocalHeader(0), \
+#define CXX_COMMON_FILE_ROLES(__langPrefix, __Filetype, __version) \
+	static roleDefinition __langPrefix##__Filetype##Roles [] = { \
+		RoleTemplateSystem##__Filetype(__version), \
+		RoleTemplateLocal##__Filetype(__version), \
 	}
 
+#define CXX_COMMON_HEADER_ROLES(__langPrefix) \
+	CXX_COMMON_FILE_ROLES(__langPrefix, Header, 0)
+#define CXX_COMMON_DATAFILE_ROLES(__langPrefix) \
+	CXX_COMMON_FILE_ROLES(__langPrefix, Datafile, 2)
+
 CXX_COMMON_HEADER_ROLES(C);
+CXX_COMMON_DATAFILE_ROLES(C);
 static roleDefinition CXXHeaderRoles [] = {
 		RoleTemplateSystemHeader(0),
 		RoleTemplateLocalHeader(0),
@@ -44,7 +50,9 @@ static roleDefinition CXXHeaderRoles [] = {
 		{ true, "exported", "exported with \"exported imported ...\"",
 		  .version = 2 },
 };
+CXX_COMMON_DATAFILE_ROLES(CXX);
 CXX_COMMON_HEADER_ROLES(CUDA);
+CXX_COMMON_DATAFILE_ROLES(CUDA);
 
 /* Currently V parser wants these items. */
 #define RoleTemplateForeignDecl(V) { true, "foreigndecl", "declared in foreign languages", .version = V }
@@ -100,7 +108,11 @@ static roleDefinition CXXPartitionRoles [] = {
 	{ false, 'x', "externvar",  "external and forward variable declarations", .syncWith = _syncWith }, \
 	{ false, 'z', "parameter",  "function parameters inside function or prototype definitions", .syncWith = _syncWith }, \
 	{ false, 'L', "label",      "goto labels", .syncWith = _syncWith }, \
-	{ false, 'D', "macroparam", "parameters inside macro definitions", .syncWith = _syncWith }
+	{ false, 'D', "macroparam", "parameters inside macro definitions", .syncWith = _syncWith }, \
+	{ true,  'b', "datafile",   "embedded data files", \
+			.referenceOnly = true,  ATTACH_ROLES(_langPrefix##DatafileRoles), .syncWith = _syncWith, \
+			.version = 2, \
+	}
 
 static kindDefinition g_aCXXCKinds [] = {
 	/* All other than LANG_AUTO are ignored.

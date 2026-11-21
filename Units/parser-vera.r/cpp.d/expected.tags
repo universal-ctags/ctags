@@ -1,3 +1,5 @@
 vera_defines.vrh	input.vr	/^#include <vera_defines.vrh>/;"	h	language:Vera	roles:system
 local.vrh	input.vr	/^#include "local.vrh"/;"	h	language:Vera	roles:local
 string_example	input.vr	/^program string_example {$/;"	p	language:Vera	roles:def
+data0	input-0.vr	/^#embed "data0"/;"	b	language:CPreProcessor	roles:local
+data1	input-0.vr	/^#embed <data1>/;"	b	language:CPreProcessor	roles:system

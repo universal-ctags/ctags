@@ -101,7 +101,8 @@ enum eState {
 	DRCTV_ELIF,    /* "#elif" encountered */
 	DRCTV_PRAGMA,  /* #pragma encountered */
 	DRCTV_UNDEF,   /* "#undef" encountered */
-	DRCTV_INCLUDE, /* "#include" or "#embed" encountered */
+	DRCTV_INCLUDE, /* "#include" encountered */
+	DRCTV_EMBED,   /* "#embed" encountered */
 };
 
 /*  Defines the current state of the pre-processor.
@@ -144,6 +145,9 @@ typedef struct sCppState {
 
 	bool useClientLangHeaderKindIndex;
 	struct sCPreProLangModelFileKind header;
+
+	bool useClientLangDatafileKindIndex;
+	struct sCPreProLangModelFileKind datafile;
 
 	int macrodefFieldIndex;
 
@@ -211,6 +215,16 @@ static roleDefinition CPREPROHeaderRoles [] = {
 	RoleTemplateLocalHeader(0),
 };
 
+typedef enum {
+	CPREPRO_DATAFILE_KIND_SYSTEM_ROLE,
+	CPREPRO_DATAFILE_KIND_LOCAL_ROLE,
+} cPreProDatafileRole;
+
+static roleDefinition CPREPRODatafileRoles [] = {
+	RoleTemplateSystemDatafile(1),
+	RoleTemplateLocalDatafile(1),
+};
+
 
 static kindDefinition CPreProKinds [] = {
 	{ true,  'd', "macro",      "macro definitions",
@@ -218,6 +232,9 @@ static kindDefinition CPreProKinds [] = {
 	{ true, 'h', "header",     "included header files",
 	  .referenceOnly = true, ATTACH_ROLES(CPREPROHeaderRoles)},
 	{ false, 'D', "parameter", "macro parameters", },
+	{ true, 'b', "datafile",     "embedded data files",
+	  .referenceOnly = true, ATTACH_ROLES(CPREPRODatafileRoles),
+	  .version = 1 },
 };
 
 typedef enum {
@@ -282,6 +299,12 @@ static cppState Cpp = {
 		.kindIndex = CPREPRO_HEADER,
 		.systemRoleIndex = CPREPRO_HEADER_KIND_SYSTEM_ROLE,
 		.localRoleIndex = CPREPRO_HEADER_KIND_LOCAL_ROLE,
+	},
+	.useClientLangDatafileKindIndex = false,
+	.datafile = {
+		.kindIndex = CPREPRO_DATAFILE,
+		.systemRoleIndex = CPREPRO_DATAFILE_KIND_SYSTEM_ROLE,
+		.localRoleIndex = CPREPRO_DATAFILE_KIND_LOCAL_ROLE,
 	},
 	.macrodefFieldIndex = FIELD_UNKNOWN,
 	.directive = {
@@ -422,6 +445,20 @@ static void cppInitCommon(langType clientLang,
 
 		Cpp.header.systemRoleIndex = CPREPRO_HEADER_KIND_SYSTEM_ROLE;
 		Cpp.header.localRoleIndex = CPREPRO_HEADER_KIND_LOCAL_ROLE;
+	}
+
+	if (model->datafile.kindIndex != KIND_GHOST_INDEX)
+	{
+		Cpp.datafile = model->datafile;
+		Cpp.useClientLangDatafileKindIndex = true;
+	}
+	else
+	{
+		Cpp.datafile.kindIndex = CPREPRO_DATAFILE;
+		Cpp.useClientLangDatafileKindIndex = false;
+
+		Cpp.datafile.systemRoleIndex = CPREPRO_DATAFILE_KIND_SYSTEM_ROLE;
+		Cpp.datafile.localRoleIndex = CPREPRO_DATAFILE_KIND_LOCAL_ROLE;
 	}
 
 	Cpp.directive.state     = DRCTV_NONE;
@@ -938,6 +975,8 @@ static bool doesCPreProRunAsStandaloneParser (int kind)
 {
 	if (kind == CPREPRO_HEADER)
 		return !Cpp.useClientLangHeaderKindIndex;
+	else if (kind == CPREPRO_DATAFILE)
+		return !Cpp.useClientLangDatafileKindIndex;
 	else if (kind == CPREPRO_MACRO)
 		return !Cpp.useClientLangDefineMacroKindIndex;
 	else if (kind == CPREPRO_PARAM)
@@ -1048,6 +1087,14 @@ static void makeIncludeTag (const char *const name, bool systemHeader)
 						  systemHeader
 						  ? Cpp.header.systemRoleIndex
 						  : Cpp.header.localRoleIndex);
+}
+
+static void makeEmbedTag (const char *const name, bool systemDatafile)
+{
+	makeIncludeTagCommon (name, CPREPRO_DATAFILE, Cpp.datafile.kindIndex,
+						  systemDatafile
+						  ? Cpp.datafile.systemRoleIndex
+						  : Cpp.datafile.localRoleIndex);
 }
 
 static int makeParamTag (vString *name, short nth, bool placeholder)
@@ -1308,7 +1355,7 @@ static void directiveInclude (const int c, bool is_include)
 	{
 		readFilename (c, Cpp.directive.name);
 		void (* makeTag) (const char *const, bool)
-			= is_include ? makeIncludeTag : NULL;
+			= is_include ? makeIncludeTag : makeEmbedTag;
 		if (makeTag && (! isIgnore ()) && vStringLength (Cpp.directive.name))
 			(* makeTag) (vStringValue (Cpp.directive.name),
 					c == '<');
@@ -1355,9 +1402,10 @@ static bool directiveHash (const int c)
 	readDirective (c, directive, MaxDirectiveName);
 	if (stringMatch (directive, "define"))
 		Cpp.directive.state = DRCTV_DEFINE;
-	else if (stringMatch (directive, "include")
-			 || stringMatch (directive, "embed"))	/* C23 */
+	else if (stringMatch (directive, "include"))
 		Cpp.directive.state = DRCTV_INCLUDE;
+	else if (stringMatch (directive, "embed"))
+		Cpp.directive.state = DRCTV_EMBED; /* C23 */
 	else if (stringMatch (directive, "undef"))
 		Cpp.directive.state = DRCTV_UNDEF;
 	else if (strncmp (directive, "if", (size_t) 2) == 0)
@@ -1425,6 +1473,7 @@ static bool handleDirective (const int c, int *macroCorkIndex, bool *inspect_con
 		case DRCTV_PRAGMA:  directivePragma (c);         break;
 		case DRCTV_UNDEF:   directiveUndef (c);          break;
 		case DRCTV_INCLUDE: directiveInclude (c, true);  break;
+		case DRCTV_EMBED:   directiveInclude (c, false); break;
 	}
 	return ignore;
 }
@@ -1812,7 +1861,8 @@ process:
 			case DOUBLE_QUOTE:
 				condition = conditionMayFlush(condition, false);
 
-				if (Cpp.directive.state == DRCTV_INCLUDE)
+				if (Cpp.directive.state == DRCTV_INCLUDE
+					|| Cpp.directive.state == DRCTV_EMBED)
 					goto enter;
 				else
 				{
@@ -2911,6 +2961,10 @@ extern parserDefinition* CPreProParser (void)
 	def->paramCount = ARRAY_SIZE(CpreProParams);
 
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
+
 	return def;
 }
 

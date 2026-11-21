@@ -82,8 +82,11 @@
 #define RoleTemplateSystemHeader(VERSION) RoleTemplateSystemFor(header, VERSION)
 #define RoleTemplateLocalHeader(VERSION)  RoleTemplateLocalFor(header, VERSION)
 
+#define RoleTemplateSystemDatafile(VERSION) RoleTemplateSystemFor(datafile, VERSION)
+#define RoleTemplateLocalDatafile(VERSION)  RoleTemplateLocalFor(datafile, VERSION)
+
 typedef enum {
-	CPREPRO_MACRO, CPREPRO_HEADER, CPREPRO_PARAM,
+	CPREPRO_MACRO, CPREPRO_HEADER, CPREPRO_PARAM, CPREPRO_DATAFILE
 } cPreProKind;
 
 struct sCPreProLangModelFileKind {
@@ -98,6 +101,7 @@ struct sCPreProLangModel {
 		macroUndefRoleIndex, macroConditionRoleIndex;
 	int macroParamKindIndex;
 	struct sCPreProLangModelFileKind header;
+	struct sCPreProLangModelFileKind datafile;
 	int macrodefFieldIndex;
 };
 
@@ -110,6 +114,12 @@ struct sCPreProLangModel {
 		.macroParamKindIndex     = KIND_GHOST_INDEX,		\
 															\
 		.header                  = {						\
+			.kindIndex           = KIND_GHOST_INDEX,		\
+			.systemRoleIndex     = ROLE_DEFINITION_INDEX,	\
+			.localRoleIndex      = ROLE_DEFINITION_INDEX,	\
+		},													\
+															\
+		.datafile                = {						\
 			.kindIndex           = KIND_GHOST_INDEX,		\
 			.systemRoleIndex     = ROLE_DEFINITION_INDEX,	\
 			.localRoleIndex      = ROLE_DEFINITION_INDEX,	\

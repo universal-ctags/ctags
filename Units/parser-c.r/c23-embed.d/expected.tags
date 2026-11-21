@@ -1,8 +1,8 @@
 a.h	input.c	/^#include "a.h"/;"	h	roles:local
 data	input.c	/^static const unsigned char data[] = {$/;"	v	typeref:typename:const unsigned char[]	file:	roles:def
-data.bin	input.c	/^#embed "data.bin"/;"	h	roles:local
-font.ttf	input.c	/^#embed <font.ttf>/;"	h	roles:system
-inline.bin	input.c	/^#embed "inline.bin"/;"	h	roles:local
-nospace.bin	input.c	/^#embed"nospace.bin"/;"	h	roles:local
-spaced.bin	input.c	/^#   embed "spaced.bin"/;"	h	roles:local
-sys/res.dat	input.c	/^#embed <sys\/res.dat>/;"	h	roles:system
+data.bin	input.c	/^#embed "data.bin"/;"	b	roles:local
+font.ttf	input.c	/^#embed <font.ttf>/;"	b	roles:system
+inline.bin	input.c	/^#embed "inline.bin"/;"	b	roles:local
+nospace.bin	input.c	/^#embed"nospace.bin"/;"	b	roles:local
+spaced.bin	input.c	/^#   embed "spaced.bin"/;"	b	roles:local
+sys/res.dat	input.c	/^#embed <sys\/res.dat>/;"	b	roles:system

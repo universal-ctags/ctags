@@ -49,6 +49,7 @@
 {"_type": "ptag", "name": "TAG_FIELD_DESCRIPTION", "path": "typeref", "pattern": "Type and name of a variable or typedef"}
 {"_type": "ptag", "name": "TAG_FIELD_DESCRIPTION", "path": "xpath", "pattern": "xpath for the tag"}
 {"_type": "ptag", "name": "TAG_FILE_SORTED", "path": "1", "pattern": "0=unsorted, 1=sorted, 2=foldcase"}
+{"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "C", "path": "b,datafile", "pattern": "embedded data files"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "C", "path": "d,macro", "pattern": "macro definitions"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "C", "path": "e,enumerator", "pattern": "enumerators (values inside an enumeration)"}
 {"_type": "ptag", "name": "TAG_KIND_DESCRIPTION", "parserName": "C", "path": "f,function", "pattern": "function definitions"}
@@ -91,6 +92,8 @@
 {"_type": "ptag", "name": "TAG_PROGRAM_AUTHOR", "path": "Universal Ctags Team", "pattern": ""}
 {"_type": "ptag", "name": "TAG_PROGRAM_NAME", "path": "Universal Ctags", "pattern": "Derived from Exuberant Ctags"}
 {"_type": "ptag", "name": "TAG_PROGRAM_URL", "path": "https://ctags.io/", "pattern": "official site"}
+{"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "datafile", "path": "local", "pattern": "local datafile"}
+{"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "datafile", "path": "system", "pattern": "system datafile"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "function", "path": "foreigncall", "pattern": "called in foreign languages"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "function", "path": "foreigndecl", "pattern": "declared in foreign languages"}
 {"_type": "ptag", "name": "TAG_ROLE_DESCRIPTION", "parserName": "C", "kindName": "header", "path": "local", "pattern": "local header"}

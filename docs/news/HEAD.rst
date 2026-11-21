@@ -134,6 +134,11 @@ Perl:
       Non-ASCII characters in subroutine names, package names, etc., are
       now preserved instead of being cut at the first non-ASCII byte.
 
+CPreProcessor/C/C++/CUDA:
+
+    * Extract files embedded with #embed with newly introduced ``datafile``/``b``
+      kind.
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
