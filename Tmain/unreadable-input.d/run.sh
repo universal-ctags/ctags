@@ -22,15 +22,21 @@ if [ $(id -u) = 0 ] && ! sudo -u '#1' $CTAGS --version > /dev/null; then
 	skip "sudo needed in this test case doesn't work expectedly on this platform (execution)"
 fi
 
+cleanup()
+{
+	rm -f ${INPUT0}
+	[ -d ${INPUT0%/*} ] && rmdir ${INPUT0%/*}
+}
+
+trap cleanup EXIT
+
 mkdir -p ${INPUT0%/*}
 echo "int v0;" > ${INPUT0}
 chmod a-r ${INPUT0}
 
 if [ $(id -u) = 0 ] && sudo -u '#1' cat ${INPUT0} > /dev/null 2>&1; then
-	rm ${INPUT0}
 	skip "sudo needed in this test case doesn't work expectedly on this platform (file reading)"
 elif [ $(id -u) != 0 ] && cat ${INPUT0} > /dev/null 2>&1; then
-	rm ${INPUT0}
 	skip "chmod a-r doesn't work expectedly on this platform"
 fi
 
@@ -46,4 +52,3 @@ fi
 		$CTAGS --quiet --options=NONE -L - -o -
 	fi
 }
-rm ${INPUT0}
