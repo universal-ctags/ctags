@@ -1302,13 +1302,15 @@ static void directiveElif (const int c)
 	Cpp.directive.state = DRCTV_NONE;
 }
 
-static void directiveInclude (const int c)
+static void directiveInclude (const int c, bool is_include)
 {
 	if (c == '<' || c == '"')
 	{
 		readFilename (c, Cpp.directive.name);
-		if ((! isIgnore ()) && vStringLength (Cpp.directive.name))
-			makeIncludeTag (vStringValue (Cpp.directive.name),
+		void (* makeTag) (const char *const, bool)
+			= is_include ? makeIncludeTag : NULL;
+		if (makeTag && (! isIgnore ()) && vStringLength (Cpp.directive.name))
+			(* makeTag) (vStringValue (Cpp.directive.name),
 					c == '<');
 	}
 	Cpp.directive.state = DRCTV_NONE;
@@ -1421,7 +1423,7 @@ static bool handleDirective (const int c, int *macroCorkIndex, bool *inspect_con
 			break;
 		case DRCTV_PRAGMA:  directivePragma (c);         break;
 		case DRCTV_UNDEF:   directiveUndef (c);          break;
-		case DRCTV_INCLUDE: directiveInclude (c);        break;
+		case DRCTV_INCLUDE: directiveInclude (c, true);  break;
 	}
 	return ignore;
 }
