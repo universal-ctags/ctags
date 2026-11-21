@@ -4,6 +4,7 @@ environment:
   matrix:
     - compiler: msbuild
       CONFIGURATION: Release
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     # - compiler: msys2
     #   ARCH: x64
     #   MSYS2_ARCH: x86_64
@@ -16,7 +17,7 @@ environment:
     #   MSYSTEM: MINGW32
     - compiler: msvc
       ARCH: x64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     #- compiler: msvc
     #  ARCH: x86
     - compiler: mingw
