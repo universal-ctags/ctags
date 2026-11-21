@@ -1,0 +1,12 @@
+a	input.cpp	/^int a, b;$/;"	v	typeref:typename:int
+b	input.cpp	/^int a, b;$/;"	v	typeref:typename:int
+f1	input.cpp	/^void f1(decltype(a + b) x) {}$/;"	f	typeref:typename:void	signature:(decltype(a+b) x)
+x	input.cpp	/^void f1(decltype(a + b) x) {}$/;"	z	function:f1	typeref:typename:decltype(a+b)	file:
+f2	input.cpp	/^void f2(int y, decltype(a * 2) z);$/;"	p	typeref:typename:void	file:	signature:(int y,decltype(a * 2) z)
+y	input.cpp	/^void f2(int y, decltype(a * 2) z);$/;"	z	prototype:f2	typeref:typename:int	file:
+z	input.cpp	/^void f2(int y, decltype(a * 2) z);$/;"	z	prototype:f2	typeref:typename:decltype(a * 2)	file:
+f3	input.cpp	/^void f3(decltype(a) x, decltype(b - 1) y) {}$/;"	f	typeref:typename:void	signature:(decltype(a) x,decltype(b-1) y)
+x	input.cpp	/^void f3(decltype(a) x, decltype(b - 1) y) {}$/;"	z	function:f3	typeref:typename:decltype(a)	file:
+y	input.cpp	/^void f3(decltype(a) x, decltype(b - 1) y) {}$/;"	z	function:f3	typeref:typename:decltype(b-1)	file:
+g	input.cpp	/^decltype(a + b) g(int q) { return 0; }$/;"	f	typeref:typename:decltype(a+b)	signature:(int q)
+q	input.cpp	/^decltype(a + b) g(int q) { return 0; }$/;"	z	function:g	typeref:typename:int	file:
