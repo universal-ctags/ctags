@@ -6,6 +6,9 @@
 *
 *   This module contains functions for parsing and scanning Vera
 *   source files.
+*
+*   References:
+*   - https://www.scribd.com/document/60086044/lrm
 */
 
 /*
