@@ -1,0 +1,8 @@
+// Taken from Example 3-5 of https://www.scribd.com/document/60086044/lrm
+#include <vera_defines.vrh>
+#include "local.vrh"
+
+program string_example {
+   string str = "This is a string";
+   printf("str = %s \n", str);
+}
