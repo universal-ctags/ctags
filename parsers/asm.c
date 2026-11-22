@@ -801,9 +801,7 @@ static void findAsmTagsCommon (bool useCpp)
 	const unsigned char *line;
 
 	if (useCpp)
-		cppInit (false, false, false, false,
-				 KIND_GHOST_INDEX, 0, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
-				 FIELD_UNKNOWN);
+		cppInit (false, false, false, false, &CPreProAsIsModel);
 
 	int sectionScope = CORK_NIL;
 	int macroScope = CORK_NIL;

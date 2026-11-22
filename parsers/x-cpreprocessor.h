@@ -15,6 +15,7 @@
 #include "general.h"  /* must always come first */
 
 #include "debug.h"
+#include "entry.h"
 #include "mio.h"
 #include "ptrarray.h"
 #include "types.h"
@@ -73,12 +74,49 @@
 #define RoleTemplateUndef { true, "undef", "undefined" }
 #define RoleTemplateCondition { false, "condition", "used in part of #if/#ifdef/#elif conditions" }
 
-#define RoleTemplateSystem { true, "system", "system header" }
-#define RoleTemplateLocal  { true, "local", "local header" }
+#define RoleTemplateSystemFor(FILETYPE, VERSION) \
+	{ true, "system", "system " #FILETYPE, .version = VERSION }
+#define RoleTemplateLocalFor(FILETYPE, VERSION) \
+	{ true, "local", "local " #FILETYPE, .version = VERSION }
+
+#define RoleTemplateSystemHeader(VERSION) RoleTemplateSystemFor(header, VERSION)
+#define RoleTemplateLocalHeader(VERSION)  RoleTemplateLocalFor(header, VERSION)
 
 typedef enum {
 	CPREPRO_MACRO, CPREPRO_HEADER, CPREPRO_PARAM,
 } cPreProKind;
+
+struct sCPreProLangModelFileKind {
+	int kindIndex,
+		systemRoleIndex, localRoleIndex;
+};
+
+/* The members for role indexes have no effect
+ * when their kind index is KIND_GHOST_INDEX. */
+struct sCPreProLangModel {
+	int defineMacroKindIndex,
+		macroUndefRoleIndex, macroConditionRoleIndex;
+	int macroParamKindIndex;
+	struct sCPreProLangModelFileKind header;
+	int macrodefFieldIndex;
+};
+
+/* Use the language model of CPreProcessor without any customizing */
+#define CPreProAsIsModel ((struct sCPreProLangModel) {		\
+		.defineMacroKindIndex    = KIND_GHOST_INDEX,		\
+		.macroUndefRoleIndex     = ROLE_DEFINITION_INDEX,	\
+		.macroConditionRoleIndex = ROLE_DEFINITION_INDEX,	\
+															\
+		.macroParamKindIndex     = KIND_GHOST_INDEX,		\
+															\
+		.header                  = {						\
+			.kindIndex           = KIND_GHOST_INDEX,		\
+			.systemRoleIndex     = ROLE_DEFINITION_INDEX,	\
+			.localRoleIndex      = ROLE_DEFINITION_INDEX,	\
+		},													\
+															\
+		.macrodefFieldIndex      = FIELD_UNKNOWN,			\
+	})
 
 /*
 *   FUNCTION PROTOTYPES
@@ -93,13 +131,7 @@ extern void cppInit (const bool state,
 		     const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
-		     int defineMacroKindIndex,
-		     int macroUndefRoleIndex,
-		     int macroConditionRoleIndex,
-		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macroParamKindIndex,
-		     int macrodefFieldIndex);
+		     const struct sCPreProLangModel *model);
 
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);

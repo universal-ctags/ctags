@@ -1,0 +1,3 @@
+vera_defines.vrh	input.vr	/^#include <vera_defines.vrh>/;"	h	language:Vera	roles:system
+local.vrh	input.vr	/^#include "local.vrh"/;"	h	language:Vera	roles:local
+string_example	input.vr	/^program string_example {$/;"	p	language:Vera	roles:def
