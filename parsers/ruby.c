@@ -220,7 +220,7 @@ static bool canMatchKeywordWithAssignFull (const unsigned char** s, const unsign
 										   const char* literal, vString *assignee)
 {
 	const unsigned char* original_pos = *s;
-	size_t original_len;
+	size_t original_len = 0;
 	if (assignee)
 		original_len = vStringLength  (assignee);
 

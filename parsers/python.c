@@ -1261,7 +1261,7 @@ static bool parseImport (tokenInfo *const token)
 	if (token->keyword == KEYWORD_import)
 	{
 		bool parenthesized = false;
-		int moduleIndex;
+		int moduleIndex = CORK_NIL;
 
 		if (fromModule)
 		{
