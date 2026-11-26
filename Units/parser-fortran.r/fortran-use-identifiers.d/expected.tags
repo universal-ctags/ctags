@@ -1,0 +1,4 @@
+identifiers	input.f90	/^program identifiers$/;"	p	roles:def
+use	input.f90	/^  integer :: use(/;"	v	program:identifiers	roles:def
+p	input.f90	/^  integer, target :: p$/;"	v	program:identifiers	roles:def
+valid_in_block	input.f90	/^    use valid_in_block$/;"	m	program:identifiers	roles:used

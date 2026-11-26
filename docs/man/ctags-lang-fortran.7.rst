@@ -20,6 +20,27 @@ DESCRIPTION
 -----------
 This man page gathers random notes about tagging FORTRAN source code.
 
+REFERENCES
+----------
+With ``--extras=+r``, USE statements emit ``module`` references with the
+``used`` role. Plain USE statements and the INTRINSIC, NON_INTRINSIC, ONLY,
+and renaming forms are supported in fixed and free source forms. Imported
+names and aliases are not tagged as module references.
+Use ``--fields=+{roles}`` to display the roles. Intrinsic and non-intrinsic
+modules share the same ``used`` role; references do not record module nature.
+
+References carry the enclosing scope, as definition tags do. USE statements
+inside BLOCK constructs and implicit main programs are also handled. BLOCK
+constructs do not introduce a tag scope, and an implicit main program has no
+named program scope.
+
+INCLUDE files are not expanded, so USE statements within included files are
+not tagged when parsing the including source file.
+
+Module reference names preserve their spelling in the source, as module
+definition names do. Fortran is case-insensitive, so consumers matching
+references to definitions should compare names without regard to case.
+
 VERSIONS
 --------
 
@@ -27,6 +48,11 @@ Change since "0.0"
 ~~~~~~~~~~~~~~~~~~
 
 * New extra ``linkName``.
+
+Change since "1.0"
+~~~~~~~~~~~~~~~~~~
+
+* Add the ``used`` role to the ``module`` kind.
 
 SEE ALSO
 --------

@@ -115,6 +115,7 @@ enum eKeywordId {
 	KEYWORD_map,
 	KEYWORD_module,
 	KEYWORD_namelist,
+	KEYWORD_non_intrinsic,
 	KEYWORD_non_overridable,
 	KEYWORD_nopass,
 	KEYWORD_operator,
@@ -247,6 +248,14 @@ static struct {
 	bool newline;
 } Free;
 
+typedef enum {
+	R_MODULE_USED,
+} fortranModuleRole;
+
+static roleDefinition FortranModuleRoles [] = {
+	{ true, "used", "used module", .version = 2 },
+};
+
 /* indexed by tagType */
 static kindDefinition FortranKinds [] = {
 	{ true,  'b', "blockData",  "block data"},
@@ -258,7 +267,8 @@ static kindDefinition FortranKinds [] = {
 	{ true,  'k', "component",  "type and structure components"},
 	{ true,  'l', "label",      "labels"},
 	{ false, 'L', "local",      "local, common block, and namelist variables"},
-	{ true,  'm', "module",     "modules"},
+	{ true,  'm', "module",     "modules",
+	  .referenceOnly = false, ATTACH_ROLES (FortranModuleRoles) },
 	{ true,  'M', "method",     "type bound procedures"},
 	{ true,  'n', "namelist",   "namelists"},
 	{ true,  'N', "enumerator", "enumeration values"},
@@ -331,6 +341,7 @@ static const keywordTable FortranKeywordTable [] = {
 	{ "map",            KEYWORD_map          },
 	{ "module",         KEYWORD_module       },
 	{ "namelist",       KEYWORD_namelist     },
+	{ "non_intrinsic",  KEYWORD_non_intrinsic },
 	{ "non_overridable", KEYWORD_non_overridable },
 	{ "nopass",         KEYWORD_nopass       },
 	{ "operator",       KEYWORD_operator     },
@@ -622,6 +633,16 @@ static int makeFortranLinkNameTag(tagEntryInfo *e)
 	return r;
 }
 
+static void setFortranScope (tagEntryInfo *const e)
+{
+	const tokenInfo* const scope = ancestorScope ();
+	if (scope != NULL)
+	{
+		e->extensionFields.scopeKindIndex = scope->tag;
+		e->extensionFields.scopeName = vStringValue (scope->string);
+	}
+}
+
 static void makeFortranTag (tokenInfo *const token, tagType tag)
 {
 	token->tag = tag;
@@ -644,15 +665,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
 		e.truncateLineAfterTag = (bool) (token->tag != TAG_LABEL);
 
-		if (ancestorCount () > 0)
-		{
-			const tokenInfo* const scope = ancestorScope ();
-			if (scope != NULL)
-			{
-				e.extensionFields.scopeKindIndex = scope->tag;
-				e.extensionFields.scopeName = vStringValue (scope->string);
-			}
-		}
+		setFortranScope (&e);
 		if (token->parentType != NULL &&
 			vStringLength (token->parentType) > 0 &&
 			(token->tag == TAG_DERIVED_TYPE || (token->tag == TAG_SUBMODULE)))
@@ -1746,14 +1759,14 @@ static void parseCommonNamelistStmt (tokenInfo *const token, tagType type)
 			strcmp (vStringValue (token->string), "/") == 0)
 		{
 			readToken (token);
-			if (isType (token, TOKEN_IDENTIFIER))
+			if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 			{
 				makeFortranTag (token, type);
 				readToken (token);
 			}
 			skipPast (token, TOKEN_OPERATOR);
 		}
-		if (isType (token, TOKEN_IDENTIFIER))
+		if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 			makeFortranTag (token, TAG_LOCAL);
 		readToken (token);
 		if (isType (token, TOKEN_PAREN_OPEN))
@@ -2206,7 +2219,7 @@ static void parseEntryStmt (tokenInfo *const token)
 {
 	Assert (isKeyword (token, KEYWORD_entry));
 	readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 		makeFortranTag (token, TAG_ENTRY_POINT);
 	skipToNextStatement (token);
 }
@@ -2344,6 +2357,58 @@ static bool parseImplicitPartStmt (tokenInfo *const token)
 	return result;
 }
 
+/*
+ * use-stmt is
+ *     USE [[, module-nature] ::] module-name [, rename-list]
+ *     or USE [[, module-nature] ::] module-name , ONLY : [only-list]
+ *
+ * The rename/ONLY lists affect names imported from the module, not the
+ * module reference itself, so only the prefix through module-name needs to
+ * be parsed here.
+ */
+static void parseUseStmt (tokenInfo *const token)
+{
+	Assert (isKeyword (token, KEYWORD_use));
+	readToken (token);
+
+	if (isType (token, TOKEN_COMMA))
+	{
+		readToken (token);
+		if (!isKeyword (token, KEYWORD_intrinsic) &&
+			!isKeyword (token, KEYWORD_non_intrinsic))
+		{
+			skipToNextStatement (token);
+			return;
+		}
+		readToken (token);
+		/* A module-nature requires the double colon. */
+		if (!isType (token, TOKEN_DOUBLE_COLON))
+		{
+			skipToNextStatement (token);
+			return;
+		}
+	}
+
+	if (isType (token, TOKEN_DOUBLE_COLON))
+		readToken (token);
+
+	if ((isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD)) &&
+		includeTag (TAG_MODULE) &&
+		isXtagEnabled (XTAG_REFERENCE_TAGS) &&
+		isLanguageRoleEnabled (getInputLanguage (), TAG_MODULE, R_MODULE_USED))
+	{
+		tagEntryInfo e;
+		initRefTagEntry (&e, vStringValue (token->string), TAG_MODULE,
+						 R_MODULE_USED);
+		updateTagLine (&e, token->lineNumber, token->filePosition);
+		e.truncateLineAfterTag = true;
+		setFortranScope (&e);
+		makeTagEntry (&e);
+	}
+
+	skipToNextStatement (token);
+}
+
 /*  specification-part is
  *      [use-stmt] ... (is USE module-name etc.)
  *      [implicit-part] (is [implicit-part-stmt] ... [implicit-stmt])
@@ -2352,8 +2417,15 @@ static bool parseImplicitPartStmt (tokenInfo *const token)
 static bool parseSpecificationPart (tokenInfo *const token)
 {
 	bool result = false;
-	while (skipStatementIfKeyword (token, KEYWORD_use))
+	/* INCLUDE can appear between USE statements. */
+	while (isKeyword (token, KEYWORD_use) || isKeyword (token, KEYWORD_include))
+	{
+		if (isKeyword (token, KEYWORD_use))
+			parseUseStmt (token);
+		else
+			skipToNextStatement (token);
 		result = true;
+	}
 	while (skipStatementIfKeyword (token, KEYWORD_import))
 		result = true;
 	while (parseImplicitPartStmt (token))
@@ -2375,8 +2447,11 @@ static void parseBlockData (tokenInfo *const token)
 	if (isKeyword (token, KEYWORD_data))
 	{
 		readToken (token);
-		if (isType (token, TOKEN_IDENTIFIER))
+		if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
+		{
+			token->type = TOKEN_IDENTIFIER;
 			makeFortranTag (token, TAG_BLOCK_DATA);
+		}
 	}
 	ancestorPush (token);
 	skipToNextStatement (token);
@@ -2453,7 +2528,7 @@ static vString *parserParentIdentifierOfSubmoduleStatement (tokenInfo *const tok
 	while (1)
 	{
 		readToken (token);
-		if (isType (token, TOKEN_IDENTIFIER))
+		if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 			vStringCat (parentId, token->string);
 		else if (isType (token, TOKEN_COLON))
 			vStringPut (parentId, ':');
@@ -2572,6 +2647,11 @@ static bool parseExecutionPart (tokenInfo *const token)
 				result = true;
 				break;
 
+			case KEYWORD_use:
+				parseUseStmt (token);
+				result = true;
+				break;
+
 			case KEYWORD_contains:
 			case KEYWORD_function:
 			case KEYWORD_subroutine:
@@ -2630,8 +2710,8 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
 	{
-		tokenInfo* name = newTokenFrom (token);
 		token->type = TOKEN_IDENTIFIER;
+		tokenInfo* name = newTokenFrom (token);
 		if (tag == TAG_SUBROUTINE ||
 			tag == TAG_PROTOTYPE)
 			name->signature = parseSignature (token);

@@ -1,0 +1,11 @@
+non_intrinsic	input.f90	/^program non_intrinsic$/;"	p	roles:def
+program_dep	input.f90	/^  use program_dep$/;"	m	program:non_intrinsic	roles:used
+x	input.f90	/^  integer :: x$/;"	v	program:non_intrinsic	roles:def
+holder	input.f90	/^module holder$/;"	m	roles:def
+non_intrinsic	input.f90	/^  subroutine non_intrinsic(/;"	s	module:holder	roles:def
+subroutine_dep	input.f90	/^    use subroutine_dep$/;"	m	subroutine:non_intrinsic	roles:used
+y	input.f90	/^    integer :: y$/;"	L	subroutine:non_intrinsic	file:	roles:def
+other_holder	input.f90	/^module other_holder$/;"	m	roles:def
+non_intrinsic	input.f90	/^  integer function non_intrinsic(/;"	f	module:other_holder	roles:def
+function_dep	input.f90	/^    use function_dep$/;"	m	function:non_intrinsic	roles:used
+z	input.f90	/^    integer :: z$/;"	L	function:non_intrinsic	file:	roles:def

@@ -1,0 +1,40 @@
+main	input.f90	/^program main$/;"	p	line:1	roles:def
+alpha	input.f90	/^  use alpha$/;"	m	line:2	program:main	roles:used
+beta	input.f90	/^  use :: beta$/;"	m	line:3	program:main	roles:used
+iso_c_binding	input.f90	/^  use, intrinsic :: iso_c_binding$/;"	m	line:4	program:main	roles:used
+gamma	input.f90	/^  use, non_intrinsic :: gamma$/;"	m	line:5	program:main	roles:used
+delta	input.f90	/^  use delta,/;"	m	line:6	program:main	roles:used
+epsilon	input.f90	/^  use epsilon,/;"	m	line:7	program:main	roles:used
+zeta	input.f90	/^  use zeta,/;"	m	line:8	program:main	roles:used
+operators	input.f90	/^  use operators,/;"	m	line:9	program:main	roles:used
+renamed_operators	input.f90	/^  use renamed_operators,/;"	m	line:10	program:main	roles:used
+type	input.f90	/^  use type$/;"	m	line:11	program:main	roles:used
+iso_fortran_env	input.f90	/^       iso_fortran_env$/;"	m	line:13	program:main	roles:used
+MixedCase	input.f90	/^  USE, INTRINSIC :: MixedCase$/;"	m	line:15	program:main	roles:used
+split_module	input.f90	/^  use split_&$/;"	m	line:16	program:main	roles:used
+semicolon_one	input.f90	/^  use semicolon_one;/;"	m	line:18	program:main	roles:used
+semicolon_two	input.f90	/^  use semicolon_one; use semicolon_two$/;"	m	line:18	program:main	roles:used
+100	input.f90	/^100 use labelled_module$/;"	l	line:19	program:main	file:	roles:def
+labelled_module	input.f90	/^100 use labelled_module$/;"	m	line:19	program:main	roles:used
+block_module	input.f90	/^    use block_module,/;"	m	line:24	program:main	roles:used
+container	input.f90	/^module container$/;"	m	line:30	roles:def
+module_dep	input.f90	/^  use module_dep$/;"	m	line:31	module:container	roles:used
+api	input.f90	/^  interface api$/;"	i	line:32	module:container	roles:def
+interface_dep	input.f90	/^      use interface_dep$/;"	m	line:34	prototype:prototype	roles:used
+worker	input.f90	/^  subroutine worker$/;"	s	line:38	module:container	roles:def
+subroutine_dep	input.f90	/^    use subroutine_dep$/;"	m	line:39	subroutine:worker	roles:used
+answer	input.f90	/^  function answer(/;"	f	line:41	module:container	roles:def
+function_dep	input.f90	/^    use function_dep$/;"	m	line:42	function:answer	roles:used
+child	input.f90	/^submodule (container) child$/;"	S	line:48	roles:def
+submodule_dep	input.f90	/^  use submodule_dep$/;"	m	line:49	submodule:child	roles:used
+defaults	input.f90	/^block data defaults$/;"	b	line:52	roles:def
+block_data_dep	input.f90	/^  use block_data_dep$/;"	m	line:53	blockData:defaults	roles:used
+implicit_program_dep	input.f90	/^use implicit_program_dep$/;"	m	line:56	roles:used
+FIXED	input-1.f	/^      PROGRAM FIXED$/;"	p	line:1	roles:def
+FIXED_MODULE	input-1.f	/^      USE FIXED_MODULE$/;"	m	line:2	program:FIXED	roles:used
+ISO_FORTRAN_ENV	input-1.f	/^     & ISO_FORTRAN_ENV$/;"	m	line:4	program:FIXED	roles:used
+SPLIT_MODULE	input-1.f	/^      USE SPLIT_$/;"	m	line:5	program:FIXED	roles:used
+include_container	input-2.f90	/^module include_container$/;"	m	line:1	roles:def
+iso_fortran_env	input-2.f90	/^  use iso_fortran_env,/;"	m	line:3	module:include_container	roles:used
+iso_c_binding	input-2.f90	/^  use iso_c_binding,/;"	m	line:6	module:include_container	roles:used
+value	input-2.f90	/^  integer(int32) :: value$/;"	v	line:8	module:include_container	roles:def

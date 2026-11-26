@@ -1,0 +1,7 @@
+      PROGRAM FIXED
+      USE FIXED_MODULE
+      USE, INTRINSIC ::
+     & ISO_FORTRAN_ENV
+      USE SPLIT_
+     &MODULE
+      END

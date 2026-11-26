@@ -1,0 +1,4 @@
+incomplete	input.f90	/^program incomplete$/;"	p	roles:def
+valid_after_errors	input.f90	/^  use valid_after_errors$/;"	m	program:incomplete	roles:used
+valid_with_colons	input.f90	/^  use :: valid_with_colons$/;"	m	program:incomplete	roles:used
+at_eof	input.f90	/^use at_eof/;"	m	roles:used
