@@ -1,0 +1,10 @@
+h	input.ts	/^const h = 4;$/;"	C
+half	input.ts	/^const half = { y: h \/ 2 }; \/\/ a division, not a regex$/;"	C
+third	input.ts	/^const third = (h \/ 3); \/\/ a division in parentheses$/;"	C
+scale	input.ts	/^function scale(n = h \/ 2) {} \/\/ a division in a default parameter$/;"	f
+Box	input.ts	/^class Box {$/;"	c
+width	input.ts	/^  width = Math.round(h \/ 2); \/\/ a division in a property initializer$/;"	p	class:Box
+area	input.ts	/^  area() { return h \/ 2; } \/\/ a division in a method$/;"	m	class:Box
+braces	input.ts	/^const braces = { close: \/}\/ }; \/\/ a regex containing a brace$/;"	C
+hasQuote	input.ts	/^function hasQuote(s: string) { return \/'\/.test(s); } \/\/ a regex after return$/;"	f
+last	input.ts	/^const last = 1;$/;"	C
