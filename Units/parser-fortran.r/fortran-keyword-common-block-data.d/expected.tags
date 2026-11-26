@@ -1,0 +1,13 @@
+intrinsic	input.f90	/^block data intrinsic$/;"	b
+value	input.f90	/^  integer :: value$/;"	v	blockData:intrinsic
+intrinsic	input.f90	4;"	c	blockData:intrinsic
+value	input.f90	/^  common \/intrinsic\/ value$/;"	L	blockData:intrinsic	file:
+consumer	input.f90	/^program consumer$/;"	p
+intrinsic	input.f90	/^  integer :: intrinsic(/;"	v	program:consumer
+other	input.f90	/^  integer :: intrinsic(2), other$/;"	v	program:consumer
+storage	input.f90	9;"	c	program:consumer
+intrinsic	input.f90	/^  common \/storage\/ intrinsic,/;"	L	program:consumer	file:
+other	input.f90	/^  common \/storage\/ intrinsic, other$/;"	L	program:consumer	file:
+intrinsic	input.f90	/^  namelist \/intrinsic\/ intrinsic,/;"	n	program:consumer
+intrinsic	input.f90	/^  namelist \/intrinsic\/ intrinsic,/;"	L	program:consumer	file:
+other	input.f90	/^  namelist \/intrinsic\/ intrinsic, other$/;"	L	program:consumer	file:

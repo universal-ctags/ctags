@@ -1,0 +1,8 @@
+intrinsic	input.f90	/^program intrinsic$/;"	p
+x	input.f90	/^  integer :: x$/;"	v	program:intrinsic
+holder	input.f90	/^module holder$/;"	m
+intrinsic	input.f90	/^  subroutine intrinsic(/;"	s	module:holder
+y	input.f90	/^    integer :: y$/;"	L	subroutine:intrinsic	file:
+other_holder	input.f90	/^module other_holder$/;"	m
+intrinsic	input.f90	/^  integer function intrinsic(/;"	f	module:other_holder
+z	input.f90	/^    integer :: z$/;"	L	function:intrinsic	file:
