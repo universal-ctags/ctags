@@ -1,0 +1,7 @@
+Shape	input.java	/^public sealed interface Shape permits Circle, Square, Rectangle { }$/;"	i
+Base	input.java	/^sealed class Base permits Derived { }$/;"	c
+Expr	input.java	/^sealed interface Expr extends Node permits Constant, Plus { }$/;"	i	inherits:Node
+Node	input.java	/^non-sealed interface Node { }$/;"	i
+Acl	input-0.java	/^class Acl {$/;"	c
+permits	input-0.java	/^    private boolean permits;$/;"	f	class:Acl	file:
+permits	input-0.java	/^    boolean permits(String user) {$/;"	m	class:Acl	signature:(String user)

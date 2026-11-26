@@ -77,7 +77,7 @@ enum eKeywordId {
 	KEYWORD_MUTABLE,
 	KEYWORD_NAMESPACE, KEYWORD_NEW, KEYWORD_NATIVE,
 	KEYWORD_OPERATOR, KEYWORD_OVERRIDE,
-	KEYWORD_PACKAGE, KEYWORD_PRIVATE,
+	KEYWORD_PACKAGE, KEYWORD_PERMITS, KEYWORD_PRIVATE,
 	KEYWORD_PROTECTED, KEYWORD_PUBLIC,
 	KEYWORD_RECORD,
 	KEYWORD_REGISTER, KEYWORD_RETURN, KEYWORD_SHARED,
@@ -451,6 +451,7 @@ static const keywordDesc KeywordTable [] = {
      { "override",        KEYWORD_OVERRIDE,        { 1, 1, 0 } },
      { "package",         KEYWORD_PACKAGE,         { 0, 1, 1 } },
      { "pragma",          KEYWORD_PRAGMA,          { 0, 1, 0 } },
+     { "permits",         KEYWORD_PERMITS,         { 0, 0, 1 } },
      { "private",         KEYWORD_PRIVATE,         { 1, 1, 1 } },
      { "protected",       KEYWORD_PROTECTED,       { 1, 1, 1 } },
      { "public",          KEYWORD_PUBLIC,          { 1, 1, 1 } },
@@ -1831,6 +1832,29 @@ static void addParentClass (statementInfo *const st, tokenInfo *const token)
 	vStringCat (st->parentClasses, token->name);
 }
 
+/*  Consumes the subtype list of a sealed Java type, up to the opening brace.
+ *
+ *  The names are read and discarded rather than passed to addParentClass: they
+ *  are the subtypes the declared type permits, so recording them as parents
+ *  would claim Shape inherits Circle, which is backwards.
+ */
+static void skipPermittedSubtypes (void)
+{
+	tokenInfo *const token = newToken ();
+	int c;
+
+	do
+	{
+		c = skipToNonWhite ();
+		if (cppIsident1 (c))
+			readIdentifier (token, c);
+		else if (c == '<')
+			skipToMatch ("<>");
+	} while (c != '{'  &&  c != EOF);
+	cppUngetc (c);
+	deleteToken (token);
+}
+
 static void readParents (statementInfo *const st, const int qualifier)
 {
 	tokenInfo *const token = newToken ();
@@ -1843,6 +1867,19 @@ static void readParents (statementInfo *const st, const int qualifier)
 		if (cppIsident1 (c))
 		{
 			readIdentifier (token, c);
+			if (token->keyword == KEYWORD_PERMITS)
+			{
+				/*  "sealed interface E extends N permits A, B {}" ends its
+				 *  supertype list here. Without this the loop runs to the brace
+				 *  and records A and B as parents of E as well.
+				 */
+				addParentClass (st, parent);
+				initToken (parent);
+				skipPermittedSubtypes ();
+				deleteToken (parent);
+				deleteToken (token);
+				return;
+			}
 			if (isType (token, TOKEN_NAME))
 				vStringCat (parent->name, token->name);
 			else
@@ -1924,6 +1961,31 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_INTERFACE: processInterface (st);                  break;
 		case KEYWORD_LONG:      st->declaration = DECL_BASE;            break;
 		case KEYWORD_OPERATOR:  readOperator (st);                      break;
+		/* "sealed interface S permits A, B {}" names its subtypes the same way
+		 * "extends" and "implements" name theirs. Without this the parser takes
+		 * the last name before the brace as the declared type, so S gets no tag
+		 * and A or B is tagged in its place.
+		 *
+		 * permits is contextual, legal as an ordinary identifier, and it only
+		 * introduces a subtype list inside a class or interface declaration. Read
+		 * it as a name anywhere else, or a field or method called permits stops
+		 * being tagged. */
+		case KEYWORD_PERMITS:
+			if (st->declaration == DECL_CLASS ||
+				st->declaration == DECL_INTERFACE)
+			{
+				skipPermittedSubtypes ();
+				setToken (st, TOKEN_NONE);
+			}
+			else
+			{
+				tokenInfo *const token = activeToken (st);
+
+				token->type = TOKEN_NAME;
+				token->keyword = KEYWORD_NONE;
+				processName (st);
+			}
+			break;
 		case KEYWORD_MIXIN:     st->declaration = DECL_MIXIN;           break;
 		case KEYWORD_PRIVATE:   setAccess (st, ACCESS_PRIVATE);         break;
 		case KEYWORD_PROTECTED: setAccess (st, ACCESS_PROTECTED);       break;
