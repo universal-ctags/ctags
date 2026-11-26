@@ -221,6 +221,48 @@ Input/Output File Options
 
 	This option is quite esoteric and is empty by default.
 
+``--oneshot=<filename>``
+	Makes ctags behave as a filter, reading source
+	file contents from standard input and printing their tags to
+	standard output. When this option is enabled, the options ``-L``,
+	``-f``, ``-o``, and ``--totals`` are ignored.
+
+	ctags assumes *<filename>* is the input file
+	name of the contents. It affects language selection.
+	*<filename>* appears as the input file name in the tags output.
+
+	This option is useful for extracting interesting names in command
+	output.
+
+	For example, you can extract C preprocessor macro names in the source
+	code specified by a URL:
+
+	.. code-block:: console
+
+	   $ curl -s -o - \
+				'https://raw.githubusercontent.com/torvalds/linux/refs/heads/master/fs/buffer.c' \
+			| ./ctags --oneshot=buf.c --kinds-C='{macro}'
+	   BH_ENTRY	buf.c	/^#define BH_ENTRY(/;"	d	file:
+	   ...
+
+	Make the output in JSON format:
+
+	.. code-block:: console
+
+	   $ curl -s -o - \
+				'https://raw.githubusercontent.com/torvalds/linux/refs/heads/master/fs/buffer.c' \
+			| ./ctags --oneshot=buf.c --kinds-C='{macro}' --output-format=json \
+			| jq .
+	   {
+	     "_type": "tag",
+	     "name": "BH_ENTRY",
+	     "path": "buf.c",
+	     "pattern": "/^#define BH_ENTRY(/",
+	     "file": true,
+	     "kind": "macro"
+	   }
+	   ...
+
 ``--links[=(yes|no)]``
 	Indicates whether symbolic links (if supported) should be followed.
 	When disabled, symbolic links are ignored. This option is on by default.

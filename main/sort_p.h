@@ -25,11 +25,11 @@ extern void catFile (MIO *mio);
 
 #ifdef EXTERNAL_SORT
 extern void externalSortTags (const bool toStdout, MIO *tagFile);
-#else
+#endif
+
 extern void internalSortTags (const bool toStdout,
 			      MIO *mio,
 			      size_t numTags);
-#endif
 
 /* mio is closed in this function. */
 extern void failedSort (MIO *const mio, const char* msg);

@@ -105,9 +105,11 @@ typedef struct sOptionValues {
 	bool putFieldPrefix;		 /* --put-field-prefix */
 	unsigned int maxRecursionDepth; /* --maxdepth=<max-recursion-depth> */
 	bool fieldsReset;				/* --fields=[^+-] */
-	enum interactiveMode { INTERACTIVE_NONE = 0,
-						   INTERACTIVE_DEFAULT,
-						   INTERACTIVE_SANDBOX, } interactive; /* --interactive */
+	enum interactiveMode { INTERACTIVE_NONE         = 0,
+						   INTERACTIVE_MODE         = 1 << 0,
+						   INTERACTIVE_WITH_SANDBOX = 1 << 1,
+						   INTERACTIVE_ONESHOT      = 1 << 2,
+	} interactive; /* --interactive */
 #ifdef _WIN32
 	enum filenameSepOp { FILENAME_SEP_NO_REPLACE = false,
 						 FILENAME_SEP_USE_SLASH  = true,
