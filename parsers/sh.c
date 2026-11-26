@@ -38,6 +38,7 @@ typedef enum {
 	K_FUNCTION,
 	K_SCRIPT,
 	K_HEREDOCLABEL,
+	K_VARIABLE,
 } shKind;
 
 typedef enum {
@@ -73,6 +74,19 @@ static roleDefinition ZshHeredocRoles [] = {
 };
 
 typedef enum {
+	R_VARIABLE_UNSET,
+} shVariableRole;
+
+#define SH_VARIABLE_ROLES_COMMON { true, "unset", "unset", .version = 1 }
+static roleDefinition ShVariableRoles [] = {
+	SH_VARIABLE_ROLES_COMMON,
+};
+
+static roleDefinition ZshVariableRoles [] = {
+	SH_VARIABLE_ROLES_COMMON,
+};
+
+typedef enum {
 	R_ZSH_FUNCTION_AUTOLOADED,
 } zshFunctionRole;
 
@@ -80,21 +94,24 @@ static roleDefinition ZshFunctionRoles [] = {
 	{ true, "autoloaded", "function name passed to autoload built-in command" },
 };
 
-#define SH_KINDS_COMMON(SCRIPT_ROLES,HEREDOC_ROLES, FUNCTION_ROLES_SPEC) \
+#define SH_KINDS_COMMON(SCRIPT_ROLES,HEREDOC_ROLES, VARIABLE_ROLES, FUNCTION_ROLES_SPEC) \
 	{ true, 'a', "alias", "aliases"},							\
 	{ true, 'f', "function", "functions",						\
 	  .referenceOnly = false, FUNCTION_ROLES_SPEC },			\
 	{ true, 's', "script", "script files",						\
 	  .referenceOnly = true, ATTACH_ROLES (SCRIPT_ROLES) },		\
-	{ true, 'h', "heredoc", "label for here document",			\
-	  .referenceOnly = false, ATTACH_ROLES (HEREDOC_ROLES) }
+	{ true, 'h', "heredoc", "labels for here document",			\
+	  .referenceOnly = false, ATTACH_ROLES (HEREDOC_ROLES) },   \
+	{ true, 'v', "variable", "variables assigment (experimental)", \
+	  .referenceOnly = false, ATTACH_ROLES (VARIABLE_ROLES), .version = 1 }
+
 
 static kindDefinition ShKinds [] = {
-	SH_KINDS_COMMON(ShScriptRoles, ShHeredocRoles,),
+	SH_KINDS_COMMON(ShScriptRoles, ShHeredocRoles, ShVariableRoles,)
 };
 
 static kindDefinition ZshKinds [] = {
-	SH_KINDS_COMMON(ZshScriptRoles, ZshHeredocRoles,
+	SH_KINDS_COMMON(ZshScriptRoles, ZshHeredocRoles, ZshVariableRoles,
 					ATTACH_ROLES(ZshFunctionRoles)),
 };
 
@@ -103,6 +120,8 @@ enum eShKeywordId {
 	KEYWORD_alias,
 	KEYWORD_source,
 	KEYWORD_autoload,
+	KEYWORD_declare,			/* declare, typeset, local, export, readonly, float(zsh), integer */
+	KEYWORD_unset,
 };
 
 const char *dialectMap [] = {
@@ -114,6 +133,14 @@ static const struct dialectalKeyword KeywordTable [] = {
 	{ "alias",     KEYWORD_alias,    { 1, 1 } },
 	{ "source",    KEYWORD_source,   { 1, 1 } },
 	{ "autoload",  KEYWORD_autoload, { 0, 1 } },
+	{ "declare",   KEYWORD_declare,  { 1, 1 } },
+	{ "typset",    KEYWORD_declare,  { 1, 1 } },
+	{ "local",     KEYWORD_declare,  { 1, 1 } },
+	{ "export",    KEYWORD_declare,  { 1, 1 } },
+	{ "readonly",  KEYWORD_declare,  { 1, 1 } },
+	{ "float",     KEYWORD_declare,  { 0, 1 } },
+	{ "integer",   KEYWORD_declare,  { 0, 1 } },
+	{ "unset",     KEYWORD_unset,    { 1, 1 } },
 };
 
 /*
@@ -356,6 +383,13 @@ static size_t handleShKeyword (int keyword,
 		*role = R_SCRIPT_LOADED;
 		*check_char = isFileChar;
 		break;
+	case KEYWORD_unset:
+		*role = R_VARIABLE_UNSET;
+		/* FALL THROUGH */
+	case KEYWORD_declare:
+		*kind = K_VARIABLE;
+		*check_char = isIdentChar;
+		break;
 	default:
 		AssertNotReached();
 		break;
@@ -513,6 +547,54 @@ static size_t handleZshKeyword (int keyword,
 	return vStringLength(token);
 }
 
+static bool doesLineCotinue(const unsigned char *start, const unsigned char *cp)
+{
+	cp--;
+	if (start >= cp)
+		return false;
+
+	if (*cp != '\\')
+		return false;
+
+	while (start < cp)
+	{
+		if (*cp == ';' || *cp == '|' || *cp == '&'
+			|| *cp == '(' || *cp == '{')
+			return false;
+		else if (isspace(*cp))
+			cp--;
+		else
+			return true;
+	}
+	return false;
+}
+
+static bool handleVariableAssignment (vString *input)
+{
+	const char *base = vStringValue (input);
+	const char *cp = base;
+
+	while (*cp != '\0')
+	{
+		if (*cp == '=' || (*cp == '+' && *(cp + 1) == '='))
+		{
+			size_t len = cp - base;
+			if (len > 0)
+			{
+				vStringTruncate (input, len);
+				return true;
+			}
+			break;
+		}
+		else if ( ((cp == base)?
+				   isIdentChar0: isIdentChar) ((unsigned char)*cp) )
+			cp++;
+		else
+			break;
+	}
+	return false;
+}
+
 typedef bool (* checkCharFunc) (int);
 static void findShTagsCommon (size_t (* keyword_handler) (int,
 														  vString *,
@@ -531,6 +613,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 	struct hereDocParsingState hstate;
 	hdocStateInit (&hstate);
 
+	bool cont_line = false;
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char* cp = line;
@@ -556,10 +639,12 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 				vStringDelete (hereDocDelimiter);
 				hereDocDelimiter = NULL;
 			}
+			cont_line = false;
 			continue;
 		}
 
 		hdocStateClear (&hstate);
+		bool beginning_of_line = !cont_line;
 		while (*cp != '\0')
 		{
 			subparser *sub = NULL;
@@ -697,6 +782,7 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 						cp += d;
 					else if (*cp != '\0')
 						++cp;
+					beginning_of_line = false;
 					continue;
 				}
 
@@ -710,8 +796,9 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 			while (isspace (*cp))
 				++cp;
 
-			if ((found_kind != K_SCRIPT)
-			    && *cp == '(')
+			if (found_kind == K_SCRIPT)
+				;				/* Do NOTHING */
+			else if (*cp == '(')
 			{
 				++cp;
 				while (isspace (*cp))
@@ -737,6 +824,10 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 					++cp;
 				}
 			}
+			else if (beginning_of_line
+					 && found_kind == K_NOTHING
+					 && handleVariableAssignment (name))
+				found_kind = K_VARIABLE;
 
 			if (found_kind != K_NOTHING)
 			{
@@ -753,7 +844,11 @@ static void findShTagsCommon (size_t (* keyword_handler) (int,
 			else if (!hereDocDelimiter)
 				hdocStateUpdateArgs (&hstate, name);
 			vStringClear (name);
+			beginning_of_line = false;
 		}
+		if (*cp == '#')
+			cont_line = false;
+		cont_line = doesLineCotinue (line, cp);
 	}
 	hdocStateFini (&hstate);
 	vStringDelete (name);
