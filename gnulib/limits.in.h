@@ -1,6 +1,6 @@
 /* A GNU-like <limits.h>.
 
-   Copyright 2016-2021 Free Software Foundation, Inc.
+   Copyright 2016-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -20,7 +20,7 @@
 #endif
 @PRAGMA_COLUMNS@
 
-#if defined _GL_ALREADY_INCLUDING_LIMITS_H
+#if defined _@GUARD_PREFIX@_ALREADY_INCLUDING_LIMITS_H
 /* Special invocation convention:
    On Haiku/x86_64, we have a sequence of nested includes
    <limits.h> -> <syslimits.h> -> <limits.h>.
@@ -34,12 +34,12 @@
 
 #ifndef _@GUARD_PREFIX@_LIMITS_H
 
-# define _GL_ALREADY_INCLUDING_LIMITS_H
+# define _@GUARD_PREFIX@_ALREADY_INCLUDING_LIMITS_H
 
 /* The include_next requires a split double-inclusion guard.  */
 # @INCLUDE_NEXT@ @NEXT_LIMITS_H@
 
-# undef _GL_ALREADY_INCLUDING_LIMITS_H
+# undef _@GUARD_PREFIX@_ALREADY_INCLUDING_LIMITS_H
 
 #ifndef _@GUARD_PREFIX@_LIMITS_H
 #define _@GUARD_PREFIX@_LIMITS_H
@@ -47,7 +47,7 @@
 #ifndef LLONG_MIN
 # if defined LONG_LONG_MIN /* HP-UX 11.31 */
 #  define LLONG_MIN LONG_LONG_MIN
-# elif defined LONGLONG_MIN /* IRIX 6.5 */
+# elif defined LONGLONG_MIN /* AIX, BeOS */
 #  define LLONG_MIN LONGLONG_MIN
 # elif defined __GNUC__
 #  define LLONG_MIN (- __LONG_LONG_MAX__ - 1LL)
@@ -56,7 +56,7 @@
 #ifndef LLONG_MAX
 # if defined LONG_LONG_MAX /* HP-UX 11.31 */
 #  define LLONG_MAX LONG_LONG_MAX
-# elif defined LONGLONG_MAX /* IRIX 6.5 */
+# elif defined LONGLONG_MAX /* AIX, BeOS */
 #  define LLONG_MAX LONGLONG_MAX
 # elif defined __GNUC__
 #  define LLONG_MAX __LONG_LONG_MAX__
@@ -65,7 +65,7 @@
 #ifndef ULLONG_MAX
 # if defined ULONG_LONG_MAX /* HP-UX 11.31 */
 #  define ULLONG_MAX ULONG_LONG_MAX
-# elif defined ULONGLONG_MAX /* IRIX 6.5 */
+# elif defined ULONGLONG_MAX /* AIX, BeOS */
 #  define ULLONG_MAX ULONGLONG_MAX
 # elif defined __GNUC__
 #  define ULLONG_MAX (__LONG_LONG_MAX__ * 2ULL + 1ULL)
@@ -99,10 +99,16 @@
 # endif
 #endif
 
-/* Macros specified by ISO/IEC TS 18661-1:2014.  */
+/* Assume no multibyte character is longer than 16 bytes.  */
+#ifndef MB_LEN_MAX
+# define MB_LEN_MAX 16
+#endif
+
+/* Macros specified by C23 and by ISO/IEC TS 18661-1:2014.  */
 
 #if (! defined ULLONG_WIDTH                                             \
-     && (defined _GNU_SOURCE || defined __STDC_WANT_IEC_60559_BFP_EXT__))
+     && (defined _GNU_SOURCE || defined __STDC_WANT_IEC_60559_BFP_EXT__ \
+         || (defined __STDC_VERSION__ && 201710 < __STDC_VERSION__)))
 # define CHAR_WIDTH _GL_INTEGER_WIDTH (CHAR_MIN, CHAR_MAX)
 # define SCHAR_WIDTH _GL_INTEGER_WIDTH (SCHAR_MIN, SCHAR_MAX)
 # define UCHAR_WIDTH _GL_INTEGER_WIDTH (0, UCHAR_MAX)
@@ -114,7 +120,31 @@
 # define ULONG_WIDTH _GL_INTEGER_WIDTH (0, ULONG_MAX)
 # define LLONG_WIDTH _GL_INTEGER_WIDTH (LLONG_MIN, LLONG_MAX)
 # define ULLONG_WIDTH _GL_INTEGER_WIDTH (0, ULLONG_MAX)
-#endif /* !ULLONG_WIDTH && (_GNU_SOURCE || __STDC_WANT_IEC_60559_BFP_EXT__) */
+#endif
+
+/* Macros specified by C23.  */
+
+#if (defined _GNU_SOURCE \
+     || (defined __STDC_VERSION__ && 201710 < __STDC_VERSION__))
+# if ! defined BOOL_WIDTH
+#  define BOOL_WIDTH 1
+#  define BOOL_MAX 1
+# elif ! defined BOOL_MAX
+#  define BOOL_MAX 1
+# endif
+#endif
+
+/* Macro specified by POSIX.  */
+
+/* The maximum ssize_t value.  Although it might not be of ssize_t type
+   as it should be, it's too much trouble to fix this minor detail.  */
+#ifndef SSIZE_MAX
+# ifdef _WIN64
+#  define SSIZE_MAX LLONG_MAX
+# else
+#  define SSIZE_MAX LONG_MAX
+# endif
+#endif
 
 #endif /* _@GUARD_PREFIX@_LIMITS_H */
 #endif /* _@GUARD_PREFIX@_LIMITS_H */

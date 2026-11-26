@@ -1,5 +1,5 @@
 /* Plain mutexes (native Windows implementation).
-   Copyright (C) 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -23,10 +23,12 @@
 #include "windows-mutex.h"
 
 #include <errno.h>
+#include <stdlib.h>
 
 void
 glwthread_mutex_init (glwthread_mutex_t *mutex)
 {
+  mutex->owner = 0;
   InitializeCriticalSection (&mutex->lock);
   mutex->guard.done = 1;
 }
@@ -49,7 +51,13 @@ glwthread_mutex_lock (glwthread_mutex_t *mutex)
             Sleep (0);
         }
     }
+  /* If this thread already owns the mutex, POSIX pthread_mutex_lock() is
+     required to deadlock here.  But let's not do that on purpose.  */
   EnterCriticalSection (&mutex->lock);
+  {
+    DWORD self = GetCurrentThreadId ();
+    mutex->owner = self;
+  }
   return 0;
 }
 
@@ -72,6 +80,21 @@ glwthread_mutex_trylock (glwthread_mutex_t *mutex)
     }
   if (!TryEnterCriticalSection (&mutex->lock))
     return EBUSY;
+  {
+    DWORD self = GetCurrentThreadId ();
+    /* TryEnterCriticalSection succeeded.  This means that the mutex was either
+       previously unlocked (and thus mutex->owner == 0) or previously locked by
+       this thread (and thus mutex->owner == self).  Since the mutex is meant to
+       be plain, we need to fail in the latter case.  */
+    if (mutex->owner == self)
+      {
+        LeaveCriticalSection (&mutex->lock);
+        return EBUSY;
+      }
+    if (mutex->owner != 0)
+      abort ();
+    mutex->owner = self;
+  }
   return 0;
 }
 
@@ -80,6 +103,7 @@ glwthread_mutex_unlock (glwthread_mutex_t *mutex)
 {
   if (!mutex->guard.done)
     return EINVAL;
+  mutex->owner = 0;
   LeaveCriticalSection (&mutex->lock);
   return 0;
 }

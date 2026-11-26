@@ -1,5 +1,5 @@
 /* Use the internal lock used by mbrtowc and mbrtoc32.
-   Copyright (C) 2019-2021 Free Software Foundation, Inc.
+   Copyright (C) 2019-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -21,9 +21,9 @@
 static inline int
 mbtowc_unlocked (wchar_t *pwc, const char *p, size_t m)
 {
-  /* Put the hidden internal state of mbtowc into its initial state.
+  /* Put the hidden internal state of mbtowc into an initial state.
      This is needed at least with glibc, uClibc, and MSVC CRT.
-     See <https://sourceware.org/bugzilla/show_bug.cgi?id=9674>.  */
+     See <https://sourceware.org/PR9674>.  */
   mbtowc (NULL, NULL, 0);
 
   return mbtowc (pwc, p, m);
@@ -32,7 +32,7 @@ mbtowc_unlocked (wchar_t *pwc, const char *p, size_t m)
 /* Prohibit renaming this symbol.  */
 #undef gl_get_mbtowc_lock
 
-#if GNULIB_MBRTOWC_SINGLE_THREAD
+#if AVOID_ANY_THREADS || GNULIB_MBRTOWC_SINGLE_THREAD
 
 /* All uses of this function are in a single thread.  No locking needed.  */
 
@@ -50,16 +50,15 @@ static int
 mbtowc_with_lock (wchar_t *pwc, const char *p, size_t m)
 {
   CRITICAL_SECTION *lock = gl_get_mbtowc_lock ();
-  int ret;
 
   EnterCriticalSection (lock);
-  ret = mbtowc_unlocked (pwc, p, m);
+  int ret = mbtowc_unlocked (pwc, p, m);
   LeaveCriticalSection (lock);
 
   return ret;
 }
 
-#elif HAVE_PTHREAD_API /* AIX, IRIX, Cygwin */
+#elif HAVE_PTHREAD_API /* AIX, Cygwin */
 
 extern
 # if defined _WIN32 || defined __CYGWIN__
@@ -67,7 +66,7 @@ extern
 # endif
   pthread_mutex_t *gl_get_mbtowc_lock (void);
 
-# if HAVE_WEAK_SYMBOLS /* IRIX */
+# if HAVE_WEAK_SYMBOLS
 
    /* Avoid the need to link with '-lpthread'.  */
 #  pragma weak pthread_mutex_lock
@@ -89,11 +88,10 @@ mbtowc_with_lock (wchar_t *pwc, const char *p, size_t m)
   if (pthread_in_use())
     {
       pthread_mutex_t *lock = gl_get_mbtowc_lock ();
-      int ret;
 
       if (pthread_mutex_lock (lock))
         abort ();
-      ret = mbtowc_unlocked (pwc, p, m);
+      int ret = mbtowc_unlocked (pwc, p, m);
       if (pthread_mutex_unlock (lock))
         abort ();
 
@@ -111,11 +109,10 @@ static int
 mbtowc_with_lock (wchar_t *pwc, const char *p, size_t m)
 {
   mtx_t *lock = gl_get_mbtowc_lock ();
-  int ret;
 
   if (mtx_lock (lock) != thrd_success)
     abort ();
-  ret = mbtowc_unlocked (pwc, p, m);
+  int ret = mbtowc_unlocked (pwc, p, m);
   if (mtx_unlock (lock) != thrd_success)
     abort ();
 

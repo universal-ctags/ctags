@@ -1,5 +1,5 @@
 /* Convert string to wide string.
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This file is free software: you can redistribute it and/or modify
@@ -30,7 +30,6 @@ FUNC (DCHAR_T *dest, const char **srcp, size_t len, mbstate_t *ps)
         for (; len > 0; destptr++, len--)
           {
             size_t src_avail;
-            size_t ret;
 
             /* An optimized variant of
                src_avail = strnlen1 (src, MB_LEN_MAX);  */
@@ -46,7 +45,7 @@ FUNC (DCHAR_T *dest, const char **srcp, size_t len, mbstate_t *ps)
               src_avail = 4 + strnlen1 (src + 4, MB_LEN_MAX - 4);
 
             /* Parse the next multibyte character.  */
-            ret = MBRTOWC (destptr, src, src_avail, ps);
+            size_t ret = MBRTOWC (destptr, src, src_avail, ps);
 
             if (ret == (size_t)(-2))
               /* Encountered a multibyte character that extends past a '\0' byte
@@ -61,7 +60,8 @@ FUNC (DCHAR_T *dest, const char **srcp, size_t len, mbstate_t *ps)
                 /* Here mbsinit (ps).  */
                 break;
               }
-            src += ret;
+            if (!(USES_C32 && ret == (size_t)(-3)))
+              src += ret;
           }
 
         *srcp = src;
@@ -77,7 +77,6 @@ FUNC (DCHAR_T *dest, const char **srcp, size_t len, mbstate_t *ps)
         for (;; totalcount++)
           {
             size_t src_avail;
-            size_t ret;
 
             /* An optimized variant of
                src_avail = strnlen1 (src, MB_LEN_MAX);  */
@@ -93,7 +92,7 @@ FUNC (DCHAR_T *dest, const char **srcp, size_t len, mbstate_t *ps)
               src_avail = 4 + strnlen1 (src + 4, MB_LEN_MAX - 4);
 
             /* Parse the next multibyte character.  */
-            ret = MBRTOWC (NULL, src, src_avail, &state);
+            size_t ret = MBRTOWC (NULL, src, src_avail, &state);
 
             if (ret == (size_t)(-2))
               /* Encountered a multibyte character that extends past a '\0' byte

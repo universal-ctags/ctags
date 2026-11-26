@@ -1,5 +1,5 @@
 /* Search wide character array for a wide character.
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2011.
 
    This file is free software: you can redistribute it and/or modify

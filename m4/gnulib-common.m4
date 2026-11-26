@@ -1,8 +1,10 @@
-# gnulib-common.m4 serial 66
-dnl Copyright (C) 2007-2021 Free Software Foundation, Inc.
+# gnulib-common.m4
+# serial 122
+dnl Copyright (C) 2007-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_PREREQ([2.62])
 
@@ -15,38 +17,65 @@ AC_DEFUN([gl_COMMON], [
   AC_REQUIRE([gl_ZZGNULIB])
 ])
 AC_DEFUN([gl_COMMON_BODY], [
+  AH_VERBATIM([0witness],
+[/* Witness that <config.h> has been included.  */
+#define _GL_CONFIG_H_INCLUDED 1
+])
+  dnl Avoid warnings from gcc -Wtrailing-whitespace.
+  dnl This is a temporary workaround until Autoconf fixes it.
+  dnl Test case:
+  dnl empty1=; empty2=; AC_DEFINE_UNQUOTED([FOO], [$empty1$empty2], [...])
+  dnl should produce "#define FOO /**/", not "#define FOO ".
+  AH_TOP([#if defined __GNUC__ && __GNUC__ >= 15 && !defined __clang__
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wtrailing-whitespace"
+#endif
+])
+  AH_BOTTOM([#if defined __GNUC__ && __GNUC__ >= 15 && !defined __clang__
+# pragma GCC diagnostic pop
+#endif
+])
   AH_VERBATIM([_GL_GNUC_PREREQ],
-[/* True if the compiler says it groks GNU C version MAJOR.MINOR.  */
-#if defined __GNUC__ && defined __GNUC_MINOR__
+[/* True if the compiler says it groks GNU C version MAJOR.MINOR.
+    Except that
+      - clang groks GNU C 4.2, even on Windows, where it does not define
+        __GNUC__.
+      - The OpenMandriva-modified clang compiler pretends that it groks
+        GNU C version 13.1, but it doesn't: It does not support
+        __attribute__ ((__malloc__ (f, i))), nor does it support
+        __attribute__ ((__warning__ (message))) on a function redeclaration.
+      - Users can make clang lie as well, through the -fgnuc-version option.  */
+#if defined __GNUC__ && defined __GNUC_MINOR__ && !defined __clang__
 # define _GL_GNUC_PREREQ(major, minor) \
     ((major) < __GNUC__ + ((minor) <= __GNUC_MINOR__))
+#elif defined __clang__
+  /* clang really only groks GNU C 4.2.  */
+# define _GL_GNUC_PREREQ(major, minor) \
+    ((major) < 4 + ((minor) <= 2))
 #else
 # define _GL_GNUC_PREREQ(major, minor) 0
 #endif
 ])
   AH_VERBATIM([_Noreturn],
-[/* The _Noreturn keyword of C11.  */
+[/* The _Noreturn keyword of C11.
+   Do not use [[noreturn]], because with it the syntax
+     extern _Noreturn void func (...);
+   would not be valid; such a declaration would be valid only with 'extern'
+   and '_Noreturn' swapped, or without the 'extern' keyword.  However, some
+   AIX system header files and several gnulib header files use precisely
+   this syntax with 'extern'.  So even though C23 deprecates _Noreturn,
+   it is currently more portable to prefer it to [[noreturn]].
+
+   Also, do not try to work around LLVM bug 59792 (clang 15 or earlier).
+   This rare bug can be worked around by compiling with 'clang -D_Noreturn=',
+   though the workaround may generate many false-alarm warnings.  */
 #ifndef _Noreturn
-# if (defined __cplusplus \
-      && ((201103 <= __cplusplus && !(__GNUC__ == 4 && __GNUC_MINOR__ == 7)) \
-          || (defined _MSC_VER && 1900 <= _MSC_VER)) \
-      && 0)
-    /* [[noreturn]] is not practically usable, because with it the syntax
-         extern _Noreturn void func (...);
-       would not be valid; such a declaration would only be valid with 'extern'
-       and '_Noreturn' swapped, or without the 'extern' keyword.  However, some
-       AIX system header files and several gnulib header files use precisely
-       this syntax with 'extern'.  */
-#  define _Noreturn [[noreturn]]
-# elif ((!defined __cplusplus || defined __clang__) \
-        && (201112 <= (defined __STDC_VERSION__ ? __STDC_VERSION__ : 0) \
-            || (!defined __STRICT_ANSI__ \
-                && (_GL_GNUC_PREREQ (4, 7) \
-                    || (defined __apple_build_version__ \
-                        ? 6000000 <= __apple_build_version__ \
-                        : 3 < __clang_major__ + (5 <= __clang_minor__))))))
+# if ((!defined __cplusplus || defined __clang__) \
+      && (201112 <= (defined __STDC_VERSION__ ? __STDC_VERSION__ : 0)))
    /* _Noreturn works as-is.  */
 # elif _GL_GNUC_PREREQ (2, 8) || defined __clang__ || 0x5110 <= __SUNPRO_C
+   /* Prefer __attribute__ ((__noreturn__)) to plain _Noreturn even if the
+      latter works, as 'gcc -std=gnu99 -Wpedantic' warns about _Noreturn.  */
 #  define _Noreturn __attribute__ ((__noreturn__))
 # elif 1200 <= (defined _MSC_VER ? _MSC_VER : 0)
 #  define _Noreturn __declspec (noreturn)
@@ -67,216 +96,856 @@ AC_DEFUN([gl_COMMON_BODY], [
 #endif])
   AH_VERBATIM([attribute],
 [/* Attributes.  */
-#if (defined __has_attribute \
-     && (!defined __clang_minor__ \
-         || 3 < __clang_major__ + (5 <= __clang_minor__)))
-# define _GL_HAS_ATTRIBUTE(attr) __has_attribute (__##attr##__)
-#else
-# define _GL_HAS_ATTRIBUTE(attr) _GL_ATTR_##attr
-# define _GL_ATTR_alloc_size _GL_GNUC_PREREQ (4, 3)
-# define _GL_ATTR_always_inline _GL_GNUC_PREREQ (3, 2)
-# define _GL_ATTR_artificial _GL_GNUC_PREREQ (4, 3)
-# define _GL_ATTR_cold _GL_GNUC_PREREQ (4, 3)
-# define _GL_ATTR_const _GL_GNUC_PREREQ (2, 95)
-# define _GL_ATTR_deprecated _GL_GNUC_PREREQ (3, 1)
-# define _GL_ATTR_diagnose_if 0
-# define _GL_ATTR_error _GL_GNUC_PREREQ (4, 3)
-# define _GL_ATTR_externally_visible _GL_GNUC_PREREQ (4, 1)
-# define _GL_ATTR_fallthrough _GL_GNUC_PREREQ (7, 0)
-# define _GL_ATTR_format _GL_GNUC_PREREQ (2, 7)
-# define _GL_ATTR_leaf _GL_GNUC_PREREQ (4, 6)
-# ifdef _ICC
-#  define _GL_ATTR_may_alias 0
+/* Define _GL_HAS_ATTRIBUTE only once, because on FreeBSD, with gcc < 5, if
+   <config.h> gets included once again after <sys/cdefs.h>, __has_attribute(x)
+   expands to 0 always, and redefining _GL_HAS_ATTRIBUTE would turn off all
+   attributes.  */
+#ifndef _GL_HAS_ATTRIBUTE
+# if (defined __has_attribute \
+      && (!defined __clang_minor__ \
+          || (defined __apple_build_version__ \
+              ? 7000000 <= __apple_build_version__ \
+              : 5 <= __clang_major__)))
+#  define _GL_HAS_ATTRIBUTE(attr) __has_attribute (__##attr##__)
 # else
-#  define _GL_ATTR_may_alias _GL_GNUC_PREREQ (3, 3)
+#  define _GL_HAS_ATTRIBUTE(attr) _GL_ATTR_##attr
+/* The following lines list the first GCC version that supports the attribute.
+   Although the lines are not used in GCC 5 and later (as GCC 5 introduced
+   __has_attribute support), list GCC versions 5+ anyway for completeness.  */
+#  define _GL_ATTR_alloc_size _GL_GNUC_PREREQ (4, 3)
+#  define _GL_ATTR_always_inline _GL_GNUC_PREREQ (3, 2)
+#  define _GL_ATTR_artificial _GL_GNUC_PREREQ (4, 3)
+#  define _GL_ATTR_cold _GL_GNUC_PREREQ (4, 3)
+#  define _GL_ATTR_const _GL_GNUC_PREREQ (2, 95)
+#  define _GL_ATTR_deprecated _GL_GNUC_PREREQ (3, 1)
+#  define _GL_ATTR_diagnose_if 0
+#  define _GL_ATTR_error _GL_GNUC_PREREQ (4, 3)
+#  define _GL_ATTR_externally_visible _GL_GNUC_PREREQ (4, 1)
+#  define _GL_ATTR_fallthrough _GL_GNUC_PREREQ (7, 0)
+#  define _GL_ATTR_format _GL_GNUC_PREREQ (2, 7)
+#  define _GL_ATTR_leaf _GL_GNUC_PREREQ (4, 6)
+#  define _GL_ATTR_malloc _GL_GNUC_PREREQ (3, 0)
+#  ifdef _ICC
+#   define _GL_ATTR_may_alias 0
+#  else
+#   define _GL_ATTR_may_alias _GL_GNUC_PREREQ (3, 3)
+#  endif
+#  define _GL_ATTR_noinline _GL_GNUC_PREREQ (3, 1)
+#  define _GL_ATTR_nonnull _GL_GNUC_PREREQ (3, 3)
+#  define _GL_ATTR_nonnull_if_nonzero _GL_GNUC_PREREQ (15, 1)
+#  define _GL_ATTR_nonstring _GL_GNUC_PREREQ (8, 0)
+#  define _GL_ATTR_nothrow _GL_GNUC_PREREQ (3, 3)
+#  define _GL_ATTR_packed _GL_GNUC_PREREQ (2, 7)
+#  define _GL_ATTR_pure _GL_GNUC_PREREQ (2, 96)
+#  define _GL_ATTR_reproducible _GL_GNUC_PREREQ (15, 1)
+#  define _GL_ATTR_returns_nonnull _GL_GNUC_PREREQ (4, 9)
+#  define _GL_ATTR_sentinel _GL_GNUC_PREREQ (4, 0)
+#  define _GL_ATTR_unsequenced _GL_GNUC_PREREQ (15, 1)
+#  define _GL_ATTR_unused _GL_GNUC_PREREQ (2, 7)
+#  define _GL_ATTR_warn_unused_result _GL_GNUC_PREREQ (3, 4)
 # endif
-# define _GL_ATTR_malloc _GL_GNUC_PREREQ (3, 0)
-# define _GL_ATTR_noinline _GL_GNUC_PREREQ (3, 1)
-# define _GL_ATTR_nonnull _GL_GNUC_PREREQ (3, 3)
-# define _GL_ATTR_nonstring _GL_GNUC_PREREQ (8, 0)
-# define _GL_ATTR_nothrow _GL_GNUC_PREREQ (3, 3)
-# define _GL_ATTR_packed _GL_GNUC_PREREQ (2, 7)
-# define _GL_ATTR_pure _GL_GNUC_PREREQ (2, 96)
-# define _GL_ATTR_returns_nonnull _GL_GNUC_PREREQ (4, 9)
-# define _GL_ATTR_sentinel _GL_GNUC_PREREQ (4, 0)
-# define _GL_ATTR_unused _GL_GNUC_PREREQ (2, 7)
-# define _GL_ATTR_warn_unused_result _GL_GNUC_PREREQ (3, 4)
 #endif
 
-]dnl There is no _GL_ATTRIBUTE_ALIGNED; use stdalign's _Alignas instead.
+/* Use __has_c_attribute if available.  However, do not use with
+   pre-C23 GCC, which can issue false positives if -Wpedantic.  */
+#if (defined __has_c_attribute \
+     && ! (_GL_GNUC_PREREQ (4, 6) \
+           && (defined __STDC_VERSION__ ? __STDC_VERSION__ : 0) <= 201710))
+# define _GL_HAVE___HAS_C_ATTRIBUTE 1
+#else
+# define _GL_HAVE___HAS_C_ATTRIBUTE 0
+#endif
+
+/* Attributes in bracket syntax [[...]] vs. attributes in __attribute__((...))
+   syntax, in function declarations.  There are two problems here.
+   (Last tested with gcc/g++ 14 and clang/clang++ 18.)
+
+   1) We want that the _GL_ATTRIBUTE_* can be cumulated on the same declaration
+      in any order.
+      =========================== foo.c = foo.cc ===========================
+      __attribute__ ((__deprecated__)) [[__nodiscard__]] int bar1 (int);
+      [[__nodiscard__]] __attribute__ ((__deprecated__)) int bar2 (int);
+      ======================================================================
+      This gives a syntax error
+        - in C mode with gcc
+          <https://gcc.gnu.org/PR108796>, and
+        - in C++ mode with clang++ version < 16, and
+        - in C++ mode, inside extern "C" {}, still in newer clang++ versions
+          <https://github.com/llvm/llvm-project/issues/101990>.
+ */
+/* Define if, in a function declaration, the attributes in bracket syntax
+   [[...]] must come before the attributes in __attribute__((...)) syntax.
+   If this is defined, it is best to avoid the bracket syntax, so that the
+   various _GL_ATTRIBUTE_* can be cumulated on the same declaration in any
+   order.  */
+#ifdef __cplusplus
+# if defined __clang__
+#  define _GL_BRACKET_BEFORE_ATTRIBUTE 1
+# endif
+#else
+# if defined __GNUC__ && !defined __clang__
+#  define _GL_BRACKET_BEFORE_ATTRIBUTE 1
+# endif
+#endif
+/*
+   2) We want that the _GL_ATTRIBUTE_* can be placed in a declaration
+        - without 'extern', in C as well as in C++,
+        - with 'extern', in C,
+        - with 'extern "C"', in C++
+      in the same position.  That is, we don't want to be forced to use a
+      macro which arranges for the attribute to come before 'extern' in
+      one case and after 'extern' in the other case, because such a macro
+      would make the source code of .h files pretty ugly.
+      =========================== foo.c = foo.cc ===========================
+      #ifdef __cplusplus
+      # define CC "C"
+      #else
+      # define CC
+      #endif
+
+      #define ND   [[__nodiscard__]]
+      #define WUR  __attribute__((__warn_unused_result__))
+
+      #ifdef __cplusplus
+      extern "C" {
+      #endif
+                                        // gcc   clang  g++   clang++
+
+      ND int foo (int);
+      int ND foo (int);                 // warn  error  warn  error
+      int foo ND (int);
+      int foo (int) ND;                 // warn  error  warn  error
+
+      WUR int foo (int);
+      int WUR foo (int);
+      int fo1 WUR (int);                // error error  error error
+      int foo (int) WUR;
+
+      #ifdef __cplusplus
+      }
+      #endif
+
+                                        // gcc   clang  g++   clang++
+
+      ND extern CC int foo (int);       //              error error
+      extern CC ND int foo (int);       // error error
+      extern CC int ND foo (int);       // warn  error  warn  error
+      extern CC int foo ND (int);
+      extern CC int foo (int) ND;       // warn  error  warn  error
+
+      WUR extern CC int foo (int);      //              warn
+      extern CC WUR int foo (int);
+      extern CC int WUR foo (int);
+      extern CC int foo WUR (int);      // error error  error error
+      extern CC int foo (int) WUR;
+
+      ND EXTERN_C_FUNC int foo (int);   //              error error
+      EXTERN_C_FUNC ND int foo (int);
+      EXTERN_C_FUNC int ND foo (int);   // warn  error  warn  error
+      EXTERN_C_FUNC int foo ND (int);
+      EXTERN_C_FUNC int foo (int) ND;   // warn  error  warn  error
+
+      WUR EXTERN_C_FUNC int foo (int);  //              warn
+      EXTERN_C_FUNC WUR int foo (int);
+      EXTERN_C_FUNC int WUR foo (int);
+      EXTERN_C_FUNC int fo2 WUR (int);  // error error  error error
+      EXTERN_C_FUNC int foo (int) WUR;
+      ======================================================================
+      So, if we insist on using the 'extern' keyword ('extern CC' idiom):
+        * If _GL_ATTRIBUTE_* expands to bracket syntax [[...]]
+          in both C and C++, there is one available position:
+            - between the function name and the parameter list.
+        * If _GL_ATTRIBUTE_* expands to __attribute__((...)) syntax
+          in both C and C++, there are several available positions:
+            - before the return type,
+            - between return type and function name,
+            - at the end of the declaration.
+        * If _GL_ATTRIBUTE_* expands to bracket syntax [[...]] in C and to
+          __attribute__((...)) syntax in C++, there is no available position:
+          it would need to come before 'extern' in C but after 'extern "C"'
+          in C++.
+        * If _GL_ATTRIBUTE_* expands to __attribute__((...)) syntax in C and
+          to bracket syntax [[...]] in C++, there is one available position:
+            - before the return type.
+      Whereas, if we use the 'EXTERN_C_FUNC' idiom, which conditionally
+      omits the 'extern' keyword:
+        * If _GL_ATTRIBUTE_* expands to bracket syntax [[...]]
+          in both C and C++, there are two available positions:
+            - before the return type,
+            - between the function name and the parameter list.
+        * If _GL_ATTRIBUTE_* expands to __attribute__((...)) syntax
+          in both C and C++, there are several available positions:
+            - before the return type,
+            - between return type and function name,
+            - at the end of the declaration.
+        * If _GL_ATTRIBUTE_* expands to bracket syntax [[...]] in C and to
+          __attribute__((...)) syntax in C++, there is one available position:
+            - before the return type.
+        * If _GL_ATTRIBUTE_* expands to __attribute__((...)) syntax in C and
+          to bracket syntax [[...]] in C++, there is one available position:
+            - before the return type.
+      The best choice is therefore to use the 'EXTERN_C_FUNC' idiom and
+      put the attributes before the return type. This works regardless
+      to what the _GL_ATTRIBUTE_* macros expand.
+ */
+
+/* Attributes in bracket syntax [[...]] vs. attributes in __attribute__((...))
+   syntax, in static/inline function definitions.
+
+   There are similar constraints as for function declarations.  However, here,
+   we cannot omit the storage-class specifier.  Therefore, the following rule
+   applies:
+     * The macros
+         _GL_ATTRIBUTE_DEPRECATED
+         _GL_ATTRIBUTE_MAYBE_UNUSED
+         _GL_ATTRIBUTE_NODISCARD
+         _GL_ATTRIBUTE_REPRODUCIBLE
+         _GL_ATTRIBUTE_UNSEQUENCED
+       which may expand to bracket syntax [[...]], must come first, before the
+       storage-class specifier.
+     * Other _GL_ATTRIBUTE_* macros, that expand to __attribute__((...)) syntax,
+       are better placed between the storage-class specifier and the return
+       type.
+ */
+
+/* Attributes in bracket syntax [[...]] vs. attributes in __attribute__((...))
+   syntax, in variable declarations.
+
+   At which position can they be placed?
+   (Last tested with gcc/g++ 14 and clang/clang++ 18.)
+
+      =========================== foo.c = foo.cc ===========================
+      #ifdef __cplusplus
+      # define CC "C"
+      #else
+      # define CC
+      #endif
+
+      #define BD   [[__deprecated__]]
+      #define AD   __attribute__ ((__deprecated__))
+
+                              // gcc   clang  g++    clang++
+
+      BD extern CC int var;   //              error  error
+      extern CC BD int var;   // error error
+      extern CC int BD var;   // warn  error  warn   error
+      extern CC int var BD;
+
+      AD extern CC int var;   //              warn
+      extern CC AD int var;
+      extern CC int AD var;
+      extern CC int var AD;
+
+      BD extern CC int z[];   //              error  error
+      extern CC BD int z[];   // error error
+      extern CC int BD z[];   // warn  error  warn   error
+      extern CC int z1 BD [];
+      extern CC int z[] BD;   // warn  error         error
+
+      AD extern CC int z[];   //              warn
+      extern CC AD int z[];
+      extern CC int AD z[];
+      extern CC int z2 AD []; // error error  error  error
+      extern CC int z[] AD;
+      ======================================================================
+
+   * For non-array variables, the only good position is after the variable name,
+     that is, at the end of the declaration.
+   * For array variables, you will need to distinguish C and C++:
+       - In C, before the 'extern' keyword.
+       - In C++, between the 'extern "C"' and the variable's type.
+ */
+]dnl There is no _GL_ATTRIBUTE_ALIGNED; use stdalign's alignas instead.
 [
-#if _GL_HAS_ATTRIBUTE (alloc_size)
-# define _GL_ATTRIBUTE_ALLOC_SIZE(args) __attribute__ ((__alloc_size__ args))
-#else
-# define _GL_ATTRIBUTE_ALLOC_SIZE(args)
+/* _GL_ATTRIBUTE_ALLOC_SIZE ((N)) declares that the Nth argument of the function
+   is the size of the returned memory block.
+   _GL_ATTRIBUTE_ALLOC_SIZE ((M, N)) declares that the Mth argument multiplied
+   by the Nth argument of the function is the size of the returned memory block.
+ */
+/* Applies to: functions, pointer to functions, function types.  */
+#ifndef _GL_ATTRIBUTE_ALLOC_SIZE
+# if _GL_HAS_ATTRIBUTE (alloc_size)
+#  define _GL_ATTRIBUTE_ALLOC_SIZE(args) __attribute__ ((__alloc_size__ args))
+# else
+#  define _GL_ATTRIBUTE_ALLOC_SIZE(args)
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (always_inline)
-# define _GL_ATTRIBUTE_ALWAYS_INLINE __attribute__ ((__always_inline__))
-#else
-# define _GL_ATTRIBUTE_ALWAYS_INLINE
+/* _GL_ATTRIBUTE_ALWAYS_INLINE tells that the compiler should always inline the
+   function and report an error if it cannot do so.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_ALWAYS_INLINE
+# if _GL_HAS_ATTRIBUTE (always_inline)
+#  define _GL_ATTRIBUTE_ALWAYS_INLINE __attribute__ ((__always_inline__))
+# else
+#  define _GL_ATTRIBUTE_ALWAYS_INLINE
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (artificial)
-# define _GL_ATTRIBUTE_ARTIFICIAL __attribute__ ((__artificial__))
-#else
-# define _GL_ATTRIBUTE_ARTIFICIAL
+/* _GL_ATTRIBUTE_ARTIFICIAL declares that the function is not important to show
+    in stack traces when debugging.  The compiler should omit the function from
+    stack traces.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_ARTIFICIAL
+# if _GL_HAS_ATTRIBUTE (artificial)
+#  define _GL_ATTRIBUTE_ARTIFICIAL __attribute__ ((__artificial__))
+# else
+#  define _GL_ATTRIBUTE_ARTIFICIAL
+# endif
 #endif
 
+/* _GL_ATTRIBUTE_COLD declares that the function is rarely executed.  */
+/* Applies to: functions.  */
 /* Avoid __attribute__ ((cold)) on MinGW; see thread starting at
    <https://lists.gnu.org/r/emacs-devel/2019-04/msg01152.html>.
    Also, Oracle Studio 12.6 requires 'cold' not '__cold__'.  */
-#if _GL_HAS_ATTRIBUTE (cold) && !defined __MINGW32__
-# ifndef __SUNPRO_C
-#  define _GL_ATTRIBUTE_COLD __attribute__ ((__cold__))
+#ifndef _GL_ATTRIBUTE_COLD
+# if _GL_HAS_ATTRIBUTE (cold) && !defined __MINGW32__
+#  ifndef __SUNPRO_C
+#   define _GL_ATTRIBUTE_COLD __attribute__ ((__cold__))
+#  else
+#   define _GL_ATTRIBUTE_COLD __attribute__ ((cold))
+#  endif
 # else
-#  define _GL_ATTRIBUTE_COLD __attribute__ ((cold))
+#  define _GL_ATTRIBUTE_COLD
 # endif
-#else
-# define _GL_ATTRIBUTE_COLD
 #endif
 
-#if _GL_HAS_ATTRIBUTE (const)
-# define _GL_ATTRIBUTE_CONST __attribute__ ((__const__))
-#else
-# define _GL_ATTRIBUTE_CONST
+/* _GL_ATTRIBUTE_CONST declares:
+   It is OK for a compiler to move a call, or omit a duplicate call
+   and reuse a cached return value, even if the state changes between calls.
+   It is also OK to omit a call if the result is not used.
+   This attribute is safe if the function does not change observable state,
+   returns a value determined solely by its arguments' values
+   without examining state, and always returns exactly once -
+   e.g., does not raise an exception, call longjmp, or loop forever.
+   (This attribute is stricter than _GL_ATTRIBUTE_PURE because the
+   function cannot observe state.  Unlike _GL_ATTRIBUTE_UNSEQUENCED
+   the function must return exactly once and cannot access state
+   addressed by its pointer arguments or that happens to have the same
+   value for all calls to the function, but the function is allowed to
+   return a pointer to storage that can be modified later.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_CONST
+# if _GL_HAS_ATTRIBUTE (const)
+#  define _GL_ATTRIBUTE_CONST __attribute__ ((__const__))
+# else
+#  define _GL_ATTRIBUTE_CONST
+# endif
 #endif
 
-#if 201710L < __STDC_VERSION__
-# define _GL_ATTRIBUTE_DEPRECATED [[__deprecated__]]
-#elif _GL_HAS_ATTRIBUTE (deprecated)
-# define _GL_ATTRIBUTE_DEPRECATED __attribute__ ((__deprecated__))
-#else
-# define _GL_ATTRIBUTE_DEPRECATED
+/* _GL_ATTRIBUTE_COUNTED_BY (C) declares that the number of elements of
+   the field is given by C, which must be another field in the same struct.
+   The programmer is responsible for guaranteeing some invariants; see
+   <https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html> for details.  */
+/* Applies to struct fields of type array or pointer (to data).  */
+#ifndef _GL_ATTRIBUTE_COUNTED_BY
+/* This attributes is supported
+     - for fields of array type: by gcc >= 16, clang >= 18,
+     - for fields of pointer type: by gcc when <https://gcc.gnu.org/PR125072>
+       will be fixed, clang >= 19.  */
+# if defined __clang__ && __clang_major__ >= 19
+#  define _GL_ATTRIBUTE_COUNTED_BY(c) __attribute__ ((__counted_by__ (c)))
+# else
+#  define _GL_ATTRIBUTE_COUNTED_BY(c)
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (error)
-# define _GL_ATTRIBUTE_ERROR(msg) __attribute__ ((__error__ (msg)))
-# define _GL_ATTRIBUTE_WARNING(msg) __attribute__ ((__warning__ (msg)))
-#elif _GL_HAS_ATTRIBUTE (diagnose_if)
-# define _GL_ATTRIBUTE_ERROR(msg) __attribute__ ((__diagnose_if__ (1, msg, "error")))
-# define _GL_ATTRIBUTE_WARNING(msg) __attribute__ ((__diagnose_if__ (1, msg, "warning")))
-#else
-# define _GL_ATTRIBUTE_ERROR(msg)
-# define _GL_ATTRIBUTE_WARNING(msg)
+/* _GL_ATTRIBUTE_DEALLOC (F, I) declares that the function returns pointers
+   that can be freed by passing them as the Ith argument to the
+   function F.
+   _GL_ATTRIBUTE_DEALLOC_FREE declares that the function returns pointers that
+   can be freed via 'free'; it can be used only after declaring 'free'.  */
+/* Applies to: functions.  Cannot be used on inline functions.  */
+#ifndef _GL_ATTRIBUTE_DEALLOC
+# if _GL_GNUC_PREREQ (11, 0)
+#  define _GL_ATTRIBUTE_DEALLOC(f, i) __attribute__ ((__malloc__ (f, i)))
+# else
+#  define _GL_ATTRIBUTE_DEALLOC(f, i)
+# endif
+#endif
+/* If gnulib's <string.h> or <wchar.h> has already defined this macro, continue
+   to use this earlier definition, since <stdlib.h> may not have been included
+   yet.  */
+#ifndef _GL_ATTRIBUTE_DEALLOC_FREE
+# if defined __cplusplus && defined __GNUC__ && !defined __clang__
+/* Work around GCC bug <https://gcc.gnu.org/PR108231> */
+#  define _GL_ATTRIBUTE_DEALLOC_FREE \
+     _GL_ATTRIBUTE_DEALLOC ((void (*) (void *)) free, 1)
+# else
+#  define _GL_ATTRIBUTE_DEALLOC_FREE \
+     _GL_ATTRIBUTE_DEALLOC (free, 1)
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (externally_visible)
-# define _GL_ATTRIBUTE_EXTERNALLY_VISIBLE __attribute__ ((externally_visible))
-#else
-# define _GL_ATTRIBUTE_EXTERNALLY_VISIBLE
+/* _GL_ATTRIBUTE_DEPRECATED: Declares that an entity is deprecated.
+   The compiler may warn if the entity is used.  */
+/* Applies to:
+     - function, variable,
+     - struct, union, struct/union member,
+     - enumeration, enumeration item,
+     - typedef,
+   in C++ also: namespace, class, template specialization.  */
+#ifndef _GL_ATTRIBUTE_DEPRECATED
+# ifndef _GL_BRACKET_BEFORE_ATTRIBUTE
+#  if _GL_HAVE___HAS_C_ATTRIBUTE
+#   if __has_c_attribute (__deprecated__)
+#    define _GL_ATTRIBUTE_DEPRECATED [[__deprecated__]]
+#   endif
+#  endif
+# endif
+# if !defined _GL_ATTRIBUTE_DEPRECATED && _GL_HAS_ATTRIBUTE (deprecated)
+#  define _GL_ATTRIBUTE_DEPRECATED __attribute__ ((__deprecated__))
+# endif
+# ifndef _GL_ATTRIBUTE_DEPRECATED
+#  define _GL_ATTRIBUTE_DEPRECATED
+# endif
 #endif
 
-/* FALLTHROUGH is special, because it always expands to something.  */
-#if 201710L < __STDC_VERSION__
-# define _GL_ATTRIBUTE_FALLTHROUGH [[__fallthrough__]]
-#elif _GL_HAS_ATTRIBUTE (fallthrough)
-# define _GL_ATTRIBUTE_FALLTHROUGH __attribute__ ((__fallthrough__))
-#else
-# define _GL_ATTRIBUTE_FALLTHROUGH ((void) 0)
+/* _GL_ATTRIBUTE_ERROR(msg) requests an error if a function is called and
+   the function call is not optimized away.
+   _GL_ATTRIBUTE_WARNING(msg) requests a warning if a function is called and
+   the function call is not optimized away.  */
+/* Applies to: functions.  */
+#if !(defined _GL_ATTRIBUTE_ERROR && defined _GL_ATTRIBUTE_WARNING)
+# if _GL_HAS_ATTRIBUTE (error)
+#  define _GL_ATTRIBUTE_ERROR(msg) __attribute__ ((__error__ (msg)))
+#  define _GL_ATTRIBUTE_WARNING(msg) __attribute__ ((__warning__ (msg)))
+# elif _GL_HAS_ATTRIBUTE (diagnose_if)
+#  define _GL_ATTRIBUTE_ERROR(msg) __attribute__ ((__diagnose_if__ (1, msg, "error")))
+#  define _GL_ATTRIBUTE_WARNING(msg) __attribute__ ((__diagnose_if__ (1, msg, "warning")))
+# else
+#  define _GL_ATTRIBUTE_ERROR(msg)
+#  define _GL_ATTRIBUTE_WARNING(msg)
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (format)
-# define _GL_ATTRIBUTE_FORMAT(spec) __attribute__ ((__format__ spec))
-#else
-# define _GL_ATTRIBUTE_FORMAT(spec)
+/* _GL_ATTRIBUTE_EXTERNALLY_VISIBLE declares that the entity should remain
+   visible to debuggers etc., even with '-fwhole-program'.  */
+/* Applies to: functions, variables.  */
+#ifndef _GL_ATTRIBUTE_EXTERNALLY_VISIBLE
+# if _GL_HAS_ATTRIBUTE (externally_visible)
+#  define _GL_ATTRIBUTE_EXTERNALLY_VISIBLE __attribute__ ((externally_visible))
+# else
+#  define _GL_ATTRIBUTE_EXTERNALLY_VISIBLE
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (leaf)
-# define _GL_ATTRIBUTE_LEAF __attribute__ ((__leaf__))
-#else
-# define _GL_ATTRIBUTE_LEAF
+/* _GL_ATTRIBUTE_FALLTHROUGH declares that it is not a programming mistake if
+   the control flow falls through to the immediately following 'case' or
+   'default' label.  The compiler should not warn in this case.  */
+/* Applies to: Empty statement (;), inside a 'switch' statement.  */
+/* Always expands to something.  */
+#ifndef _GL_ATTRIBUTE_FALLTHROUGH
+# if _GL_HAVE___HAS_C_ATTRIBUTE
+#  if __has_c_attribute (__fallthrough__)
+#   define _GL_ATTRIBUTE_FALLTHROUGH [[__fallthrough__]]
+#  endif
+# endif
+# if !defined _GL_ATTRIBUTE_FALLTHROUGH && _GL_HAS_ATTRIBUTE (fallthrough)
+#  define _GL_ATTRIBUTE_FALLTHROUGH __attribute__ ((__fallthrough__))
+# endif
+# ifndef _GL_ATTRIBUTE_FALLTHROUGH
+#  define _GL_ATTRIBUTE_FALLTHROUGH ((void) 0)
+# endif
 #endif
 
+/* _GL_ATTRIBUTE_FORMAT ((ARCHETYPE, STRING-INDEX, FIRST-TO-CHECK))
+   declares that the STRING-INDEXth function argument is a format string of
+   style ARCHETYPE, which is one of:
+     printf, gnu_printf
+     scanf, gnu_scanf,
+     strftime, gnu_strftime,
+     strfmon,
+   or the same thing prefixed and suffixed with '__'.
+   If FIRST-TO-CHECK is not 0, arguments starting at FIRST-TO_CHECK
+   are suitable for the format string.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_FORMAT
+# if _GL_HAS_ATTRIBUTE (format)
+#  define _GL_ATTRIBUTE_FORMAT(spec) __attribute__ ((__format__ spec))
+# else
+#  define _GL_ATTRIBUTE_FORMAT(spec)
+# endif
+#endif
+
+/* _GL_ATTRIBUTE_LEAF declares that if the function is called from some other
+   compilation unit, it executes code from that unit only by return or by
+   exception handling.  This declaration lets the compiler optimize that unit
+   more aggressively.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_LEAF
+# if _GL_HAS_ATTRIBUTE (leaf)
+#  define _GL_ATTRIBUTE_LEAF __attribute__ ((__leaf__))
+# else
+#  define _GL_ATTRIBUTE_LEAF
+# endif
+#endif
+
+/* _GL_ATTRIBUTE_MALLOC declares that the function returns a pointer to freshly
+   allocated memory.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_MALLOC
+# if _GL_HAS_ATTRIBUTE (malloc)
+#  define _GL_ATTRIBUTE_MALLOC __attribute__ ((__malloc__))
+# else
+#  define _GL_ATTRIBUTE_MALLOC
+# endif
+#endif
+
+/* _GL_ATTRIBUTE_MAY_ALIAS declares that pointers to the type may point to the
+   same storage as pointers to other types.  Thus this declaration disables
+   strict aliasing optimization.  */
+/* Applies to: types.  */
 /* Oracle Studio 12.6 mishandles may_alias despite __has_attribute OK.  */
-#if _GL_HAS_ATTRIBUTE (may_alias) && !defined __SUNPRO_C
-# define _GL_ATTRIBUTE_MAY_ALIAS __attribute__ ((__may_alias__))
-#else
-# define _GL_ATTRIBUTE_MAY_ALIAS
+#ifndef _GL_ATTRIBUTE_MAY_ALIAS
+# if _GL_HAS_ATTRIBUTE (may_alias) && !defined __SUNPRO_C
+#  define _GL_ATTRIBUTE_MAY_ALIAS __attribute__ ((__may_alias__))
+# else
+#  define _GL_ATTRIBUTE_MAY_ALIAS
+# endif
 #endif
 
-#if 201710L < __STDC_VERSION__
-# define _GL_ATTRIBUTE_MAYBE_UNUSED [[__maybe_unused__]]
-#elif _GL_HAS_ATTRIBUTE (unused)
-# define _GL_ATTRIBUTE_MAYBE_UNUSED __attribute__ ((__unused__))
-#else
-# define _GL_ATTRIBUTE_MAYBE_UNUSED
+/* _GL_ATTRIBUTE_MAYBE_UNUSED declares that it is not a programming mistake if
+   the entity is not used.  The compiler should not warn if the entity is not
+   used.  However, 'int _GL_UNNAMED (i)' is preferable to
+   '_GL_ATTRIBUTE_MAYBE_UNUSED int i' when parameter I is unused
+   regardless of preprocessor macro settings.  */
+/* Applies to:
+     - function, variable,
+     - struct, union, struct/union member,
+     - enumeration, enumeration item,
+     - typedef,
+   in C++ also: class.  */
+/* In C++ and C23, this is spelled [[__maybe_unused__]].
+   GCC's syntax is __attribute__ ((__unused__)).
+   clang supports both syntaxes.  Except that with clang ≥ 6, < 10, in C++ mode,
+   __has_c_attribute (__maybe_unused__) yields true but the use of
+   [[__maybe_unused__]] nevertheless produces a warning.  */
+#ifndef _GL_ATTRIBUTE_MAYBE_UNUSED
+# ifndef _GL_BRACKET_BEFORE_ATTRIBUTE
+#  if defined __clang__ && defined __cplusplus
+#   if !defined __apple_build_version__ && __clang_major__ >= 10
+#    define _GL_ATTRIBUTE_MAYBE_UNUSED [[__maybe_unused__]]
+#   endif
+#  elif _GL_HAVE___HAS_C_ATTRIBUTE
+#   if __has_c_attribute (__maybe_unused__)
+#    define _GL_ATTRIBUTE_MAYBE_UNUSED [[__maybe_unused__]]
+#   endif
+#  endif
+# endif
+# ifndef _GL_ATTRIBUTE_MAYBE_UNUSED
+#  define _GL_ATTRIBUTE_MAYBE_UNUSED _GL_ATTRIBUTE_UNUSED
+# endif
 #endif
-/* Earlier spellings of this macro.  */
+/* Alternative spelling of this macro, for convenience and for
+   compatibility with glibc/include/libc-symbols.h.  */
 #define _GL_UNUSED _GL_ATTRIBUTE_MAYBE_UNUSED
+/* Earlier spellings of this macro.  */
 #define _UNUSED_PARAMETER_ _GL_ATTRIBUTE_MAYBE_UNUSED
 
-#if _GL_HAS_ATTRIBUTE (malloc)
-# define _GL_ATTRIBUTE_MALLOC __attribute__ ((__malloc__))
-#else
-# define _GL_ATTRIBUTE_MALLOC
+/* _GL_ATTRIBUTE_NODISCARD declares that the caller of the function should not
+   discard the return value.  The compiler may warn if the caller does not use
+   the return value, unless the caller uses something like ignore_value.  */
+/* Applies to: function, enumeration, class.  */
+#ifndef _GL_ATTRIBUTE_NODISCARD
+# ifndef _GL_BRACKET_BEFORE_ATTRIBUTE
+#  if defined __clang__ && defined __cplusplus
+  /* With clang up to 15.0.6 (at least), in C++ mode, [[__nodiscard__]] produces
+     a warning.
+     The 1000 below means a yet unknown threshold.  When clang++ version X
+     starts supporting [[__nodiscard__]] without warning about it, you can
+     replace the 1000 with X.  */
+#   if __clang_major__ >= 1000
+#    define _GL_ATTRIBUTE_NODISCARD [[__nodiscard__]]
+#   endif
+#  elif _GL_HAVE___HAS_C_ATTRIBUTE
+#   if __has_c_attribute (__nodiscard__)
+#    define _GL_ATTRIBUTE_NODISCARD [[__nodiscard__]]
+#   endif
+#  endif
+# endif
+# if !defined _GL_ATTRIBUTE_NODISCARD && _GL_HAS_ATTRIBUTE (warn_unused_result)
+#  define _GL_ATTRIBUTE_NODISCARD __attribute__ ((__warn_unused_result__))
+# endif
+# ifndef _GL_ATTRIBUTE_NODISCARD
+#  define _GL_ATTRIBUTE_NODISCARD
+# endif
 #endif
 
-#if 201710L < __STDC_VERSION__
-# define _GL_ATTRIBUTE_NODISCARD [[__nodiscard__]]
-#elif _GL_HAS_ATTRIBUTE (warn_unused_result)
-# define _GL_ATTRIBUTE_NODISCARD __attribute__ ((__warn_unused_result__))
-#else
-# define _GL_ATTRIBUTE_NODISCARD
+/* _GL_ATTRIBUTE_NOINLINE tells that the compiler should not inline the
+   function.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_NOINLINE
+# if _GL_HAS_ATTRIBUTE (noinline)
+#  define _GL_ATTRIBUTE_NOINLINE __attribute__ ((__noinline__))
+# else
+#  define _GL_ATTRIBUTE_NOINLINE
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (noinline)
-# define _GL_ATTRIBUTE_NOINLINE __attribute__ ((__noinline__))
-#else
-# define _GL_ATTRIBUTE_NOINLINE
+/* _GL_ATTRIBUTE_NONNULL ((N1, N2,...)) declares that the arguments N1, N2,...
+   must not be NULL.
+   _GL_ATTRIBUTE_NONNULL () declares that all pointer arguments must not be
+   null.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_NONNULL
+# if _GL_HAS_ATTRIBUTE (nonnull)
+#  define _GL_ATTRIBUTE_NONNULL(args) __attribute__ ((__nonnull__ args))
+# else
+#  define _GL_ATTRIBUTE_NONNULL(args)
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (nonnull)
-# define _GL_ATTRIBUTE_NONNULL(args) __attribute__ ((__nonnull__ args))
-#else
-# define _GL_ATTRIBUTE_NONNULL(args)
+/* _GL_ATTRIBUTE_NONNULL_IF_NONZERO (NP, NI) declares that the argument NP
+   (a pointer) must not be NULL if the argument NI (an integer) is != 0.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_NONNULL_IF_NONZERO
+# if _GL_HAS_ATTRIBUTE (nonnull_if_nonzero)
+#  define _GL_ATTRIBUTE_NONNULL_IF_NONZERO(np, ni) __attribute__ ((__nonnull_if_nonzero__ (np, ni)))
+# else
+#  define _GL_ATTRIBUTE_NONNULL_IF_NONZERO(np, ni)
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (nonstring)
-# define _GL_ATTRIBUTE_NONSTRING __attribute__ ((__nonstring__))
-#else
-# define _GL_ATTRIBUTE_NONSTRING
+/* _GL_ATTRIBUTE_NONSTRING declares that the contents of a character array is
+   not meant to be NUL-terminated.  */
+/* Applies to: struct/union members and variables that are arrays of element
+   type '[[un]signed] char'.  */
+#ifndef _GL_ATTRIBUTE_NONSTRING
+# if _GL_HAS_ATTRIBUTE (nonstring)
+#  define _GL_ATTRIBUTE_NONSTRING __attribute__ ((__nonstring__))
+# else
+#  define _GL_ATTRIBUTE_NONSTRING
+# endif
 #endif
 
 /* There is no _GL_ATTRIBUTE_NORETURN; use _Noreturn instead.  */
 
-#if _GL_HAS_ATTRIBUTE (nothrow) && !defined __cplusplus
-# define _GL_ATTRIBUTE_NOTHROW __attribute__ ((__nothrow__))
-#else
-# define _GL_ATTRIBUTE_NOTHROW
+/* _GL_ATTRIBUTE_NOTHROW declares that the function does not throw exceptions.
+ */
+/* Applies to: functions.  */
+/* After a function's parameter list, this attribute must come first, before
+   other attributes.  */
+#ifndef _GL_ATTRIBUTE_NOTHROW
+# if defined __cplusplus
+#  if _GL_GNUC_PREREQ (2, 8) || __clang_major__ >= 4
+#   if __cplusplus >= 201103L
+#    define _GL_ATTRIBUTE_NOTHROW noexcept (true)
+#   else
+#    define _GL_ATTRIBUTE_NOTHROW throw ()
+#   endif
+#  else
+#   define _GL_ATTRIBUTE_NOTHROW
+#  endif
+# else
+#  if _GL_HAS_ATTRIBUTE (nothrow)
+#   define _GL_ATTRIBUTE_NOTHROW __attribute__ ((__nothrow__))
+#  else
+#   define _GL_ATTRIBUTE_NOTHROW
+#  endif
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (packed)
-# define _GL_ATTRIBUTE_PACKED __attribute__ ((__packed__))
-#else
-# define _GL_ATTRIBUTE_PACKED
+/* _GL_ATTRIBUTE_PACKED declares:
+   For struct members: The member has the smallest possible alignment.
+   For struct, union, class: All members have the smallest possible alignment,
+   minimizing the memory required.  */
+/* Applies to: struct members, struct, union,
+   in C++ also: class.  */
+#ifndef _GL_ATTRIBUTE_PACKED
+/* Oracle Studio 12.6 miscompiles code with __attribute__ ((__packed__)) despite
+   __has_attribute OK.  */
+# if _GL_HAS_ATTRIBUTE (packed) && !defined __SUNPRO_C
+#  define _GL_ATTRIBUTE_PACKED __attribute__ ((__packed__))
+# else
+#  define _GL_ATTRIBUTE_PACKED
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (pure)
-# define _GL_ATTRIBUTE_PURE __attribute__ ((__pure__))
-#else
-# define _GL_ATTRIBUTE_PURE
+/* _GL_ATTRIBUTE_PURE declares:
+   It is OK for a compiler to move a call, or omit a duplicate call
+   and reuse a cached return value, if observable state is the same.
+   It is also OK to omit a call if the return value is not used.
+   This attribute is safe if the function does not change observable state,
+   returns a value determined solely by its arguments's values
+   together with observable state, and always returns exactly once.
+   (This attribute is looser than _GL_ATTRIBUTE_CONST because the function
+   can depend on observable state.
+   Unlike _GL_ATTRIBUTE_REPRODUCIBLE the function must return exactly
+   once and cannot change state addressed by its arguments, but the
+   function can return a pointer to storage whose contents change later.)  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_PURE
+# if _GL_HAS_ATTRIBUTE (pure)
+#  define _GL_ATTRIBUTE_PURE __attribute__ ((__pure__))
+# else
+#  define _GL_ATTRIBUTE_PURE
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (returns_nonnull)
-# define _GL_ATTRIBUTE_RETURNS_NONNULL __attribute__ ((__returns_nonnull__))
-#else
-# define _GL_ATTRIBUTE_RETURNS_NONNULL
+/* _GL_ATTRIBUTE_REPRODUCIBLE declares:
+   It is OK for a compiler to move a call, or omit a duplicate call
+   and reuse a cached value returned either directly or indirectly via
+   a pointer, if other observable state is the same;
+   however, pointer arguments cannot alias.
+   This attribute is safe for a function that is effectless and idempotent;
+   see ISO C 23 § 6.7.13.8 for a definition of these terms.
+   (This attribute is looser than _GL_ATTRIBUTE_UNSEQUENCED because
+   the function need not be stateless or independent.
+   Unlike _GL_ATTRIBUTE_PURE the function need not return exactly once
+   and can change state addressed by its pointer arguments, but the
+   function cannot return a pointer to storage whose contents change later.)
+   See also <https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2956.htm> and
+   <https://stackoverflow.com/questions/76847905/>.  */
+/* Applies to: functions, pointer to functions, function types.  */
+#ifndef _GL_ATTRIBUTE_REPRODUCIBLE
+/* This may be revisited when gcc and clang support [[reproducible]] or possibly
+   __attribute__ ((__reproducible__)).  */
+# ifndef _GL_BRACKET_BEFORE_ATTRIBUTE
+#  if _GL_HAS_ATTRIBUTE (reproducible)
+#   define _GL_ATTRIBUTE_REPRODUCIBLE [[reproducible]]
+#  endif
+# endif
+# ifndef _GL_ATTRIBUTE_REPRODUCIBLE
+#  define _GL_ATTRIBUTE_REPRODUCIBLE
+# endif
 #endif
 
-#if _GL_HAS_ATTRIBUTE (sentinel)
-# define _GL_ATTRIBUTE_SENTINEL(pos) __attribute__ ((__sentinel__ pos))
-#else
-# define _GL_ATTRIBUTE_SENTINEL(pos)
+/* _GL_ATTRIBUTE_RETURNS_NONNULL declares that the function's return value is
+   a non-NULL pointer.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_RETURNS_NONNULL
+# if _GL_HAS_ATTRIBUTE (returns_nonnull)
+#  define _GL_ATTRIBUTE_RETURNS_NONNULL __attribute__ ((__returns_nonnull__))
+# else
+#  define _GL_ATTRIBUTE_RETURNS_NONNULL
+# endif
+#endif
+
+/* _GL_ATTRIBUTE_SENTINEL(pos) declares that the variadic function expects a
+   trailing NULL argument.
+   _GL_ATTRIBUTE_SENTINEL () - The last argument is NULL (requires C99).
+   _GL_ATTRIBUTE_SENTINEL ((N)) - The (N+1)st argument from the end is NULL.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_SENTINEL
+# if _GL_HAS_ATTRIBUTE (sentinel)
+#  define _GL_ATTRIBUTE_SENTINEL(pos) __attribute__ ((__sentinel__ pos))
+# else
+#  define _GL_ATTRIBUTE_SENTINEL(pos)
+# endif
+#endif
+
+/* _GL_ATTRIBUTE_UNSEQUENCED declares:
+   It is OK for a compiler to move a call, or omit a duplicate call
+   and reuse a cached value returned either directly or indirectly via
+   a pointer, if the state addressed by its pointer arguments is the same;
+   however, pointer arguments cannot alias.
+   This attribute is safe for a function that is effectless, idempotent,
+   stateless, and independent; see ISO C 23 § 6.7.13.8 for a definition of
+   these terms.
+   (This attribute is stricter than _GL_ATTRIBUTE_REPRODUCIBLE because
+   the function must be stateless and independent.  Unlike
+   _GL_ATTRIBUTE_CONST the function need not return exactly once, and
+   can depend on state accessed via its pointer arguments or that
+   happens to have the same value for all calls to the function, but
+   the function cannot return a pointer to storage whose contents
+   change later.)
+   See also <https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2956.htm> and
+   <https://stackoverflow.com/questions/76847905/>.  */
+/* Applies to: functions, pointer to functions, function types.  */
+#ifndef _GL_ATTRIBUTE_UNSEQUENCED
+/* This may be revisited when gcc and clang support [[unsequenced]] or possibly
+   __attribute__ ((__unsequenced__)).  */
+# ifndef _GL_BRACKET_BEFORE_ATTRIBUTE
+#  if _GL_HAS_ATTRIBUTE (unsequenced)
+#   define _GL_ATTRIBUTE_UNSEQUENCED [[unsequenced]]
+#  endif
+# endif
+# ifndef _GL_ATTRIBUTE_UNSEQUENCED
+#  define _GL_ATTRIBUTE_UNSEQUENCED
+# endif
+#endif
+
+/* A helper macro.  Don't use it directly.  */
+#ifndef _GL_ATTRIBUTE_UNUSED
+# if _GL_HAS_ATTRIBUTE (unused)
+#  define _GL_ATTRIBUTE_UNUSED __attribute__ ((__unused__))
+# else
+#  define _GL_ATTRIBUTE_UNUSED
+# endif
 #endif
 
 ]dnl There is no _GL_ATTRIBUTE_VISIBILITY; see m4/visibility.m4 instead.
 [
-/* To support C++ as well as C, use _GL_UNUSED_LABEL with trailing ';'.  */
-#if !defined __cplusplus || _GL_GNUC_PREREQ (4, 5)
-# define _GL_UNUSED_LABEL _GL_ATTRIBUTE_MAYBE_UNUSED
+/* _GL_UNUSED_LABEL; declares that it is not a programming mistake if the
+   immediately preceding label is not used.  The compiler should not warn
+   if the label is not used.  */
+/* Applies to: label (both in C and C++).  */
+/* Note that g++ < 4.5 does not support the '__attribute__ ((__unused__)) ;'
+   syntax.  But clang does.  */
+#ifndef _GL_UNUSED_LABEL
+# if !(defined __cplusplus && !_GL_GNUC_PREREQ (4, 5)) || defined __clang__
+#  define _GL_UNUSED_LABEL _GL_ATTRIBUTE_UNUSED
+# else
+#  define _GL_UNUSED_LABEL
+# endif
+#endif
+
+/* _GL_UNNAMED (ID) is the "name" of an unnamed function parameter.
+   Each of the function's unnamed parameters should have a unique "name".
+   The "name" cannot be used.  This ports both to C17 and earlier, which
+   lack unnamed parameters, and to C++ and later C, which have them.  */
+/* Applies to:
+     - function parameters.  */
+#ifndef _GL_UNNAMED
+# if ((defined __STDC_VERSION__ ? __STDC_VERSION__ : 0) < 202311 \
+      && !defined __cplusplus)
+#  define _GL_UNNAMED(id) unnamed_##id _GL_ATTRIBUTE_UNUSED
+# else
+#  define _GL_UNNAMED(id)
+# endif
+#endif
+
+/* The following attributes enable detection of thread safety problems
+   and resource leaks at compile-time, by clang ≥ 15, when the warning option
+   -Wthread-safety is enabled.  For usage, see
+   <https://clang.llvm.org/docs/ThreadSafetyAnalysis.html>.  */
+#ifndef _GL_ATTRIBUTE_CAPABILITY_TYPE
+# if __clang_major__ >= 15
+#  define _GL_ATTRIBUTE_CAPABILITY_TYPE(concept) \
+     __attribute__ ((__capability__ (concept)))
+# else
+#  define _GL_ATTRIBUTE_CAPABILITY_TYPE(concept)
+# endif
+#endif
+#ifndef _GL_ATTRIBUTE_ACQUIRE_CAPABILITY
+# if __clang_major__ >= 15
+#  define _GL_ATTRIBUTE_ACQUIRE_CAPABILITY(resource) \
+     __attribute__ ((__acquire_capability__ (resource)))
+# else
+#  define _GL_ATTRIBUTE_ACQUIRE_CAPABILITY(resource)
+# endif
+#endif
+#ifndef _GL_ATTRIBUTE_RELEASE_CAPABILITY
+# if __clang_major__ >= 15
+#  define _GL_ATTRIBUTE_RELEASE_CAPABILITY(resource) \
+     __attribute__ ((__release_capability__ (resource)))
+# else
+#  define _GL_ATTRIBUTE_RELEASE_CAPABILITY(resource)
+# endif
+#endif
+])
+  AH_VERBATIM([c_linkage],
+[/* In C++, there is the concept of "language linkage", that encompasses
+    name mangling and function calling conventions.
+    The following macros start and end a block of "C" linkage.  */
+#ifdef __cplusplus
+# define _GL_BEGIN_C_LINKAGE extern "C" {
+# define _GL_END_C_LINKAGE }
 #else
-# define _GL_UNUSED_LABEL
+# define _GL_BEGIN_C_LINKAGE
+# define _GL_END_C_LINKAGE
 #endif
 ])
   AH_VERBATIM([async_safe],
@@ -316,8 +985,8 @@ AC_DEFUN([gl_COMMON_BODY], [
      -1 if n1 < n2
    The naïve code   (n1 > n2 ? 1 : n1 < n2 ? -1 : 0)  produces a conditional
    jump with nearly all GCC versions up to GCC 10.
-   This variant     (n1 < n2 ? -1 : n1 > n2)  produces a conditional with many
-   GCC versions up to GCC 9.
+   This variant     (n1 < n2 ? -1 : n1 > n2)  produces a conditional jump with
+   many GCC versions up to GCC 9.
    The better code  (n1 > n2) - (n1 < n2)  from Hacker's Delight § 2-9
    avoids conditional jumps in all GCC versions >= 3.4.  */
 #define _GL_CMP(n1, n2) (((n1) > (n2)) - ((n1) < (n2)))
@@ -334,7 +1003,7 @@ AC_DEFUN([gl_COMMON_BODY], [
   dnl gl_cross_guess_normal    (to be used when 'yes' is good and 'no' is bad),
   dnl gl_cross_guess_inverted  (to be used when 'no' is good and 'yes' is bad).
   AC_ARG_ENABLE([cross-guesses],
-    [AS_HELP_STRING([--enable-cross-guesses={conservative|risky}],
+    [AS_HELP_STRING([[--enable-cross-guesses={conservative|risky}]],
        [specify policy for cross-compilation guesses])],
     [if test "x$enableval" != xconservative && test "x$enableval" != xrisky; then
        AC_MSG_WARN([invalid argument supplied to --enable-cross-guesses])
@@ -580,9 +1249,9 @@ Amsterdam
 ])
 
 # AC_C_RESTRICT
-# This definition is copied from post-2.70 Autoconf and overrides the
-# AC_C_RESTRICT macro from autoconf 2.60..2.70.
-m4_version_prereq([2.70.1], [], [
+# This definition is copied from post-2.73 Autoconf and overrides the
+# AC_C_RESTRICT macro from autoconf 2.60..2.73.
+m4_version_prereq([2.73.1], [], [
 AC_DEFUN([AC_C_RESTRICT],
 [AC_CACHE_CHECK([for C/C++ restrict keyword], [ac_cv_c_restrict],
   [ac_cv_c_restrict=no
@@ -608,9 +1277,14 @@ AC_DEFUN([AC_C_RESTRICT],
   ])
  AH_VERBATIM([restrict],
 [/* Define to the equivalent of the C99 'restrict' keyword, or to
-   nothing if this is not supported.  Do not define if restrict is
-   supported only directly.  */
+   nothing if this is not supported.  In particular it is not supported
+   in MSVC 14.44 and in g++ 7 on Solaris 11, although these compilers
+   define __STDC_VERSION__ to 199901L.
+   Do not define if restrict is supported directly.  */
+#if ! (defined __STDC_VERSION__ && 199901L <= __STDC_VERSION__ \
+       && !defined _MSC_VER && !defined __cplusplus)
 #undef restrict
+#endif
 /* Work around a bug in older versions of Sun C++, which did not
    #define __restrict__ or support _Restrict or __restrict__
    even though the corresponding Sun C compiler ended up with
@@ -666,6 +1340,24 @@ AC_DEFUN([gl_CACHE_VAL_SILENT],
   ])
 ])
 
+# gl_CONDITIONAL(conditional, condition)
+# is like AM_CONDITIONAL(conditional, condition), except that it does not
+# produce an error
+#   configure: error: conditional "..." was never defined.
+#   Usually this means the macro was only invoked conditionally.
+# when only invoked conditionally. Instead, in that case, both the _TRUE
+# and the _FALSE case are disabled.
+AC_DEFUN([gl_CONDITIONAL],
+[
+  pushdef([AC_CONFIG_COMMANDS_PRE], [:])dnl
+  AM_CONDITIONAL([$1], [$2])
+  popdef([AC_CONFIG_COMMANDS_PRE])dnl
+  if test -z "${[$1]_TRUE}" && test -z "${[$1]_FALSE}"; then
+    [$1]_TRUE='#'
+    [$1]_FALSE='#'
+  fi
+])
+
 # gl_CC_ALLOW_WARNINGS
 # sets and substitutes a variable GL_CFLAG_ALLOW_WARNINGS, to a $(CC) option
 # that reverts a preceding '-Werror' option, if available.
@@ -676,7 +1368,7 @@ AC_DEFUN([gl_CC_ALLOW_WARNINGS],
   AC_REQUIRE([AC_PROG_CC])
   AC_CACHE_CHECK([for C compiler option to allow warnings],
     [gl_cv_cc_wallow],
-    [rm -f conftest*
+    [rm -fr conftest*
      echo 'int dummy;' > conftest.c
      AC_TRY_COMMAND([${CC-cc} $CFLAGS $CPPFLAGS -c conftest.c 2>conftest1.err]) >/dev/null
      AC_TRY_COMMAND([${CC-cc} $CFLAGS $CPPFLAGS -Wno-error -c conftest.c 2>conftest2.err]) >/dev/null
@@ -689,7 +1381,7 @@ AC_DEFUN([gl_CC_ALLOW_WARNINGS],
      else
        gl_cv_cc_wallow=none
      fi
-     rm -f conftest*
+     rm -fr conftest*
     ])
   case "$gl_cv_cc_wallow" in
     none) GL_CFLAG_ALLOW_WARNINGS='' ;;
@@ -707,7 +1399,7 @@ AC_DEFUN([gl_CXX_ALLOW_WARNINGS],
   if test -n "$CXX" && test "$CXX" != no; then
     AC_CACHE_CHECK([for C++ compiler option to allow warnings],
       [gl_cv_cxx_wallow],
-      [rm -f conftest*
+      [rm -fr conftest*
        echo 'int dummy;' > conftest.cc
        AC_TRY_COMMAND([${CXX-c++} $CXXFLAGS $CPPFLAGS -c conftest.cc 2>conftest1.err]) >/dev/null
        AC_TRY_COMMAND([${CXX-c++} $CXXFLAGS $CPPFLAGS -Wno-error -c conftest.cc 2>conftest2.err]) >/dev/null
@@ -720,7 +1412,7 @@ AC_DEFUN([gl_CXX_ALLOW_WARNINGS],
        else
          gl_cv_cxx_wallow=none
        fi
-       rm -f conftest*
+       rm -fr conftest*
       ])
     case "$gl_cv_cxx_wallow" in
       none) GL_CXXFLAG_ALLOW_WARNINGS='' ;;
@@ -730,6 +1422,356 @@ AC_DEFUN([gl_CXX_ALLOW_WARNINGS],
     GL_CXXFLAG_ALLOW_WARNINGS=''
   fi
   AC_SUBST([GL_CXXFLAG_ALLOW_WARNINGS])
+])
+
+# gl_CC_GNULIB_WARNINGS
+# sets and substitutes a variable GL_CFLAG_GNULIB_WARNINGS, to a $(CC) option
+# set that enables or disables warnings as suitable for the Gnulib coding style.
+AC_DEFUN([gl_CC_GNULIB_WARNINGS],
+[
+  AC_REQUIRE([gl_CC_ALLOW_WARNINGS])
+  dnl Assume that the compiler supports -Wno-* options only if it also supports
+  dnl -Wno-error.
+  GL_CFLAG_GNULIB_WARNINGS=''
+  if test -n "$GL_CFLAG_ALLOW_WARNINGS"; then
+    dnl Enable these warning options:
+    dnl
+    dnl                                       GCC             clang
+    dnl -Wno-cast-qual                        >= 3            >= 3.9
+    dnl -Wno-conversion                       >= 3            >= 3.9
+    dnl -Wno-float-conversion                 >= 4.9          >= 3.9
+    dnl -Wno-float-equal                      >= 3            >= 3.9
+    dnl -Wimplicit-fallthrough                >= 7            >= 3.9
+    dnl -Wno-pedantic                         >= 4.8          >= 3.9
+    dnl -Wno-sign-compare                     >= 3            >= 3.9
+    dnl -Wno-sign-conversion                  >= 4.3          >= 3.9
+    dnl -Wno-string-plus-int                  -               >= 3.9
+    dnl -Wno-tautological-out-of-range-compare  -             >= 3.9
+    dnl -Wno-type-limits                      >= 4.3          >= 3.9
+    dnl -Wno-undef                            >= 3            >= 3.9
+    dnl -Wno-unsuffixed-float-constants       >= 4.5
+    dnl -Wno-unused-const-variable            >= 6.1          >= 3.9
+    dnl -Wno-unused-function                  >= 3            >= 3.9
+    dnl -Wno-unused-parameter                 >= 3            >= 3.9
+    dnl
+    cat > conftest.c <<\EOF
+      #if (__GNUC__ >= 3 && !defined __clang__) || (__clang_major__ + (__clang_minor__ >= 9) > 3)
+      -Wno-cast-qual
+      -Wno-conversion
+      -Wno-float-equal
+      -Wno-sign-compare
+      -Wno-undef
+      -Wno-unused-function
+      -Wno-unused-parameter
+      #endif
+      #if (__GNUC__ + (__GNUC_MINOR__ >= 9) > 4 && !defined __clang__) || (__clang_major__ + (__clang_minor__ >= 9) > 3)
+      -Wno-float-conversion
+      #endif
+      #if (__GNUC__ >= 7 && !defined __clang__) || (__clang_major__ + (__clang_minor__ >= 9) > 3)
+      -Wimplicit-fallthrough
+      #endif
+      #if (__GNUC__ + (__GNUC_MINOR__ >= 8) > 4 && !defined __clang__) || (__clang_major__ + (__clang_minor__ >= 9) > 3)
+      -Wno-pedantic
+      #endif
+      #if 3 < __clang_major__ + (9 <= __clang_minor__)
+      -Wno-string-plus-int
+      -Wno-tautological-constant-out-of-range-compare
+      #endif
+      #if (__GNUC__ + (__GNUC_MINOR__ >= 3) > 4 && !defined __clang__) || (__clang_major__ + (__clang_minor__ >= 9) > 3)
+      -Wno-sign-conversion
+      -Wno-type-limits
+      #endif
+      #if (__GNUC__ + (__GNUC_MINOR__ >= 1) > 6 && !defined __clang__) || (__clang_major__ + (__clang_minor__ >= 9) > 3)
+      -Wno-unused-const-variable
+      #endif
+      #if (__GNUC__ + (__GNUC_MINOR__ >= 5) > 4 && !defined __clang__)
+      -Wno-unsuffixed-float-constants
+      #endif
+EOF
+    gl_command="$CC $CFLAGS $CPPFLAGS -E conftest.c > conftest.out"
+    if AC_TRY_EVAL([gl_command]); then
+      gl_options=`grep -v '#' conftest.out`
+      for word in $gl_options; do
+        GL_CFLAG_GNULIB_WARNINGS="$GL_CFLAG_GNULIB_WARNINGS $word"
+      done
+    fi
+    rm -f conftest.c conftest.out
+  fi
+  AC_SUBST([GL_CFLAG_GNULIB_WARNINGS])
+])
+
+dnl gl_CONDITIONAL_HEADER([foo.h])
+dnl takes a shell variable GL_GENERATE_FOO_H (with value true or false) as input
+dnl and produces
+dnl   - an AC_SUBSTed variable FOO_H that is either a file name or empty, based
+dnl     on whether GL_GENERATE_FOO_H is true or false,
+dnl   - an Automake conditional GL_GENERATE_FOO_H that evaluates to the value of
+dnl     the shell variable GL_GENERATE_FOO_H.
+AC_DEFUN([gl_CONDITIONAL_HEADER],
+[
+  m4_pushdef([gl_header_name], AS_TR_SH(m4_toupper($1)))
+  m4_pushdef([gl_generate_var], [GL_GENERATE_]AS_TR_SH(m4_toupper($1)))
+  m4_pushdef([gl_generate_cond], [GL_GENERATE_]AS_TR_SH(m4_toupper($1)))
+  case "$gl_generate_var" in
+    false) gl_header_name='' ;;
+    true)
+      dnl It is OK to use a .h file in lib/ from within tests/, but not vice
+      dnl versa.
+      if test -z "$gl_header_name"; then
+        gl_header_name="${gl_source_base_prefix}$1"
+      fi
+      ;;
+    *) echo "*** gl_generate_var is not set correctly" 1>&2; exit 1 ;;
+  esac
+  AC_SUBST(gl_header_name)
+  gl_CONDITIONAL(gl_generate_cond, [$gl_generate_var])
+  m4_popdef([gl_generate_cond])
+  m4_popdef([gl_generate_var])
+  m4_popdef([gl_header_name])
+])
+
+dnl Preparations for gl_CHECK_FUNCS_MACOS.
+AC_DEFUN([gl_PREPARE_CHECK_FUNCS_MACOS],
+[
+  AC_REQUIRE([AC_CANONICAL_HOST])
+  AC_REQUIRE([gl_COMPILER_CLANG])
+  AC_CACHE_CHECK([for compiler option needed when checking for future declarations],
+    [gl_cv_compiler_check_future_option],
+    [case "$host_os" in
+       dnl This is only needed on macOS.
+       darwin*)
+         if test $gl_cv_compiler_clang = yes; then
+           dnl Test whether the compiler supports the option
+           dnl '-Werror=unguarded-availability-new'.
+           saved_ac_compile="$ac_compile"
+           ac_compile="$ac_compile -Werror=unguarded-availability-new"
+           AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]],[[]])],
+             [gl_cv_compiler_check_future_option='-Werror=unguarded-availability-new'],
+             [gl_cv_compiler_check_future_option=none])
+           ac_compile="$saved_ac_compile"
+         else
+           gl_cv_compiler_check_future_option=none
+         fi
+         ;;
+       *) gl_cv_compiler_check_future_option=none ;;
+     esac
+    ])
+])
+
+dnl Pieces of the expansion of
+dnl gl_CHECK_FUNCS_ANDROID
+dnl gl_CHECK_FUNCS_MACOS
+dnl gl_CHECK_FUNCS_ANDROID_MACOS
+
+AC_DEFUN([gl_CHECK_FUNCS_DEFAULT_CASE],
+[
+         *)
+           AC_CHECK_FUNC([$1])
+           [gl_cv_onwards_func_][$1]=$[ac_cv_func_][$1]
+           ;;
+])
+
+AC_DEFUN([gl_CHECK_FUNCS_CASE_FOR_ANDROID],
+[
+         linux*-android*)
+           AC_CHECK_DECL([$1], , , [$2])
+           if test $[ac_cv_have_decl_][$1] = yes; then
+             AC_CHECK_FUNC([[$1]])
+             if test $[ac_cv_func_][$1] = yes; then
+               [gl_cv_onwards_func_][$1]=yes
+             else
+               dnl The function is declared but does not exist. This should not
+               dnl happen normally. But anyway, we know that a future version
+               dnl of Android will have the function.
+               [gl_cv_onwards_func_][$1]='future OS version'
+             fi
+           else
+             [gl_cv_onwards_func_][$1]='future OS version'
+           fi
+           ;;
+])
+
+AC_DEFUN([gl_CHECK_FUNCS_CASE_FOR_MACOS],
+[
+         darwin*)
+           if test "x$gl_cv_compiler_check_future_option" != "xnone"; then
+             dnl Use a compile test, not a link test.
+             saved_ac_compile="$ac_compile"
+             ac_compile="$ac_compile $gl_cv_compiler_check_future_option"
+             saved_ac_compile_for_check_decl="$ac_compile_for_check_decl"
+             ac_compile_for_check_decl="$ac_compile_for_check_decl $gl_cv_compiler_check_future_option"
+             unset [ac_cv_have_decl_][$1]
+             AC_CHECK_DECL([$1], , , [$2])
+             ac_compile="$saved_ac_compile"
+             ac_compile_for_check_decl="$saved_ac_compile_for_check_decl"
+             [ac_cv_func_][$1]="$[ac_cv_have_decl_][$1]"
+             if test $[ac_cv_func_][$1] = yes; then
+               [gl_cv_onwards_func_][$1]=yes
+             else
+               dnl This is a bit complicated, because here we need the behaviour
+               dnl of AC_CHECK_DECL before the
+               dnl commit e1bbc9b93cdff61d70719c224b37970e065008bb (2025-05-26).
+               [ac_cv_have_decl_][$1][_saved]="$[ac_cv_have_decl_][$1]"
+               unset [ac_cv_have_decl_][$1]
+               ac_c_future_darwin_options_saved="$ac_c_future_darwin_options"
+               ac_cxx_future_darwin_options_saved="$ac_cxx_future_darwin_options"
+               ac_c_future_darwin_options=
+               ac_cxx_future_darwin_options=
+               AC_CHECK_DECL([$1], , , [$2])
+               ac_c_future_darwin_options="$ac_c_future_darwin_options_saved"
+               ac_cxx_future_darwin_options="$ac_cxx_future_darwin_options_saved"
+               if test $[ac_cv_have_decl_][$1] = yes; then
+                 [gl_cv_onwards_func_][$1]='future OS version'
+               else
+                 [gl_cv_onwards_func_][$1]=no
+               fi
+               [ac_cv_have_decl_][$1]="$[ac_cv_have_decl_][$1][_saved]"
+               unset [ac_cv_have_decl_][$1][_saved]
+             fi
+           else
+             AC_CHECK_FUNC([$1])
+             [gl_cv_onwards_func_][$1]=$[ac_cv_func_][$1]
+           fi
+           ;;
+])
+
+AC_DEFUN([gl_CHECK_FUNCS_SET_RESULTS],
+[
+  case "$[gl_cv_onwards_func_][$1]" in
+    future*) [ac_cv_func_][$1]=no ;;
+    *)       [ac_cv_func_][$1]=$[gl_cv_onwards_func_][$1] ;;
+  esac
+  if test $[ac_cv_func_][$1] = yes; then
+    AC_DEFINE([HAVE_]m4_translit([[$1]],
+                                 [abcdefghijklmnopqrstuvwxyz],
+                                 [ABCDEFGHIJKLMNOPQRSTUVWXYZ]),
+              [1], [Define to 1 if you have the `$1' function.])
+  fi
+])
+
+dnl gl_CHECK_FUNCS_ANDROID([func], [[#include <foo.h>]])
+dnl is like AC_CHECK_FUNCS([func]), taking into account a portability problem
+dnl on Android.
+dnl
+dnl When code is compiled on Android, it is in the context of a certain
+dnl "Android API level", which indicates the minimum version of Android on
+dnl which the app can be installed. In other words, you don't compile for a
+dnl specific version of Android. You compile for all versions of Android,
+dnl onwards from the given API level.
+dnl Thus, the question "does the OS have the function func" has three possible
+dnl answers:
+dnl   - yes, in all versions starting from the given API level,
+dnl   - no, in no version,
+dnl   - not in the given API level, but in a later version of Android.
+dnl
+dnl In detail, this works as follows:
+dnl If func was added to Android API level, say, 28, then the libc.so has the
+dnl symbol func always, whereas the header file <foo.h> declares func
+dnl conditionally:
+dnl   #if __ANDROID_API__ >= 28
+dnl   ... func (...) __INTRODUCED_IN(28);
+dnl   #endif
+dnl Thus, when compiling with "clang -target armv7a-unknown-linux-android28",
+dnl the function func is declared and exists in libc.
+dnl Whereas when compiling with "clang -target armv7a-unknown-linux-android27",
+dnl the function func is not declared but exists in libc.
+dnl
+dnl This macro sets two variables:
+dnl   - gl_cv_onwards_func_<func>   to yes / no / "future OS version"
+dnl   - ac_cv_func_<func>           to yes / no / no
+dnl The first variable allows distinguishing all three cases.
+dnl The second variable is set, so that an invocation
+dnl   gl_CHECK_FUNCS_ANDROID([func], [[#include <foo.h>]])
+dnl can be used as a drop-in replacement for
+dnl   AC_CHECK_FUNCS([func]).
+AC_DEFUN([gl_CHECK_FUNCS_ANDROID],
+[
+  AC_REQUIRE([AC_CANONICAL_HOST])
+  AC_CACHE_CHECK([for [$1]],
+    [[gl_cv_onwards_func_][$1]],
+    [gl_SILENT([
+       case "$host_os" in
+         gl_CHECK_FUNCS_CASE_FOR_ANDROID([$1], [$2])
+         gl_CHECK_FUNCS_DEFAULT_CASE([$1])
+       esac
+      ])
+    ])
+  gl_CHECK_FUNCS_SET_RESULTS([$1])
+])
+
+dnl gl_CHECK_FUNCS_MACOS([func], [[#include <foo.h>]])
+dnl is like AC_CHECK_FUNCS([func]), taking into account a portability problem
+dnl on macOS.
+dnl
+dnl When code is compiled on macOS, it is in the context of a certain minimum
+dnl macOS version, that can be set through the option '-mmacosx-version-min='.
+dnl In other words, you don't compile for a specific version of macOS. You
+dnl compile for all versions of macOS, onwards from the given version.
+dnl Thus, the question "does the OS have the function func" has three possible
+dnl answers:
+dnl   - yes, in all versions starting from the given version,
+dnl   - no, in no version,
+dnl   - not in the given version, but in a later version of macOS.
+dnl
+dnl In detail, this works as follows:
+dnl If func was added to, say, macOS version 13, then the libc has the
+dnl symbol func always, whereas the header file <foo.h> declares func
+dnl conditionally with a special availability attribute:
+dnl   ... func (...) __attribute__((availability(macos,introduced=13.0)));
+dnl Thus, when compiling with "clang mmacosx-version-min=13", there is no
+dnl warning about the use of func, and the resulting binary
+dnl   - runs fine on macOS 13,
+dnl   - aborts with a dyld "Symbol not found" message on macOS 12.
+dnl Whereas, when compiling with "clang mmacosx-version-min=12", there is a
+dnl   warning: 'func' is only available on macOS 13.0 or newer
+dnl   [-Wunguarded-availability-new],
+dnl and the resulting binary
+dnl   - runs fine on macOS 13,
+dnl   - crashes with a SIGSEGV (signal 11) on macOS 12.
+dnl
+dnl This macro sets two variables:
+dnl   - gl_cv_onwards_func_<func>   to yes / no / "future OS version"
+dnl   - ac_cv_func_<func>           to yes / no / no
+dnl The first variable allows distinguishing all three cases.
+dnl The second variable is set, so that an invocation
+dnl   gl_CHECK_FUNCS_MACOS([func], [[#include <foo.h>]])
+dnl can be used as a drop-in replacement for
+dnl   AC_CHECK_FUNCS([func]).
+AC_DEFUN([gl_CHECK_FUNCS_MACOS],
+[
+  AC_REQUIRE([AC_CANONICAL_HOST])
+  AC_REQUIRE([gl_PREPARE_CHECK_FUNCS_MACOS])
+  AC_CACHE_CHECK([for [$1]],
+    [[gl_cv_onwards_func_][$1]],
+    [gl_SILENT([
+       case "$host_os" in
+         gl_CHECK_FUNCS_CASE_FOR_MACOS([$1], [$2])
+         gl_CHECK_FUNCS_DEFAULT_CASE([$1])
+       esac
+      ])
+    ])
+  gl_CHECK_FUNCS_SET_RESULTS([$1])
+])
+
+dnl gl_CHECK_FUNCS_ANDROID_MACOS([func], [[#include <foo.h>]])
+dnl is like AC_CHECK_FUNCS([func]), taking into account a portability problem
+dnl on Android and on macOS.
+dnl It is the combination of gl_CHECK_FUNCS_ANDROID and gl_CHECK_FUNCS_MACOS.
+AC_DEFUN([gl_CHECK_FUNCS_ANDROID_MACOS],
+[
+  AC_REQUIRE([AC_CANONICAL_HOST])
+  AC_REQUIRE([gl_PREPARE_CHECK_FUNCS_MACOS])
+  AC_CACHE_CHECK([for [$1]],
+    [[gl_cv_onwards_func_][$1]],
+    [gl_SILENT([
+       case "$host_os" in
+         gl_CHECK_FUNCS_CASE_FOR_ANDROID([$1], [$2])
+         gl_CHECK_FUNCS_CASE_FOR_MACOS([$1], [$2])
+         gl_CHECK_FUNCS_DEFAULT_CASE([$1])
+       esac
+      ])
+    ])
+  gl_CHECK_FUNCS_SET_RESULTS([$1])
 ])
 
 dnl Expands to some code for use in .c programs that, on native Windows, defines

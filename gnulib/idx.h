@@ -1,5 +1,5 @@
 /* A type for indices and sizes.
-   Copyright (C) 2020-2021 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -19,11 +19,17 @@
 #ifndef _IDX_H
 #define _IDX_H
 
-/* Get ptrdiff_t.  */
-#include <stddef.h>
+#ifndef __PTRDIFF_TYPE__
+# include <stddef.h>
+#endif
 
-/* Get PTRDIFF_MAX.  */
-#include <stdint.h>
+/* IDX_MAX is the maximum value of an idx_t.  */
+#ifdef __PTRDIFF_MAX__
+# define IDX_MAX __PTRDIFF_MAX__
+#else
+# include <stdint.h>
+# define IDX_MAX PTRDIFF_MAX
+#endif
 
 /* The type 'idx_t' holds an (array) index or an (object) size.
    Its implementation promotes to a signed integer type,
@@ -55,6 +61,26 @@
 
      * Because 'size_t' is an unsigned type, and a signed type is better.
        See above.
+
+   Why not use 'ssize_t'?
+
+     * 'ptrdiff_t' is more portable; it is standardized by ISO C
+       whereas 'ssize_t' is standardized only by POSIX.
+
+     * 'ssize_t' is not required to be as wide as 'size_t', and some
+       now-obsolete POSIX platforms had 'size_t' wider than 'ssize_t'.
+
+     * Conversely, some now-obsolete platforms had 'ptrdiff_t' wider
+       than 'size_t', which can be a win and conforms to POSIX.
+
+   Won't this cause a problem with objects larger than PTRDIFF_MAX?
+
+     * Typical modern or large platforms do not allocate such objects,
+       so this is not much of a problem in practice; for example, you
+       can safely write 'idx_t len = strlen (s);'.  To port to older
+       small platforms where allocations larger than PTRDIFF_MAX could
+       in theory be a problem, you can use Gnulib's ialloc module, or
+       functions like ximalloc in Gnulib's xalloc module.
 
    Why not use 'ptrdiff_t' directly?
 
@@ -91,6 +117,11 @@
        help producing good code and good warnings.  The type 'idx_t' could
        then be typedef'ed to a range type that is signed after promotion.  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* In the future, idx_t could be typedef'ed to a signed range type.
    The clang "extended integer types", supported in Clang 11 or newer
    <https://clang.llvm.org/docs/LanguageExtensions.html#extended-integer-types>,
@@ -102,13 +133,20 @@
 /* Use the signed type 'ptrdiff_t'.  */
 /* Note: ISO C does not mandate that 'size_t' and 'ptrdiff_t' have the same
    size, but it is so on all platforms we have seen since 1990.  */
+#ifdef __PTRDIFF_TYPE__
+typedef __PTRDIFF_TYPE__ idx_t;
+#else
+/* <stddef.h> already included above.  */
 typedef ptrdiff_t idx_t;
-
-/* IDX_MAX is the maximum value of an idx_t.  */
-#define IDX_MAX PTRDIFF_MAX
+#endif
 
 /* So far no need has been found for an IDX_WIDTH macro.
    Perhaps there should be another macro IDX_VALUE_BITS that does not
    count the sign bit and is therefore one less than PTRDIFF_WIDTH.  */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _IDX_H */

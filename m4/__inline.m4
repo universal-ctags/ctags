@@ -1,8 +1,12 @@
-# Test for __inline keyword
-dnl Copyright 2017-2021 Free Software Foundation, Inc.
+# __inline.m4
+# serial 1
+dnl Copyright 2017-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
+
+# Test for __inline keyword
 
 AC_DEFUN([gl___INLINE],
 [

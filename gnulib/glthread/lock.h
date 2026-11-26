@@ -1,5 +1,5 @@
 /* Locking in multithreaded situations.
-   Copyright (C) 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -64,32 +64,28 @@
      Taking the lock:     err = glthread_recursive_lock_lock (&name);
      Releasing the lock:  err = glthread_recursive_lock_unlock (&name);
      De-initialization:   err = glthread_recursive_lock_destroy (&name);
-
-  Once-only execution:
-     Type:                gl_once_t
-     Initializer:         gl_once_define(extern, name)
-     Execution:           gl_once (name, initfunction);
-   Equivalent functions with control of error handling:
-     Execution:           err = glthread_once (&name, initfunction);
 */
 
 
 #ifndef _LOCK_H
 #define _LOCK_H
 
-#include <errno.h>
+/* This file uses HAVE_THREADS_H, HAVE_PTHREAD_RWLOCK,
+   HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER,
+   PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP,
+   USE_ISOC_THREADS, USE_POSIX_THREADS, USE_ISOC_AND_POSIX_THREADS,
+   USE_WINDOWS_THREADS,
+   HAVE_PTHREAD_MUTEX_RECURSIVE.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
+
 #include <stdlib.h>
 
-#if !defined c11_threads_in_use
-# if HAVE_THREADS_H && USE_POSIX_THREADS_FROM_LIBC
-#  define c11_threads_in_use() 1
-# elif HAVE_THREADS_H && USE_POSIX_THREADS_WEAK
-#  include <threads.h>
-#  pragma weak thrd_exit
-#  define c11_threads_in_use() (thrd_exit != NULL)
-# else
-#  define c11_threads_in_use() 0
-# endif
+#if (USE_ISOC_THREADS || USE_POSIX_THREADS || USE_ISOC_AND_POSIX_THREADS \
+     || USE_WINDOWS_THREADS)
+# include "glthread/once.h"
+/* c11_threads_in_use() is defined in glthread/once.h.  */
 #endif
 
 /* ========================================================================= */
@@ -187,14 +183,6 @@ extern int glthread_recursive_lock_lock (gl_recursive_lock_t *lock);
 extern int glthread_recursive_lock_unlock (gl_recursive_lock_t *lock);
 extern int glthread_recursive_lock_destroy (gl_recursive_lock_t *lock);
 
-/* -------------------------- gl_once_t datatype -------------------------- */
-
-typedef once_flag gl_once_t;
-# define gl_once_define(STORAGECLASS, NAME) \
-    STORAGECLASS once_flag NAME = ONCE_FLAG_INIT;
-# define glthread_once(ONCE_CONTROL, INITFUNCTION) \
-    (call_once (ONCE_CONTROL, INITFUNCTION), 0)
-
 # ifdef __cplusplus
 }
 # endif
@@ -213,80 +201,7 @@ typedef once_flag gl_once_t;
 extern "C" {
 # endif
 
-# if PTHREAD_IN_USE_DETECTION_HARD
-
-/* The pthread_in_use() detection needs to be done at runtime.  */
-#  define pthread_in_use() \
-     glthread_in_use ()
-extern int glthread_in_use (void);
-
-# endif
-
-# if USE_POSIX_THREADS_WEAK
-
-/* Use weak references to the POSIX threads library.  */
-
-/* Weak references avoid dragging in external libraries if the other parts
-   of the program don't use them.  Here we use them, because we don't want
-   every program that uses libintl to depend on libpthread.  This assumes
-   that libpthread would not be loaded after libintl; i.e. if libintl is
-   loaded first, by an executable that does not depend on libpthread, and
-   then a module is dynamically loaded that depends on libpthread, libintl
-   will not be multithread-safe.  */
-
-/* The way to test at runtime whether libpthread is present is to test
-   whether a function pointer's value, such as &pthread_mutex_init, is
-   non-NULL.  However, some versions of GCC have a bug through which, in
-   PIC mode, &foo != NULL always evaluates to true if there is a direct
-   call to foo(...) in the same function.  To avoid this, we test the
-   address of a function in libpthread that we don't use.  */
-
-#  pragma weak pthread_mutex_init
-#  pragma weak pthread_mutex_lock
-#  pragma weak pthread_mutex_unlock
-#  pragma weak pthread_mutex_destroy
-#  pragma weak pthread_rwlock_init
-#  pragma weak pthread_rwlock_rdlock
-#  pragma weak pthread_rwlock_wrlock
-#  pragma weak pthread_rwlock_unlock
-#  pragma weak pthread_rwlock_destroy
-#  pragma weak pthread_once
-#  pragma weak pthread_cond_init
-#  pragma weak pthread_cond_wait
-#  pragma weak pthread_cond_signal
-#  pragma weak pthread_cond_broadcast
-#  pragma weak pthread_cond_destroy
-#  pragma weak pthread_mutexattr_init
-#  pragma weak pthread_mutexattr_settype
-#  pragma weak pthread_mutexattr_destroy
-#  pragma weak pthread_rwlockattr_init
-#  if __GNU_LIBRARY__ > 1
-#   pragma weak pthread_rwlockattr_setkind_np
-#  endif
-#  pragma weak pthread_rwlockattr_destroy
-#  ifndef pthread_self
-#   pragma weak pthread_self
-#  endif
-
-#  if !PTHREAD_IN_USE_DETECTION_HARD
-    /* Considering all platforms with USE_POSIX_THREADS_WEAK, only few symbols
-       can be used to determine whether libpthread is in use.  These are:
-         pthread_mutexattr_gettype
-         pthread_rwlockattr_destroy
-         pthread_rwlockattr_init
-     */
-#   pragma weak pthread_mutexattr_gettype
-#   define pthread_in_use() \
-      (pthread_mutexattr_gettype != NULL || c11_threads_in_use ())
-#  endif
-
-# else
-
-#  if !PTHREAD_IN_USE_DETECTION_HARD
-#   define pthread_in_use() 1
-#  endif
-
-# endif
+/* pthread_in_use() is defined in glthread/once.h.  */
 
 /* -------------------------- gl_lock_t datatype -------------------------- */
 
@@ -327,7 +242,7 @@ typedef pthread_rwlock_t gl_rwlock_t;
 #    endif
 #    define glthread_rwlock_init(LOCK) \
        (pthread_in_use () ? pthread_rwlock_init (LOCK, NULL) : 0)
-#   else /* glibc with bug https://sourceware.org/bugzilla/show_bug.cgi?id=13701 */
+#   else /* glibc with bug https://sourceware.org/PR13701 */
 #    define gl_rwlock_initializer \
        PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP
 #    define glthread_rwlock_init(LOCK) \
@@ -502,26 +417,6 @@ extern int glthread_recursive_lock_destroy_multithreaded (gl_recursive_lock_t *l
 
 # endif
 
-/* -------------------------- gl_once_t datatype -------------------------- */
-
-typedef pthread_once_t gl_once_t;
-# define gl_once_define(STORAGECLASS, NAME) \
-    STORAGECLASS pthread_once_t NAME = PTHREAD_ONCE_INIT;
-# if PTHREAD_IN_USE_DETECTION_HARD || USE_POSIX_THREADS_WEAK
-#  define glthread_once(ONCE_CONTROL, INITFUNCTION) \
-     (pthread_in_use ()                                                        \
-      ? pthread_once (ONCE_CONTROL, INITFUNCTION)                              \
-      : (glthread_once_singlethreaded (ONCE_CONTROL) ? (INITFUNCTION (), 0) : 0))
-# else
-#  define glthread_once(ONCE_CONTROL, INITFUNCTION) \
-     (pthread_in_use ()                                                        \
-      ? glthread_once_multithreaded (ONCE_CONTROL, INITFUNCTION)               \
-      : (glthread_once_singlethreaded (ONCE_CONTROL) ? (INITFUNCTION (), 0) : 0))
-extern int glthread_once_multithreaded (pthread_once_t *once_control,
-                                        void (*init_function) (void));
-# endif
-extern int glthread_once_singlethreaded (pthread_once_t *once_control);
-
 # ifdef __cplusplus
 }
 # endif
@@ -538,7 +433,6 @@ extern int glthread_once_singlethreaded (pthread_once_t *once_control);
 # include "windows-mutex.h"
 # include "windows-rwlock.h"
 # include "windows-recmutex.h"
-# include "windows-once.h"
 
 # ifdef __cplusplus
 extern "C" {
@@ -611,14 +505,6 @@ typedef glwthread_recmutex_t gl_recursive_lock_t;
 # define glthread_recursive_lock_destroy(LOCK) \
     glwthread_recmutex_destroy (LOCK)
 
-/* -------------------------- gl_once_t datatype -------------------------- */
-
-typedef glwthread_once_t gl_once_t;
-# define gl_once_define(STORAGECLASS, NAME) \
-    STORAGECLASS gl_once_t NAME = GLWTHREAD_ONCE_INIT;
-# define glthread_once(ONCE_CONTROL, INITFUNCTION) \
-    (glwthread_once (ONCE_CONTROL, INITFUNCTION), 0)
-
 # ifdef __cplusplus
 }
 # endif
@@ -661,14 +547,6 @@ typedef int gl_recursive_lock_t;
 # define glthread_recursive_lock_lock(NAME) 0
 # define glthread_recursive_lock_unlock(NAME) 0
 # define glthread_recursive_lock_destroy(NAME) 0
-
-/* -------------------------- gl_once_t datatype -------------------------- */
-
-typedef int gl_once_t;
-# define gl_once_define(STORAGECLASS, NAME) \
-    STORAGECLASS gl_once_t NAME = 0;
-# define glthread_once(ONCE_CONTROL, INITFUNCTION) \
-    (*(ONCE_CONTROL) == 0 ? (*(ONCE_CONTROL) = ~ 0, INITFUNCTION (), 0) : 0)
 
 #endif
 
@@ -774,16 +652,6 @@ typedef int gl_once_t;
        if (glthread_recursive_lock_destroy (&NAME)) \
          abort ();                                  \
      }                                              \
-   while (0)
-
-/* -------------------------- gl_once_t datatype -------------------------- */
-
-#define gl_once(NAME, INITFUNCTION) \
-   do                                           \
-     {                                          \
-       if (glthread_once (&NAME, INITFUNCTION)) \
-         abort ();                              \
-     }                                          \
    while (0)
 
 /* ========================================================================= */

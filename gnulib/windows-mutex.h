@@ -1,5 +1,5 @@
 /* Plain mutexes (native Windows implementation).
-   Copyright (C) 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -28,6 +28,7 @@
 typedef struct
         {
           glwthread_initguard_t guard; /* protects the initialization */
+          DWORD owner;
           CRITICAL_SECTION lock;
         }
         glwthread_mutex_t;

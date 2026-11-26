@@ -1,8 +1,10 @@
-# fnmatch_h.m4 serial 7
-dnl Copyright (C) 2009-2021 Free Software Foundation, Inc.
+# fnmatch_h.m4
+# serial 8
+dnl Copyright (C) 2009-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Bruno Haible.
 
@@ -27,20 +29,18 @@ AC_DEFUN_ONCE([gl_FNMATCH_H],
   AC_SUBST([HAVE_FNMATCH_H])
 
   m4_ifdef([gl_POSIXCHECK],
-    [FNMATCH_H=fnmatch.h],
-    [FNMATCH_H=''
+    [GL_GENERATE_FNMATCH_H=true],
+    [GL_GENERATE_FNMATCH_H=false
      if m4_ifdef([gl_ANSI_CXX], [test "$CXX" != no], [false]); then
        dnl Override <fnmatch.h> always, to support the C++ GNULIB_NAMESPACE.
-       FNMATCH_H=fnmatch.h
+       GL_GENERATE_FNMATCH_H=true
      else
        if test $ac_cv_header_fnmatch_h != yes; then
          dnl Provide a substitute <fnmatch.h> file.
-         FNMATCH_H=fnmatch.h
+         GL_GENERATE_FNMATCH_H=true
        fi
      fi
     ])
-  AC_SUBST([FNMATCH_H])
-  AM_CONDITIONAL([GL_GENERATE_FNMATCH_H], [test -n "$FNMATCH_H"])
 
   dnl Check for declarations of anything we want to poison if the
   dnl corresponding gnulib module is not in use.
@@ -53,8 +53,7 @@ dnl Unconditionally enables the replacement of <fnmatch.h>.
 AC_DEFUN([gl_REPLACE_FNMATCH_H],
 [
   gl_FNMATCH_H_REQUIRE_DEFAULTS
-  FNMATCH_H='fnmatch.h'
-  AM_CONDITIONAL([GL_GENERATE_FNMATCH_H], [test -n "$FNMATCH_H"])
+  GL_GENERATE_FNMATCH_H=true
 ])
 
 # gl_FNMATCH_MODULE_INDICATOR([modulename])
