@@ -1,0 +1,12 @@
+[default.extend-words]
+Fo = "Fo"
+mak = "mak"
+Cpy = "Cpy"
+snet = "snet"
+ESPACE = "ESPACE"
+
+[files]
+extend-exclude = [
+"gnulib/**",
+"misc/packcc/**"
+]
