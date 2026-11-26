@@ -2515,7 +2515,20 @@ static parserDefinition* OptlibParser(const char *name, const char *base,
 
 	if (base)
 	{
-		subparser *sub = xCalloc (1, subparser);
+		/* The base parser casts this object to its own, larger,
+		 * subparser struct (e.g. bibTexSubparser).  Allocate as much
+		 * room as that struct needs; a bare `subparser' is not enough
+		 * and makes the base parser read past the end of the object.
+		 * See issue #4517. */
+		size_t subSize = sizeof (subparser);
+		langType baseLang = getNamedLanguage (base, 0);
+		if (baseLang != LANG_IGNORE)
+		{
+			parserDefinition *baseDef = LanguageTable [baseLang].def;
+			if (baseDef->subparserSize > subSize)
+				subSize = baseDef->subparserSize;
+		}
+		subparser *sub = (subparser *)eCalloc (1, subSize);
 
 		sub->direction = direction;
 		dep[0].type = DEPTYPE_SUBPARSER;

@@ -162,7 +162,11 @@ static void findIniconfTags (void)
 			if (sub)
 			{
 				enterSubparser((subparser *)sub);
-				sub->newDataNotify (sub, vStringValue (name), NULL, NULL);
+				/* Not every subparser installed on Iniconf is a
+				 * crafted one; a subparser defined with the optlib
+				 * {base=Iniconf} syntax has no newDataNotify. */
+				if (sub->newDataNotify)
+					sub->newDataNotify (sub, vStringValue (name), NULL, NULL);
 				leaveSubparser ();
 			}
 
@@ -212,7 +216,8 @@ static void findIniconfTags (void)
 					if (sub)
 					{
 						enterSubparser ((subparser *)sub);
-						sub->newDataNotify (sub,
+						if (sub->newDataNotify)
+							sub->newDataNotify (sub,
 											(vStringLength (scope) > 0)
 											? vStringValue (scope)
 											: NULL,
@@ -250,6 +255,7 @@ extern parserDefinition* IniconfParser (void)
 	def->extensions = extensions;
 	def->parser     = findIniconfTags;
 	def->useCork   = CORK_QUEUE;
+	def->subparserSize = sizeof (iniconfSubparser);
 
 	return def;
 }

@@ -128,6 +128,14 @@ struct sParserDefinition {
 									  you don't need this parser-global
 									  allowNullTag; set tagEntryInfo::allowNullTag
 									  instead. */
+	/* Size of the subparser struct this parser expects when it acts as a
+	 * base parser for a subparser.  A base parser embeds `subparser' as the
+	 * first member of a larger struct holding its own callbacks, and casts
+	 * the generic subparser pointer back to that larger struct.  When a
+	 * subparser is defined with the optlib `{base=...}' syntax, the main
+	 * part allocates the object, so it must know how much room the base
+	 * parser needs.  0 means the base parser uses a bare `subparser'. */
+	size_t subparserSize;
 	bool requestAutomaticFQTag;
 	tagRegexTable *tagRegexTable;
 	unsigned int tagRegexCount;
