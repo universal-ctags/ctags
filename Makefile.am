@@ -64,9 +64,9 @@ EXTRA_DIST   = README.md NEWS.rst autogen.sh \
 	       $(WIN32_HEADS) $(WIN32_SRCS) mk_mingw.mak mk_mvc.mak \
 	       win32/mkstemp/COPYING.MinGW-w64-runtime.txt \
 	       win32/ctags.rc win32/ctags.exe.manifest win32/resource.h \
-	       win32/ctags_vs2013.sln \
-	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
-	       win32/ctags_vs2013.vcxproj.in win32/ctags_vs2013.vcxproj.filters.in \
+	       win32/ctags.sln \
+	       win32/ctags.vcxproj win32/ctags.vcxproj.filters \
+	       win32/ctags.vcxproj.in win32/ctags.vcxproj.filters.in \
 	       win32/GNUmakefile \
 	       win32/gen-repoinfo.bat \
 	       misc/txt2cstr \
