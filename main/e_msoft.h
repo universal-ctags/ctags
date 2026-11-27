@@ -29,6 +29,8 @@
 #define HAVE_FNMATCH_H 1
 #define HAVE_PUTENV 1
 #define TMPDIR "\\"
+#define HAVE_GETCURRENTTHREADSTACKLIMITS 1
+#define NEED_PROTO_GETCURRENTTHREADSTACKLIMITS 0 /* the function declared in windows.h  */
 
 int mkstemp (char *template_name);
 
