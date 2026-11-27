@@ -1,0 +1,30 @@
+inline	input.py	/^inline = True$/;"	v	roles:def
+extern	input.py	/^extern = {}$/;"	v	roles:def
+cimport	input.py	/^cimport = 1$/;"	v	roles:def
+cdef	input.py	/^cdef = 2$/;"	v	roles:def
+cpdef	input.py	/^cpdef = 3$/;"	v	roles:def
+pkg	input.py	/^from pkg import inline, other$/;"	i	roles:namespace
+inline	input.py	/^from pkg import inline, other$/;"	Y	module:pkg	roles:imported
+other	input.py	/^from pkg import inline, other$/;"	Y	module:pkg	roles:imported
+pkg	input.py	/^from pkg import thing as extern$/;"	i	roles:namespace
+thing	input.py	/^from pkg import thing as extern$/;"	Y	module:pkg	roles:indirectlyImported
+extern	input.py	/^from pkg import thing as extern$/;"	Y	roles:def	nameref:unknown:thing
+mod	input.py	/^import mod as cdef$/;"	i	roles:indirectlyImported
+cdef	input.py	/^import mod as cdef$/;"	I	roles:def	nameref:module:mod
+Options	input.py	/^class Options:$/;"	c	roles:def
+inline	input.py	/^    inline = False$/;"	v	class:Options	roles:def
+extern	input.py	/^    extern: bool = True$/;"	v	class:Options	typeref:typename:bool	roles:def
+cdef	input.py	/^    def cdef(self, source):$/;"	m	class:Options	signature:(self, source)	roles:def
+self	input.py	/^    def cdef(self, source):$/;"	z	member:Options.cdef	file:	roles:def
+source	input.py	/^    def cdef(self, source):$/;"	z	member:Options.cdef	file:	roles:def
+cpdef	input.py	/^    def cpdef (self):$/;"	m	class:Options	signature:(self)	roles:def
+self	input.py	/^    def cpdef (self):$/;"	z	member:Options.cpdef	file:	roles:def
+inline	input.py	/^    def inline(self):$/;"	m	class:Options	signature:(self)	roles:def
+self	input.py	/^    def inline(self):$/;"	z	member:Options.inline	file:	roles:def
+extern	input.py	/^def extern(name):$/;"	f	signature:(name)	roles:def
+name	input.py	/^def extern(name):$/;"	z	function:extern	file:	roles:def
+cimport	input.py	/^def cimport():$/;"	f	signature:()	roles:def
+inline	input.py	/^class inline:$/;"	c	roles:def
+last	input.py	/^def last(inline, extern=None):$/;"	f	signature:(inline, extern=None)	roles:def
+inline	input.py	/^def last(inline, extern=None):$/;"	z	function:last	file:	roles:def
+extern	input.py	/^def last(inline, extern=None):$/;"	z	function:last	file:	roles:def
