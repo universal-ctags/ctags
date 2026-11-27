@@ -2007,6 +2007,12 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 			.localRoleIndex = CR_HEADER_LOCAL,
 		},
 
+		.datafile = {
+			.kindIndex = CXXTagKindEMBED,
+			.systemRoleIndex = CR_DATAFILE_SYSTEM,
+			.localRoleIndex = CR_DATAFILE_LOCAL,
+		},
+
 		.macrodefFieldIndex = g_cxx.pFieldOptions[CXXTagFieldMacrodef].ftype,
 	};
 

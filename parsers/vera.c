@@ -2230,6 +2230,12 @@ static rescanReason findCTags (const unsigned int passCount)
 			.localRoleIndex = VR_HEADER_LOCAL,
 		},
 
+		.datafile = {
+			.kindIndex = KIND_GHOST_INDEX,
+			.systemRoleIndex = ROLE_DEFINITION_INDEX,
+			.localRoleIndex = ROLE_DEFINITION_INDEX,
+		},
+
 		.macrodefFieldIndex = FIELD_UNKNOWN,
 	};
 

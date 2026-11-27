@@ -35,6 +35,7 @@ enum CXXTagCommonKind
 	CXXTagKindPARAMETER,
 	CXXTagKindLABEL,
 	CXXTagKindMACROPARAM,
+	CXXTagKindEMBED,
 
 	CXXTagCommonKindCount
 };
@@ -213,6 +214,11 @@ typedef enum {
 	CR_HEADER_SYSTEM,
 	CR_HEADER_LOCAL,
 } cHeaderRole;
+
+typedef enum {
+	CR_DATAFILE_SYSTEM,
+	CR_DATAFILE_LOCAL,
+} cDatafileRole;
 
 typedef enum {
 	CXXR_HEADER_IMPORTED = CR_HEADER_LOCAL + 1,
