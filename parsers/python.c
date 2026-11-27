@@ -479,6 +479,46 @@ static void ungetToken (tokenInfo *const token)
 	copyToken (NextToken, token);
 }
 
+/* cdef, cimport, cpdef, extern and inline are keywords only in Cython.  In
+ * Python they are ordinary names, and both languages use this parser. */
+static bool isCythonKeyword (const tokenInfo *const token)
+{
+	return (token->keyword == KEYWORD_cdef ||
+	        token->keyword == KEYWORD_cpdef ||
+	        token->keyword == KEYWORD_extern ||
+	        token->keyword == KEYWORD_inline ||
+	        (token->keyword == KEYWORD_import &&
+	         strcmp (vStringValue (token->string), "cimport") == 0));
+}
+
+/* Looks at what follows a Cython keyword to tell it apart from a Python name,
+ * as in "cdef int x" against "cdef = 1". */
+static bool isFollowedByCythonSyntax (const tokenInfo *const token)
+{
+	int c = getcFromInputFile ();
+	bool hasSpace = false;
+
+	while (c == ' ' || c == '\t')
+	{
+		hasSpace = true;
+		c = getcFromInputFile ();
+	}
+	ungetcToInputFile (c);
+	if (hasSpace)
+		ungetcToInputFile (' ');
+
+	/* '(' can open a tuple return type: "cdef inline (int) f(int i)" */
+	if ((isIdentifierChar (c) && ! isdigit (c)) || c == '(' || c == '\\')
+		return true;
+
+	if (token->keyword == KEYWORD_cdef || token->keyword == KEYWORD_cpdef)
+		return c == ':';
+	if (token->keyword == KEYWORD_import)
+		return c == '*';
+
+	return false;
+}
+
 static void readTokenFull (tokenInfo *const token, bool inclWhitespaces)
 {
 	int c;
@@ -669,6 +709,8 @@ getNextChar:
 				/* FIXME: handle U, B, R and F string prefixes? */
 				readIdentifier (token->string, c);
 				token->keyword = lookupKeyword (vStringValue (token->string), Lang_python);
+				if (isCythonKeyword (token) && ! isFollowedByCythonSyntax (token))
+					token->keyword = KEYWORD_NONE;
 				if (token->keyword == KEYWORD_NONE
 					|| isSoftKeyword(token->keyword))
 					token->type = TOKEN_IDENTIFIER;
@@ -1175,6 +1217,12 @@ static bool parseClassOrDef (tokenInfo *const token,
 	else
 	{
 		readToken (token);
+		/* what follows "def" or "class" is a name, as in "def cdef(self):" */
+		if (isCythonKeyword (token))
+		{
+			token->type = TOKEN_IDENTIFIER;
+			token->keyword = KEYWORD_NONE;
+		}
 		if (token->type != TOKEN_IDENTIFIER)
 		{
 			TRACE_LEAVE_TEXT("token->type != TOKEN_IDENTIFIER");
