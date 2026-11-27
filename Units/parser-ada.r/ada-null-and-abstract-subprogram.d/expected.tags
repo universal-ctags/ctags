@@ -1,0 +1,11 @@
+Shapes	input.adb	/^package Shapes is$/;"	P
+Shape	input.adb	/^  type Shape is abstract tagged null record;$/;"	t	packspec:Shapes
+Draw	input.adb	/^  procedure Draw (S : in Shape) is abstract;$/;"	R	packspec:Shapes
+Area	input.adb	/^  function Area (S : in Shape) return Float is abstract;$/;"	R	packspec:Shapes
+Reset	input.adb	/^  procedure Reset (S : in out Shape) is null;$/;"	r	packspec:Shapes
+Move	input.adb	/^  procedure Move (S : in out Shape; DX, DY : in Float);$/;"	R	packspec:Shapes
+Lists	input.adb	/^package body Lists is$/;"	p
+Finalize	input.adb	/^  procedure Finalize (Item : in out List_T) is null;$/;"	r	package:Lists	file:
+Assign	input.adb	/^  procedure Assign (To : in out List_T; From : in List_T) is$/;"	r	package:Lists	file:
+Count	input.adb	/^    Count : Natural := 0;$/;"	v	subprogram:Assign	file:
+Length	input.adb	/^  function Length (L : in List_T) return Natural is$/;"	r	package:Lists	file:
