@@ -267,7 +267,8 @@ gl_EARLY
 
 AC_ARG_VAR(RANLIB,[ranlib command or path])
 AC_PROG_RANLIB
-PRETTY_ARG_VAR([AR], [ar command or path], [ar])
+AC_ARG_VAR(AR,[ar command or path])
+AM_PROG_AR
 AC_C_BIGENDIAN
 
 if test "$cross_compiling" = "yes"; then
